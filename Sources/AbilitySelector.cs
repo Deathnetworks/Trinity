@@ -1,0 +1,78 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Reflection;
+using System.Threading;
+using System.Windows;
+using System.Windows.Controls;
+using System.IO;
+using System.Windows.Markup;
+using Zeta;
+using Zeta.Common;
+using Zeta.Common.Plugins;
+using Zeta.CommonBot;
+using Zeta.CommonBot.Profile;
+using Zeta.CommonBot.Profile.Composites;
+using Zeta.Internals;
+using Zeta.Internals.Actors;
+using Zeta.Internals.Actors.Gizmos;
+using Zeta.Internals.SNO;
+using Zeta.Navigation;
+using Zeta.TreeSharp;
+using Zeta.XmlEngine;
+namespace GilesTrinity
+{
+    public partial class GilesTrinity : IPlugin
+    {
+        /// <summary>
+        /// A default power in case we can't use anything else
+        /// </summary>
+        private static GilesPower defaultPower = new GilesPower(SNOPower.None, 0, vNullLocation, -1, -1, 0, 0, false);
+
+        /// <summary>
+        /// Returns an appropriately selected SNOPower and related information
+        /// </summary>
+        /// <param name="bCurrentlyAvoiding">Are we currently avoiding?</param>
+        /// <param name="bOOCBuff">Buff Out Of Combat</param>
+        /// <param name="bDestructiblePower">Is this for breaking destructables?</param>
+        /// <returns></returns>
+        public static GilesPower GilesAbilitySelector(bool bCurrentlyAvoiding = false, bool bOOCBuff = false, bool bDestructiblePower = false)
+        {
+            // Refresh buffs once to save buff-check-spam
+            GilesRefreshBuffs();
+            // See if archon just appeared/disappeared, so update the hotbar
+            if (bRefreshHotbarAbilities)
+                GilesRefreshHotbar(GilesHasBuff(SNOPower.Wizard_Archon));
+            // Extra height thingy, not REALLY used as it was originally going to be, will probably get phased out...
+            float iThisHeight = iExtraHeight;
+            // Switch based on the cached character class
+            switch (iMyCachedActorClass)
+            {
+                // * Barbs
+                case ActorClass.Barbarian: 
+                    return GetBarbarianPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
+
+                // Monks
+                case ActorClass.Monk: 
+                    return GetMonkPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
+
+                // Wizards
+                case ActorClass.Wizard: 
+                    return GetWizardPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
+
+                // Witch Doctors
+                case ActorClass.WitchDoctor:
+                    return GetWitchDoctorPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower, iThisHeight);
+
+                // Demon Hunters
+                case ActorClass.DemonHunter:
+                    return GetDemonHunterPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
+            }
+            return defaultPower;
+        }
+
+    }
+}

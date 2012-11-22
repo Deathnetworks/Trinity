@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{997F24E1-4CD7-42C7-A5B5-4983636D5F2B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>ClassLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>GilesTrinity</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Demonbuddy">
+      <HintPath>..\Demonbuddy.exe</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BlankRoutines.cs" />
+    <Compile Include="Abilities\Barbarian.cs" />
+    <Compile Include="Abilities\Monk.cs" />
+    <Compile Include="Abilities\Wizard.cs" />
+    <Compile Include="Abilities\DemonHunter.cs" />
+    <Compile Include="Abilities\WitchDoctor.cs" />
+    <Compile Include="Classes\GilesSettings.cs" />
+    <Compile Include="Classes\GilesObjstacle.cs" />
+    <Compile Include="Classes\GilesPower.cs" />
+    <Compile Include="Classes\GilesCachedACDItem.cs" />
+    <Compile Include="Classes\GilesGameBalanceDataCache.cs" />
+    <Compile Include="Classes\GilesItemStats.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Configuration.cs" />
+    <Compile Include="Behaviors.cs" />
+    <Compile Include="AbilitySelector.cs" />
+    <Compile Include="BotStart.cs" />
+    <Compile Include="StashSellSalvage.cs" />
+    <Compile Include="Weighting.cs" />
+    <Compile Include="GilesGlobalOverlord.cs" />
+    <Compile Include="Movement.cs" />
+    <Compile Include="ItemHandling.cs" />
+    <Compile Include="Prowl.cs" />
+    <Compile Include="Plugin.cs" />
+    <Compile Include="Variables.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="Classes\GilesObject.cs" />
+    <Compile Include="Classes\GilesPlayerCache.cs" />
+    <Compile Include="Dictionaries.cs" />
+    <Compile Include="StuckHandler.cs" />
+    <Compile Include="Classes\GilesPlayerMover.cs" />
+    <Compile Include="!Template.cs" />
+    <Compile Include="RefreshDiaObject.cs" />
+    <Compile Include="GilesTrinity.cs" />
+    <Compile Include="RefreshDiaObjects.cs" />
+    <Compile Include="XmlTags\TrinityIfRandom.cs" />
+    <Compile Include="XmlTags\TrinityIfSNOInRange.cs" />
+    <Compile Include="XmlTags\TrinityIf.cs" />
+    <Compile Include="XmlTags\TrinityInteract.cs" />
+    <Compile Include="XmlTags\TrinityLoadProfile.cs" />
+    <Compile Include="XmlTags\TrinityLog.cs" />
+    <Compile Include="XmlTags\TrinityMaxDeaths.cs" />
+    <Compile Include="XmlTags\TrinityMoveToSNO.cs" />
+    <Compile Include="XmlTags\TrinityMoveTo.cs" />
+    <Compile Include="XmlTags\TrinityRandomRoll.cs" />
+    <Compile Include="XmlTags\TrinityTownRun.cs" />
+    <Compile Include="XmlTags\TrinityUseOnce.cs" />
+    <Compile Include="XmlTags\TrinityUseReset.cs" />
+    <Compile Include="XmlTags\TrinityUseStop.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="GilesTrinity.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+</Project>

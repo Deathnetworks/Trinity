@@ -1,0 +1,316 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Reflection;
+using System.Threading;
+using System.Windows;
+using System.Windows.Controls;
+using System.IO;
+using System.Windows.Markup;
+using Zeta;
+using Zeta.Common;
+using Zeta.Common.Plugins;
+using Zeta.CommonBot;
+using Zeta.CommonBot.Profile;
+using Zeta.CommonBot.Profile.Composites;
+using Zeta.Internals;
+using Zeta.Internals.Actors;
+using Zeta.Internals.Actors.Gizmos;
+using Zeta.Internals.SNO;
+using Zeta.Navigation;
+using Zeta.TreeSharp;
+using Zeta.XmlEngine;
+using Zeta.Pathfinding;
+namespace GilesTrinity
+{
+    public partial class GilesTrinity : IPlugin
+    {
+        // Find fresh targets, start main BT if needed, cast any buffs needed etc.
+        private static bool GilesGlobalOverlord(object ret)
+        {
+            // If we aren't in the game of a world is loading, don't do anything yet
+            if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
+            {
+                lastChangedZigZag = DateTime.Today;
+                vPositionLastZigZagCheck = Vector3.Zero;
+                return false;
+            }
+            if (gp == null)
+                gp = Navigator.SearchGridProvider;
+            gp.Update();
+            if (pf == null)
+                pf = new PathFinder(gp);
+            // Big main-bot pause button
+            if (bMainBotPaused)
+            {
+                return true;
+            }
+            // World ID safety caching incase it's ever unavailable
+            if (ZetaDia.CurrentWorldDynamicId != -1)
+                iCurrentWorldID = ZetaDia.CurrentWorldDynamicId;
+            // Game difficulty, used really for vault on DH's
+            if (ZetaDia.Service.CurrentHero.CurrentDifficulty != GameDifficulty.Invalid)
+                iCurrentGameDifficulty = ZetaDia.Service.CurrentHero.CurrentDifficulty;
+            // Refresh player buffs (to check for archon)
+            GilesRefreshBuffs();
+            // Store all of the player's abilities every now and then, to keep it cached and handy, also check for critical-mass timer changes etc.
+            iCombatLoops++;
+            if (!bMappedPlayerAbilities || iCombatLoops >= 50 || bRefreshHotbarAbilities)
+            {
+                // Update the cached player's cache
+                ActorClass tempClass = ActorClass.Invalid;
+                try
+                {
+                    tempClass = ZetaDia.Actors.Me.ActorClass;
+                }
+                catch
+                {
+                    Logging.WriteDiagnostic("[Trinity] Safely handled exception trying to get character class.");
+                }
+                if (tempClass != ActorClass.Invalid)
+                    iMyCachedActorClass = ZetaDia.Actors.Me.ActorClass;
+                iCombatLoops = 0;
+                GilesRefreshHotbar(GilesHasBuff(SNOPower.Wizard_Archon));
+                dictAbilityRepeatDelay = new Dictionary<SNOPower, int>(dictAbilityRepeatDefaults);
+                if (settings.bEnableCriticalMass && (iMyCachedActorClass == ActorClass.Wizard || iMyCachedActorClass == ActorClass.WitchDoctor))
+                {
+                    dictAbilityRepeatDelay[SNOPower.Wizard_FrostNova] = 25;
+                    dictAbilityRepeatDelay[SNOPower.Wizard_ExplosiveBlast] = 25;
+                    dictAbilityRepeatDelay[SNOPower.Wizard_DiamondSkin] = 100;
+                    dictAbilityRepeatDelay[SNOPower.Wizard_SlowTime] = 6000;
+                    dictAbilityRepeatDelay[SNOPower.Wizard_WaveOfForce] = 1500;
+                    dictAbilityRepeatDelay[SNOPower.Wizard_MirrorImage] = 1500;
+                    dictAbilityRepeatDelay[SNOPower.Wizard_Archon_ArcaneBlast] = 1500;
+                    dictAbilityRepeatDelay[SNOPower.Wizard_Teleport] = 2700;
+                    dictAbilityRepeatDelay[SNOPower.Wizard_Archon_SlowTime] = 1500;
+                    dictAbilityRepeatDelay[SNOPower.Wizard_Archon_Teleport] = 2700;
+                    dictAbilityRepeatDelay[SNOPower.Witchdoctor_SoulHarvest] = 1000;
+                    dictAbilityRepeatDelay[SNOPower.Witchdoctor_SpiritWalk] = 1000;
+                    dictAbilityRepeatDelay[SNOPower.Witchdoctor_Horrify] = 1000;
+                    dictAbilityRepeatDelay[SNOPower.Witchdoctor_Gargantuan] = 20000;
+                    dictAbilityRepeatDelay[SNOPower.Witchdoctor_SummonZombieDog] = 20000;
+                    dictAbilityRepeatDelay[SNOPower.Witchdoctor_GraspOfTheDead] = 500;
+                    dictAbilityRepeatDelay[SNOPower.Witchdoctor_SpiritBarrage] = 2000;
+                    dictAbilityRepeatDelay[SNOPower.Witchdoctor_Locust_Swarm] = 2000;
+                    dictAbilityRepeatDelay[SNOPower.Witchdoctor_Haunt] = 2000;
+                    dictAbilityRepeatDelay[SNOPower.Witchdoctor_Hex] = 3000;
+                    dictAbilityRepeatDelay[SNOPower.Witchdoctor_MassConfusion] = 15000;
+                    dictAbilityRepeatDelay[SNOPower.Witchdoctor_FetishArmy] = 20000;
+                    dictAbilityRepeatDelay[SNOPower.Witchdoctor_BigBadVoodoo] = 20000;
+                }
+                if (settings.bWrath90Seconds && iMyCachedActorClass == ActorClass.Barbarian)
+                {
+                    dictAbilityRepeatDelay[SNOPower.Barbarian_Earthquake] = 90500;
+                    dictAbilityRepeatDelay[SNOPower.Barbarian_CallOfTheAncients] = 90500;
+                    dictAbilityRepeatDelay[SNOPower.Barbarian_WrathOfTheBerserker] = 90500;
+                }
+                // Pick an appropriate health set etc. based on class
+                switch (iMyCachedActorClass)
+                {
+                    case ActorClass.Barbarian:
+                        // What health % should we use a potion, or look for a globe
+                        iEmergencyHealthPotionLimit = settings.dEmergencyHealthPotionBarb;
+                        iEmergencyHealthGlobeLimit = settings.dEmergencyHealthGlobeBarb;
+                        iKiteDistance = settings.iKiteDistanceBarb;
+                        // The health percentage to avoid these objects at 
+                        dictAvoidanceHealth = new Dictionary<int, double>(dictAvoidanceHealthBarb);
+                        break;
+                    case ActorClass.Monk:
+                        // What health % should we use a potion, or look for a globe
+                        iEmergencyHealthPotionLimit = settings.dEmergencyHealthPotionMonk;
+                        iEmergencyHealthGlobeLimit = settings.dEmergencyHealthGlobeMonk;
+                        iKiteDistance = 0;
+                        // The health percentage to avoid these objects at 
+                        dictAvoidanceHealth = new Dictionary<int, double>(dictAvoidanceHealthMonk);
+                        break;
+                    case ActorClass.Wizard:
+                        // What health % should we use a potion, or look for a globe
+                        iEmergencyHealthPotionLimit = settings.dEmergencyHealthPotionWiz;
+                        iEmergencyHealthGlobeLimit = settings.dEmergencyHealthGlobeWiz;
+                        iKiteDistance = settings.iKiteDistanceWiz;
+                        // The health percentage to avoid these objects at 
+                        dictAvoidanceHealth = new Dictionary<int, double>(dictAvoidanceHealthWizard);
+                        break;
+                    case ActorClass.WitchDoctor:
+                        // What health % should we use a potion, or look for a globe
+                        iEmergencyHealthPotionLimit = settings.dEmergencyHealthPotionWitch;
+                        iEmergencyHealthGlobeLimit = settings.dEmergencyHealthGlobeWitch;
+                        iKiteDistance = settings.iKiteDistanceWitch;
+                        // The health percentage to avoid these objects at 
+                        dictAvoidanceHealth = new Dictionary<int, double>(dictAvoidanceHealthWitch);
+                        break;
+                    case ActorClass.DemonHunter:
+                        // What health % should we use a potion, or look for a globe
+                        iEmergencyHealthPotionLimit = settings.dEmergencyHealthPotionDemon;
+                        iEmergencyHealthGlobeLimit = settings.dEmergencyHealthGlobeDemon;
+                        iKiteDistance = settings.iKiteDistanceDemon;
+                        // The health percentage to avoid these objects at 
+                        dictAvoidanceHealth = new Dictionary<int, double>(dictAvoidanceHealthDemon);
+                        break;
+                }
+            }
+            // Clear target current and reset key variables used during the target-handling function
+
+            //CurrentTarget = null;
+            bDontMoveMeIAmDoingShit = false;
+            iTimesBlockedMoving = 0;
+            bAlreadyMoving = false;
+            lastMovementCommand = DateTime.Today;
+            bAvoidDirectionBlacklisting = false;
+            bWaitingForPower = false;
+            bWaitingAfterPower = false;
+            bWaitingForPotion = false;
+            bWasRootedLastTick = false;
+
+            ClearBlacklists();
+
+            // Let's calculate whether or not we want a new target list... update at least once every 150 milliseconds in main decorator
+            bool bShouldRefreshDiaObjects = DateTime.Now.Subtract(lastRefreshedObjects).TotalMilliseconds >= 150;
+            // So, do we want a new target or not?
+            if (bShouldRefreshDiaObjects)
+            {
+                // Update player data
+                UpdateCachedPlayerData();
+                // Check for death / player being dead
+                if (playerStatus.dCurrentHealthPct <= 0)
+                {
+                    return false;
+                }
+                RefreshDiaObjectCache();
+
+            }
+            else
+            {
+                // Return false here means we only do all of the below OOC stuff at max once every 150ms
+                return false;
+            }
+
+            // We have a target, start the target handler!
+            if (CurrentTarget != null)
+            {
+                bWholeNewTarget = true;
+                bDontMoveMeIAmDoingShit = true;
+                bPickNewAbilities = true;
+                return true;
+            }
+
+            // Pop a potion when necessary
+            if (playerStatus.dCurrentHealthPct <= iEmergencyHealthPotionLimit)
+            {
+                if (!playerStatus.bIsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
+                {
+                    ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).FirstOrDefault();
+                    if (thisBestPotion != null)
+                    {
+                        WaitWhileAnimating(4, true);
+                        ZetaDia.Me.Inventory.UseItem((thisBestPotion.DynamicId));
+                    }
+                    dictAbilityLastUse[SNOPower.DrinkHealthPotion] = DateTime.Now;
+                    WaitWhileAnimating(3, true);
+                }
+            }
+
+            sStatusText = "[Trinity] No more targets - DemonBuddy/profile management is now in control";
+
+            if (settings.bDebugInfo && bResetStatusText)
+            {
+                bResetStatusText = false;
+                BotMain.StatusText = sStatusText;
+            }
+            
+            // Nothing to do... do we have some maintenance we can do instead, like out of combat buffing?
+            lastChangedZigZag = DateTime.Today;
+            vPositionLastZigZagCheck = Vector3.Zero;
+            // Out of combat buffing etc. but only if we don't want to return to town etc.
+            ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
+            if (!playerStatus.bIsInTown && !bWantToTownRun && !bGilesForcedVendoring && myAnimationState != null
+                && myAnimationState.State != AnimationState.Attacking
+                && myAnimationState.State != AnimationState.Casting
+                && myAnimationState.State != AnimationState.Channeling)
+            {
+                bDontSpamOutofCombat = false;
+                powerBuff = GilesAbilitySelector(false, true, false);
+                if (powerBuff.SNOPower != SNOPower.None)
+                {
+                    WaitWhileAnimating(4, true);
+                    ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.vTargetLocation, powerBuff.iTargetWorldID, powerBuff.iTargetGUID);
+                    powerLastSnoPowerUsed = powerBuff.SNOPower;
+                    dictAbilityLastUse[powerBuff.SNOPower] = DateTime.Now;
+                    WaitWhileAnimating(3, true);
+                }
+            }
+            else
+            {
+                // Check if we are portalling to town, if so increase our kill radius temporarily
+                if (myAnimationState != null)
+                {
+                    switch (myAnimationState.Current)
+                    {
+                        case SNOAnim.barbarian_male_HTH_Recall_Channel_01:
+                        case SNOAnim.Barbarian_Female_HTH_Recall_Channel_01:
+                        case SNOAnim.Monk_Male_recall_channel:
+                        case SNOAnim.Monk_Female_recall_channel:
+                        case SNOAnim.WitchDoctor_Male_recall_channel:
+                        case SNOAnim.WitchDoctor_Female_recall_channel:
+                        case SNOAnim.Wizard_Male_HTH_recall_channel:
+                        case SNOAnim.Wizard_Female_HTH_recall_channel:
+                        case SNOAnim.Demonhunter_Male_HTH_recall_channel:
+                        case SNOAnim.Demonhunter_Female_HTH_recall_channel:
+                            iKeepKillRadiusExtendedFor = 20;
+                            break;
+                    }
+                }
+            }
+            CurrentTarget = null;
+
+            // Ok let DemonBuddy do stuff this loop, since we're done for the moment
+            //Logging.WriteDiagnostic(sStatusText);
+
+            return false;
+        }
+
+        private static void ClearBlacklists()
+        {
+            // Clear the temporary blacklist every 90 seconds (default was 90)
+            if (DateTime.Now.Subtract(dateSinceBlacklist90Clear).TotalSeconds > 90)
+            {
+                dateSinceBlacklist90Clear = DateTime.Now;
+                hashRGUIDIgnoreBlacklist90 = new HashSet<int>();
+            }
+            // Clear the full blacklist every 60 seconds (default was 60)
+            if (DateTime.Now.Subtract(dateSinceBlacklist60Clear).TotalSeconds > 60)
+            {
+                dateSinceBlacklist60Clear = DateTime.Now;
+                hashRGUIDIgnoreBlacklist60 = new HashSet<int>();
+                RefreshProfileBlacklists();
+            }
+            // Clear the temporary blacklist every 90 seconds (default was 90)
+            if (DateTime.Now.Subtract(dateSinceBlacklist15Clear).TotalSeconds > 15)
+            {
+                dateSinceBlacklist15Clear = DateTime.Now;
+                hashRGUIDIgnoreBlacklist15 = new HashSet<int>();
+            }
+        }
+        /// <summary>
+        /// Adds profile blacklist entries to the Giles Blacklist
+        /// </summary>
+        private static void RefreshProfileBlacklists()
+        {
+            foreach (TargetBlacklist b in Zeta.CommonBot.ProfileManager.CurrentProfile.TargetBlacklists)
+            {
+                if (!hashSNOIgnoreBlacklist.Contains(b.ActorId))
+                {
+                    Logging.WriteDiagnostic("Adding Profile TargetBlacklist {0} to Giles Blacklists", b.ActorId);
+                    hashSNOIgnoreBlacklist.Add(b.ActorId);
+                }
+                if (!hashActorSNOIgnoreBlacklist.Contains(b.ActorId))
+                {
+                    hashActorSNOIgnoreBlacklist.Add(b.ActorId);
+                }
+            }
+        }
+    }
+}

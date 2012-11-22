@@ -1,0 +1,3 @@
+1 - Clone Git Repository to your local folder
+2 - Put DemonBuddy.exe in root of local folder (I used 285) 
+3 - Launch UnifiedTrinitiy.sln with Visual Studio 2010 or 2012 

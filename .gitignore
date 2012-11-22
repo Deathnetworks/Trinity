@@ -1,0 +1,5 @@
+*.exe
+/Sources/bin
+/Sources/obj
+*.suo
+*.suo
