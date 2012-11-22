@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Zeta.Common;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Profile;
@@ -13,12 +11,9 @@ namespace GilesTrinity.XmlTags
 {
     // Trinity If perfectly mimics DB If - this is just for experimenting
     [XmlElement("TrinityIf")]
-    public class TrinityIf : ComplexNodeTag, IPythonExecutable
+    public class TrinityIf : BaseComplexNodeTag, IPythonExecutable
     {
-        private bool? bComplexDoneCheck;
-        private bool? bAlreadyCompleted;
         private Func<bool> funcConditionalProcess;
-        private static Func<ProfileBehavior, bool> funcBehaviorProcess;
         private string sConditionString;
 
         public virtual void CompilePython()
@@ -36,7 +31,7 @@ namespace GilesTrinity.XmlTags
             return new Zeta.TreeSharp.Decorator(new CanRunDecoratorDelegate(CheckNotAlreadyDone), decorated);
         }
 
-        public bool GetConditionExec()
+        public override bool GetConditionExec()
         {
             bool flag;
             try
@@ -56,23 +51,9 @@ namespace GilesTrinity.XmlTags
             return flag;
         }
 
-        private bool CheckNotAlreadyDone(object object_0)
+        private bool CheckNotAlreadyDone(object obj)
         {
             return !IsDone;
-        }
-
-        public override void ResetCachedDone()
-        {
-            foreach (ProfileBehavior behavior in Body)
-            {
-                behavior.ResetCachedDone();
-            }
-            bComplexDoneCheck = null;
-        }
-
-        private static bool CheckBehaviorIsDone(ProfileBehavior profileBehavior)
-        {
-            return profileBehavior.IsDone;
         }
 
         [XmlAttribute("condition", true)]
@@ -97,40 +78,6 @@ namespace GilesTrinity.XmlTags
             set
             {
                 funcConditionalProcess = value;
-            }
-        }
-
-        public override bool IsDone
-        {
-            get
-            {
-                // Make sure we've not already completed this if
-                if (bAlreadyCompleted.HasValue && bAlreadyCompleted == true)
-                {
-                    return true;
-                }
-
-                // First check the actual "if" conditions if we haven't already
-                if (!bComplexDoneCheck.HasValue)
-                {
-                    bComplexDoneCheck = new bool?(GetConditionExec());
-                }
-                if (bComplexDoneCheck == false)
-                {
-                    return true;
-                }
-
-                // Ok we've already checked that and it was false FIRST check, so now go purely on behavior-done flag
-                if (funcBehaviorProcess == null)
-                {
-                    funcBehaviorProcess = new Func<ProfileBehavior, bool>(CheckBehaviorIsDone);
-                }
-                bool bAllChildrenDone = Body.All<ProfileBehavior>(funcBehaviorProcess);
-                if (bAllChildrenDone)
-                {
-                    bAlreadyCompleted = true;
-                }
-                return bAllChildrenDone;
             }
         }
     }

@@ -1,28 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Net;
-using System.Web;
-using System.Reflection;
 using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.IO;
-using System.Windows.Markup;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
-using Zeta.CommonBot.Profile;
-using Zeta.CommonBot.Profile.Composites;
-using Zeta.Internals;
 using Zeta.Internals.Actors;
-using Zeta.Internals.Actors.Gizmos;
-using Zeta.Internals.SNO;
-using Zeta.Navigation;
-using Zeta.TreeSharp;
-using Zeta.XmlEngine;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -64,15 +49,20 @@ namespace GilesTrinity
                 Logging.WriteDiagnostic("[Trinity] Safely handled exception for grabbing player data.");
             }
         }
-        // Quick and Dirty routine just to force a wait until the character is "free"
-        public static void WaitWhileAnimating(int iMaxSafetyLoops = 10, bool bWaitForAttacking = false)
+
+        /// <summary>
+        /// Quick and Dirty routine just to force a wait until the character is "free"
+        /// </summary>
+        /// <param name="maxSafetyLoops">The max safety loops.</param>
+        /// <param name="waitForAttacking">if set to <c>true</c> wait for attacking.</param>
+        public static void WaitWhileAnimating(int maxSafetyLoops = 10, bool waitForAttacking = false)
         {
             bool bKeepLooping = true;
             int iSafetyLoops = 0;
             while (bKeepLooping)
             {
                 iSafetyLoops++;
-                if (iSafetyLoops > iMaxSafetyLoops)
+                if (iSafetyLoops > maxSafetyLoops)
                     bKeepLooping = false;
                 bool bIsAnimating = false;
                 try
@@ -80,7 +70,7 @@ namespace GilesTrinity
                     ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
                     if (myAnimationState == null || myAnimationState.State == AnimationState.Casting || myAnimationState.State == AnimationState.Channeling)
                         bIsAnimating = true;
-                    if (bWaitForAttacking && (myAnimationState == null || myAnimationState.State == AnimationState.Attacking))
+                    if (waitForAttacking && (myAnimationState == null || myAnimationState.State == AnimationState.Attacking))
                         bIsAnimating = true;
                 }
                 catch
@@ -91,37 +81,46 @@ namespace GilesTrinity
                     bKeepLooping = false;
             }
         }
-        // Check re-use timers on skills
-        // Returns whether or not we can use a skill, or if it's on our own internal Trinity cooldown timer
-        private static bool GilesUseTimer(SNOPower thispower, bool bReCheck = false)
+        
+        /// <summary>
+        /// Check re-use timers on skills
+        /// </summary>
+        /// <param name="power">The power.</param>
+        /// <param name="recheck">if set to <c>true</c> check again.</param>
+        /// <returns>
+        /// Returns whether or not we can use a skill, or if it's on our own internal Trinity cooldown timer
+        /// </returns>
+        private static bool GilesUseTimer(SNOPower power, bool recheck = false)
         {
-            if (DateTime.Now.Subtract(dictAbilityLastUse[thispower]).TotalMilliseconds >= dictAbilityRepeatDelay[thispower])
+            if (DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds >= dictAbilityRepeatDelay[power])
                 return true;
-            if (bReCheck && DateTime.Now.Subtract(dictAbilityLastUse[thispower]).TotalMilliseconds >= 150 && DateTime.Now.Subtract(dictAbilityLastUse[thispower]).TotalMilliseconds <= 600)
+            if (recheck && DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds >= 150 && DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds <= 600)
                 return true;
             return false;
         }
         // This function checks when the spell last failed (according to D3 memory, which isn't always reliable)
         // To prevent Trinity getting stuck re-trying the same spell over and over and doing nothing else
         // No longer used but keeping this here incase I re-use it
-        private static bool GilesCanRecastAfterFailure(SNOPower thispower, int iMaxRecheckTime = 250)
+        private static bool GilesCanRecastAfterFailure(SNOPower power, int maxRecheckTime = 250)
         {
-            if (DateTime.Now.Subtract(dictAbilityLastFailed[thispower]).TotalMilliseconds <= iMaxRecheckTime)
+            if (DateTime.Now.Subtract(dictAbilityLastFailed[power]).TotalMilliseconds <= maxRecheckTime)
                 return false;
             return true;
         }
+
         // When last hit the power-manager for this - not currently used, saved here incase I use it again in the future!
         // This is a safety function to prevent spam of the CPU and time-intensive "PowerManager.CanCast" function in DB
         // No longer used but keeping this here incase I re-use it
-        private static bool GilesPowerManager(SNOPower thispower, int iMaxRecheckTime)
+        private static bool GilesPowerManager(SNOPower power, int maxRecheckTime)
         {
-            if (DateTime.Now.Subtract(dictAbilityLastPowerChecked[thispower]).TotalMilliseconds <= iMaxRecheckTime)
+            if (DateTime.Now.Subtract(dictAbilityLastPowerChecked[power]).TotalMilliseconds <= maxRecheckTime)
                 return false;
-            dictAbilityLastPowerChecked[thispower] = DateTime.Now;
-            if (PowerManager.CanCast(thispower))
+            dictAbilityLastPowerChecked[power] = DateTime.Now;
+            if (PowerManager.CanCast(power))
                 return true;
             return false;
         }
+
         // Checking for buffs and caching the buff list
         // Cache all current buffs on character
         public static void GilesRefreshBuffs()
@@ -159,49 +158,56 @@ namespace GilesTrinity
             }
             //"g_killElitePack : 1, snoid=230745" <- Noting this here incase I ever want to monitor NV stacks, this is the SNO ID code for it!
         }
+
         // Check if a particular buff is present
         public static bool GilesHasBuff(SNOPower power)
         {
             int id = (int)power;
             return listCachedBuffs.Any(u => u.SNOId == id);
         }
+
         // Returns how many stacks of a particular buff there are
-        public static int GilesBuffStacks(SNOPower thispower)
+        public static int GilesBuffStacks(SNOPower power)
         {
-            int iStacks;
-            if (dictCachedBuffs.TryGetValue((int)thispower, out iStacks))
+            int stacks;
+            if (dictCachedBuffs.TryGetValue((int)power, out stacks))
             {
-                return iStacks;
+                return stacks;
             }
             return 0;
         }
+
         // Refresh the skills in our hotbar
         // Also caches the values after - but ONLY if we aren't in archon mode (or if this function is told NOT to cache this)
-        public static void GilesRefreshHotbar(bool bDontCacheThis = false)
+        public static void GilesRefreshHotbar(bool dontCacheThis = false)
         {
             bMappedPlayerAbilities = true;
             hashPowerHotbarAbilities = new HashSet<SNOPower>();
             for (int i = 0; i <= 5; i++)
                 hashPowerHotbarAbilities.Add(ZetaDia.Me.GetHotbarPowerId((HotbarSlot)i));
             bRefreshHotbarAbilities = false;
-            if (!bDontCacheThis)
+            if (!dontCacheThis)
                 hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(hashPowerHotbarAbilities);
         }
+
         // Now Find the best ability to use
         // Special check to force re-buffing before castign archon
-        private static bool bCanCastArchon = false;
-        private static void Log(string message, bool bIsDiagnostic = false)
+        private static bool CanCastArchon = false;
+
+        private static void Log(string message, bool isDiagnostic = false)
         {
             string totalMessage = String.Format("[Trinity] {0}", message);
-            if (!bIsDiagnostic)
+            if (!isDiagnostic)
                 Logging.Write(totalMessage);
             else
                 Logging.WriteDiagnostic(totalMessage);
         }
-        private static bool botispaused()
+
+        private static bool BotIsPaused()
         {
             return bMainBotPaused;
         }
+
         // Force town-run button
         private static void buttonTownRun_Click(object sender, RoutedEventArgs e)
         {
@@ -227,11 +233,12 @@ namespace GilesTrinity
             }
             else
             {
-                BotMain.PauseWhile(botispaused);
+                BotMain.PauseWhile(BotIsPaused);
                 btnPauseBot.Content = "Unpause Bot";
                 bMainBotPaused = true;
             }
         }
+
         private void GilesTrinityOnDeath(object src, EventArgs mea)
         {
             if (DateTime.Now.Subtract(lastDied).TotalSeconds > 10)
@@ -268,6 +275,7 @@ namespace GilesTrinity
                 }
             }
         }
+
         // When the bot stops, output a final item-stats report so it is as up-to-date as can be
         private void GilesTrinityHandleBotStop(IBot bot)
         {
@@ -287,23 +295,29 @@ namespace GilesTrinity
             iMaxDeathsAllowed = 0;
             iDeathsThisRun = 0;
         }
+
         // How many total leave games, for stat-tracking?
         public static int iTotalJoinGames = 0;
+
         // Each time we join & leave a game, might as well clear the hashset of looked-at dropped items - just to keep it smaller
         private static void GilesTrinityOnJoinGame(object src, EventArgs mea)
         {
             iTotalJoinGames++;
             GilesResetEverythingNewGame();
         }
+
         // How many total leave games, for stat-tracking?
-        public static int iTotalLeaveGames = 0;
+        public static int TotalLeaveGames = 0;
+
         // Each time we join & leave a game, might as well clear the hashset of looked-at dropped items - just to keep it smaller
         private static void GilesTrinityOnLeaveGame(object src, EventArgs mea)
         {
-            iTotalLeaveGames++;
+            TotalLeaveGames++;
             GilesResetEverythingNewGame();
         }
-        public static int iTotalProfileRecycles = 0;
+
+        public static int TotalProfileRecycles = 0;
+        
         public static void GilesResetEverythingNewGame()
         {
             hashUseOnceID = new HashSet<int>();

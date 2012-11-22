@@ -19,6 +19,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -50,7 +51,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BlankRoutines.cs" />
     <Compile Include="Abilities\Barbarian.cs" />
     <Compile Include="Abilities\Monk.cs" />
     <Compile Include="Abilities\Wizard.cs" />
@@ -67,6 +67,9 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotStart.cs" />
+    <Compile Include="DbProvider\GilesCombatTargetingReplacer.cs" />
+    <Compile Include="DbProvider\GilesLootTargetingProvider.cs" />
+    <Compile Include="DbProvider\GilesObstacleTargetingProvider.cs" />
     <Compile Include="StashSellSalvage.cs" />
     <Compile Include="Weighting.cs" />
     <Compile Include="GilesGlobalOverlord.cs" />
@@ -85,6 +88,7 @@
     <Compile Include="RefreshDiaObject.cs" />
     <Compile Include="GilesTrinity.cs" />
     <Compile Include="RefreshDiaObjects.cs" />
+    <Compile Include="XmlTags\BaseComplexNodeTag.cs" />
     <Compile Include="XmlTags\TrinityIfRandom.cs" />
     <Compile Include="XmlTags\TrinityIfSNOInRange.cs" />
     <Compile Include="XmlTags\TrinityIf.cs" />

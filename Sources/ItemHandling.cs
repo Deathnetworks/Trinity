@@ -1,30 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
-using System.Web;
-using System.Reflection;
+using System.Net.Mail;
 using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
-using System.IO;
-using System.Windows.Markup;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
-using Zeta.CommonBot.Profile;
-using Zeta.CommonBot.Profile.Composites;
-using Zeta.Internals;
 using Zeta.Internals.Actors;
-using Zeta.Internals.Actors.Gizmos;
-using Zeta.Internals.SNO;
-using Zeta.Navigation;
-using Zeta.TreeSharp;
-using Zeta.XmlEngine;
-using System.Text;
-using System.Net.Mail;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -1730,45 +1716,6 @@ namespace GilesTrinity
                             if (i == LIFEONHIT && (iThisItemsMaxStats[i] - iTempStatistic) < 45.2f)
                                 iFinalBonusGranted += 1.2;
 
-                            // Within final 50 armor
-                            if (i == ARMOR && (iThisItemsMaxStats[i] - iTempStatistic) < 50.2f)
-                            {
-                                iFinalBonusGranted += 0.30;
-                                if ((iHadStat[STRENGTH] / iThisItemsMaxStats[STRENGTH]) > iMinimumThreshold[STRENGTH])
-                                    iFinalBonusGranted += 0.30;
-                            }
-
-                            // Within final 15 armor
-                            if (i == ARMOR && (iThisItemsMaxStats[i] - iTempStatistic) < 15.2f)
-                                iFinalBonusGranted += 0.20;
-
-                            // More than 2.5 crit chance out
-                            if (i == CRITCHANCE && (iThisItemsMaxStats[i] - iTempStatistic) > 5.55f)
-                                iFinalBonusGranted -= 0.20;
-
-                            // More than 20 crit damage out
-                            if (i == CRITDAMAGE && (iThisItemsMaxStats[i] - iTempStatistic) > 19.95f)
-                                iFinalBonusGranted -= 0.20;
-
-                            // More than 2 attack speed out
-                            if (i == ATTACKSPEED && (iThisItemsMaxStats[i] - iTempStatistic) > 1.95f)
-                                iFinalBonusGranted -= 0.20;
-
-                            // More than 15 gold find out
-                            if (i == GOLDFIND && (iThisItemsMaxStats[i] - iTempStatistic) > 15.2f)
-                                iFinalBonusGranted -= 0.1;
-
-                            // More than 15 magic find out
-                            if (i == MAGICFIND && (iThisItemsMaxStats[i] - iTempStatistic) > 15.2f)
-                                iFinalBonusGranted -= 0.1;
-
-                            // More than 30 all resist out
-                            if (i == ALLRESIST && (iThisItemsMaxStats[i] - iTempStatistic) > 20.2f)
-                                iFinalBonusGranted -= 0.1;
-
-                            // More than 40 all resist out
-                            if (i == ALLRESIST && (iThisItemsMaxStats[i] - iTempStatistic) > 30.2f)
-                                iFinalBonusGranted -= 0.1;
                         }
                         else
                         {
@@ -1789,46 +1736,47 @@ namespace GilesTrinity
                             if (i == LIFEONHIT && (iThisItemsMaxStats[i] - iTempStatistic) < 40.2f)
                                 iFinalBonusGranted += 1.2;
 
-                            // Within final 50 armor
-                            if (i == ARMOR && (iThisItemsMaxStats[i] - iTempStatistic) < 50.2f)
-                            {
-                                iFinalBonusGranted += 0.30;
-                                if ((iHadStat[STRENGTH] / iThisItemsMaxStats[STRENGTH]) > iMinimumThreshold[STRENGTH])
-                                    iFinalBonusGranted += 0.30;
-                            }
-
-                            // Within final 15 armor
-                            if (i == ARMOR && (iThisItemsMaxStats[i] - iTempStatistic) < 15.2f)
-                                iFinalBonusGranted += 0.20;
-
-                            // More than 2.5 crit chance out
-                            if (i == CRITCHANCE && (iThisItemsMaxStats[i] - iTempStatistic) > 5.55f)
-                                iFinalBonusGranted -= 0.20;
-
-                            // More than 20 crit damage out
-                            if (i == CRITDAMAGE && (iThisItemsMaxStats[i] - iTempStatistic) > 19.95f)
-                                iFinalBonusGranted -= 0.20;
-
-                            // More than 2 attack speed out
-                            if (i == ATTACKSPEED && (iThisItemsMaxStats[i] - iTempStatistic) > 1.95f)
-                                iFinalBonusGranted -= 0.20;
-
-                            // More than 15 gold find out
-                            if (i == GOLDFIND && (iThisItemsMaxStats[i] - iTempStatistic) > 15.2f)
-                                iFinalBonusGranted -= 0.1;
-
-                            // More than 15 magic find out
-                            if (i == MAGICFIND && (iThisItemsMaxStats[i] - iTempStatistic) > 15.2f)
-                                iFinalBonusGranted -= 0.1;
-
-                            // More than 30 all resist out
-                            if (i == ALLRESIST && (iThisItemsMaxStats[i] - iTempStatistic) > 20.2f)
-                                iFinalBonusGranted -= 0.1;
-
-                            // More than 40 all resist out
-                            if (i == ALLRESIST && (iThisItemsMaxStats[i] - iTempStatistic) > 30.2f)
-                                iFinalBonusGranted -= 0.1;
                         }
+
+                        // Within final 50 armor
+                        if (i == ARMOR && (iThisItemsMaxStats[i] - iTempStatistic) < 50.2f)
+                        {
+                            iFinalBonusGranted += 0.30;
+                            if ((iHadStat[STRENGTH] / iThisItemsMaxStats[STRENGTH]) > iMinimumThreshold[STRENGTH])
+                                iFinalBonusGranted += 0.30;
+                        }
+
+                        // Within final 15 armor
+                        if (i == ARMOR && (iThisItemsMaxStats[i] - iTempStatistic) < 15.2f)
+                            iFinalBonusGranted += 0.20;
+
+                        // More than 2.5 crit chance out
+                        if (i == CRITCHANCE && (iThisItemsMaxStats[i] - iTempStatistic) > 5.55f)
+                            iFinalBonusGranted -= 0.20;
+
+                        // More than 20 crit damage out
+                        if (i == CRITDAMAGE && (iThisItemsMaxStats[i] - iTempStatistic) > 19.95f)
+                            iFinalBonusGranted -= 0.20;
+
+                        // More than 2 attack speed out
+                        if (i == ATTACKSPEED && (iThisItemsMaxStats[i] - iTempStatistic) > 1.95f)
+                            iFinalBonusGranted -= 0.20;
+
+                        // More than 15 gold find out
+                        if (i == GOLDFIND && (iThisItemsMaxStats[i] - iTempStatistic) > 15.2f)
+                            iFinalBonusGranted -= 0.1;
+
+                        // More than 15 magic find out
+                        if (i == MAGICFIND && (iThisItemsMaxStats[i] - iTempStatistic) > 15.2f)
+                            iFinalBonusGranted -= 0.1;
+
+                        // More than 30 all resist out
+                        if (i == ALLRESIST && (iThisItemsMaxStats[i] - iTempStatistic) > 20.2f)
+                            iFinalBonusGranted -= 0.1;
+
+                        // More than 40 all resist out
+                        if (i == ALLRESIST && (iThisItemsMaxStats[i] - iTempStatistic) > 30.2f)
+                            iFinalBonusGranted -= 0.1;
                     }
 
                     // All the "set to 0" checks now
@@ -2083,7 +2031,6 @@ namespace GilesTrinity
             // Helmets
             if (thisGilesItemType == GilesItemType.Helm || thisGilesItemType == GilesItemType.WizardHat || thisGilesItemType == GilesItemType.VoodooMask || thisGilesItemType == GilesItemType.SpiritStone)
             {
-
                 // Helmets without a socket lose 20% of total score, and most of any MF/GF bonus
                 if (iHadStat[SOCKETS] == 0)
                 {
@@ -2227,13 +2174,13 @@ namespace GilesTrinity
                 LogWriter.WriteLine("Total tracking time: " + TotalRunningTime.Hours.ToString() + "h " + TotalRunningTime.Minutes.ToString() +
                     "m " + TotalRunningTime.Seconds.ToString() + "s");
                 LogWriter.WriteLine("Total deaths: " + iTotalDeaths.ToString() + " [" + Math.Round(iTotalDeaths / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                LogWriter.WriteLine("Total games (approx): " + iTotalLeaveGames.ToString() + " [" + Math.Round(iTotalLeaveGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                if (iTotalLeaveGames == 0 && iTotalJoinGames > 0)
+                LogWriter.WriteLine("Total games (approx): " + TotalLeaveGames.ToString() + " [" + Math.Round(TotalLeaveGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
+                if (TotalLeaveGames == 0 && iTotalJoinGames > 0)
                 {
-                    if (iTotalJoinGames == 1 && iTotalProfileRecycles > 1)
+                    if (iTotalJoinGames == 1 && TotalProfileRecycles > 1)
                     {
                         LogWriter.WriteLine("(a profile manager/death handler is interfering with join/leave game events, attempting to guess total runs based on profile-loops)");
-                        LogWriter.WriteLine("Total full profile cycles: " + iTotalProfileRecycles.ToString() + " [" + Math.Round(iTotalProfileRecycles / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
+                        LogWriter.WriteLine("Total full profile cycles: " + TotalProfileRecycles.ToString() + " [" + Math.Round(TotalProfileRecycles / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
                     }
                     else
                     {

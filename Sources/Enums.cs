@@ -1,33 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net;
-using System.Web;
-using System.Reflection;
-using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
-using System.IO;
-using System.Windows.Markup;
-using Zeta;
-using Zeta.Common;
-using Zeta.Common.Plugins;
-using Zeta.CommonBot;
-using Zeta.CommonBot.Profile;
-using Zeta.CommonBot.Profile.Composites;
-using Zeta.Internals;
-using Zeta.Internals.Actors;
-using Zeta.Internals.Actors.Gizmos;
-using Zeta.Internals.SNO;
-using Zeta.Navigation;
-using Zeta.TreeSharp;
-using Zeta.XmlEngine;
+﻿using Zeta.Common.Plugins;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-// Primary "lowest level" item type (eg EXACTLY what kind of item it is)
+        /// <summary>
+        /// Primary "lowest level" item type (eg EXACTLY what kind of item it is)
+        /// </summary>
         public enum GilesItemType
         {
             Unknown,
@@ -86,7 +64,10 @@ namespace GilesTrinity
             HealthGlobe,
             InfernalKey,
         }
-// Base types, eg "one handed weapons" "armors" etc.
+
+        /// <summary>
+        /// Base types, eg "one handed weapons" "armors" etc.
+        /// </summary>
         public enum GilesBaseItemType
         {
             Unknown,
@@ -101,7 +82,10 @@ namespace GilesTrinity
             Gem,
             HealthGlobe
         }
-// Generic object types - eg a monster, an item to pickup, a shrine to click etc.
+
+        /// <summary>
+        /// Generic object types - eg a monster, an item to pickup, a shrine to click etc.
+        /// </summary>
         public enum GilesObjectType
         {
             Unknown,

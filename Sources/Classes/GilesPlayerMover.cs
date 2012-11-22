@@ -1,30 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net;
-using System.Web;
-using System.Reflection;
-using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
 using System.IO;
-using System.Windows.Markup;
+using System.Linq;
+using System.Threading;
 using Zeta;
 using Zeta.Common;
-using Zeta.Common.Plugins;
 using Zeta.CommonBot;
-using Zeta.CommonBot.Profile;
-using Zeta.CommonBot.Profile.Composites;
 using Zeta.CommonBot.Profile.Common;
-using Zeta.Internals;
 using Zeta.Internals.Actors;
-using Zeta.Internals.Actors.Gizmos;
 using Zeta.Internals.SNO;
 using Zeta.Navigation;
-using Zeta.Pathfinding;
 using Zeta.TreeSharp;
-using Zeta.XmlEngine;
 namespace GilesTrinity
 {
     // Player Mover Class
@@ -242,8 +228,8 @@ namespace GilesTrinity
                 // See if we appear to have started a new game
                 if (GilesTrinity.sFirstProfileSeen != "" && sThisProfile == GilesTrinity.sFirstProfileSeen)
                 {
-                    GilesTrinity.iTotalProfileRecycles++;
-                    if (GilesTrinity.iTotalProfileRecycles > GilesTrinity.iTotalJoinGames && GilesTrinity.iTotalProfileRecycles > GilesTrinity.iTotalLeaveGames)
+                    GilesTrinity.TotalProfileRecycles++;
+                    if (GilesTrinity.TotalProfileRecycles > GilesTrinity.iTotalJoinGames && GilesTrinity.TotalProfileRecycles > GilesTrinity.TotalLeaveGames)
                     {
                         GilesTrinity.GilesResetEverythingNewGame();
                     }

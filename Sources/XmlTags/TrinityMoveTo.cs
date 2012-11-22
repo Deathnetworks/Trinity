@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot.Profile;

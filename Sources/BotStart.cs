@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net;
 using Zeta;
 using Zeta.Common;
-using Zeta.CommonBot;
 using Zeta.Common.Plugins;
-using Zeta.Internals;
-using Zeta.Navigation;
+using Zeta.CommonBot;
 using Zeta.TreeSharp;
-using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;
 
 namespace GilesTrinity

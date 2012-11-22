@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Zeta.CommonBot.Profile;
 using Zeta.CommonBot.Profile.Composites;
 using Zeta.TreeSharp;
@@ -11,12 +9,9 @@ namespace GilesTrinity.XmlTags
 {
     // TrinityIfRandom only runs the container stuff if the given id is the given value
     [XmlElement("TrinityIfRandom")]
-    public class TrinityIfRandom : ComplexNodeTag
+    public class TrinityIfRandom : BaseComplexNodeTag
     {
-        private bool? bComplexDoneCheck;
-        private bool? bAlreadyCompleted;
         private Func<bool> funcConditionalProcess;
-        private static Func<ProfileBehavior, bool> funcBehaviorProcess;
         private int iID;
         private int iResult;
 
@@ -30,7 +25,7 @@ namespace GilesTrinity.XmlTags
             return new Zeta.TreeSharp.Decorator(new CanRunDecoratorDelegate(CheckNotAlreadyDone), decorated);
         }
 
-        public bool GetConditionExec()
+        public override bool GetConditionExec()
         {
             int iOldValue;
 
@@ -46,23 +41,9 @@ namespace GilesTrinity.XmlTags
             return false;
         }
 
-        private bool CheckNotAlreadyDone(object object_0)
+        private bool CheckNotAlreadyDone(object obj)
         {
             return !IsDone;
-        }
-
-        public override void ResetCachedDone()
-        {
-            foreach (ProfileBehavior behavior in Body)
-            {
-                behavior.ResetCachedDone();
-            }
-            bComplexDoneCheck = null;
-        }
-
-        private static bool CheckBehaviorIsDone(ProfileBehavior profileBehavior)
-        {
-            return profileBehavior.IsDone;
         }
 
         [XmlAttribute("id")]
@@ -103,34 +84,5 @@ namespace GilesTrinity.XmlTags
             }
         }
 
-        public override bool IsDone
-        {
-            get
-            {
-                // Make sure we've not already completed this tag
-                if (bAlreadyCompleted.HasValue && bAlreadyCompleted == true)
-                {
-                    return true;
-                }
-                if (!bComplexDoneCheck.HasValue)
-                {
-                    bComplexDoneCheck = new bool?(GetConditionExec());
-                }
-                if (bComplexDoneCheck == false)
-                {
-                    return true;
-                }
-                if (funcBehaviorProcess == null)
-                {
-                    funcBehaviorProcess = new Func<ProfileBehavior, bool>(CheckBehaviorIsDone);
-                }
-                bool bAllChildrenDone = Body.All<ProfileBehavior>(funcBehaviorProcess);
-                if (bAllChildrenDone)
-                {
-                    bAlreadyCompleted = true;
-                }
-                return bAllChildrenDone;
-            }
-        }
     }
 }

@@ -1,28 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net;
-using System.Web;
-using System.Reflection;
-using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
-using System.IO;
-using System.Windows.Markup;
-using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
-using Zeta.CommonBot.Profile;
-using Zeta.CommonBot.Profile.Composites;
-using Zeta.Internals;
 using Zeta.Internals.Actors;
-using Zeta.Internals.Actors.Gizmos;
-using Zeta.Internals.SNO;
-using Zeta.Navigation;
-using Zeta.TreeSharp;
-using Zeta.XmlEngine;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -197,19 +177,19 @@ namespace GilesTrinity
                     if (hashPowerHotbarAbilities.Contains(SNOPower.Wizard_EnergyArmor) || hashPowerHotbarAbilities.Contains(SNOPower.Wizard_IceArmor) ||
                         hashPowerHotbarAbilities.Contains(SNOPower.Wizard_StormArmor)) iExtraEnergyNeeded += 25;
                     if (!bHasBuffAbilities || playerStatus.dCurrentEnergy <= iExtraEnergyNeeded)
-                        bCanCastArchon = true;
-                    if (!bCanCastArchon)
+                        CanCastArchon = true;
+                    if (!CanCastArchon)
                     {
                         dictAbilityLastUse[SNOPower.Wizard_MagicWeapon] = DateTime.Today;
                         //dictAbilityLastUse[SNOPower.Wizard_Familiar] = DateTime.Today;
                         dictAbilityLastUse[SNOPower.Wizard_EnergyArmor] = DateTime.Today;
                         dictAbilityLastUse[SNOPower.Wizard_IceArmor] = DateTime.Today;
                         dictAbilityLastUse[SNOPower.Wizard_StormArmor] = DateTime.Today;
-                        bCanCastArchon = true;
+                        CanCastArchon = true;
                     }
                     else
                     {
-                        bCanCastArchon = false;
+                        CanCastArchon = false;
                         return new GilesPower(SNOPower.Wizard_Archon, 0f, vNullLocation, iCurrentWorldID, -1, 4, 5, USE_SLOWLY);
                     }
                 }
