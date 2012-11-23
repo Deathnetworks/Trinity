@@ -386,7 +386,7 @@ namespace GilesTrinity
             switch (str)
             {
                 case "[BASETYPE]":
-                    return item.DBItemType;
+                    return basetype.ToString();
                 case "[TYPE]":
                     return truetype.ToString();
                 case "[QUALITY]":
