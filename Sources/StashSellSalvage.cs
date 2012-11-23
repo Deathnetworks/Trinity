@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.Notifications;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -281,9 +282,6 @@ namespace GilesTrinity
         {
             Log("GSDebug: Stash routine ending sequence...", true);
 
-            // See if there's any legendary items we should send Prowl notifications about
-            while (pushQueue.Count > 0) { SendNotification(pushQueue.Dequeue()); }
-
             // Lock memory (probably not actually necessary anymore, since we handle all item stuff ourselves!?)
             using (ZetaDia.Memory.AcquireFrame())
             {
@@ -299,7 +297,7 @@ namespace GilesTrinity
                         LogWriter.WriteLine("");
                     LogStream.Close();
                     if (settings.bEnableEmail && EmailMessage.Length > 0)
-                        SendEmail(sEmailAddress, sEmailAddress, "New DB stash loot - " + sBotName, EmailMessage.ToString(), SmtpServer, sEmailPassword);
+                        NotificationManager.SendEmail(sEmailAddress, sEmailAddress, "New DB stash loot - " + sBotName, EmailMessage.ToString(), SmtpServer, sEmailPassword);
                     EmailMessage.Clear();
                 }
                 catch (IOException)
@@ -464,7 +462,7 @@ namespace GilesTrinity
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.DyeType, thisitem.ItemType, thisitem.FollowerSpecialType,
                             thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
                         bool bShouldSellThis = settings.bUseGilesFilters
-                            ? GilesSellValidation(thiscacheditem.ThisInternalName, thiscacheditem.ThisLevel, thiscacheditem.ThisQuality, thiscacheditem.ThisDBItemType, thiscacheditem.ThisFollowerType)
+                            ? GilesSellValidation(thiscacheditem.InternalName, thiscacheditem.Level, thiscacheditem.Quality, thiscacheditem.DBItemType, thiscacheditem.FollowerType)
                             : ItemManager.ShouldSellItem(thisitem);
 
                         // if it has gems, always salvage
@@ -698,7 +696,7 @@ namespace GilesTrinity
                 // Item log for cool stuff sold
                 if (thisitem != null)
                 {
-                    GilesItemType OriginalGilesItemType = DetermineItemType(thisitem.ThisInternalName, thisitem.ThisDBItemType, thisitem.ThisFollowerType);
+                    GilesItemType OriginalGilesItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
                     GilesBaseItemType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
                     if (thisGilesBaseType == GilesBaseItemType.WeaponTwoHand || thisGilesBaseType == GilesBaseItemType.WeaponOneHand || thisGilesBaseType == GilesBaseItemType.WeaponRange ||
                         thisGilesBaseType == GilesBaseItemType.Armor || thisGilesBaseType == GilesBaseItemType.Jewelry || thisGilesBaseType == GilesBaseItemType.Offhand ||
@@ -707,7 +705,7 @@ namespace GilesTrinity
                         double iThisItemValue = ValueThisItem(thisitem, OriginalGilesItemType);
                         LogJunkItems(thisitem, thisGilesBaseType, OriginalGilesItemType, iThisItemValue);
                     }
-                    ZetaDia.Me.Inventory.SellItem(thisitem.ThisDynamicID);
+                    ZetaDia.Me.Inventory.SellItem(thisitem.DynamicID);
                 }
                 if (thisitem != null)
                     hashGilesCachedSellItems.Remove(thisitem);
@@ -837,7 +835,7 @@ namespace GilesTrinity
                         GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.DyeType, thisitem.ItemType, thisitem.FollowerSpecialType,
                             thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
-                        bool bShouldSalvageThis = settings.bUseGilesFilters ? GilesSalvageValidation(thiscacheditem.ThisInternalName, thiscacheditem.ThisLevel, thiscacheditem.ThisQuality, thiscacheditem.ThisDBItemType, thiscacheditem.ThisFollowerType) : ItemManager.ShouldSalvageItem(thisitem);
+                        bool bShouldSalvageThis = settings.bUseGilesFilters ? GilesSalvageValidation(thiscacheditem.InternalName, thiscacheditem.Level, thiscacheditem.Quality, thiscacheditem.DBItemType, thiscacheditem.FollowerType) : ItemManager.ShouldSalvageItem(thisitem);
                         if (bShouldSalvageThis)
                         {
                             hashGilesCachedSalvageItems.Add(thiscacheditem);
@@ -1040,7 +1038,7 @@ namespace GilesTrinity
                 {
 
                     // Item log for cool stuff stashed
-                    GilesItemType OriginalGilesItemType = DetermineItemType(thisitem.ThisInternalName, thisitem.ThisDBItemType, thisitem.ThisFollowerType);
+                    GilesItemType OriginalGilesItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
                     GilesBaseItemType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
                     if (thisGilesBaseType == GilesBaseItemType.WeaponTwoHand || thisGilesBaseType == GilesBaseItemType.WeaponOneHand || thisGilesBaseType == GilesBaseItemType.WeaponRange ||
                         thisGilesBaseType == GilesBaseItemType.Armor || thisGilesBaseType == GilesBaseItemType.Jewelry || thisGilesBaseType == GilesBaseItemType.Offhand ||
@@ -1049,7 +1047,7 @@ namespace GilesTrinity
                         double iThisItemValue = ValueThisItem(thisitem, OriginalGilesItemType);
                         LogJunkItems(thisitem, thisGilesBaseType, OriginalGilesItemType, iThisItemValue);
                     }
-                    ZetaDia.Me.Inventory.SalvageItem(thisitem.ThisDynamicID);
+                    ZetaDia.Me.Inventory.SalvageItem(thisitem.DynamicID);
                 }
                 if (thisitem != null)
                     hashGilesCachedSalvageItems.Remove(thisitem);
@@ -1132,7 +1130,7 @@ namespace GilesTrinity
         /// <param name="thisgilesbaseitemtype"></param>
         /// <param name="thisgilesitemtype"></param>
         /// <param name="ithisitemvalue"></param>
-        public static void LogGoodItems(GilesCachedACDItem thisgooditem, GilesBaseItemType thisgilesbaseitemtype, GilesItemType thisgilesitemtype, double ithisitemvalue)
+        internal static void LogGoodItems(GilesCachedACDItem thisgooditem, GilesBaseItemType thisgilesbaseitemtype, GilesItemType thisgilesitemtype, double ithisitemvalue)
         {
             FileStream LogStream = null;
             try
@@ -1148,21 +1146,21 @@ namespace GilesTrinity
                     }
                     string sLegendaryString = "";
                     bool bShouldNotify = false;
-                    if (thisgooditem.ThisQuality >= ItemQuality.Legendary)
+                    if (thisgooditem.Quality >= ItemQuality.Legendary)
                     {
                         if (!settings.bEnableLegendaryNotifyScore)
                             bShouldNotify = true;
                         else if (settings.bEnableLegendaryNotifyScore && EvaluateItemScoreForNotification(thisgilesbaseitemtype, ithisitemvalue))
                             bShouldNotify = true;
                         if (bShouldNotify)
-                            AddNotificationToQueue(thisgooditem.ThisRealName + " [" + thisgilesitemtype.ToString() +
+                            NotificationManager.AddNotificationToQueue(thisgooditem.RealName + " [" + thisgilesitemtype.ToString() +
                                 "] (Score=" + ithisitemvalue.ToString() + ". " + sValueItemStatString + ")",
                                 ZetaDia.Service.CurrentHero.Name + " new legendary!", ProwlNotificationPriority.Emergency);
                         sLegendaryString = " {legendary item}";
 
                         // Change made by bombastic
                         Logging.Write("+=+=+=+=+=+=+=+=+ LEGENDARY FOUND +=+=+=+=+=+=+=+=+");
-                        Logging.Write("+  Name:       " + thisgooditem.ThisRealName + " (" + thisgilesitemtype.ToString() + ")");
+                        Logging.Write("+  Name:       " + thisgooditem.RealName + " (" + thisgilesitemtype.ToString() + ")");
                         Logging.Write("+  Score:       " + Math.Round(ithisitemvalue).ToString());
                         Logging.Write("+  Attributes: " + sValueItemStatString);
                         Logging.Write("+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
@@ -1173,15 +1171,15 @@ namespace GilesTrinity
                         // Check for non-legendary notifications
                         bShouldNotify = EvaluateItemScoreForNotification(thisgilesbaseitemtype, ithisitemvalue);
                         if (bShouldNotify)
-                            AddNotificationToQueue(thisgooditem.ThisRealName + " [" + thisgilesitemtype.ToString() + "] (Score=" + ithisitemvalue.ToString() + ". " + sValueItemStatString + ")", ZetaDia.Service.CurrentHero.Name + " new item!", ProwlNotificationPriority.Emergency);
+                            NotificationManager.AddNotificationToQueue(thisgooditem.RealName + " [" + thisgilesitemtype.ToString() + "] (Score=" + ithisitemvalue.ToString() + ". " + sValueItemStatString + ")", ZetaDia.Service.CurrentHero.Name + " new item!", ProwlNotificationPriority.Emergency);
                     }
                     if (bShouldNotify)
                     {
-                        EmailMessage.AppendLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.ThisRealName + "'. Score = " + Math.Round(ithisitemvalue).ToString() + sLegendaryString)
+                        EmailMessage.AppendLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.RealName + "'. Score = " + Math.Round(ithisitemvalue).ToString() + sLegendaryString)
                             .AppendLine("  " + sValueItemStatString)
                             .AppendLine();
                     }
-                    LogWriter.WriteLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.ThisRealName + "'. Score = " + Math.Round(ithisitemvalue).ToString() + sLegendaryString);
+                    LogWriter.WriteLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.RealName + "'. Score = " + Math.Round(ithisitemvalue).ToString() + sLegendaryString);
                     LogWriter.WriteLine("  " + sValueItemStatString);
                     LogWriter.WriteLine("");
                 }
@@ -1202,7 +1200,7 @@ namespace GilesTrinity
         /// <param name="thisgilesbaseitemtype"></param>
         /// <param name="thisgilesitemtype"></param>
         /// <param name="ithisitemvalue"></param>
-        public static void LogJunkItems(GilesCachedACDItem thisgooditem, GilesBaseItemType thisgilesbaseitemtype, GilesItemType thisgilesitemtype, double ithisitemvalue)
+        internal static void LogJunkItems(GilesCachedACDItem thisgooditem, GilesBaseItemType thisgilesbaseitemtype, GilesItemType thisgilesitemtype, double ithisitemvalue)
         {
             FileStream LogStream = null;
             try
@@ -1217,9 +1215,9 @@ namespace GilesTrinity
                         LogWriter.WriteLine("====================");
                     }
                     string sLegendaryString = "";
-                    if (thisgooditem.ThisQuality >= ItemQuality.Legendary)
+                    if (thisgooditem.Quality >= ItemQuality.Legendary)
                         sLegendaryString = " {legendary item}";
-                    LogWriter.WriteLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.ThisRealName + "'. Score = " + Math.Round(ithisitemvalue).ToString() + sLegendaryString);
+                    LogWriter.WriteLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.RealName + "'. Score = " + Math.Round(ithisitemvalue).ToString() + sLegendaryString);
                     if (sJunkItemStatString != "")
                         LogWriter.WriteLine("  " + sJunkItemStatString);
                     else
@@ -1244,12 +1242,12 @@ namespace GilesTrinity
         private static bool GilesStashAttempt(GilesCachedACDItem item)
         {
             int iPlayerDynamicID = ZetaDia.Me.CommonData.DynamicId;
-            int iOriginalGameBalanceId = item.ThisBalanceID;
-            int iOriginalDynamicID = item.ThisDynamicID;
-            int iOriginalStackQuantity = item.ThisItemStackQuantity;
-            string sOriginalItemName = item.ThisRealName;
-            string sOriginalInternalName = item.ThisInternalName;
-            GilesItemType OriginalGilesItemType = DetermineItemType(item.ThisInternalName, item.ThisDBItemType, item.ThisFollowerType);
+            int iOriginalGameBalanceId = item.BalanceID;
+            int iOriginalDynamicID = item.DynamicID;
+            int iOriginalStackQuantity = item.ItemStackQuantity;
+            string sOriginalItemName = item.RealName;
+            string sOriginalInternalName = item.InternalName;
+            GilesItemType OriginalGilesItemType = DetermineItemType(item.InternalName, item.DBItemType, item.FollowerType);
             GilesBaseItemType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
             bool bOriginalTwoSlot = DetermineIsTwoSlot(OriginalGilesItemType);
             bool bOriginalIsStackable = DetermineIsStackable(OriginalGilesItemType);

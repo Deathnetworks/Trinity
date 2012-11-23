@@ -48,21 +48,21 @@ namespace GilesTrinity.XmlTags
                 {
 
                     // Loop through all the skip ahead zones and see if one of them is within radius of our intended destination to skip ahead
-                    foreach (GilesTrinity.GilesObstacle thisObject in GilesTrinity.hashSkipAheadAreaCache)
+                    foreach (GilesObstacle thisObject in GilesTrinity.hashSkipAheadAreaCache)
                     {
-                        if (thisObject.vThisLocation.Distance(Position) <= thisObject.fThisRadius)
+                        if (thisObject.Location.Distance(Position) <= thisObject.Radius)
                         {
                             Logging.WriteDiagnostic("[Trinity] Skipping ahead from moveto " + Position.ToString() + " to next moveto.");
                             GilesTrinity.bSkipAheadAGo = true;
                             return RunStatus.Success;
                         }
                     }
-                    GilesTrinity.hashSkipAheadAreaCache = new HashSet<GilesTrinity.GilesObstacle>();
+                    GilesTrinity.hashSkipAheadAreaCache = new HashSet<GilesObstacle>();
                 }
             }
             else
             {
-                GilesTrinity.hashSkipAheadAreaCache = new HashSet<GilesTrinity.GilesObstacle>();
+                GilesTrinity.hashSkipAheadAreaCache = new HashSet<GilesObstacle>();
             }
 
             // Now use Trinity movement to try a direct movement towards that location

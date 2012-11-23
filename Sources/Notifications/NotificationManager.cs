@@ -1,30 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Net.Mail;
+using System.Text;
 using System.Web;
-using Zeta.Common.Plugins;
-namespace GilesTrinity
+
+namespace GilesTrinity.Notifications
 {
-    public partial class GilesTrinity : IPlugin
+    //TODO: Add mail management here 
+    
+    internal static class NotificationManager
     {
-// Prowl Notification Support
         public static Queue<ProwlNotification> pushQueue = new Queue<ProwlNotification>();
-        public struct ProwlNotification
-        {
-            public string Event { get; set; }
-            public string Description { get; set; }
-            public ProwlNotificationPriority Priority { get; set; }
-        }
-        public enum ProwlNotificationPriority : sbyte
-        {
-            VeryLow = -2,
-            Moderate = -1,
-            Normal = 0,
-            High = 1,
-            Emergency = 2
-        }
+
         public static void AddNotificationToQueue(string description, string eventName, ProwlNotificationPriority priority)
         {
-// Queue the notification message
+            // Queue the notification message
             var newNotification =
                     new ProwlNotification
                     {
@@ -36,7 +28,7 @@ namespace GilesTrinity
         }
         public static void SendNotification(ProwlNotification notification)
         {
-            if (settings.bEnableProwl && sProwlAPIKey != "")
+            if (GilesTrinity.settings.bEnableProwl && GilesTrinity.sProwlAPIKey != "")
             {
                 var newNotification =
                         new ProwlNotification
@@ -53,7 +45,7 @@ namespace GilesTrinity
                 {
                 }
             }
-            if (settings.bEnableAndroid && sAndroidAPIKey != "")
+            if (GilesTrinity.settings.bEnableAndroid && GilesTrinity.sAndroidAPIKey != "")
             {
                 var newNotification =
                         new ProwlNotification
@@ -71,12 +63,12 @@ namespace GilesTrinity
                 }
             }
         }
-        public static void PostNotification(ProwlNotification notification_, bool bForAndroid = false)
+        public static void PostNotification(ProwlNotification notification_, bool android = false)
         {
-            string prowlUrlSb = !bForAndroid ? @"https:
-//prowl.weks.net/publicapi/add" : @"https:
-//www.notifymyandroid.com/publicapi/notify";
-            string sThisAPIKey = !bForAndroid ? sProwlAPIKey : sAndroidAPIKey;
+            string prowlUrlSb = !android ? 
+                                    @"https://prowl.weks.net/publicapi/add" : 
+                                    @"https://www.notifymyandroid.com/publicapi/notify";
+            string sThisAPIKey = !android ? GilesTrinity.sProwlAPIKey : GilesTrinity.sAndroidAPIKey;
             prowlUrlSb += "?apikey=" + HttpUtility.UrlEncode(sThisAPIKey) +
                           "&application=" + HttpUtility.UrlEncode("GilesTrinity") +
                           "&description=" + HttpUtility.UrlEncode(notification_.Description) +
@@ -87,7 +79,7 @@ namespace GilesTrinity
             updateRequest.ContentLength = 0;
             updateRequest.ContentType = "application/x-www-form-urlencoded";
             updateRequest.Method = "POST";
-//updateRequest.Timeout = 5000;
+            //updateRequest.Timeout = 5000;
             var postResponse = default(WebResponse);
             try
             {
@@ -97,6 +89,36 @@ namespace GilesTrinity
             {
                 if (postResponse != null)
                     postResponse.Close();
+            }
+        }
+
+        public static void SendEmail(string to, string from, string subject, string body, string server, string password)
+        {
+            try
+            {
+                MailAddress fromAddress = new MailAddress(from);
+                MailAddress toAddress = new MailAddress(to);
+                SmtpClient smtpClient = new SmtpClient
+                                    {
+                                        Host = server,
+                                        Port = 587,
+                                        EnableSsl = true,
+                                        DeliveryMethod = SmtpDeliveryMethod.Network,
+                                        UseDefaultCredentials = false,
+                                        Credentials = new NetworkCredential(fromAddress.Address, password)
+                                    };
+                using (MailMessage message = new MailMessage(fromAddress, toAddress)
+                                                {
+                                                    Subject = subject,
+                                                    Body = body
+                                                })
+                {
+                    smtpClient.Send(message);
+                }
+            }
+            catch (Exception e)
+            {
+                GilesTrinity.Log("Error sending email." + Environment.NewLine + e.ToString());
             }
         }
     }

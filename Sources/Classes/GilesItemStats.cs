@@ -1,37 +1,45 @@
 ﻿using Zeta.Common.Plugins;
+
 namespace GilesTrinity
 {
-    public partial class GilesTrinity : IPlugin
+    // Item Stats Class and Variables - for the detailed item drop/pickup etc. stats
+    internal class GilesItemStats
     {
-// Item Stats Class and Variables - for the detailed item drop/pickup etc. stats
-        private class GilesItemStats
+        public double Total { get; set; }
+        public double[] TotalPerQuality { get; set; }
+        public double[] TotalPerLevel { get; set; }
+        public double[,] TotalPerQPerL { get; set; }
+        public double TotalPotions { get; set; }
+        public double[] PotionsPerLevel { get; set; }
+        public double TotalGems { get; set; }
+        public double[] GemsPerType { get; set; }
+        public double[] GemsPerLevel { get; set; }
+        public double[,] GemsPerTPerL { get; set; }
+        public double TotalInfernalKeys { get; set; }
+        public GilesItemStats(
+            double total, 
+            double[] totalPerQuality,
+            double[] totalPerLevel,
+            double[,] totalPerQPerL,
+            double totalPotions,
+            double[] potionsPerLevel, 
+            double totalGems,
+            double[] gemsPerType, 
+            double[] gemsPerLevel, 
+            double[,] gemsPerTPerL, 
+            double totalKeys)
         {
-            public double iTotal { get; set; }
-            public double[] iTotalPerQuality { get; set; }
-            public double[] iTotalPerLevel { get; set; }
-            public double[,] iTotalPerQPerL { get; set; }
-            public double iTotalPotions { get; set; }
-            public double[] iPotionsPerLevel { get; set; }
-            public double iTotalGems { get; set; }
-            public double[] iGemsPerType { get; set; }
-            public double[] iGemsPerLevel { get; set; }
-            public double[,] iGemsPerTPerL { get; set; }
-            public double iTotalInfernalKeys { get; set; }
-            public GilesItemStats(double total, double[] totalperq, double[] totalperl, double[,] totalperqperl, double totalpotions, double[] potionsperlevel, double totalgems,
-                double[] gemspertype, double[] gemsperlevel, double[,] gemspertperl, double totalkeys)
-            {
-                iTotal = total;
-                iTotalPerQuality = totalperq;
-                iTotalPerLevel = totalperl;
-                iTotalPerQPerL = totalperqperl;
-                iTotalPotions = totalpotions;
-                iPotionsPerLevel = potionsperlevel;
-                iTotalGems = totalgems;
-                iGemsPerType = gemspertype;
-                iGemsPerLevel = gemsperlevel;
-                iGemsPerTPerL = gemspertperl;
-                iTotalInfernalKeys = totalkeys;
-            }
+            Total = total;
+            TotalPerQuality = totalPerQuality;
+            TotalPerLevel = totalPerLevel;
+            TotalPerQPerL = totalPerQPerL;
+            TotalPotions = totalPotions;
+            PotionsPerLevel = potionsPerLevel;
+            TotalGems = totalGems;
+            GemsPerType = gemsPerType;
+            GemsPerLevel = gemsPerLevel;
+            GemsPerTPerL = gemsPerTPerL;
+            TotalInfernalKeys = totalKeys;
         }
     }
 }

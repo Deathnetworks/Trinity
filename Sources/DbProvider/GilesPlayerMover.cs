@@ -11,7 +11,8 @@ using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
 using Zeta.Navigation;
 using Zeta.TreeSharp;
-namespace GilesTrinity
+
+namespace GilesTrinity.DbProvider
 {
     // Player Mover Class
     public class GilesPlayerMover : IPlayerMover
@@ -123,7 +124,7 @@ namespace GilesTrinity
             {
                 Logging.Write("[Trinity] Your bot got stuck! Trying to unstuck (attempt #" + iTotalAntiStuckAttempts.ToString() + " of 15 attempts)");
                 Logging.WriteDiagnostic("(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
-                GilesTrinity.playerStatus.vCurrentPosition = vMyCurrentPosition;
+                GilesTrinity.playerStatus.CurrentPosition = vMyCurrentPosition;
                 vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, Vector3.Zero);
                 // Temporarily log stuff
                 if (iTotalAntiStuckAttempts == 1 && GilesTrinity.settings.bLogStucks)
@@ -321,7 +322,7 @@ namespace GilesTrinity
                     // Do we want to immediately generate a 2nd waypoint to "chain" anti-stucks in an ever-increasing path-length?
                     if (iTimesReachedStuckPoint <= iTotalAntiStuckAttempts)
                     {
-                        GilesTrinity.playerStatus.vCurrentPosition = vMyCurrentPosition;
+                        GilesTrinity.playerStatus.CurrentPosition = vMyCurrentPosition;
                         vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, Vector3.Zero);
                         vMoveToTarget = vSafeMovementLocation;
                     }
@@ -353,9 +354,9 @@ namespace GilesTrinity
             //}
             // See if there's an obstacle in our way, if so try to navigate around it
             Vector3 point = vMoveToTarget;
-            foreach (GilesTrinity.GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
-                            GilesTrinity.GilesIntersectsPath(cp.vThisLocation, cp.fThisRadius, vMyCurrentPosition, point) &&
-                            cp.vThisLocation.Distance(vMyCurrentPosition) > GilesTrinity.dictSNONavigationSize[cp.iThisSNOID]))
+            foreach (GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
+                            GilesTrinity.GilesIntersectsPath(cp.Location, cp.Radius, vMyCurrentPosition, point) &&
+                            cp.Location.Distance(vMyCurrentPosition) > GilesTrinity.dictSNONavigationSize[cp.SNOID]))           
             {
                 if (vShiftedPosition == Vector3.Zero)
                 {

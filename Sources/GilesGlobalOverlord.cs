@@ -160,7 +160,7 @@ namespace GilesTrinity
                 // Update player data
                 UpdateCachedPlayerData();
                 // Check for death / player being dead
-                if (playerStatus.dCurrentHealthPct <= 0)
+                if (playerStatus.CurrentHealthPct <= 0)
                 {
                     return false;
                 }
@@ -183,9 +183,9 @@ namespace GilesTrinity
             }
 
             // Pop a potion when necessary
-            if (playerStatus.dCurrentHealthPct <= iEmergencyHealthPotionLimit)
+            if (playerStatus.CurrentHealthPct <= iEmergencyHealthPotionLimit)
             {
-                if (!playerStatus.bIsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
+                if (!playerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
                 {
                     ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).FirstOrDefault();
                     if (thisBestPotion != null)
@@ -211,7 +211,7 @@ namespace GilesTrinity
             vPositionLastZigZagCheck = Vector3.Zero;
             // Out of combat buffing etc. but only if we don't want to return to town etc.
             ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
-            if (!playerStatus.bIsInTown && !bWantToTownRun && !bGilesForcedVendoring && myAnimationState != null
+            if (!playerStatus.IsInTown && !bWantToTownRun && !bGilesForcedVendoring && myAnimationState != null
                 && myAnimationState.State != AnimationState.Attacking
                 && myAnimationState.State != AnimationState.Casting
                 && myAnimationState.State != AnimationState.Channeling)

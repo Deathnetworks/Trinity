@@ -46,7 +46,15 @@ namespace GilesTrinity
                 if (vAnySafePoint != vNullLocation)
                 {
                     bFoundSafeSpot = true;
-                    CurrentTarget = new GilesObject(vAnySafePoint, GilesObjectType.Avoidance, 20000, Vector3.Distance(playerStatus.vCurrentPosition, vAnySafePoint), Vector3.Distance(playerStatus.vCurrentPosition, vAnySafePoint), "GilesSafePoint");
+                    CurrentTarget = new GilesObject()
+                        {
+                        Position = vAnySafePoint,
+                        Type = GilesObjectType.Avoidance,
+                        Weight = 20000,
+                        CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
+                        RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint), 
+                        InternalName = "GilesSafePoint"
+                    };;
                 }
                 else
                 {
@@ -70,7 +78,15 @@ namespace GilesTrinity
             // No valid targets but we were told to stay put?
             if (CurrentTarget == null && bStayPutDuringAvoidance && !bRequireAvoidance)
             {
-                CurrentTarget = new GilesObject(playerStatus.vCurrentPosition, GilesObjectType.Avoidance, 20000, 2f, 2f, "GilesStayPutPoint");
+                CurrentTarget = new GilesObject()
+                                    {
+                                        Position = playerStatus.CurrentPosition,
+                                        Type = GilesObjectType.Avoidance,
+                                        Weight = 20000,
+                                        CentreDistance = 2f,
+                                        RadiusDistance = 2f,
+                                        InternalName = "GilesStayPutPoint"
+                                    };
                 Logging.WriteDiagnostic("Staying Put During Avoidance");
             }
             // Still no target, let's see if we should backtrack or wait for wrath to come off cooldown...
@@ -84,20 +100,20 @@ namespace GilesTrinity
                 return;
             }
             // Ok record the time we last saw any unit at all
-            if (CurrentTarget.GilesObjectType == GilesObjectType.Unit)
+            if (CurrentTarget.Type == GilesObjectType.Unit)
             {
                 lastHadUnitInSights = DateTime.Now;
                 // And record when we last saw any form of elite
-                if (CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || CurrentTarget.bIsTreasureGoblin)
+                if (CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin)
                     lastHadEliteUnitInSights = DateTime.Now;
             }
             // Record the last time our target changed etc.
-            if (iCurrentTargetRactorGUID != CurrentTarget.iRActorGuid)
+            if (iCurrentTargetRactorGUID != CurrentTarget.RActorGuid)
             {
                 if (bDebugLogSpecial && settings.bDebugInfo)
                 {
                     Logging.WriteDiagnostic("[Trinity] Setting dateSincePicked to {0} iCurrentTargetRactorGUID: {1} CurrentTarget.iRActorGuid: {2}",
-                        DateTime.Now, iCurrentTargetRactorGUID, CurrentTarget.iRActorGuid);
+                        DateTime.Now, iCurrentTargetRactorGUID, CurrentTarget.RActorGuid);
                 }
                 dateSincePickedTarget = DateTime.Now;
                 iTargetLastHealth = 0f;
@@ -105,20 +121,20 @@ namespace GilesTrinity
             else
             {
                 // We're sticking to the same target, so update the target's health cache to check for stucks
-                if (CurrentTarget.GilesObjectType == GilesObjectType.Unit)
+                if (CurrentTarget.Type == GilesObjectType.Unit)
                 {
                     // Check if the health has changed, if so update the target-pick time before we blacklist them again
-                    if (CurrentTarget.iHitPoints != iTargetLastHealth)
+                    if (CurrentTarget.HitPoints != iTargetLastHealth)
                     {
                         if (bDebugLogSpecial && settings.bDebugInfo)
                         {
                             Logging.WriteDiagnostic("[Trinity] Setting dateSincePicked to {0} CurrentTarget.iHitPoints: {1}  iTargetLastHealth: {2} ",
-                                DateTime.Now, CurrentTarget.iHitPoints, iTargetLastHealth);
+                                DateTime.Now, CurrentTarget.HitPoints, iTargetLastHealth);
                         }
                         dateSincePickedTarget = DateTime.Now;
                     }
                     // Now store the target's last-known health
-                    iTargetLastHealth = CurrentTarget.iHitPoints;
+                    iTargetLastHealth = CurrentTarget.HitPoints;
                 }
             }
         }
@@ -130,10 +146,10 @@ namespace GilesTrinity
             lastRefreshedObjects = DateTime.Now;
 
             // Blank current/last/next targets
-            vSafePointNear = CurrentTarget != null ? CurrentTarget.vPosition : vNullLocation;
+            vSafePointNear = CurrentTarget != null ? CurrentTarget.Position : vNullLocation;
             vKitePointAvoid = vNullLocation;
             // store current target GUID
-            iCurrentTargetRactorGUID = CurrentTarget != null ? CurrentTarget.iRActorGuid : -1;
+            iCurrentTargetRactorGUID = CurrentTarget != null ? CurrentTarget.RActorGuid : -1;
             //reset current target
             CurrentTarget = null;
             // Reset all variables for target-weight finding
@@ -325,7 +341,7 @@ namespace GilesTrinity
                     tempbasetype == GilesBaseItemType.Offhand)
                 {
                     int iThisQuality;
-                    ItemsDroppedStats.iTotal++;
+                    ItemsDroppedStats.Total++;
                     if (c_item_tQuality >= ItemQuality.Legendary)
                         iThisQuality = QUALITYORANGE;
                     else if (c_item_tQuality >= ItemQuality.Rare4)
@@ -334,14 +350,14 @@ namespace GilesTrinity
                         iThisQuality = QUALITYBLUE;
                     else
                         iThisQuality = QUALITYWHITE;
-                    ItemsDroppedStats.iTotalPerQuality[iThisQuality]++;
-                    ItemsDroppedStats.iTotalPerLevel[c_item_iLevel]++;
-                    ItemsDroppedStats.iTotalPerQPerL[iThisQuality, c_item_iLevel]++;
+                    ItemsDroppedStats.TotalPerQuality[iThisQuality]++;
+                    ItemsDroppedStats.TotalPerLevel[c_item_iLevel]++;
+                    ItemsDroppedStats.TotalPerQPerL[iThisQuality, c_item_iLevel]++;
                 }
                 else if (tempbasetype == GilesBaseItemType.Gem)
                 {
                     int iThisGemType = 0;
-                    ItemsDroppedStats.iTotalGems++;
+                    ItemsDroppedStats.TotalGems++;
                     if (c_item_GilesItemType == GilesItemType.Topaz)
                         iThisGemType = GEMTOPAZ;
                     if (c_item_GilesItemType == GilesItemType.Ruby)
@@ -350,18 +366,18 @@ namespace GilesTrinity
                         iThisGemType = GEMEMERALD;
                     if (c_item_GilesItemType == GilesItemType.Amethyst)
                         iThisGemType = GEMAMETHYST;
-                    ItemsDroppedStats.iGemsPerType[iThisGemType]++;
-                    ItemsDroppedStats.iGemsPerLevel[c_item_iLevel]++;
-                    ItemsDroppedStats.iGemsPerTPerL[iThisGemType, c_item_iLevel]++;
+                    ItemsDroppedStats.GemsPerType[iThisGemType]++;
+                    ItemsDroppedStats.GemsPerLevel[c_item_iLevel]++;
+                    ItemsDroppedStats.GemsPerTPerL[iThisGemType, c_item_iLevel]++;
                 }
                 else if (c_item_GilesItemType == GilesItemType.HealthPotion)
                 {
-                    ItemsDroppedStats.iTotalPotions++;
-                    ItemsDroppedStats.iPotionsPerLevel[c_item_iLevel]++;
+                    ItemsDroppedStats.TotalPotions++;
+                    ItemsDroppedStats.PotionsPerLevel[c_item_iLevel]++;
                 }
                 else if (c_item_GilesItemType == GilesItemType.InfernalKey)
                 {
-                    ItemsDroppedStats.iTotalInfernalKeys++;
+                    ItemsDroppedStats.TotalInfernalKeys++;
                 }
                 // See if we should update the stats file
                 if (DateTime.Now.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
@@ -500,21 +516,29 @@ namespace GilesTrinity
             // See if we should wait for [playersetting] milliseconds for possible loot drops before continuing run
             if (DateTime.Now.Subtract(lastHadUnitInSights).TotalMilliseconds <= settings.iKillLootDelay && DateTime.Now.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= 10000)
             {
-                CurrentTarget = new GilesObject(playerStatus.vCurrentPosition, GilesObjectType.Avoidance, 20000, 2f, 2f, "GilesWaitForLootDrops");
+                CurrentTarget = new GilesObject()
+                                    {
+                                        Position = playerStatus.CurrentPosition,
+                                        Type = GilesObjectType.Avoidance,
+                                        Weight = 20000,
+                                        CentreDistance = 2f,
+                                        RadiusDistance = 2f,
+                                        InternalName = "GilesWaitForLootDrops"
+                                    };
             }
             // Now see if we need to do any backtracking
-            if (CurrentTarget == null && iTotalBacktracks >= 2 && settings.bEnableBacktracking && !playerStatus.bIsInTown)
+            if (CurrentTarget == null && iTotalBacktracks >= 2 && settings.bEnableBacktracking && !playerStatus.IsInTown)
             // Never bother with the 1st backtrack position nor if we are in town
             {
                 // See if we're already within 18 feet of our start position first
-                if (Vector3.Distance(playerStatus.vCurrentPosition, vBacktrackList[1]) <= 18f)
+                if (Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[1]) <= 18f)
                 {
                     vBacktrackList = new SortedList<int, Vector3>();
                     iTotalBacktracks = 0;
                 }
                 // See if we can raytrace to the final location and it's within 25 feet
-                if (iTotalBacktracks >= 2 && Vector3.Distance(playerStatus.vCurrentPosition, vBacktrackList[1]) <= 25f &&
-                    GilesCanRayCast(playerStatus.vCurrentPosition, vBacktrackList[1], NavCellFlags.AllowWalk))
+                if (iTotalBacktracks >= 2 && Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[1]) <= 25f &&
+                    GilesCanRayCast(playerStatus.CurrentPosition, vBacktrackList[1], NavCellFlags.AllowWalk))
                 {
                     vBacktrackList = new SortedList<int, Vector3>();
                     iTotalBacktracks = 0;
@@ -524,13 +548,21 @@ namespace GilesTrinity
                     // See if we can skip to the next backtracker location first
                     if (iTotalBacktracks >= 3)
                     {
-                        if (Vector3.Distance(playerStatus.vCurrentPosition, vBacktrackList[iTotalBacktracks - 1]) <= 10f)
+                        if (Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks - 1]) <= 10f)
                         {
                             vBacktrackList.Remove(iTotalBacktracks);
                             iTotalBacktracks--;
                         }
                     }
-                    CurrentTarget = new GilesObject(vBacktrackList[iTotalBacktracks], GilesObjectType.Backtrack, 20000, Vector3.Distance(playerStatus.vCurrentPosition, vBacktrackList[iTotalBacktracks]), Vector3.Distance(playerStatus.vCurrentPosition, vBacktrackList[iTotalBacktracks]), "GilesBacktrack");
+                    CurrentTarget = new GilesObject()
+                                        {
+                                            Position = vBacktrackList[iTotalBacktracks],
+                                            Type = GilesObjectType.Backtrack,
+                                            Weight = 20000,
+                                            CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
+                                            RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
+                                            InternalName = "GilesBacktrack"
+                                        };
                 }
             }
             else
@@ -542,40 +574,64 @@ namespace GilesTrinity
             // Finally, a special check for waiting for wrath of the berserker cooldown before engaging Azmodan
             if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && settings.bWaitForWrath && !GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
                 ZetaDia.CurrentWorldId == 121214 &&
-                (Vector3.Distance(playerStatus.vCurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.vCurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+                (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 bDontSpamOutofCombat = true;
                 Logging.Write("[Trinity] Waiting for Wrath Of The Berserker cooldown before continuing to Azmodan.");
-                CurrentTarget = new GilesObject(playerStatus.vCurrentPosition, GilesObjectType.Avoidance, 20000, 2f, 2f, "GilesWaitForWrath");
+                CurrentTarget = new GilesObject()
+                                    {
+                                        Position = playerStatus.CurrentPosition,
+                                        Type = GilesObjectType.Avoidance,
+                                        Weight = 20000,
+                                        CentreDistance = 2f,
+                                        RadiusDistance = 2f,
+                                        InternalName = "GilesWaitForWrath"
+                                    };
             }
             // And a special check for wizard archon
             if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Archon) && !GilesUseTimer(SNOPower.Wizard_Archon) && settings.bWaitForArchon && ZetaDia.CurrentWorldId == 121214 &&
-                (Vector3.Distance(playerStatus.vCurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.vCurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+                (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 Logging.Write("[Trinity] Waiting for Wizard Archon cooldown before continuing to Azmodan.");
-                CurrentTarget = new GilesObject(playerStatus.vCurrentPosition, GilesObjectType.Avoidance, 20000, 2f, 2f, "GilesWaitForArchon");
+                CurrentTarget = new GilesObject()
+                                    {
+                                        Position = playerStatus.CurrentPosition,
+                                        Type = GilesObjectType.Avoidance,
+                                        Weight = 20000,
+                                        CentreDistance = 2f,
+                                        RadiusDistance = 2f,
+                                        InternalName = "GilesWaitForArchon"
+                                    };
             }
             // And a very sexy special check for WD BigBadVoodoo
             if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_BigBadVoodoo) && !PowerManager.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && ZetaDia.CurrentWorldId == 121214 &&
-                (Vector3.Distance(playerStatus.vCurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.vCurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+                (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 Logging.Write("[Trinity] Waiting for WD BigBadVoodoo cooldown before continuing to Azmodan.");
-                CurrentTarget = new GilesObject(playerStatus.vCurrentPosition, GilesObjectType.Avoidance, 20000, 2f, 2f, "GilesWaitForVoodooo");
+                CurrentTarget = new GilesObject()
+                                    {
+                                        Position = playerStatus.CurrentPosition,
+                                        Type = GilesObjectType.Avoidance,
+                                        Weight = 20000,
+                                        CentreDistance = 2f,
+                                        RadiusDistance = 2f,
+                                        InternalName = "GilesWaitForVoodooo"
+                                    };
             }
         }
         private static void RefreshSetKiting(ref Vector3 vKitePointAvoid, bool bNeedToKite, ref bool bShouldTryKiting)
         {
             bShouldTryKiting = false;
             if (
-                (((CurrentTarget != null && CurrentTarget.GilesObjectType == GilesObjectType.Unit && iKiteDistance > 0 && CurrentTarget.fRadiusDistance <= iKiteDistance) ||
-                hashMonsterObstacleCache.Any(m => m.vThisLocation.Distance(playerStatus.vCurrentPosition) <= iKiteDistance)) &&
-                (iMyCachedActorClass != ActorClass.Wizard || IsWizardShouldKite())) || playerStatus.dCurrentHealthPct <= 0.15
+                (((CurrentTarget != null && CurrentTarget.Type == GilesObjectType.Unit && iKiteDistance > 0 && CurrentTarget.RadiusDistance <= iKiteDistance) ||
+                hashMonsterObstacleCache.Any(m => m.Location.Distance(playerStatus.CurrentPosition) <= iKiteDistance)) &&
+                (iMyCachedActorClass != ActorClass.Wizard || IsWizardShouldKite())) || playerStatus.CurrentHealthPct <= 0.15
                 )
             {
                 bShouldTryKiting = true;
 
                 // lets try this... 
-                vKitePointAvoid = playerStatus.vCurrentPosition;
+                vKitePointAvoid = playerStatus.CurrentPosition;
             }
             // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
             if ((bShouldTryKiting || bNeedToKite) && (!bAnyTreasureGoblinsPresent || settings.iTreasureGoblinPriority <= 2) &&
@@ -591,7 +647,15 @@ namespace GilesTrinity
                     {
                         Logging.Write("[Trinity] Kiting to: {0} Distance: {1:0} Direction: {2:0} ", vAnySafePoint, vAnySafePoint.Distance(Me.Position), FindDirectionDegree(Me.Position, vAnySafePoint));
                     }
-                    CurrentTarget = new GilesObject(vAnySafePoint, GilesObjectType.Avoidance, 20000, Vector3.Distance(playerStatus.vCurrentPosition, vAnySafePoint), Vector3.Distance(playerStatus.vCurrentPosition, vAnySafePoint), "GilesKiting");
+                    CurrentTarget = new GilesObject()
+                                        {
+                                            Position = vAnySafePoint,
+                                            Type = GilesObjectType.Avoidance,
+                                            Weight = 20000,
+                                            CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
+                                            RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
+                                            InternalName = "GilesKiting"
+                                        };
                     timeCancelledKiteMove = DateTime.Today;
                     iMillisecondsCancelledKiteMoveFor = 5000;
 

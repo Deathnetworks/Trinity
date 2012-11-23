@@ -12,15 +12,71 @@ using Zeta.Navigation;
 
 namespace GilesTrinity
 {
+    /// <summary>
+    /// Giles Trinity DemonBuddy Plugin 
+    /// </summary>
     public partial class GilesTrinity : IPlugin
     {
-        public Version Version { get { return new Version(1, 6, 3, 4); } }
-        public string Author { get { return "GilesSmith + Demonbuddy Community Devs"; } }
-        public string Description { get { return "GilesTrinity version " + Version + " (v0.43) + x7"; } }
-
-        public void OnPulse()
-        {
+        /// <summary>
+        /// Gets the version of plugin.
+        /// </summary>
+        /// <remarks>
+        /// This is used by DemonBuddy on plugin tab 
+        /// </remarks>
+        /// <value>
+        /// The version of plugin.
+        /// </value>
+        public Version Version 
+        { 
+            get 
+            { 
+                return new Version(1, 7, 0, 0); 
+            } 
         }
+
+        /// <summary>
+        /// Gets the author of plugin.
+        /// </summary>
+        /// <remarks>
+        /// This is used by DemonBuddy on plugin tab 
+        /// </remarks>
+        /// <value>
+        /// The author of plugin.
+        /// </value>
+        public string Author 
+        { 
+            get 
+            { 
+                return "GilesSmith + Demonbuddy Community Devs"; 
+            } 
+        }
+
+        /// <summary>
+        /// Gets the description of plugin.
+        /// </summary>
+        /// <remarks>
+        /// This is used by DemonBuddy on plugin tab 
+        /// </remarks>
+        /// <value>
+        /// The description of plugin.
+        /// </value>
+        public string Description 
+        { 
+            get 
+            {
+                return string.Format("GilesTrinity Community Edition (version {0})", Version); 
+            } 
+        }
+
+        /// <summary>
+        /// Receive Pulse event from DemonBuddy.
+        /// </summary>
+        public void OnPulse()
+        { }
+
+        /// <summary>
+        /// Called when user Enable the plugin.
+        /// </summary>
         public void OnEnabled()
         {
             string battleTagName = "";
@@ -29,6 +85,7 @@ namespace GilesTrinity
                 battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
             }
             catch { }
+
             string sDemonBuddyPath = Assembly.GetEntryAssembly().Location;
             sTrinityPluginPath = Path.GetDirectoryName(sDemonBuddyPath) + @"\Plugins\GilesTrinity\";
             sTrinityConfigFile = Path.GetDirectoryName(sDemonBuddyPath) + @"\Settings\GilesTrinity.cfg";
@@ -123,6 +180,10 @@ namespace GilesTrinity
                 Log("");
             }
         }
+
+        /// <summary>
+        /// Called when user disable the plugin.
+        /// </summary>
         public void OnDisabled()
         {
             bPluginEnabled = false;
@@ -137,13 +198,46 @@ namespace GilesTrinity
             GameEvents.OnGameLeft -= GilesTrinityOnLeaveGame;
             Log("DISABLED: Giles Trinity is now shut down...");
         }
+
+        /// <summary>
+        /// Called when DemonBuddy shut down.
+        /// </summary>
         public void OnShutdown()
         {
         }
+
+        /// <summary>
+        /// Called when DemonBuddy initialize the plugin.
+        /// </summary>
         public void OnInitialize()
         {
         }
-        public string Name { get { return "GilesTrinity"; } }
-        public bool Equals(IPlugin other) { return (other.Name == Name) && (other.Version == Version); }
+
+        /// <summary>
+        /// Gets the displayed name of plugin.
+        /// </summary>
+        /// <remarks>
+        /// This is used by DemonBuddy on plugin tab 
+        /// </remarks>
+        /// <value>The name.</value>
+        public string Name 
+        { 
+            get 
+            { 
+                return "GilesTrinity"; 
+            } 
+        }
+
+        /// <summary>
+        /// Check if this instance of plugin is equals to the specified other.
+        /// </summary>
+        /// <param name="other">The other plugin to compare.</param>
+        /// <returns>
+        /// <c>true</c> if this instance is equals to the specified other; otherwise <c>false</c>
+        /// </returns>
+        public bool Equals(IPlugin other) 
+        { 
+            return (other.Name == Name) && (other.Version == Version); 
+        }
     }
 }

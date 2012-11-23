@@ -16,7 +16,7 @@ namespace GilesTrinity
         /// <param name="bOOCBuff">Buff Out Of Combat</param>
         /// <param name="bDestructiblePower">Is this for breaking destructables?</param>
         /// <returns></returns>
-        public static GilesPower GilesAbilitySelector(bool bCurrentlyAvoiding = false, bool bOOCBuff = false, bool bDestructiblePower = false)
+        internal static GilesPower GilesAbilitySelector(bool bCurrentlyAvoiding = false, bool bOOCBuff = false, bool bDestructiblePower = false)
         {
             // Refresh buffs once to save buff-check-spam
             GilesRefreshBuffs();

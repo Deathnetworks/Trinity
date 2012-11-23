@@ -24,7 +24,7 @@ namespace GilesTrinity
                 iFakeStart = rndNum.Next(36) * 5;
             if (bRandomizeDistance)
                 fDistanceOutreach += rndNum.Next(18);
-            float fDirectionToTarget = FindDirectionDegree(playerStatus.vCurrentPosition, vTargetLocation);
+            float fDirectionToTarget = FindDirectionDegree(playerStatus.CurrentPosition, vTargetLocation);
             float fPointToTarget;
             float fHighestWeight = float.NegativeInfinity;
             Vector3 vBestLocation = vNullLocation;
@@ -64,7 +64,7 @@ namespace GilesTrinity
                         iPosition = 360 + iPosition;
                     if (iPosition > 360)
                         iPosition = iPosition - 360;
-                    vThisZigZag = MathEx.GetPointAt(playerStatus.vCurrentPosition, fRunDistance, MathEx.ToRadians(iPosition));
+                    vThisZigZag = MathEx.GetPointAt(playerStatus.CurrentPosition, fRunDistance, MathEx.ToRadians(iPosition));
                     if (fPointToTarget <= 30f || fPointToTarget >= 330f)
                     {
                         vThisZigZag.Z = vTargetLocation.Z;
@@ -73,7 +73,7 @@ namespace GilesTrinity
                     {
                         //K: we are trying to find position that we can circle around the target
                         //   but we shouldn't run too far away from target
-                        vThisZigZag.Z = (vTargetLocation.Z + playerStatus.vCurrentPosition.Z) / 2;
+                        vThisZigZag.Z = (vTargetLocation.Z + playerStatus.CurrentPosition.Z) / 2;
                         fRunDistance = fDistanceOutreach - 5f;
                     }
                     else
@@ -101,13 +101,13 @@ namespace GilesTrinity
                         if (iMultiplier == 2)
                             fThisWeight -= 80f;
                         // Remove weight for each avoidance *IN* that location
-                        foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => GilesIntersectsPath(cp.vThisLocation, cp.fThisRadius * 1.2f, playerStatus.vCurrentPosition, vThisZigZag)))
+                        foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => GilesIntersectsPath(cp.Location, cp.Radius * 1.2f, playerStatus.CurrentPosition, vThisZigZag)))
                         {
                             bAnyAvoidance = true;
-                            fThisWeight -= (float)tempobstacle.dThisWeight;
+                            fThisWeight -= (float)tempobstacle.Weight;
                         }
                         // Give extra weight to areas we've been inside before
-                        bool bExtraSafetyWeight = hashSkipAheadAreaCache.Any(cp => cp.vThisLocation.Distance(vThisZigZag) <= cp.fThisRadius);
+                        bool bExtraSafetyWeight = hashSkipAheadAreaCache.Any(cp => cp.Location.Distance(vThisZigZag) <= cp.Radius);
                         if (bExtraSafetyWeight)
                             fThisWeight += 100f;
                         // Use this one if it's more weight, or we haven't even found one yet, or if same weight as another with a random chance
@@ -153,26 +153,26 @@ namespace GilesTrinity
                 }
                 bHasEmergencyTeleportUp = (
                     // Leap is available
-                    (!playerStatus.bIsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Leap) &&
+                    (!playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Leap) &&
                         DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Leap]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Barbarian_Leap]) ||
                     // Whirlwind is available
-                    (!playerStatus.bIsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) &&
-                        ((playerStatus.dCurrentEnergy >= 10 && !playerStatus.bWaitingForReserveEnergy) || playerStatus.dCurrentEnergy >= iWaitingReservedAmount)) ||
+                    (!playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) &&
+                        ((playerStatus.CurrentEnergy >= 10 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= iWaitingReservedAmount)) ||
                     // Tempest rush is available
-                    (!playerStatus.bIsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Monk_TempestRush) &&
-                        ((playerStatus.dCurrentEnergy >= 20 && !playerStatus.bWaitingForReserveEnergy) || playerStatus.dCurrentEnergy >= iWaitingReservedAmount)) ||
+                    (!playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Monk_TempestRush) &&
+                        ((playerStatus.CurrentEnergy >= 20 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= iWaitingReservedAmount)) ||
                     // Teleport is available
-                    (!playerStatus.bIsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Teleport) &&
-                        playerStatus.dCurrentEnergy >= 15 &&
+                    (!playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Teleport) &&
+                        playerStatus.CurrentEnergy >= 15 &&
                         PowerManager.CanCast(SNOPower.Wizard_Teleport)) ||
                     // Archon Teleport is available
-                    (!playerStatus.bIsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Archon_Teleport) &&
+                    (!playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Archon_Teleport) &&
                         PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
                     );
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
-                if (!bKitingSpot && iMyCachedActorClass == ActorClass.Wizard && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_WaveOfForce) && playerStatus.dCurrentEnergy >= 25 &&
+                if (!bKitingSpot && iMyCachedActorClass == ActorClass.Wizard && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_WaveOfForce) && playerStatus.CurrentEnergy >= 25 &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_WaveOfForce] &&
-                    !playerStatus.bIsIncapacitated && hashAvoidanceObstacleCache.Count(u => u.iThisSNOID == 5212 && u.vThisLocation.Distance(playerStatus.vCurrentPosition) <= 15f) >= 2 &&
+                    !playerStatus.IsIncapacitated && hashAvoidanceObstacleCache.Count(u => u.SNOID == 5212 && u.Location.Distance(playerStatus.CurrentPosition) <= 15f) >= 2 &&
                     (settings.bEnableCriticalMass || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, vNullLocation, iCurrentWorldID, -1);
@@ -185,7 +185,7 @@ namespace GilesTrinity
             Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
             int iFakeStart = (rndNum.Next(36)) * 10;
 
-            iFakeStart = (int)(FindDirectionDegree(playerStatus.vCurrentPosition, vNearbyPoint) - 180);
+            iFakeStart = (int)(FindDirectionDegree(playerStatus.CurrentPosition, vNearbyPoint) - 180);
 
             float fHighestWeight = 0f;
             Vector3 vBestLocation = vNullLocation;
@@ -257,11 +257,11 @@ namespace GilesTrinity
                         if (Math.Abs(fAvoidBlacklistDirection - iPosition) >= 145 || Math.Abs(fAvoidBlacklistDirection - iPosition) <= 215)
                             fBonusAmount = 200f;
                     }
-                    Vector3 vTestPoint = MathEx.GetPointAt(playerStatus.vCurrentPosition, iDistanceOut, MathEx.ToRadians(iPosition));
+                    Vector3 vTestPoint = MathEx.GetPointAt(playerStatus.CurrentPosition, iDistanceOut, MathEx.ToRadians(iPosition));
                     // First check no avoidance obstacles in this spot
-                    if (!hashAvoidanceObstacleCache.Any(u => u.vThisLocation.Distance(vTestPoint) <= GetAvoidanceRadius(u.iThisSNOID)))
+                    if (!hashAvoidanceObstacleCache.Any(u => u.Location.Distance(vTestPoint) <= GetAvoidanceRadius(u.SNOID)))
                     {
-                        bool bAvoidBlackspot = hashAvoidanceBlackspot.Any(cp => Vector3.Distance(cp.vThisLocation, vTestPoint) <= cp.fThisRadius);
+                        bool bAvoidBlackspot = hashAvoidanceBlackspot.Any(cp => Vector3.Distance(cp.Location, vTestPoint) <= cp.Radius);
                         bool bCanRaycast = false;
                         // Now see if the client can navigate there, and we haven't temporarily blacklisted this spot
                         //if (!bAvoidBlackspot)
@@ -293,7 +293,7 @@ namespace GilesTrinity
                                 }
                             }
                             // Give extra weight to areas we've been inside before
-                            bool bExtraSafetyWeight = hashSkipAheadAreaCache.Any(cp => cp.vThisLocation.Distance(vTestPoint) <= cp.fThisRadius);
+                            bool bExtraSafetyWeight = hashSkipAheadAreaCache.Any(cp => cp.Location.Distance(vTestPoint) <= cp.Radius);
                             if (bExtraSafetyWeight)
                             {
                                 if (bKitingSpot)
@@ -313,27 +313,27 @@ namespace GilesTrinity
                             if (!bFindAntiStuckSpot)
                             {
                                 Vector3 point = vTestPoint;
-                                int iMonsterCount = hashMonsterObstacleCache.Count(cp => GilesIntersectsPath(cp.vThisLocation, cp.fThisRadius, playerStatus.vCurrentPosition, point));
+                                int iMonsterCount = hashMonsterObstacleCache.Count(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, point));
                                 fThisWeight -= (iMonsterCount * 30);
-                                foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => GilesIntersectsPath(cp.vThisLocation, cp.fThisRadius * 2f, playerStatus.vCurrentPosition, point)))
+                                foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => GilesIntersectsPath(cp.Location, cp.Radius * 2f, playerStatus.CurrentPosition, point)))
                                 {
                                     // We don't want to kite through avoidance... 
                                     if (bKitingSpot)
                                         fThisWeight = 0;
                                     else
-                                        fThisWeight -= (float)(tempobstacle.dThisWeight * 0.6);
+                                        fThisWeight -= (float)(tempobstacle.Weight * 0.6);
                                 }
-                                foreach (GilesObstacle tempobstacle in hashMonsterObstacleCache.Where(cp => GilesIntersectsPath(cp.vThisLocation, cp.fThisRadius * 2f, playerStatus.vCurrentPosition, point)))
+                                foreach (GilesObstacle tempobstacle in hashMonsterObstacleCache.Where(cp => GilesIntersectsPath(cp.Location, cp.Radius * 2f, playerStatus.CurrentPosition, point)))
                                 {
                                     // We don't want to kite through monsters... 
                                     if (bKitingSpot)
                                         fThisWeight = 0;
                                     else
-                                        fThisWeight -= (float)(tempobstacle.dThisWeight * 0.6);
+                                        fThisWeight -= (float)(tempobstacle.Weight * 0.6);
                                 }
                                 if (bKitingSpot)
                                 {
-                                    foreach (GilesObstacle tempobstacle in hashNavigationObstacleCache.Where(cp => GilesIntersectsPath(cp.vThisLocation, cp.fThisRadius * 2f, playerStatus.vCurrentPosition, point)))
+                                    foreach (GilesObstacle tempobstacle in hashNavigationObstacleCache.Where(cp => GilesIntersectsPath(cp.Location, cp.Radius * 2f, playerStatus.CurrentPosition, point)))
                                     {
                                         // We don't want to kite through obstacles...
                                         fThisWeight = 0;
@@ -341,7 +341,7 @@ namespace GilesTrinity
                                 }
                                 foreach (GilesObstacle tempobstacle in hashMonsterObstacleCache)
                                 {
-                                    float fDistFromMonster = tempobstacle.vThisLocation.Distance(vNearbyPoint);
+                                    float fDistFromMonster = tempobstacle.Location.Distance(vNearbyPoint);
                                     float fDistFromMe = vTestPoint.Distance(vNearbyPoint);
                                     if (fDistFromMonster < fDistFromMe)
                                     {
@@ -359,7 +359,7 @@ namespace GilesTrinity
                             if (bKitingSpot)
                             {
                                 // Kiting spots don't like to end up near other monsters
-                                foreach (GilesObstacle tempobstacle in hashMonsterObstacleCache.Where(cp => Vector3.Distance(cp.vThisLocation, vTestPoint) <= (cp.fThisRadius + iKiteDistance)))
+                                foreach (GilesObstacle tempobstacle in hashMonsterObstacleCache.Where(cp => Vector3.Distance(cp.Location, vTestPoint) <= (cp.Radius + iKiteDistance)))
                                 {
                                     fThisWeight = 0;
                                 }

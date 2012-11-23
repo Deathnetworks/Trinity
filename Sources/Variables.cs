@@ -9,10 +9,17 @@ using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
 using Zeta.Pathfinding;
+
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
+
+        /// <summary>
+        /// Settings of the plugin
+        /// </summary>
+        public static GilesSettings settings = new GilesSettings();
+
         /// <summary>
         /// Special debugging
         /// </summary>
@@ -75,7 +82,7 @@ namespace GilesTrinity
         /// This object is used for the main handling - the "current target" etc. as selected by the target-selecter, whether it be a unit, an item, a shrine, anything. 
         /// It's cached data using my own class, so I never need to hit D3 memory to "re-check" the data or to call an interact request or anything
         /// </summary>
-        public static GilesObject CurrentTarget = null;
+        internal static GilesObject CurrentTarget = null;
 
         /// <summary>
         /// A flag to indicate whether we have a new target from the overlord (decorator) or not, in which case don't refresh targets again this first loop
@@ -157,7 +164,7 @@ namespace GilesTrinity
         /// <summary>
         /// Obstacle cache, things we can't or shouldn't move through
         /// </summary>
-        public static HashSet<GilesObstacle> hashNavigationObstacleCache = new HashSet<GilesObstacle>();
+        internal static HashSet<GilesObstacle> hashNavigationObstacleCache = new HashSet<GilesObstacle>();
 
         // Related to the profile reloaded when restarting games, to pick the FIRST profile.
 
@@ -167,7 +174,7 @@ namespace GilesTrinity
         public static string sFirstProfileSeen = "";
 
         // A list of small areas covering zones we move through while fighting to help our custom move-handler skip ahead waypoints
-        public static HashSet<GilesObstacle> hashSkipAheadAreaCache = new HashSet<GilesObstacle>();
+        internal static HashSet<GilesObstacle> hashSkipAheadAreaCache = new HashSet<GilesObstacle>();
         public static DateTime lastAddedLocationCache = DateTime.Today;
         public static Vector3 vLastRecordedLocationCache = Vector3.Zero;
         public static bool bSkipAheadAGo = false;

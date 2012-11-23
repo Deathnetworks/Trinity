@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.DbProvider;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,7 +18,7 @@ namespace GilesTrinity
         /// </summary>
         private static void UpdateCachedPlayerData()
         {
-            if (DateTime.Now.Subtract(playerStatus.lastUpdatedPlayer).TotalMilliseconds <= 50)
+            if (DateTime.Now.Subtract(playerStatus.LastUpdated).TotalMilliseconds <= 50)
                 return;
             // If we aren't in the game of a world is loading, don't do anything yet
             if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
@@ -27,22 +28,22 @@ namespace GilesTrinity
                 return;
             try
             {
-                playerStatus.lastUpdatedPlayer = DateTime.Now;
-                playerStatus.bIsInTown = me.IsInTown;
-                playerStatus.bIsIncapacitated = (me.IsFeared || me.IsStunned || me.IsFrozen || me.IsBlind);
-                playerStatus.bIsRooted = me.IsRooted;
-                playerStatus.dCurrentHealthPct = me.HitpointsCurrentPct;
-                playerStatus.dCurrentEnergy = me.CurrentPrimaryResource;
-                playerStatus.dCurrentEnergyPct = playerStatus.dCurrentEnergy / me.MaxPrimaryResource;
-                playerStatus.dDiscipline = me.CurrentSecondaryResource;
-                playerStatus.dDisciplinePct = playerStatus.dDiscipline / me.MaxSecondaryResource;
-                playerStatus.vCurrentPosition = me.Position;
-                if (playerStatus.dCurrentEnergy >= iWaitingReservedAmount)
-                    playerStatus.bWaitingForReserveEnergy = false;
-                if (playerStatus.dCurrentEnergy < 20)
-                    playerStatus.bWaitingForReserveEnergy = true;
-                playerStatus.iMyDynamicID = me.CommonData.DynamicId;
-                playerStatus.iMyLevel = me.Level;
+                playerStatus.LastUpdated = DateTime.Now;
+                playerStatus.IsInTown = me.IsInTown;
+                playerStatus.IsIncapacitated = (me.IsFeared || me.IsStunned || me.IsFrozen || me.IsBlind);
+                playerStatus.IsRooted = me.IsRooted;
+                playerStatus.CurrentHealthPct = me.HitpointsCurrentPct;
+                playerStatus.CurrentEnergy = me.CurrentPrimaryResource;
+                playerStatus.CurrentEnergyPct = playerStatus.CurrentEnergy / me.MaxPrimaryResource;
+                playerStatus.Discipline = me.CurrentSecondaryResource;
+                playerStatus.DisciplinePct = playerStatus.Discipline / me.MaxSecondaryResource;
+                playerStatus.CurrentPosition = me.Position;
+                if (playerStatus.CurrentEnergy >= iWaitingReservedAmount)
+                    playerStatus.WaitingForReserveEnergy = false;
+                if (playerStatus.CurrentEnergy < 20)
+                    playerStatus.WaitingForReserveEnergy = true;
+                playerStatus.MyDynamicID = me.CommonData.DynamicId;
+                playerStatus.Level = me.Level;
             }
             catch
             {
@@ -194,7 +195,7 @@ namespace GilesTrinity
         // Special check to force re-buffing before castign archon
         private static bool CanCastArchon = false;
 
-        private static void Log(string message, bool isDiagnostic = false)
+        internal static void Log(string message, bool isDiagnostic = false)
         {
             string totalMessage = String.Format("[Trinity] {0}", message);
             if (!isDiagnostic)

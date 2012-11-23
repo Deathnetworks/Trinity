@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.DbProvider;
+using System;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -88,11 +89,40 @@ namespace GilesTrinity
             if (bWantThis)
             {
                 c_IgnoreReason = "None";
-                listGilesObjectCache.Add(new GilesObject(c_vPosition, c_ObjectType, c_dWeight, c_fCentreDistance, c_fRadiusDistance, c_sName,
-                    c_iACDGUID, c_iRActorGuid, c_iDynamicID, c_iBalanceID, c_iActorSNO, c_item_iLevel, c_item_iGoldStackSize, c_item_bOneHanded,
-                    c_item_tQuality, c_item_tDBItemType, c_item_tFollowerType, c_item_GilesItemType, c_unit_bIsElite, c_unit_bIsRare, c_unit_bIsUnique,
-                    c_unit_bIsMinion, c_unit_bIsTreasureGoblin, c_unit_bIsBoss, c_unit_bIsAttackable, c_unit_dHitPoints, c_fRadius,
-                    c_unit_MonsterSize, c_diaObject, c_bIsEliteRareUnique, c_bForceLeapAgainst));
+                listGilesObjectCache.Add(
+                    new GilesObject(c_diaObject)
+                    {
+                        Position = c_vPosition,
+                        Type = c_ObjectType,
+                        Weight = c_dWeight,
+                        CentreDistance = c_fCentreDistance,
+                        RadiusDistance = c_fRadiusDistance, 
+                        InternalName = c_sName, 
+                        ACDGuid = c_iACDGUID, 
+                        RActorGuid = c_iRActorGuid,
+                        DynamicID = c_iDynamicID, 
+                        BalanceID = c_iBalanceID, 
+                        ActorSNO = c_iActorSNO,
+                        Level = c_item_iLevel,
+                        GoldAmount = c_item_iGoldStackSize,
+                        OneHanded = c_item_bOneHanded, 
+                        ItemQuality = c_item_tQuality,
+                        DBItemType = c_item_tDBItemType,
+                        FollowerType = c_item_tFollowerType, 
+                        GilesItemType = c_item_GilesItemType,
+                        IsElite = c_unit_bIsElite,
+                        IsRare = c_unit_bIsRare,
+                        IsUnique = c_unit_bIsUnique, 
+                        IsMinion = c_unit_bIsMinion, 
+                        IsTreasureGoblin = c_unit_bIsTreasureGoblin,
+                        IsBoss = c_unit_bIsBoss, 
+                        IsAttackable = c_unit_bIsAttackable, 
+                        HitPoints = c_unit_dHitPoints, 
+                        Radius = c_fRadius,
+                        MonsterStyle = c_unit_MonsterSize,
+                        IsEliteRareUnique = c_bIsEliteRareUnique, 
+                        ForceLeapAgainst = c_bForceLeapAgainst
+                    });
             }
             return true;
         }
@@ -246,7 +276,7 @@ namespace GilesTrinity
         private static void RefreshStepCalculateDistance()
         {
             // Calculate distance, don't rely on DB's internal method as this may hit Diablo 3 memory again
-            c_fCentreDistance = Vector3.Distance(playerStatus.vCurrentPosition, c_vPosition);
+            c_fCentreDistance = Vector3.Distance(playerStatus.CurrentPosition, c_vPosition);
             // Set radius-distance to centre distance at first
             c_fRadiusDistance = c_fCentreDistance;
         }
@@ -637,7 +667,7 @@ namespace GilesTrinity
             if (c_ObjectType != GilesObjectType.Avoidance)
             {
                 // Calculate the z-height difference between our current position, and this object's position
-                c_fZDiff = Math.Abs(playerStatus.vCurrentPosition.Z - c_vPosition.Z);
+                c_fZDiff = Math.Abs(playerStatus.CurrentPosition.Z - c_vPosition.Z);
                 switch (c_ObjectType)
                 {
                     case GilesObjectType.Door:
@@ -1222,10 +1252,10 @@ namespace GilesTrinity
             else
             {
                 // We pulled this data from the dictionary cache, so use it instead of trying to get new data from DB/D3 memory!
-                c_item_iLevel = tempGilesGameBalanceId.iThisItemLevel;
-                c_item_tDBItemType = tempGilesGameBalanceId.thisItemType;
-                c_item_bOneHanded = tempGilesGameBalanceId.bThisOneHand;
-                c_item_tFollowerType = tempGilesGameBalanceId.thisFollowerType;
+                c_item_iLevel = tempGilesGameBalanceId.ItemLevel;
+                c_item_tDBItemType = tempGilesGameBalanceId.ItemType;
+                c_item_bOneHanded = tempGilesGameBalanceId.OneHand;
+                c_item_tFollowerType = tempGilesGameBalanceId.FollowerType;
             }
             // Able to get cached data or not?
             // Error reading the item?
@@ -1933,7 +1963,7 @@ namespace GilesTrinity
                 }
             }
             // Add it to the list of known avoidance objects, *IF* our health is lower than this avoidance health limit
-            if (!bIgnoreThisAvoidance && dThisHealthAvoid >= playerStatus.dCurrentHealthPct)
+            if (!bIgnoreThisAvoidance && dThisHealthAvoid >= playerStatus.CurrentHealthPct)
             {
                 // Generate a "weight" for how badly we want to avoid this obstacle, based on a percentage of 100% the avoidance health is, multiplied into a max of 200 weight
                 double dThisWeight = (200 * dThisHealthAvoid);
