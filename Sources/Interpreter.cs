@@ -58,13 +58,13 @@ namespace GilesTrinity
 
         public Interpreter()
         {
-            customPath = GilesTrinity.sTrinityPluginPath + @"Specification\";
-            logPath = GilesTrinity.sTrinityPluginPath + @"Log\";
-            init();
+            //init();
         }
 
         public void init()
         {
+            customPath = GilesTrinity.sTrinityPluginPath + @"Specification\";
+            logPath = GilesTrinity.sTrinityPluginPath + @"Log\";
             ruleSet = new ArrayList();
 
             string disFileName = "config.dis";
