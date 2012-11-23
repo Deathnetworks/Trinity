@@ -179,6 +179,7 @@ namespace GilesTrinity
                 Log("ENABLED: " + Description + " now in action!"); ;
                 Log("");
             }
+            StashRule.init();
         }
 
         /// <summary>

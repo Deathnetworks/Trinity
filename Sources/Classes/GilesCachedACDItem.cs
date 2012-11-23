@@ -6,7 +6,7 @@ namespace GilesTrinity
     // GilesCachedACDItem - Special caching class to help with backpack-item handling
     // So we can make an object, read all item stats from a backpack item *ONCE*, then store it here while my behavior trees process everything
     // Preventing any need for calling D3 memory again after the initial read (every D3 memory read is a chance for a DB crash/item mis-read/stuck!)
-    internal class GilesCachedACDItem
+    public class GilesCachedACDItem
     {
         public string InternalName { get; set; }
         public string RealName { get; set; }
@@ -17,6 +17,7 @@ namespace GilesTrinity
         public int DynamicID { get; set; }
         public float WeaponDPS { get; set; }
         public bool OneHanded { get; set; }
+        public bool TwoHanded { get; set; }
         public DyeType DyeType { get; set; }
         public ItemType DBItemType { get; set; }
         public FollowerType FollowerType { get; set; }
@@ -57,6 +58,25 @@ namespace GilesTrinity
         public float ArcaneOnCrit { get; set; }
         public float ManaRegen { get; set; }
         public float GlobeBonus { get; set; }
+        public float HatredRegen { get; set; }
+        public float MaxFury { get; set; }
+        public float SpiritRegen { get; set; }
+        public float MaxSpirit { get; set; }
+        public float HealthPerSpiritSpent { get; set; }
+        public float MaxArcanePower { get; set; }
+        public float DamageReductionPhysicalPercent { get; set; }
+        public float ArmorTotal { get; set; }
+        public float Armor { get; set; }
+        public float FireDamagePercent { get; set; }
+        public float LightningDamagePercent { get; set; }
+        public float ColdDamagePercent { get; set; }
+        public float PoisonDamagePercent { get; set; }
+        public float ArcaneDamagePercent { get; set; }
+        public float HolyDamagePercent { get; set; }
+        public float HealthGlobeBonus { get; set; }
+        public float WeaponAttacksPerSecond { get; set; }
+        public float WeaponMaxDamage { get; set; }
+        public float WeaponMinDamage { get; set; }
 
         public GilesCachedACDItem(
             string internalName, 
@@ -68,6 +88,7 @@ namespace GilesTrinity
             int dynamicId, 
             float dps,
             bool oneHanded, 
+            bool twoHanded,
             DyeType dyeType, 
             ItemType itemType, 
             FollowerType followerType, 
@@ -84,6 +105,7 @@ namespace GilesTrinity
             DynamicID = dynamicId;
             WeaponDPS = dps;
             OneHanded = oneHanded;
+            TwoHanded = twoHanded;
             DyeType = dyeType;
             DBItemType = itemType;
             FollowerType = followerType;
@@ -124,6 +146,27 @@ namespace GilesTrinity
             ArcaneOnCrit = itemStats.ArcaneOnCrit;
             ManaRegen = itemStats.ManaRegen;
             GlobeBonus = itemStats.HealthGlobeBonus;
+            HatredRegen = itemStats.HatredRegen;
+            MaxFury = itemStats.MaxFury;
+            SpiritRegen = itemStats.SpiritRegen;
+            MaxSpirit = itemStats.MaxSpirit;
+            HealthPerSpiritSpent = itemStats.HealthPerSpiritSpent;
+            MaxArcanePower = itemStats.MaxArcanePower;
+            DamageReductionPhysicalPercent = itemStats.DamageReductionPhysicalPercent;
+            ArmorTotal = itemStats.ArmorTotal;
+            Armor = itemStats.Armor;
+            FireDamagePercent = itemStats.FireDamagePercent;
+            LightningDamagePercent = itemStats.LightningDamagePercent;
+            ColdDamagePercent = itemStats.ColdDamagePercent;
+            PoisonDamagePercent = itemStats.PoisonDamagePercent;
+            ArcaneDamagePercent = itemStats.ArcaneDamagePercent;
+            HolyDamagePercent = itemStats.HolyDamagePercent;
+            HealthGlobeBonus = itemStats.HealthGlobeBonus;
+            WeaponAttacksPerSecond = itemStats.WeaponAttacksPerSecond;
+            WeaponMaxDamage = itemStats.WeaponMaxDamage;
+            WeaponMinDamage = itemStats.WeaponMinDamage;
+
         }
+
     }
 }

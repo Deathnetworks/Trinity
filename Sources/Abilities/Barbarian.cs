@@ -373,10 +373,10 @@ namespace GilesTrinity
                 if (bGenerateNewZigZag)
                 {
                     //float fExtraDistance = targetCurrent.fCentreDistance+(targetCurrent.fCentreDistance <= 16f ? 16f : 8f);
-                    vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, CurrentTarget.CentreDistance + 25f);
+                    //vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, CurrentTarget.CentreDistance + 25f);
                     // Resetting this to ensure the "no-spam" is reset since we changed our target location
                     if (iAnythingWithinRange[RANGE_30] >= 6 || iElitesWithinRange[RANGE_30] >= 3 || c_iActorSNO == 89690)
-                        vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f, false, false, true);
+                        vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f, false, true);
                     else
                         vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f);
                     powerLastSnoPowerUsed = SNOPower.None;

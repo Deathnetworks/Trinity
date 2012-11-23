@@ -71,6 +71,7 @@
     <Compile Include="DbProvider\GilesLootTargetingProvider.cs" />
     <Compile Include="DbProvider\GilesObstacleTargetingProvider.cs" />
     <Compile Include="Classes\GilesObject.cs" />
+    <Compile Include="Interpreter.cs" />
     <Compile Include="Notifications\NotificationManager.cs" />
     <Compile Include="Notifications\ProwlNotification.cs" />
     <Compile Include="Notifications\ProwlNotificationPriority.cs" />
@@ -111,6 +112,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Specification\config.dis" />
+    <None Include="Specification\legendary.dis" />
+    <None Include="Specification\magic.dis" />
+    <None Include="Specification\rare.dis" />
+    <None Include="Specification\rare.dis.orig" />
+    <None Include="Specification\test.dis" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Log\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>

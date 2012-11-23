@@ -597,5 +597,8 @@ namespace GilesTrinity
         // Behaviors: How close we need to get to the target before we consider it "reached"
         private static float fRangeRequired = 1f;
         private static float fDistanceReduction = 0f;
+
+        // Darkfriend's Looting Rule
+        private static Interpreter StashRule = new Interpreter();
     }
 }

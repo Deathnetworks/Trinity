@@ -580,7 +580,7 @@ namespace GilesTrinity
             }
 
             // Loop through all the objects and give them a weight
-            if (bDebugLogSpecial && !settings.bDebugInfo && CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO != null && CurrentTarget.Type != null)
+            if (bDebugLogSpecial && !settings.bDebugInfo && CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.Type != GilesObjectType.Unknown)
             {
                 Logging.WriteVerbose("[Trinity] Target changed to {2} {0} ({1})",
                                 CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.Type);
