@@ -22,6 +22,7 @@ namespace GilesTrinity.XmlTags
         private float fRandomizedDistance;
         private string sDestinationName;
         private string sNoSkip;
+        private string sUseNavigation;
         private Vector3? vMainVector;
 
         protected override Composite CreateBehavior()
@@ -66,7 +67,10 @@ namespace GilesTrinity.XmlTags
             }
 
             // Now use Trinity movement to try a direct movement towards that location
-            Navigator.PlayerMover.MoveTowards(Position);
+            if (sUseNavigation == null || sUseNavigation.ToLower() != "true")
+                Navigator.PlayerMover.MoveTowards(Position);
+            else
+                Navigator.MoveTo(Position);
             return RunStatus.Success;
         }
 
@@ -104,6 +108,19 @@ namespace GilesTrinity.XmlTags
                     return m_IsDone;
                 }
                 return true;
+            }
+        }
+
+        [XmlAttribute("navigation")]
+        public string navigation
+        {
+            get
+            {
+                return sUseNavigation;
+            }
+            set
+            {
+                sUseNavigation = value;
             }
         }
 
@@ -217,5 +234,7 @@ namespace GilesTrinity.XmlTags
                 fPosZ = value;
             }
         }
+
+        
     }
 }

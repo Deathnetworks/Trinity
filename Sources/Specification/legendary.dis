@@ -1709,7 +1709,7 @@
 // Reduces duration of control impairing effects by 11-12%
 // +1 Random Magic Properties
 // Item Level: 61
-[QUALITY] == Legendary && [NAME] == Gladiator Gauntlets # [DMGFACTOR] > 10 || [MAXSTATVIT] > 100 || [ALLRES] > 50
+[QUALITY] == Legendary && [NAME] == Gladiator Gauntlets # [1] == 1 # [TRASH]
 
 // - Frostburn Gauntlets ------------------------------------------------------+
 // Legendary Gloves
