@@ -356,7 +356,7 @@ namespace GilesTrinity
                 (!settings.bSelectiveWhirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)) &&
                 // Only if within 15 foot of main target
                 ((CurrentTarget.RadiusDistance <= 25f || iAnythingWithinRange[RANGE_25] >= 1)) &&
-                //(iAnythingWithinRange[RANGE_50] >= 2 || CurrentTarget.HitPoints >= 0.30 || CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || playerStatus.CurrentHealthPct <= 0.60) &&
+                (iAnythingWithinRange[RANGE_50] >= 2 || CurrentTarget.HitPoints >= 0.30 || CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || playerStatus.CurrentHealthPct <= 0.60) &&
                 // Check for energy reservation amounts
                 //((playerStatus.dCurrentEnergy >= 20 && !playerStatus.bWaitingForReserveEnergy) || playerStatus.dCurrentEnergy >= iWaitingReservedAmount) &&
                 playerStatus.CurrentEnergy >= 10 &&
