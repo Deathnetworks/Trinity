@@ -643,7 +643,7 @@ namespace GilesTrinity
                     return;
                 }
                 GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
-                    thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.DyeType, thisitem.ItemType, thisitem.FollowerSpecialType,
+                    thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.FollowerSpecialType,
                     thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
                 double iThisItemValue = ValueThisItem(thiscacheditem, tempItemType);
                 double iNeedScore = ScoreNeeded(tempItemType);
@@ -763,7 +763,7 @@ namespace GilesTrinity
                     else
                     {
                         GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId, item.DynamicId,
-                            item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.DyeType, item.ItemType, item.FollowerSpecialType, item.IsUnidentified, item.ItemStackQuantity,
+                            item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.IsTwoHand, item.DyeType, item.ItemType, item.FollowerSpecialType, item.IsUnidentified, item.ItemStackQuantity,
                             item.Stats);
                         bool bShouldStashTest = ShouldWeStashThis(thiscacheditem);
                         Logging.Write(bShouldStashTest ? "* KEEP *" : "-- TRASH --");
@@ -793,6 +793,7 @@ namespace GilesTrinity
 
             // Now look for Misc items we might want to keep
             GilesItemType TrueItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
+            GilesBaseItemType thisGilesBaseType = DetermineBaseType(TrueItemType);
             if (TrueItemType == GilesItemType.StaffOfHerding)
             {
                 if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep staff of herding)");
@@ -843,11 +844,22 @@ namespace GilesTrinity
                 if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (ignoring potions)");
                 return false;
             }
-            if (thisitem.Quality >= ItemQuality.Legendary)
+
+            switch (StashRule.checkItem(thisitem, TrueItemType, thisGilesBaseType))
             {
-                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep legendaries)");
-                return true;
+                case Interpreter.InterpreterAction.KEEP:
+                    return true;
+                case Interpreter.InterpreterAction.TRASH:
+                    return false;
+                default:
+                    break;
             }
+
+            //if (thisitem.Quality >= ItemQuality.Legendary)
+            //{
+            //    if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep legendaries)");
+            //    return true;
+            //}
 
             // Ok now try to do some decent item scoring based on item types
             double iNeedScore = ScoreNeeded(TrueItemType);
