@@ -127,7 +127,7 @@ namespace GilesTrinity
         /// <summary>
         /// A "fake" object to send to target provider for stuck handlers etc.
         /// </summary>
-        public static DiaObject thisFakeObject;
+        public static DiaObject FakeObject;
 
         /// <summary>
         /// Timestamp of when our position was last measured as changed

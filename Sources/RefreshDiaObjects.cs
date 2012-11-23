@@ -159,7 +159,7 @@ namespace GilesTrinity
             iCurrentMaxLootRadius = Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius;
             bStayPutDuringAvoidance = false;
             // Set up the fake object for the target handler
-            thisFakeObject = null;
+            FakeObject = null;
             // Not allowed to kill monsters due to profile/routine/combat targeting settings - just set the kill range to a third
             if (!ProfileManager.CurrentProfile.KillMonsters || !CombatTargeting.Instance.AllowedToKillMonsters)
             {

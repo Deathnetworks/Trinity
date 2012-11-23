@@ -20,11 +20,13 @@ namespace GilesTrinity.DbProvider
         /// <returns>Blank list of target, GilesTrinity don't use this Db process.</returns>
         public List<DiaObject> GetObjectsByWeight()
         {
-            if (!GilesTrinity.bDontMoveMeIAmDoingShit || GilesTrinity.thisFakeObject == null)
+            if (!GilesTrinity.bDontMoveMeIAmDoingShit || GilesTrinity.FakeObject == null)
                 return listEmptyList;
-            List<DiaObject> listFakeList = new List<DiaObject>();
-            listFakeList.Add(GilesTrinity.thisFakeObject);
-            return listFakeList;
+
+            return new List<DiaObject>() 
+                        { 
+                            GilesTrinity.FakeObject 
+                        };
         }
     }
 }

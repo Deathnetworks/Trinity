@@ -847,8 +847,8 @@ namespace GilesTrinity
             {
                 c_diaObject = (DiaUnit)thisUnit;
                 // Prepare the fake object for target handler
-                if (thisFakeObject == null)
-                    thisFakeObject = thisUnit;
+                if (FakeObject == null)
+                    FakeObject = thisUnit;
             }
             catch
             {
