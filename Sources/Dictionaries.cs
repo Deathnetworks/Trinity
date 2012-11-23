@@ -361,6 +361,12 @@ namespace GilesTrinity
             60665, 60844, 78554, 86400, 86428, 81699, 86266, 86400, 110769, 192466, 211456, 6190, 80002, 104596, 58836, 104827, 74909, 6155, 6156, 6158, 6159, 75132,
             181504, 91688, 3016, 3007, 3011, 3014, 130858, 131573, 214396, 182730, 226087, 141639, 206569, 15119, 54413, 54926, 2979, 56416, 53802, 5776, 3949, 
             108490, 52833, 200371,
+            //a3dun_crater_st_Demo_ChainPylon_Fire_Azmodan
+            198977,
+            //a3dun_crater_st_Demon_ChainPylon_Fire_MistressOfPain
+            201680,
+            //trOut_Leor_painting
+            217285,
          };
         // Timers for abilities and selection of best ability etc.
         // Dictionaries holding the data/timers
