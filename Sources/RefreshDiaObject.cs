@@ -1022,6 +1022,10 @@ namespace GilesTrinity
             }
             else
                 bUseBerserker = false;
+            if (theseaffixes.HasFlag(MonsterAffixes.Waller))
+                bCheckGround = true;
+            else
+                bCheckGround = false;
             // Is this something we should try to force leap/other movement abilities against?
             c_bForceLeapAgainst = false;
             double dUseKillRadius = RefreshKillRadius();
@@ -1063,7 +1067,8 @@ namespace GilesTrinity
             {
                 try
                 {
-                    c_unit_bIsAttackable = (tempCommonData.GetAttribute<int>(ActorAttributeType.Invulnerable) <= 0);
+                     
+                    c_unit_bIsAttackable = !thisUnit.IsInvulnerable;
                 }
                 catch (Exception ex)
                 {
@@ -1081,7 +1086,7 @@ namespace GilesTrinity
                 {
                     try
                     {
-                        bBurrowed = (tempCommonData.GetAttribute<int>(ActorAttributeType.Untargetable) != 0) || (tempCommonData.GetAttribute<int>(ActorAttributeType.Burrowed) != 0);
+                        bBurrowed = !thisUnit.IsAttackable;
                     }
                     catch (Exception ex)
                     {

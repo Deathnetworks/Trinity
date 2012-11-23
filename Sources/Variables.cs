@@ -391,6 +391,7 @@ namespace GilesTrinity
         // Goblinney things
         private static bool bUseBerserker = false;
         private static bool bWaitingForSpecial = false;
+        private static bool bCheckGround = false;
         private static int iTotalNumberGoblins = 0;
         private static DateTime lastGoblinTime = DateTime.Today;
 

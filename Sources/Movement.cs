@@ -12,7 +12,7 @@ namespace GilesTrinity
     public partial class GilesTrinity : IPlugin
     {
         // Special Zig-Zag movement for whirlwind/tempest
-        public static Vector3 FindZigZagTargetLocation(Vector3 vTargetLocation, float fDistanceOutreach, bool bRandomizeDistance = false, bool bRandomizeStart = false)
+        public static Vector3 FindZigZagTargetLocation(Vector3 vTargetLocation, float fDistanceOutreach, bool bRandomizeDistance = false, bool bRandomizeStart = false, bool bCheckGround = false)
         {
             Vector3 vThisZigZag = vNullLocation;
             Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
@@ -82,7 +82,13 @@ namespace GilesTrinity
                         //   this can help a lot when we are near stairs
                         fRunDistance = 8f;
                     }
-                    bCanRayCast = pf.IsNavigable(gp.WorldToGrid(vThisZigZag.ToVector2()));
+                    
+                    if (bCheckGround)   {
+                        vThisZigZag.Z = gp.GetHeight(vThisZigZag.ToVector2());
+                        bCanRayCast = ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
+                    }
+                    else
+                        bCanRayCast = pf.IsNavigable(gp.WorldToGrid(vThisZigZag.ToVector2()));
                     // Give weight to each zigzag point, so we can find the best one to aim for
                     if (bCanRayCast)
                     {
