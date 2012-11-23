@@ -356,7 +356,7 @@ namespace GilesTrinity
                 (!settings.bSelectiveWhirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)) &&
                 // Only if within 15 foot of main target
                 ((CurrentTarget.RadiusDistance <= 25f || iAnythingWithinRange[RANGE_25] >= 1)) &&
-                (iAnythingWithinRange[RANGE_50] >= 2 || CurrentTarget.HitPoints >= 0.30 || CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || playerStatus.CurrentHealthPct <= 0.60) &&
+                //(iAnythingWithinRange[RANGE_50] >= 2 || CurrentTarget.HitPoints >= 0.30 || CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || playerStatus.CurrentHealthPct <= 0.60) &&
                 // Check for energy reservation amounts
                 //((playerStatus.dCurrentEnergy >= 20 && !playerStatus.bWaitingForReserveEnergy) || playerStatus.dCurrentEnergy >= iWaitingReservedAmount) &&
                 playerStatus.CurrentEnergy >= 10 &&
@@ -373,10 +373,10 @@ namespace GilesTrinity
                 if (bGenerateNewZigZag)
                 {
                     //float fExtraDistance = targetCurrent.fCentreDistance+(targetCurrent.fCentreDistance <= 16f ? 16f : 8f);
-                    vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, CurrentTarget.CentreDistance + 25f);
+                    //vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, CurrentTarget.CentreDistance + 25f);
                     // Resetting this to ensure the "no-spam" is reset since we changed our target location
                     if (iAnythingWithinRange[RANGE_30] >= 6 || iElitesWithinRange[RANGE_30] >= 3 || c_iActorSNO == 89690)
-                        vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f, false, false, true);
+                        vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f, false, true);
                     else
                         vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f);
                     powerLastSnoPowerUsed = SNOPower.None;

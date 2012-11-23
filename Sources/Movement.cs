@@ -12,7 +12,7 @@ namespace GilesTrinity
     public partial class GilesTrinity : IPlugin
     {
         // Special Zig-Zag movement for whirlwind/tempest
-        public static Vector3 FindZigZagTargetLocation(Vector3 vTargetLocation, float fDistanceOutreach, bool bRandomizeDistance = false, bool bNinetyDegree = false, bool bRandomizeStart = false)
+        public static Vector3 FindZigZagTargetLocation(Vector3 vTargetLocation, float fDistanceOutreach, bool bRandomizeDistance = false, bool bRandomizeStart = false)
         {
             Vector3 vThisZigZag = vNullLocation;
             Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
@@ -21,13 +21,16 @@ namespace GilesTrinity
             //K: bRandomizeStart is for boss and elite, they usually jump around, make obstacles, let you Incapacitated. 
             //   you usually have to move back and forth to hit them
             if (bRandomizeStart)
-                iFakeStart = rndNum.Next(36) * 5;
+                iFakeStart = rndNum.Next(18) * 5;
             if (bRandomizeDistance)
                 fDistanceOutreach += rndNum.Next(18);
             float fDirectionToTarget = FindDirectionDegree(playerStatus.CurrentPosition, vTargetLocation);
+
             float fPointToTarget;
+
             float fHighestWeight = float.NegativeInfinity;
             Vector3 vBestLocation = vNullLocation;
+
             bool bFoundSafeSpotsFirstLoop = false;
             float fAdditionalRange = 0f;
             //K: Direction is more important than distance
@@ -37,33 +40,30 @@ namespace GilesTrinity
                 {
                     if (bFoundSafeSpotsFirstLoop)
                         break;
-                    fAdditionalRange = 210f;
+                    fAdditionalRange = 150f;
                     if (bRandomizeStart)
-                        iFakeStart = 60f + (rndNum.Next(12) * 5);
+                        iFakeStart = 30f + (rndNum.Next(16) * 5);
                     else
-                        iFakeStart = (rndNum.Next(13) * 5);
+                        iFakeStart = (rndNum.Next(17) * 5);
                 }
                 float fRunDistance = fDistanceOutreach;
                 for (float iDegreeChange = iFakeStart; iDegreeChange <= 30f + fAdditionalRange; iDegreeChange += 5)
                 {
                     float iPosition = iDegreeChange;
                     //point to target is better, otherwise we have to avoid obstacle first 
-                    if (iPosition > 210f)
-                        iPosition = 120f - iPosition;
-                    else if (iPosition > 180f)
-                        iPosition = iPosition - 90f;
-                    else if (iPosition > 105f)
+                    if (iPosition > 105f)
                         iPosition = 90f - iPosition;
                     else if (iPosition > 30f)
                         iPosition -= 15f;
                     else
                         iPosition = 15f - iPosition;
                     fPointToTarget = iPosition;
+
                     iPosition += fDirectionToTarget;
                     if (iPosition < 0)
-                        iPosition = 360 + iPosition;
-                    if (iPosition > 360)
-                        iPosition = iPosition - 360;
+                        iPosition = 360f + iPosition;
+                    if (iPosition >= 360f)
+                        iPosition = iPosition - 360f;
                     vThisZigZag = MathEx.GetPointAt(playerStatus.CurrentPosition, fRunDistance, MathEx.ToRadians(iPosition));
                     if (fPointToTarget <= 30f || fPointToTarget >= 330f)
                     {
@@ -82,17 +82,7 @@ namespace GilesTrinity
                         //   this can help a lot when we are near stairs
                         fRunDistance = 8f;
                     }
-                    //
-                    //K: The idea here is still we care more about direction than others things, if we are near plain area, no need to care about obstacles
-                    //if (Math.Abs(playerStatus.vCurrentPosition.Z - vThisZigZag.Z) < 1f)
-                    //    bCanRayCast = GilesCanRayCast(playerStatus.vCurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
-                    //
-                    //K: carefully handle stairs, we cannot jump up and down stairs, so we need judge this on the ground
-                    //else
-                    //    bCanRayCast = ZetaDia.Physics.Raycast(playerStatus.vCurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
-
                     bCanRayCast = pf.IsNavigable(gp.WorldToGrid(vThisZigZag.ToVector2()));
-
                     // Give weight to each zigzag point, so we can find the best one to aim for
                     if (bCanRayCast)
                     {
