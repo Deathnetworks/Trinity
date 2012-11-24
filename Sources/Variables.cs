@@ -24,16 +24,19 @@ namespace GilesTrinity
         /// Special debugging
         /// </summary>
         private static bool bDebugLogSpecial = false;
+        private static bool bDebugLogSpecial = true;
 
         /// <summary>
         /// Dumps info every tick about object caching... this will dump hundreds of MB of data in an hour, be careful!
         /// </summary>
         private static bool bDebugLogRefreshDiaObject = false;
+        private static bool bDebugLogRefreshDiaObject = true;
 
         /// <summary>
         /// Dumps info every tick about object/target weighting... this will dump hundreds of MB of data in an hour, be careful!
         /// </summary>
         private static bool bDebugLogWeights = false;
+        private static bool bDebugLogWeights = true;
 
         /// <summary>
         /// Used for letting noobs know they started the bot without Trinity enabled in the plugins tab.
