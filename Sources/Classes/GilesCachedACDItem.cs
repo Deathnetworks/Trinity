@@ -20,6 +20,7 @@ namespace GilesTrinity
         public bool TwoHanded { get; set; }
         public DyeType DyeType { get; set; }
         public ItemType DBItemType { get; set; }
+        public ItemBaseType DBBaseType { get; set; }
         public FollowerType FollowerType { get; set; }
         public bool IsUnidentified { get; set; }
         public int ItemStackQuantity { get; set; }
@@ -91,6 +92,7 @@ namespace GilesTrinity
             bool twoHanded,
             DyeType dyeType, 
             ItemType itemType, 
+            ItemBaseType itembasetype, 
             FollowerType followerType, 
             bool unidentified, 
             int stackQuantity, 
@@ -108,6 +110,7 @@ namespace GilesTrinity
             TwoHanded = twoHanded;
             DyeType = dyeType;
             DBItemType = itemType;
+            DBBaseType = itembasetype;
             FollowerType = followerType;
             IsUnidentified = unidentified;
             ItemStackQuantity = stackQuantity;

@@ -43,7 +43,6 @@ namespace GilesTrinity
 
         GilesCachedACDItem item;
         GilesItemType truetype;
-        GilesBaseItemType basetype;
 
         TextWriter log;
 
@@ -206,11 +205,10 @@ namespace GilesTrinity
             return fileName;
         }
 
-        public InterpreterAction checkItem(GilesCachedACDItem item, GilesItemType thisGilesItemType, GilesBaseItemType thisGilesBaseType)
+        public InterpreterAction checkItem(GilesCachedACDItem item, GilesItemType thisGilesItemType)
         {
             this.item = item;
             this.truetype = thisGilesItemType;
-            this.basetype = thisGilesBaseType;
 
             bool checkFlag = true;
 
@@ -386,7 +384,7 @@ namespace GilesTrinity
             switch (str)
             {
                 case "[BASETYPE]":
-                    return basetype.ToString();
+                    return item.DBBaseType.ToString();
                 case "[TYPE]":
                     return truetype.ToString();
                 case "[QUALITY]":
