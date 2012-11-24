@@ -855,11 +855,11 @@ namespace GilesTrinity
                     break;
             }
 
-            //if (thisitem.Quality >= ItemQuality.Legendary)
-            //{
-            //    if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep legendaries)");
-            //    return true;
-            //}
+            if (thisitem.Quality >= ItemQuality.Legendary)
+            {
+                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep legendaries)");
+               return true;
+            }
 
             // Ok now try to do some decent item scoring based on item types
             double iNeedScore = ScoreNeeded(TrueItemType);

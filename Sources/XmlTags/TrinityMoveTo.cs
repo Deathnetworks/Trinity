@@ -112,7 +112,7 @@ namespace GilesTrinity.XmlTags
         }
 
         [XmlAttribute("navigation")]
-        public string navigation
+        public string Navigation
         {
             get
             {

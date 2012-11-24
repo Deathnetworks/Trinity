@@ -572,22 +572,22 @@ namespace GilesTrinity
             }
             // End of backtracking check
             // Finally, a special check for waiting for wrath of the berserker cooldown before engaging Azmodan
-            if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && settings.bWaitForWrath && !GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                ZetaDia.CurrentWorldId == 121214 &&
-                (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
-            {
-                bDontSpamOutofCombat = true;
-                Logging.Write("[Trinity] Waiting for Wrath Of The Berserker cooldown before continuing to Azmodan.");
-                CurrentTarget = new GilesObject()
-                                    {
-                                        Position = playerStatus.CurrentPosition,
-                                        Type = GilesObjectType.Avoidance,
-                                        Weight = 20000,
-                                        CentreDistance = 2f,
-                                        RadiusDistance = 2f,
-                                        InternalName = "GilesWaitForWrath"
-                                    };
-            }
+            //if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && settings.bWaitForWrath && !GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
+            //    ZetaDia.CurrentWorldId == 121214 &&
+            //    (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+            //{
+            //    bDontSpamOutofCombat = true;
+            //    Logging.Write("[Trinity] Waiting for Wrath Of The Berserker cooldown before continuing to Azmodan.");
+            //    CurrentTarget = new GilesObject()
+            //                        {
+            //                            Position = playerStatus.CurrentPosition,
+            //                            Type = GilesObjectType.Avoidance,
+            //                            Weight = 20000,
+            //                            CentreDistance = 2f,
+            //                            RadiusDistance = 2f,
+            //                            InternalName = "GilesWaitForWrath"
+            //                        };
+            //}
             // And a special check for wizard archon
             if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Archon) && !GilesUseTimer(SNOPower.Wizard_Archon) && settings.bWaitForArchon && ZetaDia.CurrentWorldId == 121214 &&
                 (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
