@@ -119,10 +119,18 @@ namespace GilesTrinity.DbProvider
                 Logging.Write("[Trinity] This is too far for the unstucker, and is likely a sign of ending up in the wrong map zone.");
                 iTotalAntiStuckAttempts = 20;
             }
-            //intell
+            // intell
             if (iTotalAntiStuckAttempts <= 15)
             {
-                Logging.Write("[Trinity] Your bot got stuck! Trying to unstuck (attempt #" + iTotalAntiStuckAttempts.ToString() + " of 15 attempts)");
+                Logging.Write(
+                    "[Trinity] Your bot got stuck! Trying to unstuck (attempt #{0} of 15 attempts) {1} {2} {3} {4}",
+                    iTotalAntiStuckAttempts.ToString(),
+                    "Act=\"" + ZetaDia.CurrentAct + "\" ",
+                    "questId=\"" + ZetaDia.CurrentQuest.QuestSNO + "\" ",
+                    "stepId=\"" + ZetaDia.CurrentQuest.StepId + "\" ",
+                    "worldId=\"" + ZetaDia.CurrentWorldId + "\" "
+                );
+
                 Logging.WriteDiagnostic("(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
                 GilesTrinity.playerStatus.CurrentPosition = vMyCurrentPosition;
                 vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, Vector3.Zero);
@@ -273,7 +281,7 @@ namespace GilesTrinity.DbProvider
                 }
             }
             // Make sure GilesTrinity doesn't want us to avoid routine-movement
-            //if (GilesTrinity.bDontMoveMeIAmDoingShit)
+            // if (GilesTrinity.bDontMoveMeIAmDoingShit)
             //    return;
             // Store player current position
             vMyCurrentPosition = ZetaDia.Me.Position;
@@ -348,10 +356,10 @@ namespace GilesTrinity.DbProvider
                 fDistanceFromTarget = Vector3.Distance(vMyCurrentPosition, vMoveToTarget);
             }
             // Is the built-in unstucker enabled or not?
-            //if (GilesTrinity.settings.bDebugInfo)
-            //{
+            // if (GilesTrinity.settings.bDebugInfo)
+            // {
             //    Logging.WriteDiagnostic("[Trinity] Moving toward <{0:0},{1:0},{2:0}> distance: {3:0}", vMoveToTarget.X, vMoveToTarget.Y, vMoveToTarget.Z, fDistanceFromTarget);
-            //}
+            // }
             // See if there's an obstacle in our way, if so try to navigate around it
             Vector3 point = vMoveToTarget;
             foreach (GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
@@ -474,7 +482,7 @@ namespace GilesTrinity.DbProvider
             }
             // Allowed to use movement powers to move out-of-combat?
             ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
-            //ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
+            // ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
         }
     }
 }

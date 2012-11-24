@@ -186,7 +186,8 @@ namespace GilesTrinity
                 }
                 // Been trying to handle the same target for more than 30 seconds without damaging/reaching it? Blacklist it!
                 // Note: The time since target picked updates every time the current target loses health, if it's a monster-target
-                if (CurrentTargetIsNotAvoidance() && (
+                // Don't blacklist stuff if we're playing a cutscene
+                if (!ZetaDia.IsPlayingCutscene && CurrentTargetIsNotAvoidance() && (
                             (CurrentTargetIsNonUnit() && GetSecondsSinceTargetAssigned() > 6) ||
                             (CurrentTargetIsUnit() && GetSecondsSinceTargetAssigned() > 15)))
                 {
@@ -209,14 +210,18 @@ namespace GilesTrinity
                     {
                         if (CurrentTarget.Type == GilesObjectType.Unit)
                         {
-                            Logging.Write("[Trinity] Blacklisting a monster because of possible stuck issues. Monster=" + CurrentTarget.InternalName + " {" +
-                                CurrentTarget.ActorSNO.ToString() + "}. Range=" + CurrentTarget.CentreDistance.ToString("0") + ", health %=" + CurrentTarget.HitPoints.ToString("0")
+                            Logging.Write("[Trinity] Blacklisting a monster because of possible stuck issues. " +
+                                "Monster=" + CurrentTarget.InternalName + " {" +
+                                CurrentTarget.ActorSNO + "} Range=" + CurrentTarget.CentreDistance.ToString("0") + " health %=" + CurrentTarget.HitPoints.ToString("0") +
+                                " RActorGUID=" + CurrentTarget.RActorGuid
                                 );
                         }
                         else
                         {
                             Logging.Write("[Trinity] Blacklisting an object because of possible stuck issues. Object=" + CurrentTarget.InternalName + " {" +
-                                CurrentTarget.ActorSNO + "}. Range=" + CurrentTarget.CentreDistance.ToString("0"));
+                                CurrentTarget.ActorSNO + "}. Range=" + CurrentTarget.CentreDistance.ToString("0") +
+                                " RActorGUID=" + CurrentTarget.RActorGuid
+                                );
                         }
 
                         if (CurrentTarget.IsBoss)
