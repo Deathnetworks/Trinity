@@ -15,7 +15,7 @@
 // |  (     (   | .  |  _|    |   (_ |  |  |   /   _ \   |     |   (   | .  | 
 // | \___| \___/ _|\_| _|   ___| \___| \__/ _|_\ _/  _\ _|   ___| \___/ _|\_| 
 // +--------------------------------------------------------------------------------------+   
-$$ [DEBUG]		== false				// verbose logging ... unused at the moment
+$$ [DEBUG]		== true				// verbose logging ... unused at the moment
 $$ [LOG]		== true					// log all information to the log file
 $$ [TRASHLOG]	== true					// log all trashed items ... legendary only for now
 // +--------------------------------------------------------------------------------------+   

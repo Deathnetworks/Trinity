@@ -227,18 +227,18 @@ namespace GilesTrinity
             if (sThisInternalName.StartsWith("twohandedsword_")) return GilesItemType.TwoHandSword;
             if (sThisInternalName.StartsWith("staffofcow")) return GilesItemType.StaffOfHerding;
             if (sThisInternalName.StartsWith("mojo_")) return GilesItemType.Mojo;
-            if (sThisInternalName.StartsWith("orb_")) return GilesItemType.Source;
+            if (sThisInternalName.StartsWith("orb_")) return GilesItemType.Orb;
             if (sThisInternalName.StartsWith("quiver_")) return GilesItemType.Quiver;
             if (sThisInternalName.StartsWith("shield_")) return GilesItemType.Shield;
             if (sThisInternalName.StartsWith("amulet_")) return GilesItemType.Amulet;
             if (sThisInternalName.StartsWith("ring_")) return GilesItemType.Ring;
             if (sThisInternalName.StartsWith("boots_")) return GilesItemType.Boots;
-            if (sThisInternalName.StartsWith("bracers_")) return GilesItemType.Bracers;
+            if (sThisInternalName.StartsWith("bracers_")) return GilesItemType.Bracer;
             if (sThisInternalName.StartsWith("cloak_")) return GilesItemType.Cloak;
             if (sThisInternalName.StartsWith("gloves_")) return GilesItemType.Gloves;
-            if (sThisInternalName.StartsWith("pants_")) return GilesItemType.Pants;
+            if (sThisInternalName.StartsWith("pants_")) return GilesItemType.Legs;
             if (sThisInternalName.StartsWith("barbbelt_")) return GilesItemType.MightyBelt;
-            if (sThisInternalName.StartsWith("shoulderpads_")) return GilesItemType.Shoulders;
+            if (sThisInternalName.StartsWith("shoulderpads_")) return GilesItemType.Shoulder;
             if (sThisInternalName.StartsWith("spiritstone_")) return GilesItemType.SpiritStone;
             if (sThisInternalName.StartsWith("voodoomask_")) return GilesItemType.VoodooMask;
             if (sThisInternalName.StartsWith("wizardhat_")) return GilesItemType.WizardHat;
@@ -332,14 +332,14 @@ namespace GilesTrinity
             {
                 thisGilesBaseType = GilesBaseItemType.WeaponRange;
             }
-            else if (thisGilesItemType == GilesItemType.Mojo || thisGilesItemType == GilesItemType.Source ||
+            else if (thisGilesItemType == GilesItemType.Mojo || thisGilesItemType == GilesItemType.Orb ||
                 thisGilesItemType == GilesItemType.Quiver || thisGilesItemType == GilesItemType.Shield)
             {
                 thisGilesBaseType = GilesBaseItemType.Offhand;
             }
-            else if (thisGilesItemType == GilesItemType.Boots || thisGilesItemType == GilesItemType.Bracers || thisGilesItemType == GilesItemType.Chest ||
+            else if (thisGilesItemType == GilesItemType.Boots || thisGilesItemType == GilesItemType.Bracer || thisGilesItemType == GilesItemType.Chest ||
                 thisGilesItemType == GilesItemType.Cloak || thisGilesItemType == GilesItemType.Gloves || thisGilesItemType == GilesItemType.Helm ||
-                thisGilesItemType == GilesItemType.Pants || thisGilesItemType == GilesItemType.Shoulders || thisGilesItemType == GilesItemType.SpiritStone ||
+                thisGilesItemType == GilesItemType.Legs || thisGilesItemType == GilesItemType.Shoulder || thisGilesItemType == GilesItemType.SpiritStone ||
                 thisGilesItemType == GilesItemType.VoodooMask || thisGilesItemType == GilesItemType.WizardHat || thisGilesItemType == GilesItemType.Belt ||
                 thisGilesItemType == GilesItemType.MightyBelt)
             {
@@ -391,11 +391,11 @@ namespace GilesTrinity
                 thisGilesItemType == GilesItemType.TwoHandDaibo || thisGilesItemType == GilesItemType.TwoHandCrossbow || thisGilesItemType == GilesItemType.TwoHandMace ||
                 thisGilesItemType == GilesItemType.TwoHandMighty || thisGilesItemType == GilesItemType.TwoHandPolearm || thisGilesItemType == GilesItemType.TwoHandStaff ||
                 thisGilesItemType == GilesItemType.TwoHandSword || thisGilesItemType == GilesItemType.TwoHandAxe || thisGilesItemType == GilesItemType.HandCrossbow ||
-                thisGilesItemType == GilesItemType.TwoHandBow || thisGilesItemType == GilesItemType.Mojo || thisGilesItemType == GilesItemType.Source ||
+                thisGilesItemType == GilesItemType.TwoHandBow || thisGilesItemType == GilesItemType.Mojo || thisGilesItemType == GilesItemType.Orb ||
                 thisGilesItemType == GilesItemType.Quiver || thisGilesItemType == GilesItemType.Shield || thisGilesItemType == GilesItemType.Boots ||
-                thisGilesItemType == GilesItemType.Bracers || thisGilesItemType == GilesItemType.Chest || thisGilesItemType == GilesItemType.Cloak ||
-                thisGilesItemType == GilesItemType.Gloves || thisGilesItemType == GilesItemType.Helm || thisGilesItemType == GilesItemType.Pants ||
-                thisGilesItemType == GilesItemType.Shoulders || thisGilesItemType == GilesItemType.SpiritStone ||
+                thisGilesItemType == GilesItemType.Bracer || thisGilesItemType == GilesItemType.Chest || thisGilesItemType == GilesItemType.Cloak ||
+                thisGilesItemType == GilesItemType.Gloves || thisGilesItemType == GilesItemType.Helm || thisGilesItemType == GilesItemType.Legs ||
+                thisGilesItemType == GilesItemType.Shoulder || thisGilesItemType == GilesItemType.SpiritStone ||
                 thisGilesItemType == GilesItemType.VoodooMask || thisGilesItemType == GilesItemType.WizardHat || thisGilesItemType == GilesItemType.StaffOfHerding)
                 return true;
             return false;
@@ -427,21 +427,21 @@ namespace GilesTrinity
                 case GilesItemType.TwoHandSword: return ItemType.Sword;
                 case GilesItemType.StaffOfHerding: return ItemType.Staff;
                 case GilesItemType.Mojo: return ItemType.Mojo;
-                case GilesItemType.Source: return ItemType.Orb;
+                case GilesItemType.Orb: return ItemType.Orb;
                 case GilesItemType.Quiver: return ItemType.Quiver;
                 case GilesItemType.Shield: return ItemType.Shield;
                 case GilesItemType.Amulet: return ItemType.Amulet;
                 case GilesItemType.Ring: return ItemType.Ring;
                 case GilesItemType.Belt: return ItemType.Belt;
                 case GilesItemType.Boots: return ItemType.Boots;
-                case GilesItemType.Bracers: return ItemType.Bracer;
+                case GilesItemType.Bracer: return ItemType.Bracer;
                 case GilesItemType.Chest: return ItemType.Chest;
                 case GilesItemType.Cloak: return ItemType.Cloak;
                 case GilesItemType.Gloves: return ItemType.Gloves;
                 case GilesItemType.Helm: return ItemType.Helm;
-                case GilesItemType.Pants: return ItemType.Legs;
+                case GilesItemType.Legs: return ItemType.Legs;
                 case GilesItemType.MightyBelt: return ItemType.MightyBelt;
-                case GilesItemType.Shoulders: return ItemType.Shoulder;
+                case GilesItemType.Shoulder: return ItemType.Shoulder;
                 case GilesItemType.SpiritStone: return ItemType.SpiritStone;
                 case GilesItemType.VoodooMask: return ItemType.VoodooMask;
                 case GilesItemType.WizardHat: return ItemType.WizardHat;
@@ -793,7 +793,18 @@ namespace GilesTrinity
 
             // Now look for Misc items we might want to keep
             GilesItemType TrueItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
-            //GilesBaseItemType thisGilesBaseType = DetermineBaseType(TrueItemType);
+            GilesBaseItemType thisGilesBaseType = DetermineBaseType(TrueItemType);
+
+            switch (StashRule.checkItem(thisitem, TrueItemType, thisGilesBaseType))
+            {
+                case Interpreter.InterpreterAction.KEEP:
+                    return true;
+                case Interpreter.InterpreterAction.TRASH:
+                    return false;
+                default:
+                    break;
+            }
+
             if (TrueItemType == GilesItemType.StaffOfHerding)
             {
                 if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep staff of herding)");
@@ -845,15 +856,7 @@ namespace GilesTrinity
                 return false;
             }
 
-            switch (StashRule.checkItem(thisitem))
-            {
-                case Interpreter.InterpreterAction.KEEP:
-                    return true;
-                case Interpreter.InterpreterAction.TRASH:
-                    return false;
-                default:
-                    break;
-            }
+            
 
             if (thisitem.Quality >= ItemQuality.Legendary)
             {
@@ -891,11 +894,11 @@ namespace GilesTrinity
                 iThisNeedScore = settings.iNeedPointsToKeepJewelry;
 
             // Armor
-            if (thisGilesItemType == GilesItemType.Mojo || thisGilesItemType == GilesItemType.Source || thisGilesItemType == GilesItemType.Quiver ||
+            if (thisGilesItemType == GilesItemType.Mojo || thisGilesItemType == GilesItemType.Orb || thisGilesItemType == GilesItemType.Quiver ||
                 thisGilesItemType == GilesItemType.Shield || thisGilesItemType == GilesItemType.Belt || thisGilesItemType == GilesItemType.Boots ||
-                thisGilesItemType == GilesItemType.Bracers || thisGilesItemType == GilesItemType.Chest || thisGilesItemType == GilesItemType.Cloak ||
-                thisGilesItemType == GilesItemType.Gloves || thisGilesItemType == GilesItemType.Helm || thisGilesItemType == GilesItemType.Pants ||
-                thisGilesItemType == GilesItemType.MightyBelt || thisGilesItemType == GilesItemType.Shoulders || thisGilesItemType == GilesItemType.SpiritStone ||
+                thisGilesItemType == GilesItemType.Bracer || thisGilesItemType == GilesItemType.Chest || thisGilesItemType == GilesItemType.Cloak ||
+                thisGilesItemType == GilesItemType.Gloves || thisGilesItemType == GilesItemType.Helm || thisGilesItemType == GilesItemType.Legs ||
+                thisGilesItemType == GilesItemType.MightyBelt || thisGilesItemType == GilesItemType.Shoulder || thisGilesItemType == GilesItemType.SpiritStone ||
                 thisGilesItemType == GilesItemType.VoodooMask || thisGilesItemType == GilesItemType.WizardHat)
                 iThisNeedScore = settings.iNeedPointsToKeepArmor;
             return Math.Round(iThisNeedScore);
@@ -945,7 +948,7 @@ namespace GilesTrinity
             // Off-handed stuff
 
             // Mojo, Source, Quiver
-            if (thisGilesItemType == GilesItemType.Mojo || thisGilesItemType == GilesItemType.Source || thisGilesItemType == GilesItemType.Quiver)
+            if (thisGilesItemType == GilesItemType.Mojo || thisGilesItemType == GilesItemType.Orb || thisGilesItemType == GilesItemType.Quiver)
             {
                 Array.Copy(iMaxOffHand, iThisItemsMaxStats, TOTALSTATS);
                 Array.Copy(iArmorPointsAtMax, iThisItemsMaxPoints, TOTALSTATS);
@@ -997,7 +1000,7 @@ namespace GilesTrinity
             }
 
             // Bracers
-            if (thisGilesItemType == GilesItemType.Bracers)
+            if (thisGilesItemType == GilesItemType.Bracer)
             {
                 Array.Copy(iMaxBracer, iThisItemsMaxStats, TOTALSTATS);
                 Array.Copy(iArmorPointsAtMax, iThisItemsMaxPoints, TOTALSTATS);
@@ -1035,7 +1038,7 @@ namespace GilesTrinity
             }
 
             // Pants
-            if (thisGilesItemType == GilesItemType.Pants)
+            if (thisGilesItemType == GilesItemType.Legs)
             {
                 Array.Copy(iMaxPants, iThisItemsMaxStats, TOTALSTATS);
                 Array.Copy(iArmorPointsAtMax, iThisItemsMaxPoints, TOTALSTATS);
@@ -1049,7 +1052,7 @@ namespace GilesTrinity
             }
 
             // Shoulders
-            if (thisGilesItemType == GilesItemType.Shoulders)
+            if (thisGilesItemType == GilesItemType.Shoulder)
             {
                 Array.Copy(iMaxShoulders, iThisItemsMaxStats, TOTALSTATS);
                 Array.Copy(iArmorPointsAtMax, iThisItemsMaxPoints, TOTALSTATS);
@@ -1236,7 +1239,7 @@ namespace GilesTrinity
                         }
 
                         // Pants
-                        if (thisGilesItemType == GilesItemType.Pants)
+                        if (thisGilesItemType == GilesItemType.Legs)
                         {
                             if (iTempStatistic >= 2)
                             {
@@ -1795,7 +1798,7 @@ namespace GilesTrinity
 
                     // Disable specific primary stat scoring for certain class-specific item types
                     if ((thisGilesItemType == GilesItemType.VoodooMask || thisGilesItemType == GilesItemType.WizardHat || thisGilesItemType == GilesItemType.Wand ||
-                        thisGilesItemType == GilesItemType.CeremonialKnife || thisGilesItemType == GilesItemType.Mojo || thisGilesItemType == GilesItemType.Source)
+                        thisGilesItemType == GilesItemType.CeremonialKnife || thisGilesItemType == GilesItemType.Mojo || thisGilesItemType == GilesItemType.Orb)
                         && (i == STRENGTH || i == DEXTERITY))
                         iFinalBonusGranted = 0;
                     if ((thisGilesItemType == GilesItemType.Quiver || thisGilesItemType == GilesItemType.HandCrossbow || thisGilesItemType == GilesItemType.Cloak ||
@@ -1983,7 +1986,7 @@ namespace GilesTrinity
             }
 
             // Mojos and Sources
-            if (thisGilesItemType == GilesItemType.Source || thisGilesItemType == GilesItemType.Mojo)
+            if (thisGilesItemType == GilesItemType.Orb || thisGilesItemType == GilesItemType.Mojo)
             {
                 iTotalRequirements = 0;
                 if (iHadStat[INTELLIGENCE] >= 100)
@@ -2033,7 +2036,7 @@ namespace GilesTrinity
             }
 
             // Chests/cloaks/pants without a socket lose 17% of total score
-            if ((thisGilesItemType == GilesItemType.Chest || thisGilesItemType == GilesItemType.Cloak || thisGilesItemType == GilesItemType.Pants) && iHadStat[SOCKETS] == 0)
+            if ((thisGilesItemType == GilesItemType.Chest || thisGilesItemType == GilesItemType.Cloak || thisGilesItemType == GilesItemType.Legs) && iHadStat[SOCKETS] == 0)
                 iTotalPoints *= 0.83;
 
             // Boots with no movement speed get reduced score
