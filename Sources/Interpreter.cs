@@ -579,7 +579,7 @@ namespace GilesTrinity
         public void logOut(string str, LogType logType)
         {
             log = new StreamWriter(logPath + (logType.ToString().ToLower() + "_" + startTimestamp) + ".txt", true);
-            log.WriteLine(DateTime.Now.ToString("ddMMyyyyHHmmss") + ": " + str);
+            log.WriteLine(DateTime.Now.ToString("G") + ": " + str);
             log.Close();
         }
 
