@@ -42,7 +42,6 @@ namespace GilesTrinity
         ArrayList ruleSet;
 
         GilesCachedACDItem item;
-        GilesItemType truetype;
 
         TextWriter log;
 
@@ -205,10 +204,9 @@ namespace GilesTrinity
             return fileName;
         }
 
-        public InterpreterAction checkItem(GilesCachedACDItem item, GilesItemType thisGilesItemType)
+        public InterpreterAction checkItem(GilesCachedACDItem item)
         {
             this.item = item;
-            this.truetype = thisGilesItemType;
 
             bool checkFlag = true;
 
@@ -386,7 +384,7 @@ namespace GilesTrinity
                 case "[BASETYPE]":
                     return item.DBBaseType.ToString();
                 case "[TYPE]":
-                    return truetype.ToString();
+                    return item.DBItemType.ToString();
                 case "[QUALITY]":
                    return Regex.Replace(item.Quality.ToString(), @"[\d-]", string.Empty);
                 case "[NAME]":
@@ -586,7 +584,7 @@ namespace GilesTrinity
             if (item == null)
                 return "nullItem";
             else
-                return item.RealName + "," + item.Quality + "," + truetype + " (" + item.Level + ") " + item.BalanceID;
+                return item.RealName + "," + item.Quality + "," + item.DBItemType + " (" + item.Level + ") " + item.BalanceID;
         }
 
         public void logItemFullTag(GilesCachedACDItem item, LogType logType)

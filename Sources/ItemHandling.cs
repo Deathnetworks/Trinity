@@ -845,7 +845,7 @@ namespace GilesTrinity
                 return false;
             }
 
-            switch (StashRule.checkItem(thisitem, TrueItemType))
+            switch (StashRule.checkItem(thisitem))
             {
                 case Interpreter.InterpreterAction.KEEP:
                     return true;

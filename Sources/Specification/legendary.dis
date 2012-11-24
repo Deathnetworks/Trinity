@@ -1721,7 +1721,7 @@
 // Health Globes and Potions Grant +3733-5977 Life.
 // Increases Gold and Health Pickup by 7 Yards.
 // Item Level: 62
-[QUALITY] == Legendary && [NAME] == Gladiator Gauntlets # [COLDDMG%] > 5 && [ARMORTOT] > 750
+[QUALITY] == Legendary && [NAME] == Frostburn Gauntlets # [COLDDMG%] > 5 && [ARMORTOT] > 750
 
 // - Tasker and Theo ----------------------------------------------------------+
 // Legendary Gloves
