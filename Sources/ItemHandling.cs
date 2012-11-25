@@ -917,8 +917,6 @@ namespace GilesTrinity
             if (thisitem.Quality >= ItemQuality.Legendary)
             switch (StashRule.checkItem(thisitem, TrueItemType, thisGilesBaseType))
             {
-                Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep legendaries)");
-                return true;
                 case Interpreter.InterpreterAction.KEEP:
                     return true;
                 case Interpreter.InterpreterAction.TRASH:
