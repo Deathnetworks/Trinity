@@ -1,4 +1,5 @@
 ﻿using GilesTrinity.DbProvider;
+using GilesTrinity.Settings.Loot;
 using System;
 using Zeta;
 using Zeta.Common;
@@ -330,7 +331,7 @@ namespace GilesTrinity
                 if (hashAvoidanceSNOList.Contains(c_ActorSNO) || hashAvoidanceBuffSNOList.Contains(c_ActorSNO) || hashAvoidanceSNOProjectiles.Contains(c_ActorSNO))
                 {
                     // If avoidance is disabled, ignore this avoidance stuff
-                    if (!settings.bEnableAvoidance)
+                    if (!Settings.Combat.Misc.AvoidAOE)
                     {
                         bWantThis = false;
                         //return bWantThis;
@@ -1026,7 +1027,7 @@ namespace GilesTrinity
             // Flag this as a treasure goblin *OR* ignore this object altogether if treasure goblins are set to ignore
             if (hashActorSNOGoblins.Contains(c_ActorSNO))
             {
-                if (settings.iTreasureGoblinPriority != 0)
+                if (Settings.Combat.Misc.GoblinPriority != 0)
                 {
                     c_unit_bIsTreasureGoblin = true;
                 }
@@ -1198,20 +1199,20 @@ namespace GilesTrinity
             if (c_bIsEliteRareUnique || c_unit_bIsBoss)
                 bAnyChampionsPresent = true;
             // Extended kill radius after last fighting, or when we want to force a town run
-            if ((settings.bExtendedKillRange && iKeepKillRadiusExtendedFor > 0) || bGilesForcedVendoring)
+            if ((Settings.Combat.Misc.ExtendedTrashKill && iKeepKillRadiusExtendedFor > 0) || bGilesForcedVendoring)
             {
                 if (c_RadiusDistance <= dUseKillRadius && bWantThis)
                     bAnyMobsInCloseRange = true;
             }
             else
             {
-                if (c_RadiusDistance <= settings.iMonsterKillRange && bWantThis)
+                if (c_RadiusDistance <= Settings.Combat.Misc.NonEliteRange && bWantThis)
                     bAnyMobsInCloseRange = true;
             }
             if (c_unit_bIsTreasureGoblin)
                 bAnyTreasureGoblinsPresent = true;
             // Units with very high priority (1900+) allow an extra 50% on the non-elite kill slider range
-            if (!bAnyMobsInCloseRange && !bAnyChampionsPresent && !bAnyTreasureGoblinsPresent && c_RadiusDistance <= (settings.iMonsterKillRange * 1.5))
+            if (!bAnyMobsInCloseRange && !bAnyChampionsPresent && !bAnyTreasureGoblinsPresent && c_RadiusDistance <= (Settings.Combat.Misc.NonEliteRange * 1.5))
             {
                 int iExtraPriority;
                 // Enable extended kill radius for specific unit-types
@@ -1455,7 +1456,7 @@ namespace GilesTrinity
                 //return bWantThis;
             }
             // Now see if we actually want it
-            if (settings.bUseGilesFilters)
+            if (Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy)
             {
                 // Get whether or not we want this item, cached if possible
                 bool bWantThisItem;
@@ -1523,7 +1524,7 @@ namespace GilesTrinity
                 dictGilesGoldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
             }
             // Ignore gold piles that are (currently) too small...
-            iCurrentMinimumStackSize = settings.iMinimumGoldStack;
+            iCurrentMinimumStackSize = Settings.Loot.Pickup.MinimumGoldStack;
             // Up to 40% less gold limit needed at close range
             if (c_CentreDistance <= 20f)
             {
@@ -1706,7 +1707,7 @@ namespace GilesTrinity
                         AddToCache = true;
                         // Shrines
                         // Check if either we want to ignore all shrines
-                        if (settings.IgnoreAllShrines)
+                        if (!Settings.WorldObject.UseShrine)
                         {
                             // We're ignoring all shrines, so blacklist this one
                             hashRGUIDIgnoreBlacklist60.Add(c_RActorGuid);
@@ -1766,12 +1767,12 @@ namespace GilesTrinity
                         //return bWantThis;
                         //}
                         // Set min distance to user-defined setting
-                        iMinDistance = settings.iDestructibleAttackRange + (c_Radius * 0.70);
+                        iMinDistance = Settings.WorldObject.DestructibleRange + (c_Radius * 0.70);
                         if (bForceCloseRangeTarget)
                             iMinDistance += 6f;
                         // Large objects, like logs - Give an extra xx feet of distance
                         if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out iExtendedRange))
-                            iMinDistance = settings.iDestructibleAttackRange + iExtendedRange;
+                            iMinDistance = Settings.WorldObject.DestructibleRange + iExtendedRange;
                         // This object isn't yet in our destructible desire range
                         if (iMinDistance <= 0 || c_CentreDistance > iMinDistance)
                         {
@@ -1811,12 +1812,12 @@ namespace GilesTrinity
                         //return bWantThis;
                         //}
                         // Set min distance to user-defined setting
-                        iMinDistance = settings.iDestructibleAttackRange + (c_Radius * 0.30);
+                        iMinDistance = Settings.WorldObject.DestructibleRange + (c_Radius * 0.30);
                         if (bForceCloseRangeTarget)
                             iMinDistance += 6f;
                         // Large objects, like logs - Give an extra xx feet of distance
                         if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out iExtendedRange))
-                            iMinDistance = settings.iDestructibleAttackRange + iExtendedRange;
+                            iMinDistance = Settings.WorldObject.DestructibleRange + iExtendedRange;
                         // This object isn't yet in our destructible desire range
                         if (iMinDistance <= 0 || c_RadiusDistance > iMinDistance)
                         {
@@ -1895,15 +1896,15 @@ namespace GilesTrinity
                             dictPhysicsSNO.Add(c_ActorSNO, iThisPhysicsSNO);
                         }
                         // Any physics mesh? Give a minimum distance of 5 feet
-                        if (c_Name.ToLower().Contains("corpse") && settings.bIgnoreCorpses)
+                        if (c_Name.ToLower().Contains("corpse") && Settings.WorldObject.IgnoreNonBlocking)
                         {
                             bBlacklistThis = true;
                         }
-                        else if (iThisPhysicsSNO > 0 || !settings.bIgnoreCorpses)
+                        else if (iThisPhysicsSNO > 0 || !Settings.WorldObject.IgnoreNonBlocking)
                         {
                             //Logging.WriteDiagnostic("[Trinity] open container " + tmp_sThisInternalName + "[" + tmp_iThisActorSNO.ToString() + "]" + iThisPhysicsSNO);
                             bBlacklistThis = false;
-                            iMinDistance = settings.iContainerOpenRange;
+                            iMinDistance = Settings.WorldObject.ContainerOpenRange;
                         }
                         else
                         {
@@ -1913,8 +1914,8 @@ namespace GilesTrinity
                         if (hashSNOContainerWhitelist.Contains(c_ActorSNO))
                         {
                             bBlacklistThis = false;
-                            if (settings.iContainerOpenRange > 0)
-                                iMinDistance = settings.iContainerOpenRange + 5;
+                            if (Settings.WorldObject.ContainerOpenRange > 0)
+                                iMinDistance = Settings.WorldObject.ContainerOpenRange + 5;
                         }
                         else if (c_Name.ToLower().Contains("chest") && !c_Name.ToLower().Contains("chest_rare"))
                         {
@@ -1924,8 +1925,8 @@ namespace GilesTrinity
                         if (hashSNOContainerResplendant.Contains(c_ActorSNO))
                         {
                             bBlacklistThis = false;
-                            if (settings.iContainerOpenRange > 0)
-                                iMinDistance = settings.iContainerOpenRange + 20;
+                            if (Settings.WorldObject.ContainerOpenRange > 0)
+                                iMinDistance = Settings.WorldObject.ContainerOpenRange + 20;
                             else
                                 iMinDistance = 10;
                         }
@@ -1956,7 +1957,7 @@ namespace GilesTrinity
         private static bool RefreshGilesAvoidance(bool bWantThis)
         {
             bWantThis = true;
-            // Note if you are looking here - an AOE object won't even appear at this stage if you have settings.bEnableAvoidance switched off!
+            // Note if you are looking here - an AOE object won't even appear at this stage if you have Settings.Combat.Misc.AvoidAOE switched off!
             //if (!hashAvoidanceSNOList.Contains(tmp_iThisActorSNO))
             //{
             //    Logging.WriteDiagnostic("GSDebug: Invalid avoidance detected, SNO=" + tmp_iThisActorSNO.ToString() + ", name=" + tmp_sThisInternalName + ", object type=" +
@@ -2048,7 +2049,7 @@ namespace GilesTrinity
         {
             try
             {
-                return dictAvoidanceRadius[c_ActorSNO];
+                return AvoidanceManager.GetAvoidanceRadiusBySNO(c_ActorSNO, c_Radius);
             }
             catch
             {
@@ -2060,7 +2061,7 @@ namespace GilesTrinity
         {
             try
             {
-                return dictAvoidanceRadius[actorSNO];
+                return AvoidanceManager.GetAvoidanceRadiusBySNO(actorSNO, c_Radius);
             }
             catch
             {
@@ -2072,7 +2073,7 @@ namespace GilesTrinity
         {
             try
             {
-                return dictAvoidanceHealth[c_ActorSNO];
+                return AvoidanceManager.GetAvoidanceHealthBySNO(c_ActorSNO,1);
             }
             catch
             {

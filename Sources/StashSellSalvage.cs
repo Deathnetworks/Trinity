@@ -11,7 +11,7 @@ using Zeta.Internals;
 using Zeta.Internals.Actors;
 using Zeta.Internals.Actors.Gizmos;
 using Zeta.TreeSharp;
-
+using GilesTrinity.Settings.Loot;
 
 namespace GilesTrinity
 {
@@ -30,7 +30,7 @@ namespace GilesTrinity
         {
 
             // Check this isn't something we want to salvage
-            if (settings.bSalvageJunk)
+            if (Settings.Loot.TownRun.TrashMode == TrashMode.Salvaging)
             {
                 if (GilesSalvageValidation(thisinternalname, thislevel, thisquality, thisdbitemtype, thisfollowertype))
                     return false;
@@ -72,7 +72,7 @@ namespace GilesTrinity
         /// <returns></returns>
         private static bool GilesSalvageValidation(string thisinternalname, int thislevel, ItemQuality thisquality, ItemType thisdbitemtype, FollowerType thisfollowertype)
         {
-            if (!settings.bSalvageJunk)
+            if (Settings.Loot.TownRun.TrashMode != TrashMode.Salvaging)
                 return false;
 
             // Make sure it's not legendary
@@ -240,7 +240,7 @@ namespace GilesTrinity
                         GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.FollowerSpecialType,
                             thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
-                        bool bShouldStashThis = settings.bUseGilesFilters ? ShouldWeStashThis(thiscacheditem) : ItemManager.ShouldStashItem(thisitem);
+                        bool bShouldStashThis = Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? ShouldWeStashThis(thiscacheditem) : ItemManager.ShouldStashItem(thisitem);
                         if (bShouldStashThis)
                         {
                             hashGilesCachedKeepItems.Add(thiscacheditem);
@@ -263,7 +263,7 @@ namespace GilesTrinity
         /// <returns></returns>
         private static RunStatus GilesOptimisedPreStash(object ret)
         {
-            if (settings.bDebugInfo)
+            if (Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Stash routine started";
             Log("GSDebug: Stash routine started.", true);
             loggedAnythingThisStash = false;
@@ -296,8 +296,14 @@ namespace GilesTrinity
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
                         LogWriter.WriteLine("");
                     LogStream.Close();
-                    if (settings.bEnableEmail && EmailMessage.Length > 0)
-                        NotificationManager.SendEmail(sEmailAddress, sEmailAddress, "New DB stash loot - " + sBotName, EmailMessage.ToString(), SmtpServer, sEmailPassword);
+                    if (Settings.Notification.MailEnabled && EmailMessage.Length > 0)
+                        NotificationManager.SendEmail(
+                            Settings.Notification.EmailAddress, 
+                            Settings.Notification.EmailAddress, 
+                            "New DB stash loot - " + ZetaDia.Service.CurrentHero.BattleTagName, 
+                            EmailMessage.ToString(), 
+                            SmtpServer,
+                            Settings.Notification.EmailPassword);
                     EmailMessage.Clear();
                 }
                 catch (IOException)
@@ -461,7 +467,7 @@ namespace GilesTrinity
                         GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.FollowerSpecialType,
                             thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
-                        bool bShouldSellThis = settings.bUseGilesFilters
+                        bool bShouldSellThis = Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy
                             ? GilesSellValidation(thiscacheditem.InternalName, thiscacheditem.Level, thiscacheditem.Quality, thiscacheditem.DBItemType, thiscacheditem.FollowerType)
                             : ItemManager.ShouldSellItem(thisitem);
 
@@ -472,7 +478,7 @@ namespace GilesTrinity
                         }
 
                         // Don't sell stuff that we want to salvage, if using custom loot-rules
-                        if (!settings.bUseGilesFilters && ItemManager.ShouldSalvageItem(thisitem))
+                        if (Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy && ItemManager.ShouldSalvageItem(thisitem))
                         {
                             bShouldSellThis = false;
                         }
@@ -498,7 +504,7 @@ namespace GilesTrinity
         /// <returns></returns>
         private static RunStatus GilesOptimisedPreSell(object ret)
         {
-            if (settings.bDebugInfo)
+            if (Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Sell routine started";
             Log("GSDebug: Sell routine started.", true);
             ZetaDia.Actors.Update();
@@ -835,7 +841,7 @@ namespace GilesTrinity
                         GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.FollowerSpecialType,
                             thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
-                        bool bShouldSalvageThis = settings.bUseGilesFilters ? GilesSalvageValidation(thiscacheditem.InternalName, thiscacheditem.Level, thiscacheditem.Quality, thiscacheditem.DBItemType, thiscacheditem.FollowerType) : ItemManager.ShouldSalvageItem(thisitem);
+                        bool bShouldSalvageThis = Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesSalvageValidation(thiscacheditem.InternalName, thiscacheditem.Level, thiscacheditem.Quality, thiscacheditem.DBItemType, thiscacheditem.FollowerType) : ItemManager.ShouldSalvageItem(thisitem);
                         if (bShouldSalvageThis)
                         {
                             hashGilesCachedSalvageItems.Add(thiscacheditem);
@@ -858,7 +864,7 @@ namespace GilesTrinity
         /// <returns></returns>
         private static RunStatus GilesOptimisedPreSalvage(object ret)
         {
-            if (settings.bDebugInfo)
+            if (Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Salvage routine started";
             Log("GSDebug: Salvage routine started.", true);
             ZetaDia.Actors.Update();
@@ -1148,9 +1154,9 @@ namespace GilesTrinity
                     bool bShouldNotify = false;
                     if (thisgooditem.Quality >= ItemQuality.Legendary)
                     {
-                        if (!settings.bEnableLegendaryNotifyScore)
+                        if (!Settings.Notification.LegendaryScoring)
                             bShouldNotify = true;
-                        else if (settings.bEnableLegendaryNotifyScore && EvaluateItemScoreForNotification(thisgilesbaseitemtype, ithisitemvalue))
+                        else if (Settings.Notification.LegendaryScoring && EvaluateItemScoreForNotification(thisgilesbaseitemtype, ithisitemvalue))
                             bShouldNotify = true;
                         if (bShouldNotify)
                             NotificationManager.AddNotificationToQueue(thisgooditem.RealName + " [" + thisgilesitemtype.ToString() +

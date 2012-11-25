@@ -56,7 +56,7 @@ namespace GilesTrinity
                 // Not on heart of sin after Cydaea
                 CurrentTarget.ActorSNO != 193077 &&
                 // Make sure we are allowed to use wrath on goblins, else make sure this isn't a goblin
-                (settings.bGoblinWrath || !CurrentTarget.IsTreasureGoblin || iElitesWithinRange[RANGE_15] >= 1) &&
+                (Settings.Combat.Barbarian.UseWOTBGoblin || !CurrentTarget.IsTreasureGoblin || iElitesWithinRange[RANGE_15] >= 1) &&
                 // If on a boss, only when injured
                 ((CurrentTarget.IsBoss && CurrentTarget.HitPoints <= 0.99 && !hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind)) ||
                 // If *NOT* on a boss, and definitely no boss in range, then judge based on any elites at all within 30 feet
@@ -109,7 +109,7 @@ namespace GilesTrinity
             }
             // Special segment for sprint as an out-of-combat only
             if (bOOCBuff && !bDontSpamOutofCombat &&
-                (settings.bOutOfCombatMovementPowers || GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) &&
+                (Settings.Combat.Misc.AllowOOCMovement || GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) &&
                 !playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Sprint) &&
                 !GilesHasBuff(SNOPower.Barbarian_Sprint) &&
                 playerStatus.CurrentEnergy >= 20 && GilesUseTimer(SNOPower.Barbarian_Sprint) && PowerManager.CanCast(SNOPower.Barbarian_Sprint))
@@ -236,8 +236,8 @@ namespace GilesTrinity
                      (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) &&
                 // See if it's off-cooldown and at least 40 fury, or use as a fury dump
                          (
-                            (settings.bFuryDumpWrath && playerStatus.CurrentEnergyPct >= 0.92 && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
-                            (settings.bFuryDumpAlways && playerStatus.CurrentEnergyPct >= 0.92) ||
+                            (Settings.Combat.Barbarian.FuryDumpWOTB && playerStatus.CurrentEnergyPct >= 0.92 && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                            (Settings.Combat.Barbarian.FuryDumpAlways && playerStatus.CurrentEnergyPct >= 0.92) ||
                             (DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Rend]).TotalMilliseconds >= 2800)
                          ) &&
                 // Max once every 1.2 seconds even if fury dumping, so sprint can be fury dumped too
@@ -334,8 +334,8 @@ namespace GilesTrinity
                 DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Sprint]).TotalMilliseconds >= 200 &&
                 // Fury Dump Options for sprint: use at max energy constantly, or on a timer
                 (
-                    (settings.bFuryDumpWrath && playerStatus.CurrentEnergyPct >= 0.95 && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
-                    (settings.bFuryDumpAlways && playerStatus.CurrentEnergyPct >= 0.95) ||
+                    (Settings.Combat.Barbarian.FuryDumpWOTB && playerStatus.CurrentEnergyPct >= 0.95 && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                    (Settings.Combat.Barbarian.FuryDumpAlways && playerStatus.CurrentEnergyPct >= 0.95) ||
                     ((GilesUseTimer(SNOPower.Barbarian_Sprint) && !GilesHasBuff(SNOPower.Barbarian_Sprint)) &&
                 // Always keep up if we are whirlwinding, or if the target is a goblin
                         (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) || CurrentTarget.IsTreasureGoblin))
@@ -353,7 +353,7 @@ namespace GilesTrinity
             // Whirlwind spam as long as necessary pre-buffs are up
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) && !playerStatus.IsIncapacitated && !playerStatus.IsRooted &&
                 // Don't WW against goblins, units in the special SNO list
-                (!settings.bSelectiveWhirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)) &&
+                (!Settings.Combat.Barbarian.SelectiveWirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)) &&
                 // Only if within 15 foot of main target
                 ((CurrentTarget.RadiusDistance <= 25f || iAnythingWithinRange[RANGE_25] >= 1)) &&
                 (iAnythingWithinRange[RANGE_50] >= 2 || CurrentTarget.HitPoints >= 0.30 || CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || playerStatus.CurrentHealthPct <= 0.60) &&
@@ -389,8 +389,8 @@ namespace GilesTrinity
             if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_BattleRage) && !playerStatus.IsIncapacitated &&
                 // Fury Dump Options for battle rage IF they don't have sprint 
                 (
-                 (settings.bFuryDumpWrath && playerStatus.CurrentEnergyPct >= 0.99 && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
-                 (settings.bFuryDumpAlways && playerStatus.CurrentEnergyPct >= 0.99) || !GilesHasBuff(SNOPower.Barbarian_BattleRage)
+                 (Settings.Combat.Barbarian.FuryDumpWOTB && playerStatus.CurrentEnergyPct >= 0.99 && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                 (Settings.Combat.Barbarian.FuryDumpAlways && playerStatus.CurrentEnergyPct >= 0.99) || !GilesHasBuff(SNOPower.Barbarian_BattleRage)
                 ) &&
                 playerStatus.CurrentEnergy >= 20 && PowerManager.CanCast(SNOPower.Barbarian_BattleRage))
             {

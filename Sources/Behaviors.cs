@@ -1,4 +1,5 @@
 ﻿using GilesTrinity.DbProvider;
+using GilesTrinity.Settings.Combat;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -199,7 +200,7 @@ namespace GilesTrinity
                     // PREVENT blacklisting a monster on less than 90% health unless we haven't damaged it for more than 2 minutes
                     if (CurrentTarget.Type == GObjectType.Unit && isNavigable)
                     {
-                        if (CurrentTarget.IsTreasureGoblin && settings.iTreasureGoblinPriority >= 3)
+                        if (CurrentTarget.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Kamikaze)
                             bBlacklistThis = false;
                         //if (CurrentTarget.iHitPoints <= 0.90 && DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds <= 30)
                         //    bBlacklistThis = false;
@@ -317,7 +318,7 @@ namespace GilesTrinity
                     }
                 }
                 // Maintain a backtrack list only while fighting monsters
-                if (CurrentTarget.Type == GObjectType.Unit && settings.bEnableBacktracking &&
+                if (CurrentTarget.Type == GObjectType.Unit && Settings.Combat.Misc.AllowBacktracking &&
                     (iTotalBacktracks == 0 || Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]) >= 10f))
                 {
                     bool bAddThisBacktrack = true;
@@ -638,7 +639,7 @@ namespace GilesTrinity
                 // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
                 if ((CurrentTarget.Type == GObjectType.Avoidance ||
                     CurrentTarget.Type == GObjectType.Globe ||
-                    (CurrentTarget.Type == GObjectType.Backtrack && settings.bOutOfCombatMovementPowers))
+                    (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
                     && GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk)
                     )
                 {
@@ -699,7 +700,7 @@ namespace GilesTrinity
                     (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && fDistanceFromTarget >= 6f) &&
                     (CurrentTarget.Type != GObjectType.Unit ||
                     (CurrentTarget.Type == GObjectType.Unit && !CurrentTarget.IsTreasureGoblin &&
-                        (!settings.bSelectiveWhirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)))))
+                        (!Settings.Combat.Barbarian.SelectiveWirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)))))
                 {
                     // Special code to prevent whirlwind double-spam, this helps save fury
                     bool bUseThisLoop = SNOPower.Barbarian_Whirlwind != powerLastSnoPowerUsed;
@@ -906,7 +907,7 @@ namespace GilesTrinity
             if (CurrentTarget.Type == GObjectType.Unit && currentPower.SNOPower != SNOPower.None)
                 sStatusText += "Power=" + currentPower.SNOPower.ToString() + " (range " + fRangeRequired.ToString() + ") ";
             sStatusText += "Weight=" + CurrentTarget.Weight.ToString() + " MOVING INTO RANGE";
-            if (settings.bDebugInfo)
+            if (Settings.Advanced.DebugInStatusBar)
             {
                 BotMain.StatusText = sStatusText;
                 Logging.WriteDiagnostic(sStatusText);
@@ -953,7 +954,7 @@ namespace GilesTrinity
             if (CurrentTarget.Type == GObjectType.Unit && currentPower.SNOPower != SNOPower.None)
                 sStatusText += "Power=" + currentPower.SNOPower.ToString() + " (range " + fRangeRequired.ToString() + ") ";
             sStatusText += "Weight=" + Math.Round(CurrentTarget.Weight, 2).ToString() + " IN RANGE, NOW INTERACTING";
-            if (settings.bDebugInfo)
+            if (Settings.Advanced.DebugInStatusBar)
             {
                 BotMain.StatusText = sStatusText;
                 Logging.WriteDiagnostic(sStatusText);

@@ -135,7 +135,7 @@ namespace GilesTrinity.DbProvider
                 GilesTrinity.playerStatus.CurrentPosition = vMyCurrentPosition;
                 vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, Vector3.Zero);
                 // Temporarily log stuff
-                if (iTotalAntiStuckAttempts == 1 && GilesTrinity.settings.bLogStucks)
+                if (iTotalAntiStuckAttempts == 1 && GilesTrinity.Settings.Advanced.LogStuckLocation)
                 {
                     FileStream LogStream = File.Open(GilesTrinity.sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - Stucks - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
@@ -193,7 +193,7 @@ namespace GilesTrinity.DbProvider
                 iTimesReachedMaxUnstucks = 3;
             }
             // Exit the game and reload the profile
-            if (GilesTrinity.settings.bEnableProfileReloading && DateTime.Now.Subtract(timeLastRestartedGame).TotalMinutes >= 15)
+            if (GilesTrinity.Settings.Advanced.AllowRestartGame && DateTime.Now.Subtract(timeLastRestartedGame).TotalMinutes >= 15)
             {
                 timeLastRestartedGame = DateTime.Now;
                 string sUseProfile = GilesTrinity.sFirstProfileSeen;
@@ -250,7 +250,7 @@ namespace GilesTrinity.DbProvider
             }
             // The below code is to help profile/routine makers avoid waypoints with a long distance between them.
             // Long-distances between waypoints is bad - it increases stucks, and forces the DB nav-server to be called.
-            if (GilesTrinity.settings.bLogStucks)
+            if (GilesTrinity.Settings.Advanced.LogStuckLocation)
             {
                 if (vLastMoveTo == Vector3.Zero)
                     vLastMoveTo = vMoveToTarget;
@@ -288,7 +288,7 @@ namespace GilesTrinity.DbProvider
             // Store distance to current moveto target
             float fDistanceFromTarget;
             // Do unstuckery things
-            if (GilesTrinity.settings.bEnableUnstucker)
+            if (GilesTrinity.Settings.Advanced.UnstuckerEnabled)
             {
                 // Store the "real" (not anti-stuck) destination
                 vOldMoveToTarget = vMoveToTarget;
@@ -356,7 +356,7 @@ namespace GilesTrinity.DbProvider
                 fDistanceFromTarget = Vector3.Distance(vMyCurrentPosition, vMoveToTarget);
             }
             // Is the built-in unstucker enabled or not?
-            // if (GilesTrinity.settings.bDebugInfo)
+            // if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
             // {
             //    Logging.WriteDiagnostic("[Trinity] Moving toward <{0:0},{1:0},{2:0}> distance: {3:0}", vMoveToTarget.X, vMoveToTarget.Y, vMoveToTarget.Z, fDistanceFromTarget);
             // }
@@ -404,7 +404,7 @@ namespace GilesTrinity.DbProvider
             }
 
             // See if we can use abilities like leap etc. for movement out of combat, but not in town
-            if (GilesTrinity.settings.bOutOfCombatMovementPowers && !ZetaDia.Me.IsInTown)
+            if (GilesTrinity.Settings.Combat.Misc.AllowOOCMovement && !ZetaDia.Me.IsInTown)
             {
                 bool bTooMuchZChange = ((vMyCurrentPosition.Z - vMoveToTarget.Z) >= 4f);
                 // Leap movement for a barb
@@ -435,7 +435,7 @@ namespace GilesTrinity.DbProvider
                 }
                 // Vault for a DH - maximum set by user-defined setting
                 if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Vault) && !bTooMuchZChange &&
-                    DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= GilesTrinity.settings.iDHVaultMovementDelay &&
+                    DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= GilesTrinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     fDistanceFromTarget >= 18f &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) && !ShrinesInArea(vMoveToTarget))
                 {
