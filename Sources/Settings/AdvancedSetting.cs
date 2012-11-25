@@ -8,43 +8,145 @@ using System.Text;
 namespace GilesTrinity.Settings
 {
     [DataContract]
-    public class AdvancedSetting : ITrinitySetting<AdvancedSetting>
+    public class AdvancedSetting : ITrinitySetting<AdvancedSetting>, INotifyPropertyChanged
     {
+        #region Fields
+        private bool _UnstuckerEnabled;
+        private bool _AllowRestartGame;
+        private bool _TPSEnabled;
+        private int _TPSLimit;
+        private bool _DebugInStatusBar;
+        private bool _LogStuckLocation;
+        #endregion Fields
+
+        #region Events
+        /// <summary>
+        /// Occurs when property changed.
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Events
+
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdvancedSetting" /> class.
+        /// </summary>
         public AdvancedSetting()
         {
             Reset();
         }
+        #endregion Constructors
 
+        #region Properties
         [DataMember(IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(true)]
         public bool UnstuckerEnabled
-        { get; set; }
+        {
+            get
+            {
+                return _UnstuckerEnabled;
+            }
+            set
+            {
+                if (_UnstuckerEnabled != value)
+                {
+                    _UnstuckerEnabled = value;
+                    OnPropertyChanged("UnstuckerEnabled");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(false)]
         public bool AllowRestartGame
-        { get; set; }
+        {
+            get
+            {
+                return _AllowRestartGame;
+            }
+            set
+            {
+                if (_AllowRestartGame != value)
+                {
+                    _AllowRestartGame = value;
+                    OnPropertyChanged("AllowRestartGame");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(false)]
         public bool TPSEnabled
-        { get; set; }
+        {
+            get
+            {
+                return _TPSEnabled;
+            }
+            set
+            {
+                if (_TPSEnabled != value)
+                {
+                    _TPSEnabled = value;
+                    OnPropertyChanged("TPSEnabled");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(10)]
         public int TPSLimit
-        { get; set; }
+        {
+            get
+            {
+                return _TPSLimit;
+            }
+            set
+            {
+                if (_TPSLimit != value)
+                {
+                    _TPSLimit = value;
+                    OnPropertyChanged("TPSLimit");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(false)]
         public bool DebugInStatusBar
-        { get; set; }
+        {
+            get
+            {
+                return _DebugInStatusBar;
+            }
+            set
+            {
+                if (_DebugInStatusBar != value)
+                {
+                    _DebugInStatusBar = value;
+                    OnPropertyChanged("DebugInStatusBar");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(false)]
         public bool LogStuckLocation
-        { get; set; }
+        {
+            get
+            {
+                return _LogStuckLocation;
+            }
+            set
+            {
+                if (_LogStuckLocation != value)
+                {
+                    _LogStuckLocation = value;
+                    OnPropertyChanged("Password");
+                }
+            }
+        }
+        #endregion Properties
 
+        #region Methods
         public void Reset()
         {
             TrinitySetting.Reset(this);
@@ -59,5 +161,18 @@ namespace GilesTrinity.Settings
         {
             return TrinitySetting.Clone(this);
         }
+
+        /// <summary>
+        /// Called when property changed.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        private void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion Methods
     }
 }

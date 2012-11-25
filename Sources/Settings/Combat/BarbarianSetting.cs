@@ -8,13 +8,64 @@ using System.Text;
 namespace GilesTrinity.Settings.Combat
 {
     [DataContract]
-    public class BarbarianSetting : ITrinitySetting<BarbarianSetting>, IAvoidanceHealth
+    public class BarbarianSetting : ITrinitySetting<BarbarianSetting>, IAvoidanceHealth, INotifyPropertyChanged
     {
+        #region Fields
+        private float _PotionLevel;
+        private float _HealthGlobeLevel;
+        private int _KiteLimit;
+        private float _AvoidArcaneHealth;
+        private float _AvoidDesecratorHealth;
+        private float _AvoidMoltenCoreHealth;
+        private float _AvoidMoltenTrailHealth;
+        private float _AvoidPoisonTreeHealth;
+        private float _AvoidPlagueCloudHealth;
+        private float _AvoidIceBallsHealth;
+        private float _AvoidPlagueHandsHealth;
+        private float _AvoidBeesWaspsHealth;
+        private float _AvoidAzmoPoolsHealth;
+        private float _AvoidAzmoBodiesHealth;
+        private float _AvoidShamanFireHealth;
+        private float _AvoidGhomGasHealth;
+        private float _AvoidAzmoFireBallHealth;
+        private float _AvoidBelialHealth;
+        private float _AvoidButcherFloorPanelHealth;
+        private float _AvoidDiabloMeteorHealth;
+        private float _AvoidDiabloPrisonHealth;
+        private float _AvoidDiabloRingOfFireHealth;
+        private float _AvoidIceTrailHealth;
+        private float _AvoidMageFireHealth;
+        private float _AvoidMaghdaProjectilleHealth;
+        private float _AvoidMoltenBallHealth;
+        private float _AvoidWallOfFireHealth;
+        private float _AvoidZoltBubbleHealth;
+        private float _AvoidZoltTwisterHealth;
+        private bool _SelectiveWirlwind;
+        private bool _BoonBulKathosPassive;
+        private bool _WaitWOTB;
+        private bool _UseWOTBGoblin;
+        private bool _FuryDumpWOTB;
+        private bool _FuryDumpAlways;
+        #endregion Fields
+
+        #region Events
+        /// <summary>
+        /// Occurs when property changed.
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Events
+
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BarbarianSetting" /> class.
+        /// </summary>
         public BarbarianSetting()
         {
             Reset();
         }
+        #endregion Constructors
 
+        #region Properties
         [DataMember(IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(0.42f)]
         public float PotionLevel
@@ -179,8 +230,9 @@ namespace GilesTrinity.Settings.Combat
         [DefaultValue(false)]
         public bool FuryDumpAlways
         { get; set; }
+        #endregion Properties
 
-
+        #region Methods
         public void Reset()
         {
             TrinitySetting.Reset(this);
@@ -195,5 +247,18 @@ namespace GilesTrinity.Settings.Combat
         {
             return TrinitySetting.Clone(this);
         }
+
+        /// <summary>
+        /// Called when property changed.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        private void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion Methods
     }
 }

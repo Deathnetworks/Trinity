@@ -8,13 +8,33 @@ using System.Text;
 namespace GilesTrinity.Settings.Loot
 {
     [DataContract]
-    public class TownRunSetting : ITrinitySetting<TownRunSetting>
+    public class TownRunSetting : ITrinitySetting<TownRunSetting>, INotifyPropertyChanged
     {
+        #region Fields
+        private TrashMode _TrashMode;
+        private int _WeaponScore;
+        private int _ArmorScore;
+        private int _JewelryScore;
+        #endregion Fields
+
+        #region Events
+        /// <summary>
+        /// Occurs when property changed.
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Events
+
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TownRunSetting" /> class.
+        /// </summary>
         public TownRunSetting()
         { 
             Reset(); 
         }
+        #endregion Constructors
 
+        #region Properties
         [DataMember(IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(TrashMode.Selling)]
         public TrashMode TrashMode
@@ -34,7 +54,9 @@ namespace GilesTrinity.Settings.Loot
         [DefaultValue(15000)]
         public int JewelryScore
         { get; set; }
+        #endregion Properties
 
+        #region Methods
         public void Reset()
         {
             TrinitySetting.Reset(this);
@@ -49,5 +71,18 @@ namespace GilesTrinity.Settings.Loot
         {
             return TrinitySetting.Clone(this);
         }
+
+        /// <summary>
+        /// Called when property changed.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        private void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion Methods
     }
 }

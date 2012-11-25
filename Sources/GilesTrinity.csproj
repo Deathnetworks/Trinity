@@ -59,7 +59,6 @@
     <Compile Include="Abilities\WitchDoctor.cs" />
     <Compile Include="AvoidanceManager.cs" />
     <Compile Include="AvoidanceType.cs" />
-    <Compile Include="Classes\GilesSettings.cs" />
     <Compile Include="Classes\GilesObjstacle.cs" />
     <Compile Include="Classes\GilesPower.cs" />
     <Compile Include="Classes\GilesCachedACDItem.cs" />
