@@ -32,14 +32,14 @@ namespace GilesTrinity
             // Also use many cache dictionaries to minimize DB<->D3 memory hits, and speed everything up a lot
             RefreshCacheMainLoop();
             // Reduce ignore-for-loops counter
-            if (iIgnoreThisForLoops > 0)
-                iIgnoreThisForLoops--;
+            if (IgnoreTargetForLoops > 0)
+                IgnoreTargetForLoops--;
             // If we have an avoidance under our feet, then create a new object which contains a safety point to move to
             // But only if we aren't force-cancelling avoidance for XX time
             bool bFoundSafeSpot = false;
             // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
             if (bRequireAvoidance && (!bAnyTreasureGoblinsPresent || settings.iTreasureGoblinPriority <= 2) &&
-                DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= iMillisecondsCancelledEmergencyMoveFor)
+                DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
             {
                 Vector3 vAnySafePoint = FindSafeZone(false, 1, vSafePointNear);
                 // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
@@ -49,7 +49,7 @@ namespace GilesTrinity
                     CurrentTarget = new GilesObject()
                         {
                         Position = vAnySafePoint,
-                        Type = GilesObjectType.Avoidance,
+                        Type = GObjectType.Avoidance,
                         Weight = 20000,
                         CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
                         RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint), 
@@ -59,7 +59,7 @@ namespace GilesTrinity
                 else
                 {
                     // Didn't find any safe spot we could reach, so don't look for any more safe spots for at least 2.8 seconds
-                    iMillisecondsCancelledEmergencyMoveFor = 2800;
+                    cancelledEmergencyMoveForMilliseconds = 2800;
                     timeCancelledEmergencyMove = DateTime.Now;
                 }
             }
@@ -81,7 +81,7 @@ namespace GilesTrinity
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
-                                        Type = GilesObjectType.Avoidance,
+                                        Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
@@ -100,7 +100,7 @@ namespace GilesTrinity
                 return;
             }
             // Ok record the time we last saw any unit at all
-            if (CurrentTarget.Type == GilesObjectType.Unit)
+            if (CurrentTarget.Type == GObjectType.Unit)
             {
                 lastHadUnitInSights = DateTime.Now;
                 // And record when we last saw any form of elite
@@ -108,12 +108,12 @@ namespace GilesTrinity
                     lastHadEliteUnitInSights = DateTime.Now;
             }
             // Record the last time our target changed etc.
-            if (iCurrentTargetRactorGUID != CurrentTarget.RActorGuid)
+            if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
             {
                 if (bDebugLogSpecial && settings.bDebugInfo)
                 {
                     Logging.WriteDiagnostic("[Trinity] Setting dateSincePicked to {0} iCurrentTargetRactorGUID: {1} CurrentTarget.iRActorGuid: {2}",
-                        DateTime.Now, iCurrentTargetRactorGUID, CurrentTarget.RActorGuid);
+                        DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
                 }
                 dateSincePickedTarget = DateTime.Now;
                 iTargetLastHealth = 0f;
@@ -121,7 +121,7 @@ namespace GilesTrinity
             else
             {
                 // We're sticking to the same target, so update the target's health cache to check for stucks
-                if (CurrentTarget.Type == GilesObjectType.Unit)
+                if (CurrentTarget.Type == GObjectType.Unit)
                 {
                     // Check if the health has changed, if so update the target-pick time before we blacklist them again
                     if (CurrentTarget.HitPoints != iTargetLastHealth)
@@ -149,7 +149,7 @@ namespace GilesTrinity
             vSafePointNear = CurrentTarget != null ? CurrentTarget.Position : vNullLocation;
             vKitePointAvoid = vNullLocation;
             // store current target GUID
-            iCurrentTargetRactorGUID = CurrentTarget != null ? CurrentTarget.RActorGuid : -1;
+            CurrentTargetRactorGUID = CurrentTarget != null ? CurrentTarget.RActorGuid : -1;
             //reset current target
             CurrentTarget = null;
             // Reset all variables for target-weight finding
@@ -223,7 +223,7 @@ namespace GilesTrinity
                 {
                     case 1:
                         dictGilesVectorCache = new Dictionary<int, Vector3>();
-                        dictGilesObjectTypeCache = new Dictionary<int, GilesObjectType>();
+                        dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
                         dictGilesActorSNOCache = new Dictionary<int, int>();
                         dictGilesACDGUIDCache = new Dictionary<int, int>();
                         dictGilesLastHealthCache = new Dictionary<int, double>();
@@ -263,9 +263,9 @@ namespace GilesTrinity
             // Flag for if we should search for an avoidance spot or not
             bRequireAvoidance = false;
             // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
-            iHighestWeightFound = 0;
+            w_HighestWeightFound = 0;
             // Here's the list we'll use to store each object
-            listGilesObjectCache = new List<GilesObject>();
+            GilesObjectCache = new List<GilesObject>();
             hashDoneThisRactor = new HashSet<int>();
         }
         private static Stopwatch swTimeSinceLastDebug = new Stopwatch();
@@ -293,7 +293,7 @@ namespace GilesTrinity
                     if (bDebugLogRefreshDiaObject && settings.bDebugInfo)
                     {
                         bool ignore = (from n in ignoreNames
-                                       where c_sName.StartsWith(n)
+                                       where c_Name.StartsWith(n)
                                        select true).FirstOrDefault();
 
                         if (!ignore)
@@ -303,13 +303,13 @@ namespace GilesTrinity
                                 + (!bWantThis ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "")
                                 + " Type: " + c_ObjectType
                                 + " (" + c_diaObject.ActorType + ")"
-                                + " Name: " + c_sName
-                                + " (" + c_iActorSNO + ")"
+                                + " Name: " + c_Name
+                                + " (" + c_ActorSNO + ")"
                                 + (c_unit_bIsBoss ? " isBossSNO" : "")
-                                + " Dist2Mid: " + c_fCentreDistance.ToString("0")
-                                + " Dist2Rad: " + c_fRadiusDistance.ToString("0")
-                                + " ZDiff: " + c_fZDiff.ToString("0")
-                                + " Radius: " + c_fRadius
+                                + " Dist2Mid: " + c_CentreDistance.ToString("0")
+                                + " Dist2Rad: " + c_RadiusDistance.ToString("0")
+                                + " ZDiff: " + c_ZDiff.ToString("0")
+                                + " Radius: " + c_Radius
                                );
                         }
                     }
@@ -331,51 +331,51 @@ namespace GilesTrinity
             }
         }
 
-        private static void RefreshItemStats(GilesBaseItemType tempbasetype)
+        private static void RefreshItemStats(GBaseItemType tempbasetype)
         {
-            if (!_hashsetItemStatsLookedAt.Contains(c_iRActorGuid))
+            if (!_hashsetItemStatsLookedAt.Contains(c_RActorGuid))
             {
-                _hashsetItemStatsLookedAt.Add(c_iRActorGuid);
-                if (tempbasetype == GilesBaseItemType.Armor || tempbasetype == GilesBaseItemType.WeaponOneHand || tempbasetype == GilesBaseItemType.WeaponTwoHand ||
-                    tempbasetype == GilesBaseItemType.WeaponRange || tempbasetype == GilesBaseItemType.Jewelry || tempbasetype == GilesBaseItemType.FollowerItem ||
-                    tempbasetype == GilesBaseItemType.Offhand)
+                _hashsetItemStatsLookedAt.Add(c_RActorGuid);
+                if (tempbasetype == GBaseItemType.Armor || tempbasetype == GBaseItemType.WeaponOneHand || tempbasetype == GBaseItemType.WeaponTwoHand ||
+                    tempbasetype == GBaseItemType.WeaponRange || tempbasetype == GBaseItemType.Jewelry || tempbasetype == GBaseItemType.FollowerItem ||
+                    tempbasetype == GBaseItemType.Offhand)
                 {
                     int iThisQuality;
                     ItemsDroppedStats.Total++;
-                    if (c_item_tQuality >= ItemQuality.Legendary)
+                    if (c_ItemQuality >= ItemQuality.Legendary)
                         iThisQuality = QUALITYORANGE;
-                    else if (c_item_tQuality >= ItemQuality.Rare4)
+                    else if (c_ItemQuality >= ItemQuality.Rare4)
                         iThisQuality = QUALITYYELLOW;
-                    else if (c_item_tQuality >= ItemQuality.Magic1)
+                    else if (c_ItemQuality >= ItemQuality.Magic1)
                         iThisQuality = QUALITYBLUE;
                     else
                         iThisQuality = QUALITYWHITE;
                     ItemsDroppedStats.TotalPerQuality[iThisQuality]++;
-                    ItemsDroppedStats.TotalPerLevel[c_item_iLevel]++;
-                    ItemsDroppedStats.TotalPerQPerL[iThisQuality, c_item_iLevel]++;
+                    ItemsDroppedStats.TotalPerLevel[c_ItemLevel]++;
+                    ItemsDroppedStats.TotalPerQPerL[iThisQuality, c_ItemLevel]++;
                 }
-                else if (tempbasetype == GilesBaseItemType.Gem)
+                else if (tempbasetype == GBaseItemType.Gem)
                 {
                     int iThisGemType = 0;
                     ItemsDroppedStats.TotalGems++;
-                    if (c_item_GilesItemType == GilesItemType.Topaz)
+                    if (c_item_GilesItemType == GItemType.Topaz)
                         iThisGemType = GEMTOPAZ;
-                    if (c_item_GilesItemType == GilesItemType.Ruby)
+                    if (c_item_GilesItemType == GItemType.Ruby)
                         iThisGemType = GEMRUBY;
-                    if (c_item_GilesItemType == GilesItemType.Emerald)
+                    if (c_item_GilesItemType == GItemType.Emerald)
                         iThisGemType = GEMEMERALD;
-                    if (c_item_GilesItemType == GilesItemType.Amethyst)
+                    if (c_item_GilesItemType == GItemType.Amethyst)
                         iThisGemType = GEMAMETHYST;
                     ItemsDroppedStats.GemsPerType[iThisGemType]++;
-                    ItemsDroppedStats.GemsPerLevel[c_item_iLevel]++;
-                    ItemsDroppedStats.GemsPerTPerL[iThisGemType, c_item_iLevel]++;
+                    ItemsDroppedStats.GemsPerLevel[c_ItemLevel]++;
+                    ItemsDroppedStats.GemsPerTPerL[iThisGemType, c_ItemLevel]++;
                 }
-                else if (c_item_GilesItemType == GilesItemType.HealthPotion)
+                else if (c_item_GilesItemType == GItemType.HealthPotion)
                 {
                     ItemsDroppedStats.TotalPotions++;
-                    ItemsDroppedStats.PotionsPerLevel[c_item_iLevel]++;
+                    ItemsDroppedStats.PotionsPerLevel[c_ItemLevel]++;
                 }
-                else if (c_item_GilesItemType == GilesItemType.InfernalKey)
+                else if (c_item_GilesItemType == GItemType.InfernalKey)
                 {
                     ItemsDroppedStats.TotalInfernalKeys++;
                 }
@@ -394,32 +394,32 @@ namespace GilesTrinity
             // Bosses get extra radius
             if (c_unit_bIsBoss)
             {
-                if (c_iActorSNO != 80509)
+                if (c_ActorSNO != 80509)
                     // Kulle Exception
                     dUseKillRadius *= 1.5;
                 // And even more if they're already injured
-                if (c_unit_dHitPoints <= 0.98)
+                if (c_HitPoints <= 0.98)
                     dUseKillRadius *= 4;
                 // And make sure we have a MINIMUM range for bosses - incase they are at screen edge etc.
                 if (dUseKillRadius <= 200)
-                    if (c_iActorSNO != 80509)
+                    if (c_ActorSNO != 80509)
                         // Kulle Exception
                         dUseKillRadius = 200;
             }
             // Special short-range list to ignore weakling mobs
-            if (hashActorSNOShortRangeOnly.Contains(c_iActorSNO))
+            if (hashActorSNOShortRangeOnly.Contains(c_ActorSNO))
                 dUseKillRadius = 12;
             // Prevent long-range mobs beign ignored while they may be pounding on us
-            if (dUseKillRadius <= 30 && hashActorSNORanged.Contains(c_iActorSNO))
+            if (dUseKillRadius <= 30 && hashActorSNORanged.Contains(c_ActorSNO))
                 dUseKillRadius = 30;
             //intell
             //GoatMutant_Ranged_A_Unique_Uber-10955 ActorSNO:	255996 	(act 1)
             //DuneDervish_B_Unique_Uber-14252 ActorSNO: 		256000	(act 2)
             //morluSpellcaster_A_Unique_Uber-17451 ActorSNO:	256015	(act 3)
-            if (c_iActorSNO == 256015 || c_iActorSNO == 256000 || c_iActorSNO == 255996)
+            if (c_ActorSNO == 256015 || c_ActorSNO == 256000 || c_ActorSNO == 255996)
                 dUseKillRadius = 80;
             // Injured treasure goblins get a huge extra radius - since they don't stay on the map long if injured, anyway!
-            if (c_unit_bIsTreasureGoblin && (c_fCentreDistance <= 60 || c_unit_dHitPoints <= 0.99))
+            if (c_unit_bIsTreasureGoblin && (c_CentreDistance <= 60 || c_HitPoints <= 0.99))
             {
                 c_bForceLeapAgainst = true;
                 if (settings.iTreasureGoblinPriority <= 2)
@@ -433,7 +433,7 @@ namespace GilesTrinity
             else if ((c_unit_bIsElite || c_unit_bIsRare || c_unit_bIsUnique || c_unit_bIsMinion))
             {
                 c_bForceLeapAgainst = true;
-                if (c_unit_dHitPoints <= 0.99)
+                if (c_HitPoints <= 0.99)
                 {
                     dUseKillRadius *= 2;
                     if (dUseKillRadius <= 90) dUseKillRadius = 90;
@@ -454,12 +454,12 @@ namespace GilesTrinity
         private static MonsterAffixes RefreshAffixes(ACD tempCommonData)
         {
             MonsterAffixes theseaffixes;
-            if (!dictGilesMonsterAffixCache.TryGetValue(c_iRActorGuid, out theseaffixes))
+            if (!dictGilesMonsterAffixCache.TryGetValue(c_RActorGuid, out theseaffixes))
             {
                 try
                 {
                     theseaffixes = tempCommonData.MonsterAffixes;
-                    dictGilesMonsterAffixCache.Add(c_iRActorGuid, theseaffixes);
+                    dictGilesMonsterAffixCache.Add(c_RActorGuid, theseaffixes);
                 }
                 catch
                 {
@@ -476,13 +476,13 @@ namespace GilesTrinity
         {
             if (!bHasCachedHealth)
             {
-                dictGilesLastHealthCache.Add(c_iRActorGuid, dThisCurrentHealth);
-                dictGilesLastHealthChecked.Add(c_iRActorGuid, iLastCheckedHealth);
+                dictGilesLastHealthCache.Add(c_RActorGuid, dThisCurrentHealth);
+                dictGilesLastHealthChecked.Add(c_RActorGuid, iLastCheckedHealth);
             }
             else
             {
-                dictGilesLastHealthCache[c_iRActorGuid] = dThisCurrentHealth;
-                dictGilesLastHealthChecked[c_iRActorGuid] = iLastCheckedHealth;
+                dictGilesLastHealthCache[c_RActorGuid] = dThisCurrentHealth;
+                dictGilesLastHealthChecked[c_RActorGuid] = iLastCheckedHealth;
             }
         }
         private static MonsterType RefreshMonsterType(ACD tempCommonData, MonsterType monsterType, bool bAddToDictionary)
@@ -491,7 +491,7 @@ namespace GilesTrinity
             if (monsterInfo != null)
             {
                 // Force Jondar as an undead, since Diablo 3 sticks him as a permanent ally
-                if (c_iActorSNO == 86624)
+                if (c_ActorSNO == 86624)
                 {
                     monsterType = MonsterType.Undead;
                 }
@@ -501,9 +501,9 @@ namespace GilesTrinity
                 }
                 // Is this going to be a new dictionary entry, or updating one already existing?
                 if (bAddToDictionary)
-                    dictionaryStoredMonsterTypes.Add(c_iActorSNO, monsterType);
+                    dictionaryStoredMonsterTypes.Add(c_ActorSNO, monsterType);
                 else
-                    dictionaryStoredMonsterTypes[c_iActorSNO] = monsterType;
+                    dictionaryStoredMonsterTypes[c_ActorSNO] = monsterType;
             }
             else
             {
@@ -519,7 +519,7 @@ namespace GilesTrinity
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
-                                        Type = GilesObjectType.Avoidance,
+                                        Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
@@ -557,7 +557,7 @@ namespace GilesTrinity
                     CurrentTarget = new GilesObject()
                                         {
                                             Position = vBacktrackList[iTotalBacktracks],
-                                            Type = GilesObjectType.Backtrack,
+                                            Type = GObjectType.Backtrack,
                                             Weight = 20000,
                                             CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
                                             RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
@@ -581,7 +581,7 @@ namespace GilesTrinity
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
-                                        Type = GilesObjectType.Avoidance,
+                                        Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
@@ -596,7 +596,7 @@ namespace GilesTrinity
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
-                                        Type = GilesObjectType.Avoidance,
+                                        Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
@@ -611,7 +611,7 @@ namespace GilesTrinity
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
-                                        Type = GilesObjectType.Avoidance,
+                                        Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
@@ -623,7 +623,7 @@ namespace GilesTrinity
         {
             bShouldTryKiting = false;
             if (
-                (((CurrentTarget != null && CurrentTarget.Type == GilesObjectType.Unit && iKiteDistance > 0 && CurrentTarget.RadiusDistance <= iKiteDistance) ||
+                (((CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && iKiteDistance > 0 && CurrentTarget.RadiusDistance <= iKiteDistance) ||
                 hashMonsterObstacleCache.Any(m => m.Location.Distance(playerStatus.CurrentPosition) <= iKiteDistance)) &&
                 (iMyCachedActorClass != ActorClass.Wizard || IsWizardShouldKite())) || playerStatus.CurrentHealthPct <= 0.15
                 )
@@ -635,8 +635,8 @@ namespace GilesTrinity
             }
             // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
             if ((bShouldTryKiting || bNeedToKite) && (!bAnyTreasureGoblinsPresent || settings.iTreasureGoblinPriority <= 2) &&
-                DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= iMillisecondsCancelledEmergencyMoveFor &&
-                (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= iMillisecondsCancelledKiteMoveFor ||
+                DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds &&
+                (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= cancelledKiteMoveForMilliseconds ||
                 (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= 2500 && bNeedToKite)))
             {
                 Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true);
@@ -650,14 +650,14 @@ namespace GilesTrinity
                     CurrentTarget = new GilesObject()
                                         {
                                             Position = vAnySafePoint,
-                                            Type = GilesObjectType.Avoidance,
+                                            Type = GObjectType.Avoidance,
                                             Weight = 20000,
                                             CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
                                             RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
                                             InternalName = "GilesKiting"
                                         };
                     timeCancelledKiteMove = DateTime.Today;
-                    iMillisecondsCancelledKiteMoveFor = 5000;
+                    cancelledKiteMoveForMilliseconds = 5000;
 
                     // Try forcing a target update with each kiting
                     //bForceTargetUpdate = true;
@@ -666,7 +666,7 @@ namespace GilesTrinity
                 {
                     // Didn't find any kiting we could reach, so don't look for any more kite spots for at least 1.5 seconds
                     timeCancelledKiteMove = DateTime.Today;
-                    iMillisecondsCancelledKiteMoveFor = 2500;
+                    cancelledKiteMoveForMilliseconds = 2500;
                 }
             }
         }

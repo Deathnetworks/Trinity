@@ -40,6 +40,7 @@ namespace GilesTrinity
         /// </summary>
         private static bool bPluginEnabled = false;
 
+
         /* A few special variables, mainly for Giles use, just at the top for easy access
          * Set the following to true, to disable file-logging for performance increase
          * WARNING: IF YOU GET CRASHES, ISSUES, OR PROBLEMS AND HAVE LOG-FILES DISABLED...
@@ -54,15 +55,22 @@ namespace GilesTrinity
         private const bool bLogBalanceDataForGiles = false;
 
         /// <summary>
-        /// A flag to say whether any NON-hashActorSNOWhirlwindIgnore things are around
+        /// Full Analysis SPAMS like hell. But useful for seeing how the score-calculator is adding/removing points
+        /// Really this is only for Giles to debug and improve the formula, users likely won't find this useful
         /// </summary>
-        private static bool bAnyNonWWIgnoreMobsInRange = false;
+        private static bool fullItemAnalysis = false;
+
 
         /* I create so many variables that it's a pain in the arse to categorize them
          * So I just throw them all here for quick searching, reference etc.
          * I've tried to make most variable names be pretty damned obvious what they are for!
          * I've also commented a lot of variables/sections of variables to explain what they are for, incase you are trying to work them all out!
          */
+        /// <summary>
+        /// A flag to say whether any NON-hashActorSNOWhirlwindIgnore things are around
+        /// </summary>
+        private static bool bAnyNonWWIgnoreMobsInRange = false;
+
         /// <summary>
         /// A null location, may shave off the tiniest fraction of CPU time, but probably not. Still, I like using this variable! :D
         /// </summary>
@@ -147,14 +155,14 @@ namespace GilesTrinity
         private static Dictionary<int, MonsterSize> dictionaryStoredMonsterSizes = new Dictionary<int, MonsterSize>();
 
         /// <summary>
-        /// Used to ignore a specific RActor for <see cref="iIgnoreThisForLoops"/> ticks
+        /// Used to ignore a specific RActor for <see cref="IgnoreTargetForLoops"/> ticks
         /// </summary>
-        private static int iIgnoreThisRactorGUID = 0;
+        private static int IgnoreRactorGUID = 0;
 
         /// <summary>
-        /// Ignore <see cref=" iIgnoreThisRactorGUID"/> for this many ticks
+        /// Ignore <see cref=" IgnoreRactorGUID"/> for this many ticks
         /// </summary>
-        private static int iIgnoreThisForLoops = 0;
+        private static int IgnoreTargetForLoops = 0;
 
         /// <summary>
         /// Holds all of the player's current info handily cached, updated once per loop with a minimum timer on updates to save D3 memory hits
@@ -328,47 +336,40 @@ namespace GilesTrinity
         /// This force-prevents avoidance for XX loops incase we get stuck trying to avoid stuff
         /// </summary>
         private static DateTime timeCancelledEmergencyMove = DateTime.Today;
-        private static int iMillisecondsCancelledEmergencyMoveFor = 0;
+        private static int cancelledEmergencyMoveForMilliseconds = 0;
 
         /// <summary>
         /// Prevent spam-kiting too much - allow fighting between each kite movement
         /// </summary>
         private static DateTime timeCancelledKiteMove = DateTime.Today;
-        private static int iMillisecondsCancelledKiteMoveFor = 0;
+        private static int cancelledKiteMoveForMilliseconds = 0;
 
         // For if we have emergency teleport abilities available right now or not
-        private static bool bHasEmergencyTeleportUp = false;
+        private static bool hasEmergencyTeleportUp = false;
 
         // How many follower items were ignored, purely for item stat tracking
-        private static int iTotalFollowerItemsIgnored = 0;
+        private static int totalFollowerItemsIgnored = 0;
 
         // Variable to let us force new target creations immediately after a root
-        private static bool bWasRootedLastTick = false;
+        private static bool wasRootedLastTick = false;
 
         // Random variables used during item handling and town-runs
-        private static int iItemDelayLoopLimit = 0;
-        private static int iCurrentItemLoops = 0;
-        private static bool bLoggedAnythingThisStash = false;
-        private static bool bUpdatedStashMap = false;
-        private static bool bLoggedJunkThisStash = false;
-        private static string sValueItemStatString = "";
-        private static string sJunkItemStatString = "";
-        private static bool bTestingBackpack = false;
+        private static int itemDelayLoopLimit = 0;
+        private static int currentItemLoops = 0;
+        private static bool loggedAnythingThisStash = false;
+        private static bool updatedStashMap = false;
+        private static bool loggedJunkThisStash = false;
+        private static string ValueItemStatString = "";
+        private static string junkItemStatString = "";
+        private static bool testingBackpack = false;
 
         // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
-        private static bool[,] GilesStashSlotBlocked = new bool[7, 30];
+        private static bool[,] StashSlotBlocked = new bool[7, 30];
         private static bool bOutputItemScores = false;
-
-        // Full Analysis SPAMS like hell. But useful for seeing how the score-calculator is adding/removing points
-
-        // Really this is only for Giles to debug and improve the formula, users likely won't find this useful
-        private const bool bFullAnalysis = false;
-
-        // Teehee I typed "Anal" LOLOLOL
 
         // Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
         private static GilesPower powerBuff;
-        private static GilesPower powerPrime;
+        private static GilesPower currentPower;
         private static SNOPower powerLastSnoPowerUsed = SNOPower.None;
 
         // Two variables to stop DB from attempting any navigator movement mid-combat/mid-backtrack
@@ -472,8 +473,8 @@ namespace GilesTrinity
         private static Dictionary<int, int> _dictItemStashAttempted = new Dictionary<int, int>();
 
         // These objects are instances of my stats class above, holding identical types of data for two different things - one holds item DROP stats, one holds item PICKUP stats
-        private static GilesItemStats ItemsDroppedStats = new GilesItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
-        private static GilesItemStats ItemsPickedStats = new GilesItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
+        private static GItemStats ItemsDroppedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
+        private static GItemStats ItemsPickedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
         private static HashSet<GilesCachedACDItem> hashGilesCachedKeepItems = new HashSet<GilesCachedACDItem>();
         private static HashSet<GilesCachedACDItem> hashGilesCachedSalvageItems = new HashSet<GilesCachedACDItem>();
         private static HashSet<GilesCachedACDItem> hashGilesCachedSellItems = new HashSet<GilesCachedACDItem>();
@@ -502,29 +503,39 @@ namespace GilesTrinity
          * Even if it looks a bit messy and probably should have just used it's own object instance of the cache-class instead! :D
          * c_ variables are all used in the caching mechanism
          */
-        private static Vector3 c_vPosition = Vector3.Zero;
-        private static GilesObjectType c_ObjectType = GilesObjectType.Unknown;
-        private static double c_dWeight = 0d;
-        private static double c_unit_dHitPoints = 0d;
-        private static float c_fCentreDistance = 0f;
-        private static float c_fRadiusDistance = 0f;
-        private static float c_fRadius = 0f;
-        private static float c_fZDiff = 0f;
-        private static string c_sName = "";
+        /// <summary>
+        /// This contains the active cache of DiaObjects
+        /// </summary>
+        private static List<GilesObject> GilesObjectCache;
+
+        /// <summary>
+        /// This will eventually be come our single source of truth and we can get rid of most/all of the below "c_" variables
+        /// </summary>
+        private static GilesObject cacheEntry = null;
+
+        private static Vector3 c_Position = Vector3.Zero;
+        private static GObjectType c_ObjectType = GObjectType.Unknown;
+        private static double c_Weight = 0d;
+        private static double c_HitPoints = 0d;
+        private static float c_CentreDistance = 0f;
+        private static float c_RadiusDistance = 0f;
+        private static float c_Radius = 0f;
+        private static float c_ZDiff = 0f;
+        private static string c_Name = "";
         private static string c_IgnoreReason = "";
         private static string c_IgnoreSubStep = "";
-        private static int c_iACDGUID = 0;
-        private static int c_iRActorGuid = 0;
-        private static int c_iDynamicID = 0;
-        private static int c_iBalanceID = 0;
-        private static int c_iActorSNO = 0;
-        private static int c_item_iLevel = 0;
-        private static int c_item_iGoldStackSize = 0;
-        private static bool c_item_bOneHanded = false;
-        private static ItemQuality c_item_tQuality = ItemQuality.Invalid;
-        private static ItemType c_item_tDBItemType = ItemType.Unknown;
+        private static int c_ACDGUID = 0;
+        private static int c_RActorGuid = 0;
+        private static int c_GameDynamicID = 0;
+        private static int c_BalanceID = 0;
+        private static int c_ActorSNO = 0;
+        private static int c_ItemLevel = 0;
+        private static int c_GoldStackSize = 0;
+        private static bool c_IsOneHandedItem = false;
+        private static ItemQuality c_ItemQuality = ItemQuality.Invalid;
+        private static ItemType c_DBItemType = ItemType.Unknown;
         private static FollowerType c_item_tFollowerType = FollowerType.None;
-        private static GilesItemType c_item_GilesItemType = GilesItemType.Unknown;
+        private static GItemType c_item_GilesItemType = GItemType.Unknown;
         private static MonsterSize c_unit_MonsterSize = MonsterSize.Unknown;
         private static DiaObject c_diaObject = null;
         private static ACD c_CommonData = null;
@@ -538,6 +549,17 @@ namespace GilesTrinity
         private static bool c_unit_bIsAttackable = false;
         private static bool c_bForceLeapAgainst = false;
         private static bool c_bIsObstacle = false;
+
+        // From main RefreshDiaobjects
+        private static Vector3 vSafePointNear;
+        private static Vector3 vKitePointAvoid;
+        private static int CurrentTargetRactorGUID;
+        private static int iUnitsSurrounding;
+        private static double w_HighestWeightFound;
+        private static HashSet<int> hashDoneThisRactor;
+        private static bool bNeedToKite = false;
+        private static bool bShouldTryKiting = false;
+
 
         /// <summary>
         /// Used for trimming off numbers from object names in RefreshDiaObject
@@ -563,17 +585,6 @@ namespace GilesTrinity
 
         // When did we last send a move-power command?
         private static DateTime lastSentMovePower = DateTime.Today;
-
-        // From RefreshDiaObjects()
-        private static Vector3 vSafePointNear;
-        private static Vector3 vKitePointAvoid;
-        private static int iCurrentTargetRactorGUID;
-        private static int iUnitsSurrounding;
-        private static double iHighestWeightFound;
-        private static List<GilesObject> listGilesObjectCache;
-        private static HashSet<int> hashDoneThisRactor;
-        private static bool bNeedToKite = false;
-        private static bool bShouldTryKiting = false;
 
         // Email stuff
         public static string SmtpServer = "smtp.gmail.com";

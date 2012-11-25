@@ -1,9 +1,9 @@
-﻿using Zeta.Common.Plugins;
-
-namespace GilesTrinity
+﻿namespace GilesTrinity
 {
-    // Item Stats Class and Variables - for the detailed item drop/pickup etc. stats
-    internal class GilesItemStats
+    /// <summary>
+    /// Item Stats Class and Variables - for the detailed item drop/pickup etc. stats
+    /// </summary>
+    internal class GItemStats
     {
         public double Total { get; set; }
         public double[] TotalPerQuality { get; set; }
@@ -15,8 +15,8 @@ namespace GilesTrinity
         public double[] GemsPerType { get; set; }
         public double[] GemsPerLevel { get; set; }
         public double[,] GemsPerTPerL { get; set; }
-        public double TotalInfernalKeys { get; set; }
-        public GilesItemStats(
+        public int TotalInfernalKeys { get; set; }
+        public GItemStats(
             double total, 
             double[] totalPerQuality,
             double[] totalPerLevel,
@@ -27,7 +27,7 @@ namespace GilesTrinity
             double[] gemsPerType, 
             double[] gemsPerLevel, 
             double[,] gemsPerTPerL, 
-            double totalKeys)
+            int totalKeys)
         {
             Total = total;
             TotalPerQuality = totalPerQuality;

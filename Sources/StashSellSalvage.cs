@@ -39,21 +39,21 @@ namespace GilesTrinity
             // Make sure it's not legendary
             //if (thisquality >= ItemQuality.Legendary)
             //    return false;
-            GilesItemType thisGilesItemType = DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
-            GilesBaseItemType thisGilesBaseType = DetermineBaseType(thisGilesItemType);
+            GItemType thisGilesItemType = DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
+            GBaseItemType thisGilesBaseType = DetermineBaseType(thisGilesItemType);
             switch (thisGilesBaseType)
             {
-                case GilesBaseItemType.WeaponRange:
-                case GilesBaseItemType.WeaponOneHand:
-                case GilesBaseItemType.WeaponTwoHand:
-                case GilesBaseItemType.Armor:
-                case GilesBaseItemType.Offhand:
-                case GilesBaseItemType.Jewelry:
-                case GilesBaseItemType.FollowerItem:
+                case GBaseItemType.WeaponRange:
+                case GBaseItemType.WeaponOneHand:
+                case GBaseItemType.WeaponTwoHand:
+                case GBaseItemType.Armor:
+                case GBaseItemType.Offhand:
+                case GBaseItemType.Jewelry:
+                case GBaseItemType.FollowerItem:
                     return true;
-                case GilesBaseItemType.Gem:
-                case GilesBaseItemType.Misc:
-                case GilesBaseItemType.Unknown:
+                case GBaseItemType.Gem:
+                case GBaseItemType.Misc:
+                case GBaseItemType.Unknown:
                     return false;
             }
 
@@ -78,35 +78,35 @@ namespace GilesTrinity
             // Make sure it's not legendary
             //if (thisquality >= ItemQuality.Legendary)
             //    return false;
-            GilesItemType thisGilesItemType = DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
-            GilesBaseItemType thisGilesBaseType = DetermineBaseType(thisGilesItemType);
+            GItemType thisGilesItemType = DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
+            GBaseItemType thisGilesBaseType = DetermineBaseType(thisGilesItemType);
             switch (thisGilesBaseType)
             {
-                case GilesBaseItemType.WeaponRange:
-                case GilesBaseItemType.WeaponOneHand:
-                case GilesBaseItemType.WeaponTwoHand:
-                case GilesBaseItemType.Armor:
-                case GilesBaseItemType.Offhand:
+                case GBaseItemType.WeaponRange:
+                case GBaseItemType.WeaponOneHand:
+                case GBaseItemType.WeaponTwoHand:
+                case GBaseItemType.Armor:
+                case GBaseItemType.Offhand:
                     if (thislevel >= 61 && thisquality >= ItemQuality.Magic1)
                     {
                         return true;
                     }
                     return false;
-                case GilesBaseItemType.Jewelry:
+                case GBaseItemType.Jewelry:
                     if (thislevel >= 59 && thisquality >= ItemQuality.Magic1)
                     {
                         return true;
                     }
                     return false;
-                case GilesBaseItemType.FollowerItem:
+                case GBaseItemType.FollowerItem:
                     if (thislevel >= 60 && thisquality >= ItemQuality.Magic1)
                     {
                         return true;
                     }
                     return false;
-                case GilesBaseItemType.Gem:
-                case GilesBaseItemType.Misc:
-                case GilesBaseItemType.Unknown:
+                case GBaseItemType.Gem:
+                case GBaseItemType.Misc:
+                case GBaseItemType.Unknown:
                     return false;
             }
 
@@ -266,9 +266,9 @@ namespace GilesTrinity
             if (settings.bDebugInfo)
                 BotMain.StatusText = "Town run: Stash routine started";
             Log("GSDebug: Stash routine started.", true);
-            bLoggedAnythingThisStash = false;
-            bUpdatedStashMap = false;
-            iCurrentItemLoops = 0;
+            loggedAnythingThisStash = false;
+            updatedStashMap = false;
+            currentItemLoops = 0;
             RandomizeTheTimer();
             return RunStatus.Success;
         }
@@ -287,7 +287,7 @@ namespace GilesTrinity
             {
                 ZetaDia.Actors.Update();
             }
-            if (bLoggedAnythingThisStash)
+            if (loggedAnythingThisStash)
             {
                 FileStream LogStream = null;
                 try
@@ -306,7 +306,7 @@ namespace GilesTrinity
                     if (LogStream != null)
                         LogStream.Close();
                 }
-                bLoggedAnythingThisStash = false;
+                loggedAnythingThisStash = false;
             }
             Log("GSDebug: Stash routine finished.", true);
             return RunStatus.Success;
@@ -356,24 +356,24 @@ namespace GilesTrinity
                 objPlayStash.Interact();
                 return RunStatus.Running;
             }
-            if (!bUpdatedStashMap)
+            if (!updatedStashMap)
             {
 
                 // Array for what blocks are or are not blocked
                 for (int iRow = 0; iRow <= 29; iRow++)
                     for (int iColumn = 0; iColumn <= 6; iColumn++)
-                        GilesStashSlotBlocked[iColumn, iRow] = false;
+                        StashSlotBlocked[iColumn, iRow] = false;
 
                 // Block off the entire of any "protected stash pages"
                 foreach (int iProtPage in Zeta.CommonBot.Settings.CharacterSettings.Instance.ProtectedStashPages)
                     for (int iProtRow = 0; iProtRow <= 9; iProtRow++)
                         for (int iProtColumn = 0; iProtColumn <= 6; iProtColumn++)
-                            GilesStashSlotBlocked[iProtColumn, iProtRow + (iProtPage * 10)] = true;
+                            StashSlotBlocked[iProtColumn, iProtRow + (iProtPage * 10)] = true;
 
                 // Remove rows we don't have
                 for (int iRow = (ZetaDia.Me.NumSharedStashSlots / 7); iRow <= 29; iRow++)
                     for (int iColumn = 0; iColumn <= 6; iColumn++)
-                        GilesStashSlotBlocked[iColumn, iRow] = true;
+                        StashSlotBlocked[iColumn, iRow] = true;
 
                 // Map out all the items already in the stash
                 foreach (ACDItem tempitem in ZetaDia.Me.Inventory.StashItems)
@@ -384,13 +384,13 @@ namespace GilesTrinity
                         int inventoryColumn = tempitem.InventoryColumn;
 
                         // Mark this slot as not-free
-                        GilesStashSlotBlocked[inventoryColumn, inventoryRow] = true;
+                        StashSlotBlocked[inventoryColumn, inventoryRow] = true;
 
                         // Try and reliably find out if this is a two slot item or not
-                        GilesItemType tempItemType = DetermineItemType(tempitem.InternalName, tempitem.ItemType, tempitem.FollowerSpecialType);
+                        GItemType tempItemType = DetermineItemType(tempitem.InternalName, tempitem.ItemType, tempitem.FollowerSpecialType);
                         if (DetermineIsTwoSlot(tempItemType) && inventoryRow != 19 && inventoryRow != 9 && inventoryRow != 29)
                         {
-                            GilesStashSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
+                            StashSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                         }
                         else if (DetermineIsTwoSlot(tempItemType) && (inventoryRow == 19 || inventoryRow == 9 || inventoryRow == 29))
                         {
@@ -402,16 +402,16 @@ namespace GilesTrinity
                 }
 
                 // Loop through all stash items
-                bUpdatedStashMap = true;
+                updatedStashMap = true;
             }
 
             // Need to update the stash map?
             if (hashGilesCachedKeepItems.Count > 0)
             {
-                iCurrentItemLoops++;
-                if (iCurrentItemLoops < iItemDelayLoopLimit)
+                currentItemLoops++;
+                if (currentItemLoops < itemDelayLoopLimit)
                     return RunStatus.Running;
-                iCurrentItemLoops = 0;
+                currentItemLoops = 0;
                 RandomizeTheTimer();
                 GilesCachedACDItem thisitem = hashGilesCachedKeepItems.FirstOrDefault();
                 bool bDidStashSucceed = GilesStashAttempt(thisitem);
@@ -509,10 +509,10 @@ namespace GilesTrinity
             }
             bGoToSafetyPointFirst = true;
             bGoToSafetyPointSecond = false;
-            bLoggedJunkThisStash = false;
+            loggedJunkThisStash = false;
             bCurrentlyMoving = false;
             bReachedDestination = false;
-            iCurrentItemLoops = 0;
+            currentItemLoops = 0;
             RandomizeTheTimer();
             return RunStatus.Success;
         }
@@ -686,21 +686,21 @@ namespace GilesTrinity
             }
             if (hashGilesCachedSellItems.Count > 0)
             {
-                iCurrentItemLoops++;
-                if (iCurrentItemLoops < iItemDelayLoopLimit)
+                currentItemLoops++;
+                if (currentItemLoops < itemDelayLoopLimit)
                     return RunStatus.Running;
-                iCurrentItemLoops = 0;
+                currentItemLoops = 0;
                 RandomizeTheTimer();
                 GilesCachedACDItem thisitem = hashGilesCachedSellItems.FirstOrDefault();
 
                 // Item log for cool stuff sold
                 if (thisitem != null)
                 {
-                    GilesItemType OriginalGilesItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
-                    GilesBaseItemType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
-                    if (thisGilesBaseType == GilesBaseItemType.WeaponTwoHand || thisGilesBaseType == GilesBaseItemType.WeaponOneHand || thisGilesBaseType == GilesBaseItemType.WeaponRange ||
-                        thisGilesBaseType == GilesBaseItemType.Armor || thisGilesBaseType == GilesBaseItemType.Jewelry || thisGilesBaseType == GilesBaseItemType.Offhand ||
-                        thisGilesBaseType == GilesBaseItemType.FollowerItem)
+                    GItemType OriginalGilesItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
+                    GBaseItemType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
+                    if (thisGilesBaseType == GBaseItemType.WeaponTwoHand || thisGilesBaseType == GBaseItemType.WeaponOneHand || thisGilesBaseType == GBaseItemType.WeaponRange ||
+                        thisGilesBaseType == GBaseItemType.Armor || thisGilesBaseType == GBaseItemType.Jewelry || thisGilesBaseType == GBaseItemType.Offhand ||
+                        thisGilesBaseType == GBaseItemType.FollowerItem)
                     {
                         double iThisItemValue = ValueThisItem(thisitem, OriginalGilesItemType);
                         LogJunkItems(thisitem, thisGilesBaseType, OriginalGilesItemType, iThisItemValue);
@@ -739,7 +739,7 @@ namespace GilesTrinity
             }
             ZetaDia.Me.Inventory.RepairEquippedItems();
             bNeedsEquipmentRepairs = false;
-            if (bLoggedJunkThisStash)
+            if (loggedJunkThisStash)
             {
                 FileStream LogStream = null;
                 try
@@ -755,7 +755,7 @@ namespace GilesTrinity
                     if (LogStream != null)
                         LogStream.Close();
                 }
-                bLoggedJunkThisStash = false;
+                loggedJunkThisStash = false;
             }
 
             // See if we can close the inventory window
@@ -869,10 +869,10 @@ namespace GilesTrinity
             }
             bGoToSafetyPointFirst = true;
             bGoToSafetyPointSecond = false;
-            bLoggedJunkThisStash = false;
+            loggedJunkThisStash = false;
             bCurrentlyMoving = false;
             bReachedDestination = false;
-            iCurrentItemLoops = 0;
+            currentItemLoops = 0;
             RandomizeTheTimer();
             return RunStatus.Success;
         }
@@ -1028,21 +1028,21 @@ namespace GilesTrinity
             }
             if (hashGilesCachedSalvageItems.Count > 0)
             {
-                iCurrentItemLoops++;
-                if (iCurrentItemLoops < iItemDelayLoopLimit)
+                currentItemLoops++;
+                if (currentItemLoops < itemDelayLoopLimit)
                     return RunStatus.Running;
-                iCurrentItemLoops = 0;
+                currentItemLoops = 0;
                 RandomizeTheTimer();
                 GilesCachedACDItem thisitem = hashGilesCachedSalvageItems.FirstOrDefault();
                 if (thisitem != null)
                 {
 
                     // Item log for cool stuff stashed
-                    GilesItemType OriginalGilesItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
-                    GilesBaseItemType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
-                    if (thisGilesBaseType == GilesBaseItemType.WeaponTwoHand || thisGilesBaseType == GilesBaseItemType.WeaponOneHand || thisGilesBaseType == GilesBaseItemType.WeaponRange ||
-                        thisGilesBaseType == GilesBaseItemType.Armor || thisGilesBaseType == GilesBaseItemType.Jewelry || thisGilesBaseType == GilesBaseItemType.Offhand ||
-                        thisGilesBaseType == GilesBaseItemType.FollowerItem)
+                    GItemType OriginalGilesItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
+                    GBaseItemType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
+                    if (thisGilesBaseType == GBaseItemType.WeaponTwoHand || thisGilesBaseType == GBaseItemType.WeaponOneHand || thisGilesBaseType == GBaseItemType.WeaponRange ||
+                        thisGilesBaseType == GBaseItemType.Armor || thisGilesBaseType == GBaseItemType.Jewelry || thisGilesBaseType == GBaseItemType.Offhand ||
+                        thisGilesBaseType == GBaseItemType.FollowerItem)
                     {
                         double iThisItemValue = ValueThisItem(thisitem, OriginalGilesItemType);
                         LogJunkItems(thisitem, thisGilesBaseType, OriginalGilesItemType, iThisItemValue);
@@ -1071,7 +1071,7 @@ namespace GilesTrinity
             {
                 ZetaDia.Actors.Update();
             }
-            if (bLoggedJunkThisStash)
+            if (loggedJunkThisStash)
             {
                 FileStream LogStream = null;
                 try
@@ -1087,7 +1087,7 @@ namespace GilesTrinity
                     if (LogStream != null)
                         LogStream.Close();
                 }
-                bLoggedJunkThisStash = false;
+                loggedJunkThisStash = false;
             }
             if (!bReachedSafety && ZetaDia.CurrentAct == Act.A3)
             {
@@ -1130,7 +1130,7 @@ namespace GilesTrinity
         /// <param name="thisgilesbaseitemtype"></param>
         /// <param name="thisgilesitemtype"></param>
         /// <param name="ithisitemvalue"></param>
-        internal static void LogGoodItems(GilesCachedACDItem thisgooditem, GilesBaseItemType thisgilesbaseitemtype, GilesItemType thisgilesitemtype, double ithisitemvalue)
+        internal static void LogGoodItems(GilesCachedACDItem thisgooditem, GBaseItemType thisgilesbaseitemtype, GItemType thisgilesitemtype, double ithisitemvalue)
         {
             FileStream LogStream = null;
             try
@@ -1138,9 +1138,9 @@ namespace GilesTrinity
                 LogStream = File.Open(sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - StashLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
                 {
-                    if (!bLoggedAnythingThisStash)
+                    if (!loggedAnythingThisStash)
                     {
-                        bLoggedAnythingThisStash = true;
+                        loggedAnythingThisStash = true;
                         LogWriter.WriteLine(DateTime.Now.ToString() + ":");
                         LogWriter.WriteLine("====================");
                     }
@@ -1154,7 +1154,7 @@ namespace GilesTrinity
                             bShouldNotify = true;
                         if (bShouldNotify)
                             NotificationManager.AddNotificationToQueue(thisgooditem.RealName + " [" + thisgilesitemtype.ToString() +
-                                "] (Score=" + ithisitemvalue.ToString() + ". " + sValueItemStatString + ")",
+                                "] (Score=" + ithisitemvalue.ToString() + ". " + ValueItemStatString + ")",
                                 ZetaDia.Service.CurrentHero.Name + " new legendary!", ProwlNotificationPriority.Emergency);
                         sLegendaryString = " {legendary item}";
 
@@ -1162,7 +1162,7 @@ namespace GilesTrinity
                         Logging.Write("+=+=+=+=+=+=+=+=+ LEGENDARY FOUND +=+=+=+=+=+=+=+=+");
                         Logging.Write("+  Name:       " + thisgooditem.RealName + " (" + thisgilesitemtype.ToString() + ")");
                         Logging.Write("+  Score:       " + Math.Round(ithisitemvalue).ToString());
-                        Logging.Write("+  Attributes: " + sValueItemStatString);
+                        Logging.Write("+  Attributes: " + ValueItemStatString);
                         Logging.Write("+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
                     }
                     else
@@ -1171,16 +1171,16 @@ namespace GilesTrinity
                         // Check for non-legendary notifications
                         bShouldNotify = EvaluateItemScoreForNotification(thisgilesbaseitemtype, ithisitemvalue);
                         if (bShouldNotify)
-                            NotificationManager.AddNotificationToQueue(thisgooditem.RealName + " [" + thisgilesitemtype.ToString() + "] (Score=" + ithisitemvalue.ToString() + ". " + sValueItemStatString + ")", ZetaDia.Service.CurrentHero.Name + " new item!", ProwlNotificationPriority.Emergency);
+                            NotificationManager.AddNotificationToQueue(thisgooditem.RealName + " [" + thisgilesitemtype.ToString() + "] (Score=" + ithisitemvalue.ToString() + ". " + ValueItemStatString + ")", ZetaDia.Service.CurrentHero.Name + " new item!", ProwlNotificationPriority.Emergency);
                     }
                     if (bShouldNotify)
                     {
                         EmailMessage.AppendLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.RealName + "'. Score = " + Math.Round(ithisitemvalue).ToString() + sLegendaryString)
-                            .AppendLine("  " + sValueItemStatString)
+                            .AppendLine("  " + ValueItemStatString)
                             .AppendLine();
                     }
                     LogWriter.WriteLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.RealName + "'. Score = " + Math.Round(ithisitemvalue).ToString() + sLegendaryString);
-                    LogWriter.WriteLine("  " + sValueItemStatString);
+                    LogWriter.WriteLine("  " + ValueItemStatString);
                     LogWriter.WriteLine("");
                 }
                 LogStream.Close();
@@ -1200,7 +1200,7 @@ namespace GilesTrinity
         /// <param name="thisgilesbaseitemtype"></param>
         /// <param name="thisgilesitemtype"></param>
         /// <param name="ithisitemvalue"></param>
-        internal static void LogJunkItems(GilesCachedACDItem thisgooditem, GilesBaseItemType thisgilesbaseitemtype, GilesItemType thisgilesitemtype, double ithisitemvalue)
+        internal static void LogJunkItems(GilesCachedACDItem thisgooditem, GBaseItemType thisgilesbaseitemtype, GItemType thisgilesitemtype, double ithisitemvalue)
         {
             FileStream LogStream = null;
             try
@@ -1208,9 +1208,9 @@ namespace GilesTrinity
                 LogStream = File.Open(sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
                 {
-                    if (!bLoggedJunkThisStash)
+                    if (!loggedJunkThisStash)
                     {
-                        bLoggedJunkThisStash = true;
+                        loggedJunkThisStash = true;
                         LogWriter.WriteLine(DateTime.Now.ToString() + ":");
                         LogWriter.WriteLine("====================");
                     }
@@ -1218,8 +1218,8 @@ namespace GilesTrinity
                     if (thisgooditem.Quality >= ItemQuality.Legendary)
                         sLegendaryString = " {legendary item}";
                     LogWriter.WriteLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.RealName + "'. Score = " + Math.Round(ithisitemvalue).ToString() + sLegendaryString);
-                    if (sJunkItemStatString != "")
-                        LogWriter.WriteLine("  " + sJunkItemStatString);
+                    if (junkItemStatString != "")
+                        LogWriter.WriteLine("  " + junkItemStatString);
                     else
                         LogWriter.WriteLine("  (no scorable attributes)");
                     LogWriter.WriteLine("");
@@ -1247,8 +1247,8 @@ namespace GilesTrinity
             int iOriginalStackQuantity = item.ItemStackQuantity;
             string sOriginalItemName = item.RealName;
             string sOriginalInternalName = item.InternalName;
-            GilesItemType OriginalGilesItemType = DetermineItemType(item.InternalName, item.DBItemType, item.FollowerType);
-            GilesBaseItemType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
+            GItemType OriginalGilesItemType = DetermineItemType(item.InternalName, item.DBItemType, item.FollowerType);
+            GBaseItemType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
             bool bOriginalTwoSlot = DetermineIsTwoSlot(OriginalGilesItemType);
             bool bOriginalIsStackable = DetermineIsStackable(OriginalGilesItemType);
             int iAttempts;
@@ -1265,18 +1265,18 @@ namespace GilesTrinity
                     // Array for what blocks are or are not blocked
                     for (int iRow = 0; iRow <= 29; iRow++)
                         for (int iColumn = 0; iColumn <= 6; iColumn++)
-                            GilesStashSlotBlocked[iColumn, iRow] = false;
+                            StashSlotBlocked[iColumn, iRow] = false;
 
                     // Block off the entire of any "protected stash pages"
                     foreach (int iProtPage in Zeta.CommonBot.Settings.CharacterSettings.Instance.ProtectedStashPages)
                         for (int iProtRow = 0; iProtRow <= 9; iProtRow++)
                             for (int iProtColumn = 0; iProtColumn <= 6; iProtColumn++)
-                                GilesStashSlotBlocked[iProtColumn, iProtRow + (iProtPage * 10)] = true;
+                                StashSlotBlocked[iProtColumn, iProtRow + (iProtPage * 10)] = true;
 
                     // Remove rows we don't have
                     for (int iRow = (ZetaDia.Me.NumSharedStashSlots / 7); iRow <= 29; iRow++)
                         for (int iColumn = 0; iColumn <= 6; iColumn++)
-                            GilesStashSlotBlocked[iColumn, iRow] = true;
+                            StashSlotBlocked[iColumn, iRow] = true;
 
                     // Map out all the items already in the stash
                     foreach (ACDItem tempitem in ZetaDia.Me.Inventory.StashItems)
@@ -1287,13 +1287,13 @@ namespace GilesTrinity
                             int inventoryColumn = tempitem.InventoryColumn;
 
                             // Mark this slot as not-free
-                            GilesStashSlotBlocked[inventoryColumn, inventoryRow] = true;
+                            StashSlotBlocked[inventoryColumn, inventoryRow] = true;
 
                             // Try and reliably find out if this is a two slot item or not
-                            GilesStashSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
+                            StashSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                             if (inventoryRow != 19 && inventoryRow != 9 && inventoryRow != 29)
                             {
-                                GilesStashSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
+                                StashSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                             }
                         }
                     }
@@ -1320,9 +1320,9 @@ namespace GilesTrinity
             int iLeftoverStackQuantity = 0;
 
             // Item log for cool stuff stashed
-            if (thisGilesBaseType == GilesBaseItemType.WeaponTwoHand || thisGilesBaseType == GilesBaseItemType.WeaponOneHand || thisGilesBaseType == GilesBaseItemType.WeaponRange ||
-                thisGilesBaseType == GilesBaseItemType.Armor || thisGilesBaseType == GilesBaseItemType.Jewelry || thisGilesBaseType == GilesBaseItemType.Offhand ||
-                thisGilesBaseType == GilesBaseItemType.FollowerItem)
+            if (thisGilesBaseType == GBaseItemType.WeaponTwoHand || thisGilesBaseType == GBaseItemType.WeaponOneHand || thisGilesBaseType == GBaseItemType.WeaponRange ||
+                thisGilesBaseType == GBaseItemType.Armor || thisGilesBaseType == GBaseItemType.Jewelry || thisGilesBaseType == GBaseItemType.Offhand ||
+                thisGilesBaseType == GBaseItemType.FollowerItem)
             {
                 double iThisItemValue = ValueThisItem(item, OriginalGilesItemType);
                 LogGoodItems(item, thisGilesBaseType, OriginalGilesItemType, iThisItemValue);
@@ -1380,7 +1380,7 @@ namespace GilesTrinity
                     {
 
                         // If nothing in the 1st row 
-                        if (!GilesStashSlotBlocked[iColumn, iRow])
+                        if (!StashSlotBlocked[iColumn, iRow])
                         {
                             bool bNotEnoughSpace = false;
 
@@ -1389,7 +1389,7 @@ namespace GilesTrinity
                                 bNotEnoughSpace = true;
 
                             // Already something in the stash in the 2nd row)
-                            else if (GilesStashSlotBlocked[iColumn, iRow + 1])
+                            else if (StashSlotBlocked[iColumn, iRow + 1])
                                 bNotEnoughSpace = true;
                             if (!bNotEnoughSpace)
                             {
@@ -1417,14 +1417,14 @@ namespace GilesTrinity
                     {
 
                         // Nothing in this slot
-                        if (!GilesStashSlotBlocked[iColumn, iRow])
+                        if (!StashSlotBlocked[iColumn, iRow])
                         {
                             bool bSensibleLocation = false;
                             if (!bTopPageRow && !bBottomPageRow)
                             {
 
                                 // Something above and below this slot, or an odd-numbered row, so put something here
-                                if ((GilesStashSlotBlocked[iColumn, iRow + 1] && GilesStashSlotBlocked[iColumn, iRow - 1]) ||
+                                if ((StashSlotBlocked[iColumn, iRow + 1] && StashSlotBlocked[iColumn, iRow - 1]) ||
                                     (iRow) % 2 != 0)
                                     bSensibleLocation = true;
                             }
@@ -1432,7 +1432,7 @@ namespace GilesTrinity
                             // Top page row with something directly underneath already blocking
                             else if (bTopPageRow)
                             {
-                                if (GilesStashSlotBlocked[iColumn, iRow + 1])
+                                if (StashSlotBlocked[iColumn, iRow + 1])
                                     bSensibleLocation = true;
                             }
 
@@ -1465,7 +1465,7 @@ namespace GilesTrinity
                         {
 
                             // Nothing in this spot, we're good!
-                            if (!GilesStashSlotBlocked[iColumn, iRow])
+                            if (!StashSlotBlocked[iColumn, iRow])
                             {
                                 iPointX = iColumn;
                                 iPointY = iRow;
@@ -1489,9 +1489,9 @@ namespace GilesTrinity
             }
 
             // We have two valid points that are empty, move the object here!
-            GilesStashSlotBlocked[iPointX, iPointY] = true;
+            StashSlotBlocked[iPointX, iPointY] = true;
             if (bOriginalTwoSlot)
-                GilesStashSlotBlocked[iPointX, iPointY + 1] = true;
+                StashSlotBlocked[iPointX, iPointY + 1] = true;
             ZetaDia.Me.Inventory.MoveItem(iOriginalDynamicID, iPlayerDynamicID, InventorySlot.PlayerSharedStash, iPointX, iPointY);
             return true;
         }

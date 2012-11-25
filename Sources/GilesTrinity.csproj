@@ -67,6 +67,7 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotStart.cs" />
+    <Compile Include="ItemValuation.cs" />
     <Compile Include="DbProvider\GilesCombatTargetingReplacer.cs" />
     <Compile Include="DbProvider\GilesLootTargetingProvider.cs" />
     <Compile Include="DbProvider\GilesObstacleTargetingProvider.cs" />

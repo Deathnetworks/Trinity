@@ -82,7 +82,7 @@ namespace GilesTrinity
                     bKeepLooping = false;
             }
         }
-        
+
         /// <summary>
         /// Check re-use timers on skills
         /// </summary>
@@ -195,6 +195,11 @@ namespace GilesTrinity
         // Special check to force re-buffing before castign archon
         private static bool CanCastArchon = false;
 
+        /// <summary>
+        /// Writes a log message (default is LogLevel=Normal)
+        /// </summary>
+        /// <param name="message">The message</param>
+        /// <param name="isDiagnostic">If true, will be loglevel=Diagnostic, else, loglevel=Normal</param>
         internal static void Log(string message, bool isDiagnostic = false)
         {
             string totalMessage = String.Format("[Trinity] {0}", message);
@@ -318,7 +323,7 @@ namespace GilesTrinity
         }
 
         public static int TotalProfileRecycles = 0;
-        
+
         public static void GilesResetEverythingNewGame()
         {
             hashUseOnceID = new HashSet<int>();
@@ -345,7 +350,7 @@ namespace GilesTrinity
             GilesPlayerMover.iCancelUnstuckerForSeconds = 0;
             GilesPlayerMover.timeCancelledUnstuckerFor = DateTime.Today;
             // Reset all the caches
-            dictGilesObjectTypeCache = new Dictionary<int, GilesObjectType>();
+            dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
             dictGilesMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
             dictGilesMaxHealthCache = new Dictionary<int, double>();
             dictGilesLastHealthCache = new Dictionary<int, double>();

@@ -141,7 +141,7 @@ namespace GilesTrinity
                 {
                     return vlastSafeSpot;
                 }
-                bHasEmergencyTeleportUp = (
+                hasEmergencyTeleportUp = (
                     // Leap is available
                     (!playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Leap) &&
                         DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Leap]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Barbarian_Leap]) ||

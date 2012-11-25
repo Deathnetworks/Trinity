@@ -4,7 +4,7 @@ namespace GilesTrinity
     /// <summary>
     /// Primary "lowest level" item type (eg EXACTLY what kind of item it is)
     /// </summary>
-    public enum GilesItemType
+    public enum GItemType
     {
         Unknown,
         Axe,
@@ -66,7 +66,7 @@ namespace GilesTrinity
     /// <summary>
     /// Base types, eg "one handed weapons" "armors" etc.
     /// </summary>
-    public enum GilesBaseItemType
+    public enum GBaseItemType
     {
         Unknown,
         WeaponOneHand,
@@ -84,7 +84,7 @@ namespace GilesTrinity
     /// <summary>
     /// Generic object types - eg a monster, an item to pickup, a shrine to click etc.
     /// </summary>
-    public enum GilesObjectType
+    public enum GObjectType
     {
         Unknown,
         Unit,
