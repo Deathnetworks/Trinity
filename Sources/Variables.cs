@@ -59,7 +59,7 @@ namespace GilesTrinity
         /// <summary>
         /// This will log item stat balancing data to special log files
         /// </summary>
-        private const bool bLogBalanceDataForGiles = true;
+        private const bool LogItemBalanceData = true;
 
         /// <summary>
         /// Full Analysis SPAMS like hell. But useful for seeing how the score-calculator is adding/removing points

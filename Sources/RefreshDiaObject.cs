@@ -8,6 +8,7 @@ using Zeta.CommonBot;
 using Zeta.Internals.Actors;
 using Zeta.Internals.Actors.Gizmos;
 using Zeta.Internals.SNO;
+using System.IO;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -1119,7 +1120,7 @@ namespace GilesTrinity
                 {
                     try
                     {
-                        bBurrowed = !thisUnit.IsAttackable;
+                        bBurrowed = !thisUnit.IsBurrowed;
                     }
                     catch (Exception ex)
                     {
@@ -1256,21 +1257,21 @@ namespace GilesTrinity
                         c_DBItemType = tempitem.CommonData.ItemType;
                         c_IsOneHandedItem = tempitem.CommonData.IsOneHand;
                         c_item_tFollowerType = tempitem.CommonData.FollowerSpecialType;
+
                         dictGilesGameBalanceDataCache.Add(c_BalanceID, new GilesGameBalanceDataCache(c_ItemLevel, c_DBItemType, c_IsOneHandedItem,
                             c_item_tFollowerType));
                         // Temporarily log stuff
-                        //if (bLogBalanceDataForGiles)
-                        //{
-                        //    FileStream LogStream = File.Open(sTrinityPluginPath + "_BalanceData_" + ZetaDia.Service.CurrentHero.BattleTagName + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
-                        //    using (StreamWriter LogWriter = new StreamWriter(LogStream))
-                        //    {
-                        //        LogWriter.WriteLine("{" + tmp_iThisBalanceID.ToString() + ", new GilesGameBalanceDataCache(" +
-                        //            tmp_item_iThisLevel.ToString() + ", ItemType." + tmp_item_ThisDBItemType.ToString() + ", " +
-                        //            tmp_item_bThisOneHanded.ToString().ToLower() + ", FollowerType." + tmp_item_ThisFollowerType.ToString() + ")}, 
-                        //" + tmp_sThisInternalName + " [" + tmp_iThisActorSNO.ToString() + "]");
-                        //    }
-                        //    LogStream.Close();
-                        //}
+                        if (LogItemBalanceData)
+                        {
+                            FileStream LogStream = File.Open(sTrinityPluginPath + "_BalanceData_" + ZetaDia.Service.CurrentHero.BattleTagName + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
+                            using (StreamWriter LogWriter = new StreamWriter(LogStream))
+                            {
+                                LogWriter.WriteLine("{" + c_BalanceID.ToString() + ", new GilesGameBalanceDataCache(" +
+                                   c_ItemLevel.ToString() + ", ItemType." + c_DBItemType.ToString() + ", " +
+                                   c_IsOneHandedItem.ToString().ToLower() + ", FollowerType." + c_item_tFollowerType.ToString() + ")}, " + c_Name + " [" + c_ActorSNO.ToString() + "]");
+                            }
+                            LogStream.Close();
+                        }
                     }
                     catch (Exception ex)
                     {

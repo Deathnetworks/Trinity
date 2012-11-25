@@ -744,6 +744,7 @@ namespace GilesTrinity
                 BotMain.Stop();
             }
             ZetaDia.Me.Inventory.RepairEquippedItems();
+
             bNeedsEquipmentRepairs = false;
             if (loggedJunkThisStash)
             {

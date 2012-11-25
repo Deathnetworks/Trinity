@@ -835,6 +835,7 @@ namespace GilesTrinity
         /// <returns></returns>
         private static bool ShouldWeStashThis(GilesCachedACDItem thisitem)
         {
+            // auto trash blue items
             if (thisitem.Quality < ItemQuality.Rare4)
             {
                 return false;
@@ -927,6 +928,7 @@ namespace GilesTrinity
             // Ok now try to do some decent item scoring based on item types
             double iNeedScore = ScoreNeeded(TrueItemType);
             double iMyScore = ValueThisItem(thisitem, TrueItemType);
+
             if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = " + iMyScore.ToString());
             if (iMyScore >= iNeedScore) return true;
 

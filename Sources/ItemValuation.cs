@@ -10,6 +10,10 @@ namespace GilesTrinity
         private static bool IsInvalidItem = true;
         private static double TotalItemPoints = 0;
         private static GBaseItemType baseItemType = GBaseItemType.Unknown;
+
+        /// <summary>
+        /// This is a bonus applied at the end of valuation 
+        /// </summary>
         private static double BestFinalBonus = 1d;
 
         // Constants for convenient stat names
@@ -32,12 +36,24 @@ namespace GilesTrinity
         /// <returns></returns>
         private static double ValueThisItem(GilesCachedACDItem item, GItemType itemType)
         {
+            // Reset static variables
             TotalItemPoints = 0;
             IsInvalidItem = true;
             ItemMaxStats = new double[TOTALSTATS];
             ItemMaxPoints = new double[TOTALSTATS];
             baseItemType = DetermineBaseType(itemType);
+            BestFinalBonus = 1d;
+            HadStat = new double[TOTALSTATS] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            HadPoints = new double[TOTALSTATS] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            SafeLifePercentage = 0;
+            SocketsCanReplacePrimaries = false;
+            HighestScoringPrimary = 0;
+            WhichPrimaryIsHighest = 0;
+            AmountHighestScoringPrimary = 0;
+            TotalRequirements = 0;
+            GlobalMultiplier = 1;
 
+            // Checks for Invalid Item Types
             CheckForInvalidItemType(itemType);
 
             // Double safety check for unidentified items
@@ -118,8 +134,7 @@ namespace GilesTrinity
                     // Final bonus granted is an end-of-score multiplier. 1 = 100%, so all items start off with 100%, of course!
                     double FinalBonusGranted = 1;
 
-                    // Temp percent is what PERCENTAGE of the *MAXIMUM POSSIBLE STAT*, this stat is at.
-
+                    // Item Stat Ratio is what PERCENTAGE of the *MAXIMUM POSSIBLE STAT*, this stat is at.
                     // Note that stats OVER the max will get a natural score boost, since this value will be over 1!
                     double itemStatRatio = TempStatistic / ItemMaxStats[i];
 
@@ -127,7 +142,7 @@ namespace GilesTrinity
                     double iTempPoints = ItemMaxPoints[i] * itemStatRatio;
 
                     if (fullItemAnalysis) 
-                        Log("--- " + StatNames[i] + ": " + TempStatistic.ToString() + " out of " + ItemMaxStats[i].ToString() + " (" + ItemMaxPoints[i].ToString() + " * " + itemStatRatio.ToString() + " = " + iTempPoints.ToString() + ")");
+                        Log("--- " + StatNames[i] + ": " + TempStatistic.ToString("0") + " out of " + ItemMaxStats[i].ToString() + " (" + ItemMaxPoints[i].ToString() + " * " + itemStatRatio.ToString("0.000") + " = " + iTempPoints.ToString("0") + ")");
 
                     // Check if this statistic is over the "bonus threshold" array value for this stat - if it is, then it gets a score bonus when over a certain % of max-stat
                     if (itemStatRatio > BonusThreshold[i] && BonusThreshold[i] > 0f)
@@ -419,7 +434,10 @@ namespace GilesTrinity
                         // Shields get less of a special bonus from high prime stats
                         if (itemType == GItemType.Shield)
                             SpecialBonus *= 0.7;
-                        if (fullItemAnalysis) Log("------- special bonus =" + SpecialBonus.ToString(), true);
+
+                        if (fullItemAnalysis && SpecialBonus > 0) 
+                            Log("------- special bonus =" + SpecialBonus.ToString(), true);
+
                         FinalBonusGranted += SpecialBonus;
                     }
 
@@ -428,10 +446,18 @@ namespace GilesTrinity
                     if (i == LIFESTEAL && itemType == GItemType.MightyBelt)
                         FinalBonusGranted += 0.3;
 
-                    // Knock off points for being particularly low
-                    if ((TempStatistic / ItemMaxStats[i]) < MinimumThreshold[i] && MinimumThreshold[i] > 0f)
-                        FinalBonusGranted -= 0.35;
-
+                    if (i == TOTALDPS)
+                    {
+                        // Knock off points for being particularly low
+                        if ((TempStatistic / ItemMaxStats[i]) < MinimumThreshold[i] && MinimumThreshold[i] > 0f)
+                            FinalBonusGranted -= 0.5;
+                    }
+                    else
+                    {
+                        // Knock off points for being particularly low
+                        if ((TempStatistic / ItemMaxStats[i]) < MinimumThreshold[i] && MinimumThreshold[i] > 0f)
+                            FinalBonusGranted -= 0.35;
+                    }
                     // Grant a 20% bonus to vitality or Life%, for being paired with any prime stat above minimum threshold +.1
                     if (((i == VITALITY && (TempStatistic / ItemMaxStats[VITALITY]) > MinimumThreshold[VITALITY]) ||
                           i == LIFEPERCENT && (TempStatistic / ItemMaxStats[LIFEPERCENT]) > MinimumThreshold[LIFEPERCENT]) &&
@@ -483,8 +509,8 @@ namespace GilesTrinity
                         FinalBonusGranted += iSpecialBonus;
 
                         // Global bonus to everything
-                        if ((ItemMaxStats[i] - TempStatistic) < 10.2f)
-                            GlobalMultiplier += 0.05;
+                        //if ((ItemMaxStats[i] - TempStatistic) < 10.2f)
+                        //    GlobalMultiplier += 0.05;
                     }
 
                     // All resist special bonuses
@@ -630,7 +656,7 @@ namespace GilesTrinity
                     }
 
                     // And now for jewelry checks...
-                    else
+                    if (itemType == GItemType.Ring || itemType == GItemType.Amulet)
                     {
 
                         // Global bonus to everything if jewelry has an all resist above 50%
@@ -790,7 +816,8 @@ namespace GilesTrinity
                     if (i == DEXTERITY || i == STRENGTH || i == INTELLIGENCE)
                     {
                         if (fullItemAnalysis)
-                            Log("---- +" + iTempPoints.ToString() + " (*" + FinalBonusGranted.ToString() + " multiplier) [MUST BE MAX STAT SCORE TO COUNT]", true);
+                            Log("---- +" + iTempPoints.ToString("0") + " (*" + FinalBonusGranted.ToString("0.00") + " multiplier) [MUST BE MAX STAT SCORE TO COUNT]", true);
+
                         if (iTempPoints > HighestScoringPrimary)
                         {
                             HighestScoringPrimary = iTempPoints;
@@ -801,7 +828,8 @@ namespace GilesTrinity
                     else
                     {
                         if (fullItemAnalysis)
-                            Log("---- +" + iTempPoints.ToString() + " score (*" + FinalBonusGranted.ToString() + " multiplier)", true);
+                            Log("---- +" + iTempPoints.ToString("0") + " score (*" + FinalBonusGranted.ToString("0.00") + " multiplier)", true);
+
                         TotalItemPoints += iTempPoints;
                     }
                     HadPoints[i] = iTempPoints;
@@ -831,11 +859,13 @@ namespace GilesTrinity
                 if ((HadStat[VITALITY] < 40) || SafeLifePercentage < 0.7)
                     HighestScoringPrimary *= 0.8;
                 TotalItemPoints += HighestScoringPrimary;
+
                 ValueItemStatString = StatNames[WhichPrimaryIsHighest] + "=" + Math.Round(AmountHighestScoringPrimary).ToString() + ". " + ValueItemStatString;
                 junkItemStatString = StatNames[WhichPrimaryIsHighest] + "=" + Math.Round(AmountHighestScoringPrimary).ToString() + ". " + junkItemStatString;
+
             }
             if (fullItemAnalysis)
-                Log("--- +" + TotalItemPoints.ToString() + " total score pre-special reductions. (GM=" + GlobalMultiplier.ToString() + ")", true);
+                Log("--- +" + TotalItemPoints.ToString("0") + " total score pre-special reductions. (GlobalMultiplier=" + GlobalMultiplier.ToString("0.000") + ")", true);
 
             // Global multiplier
             TotalItemPoints *= GlobalMultiplier;
@@ -1010,12 +1040,15 @@ namespace GilesTrinity
                 }
             }
 
+            if (fullItemAnalysis)
+                Log("--- +" + TotalItemPoints.ToString("0") + " total score after special reductions. (TotalRequirements=" + TotalRequirements + ")", true);
+
             GetBestFinalPoints(itemType);
 
             TotalItemPoints *= BestFinalBonus;
 
             if (fullItemAnalysis)
-                Log("TOTAL: " + TotalItemPoints.ToString());
+                Log("TOTAL: " + TotalItemPoints.ToString("0") + "(Final Bonus=" + BestFinalBonus.ToString("0.00") + ")");
 
             if (fullItemAnalysis)
                 Log("");
@@ -1028,7 +1061,8 @@ namespace GilesTrinity
             // One Handed Weapons 
             if (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
                  itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
-                 itemType == GItemType.Spear || itemType == GItemType.Sword || itemType == GItemType.Wand)
+                 itemType == GItemType.Spear || itemType == GItemType.Sword || itemType == GItemType.Wand || 
+                 itemType == GItemType.HandCrossbow)
             {
                 Array.Copy(MaxPointsWeaponOneHand, ItemMaxStats, TOTALSTATS);
                 Array.Copy(WeaponPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1038,24 +1072,26 @@ namespace GilesTrinity
             // Two Handed Weapons
             if (itemType == GItemType.TwoHandAxe || itemType == GItemType.TwoHandDaibo || itemType == GItemType.TwoHandMace ||
                 itemType == GItemType.TwoHandMighty || itemType == GItemType.TwoHandPolearm || itemType == GItemType.TwoHandStaff ||
-                itemType == GItemType.TwoHandSword)
+                itemType == GItemType.TwoHandSword ||
+                itemType == GItemType.TwoHandCrossbow || itemType == GItemType.TwoHandBow)
             {
                 Array.Copy(MaxPointsWeaponTwoHand, ItemMaxStats, TOTALSTATS);
                 Array.Copy(WeaponPointsAtMax, ItemMaxPoints, TOTALSTATS);
                 IsInvalidItem = false;
             }
 
+            // rrrix: ranged weapons have the same max statistics as melee weapons, this breaks the calculation!
             // Ranged Weapons
-            if (itemType == GItemType.TwoHandCrossbow || itemType == GItemType.TwoHandBow || itemType == GItemType.HandCrossbow)
-            {
-                Array.Copy(MaxPointsWeaponRanged, ItemMaxStats, TOTALSTATS);
-                Array.Copy(WeaponPointsAtMax, ItemMaxPoints, TOTALSTATS);
-                if (itemType == GItemType.HandCrossbow)
-                {
-                    ItemMaxStats[TOTALDPS] -= 150;
-                }
-                IsInvalidItem = false;
-            }
+            //if (itemType == GItemType.TwoHandCrossbow || itemType == GItemType.TwoHandBow || itemType == GItemType.HandCrossbow)
+            //{
+            //    Array.Copy(MaxPointsWeaponRanged, ItemMaxStats, TOTALSTATS);
+            //    Array.Copy(WeaponPointsAtMax, ItemMaxPoints, TOTALSTATS);
+            //    if (itemType == GItemType.HandCrossbow)
+            //    {
+            //        ItemMaxStats[TOTALDPS] -= 150;
+            //    }
+            //    IsInvalidItem = false;
+            //}
 
             // Off-handed stuff
 
@@ -1200,6 +1236,10 @@ namespace GilesTrinity
             }
         }
 
+        /// <summary>
+        /// Define Special Reductions
+        /// </summary>
+        /// <param name="itemType"></param>
         private static void GetBestFinalPoints(GItemType itemType)
         {
             // Gold-find and pickup radius combined
@@ -1210,60 +1250,81 @@ namespace GilesTrinity
             if ((HadStat[ALLRESIST] / ItemMaxStats[ALLRESIST] > 0.55) && (HadStat[PICKUPRADIUS] > 0))
                 TotalItemPoints += (((ItemMaxPoints[PICKUPRADIUS] + ItemMaxPoints[ALLRESIST]) / 2) * 0.65);
 
-            // Special crit hit/crit chance/attack speed combos
+            // Special crit hit/crit chance/attack speed combos a.k.a Trifecta!
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.8)) && (HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.8)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.8)))
             {
                 if (BestFinalBonus < 3.2 && itemType != GItemType.Quiver)
                     BestFinalBonus = 3.2;
             }
+
+            /*
+             *  2.3 Bonus for 80% 2 of 3 CritDmg/Crit%/AttackSpd Combo
+             */
+            // 80% of crit chance, 80% crit damage of max for item
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.8)) && (HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.8)))
             {
                 if (BestFinalBonus < 2.3)
                     BestFinalBonus = 2.3;
             }
+            // 80% of crit chance, 80% of attack speed of max for item
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.8)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.8)))
             {
                 if (BestFinalBonus < 2.1 && itemType != GItemType.Quiver)
                     BestFinalBonus = 2.1;
             }
+            // 80% of crit damage, 80% of attack speed of max for item
             if ((HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.8)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.8)))
             {
                 if (BestFinalBonus < 1.8 && itemType != GItemType.Quiver)
                     BestFinalBonus = 1.8;
             }
+            /*
+             *  2.1 Bonus for 65% 2 of 3 CritDmg/Crit%/AttackSpd Combo
+             */
+            // 65% crit chance, 65% crit damage, 65% attack speed of max for item
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.65)) && (HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.65)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.65)))
             {
                 if (BestFinalBonus < 2.1 && itemType != GItemType.Quiver)
                     BestFinalBonus = 2.1;
             }
+            // 65% crit chance, 65% crit damage
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.65)) && (HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.65)))
             {
                 if (BestFinalBonus < 1.9) BestFinalBonus = 1.9;
             }
+            // 65% crit chance, 65% attack speed of max for item
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.65)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.65)))
             {
                 if (BestFinalBonus < 1.7 && itemType != GItemType.Quiver)
                     BestFinalBonus = 1.7;
             }
+            // 65% crit damage, 65% attack speed of max for item
             if ((HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.65)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.65)))
             {
                 if (BestFinalBonus < 1.5 && itemType != GItemType.Quiver)
                     BestFinalBonus = 1.5;
             }
+            /*
+            *  1.7 Bonus for 45% 2 of 3 CritDmg/Crit%/AttackSpd Combo
+            */
+            // 45% crit chance, 45% crit damage, 45% attack speed of max for item
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.45)) && (HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.45)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.45)))
             {
                 if (BestFinalBonus < 1.7 && itemType != GItemType.Quiver)
                     BestFinalBonus = 1.7;
             }
+            // 45% crit chance, 45% crit damage, 45% attack speed of max for item
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.45)) && (HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.45)))
             {
                 if (BestFinalBonus < 1.4) BestFinalBonus = 1.4;
             }
+            // 45% crit chance, 45% attack speed of max for item
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.45)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.45)))
             {
                 if (BestFinalBonus < 1.3 && itemType != GItemType.Quiver)
                     BestFinalBonus = 1.3;
             }
+            // 45% crit damage, 45% attack speed of max for item
             if ((HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.45)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.45)))
             {
                 if (BestFinalBonus < 1.1 && itemType != GItemType.Quiver)

@@ -1,0 +1,4 @@
+// Variable name                                               Dex,  Int,  Str,  Vit,   L%,  LOH, Stl%,  LPS,   MF,   GF,   MS,  Rad,  Sox, Crit, CDam, ASPD, Min+, Max+,  Blk, Thn,    AR,   SR,  DPS, ARMR, Disc, Mana, Arc., Regn, Globe
+private static double[] BonusThreshold = new double[29] 	{ 0.75, 0.75, 0.75, 0.75, 0.80, 0.70, 0.80, 1.00, 1.00, 1.00, 0.95, 1.00, 1.00, 0.70, 0.90, 0.90, 0.90, 0.90, 0.83, 1.00, 0.85, 0.95, 0.80, 0.90, 1.00, 1.00, 1.00, 0.90, 1.00 };
+private static double[] MinimumThreshold = new double[29] 	{ 0.40, 0.40, 0.40, 0.30, 0.60, 0.35, 0.60, 0.70, 0.40, 0.40, 0.75, 0.80, 0.40, 0.40, 0.60, 0.40, 0.20, 0.20, 0.65, 0.60, 0.40, 0.55, 0.80, 0.80, 0.70, 0.70, 0.70, 0.70, 0.40 };
+private static double[] StatMinimumPrimary = new double[29] { 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.20, 0.40, 0.40, 0.30, 0.00, 0.00, 0.00, 0.00, 0.00, 0.40, 0.40, 0.40, 0.40, 0.40, 0.40, 0.00, 0.40, 0.40, 0.40, 0.40, 0.40, 0.40 };
