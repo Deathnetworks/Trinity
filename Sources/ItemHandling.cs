@@ -851,15 +851,7 @@ namespace GilesTrinity
             GItemType TrueItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
             GBaseItemType thisGilesBaseType = DetermineBaseType(TrueItemType);
 
-            switch (StashRule.checkItem(thisitem, TrueItemType, thisGilesBaseType))
-            {
-                case Interpreter.InterpreterAction.KEEP:
-                    return true;
-                case Interpreter.InterpreterAction.TRASH:
-                    return false;
-                default:
-                    break;
-            }
+            
 
             if (TrueItemType == GItemType.StaffOfHerding)
             {
