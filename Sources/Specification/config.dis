@@ -23,9 +23,11 @@ $$ [TRASHLOG]	== true					// log all trashed items ... legendary only for now
 // |    /  |  | |     _|     _|    |   |     _|  \__ \ 
 // | _|_\ \__/ ____| ___|   _|   ___| ____| ___| ____/ 
 // +--------------------------------------------------------------------------------------+  
-$$ [FILE]	== legendary.dis		// legendary item rules
-$$ [FILE]	== rare.dis				// rare item rules
-$$ [FILE]	== magic.dis			// magic item rules
-//$$ [FILE]	== test.dis				// test item rules
+
+// Uncomment this 3 line for activate Item Rules 
+//$$ [FILE]	== legendary.dis		// legendary item rules
+//$$ [FILE]	== rare.dis				// rare item rules
+//$$ [FILE]	== magic.dis			// magic item rules
+
 
  

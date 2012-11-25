@@ -147,7 +147,6 @@
     <None Include="Specification\legendary.dis" />
     <None Include="Specification\magic.dis" />
     <None Include="Specification\rare.dis" />
-    <None Include="Specification\test.dis" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Log\" />
