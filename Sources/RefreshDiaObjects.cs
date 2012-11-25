@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.Settings.Combat;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace GilesTrinity
             // But only if we aren't force-cancelling avoidance for XX time
             bool bFoundSafeSpot = false;
             // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
-            if (bRequireAvoidance && (!bAnyTreasureGoblinsPresent || settings.iTreasureGoblinPriority <= 2) &&
+            if (bRequireAvoidance && (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
                 DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
             {
                 Vector3 vAnySafePoint = FindSafeZone(false, 1, vSafePointNear);
@@ -48,13 +49,13 @@ namespace GilesTrinity
                     bFoundSafeSpot = true;
                     CurrentTarget = new GilesObject()
                         {
-                        Position = vAnySafePoint,
-                        Type = GObjectType.Avoidance,
-                        Weight = 20000,
-                        CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
-                        RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint), 
-                        InternalName = "GilesSafePoint"
-                    };;
+                            Position = vAnySafePoint,
+                            Type = GObjectType.Avoidance,
+                            Weight = 20000,
+                            CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
+                            RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
+                            InternalName = "GilesSafePoint"
+                        }; ;
                 }
                 else
                 {
@@ -110,7 +111,7 @@ namespace GilesTrinity
             // Record the last time our target changed etc.
             if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
             {
-                if (bDebugLogSpecial && settings.bDebugInfo)
+                if (bDebugLogSpecial && Settings.Advanced.DebugInStatusBar)
                 {
                     Logging.WriteDiagnostic("[Trinity] Setting dateSincePicked to {0} iCurrentTargetRactorGUID: {1} CurrentTarget.iRActorGuid: {2}",
                         DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
@@ -126,7 +127,7 @@ namespace GilesTrinity
                     // Check if the health has changed, if so update the target-pick time before we blacklist them again
                     if (CurrentTarget.HitPoints != iTargetLastHealth)
                     {
-                        if (bDebugLogSpecial && settings.bDebugInfo)
+                        if (bDebugLogSpecial && Settings.Advanced.DebugInStatusBar)
                         {
                             Logging.WriteDiagnostic("[Trinity] Setting dateSincePicked to {0} CurrentTarget.iHitPoints: {1}  iTargetLastHealth: {2} ",
                                 DateTime.Now, CurrentTarget.HitPoints, iTargetLastHealth);
@@ -154,7 +155,7 @@ namespace GilesTrinity
             CurrentTarget = null;
             // Reset all variables for target-weight finding
             bAnyTreasureGoblinsPresent = false;
-            iCurrentMaxKillRadius = (float)(settings.iMonsterKillRange);
+            iCurrentMaxKillRadius = (float)(Settings.Combat.Misc.NonEliteRange);
             //intell
             iCurrentMaxLootRadius = Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius;
             bStayPutDuringAvoidance = false;
@@ -290,7 +291,7 @@ namespace GilesTrinity
                 {
                     bool bWantThis = CacheDiaObject(currentObject);
                     //if (bDebugLogRefreshDiaObject && tmp_ThisGilesObjectType != GilesObjectType.Unknown && swTimeSinceLastDebug.ElapsedMilliseconds > 1000)
-                    if (bDebugLogRefreshDiaObject && settings.bDebugInfo)
+                    if (bDebugLogRefreshDiaObject && Settings.Advanced.DebugInStatusBar)
                     {
                         bool ignore = (from n in ignoreNames
                                        where c_Name.StartsWith(n)
@@ -316,7 +317,7 @@ namespace GilesTrinity
                 }
                 catch (Exception ex)
                 {
-                    if (bDebugLogSpecial && settings.bDebugInfo)
+                    if (bDebugLogSpecial && Settings.Advanced.DebugInStatusBar)
                     {
                         Logging.WriteDiagnostic("[Trinity] error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
                             currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance);
@@ -422,7 +423,7 @@ namespace GilesTrinity
             if (c_unit_bIsTreasureGoblin && (c_CentreDistance <= 60 || c_HitPoints <= 0.99))
             {
                 c_bForceLeapAgainst = true;
-                if (settings.iTreasureGoblinPriority <= 2)
+                if (Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize)
                     dUseKillRadius *= 2.5;
                 else
                     dUseKillRadius *= 4;
@@ -514,7 +515,7 @@ namespace GilesTrinity
         private static void RefreshDoBackTrack()
         {
             // See if we should wait for [playersetting] milliseconds for possible loot drops before continuing run
-            if (DateTime.Now.Subtract(lastHadUnitInSights).TotalMilliseconds <= settings.iKillLootDelay && DateTime.Now.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= 10000)
+            if (DateTime.Now.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill && DateTime.Now.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= 10000)
             {
                 CurrentTarget = new GilesObject()
                                     {
@@ -527,7 +528,7 @@ namespace GilesTrinity
                                     };
             }
             // Now see if we need to do any backtracking
-            if (CurrentTarget == null && iTotalBacktracks >= 2 && settings.bEnableBacktracking && !playerStatus.IsInTown)
+            if (CurrentTarget == null && iTotalBacktracks >= 2 && Settings.Combat.Misc.AllowBacktracking && !playerStatus.IsInTown)
             // Never bother with the 1st backtrack position nor if we are in town
             {
                 // See if we're already within 18 feet of our start position first
@@ -572,7 +573,7 @@ namespace GilesTrinity
             }
             // End of backtracking check
             // Finally, a special check for waiting for wrath of the berserker cooldown before engaging Azmodan
-            //if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && settings.bWaitForWrath && !GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
+            //if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Barbarian.WaitWOTB && !GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
             //    ZetaDia.CurrentWorldId == 121214 &&
             //    (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             //{
@@ -589,7 +590,7 @@ namespace GilesTrinity
             //                        };
             //}
             // And a special check for wizard archon
-            if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Archon) && !GilesUseTimer(SNOPower.Wizard_Archon) && settings.bWaitForArchon && ZetaDia.CurrentWorldId == 121214 &&
+            if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Archon) && !GilesUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && ZetaDia.CurrentWorldId == 121214 &&
                 (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 Logging.Write("[Trinity] Waiting for Wizard Archon cooldown before continuing to Azmodan.");
@@ -634,7 +635,7 @@ namespace GilesTrinity
                 vKitePointAvoid = playerStatus.CurrentPosition;
             }
             // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
-            if ((bShouldTryKiting || bNeedToKite) && (!bAnyTreasureGoblinsPresent || settings.iTreasureGoblinPriority <= 2) &&
+            if ((bShouldTryKiting || bNeedToKite) && (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
                 DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds &&
                 (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= cancelledKiteMoveForMilliseconds ||
                 (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= 2500 && bNeedToKite)))
@@ -672,7 +673,7 @@ namespace GilesTrinity
         }
         private static bool IsWizardShouldKite()
         {
-            return (iMyCachedActorClass == ActorClass.Wizard && (!settings.bKiteOnlyArchon || GilesHasBuff(SNOPower.Wizard_Archon)));
+            return (iMyCachedActorClass == ActorClass.Wizard && (!Settings.Combat.Wizard.OnlyKiteInArchon || GilesHasBuff(SNOPower.Wizard_Archon)));
         }
     }
 }

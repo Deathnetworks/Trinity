@@ -169,7 +169,7 @@ namespace GilesTrinity
                 if (!bKitingSpot && iMyCachedActorClass == ActorClass.Wizard && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_WaveOfForce) && playerStatus.CurrentEnergy >= 25 &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_WaveOfForce] &&
                     !playerStatus.IsIncapacitated && hashAvoidanceObstacleCache.Count(u => u.SNOID == 5212 && u.Location.Distance(playerStatus.CurrentPosition) <= 15f) >= 2 &&
-                    (settings.bEnableCriticalMass || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
+                    (Settings.Combat.Wizard.CriticalMass || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, vNullLocation, iCurrentWorldID, -1);
                 }

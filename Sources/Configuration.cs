@@ -1,7 +1,11 @@
-﻿using System;
+﻿﻿using GilesTrinity.DbProvider;
+using GilesTrinity.Settings.Combat;
+using GilesTrinity.Settings.Loot;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
@@ -15,1028 +19,16 @@ namespace GilesTrinity
         // Save Configuration
         private void SaveConfiguration()
         {
-            if (bSavingConfig) return;
-            bSavingConfig = true;
-            FileStream configStream = File.Open(sTrinityConfigFile, FileMode.Create, FileAccess.Write, FileShare.Read);
-            using (StreamWriter configWriter = new StreamWriter(configStream))
-            {
-                configWriter.WriteLine("JewelryPoints=" + settings.iNeedPointsToKeepJewelry.ToString());
-                configWriter.WriteLine("ArmorPoints=" + settings.iNeedPointsToKeepArmor.ToString());
-                configWriter.WriteLine("WeaponPoints=" + settings.iNeedPointsToKeepWeapon.ToString());
-                configWriter.WriteLine(settings.bSalvageJunk ? "Salvage=true" : "Salvage=false");
-                configWriter.WriteLine(settings.bUseGilesFilters ? "Filters=true" : "Filters=false");
-                configWriter.WriteLine(settings.bGemsEmerald ? "Emerald=true" : "Emerald=false");
-                configWriter.WriteLine(settings.bGemsAmethyst ? "Amethyst=true" : "Amethyst=false");
-                configWriter.WriteLine(settings.bGemsTopaz ? "Topaz=true" : "Topaz=false");
-                configWriter.WriteLine(settings.bGemsRuby ? "Ruby=true" : "Ruby=false");
-                configWriter.WriteLine(settings.bPickupCraftTomes ? "Tomes=true" : "Tomes=false");
-                configWriter.WriteLine(settings.bPickupPlans ? "Plans=true" : "Plans=false");
-                configWriter.WriteLine(settings.bPickupFollower ? "Followers=true" : "Followers=false");
-                configWriter.WriteLine("Potions=" + settings.iFilterPotions.ToString());
-                configWriter.WriteLine("ilvlPots=" + settings.iFilterPotionLevel.ToString());
-                configWriter.WriteLine("ilvlLegendary=" + settings.FilterLegendary.ToString());
-                configWriter.WriteLine("ilvlWB=" + settings.FilterBlueWeapons.ToString());
-                configWriter.WriteLine("ilvlWY=" + settings.FilterYellowWeapons.ToString());
-                configWriter.WriteLine("ilvlAB=" + settings.iFilterBlueArmor.ToString());
-                configWriter.WriteLine("ilvlAY=" + settings.iFilterYellowArmor.ToString());
-                configWriter.WriteLine("ilvlJB=" + settings.iFilterBlueJewelry.ToString());
-                configWriter.WriteLine("ilvlJY=" + settings.iFilterYellowJewelry.ToString());
-                configWriter.WriteLine("ilvlGems=" + settings.iFilterGems.ToString());
-                configWriter.WriteLine("ilvlMisc=" + settings.iFilterMisc.ToString());
-                configWriter.WriteLine("GoldPickup=" + settings.iMinimumGoldStack.ToString());
-                configWriter.WriteLine("GoblinPriority=" + settings.iTreasureGoblinPriority.ToString());
-                configWriter.WriteLine("TriggerRange=" + settings.iMonsterKillRange.ToString());
-                configWriter.WriteLine("LootDelay=" + settings.iKillLootDelay.ToString());
-                configWriter.WriteLine("VaultDelay=" + settings.iDHVaultMovementDelay.ToString());
-                configWriter.WriteLine("MonkInna=" + settings.bMonkInnaSet.ToString());
-                configWriter.WriteLine("Avoidance=" + settings.bEnableAvoidance.ToString());
-                configWriter.WriteLine("Globes=" + settings.bEnableGlobes.ToString());
-                configWriter.WriteLine("CriticalMass=" + settings.bEnableCriticalMass.ToString());
-                configWriter.WriteLine("OOCMovementPower=" + settings.bOutOfCombatMovementPowers.ToString());
-                configWriter.WriteLine("ExtendedKills=" + settings.bExtendedKillRange.ToString());
-                configWriter.WriteLine("SelectiveWW=" + settings.bSelectiveWhirlwind.ToString());
-                configWriter.WriteLine("Wrath90=" + settings.bWrath90Seconds.ToString());
-                configWriter.WriteLine("WizKiteArchonOnly=" + settings.bKiteOnlyArchon.ToString());
-                configWriter.WriteLine("WizWaitForArchon=" + settings.bWaitForArchon.ToString());
-                configWriter.WriteLine("BarbWaitForWrath=" + settings.bWaitForWrath.ToString());
-                configWriter.WriteLine("BarbGoblinWrath=" + settings.bGoblinWrath.ToString());
-                configWriter.WriteLine("BarbFuryDumpWrath=" + settings.bFuryDumpWrath.ToString());
-                configWriter.WriteLine("BarbFuryDumpAlways=" + settings.bFuryDumpAlways.ToString());
-                configWriter.WriteLine("LogStucks=" + settings.bLogStucks.ToString());
-                configWriter.WriteLine("Unstucker=" + settings.bEnableUnstucker.ToString());
-                configWriter.WriteLine("ProfileReloading=" + settings.bEnableProfileReloading.ToString());
-                configWriter.WriteLine("Backtracking=" + settings.bEnableBacktracking.ToString());
-                configWriter.WriteLine(settings.IgnoreAllShrines ? "ShrineIgnore=all" : "ShrineIgnore=none");
-                configWriter.WriteLine("ContainerRange=" + settings.iContainerOpenRange.ToString());
-                configWriter.WriteLine("DestructibleRange=" + settings.iDestructibleAttackRange.ToString());
-                configWriter.WriteLine("IgnoreCorpses=" + settings.bIgnoreCorpses.ToString());
-                configWriter.WriteLine(settings.bEnableTPS ? "TPSEnabled=true" : "TPSEnabled=false");
-                configWriter.WriteLine("TPSAmount=" + settings.iTPSAmount.ToString());
-                configWriter.WriteLine(settings.bDebugInfo ? "DebugInfo=true" : "DebugInfo=false");
-                configWriter.WriteLine(settings.bEnableProwl ? "EnableProwl=true" : "EnableProwl=false");
-                configWriter.WriteLine(settings.bEnableAndroid ? "EnableAndroid=true" : "EnableAndroid=false");
-                configWriter.WriteLine(settings.bEnableEmail ? "EnableEmail=true" : "EnableEmail=false");
-                configWriter.WriteLine("EmailAddress=" + sEmailAddress);
-                configWriter.WriteLine("EmailPassword=" + sEmailPassword);
-                configWriter.WriteLine("ProwlKey=" + sProwlAPIKey);
-                configWriter.WriteLine("AndroidKey=" + sAndroidAPIKey);
-                configWriter.WriteLine("EnableLegendaryNotifyScore=" + (settings.bEnableLegendaryNotifyScore ? "true" : "false"));
-                configWriter.WriteLine("JewelryNotify=" + settings.iNeedPointsToNotifyJewelry.ToString());
-                configWriter.WriteLine("ArmorNotify=" + settings.iNeedPointsToNotifyArmor.ToString());
-                configWriter.WriteLine("WeaponNotify=" + settings.iNeedPointsToNotifyWeapon.ToString());
-                configWriter.WriteLine("KiteBarb=" + settings.iKiteDistanceBarb.ToString());
-                configWriter.WriteLine("KiteWiz=" + settings.iKiteDistanceWiz.ToString());
-                configWriter.WriteLine("KiteWitch=" + settings.iKiteDistanceWitch.ToString());
-                configWriter.WriteLine("KiteDemon=" + settings.iKiteDistanceDemon.ToString());
-                configWriter.WriteLine("PotBarb=" + settings.dEmergencyHealthPotionBarb.ToString());
-                configWriter.WriteLine("PotMonk=" + settings.dEmergencyHealthPotionMonk.ToString());
-                configWriter.WriteLine("PotWiz=" + settings.dEmergencyHealthPotionWiz.ToString());
-                configWriter.WriteLine("PotWitch=" + settings.dEmergencyHealthPotionWitch.ToString());
-                configWriter.WriteLine("PotDemon=" + settings.dEmergencyHealthPotionDemon.ToString());
-                configWriter.WriteLine("GlobeBarb=" + settings.dEmergencyHealthGlobeBarb.ToString());
-                configWriter.WriteLine("GlobeMonk=" + settings.dEmergencyHealthGlobeMonk.ToString());
-                configWriter.WriteLine("GlobeWiz=" + settings.dEmergencyHealthGlobeWiz.ToString());
-                configWriter.WriteLine("GlobeWitch=" + settings.dEmergencyHealthGlobeWitch.ToString());
-                configWriter.WriteLine("GlobeDemon=" + settings.dEmergencyHealthGlobeDemon.ToString());
-                string sHealthLine = "";
-                for (int i = 1; i <= 13; i++)
-                {
-                    switch (i)
-                    {
-                        case 1:
-                            sHealthLine += dictAvoidanceHealthBarb[219702].ToString();
-                            break;
-                        case 2:
-                            sHealthLine += dictAvoidanceHealthBarb[84608].ToString();
-                            break;
-                        case 3:
-                            sHealthLine += dictAvoidanceHealthBarb[4804].ToString();
-                            break;
-                        case 4:
-                            sHealthLine += dictAvoidanceHealthBarb[95868].ToString();
-                            break;
-                        case 5:
-                            sHealthLine += dictAvoidanceHealthBarb[5482].ToString();
-                            break;
-                        case 6:
-                            sHealthLine += dictAvoidanceHealthBarb[108869].ToString();
-                            break;
-                        case 7:
-                            sHealthLine += dictAvoidanceHealthBarb[223675].ToString();
-                            break;
-                        case 8:
-                            sHealthLine += dictAvoidanceHealthBarb[3865].ToString();
-                            break;
-                        case 9:
-                            sHealthLine += dictAvoidanceHealthBarb[5212].ToString();
-                            break;
-                        case 10:
-                            sHealthLine += dictAvoidanceHealthBarb[123124].ToString();
-                            break;
-                        case 11:
-                            sHealthLine += dictAvoidanceHealthBarb[123839].ToString();
-                            break;
-                        case 12:
-                            sHealthLine += dictAvoidanceHealthBarb[4103].ToString();
-                            break;
-                        case 13:
-                            sHealthLine += dictAvoidanceHealthBarb[93837].ToString();
-                            break;
-                    }
-                    if (i < 13)
-                        sHealthLine += " ";
-                }
-                configWriter.WriteLine("AOEBarbHealth=" + sHealthLine);
-                sHealthLine = "";
-                for (int i = 1; i <= 13; i++)
-                {
-                    switch (i)
-                    {
-                        case 1:
-                            sHealthLine += dictAvoidanceHealthMonk[219702].ToString();
-                            break;
-                        case 2:
-                            sHealthLine += dictAvoidanceHealthMonk[84608].ToString();
-                            break;
-                        case 3:
-                            sHealthLine += dictAvoidanceHealthMonk[4804].ToString();
-                            break;
-                        case 4:
-                            sHealthLine += dictAvoidanceHealthMonk[95868].ToString();
-                            break;
-                        case 5:
-                            sHealthLine += dictAvoidanceHealthMonk[5482].ToString();
-                            break;
-                        case 6:
-                            sHealthLine += dictAvoidanceHealthMonk[108869].ToString();
-                            break;
-                        case 7:
-                            sHealthLine += dictAvoidanceHealthMonk[223675].ToString();
-                            break;
-                        case 8:
-                            sHealthLine += dictAvoidanceHealthMonk[3865].ToString();
-                            break;
-                        case 9:
-                            sHealthLine += dictAvoidanceHealthMonk[5212].ToString();
-                            break;
-                        case 10:
-                            sHealthLine += dictAvoidanceHealthMonk[123124].ToString();
-                            break;
-                        case 11:
-                            sHealthLine += dictAvoidanceHealthMonk[123839].ToString();
-                            break;
-                        case 12:
-                            sHealthLine += dictAvoidanceHealthMonk[4103].ToString();
-                            break;
-                        case 13:
-                            sHealthLine += dictAvoidanceHealthMonk[93837].ToString();
-                            break;
-                    }
-                    if (i < 13)
-                        sHealthLine += " ";
-                }
-                configWriter.WriteLine("AOEMonkHealth=" + sHealthLine);
-                sHealthLine = "";
-                for (int i = 1; i <= 13; i++)
-                {
-                    switch (i)
-                    {
-                        case 1:
-                            sHealthLine += dictAvoidanceHealthWizard[219702].ToString();
-                            break;
-                        case 2:
-                            sHealthLine += dictAvoidanceHealthWizard[84608].ToString();
-                            break;
-                        case 3:
-                            sHealthLine += dictAvoidanceHealthWizard[4804].ToString();
-                            break;
-                        case 4:
-                            sHealthLine += dictAvoidanceHealthWizard[95868].ToString();
-                            break;
-                        case 5:
-                            sHealthLine += dictAvoidanceHealthWizard[5482].ToString();
-                            break;
-                        case 6:
-                            sHealthLine += dictAvoidanceHealthWizard[108869].ToString();
-                            break;
-                        case 7:
-                            sHealthLine += dictAvoidanceHealthWizard[223675].ToString();
-                            break;
-                        case 8:
-                            sHealthLine += dictAvoidanceHealthWizard[3865].ToString();
-                            break;
-                        case 9:
-                            sHealthLine += dictAvoidanceHealthWizard[5212].ToString();
-                            break;
-                        case 10:
-                            sHealthLine += dictAvoidanceHealthWizard[123124].ToString();
-                            break;
-                        case 11:
-                            sHealthLine += dictAvoidanceHealthWizard[123839].ToString();
-                            break;
-                        case 12:
-                            sHealthLine += dictAvoidanceHealthWizard[4103].ToString();
-                            break;
-                        case 13:
-                            sHealthLine += dictAvoidanceHealthWizard[93837].ToString();
-                            break;
-                    }
-                    if (i < 13)
-                        sHealthLine += " ";
-                }
-                configWriter.WriteLine("AOEWizardHealth=" + sHealthLine);
-                sHealthLine = "";
-                for (int i = 1; i <= 13; i++)
-                {
-                    switch (i)
-                    {
-                        case 1:
-                            sHealthLine += dictAvoidanceHealthWitch[219702].ToString();
-                            break;
-                        case 2:
-                            sHealthLine += dictAvoidanceHealthWitch[84608].ToString();
-                            break;
-                        case 3:
-                            sHealthLine += dictAvoidanceHealthWitch[4804].ToString();
-                            break;
-                        case 4:
-                            sHealthLine += dictAvoidanceHealthWitch[95868].ToString();
-                            break;
-                        case 5:
-                            sHealthLine += dictAvoidanceHealthWitch[5482].ToString();
-                            break;
-                        case 6:
-                            sHealthLine += dictAvoidanceHealthWitch[108869].ToString();
-                            break;
-                        case 7:
-                            sHealthLine += dictAvoidanceHealthWitch[223675].ToString();
-                            break;
-                        case 8:
-                            sHealthLine += dictAvoidanceHealthWitch[3865].ToString();
-                            break;
-                        case 9:
-                            sHealthLine += dictAvoidanceHealthWitch[5212].ToString();
-                            break;
-                        case 10:
-                            sHealthLine += dictAvoidanceHealthWitch[123124].ToString();
-                            break;
-                        case 11:
-                            sHealthLine += dictAvoidanceHealthWitch[123839].ToString();
-                            break;
-                        case 12:
-                            sHealthLine += dictAvoidanceHealthWitch[4103].ToString();
-                            break;
-                        case 13:
-                            sHealthLine += dictAvoidanceHealthWitch[93837].ToString();
-                            break;
-                    }
-                    if (i < 13)
-                        sHealthLine += " ";
-                }
-                configWriter.WriteLine("AOEWitchHealth=" + sHealthLine);
-                sHealthLine = "";
-                for (int i = 1; i <= 13; i++)
-                {
-                    switch (i)
-                    {
-                        case 1:
-                            sHealthLine += dictAvoidanceHealthDemon[219702].ToString();
-                            break;
-                        case 2:
-                            sHealthLine += dictAvoidanceHealthDemon[84608].ToString();
-                            break;
-                        case 3:
-                            sHealthLine += dictAvoidanceHealthDemon[4804].ToString();
-                            break;
-                        case 4:
-                            sHealthLine += dictAvoidanceHealthDemon[95868].ToString();
-                            break;
-                        case 5:
-                            sHealthLine += dictAvoidanceHealthDemon[5482].ToString();
-                            break;
-                        case 6:
-                            sHealthLine += dictAvoidanceHealthDemon[108869].ToString();
-                            break;
-                        case 7:
-                            sHealthLine += dictAvoidanceHealthDemon[223675].ToString();
-                            break;
-                        case 8:
-                            sHealthLine += dictAvoidanceHealthDemon[3865].ToString();
-                            break;
-                        case 9:
-                            sHealthLine += dictAvoidanceHealthDemon[5212].ToString();
-                            break;
-                        case 10:
-                            sHealthLine += dictAvoidanceHealthDemon[123124].ToString();
-                            break;
-                        case 11:
-                            sHealthLine += dictAvoidanceHealthDemon[123839].ToString();
-                            break;
-                        case 12:
-                            sHealthLine += dictAvoidanceHealthDemon[4103].ToString();
-                            break;
-                        case 13:
-                            sHealthLine += dictAvoidanceHealthDemon[93837].ToString();
-                            break;
-                    }
-                    if (i < 13)
-                        sHealthLine += " ";
-                }
-                configWriter.WriteLine("AOEDemonHealth=" + sHealthLine);
-                sHealthLine = "";
-                for (int i = 1; i <= 13; i++)
-                {
-                    switch (i)
-                    {
-                        case 1:
-                            sHealthLine += dictAvoidanceRadius[219702].ToString();
-                            break;
-                        case 2:
-                            sHealthLine += dictAvoidanceRadius[84608].ToString();
-                            break;
-                        case 3:
-                            sHealthLine += dictAvoidanceRadius[4804].ToString();
-                            break;
-                        case 4:
-                            sHealthLine += dictAvoidanceRadius[95868].ToString();
-                            break;
-                        case 5:
-                            sHealthLine += dictAvoidanceRadius[5482].ToString();
-                            break;
-                        case 6:
-                            sHealthLine += dictAvoidanceRadius[108869].ToString();
-                            break;
-                        case 7:
-                            sHealthLine += dictAvoidanceRadius[223675].ToString();
-                            break;
-                        case 8:
-                            sHealthLine += dictAvoidanceRadius[3865].ToString();
-                            break;
-                        case 9:
-                            sHealthLine += dictAvoidanceRadius[5212].ToString();
-                            break;
-                        case 10:
-                            sHealthLine += dictAvoidanceRadius[123124].ToString();
-                            break;
-                        case 11:
-                            sHealthLine += dictAvoidanceRadius[123839].ToString();
-                            break;
-                        case 12:
-                            sHealthLine += dictAvoidanceRadius[4103].ToString();
-                            break;
-                        case 13:
-                            sHealthLine += dictAvoidanceRadius[93837].ToString();
-                            break;
-                    }
-                    if (i < 13)
-                        sHealthLine += " ";
-                }
-                configWriter.WriteLine("AOERadius=" + sHealthLine);
-            }
-            configStream.Close();
-            saveEmailConfiguration();
-            bSavingConfig = false;
-            bMappedPlayerAbilities = false;
-        }
-        private void saveEmailConfiguration()
-        {
-            FileStream emailConfigStream = File.Open(sTrinityEmailConfigFile, FileMode.Create, FileAccess.Write, FileShare.Read);
-            using (StreamWriter configWriter = new StreamWriter(emailConfigStream))
-            {
-                configWriter.WriteLine(settings.bEnableEmail ? "EnableEmail=true" : "EnableEmail=false");
-                configWriter.WriteLine("EmailAddress=" + sEmailAddress);
-                configWriter.WriteLine("EmailPassword=" + sEmailPassword);
-                configWriter.WriteLine("BotName=" + sBotName);
-            }
-            emailConfigStream.Close();
+            DbHelper.Log("Entry Assembly Location : {0}", Assembly.GetEntryAssembly().Location);
+            DbHelper.Log("Entry Assembly Directory : {0}", Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+            Settings.Save(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), @"Settings\GilesTrinity.xml"));
         }
         // Load Configuration
         private void LoadConfiguration()
         {
-            try
-            {
-                //Check for Config file
-                if (!File.Exists(sTrinityConfigFile))
-                {
-                    Log("No config file found, now creating a new config from defaults at: " + sTrinityConfigFile);
-                    SaveConfiguration();
-                    return;
-                }
-                //Load File
-                string[] healthlevels;
-                using (StreamReader configReader = new StreamReader(sTrinityConfigFile))
-                {
-                    while (!configReader.EndOfStream)
-                    {
-                        string[] config = configReader.ReadLine().Split('=');
-                        if (config != null)
-                        {
-                            switch (config[0])
-                            {
-                                case "GoblinPriority":
-                                    settings.iTreasureGoblinPriority = Convert.ToInt32(config[1]);
-                                    break;
-                                case "TriggerRange":
-                                    settings.iMonsterKillRange = Convert.ToDouble(config[1]);
-                                    break;
-                                case "LootDelay":
-                                    settings.iKillLootDelay = Convert.ToInt32(config[1]);
-                                    break;
-                                case "VaultDelay":
-                                    settings.iDHVaultMovementDelay = Convert.ToInt32(config[1]);
-                                    break;
-                                case "MonkInna":
-                                    settings.bMonkInnaSet = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Avoidance":
-                                    settings.bEnableAvoidance = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Globes":
-                                    settings.bEnableGlobes = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "CriticalMass":
-                                    settings.bEnableCriticalMass = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "OOCMovementPower":
-                                    settings.bOutOfCombatMovementPowers = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Backtracking":
-                                    settings.bEnableBacktracking = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "JewelryPoints":
-                                    settings.iNeedPointsToKeepJewelry = Convert.ToDouble(config[1]);
-                                    break;
-                                case "ArmorPoints":
-                                    settings.iNeedPointsToKeepArmor = Convert.ToDouble(config[1]);
-                                    break;
-                                case "WeaponPoints":
-                                    settings.iNeedPointsToKeepWeapon = Convert.ToDouble(config[1]);
-                                    break;
-                                case "JewelryNotify":
-                                    settings.iNeedPointsToNotifyJewelry = Convert.ToDouble(config[1]);
-                                    break;
-                                case "ArmorNotify":
-                                    settings.iNeedPointsToNotifyArmor = Convert.ToDouble(config[1]);
-                                    break;
-                                case "WeaponNotify":
-                                    settings.iNeedPointsToNotifyWeapon = Convert.ToDouble(config[1]);
-                                    break;
-                                case "Salvage":
-                                    settings.bSalvageJunk = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Filters":
-                                    settings.bUseGilesFilters = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Emerald":
-                                    settings.bGemsEmerald = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Amethyst":
-                                    settings.bGemsAmethyst = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Topaz":
-                                    settings.bGemsTopaz = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Ruby":
-                                    settings.bGemsRuby = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Tomes":
-                                    settings.bPickupCraftTomes = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Plans":
-                                    settings.bPickupPlans = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Followers":
-                                    settings.bPickupFollower = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Potions":
-                                    settings.iFilterPotions = Convert.ToInt16(config[1]);
-                                    break;
-                                case "ilvlPots":
-                                    settings.iFilterPotionLevel = Convert.ToInt16(config[1]);
-                                    break;
-                                case "ilvlLegendary":
-                                    settings.FilterLegendary = Convert.ToInt16(config[1]);
-                                    break;
-                                case "ilvlWB":
-                                    settings.FilterBlueWeapons = Convert.ToInt16(config[1]);
-                                    break;
-                                case "ilvlWY":
-                                    settings.FilterYellowWeapons = Convert.ToInt16(config[1]);
-                                    break;
-                                case "ilvlAB":
-                                    settings.iFilterBlueArmor = Convert.ToInt16(config[1]);
-                                    break;
-                                case "ilvlAY":
-                                    settings.iFilterYellowArmor = Convert.ToInt16(config[1]);
-                                    break;
-                                case "ilvlJB":
-                                    settings.iFilterBlueJewelry = Convert.ToInt16(config[1]);
-                                    break;
-                                case "ilvlJY":
-                                    settings.iFilterYellowJewelry = Convert.ToInt16(config[1]);
-                                    break;
-                                case "ilvlGems":
-                                    settings.iFilterGems = Convert.ToInt16(config[1]);
-                                    break;
-                                case "ilvlMisc":
-                                    settings.iFilterMisc = Convert.ToInt16(config[1]);
-                                    break;
-                                case "GoldPickup":
-                                    settings.iMinimumGoldStack = Convert.ToInt16(config[1]);
-                                    break;
-                                case "ShrineIgnore":
-                                    settings.IgnoreAllShrines = (config[1] == "all");
-                                    break;
-                                case "ContainerRange":
-                                    settings.iContainerOpenRange = Convert.ToDouble(config[1]);
-                                    break;
-                                case "DestructibleRange":
-                                    settings.iDestructibleAttackRange = Convert.ToDouble(config[1]);
-                                    break;
-                                case "IgnoreCorpses":
-                                    settings.bIgnoreCorpses = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "TPSEnabled":
-                                    settings.bEnableTPS = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "TPSAmount":
-                                    settings.iTPSAmount = Convert.ToDouble(config[1]);
-                                    break;
-                                case "DebugInfo":
-                                    settings.bDebugInfo = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "LogStucks":
-                                    settings.bLogStucks = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "ProfileReloading":
-                                    settings.bEnableProfileReloading = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Unstucker":
-                                    settings.bEnableUnstucker = Convert.ToBoolean(config[1]);
-                                    if (settings.bEnableUnstucker)
-                                        Navigator.StuckHandler = new GilesStuckHandler();
-                                    else
-                                        Navigator.StuckHandler = new DefaultStuckHandler();
-                                    break;
-                                case "ExtendedKills":
-                                    settings.bExtendedKillRange = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "SelectiveWW":
-                                    settings.bSelectiveWhirlwind = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "Wrath90":
-                                    settings.bWrath90Seconds = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "WizKiteArchonOnly":
-                                    settings.bKiteOnlyArchon = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "WizWaitForArchon":
-                                    settings.bWaitForArchon = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "BarbWaitForWrath":
-                                    settings.bWaitForWrath = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "BarbGoblinWrath":
-                                    settings.bGoblinWrath = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "BarbFuryDumpWrath":
-                                    settings.bFuryDumpWrath = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "BarbFuryDumpAlways":
-                                    settings.bFuryDumpAlways = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "EnableProwl":
-                                    settings.bEnableProwl = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "EnableLegendaryNotifyScore":
-                                    settings.bEnableLegendaryNotifyScore = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "ProwlKey":
-                                    sProwlAPIKey = config[1];
-                                    break;
-                                case "EnableEmail":
-                                    settings.bEnableEmail = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "EmailAddress":
-                                    sEmailAddress = config[1];
-                                    break;
-                                case "EmailPassword":
-                                    sEmailPassword = config[1];
-                                    break;
-                                case "EnableAndroid":
-                                    settings.bEnableAndroid = Convert.ToBoolean(config[1]);
-                                    break;
-                                case "AndroidKey":
-                                    sAndroidAPIKey = config[1];
-                                    break;
-                                case "KiteBarb":
-                                    settings.iKiteDistanceBarb = Convert.ToInt32(config[1]);
-                                    break;
-                                case "KiteWiz":
-                                    settings.iKiteDistanceWiz = Convert.ToInt32(config[1]);
-                                    break;
-                                case "KiteWitch":
-                                    settings.iKiteDistanceWitch = Convert.ToInt32(config[1]);
-                                    break;
-                                case "KiteDemon":
-                                    settings.iKiteDistanceDemon = Convert.ToInt32(config[1]);
-                                    break;
-                                case "PotBarb":
-                                    settings.dEmergencyHealthPotionBarb = Convert.ToDouble(config[1]);
-                                    break;
-                                case "PotMonk":
-                                    settings.dEmergencyHealthPotionMonk = Convert.ToDouble(config[1]);
-                                    break;
-                                case "PotWiz":
-                                    settings.dEmergencyHealthPotionWiz = Convert.ToDouble(config[1]);
-                                    break;
-                                case "PotWitch":
-                                    settings.dEmergencyHealthPotionWitch = Convert.ToDouble(config[1]);
-                                    break;
-                                case "PotDemon":
-                                    settings.dEmergencyHealthPotionDemon = Convert.ToDouble(config[1]);
-                                    break;
-                                case "GlobeBarb":
-                                    settings.dEmergencyHealthGlobeBarb = Convert.ToDouble(config[1]);
-                                    break;
-                                case "GlobeMonk":
-                                    settings.dEmergencyHealthGlobeMonk = Convert.ToDouble(config[1]);
-                                    break;
-                                case "GlobeWiz":
-                                    settings.dEmergencyHealthGlobeWiz = Convert.ToDouble(config[1]);
-                                    break;
-                                case "GlobeWitch":
-                                    settings.dEmergencyHealthGlobeWitch = Convert.ToDouble(config[1]);
-                                    break;
-                                case "GlobeDemon":
-                                    settings.dEmergencyHealthGlobeDemon = Convert.ToDouble(config[1]);
-                                    break;
-                                case "AOEBarbHealth":
-                                    healthlevels = config[1].Split(new string[] { " " }, StringSplitOptions.None);
-                                    for (int i = 1; i <= healthlevels.Length; i++)
-                                    {
-                                        switch (i)
-                                        {
-                                            case 1:
-                                                dictAvoidanceHealthBarb[219702] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthBarb[221225] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 2:
-                                                dictAvoidanceHealthBarb[84608] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 3:
-                                                dictAvoidanceHealthBarb[4803] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthBarb[4804] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthBarb[224225] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthBarb[247987] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 4:
-                                                dictAvoidanceHealthBarb[95868] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 5:
-                                                dictAvoidanceHealthBarb[5482] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthBarb[6578] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 6:
-                                                dictAvoidanceHealthBarb[108869] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 7:
-                                                dictAvoidanceHealthBarb[402] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthBarb[223675] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 8:
-                                                dictAvoidanceHealthBarb[3865] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 9:
-                                                dictAvoidanceHealthBarb[5212] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 10:
-                                                dictAvoidanceHealthBarb[123124] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 11:
-                                                dictAvoidanceHealthBarb[123839] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 12:
-                                                dictAvoidanceHealthBarb[4103] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 13:
-                                                dictAvoidanceHealthBarb[93837] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                        }
-                                    }
-                                    break;
-                                case "AOEMonkHealth":
-                                    healthlevels = config[1].Split(new string[] { " " }, StringSplitOptions.None);
-                                    for (int i = 1; i <= healthlevels.Length; i++)
-                                    {
-                                        switch (i)
-                                        {
-                                            case 1:
-                                                dictAvoidanceHealthMonk[219702] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthMonk[221225] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 2:
-                                                dictAvoidanceHealthMonk[84608] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 3:
-                                                dictAvoidanceHealthMonk[4803] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthMonk[4804] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthMonk[224225] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthMonk[247987] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 4:
-                                                dictAvoidanceHealthMonk[95868] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 5:
-                                                dictAvoidanceHealthMonk[5482] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthMonk[6578] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 6:
-                                                dictAvoidanceHealthMonk[108869] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 7:
-                                                dictAvoidanceHealthMonk[402] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthMonk[223675] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 8:
-                                                dictAvoidanceHealthMonk[3865] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 9:
-                                                dictAvoidanceHealthMonk[5212] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 10:
-                                                dictAvoidanceHealthMonk[123124] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 11:
-                                                dictAvoidanceHealthMonk[123839] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 12:
-                                                dictAvoidanceHealthMonk[4103] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 13:
-                                                dictAvoidanceHealthMonk[93837] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                        }
-                                    }
-                                    break;
-                                case "AOEWizardHealth":
-                                    healthlevels = config[1].Split(new string[] { " " }, StringSplitOptions.None);
-                                    for (int i = 1; i <= healthlevels.Length; i++)
-                                    {
-                                        switch (i)
-                                        {
-                                            case 1:
-                                                dictAvoidanceHealthWizard[219702] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthWizard[221225] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 2:
-                                                dictAvoidanceHealthWizard[84608] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 3:
-                                                dictAvoidanceHealthWizard[4803] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthWizard[4804] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthWizard[224225] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthWizard[247987] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 4:
-                                                dictAvoidanceHealthWizard[95868] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 5:
-                                                dictAvoidanceHealthWizard[5482] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthWizard[6578] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 6:
-                                                dictAvoidanceHealthWizard[108869] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 7:
-                                                dictAvoidanceHealthWizard[402] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthWizard[223675] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 8:
-                                                dictAvoidanceHealthWizard[3865] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 9:
-                                                dictAvoidanceHealthWizard[5212] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 10:
-                                                dictAvoidanceHealthWizard[123124] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 11:
-                                                dictAvoidanceHealthWizard[123839] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 12:
-                                                dictAvoidanceHealthWizard[4103] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 13:
-                                                dictAvoidanceHealthWizard[93837] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                        }
-                                    }
-                                    break;
-                                case "AOEWitchHealth":
-                                    healthlevels = config[1].Split(new string[] { " " }, StringSplitOptions.None);
-                                    for (int i = 1; i <= healthlevels.Length; i++)
-                                    {
-                                        switch (i)
-                                        {
-                                            case 1:
-                                                dictAvoidanceHealthWitch[219702] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthWitch[221225] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 2:
-                                                dictAvoidanceHealthWitch[84608] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 3:
-                                                dictAvoidanceHealthWitch[4803] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthWitch[4804] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthWitch[224225] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthWitch[247987] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 4:
-                                                dictAvoidanceHealthWitch[95868] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 5:
-                                                dictAvoidanceHealthWitch[5482] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthWitch[6578] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 6:
-                                                dictAvoidanceHealthWitch[108869] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 7:
-                                                dictAvoidanceHealthWitch[402] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthWitch[223675] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 8:
-                                                dictAvoidanceHealthWitch[3865] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 9:
-                                                dictAvoidanceHealthWitch[5212] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 10:
-                                                dictAvoidanceHealthWitch[123124] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 11:
-                                                dictAvoidanceHealthWitch[123839] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 12:
-                                                dictAvoidanceHealthWitch[4103] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 13:
-                                                dictAvoidanceHealthWitch[93837] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                        }
-                                    }
-                                    break;
-                                case "AOEDemonHealth":
-                                    healthlevels = config[1].Split(new string[] { " " }, StringSplitOptions.None);
-                                    for (int i = 1; i <= healthlevels.Length; i++)
-                                    {
-                                        switch (i)
-                                        {
-                                            case 1:
-                                                dictAvoidanceHealthDemon[219702] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthDemon[221225] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 2:
-                                                dictAvoidanceHealthDemon[84608] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 3:
-                                                dictAvoidanceHealthDemon[4803] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthDemon[4804] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthDemon[224225] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthDemon[247987] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 4:
-                                                dictAvoidanceHealthDemon[95868] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 5:
-                                                dictAvoidanceHealthDemon[5482] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthDemon[6578] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 6:
-                                                dictAvoidanceHealthDemon[108869] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 7:
-                                                dictAvoidanceHealthDemon[402] = Convert.ToDouble(healthlevels[i - 1]);
-                                                dictAvoidanceHealthDemon[223675] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 8:
-                                                dictAvoidanceHealthDemon[3865] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 9:
-                                                dictAvoidanceHealthDemon[5212] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 10:
-                                                dictAvoidanceHealthDemon[123124] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 11:
-                                                dictAvoidanceHealthDemon[123839] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 12:
-                                                dictAvoidanceHealthDemon[4103] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                            case 13:
-                                                dictAvoidanceHealthDemon[93837] = Convert.ToDouble(healthlevels[i - 1]);
-                                                break;
-                                        }
-                                    }
-                                    break;
-                                case "AOERadius":
-                                    healthlevels = config[1].Split(new string[] { " " }, StringSplitOptions.None);
-                                    for (int i = 1; i <= healthlevels.Length; i++)
-                                    {
-                                        switch (i)
-                                        {
-                                            case 1:
-                                                dictAvoidanceRadius[219702] = Convert.ToInt32(healthlevels[i - 1]);
-                                                dictAvoidanceRadius[221225] = Convert.ToInt32(healthlevels[i - 1]);
-                                                break;
-                                            case 2:
-                                                dictAvoidanceRadius[84608] = Convert.ToInt32(healthlevels[i - 1]);
-                                                break;
-                                            case 3:
-                                                dictAvoidanceRadius[4803] = Convert.ToInt32(healthlevels[i - 1]);
-                                                dictAvoidanceRadius[4804] = Convert.ToInt32(healthlevels[i - 1]);
-                                                dictAvoidanceRadius[224225] = Convert.ToInt32(healthlevels[i - 1]);
-                                                dictAvoidanceRadius[247987] = Convert.ToInt32(healthlevels[i - 1]);
-                                                break;
-                                            case 4:
-                                                dictAvoidanceRadius[95868] = Convert.ToInt32(healthlevels[i - 1]);
-                                                break;
-                                            case 5:
-                                                dictAvoidanceRadius[5482] = Convert.ToInt32(healthlevels[i - 1]);
-                                                dictAvoidanceRadius[6578] = Convert.ToInt32(healthlevels[i - 1]);
-                                                break;
-                                            case 6:
-                                                dictAvoidanceRadius[108869] = Convert.ToInt32(healthlevels[i - 1]);
-                                                break;
-                                            case 7:
-                                                dictAvoidanceRadius[402] = Convert.ToInt32(healthlevels[i - 1]);
-                                                dictAvoidanceRadius[223675] = Convert.ToInt32(healthlevels[i - 1]);
-                                                break;
-                                            case 8:
-                                                dictAvoidanceRadius[3865] = Convert.ToInt32(healthlevels[i - 1]);
-                                                break;
-                                            case 9:
-                                                dictAvoidanceRadius[5212] = Convert.ToInt32(healthlevels[i - 1]);
-                                                break;
-                                            case 10:
-                                                dictAvoidanceRadius[123124] = Convert.ToInt32(healthlevels[i - 1]);
-                                                break;
-                                            case 11:
-                                                dictAvoidanceRadius[123839] = Convert.ToInt32(healthlevels[i - 1]);
-                                                break;
-                                            case 12:
-                                                dictAvoidanceRadius[4103] = Convert.ToInt32(healthlevels[i - 1]);
-                                                break;
-                                            case 13:
-                                                dictAvoidanceRadius[93837] = Convert.ToInt32(healthlevels[i - 1]);
-                                                break;
-                                        }
-                                    }
-                                    break;
-                            }
-                        }
-                    }
-                    configReader.Close();
-                }
-            }
-            catch
-            {
-                SaveConfiguration();
-                return;
-            }
-            if (!File.Exists(sTrinityEmailConfigFile))
-            {
-                saveEmailConfiguration();
-            }
-            using (StreamReader configReader = new StreamReader(sTrinityEmailConfigFile))
-            {
-                while (!configReader.EndOfStream)
-                {
-                    string[] config = configReader.ReadLine().Split('=');
-                    if (config != null)
-                    {
-                        switch (config[0])
-                        {
-                            case "EnableEmail":
-                                settings.bEnableEmail = Convert.ToBoolean(config[1]);
-                                break;
-                            case "EmailAddress":
-                                sEmailAddress = config[1];
-                                break;
-                            case "EmailPassword":
-                                sEmailPassword = config[1];
-                                break;
-                            case "BotName":
-                                sBotName = config[1];
-                                break;
-                        }
-                    }
-                }
-                configReader.Close();
-            }
-            bMappedPlayerAbilities = false;
+            DbHelper.Log("Entry Assembly Location : {0}", Assembly.GetEntryAssembly().Location);
+            DbHelper.Log("Entry Assembly Directory : {0}", Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+            Settings.Load(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), @"Settings\GilesTrinity.xml"));
         }
         // * CONFIG WINDOW REGION
         #region configWindow
@@ -1479,7 +471,7 @@ namespace GilesTrinity
             string sSliderName = thisslider.Name.Substring(11);
             int iClass = Convert.ToInt32(sSliderName.Substring(0, 1));
             int iAvoid = Convert.ToInt32(sSliderName.Substring(2));
-            double dThisHealthLimit = (Math.Round(thisslider.Value) / 100);
+            double dThisHealthLimit = (Math.Round(thisslider.Value / 100));
             textAOEHealth[iClass, iAvoid - 1].Text = (dThisHealthLimit * 100).ToString();
             switch (iClass)
             {
@@ -1488,49 +480,43 @@ namespace GilesTrinity
                     switch (iAvoid)
                     {
                         case 1:
-                            dictAvoidanceHealthBarb[219702] = dThisHealthLimit;
-                            dictAvoidanceHealthBarb[221225] = dThisHealthLimit;
+                            Settings.Combat.Barbarian.AvoidArcaneHealth = (float)dThisHealthLimit;
                             break;
                         case 2:
-                            dictAvoidanceHealthBarb[84608] = dThisHealthLimit;
+                            Settings.Combat.Barbarian.AvoidDesecratorHealth = (float)dThisHealthLimit;
                             break;
                         case 3:
-                            dictAvoidanceHealthBarb[4803] = dThisHealthLimit;
-                            dictAvoidanceHealthBarb[4804] = dThisHealthLimit;
-                            dictAvoidanceHealthBarb[224225] = dThisHealthLimit;
-                            dictAvoidanceHealthBarb[247987] = dThisHealthLimit;
+                            Settings.Combat.Barbarian.AvoidMoltenCoreHealth = (float)dThisHealthLimit;
                             break;
                         case 4:
-                            dictAvoidanceHealthBarb[95868] = dThisHealthLimit;
+                            Settings.Combat.Barbarian.AvoidMoltenTrailHealth = (float)dThisHealthLimit;
                             break;
                         case 5:
-                            dictAvoidanceHealthBarb[5482] = dThisHealthLimit;
-                            dictAvoidanceHealthBarb[6578] = dThisHealthLimit;
+                            Settings.Combat.Barbarian.AvoidPoisonTreeHealth = (float)dThisHealthLimit;
                             break;
                         case 6:
-                            dictAvoidanceHealthBarb[108869] = dThisHealthLimit;
+                            Settings.Combat.Barbarian.AvoidPlagueCloudHealth = (float)dThisHealthLimit;
                             break;
                         case 7:
-                            dictAvoidanceHealthBarb[402] = dThisHealthLimit;
-                            dictAvoidanceHealthBarb[223675] = dThisHealthLimit;
+                            Settings.Combat.Barbarian.AvoidIceBallsHealth = (float)dThisHealthLimit;
                             break;
                         case 8:
-                            dictAvoidanceHealthBarb[3865] = dThisHealthLimit;
+                            Settings.Combat.Barbarian.AvoidPlagueHandsHealth = (float)dThisHealthLimit;
                             break;
                         case 9:
-                            dictAvoidanceHealthBarb[5212] = dThisHealthLimit;
+                            Settings.Combat.Barbarian.AvoidBeesWaspsHealth = (float)dThisHealthLimit;
                             break;
                         case 10:
-                            dictAvoidanceHealthBarb[123124] = dThisHealthLimit;
+                            Settings.Combat.Barbarian.AvoidAzmoPoolsHealth = (float)dThisHealthLimit;
                             break;
                         case 11:
-                            dictAvoidanceHealthBarb[123839] = dThisHealthLimit;
+                            Settings.Combat.Barbarian.AvoidAzmoBodiesHealth = (float)dThisHealthLimit;
                             break;
                         case 12:
-                            dictAvoidanceHealthBarb[4103] = dThisHealthLimit;
+                            Settings.Combat.Barbarian.AvoidShamanFireHealth = (float)dThisHealthLimit;
                             break;
                         case 13:
-                            dictAvoidanceHealthBarb[93837] = dThisHealthLimit;
+                            Settings.Combat.Barbarian.AvoidGhomGasHealth = (float)dThisHealthLimit;
                             break;
                     }
                     break;
@@ -1539,49 +525,43 @@ namespace GilesTrinity
                     switch (iAvoid)
                     {
                         case 1:
-                            dictAvoidanceHealthMonk[219702] = dThisHealthLimit;
-                            dictAvoidanceHealthMonk[221225] = dThisHealthLimit;
+                            Settings.Combat.Monk.AvoidArcaneHealth = (float)dThisHealthLimit;
                             break;
                         case 2:
-                            dictAvoidanceHealthMonk[84608] = dThisHealthLimit;
+                            Settings.Combat.Monk.AvoidDesecratorHealth = (float)dThisHealthLimit;
                             break;
                         case 3:
-                            dictAvoidanceHealthMonk[4803] = dThisHealthLimit;
-                            dictAvoidanceHealthMonk[4804] = dThisHealthLimit;
-                            dictAvoidanceHealthMonk[224225] = dThisHealthLimit;
-                            dictAvoidanceHealthMonk[247987] = dThisHealthLimit;
+                            Settings.Combat.Monk.AvoidMoltenCoreHealth = (float)dThisHealthLimit;
                             break;
                         case 4:
-                            dictAvoidanceHealthMonk[95868] = dThisHealthLimit;
+                            Settings.Combat.Monk.AvoidMoltenTrailHealth = (float)dThisHealthLimit;
                             break;
                         case 5:
-                            dictAvoidanceHealthMonk[5482] = dThisHealthLimit;
-                            dictAvoidanceHealthMonk[6578] = dThisHealthLimit;
+                            Settings.Combat.Monk.AvoidPoisonTreeHealth = (float)dThisHealthLimit;
                             break;
                         case 6:
-                            dictAvoidanceHealthMonk[108869] = dThisHealthLimit;
+                            Settings.Combat.Monk.AvoidPlagueCloudHealth = (float)dThisHealthLimit;
                             break;
                         case 7:
-                            dictAvoidanceHealthMonk[402] = dThisHealthLimit;
-                            dictAvoidanceHealthMonk[223675] = dThisHealthLimit;
+                            Settings.Combat.Monk.AvoidIceBallsHealth = (float)dThisHealthLimit;
                             break;
                         case 8:
-                            dictAvoidanceHealthMonk[3865] = dThisHealthLimit;
+                            Settings.Combat.Monk.AvoidPlagueHandsHealth = (float)dThisHealthLimit;
                             break;
                         case 9:
-                            dictAvoidanceHealthMonk[5212] = dThisHealthLimit;
+                            Settings.Combat.Monk.AvoidBeesWaspsHealth = (float)dThisHealthLimit;
                             break;
                         case 10:
-                            dictAvoidanceHealthMonk[123124] = dThisHealthLimit;
+                            Settings.Combat.Monk.AvoidAzmoPoolsHealth = (float)dThisHealthLimit;
                             break;
                         case 11:
-                            dictAvoidanceHealthMonk[123839] = dThisHealthLimit;
+                            Settings.Combat.Monk.AvoidAzmoBodiesHealth = (float)dThisHealthLimit;
                             break;
                         case 12:
-                            dictAvoidanceHealthMonk[4103] = dThisHealthLimit;
+                            Settings.Combat.Monk.AvoidShamanFireHealth = (float)dThisHealthLimit;
                             break;
                         case 13:
-                            dictAvoidanceHealthMonk[93837] = dThisHealthLimit;
+                            Settings.Combat.Monk.AvoidGhomGasHealth = (float)dThisHealthLimit;
                             break;
                     }
                     break;
@@ -1590,49 +570,43 @@ namespace GilesTrinity
                     switch (iAvoid)
                     {
                         case 1:
-                            dictAvoidanceHealthWizard[219702] = dThisHealthLimit;
-                            dictAvoidanceHealthWizard[221225] = dThisHealthLimit;
+                            Settings.Combat.Wizard.AvoidArcaneHealth = (float)dThisHealthLimit;
                             break;
                         case 2:
-                            dictAvoidanceHealthWizard[84608] = dThisHealthLimit;
+                            Settings.Combat.Wizard.AvoidDesecratorHealth = (float)dThisHealthLimit;
                             break;
                         case 3:
-                            dictAvoidanceHealthWizard[4803] = dThisHealthLimit;
-                            dictAvoidanceHealthWizard[4804] = dThisHealthLimit;
-                            dictAvoidanceHealthWizard[224225] = dThisHealthLimit;
-                            dictAvoidanceHealthWizard[247987] = dThisHealthLimit;
+                            Settings.Combat.Wizard.AvoidMoltenCoreHealth = (float)dThisHealthLimit;
                             break;
                         case 4:
-                            dictAvoidanceHealthWizard[95868] = dThisHealthLimit;
+                            Settings.Combat.Wizard.AvoidMoltenTrailHealth = (float)dThisHealthLimit;
                             break;
                         case 5:
-                            dictAvoidanceHealthWizard[5482] = dThisHealthLimit;
-                            dictAvoidanceHealthWizard[6578] = dThisHealthLimit;
+                            Settings.Combat.Wizard.AvoidPoisonTreeHealth = (float)dThisHealthLimit;
                             break;
                         case 6:
-                            dictAvoidanceHealthWizard[108869] = dThisHealthLimit;
+                            Settings.Combat.Wizard.AvoidPlagueCloudHealth = (float)dThisHealthLimit;
                             break;
                         case 7:
-                            dictAvoidanceHealthWizard[402] = dThisHealthLimit;
-                            dictAvoidanceHealthWizard[223675] = dThisHealthLimit;
+                            Settings.Combat.Wizard.AvoidIceBallsHealth = (float)dThisHealthLimit;
                             break;
                         case 8:
-                            dictAvoidanceHealthWizard[3865] = dThisHealthLimit;
+                            Settings.Combat.Wizard.AvoidPlagueHandsHealth = (float)dThisHealthLimit;
                             break;
                         case 9:
-                            dictAvoidanceHealthWizard[5212] = dThisHealthLimit;
+                            Settings.Combat.Wizard.AvoidBeesWaspsHealth = (float)dThisHealthLimit;
                             break;
                         case 10:
-                            dictAvoidanceHealthWizard[123124] = dThisHealthLimit;
+                            Settings.Combat.Wizard.AvoidAzmoPoolsHealth = (float)dThisHealthLimit;
                             break;
                         case 11:
-                            dictAvoidanceHealthWizard[123839] = dThisHealthLimit;
+                            Settings.Combat.Wizard.AvoidAzmoBodiesHealth = (float)dThisHealthLimit;
                             break;
                         case 12:
-                            dictAvoidanceHealthWizard[4103] = dThisHealthLimit;
+                            Settings.Combat.Wizard.AvoidShamanFireHealth = (float)dThisHealthLimit;
                             break;
                         case 13:
-                            dictAvoidanceHealthWizard[93837] = dThisHealthLimit;
+                            Settings.Combat.Wizard.AvoidGhomGasHealth = (float)dThisHealthLimit;
                             break;
                     }
                     break;
@@ -1641,49 +615,43 @@ namespace GilesTrinity
                     switch (iAvoid)
                     {
                         case 1:
-                            dictAvoidanceHealthWitch[219702] = dThisHealthLimit;
-                            dictAvoidanceHealthWitch[221225] = dThisHealthLimit;
+                            Settings.Combat.WitchDoctor.AvoidArcaneHealth = (float)dThisHealthLimit;
                             break;
                         case 2:
-                            dictAvoidanceHealthWitch[84608] = dThisHealthLimit;
+                            Settings.Combat.WitchDoctor.AvoidDesecratorHealth = (float)dThisHealthLimit;
                             break;
                         case 3:
-                            dictAvoidanceHealthWitch[4803] = dThisHealthLimit;
-                            dictAvoidanceHealthWitch[4804] = dThisHealthLimit;
-                            dictAvoidanceHealthWitch[224225] = dThisHealthLimit;
-                            dictAvoidanceHealthWitch[247987] = dThisHealthLimit;
+                            Settings.Combat.WitchDoctor.AvoidMoltenCoreHealth = (float)dThisHealthLimit;
                             break;
                         case 4:
-                            dictAvoidanceHealthWitch[95868] = dThisHealthLimit;
+                            Settings.Combat.WitchDoctor.AvoidMoltenTrailHealth = (float)dThisHealthLimit;
                             break;
                         case 5:
-                            dictAvoidanceHealthWitch[5482] = dThisHealthLimit;
-                            dictAvoidanceHealthWitch[6578] = dThisHealthLimit;
+                            Settings.Combat.WitchDoctor.AvoidPoisonTreeHealth = (float)dThisHealthLimit;
                             break;
                         case 6:
-                            dictAvoidanceHealthWitch[108869] = dThisHealthLimit;
+                            Settings.Combat.WitchDoctor.AvoidPlagueCloudHealth = (float)dThisHealthLimit;
                             break;
                         case 7:
-                            dictAvoidanceHealthWitch[402] = dThisHealthLimit;
-                            dictAvoidanceHealthWitch[223675] = dThisHealthLimit;
+                            Settings.Combat.WitchDoctor.AvoidIceBallsHealth = (float)dThisHealthLimit;
                             break;
                         case 8:
-                            dictAvoidanceHealthWitch[3865] = dThisHealthLimit;
+                            Settings.Combat.WitchDoctor.AvoidPlagueHandsHealth = (float)dThisHealthLimit;
                             break;
                         case 9:
-                            dictAvoidanceHealthWitch[5212] = dThisHealthLimit;
+                            Settings.Combat.WitchDoctor.AvoidBeesWaspsHealth = (float)dThisHealthLimit;
                             break;
                         case 10:
-                            dictAvoidanceHealthWitch[123124] = dThisHealthLimit;
+                            Settings.Combat.WitchDoctor.AvoidAzmoPoolsHealth = (float)dThisHealthLimit;
                             break;
                         case 11:
-                            dictAvoidanceHealthWitch[123839] = dThisHealthLimit;
+                            Settings.Combat.WitchDoctor.AvoidAzmoBodiesHealth = (float)dThisHealthLimit;
                             break;
                         case 12:
-                            dictAvoidanceHealthWitch[4103] = dThisHealthLimit;
+                            Settings.Combat.WitchDoctor.AvoidShamanFireHealth = (float)dThisHealthLimit;
                             break;
                         case 13:
-                            dictAvoidanceHealthWitch[93837] = dThisHealthLimit;
+                            Settings.Combat.WitchDoctor.AvoidGhomGasHealth = (float)dThisHealthLimit;
                             break;
                     }
                     break;
@@ -1692,49 +660,43 @@ namespace GilesTrinity
                     switch (iAvoid)
                     {
                         case 1:
-                            dictAvoidanceHealthDemon[219702] = dThisHealthLimit;
-                            dictAvoidanceHealthDemon[221225] = dThisHealthLimit;
+                            Settings.Combat.DemonHunter.AvoidArcaneHealth = (float)dThisHealthLimit;
                             break;
                         case 2:
-                            dictAvoidanceHealthDemon[84608] = dThisHealthLimit;
+                            Settings.Combat.DemonHunter.AvoidDesecratorHealth = (float)dThisHealthLimit;
                             break;
                         case 3:
-                            dictAvoidanceHealthDemon[4803] = dThisHealthLimit;
-                            dictAvoidanceHealthDemon[4804] = dThisHealthLimit;
-                            dictAvoidanceHealthDemon[224225] = dThisHealthLimit;
-                            dictAvoidanceHealthDemon[247987] = dThisHealthLimit;
+                            Settings.Combat.DemonHunter.AvoidMoltenCoreHealth = (float)dThisHealthLimit;
                             break;
                         case 4:
-                            dictAvoidanceHealthDemon[95868] = dThisHealthLimit;
+                            Settings.Combat.DemonHunter.AvoidMoltenTrailHealth = (float)dThisHealthLimit;
                             break;
                         case 5:
-                            dictAvoidanceHealthDemon[5482] = dThisHealthLimit;
-                            dictAvoidanceHealthDemon[6578] = dThisHealthLimit;
+                            Settings.Combat.DemonHunter.AvoidPoisonTreeHealth = (float)dThisHealthLimit;
                             break;
                         case 6:
-                            dictAvoidanceHealthDemon[108869] = dThisHealthLimit;
+                            Settings.Combat.DemonHunter.AvoidPlagueCloudHealth = (float)dThisHealthLimit;
                             break;
                         case 7:
-                            dictAvoidanceHealthDemon[402] = dThisHealthLimit;
-                            dictAvoidanceHealthDemon[223675] = dThisHealthLimit;
+                            Settings.Combat.DemonHunter.AvoidIceBallsHealth = (float)dThisHealthLimit;
                             break;
                         case 8:
-                            dictAvoidanceHealthDemon[3865] = dThisHealthLimit;
+                            Settings.Combat.DemonHunter.AvoidPlagueHandsHealth = (float)dThisHealthLimit;
                             break;
                         case 9:
-                            dictAvoidanceHealthDemon[5212] = dThisHealthLimit;
+                            Settings.Combat.DemonHunter.AvoidBeesWaspsHealth = (float)dThisHealthLimit;
                             break;
                         case 10:
-                            dictAvoidanceHealthDemon[123124] = dThisHealthLimit;
+                            Settings.Combat.DemonHunter.AvoidAzmoPoolsHealth = (float)dThisHealthLimit;
                             break;
                         case 11:
-                            dictAvoidanceHealthDemon[123839] = dThisHealthLimit;
+                            Settings.Combat.DemonHunter.AvoidAzmoBodiesHealth = (float)dThisHealthLimit;
                             break;
                         case 12:
-                            dictAvoidanceHealthDemon[4103] = dThisHealthLimit;
+                            Settings.Combat.DemonHunter.AvoidShamanFireHealth = (float)dThisHealthLimit;
                             break;
                         case 13:
-                            dictAvoidanceHealthDemon[93837] = dThisHealthLimit;
+                            Settings.Combat.DemonHunter.AvoidGhomGasHealth = (float)dThisHealthLimit;
                             break;
                     }
                     break;
@@ -1754,49 +716,43 @@ namespace GilesTrinity
             switch (iAvoid)
             {
                 case 1:
-                    dictAvoidanceRadius[219702] = iThisAvoidRadius;
-                    dictAvoidanceRadius[221225] = iThisAvoidRadius;
+                    Settings.Combat.AvoidanceRadius.Arcane = iThisAvoidRadius;
                     break;
                 case 2:
-                    dictAvoidanceRadius[84608] = iThisAvoidRadius;
+                    Settings.Combat.AvoidanceRadius.Desecrator = iThisAvoidRadius;
                     break;
                 case 3:
-                    dictAvoidanceRadius[4803] = iThisAvoidRadius;
-                    dictAvoidanceRadius[4804] = iThisAvoidRadius;
-                    dictAvoidanceRadius[224225] = iThisAvoidRadius;
-                    dictAvoidanceRadius[247987] = iThisAvoidRadius;
+                    Settings.Combat.AvoidanceRadius.MoltenCore = iThisAvoidRadius;
                     break;
                 case 4:
-                    dictAvoidanceRadius[95868] = iThisAvoidRadius;
+                    Settings.Combat.AvoidanceRadius.MoltenTrail = iThisAvoidRadius;
                     break;
                 case 5:
-                    dictAvoidanceRadius[5482] = iThisAvoidRadius;
-                    dictAvoidanceRadius[6578] = iThisAvoidRadius;
+                    Settings.Combat.AvoidanceRadius.PoisonTree = iThisAvoidRadius;
                     break;
                 case 6:
-                    dictAvoidanceRadius[108869] = iThisAvoidRadius;
+                    Settings.Combat.AvoidanceRadius.PlagueCloud = iThisAvoidRadius;
                     break;
                 case 7:
-                    dictAvoidanceRadius[402] = iThisAvoidRadius;
-                    dictAvoidanceRadius[223675] = iThisAvoidRadius;
+                    Settings.Combat.AvoidanceRadius.IceBalls = iThisAvoidRadius;
                     break;
                 case 8:
-                    dictAvoidanceRadius[3865] = iThisAvoidRadius;
+                    Settings.Combat.AvoidanceRadius.PlagueHands = iThisAvoidRadius;
                     break;
                 case 9:
-                    dictAvoidanceRadius[5212] = iThisAvoidRadius;
+                    Settings.Combat.AvoidanceRadius.BeesWasps = iThisAvoidRadius;
                     break;
                 case 10:
-                    dictAvoidanceRadius[123124] = iThisAvoidRadius;
+                    Settings.Combat.AvoidanceRadius.AzmoPools = iThisAvoidRadius;
                     break;
                 case 11:
-                    dictAvoidanceRadius[123839] = iThisAvoidRadius;
+                    Settings.Combat.AvoidanceRadius.AzmoBodies = iThisAvoidRadius;
                     break;
                 case 12:
-                    dictAvoidanceRadius[4103] = iThisAvoidRadius;
+                    Settings.Combat.AvoidanceRadius.ShamanFire = iThisAvoidRadius;
                     break;
                 case 13:
-                    dictAvoidanceRadius[93837] = iThisAvoidRadius;
+                    Settings.Combat.AvoidanceRadius.GhomGas = iThisAvoidRadius;
                     break;
             }
             bool bOldSuppress = bSuppressEventChanges;
@@ -1816,13 +772,13 @@ namespace GilesTrinity
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bIgnoreCorpses = true;
+            Settings.WorldObject.IgnoreNonBlocking = true;
         }
         private void checkIgnoreCorpses_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bIgnoreCorpses = false;
+            Settings.WorldObject.IgnoreNonBlocking = false;
         }
         private void slidePot0_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1830,7 +786,7 @@ namespace GilesTrinity
                 return;
             slidePot0.Value = Math.Round(slidePot0.Value);
             textPot0.Text = slidePot0.Value.ToString();
-            settings.dEmergencyHealthPotionBarb = (Math.Round(slidePot0.Value) / 100);
+            Settings.Combat.Barbarian.PotionLevel = (float)(Math.Round(slidePot0.Value) / 100);
         }
         private void slidePot1_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1838,7 +794,7 @@ namespace GilesTrinity
                 return;
             slidePot1.Value = Math.Round(slidePot1.Value);
             textPot1.Text = slidePot1.Value.ToString();
-            settings.dEmergencyHealthPotionMonk = (Math.Round(slidePot1.Value) / 100);
+            Settings.Combat.Monk.PotionLevel = (float)(Math.Round(slidePot1.Value) / 100);
         }
         private void slidePot2_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1846,7 +802,7 @@ namespace GilesTrinity
                 return;
             slidePot2.Value = Math.Round(slidePot2.Value);
             textPot2.Text = slidePot2.Value.ToString();
-            settings.dEmergencyHealthPotionWiz = (Math.Round(slidePot2.Value) / 100);
+            Settings.Combat.Wizard.PotionLevel = (float)(Math.Round(slidePot2.Value) / 100);
         }
         private void slidePot3_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1854,7 +810,7 @@ namespace GilesTrinity
                 return;
             slidePot3.Value = Math.Round(slidePot3.Value);
             textPot3.Text = slidePot3.Value.ToString();
-            settings.dEmergencyHealthPotionWitch = (Math.Round(slidePot3.Value) / 100);
+            Settings.Combat.WitchDoctor.PotionLevel = (float)(Math.Round(slidePot3.Value) / 100);
         }
         private void slidePot4_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1862,7 +818,7 @@ namespace GilesTrinity
                 return;
             slidePot4.Value = Math.Round(slidePot4.Value);
             textPot4.Text = slidePot4.Value.ToString();
-            settings.dEmergencyHealthPotionDemon = (Math.Round(slidePot4.Value) / 100);
+            Settings.Combat.DemonHunter.PotionLevel = (float)(Math.Round(slidePot4.Value) / 100);
         }
         private void slideGlobe0_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1870,7 +826,7 @@ namespace GilesTrinity
                 return;
             slideGlobe0.Value = Math.Round(slideGlobe0.Value);
             textGlobe0.Text = slideGlobe0.Value.ToString();
-            settings.dEmergencyHealthGlobeBarb = (Math.Round(slideGlobe0.Value) / 100);
+            Settings.Combat.Barbarian.HealthGlobeLevel = (float)(Math.Round(slideGlobe0.Value) / 100);
         }
         private void slideGlobe1_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1878,7 +834,7 @@ namespace GilesTrinity
                 return;
             slideGlobe1.Value = Math.Round(slideGlobe1.Value);
             textGlobe1.Text = slideGlobe1.Value.ToString();
-            settings.dEmergencyHealthGlobeMonk = (Math.Round(slideGlobe1.Value) / 100);
+            Settings.Combat.Monk.HealthGlobeLevel = (float)(Math.Round(slideGlobe1.Value) / 100);
         }
         private void slideGlobe2_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1886,7 +842,7 @@ namespace GilesTrinity
                 return;
             slideGlobe2.Value = Math.Round(slideGlobe2.Value);
             textGlobe2.Text = slideGlobe2.Value.ToString();
-            settings.dEmergencyHealthGlobeWiz = (Math.Round(slideGlobe2.Value) / 100);
+            Settings.Combat.Wizard.HealthGlobeLevel = (float)(Math.Round(slideGlobe2.Value) / 100);
         }
         private void slideGlobe3_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1894,7 +850,7 @@ namespace GilesTrinity
                 return;
             slideGlobe3.Value = Math.Round(slideGlobe3.Value);
             textGlobe3.Text = slideGlobe3.Value.ToString();
-            settings.dEmergencyHealthGlobeWitch = (Math.Round(slideGlobe3.Value) / 100);
+            Settings.Combat.WitchDoctor.HealthGlobeLevel = (float)(Math.Round(slideGlobe3.Value) / 100);
         }
         private void slideGlobe4_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1902,7 +858,7 @@ namespace GilesTrinity
                 return;
             slideGlobe4.Value = Math.Round(slideGlobe4.Value);
             textGlobe4.Text = slideGlobe4.Value.ToString();
-            settings.dEmergencyHealthGlobeDemon = (Math.Round(slideGlobe4.Value) / 100);
+            Settings.Combat.DemonHunter.HealthGlobeLevel = (float)(Math.Round(slideGlobe4.Value) / 100);
         }
         private void trackContainerRange_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1910,7 +866,7 @@ namespace GilesTrinity
                 return;
             slideContainerRange.Value = Math.Round(slideContainerRange.Value);
             textContainerRange.Text = slideContainerRange.Value.ToString();
-            settings.iContainerOpenRange = Math.Round(slideContainerRange.Value);
+            Settings.WorldObject.ContainerOpenRange = (int)Math.Round(slideContainerRange.Value);
         }
         private void trackDestructibleRange_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1918,19 +874,19 @@ namespace GilesTrinity
                 return;
             slideDestructibleRange.Value = Math.Round(slideDestructibleRange.Value);
             textDestructibleRange.Text = slideDestructibleRange.Value.ToString();
-            settings.iDestructibleAttackRange = Math.Round(slideDestructibleRange.Value);
+            Settings.WorldObject.DestructibleRange = (int)Math.Round(slideDestructibleRange.Value);
         }
         private void checkIgnoreAll_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.IgnoreAllShrines = true;
+            Settings.WorldObject.UseShrine = false;
         }
         private void checkIgnoreNone_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.IgnoreAllShrines = false;
+            Settings.WorldObject.UseShrine = true;
         }
         private void trackGoldAmount_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1938,266 +894,278 @@ namespace GilesTrinity
                 return;
             slideGoldAmount.Value = Math.Round(slideGoldAmount.Value);
             textGoldAmount.Text = slideGoldAmount.Value.ToString();
-            settings.iMinimumGoldStack = Convert.ToInt32(Math.Round(slideGoldAmount.Value));
+            Settings.Loot.Pickup.MinimumGoldStack = Convert.ToInt32(Math.Round(slideGoldAmount.Value));
         }
         private void comboWB_changed(object sender, SelectionChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.FilterBlueWeapons = Convert.ToInt32(comboWB.SelectedValue);
+            Settings.Loot.Pickup.WeaponBlueLevel = Convert.ToInt32(comboWB.SelectedValue);
         }
         private void comboLegendary_changed(object sender, SelectionChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.FilterLegendary = Convert.ToInt32(comboLegendary.SelectedValue);
+            Settings.Loot.Pickup.LegendaryLevel = Convert.ToInt32(comboLegendary.SelectedValue);
         }
         private void comboWY_changed(object sender, SelectionChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.FilterYellowWeapons = Convert.ToInt32(comboWY.SelectedValue);
+            Settings.Loot.Pickup.WeaponYellowLevel = Convert.ToInt32(comboWY.SelectedValue);
         }
         private void comboAB_changed(object sender, SelectionChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iFilterBlueArmor = Convert.ToInt32(comboAB.SelectedValue);
+            Settings.Loot.Pickup.ArmorBlueLevel = Convert.ToInt32(comboAB.SelectedValue);
         }
         private void comboAY_changed(object sender, SelectionChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iFilterYellowArmor = Convert.ToInt32(comboAY.SelectedValue);
+            Settings.Loot.Pickup.ArmorYellowLevel = Convert.ToInt32(comboAY.SelectedValue);
         }
         private void comboJB_changed(object sender, SelectionChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iFilterBlueJewelry = Convert.ToInt32(comboJB.SelectedValue);
+            Settings.Loot.Pickup.JewelryBlueLevel = Convert.ToInt32(comboJB.SelectedValue);
         }
         private void comboJY_changed(object sender, SelectionChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iFilterYellowJewelry = Convert.ToInt32(comboJY.SelectedValue);
+            Settings.Loot.Pickup.JewelryYellowLevel = Convert.ToInt32(comboJY.SelectedValue);
         }
         private void comboGems_changed(object sender, SelectionChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iFilterGems = Convert.ToInt32(comboGems.SelectedValue);
+            Settings.Loot.Pickup.GemLevel = Convert.ToInt32(comboGems.SelectedValue);
         }
         private void comboMisc_changed(object sender, SelectionChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iFilterMisc = Convert.ToInt32(comboMisc.SelectedValue);
+            Settings.Loot.Pickup.MiscItemLevel = Convert.ToInt32(comboMisc.SelectedValue);
         }
         private void comboPotions_changed(object sender, SelectionChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iFilterPotions = Convert.ToInt32(comboPotions.SelectedValue);
+            Settings.Loot.Pickup.PotionMode = (PotionMode)Convert.ToInt32(comboPotions.SelectedValue);
         }
         private void comboPotionLevel_changed(object sender, SelectionChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iFilterPotionLevel = Convert.ToInt32(comboPotionLevel.SelectedValue);
+            Settings.Loot.Pickup.Potionlevel = Convert.ToInt32(comboPotionLevel.SelectedValue);
         }
         private void checkFollower_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bPickupFollower = true;
+            Settings.Loot.Pickup.FollowerItem = true;
         }
         private void checkFollower_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bPickupFollower = false;
+            Settings.Loot.Pickup.FollowerItem = false;
         }
         private void checkDesigns_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bPickupPlans = true;
+            Settings.Loot.Pickup.DesignPlan = true;
         }
         private void checkDesigns_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bPickupPlans = false;
+            Settings.Loot.Pickup.DesignPlan = false;
         }
         private void checkCraftTomes_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bPickupCraftTomes = true;
+            Settings.Loot.Pickup.CraftTomes = true;
         }
         private void checkCraftTomes_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bPickupCraftTomes = false;
+            Settings.Loot.Pickup.CraftTomes = false;
         }
         private void btnRulesGiles_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bUseGilesFilters = true;
+            Settings.Loot.ItemFilterMode = ItemFilterMode.TrinityOnly;
         }
         private void btnRulesCustom_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bUseGilesFilters = false;
+            Settings.Loot.ItemFilterMode = ItemFilterMode.DemonBuddy;
         }
         private void btnSalvage_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bSalvageJunk = true;
+            Settings.Loot.TownRun.TrashMode = TrashMode.Salvaging;
         }
         private void btnSell_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bSalvageJunk = false;
+            Settings.Loot.TownRun.TrashMode = TrashMode.Salvaging;
         }
         private void checkEmerald_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bGemsEmerald = true;
+            Settings.Loot.Pickup.GemType = Settings.Loot.Pickup.GemType | TrinityGemType.Emerald;
         }
         private void checkEmerald_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bGemsEmerald = false;
+            if ((Settings.Loot.Pickup.GemType & TrinityGemType.Emerald) == TrinityGemType.Emerald)
+            {
+                Settings.Loot.Pickup.GemType = (int)Settings.Loot.Pickup.GemType - TrinityGemType.Emerald;
+            }
         }
         private void checkAmethyst_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bGemsAmethyst = true;
+            Settings.Loot.Pickup.GemType = Settings.Loot.Pickup.GemType | TrinityGemType.Amethys;
         }
         private void checkAmethyst_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bGemsAmethyst = false;
+            if ((Settings.Loot.Pickup.GemType & TrinityGemType.Amethys) == TrinityGemType.Amethys)
+            {
+                Settings.Loot.Pickup.GemType = (int)Settings.Loot.Pickup.GemType - TrinityGemType.Amethys;
+            }
         }
         private void checkTopaz_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bGemsTopaz = true;
+            Settings.Loot.Pickup.GemType = Settings.Loot.Pickup.GemType | TrinityGemType.Topaz;
         }
         private void checkTopaz_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bGemsTopaz = false;
+            if ((Settings.Loot.Pickup.GemType & TrinityGemType.Topaz) == TrinityGemType.Topaz)
+            {
+                Settings.Loot.Pickup.GemType = (int)Settings.Loot.Pickup.GemType - TrinityGemType.Topaz;
+            }
         }
         private void checkRuby_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bGemsRuby = true;
+            Settings.Loot.Pickup.GemType = Settings.Loot.Pickup.GemType | TrinityGemType.Ruby;
         }
         private void checkRuby_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bGemsRuby = false;
+            if ((Settings.Loot.Pickup.GemType & TrinityGemType.Ruby) == TrinityGemType.Ruby)
+            {
+                Settings.Loot.Pickup.GemType = (int)Settings.Loot.Pickup.GemType - TrinityGemType.Ruby;
+            }
         }
         private void checkAndroid_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableAndroid = true;
+            Settings.Notification.AndroidEnabled = true;
         }
         private void checkAndroid_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableAndroid = false;
+            Settings.Notification.AndroidEnabled = false;
         }
         private void textAndroid_change(object sender, TextChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            sAndroidAPIKey = textAndroidKey.Text;
+            Settings.Notification.AndroidKey = textAndroidKey.Text;
         }
         private void checkProwl_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableProwl = true;
+            Settings.Notification.IPhoneEnabled = true;
         }
         private void checkProwl_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableProwl = false;
+            Settings.Notification.IPhoneEnabled = false;
         }
         private void textProwl_change(object sender, TextChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            sProwlAPIKey = textProwlKey.Text;
+            Settings.Notification.IPhoneKey = textProwlKey.Text;
         }
         private void checkEmail_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableEmail = true;
+            Settings.Notification.MailEnabled = true;
         }
         private void checkEmail_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableEmail = false;
+            Settings.Notification.MailEnabled = false;
         }
         private void checkLegendaryNotifyScore_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableLegendaryNotifyScore = true;
+            Settings.Notification.LegendaryScoring = true;
         }
         private void checkLegendaryNotifyScore_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableLegendaryNotifyScore = false;
+            Settings.Notification.LegendaryScoring = false;
         }
         private void txtEmailAddress_change(object sender, TextChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            sEmailAddress = txtEmailAddress.Text;
+            Settings.Notification.EmailAddress = txtEmailAddress.Text;
         }
         private void txtEmailPassword_change(object sender, TextChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            sEmailPassword = txtEmailPassword.Text;
+            Settings.Notification.EmailPassword = txtEmailPassword.Text;
         }
         private void txtBotName_change(object sender, TextChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            sBotName = txtBotName.Text;
+            Settings.Notification.BotName = txtBotName.Text;
         }
         private void trackScoreWeapons_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (bSuppressEventChanges)
                 return;
             slideWeapon.Value = Math.Round(slideWeapon.Value);
-            settings.iNeedPointsToKeepWeapon = slideWeapon.Value;
+            Settings.Loot.TownRun.WeaponScore = (int)slideWeapon.Value;
             WeaponText.Text = slideWeapon.Value.ToString();
         }
         private void trackScoreArmor_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -2205,7 +1173,7 @@ namespace GilesTrinity
             if (bSuppressEventChanges)
                 return;
             slideArmor.Value = Math.Round(slideArmor.Value);
-            settings.iNeedPointsToKeepArmor = slideArmor.Value;
+            Settings.Loot.TownRun.ArmorScore = (int)slideArmor.Value;
             ArmorText.Text = slideArmor.Value.ToString();
         }
         private void trackScoreJewelry_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -2213,7 +1181,7 @@ namespace GilesTrinity
             if (bSuppressEventChanges)
                 return;
             slideJewelry.Value = Math.Round(slideJewelry.Value);
-            settings.iNeedPointsToKeepJewelry = slideJewelry.Value;
+            Settings.Loot.TownRun.JewelryScore = (int)slideJewelry.Value;
             JewelryText.Text = slideJewelry.Value.ToString();
         }
         private void trackNotifyWeapons_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -2221,7 +1189,7 @@ namespace GilesTrinity
             if (bSuppressEventChanges)
                 return;
             slideNotifyWeapon.Value = Math.Round(slideNotifyWeapon.Value);
-            settings.iNeedPointsToNotifyWeapon = slideNotifyWeapon.Value;
+            Settings.Notification.WeaponScore = (int)slideNotifyWeapon.Value;
             WeaponNotifyText.Text = slideNotifyWeapon.Value.ToString();
         }
         private void trackNotifyArmor_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -2229,7 +1197,7 @@ namespace GilesTrinity
             if (bSuppressEventChanges)
                 return;
             slideNotifyArmor.Value = Math.Round(slideNotifyArmor.Value);
-            settings.iNeedPointsToNotifyArmor = slideNotifyArmor.Value;
+            Settings.Notification.ArmorScore = (int)slideNotifyArmor.Value;
             ArmorNotifyText.Text = slideNotifyArmor.Value.ToString();
         }
         private void trackNotifyJewelry_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -2237,204 +1205,204 @@ namespace GilesTrinity
             if (bSuppressEventChanges)
                 return;
             slideNotifyJewelry.Value = Math.Round(slideNotifyJewelry.Value);
-            settings.iNeedPointsToNotifyJewelry = slideNotifyJewelry.Value;
+            Settings.Notification.JewelryScore = (int)slideNotifyJewelry.Value;
             JewelryNotifyText.Text = slideNotifyJewelry.Value.ToString();
         }
         private void checkBacktracking_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableBacktracking = true;
+            Settings.Combat.Misc.AllowBacktracking = true;
         }
         private void checkBacktracking_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableBacktracking = false;
+            Settings.Combat.Misc.AllowBacktracking = false;
         }
         private void checkDebugInfo_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bDebugInfo = true;
+            Settings.Advanced.DebugInStatusBar = true;
         }
         private void checkDebugInfo_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bDebugInfo = false;
+            Settings.Advanced.DebugInStatusBar = false;
         }
         private void checkTPS_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableTPS = true;
-            BotMain.TicksPerSecond = (int)settings.iTPSAmount;
+            Settings.Advanced.TPSEnabled = true;
+            BotMain.TicksPerSecond = (int)Settings.Advanced.TPSLimit;
         }
         private void checkTPS_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableTPS = false;
+            Settings.Advanced.TPSEnabled = false;
             BotMain.TicksPerSecond = 10;
         }
         private void checkProfileReload_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableProfileReloading = true;
+            Settings.Advanced.AllowRestartGame = true;
         }
         private void checkProfileReload_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableProfileReloading = false;
+            Settings.Advanced.AllowRestartGame = false;
         }
         private void checkUnstucker_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableUnstucker = true;
+            Settings.Advanced.UnstuckerEnabled = true;
             Navigator.StuckHandler = new GilesStuckHandler();
         }
         private void checkUnstucker_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableUnstucker = false;
+            Settings.Advanced.UnstuckerEnabled = false;
             Navigator.StuckHandler = new DefaultStuckHandler();
         }
         private void checkLogStucks_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bLogStucks = true;
+            Settings.Advanced.LogStuckLocation = true;
         }
         private void checkLogStucks_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bLogStucks = false;
+            Settings.Advanced.LogStuckLocation = false;
         }
         private void checkExtendedRange_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bExtendedKillRange = true;
+            Settings.Combat.Misc.ExtendedTrashKill = true;
         }
         private void checkExtendedRange_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bExtendedKillRange = false;
+            Settings.Combat.Misc.ExtendedTrashKill = false;
         }
         private void checkWrath90_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bWrath90Seconds = true;
+            Settings.Combat.Barbarian.BoonBulKathosPassive = true;
         }
         private void checkWrath90_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bWrath90Seconds = false;
+            Settings.Combat.Barbarian.BoonBulKathosPassive = false;
         }
         private void checkSelectiveWW_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bSelectiveWhirlwind = true;
+            Settings.Combat.Barbarian.SelectiveWirlwind = true;
         }
         private void checkSelectiveWW_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bSelectiveWhirlwind = false;
+            Settings.Combat.Barbarian.SelectiveWirlwind = false;
         }
         private void checkKiteArchonOnly_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bKiteOnlyArchon = true;
+            Settings.Combat.Wizard.OnlyKiteInArchon = true;
         }
         private void checkKiteArchonOnly_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bKiteOnlyArchon = false;
+            Settings.Combat.Wizard.OnlyKiteInArchon = false;
         }
         private void checkWaitArchonAzmo_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bWaitForArchon = true;
+            Settings.Combat.Wizard.WaitArchon = true;
         }
         private void checkWaitArchonAzmo_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bWaitForArchon = false;
+            Settings.Combat.Wizard.WaitArchon = false;
         }
         private void checkWaitWrath_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bWaitForWrath = true;
+            Settings.Combat.Barbarian.WaitWOTB = true;
         }
         private void checkWaitWrath_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bWaitForWrath = false;
+            Settings.Combat.Barbarian.WaitWOTB = false;
         }
         private void checkGoblinWrath_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bGoblinWrath = true;
+            Settings.Combat.Barbarian.UseWOTBGoblin = true;
         }
         private void checkGoblinWrath_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bGoblinWrath = false;
+            Settings.Combat.Barbarian.UseWOTBGoblin = false;
         }
         private void checkMonkInna_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bMonkInnaSet = true;
+            Settings.Combat.Monk.HasInnaSet = true;
         }
         private void checkMonkInna_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bMonkInnaSet = false;
+            Settings.Combat.Monk.HasInnaSet = false;
         }
         private void checkFuryDumpWrath_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bFuryDumpWrath = true;
+            Settings.Combat.Barbarian.FuryDumpWOTB = true;
         }
         private void checkFuryDumpWrath_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bFuryDumpWrath = false;
+            Settings.Combat.Barbarian.FuryDumpWOTB = false;
         }
         private void checkFuryDumpAlways_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bFuryDumpAlways = true;
+            Settings.Combat.Barbarian.FuryDumpAlways = true;
         }
         private void checkFuryDumpAlways_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bFuryDumpAlways = false;
+            Settings.Combat.Barbarian.FuryDumpAlways = false;
         }
         private void trackTPS_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -2442,59 +1410,59 @@ namespace GilesTrinity
                 return;
             slideTPS.Value = Math.Round(slideTPS.Value);
             textTPS.Text = slideTPS.Value.ToString();
-            settings.iTPSAmount = Math.Round(slideTPS.Value);
-            if (settings.bEnableTPS)
+            Settings.Advanced.TPSLimit = (int)Math.Round(slideTPS.Value);
+            if (Settings.Advanced.TPSEnabled)
             {
-                BotMain.TicksPerSecond = (int)settings.iTPSAmount;
+                BotMain.TicksPerSecond = Settings.Advanced.TPSLimit;
             }
         }
         private void checkAvoidance_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableAvoidance = true;
+            Settings.Combat.Misc.AvoidAOE = true;
         }
         private void checkAvoidance_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableAvoidance = false;
+            Settings.Combat.Misc.AvoidAOE = false;
         }
         private void checkGlobes_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableGlobes = true;
+            Settings.Combat.Misc.CollectHealthGlobe = true;
         }
         private void checkGlobes_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableGlobes = false;
+            Settings.Combat.Misc.CollectHealthGlobe = false;
         }
         private void checkCritical_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableCriticalMass = true;
+            Settings.Combat.Wizard.CriticalMass = true;
         }
         private void checkCritical_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bEnableCriticalMass = false;
+            Settings.Combat.Wizard.CriticalMass = false;
         }
         private void checkMovementAbilities_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bOutOfCombatMovementPowers = true;
+            Settings.Combat.Misc.AllowOOCMovement = true;
         }
         private void checkMovementAbilities_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bOutOfCombatMovementPowers = false;
+            Settings.Combat.Misc.AllowOOCMovement = false;
         }
         private void slideKite0_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -2502,7 +1470,7 @@ namespace GilesTrinity
                 return;
             slideKite0.Value = Math.Round(slideKite0.Value);
             textKite0.Text = slideKite0.Value.ToString();
-            settings.iKiteDistanceBarb = (int)Math.Round(slideKite0.Value);
+            Settings.Combat.Barbarian.KiteLimit = (int)Math.Round(slideKite0.Value);
         }
         private void slideKite2_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -2510,7 +1478,7 @@ namespace GilesTrinity
                 return;
             slideKite2.Value = Math.Round(slideKite2.Value);
             textKite2.Text = slideKite2.Value.ToString();
-            settings.iKiteDistanceWiz = (int)Math.Round(slideKite2.Value);
+            Settings.Combat.Wizard.KiteLimit = (int)Math.Round(slideKite2.Value);
         }
         private void slideKite3_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -2518,7 +1486,7 @@ namespace GilesTrinity
                 return;
             slideKite3.Value = Math.Round(slideKite3.Value);
             textKite3.Text = slideKite3.Value.ToString();
-            settings.iKiteDistanceWitch = (int)Math.Round(slideKite3.Value);
+            Settings.Combat.WitchDoctor.KiteLimit = (int)Math.Round(slideKite3.Value);
         }
         private void slideKite4_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -2526,7 +1494,7 @@ namespace GilesTrinity
                 return;
             slideKite4.Value = Math.Round(slideKite4.Value);
             textKite4.Text = slideKite4.Value.ToString();
-            settings.iKiteDistanceDemon = (int)Math.Round(slideKite4.Value);
+            Settings.Combat.DemonHunter.KiteLimit = (int)Math.Round(slideKite4.Value);
         }
         private void slideVaultDelay_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -2534,7 +1502,7 @@ namespace GilesTrinity
                 return;
             slideVaultDelay.Value = Math.Round(slideVaultDelay.Value);
             textVaultDelay.Text = slideVaultDelay.Value.ToString();
-            settings.iDHVaultMovementDelay = (int)Math.Round(slideVaultDelay.Value);
+            Settings.Combat.DemonHunter.VaultMovementDelay = (int)Math.Round(slideVaultDelay.Value);
         }
         private void slideLootDelay_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -2542,7 +1510,7 @@ namespace GilesTrinity
                 return;
             slideLootDelay.Value = Math.Round(slideLootDelay.Value);
             textLootDelay.Text = slideLootDelay.Value.ToString();
-            settings.iKillLootDelay = (int)Math.Round(slideLootDelay.Value);
+            Settings.Combat.Misc.DelayAfterKill = (int)Math.Round(slideLootDelay.Value);
         }
         private void trackTriggerRange_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -2550,32 +1518,32 @@ namespace GilesTrinity
                 return;
             slideTriggerRange.Value = Math.Round(slideTriggerRange.Value);
             textTriggerRange.Text = slideTriggerRange.Value.ToString();
-            settings.iMonsterKillRange = Math.Round(slideTriggerRange.Value);
+            Settings.Combat.Misc.NonEliteRange = (int)Math.Round(slideTriggerRange.Value);
         }
         // The three events for the treasure goblin priority choice
         private void checkTreasureIgnore_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iTreasureGoblinPriority = 0;
+            Settings.Combat.Misc.GoblinPriority = GoblinPriority.Ignore;
         }
         private void checkTreasureNormal_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iTreasureGoblinPriority = 1;
+            Settings.Combat.Misc.GoblinPriority = GoblinPriority.Normal;
         }
         private void checkTreasurePrioritize_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iTreasureGoblinPriority = 2;
+            Settings.Combat.Misc.GoblinPriority = GoblinPriority.Prioritize;
         }
         private void checkTreasureKamikaze_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iTreasureGoblinPriority = 3;
+            Settings.Combat.Misc.GoblinPriority = GoblinPriority.Kamikaze;
         }
         // Event handler for the config window being closed
         private void configWindow_Closed(object sender, EventArgs e)
@@ -2608,156 +1576,63 @@ namespace GilesTrinity
         // Default button clicked
         private void buttonDefaults_Click(object sender, RoutedEventArgs e)
         {
-            settings = new GilesSettings();
-            dictAvoidanceHealthBarb = new Dictionary<int, double>(dictAvoidanceHealthBarbDefaults);
-            dictAvoidanceHealthMonk = new Dictionary<int, double>(dictAvoidanceHealthMonkDefaults);
-            dictAvoidanceHealthWizard = new Dictionary<int, double>(dictAvoidanceHealthWizardDefaults);
-            dictAvoidanceHealthWitch = new Dictionary<int, double>(dictAvoidanceHealthWitchDefaults);
-            dictAvoidanceHealthDemon = new Dictionary<int, double>(dictAvoidanceHealthDemonDefaults);
-            dictAvoidanceRadius = new Dictionary<int, double>(dictAvoidanceRadiusDefaults);
+            Settings.Reset();
             settingsWindowResetValues();
         }
         // Individual reset buttons
         private void resetCombat_Click(object sender, RoutedEventArgs e)
         {
-            GilesSettings tempsettings = new GilesSettings();
-            settings.bEnableBacktracking = tempsettings.bEnableBacktracking;
-            settings.bEnableAvoidance = tempsettings.bEnableAvoidance;
-            settings.bEnableGlobes = tempsettings.bEnableGlobes;
-            settings.bEnableCriticalMass = tempsettings.bEnableCriticalMass;
-            settings.iTreasureGoblinPriority = tempsettings.iTreasureGoblinPriority;
-            settings.iMonsterKillRange = tempsettings.iMonsterKillRange;
-            settings.iKillLootDelay = tempsettings.iKillLootDelay;
-            settings.iDHVaultMovementDelay = tempsettings.iDHVaultMovementDelay;
-            settings.bMonkInnaSet = tempsettings.bMonkInnaSet;
-            settings.bOutOfCombatMovementPowers = tempsettings.bOutOfCombatMovementPowers;
-            settings.bExtendedKillRange = tempsettings.bExtendedKillRange;
-            settings.bSelectiveWhirlwind = tempsettings.bSelectiveWhirlwind;
-            settings.bWrath90Seconds = tempsettings.bWrath90Seconds;
-            settings.bWaitForWrath = tempsettings.bWaitForWrath;
-            settings.bGoblinWrath = tempsettings.bGoblinWrath;
-            settings.bFuryDumpWrath = tempsettings.bFuryDumpWrath;
-            settings.bFuryDumpAlways = tempsettings.bFuryDumpAlways;
-            settings.bKiteOnlyArchon = tempsettings.bKiteOnlyArchon;
-            settings.bWaitForArchon = tempsettings.bWaitForArchon;
+            Settings.Combat.Misc.Reset();
             settingsWindowResetValues();
         }
         private void resetAOE0_Click(object sender, RoutedEventArgs e)
         {
-            dictAvoidanceHealthBarb = new Dictionary<int, double>(dictAvoidanceHealthBarbDefaults);
-            dictAvoidanceRadius = new Dictionary<int, double>(dictAvoidanceRadiusDefaults);
-            GilesSettings tempsettings = new GilesSettings();
-            settings.dEmergencyHealthPotionBarb = tempsettings.dEmergencyHealthPotionBarb;
-            settings.dEmergencyHealthGlobeBarb = tempsettings.dEmergencyHealthGlobeBarb;
-            settings.iKiteDistanceBarb = tempsettings.iKiteDistanceBarb;
+            Settings.Combat.Barbarian.Reset();
             settingsWindowResetValues();
         }
         private void resetAOE1_Click(object sender, RoutedEventArgs e)
         {
-            dictAvoidanceHealthMonk = new Dictionary<int, double>(dictAvoidanceHealthMonkDefaults);
-            dictAvoidanceRadius = new Dictionary<int, double>(dictAvoidanceRadiusDefaults);
-            GilesSettings tempsettings = new GilesSettings();
-            settings.dEmergencyHealthPotionMonk = tempsettings.dEmergencyHealthPotionMonk;
-            settings.dEmergencyHealthGlobeMonk = tempsettings.dEmergencyHealthGlobeMonk;
-            settings.bMonkInnaSet = tempsettings.bMonkInnaSet;
+            Settings.Combat.Monk.Reset();
             settingsWindowResetValues();
         }
         private void resetAOE2_Click(object sender, RoutedEventArgs e)
         {
-            dictAvoidanceHealthWizard = new Dictionary<int, double>(dictAvoidanceHealthWizardDefaults);
-            dictAvoidanceRadius = new Dictionary<int, double>(dictAvoidanceRadiusDefaults);
-            GilesSettings tempsettings = new GilesSettings();
-            settings.dEmergencyHealthPotionWiz = tempsettings.dEmergencyHealthPotionWiz;
-            settings.dEmergencyHealthGlobeWiz = tempsettings.dEmergencyHealthGlobeWiz;
-            settings.iKiteDistanceWiz = tempsettings.iKiteDistanceWiz;
-            settings.bKiteOnlyArchon = tempsettings.bKiteOnlyArchon;
-            settings.bWaitForArchon = tempsettings.bWaitForArchon;
+            Settings.Combat.Wizard.Reset();
             settingsWindowResetValues();
         }
         private void resetAOE3_Click(object sender, RoutedEventArgs e)
         {
-            dictAvoidanceHealthWitch = new Dictionary<int, double>(dictAvoidanceHealthWitchDefaults);
-            dictAvoidanceRadius = new Dictionary<int, double>(dictAvoidanceRadiusDefaults);
-            GilesSettings tempsettings = new GilesSettings();
-            settings.dEmergencyHealthPotionWitch = tempsettings.dEmergencyHealthPotionWitch;
-            settings.dEmergencyHealthGlobeWitch = tempsettings.dEmergencyHealthGlobeWitch;
-            settings.iKiteDistanceWitch = tempsettings.iKiteDistanceWitch;
+            Settings.Combat.WitchDoctor.Reset();
             settingsWindowResetValues();
         }
         private void resetAOE4_Click(object sender, RoutedEventArgs e)
         {
-            dictAvoidanceHealthDemon = new Dictionary<int, double>(dictAvoidanceHealthDemonDefaults);
-            dictAvoidanceRadius = new Dictionary<int, double>(dictAvoidanceRadiusDefaults);
-            GilesSettings tempsettings = new GilesSettings();
-            settings.dEmergencyHealthPotionDemon = tempsettings.dEmergencyHealthPotionDemon;
-            settings.dEmergencyHealthGlobeDemon = tempsettings.dEmergencyHealthGlobeDemon;
-            settings.iKiteDistanceDemon = tempsettings.iKiteDistanceDemon;
+            Settings.Combat.DemonHunter.Reset();
             settingsWindowResetValues();
         }
         private void resetWorld_Click(object sender, RoutedEventArgs e)
         {
-            GilesSettings tempsettings = new GilesSettings();
-            settings.IgnoreAllShrines = tempsettings.IgnoreAllShrines;
-            settings.bIgnoreCorpses = tempsettings.bIgnoreCorpses;
-            settings.iContainerOpenRange = tempsettings.iContainerOpenRange;
-            settings.iDestructibleAttackRange = tempsettings.iDestructibleAttackRange;
+            Settings.WorldObject.Reset();
             settingsWindowResetValues();
         }
         private void resetItems_Click(object sender, RoutedEventArgs e)
         {
-            GilesSettings tempsettings = new GilesSettings();
-            settings.bUseGilesFilters = tempsettings.bUseGilesFilters;
-            settings.iMinimumGoldStack = tempsettings.iMinimumGoldStack;
-            settings.iFilterPotions = tempsettings.iFilterPotions;
-            settings.FilterLegendary = tempsettings.FilterLegendary;
-            settings.FilterBlueWeapons = tempsettings.FilterBlueWeapons;
-            settings.FilterYellowWeapons = tempsettings.FilterYellowWeapons;
-            settings.iFilterBlueArmor = tempsettings.iFilterBlueArmor;
-            settings.iFilterYellowArmor = tempsettings.iFilterYellowArmor;
-            settings.iFilterBlueJewelry = tempsettings.iFilterBlueJewelry;
-            settings.iFilterYellowJewelry = tempsettings.iFilterYellowJewelry;
-            settings.iFilterGems = tempsettings.iFilterGems;
-            settings.iFilterMisc = tempsettings.iFilterMisc;
-            settings.iFilterPotionLevel = tempsettings.iFilterPotionLevel;
-            settings.bGemsEmerald = tempsettings.bGemsEmerald;
-            settings.bGemsAmethyst = tempsettings.bGemsAmethyst;
-            settings.bGemsTopaz = tempsettings.bGemsTopaz;
-            settings.bGemsRuby = tempsettings.bGemsRuby;
-            settings.bPickupCraftTomes = tempsettings.bPickupCraftTomes;
-            settings.bPickupPlans = tempsettings.bPickupPlans;
-            settings.bPickupFollower = tempsettings.bPickupFollower;
+            Settings.Loot.Pickup.Reset();
             settingsWindowResetValues();
         }
         private void resetTown_Click(object sender, RoutedEventArgs e)
         {
-            GilesSettings tempsettings = new GilesSettings();
-            settings.bSalvageJunk = tempsettings.bSalvageJunk;
-            settings.iNeedPointsToKeepJewelry = tempsettings.iNeedPointsToKeepJewelry;
-            settings.iNeedPointsToKeepArmor = tempsettings.iNeedPointsToKeepArmor;
-            settings.iNeedPointsToKeepWeapon = tempsettings.iNeedPointsToKeepWeapon;
+            Settings.Loot.TownRun.Reset();
             settingsWindowResetValues();
         }
         private void resetAdvanced_Click(object sender, RoutedEventArgs e)
         {
-            GilesSettings tempsettings = new GilesSettings();
-            settings.bEnableTPS = tempsettings.bEnableTPS;
-            settings.iTPSAmount = tempsettings.iTPSAmount;
-            settings.bLogStucks = tempsettings.bLogStucks;
-            settings.bEnableUnstucker = tempsettings.bEnableUnstucker;
-            settings.bEnableProfileReloading = tempsettings.bEnableProfileReloading;
-            settings.bDebugInfo = tempsettings.bDebugInfo;
-            settings.bEnableLegendaryNotifyScore = tempsettings.bEnableLegendaryNotifyScore;
+            Settings.Advanced.Reset();
             settingsWindowResetValues();
         }
         private void resetMobile_Click(object sender, RoutedEventArgs e)
         {
-            GilesSettings tempsettings = new GilesSettings();
-            settings.bEnableProwl = tempsettings.bEnableProwl;
-            settings.bEnableAndroid = tempsettings.bEnableAndroid;
-            settings.iNeedPointsToNotifyJewelry = tempsettings.iNeedPointsToNotifyJewelry;
-            settings.iNeedPointsToNotifyArmor = tempsettings.iNeedPointsToNotifyArmor;
-            settings.iNeedPointsToNotifyWeapon = tempsettings.iNeedPointsToNotifyWeapon;
-            settings.bEnableEmail = tempsettings.bEnableEmail;
+            Settings.Notification.Reset();
             settingsWindowResetValues();
         }
         // This function sets all of the window elements of the config window, to the current actual values held in the variables
@@ -2771,43 +1646,44 @@ namespace GilesTrinity
                     switch (n)
                     {
                         case 1:
-                            slideAOERadius[i, n - 1].Value = dictAvoidanceRadius[219702];
+                            DbHelper.Log("AvoidanceRadius.Arcane: {0}", Settings.Combat.AvoidanceRadius.Arcane);
+                            slideAOERadius[i, n - 1].Value = Settings.Combat.AvoidanceRadius.Arcane;
                             break;
                         case 2:
-                            slideAOERadius[i, n - 1].Value = dictAvoidanceRadius[84608];
+                            slideAOERadius[i, n - 1].Value = Settings.Combat.AvoidanceRadius.Desecrator;
                             break;
                         case 3:
-                            slideAOERadius[i, n - 1].Value = dictAvoidanceRadius[4804];
+                            slideAOERadius[i, n - 1].Value = Settings.Combat.AvoidanceRadius.MoltenCore;
                             break;
                         case 4:
-                            slideAOERadius[i, n - 1].Value = dictAvoidanceRadius[95868];
+                            slideAOERadius[i, n - 1].Value = Settings.Combat.AvoidanceRadius.MoltenTrail;
                             break;
                         case 5:
-                            slideAOERadius[i, n - 1].Value = dictAvoidanceRadius[5482];
+                            slideAOERadius[i, n - 1].Value = Settings.Combat.AvoidanceRadius.PoisonTree;
                             break;
                         case 6:
-                            slideAOERadius[i, n - 1].Value = dictAvoidanceRadius[108869];
+                            slideAOERadius[i, n - 1].Value = Settings.Combat.AvoidanceRadius.PlagueCloud;
                             break;
                         case 7:
-                            slideAOERadius[i, n - 1].Value = dictAvoidanceRadius[223675];
+                            slideAOERadius[i, n - 1].Value = Settings.Combat.AvoidanceRadius.IceBalls;
                             break;
                         case 8:
-                            slideAOERadius[i, n - 1].Value = dictAvoidanceRadius[3865];
+                            slideAOERadius[i, n - 1].Value = Settings.Combat.AvoidanceRadius.PlagueHands;
                             break;
                         case 9:
-                            slideAOERadius[i, n - 1].Value = dictAvoidanceRadius[5212];
+                            slideAOERadius[i, n - 1].Value = Settings.Combat.AvoidanceRadius.BeesWasps;
                             break;
                         case 10:
-                            slideAOERadius[i, n - 1].Value = dictAvoidanceRadius[123124];
+                            slideAOERadius[i, n - 1].Value = Settings.Combat.AvoidanceRadius.AzmoPools;
                             break;
                         case 11:
-                            slideAOERadius[i, n - 1].Value = dictAvoidanceRadius[123839];
+                            slideAOERadius[i, n - 1].Value = Settings.Combat.AvoidanceRadius.AzmoBodies;
                             break;
                         case 12:
-                            slideAOERadius[i, n - 1].Value = dictAvoidanceRadius[4103];
+                            slideAOERadius[i, n - 1].Value = Settings.Combat.AvoidanceRadius.ShamanFire;
                             break;
                         case 13:
-                            slideAOERadius[i, n - 1].Value = dictAvoidanceRadius[93837];
+                            slideAOERadius[i, n - 1].Value = Settings.Combat.AvoidanceRadius.GhomGas;
                             break;
                     }
                     switch (i)
@@ -2817,43 +1693,43 @@ namespace GilesTrinity
                             switch (n)
                             {
                                 case 1:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthBarb[219702] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Barbarian.AvoidArcaneHealth * 100);
                                     break;
                                 case 2:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthBarb[84608] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Barbarian.AvoidDesecratorHealth * 100);
                                     break;
                                 case 3:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthBarb[4804] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Barbarian.AvoidMoltenCoreHealth * 100);
                                     break;
                                 case 4:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthBarb[95868] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Barbarian.AvoidMoltenTrailHealth * 100);
                                     break;
                                 case 5:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthBarb[5482] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Barbarian.AvoidPoisonTreeHealth * 100);
                                     break;
                                 case 6:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthBarb[108869] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Barbarian.AvoidPlagueCloudHealth * 100);
                                     break;
                                 case 7:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthBarb[223675] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Barbarian.AvoidIceBallsHealth * 100);
                                     break;
                                 case 8:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthBarb[3865] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Barbarian.AvoidPlagueHandsHealth * 100);
                                     break;
                                 case 9:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthBarb[5212] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Barbarian.AvoidBeesWaspsHealth * 100);
                                     break;
                                 case 10:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthBarb[123124] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Barbarian.AvoidAzmoPoolsHealth * 100);
                                     break;
                                 case 11:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthBarb[123839] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Barbarian.AvoidAzmoBodiesHealth * 100);
                                     break;
                                 case 12:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthBarb[4103] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Barbarian.AvoidShamanFireHealth * 100);
                                     break;
                                 case 13:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthBarb[93837] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Barbarian.AvoidGhomGasHealth * 100);
                                     break;
                             }
                             break;
@@ -2862,43 +1738,43 @@ namespace GilesTrinity
                             switch (n)
                             {
                                 case 1:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthMonk[219702] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Monk.AvoidArcaneHealth * 100);
                                     break;
                                 case 2:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthMonk[84608] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Monk.AvoidDesecratorHealth * 100);
                                     break;
                                 case 3:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthMonk[4804] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Monk.AvoidMoltenCoreHealth * 100);
                                     break;
                                 case 4:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthMonk[95868] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Monk.AvoidMoltenTrailHealth * 100);
                                     break;
                                 case 5:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthMonk[5482] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Monk.AvoidPoisonTreeHealth * 100);
                                     break;
                                 case 6:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthMonk[108869] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Monk.AvoidPlagueCloudHealth * 100);
                                     break;
                                 case 7:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthMonk[223675] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Monk.AvoidIceBallsHealth * 100);
                                     break;
                                 case 8:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthMonk[3865] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Monk.AvoidPlagueHandsHealth * 100);
                                     break;
                                 case 9:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthMonk[5212] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Monk.AvoidBeesWaspsHealth * 100);
                                     break;
                                 case 10:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthMonk[123124] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Monk.AvoidAzmoPoolsHealth * 100);
                                     break;
                                 case 11:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthMonk[123839] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Monk.AvoidAzmoBodiesHealth * 100);
                                     break;
                                 case 12:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthMonk[4103] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Monk.AvoidShamanFireHealth * 100);
                                     break;
                                 case 13:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthMonk[93837] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Monk.AvoidGhomGasHealth * 100);
                                     break;
                             }
                             break;
@@ -2907,43 +1783,43 @@ namespace GilesTrinity
                             switch (n)
                             {
                                 case 1:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWizard[219702] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Wizard.AvoidArcaneHealth * 100);
                                     break;
                                 case 2:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWizard[84608] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Wizard.AvoidDesecratorHealth * 100);
                                     break;
                                 case 3:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWizard[4804] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Wizard.AvoidMoltenCoreHealth * 100);
                                     break;
                                 case 4:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWizard[95868] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Wizard.AvoidMoltenTrailHealth * 100);
                                     break;
                                 case 5:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWizard[5482] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Wizard.AvoidPoisonTreeHealth * 100);
                                     break;
                                 case 6:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWizard[108869] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Wizard.AvoidPlagueCloudHealth * 100);
                                     break;
                                 case 7:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWizard[223675] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Wizard.AvoidIceBallsHealth * 100);
                                     break;
                                 case 8:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWizard[3865] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Wizard.AvoidPlagueHandsHealth * 100);
                                     break;
                                 case 9:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWizard[5212] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Wizard.AvoidBeesWaspsHealth * 100);
                                     break;
                                 case 10:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWizard[123124] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Wizard.AvoidAzmoPoolsHealth * 100);
                                     break;
                                 case 11:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWizard[123839] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Wizard.AvoidAzmoBodiesHealth * 100);
                                     break;
                                 case 12:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWizard[4103] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Wizard.AvoidShamanFireHealth * 100);
                                     break;
                                 case 13:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWizard[93837] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.Wizard.AvoidGhomGasHealth * 100);
                                     break;
                             }
                             break;
@@ -2952,43 +1828,43 @@ namespace GilesTrinity
                             switch (n)
                             {
                                 case 1:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWitch[219702] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.WitchDoctor.AvoidArcaneHealth * 100);
                                     break;
                                 case 2:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWitch[84608] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.WitchDoctor.AvoidDesecratorHealth * 100);
                                     break;
                                 case 3:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWitch[4804] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.WitchDoctor.AvoidMoltenCoreHealth * 100);
                                     break;
                                 case 4:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWitch[95868] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.WitchDoctor.AvoidMoltenTrailHealth * 100);
                                     break;
                                 case 5:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWitch[5482] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.WitchDoctor.AvoidPoisonTreeHealth * 100);
                                     break;
                                 case 6:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWitch[108869] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.WitchDoctor.AvoidPlagueCloudHealth * 100);
                                     break;
                                 case 7:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWitch[223675] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.WitchDoctor.AvoidIceBallsHealth * 100);
                                     break;
                                 case 8:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWitch[3865] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.WitchDoctor.AvoidPlagueHandsHealth * 100);
                                     break;
                                 case 9:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWitch[5212] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.WitchDoctor.AvoidBeesWaspsHealth * 100);
                                     break;
                                 case 10:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWitch[123124] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.WitchDoctor.AvoidAzmoPoolsHealth * 100);
                                     break;
                                 case 11:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWitch[123839] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.WitchDoctor.AvoidAzmoBodiesHealth * 100);
                                     break;
                                 case 12:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWitch[4103] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.WitchDoctor.AvoidShamanFireHealth * 100);
                                     break;
                                 case 13:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthWitch[93837] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.WitchDoctor.AvoidGhomGasHealth * 100);
                                     break;
                             }
                             break;
@@ -2997,43 +1873,43 @@ namespace GilesTrinity
                             switch (n)
                             {
                                 case 1:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthDemon[219702] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.DemonHunter.AvoidArcaneHealth * 100);
                                     break;
                                 case 2:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthDemon[84608] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.DemonHunter.AvoidDesecratorHealth * 100);
                                     break;
                                 case 3:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthDemon[4804] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.DemonHunter.AvoidMoltenCoreHealth * 100);
                                     break;
                                 case 4:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthDemon[95868] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.DemonHunter.AvoidMoltenTrailHealth * 100);
                                     break;
                                 case 5:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthDemon[5482] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.DemonHunter.AvoidPoisonTreeHealth * 100);
                                     break;
                                 case 6:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthDemon[108869] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.DemonHunter.AvoidPlagueCloudHealth * 100);
                                     break;
                                 case 7:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthDemon[223675] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.DemonHunter.AvoidIceBallsHealth * 100);
                                     break;
                                 case 8:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthDemon[3865] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.DemonHunter.AvoidPlagueHandsHealth * 100);
                                     break;
                                 case 9:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthDemon[5212] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.DemonHunter.AvoidBeesWaspsHealth * 100);
                                     break;
                                 case 10:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthDemon[123124] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.DemonHunter.AvoidAzmoPoolsHealth * 100);
                                     break;
                                 case 11:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthDemon[123839] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.DemonHunter.AvoidAzmoBodiesHealth * 100);
                                     break;
                                 case 12:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthDemon[4103] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.DemonHunter.AvoidShamanFireHealth * 100);
                                     break;
                                 case 13:
-                                    slideAOEHealth[i, n - 1].Value = dictAvoidanceHealthDemon[93837] * 100;
+                                    slideAOEHealth[i, n - 1].Value = Math.Round(Settings.Combat.DemonHunter.AvoidGhomGasHealth * 100);
                                     break;
                             }
                             break;
@@ -3045,25 +1921,25 @@ namespace GilesTrinity
                 // Loop through the avoidances
             }
             // Loop through the classes
-            comboLegendary.SelectedIndex = comboLegendary.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.FilterLegendary.ToString())).Count();
-            comboWB.SelectedIndex = comboWB.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.FilterBlueWeapons.ToString())).Count();
-            comboWY.SelectedIndex = comboWY.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.FilterYellowWeapons.ToString())).Count();
-            comboAB.SelectedIndex = comboAB.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterBlueArmor.ToString())).Count();
-            comboAY.SelectedIndex = comboAY.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterYellowArmor.ToString())).Count();
-            comboJB.SelectedIndex = comboJB.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterBlueJewelry.ToString())).Count();
-            comboJY.SelectedIndex = comboJY.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterYellowJewelry.ToString())).Count();
-            comboGems.SelectedIndex = comboGems.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterGems.ToString())).Count();
-            comboMisc.SelectedIndex = comboMisc.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterMisc.ToString())).Count();
-            comboPotions.SelectedIndex = comboPotions.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterPotions.ToString())).Count();
-            comboPotionLevel.SelectedIndex = comboPotionLevel.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterPotionLevel.ToString())).Count();
-            checkCraftTomes.IsChecked = settings.bPickupCraftTomes;
-            checkDesigns.IsChecked = settings.bPickupPlans;
-            checkFollower.IsChecked = settings.bPickupFollower;
-            checkGemEmerald.IsChecked = settings.bGemsEmerald;
-            checkGemAmethyst.IsChecked = settings.bGemsAmethyst;
-            checkGemTopaz.IsChecked = settings.bGemsTopaz;
-            checkGemRuby.IsChecked = settings.bGemsRuby;
-            if (settings.bSalvageJunk)
+            comboLegendary.SelectedIndex = comboLegendary.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.LegendaryLevel.ToString())).Count();
+            comboWB.SelectedIndex = comboWB.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.WeaponBlueLevel.ToString())).Count();
+            comboWY.SelectedIndex = comboWY.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.WeaponYellowLevel.ToString())).Count();
+            comboAB.SelectedIndex = comboAB.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.ArmorBlueLevel.ToString())).Count();
+            comboAY.SelectedIndex = comboAY.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.ArmorYellowLevel.ToString())).Count();
+            comboJB.SelectedIndex = comboJB.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.JewelryBlueLevel.ToString())).Count();
+            comboJY.SelectedIndex = comboJY.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.JewelryYellowLevel.ToString())).Count();
+            comboGems.SelectedIndex = comboGems.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.GemLevel.ToString())).Count();
+            comboMisc.SelectedIndex = comboMisc.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.MiscItemLevel.ToString())).Count();
+            comboPotions.SelectedIndex = comboPotions.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(((int)Settings.Loot.Pickup.PotionMode).ToString())).Count();
+            comboPotionLevel.SelectedIndex = comboPotionLevel.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.Potionlevel.ToString())).Count();
+            checkCraftTomes.IsChecked = Settings.Loot.Pickup.CraftTomes;
+            checkDesigns.IsChecked = Settings.Loot.Pickup.DesignPlan;
+            checkFollower.IsChecked = Settings.Loot.Pickup.FollowerItem;
+            checkGemEmerald.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Emerald) == TrinityGemType.Emerald;
+            checkGemAmethyst.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Amethys) == TrinityGemType.Amethys;
+            checkGemTopaz.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Topaz) == TrinityGemType.Topaz;
+            checkGemRuby.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Ruby) == TrinityGemType.Ruby;
+            if (Settings.Loot.TownRun.TrashMode == TrashMode.Salvaging)
             {
                 btnSalvage.IsChecked = true;
                 btnSell.IsChecked = false;
@@ -3073,7 +1949,7 @@ namespace GilesTrinity
                 btnSell.IsChecked = true;
                 btnSalvage.IsChecked = false;
             }
-            if (settings.bUseGilesFilters)
+            if (Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy)
             {
                 btnRulesGiles.IsChecked = true;
                 btnRulesCustom.IsChecked = false;
@@ -3083,63 +1959,62 @@ namespace GilesTrinity
                 btnRulesCustom.IsChecked = true;
                 btnRulesGiles.IsChecked = false;
             }
-            slideWeapon.Value = Math.Round(settings.iNeedPointsToKeepWeapon);
+            slideWeapon.Value = Settings.Loot.TownRun.WeaponScore;
             WeaponText.Text = slideWeapon.Value.ToString();
-            slideArmor.Value = Math.Round(settings.iNeedPointsToKeepArmor);
+            slideArmor.Value = Settings.Loot.TownRun.ArmorScore;
             ArmorText.Text = slideArmor.Value.ToString();
-            slideJewelry.Value = Math.Round(settings.iNeedPointsToKeepJewelry);
+            slideJewelry.Value = Settings.Loot.TownRun.JewelryScore;
             JewelryText.Text = slideJewelry.Value.ToString();
-            slideNotifyWeapon.Value = Math.Round(settings.iNeedPointsToNotifyWeapon);
+            slideNotifyWeapon.Value = Settings.Notification.WeaponScore;
             WeaponNotifyText.Text = slideNotifyWeapon.Value.ToString();
-            slideNotifyArmor.Value = Math.Round(settings.iNeedPointsToNotifyArmor);
+            slideNotifyArmor.Value = Settings.Notification.ArmorScore;
             ArmorNotifyText.Text = slideNotifyArmor.Value.ToString();
-            slideNotifyJewelry.Value = Math.Round(settings.iNeedPointsToNotifyJewelry);
+            slideNotifyJewelry.Value = Settings.Notification.JewelryScore;
             JewelryNotifyText.Text = slideNotifyJewelry.Value.ToString();
-            slideGoldAmount.Value = settings.iMinimumGoldStack;
-            textGoldAmount.Text = settings.iMinimumGoldStack.ToString();
-            slideTriggerRange.Value = settings.iMonsterKillRange;
-            textTriggerRange.Text = settings.iMonsterKillRange.ToString();
-            slideLootDelay.Value = settings.iKillLootDelay;
-            textLootDelay.Text = settings.iKillLootDelay.ToString();
-            slideVaultDelay.Value = settings.iDHVaultMovementDelay;
-            textVaultDelay.Text = settings.iDHVaultMovementDelay.ToString();
-            slideKite0.Value = settings.iKiteDistanceBarb;
-            textKite0.Text = settings.iKiteDistanceBarb.ToString();
-            slideKite2.Value = settings.iKiteDistanceWiz;
-            textKite2.Text = settings.iKiteDistanceWiz.ToString();
-            slideKite3.Value = settings.iKiteDistanceWitch;
-            textKite3.Text = settings.iKiteDistanceWitch.ToString();
-            slideKite4.Value = settings.iKiteDistanceDemon;
-            textKite4.Text = settings.iKiteDistanceDemon.ToString();
-            if (settings.iTreasureGoblinPriority == 0)
+            slideGoldAmount.Value = Settings.Loot.Pickup.MinimumGoldStack;
+            textGoldAmount.Text = Settings.Loot.Pickup.MinimumGoldStack.ToString();
+            slideTriggerRange.Value = Settings.Combat.Misc.NonEliteRange;
+            textTriggerRange.Text = Settings.Combat.Misc.NonEliteRange.ToString();
+            slideLootDelay.Value = Settings.Combat.Misc.DelayAfterKill;
+            textLootDelay.Text = Settings.Combat.Misc.DelayAfterKill.ToString();
+            slideVaultDelay.Value = Settings.Combat.DemonHunter.VaultMovementDelay;
+            textVaultDelay.Text = Settings.Combat.DemonHunter.VaultMovementDelay.ToString();
+            slideKite0.Value = Settings.Combat.Barbarian.KiteLimit;
+            textKite0.Text = Settings.Combat.Barbarian.KiteLimit.ToString();
+            slideKite2.Value = Settings.Combat.Wizard.KiteLimit;
+            textKite2.Text = Settings.Combat.Wizard.KiteLimit.ToString();
+            slideKite3.Value = Settings.Combat.WitchDoctor.KiteLimit;
+            textKite3.Text = Settings.Combat.WitchDoctor.KiteLimit.ToString();
+            slideKite4.Value = Settings.Combat.DemonHunter.KiteLimit;
+            textKite4.Text = Settings.Combat.DemonHunter.KiteLimit.ToString();
+            switch(Settings.Combat.Misc.GoblinPriority )
             {
-                checkTreasureNormal.IsChecked = false;
-                checkTreasurePrioritize.IsChecked = false;
-                checkTreasureKamikaze.IsChecked = false;
-                checkTreasureIgnore.IsChecked = true;
+                case GoblinPriority.Ignore:
+                    checkTreasureNormal.IsChecked = false;
+                    checkTreasurePrioritize.IsChecked = false;
+                    checkTreasureKamikaze.IsChecked = false;
+                    checkTreasureIgnore.IsChecked = true;
+                    break;
+                case GoblinPriority.Normal:
+                    checkTreasureIgnore.IsChecked = false;
+                    checkTreasurePrioritize.IsChecked = false;
+                    checkTreasureKamikaze.IsChecked = false;
+                    checkTreasureNormal.IsChecked = true;
+                    break;
+                case GoblinPriority.Prioritize:
+                    checkTreasureIgnore.IsChecked = false;
+                    checkTreasureNormal.IsChecked = false;
+                    checkTreasureKamikaze.IsChecked = false;
+                    checkTreasurePrioritize.IsChecked = true;
+                    break;
+                case GoblinPriority.Kamikaze:
+                    checkTreasureIgnore.IsChecked = false;
+                    checkTreasureNormal.IsChecked = false;
+                    checkTreasurePrioritize.IsChecked = false;
+                    checkTreasureKamikaze.IsChecked = true;
+                    break;
             }
-            else if (settings.iTreasureGoblinPriority == 1)
-            {
-                checkTreasureIgnore.IsChecked = false;
-                checkTreasurePrioritize.IsChecked = false;
-                checkTreasureKamikaze.IsChecked = false;
-                checkTreasureNormal.IsChecked = true;
-            }
-            else if (settings.iTreasureGoblinPriority == 2)
-            {
-                checkTreasureIgnore.IsChecked = false;
-                checkTreasureNormal.IsChecked = false;
-                checkTreasureKamikaze.IsChecked = false;
-                checkTreasurePrioritize.IsChecked = true;
-            }
-            else
-            {
-                checkTreasureIgnore.IsChecked = false;
-                checkTreasureNormal.IsChecked = false;
-                checkTreasurePrioritize.IsChecked = false;
-                checkTreasureKamikaze.IsChecked = true;
-            }
-            if (settings.IgnoreAllShrines)
+            if (!Settings.WorldObject.UseShrine)
             {
                 checkIgnoreNone.IsChecked = false;
                 checkIgnoreAll.IsChecked = true;
@@ -3149,62 +2024,63 @@ namespace GilesTrinity
                 checkIgnoreAll.IsChecked = false;
                 checkIgnoreNone.IsChecked = true;
             }
-            checkBacktracking.IsChecked = settings.bEnableBacktracking;
-            checkCritical.IsChecked = settings.bEnableCriticalMass;
-            checkGrave.IsChecked = settings.bEnableCriticalMass;
-            checkAvoidance.IsChecked = settings.bEnableAvoidance;
-            checkGlobes.IsChecked = settings.bEnableGlobes;
-            slideContainerRange.Value = settings.iContainerOpenRange;
-            textContainerRange.Text = settings.iContainerOpenRange.ToString();
-            slideDestructibleRange.Value = settings.iDestructibleAttackRange;
-            textDestructibleRange.Text = settings.iDestructibleAttackRange.ToString();
-            checkIgnoreCorpses.IsChecked = settings.bIgnoreCorpses;
-            checkMovementAbilities.IsChecked = settings.bOutOfCombatMovementPowers;
-            textTPS.Text = settings.iTPSAmount.ToString();
-            slideTPS.Value = settings.iTPSAmount;
-            checkTPS.IsChecked = settings.bEnableTPS;
-            checkLogStucks.IsChecked = settings.bLogStucks;
-            checkProwl.IsChecked = settings.bEnableProwl;
-            textProwlKey.Text = sProwlAPIKey;
-            checkEmail.IsChecked = settings.bEnableEmail;
-            checkLegendaryNotify.IsChecked = settings.bEnableLegendaryNotifyScore;
-            txtEmailAddress.Text = sEmailAddress;
-            txtEmailPassword.Text = sEmailPassword;
-            txtBotName.Text = sBotName; checkAndroid.IsChecked = settings.bEnableAndroid;
-            textAndroidKey.Text = sAndroidAPIKey;
-            checkUnstucker.IsChecked = settings.bEnableUnstucker;
-            checkProfileReload.IsChecked = settings.bEnableProfileReloading;
-            checkExtendedRange.IsChecked = settings.bExtendedKillRange;
-            checkSelectiveWW.IsChecked = settings.bSelectiveWhirlwind;
-            checkWrath90.IsChecked = settings.bWrath90Seconds;
-            checkWaitWrath.IsChecked = settings.bWaitForWrath;
-            checkKiteArchonOnly.IsChecked = settings.bKiteOnlyArchon;
-            checkWaitArchonAzmo.IsChecked = settings.bWaitForArchon;
-            checkGoblinWrath.IsChecked = settings.bGoblinWrath;
-            checkFuryDumpWrath.IsChecked = settings.bFuryDumpWrath;
-            checkFuryDumpAlways.IsChecked = settings.bFuryDumpAlways;
-            checkDebugInfo.IsChecked = settings.bDebugInfo;
-            checkMonkInna.IsChecked = settings.bMonkInnaSet;
-            slidePot0.Value = Math.Floor(settings.dEmergencyHealthPotionBarb * 100);
-            slidePot1.Value = Math.Floor(settings.dEmergencyHealthPotionMonk * 100);
-            slidePot2.Value = Math.Floor(settings.dEmergencyHealthPotionWiz * 100);
-            slidePot3.Value = Math.Floor(settings.dEmergencyHealthPotionWitch * 100);
-            slidePot4.Value = Math.Floor(settings.dEmergencyHealthPotionDemon * 100);
-            textPot0.Text = Math.Floor(settings.dEmergencyHealthPotionBarb * 100).ToString();
-            textPot1.Text = Math.Floor(settings.dEmergencyHealthPotionMonk * 100).ToString();
-            textPot2.Text = Math.Floor(settings.dEmergencyHealthPotionWiz * 100).ToString();
-            textPot3.Text = Math.Floor(settings.dEmergencyHealthPotionWitch * 100).ToString();
-            textPot4.Text = Math.Floor(settings.dEmergencyHealthPotionDemon * 100).ToString();
-            slideGlobe0.Value = Math.Floor(settings.dEmergencyHealthGlobeBarb * 100);
-            slideGlobe1.Value = Math.Floor(settings.dEmergencyHealthGlobeMonk * 100);
-            slideGlobe2.Value = Math.Floor(settings.dEmergencyHealthGlobeWiz * 100);
-            slideGlobe3.Value = Math.Floor(settings.dEmergencyHealthGlobeWitch * 100);
-            slideGlobe4.Value = Math.Floor(settings.dEmergencyHealthGlobeDemon * 100);
-            textGlobe0.Text = Math.Floor(settings.dEmergencyHealthGlobeBarb * 100).ToString();
-            textGlobe1.Text = Math.Floor(settings.dEmergencyHealthGlobeMonk * 100).ToString();
-            textGlobe2.Text = Math.Floor(settings.dEmergencyHealthGlobeWiz * 100).ToString();
-            textGlobe3.Text = Math.Floor(settings.dEmergencyHealthGlobeWitch * 100).ToString();
-            textGlobe4.Text = Math.Floor(settings.dEmergencyHealthGlobeDemon * 100).ToString();
+            checkBacktracking.IsChecked = Settings.Combat.Misc.AllowBacktracking;
+            checkCritical.IsChecked = Settings.Combat.Wizard.CriticalMass;
+            checkGrave.IsChecked = Settings.Combat.WitchDoctor.GraveInjustice;
+            checkAvoidance.IsChecked = Settings.Combat.Misc.AvoidAOE;
+            checkGlobes.IsChecked = Settings.Combat.Misc.CollectHealthGlobe;
+            slideContainerRange.Value = Settings.WorldObject.ContainerOpenRange;
+            textContainerRange.Text = Settings.WorldObject.ContainerOpenRange.ToString();
+            slideDestructibleRange.Value = Settings.WorldObject.DestructibleRange;
+            textDestructibleRange.Text = Settings.WorldObject.DestructibleRange.ToString();
+            checkIgnoreCorpses.IsChecked = Settings.WorldObject.IgnoreNonBlocking;
+            checkMovementAbilities.IsChecked = Settings.Combat.Misc.AllowOOCMovement;
+            textTPS.Text = Settings.Advanced.TPSLimit.ToString();
+            slideTPS.Value = Settings.Advanced.TPSLimit;
+            checkTPS.IsChecked = Settings.Advanced.TPSEnabled;
+            checkLogStucks.IsChecked = Settings.Advanced.LogStuckLocation;
+            checkProwl.IsChecked = Settings.Notification.IPhoneEnabled;
+            textProwlKey.Text = Settings.Notification.IPhoneKey;
+            checkEmail.IsChecked = Settings.Notification.MailEnabled;
+            checkLegendaryNotify.IsChecked = Settings.Notification.LegendaryScoring;
+            txtEmailAddress.Text = Settings.Notification.EmailAddress;
+            txtEmailPassword.Text = Settings.Notification.EmailPassword;
+            txtBotName.Text = Settings.Notification.BotName; 
+            checkAndroid.IsChecked = Settings.Notification.AndroidEnabled;
+            textAndroidKey.Text = Settings.Notification.AndroidKey;
+            checkUnstucker.IsChecked = Settings.Advanced.UnstuckerEnabled;
+            checkProfileReload.IsChecked = Settings.Advanced.AllowRestartGame;
+            checkExtendedRange.IsChecked = Settings.Combat.Misc.ExtendedTrashKill;
+            checkSelectiveWW.IsChecked = Settings.Combat.Barbarian.SelectiveWirlwind;
+            checkWrath90.IsChecked = Settings.Combat.Barbarian.BoonBulKathosPassive;
+            checkWaitWrath.IsChecked = Settings.Combat.Barbarian.WaitWOTB;
+            checkKiteArchonOnly.IsChecked = Settings.Combat.Wizard.OnlyKiteInArchon;
+            checkWaitArchonAzmo.IsChecked = Settings.Combat.Wizard.WaitArchon;
+            checkGoblinWrath.IsChecked = Settings.Combat.Barbarian.UseWOTBGoblin;
+            checkFuryDumpWrath.IsChecked = Settings.Combat.Barbarian.FuryDumpWOTB;
+            checkFuryDumpAlways.IsChecked = Settings.Combat.Barbarian.FuryDumpAlways;
+            checkDebugInfo.IsChecked = Settings.Advanced.DebugInStatusBar;
+            checkMonkInna.IsChecked = Settings.Combat.Monk.HasInnaSet;
+            slidePot0.Value = Math.Floor(Settings.Combat.Barbarian.PotionLevel * 100);
+            slidePot1.Value = Math.Floor(Settings.Combat.Monk.PotionLevel * 100);
+            slidePot2.Value = Math.Floor(Settings.Combat.Wizard.PotionLevel * 100);
+            slidePot3.Value = Math.Floor(Settings.Combat.WitchDoctor.PotionLevel * 100);
+            slidePot4.Value = Math.Floor(Settings.Combat.DemonHunter.PotionLevel * 100);
+            textPot0.Text = Math.Floor(Settings.Combat.Barbarian.PotionLevel * 100).ToString();
+            textPot1.Text = Math.Floor(Settings.Combat.Monk.PotionLevel * 100).ToString();
+            textPot2.Text = Math.Floor(Settings.Combat.Wizard.PotionLevel * 100).ToString();
+            textPot3.Text = Math.Floor(Settings.Combat.WitchDoctor.PotionLevel * 100).ToString();
+            textPot4.Text = Math.Floor(Settings.Combat.DemonHunter.PotionLevel * 100).ToString();
+            slideGlobe0.Value = Math.Floor(Settings.Combat.Barbarian.HealthGlobeLevel * 100);
+            slideGlobe1.Value = Math.Floor(Settings.Combat.Monk.HealthGlobeLevel * 100);
+            slideGlobe2.Value = Math.Floor(Settings.Combat.Wizard.HealthGlobeLevel * 100);
+            slideGlobe3.Value = Math.Floor(Settings.Combat.WitchDoctor.HealthGlobeLevel * 100);
+            slideGlobe4.Value = Math.Floor(Settings.Combat.DemonHunter.HealthGlobeLevel * 100);
+            textGlobe0.Text = Math.Floor(Settings.Combat.Barbarian.HealthGlobeLevel * 100).ToString();
+            textGlobe1.Text = Math.Floor(Settings.Combat.Monk.HealthGlobeLevel * 100).ToString();
+            textGlobe2.Text = Math.Floor(Settings.Combat.Wizard.HealthGlobeLevel * 100).ToString();
+            textGlobe3.Text = Math.Floor(Settings.Combat.WitchDoctor.HealthGlobeLevel * 100).ToString();
+            textGlobe4.Text = Math.Floor(Settings.Combat.DemonHunter.HealthGlobeLevel * 100).ToString();
             bSuppressEventChanges = false;
         }
         #endregion

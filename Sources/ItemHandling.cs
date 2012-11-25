@@ -1,8 +1,11 @@
-﻿using System;
+﻿using GilesTrinity.Settings.Loot;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading;
 using Zeta;
 using Zeta.Common;
@@ -41,7 +44,7 @@ namespace GilesTrinity
             // If it's legendary, we always want it *IF* it's level is right
             if (quality >= ItemQuality.Legendary)
             {
-                if (settings.FilterLegendary > 0 && (level >= settings.FilterLegendary || settings.FilterLegendary == 1))
+                if (Settings.Loot.Pickup.LegendaryLevel > 0 && (level >= Settings.Loot.Pickup.LegendaryLevel || Settings.Loot.Pickup.LegendaryLevel == 1))
                     return true;
                 return false;
             }
@@ -72,7 +75,7 @@ namespace GilesTrinity
                     }
                     if (quality >= ItemQuality.Magic1 && quality < ItemQuality.Rare4)
                     {
-                        if (settings.FilterBlueWeapons == 0 || (settings.FilterBlueWeapons != 0 && level < settings.FilterBlueWeapons))
+                        if (Settings.Loot.Pickup.WeaponBlueLevel == 0 || (Settings.Loot.Pickup.WeaponBlueLevel != 0 && level < Settings.Loot.Pickup.WeaponBlueLevel))
                         {
 
                             // Between magic and rare, and either we want no blues, or this level is higher than the blue level we want
@@ -81,7 +84,7 @@ namespace GilesTrinity
                     }
                     else
                     {
-                        if (settings.FilterYellowWeapons == 0 || (settings.FilterYellowWeapons != 0 && level < settings.FilterYellowWeapons))
+                        if (Settings.Loot.Pickup.WeaponYellowLevel == 0 || (Settings.Loot.Pickup.WeaponYellowLevel != 0 && level < Settings.Loot.Pickup.WeaponYellowLevel))
                         {
 
                             // Between magic and rare, and either we want no blues, or this level is higher than the blue level we want
@@ -99,7 +102,7 @@ namespace GilesTrinity
                     }
                     if (quality >= ItemQuality.Magic1 && quality < ItemQuality.Rare4)
                     {
-                        if (settings.iFilterBlueArmor == 0 || (settings.iFilterBlueArmor != 0 && level < settings.iFilterBlueArmor))
+                        if (Settings.Loot.Pickup.ArmorBlueLevel == 0 || (Settings.Loot.Pickup.ArmorBlueLevel != 0 && level < Settings.Loot.Pickup.ArmorBlueLevel))
                         {
 
                             // Between magic and rare, and either we want no blues, or this level is higher than the blue level we want
@@ -108,7 +111,7 @@ namespace GilesTrinity
                     }
                     else
                     {
-                        if (settings.iFilterYellowArmor == 0 || (settings.iFilterYellowArmor != 0 && level < settings.iFilterYellowArmor))
+                        if (Settings.Loot.Pickup.ArmorYellowLevel == 0 || (Settings.Loot.Pickup.ArmorYellowLevel != 0 && level < Settings.Loot.Pickup.ArmorYellowLevel))
                         {
 
                             // Between magic and rare, and either we want no blues, or this level is higher than the blue level we want
@@ -125,7 +128,7 @@ namespace GilesTrinity
                     }
                     if (quality >= ItemQuality.Magic1 && quality < ItemQuality.Rare4)
                     {
-                        if (settings.iFilterBlueJewelry == 0 || (settings.iFilterBlueJewelry != 0 && level < settings.iFilterBlueJewelry))
+                        if (Settings.Loot.Pickup.JewelryBlueLevel == 0 || (Settings.Loot.Pickup.JewelryBlueLevel != 0 && level < Settings.Loot.Pickup.JewelryBlueLevel))
                         {
 
                             // Between magic and rare, and either we want no blues, or this level is higher than the blue level we want
@@ -134,7 +137,7 @@ namespace GilesTrinity
                     }
                     else
                     {
-                        if (settings.iFilterYellowJewelry == 0 || (settings.iFilterYellowJewelry != 0 && level < settings.iFilterYellowJewelry))
+                        if (Settings.Loot.Pickup.JewelryYellowLevel == 0 || (Settings.Loot.Pickup.JewelryYellowLevel != 0 && level < Settings.Loot.Pickup.JewelryYellowLevel))
                         {
 
                             // Between magic and rare, and either we want no blues, or this level is higher than the blue level we want
@@ -143,7 +146,7 @@ namespace GilesTrinity
                     }
                     break;
                 case GBaseItemType.FollowerItem:
-                    if (level < 60 || !settings.bPickupFollower || quality < ItemQuality.Rare4)
+                    if (level < 60 || !Settings.Loot.Pickup.FollowerItem || quality < ItemQuality.Rare4)
                     {
                         if (!_hashsetItemFollowersIgnored.Contains(dynamicID))
                         {
@@ -154,8 +157,11 @@ namespace GilesTrinity
                     }
                     break;
                 case GBaseItemType.Gem:
-                    if (level < settings.iFilterGems || (itemType == GItemType.Ruby && !settings.bGemsRuby) || (itemType == GItemType.Emerald && !settings.bGemsEmerald) ||
-                        (itemType == GItemType.Amethyst && !settings.bGemsAmethyst) || (itemType == GItemType.Topaz && !settings.bGemsTopaz))
+                    if (level < Settings.Loot.Pickup.GemLevel || 
+                        (itemType == GItemType.Ruby && (Settings.Loot.Pickup.GemType & TrinityGemType.Ruby) != TrinityGemType.Ruby) || 
+                        (itemType == GItemType.Emerald && (Settings.Loot.Pickup.GemType & TrinityGemType.Emerald) != TrinityGemType.Emerald) ||
+                        (itemType == GItemType.Amethyst && (Settings.Loot.Pickup.GemType & TrinityGemType.Amethys) != TrinityGemType.Amethys) ||
+                        (itemType == GItemType.Topaz && (Settings.Loot.Pickup.GemType & TrinityGemType.Topaz) != TrinityGemType.Topaz))
                     {
                         return false;
                     }
@@ -163,15 +169,15 @@ namespace GilesTrinity
                 case GBaseItemType.Misc:
 
                     // Note; Infernal keys are misc, so should be picked up here - we aren't filtering them out, so should default to true at the end of this function
-                    if (itemType == GItemType.CraftingMaterial && level < settings.iFilterMisc)
+                    if (itemType == GItemType.CraftingMaterial && level < Settings.Loot.Pickup.MiscItemLevel)
                     {
                         return false;
                     }
-                    if (itemType == GItemType.CraftTome && (level < settings.iFilterMisc || !settings.bPickupCraftTomes))
+                    if (itemType == GItemType.CraftTome && (level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.CraftTomes))
                     {
                         return false;
                     }
-                    if (itemType == GItemType.CraftingPlan && !settings.bPickupPlans)
+                    if (itemType == GItemType.CraftingPlan && !Settings.Loot.Pickup.DesignPlan)
                     {
                         return false;
                     }
@@ -179,11 +185,11 @@ namespace GilesTrinity
                     // Potion filtering
                     if (itemType == GItemType.HealthPotion)
                     {
-                        if (settings.iFilterPotions == 1 || level < settings.iFilterPotionLevel)
+                        if (Settings.Loot.Pickup.PotionMode == PotionMode.Ignore || level < Settings.Loot.Pickup.Potionlevel)
                         {
                             return false;
                         }
-                        if (settings.iFilterPotions == 2)
+                        if (Settings.Loot.Pickup.PotionMode == PotionMode.Cap)
                         {
 
                             // Map out all the items already in the backpack
@@ -829,6 +835,10 @@ namespace GilesTrinity
         /// <returns></returns>
         private static bool ShouldWeStashThis(GilesCachedACDItem thisitem)
         {
+            if (thisitem.Quality < ItemQuality.Rare4)
+            {
+                return false;
+            }
 
             // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
             if (thisitem.IsUnidentified)
@@ -905,10 +915,23 @@ namespace GilesTrinity
             
 
             if (thisitem.Quality >= ItemQuality.Legendary)
+            switch (StashRule.checkItem(thisitem, TrueItemType, thisGilesBaseType))
             {
                 Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep legendaries)");
                 return true;
+                case Interpreter.InterpreterAction.KEEP:
+                    return true;
+                case Interpreter.InterpreterAction.TRASH:
+                    return false;
+                default:
+                    break;
             }
+
+            //if (thisitem.Quality >= ItemQuality.Legendary)
+            //{
+            //    if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep legendaries)");
+            //    return true;
+            //}
 
             // Ok now try to do some decent item scoring based on item types
             double iNeedScore = ScoreNeeded(TrueItemType);
@@ -936,12 +959,12 @@ namespace GilesTrinity
                 thisGilesItemType == GItemType.TwoHandDaibo || thisGilesItemType == GItemType.TwoHandCrossbow || thisGilesItemType == GItemType.TwoHandMace ||
                 thisGilesItemType == GItemType.TwoHandMighty || thisGilesItemType == GItemType.TwoHandPolearm || thisGilesItemType == GItemType.TwoHandStaff ||
                 thisGilesItemType == GItemType.TwoHandSword || thisGilesItemType == GItemType.TwoHandAxe || thisGilesItemType == GItemType.HandCrossbow || thisGilesItemType == GItemType.TwoHandBow)
-                iThisNeedScore = settings.iNeedPointsToKeepWeapon;
+                iThisNeedScore = Settings.Loot.TownRun.WeaponScore;
 
             // Jewelry
             if (thisGilesItemType == GItemType.Ring || thisGilesItemType == GItemType.Amulet || thisGilesItemType == GItemType.FollowerEnchantress ||
                 thisGilesItemType == GItemType.FollowerScoundrel || thisGilesItemType == GItemType.FollowerTemplar)
-                iThisNeedScore = settings.iNeedPointsToKeepJewelry;
+                iThisNeedScore = Settings.Loot.TownRun.JewelryScore;
 
             // Armor
             if (thisGilesItemType == GItemType.Mojo || thisGilesItemType == GItemType.Orb || thisGilesItemType == GItemType.Quiver ||
@@ -950,7 +973,7 @@ namespace GilesTrinity
                 thisGilesItemType == GItemType.Gloves || thisGilesItemType == GItemType.Helm || thisGilesItemType == GItemType.Legs ||
                 thisGilesItemType == GItemType.MightyBelt || thisGilesItemType == GItemType.Shoulder || thisGilesItemType == GItemType.SpiritStone ||
                 thisGilesItemType == GItemType.VoodooMask || thisGilesItemType == GItemType.WizardHat)
-                iThisNeedScore = settings.iNeedPointsToKeepArmor;
+                iThisNeedScore = Settings.Loot.TownRun.ArmorScore;
             return Math.Round(iThisNeedScore);
         }
 
@@ -961,16 +984,16 @@ namespace GilesTrinity
                 case GBaseItemType.WeaponOneHand:
                 case GBaseItemType.WeaponRange:
                 case GBaseItemType.WeaponTwoHand:
-                    if (ithisitemvalue >= settings.iNeedPointsToNotifyWeapon)
+                    if (ithisitemvalue >= Settings.Notification.WeaponScore)
                         return true;
                     break;
                 case GBaseItemType.Armor:
                 case GBaseItemType.Offhand:
-                    if (ithisitemvalue >= settings.iNeedPointsToNotifyArmor)
+                    if (ithisitemvalue >= Settings.Notification.ArmorScore)
                         return true;
                     break;
                 case GBaseItemType.Jewelry:
-                    if (ithisitemvalue >= settings.iNeedPointsToNotifyJewelry)
+                    if (ithisitemvalue >= Settings.Notification.JewelryScore)
                         return true;
                     break;
             }

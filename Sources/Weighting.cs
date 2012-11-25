@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.Settings.Combat;
+using System;
 using System.Linq;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -12,8 +13,16 @@ namespace GilesTrinity
         {
 
             // Store if we are ignoring all units this cycle or not
-            bool bIgnoreAllUnits = !bAnyChampionsPresent && !bAnyMobsInCloseRange && ((!bAnyTreasureGoblinsPresent && settings.iTreasureGoblinPriority >= 2) || settings.iTreasureGoblinPriority < 2) &&
-                            playerStatus.CurrentHealthPct >= 0.85d;
+            bool bIgnoreAllUnits = !bAnyChampionsPresent &&
+                                    !bAnyMobsInCloseRange &&
+                                    (
+                                        (
+                                            !bAnyTreasureGoblinsPresent &&
+                                            Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize
+                                        ) ||
+                                        Settings.Combat.Misc.GoblinPriority < GoblinPriority.Prioritize
+                                    ) &&
+                                    playerStatus.CurrentHealthPct >= 0.85d;
             bool bPrioritizeCloseRange = (bForceCloseRangeTarget || playerStatus.IsRooted);
             bool bIsBerserked = GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
             foreach (GilesObject cacheObject in GilesObjectCache)
@@ -103,7 +112,7 @@ namespace GilesTrinity
                                 cacheObject.Weight = 20000 - (Math.Floor(cacheObject.CentreDistance) * 200);
 
                                 // Goblin priority KAMIKAZEEEEEEEE
-                                if (cacheObject.IsTreasureGoblin && settings.iTreasureGoblinPriority == 3)
+                                if (cacheObject.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze)
                                     cacheObject.Weight += 25000;
                             }
                             else
@@ -165,7 +174,7 @@ namespace GilesTrinity
                                         cacheObject.Weight += (1500 * (1 - (cacheObject.HitPoints / 0.45)));
 
                                     // Goblins on low health get extra priority - up to 2500
-                                    if (settings.iTreasureGoblinPriority >= 2 && cacheObject.IsTreasureGoblin && cacheObject.HitPoints <= 0.98)
+                                    if (Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize && cacheObject.IsTreasureGoblin && cacheObject.HitPoints <= 0.98)
                                         cacheObject.Weight += (3000 * (1 - (cacheObject.HitPoints / 0.85)));
 
                                     // Bonuses to priority type monsters from the dictionary/hashlist set at the top of the code
@@ -243,25 +252,21 @@ namespace GilesTrinity
                                         }
 
                                         // Original Trinity stuff for priority handling now
-                                        switch (settings.iTreasureGoblinPriority)
+                                        switch (Settings.Combat.Misc.GoblinPriority)
                                         {
-                                            case 1:
-
+                                            case GoblinPriority.Normal:
                                                 // Treating goblins as "normal monsters". Ok so I lied a little in the config, they get a little extra weight really! ;)
                                                 cacheObject.Weight += 751;
                                                 break;
-                                            case 2:
-
+                                            case GoblinPriority.Prioritize:
                                                 // Super-high priority option below... 
                                                 cacheObject.Weight += 10101;
                                                 break;
-                                            case 3:
-
+                                            case GoblinPriority.Kamikaze:
                                                 // KAMIKAZE SUICIDAL TREASURE GOBLIN RAPE AHOY!
                                                 cacheObject.Weight += 40000;
                                                 break;
 
-                                            // PS: 58008 is an awesome number on any calculator.
                                         }
                                     }
                                 }
@@ -336,7 +341,7 @@ namespace GilesTrinity
                             // Weight Health Globes
 
                             // Give all globes 0 weight (so never gone-to), unless we have low health, then go for them
-                            if (playerStatus.CurrentHealthPct > iEmergencyHealthGlobeLimit || !settings.bEnableGlobes)
+                            if (playerStatus.CurrentHealthPct > iEmergencyHealthGlobeLimit || !Settings.Combat.Misc.CollectHealthGlobe)
                             {
                                 cacheObject.Weight = 0;
                             }
@@ -545,7 +550,7 @@ namespace GilesTrinity
 
                 //    bStayPutDuringAvoidance = true;
                 //}
-                if (bDebugLogWeights && settings.bDebugInfo)
+                if (bDebugLogWeights && Settings.Advanced.DebugInStatusBar)
                 {
                     Logging.WriteDiagnostic("[Trinity] Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5}",
                         cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, bRequireAvoidance);
@@ -580,7 +585,7 @@ namespace GilesTrinity
             }
 
             // Loop through all the objects and give them a weight
-            if (bDebugLogSpecial && !settings.bDebugInfo && CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.Type != GObjectType.Unknown)
+            if (bDebugLogSpecial && !Settings.Advanced.DebugInStatusBar && CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.Type != GObjectType.Unknown)
             {
                 Logging.WriteVerbose("[Trinity] Target changed to {2} {0} ({1})",
                                 CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.Type);

@@ -60,7 +60,7 @@ namespace GilesTrinity
                 iCombatLoops = 0;
                 GilesRefreshHotbar(GilesHasBuff(SNOPower.Wizard_Archon));
                 dictAbilityRepeatDelay = new Dictionary<SNOPower, int>(dictAbilityRepeatDefaults);
-                if (settings.bEnableCriticalMass && (iMyCachedActorClass == ActorClass.Wizard || iMyCachedActorClass == ActorClass.WitchDoctor))
+                if (Settings.Combat.Wizard.CriticalMass && iMyCachedActorClass == ActorClass.Wizard)
                 {
                     dictAbilityRepeatDelay[SNOPower.Wizard_FrostNova] = 25;
                     dictAbilityRepeatDelay[SNOPower.Wizard_ExplosiveBlast] = 25;
@@ -72,6 +72,9 @@ namespace GilesTrinity
                     dictAbilityRepeatDelay[SNOPower.Wizard_Teleport] = 2700;
                     dictAbilityRepeatDelay[SNOPower.Wizard_Archon_SlowTime] = 1500;
                     dictAbilityRepeatDelay[SNOPower.Wizard_Archon_Teleport] = 2700;
+                }
+                if (Settings.Combat.WitchDoctor.GraveInjustice && iMyCachedActorClass == ActorClass.WitchDoctor)
+                {
                     dictAbilityRepeatDelay[SNOPower.Witchdoctor_SoulHarvest] = 1000;
                     dictAbilityRepeatDelay[SNOPower.Witchdoctor_SpiritWalk] = 1000;
                     dictAbilityRepeatDelay[SNOPower.Witchdoctor_Horrify] = 1000;
@@ -86,7 +89,7 @@ namespace GilesTrinity
                     dictAbilityRepeatDelay[SNOPower.Witchdoctor_FetishArmy] = 20000;
                     dictAbilityRepeatDelay[SNOPower.Witchdoctor_BigBadVoodoo] = 20000;
                 }
-                if (settings.bWrath90Seconds && iMyCachedActorClass == ActorClass.Barbarian)
+                if (Settings.Combat.Barbarian.BoonBulKathosPassive && iMyCachedActorClass == ActorClass.Barbarian)
                 {
                     dictAbilityRepeatDelay[SNOPower.Barbarian_Earthquake] = 90500;
                     dictAbilityRepeatDelay[SNOPower.Barbarian_CallOfTheAncients] = 90500;
@@ -97,43 +100,33 @@ namespace GilesTrinity
                 {
                     case ActorClass.Barbarian:
                         // What health % should we use a potion, or look for a globe
-                        iEmergencyHealthPotionLimit = settings.dEmergencyHealthPotionBarb;
-                        iEmergencyHealthGlobeLimit = settings.dEmergencyHealthGlobeBarb;
-                        iKiteDistance = settings.iKiteDistanceBarb;
-                        // The health percentage to avoid these objects at 
-                        dictAvoidanceHealth = new Dictionary<int, double>(dictAvoidanceHealthBarb);
+                        iEmergencyHealthPotionLimit = Settings.Combat.Barbarian.PotionLevel;
+                        iEmergencyHealthGlobeLimit = Settings.Combat.Barbarian.HealthGlobeLevel;
+                        iKiteDistance = Settings.Combat.Barbarian.KiteLimit;
                         break;
                     case ActorClass.Monk:
                         // What health % should we use a potion, or look for a globe
-                        iEmergencyHealthPotionLimit = settings.dEmergencyHealthPotionMonk;
-                        iEmergencyHealthGlobeLimit = settings.dEmergencyHealthGlobeMonk;
+                        iEmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;
+                        iEmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
                         iKiteDistance = 0;
-                        // The health percentage to avoid these objects at 
-                        dictAvoidanceHealth = new Dictionary<int, double>(dictAvoidanceHealthMonk);
                         break;
                     case ActorClass.Wizard:
                         // What health % should we use a potion, or look for a globe
-                        iEmergencyHealthPotionLimit = settings.dEmergencyHealthPotionWiz;
-                        iEmergencyHealthGlobeLimit = settings.dEmergencyHealthGlobeWiz;
-                        iKiteDistance = settings.iKiteDistanceWiz;
-                        // The health percentage to avoid these objects at 
-                        dictAvoidanceHealth = new Dictionary<int, double>(dictAvoidanceHealthWizard);
+                        iEmergencyHealthPotionLimit = Settings.Combat.Wizard.PotionLevel;
+                        iEmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
+                        iKiteDistance = Settings.Combat.Wizard.KiteLimit;
                         break;
                     case ActorClass.WitchDoctor:
                         // What health % should we use a potion, or look for a globe
-                        iEmergencyHealthPotionLimit = settings.dEmergencyHealthPotionWitch;
-                        iEmergencyHealthGlobeLimit = settings.dEmergencyHealthGlobeWitch;
-                        iKiteDistance = settings.iKiteDistanceWitch;
-                        // The health percentage to avoid these objects at 
-                        dictAvoidanceHealth = new Dictionary<int, double>(dictAvoidanceHealthWitch);
+                        iEmergencyHealthPotionLimit = Settings.Combat.WitchDoctor.PotionLevel;
+                        iEmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
+                        iKiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
                         break;
                     case ActorClass.DemonHunter:
                         // What health % should we use a potion, or look for a globe
-                        iEmergencyHealthPotionLimit = settings.dEmergencyHealthPotionDemon;
-                        iEmergencyHealthGlobeLimit = settings.dEmergencyHealthGlobeDemon;
-                        iKiteDistance = settings.iKiteDistanceDemon;
-                        // The health percentage to avoid these objects at 
-                        dictAvoidanceHealth = new Dictionary<int, double>(dictAvoidanceHealthDemon);
+                        iEmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
+                        iEmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
+                        iKiteDistance = Settings.Combat.DemonHunter.KiteLimit;
                         break;
                 }
             }
@@ -200,7 +193,7 @@ namespace GilesTrinity
 
             sStatusText = "[Trinity] No more targets - DemonBuddy/profile management is now in control";
 
-            if (settings.bDebugInfo && bResetStatusText)
+            if (Settings.Advanced.DebugInStatusBar && bResetStatusText)
             {
                 bResetStatusText = false;
                 BotMain.StatusText = sStatusText;

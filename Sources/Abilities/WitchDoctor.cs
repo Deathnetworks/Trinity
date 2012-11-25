@@ -18,7 +18,7 @@ namespace GilesTrinity
             // Spirit Walk Cast on 65% health or while avoiding anything but molten core or incapacitated or Chasing Goblins
             if (hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_SpiritWalk) && playerStatus.CurrentEnergy >= 49 &&
                 (
-                 playerStatus.CurrentHealthPct <= 0.65 || playerStatus.IsIncapacitated || playerStatus.IsRooted || (settings.bOutOfCombatMovementPowers && bOOCBuff) ||
+                 playerStatus.CurrentHealthPct <= 0.65 || playerStatus.IsIncapacitated || playerStatus.IsRooted || (Settings.Combat.Misc.AllowOOCMovement && bOOCBuff) ||
                  (!bOOCBuff && CurrentTarget.IsTreasureGoblin && CurrentTarget.HitPoints < 0.90 && CurrentTarget.RadiusDistance <= 40f)
                 ) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_SpiritWalk))
@@ -85,7 +85,7 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.Witchdoctor_GraspOfTheDead, 25f, CurrentTarget.Position, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
             }
             // Horrify Buff When not in combat for movement speed
-            if (bOOCBuff && settings.bEnableCriticalMass == true && hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_Horrify) && !playerStatus.IsIncapacitated && playerStatus.CurrentEnergy >= 37 &&
+            if (bOOCBuff && Settings.Combat.WitchDoctor.GraveInjustice == true && hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_Horrify) && !playerStatus.IsIncapacitated && playerStatus.CurrentEnergy >= 37 &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_Horrify))
             {
                 return new GilesPower(SNOPower.Witchdoctor_Horrify, 0f, vNullLocation, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);

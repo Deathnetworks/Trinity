@@ -175,9 +175,9 @@ namespace GilesTrinity
                         GilesTrinityOnJoinGame(null, null);
                 }
                 // Carguy's ticks-per-second feature
-                if (settings.bEnableTPS)
+                if (Settings.Advanced.TPSEnabled)
                 {
-                    BotMain.TicksPerSecond = (int)settings.iTPSAmount;
+                    BotMain.TicksPerSecond = (int)Settings.Advanced.TPSLimit;
                 }
                 Log("");
                 Log("ENABLED: " + Description + " now in action!"); ;

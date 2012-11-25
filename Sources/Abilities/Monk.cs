@@ -69,15 +69,15 @@ namespace GilesTrinity
                 (
                     iElitesWithinRange[RANGE_15] >= 1 || playerStatus.CurrentHealthPct <= 0.4 || (iAnythingWithinRange[RANGE_20] >= 5 && iElitesWithinRange[RANGE_50] == 0) ||
                     (iAnythingWithinRange[RANGE_15] >= 3 && playerStatus.CurrentEnergyPct <= 0.5) || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 15f) ||
-                    (iAnythingWithinRange[RANGE_15] >= 1 && hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && !GilesHasBuff(SNOPower.Monk_SweepingWind) && settings.bMonkInnaSet)
+                    (iAnythingWithinRange[RANGE_15] >= 1 && hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && !GilesHasBuff(SNOPower.Monk_SweepingWind) && Settings.Combat.Monk.HasInnaSet)
                 ) &&
                 // Check if we don't have breath of heaven
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_BreathOfHeaven) ||
-                (hashPowerHotbarAbilities.Contains(SNOPower.Monk_BreathOfHeaven) && (!settings.bMonkInnaSet || GilesHasBuff(SNOPower.Monk_BreathOfHeaven)))) &&
+                (hashPowerHotbarAbilities.Contains(SNOPower.Monk_BreathOfHeaven) && (!Settings.Combat.Monk.HasInnaSet || GilesHasBuff(SNOPower.Monk_BreathOfHeaven)))) &&
                 // Check if either we don't have sweeping winds, or we do and it's ready to cast in a moment
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) ||
                 (hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 95 ||
-                (settings.bMonkInnaSet && playerStatus.CurrentEnergy >= 25) || GilesHasBuff(SNOPower.Monk_SweepingWind))) ||
+                (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 25) || GilesHasBuff(SNOPower.Monk_SweepingWind))) ||
                 playerStatus.CurrentHealthPct <= 0.4) &&
                 GilesUseTimer(SNOPower.Monk_BlindingFlash) && PowerManager.CanCast(SNOPower.Monk_BlindingFlash))
             {
@@ -93,25 +93,25 @@ namespace GilesTrinity
             // Sweeping wind
             //intell -- inna
             if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && !GilesHasBuff(SNOPower.Monk_SweepingWind) &&
-                (iElitesWithinRange[RANGE_25] > 0 || iAnythingWithinRange[RANGE_20] >= 3 || (iAnythingWithinRange[RANGE_20] >= 1 && settings.bMonkInnaSet) || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 25f)) &&
+                (iElitesWithinRange[RANGE_25] > 0 || iAnythingWithinRange[RANGE_20] >= 3 || (iAnythingWithinRange[RANGE_20] >= 1 && Settings.Combat.Monk.HasInnaSet) || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 25f)) &&
                 // Check if either we don't have blinding flash, or we do and it's been cast in the last 6000ms
                 //DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 6000)) &&
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_BlindingFlash) ||
                 (hashPowerHotbarAbilities.Contains(SNOPower.Monk_BlindingFlash) &&
-                ((!settings.bMonkInnaSet && iElitesWithinRange[RANGE_50] == 0 && !CurrentTarget.IsEliteRareUnique && !CurrentTarget.IsBoss) || GilesHasBuff(SNOPower.Monk_BlindingFlash)))) &&
+                ((!Settings.Combat.Monk.HasInnaSet && iElitesWithinRange[RANGE_50] == 0 && !CurrentTarget.IsEliteRareUnique && !CurrentTarget.IsBoss) || GilesHasBuff(SNOPower.Monk_BlindingFlash)))) &&
                 // Check our mantras, if we have them, are up first
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfEvasion) || (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfEvasion) && GilesHasBuff(SNOPower.Monk_MantraOfEvasion))) &&
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfConviction) || (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfConviction) && GilesHasBuff(SNOPower.Monk_MantraOfConviction))) &&
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfRetribution) || (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfRetribution) && GilesHasBuff(SNOPower.Monk_MantraOfRetribution))) &&
                 // Check the re-use timer and energy costs
-                (playerStatus.CurrentEnergy >= 75 || (settings.bMonkInnaSet && playerStatus.CurrentEnergy >= 5)))
+                (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5)))
             {
                 SweepWindSpam = DateTime.Now;
                 return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 2,2
             }
             // Sweeping wind: spam it if inna set
             //intell -- inna
-            if (hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && settings.bMonkInnaSet && GilesHasBuff(SNOPower.Monk_SweepingWind) &&
+            if (hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && Settings.Combat.Monk.HasInnaSet && GilesHasBuff(SNOPower.Monk_SweepingWind) &&
                 playerStatus.CurrentEnergy >= 5 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 5000)
             {
                 SweepWindSpam = DateTime.Now;
@@ -154,7 +154,7 @@ namespace GilesTrinity
                     !hashPowerHotbarAbilities.Contains(SNOPower.Monk_WaveOfLight) && !hashPowerHotbarAbilities.Contains(SNOPower.Monk_CycloneStrike) &&
                     !hashPowerHotbarAbilities.Contains(SNOPower.Monk_ExplodingPalm))) &&
                 (iElitesWithinRange[RANGE_15] >= 1 || iAnythingWithinRange[RANGE_15] >= 3 ||
-                (iAnythingWithinRange[RANGE_15] >= 1 && (settings.bMonkInnaSet && playerStatus.CurrentEnergy >= 70)))) //intell -- inna
+                (iAnythingWithinRange[RANGE_15] >= 1 && (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 70)))) //intell -- inna
             {
                 if (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfEvasion) && GilesUseTimer(SNOPower.Monk_MantraOfEvasion))
                 {

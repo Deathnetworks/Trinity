@@ -43,7 +43,7 @@ namespace GilesTrinity.XmlTags
         {
 
             // First check if we can skip ahead because we recently moved here
-            if (!GilesTrinity.settings.bEnableBacktracking && (NoSkip == null || NoSkip.ToLower() != "true"))
+            if (!GilesTrinity.Settings.Combat.Misc.AllowBacktracking && (NoSkip == null || NoSkip.ToLower() != "true"))
             {
                 if (GilesTrinity.hashSkipAheadAreaCache.Any())
                 {

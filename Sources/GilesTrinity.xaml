@@ -14,7 +14,7 @@
                         <TabItem Header="Misc">
                             <Grid Height="350" Width="390">
 
-                                <Label Content="Treasure Goblins:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="143,7,0,0" VerticalAlignment="Top" Width="111" />
+                                <Label Content="Treasure Goblins:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="143,7,0,0" VerticalAlignment="Top" Width="111" />
                                 <Label Content="Trigger Range For Non-Elite Combat:" Height="24" HorizontalAlignment="Left" Margin="97,47,0,0" VerticalAlignment="Top" Width="223" FontWeight="Bold" />
                                 <TextBox Name="textTriggerRange" Height="23" HorizontalAlignment="Left" IsReadOnly="True" Margin="282,67,0,0" Text="18" VerticalAlignment="Top" Width="38" />
                                 <RadioButton Name="btnTreasureIgnore" Content="Ignore" GroupName="TreasureOptions" Height="16" HorizontalAlignment="Left" Margin="64,30,0,0" VerticalAlignment="Top" Width="76" />
@@ -42,10 +42,10 @@
 
                                 <Button Name="ResetAOE0" Content="Reset to Defaults" FontWeight="Bold" Foreground="#FF123DCE" HorizontalAlignment="Left" Margin="139,3,0,0" VerticalAlignment="Top" Width="110" />
 
-                                <Label Content="Potion %:" FontWeight="Bold" Height="22" Foreground="#FFA00000" HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top" Width="91" />
+                                <Label Content="Potion %:" FontWeight="Bold" Height="24" Foreground="#FFA00000" HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top" Width="91" />
                                 <Slider Name="slidePot0" Height="23" HorizontalAlignment="Left" Interval="1" Margin="66,27,0,0" Maximum="99" Minimum="0" SmallChange="1" TickPlacement="None" Value="46" VerticalAlignment="Top" Width="100" />
                                 <TextBox Name="textPot0" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="166,27,0,0" Text="46" VerticalAlignment="Top" Width="22" />
-                                <Label Content="Globe %:" FontWeight="Bold" Foreground="#FFA00000" Height="22" HorizontalAlignment="Left" Margin="186,25,0,0" VerticalAlignment="Top" Width="61" />
+                                <Label Content="Globe %:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="186,25,0,0" VerticalAlignment="Top" Width="61" />
                                 <Slider Name="slideGlobe0" Height="23" HorizontalAlignment="Left" Interval="1" Margin="245,27,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="60" VerticalAlignment="Top" Width="100" />
                                 <TextBox Name="textGlobe0" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="346,27,0,0" Text="60" VerticalAlignment="Top" Width="24" />
 
@@ -55,10 +55,10 @@
                                 
                                 <CheckBox Name="checkSelectiveWW" Content="Selective Whirlwind Targets*" Height="18" HorizontalAlignment="Left" Margin="10,73,0,0" Width="160" VerticalAlignment="Top" />
                                 <Label Content="(*eg goblins, occultists)" Height="24" HorizontalAlignment="Left" Margin="20,81,0,0" VerticalAlignment="Top" Width="208" />
-                                <CheckBox Name="checkWaitWrath" IsChecked="True" Content="Wait for WOTB cooldown at Azmo" Height="16" HorizontalAlignment="Left" Margin="177,75,0,0" VerticalAlignment="Top" Width="193" />
-                                <CheckBox Name="checkGoblinWrath" Content="Use WOTB on Goblins" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="177,90,0,0" VerticalAlignment="Top" Width="193" />
-                                <CheckBox Name="checkFuryDumpWrath" Content="Fury Dump in WOTB mode" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="177,105,0,0" VerticalAlignment="Top" Width="193" />
-                                <CheckBox Name="checkFuryDumpAlways" Content="Fury Dump always" Height="16" HorizontalAlignment="Left" Margin="177,120,0,0" VerticalAlignment="Top" Width="193" />
+                                <CheckBox Name="checkWaitWrath" IsChecked="True" Content="Wait for WOTB cooldown at Azmo" Height="16" HorizontalAlignment="Left" Margin="190,75,0,0" VerticalAlignment="Top" Width="193" />
+                                <CheckBox Name="checkGoblinWrath" Content="Use WOTB on Goblins" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="190,90,0,0" VerticalAlignment="Top" Width="193" />
+                                <CheckBox Name="checkFuryDumpWrath" Content="Fury Dump in WOTB mode" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="190,105,0,0" VerticalAlignment="Top" Width="193" />
+                                <CheckBox Name="checkFuryDumpAlways" Content="Fury Dump always" Height="16" HorizontalAlignment="Left" Margin="190,120,0,0" VerticalAlignment="Top" Width="193" />
                                 
                                 <ScrollViewer Height="205" HorizontalAlignment="Left" Margin="0,140,0,0" VerticalAlignment="Top" Width="388" CanContentScroll="True" BorderThickness="0">
 
@@ -67,86 +67,86 @@
                                         <Label Content="Radius:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="89,-5,0,0" VerticalAlignment="Top" Width="53" />
                                         <Label Content="Avoid @ Health %:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="224,-5,0,0" VerticalAlignment="Top" Width="115" />
 
-                                        <Label Content="Arcane:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="3,16,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Arcane:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="3,16,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_1" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,18,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_1" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,18,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_1" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,18,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_1" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,18,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Desecrator:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,37,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Desecrator:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,37,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,39,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_2" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,39,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,39,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_2" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,39,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Molten Core:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,58,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Molten Core:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,58,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_3" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,60,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_3" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,60,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_3" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,60,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_3" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,60,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Molten Trail:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,79,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Molten Trail:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,79,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_4" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,81,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_4" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,81,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_4" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,81,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_4" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,81,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Poison Tree:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,100,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Poison Tree:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,100,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_5" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,102,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_5" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,102,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_5" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,102,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_5" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,102,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Plague Cloud:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,121,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Plague Cloud:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,121,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_6" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,123,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_6" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,123,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_6" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,123,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_6" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,123,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Ice Balls:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,142,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Ice Balls:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,142,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_7" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,144,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_7" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,144,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_7" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,144,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_7" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,144,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Plague-Hands:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,163,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Plague-Hands:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,163,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_8" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,165,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_8" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,165,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_8" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,165,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_8" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,165,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Bees/Wasps:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,184,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Bees/Wasps:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,184,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_9" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,186,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_9" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,186,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_9" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,186,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_9" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,186,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Azmo Pools:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,205,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Azmo Pools:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,205,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_10" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,207,0,0" Maximum="60" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_10" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,207,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_10" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,207,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_10" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,207,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Azmo Bodies:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,226,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Azmo Bodies:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,226,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_11" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,228,0,0" Maximum="60" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_11" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,228,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_11" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,228,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_11" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,228,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Shaman Fire:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,247,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Shaman Fire:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,247,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,249,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,249,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,249,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,249,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 										
-										<Label Content="Ghom Gas:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
+										<Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,270,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_13" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,270,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,270,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_13" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,270,0,0" Text="80" VerticalAlignment="Top" Width="30" />
                                     </Grid>
                                 </ScrollViewer>
-                                <CheckBox Name="checkWrath90" Content="Boon of Bul-Kathos Passive" Height="16" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top" Width="156" />
+                                <CheckBox Name="checkWrath90" Content="Boon of Bul-Kathos Passive" Height="16" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top" Width="174" />
                             </Grid>
                         </TabItem>
                         <TabItem Header="Monk">
@@ -154,10 +154,10 @@
 
                                 <Button Name="ResetAOE1" Content="Reset to Defaults" FontWeight="Bold" Foreground="#FF123DCE" HorizontalAlignment="Left" Margin="139,3,0,0" VerticalAlignment="Top" Width="110" />
 
-                                <Label Content="Potion %:" FontWeight="Bold" Height="22" Foreground="#FFA00000" HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top" Width="91" />
+                                <Label Content="Potion %:" FontWeight="Bold" Height="24" Foreground="#FFA00000" HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top" Width="91" />
                                 <Slider Name="slidePot1" Height="23" HorizontalAlignment="Left" Interval="1" Margin="66,27,0,0" Maximum="99" Minimum="0" SmallChange="1" TickPlacement="None" Value="46" VerticalAlignment="Top" Width="100" />
                                 <TextBox Name="textPot1" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="166,27,0,0" Text="46" VerticalAlignment="Top" Width="22" />
-                                <Label Content="Globe %:" FontWeight="Bold" Foreground="#FFA00000" Height="22" HorizontalAlignment="Left" Margin="186,25,0,0" VerticalAlignment="Top" Width="61" />
+                                <Label Content="Globe %:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="186,25,0,0" VerticalAlignment="Top" Width="61" />
                                 <Slider Name="slideGlobe1" Height="23" HorizontalAlignment="Left" Interval="1" Margin="245,27,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="60" VerticalAlignment="Top" Width="100" />
                                 <TextBox Name="textGlobe1" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="346,27,0,0" Text="60" VerticalAlignment="Top" Width="24" />
 
@@ -167,79 +167,79 @@
                                         <Label Content="AOE Type:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="2,-5,0,0" VerticalAlignment="Top" Width="69" />
                                         <Label Content="Radius:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="89,-5,0,0" VerticalAlignment="Top" Width="53" />
                                         <Label Content="Avoid @ Health %:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="224,-5,0,0" VerticalAlignment="Top" Width="115" />
-                                        <Label Content="Arcane:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="3,16,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Arcane:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="3,16,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_1" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,18,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_1" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,18,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_1" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,18,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth1_1" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,18,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Desecrator:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,37,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Desecrator:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,37,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,39,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_2" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,39,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,39,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth1_2" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,39,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Molten Core:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,58,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Molten Core:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,58,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_3" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,60,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_3" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,60,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_3" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,60,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth1_3" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,60,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Molten Trail:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,79,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Molten Trail:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,79,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_4" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,81,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_4" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,81,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_4" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,81,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth1_4" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,81,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Poison Tree:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,100,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Poison Tree:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,100,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_5" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,102,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_5" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,102,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_5" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,102,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth1_5" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,102,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Plague Cloud:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,121,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Plague Cloud:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,121,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_6" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,123,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_6" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,123,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_6" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,123,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth1_6" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,123,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Ice Balls:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,142,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Ice Balls:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,142,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_7" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,144,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_7" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,144,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_7" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,144,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth1_7" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,144,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Plague-Hands:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,163,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Plague-Hands:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,163,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_8" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,165,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_8" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,165,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_8" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,165,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth1_8" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,165,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Bees/Wasps:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,184,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Bees/Wasps:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,184,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_9" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,186,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_9" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,186,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_9" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,186,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth1_9" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,186,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Azmo Pools:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,205,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Azmo Pools:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,205,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_10" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,207,0,0" Maximum="60" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_10" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,207,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_10" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,207,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth1_10" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,207,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Azmo Bodies:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,226,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Azmo Bodies:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,226,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_11" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,228,0,0" Maximum="60" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_11" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,228,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_11" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,228,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth1_11" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,228,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Shaman Fire:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,247,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Shaman Fire:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,247,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,249,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,249,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,249,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth1_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,249,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 										
-										<Label Content="Ghom Gas:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
+										<Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,270,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_13" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,270,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,270,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
@@ -254,10 +254,10 @@
 
                                 <Button Name="ResetAOE2" Content="Reset to Defaults" FontWeight="Bold" Foreground="#FF123DCE" HorizontalAlignment="Left" Margin="139,3,0,0" VerticalAlignment="Top" Width="110" />
 
-                                <Label Content="Potion %:" FontWeight="Bold" Height="22" Foreground="#FFA00000" HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top" Width="91" />
+                                <Label Content="Potion %:" FontWeight="Bold" Height="24" Foreground="#FFA00000" HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top" Width="91" />
                                 <Slider Name="slidePot2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="66,27,0,0" Maximum="99" Minimum="0" SmallChange="1" TickPlacement="None" Value="46" VerticalAlignment="Top" Width="100" />
                                 <TextBox Name="textPot2" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="166,27,0,0" Text="46" VerticalAlignment="Top" Width="22" />
-                                <Label Content="Globe %:" FontWeight="Bold" Foreground="#FFA00000" Height="22" HorizontalAlignment="Left" Margin="186,25,0,0" VerticalAlignment="Top" Width="61" />
+                                <Label Content="Globe %:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="186,25,0,0" VerticalAlignment="Top" Width="61" />
                                 <Slider Name="slideGlobe2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="245,27,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="60" VerticalAlignment="Top" Width="100" />
                                 <TextBox Name="textGlobe2" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="346,27,0,0" Text="60" VerticalAlignment="Top" Width="24" />
                                 
@@ -274,87 +274,87 @@
                                         <Label Content="AOE Type:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="2,-5,0,0" VerticalAlignment="Top" Width="69" />
                                         <Label Content="Radius:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="89,-5,0,0" VerticalAlignment="Top" Width="53" />
                                         <Label Content="Avoid @ Health %:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="224,-5,0,0" VerticalAlignment="Top" Width="115" />
-                                        <Label Content="Arcane:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="3,16,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Arcane:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="3,16,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_1" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,18,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_1" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,18,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_1" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,18,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_1" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,18,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Desecrator:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,37,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Desecrator:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,37,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,39,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_2" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,39,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,39,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_2" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,39,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Molten Core:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,58,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Molten Core:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,58,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_3" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,60,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_3" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,60,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_3" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,60,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_3" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,60,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Molten Trail:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,79,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Molten Trail:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,79,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_4" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,81,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_4" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,81,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_4" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,81,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_4" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,81,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Poison Tree:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,100,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Poison Tree:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,100,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_5" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,102,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_5" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,102,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_5" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,102,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_5" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,102,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Plague Cloud:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,121,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Plague Cloud:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,121,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_6" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,123,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_6" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,123,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_6" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,123,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_6" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,123,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Ice Balls:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,142,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Ice Balls:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,142,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_7" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,144,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_7" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,144,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_7" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,144,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_7" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,144,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Plague-Hands:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,163,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Plague-Hands:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,163,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_8" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,165,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_8" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,165,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_8" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,165,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_8" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,165,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Bees/Wasps:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,184,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Bees/Wasps:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,184,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_9" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,186,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_9" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,186,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_9" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,186,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_9" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,186,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Azmo Pools:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,205,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Azmo Pools:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,205,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_10" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,207,0,0" Maximum="60" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_10" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,207,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_10" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,207,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_10" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,207,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Azmo Bodies:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,226,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Azmo Bodies:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,226,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_11" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,228,0,0" Maximum="60" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_11" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,228,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_11" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,228,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_11" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,228,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Shaman Fire:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,247,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Shaman Fire:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,247,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,249,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,249,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,249,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,249,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 										
-										<Label Content="Ghom Gas:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
+										<Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,270,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_13" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,270,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,270,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_13" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,270,0,0" Text="80" VerticalAlignment="Top" Width="30" />
                                     </Grid>
                                 </ScrollViewer>
-                                <CheckBox Name="checkKiteArchonOnly" Content="Only Kite in Archon form" Height="16" HorizontalAlignment="Left" Margin="202,77,0,0" VerticalAlignment="Top" Width="163" />
-                                <CheckBox Name="checkWaitArchonAzmo" Content="Wait for Archon CD at Azmo" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="202,92,0,0" VerticalAlignment="Top" Width="163" />
+                                <CheckBox Name="checkKiteArchonOnly" Content="Only Kite in Archon form" Height="16" HorizontalAlignment="Left" Margin="215,77,0,0" VerticalAlignment="Top" Width="163" />
+                                <CheckBox Name="checkWaitArchonAzmo" Content="Wait for Archon CD at Azmo" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="215,92,0,0" VerticalAlignment="Top" Width="169" />
                             </Grid>
                         </TabItem>
                         <TabItem Header="WD">
@@ -362,10 +362,10 @@
 
                                 <Button Name="ResetAOE3" Content="Reset to Defaults" FontWeight="Bold" Foreground="#FF123DCE" HorizontalAlignment="Left" Margin="139,3,0,0" VerticalAlignment="Top" Width="110" />
 
-                                <Label Content="Potion %:" FontWeight="Bold" Height="22" Foreground="#FFA00000" HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top" Width="91" />
+                                <Label Content="Potion %:" FontWeight="Bold" Height="24" Foreground="#FFA00000" HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top" Width="91" />
                                 <Slider Name="slidePot3" Height="23" HorizontalAlignment="Left" Interval="1" Margin="66,27,0,0" Maximum="99" Minimum="0" SmallChange="1" TickPlacement="None" Value="46" VerticalAlignment="Top" Width="100" />
                                 <TextBox Name="textPot3" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="166,27,0,0" Text="46" VerticalAlignment="Top" Width="22" />
-                                <Label Content="Globe %:" FontWeight="Bold" Foreground="#FFA00000" Height="22" HorizontalAlignment="Left" Margin="186,25,0,0" VerticalAlignment="Top" Width="61" />
+                                <Label Content="Globe %:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="186,25,0,0" VerticalAlignment="Top" Width="61" />
                                 <Slider Name="slideGlobe3" Height="23" HorizontalAlignment="Left" Interval="1" Margin="245,27,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="60" VerticalAlignment="Top" Width="100" />
                                 <TextBox Name="textGlobe3" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="346,27,0,0" Text="60" VerticalAlignment="Top" Width="24" />
                                 <Label Content="Min-Distance Before Kite:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,49,0,0" VerticalAlignment="Top" Width="186" />
@@ -381,79 +381,79 @@
                                         <Label Content="AOE Type:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="2,-5,0,0" VerticalAlignment="Top" Width="69" />
                                         <Label Content="Radius:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="89,-5,0,0" VerticalAlignment="Top" Width="53" />
                                         <Label Content="Avoid @ Health %:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="224,-5,0,0" VerticalAlignment="Top" Width="115" />
-                                        <Label Content="Arcane:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="3,16,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Arcane:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="3,16,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_1" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,18,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_1" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,18,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_1" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,18,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth3_1" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,18,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Desecrator:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,37,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Desecrator:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,37,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,39,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_2" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,39,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,39,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth3_2" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,39,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Molten Core:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,58,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Molten Core:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,58,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_3" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,60,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_3" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,60,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_3" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,60,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth3_3" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,60,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Molten Trail:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,79,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Molten Trail:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,79,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_4" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,81,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_4" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,81,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_4" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,81,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth3_4" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,81,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Poison Tree:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,100,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Poison Tree:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,100,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_5" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,102,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_5" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,102,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_5" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,102,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth3_5" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,102,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Plague Cloud:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,121,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Plague Cloud:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,121,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_6" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,123,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_6" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,123,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_6" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,123,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth3_6" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,123,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Ice Balls:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,142,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Ice Balls:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,142,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_7" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,144,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_7" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,144,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_7" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,144,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth3_7" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,144,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Plague-Hands:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,163,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Plague-Hands:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,163,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_8" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,165,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_8" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,165,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_8" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,165,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth3_8" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,165,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Bees/Wasps:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,184,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Bees/Wasps:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,184,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_9" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,186,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_9" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,186,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_9" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,186,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth3_9" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,186,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Azmo Pools:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,205,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Azmo Pools:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,205,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_10" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,207,0,0" Maximum="60" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_10" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,207,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_10" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,207,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth3_10" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,207,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Azmo Bodies:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,226,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Azmo Bodies:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,226,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_11" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,228,0,0" Maximum="60" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_11" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,228,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_11" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,228,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth3_11" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,228,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Shaman Fire:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,247,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Shaman Fire:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,247,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,249,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,249,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,249,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth3_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,249,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 										
-										<Label Content="Ghom Gas:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
+										<Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,270,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_13" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,270,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,270,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
@@ -467,10 +467,10 @@
                             <Grid Height="350" Width="390">
                                 <Button Name="ResetAOE4" Content="Reset to Defaults" FontWeight="Bold" Foreground="#FF123DCE" HorizontalAlignment="Left" Margin="139,3,0,0" VerticalAlignment="Top" Width="110" />
 
-                                <Label Content="Potion %:" FontWeight="Bold" Height="22" Foreground="#FFA00000" HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top" Width="91" />
+                                <Label Content="Potion %:" FontWeight="Bold" Height="24" Foreground="#FFA00000" HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top" Width="91" />
                                 <Slider Name="slidePot4" Height="23" HorizontalAlignment="Left" Interval="1" Margin="66,27,0,0" Maximum="99" Minimum="0" SmallChange="1" TickPlacement="None" Value="46" VerticalAlignment="Top" Width="100" />
                                 <TextBox Name="textPot4" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="166,27,0,0" Text="46" VerticalAlignment="Top" Width="22" />
-                                <Label Content="Globe %:" FontWeight="Bold" Foreground="#FFA00000" Height="22" HorizontalAlignment="Left" Margin="186,25,0,0" VerticalAlignment="Top" Width="61" />
+                                <Label Content="Globe %:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="186,25,0,0" VerticalAlignment="Top" Width="61" />
                                 <Slider Name="slideGlobe4" Height="23" HorizontalAlignment="Left" Interval="1" Margin="245,27,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="60" VerticalAlignment="Top" Width="100" />
                                 <TextBox Name="textGlobe4" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="346,27,0,0" Text="60" VerticalAlignment="Top" Width="24" />
 
@@ -480,79 +480,79 @@
                                         <Label Content="AOE Type:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="2,-5,0,0" VerticalAlignment="Top" Width="69" />
                                         <Label Content="Radius:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="89,-5,0,0" VerticalAlignment="Top" Width="53" />
                                         <Label Content="Avoid @ Health %:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="224,-5,0,0" VerticalAlignment="Top" Width="115" />
-                                        <Label Content="Arcane:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="3,16,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Arcane:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="3,16,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_1" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,18,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_1" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,18,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_1" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,18,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth4_1" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,18,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Desecrator:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,37,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Desecrator:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,37,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,39,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_2" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,39,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,39,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth4_2" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,39,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Molten Core:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,58,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Molten Core:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,58,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_3" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,60,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_3" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,60,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_3" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,60,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth4_3" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,60,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Molten Trail:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,79,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Molten Trail:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,79,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_4" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,81,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_4" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,81,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_4" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,81,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth4_4" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,81,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Poison Tree:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,100,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Poison Tree:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,100,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_5" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,102,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_5" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,102,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_5" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,102,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth4_5" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,102,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Plague Cloud:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,121,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Plague Cloud:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,121,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_6" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,123,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_6" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,123,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_6" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,123,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth4_6" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,123,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Ice Balls:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,142,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Ice Balls:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,142,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_7" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,144,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_7" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,144,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_7" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,144,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth4_7" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,144,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Plague-Hands:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,163,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Plague-Hands:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,163,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_8" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,165,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_8" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,165,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_8" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,165,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth4_8" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,165,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Bees/Wasps:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,184,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Bees/Wasps:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,184,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_9" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,186,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_9" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,186,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_9" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,186,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth4_9" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,186,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Azmo Pools:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,205,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Azmo Pools:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,205,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_10" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,207,0,0" Maximum="60" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_10" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,207,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_10" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,207,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth4_10" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,207,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Azmo Bodies:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,226,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Azmo Bodies:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,226,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_11" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,228,0,0" Maximum="60" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_11" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,228,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_11" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,228,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth4_11" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,228,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 
-                                        <Label Content="Shaman Fire:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,247,0,0" VerticalAlignment="Top" Width="92" />
+                                        <Label Content="Shaman Fire:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,247,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,249,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,249,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,249,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth4_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,249,0,0" Text="80" VerticalAlignment="Top" Width="30" />
 										
-										<Label Content="Ghom Gas:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
+										<Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,270,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_13" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,270,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,270,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
@@ -573,11 +573,11 @@
             </TabItem>
             <TabItem Header="Objects">
                 <Grid Height="400" Width="413">
-                    <Label Content="Destructible Attack Range:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="102,45,0,0" VerticalAlignment="Top" Width="165" />
+                    <Label Content="Destructible Attack Range:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="102,45,0,0" VerticalAlignment="Top" Width="165" />
                     <Label Content="Container Open Range:" FontWeight="Bold" Height="23" HorizontalAlignment="Left" Margin="102,5,0,0" VerticalAlignment="Top" Width="144" />
                     <TextBox Name="textContainerRange" Height="23" HorizontalAlignment="Left" IsReadOnly="True" Margin="288,25,0,0" Text="12" VerticalAlignment="Top" Width="38" />
                     <TextBox Name="textDestructibleRange" Height="23" HorizontalAlignment="Left" IsReadOnly="True" Margin="288,65,0,0" Text="6" VerticalAlignment="Top" Width="38" />
-                    <Label Content="Shrines:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="99,92,0,0" VerticalAlignment="Top" Width="62" />
+                    <Label Content="Shrines:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="99,92,0,0" VerticalAlignment="Top" Width="62" />
                     <RadioButton Name="btnIgnoreAll" Content="Ignore Shrines" GroupName="ShrineOptions" Height="16" HorizontalAlignment="Left" Margin="153,97,0,0" VerticalAlignment="Top" Width="88" />
                     <RadioButton Name="btnIgnoreNone" IsChecked="True" Content="Click Shrines" GroupName="ShrineOptions" Height="16" HorizontalAlignment="Left" Margin="242,98,0,0" VerticalAlignment="Top" Width="76" />
                     <Slider Name="slideContainerRange" Height="23" HorizontalAlignment="Left" Interval="500" Margin="102,25,0,0" Maximum="60" Minimum="6" SmallChange="1" TickFrequency="5" TickPlacement="BottomRight" Value="12" VerticalAlignment="Top" Width="180" />
@@ -589,10 +589,10 @@
             </TabItem>
             <TabItem Header="Items">
                 <Grid Height="400" Width="413">
-                    <RadioButton Name="btnRulesGiles" Content="Use Giles Filters and Scoring" GroupName="CustomRules" Height="18" HorizontalAlignment="Left" IsChecked="True" Margin="8,29,0,0" VerticalAlignment="Top" Width="162" />
+                    <RadioButton Name="btnRulesGiles" Content="Use Giles Filters and Scoring" GroupName="CustomRules" Height="18" HorizontalAlignment="Left" IsChecked="True" Margin="8,29,0,0" VerticalAlignment="Top" Width="177" />
                     <RadioButton Name="btnRulesCustom" Content="Use Custom Loot Rules*" GroupName="CustomRules" Height="18" Margin="214,29,54,0" VerticalAlignment="Top" />
-                    <Label Content="Blue Items:" FontWeight="Bold" Foreground="#FF004EFF" Height="24" HorizontalAlignment="Left" Margin="64,70,0,0" VerticalAlignment="Top" Width="89" />
-                    <Label Content="Yellow Items:" FontWeight="Bold" Foreground="#FFCBAC0D" Height="24" HorizontalAlignment="Left" Margin="157,70,0,0" VerticalAlignment="Top" Width="87" />
+                    <Label Content="Blue Items:" FontWeight="Bold" Foreground="#FF004EFF" Height="24" HorizontalAlignment="Left" Margin="64,70,0,0" VerticalAlignment="Top" Width="89" Padding="5,2,5,5" />
+                    <Label Content="Yellow Items:" FontWeight="Bold" Foreground="#FFCBAC0D" Height="24" HorizontalAlignment="Left" Margin="157,70,0,0" VerticalAlignment="Top" Width="87" Padding="5,2,5,5" />
                     <Label Content="Weapons:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="8,88,0,0" VerticalAlignment="Top" Width="68" />
                     <ComboBox Name="comboWB" Height="23" HorizontalAlignment="Left" Margin="68,89,0,0" SelectedValuePath="Tag" VerticalAlignment="Top" Width="89">
                         <ComboBoxItem Content="None" Tag="0" />
@@ -769,7 +769,7 @@
                     <CheckBox Name="checkGemTopaz" Content="Topaz" Height="18" HorizontalAlignment="Left" Margin="68,214,0,0" VerticalAlignment="Top" Width="49" />
                     <CheckBox Name="checkGemAmethyst" Content="Amethyst" Height="18" HorizontalAlignment="Left" Margin="121,214,0,0" VerticalAlignment="Top" Width="64" />
                     <CheckBox Name="checkGemRuby" Content="Ruby" Height="18" HorizontalAlignment="Left" Margin="191,214,0,0" VerticalAlignment="Top" Width="51" />
-                    <Label Content="Misc Items:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="265,68,0,0" VerticalAlignment="Top" Width="94" />
+                    <Label Content="Misc Items:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="265,68,0,0" VerticalAlignment="Top" Width="94" Padding="5,2,5,5" />
                     <CheckBox Name="checkCraftTomes" Content="Pickup Craft Tomes" Height="18" HorizontalAlignment="Left" Margin="267,117,0,0" VerticalAlignment="Top" Width="123" />
                     <CheckBox Name="checkDesigns" Content="Pickup Designs/Plans" Height="18" HorizontalAlignment="Left" IsChecked="True" Margin="267,141,0,0" VerticalAlignment="Top" Width="125" />
                     <CheckBox Name="checkFollower" Content="Pickup Follower Items" Height="18" HorizontalAlignment="Left" IsChecked="True" Margin="267,165,0,0" VerticalAlignment="Top" Width="125" />
@@ -802,11 +802,11 @@
                         <ComboBoxItem Content="Inferno Misc+" IsSelected="True" Tag="60" />
                     </ComboBox>
                     <Label Content="*advanced users only!" FontStyle="Italic" FontWeight="Normal" Height="24" Margin="222,39,66,0" VerticalAlignment="Top" />
-                    <Label Content="Minimum Gold Pile:" FontWeight="Bold" Foreground="#FFA00000" Height="22" HorizontalAlignment="Left" Margin="256,185,0,0" VerticalAlignment="Top" Width="140" />
+                    <Label Content="Minimum Gold Pile:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="256,185,0,0" VerticalAlignment="Top" Width="140" Padding="5,1,5,5" />
                     <TextBox Name="textGoldAmount" Height="23" HorizontalAlignment="Left" IsReadOnly="True" Margin="375,206,0,0" Text="300" VerticalAlignment="Top" Width="32" />
                     <Slider Name="slideGoldAmount" Height="23" HorizontalAlignment="Left" Interval="500" Margin="261,205,0,0" Maximum="3000" Minimum="0" SmallChange="5" TickFrequency="100" TickPlacement="BottomRight" Value="300" VerticalAlignment="Top" Width="113" />
                     <Button Name="ResetItems" Content="Reset to Defaults" FontWeight="Bold" Foreground="#FF123DCE" Height="23" HorizontalAlignment="Left" Margin="154,287,0,0" VerticalAlignment="Top" Width="110" />
-                    <Label Content="Legendary Items:" FontWeight="Bold" Foreground="#FFA73B1E" Height="24" HorizontalAlignment="Left" Margin="12,229,0,0" VerticalAlignment="Top" Width="111" />
+                    <Label Content="Legendary Items:" FontWeight="Bold" Foreground="#FFA73B1E" Height="24" HorizontalAlignment="Left" Margin="12,229,0,0" VerticalAlignment="Top" Width="111" Padding="5,3,5,5" />
                     <ComboBox Name="comboLegendary" Height="23" HorizontalAlignment="Left" Margin="117,230,0,0" SelectedValuePath="Tag" VerticalAlignment="Top" Width="89">
                         <ComboBoxItem Content="None" Tag="0" />
                         <ComboBoxItem Content="ilvl 1+" IsSelected="True" Tag="1" />
@@ -852,14 +852,14 @@
                     <RadioButton Name="btnSalvage" Content="Salvage*" GroupName="SalvageSell" Height="18" HorizontalAlignment="Left" Margin="140,24,0,0" VerticalAlignment="Top" Width="59" />
                     <RadioButton Name="btnSell" Content="Sell" GroupName="SalvageSell" Height="18" IsChecked="True" Margin="201,24,160,0" VerticalAlignment="Top" />
                     <Button Name="buttonTest" Content="Test Backpack Scores" Height="23" HorizontalAlignment="Left" Margin="153,216,0,0" VerticalAlignment="Top" Width="117" />
-                    <Label Content="See Sample Backpack Scores:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="120,195,0,0" VerticalAlignment="Top" Width="179" />
+                    <Label Content="See Sample Backpack Scores:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="120,195,0,0" VerticalAlignment="Top" Width="179" Padding="0" />
                     <Label Content="(*only salvages inferno items)" FontStyle="Italic" FontWeight="Normal" Height="24" Margin="117,32,137,0" VerticalAlignment="Top" />
                     <Button Name="ResetTown" Content="Reset to Defaults" FontWeight="Bold" Foreground="#FF123DCE" Height="23" HorizontalAlignment="Left" Margin="152,373,0,0" VerticalAlignment="Top" Width="110" />
-                    <Button Name="buttonSort" Content="Order Stash" Height="23" HorizontalAlignment="Left" Margin="152,307,0,0" VerticalAlignment="Top" Width="117" />
-                    <Label Content="Order Stash by Scores: (use carefully!)" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="95,286,0,0" VerticalAlignment="Top" Width="238" />
-                    <Label Content="IMPORTANT: Your backpack MUST BE COMPLETELY EMPTY!" Height="23" HorizontalAlignment="Left" Margin="5,326,0,0" VerticalAlignment="Top" Width="401" />
-                    <Label Content="Make sure you are stood with your STASH OPEN" Height="23" HorizontalAlignment="Left" Margin="5,338,0,0" VerticalAlignment="Top" Width="328" />
-                    <Label Content="Make sure you RESTART DEMONBUDDY BEFORE SORTING!" Height="23" HorizontalAlignment="Left" Margin="5,350,0,0" VerticalAlignment="Top" Width="328" />
+                    <Button Name="buttonSort" Content="Order Stash" Height="23" HorizontalAlignment="Left" Margin="152,301,0,0" VerticalAlignment="Top" Width="117" />
+                    <Label Content="Order Stash by Scores: (use carefully!)" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="95,274,0,0" VerticalAlignment="Top" Width="227" Padding="5,0,5,5" />
+                    <Label Content="IMPORTANT: Your backpack MUST BE COMPLETELY EMPTY!" Height="23" HorizontalAlignment="Left" Margin="5,321,0,0" VerticalAlignment="Top" Width="401" />
+                    <Label Content="Make sure you are stood with your STASH OPEN" Height="23" HorizontalAlignment="Left" Margin="5,336,0,0" VerticalAlignment="Top" Width="328" />
+                    <Label Content="Make sure you RESTART DEMONBUDDY BEFORE SORTING!" Height="23" HorizontalAlignment="Left" Margin="5,352,0,0" VerticalAlignment="Top" Width="328" />
                 </Grid>
             </TabItem>
             <TabItem Header="Advanced">
@@ -874,7 +874,7 @@
                     <Label Content="Log Stuck Locations:" Height="24" HorizontalAlignment="Left" Margin="3,225,0,0" VerticalAlignment="Top" Width="311" FontWeight="Bold" />
                     <Button Name="ResetAdvanced" Content="Reset to Defaults" FontWeight="Bold" Foreground="#FF123DCE" Height="23" HorizontalAlignment="Left" Margin="156,311,0,0" VerticalAlignment="Top" Width="110" />
                     <CheckBox Name="checkDebugInfo" Content="Debug info status bar" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="10,181,0,0" VerticalAlignment="Top" Width="143" />
-                    <Label Content="Show debug info in DB status bar:" FontWeight="Bold" Height="22" HorizontalAlignment="Left" Margin="4,159,0,0" VerticalAlignment="Top" Width="311" />
+                    <Label Content="Show debug info in DB status bar:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="4,159,0,0" VerticalAlignment="Top" Width="311" />
                     <Label Content="Useful for tracking down problems, but can be CPU intensive" Height="28" HorizontalAlignment="Left" Margin="6,192,0,0" VerticalAlignment="Top" Width="385" />
                     <CheckBox Name="checkUnstucker" Content="Enable Trinity Unstucker" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="8,28,0,0" VerticalAlignment="Top" Width="160" />
                     <Label Content="Trinity Simple Unstucker:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,6,0,0" VerticalAlignment="Top" Width="311" />
@@ -921,5 +921,6 @@
         <Label Content="Reset ALL settings:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="5,439,0,0" VerticalAlignment="Top" Width="118" />
         <Button Name="buttonDefaults" Content="Reset to Defaults" Height="23" HorizontalAlignment="Left" Margin="119,440,0,0" VerticalAlignment="Top" Width="110" FontWeight="Bold" Foreground="#FF123DCE" />
         <Button Name="buttonSave" Content="Save Settings" Height="23" HorizontalAlignment="Left" Margin="313,440,0,0" VerticalAlignment="Top" Width="110" FontWeight="Bold" Foreground="#FF123DCE" />
+        <CheckBox Content="CheckBox" Height="16" HorizontalAlignment="Left" Margin="510,394,0,0" VerticalAlignment="Top" />
     </Grid>
 </UserControl>

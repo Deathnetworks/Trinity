@@ -1,5 +1,4 @@
-﻿using GilesTrinity.Settings;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,27 +14,21 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        private static TrinitySetting _Settings = new TrinitySetting();
+
         /// <summary>
         /// Settings of the plugin
         /// </summary>
-        public static TrinitySetting Settings
-        {
-            get
-            {
-                return _Settings;
-            }
-        }
+        public static GilesSettings settings = new GilesSettings();
 
         /// <summary>
         /// Special debugging
         /// </summary>
-        private static bool bDebugLogSpecial = true;
+        private static bool bDebugLogSpecial = false;
 
         /// <summary>
         /// Dumps info every tick about object caching... this will dump hundreds of MB of data in an hour, be careful!
         /// </summary>
-        private static bool bDebugLogRefreshDiaObject = true;
+        private static bool bDebugLogRefreshDiaObject = false;
 
         /// <summary>
         /// Dumps info every tick about object/target weighting... this will dump hundreds of MB of data in an hour, be careful!
@@ -222,6 +215,12 @@ namespace GilesTrinity
         private static int iNoAbilitiesAvailableInARow = 0;
         private static DateTime lastRemindedAboutAbilities = DateTime.Today;
 
+        // Prowl API Key
+        public static string sProwlAPIKey = "";
+
+        // Android API Key
+        public static string sAndroidAPIKey = "";
+
         // Last had any mob in range, for loot-waiting
         private static DateTime lastHadUnitInSights = DateTime.Today;
 
@@ -382,6 +381,7 @@ namespace GilesTrinity
         public static string sTrinityPluginPath = "";
         private static string sTrinityConfigFile = "";
         private static string sTrinityEmailConfigFile = "";
+        private static bool bSavingConfig = false;
         public static ActorClass iMyCachedActorClass = ActorClass.Invalid;
         private static bool bAnyChampionsPresent = false;
         private static bool bAnyTreasureGoblinsPresent = false;
@@ -392,7 +392,6 @@ namespace GilesTrinity
         // Goblinney things
         private static bool bUseBerserker = false;
         private static bool bWaitingForSpecial = false;
-        private static bool bCheckGround = false;
         private static int iTotalNumberGoblins = 0;
         private static DateTime lastGoblinTime = DateTime.Today;
 
@@ -591,6 +590,11 @@ namespace GilesTrinity
         public static string SmtpServer = "smtp.gmail.com";
         public static StringBuilder EmailMessage = new StringBuilder();
 
+        // Email Settings
+        public static string sEmailAddress = "";
+        public static string sEmailPassword = "";
+        public static string sBotName = ZetaDia.Service.CurrentHero.BattleTagName;
+
         // HandleTarget
         private static bool bForceNewMovement = false;
 
@@ -607,7 +611,5 @@ namespace GilesTrinity
 
         // Darkfriend's Looting Rule
         private static Interpreter StashRule = new Interpreter();
-
-        private static bool bTemporaryNotLooting = false;
     }
 }
