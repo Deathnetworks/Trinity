@@ -905,7 +905,7 @@ namespace GilesTrinity
                 return false;
             }
 
-            if (thisitem.Quality >= ItemQuality.Legendary)
+            if (thisitem.Quality >= ItemQuality.Legendary && Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityOnly)
             {
                 if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep legendaries)");
                 return true;

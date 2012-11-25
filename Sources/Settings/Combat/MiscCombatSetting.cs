@@ -8,7 +8,7 @@ using System.Text;
 namespace GilesTrinity.Settings.Combat
 {
     [DataContract]
-    public class MiscCombatSetting : ITrinitySetting<MiscCombatSetting>
+    public class MiscCombatSetting : ITrinitySetting<MiscCombatSetting>, INotifyPropertyChanged
     {
         public MiscCombatSetting()
         {
@@ -68,6 +68,16 @@ namespace GilesTrinity.Settings.Combat
         public MiscCombatSetting Clone()
         {
             return TrinitySetting.Clone(this);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }

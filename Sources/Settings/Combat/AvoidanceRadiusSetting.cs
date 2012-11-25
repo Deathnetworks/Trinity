@@ -8,7 +8,7 @@ using System.Text;
 namespace GilesTrinity.Settings.Combat
 {
     [DataContract]
-    public class AvoidanceRadiusSetting : ITrinitySetting<AvoidanceRadiusSetting>
+    public class AvoidanceRadiusSetting : ITrinitySetting<AvoidanceRadiusSetting>, INotifyPropertyChanged
     {
         [DataMember(IsRequired = false, EmitDefaultValue = false)]
         [DefaultValue(12)]
@@ -141,6 +141,16 @@ namespace GilesTrinity.Settings.Combat
         public AvoidanceRadiusSetting Clone()
         {
             return TrinitySetting.Clone(this);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }

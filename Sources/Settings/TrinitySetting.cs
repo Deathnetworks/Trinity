@@ -13,8 +13,27 @@ using System.Text;
 namespace GilesTrinity.Settings
 {
     [DataContract]
-    public class TrinitySetting : ITrinitySetting<TrinitySetting>
+    public class TrinitySetting : ITrinitySetting<TrinitySetting>, INotifyPropertyChanged
     {
+        #region Fields
+        private CombatSetting _Combat;
+        private WorldObjectSetting _WorldObject;
+        private ItemSetting _Loot;
+        private AdvancedSetting _Advanced;
+        private NotificationSetting _Notification; 
+        #endregion Fields
+
+        #region Events
+        /// <summary>
+        /// Occurs when property changed.
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Events
+
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TrinitySetting" /> class.
+        /// </summary>
         public TrinitySetting()
         {
             Combat = new CombatSetting();
@@ -23,27 +42,96 @@ namespace GilesTrinity.Settings
             Advanced = new AdvancedSetting();
             Notification = new NotificationSetting();
         }
+        #endregion Constructors
 
+        #region Properties
         [DataMember(IsRequired = false)]
         public CombatSetting Combat
-        { get; set; }
+        {
+            get
+            {
+                return _Combat;
+            }
+            set
+            {
+                if (_Combat != value)
+                {
+                    _Combat = value;
+                    OnPropertyChanged("Combat");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         public WorldObjectSetting WorldObject
-        { get; set; }
+        {
+            get
+            {
+                return _WorldObject;
+            }
+            set
+            {
+                if (_WorldObject != value)
+                {
+                    _WorldObject = value;
+                    OnPropertyChanged("WorldObject");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         public ItemSetting Loot
-        { get; set; }
+        {
+            get
+            {
+                return _Loot;
+            }
+            set
+            {
+                if (_Loot != value)
+                {
+                    _Loot = value;
+                    OnPropertyChanged("Loot");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         public AdvancedSetting Advanced
-        { get; set; }
+        {
+            get
+            {
+                return _Advanced;
+            }
+            set
+            {
+                if (_Advanced != value)
+                {
+                    _Advanced = value;
+                    OnPropertyChanged("Advanced");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         public NotificationSetting Notification
-        { get; set; }
+        {
+            get
+            {
+                return _Notification;
+            }
+            set
+            {
+                if (_Notification != value)
+                {
+                    _Notification = value;
+                    OnPropertyChanged("Notification");
+                }
+            }
+        }
+        #endregion Properties
 
+        #region Methods
         public void Reset()
         {
             TrinitySetting.Reset(this);
@@ -98,6 +186,20 @@ namespace GilesTrinity.Settings
             }
         }
 
+        /// <summary>
+        /// Called when property changed.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        private void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion Methods
+
+        #region Static Methods
         internal static void Reset<T>(ITrinitySetting<T> setting) where T : class, ITrinitySetting<T>
         {
             try
@@ -196,6 +298,7 @@ namespace GilesTrinity.Settings
                 DbHelper.Log(TrinityLogLevel.Error, "Error when Clone Setting {1} : {0}", ex.Message, typeof(T).Name);
                 return null;
             }
-        }        
+        }
+        #endregion Static Methods
     }
 }
