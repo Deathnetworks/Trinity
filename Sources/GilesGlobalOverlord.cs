@@ -148,7 +148,7 @@ namespace GilesTrinity
             bWaitingForPower = false;
             bWaitingAfterPower = false;
             bWaitingForPotion = false;
-            bWasRootedLastTick = false;
+            wasRootedLastTick = false;
 
             ClearBlacklists();
 

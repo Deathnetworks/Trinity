@@ -377,7 +377,7 @@ namespace GilesTrinity
                     // Resetting this to ensure the "no-spam" is reset since we changed our target location
                     if (bCheckGround)
                         vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f, false, true, true);
-                    else if (iAnythingWithinRange[RANGE_30] >= 6 || iElitesWithinRange[RANGE_30] >= 3 || c_iActorSNO == 89690)
+                    else if (iAnythingWithinRange[RANGE_30] >= 6 || iElitesWithinRange[RANGE_30] >= 3 || c_ActorSNO == 89690)
                         vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f, false, true);
                     else
                         vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f);

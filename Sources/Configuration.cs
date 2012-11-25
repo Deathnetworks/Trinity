@@ -34,9 +34,9 @@ namespace GilesTrinity
                 configWriter.WriteLine(settings.bPickupFollower ? "Followers=true" : "Followers=false");
                 configWriter.WriteLine("Potions=" + settings.iFilterPotions.ToString());
                 configWriter.WriteLine("ilvlPots=" + settings.iFilterPotionLevel.ToString());
-                configWriter.WriteLine("ilvlLegendary=" + settings.iFilterLegendary.ToString());
-                configWriter.WriteLine("ilvlWB=" + settings.iFilterBlueWeapons.ToString());
-                configWriter.WriteLine("ilvlWY=" + settings.iFilterYellowWeapons.ToString());
+                configWriter.WriteLine("ilvlLegendary=" + settings.FilterLegendary.ToString());
+                configWriter.WriteLine("ilvlWB=" + settings.FilterBlueWeapons.ToString());
+                configWriter.WriteLine("ilvlWY=" + settings.FilterYellowWeapons.ToString());
                 configWriter.WriteLine("ilvlAB=" + settings.iFilterBlueArmor.ToString());
                 configWriter.WriteLine("ilvlAY=" + settings.iFilterYellowArmor.ToString());
                 configWriter.WriteLine("ilvlJB=" + settings.iFilterBlueJewelry.ToString());
@@ -66,7 +66,7 @@ namespace GilesTrinity
                 configWriter.WriteLine("Unstucker=" + settings.bEnableUnstucker.ToString());
                 configWriter.WriteLine("ProfileReloading=" + settings.bEnableProfileReloading.ToString());
                 configWriter.WriteLine("Backtracking=" + settings.bEnableBacktracking.ToString());
-                configWriter.WriteLine(settings.bIgnoreAllShrines ? "ShrineIgnore=all" : "ShrineIgnore=none");
+                configWriter.WriteLine(settings.IgnoreAllShrines ? "ShrineIgnore=all" : "ShrineIgnore=none");
                 configWriter.WriteLine("ContainerRange=" + settings.iContainerOpenRange.ToString());
                 configWriter.WriteLine("DestructibleRange=" + settings.iDestructibleAttackRange.ToString());
                 configWriter.WriteLine("IgnoreCorpses=" + settings.bIgnoreCorpses.ToString());
@@ -515,13 +515,13 @@ namespace GilesTrinity
                                     settings.iFilterPotionLevel = Convert.ToInt16(config[1]);
                                     break;
                                 case "ilvlLegendary":
-                                    settings.iFilterLegendary = Convert.ToInt16(config[1]);
+                                    settings.FilterLegendary = Convert.ToInt16(config[1]);
                                     break;
                                 case "ilvlWB":
-                                    settings.iFilterBlueWeapons = Convert.ToInt16(config[1]);
+                                    settings.FilterBlueWeapons = Convert.ToInt16(config[1]);
                                     break;
                                 case "ilvlWY":
-                                    settings.iFilterYellowWeapons = Convert.ToInt16(config[1]);
+                                    settings.FilterYellowWeapons = Convert.ToInt16(config[1]);
                                     break;
                                 case "ilvlAB":
                                     settings.iFilterBlueArmor = Convert.ToInt16(config[1]);
@@ -545,7 +545,7 @@ namespace GilesTrinity
                                     settings.iMinimumGoldStack = Convert.ToInt16(config[1]);
                                     break;
                                 case "ShrineIgnore":
-                                    settings.bIgnoreAllShrines = (config[1] == "all");
+                                    settings.IgnoreAllShrines = (config[1] == "all");
                                     break;
                                 case "ContainerRange":
                                     settings.iContainerOpenRange = Convert.ToDouble(config[1]);
@@ -1924,13 +1924,13 @@ namespace GilesTrinity
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bIgnoreAllShrines = true;
+            settings.IgnoreAllShrines = true;
         }
         private void checkIgnoreNone_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.bIgnoreAllShrines = false;
+            settings.IgnoreAllShrines = false;
         }
         private void trackGoldAmount_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1944,19 +1944,19 @@ namespace GilesTrinity
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iFilterBlueWeapons = Convert.ToInt32(comboWB.SelectedValue);
+            settings.FilterBlueWeapons = Convert.ToInt32(comboWB.SelectedValue);
         }
         private void comboLegendary_changed(object sender, SelectionChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iFilterLegendary = Convert.ToInt32(comboLegendary.SelectedValue);
+            settings.FilterLegendary = Convert.ToInt32(comboLegendary.SelectedValue);
         }
         private void comboWY_changed(object sender, SelectionChangedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            settings.iFilterYellowWeapons = Convert.ToInt32(comboWY.SelectedValue);
+            settings.FilterYellowWeapons = Convert.ToInt32(comboWY.SelectedValue);
         }
         private void comboAB_changed(object sender, SelectionChangedEventArgs e)
         {
@@ -2697,7 +2697,7 @@ namespace GilesTrinity
         private void resetWorld_Click(object sender, RoutedEventArgs e)
         {
             GilesSettings tempsettings = new GilesSettings();
-            settings.bIgnoreAllShrines = tempsettings.bIgnoreAllShrines;
+            settings.IgnoreAllShrines = tempsettings.IgnoreAllShrines;
             settings.bIgnoreCorpses = tempsettings.bIgnoreCorpses;
             settings.iContainerOpenRange = tempsettings.iContainerOpenRange;
             settings.iDestructibleAttackRange = tempsettings.iDestructibleAttackRange;
@@ -2709,9 +2709,9 @@ namespace GilesTrinity
             settings.bUseGilesFilters = tempsettings.bUseGilesFilters;
             settings.iMinimumGoldStack = tempsettings.iMinimumGoldStack;
             settings.iFilterPotions = tempsettings.iFilterPotions;
-            settings.iFilterLegendary = tempsettings.iFilterLegendary;
-            settings.iFilterBlueWeapons = tempsettings.iFilterBlueWeapons;
-            settings.iFilterYellowWeapons = tempsettings.iFilterYellowWeapons;
+            settings.FilterLegendary = tempsettings.FilterLegendary;
+            settings.FilterBlueWeapons = tempsettings.FilterBlueWeapons;
+            settings.FilterYellowWeapons = tempsettings.FilterYellowWeapons;
             settings.iFilterBlueArmor = tempsettings.iFilterBlueArmor;
             settings.iFilterYellowArmor = tempsettings.iFilterYellowArmor;
             settings.iFilterBlueJewelry = tempsettings.iFilterBlueJewelry;
@@ -3045,9 +3045,9 @@ namespace GilesTrinity
                 // Loop through the avoidances
             }
             // Loop through the classes
-            comboLegendary.SelectedIndex = comboLegendary.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterLegendary.ToString())).Count();
-            comboWB.SelectedIndex = comboWB.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterBlueWeapons.ToString())).Count();
-            comboWY.SelectedIndex = comboWY.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterYellowWeapons.ToString())).Count();
+            comboLegendary.SelectedIndex = comboLegendary.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.FilterLegendary.ToString())).Count();
+            comboWB.SelectedIndex = comboWB.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.FilterBlueWeapons.ToString())).Count();
+            comboWY.SelectedIndex = comboWY.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.FilterYellowWeapons.ToString())).Count();
             comboAB.SelectedIndex = comboAB.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterBlueArmor.ToString())).Count();
             comboAY.SelectedIndex = comboAY.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterYellowArmor.ToString())).Count();
             comboJB.SelectedIndex = comboJB.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(settings.iFilterBlueJewelry.ToString())).Count();
@@ -3139,7 +3139,7 @@ namespace GilesTrinity
                 checkTreasurePrioritize.IsChecked = false;
                 checkTreasureKamikaze.IsChecked = true;
             }
-            if (settings.bIgnoreAllShrines)
+            if (settings.IgnoreAllShrines)
             {
                 checkIgnoreNone.IsChecked = false;
                 checkIgnoreAll.IsChecked = true;

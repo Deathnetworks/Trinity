@@ -10,9 +10,9 @@ namespace GilesTrinity
         public double iNeedPointsToKeepArmor { get; set; }
         public double iNeedPointsToKeepWeapon { get; set; }
         public int iFilterPotions { get; set; }
-        public int iFilterLegendary { get; set; }
-        public int iFilterBlueWeapons { get; set; }
-        public int iFilterYellowWeapons { get; set; }
+        public int FilterLegendary { get; set; }
+        public int FilterBlueWeapons { get; set; }
+        public int FilterYellowWeapons { get; set; }
         public int iFilterBlueArmor { get; set; }
         public int iFilterYellowArmor { get; set; }
         public int iFilterBlueJewelry { get; set; }
@@ -49,7 +49,7 @@ namespace GilesTrinity
         public bool bKiteOnlyArchon { get; set; }
         public bool bWrath90Seconds { get; set; }
         // World object handler config settings
-        public bool bIgnoreAllShrines { get; set; }
+        public bool IgnoreAllShrines { get; set; }
         public bool bIgnoreCorpses { get; set; }
         public double iContainerOpenRange { get; set; }
         public double iDestructibleAttackRange { get; set; }
@@ -169,9 +169,9 @@ namespace GilesTrinity
             iNeedPointsToKeepArmor = pointsa;
             iNeedPointsToKeepWeapon = pointsw;
             iFilterPotions = filterpot;
-            iFilterLegendary = filterlegendary;
-            iFilterBlueWeapons = filterbluew;
-            iFilterYellowWeapons = filteryelloww;
+            FilterLegendary = filterlegendary;
+            FilterBlueWeapons = filterbluew;
+            FilterYellowWeapons = filteryelloww;
             iFilterBlueArmor = filterbluea;
             iFilterYellowArmor = filteryellowa;
             iFilterBlueJewelry = filterbluej;
@@ -206,7 +206,7 @@ namespace GilesTrinity
             bMonkInnaSet = monkinna;
             bWrath90Seconds = wrath90;
             // World object handler config settings
-            bIgnoreAllShrines = ignoreshrines;
+            IgnoreAllShrines = ignoreshrines;
             bIgnoreCorpses = ignorecorpses;
             iContainerOpenRange = containeropen;
             iDestructibleAttackRange = destructibleattack;

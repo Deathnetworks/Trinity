@@ -42,9 +42,8 @@ namespace GilesTrinity
         ArrayList ruleSet;
 
         GilesCachedACDItem item;
-
-        GilesItemType truetype;
-        GilesBaseItemType basetype;
+        GItemType truetype;
+        GBaseItemType basetype;
 
         TextWriter log;
 
@@ -207,10 +206,10 @@ namespace GilesTrinity
             return fileName;
         }
 
-        public InterpreterAction checkItem(GilesCachedACDItem item, GilesItemType TrueItemType, GilesBaseItemType thisGilesBaseType)
+        public InterpreterAction checkItem(GilesCachedACDItem item, GItemType thisGilesItemType, GBaseItemType thisGilesBaseType)
         {
             this.item = item;
-            truetype = TrueItemType;
+            truetype = thisGilesItemType;
             basetype = thisGilesBaseType;
 
             bool checkFlag = true;

@@ -125,10 +125,10 @@ namespace GilesTrinity.DbProvider
                 Logging.Write(
                     "[Trinity] Your bot got stuck! Trying to unstuck (attempt #{0} of 15 attempts) {1} {2} {3} {4}",
                     iTotalAntiStuckAttempts.ToString(),
-                    "Act=\"" + ZetaDia.CurrentAct + "\" ",
-                    "questId=\"" + ZetaDia.CurrentQuest.QuestSNO + "\" ",
-                    "stepId=\"" + ZetaDia.CurrentQuest.StepId + "\" ",
-                    "worldId=\"" + ZetaDia.CurrentWorldId + "\" "
+                    "Act=\"" + ZetaDia.CurrentAct + "\"",
+                    "questId=\"" + ZetaDia.CurrentQuest.QuestSNO + "\"",
+                    "stepId=\"" + ZetaDia.CurrentQuest.StepId + "\"",
+                    "worldId=\"" + ZetaDia.CurrentWorldId + "\""
                 );
 
                 Logging.WriteDiagnostic("(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");

@@ -3,3 +3,7 @@
 /Sources/obj
 *.suo
 *.suo
+/Sources/*.txt
+/Sources/log/
+/Sources/log/*
+/Sources/*.log

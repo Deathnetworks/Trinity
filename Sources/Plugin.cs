@@ -1,9 +1,9 @@
-﻿using GilesTrinity.DbProvider;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using GilesTrinity.DbProvider;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -26,12 +26,12 @@ namespace GilesTrinity
         /// <value>
         /// The version of plugin.
         /// </value>
-        public Version Version 
-        { 
-            get 
-            { 
-                return new Version(1, 7, 0, 0); 
-            } 
+        public Version Version
+        {
+            get
+            {
+                return new Version(1, 7, 0, 1);
+            }
         }
 
         /// <summary>
@@ -43,12 +43,12 @@ namespace GilesTrinity
         /// <value>
         /// The author of plugin.
         /// </value>
-        public string Author 
-        { 
-            get 
-            { 
-                return "GilesSmith + Demonbuddy Community Devs"; 
-            } 
+        public string Author
+        {
+            get
+            {
+                return "GilesSmith + Demonbuddy Community Devs";
+            }
         }
 
         /// <summary>
@@ -60,12 +60,12 @@ namespace GilesTrinity
         /// <value>
         /// The description of plugin.
         /// </value>
-        public string Description 
-        { 
-            get 
+        public string Description
+        {
+            get
             {
-                return string.Format("GilesTrinity Community Edition (version {0})", Version); 
-            } 
+                return string.Format("GilesTrinity Community Edition (version {0})", Version);
+            }
         }
 
         /// <summary>
@@ -79,6 +79,10 @@ namespace GilesTrinity
         /// </summary>
         public void OnEnabled()
         {
+#if DEBUG
+            fullItemAnalysis = true;
+#endif
+
             string battleTagName = "";
             try
             {
@@ -179,7 +183,11 @@ namespace GilesTrinity
                 Log("ENABLED: " + Description + " now in action!"); ;
                 Log("");
             }
-            StashRule.init();
+            try
+            {
+                StashRule.init();
+            }
+            catch { } 
         }
 
         /// <summary>
@@ -221,12 +229,12 @@ namespace GilesTrinity
         /// This is used by DemonBuddy on plugin tab 
         /// </remarks>
         /// <value>The name.</value>
-        public string Name 
-        { 
-            get 
-            { 
-                return "GilesTrinity"; 
-            } 
+        public string Name
+        {
+            get
+            {
+                return "GilesTrinity";
+            }
         }
 
         /// <summary>
@@ -236,9 +244,9 @@ namespace GilesTrinity
         /// <returns>
         /// <c>true</c> if this instance is equals to the specified other; otherwise <c>false</c>
         /// </returns>
-        public bool Equals(IPlugin other) 
-        { 
-            return (other.Name == Name) && (other.Version == Version); 
+        public bool Equals(IPlugin other)
+        {
+            return (other.Name == Name) && (other.Version == Version);
         }
     }
 }

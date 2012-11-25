@@ -15,7 +15,7 @@ namespace GilesTrinity
     internal class GilesObject
     {
         // Generic stuff applicable to all objects
-        public GilesObjectType Type { get; set; }
+        public GObjectType Type { get; set; }
         public double Weight { get; set; }
         public Vector3 Position { get; set; }
         public float CentreDistance { get; set; }
@@ -33,7 +33,7 @@ namespace GilesTrinity
         public ItemQuality ItemQuality { get; set; }
         public ItemType DBItemType { get; set; }
         public FollowerType FollowerType { get; set; }
-        public GilesItemType GilesItemType { get; set; }
+        public GItemType GilesItemType { get; set; }
         // Monster/unit stuff
         public bool IsElite { get; set; }
         public bool IsRare { get; set; }
