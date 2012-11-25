@@ -36,7 +36,7 @@ namespace GilesTrinity
         // Later on we will "Link" these variables to the ACTUAL items within the XAML file, so we can do things with the XAML stuff
         // I try to match the names of the variables here, with the "Name=" I give the item in the XAML - this isn't necessary, but makes things simpler
         private Button saveButton, defaultButton, testButton, sortButton, resetCombat, resetAOE0, resetAOE1, resetAOE2, resetAOE3, resetAOE4, resetWorld, resetItems, resetTown, resetAdvanced, resetMobile;
-        private RadioButton checkTreasureIgnore, checkTreasureNormal, checkTreasurePrioritize, checkTreasureKamikaze, btnRulesGiles, btnRulesCustom, btnSalvage, btnSell, checkIgnoreAll, checkIgnoreNone;
+        private RadioButton checkTreasureIgnore, checkTreasureNormal, checkTreasurePrioritize, checkTreasureKamikaze, btnRulesGiles, btnRulesCustom, btnRulesTrinityWithScript, btnSalvage, btnSell, checkIgnoreAll, checkIgnoreNone;
         private CheckBox checkAvoidance, checkGlobes, checkCritical, checkGrave, checkBacktracking, checkCraftTomes, checkDesigns, checkFollower, checkGemEmerald, checkGemAmethyst, checkGemTopaz, checkGemRuby,
             checkIgnoreCorpses, checkMovementAbilities, checkTPS, checkLogStucks, checkUnstucker, checkExtendedRange, checkDebugInfo, checkProwl, checkAndroid, checkSelectiveWW,
             checkWaitWrath, checkGoblinWrath, checkFuryDumpWrath, checkFuryDumpAlways, checkProfileReload, checkMonkInna, checkKiteArchonOnly, checkWaitArchonAzmo, checkWrath90, checkEmail, checkLegendaryNotify;
@@ -1009,6 +1009,12 @@ namespace GilesTrinity
             if (bSuppressEventChanges)
                 return;
             Settings.Loot.ItemFilterMode = ItemFilterMode.DemonBuddy;
+        }
+        private void btnRulesTrinityWithScript_check(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Loot.ItemFilterMode = ItemFilterMode.TrinityWithItemRules;
         }
         private void btnSalvage_check(object sender, RoutedEventArgs e)
         {

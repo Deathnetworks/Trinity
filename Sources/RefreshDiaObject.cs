@@ -1773,7 +1773,7 @@ namespace GilesTrinity
                         //}
                         // Set min distance to user-defined setting
                         iMinDistance = Settings.WorldObject.DestructibleRange + (c_Radius * 0.70);
-                        if (bForceCloseRangeTarget)
+                        if (ForceCloseRangeTarget)
                             iMinDistance += 6f;
                         // Large objects, like logs - Give an extra xx feet of distance
                         if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out iExtendedRange))
@@ -1818,7 +1818,7 @@ namespace GilesTrinity
                         //}
                         // Set min distance to user-defined setting
                         iMinDistance = Settings.WorldObject.DestructibleRange + (c_Radius * 0.30);
-                        if (bForceCloseRangeTarget)
+                        if (ForceCloseRangeTarget)
                             iMinDistance += 6f;
                         // Large objects, like logs - Give an extra xx feet of distance
                         if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out iExtendedRange))

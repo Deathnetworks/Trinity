@@ -590,7 +590,8 @@
             <TabItem Header="Items">
                 <Grid Height="400" Width="413">
                     <RadioButton Name="btnRulesGiles" Content="Use Giles Filters and Scoring" GroupName="CustomRules" Height="18" HorizontalAlignment="Left" IsChecked="True" Margin="8,29,0,0" VerticalAlignment="Top" Width="177" />
-                    <RadioButton Name="btnRulesCustom" Content="Use Custom Loot Rules*" GroupName="CustomRules" Height="18" Margin="214,29,54,0" VerticalAlignment="Top" />
+                    <RadioButton Name="btnRulesCustom" Content="Use Demonbuddy Loot Rules" GroupName="CustomRules" Height="18" Margin="214,29,21,0" VerticalAlignment="Top" />
+                    <RadioButton Name="btnRulesTrinityWithScript" Content="Use scripted rules" GroupName="CustomRules" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="8,49,0,0" VerticalAlignment="Top" Width="177" />
                     <Label Content="Blue Items:" FontWeight="Bold" Foreground="#FF004EFF" Height="24" HorizontalAlignment="Left" Margin="64,70,0,0" VerticalAlignment="Top" Width="89" Padding="5,2,5,5" />
                     <Label Content="Yellow Items:" FontWeight="Bold" Foreground="#FFCBAC0D" Height="24" HorizontalAlignment="Left" Margin="157,70,0,0" VerticalAlignment="Top" Width="87" Padding="5,2,5,5" />
                     <Label Content="Weapons:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="8,88,0,0" VerticalAlignment="Top" Width="68" />
@@ -801,7 +802,6 @@
                         <ComboBoxItem Content="All Level Misc+" Tag="1" />
                         <ComboBoxItem Content="Inferno Misc+" IsSelected="True" Tag="60" />
                     </ComboBox>
-                    <Label Content="*advanced users only!" FontStyle="Italic" FontWeight="Normal" Height="24" Margin="222,39,66,0" VerticalAlignment="Top" />
                     <Label Content="Minimum Gold Pile:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="256,185,0,0" VerticalAlignment="Top" Width="140" Padding="5,1,5,5" />
                     <TextBox Name="textGoldAmount" Height="23" HorizontalAlignment="Left" IsReadOnly="True" Margin="375,206,0,0" Text="300" VerticalAlignment="Top" Width="32" />
                     <Slider Name="slideGoldAmount" Height="23" HorizontalAlignment="Left" Interval="500" Margin="261,205,0,0" Maximum="3000" Minimum="0" SmallChange="5" TickFrequency="100" TickPlacement="BottomRight" Value="300" VerticalAlignment="Top" Width="113" />

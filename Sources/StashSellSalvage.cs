@@ -566,13 +566,13 @@ namespace GilesTrinity
                             bGoToSafetyPointSecond = true;*/
                         bCurrentlyMoving = false;
                     }
-                    else if (iLastDistance == iDistanceFromSell)
+                    else if (lastDistance == iDistanceFromSell)
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
                     }
                     return RunStatus.Running;
                 }
-                iLastDistance = iDistanceFromSell;
+                lastDistance = iDistanceFromSell;
                 if (iDistanceFromSell > 120f)
                     return RunStatus.Failure;
                 if (iDistanceFromSell > 8f)
@@ -662,13 +662,13 @@ namespace GilesTrinity
                             return RunStatus.Failure;
                         objSellNavigation.Interact();
                     }
-                    else if (iLastDistance == iDistanceFromSell)
+                    else if (lastDistance == iDistanceFromSell)
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
                     }
                     return RunStatus.Running;
                 }
-                iLastDistance = iDistanceFromSell;
+                lastDistance = iDistanceFromSell;
                 if (iDistanceFromSell > 120f)
                     return RunStatus.Failure;
                 if (iDistanceFromSell > 9.5f)
@@ -914,13 +914,13 @@ namespace GilesTrinity
                             bGoToSafetyPointSecond = true;
                         bCurrentlyMoving = false;
                     }
-                    else if (iLastDistance == iDistanceFromSalvage)
+                    else if (lastDistance == iDistanceFromSalvage)
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSalvageLocation, ZetaDia.Me.WorldDynamicId);
                     }
                     return RunStatus.Running;
                 }
-                iLastDistance = iDistanceFromSalvage;
+                lastDistance = iDistanceFromSalvage;
                 if (iDistanceFromSalvage > 120f)
                     return RunStatus.Failure;
                 if (iDistanceFromSalvage > 8f)
@@ -957,13 +957,13 @@ namespace GilesTrinity
                         bGoToSafetyPointSecond = false;
                         bCurrentlyMoving = false;
                     }
-                    else if (iLastDistance == iDistanceFromSalvage)
+                    else if (lastDistance == iDistanceFromSalvage)
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSalvageLocation, ZetaDia.Me.WorldDynamicId);
                     }
                     return RunStatus.Running;
                 }
-                iLastDistance = iDistanceFromSalvage;
+                lastDistance = iDistanceFromSalvage;
                 if (iDistanceFromSalvage > 120f)
                     return RunStatus.Failure;
                 if (iDistanceFromSalvage > 8f)
@@ -1004,13 +1004,13 @@ namespace GilesTrinity
                             return RunStatus.Failure;
                         objSalvageNavigation.Interact();
                     }
-                    else if (iLastDistance == iDistanceFromSalvage)
+                    else if (lastDistance == iDistanceFromSalvage)
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSalvageLocation, ZetaDia.Me.WorldDynamicId);
                     }
                     return RunStatus.Running;
                 }
-                iLastDistance = iDistanceFromSalvage;
+                lastDistance = iDistanceFromSalvage;
                 if (iDistanceFromSalvage > 120f)
                     return RunStatus.Failure;
                 if (iDistanceFromSalvage > 9.5f)
@@ -1107,13 +1107,13 @@ namespace GilesTrinity
                         bGoToSafetyPointSecond = false;
                         bCurrentlyMoving = false;
                     }
-                    else if (iLastDistance == iDistanceFromSafety)
+                    else if (lastDistance == iDistanceFromSafety)
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSafeLocation, ZetaDia.Me.WorldDynamicId);
                     }
                     return RunStatus.Running;
                 }
-                iLastDistance = iDistanceFromSafety;
+                lastDistance = iDistanceFromSafety;
                 if (iDistanceFromSafety > 120f)
                     return RunStatus.Failure;
                 if (iDistanceFromSafety > 8f)

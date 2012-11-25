@@ -548,8 +548,8 @@ namespace GilesTrinity
                     {
                         lastMovedDuringCombat = DateTime.Now;
                         // We've been stuck at least 250 ms, let's go and pick new targets etc.
-                        iTimesBlockedMoving++;
-                        bForceCloseRangeTarget = true;
+                        TimesBlockedMoving++;
+                        ForceCloseRangeTarget = true;
                         lastForcedKeepCloseRange = DateTime.Now;
                         // And tell Trinity to get a new target
                         bForceTargetUpdate = true;
@@ -562,7 +562,7 @@ namespace GilesTrinity
                         // Handle body blocking by blacklisting
                         GilesHandleBodyBlocking();
                         // If we were backtracking and failed, remove the current backtrack and try and move to the next
-                        if (CurrentTarget.Type == GObjectType.Backtrack && iTimesBlockedMoving >= 2)
+                        if (CurrentTarget.Type == GObjectType.Backtrack && TimesBlockedMoving >= 2)
                         {
                             vBacktrackList.Remove(iTotalBacktracks);
                             iTotalBacktracks--;
@@ -655,7 +655,7 @@ namespace GilesTrinity
                             vLastMoveToTarget = vCurrentDestination;
                             // Reset total body-block count, since we should have moved
                             if (DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                                iTimesBlockedMoving = 0;
+                                TimesBlockedMoving = 0;
                             return RunStatus.Running;
                         }
                         // Tempest rush for a monk
@@ -666,7 +666,7 @@ namespace GilesTrinity
                             vLastMoveToTarget = vCurrentDestination;
                             // Reset total body-block count, since we should have moved
                             if (DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                                iTimesBlockedMoving = 0;
+                                TimesBlockedMoving = 0;
                             return RunStatus.Running;
                         }
                         // Strafe for a Demon Hunter
@@ -677,7 +677,7 @@ namespace GilesTrinity
                             vLastMoveToTarget = vCurrentDestination;
                             // Reset total body-block count, since we should have moved
                             if (DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                                iTimesBlockedMoving = 0;
+                                TimesBlockedMoving = 0;
                             return RunStatus.Running;
                         }
                     }
@@ -688,7 +688,7 @@ namespace GilesTrinity
                         vLastMoveToTarget = vCurrentDestination;
                         // Reset total body-block count, since we should have moved
                         if (DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                            iTimesBlockedMoving = 0;
+                            TimesBlockedMoving = 0;
                         return RunStatus.Running;
                     }
                 }
@@ -719,9 +719,9 @@ namespace GilesTrinity
                     // Store the current destination for comparison incase of changes next loop
                     vLastMoveToTarget = vCurrentDestination;
                     // Reset total body-block count
-                    if ((!bForceCloseRangeTarget || DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds > iMillisecondsForceCloseRange) &&
+                    if ((!ForceCloseRangeTarget || DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds) &&
                         DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                        iTimesBlockedMoving = 0;
+                        TimesBlockedMoving = 0;
                     return RunStatus.Running;
                 }
             }
@@ -814,13 +814,13 @@ namespace GilesTrinity
         private static void GilesHandleBodyBlocking()
         {
             // Tell target finder to prioritize close-combat targets incase we were bodyblocked
-            switch (iTimesBlockedMoving)
+            switch (TimesBlockedMoving)
             {
                 case 1:
-                    iMillisecondsForceCloseRange = 850;
+                    ForceCloseRangeForMilliseconds = 850;
                     break;
                 case 2:
-                    iMillisecondsForceCloseRange = 1300;
+                    ForceCloseRangeForMilliseconds = 1300;
                     // Cancel avoidance attempts for 500ms
                     cancelledEmergencyMoveForMilliseconds = 1500;
                     timeCancelledEmergencyMove = DateTime.Now;
@@ -845,7 +845,7 @@ namespace GilesTrinity
                     }
                     break;
                 case 3:
-                    iMillisecondsForceCloseRange = 2000;
+                    ForceCloseRangeForMilliseconds = 2000;
                     // Cancel avoidance attempts for 1.5 seconds
                     cancelledEmergencyMoveForMilliseconds = 2000;
                     timeCancelledEmergencyMove = DateTime.Now;
@@ -855,13 +855,13 @@ namespace GilesTrinity
                         hashAvoidanceBlackspot.Add(new GilesObstacle(CurrentTarget.Position, 12f, -1, 0));
                     break;
                 default:
-                    iMillisecondsForceCloseRange = 4000;
+                    ForceCloseRangeForMilliseconds = 4000;
                     // Cancel avoidance attempts for 3.5 seconds
                     cancelledEmergencyMoveForMilliseconds = 4000;
                     timeCancelledEmergencyMove = DateTime.Now;
                     vlastSafeSpot = vNullLocation;
                     // Blacklist the current avoidance target area for the next avoidance-spot find
-                    if (iTimesBlockedMoving == 4 && CurrentTarget.Type == GObjectType.Avoidance)
+                    if (TimesBlockedMoving == 4 && CurrentTarget.Type == GObjectType.Avoidance)
                         hashAvoidanceBlackspot.Add(new GilesObstacle(CurrentTarget.Position, 16f, -1, 0));
                     break;
             }
@@ -979,7 +979,7 @@ namespace GilesTrinity
                 vLastMoveToTarget = vCurrentDestination;
                 // Reset total body-block count, since we should have moved
                 if (DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
-                    iTimesBlockedMoving = 0;
+                    TimesBlockedMoving = 0;
             }
         }
         private static void GilesHandleStepSetRangeRequired()
@@ -996,7 +996,7 @@ namespace GilesTrinity
                     {
                         // Treat the distance as closer based on the radius of monsters
                         fDistanceReduction = CurrentTarget.Radius;
-                        if (bForceCloseRangeTarget)
+                        if (ForceCloseRangeTarget)
                             fDistanceReduction -= 3f;
                         if (fDistanceReduction <= 0f)
                             fDistanceReduction = 0f;
@@ -1009,7 +1009,7 @@ namespace GilesTrinity
                     {
                         fRangeRequired = 5f;
                         // If we're having stuck issues, try forcing us to get closer to this item
-                        if (bForceCloseRangeTarget)
+                        if (ForceCloseRangeTarget)
                             fRangeRequired -= 1f;
                         // Try and randomize the distances required if we have problems looting this
                         if (IgnoreRactorGUID == CurrentTarget.RActorGuid)
@@ -1058,7 +1058,7 @@ namespace GilesTrinity
                         // Treat the distance as closer based on the radius of the object
                         fDistanceReduction = CurrentTarget.Radius;
                         fRangeRequired = 8f;
-                        if (bForceCloseRangeTarget)
+                        if (ForceCloseRangeTarget)
                             fRangeRequired -= 2f;
                         // Treat the distance as closer if the X & Y distance are almost point-blank, for objects
                         if (fDistanceToDestination <= 1.5f)
@@ -1075,7 +1075,7 @@ namespace GilesTrinity
                         // Treat the distance as closer based on the radius of the object
                         fDistanceReduction = CurrentTarget.Radius;
                         fRangeRequired = 12f;
-                        if (bForceCloseRangeTarget)
+                        if (ForceCloseRangeTarget)
                             fRangeRequired -= 2f;
                         // Check if it's in our interactable range dictionary or not
                         int iTempRange;
@@ -1095,7 +1095,7 @@ namespace GilesTrinity
                         // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
                         fRangeRequired = currentPower.SNOPower == SNOPower.None ? 9f : currentPower.iMinimumRange;
                         fDistanceReduction = CurrentTarget.Radius;
-                        if (bForceCloseRangeTarget)
+                        if (ForceCloseRangeTarget)
                             fDistanceReduction -= 3f;
                         if (fDistanceReduction <= 0f)
                             fDistanceReduction = 0f;
@@ -1117,7 +1117,7 @@ namespace GilesTrinity
                 case GObjectType.Backtrack:
                     {
                         fRangeRequired = 5f;
-                        if (bForceCloseRangeTarget)
+                        if (ForceCloseRangeTarget)
                             fRangeRequired -= 2f;
                         break;
                     }

@@ -182,9 +182,9 @@ namespace GilesTrinity
             // Refresh buffs (so we can check for wrath being up to ignore ice balls and anything else like that)
             GilesRefreshBuffs();
             // Clear forcing close-range priority on mobs after XX period of time
-            if (bForceCloseRangeTarget && DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds > iMillisecondsForceCloseRange)
+            if (ForceCloseRangeTarget && DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds)
             {
-                bForceCloseRangeTarget = false;
+                ForceCloseRangeTarget = false;
             }
             // Bunch of variables used throughout
             iUnitsSurrounding = 0;
@@ -193,7 +193,7 @@ namespace GilesTrinity
             hashNavigationObstacleCache = new HashSet<GilesObstacle>();
             bAnyChampionsPresent = false;
             bAnyMobsInCloseRange = false;
-            iLastDistance = 0f;
+            lastDistance = 0f;
             bTravellingAvoidance = false;
             // Every 15 seconds, clear the "blackspots" where avoidance failed, so we can re-check them
             if (DateTime.Now.Subtract(lastClearedAvoidanceBlackspots).TotalSeconds > 15)

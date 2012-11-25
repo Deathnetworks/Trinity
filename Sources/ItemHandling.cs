@@ -912,24 +912,25 @@ namespace GilesTrinity
                 return false;
             }
 
-            
-
             if (thisitem.Quality >= ItemQuality.Legendary)
-            switch (StashRule.checkItem(thisitem, TrueItemType, thisGilesBaseType))
             {
-                case Interpreter.InterpreterAction.KEEP:
-                    return true;
-                case Interpreter.InterpreterAction.TRASH:
-                    return false;
-                default:
-                    break;
+                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep legendaries)");
+                return true;
             }
 
-            //if (thisitem.Quality >= ItemQuality.Legendary)
-            //{
-            //    if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep legendaries)");
-            //    return true;
-            //}
+            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
+            {
+                switch (StashRule.checkItem(thisitem, TrueItemType, thisGilesBaseType))
+                {
+                    case Interpreter.InterpreterAction.KEEP:
+                        return true;
+                    case Interpreter.InterpreterAction.TRASH:
+                        return false;
+                    default:
+                        break;
+                }
+            }
+
 
             // Ok now try to do some decent item scoring based on item types
             double iNeedScore = ScoreNeeded(TrueItemType);

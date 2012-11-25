@@ -1,6 +1,6 @@
-﻿using GilesTrinity.Settings.Combat;
-using System;
+﻿using System;
 using System.Linq;
+using GilesTrinity.Settings.Combat;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
@@ -23,7 +23,9 @@ namespace GilesTrinity
                                         Settings.Combat.Misc.GoblinPriority < GoblinPriority.Prioritize
                                     ) &&
                                     playerStatus.CurrentHealthPct >= 0.85d;
-            bool bPrioritizeCloseRange = (bForceCloseRangeTarget || playerStatus.IsRooted);
+
+            bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || playerStatus.IsRooted);
+
             bool bIsBerserked = GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
             foreach (GilesObject cacheObject in GilesObjectCache)
             {
@@ -107,7 +109,7 @@ namespace GilesTrinity
                             }
 
                             // Force a close range target because we seem to be stuck *OR* if not ranged and currently rooted
-                            if (bPrioritizeCloseRange)
+                            if (PrioritizeCloseRangeUnits)
                             {
                                 cacheObject.Weight = 20000 - (Math.Floor(cacheObject.CentreDistance) * 200);
 
@@ -125,7 +127,7 @@ namespace GilesTrinity
                                     // Only 500 weight helps prevent it being prioritized over an unshielded
                                     cacheObject.Weight = 500;
                                 }
-// Not forcing close-ranged targets from being stuck, so let's calculate a weight!
+                                // Not forcing close-ranged targets from being stuck, so let's calculate a weight!
                                 else
                                 {
 
@@ -308,7 +310,7 @@ namespace GilesTrinity
                                 cacheObject.Weight += 10000d;
 
                             // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
-                            if (bPrioritizeCloseRange)
+                            if (PrioritizeCloseRangeUnits)
                                 cacheObject.Weight = 18000 - (Math.Floor(cacheObject.CentreDistance) * 200);
 
                             // If there's a monster in the path-line to the item, reduce the weight by 25%
@@ -432,7 +434,7 @@ namespace GilesTrinity
                                     cacheObject.Weight += 400;
 
                                 // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
-                                if (bPrioritizeCloseRange)
+                                if (PrioritizeCloseRangeUnits)
                                     cacheObject.Weight = 18500d - (Math.Floor(cacheObject.CentreDistance) * 200);
 
                                 // If there's a monster in the path-line to the item, reduce the weight by 25%
@@ -459,17 +461,16 @@ namespace GilesTrinity
                     case GObjectType.Barricade:
                         {
 
-                            // Weight Destructibles
-                            cacheObject.Weight = 1750d - (Math.Floor(cacheObject.CentreDistance) * 175d);
-                            //intell
+                            // Calculate the weight based on distance, where a distance = 1 is 5000
+                            cacheObject.Weight = 5000 * ( 1 - (cacheObject.RadiusDistance / Settings.WorldObject.DestructibleRange));
 
                             // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                             if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                 cacheObject.Weight += 400;
 
-                            // Close destructibles get a weight increase
-                            if (cacheObject.CentreDistance <= 16f)
-                                cacheObject.Weight += 1500d;
+                            //// Close destructibles get a weight increase
+                            //if (cacheObject.CentreDistance <= 16f)
+                            //    cacheObject.Weight += 1500d;
 
                             // If there's a monster in the path-line to the item, reduce the weight by 50%
                             if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
@@ -480,16 +481,20 @@ namespace GilesTrinity
                                 cacheObject.Weight = 1;
 
                             // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
-                            if (bPrioritizeCloseRange)
+                            if (PrioritizeCloseRangeUnits)
                                 cacheObject.Weight = 19200d - (Math.Floor(cacheObject.CentreDistance) * 200d);
 
-                            // Very close destructibles get a final weight increase
-                            if (cacheObject.CentreDistance <= 12f)
-                                cacheObject.Weight += 20000d;
+                            //// Very close destructibles get a final weight increase
+                            //if (cacheObject.CentreDistance <= 12f)
+                            //    cacheObject.Weight += 10000d;
 
-                            // We're standing on the damn thing... break it!!
-                            if (cacheObject.RadiusDistance <= 5f)
-                                cacheObject.Weight += 200000d;
+                            //// We're standing on the damn thing... break it
+                            //if (cacheObject.RadiusDistance <= 5f)
+                            //    cacheObject.Weight += 20000d;
+
+                            //// Fix for WhimsyShire Pinata
+                            //if (hashSNOContainerResplendant.Contains(cacheObject.ActorSNO))
+                            //    cacheObject.Weight = 100 + cacheObject.RadiusDistance;
                             break;
                         }
                     case GObjectType.Interactable:

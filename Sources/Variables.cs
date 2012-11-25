@@ -59,13 +59,13 @@ namespace GilesTrinity
         /// <summary>
         /// This will log item stat balancing data to special log files
         /// </summary>
-        private const bool bLogBalanceDataForGiles = false;
+        private const bool bLogBalanceDataForGiles = true;
 
         /// <summary>
         /// Full Analysis SPAMS like hell. But useful for seeing how the score-calculator is adding/removing points
         /// Really this is only for Giles to debug and improve the formula, users likely won't find this useful
         /// </summary>
-        private static bool fullItemAnalysis = false;
+        private static bool fullItemAnalysis = true;
 
 
         /* I create so many variables that it's a pain in the arse to categorize them
@@ -245,20 +245,22 @@ namespace GilesTrinity
         // Force a target update after certain interactions
         private static bool bForceTargetUpdate = false;
 
-        // This holds whether or not we want to prioritize a close-target, used when we might be body-blocked by monsters
-        private static bool bForceCloseRangeTarget = false;
+        /// <summary>
+        /// This holds whether or not we want to prioritize a close-target, used when we might be body-blocked by monsters
+        /// </summary>
+        private static bool ForceCloseRangeTarget = false;
 
         // How many times a movement fails because of being "blocked"
-        private static int iTimesBlockedMoving = 0;
+        private static int TimesBlockedMoving = 0;
 
         // how long to force close-range targets for
-        private static int iMillisecondsForceCloseRange = 0;
+        private static int ForceCloseRangeForMilliseconds = 0;
 
         // Date time we were last told to stick to close range targets
         private static DateTime lastForcedKeepCloseRange = DateTime.Today;
 
         // The distance last loop, so we can compare to current distance to work out if we moved
-        private static float iLastDistance = 0f;
+        private static float lastDistance = 0f;
 
         // Caching of the current primary target's health, to detect if we AREN'T damaging it for a period of time
         private static double iTargetLastHealth = 0f;

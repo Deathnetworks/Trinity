@@ -134,7 +134,7 @@ namespace GilesTrinity
 
             //CurrentTarget = null;
             bDontMoveMeIAmDoingShit = false;
-            iTimesBlockedMoving = 0;
+            TimesBlockedMoving = 0;
             bAlreadyMoving = false;
             lastMovementCommand = DateTime.Today;
             bAvoidDirectionBlacklisting = false;
