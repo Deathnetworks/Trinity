@@ -49,13 +49,13 @@ namespace GilesTrinity
                     bFoundSafeSpot = true;
                     CurrentTarget = new GilesObject()
                         {
-                        Position = vAnySafePoint,
-                        Type = GObjectType.Avoidance,
-                        Weight = 20000,
-                        CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
-                        RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint), 
-                        InternalName = "GilesSafePoint"
-                    };;
+                            Position = vAnySafePoint,
+                            Type = GObjectType.Avoidance,
+                            Weight = 20000,
+                            CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
+                            RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
+                            InternalName = "GilesSafePoint"
+                        }; ;
                 }
                 else
                 {

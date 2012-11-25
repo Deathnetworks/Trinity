@@ -835,6 +835,10 @@ namespace GilesTrinity
         /// <returns></returns>
         private static bool ShouldWeStashThis(GilesCachedACDItem thisitem)
         {
+            if (thisitem.Quality < ItemQuality.Rare4)
+            {
+                return false;
+            }
 
             // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
             if (thisitem.IsUnidentified)
