@@ -461,6 +461,7 @@ namespace GilesTrinity
                     case GObjectType.Barricade:
                         {
 
+                            // rrrix added this as a single "weight" source based on the DestructableRange.
                             // Calculate the weight based on distance, where a distance = 1 is 5000
                             cacheObject.Weight = 5000 * ( 1 - (cacheObject.RadiusDistance / Settings.WorldObject.DestructibleRange));
 

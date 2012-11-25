@@ -609,7 +609,5 @@ namespace GilesTrinity
 
         // Darkfriend's Looting Rule
         private static Interpreter StashRule = new Interpreter();
-
-        private static bool bTemporaryNotLooting = false;
     }
 }

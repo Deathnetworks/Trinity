@@ -18,19 +18,6 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static GilesPower GilesAbilitySelector(bool bCurrentlyAvoiding = false, bool bOOCBuff = false, bool bDestructiblePower = false)
         {
-
-            //this disables combat loot if we're avoiding so we stop trying to run through bad things to pick stuff up
-            if (bCurrentlyAvoiding && Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting)
-            {
-                Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting = false;
-                bTemporaryNotLooting = true;
-            }
-            if (!bCurrentlyAvoiding && bTemporaryNotLooting)
-            {
-                bTemporaryNotLooting = false;
-                Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting = true;
-            }
-
             // Refresh buffs once to save buff-check-spam
             GilesRefreshBuffs();
             // See if archon just appeared/disappeared, so update the hotbar

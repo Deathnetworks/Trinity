@@ -181,6 +181,8 @@ namespace GilesTrinity
                     btnRulesGiles.Checked += btnRulesGiles_check;
                     btnRulesCustom = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnRulesCustom") as RadioButton;
                     btnRulesCustom.Checked += btnRulesCustom_check;
+                    btnRulesTrinityWithScript = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnRulesTrinityWithScript") as RadioButton;
+                    btnRulesTrinityWithScript.Checked += btnRulesTrinityWithScript_check;
                     btnSalvage = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnSalvage") as RadioButton;
                     btnSalvage.Checked += btnSalvage_check;
                     btnSell = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnSell") as RadioButton;
@@ -1945,6 +1947,7 @@ namespace GilesTrinity
             checkGemAmethyst.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Amethys) == TrinityGemType.Amethys;
             checkGemTopaz.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Topaz) == TrinityGemType.Topaz;
             checkGemRuby.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Ruby) == TrinityGemType.Ruby;
+
             if (Settings.Loot.TownRun.TrashMode == TrashMode.Salvaging)
             {
                 btnSalvage.IsChecked = true;
@@ -1955,16 +1958,25 @@ namespace GilesTrinity
                 btnSell.IsChecked = true;
                 btnSalvage.IsChecked = false;
             }
-            if (Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy)
+            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityOnly)
             {
                 btnRulesGiles.IsChecked = true;
                 btnRulesCustom.IsChecked = false;
-            }
-            else
+                btnRulesTrinityWithScript.IsChecked = false;
+          }
+            else if (Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
             {
                 btnRulesCustom.IsChecked = true;
                 btnRulesGiles.IsChecked = false;
+                btnRulesTrinityWithScript.IsChecked = false;
             }
+            else if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
+            {
+                btnRulesGiles.IsChecked = false;
+                btnRulesCustom.IsChecked = false;
+                btnRulesTrinityWithScript.IsChecked = true;
+            }
+
             slideWeapon.Value = Settings.Loot.TownRun.WeaponScore;
             WeaponText.Text = slideWeapon.Value.ToString();
             slideArmor.Value = Settings.Loot.TownRun.ArmorScore;
