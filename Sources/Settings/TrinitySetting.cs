@@ -139,7 +139,7 @@ namespace GilesTrinity.Settings
 
         public void CopyTo(TrinitySetting setting)
         {
-            TrinitySetting.CopyTo(this, setting);
+            TrinitySetting.CopyTo(setting, this);
         }
 
         public TrinitySetting Clone()
@@ -162,6 +162,7 @@ namespace GilesTrinity.Settings
                         TrinitySetting loadedSetting = (TrinitySetting)serializer.ReadObject(stream);
                         stream.Close();
                         loadedSetting.CopyTo(this);
+                        DbHelper.Log(TrinityLogLevel.Verbose, "Configuration file loaded: {0}", filename);
                     }
                 }
                 else

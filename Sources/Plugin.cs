@@ -93,8 +93,11 @@ namespace GilesTrinity
             string sDemonBuddyPath = Assembly.GetEntryAssembly().Location;
             sTrinityPluginPath = Path.GetDirectoryName(sDemonBuddyPath) + @"\Plugins\GilesTrinity\";
             sTrinityConfigFile = Path.GetDirectoryName(sDemonBuddyPath) + @"\Settings\GilesTrinity.cfg";
+            
             sTrinityEmailConfigFile = Path.GetDirectoryName(sDemonBuddyPath) + @"\Settings\" + battleTagName + @"-Email.cfg";
-            Logging.WriteDiagnostic("Trinity Initialization, settings location=" + sTrinityConfigFile);
+
+            //Logging.WriteDiagnostic("Trinity Initialization, settings location=" + sTrinityConfigFile);
+
             BotMain.OnStart += GilesTrinityStart;
             // Force logging to disabled
             if (bDisableFileLogging)
@@ -111,12 +114,8 @@ namespace GilesTrinity
                         mainWindow.Title = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
                     else
                         mainWindow.Title = "DB - " + battleTagName;
-
-
                 }
-                catch
-                {
-                }
+                catch { }
                 var tab = mainWindow.FindName("tabControlMain") as TabControl;
                 if (tab == null) return;
                 var infoDumpTab = tab.Items[0] as TabItem;
