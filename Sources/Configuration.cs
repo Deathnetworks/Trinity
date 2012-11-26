@@ -35,22 +35,34 @@ namespace GilesTrinity
         // First we create a variable that is of the "type" of the actual config window item - eg a "RadioButton" for each, well, radiobutton
         // Later on we will "Link" these variables to the ACTUAL items within the XAML file, so we can do things with the XAML stuff
         // I try to match the names of the variables here, with the "Name=" I give the item in the XAML - this isn't necessary, but makes things simpler
-        private Button saveButton, defaultButton, testButton, sortButton, resetCombat, resetAOE0, resetAOE1, resetAOE2, resetAOE3, resetAOE4, resetWorld, resetItems, resetTown, resetAdvanced, resetMobile;
-        private RadioButton checkTreasureIgnore, checkTreasureNormal, checkTreasurePrioritize, checkTreasureKamikaze, btnRulesGiles, btnRulesCustom, btnRulesTrinityWithScript, btnSalvage, btnSell, checkIgnoreAll, checkIgnoreNone;
-        private CheckBox checkAvoidance, checkGlobes, checkCritical, checkGrave, checkBacktracking, checkCraftTomes, checkDesigns, checkFollower, checkGemEmerald, checkGemAmethyst, checkGemTopaz, checkGemRuby,
-            checkIgnoreCorpses, checkMovementAbilities, checkTPS, checkLogStucks, checkUnstucker, checkExtendedRange, checkDebugInfo, checkProwl, checkAndroid, checkSelectiveWW,
-            checkWaitWrath, checkGoblinWrath, checkFuryDumpWrath, checkFuryDumpAlways, checkProfileReload, checkMonkInna, checkKiteArchonOnly, checkWaitArchonAzmo, checkWrath90, checkEmail, checkLegendaryNotify;
+
+        private Button saveButton, defaultButton, testButton, sortButton, resetCombat, resetAOE0, resetAOE1, resetAOE2, resetAOE3, resetAOE4, resetWorld, resetItems, resetTown, 
+            resetAdvanced, resetMobile;
+
+        private RadioButton checkTreasureIgnore, checkTreasureNormal, checkTreasurePrioritize, checkTreasureKamikaze, btnRulesGiles, btnRulesCustom, btnRulesTrinityWithScript, 
+            btnSalvage, btnSell, checkIgnoreAll, checkIgnoreNone;
+
+        private CheckBox checkAvoidance, checkGlobes, checkCritical, checkGrave, checkBacktracking, checkCraftTomes, checkDesigns, checkFollower, checkGemEmerald, 
+            checkGemAmethyst, checkGemTopaz, checkGemRuby,checkIgnoreCorpses, checkMovementAbilities, checkTPS, checkLogStucks, checkUnstucker, checkExtendedRange, checkDebugInfo, 
+            checkProwl, checkAndroid, checkSelectiveWW,checkWaitWrath, checkGoblinWrath, checkFuryDumpWrath, checkFuryDumpAlways, checkProfileReload, checkMonkInna, checkKiteArchonOnly, 
+            checkWaitArchonAzmo, checkWrath90, checkEmail, checkLegendaryNotify;
+
         private Slider slideTriggerRange, slideWeapon, slideJewelry, slideArmor, slideGoldAmount, slideContainerRange, slideDestructibleRange, slideTPS,
             slideNotifyWeapon, slideNotifyJewelry, slideNotifyArmor, slideLootDelay, slideVaultDelay, slideKite0, slideKite2, slideKite3, slideKite4;
+
         private TextBox textTriggerRange, JewelryText, ArmorText, WeaponText, JewelryNotifyText, ArmorNotifyText, WeaponNotifyText, textGoldAmount, textContainerRange, textDestructibleRange,
             textTPS, textProwlKey, textAndroidKey, textLootDelay, textVaultDelay, textKite0, textKite2, textKite3, textKite4, txtEmailAddress, txtEmailPassword, txtBotName;
+
         private ComboBox comboWB, comboWY, comboAB, comboAY, comboJB, comboJY, comboGems, comboMisc, comboPotions, comboPotionLevel, comboLegendary;
+
         // I used an array of sliders for all the AOE stuff because there were just too many to handle separately, and they all affect the same sort of values
         // So looping through arrays and doing things to them this way meant less code and easier to add more AOE stuff in the future
+
         private Slider[,] slideAOERadius = new Slider[5, 13];
         private Slider[,] slideAOEHealth = new Slider[5, 13];
         private TextBox[,] textAOERadius = new TextBox[5, 13];
         private TextBox[,] textAOEHealth = new TextBox[5, 13];
+
         // Sliders for health potions, and health globes, for each class
         private Slider slidePot0, slidePot1, slidePot2, slidePot3, slidePot4, slideGlobe0, slideGlobe1, slideGlobe2, slideGlobe3, slideGlobe4;
         private TextBox textPot0, textPot1, textPot2, textPot3, textPot4, textGlobe0, textGlobe1, textGlobe2, textGlobe3, textGlobe4;
@@ -73,6 +85,7 @@ namespace GilesTrinity
                     StreamReader xamlStream = new StreamReader(sTrinityPluginPath + "GilesTrinity.xaml");
                     DependencyObject xamlContent = XamlReader.Load(xamlStream.BaseStream) as DependencyObject;
                     configWindow.Content = xamlContent;
+
                     // I'm not going to comment everything below - it's all pretty similar
                     // Basically the concept is this:
                     // You take the variable you created above (30 lines up or so), and you use "FindLogicalNode" to sort of "link" the variable, to that object within the XAML file
@@ -82,6 +95,7 @@ namespace GilesTrinity
                     // Now - the huge list below is because I have so many damned config options of different types!
                     // Note that I do *NOT* have any events on text boxes - because I set all textboxes to uneditable/unchangeable - they are "read only"
                     // I simply use them to show the user what the slider-value is currently set to (so when the slider changes, my code updates the text box)
+
                     slideWeapon = LogicalTreeHelper.FindLogicalNode(xamlContent, "slideWeaponScore") as Slider;
                     slideWeapon.ValueChanged += trackScoreWeapons_Scroll;
                     slideWeapon.SmallChange = 200;
@@ -386,20 +400,26 @@ namespace GilesTrinity
                         for (int n = 0; n <= 12; n++)
                         {
                             string sThisNode;
+
                             sThisNode = "slideRadius" + i.ToString() + "_" + (n + 1).ToString();
                             slideAOERadius[i, n] = LogicalTreeHelper.FindLogicalNode(xamlContent, sThisNode) as Slider;
                             sThisNode = "slideHealth" + i.ToString() + "_" + (n + 1).ToString();
                             slideAOEHealth[i, n] = LogicalTreeHelper.FindLogicalNode(xamlContent, sThisNode) as Slider;
+
                             sThisNode = "textRadius" + i.ToString() + "_" + (n + 1).ToString();
                             textAOERadius[i, n] = LogicalTreeHelper.FindLogicalNode(xamlContent, sThisNode) as TextBox;
+
                             sThisNode = "textHealth" + i.ToString() + "_" + (n + 1).ToString();
                             textAOEHealth[i, n] = LogicalTreeHelper.FindLogicalNode(xamlContent, sThisNode) as TextBox;
+
                             slideAOERadius[i, n].ValueChanged += trackAOERadius_Scroll;
                             slideAOEHealth[i, n].ValueChanged += trackAOEHealth_Scroll;
+
                             slideAOERadius[i, n].SmallChange = 1;
                             slideAOERadius[i, n].LargeChange = 1;
                             slideAOERadius[i, n].TickFrequency = 1;
                             slideAOERadius[i, n].IsSnapToTickEnabled = true;
+
                             slideAOEHealth[i, n].SmallChange = 1;
                             slideAOEHealth[i, n].LargeChange = 1;
                             slideAOEHealth[i, n].TickFrequency = 1;
@@ -473,8 +493,8 @@ namespace GilesTrinity
             string sSliderName = thisslider.Name.Substring(11);
             int iClass = Convert.ToInt32(sSliderName.Substring(0, 1));
             int iAvoid = Convert.ToInt32(sSliderName.Substring(2));
-            double dThisHealthLimit = (Math.Round(thisslider.Value / 100));
-            textAOEHealth[iClass, iAvoid - 1].Text = (dThisHealthLimit * 100).ToString();
+            double dThisHealthLimit = (thisslider.Value / 100);
+            textAOEHealth[iClass, iAvoid - 1].Text = (dThisHealthLimit * 100).ToString("0");
             switch (iClass)
             {
                 case 0:
@@ -714,7 +734,7 @@ namespace GilesTrinity
             int iClass = Convert.ToInt32(sSliderName.Substring(0, 1));
             int iAvoid = Convert.ToInt32(sSliderName.Substring(2));
             int iThisAvoidRadius = (int)Math.Round(thisslider.Value);
-            textAOERadius[iClass, iAvoid - 1].Text = iThisAvoidRadius.ToString();
+            textAOERadius[iClass, iAvoid - 1].Text = iThisAvoidRadius.ToString("0");
             switch (iAvoid)
             {
                 case 1:

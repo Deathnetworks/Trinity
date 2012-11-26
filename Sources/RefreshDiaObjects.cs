@@ -646,7 +646,10 @@ namespace GilesTrinity
                 {
                     if (bDebugLogSpecial)
                     {
-                        Logging.Write("[Trinity] Kiting to: {0} Distance: {1:0} Direction: {2:0} ", vAnySafePoint, vAnySafePoint.Distance(Me.Position), FindDirectionDegree(Me.Position, vAnySafePoint));
+                        Logging.Write("[Trinity] Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}", 
+                            vAnySafePoint, vAnySafePoint.Distance(Me.Position), FindDirectionDegree(Me.Position, vAnySafePoint),
+                            playerStatus.CurrentHealthPct, iKiteDistance, hashMonsterObstacleCache.Count(m => m.Location.Distance(playerStatus.CurrentPosition) <= iKiteDistance),
+                            bNeedToKite, bShouldTryKiting);
                     }
                     CurrentTarget = new GilesObject()
                                         {

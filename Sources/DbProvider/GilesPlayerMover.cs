@@ -52,7 +52,13 @@ namespace GilesTrinity.DbProvider
             if (DateTime.Now.Subtract(timeLastRecordedPosition).TotalMilliseconds >= 3000)
             {
                 timeLastRecordedPosition = DateTime.Now;
-                Composite c = Zeta.CommonBot.ProfileManager.CurrentProfileBehavior.Behavior;
+                Composite c = null;
+                try
+                {
+                    if (Zeta.CommonBot.ProfileManager.CurrentProfileBehavior != null)
+                        c = Zeta.CommonBot.ProfileManager.CurrentProfileBehavior.Behavior;
+                }
+                catch { }
                 Zeta.Internals.UIElement vendorWindow = Zeta.Internals.UIElements.VendorWindow;
                 AnimationState aState = ZetaDia.Me.CommonData.AnimationState;
                 if (c != null && c.GetType() == typeof(WaitTimerTag))
@@ -364,7 +370,7 @@ namespace GilesTrinity.DbProvider
             Vector3 point = vMoveToTarget;
             foreach (GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
                             GilesTrinity.GilesIntersectsPath(cp.Location, cp.Radius, vMyCurrentPosition, point) &&
-                            cp.Location.Distance(vMyCurrentPosition) > GilesTrinity.dictSNONavigationSize[cp.SNOID]))           
+                            cp.Location.Distance(vMyCurrentPosition) > GilesTrinity.dictSNONavigationSize[cp.SNOID]))
             {
                 if (vShiftedPosition == Vector3.Zero)
                 {

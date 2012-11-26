@@ -101,7 +101,7 @@ namespace GilesTrinity
         private static double[] WeaponPointsAtMax = new double[29]  { 14000, 14000, 14000, 14000, 13000, 20000, 7000, 1000, 6000, 6000, 6000, 0500, 16000, 15000, 15000, 0000, 0000, 0000, 0000, 1000, 11000, 0000, 90000, 0000, 10000, 8500, 8500, 10000, 8000 };
         private static double[] ArmorPointsAtMax = new double[29]   { 11000, 11000, 11000, 09500, 09000, 10000, 4000, 1200, 3000, 3000, 3500, 1000, 04300, 09000, 06100, 7000, 3000, 3000, 5000, 1200, 07500, 1500, 00000, 5000, 04000, 3000, 3000, 06000, 4000 };
         private static double[] JewelryPointsAtMax = new double[29] { 11500, 11000, 11000, 10000, 08000, 11000, 4000, 1200, 4500, 4500, 3500, 1000, 03500, 07500, 06300, 6800, 0800, 0800, 5000, 1200, 07500, 1500, 00000, 4500, 04000, 3000, 3000, 06000, 4000 };
-        // Some special values for score calculations
+        // Some special values for score calculations 
         // BonusThreshold is a percentage of the max-stat possible that the stat starts to get a multiplier on it's score. 1 means it has to be above 100% of the max-stat to get a multiplier (so only possible if the max-stat isn't ACTUALLY the max possible)
         // MinimumThreshold is a percentage of the max-stat possible that the stat will simply be ignored for being too low. eg if set to .5 - then anything less than 50% of the max-stat will be ignored.
         // MinimumPrimary is used for some stats only - and means that at least ONE primary stat has to be above that level  to get score. Eg magic-find has .5 - meaning any item without at least 50% of a max-stat primary  will ignore magic-find scoring.

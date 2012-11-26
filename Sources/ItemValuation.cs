@@ -34,7 +34,7 @@ namespace GilesTrinity
         /// <param name="item"></param>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        private static double ValueThisItem(GilesCachedACDItem item, GItemType itemType)
+        private static double ValueThisItem(GilesCachedACDItem item, GItemType itemType) 
         {
             // Reset static variables
             TotalItemPoints = 0;

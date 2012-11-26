@@ -1084,24 +1084,26 @@ namespace GilesTrinity
                 bWantThis = false;
                 c_IgnoreSubStep += "IsInvulnerable+";
             }
-            //if (tmp_unit_diaUnit.IsBurrowed)
-            //{
-            //    bWantThis = false;
-            //    tmp_cacheIgnoreSubStep += "IsBurrowed+";
-            //    hashRGuid3SecBlacklist.Add(tmp_iThisRActorGuid);
-            //}
+            if (thisUnit.IsBurrowed)
+            {
+                bWantThis = false;
+                c_IgnoreSubStep += "IsBurrowed+";
+            }
             if (thisUnit.IsHelper || thisUnit.IsNPC || thisUnit.IsTownVendor)
             {
                 bWantThis = false;
                 c_IgnoreSubStep += "IsNPCOrHelper+";
             }
             // Safe is-attackable detection
-            c_unit_bIsAttackable = true;
+            if (bWantThis)
+                c_unit_bIsAttackable = true;
+            else
+                c_unit_bIsAttackable = false;
             if (c_unit_bIsBoss || theseaffixes.HasFlag(MonsterAffixes.Shielding))
             {
                 try
                 {
-                     
+
                     c_unit_bIsAttackable = !thisUnit.IsInvulnerable;
                 }
                 catch (Exception ex)
@@ -1111,40 +1113,43 @@ namespace GilesTrinity
                     c_unit_bIsAttackable = true;
                 }
             }
+
+
+            // rrrix disabled this because it can change at ANY TIME and caching is a bad idea for this!
             // Inactive units like trees, withermoths etc. still underground
-            if (c_HitPoints >= 1f || c_unit_bIsBoss)
-            {
-                // Get the burrowing data for this unit
-                bool bBurrowed;
-                if (!dictGilesBurrowedCache.TryGetValue(c_RActorGuid, out bBurrowed) || c_unit_bIsBoss)
-                {
-                    try
-                    {
-                        bBurrowed = !thisUnit.IsBurrowed;
-                    }
-                    catch (Exception ex)
-                    {
-                        Logging.WriteDiagnostic("[Trinity] Safely handled exception getting is-untargetable or is-burrowed attribute for unit " + c_Name + " [" + c_ActorSNO.ToString() + "]");
-                        Logging.WriteDiagnostic(ex.ToString());
-                        bWantThis = false;
-                        //return bWantThis;
-                    }
-                    // Only cache it if it's NOT burrowed (if it *IS* - then we need to keep re-checking until it comes out!)
-                    if (!bBurrowed)
-                    {
-                        // Don't cache for bosses, as we have to check for bosses popping in and out of the game during a complex fight
-                        if (!c_unit_bIsBoss)
-                            dictGilesBurrowedCache.Add(c_RActorGuid, bBurrowed);
-                    }
-                    else
-                    {
-                        // Unit is burrowed, so we need to ignore it until it isn't!
-                        c_IgnoreSubStep = "Burrowed";
-                        bWantThis = false;
-                        //return bWantThis;
-                    }
-                }
-            }
+            //if (c_HitPoints >= 1f || c_unit_bIsBoss)
+            //{
+            //    // Get the burrowing data for this unit
+            //    bool bBurrowed;
+            //    if (!dictGilesBurrowedCache.TryGetValue(c_RActorGuid, out bBurrowed) || c_unit_bIsBoss)
+            //    {
+            //        try
+            //        {
+            //            bBurrowed = thisUnit.IsBurrowed;
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            Logging.WriteDiagnostic("[Trinity] Safely handled exception getting is-untargetable or is-burrowed attribute for unit " + c_Name + " [" + c_ActorSNO.ToString() + "]");
+            //            Logging.WriteDiagnostic(ex.ToString());
+            //            bWantThis = false;
+            //            //return bWantThis;
+            //        }
+            //        // Only cache it if it's NOT burrowed (if it *IS* - then we need to keep re-checking until it comes out!)
+            //        if (!bBurrowed)
+            //        {
+            //            // Don't cache for bosses, as we have to check for bosses popping in and out of the game during a complex fight
+            //            if (!c_unit_bIsBoss)
+            //                dictGilesBurrowedCache.Add(c_RActorGuid, bBurrowed);
+            //        }
+            //        else
+            //        {
+            //            // Unit is burrowed, so we need to ignore it until it isn't!
+            //            c_IgnoreSubStep = "Burrowed";
+            //            bWantThis = false;
+            //            //return bWantThis;
+            //        }
+            //    }
+            //}
             // Only if at full health, else don't bother checking each loop
             // See if we already have this monster's size stored, if not get it and cache it
             if (!dictionaryStoredMonsterSizes.TryGetValue(c_ActorSNO, out c_unit_MonsterSize))
@@ -2079,7 +2084,7 @@ namespace GilesTrinity
         {
             try
             {
-                return AvoidanceManager.GetAvoidanceHealthBySNO(c_ActorSNO,1);
+                return AvoidanceManager.GetAvoidanceHealthBySNO(c_ActorSNO, 1);
             }
             catch
             {

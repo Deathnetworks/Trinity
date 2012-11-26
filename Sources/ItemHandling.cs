@@ -200,6 +200,10 @@ namespace GilesTrinity
                                 return false;
                             }
                         }
+                        if (Settings.Loot.Pickup.PotionMode == PotionMode.All && level > Settings.Loot.Pickup.Potionlevel)
+                        {
+                                return true;
+                        }
                     }
                     break;
                 case GBaseItemType.HealthGlobe:
@@ -905,7 +909,7 @@ namespace GilesTrinity
                 return false;
             }
 
-            if (thisitem.Quality >= ItemQuality.Legendary && Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityOnly)
+            if (thisitem.Quality >= ItemQuality.Legendary)
             {
                 if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep legendaries)");
                 return true;
@@ -922,7 +926,7 @@ namespace GilesTrinity
                     default:
                         break;
                 }
-            }
+            } 
 
 
             // Ok now try to do some decent item scoring based on item types
