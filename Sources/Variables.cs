@@ -268,47 +268,55 @@ namespace GilesTrinity
         // This is used so we don't use certain skills until we "top up" our primary resource by enough
         private static double iWaitingReservedAmount = 0d;
 
-        // When did we last clear the temporary blacklist?
-        private static DateTime dateSinceBlacklist90Clear = DateTime.Today;
-
-        // And the full blacklist?
-        private static DateTime dateSinceBlacklist60Clear = DateTime.Today;
-
-        // And the 15 sec 
-        private static DateTime dateSinceBlacklist15Clear = DateTime.Today;
-
-        // Store the date-time when we *FIRST* picked this target, so we can blacklist after X period of time targeting
+        /// <summary>
+        /// Store the date-time when we *FIRST* picked this target, so we can blacklist after X period of time targeting
+        /// </summary>
         private static DateTime dateSincePickedTarget = DateTime.Today;
 
-        // Total main loops so we can update things every XX loops
+        /// <summary>
+        /// Total main loops so we can update things every XX (20/50/100) loops (hot bar abilities, backpack, etc)
+        /// </summary>
         private static int iCombatLoops = 0;
 
         // These values below are set on a per-class basis later on, so don't bother changing them here! These are the old default values
-        private static double iEmergencyHealthPotionLimit = 0.46;
-        private static double iEmergencyHealthGlobeLimit = 0.6;
-        private static int iKiteDistance = 0;
+        private static double PlayerEmergencyHealthPotionLimit = 0.46;
+        private static double PlayerEmergencyHealthGlobeLimit = 0.6;
+
         /// <summary>
-        /// Use RActorGUID to blacklist an object/monster for 90 seconds
+        /// Distance to kite, set on BotStart from Settings
         /// </summary>
-        private static HashSet<int> hashRGUIDIgnoreBlacklist90 = new HashSet<int>();
+        private static int PlayerKiteDistance = 0;
+
+        /*
+         *  Blacklists
+         */
+        private static bool NeedToClearBlacklist3 = false;
+        private static DateTime dateSinceBlacklist3Clear = DateTime.Today;
+        private static DateTime dateSinceBlacklist15Clear = DateTime.Today;
+        private static DateTime dateSinceBlacklist60Clear = DateTime.Today;
+        private static DateTime dateSinceBlacklist90Clear = DateTime.Today;
+
         /// <summary>
-        /// Use RActorGUID to blacklist an object/monster for 60 seconds
+        /// Short - 3 second blacklist
         /// </summary>
-        private static HashSet<int> hashRGUIDIgnoreBlacklist60 = new HashSet<int>();
+        private static HashSet<int> hashRGUIDBlacklist3 = new HashSet<int>();
         /// <summary>
         /// Use RActorGUID to blacklist an object/monster for 15 seconds
         /// </summary>
-        private static HashSet<int> hashRGUIDIgnoreBlacklist15 = new HashSet<int>();
+        private static HashSet<int> hashRGUIDBlacklist15 = new HashSet<int>();
+        /// <summary>
+        /// Use RActorGUID to blacklist an object/monster for 60 seconds
+        /// </summary>
+        private static HashSet<int> hashRGUIDBlacklist60 = new HashSet<int>();
+        /// <summary>
+        /// Use RActorGUID to blacklist an object/monster for 90 seconds
+        /// </summary>
+        private static HashSet<int> hashRGUIDBlacklist90 = new HashSet<int>();
 
         // This is a blacklist that is cleared within 3 seconds of last attacking a destructible
         private static HashSet<int> hashRGUIDDestructible3SecBlacklist = new HashSet<int>();
         private static DateTime lastDestroyedDestructible = DateTime.Today;
         private static bool bNeedClearDestructibles = false;
-
-        // This is a blacklist that is cleared within 3 seconds of last attacking a destructible
-        private static HashSet<int> hashRGuid3SecBlacklist = new HashSet<int>();
-        private static DateTime lastTemporaryBlacklist = DateTime.Today;
-        private static bool bNeedClearTemporaryBlacklist = false;
 
         // An ordered list of all of the backtrack locations to navigate through once we finish our current activities
         public static SortedList<int, Vector3> vBacktrackList = new SortedList<int, Vector3>();
@@ -322,17 +330,23 @@ namespace GilesTrinity
 
         // Some avoidance related variables
 
-        // Whether or not we need avoidance this target-search-loop
+        /// <summary>
+        /// Whether or not we need avoidance this target-search-loop
+        /// </summary>
         private static bool bRequireAvoidance = false;
 
-        // Whether or not there are projectiles to avoid
-        private static bool bTravellingAvoidance = false;
+        /// <summary>
+        /// Whether or not there are projectiles to avoid
+        /// </summary>
+        private static bool IsAvoidingProjectiles = false;
 
         // When we last FOUND a safe spot
         private static DateTime lastFoundSafeSpot = DateTime.Today;
         private static Vector3 vlastSafeSpot = Vector3.Zero;
 
-        // This lets us know if there is a target but it's in avoidance so we can just "stay put" until avoidance goes
+        /// <summary>
+        /// This lets us know if there is a target but it's in avoidance so we can just "stay put" until avoidance goes
+        /// </summary>
         private static bool bStayPutDuringAvoidance = false;
 
         /// <summary>

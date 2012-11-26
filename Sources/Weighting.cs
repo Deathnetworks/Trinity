@@ -343,7 +343,7 @@ namespace GilesTrinity
                             // Weight Health Globes
 
                             // Give all globes 0 weight (so never gone-to), unless we have low health, then go for them
-                            if (playerStatus.CurrentHealthPct > iEmergencyHealthGlobeLimit || !Settings.Combat.Misc.CollectHealthGlobe)
+                            if (playerStatus.CurrentHealthPct > PlayerEmergencyHealthGlobeLimit || !Settings.Combat.Misc.CollectHealthGlobe)
                             {
                                 cacheObject.Weight = 0;
                             }

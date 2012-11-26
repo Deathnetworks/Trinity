@@ -833,28 +833,28 @@ namespace GilesTrinity
                     return bWantThis;
                 }
                 // Check our extremely short-term destructible-blacklist
-                if (hashRGuid3SecBlacklist.Contains(c_RActorGuid))
+                if (hashRGUIDBlacklist3.Contains(c_RActorGuid))
                 {
                     bWantThis = false;
                     c_IgnoreSubStep = "hashRGuid3SecBlacklist";
                     return bWantThis;
                 }
                 // See if it's on our 90 second blacklist (from being stuck targeting it), as long as it's distance is not extremely close
-                if (hashRGUIDIgnoreBlacklist90.Contains(c_RActorGuid))
+                if (hashRGUIDBlacklist90.Contains(c_RActorGuid))
                 {
                     bWantThis = false;
                     c_IgnoreSubStep = "hashRGUIDTemporaryIgnoreBlacklist90";
                     return bWantThis;
                 }
                 // 60 second blacklist
-                if (hashRGUIDIgnoreBlacklist60.Contains(c_RActorGuid))
+                if (hashRGUIDBlacklist60.Contains(c_RActorGuid))
                 {
                     bWantThis = false;
                     c_IgnoreSubStep = "hashRGUIDIgnoreBlacklist60";
                     return bWantThis;
                 }
                 // 15 second blacklist
-                if (hashRGUIDIgnoreBlacklist15.Contains(c_RActorGuid))
+                if (hashRGUIDBlacklist15.Contains(c_RActorGuid))
                 {
                     bWantThis = false;
                     c_IgnoreSubStep = "hashRGUIDIgnoreBlacklist15";
@@ -996,9 +996,9 @@ namespace GilesTrinity
                     // Add this monster to our very short-term ignore list
                     if (!c_unit_bIsBoss)
                     {
-                        hashRGuid3SecBlacklist.Add(c_RActorGuid);
-                        lastTemporaryBlacklist = DateTime.Now;
-                        bNeedClearTemporaryBlacklist = true;
+                        hashRGUIDBlacklist3.Add(c_RActorGuid);
+                        dateSinceBlacklist3Clear = DateTime.Now;
+                        NeedToClearBlacklist3 = true;
                     }
                     bWantThis = false;
                     //return bWantThis;
@@ -1016,9 +1016,9 @@ namespace GilesTrinity
             if (c_HitPoints <= 0d && !c_unit_bIsBoss)
             {
                 // Add this monster to our very short-term ignore list
-                hashRGuid3SecBlacklist.Add(c_RActorGuid);
-                lastTemporaryBlacklist = DateTime.Now;
-                bNeedClearTemporaryBlacklist = true;
+                hashRGUIDBlacklist3.Add(c_RActorGuid);
+                dateSinceBlacklist3Clear = DateTime.Now;
+                NeedToClearBlacklist3 = true;
                 bWantThis = false;
                 c_IgnoreSubStep = "0HitPoints";
                 //return bWantThis;
@@ -1557,7 +1557,8 @@ namespace GilesTrinity
             // Blacklist gold piles already in pickup radius range
             if (c_CentreDistance <= ZetaDia.Me.GoldPickUpRadius)
             {
-                hashRGUIDIgnoreBlacklist60.Add(c_RActorGuid);
+                hashRGUIDBlacklist3.Add(c_RActorGuid);
+                hashRGUIDBlacklist60.Add(c_RActorGuid);
                 bWantThis = false;
                 return bWantThis;
             }
@@ -1586,7 +1587,7 @@ namespace GilesTrinity
             if (c_Name.ToLower().StartsWith("minimapicon"))
             {
                 // Minimap icons caused a few problems in the past, so this force-blacklists them
-                hashRGUIDIgnoreBlacklist60.Add(c_RActorGuid);
+                hashRGUIDBlacklist60.Add(c_RActorGuid);
                 c_IgnoreSubStep = "minimapicon";
                 AddToCache = false;
                 //return bWantThis;
@@ -1661,7 +1662,7 @@ namespace GilesTrinity
                         catch { }
                         if (GizmoUsed)
                         {
-                            hashRGUIDIgnoreBlacklist90.Add(c_RActorGuid);
+                            hashRGUIDBlacklist90.Add(c_RActorGuid);
                             AddToCache = false;
                             c_IgnoreSubStep = "Door is Open or Opening";
                         }
@@ -1672,7 +1673,7 @@ namespace GilesTrinity
                                 DiaGizmo door = (GizmoDoor)diaObject;
                                 if (door.IsGizmoDisabledByScript)
                                 {
-                                    hashRGUIDIgnoreBlacklist90.Add(c_RActorGuid);
+                                    hashRGUIDBlacklist90.Add(c_RActorGuid);
                                     AddToCache = false;
                                     c_IgnoreSubStep = "DoorDisabledbyScript";
                                 }
@@ -1721,7 +1722,7 @@ namespace GilesTrinity
                         if (!Settings.WorldObject.UseShrine)
                         {
                             // We're ignoring all shrines, so blacklist this one
-                            hashRGUIDIgnoreBlacklist60.Add(c_RActorGuid);
+                            hashRGUIDBlacklist60.Add(c_RActorGuid);
                             AddToCache = false;
                             //return bWantThis;
                         }
@@ -1739,7 +1740,7 @@ namespace GilesTrinity
                         if (GizmoUsed)
                         {
                             // It's already open!
-                            hashRGUIDIgnoreBlacklist60.Add(c_RActorGuid);
+                            hashRGUIDBlacklist60.Add(c_RActorGuid);
                             c_IgnoreSubStep = "GizmoHasBeenOperated";
                             AddToCache = false;
                             //return bWantThis;
@@ -1879,7 +1880,7 @@ namespace GilesTrinity
                         if (bThisOpen)
                         {
                             // It's already open!
-                            hashRGUIDIgnoreBlacklist60.Add(c_RActorGuid);
+                            hashRGUIDBlacklist60.Add(c_RActorGuid);
                             AddToCache = false;
                             //return bWantThis;
                         }
@@ -1948,7 +1949,7 @@ namespace GilesTrinity
                         // Blacklist this if it's something we should never bother looking at again
                         if (bBlacklistThis)
                         {
-                            hashRGUIDIgnoreBlacklist60.Add(c_RActorGuid);
+                            hashRGUIDBlacklist60.Add(c_RActorGuid);
                             AddToCache = false;
                             //return bWantThis;
                         }
@@ -2032,7 +2033,7 @@ namespace GilesTrinity
                     bRequireAvoidance = true;
                     // Note if this is a travelling projectile or not so we can constantly update our safe points
                     if (hashAvoidanceSNOProjectiles.Contains(c_ActorSNO))
-                        bTravellingAvoidance = true;
+                        IsAvoidingProjectiles = true;
                 }
             }
             // Butcher WIP

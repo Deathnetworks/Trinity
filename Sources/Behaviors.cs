@@ -98,7 +98,7 @@ namespace GilesTrinity
                 if (!bWholeNewTarget && !bWaitingForPower && !bWaitingForPotion)
                 {
                     // Update targets at least once every 80 milliseconds
-                    if (bForceTargetUpdate || bTravellingAvoidance || DateTime.Now.Subtract(lastRefreshedObjects).TotalMilliseconds >= 80)
+                    if (bForceTargetUpdate || IsAvoidingProjectiles || DateTime.Now.Subtract(lastRefreshedObjects).TotalMilliseconds >= 80)
                     {
                         bShouldRefreshDiaObjects = true;
                     }
@@ -227,12 +227,12 @@ namespace GilesTrinity
 
                         if (CurrentTarget.IsBoss)
                         {
-                            hashRGUIDIgnoreBlacklist15.Add(CurrentTarget.RActorGuid);
+                            hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
                             dateSinceBlacklist15Clear = DateTime.Now;
                         }
                         else
                         {
-                            hashRGUIDIgnoreBlacklist90.Add(CurrentTarget.RActorGuid);
+                            hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
                             //dateSinceBlacklist90Clear = DateTime.Now;
                             CurrentTarget = null;
                             return RunStatus.Success;
@@ -271,7 +271,7 @@ namespace GilesTrinity
                 }
                 // Pop a potion when necessary
                 // Note that we force a single-loop pause first, to help potion popping "go off"
-                if (playerStatus.CurrentHealthPct <= iEmergencyHealthPotionLimit && !bWaitingForPower && !bWaitingForPotion && !playerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
+                if (playerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !bWaitingForPower && !bWaitingForPotion && !playerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
                 {
                     bWaitingForPotion = true;
                     return RunStatus.Running;
@@ -400,9 +400,9 @@ namespace GilesTrinity
                             // If we've tried interacting too many times, blacklist this for a while
                             if (iInteractAttempts > 3)
                             {
-                                hashRGUIDIgnoreBlacklist90.Add(CurrentTarget.RActorGuid);
+                                hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
                                 //dateSinceBlacklist90Clear = DateTime.Now;
-                                hashRGUIDIgnoreBlacklist60.Add(CurrentTarget.RActorGuid);
+                                hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
                             }
                             IgnoreRactorGUID = CurrentTarget.RActorGuid;
                             IgnoreTargetForLoops = 3;
@@ -444,7 +444,7 @@ namespace GilesTrinity
                             if ((iInteractAttempts > 5 || (CurrentTarget.Type == GObjectType.Interactable && iInteractAttempts > 3)) &&
                                 !(CurrentTarget.Type != GObjectType.HealthWell))
                             {
-                                hashRGUIDIgnoreBlacklist90.Add(CurrentTarget.RActorGuid);
+                                hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
                                 //dateSinceBlacklist90Clear = DateTime.Now;
                             }
                             // Now tell Trinity to get a new target!
@@ -496,7 +496,7 @@ namespace GilesTrinity
                                     // If we've tried interacting too many times, blacklist this for a while
                                     if (iInteractAttempts > 3)
                                     {
-                                        hashRGUIDIgnoreBlacklist90.Add(CurrentTarget.RActorGuid);
+                                        hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
                                         //dateSinceBlacklist90Clear = DateTime.Now;
                                     }
                                     dictAbilityLastUse[currentPower.SNOPower] = DateTime.Now;
@@ -838,7 +838,7 @@ namespace GilesTrinity
                             {
                                 IgnoreRactorGUID = CurrentTarget.RActorGuid;
                                 IgnoreTargetForLoops = 6;
-                                hashRGUIDIgnoreBlacklist60.Add(CurrentTarget.RActorGuid);
+                                hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
                                 //dateSinceBlacklist90Clear = DateTime.Now;
                             }
                             break;
@@ -1197,9 +1197,9 @@ namespace GilesTrinity
                     // Add this monster to our very short-term ignore list
                     if (!CurrentTarget.IsBoss)
                     {
-                        hashRGuid3SecBlacklist.Add(CurrentTarget.RActorGuid);
-                        lastTemporaryBlacklist = DateTime.Now;
-                        bNeedClearTemporaryBlacklist = true;
+                        hashRGUIDBlacklist3.Add(CurrentTarget.RActorGuid);
+                        dateSinceBlacklist3Clear = DateTime.Now;
+                        NeedToClearBlacklist3 = true;
                     }
                 }
             }
@@ -1291,7 +1291,7 @@ namespace GilesTrinity
             // If we've tried interacting too many times, blacklist this for a while
             if (iInteractAttempts > 20)
             {
-                hashRGUIDIgnoreBlacklist90.Add(CurrentTarget.RActorGuid);
+                hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
                 //dateSinceBlacklist90Clear = DateTime.Now;
             }
             // Now tell Trinity to get a new target!

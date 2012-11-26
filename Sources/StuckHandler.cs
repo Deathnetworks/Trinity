@@ -13,7 +13,8 @@ namespace GilesTrinity
         { 
             get 
             { 
-                return GilesPlayerMover.UnstuckChecker(); 
+                //return GilesPlayerMover.UnstuckChecker(); 
+                return false;
             } 
         }
 

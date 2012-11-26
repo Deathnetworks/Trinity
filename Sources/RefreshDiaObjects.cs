@@ -194,7 +194,7 @@ namespace GilesTrinity
             bAnyChampionsPresent = false;
             bAnyMobsInCloseRange = false;
             lastDistance = 0f;
-            bTravellingAvoidance = false;
+            IsAvoidingProjectiles = false;
             // Every 15 seconds, clear the "blackspots" where avoidance failed, so we can re-check them
             if (DateTime.Now.Subtract(lastClearedAvoidanceBlackspots).TotalSeconds > 15)
             {
@@ -208,10 +208,10 @@ namespace GilesTrinity
                 hashRGUIDDestructible3SecBlacklist = new HashSet<int>();
             }
             // Clear our very short-term ignore-monster blacklist (from not being able to raycast on them or already dead units)
-            if (bNeedClearTemporaryBlacklist && DateTime.Now.Subtract(lastTemporaryBlacklist).TotalMilliseconds > 3000)
+            if (NeedToClearBlacklist3 && DateTime.Now.Subtract(dateSinceBlacklist3Clear).TotalMilliseconds > 3000)
             {
-                bNeedClearTemporaryBlacklist = false;
-                hashRGuid3SecBlacklist = new HashSet<int>();
+                NeedToClearBlacklist3 = false;
+                hashRGUIDBlacklist3 = new HashSet<int>();
             }
             // Clear certain cache dictionaries sequentially, spaced out over time, to force data updates
             if (DateTime.Now.Subtract(lastClearedCacheDictionary).TotalMilliseconds >= 4000)
@@ -624,8 +624,8 @@ namespace GilesTrinity
         {
             bShouldTryKiting = false;
             if (
-                (((CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && iKiteDistance > 0 && CurrentTarget.RadiusDistance <= iKiteDistance) ||
-                hashMonsterObstacleCache.Any(m => m.Location.Distance(playerStatus.CurrentPosition) <= iKiteDistance)) &&
+                (((CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance) ||
+                hashMonsterObstacleCache.Any(m => m.Location.Distance(playerStatus.CurrentPosition) <= PlayerKiteDistance)) &&
                 (iMyCachedActorClass != ActorClass.Wizard || IsWizardShouldKite())) || playerStatus.CurrentHealthPct <= 0.15
                 )
             {
@@ -648,7 +648,7 @@ namespace GilesTrinity
                     {
                         Logging.Write("[Trinity] Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}", 
                             vAnySafePoint, vAnySafePoint.Distance(Me.Position), FindDirectionDegree(Me.Position, vAnySafePoint),
-                            playerStatus.CurrentHealthPct, iKiteDistance, hashMonsterObstacleCache.Count(m => m.Location.Distance(playerStatus.CurrentPosition) <= iKiteDistance),
+                            playerStatus.CurrentHealthPct, PlayerKiteDistance, hashMonsterObstacleCache.Count(m => m.Location.Distance(playerStatus.CurrentPosition) <= PlayerKiteDistance),
                             bNeedToKite, bShouldTryKiting);
                     }
                     CurrentTarget = new GilesObject()

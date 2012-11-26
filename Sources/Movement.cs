@@ -143,7 +143,7 @@ namespace GilesTrinity
             if (!bFindAntiStuckSpot)
             {
                 // Already searched & found a safe spot in last 800 milliseconds, stick to it
-                if (!bTravellingAvoidance && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 800 && vlastSafeSpot != vNullLocation)
+                if (!IsAvoidingProjectiles && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 800 && vlastSafeSpot != vNullLocation)
                 {
                     return vlastSafeSpot;
                 }
@@ -196,7 +196,7 @@ namespace GilesTrinity
                 int iKiteStepSize = 6;
                 if (bKitingSpot)
                 {
-                    iDistanceOut = iKiteDistance + (iKiteStepSize * iStepDistance);
+                    iDistanceOut = PlayerKiteDistance + (iKiteStepSize * iStepDistance);
 
                     //switch (iStepDistance)
                     //{
@@ -355,7 +355,7 @@ namespace GilesTrinity
                             if (bKitingSpot)
                             {
                                 // Kiting spots don't like to end up near other monsters
-                                foreach (GilesObstacle tempobstacle in hashMonsterObstacleCache.Where(cp => Vector3.Distance(cp.Location, vTestPoint) <= (cp.Radius + iKiteDistance)))
+                                foreach (GilesObstacle tempobstacle in hashMonsterObstacleCache.Where(cp => Vector3.Distance(cp.Location, vTestPoint) <= (cp.Radius + PlayerKiteDistance)))
                                 {
                                     fThisWeight = 0;
                                 }

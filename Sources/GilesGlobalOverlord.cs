@@ -100,33 +100,33 @@ namespace GilesTrinity
                 {
                     case ActorClass.Barbarian:
                         // What health % should we use a potion, or look for a globe
-                        iEmergencyHealthPotionLimit = Settings.Combat.Barbarian.PotionLevel;
-                        iEmergencyHealthGlobeLimit = Settings.Combat.Barbarian.HealthGlobeLevel;
-                        iKiteDistance = Settings.Combat.Barbarian.KiteLimit;
+                        PlayerEmergencyHealthPotionLimit = Settings.Combat.Barbarian.PotionLevel;
+                        PlayerEmergencyHealthGlobeLimit = Settings.Combat.Barbarian.HealthGlobeLevel;
+                        PlayerKiteDistance = Settings.Combat.Barbarian.KiteLimit;
                         break;
                     case ActorClass.Monk:
                         // What health % should we use a potion, or look for a globe
-                        iEmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;
-                        iEmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
-                        iKiteDistance = 0;
+                        PlayerEmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;
+                        PlayerEmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
+                        PlayerKiteDistance = 0;
                         break;
                     case ActorClass.Wizard:
                         // What health % should we use a potion, or look for a globe
-                        iEmergencyHealthPotionLimit = Settings.Combat.Wizard.PotionLevel;
-                        iEmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
-                        iKiteDistance = Settings.Combat.Wizard.KiteLimit;
+                        PlayerEmergencyHealthPotionLimit = Settings.Combat.Wizard.PotionLevel;
+                        PlayerEmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
+                        PlayerKiteDistance = Settings.Combat.Wizard.KiteLimit;
                         break;
                     case ActorClass.WitchDoctor:
                         // What health % should we use a potion, or look for a globe
-                        iEmergencyHealthPotionLimit = Settings.Combat.WitchDoctor.PotionLevel;
-                        iEmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
-                        iKiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
+                        PlayerEmergencyHealthPotionLimit = Settings.Combat.WitchDoctor.PotionLevel;
+                        PlayerEmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
+                        PlayerKiteDistance = Settings.Combat.WitchDoctor.KiteLimit;
                         break;
                     case ActorClass.DemonHunter:
                         // What health % should we use a potion, or look for a globe
-                        iEmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
-                        iEmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
-                        iKiteDistance = Settings.Combat.DemonHunter.KiteLimit;
+                        PlayerEmergencyHealthPotionLimit = Settings.Combat.DemonHunter.PotionLevel;
+                        PlayerEmergencyHealthGlobeLimit = Settings.Combat.DemonHunter.HealthGlobeLevel;
+                        PlayerKiteDistance = Settings.Combat.DemonHunter.KiteLimit;
                         break;
                 }
             }
@@ -176,7 +176,7 @@ namespace GilesTrinity
             }
 
             // Pop a potion when necessary
-            if (playerStatus.CurrentHealthPct <= iEmergencyHealthPotionLimit)
+            if (playerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
             {
                 if (!playerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
                 {
@@ -198,7 +198,7 @@ namespace GilesTrinity
                 bResetStatusText = false;
                 BotMain.StatusText = sStatusText;
             }
-            
+
             // Nothing to do... do we have some maintenance we can do instead, like out of combat buffing?
             lastChangedZigZag = DateTime.Today;
             vPositionLastZigZagCheck = Vector3.Zero;
@@ -256,20 +256,20 @@ namespace GilesTrinity
             if (DateTime.Now.Subtract(dateSinceBlacklist90Clear).TotalSeconds > 90)
             {
                 dateSinceBlacklist90Clear = DateTime.Now;
-                hashRGUIDIgnoreBlacklist90 = new HashSet<int>();
+                hashRGUIDBlacklist90 = new HashSet<int>();
             }
             // Clear the full blacklist every 60 seconds (default was 60)
             if (DateTime.Now.Subtract(dateSinceBlacklist60Clear).TotalSeconds > 60)
             {
                 dateSinceBlacklist60Clear = DateTime.Now;
-                hashRGUIDIgnoreBlacklist60 = new HashSet<int>();
+                hashRGUIDBlacklist60 = new HashSet<int>();
                 RefreshProfileBlacklists();
             }
             // Clear the temporary blacklist every 90 seconds (default was 90)
             if (DateTime.Now.Subtract(dateSinceBlacklist15Clear).TotalSeconds > 15)
             {
                 dateSinceBlacklist15Clear = DateTime.Now;
-                hashRGUIDIgnoreBlacklist15 = new HashSet<int>();
+                hashRGUIDBlacklist15 = new HashSet<int>();
             }
         }
         /// <summary>

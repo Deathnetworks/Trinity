@@ -334,9 +334,9 @@ namespace GilesTrinity
             _hashsetItemPicksLookedAt = new HashSet<int>();
             _hashsetItemFollowersIgnored = new HashSet<int>();
             _dictItemStashAttempted = new Dictionary<int, int>();
-            hashRGUIDIgnoreBlacklist60 = new HashSet<int>();
-            hashRGUIDIgnoreBlacklist90 = new HashSet<int>();
-            hashRGUIDIgnoreBlacklist15 = new HashSet<int>();
+            hashRGUIDBlacklist60 = new HashSet<int>();
+            hashRGUIDBlacklist90 = new HashSet<int>();
+            hashRGUIDBlacklist15 = new HashSet<int>();
             vBacktrackList = new SortedList<int, Vector3>();
             iTotalBacktracks = 0;
             bMappedPlayerAbilities = false;
