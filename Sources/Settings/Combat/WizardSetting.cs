@@ -63,7 +63,7 @@ namespace GilesTrinity.Settings.Combat
         #endregion Constructors
 
         #region Properties
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.7f)]
         public float PotionLevel
         {
@@ -81,7 +81,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.8f)]
         public float HealthGlobeLevel
         {
@@ -99,7 +99,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(10)]
         public int KiteLimit
         {
@@ -117,7 +117,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidArcaneHealth
         {
@@ -135,7 +135,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidDesecratorHealth
         {
@@ -153,7 +153,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidMoltenCoreHealth
         {
@@ -171,7 +171,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.9f)]
         public float AvoidMoltenTrailHealth
         {
@@ -189,7 +189,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.9f)]
         public float AvoidPoisonTreeHealth
         {
@@ -207,7 +207,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.9f)]
         public float AvoidPlagueCloudHealth
         {
@@ -225,7 +225,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidIceBallsHealth
         {
@@ -243,7 +243,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidPlagueHandsHealth
         {
@@ -261,7 +261,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidBeesWaspsHealth
         {
@@ -279,7 +279,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidAzmoPoolsHealth
         {
@@ -297,7 +297,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidAzmoBodiesHealth
         {
@@ -315,7 +315,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.85f)]
         public float AvoidShamanFireHealth
         {
@@ -333,7 +333,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidGhomGasHealth
         {
@@ -351,7 +351,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidAzmoFireBallHealth
         {
@@ -369,7 +369,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidBelialHealth
         {
@@ -387,7 +387,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidButcherFloorPanelHealth
         {
@@ -405,7 +405,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.8f)]
         public float AvoidDiabloMeteorHealth
         {
@@ -423,7 +423,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidDiabloPrisonHealth
         {
@@ -441,7 +441,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.9f)]
         public float AvoidDiabloRingOfFireHealth
         {
@@ -459,7 +459,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidIceTrailHealth
         {
@@ -477,7 +477,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.3f)]
         public float AvoidMageFireHealth
         {
@@ -495,7 +495,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.7f)]
         public float AvoidMaghdaProjectilleHealth
         {
@@ -513,7 +513,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.1f)]
         public float AvoidMoltenBallHealth
         {
@@ -531,7 +531,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.5f)]
         public float AvoidWallOfFireHealth
         {
@@ -549,7 +549,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidZoltBubbleHealth
         {
@@ -567,7 +567,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.7f)]
         public float AvoidZoltTwisterHealth
         {
@@ -585,7 +585,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool CriticalMass
         {
@@ -603,7 +603,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool OnlyKiteInArchon
         {
@@ -621,7 +621,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool WaitArchon
         {

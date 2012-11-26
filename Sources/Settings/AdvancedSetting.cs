@@ -37,7 +37,7 @@ namespace GilesTrinity.Settings
         #endregion Constructors
 
         #region Properties
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool UnstuckerEnabled
         {
@@ -55,7 +55,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool AllowRestartGame
         {
@@ -73,7 +73,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool TPSEnabled
         {
@@ -91,7 +91,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(10)]
         public int TPSLimit
         {
@@ -109,7 +109,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool DebugInStatusBar
         {
@@ -127,7 +127,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool LogStuckLocation
         {

@@ -35,22 +35,22 @@ namespace GilesTrinity.Settings.Loot
         #endregion Constructors
 
         #region Properties
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(TrashMode.Selling)]
         public TrashMode TrashMode
         { get; set; }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(70000)]
         public int WeaponScore
         { get; set; }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(16000)]
         public int ArmorScore
         { get; set; }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(15000)]
         public int JewelryScore
         { get; set; }

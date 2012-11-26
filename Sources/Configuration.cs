@@ -19,15 +19,11 @@ namespace GilesTrinity
         // Save Configuration
         private void SaveConfiguration()
         {
-            DbHelper.Log("Entry Assembly Location : {0}", Assembly.GetEntryAssembly().Location);
-            DbHelper.Log("Entry Assembly Directory : {0}", Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
             Settings.Save(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), @"Settings\GilesTrinity.xml"));
         }
         // Load Configuration
         private void LoadConfiguration()
         {
-            DbHelper.Log("Entry Assembly Location : {0}", Assembly.GetEntryAssembly().Location);
-            DbHelper.Log("Entry Assembly Directory : {0}", Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
             Settings.Load(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), @"Settings\GilesTrinity.xml"));
         }
         // * CONFIG WINDOW REGION
@@ -2123,6 +2119,5 @@ namespace GilesTrinity
         }
         #endregion
         // * END OF CONFIG WINDOW REGION
-        // Primary/"Default" functions, like logs, initialize, DB event handling etc.
     }
 }

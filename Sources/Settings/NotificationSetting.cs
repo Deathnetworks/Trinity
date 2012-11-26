@@ -43,7 +43,7 @@ namespace GilesTrinity.Settings
         #endregion Constructors
 
         #region Properties
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool IPhoneEnabled
         {
@@ -61,7 +61,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue("")]
         public string IPhoneKey
         {
@@ -79,7 +79,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool AndroidEnabled
         {
@@ -97,7 +97,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue("")]
         public string AndroidKey
         {
@@ -115,7 +115,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool MailEnabled
         {
@@ -133,7 +133,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue("")]
         public string EmailAddress
         {
@@ -151,7 +151,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue("")]
         public string EmailPassword
         {
@@ -169,7 +169,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue("")]
         public string BotName
         {
@@ -187,7 +187,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(100000)]
         public int WeaponScore
         {
@@ -205,7 +205,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(30000)]
         public int ArmorScore
         {
@@ -223,7 +223,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(28000)]
         public int JewelryScore
         {
@@ -241,7 +241,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool LegendaryScoring
         {

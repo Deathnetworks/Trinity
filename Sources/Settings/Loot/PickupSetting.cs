@@ -47,7 +47,7 @@ namespace GilesTrinity.Settings.Loot
         #endregion Constructors
 
         #region Properties
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1)]
         public int WeaponBlueLevel
         {
@@ -65,7 +65,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1)]
         public int WeaponYellowLevel
         {
@@ -83,7 +83,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1)]
         public int ArmorBlueLevel
         {
@@ -101,7 +101,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1)]
         public int ArmorYellowLevel
         {
@@ -119,7 +119,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1)]
         public int JewelryBlueLevel
         {
@@ -137,7 +137,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1)]
         public int JewelryYellowLevel
         {
@@ -155,7 +155,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(PotionMode.Cap)]
         public PotionMode PotionMode
         {
@@ -173,7 +173,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1)]
         public int Potionlevel
         {
@@ -191,7 +191,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(TrinityGemType.Ruby | TrinityGemType.Amethys | TrinityGemType.Emerald | TrinityGemType.Topaz)]
         public TrinityGemType GemType
         {
@@ -209,7 +209,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1)]
         public int GemLevel
         {
@@ -227,7 +227,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1)]
         public int LegendaryLevel
         {
@@ -245,7 +245,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1)]
         public int MinimumGoldStack
         {
@@ -263,7 +263,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool CraftTomes
         {
@@ -281,7 +281,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool DesignPlan
         {
@@ -299,7 +299,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool FollowerItem
         {
@@ -317,7 +317,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(1)]
         public int MiscItemLevel
         {

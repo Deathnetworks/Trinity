@@ -34,7 +34,7 @@ namespace GilesTrinity.Settings
         #endregion Constructors
 
         #region Properties
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue("")]
         public string ServerAddress
         {
@@ -52,7 +52,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue("")]
         public string Username
         {
@@ -70,7 +70,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue("")]
         public string Password
         {

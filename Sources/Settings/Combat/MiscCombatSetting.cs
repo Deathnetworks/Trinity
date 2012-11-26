@@ -15,42 +15,42 @@ namespace GilesTrinity.Settings.Combat
             Reset();
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(GoblinPriority.Prioritize)]
         public GoblinPriority GoblinPriority
         { get; set; }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(40)]
         public int NonEliteRange
         { get; set; }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool ExtendedTrashKill
         { get; set; }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool AvoidAOE
         { get; set; }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool CollectHealthGlobe
         { get; set; }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool AllowOOCMovement
         { get; set; }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool AllowBacktracking
         { get; set; }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(800)]
         public int DelayAfterKill
         { get; set; }

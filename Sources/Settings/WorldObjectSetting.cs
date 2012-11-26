@@ -20,7 +20,7 @@ namespace GilesTrinity.Settings
             Reset();
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(15)]
         public int ContainerOpenRange
         {
@@ -38,7 +38,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(12)]
         public int DestructibleRange
         {
@@ -56,7 +56,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool UseShrine
         {
@@ -74,7 +74,7 @@ namespace GilesTrinity.Settings
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool IgnoreNonBlocking
         {

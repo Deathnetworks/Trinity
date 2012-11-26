@@ -33,7 +33,7 @@ namespace GilesTrinity.Settings.Loot
         #endregion Constructors
 
         #region Properties
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         [DefaultValue(ItemFilterMode.TrinityOnly)]
         public ItemFilterMode ItemFilterMode
         {
@@ -51,7 +51,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         public PickupSetting Pickup
         {
             get
@@ -68,7 +68,7 @@ namespace GilesTrinity.Settings.Loot
             }
         }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(IsRequired = false)]
         public TownRunSetting TownRun
         {
             get
