@@ -76,9 +76,9 @@ namespace GilesTrinity
                 (hashPowerHotbarAbilities.Contains(SNOPower.Monk_BreathOfHeaven) && (!Settings.Combat.Monk.HasInnaSet || GilesHasBuff(SNOPower.Monk_BreathOfHeaven)))) &&
                 // Check if either we don't have sweeping winds, or we do and it's ready to cast in a moment
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) ||
-                (hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 95 ||
-                (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 25) || GilesHasBuff(SNOPower.Monk_SweepingWind))) ||
-                playerStatus.CurrentHealthPct <= 0.4) &&
+                (hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 85 ||
+                (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15) || GilesHasBuff(SNOPower.Monk_SweepingWind))) ||
+                playerStatus.CurrentHealthPct <= 0.25) &&
                 GilesUseTimer(SNOPower.Monk_BlindingFlash) && PowerManager.CanCast(SNOPower.Monk_BlindingFlash))
             {
                 return new GilesPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 11f -- 1, 2
@@ -97,8 +97,7 @@ namespace GilesTrinity
                 // Check if either we don't have blinding flash, or we do and it's been cast in the last 6000ms
                 //DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 6000)) &&
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_BlindingFlash) ||
-                (hashPowerHotbarAbilities.Contains(SNOPower.Monk_BlindingFlash) &&
-                ((!Settings.Combat.Monk.HasInnaSet && iElitesWithinRange[RANGE_50] == 0 && !CurrentTarget.IsEliteRareUnique && !CurrentTarget.IsBoss) || GilesHasBuff(SNOPower.Monk_BlindingFlash)))) &&
+                (hashPowerHotbarAbilities.Contains(SNOPower.Monk_BlindingFlash) && GilesHasBuff(SNOPower.Monk_BlindingFlash))) &&
                 // Check our mantras, if we have them, are up first
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfEvasion) || (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfEvasion) && GilesHasBuff(SNOPower.Monk_MantraOfEvasion))) &&
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfConviction) || (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfConviction) && GilesHasBuff(SNOPower.Monk_MantraOfConviction))) &&

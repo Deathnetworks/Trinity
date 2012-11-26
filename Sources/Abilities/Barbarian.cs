@@ -271,13 +271,13 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.Barbarian_Rend, 0f, playerStatus.CurrentPosition, iCurrentWorldID, -1, iPreDelay, iPostDelay, USE_SLOWLY);
             }
             // Overpower used off-cooldown
-            if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Overpower) && !playerStatus.IsIncapacitated &&
+            if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Overpower) && !playerStatus.IsIncapacitated &&
                 // Doesn't need CURRENT target to be in range, just needs ANYTHING to be within 9 foot, since it's an AOE!
                 //(iAnythingWithinRange[RANGE_5] > 0 || targetCurrent.fRadiusDistance <= 6f) &&
                 //intell -- now used on melee goblin
                 (
-                    iAnythingWithinRange[RANGE_6] >= 2 ||
-                    (playerStatus.CurrentHealthPct <= 0.85 && CurrentTarget.RadiusDistance <= 5f) ||
+                    iAnythingWithinRange[RANGE_6] >= 1 ||
+                    (CurrentTarget.RadiusDistance <= 5f) ||
                     (
                         iAnythingWithinRange[RANGE_6] >= 1 &&
                         (CurrentTarget.IsEliteRareUnique || CurrentTarget.IsMinion || CurrentTarget.IsBoss || GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) ||
@@ -400,17 +400,8 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.Barbarian_BattleRage, 0f, vNullLocation, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
             }
             // Hammer of the ancients spam-attacks - never use if waiting for special
-            if (!bOOCBuff && !bCurrentlyAvoiding && !bWaitingForSpecial && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_HammerOfTheAncients) && !playerStatus.IsIncapacitated &&
-                playerStatus.CurrentEnergy >= 20 &&
-               (
-                // More than 75 energy... *OR* 55 energy and target is high on health... 
-                    playerStatus.CurrentEnergy >= 75 || (playerStatus.CurrentEnergy >= 55 && CurrentTarget.HitPoints >= 0.50) ||
-                // OR... target is elite/goblin/boss...
-                    CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss ||
-                // OR... player WOTB is active... OR player is low on health...
-                    GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) || playerStatus.CurrentHealthPct <= 0.38
-               ) &&
-               GilesUseTimer(SNOPower.Barbarian_HammerOfTheAncients))
+            if (playerStatus.CurrentEnergy >= 20 && !bOOCBuff && !bCurrentlyAvoiding && !bWaitingForSpecial && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_HammerOfTheAncients) &&
+                !playerStatus.IsIncapacitated)
             {
                 return new GilesPower(SNOPower.Barbarian_HammerOfTheAncients, 12f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
