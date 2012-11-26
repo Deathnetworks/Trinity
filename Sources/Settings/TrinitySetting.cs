@@ -277,7 +277,7 @@ namespace GilesTrinity.Settings
                             MethodBase method = prop.PropertyType.GetMethod("CopyTo", new[] { prop.PropertyType });
                             if (method != null)
                             {
-                                method.Invoke(destinationValue, new[] { sourceValue });
+                                method.Invoke(sourceValue, new[] { destinationValue });
                             }
                         }
                         else if (destinationValue != null)

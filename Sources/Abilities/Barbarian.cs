@@ -271,7 +271,7 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.Barbarian_Rend, 0f, playerStatus.CurrentPosition, iCurrentWorldID, -1, iPreDelay, iPostDelay, USE_SLOWLY);
             }
             // Overpower used off-cooldown
-            if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Overpower) && !playerStatus.IsIncapacitated &&
+            if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Overpower) && !playerStatus.IsIncapacitated &&
                 // Doesn't need CURRENT target to be in range, just needs ANYTHING to be within 9 foot, since it's an AOE!
                 //(iAnythingWithinRange[RANGE_5] > 0 || targetCurrent.fRadiusDistance <= 6f) &&
                 //intell -- now used on melee goblin
