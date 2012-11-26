@@ -761,9 +761,9 @@
                     </ComboBox>
                     <Label Content="Potions:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="8,160,0,0" VerticalAlignment="Top" Width="54" />
                     <ComboBox Name="comboPotions" Height="23" HorizontalAlignment="Left" Margin="68,161,0,0" SelectedValuePath="Tag" VerticalAlignment="Top" Width="89">
-                        <ComboBoxItem Content="Ignore All" Tag="1" />
+                        <ComboBoxItem Content="Ignore All" Tag="3" />
                         <ComboBoxItem Content="Cap At 100" IsSelected="True" Tag="2" />
-                        <ComboBoxItem Content="Pickup All" Tag="3" />
+                        <ComboBoxItem Content="Pickup All" Tag="1" />
                     </ComboBox>
                     <Label Content="Gems:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="8,183,0,0" VerticalAlignment="Top" Width="45" />
                     <CheckBox Name="checkGemEmerald" Content="Emerald" Height="18" HorizontalAlignment="Left" IsChecked="True" Margin="8,214,0,0" VerticalAlignment="Top" Width="61" />

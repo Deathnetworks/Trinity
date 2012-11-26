@@ -1,4 +1,5 @@
-﻿using GilesTrinity.Settings.Loot;
+﻿using GilesTrinity.DbProvider;
+using GilesTrinity.Settings.Loot;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -194,15 +195,14 @@ namespace GilesTrinity
 
                             // Map out all the items already in the backpack
                             int iTotalPotions =
-                                (from tempitem in ZetaDia.Me.Inventory.Backpack where tempitem.BaseAddress != IntPtr.Zero where tempitem.GameBalanceId == balanceId select tempitem.ItemStackQuantity).Sum();
+                                (from tempitem in ZetaDia.Me.Inventory.Backpack 
+                                 where tempitem.BaseAddress != IntPtr.Zero 
+                                 where tempitem.GameBalanceId == balanceId 
+                                 select tempitem.ItemStackQuantity).Sum();
                             if (iTotalPotions > 98)
                             {
                                 return false;
                             }
-                        }
-                        if (Settings.Loot.Pickup.PotionMode == PotionMode.All && level > Settings.Loot.Pickup.Potionlevel)
-                        {
-                                return true;
                         }
                     }
                     break;
@@ -211,6 +211,7 @@ namespace GilesTrinity
                 case GBaseItemType.Unknown:
                     return false;
                 default:
+                    DbHelper.Log("default case");
                     return false;
             }
 
