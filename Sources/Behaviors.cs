@@ -910,6 +910,9 @@ namespace GilesTrinity
             if (Settings.Advanced.DebugInStatusBar)
             {
                 BotMain.StatusText = sStatusText;
+            }
+            if (Settings.Advanced.DebugTargetting)
+            {
                 Logging.WriteDiagnostic(sStatusText);
             }
             bResetStatusText = true;
@@ -957,6 +960,9 @@ namespace GilesTrinity
             if (Settings.Advanced.DebugInStatusBar)
             {
                 BotMain.StatusText = sStatusText;
+            }
+            if (Settings.Advanced.DebugTargetting)
+            {
                 Logging.WriteDiagnostic(sStatusText);
             }
             bResetStatusText = true;

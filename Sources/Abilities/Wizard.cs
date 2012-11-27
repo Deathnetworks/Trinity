@@ -45,9 +45,9 @@ namespace GilesTrinity
                     (
                     // Check this isn't a critical mass wizard, cos they won't want to use this except for low health unless they don't have nova/blast in which case go for it
                     (Settings.Combat.Wizard.CriticalMass && ((!hashPowerHotbarAbilities.Contains(SNOPower.Wizard_FrostNova) && !hashPowerHotbarAbilities.Contains(SNOPower.Wizard_ExplosiveBlast)) ||
-                        (playerStatus.CurrentHealthPct <= 0.7 && (iElitesWithinRange[RANGE_15] > 0 || iAnythingWithinRange[RANGE_15] > 0 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 23f)))))
+                        (playerStatus.CurrentHealthPct <= 0.7 && (iElitesWithinRange[RANGE_15] > 0 || iAnythingWithinRange[RANGE_15] > 0 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 23f)))))
                     // Else normal wizard in which case check standard stuff
-                    || (!Settings.Combat.Wizard.CriticalMass && iElitesWithinRange[RANGE_15] > 0 || iAnythingWithinRange[RANGE_15] > 3 || playerStatus.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 23f))
+                    || (!Settings.Combat.Wizard.CriticalMass && iElitesWithinRange[RANGE_15] > 0 || iAnythingWithinRange[RANGE_15] > 3 || playerStatus.CurrentHealthPct <= 0.7 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 23f))
                     ) &&
                     hashPowerHotbarAbilities.Contains(SNOPower.Wizard_WaveOfForce) &&
                     GilesUseTimer(SNOPower.Wizard_WaveOfForce, true) && PowerManager.CanCast(SNOPower.Wizard_WaveOfForce))
@@ -162,7 +162,7 @@ namespace GilesTrinity
                 }
                 // Archon
                 if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Archon) &&
-                    (iElitesWithinRange[RANGE_30] >= 1 || iAnythingWithinRange[RANGE_25] >= 3 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 30f)) &&
+                    (iElitesWithinRange[RANGE_30] >= 1 || iAnythingWithinRange[RANGE_25] >= 3 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 30f)) &&
                     playerStatus.CurrentEnergy >= 25 && playerStatus.CurrentHealthPct >= 0.10 &&
                     PowerManager.CanCast(SNOPower.Wizard_Archon))
                 {
@@ -319,14 +319,14 @@ namespace GilesTrinity
                 // Arcane Blast
                 if (!bOOCBuff && !playerStatus.IsIncapacitated &&
                     (iElitesWithinRange[RANGE_15] >= 1 || iAnythingWithinRange[RANGE_15] >= 1 ||
-                     ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 15f)) &&
+                     (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) &&
                     GilesUseTimer(SNOPower.Wizard_Archon_ArcaneBlast) && PowerManager.CanCast(SNOPower.Wizard_Archon_ArcaneBlast))
                 {
                     return new GilesPower(SNOPower.Wizard_Archon_ArcaneBlast, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
                 }
                 // Arcane Strike (Arcane Strike) Rapid Spam at close-range only
                 if (!bOOCBuff && !playerStatus.IsIncapacitated && CurrentTarget.RadiusDistance <= 13f &&
-                    (CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss))
+                    CurrentTarget.IsBossOrEliteRareUnique)
                 {
                     return new GilesPower(SNOPower.Wizard_Archon_ArcaneStrike, 11f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
                 }

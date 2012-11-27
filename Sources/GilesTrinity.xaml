@@ -52,14 +52,16 @@
                                 <Label Content="Min-Distance Before Kite:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,49,0,0" VerticalAlignment="Top" Width="186" />
                                 <TextBox Name="textKite0" Height="23" HorizontalAlignment="Left" IsReadOnly="True" Margin="333,48,0,0" Text="0" VerticalAlignment="Top" Width="38" />
                                 <Slider Name="slideKite0" Height="23" HorizontalAlignment="Left" Interval="1" Margin="200,52,0,0" Maximum="40" Minimum="0" SmallChange="100" TickFrequency="1" TickPlacement="BottomRight" Value="0" VerticalAlignment="Top" Width="130" />
-                                
+
                                 <CheckBox Name="checkSelectiveWW" Content="Selective Whirlwind Targets*" Height="18" HorizontalAlignment="Left" Margin="10,73,0,0" Width="160" VerticalAlignment="Top" />
                                 <Label Content="(*eg goblins, occultists)" Height="24" HorizontalAlignment="Left" Margin="20,81,0,0" VerticalAlignment="Top" Width="208" />
                                 <CheckBox Name="checkWaitWrath" IsChecked="True" Content="Wait for WOTB cooldown at Azmo" Height="16" HorizontalAlignment="Left" Margin="190,75,0,0" VerticalAlignment="Top" Width="193" />
                                 <CheckBox Name="checkGoblinWrath" Content="Use WOTB on Goblins" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="190,90,0,0" VerticalAlignment="Top" Width="193" />
                                 <CheckBox Name="checkFuryDumpWrath" Content="Fury Dump in WOTB mode" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="190,105,0,0" VerticalAlignment="Top" Width="193" />
-                                <CheckBox Name="checkFuryDumpAlways" Content="Fury Dump always" Height="16" HorizontalAlignment="Left" Margin="190,120,0,0" VerticalAlignment="Top" Width="193" />
-                                
+                                <CheckBox Name="checkFuryDumpAlways" Content="Fury Dump always" Height="16" HorizontalAlignment="Left" Margin="10,117,0,0" VerticalAlignment="Top" Width="193" />
+                                <CheckBox Name="checkWrath90" Content="Boon of Bul-Kathos Passive" Height="16" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top" Width="174" />
+                                <CheckBox Name="checkWOTBHardOnly" Content="Use WOTB on hard elites only" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="190,121,0,0" VerticalAlignment="Top" Width="193" />
+
                                 <ScrollViewer Height="205" HorizontalAlignment="Left" Margin="0,140,0,0" VerticalAlignment="Top" Width="388" CanContentScroll="True" BorderThickness="0">
 
                                     <Grid Height="300" Width="385">
@@ -138,15 +140,14 @@
                                         <TextBox Name="textRadius0_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,249,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,249,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,249,0,0" Text="80" VerticalAlignment="Top" Width="30" />
-										
-										<Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
+
+                                        <Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius0_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,270,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius0_13" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,270,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth0_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,270,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth0_13" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,270,0,0" Text="80" VerticalAlignment="Top" Width="30" />
                                     </Grid>
                                 </ScrollViewer>
-                                <CheckBox Name="checkWrath90" Content="Boon of Bul-Kathos Passive" Height="16" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top" Width="174" />
                             </Grid>
                         </TabItem>
                         <TabItem Header="Monk">
@@ -238,8 +239,8 @@
                                         <TextBox Name="textRadius1_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,249,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,249,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth1_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,249,0,0" Text="80" VerticalAlignment="Top" Width="30" />
-										
-										<Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
+
+                                        <Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius1_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,270,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius1_13" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,270,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth1_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,270,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
@@ -247,6 +248,7 @@
                                     </Grid>
                                 </ScrollViewer>
                                 <CheckBox Name="checkMonkInna" Content="Inna's set (sweeping wind 5 spirit)"  HorizontalAlignment="Left" Height="17" Margin="6,50,0,0" VerticalAlignment="Top" Width="218" />
+                                <CheckBox Name="checkMonkSWWeaponSwap" Content="Sweeping Wind Weapon Swap Exploit"  HorizontalAlignment="Left" Height="17" Margin="6,72,0,0" VerticalAlignment="Top" Width="218" />
                             </Grid>
                         </TabItem>
                         <TabItem Header="Wiz">
@@ -260,14 +262,14 @@
                                 <Label Content="Globe %:" FontWeight="Bold" Foreground="#FFA00000" Height="24" HorizontalAlignment="Left" Margin="186,25,0,0" VerticalAlignment="Top" Width="61" />
                                 <Slider Name="slideGlobe2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="245,27,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="60" VerticalAlignment="Top" Width="100" />
                                 <TextBox Name="textGlobe2" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="346,27,0,0" Text="60" VerticalAlignment="Top" Width="24" />
-                                
+
                                 <Label Content="Min-Distance Before Kite:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,49,0,0" VerticalAlignment="Top" Width="186" />
                                 <TextBox Name="textKite2" Height="23" HorizontalAlignment="Left" IsReadOnly="True" Margin="333,48,0,0" Text="0" VerticalAlignment="Top" Width="38" />
                                 <Slider Name="slideKite2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="200,52,0,0" Maximum="40" Minimum="0" SmallChange="100" TickFrequency="1" TickPlacement="BottomRight" Value="0" VerticalAlignment="Top" Width="130" />
-                                
+
                                 <CheckBox Name="checkCritical" Content="Wiz Crit-Mass / WD Grave Injustice*" Height="18" Margin="4,80,151,0" VerticalAlignment="Top" />
                                 <Label Content="(*allows rapid-spam of certain spells)" Height="24" HorizontalAlignment="Left" Margin="10,87,0,0" VerticalAlignment="Top" Width="208" />
-                                
+
                                 <ScrollViewer Height="220" HorizontalAlignment="Left" Margin="0,120,0,0" VerticalAlignment="Top" Width="388" CanContentScroll="True">
 
                                     <Grid Height="300" Width="385">
@@ -345,8 +347,8 @@
                                         <TextBox Name="textRadius2_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,249,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,249,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth2_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,249,0,0" Text="80" VerticalAlignment="Top" Width="30" />
-										
-										<Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
+
+                                        <Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius2_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,270,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius2_13" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,270,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth2_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,270,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
@@ -374,7 +376,7 @@
 
                                 <CheckBox Name="checkGrave" Content="Wiz Crit-Mass / WD Grave Injustice*" Height="18" Margin="4,80,151,0" VerticalAlignment="Top" />
                                 <Label Content="(*allows rapid-spam of certain spells)" Height="24" HorizontalAlignment="Left" Margin="10,87,0,0" VerticalAlignment="Top" Width="208" />
-                                
+
                                 <ScrollViewer Height="220" HorizontalAlignment="Left" Margin="0,120,0,0" VerticalAlignment="Top" Width="388" CanContentScroll="True">
 
                                     <Grid Height="300" Width="385">
@@ -452,8 +454,8 @@
                                         <TextBox Name="textRadius3_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,249,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,249,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth3_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,249,0,0" Text="80" VerticalAlignment="Top" Width="30" />
-										
-										<Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
+
+                                        <Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius3_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,270,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius3_13" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,270,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth3_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,270,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
@@ -551,8 +553,8 @@
                                         <TextBox Name="textRadius4_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,249,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_12" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,249,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textHealth4_12" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="334,249,0,0" Text="80" VerticalAlignment="Top" Width="30" />
-										
-										<Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
+
+                                        <Label Content="Ghom Gas:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,268,0,0" VerticalAlignment="Top" Width="92" />
                                         <Slider Name="slideRadius4_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="95,270,0,0" Maximum="30" Minimum="2" SmallChange="1" TickPlacement="None" Value="16" VerticalAlignment="Top" Width="100" />
                                         <TextBox Name="textRadius4_13" Height="20" HorizontalAlignment="Left" IsReadOnly="True" Margin="200,270,0,0" Text="16" VerticalAlignment="Top" Width="24" />
                                         <Slider Name="slideHealth4_13" Height="23" HorizontalAlignment="Left" Interval="1" Margin="230,270,0,0" Maximum="100" Minimum="0" SmallChange="1" TickPlacement="None" Value="80" VerticalAlignment="Top" Width="100" />
@@ -864,19 +866,20 @@
             </TabItem>
             <TabItem Header="Advanced">
                 <Grid Height="400" Width="413">
+                    <CheckBox Name="checkUnstucker" Content="Enable Trinity Unstucker" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="8,28,0,0" VerticalAlignment="Top" Width="160" />
                     <CheckBox Name="checkTPS" Content="Enable TPS" Height="18" IsChecked="False" Margin="9,104,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" />
                     <Slider Name="slideTPS" Height="23" HorizontalAlignment="Left" Interval="500" Margin="82,102,0,0" Maximum="15" Minimum="1" SmallChange="1" TickFrequency="3" TickPlacement="BottomRight" Value="10" VerticalAlignment="Top" Width="180" />
                     <TextBox Name="textTPS" Height="23" HorizontalAlignment="Left" IsReadOnly="True" Margin="271,102,0,0" Text="10" VerticalAlignment="Top" Width="38" />
                     <Label Content="Ticks-Per-Second affects CPU usage:" Height="24" HorizontalAlignment="Left" Margin="4,80,0,0" VerticalAlignment="Top" Width="311" FontWeight="Bold" />
                     <Label Content="Set below 10 to reduce CPU use (but dumb the bot down)" Height="28" HorizontalAlignment="Left" Margin="5,122,0,0" VerticalAlignment="Top" Width="385" />
                     <Label Content="You can experiment above 10 (DB default), but this will eat CPU" Height="28" HorizontalAlignment="Left" Margin="5,135,0,0" VerticalAlignment="Top" Width="385" />
-                    <CheckBox Name="checkLogStucks" Content="Log Stuck Locations" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="9,247,0,0" VerticalAlignment="Top" Width="123" />
-                    <Label Content="Log Stuck Locations:" Height="24" HorizontalAlignment="Left" Margin="3,225,0,0" VerticalAlignment="Top" Width="311" FontWeight="Bold" />
-                    <Button Name="ResetAdvanced" Content="Reset to Defaults" FontWeight="Bold" Foreground="#FF123DCE" Height="23" HorizontalAlignment="Left" Margin="156,311,0,0" VerticalAlignment="Top" Width="110" />
-                    <CheckBox Name="checkDebugInfo" Content="Debug info status bar" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="10,181,0,0" VerticalAlignment="Top" Width="143" />
-                    <Label Content="Show debug info in DB status bar:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="4,159,0,0" VerticalAlignment="Top" Width="311" />
-                    <Label Content="Useful for tracking down problems, but can be CPU intensive" Height="28" HorizontalAlignment="Left" Margin="6,192,0,0" VerticalAlignment="Top" Width="385" />
-                    <CheckBox Name="checkUnstucker" Content="Enable Trinity Unstucker" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="8,28,0,0" VerticalAlignment="Top" Width="160" />
+                    <CheckBox Name="checkLogStucks" Content="Log Stuck Locations" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="10,168,0,0" VerticalAlignment="Top" Width="123" />
+                    <Button Name="ResetAdvanced" Content="Reset to Defaults" FontWeight="Bold" Foreground="#FF123DCE" Height="23" HorizontalAlignment="Left" Margin="157,367,0,0" VerticalAlignment="Top" Width="110" />
+                    <CheckBox Name="checkDebugInfo" Content="Debug Info In Status Bar" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="10,204,0,0" VerticalAlignment="Top" Width="158" />
+                    <CheckBox Name="checkDebugTargetting" Content="Debug Targetting System" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="10,227,0,0" VerticalAlignment="Top" Width="158" />
+                    <CheckBox Name="checkDebugCache" Content="Debug Cache System" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="10,250,0,0" VerticalAlignment="Top" Width="158" />
+                    <CheckBox Name="checkDebugWeights" Content="Debug Weight System" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="10,273,0,0" VerticalAlignment="Top" Width="158" />
+                    <CheckBox Name="checkDebugItems" Content="Debug Item Valuations" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="10,296,0,0" VerticalAlignment="Top" Width="158" />
                     <Label Content="Trinity Simple Unstucker:" FontWeight="Bold" Height="24" HorizontalAlignment="Left" Margin="2,6,0,0" VerticalAlignment="Top" Width="311" />
                     <CheckBox Name="checkProfileReload" Content="Allow Game Restarting for long stucks" Height="18" HorizontalAlignment="Left" IsChecked="False" Margin="157,28,0,0" VerticalAlignment="Top" Width="204" />
                 </Grid>

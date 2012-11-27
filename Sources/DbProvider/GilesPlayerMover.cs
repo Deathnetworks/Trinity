@@ -20,15 +20,17 @@ namespace GilesTrinity.DbProvider
         private static readonly HashSet<int> hashAvoidLeapingToSNO = new HashSet<int> { 138989, 176074, 176076, 176077, 176536, 260330 };
         // 138989 = health pool, 176074 = protection, 176076 = fortune, 176077 = frenzied, 176536 = portal in leorics, 260330 = cooldown shrine
         // Exp shrines = ???? Other shrines ????
+
         private static bool ShrinesInArea(Vector3 targetpos)
         {
             return ZetaDia.Actors.GetActorsOfType<DiaObject>(true).Any(u => hashAvoidLeapingToSNO.Contains(u.ActorSNO) && Vector3.Distance(u.Position, targetpos) <= 10f);
         }
-        // ShrinesInArea checker
+
         public void MoveStop()
         {
             ZetaDia.Me.UsePower(SNOPower.Walk, ZetaDia.Me.Position, GilesTrinity.iCurrentWorldID, -1);
         }
+
         // Anti-stuck variables
         public static Vector3 vOldMoveToTarget = Vector3.Zero;
         public static int iTimesReachedStuckPoint = 0;
@@ -242,65 +244,28 @@ namespace GilesTrinity.DbProvider
         private static Vector3 vShiftedPosition = Vector3.Zero;
         private static DateTime lastShiftedPosition = DateTime.Today;
         private static int iShiftPositionFor = 0;
+
+
         public void MoveTowards(Vector3 vMoveToTarget)
         {
+            // rrrix-note: This really shouldn't be here... 
             // Recording of all the XML's in use this run
             string sThisProfile = Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile;
-            if (sThisProfile != GilesTrinity.sLastProfileSeen)
-            {
-                // See if we appear to have started a new game
-                if (GilesTrinity.sFirstProfileSeen != "" && sThisProfile == GilesTrinity.sFirstProfileSeen)
-                {
-                    GilesTrinity.TotalProfileRecycles++;
-                    if (GilesTrinity.TotalProfileRecycles > GilesTrinity.iTotalJoinGames && GilesTrinity.TotalProfileRecycles > GilesTrinity.TotalLeaveGames)
-                    {
-                        GilesTrinity.GilesResetEverythingNewGame();
-                    }
-                }
-                GilesTrinity.listProfilesLoaded.Add(sThisProfile);
-                GilesTrinity.sLastProfileSeen = sThisProfile;
-                if (GilesTrinity.sFirstProfileSeen == "")
-                    GilesTrinity.sFirstProfileSeen = sThisProfile;
-            }
-            // The below code is to help profile/routine makers avoid waypoints with a long distance between them.
-            // Long-distances between waypoints is bad - it increases stucks, and forces the DB nav-server to be called.
-            if (GilesTrinity.Settings.Advanced.LogStuckLocation)
-            {
-                if (vLastMoveTo == Vector3.Zero)
-                    vLastMoveTo = vMoveToTarget;
-                if (vMoveToTarget != vLastMoveTo)
-                {
-                    float fDistance = Vector3.Distance(vMoveToTarget, vLastMoveTo);
-                    // Log if not in town, last waypoint wasn't FROM town, and the distance is >200 but <2000 (cos 2000+ probably means we changed map zones!)
-                    if (!ZetaDia.Me.IsInTown && !bLastWaypointWasTown && fDistance >= 200 & fDistance <= 2000)
-                    {
-                        if (!hashDoneThisVector.Contains(vMoveToTarget))
-                        {
-                            // Log it
-                            FileStream LogStream = File.Open(GilesTrinity.sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - LongPaths - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
-                            using (StreamWriter LogWriter = new StreamWriter(LogStream))
-                            {
-                                LogWriter.WriteLine(DateTime.Now.ToString() + ":");
-                                LogWriter.WriteLine("Profile Name=" + ProfileManager.CurrentProfile.Name);
-                                LogWriter.WriteLine("'From' Waypoint=" + vLastMoveTo.ToString() + ". 'To' Waypoint=" + vMoveToTarget.ToString() + ". Distance=" + fDistance.ToString());
-                            }
-                            LogStream.Close();
-                            hashDoneThisVector.Add(vMoveToTarget);
-                        }
-                    }
-                    vLastMoveTo = vMoveToTarget;
-                    bLastWaypointWasTown = false;
-                    if (ZetaDia.Me.IsInTown)
-                        bLastWaypointWasTown = true;
-                }
-            }
+            RecordLastProfile(sThisProfile);
+
+
+            vMoveToTarget = WarnAndLogLongPath(vMoveToTarget);
+
             // Make sure GilesTrinity doesn't want us to avoid routine-movement
-            // if (GilesTrinity.bDontMoveMeIAmDoingShit)
+            //if (GilesTrinity.bDontMoveMeIAmDoingShit)
             //    return;
             // Store player current position
+            
             vMyCurrentPosition = ZetaDia.Me.Position;
+            
             // Store distance to current moveto target
             float fDistanceFromTarget;
+            
             // Do unstuckery things
             if (GilesTrinity.Settings.Advanced.UnstuckerEnabled)
             {
@@ -382,27 +347,11 @@ namespace GilesTrinity.DbProvider
             {
                 if (vShiftedPosition == Vector3.Zero)
                 {
+                    // Make sure we only shift max once every 10 seconds
                     if (DateTime.Now.Subtract(lastShiftedPosition).TotalSeconds >= 10)
                     {
-                        float fDirectionToTarget = GilesTrinity.FindDirectionDegree(vMyCurrentPosition, vMoveToTarget);
-                        vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget - 50));
-                        if (!GilesTrinity.GilesCanRayCast(vMyCurrentPosition, vMoveToTarget, NavCellFlags.AllowWalk))
-                        {
-                            vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget + 50));
-                            if (!GilesTrinity.GilesCanRayCast(vMyCurrentPosition, vMoveToTarget, NavCellFlags.AllowWalk))
-                            {
-                                vMoveToTarget = point;
-                            }
-                        }
-                        if (vMoveToTarget != point)
-                        {
-                            vShiftedPosition = vMoveToTarget;
-                            iShiftPositionFor = 900;
-                            lastShiftedPosition = DateTime.Now;
-                            Logging.WriteDiagnostic("[Trinity] Navigation handler position shift to: " + vMoveToTarget.ToString() + " (was " + point.ToString() + ")");
-                        }
+                        GetShiftedPosition(ref vMoveToTarget, ref point);
                     }
-                    // Make sure we only shift max once every 10 seconds
                 }
                 else
                 {
@@ -421,6 +370,7 @@ namespace GilesTrinity.DbProvider
             if (GilesTrinity.Settings.Combat.Misc.AllowOOCMovement && !ZetaDia.Me.IsInTown)
             {
                 bool bTooMuchZChange = ((vMyCurrentPosition.Z - vMoveToTarget.Z) >= 4f);
+
                 // Leap movement for a barb
                 if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Leap) &&
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Barbarian_Leap]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Barbarian_Leap] &&
@@ -494,9 +444,87 @@ namespace GilesTrinity.DbProvider
                     return;
                 }
             }
-            // Allowed to use movement powers to move out-of-combat?
+
             ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
             // ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
+        }
+
+        private static void GetShiftedPosition(ref Vector3 vMoveToTarget, ref Vector3 point)
+        {
+            float fDirectionToTarget = GilesTrinity.FindDirectionDegree(vMyCurrentPosition, vMoveToTarget);
+            vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget - 50));
+            if (!GilesTrinity.GilesCanRayCast(vMyCurrentPosition, vMoveToTarget, NavCellFlags.AllowWalk))
+            {
+                vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget + 50));
+                if (!GilesTrinity.GilesCanRayCast(vMyCurrentPosition, vMoveToTarget, NavCellFlags.AllowWalk))
+                {
+                    vMoveToTarget = point;
+                }
+            }
+            if (vMoveToTarget != point)
+            {
+                vShiftedPosition = vMoveToTarget;
+                iShiftPositionFor = 900;
+                lastShiftedPosition = DateTime.Now;
+                Logging.WriteDiagnostic("[Trinity] Navigation handler position shift to: " + vMoveToTarget.ToString() + " (was " + point.ToString() + ")");
+            }
+        }
+
+        private static Vector3 WarnAndLogLongPath(Vector3 vMoveToTarget)
+        {
+            // The below code is to help profile/routine makers avoid waypoints with a long distance between them.
+            // Long-distances between waypoints is bad - it increases stucks, and forces the DB nav-server to be called.
+            if (GilesTrinity.Settings.Advanced.LogStuckLocation)
+            {
+                if (vLastMoveTo == Vector3.Zero)
+                    vLastMoveTo = vMoveToTarget;
+                if (vMoveToTarget != vLastMoveTo)
+                {
+                    float fDistance = Vector3.Distance(vMoveToTarget, vLastMoveTo);
+                    // Log if not in town, last waypoint wasn't FROM town, and the distance is >200 but <2000 (cos 2000+ probably means we changed map zones!)
+                    if (!ZetaDia.Me.IsInTown && !bLastWaypointWasTown && fDistance >= 200 & fDistance <= 2000)
+                    {
+                        if (!hashDoneThisVector.Contains(vMoveToTarget))
+                        {
+                            // Log it
+                            FileStream LogStream = File.Open(GilesTrinity.sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - LongPaths - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
+                            using (StreamWriter LogWriter = new StreamWriter(LogStream))
+                            {
+                                LogWriter.WriteLine(DateTime.Now.ToString() + ":");
+                                LogWriter.WriteLine("Profile Name=" + ProfileManager.CurrentProfile.Name);
+                                LogWriter.WriteLine("'From' Waypoint=" + vLastMoveTo.ToString() + ". 'To' Waypoint=" + vMoveToTarget.ToString() + ". Distance=" + fDistance.ToString());
+                            }
+                            LogStream.Close();
+                            hashDoneThisVector.Add(vMoveToTarget);
+                        }
+                    }
+                    vLastMoveTo = vMoveToTarget;
+                    bLastWaypointWasTown = false;
+                    if (ZetaDia.Me.IsInTown)
+                        bLastWaypointWasTown = true;
+                }
+            }
+            return vMoveToTarget;
+        }
+
+        private static void RecordLastProfile(string sThisProfile)
+        {
+            if (sThisProfile != GilesTrinity.sLastProfileSeen)
+            {
+                // See if we appear to have started a new game
+                if (GilesTrinity.sFirstProfileSeen != "" && sThisProfile == GilesTrinity.sFirstProfileSeen)
+                {
+                    GilesTrinity.TotalProfileRecycles++;
+                    if (GilesTrinity.TotalProfileRecycles > GilesTrinity.iTotalJoinGames && GilesTrinity.TotalProfileRecycles > GilesTrinity.TotalLeaveGames)
+                    {
+                        GilesTrinity.GilesResetEverythingNewGame();
+                    }
+                }
+                GilesTrinity.listProfilesLoaded.Add(sThisProfile);
+                GilesTrinity.sLastProfileSeen = sThisProfile;
+                if (GilesTrinity.sFirstProfileSeen == "")
+                    GilesTrinity.sFirstProfileSeen = sThisProfile;
+            }
         }
     }
 }

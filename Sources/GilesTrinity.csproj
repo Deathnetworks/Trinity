@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Abilities\Barbarian.cs" />
     <Compile Include="Abilities\Monk.cs" />
+    <Compile Include="Abilities\WeaponSwap.cs" />
     <Compile Include="Abilities\Wizard.cs" />
     <Compile Include="Abilities\DemonHunter.cs" />
     <Compile Include="Abilities\WitchDoctor.cs" />

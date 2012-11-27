@@ -30,7 +30,7 @@ namespace GilesTrinity
         {
             get
             {
-                return new Version(1, 7, 0, 8);
+                return new Version(1, 7, 0, 10);
             }
         }
 
@@ -80,7 +80,7 @@ namespace GilesTrinity
         public void OnEnabled()
         {
 #if DEBUG
-            fullItemAnalysis = true;
+            Settings.Advanced.DebugItemValuation = true;
 #endif
 
             string battleTagName = "";
@@ -93,7 +93,7 @@ namespace GilesTrinity
             string sDemonBuddyPath = Assembly.GetEntryAssembly().Location;
             sTrinityPluginPath = Path.GetDirectoryName(sDemonBuddyPath) + @"\Plugins\GilesTrinity\";
             sTrinityConfigFile = Path.GetDirectoryName(sDemonBuddyPath) + @"\Settings\GilesTrinity.cfg";
-            
+
             sTrinityEmailConfigFile = Path.GetDirectoryName(sDemonBuddyPath) + @"\Settings\" + battleTagName + @"-Email.cfg";
 
             //Logging.WriteDiagnostic("Trinity Initialization, settings location=" + sTrinityConfigFile);
@@ -110,10 +110,7 @@ namespace GilesTrinity
                 Window mainWindow = Application.Current.MainWindow;
                 try
                 {
-                    if (bDebugLogSpecial)
-                        mainWindow.Title = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
-                    else
-                        mainWindow.Title = "DB - " + battleTagName;
+                    mainWindow.Title = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
                 }
                 catch { }
                 var tab = mainWindow.FindName("tabControlMain") as TabControl;
@@ -186,7 +183,7 @@ namespace GilesTrinity
             {
                 StashRule.init();
             }
-            catch { } 
+            catch { }
         }
 
         /// <summary>
@@ -247,5 +244,14 @@ namespace GilesTrinity
         {
             return (other.Name == Name) && (other.Version == Version);
         }
+
+
+        public GilesTrinity()
+        {
+            Instance = this;
+        }
+
+        public static GilesTrinity Instance { get; private set; }
+
     }
 }

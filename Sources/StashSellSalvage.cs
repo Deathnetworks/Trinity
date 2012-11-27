@@ -1168,7 +1168,7 @@ namespace GilesTrinity
                         // Change made by bombastic
                         Logging.Write("+=+=+=+=+=+=+=+=+ LEGENDARY FOUND +=+=+=+=+=+=+=+=+");
                         Logging.Write("+  Name:       " + thisgooditem.RealName + " (" + thisgilesitemtype.ToString() + ")");
-                        Logging.Write("+  Score:       " + Math.Round(ithisitemvalue).ToString());
+                        Logging.Write("+  Score:       " + ithisitemvalue.ToString("0"));
                         Logging.Write("+  Attributes: " + ValueItemStatString);
                         Logging.Write("+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
                     }
@@ -1224,7 +1224,7 @@ namespace GilesTrinity
                     string sLegendaryString = "";
                     if (thisgooditem.Quality >= ItemQuality.Legendary)
                         sLegendaryString = " {legendary item}";
-                    LogWriter.WriteLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.RealName + "'. Score = " + Math.Round(ithisitemvalue).ToString() + sLegendaryString);
+                    LogWriter.WriteLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.RealName + "'. Score = " + ithisitemvalue.ToString("0") + sLegendaryString);
                     if (junkItemStatString != "")
                         LogWriter.WriteLine("  " + junkItemStatString);
                     else

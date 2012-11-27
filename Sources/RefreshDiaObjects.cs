@@ -111,7 +111,7 @@ namespace GilesTrinity
             // Record the last time our target changed etc.
             if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
             {
-                if (bDebugLogSpecial && Settings.Advanced.DebugInStatusBar)
+                if (Settings.Advanced.DebugTargetting)
                 {
                     Logging.WriteDiagnostic("[Trinity] Setting dateSincePicked to {0} iCurrentTargetRactorGUID: {1} CurrentTarget.iRActorGuid: {2}",
                         DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
@@ -127,7 +127,7 @@ namespace GilesTrinity
                     // Check if the health has changed, if so update the target-pick time before we blacklist them again
                     if (CurrentTarget.HitPoints != iTargetLastHealth)
                     {
-                        if (bDebugLogSpecial && Settings.Advanced.DebugInStatusBar)
+                        if (Settings.Advanced.DebugTargetting)
                         {
                             Logging.WriteDiagnostic("[Trinity] Setting dateSincePicked to {0} CurrentTarget.iHitPoints: {1}  iTargetLastHealth: {2} ",
                                 DateTime.Now, CurrentTarget.HitPoints, iTargetLastHealth);
@@ -290,8 +290,7 @@ namespace GilesTrinity
                 try
                 {
                     bool bWantThis = CacheDiaObject(currentObject);
-                    //if (bDebugLogRefreshDiaObject && tmp_ThisGilesObjectType != GilesObjectType.Unknown && swTimeSinceLastDebug.ElapsedMilliseconds > 1000)
-                    if (bDebugLogRefreshDiaObject && Settings.Advanced.DebugInStatusBar)
+                    if (Settings.Advanced.DebugCache)
                     {
                         bool ignore = (from n in ignoreNames
                                        where c_Name.StartsWith(n)
@@ -317,7 +316,7 @@ namespace GilesTrinity
                 }
                 catch (Exception ex)
                 {
-                    if (bDebugLogSpecial && Settings.Advanced.DebugInStatusBar)
+                    if (Settings.Advanced.DebugCache)
                     {
                         Logging.WriteDiagnostic("[Trinity] error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
                             currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance);
@@ -623,11 +622,16 @@ namespace GilesTrinity
         private static void RefreshSetKiting(ref Vector3 vKitePointAvoid, bool NeedToKite, ref bool TryToKite)
         {
             TryToKite = false;
+
+            if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
+            {
+                TryToKite = true;
+                vKitePointAvoid = playerStatus.CurrentPosition;
+            }
+
             if (
-                (((CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance) ||
-                hashMonsterObstacleCache.Any(m => m.Location.Distance(playerStatus.CurrentPosition) <= PlayerKiteDistance)) &&
-                (iMyCachedActorClass != ActorClass.Wizard || IsWizardShouldKite())) || playerStatus.CurrentHealthPct <= 0.15
-                )
+                ((hashMonsterObstacleCache.Any(m => m.Location.Distance(playerStatus.CurrentPosition) <= PlayerKiteDistance)) &&
+                (iMyCachedActorClass != ActorClass.Wizard || IsWizardShouldKite())) || playerStatus.CurrentHealthPct <= 0.15)
             {
                 TryToKite = true;
 
@@ -640,11 +644,12 @@ namespace GilesTrinity
                 (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= cancelledKiteMoveForMilliseconds ||
                 (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= 2500 && NeedToKite)))
             {
-                Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true);
+                Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true, playerStatus.CurrentHealthPct <= 0.15);
+
                 // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
                 if (vAnySafePoint != vNullLocation)
                 {
-                    if (bDebugLogSpecial)
+                    if (Settings.Advanced.DebugTargetting)
                     {
                         Logging.Write("[Trinity] Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}", 
                             vAnySafePoint, vAnySafePoint.Distance(Me.Position), FindDirectionDegree(Me.Position, vAnySafePoint),

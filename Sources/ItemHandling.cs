@@ -70,7 +70,7 @@ namespace GilesTrinity
                     // Not enough DPS, so analyse for possibility to blacklist
                     if (quality < ItemQuality.Magic1)
                     {
-
+                        
                         // White item, blacklist
                         return false;
                     }
@@ -204,6 +204,8 @@ namespace GilesTrinity
                                 return false;
                             }
                         }
+                        // if we're picking up all
+                        return true;
                     }
                     break;
                 case GBaseItemType.HealthGlobe:
@@ -841,7 +843,7 @@ namespace GilesTrinity
         private static bool ShouldWeStashThis(GilesCachedACDItem thisitem)
         {
             // auto trash blue items
-            if (thisitem.Quality < ItemQuality.Rare4)
+            if ((thisitem.DBBaseType == ItemBaseType.Armor || thisitem.DBBaseType == ItemBaseType.Jewelry || thisitem.DBBaseType == ItemBaseType.Weapon) && thisitem.Quality < ItemQuality.Rare4)
             {
                 return false;
             }
@@ -856,8 +858,6 @@ namespace GilesTrinity
             // Now look for Misc items we might want to keep
             GItemType TrueItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
             GBaseItemType thisGilesBaseType = DetermineBaseType(TrueItemType);
-
-            
 
             if (TrueItemType == GItemType.StaffOfHerding)
             {
@@ -1204,7 +1204,9 @@ namespace GilesTrinity
 
             // Block off the entire of any "protected bag slots"
             foreach (InventorySquare square in Zeta.CommonBot.Settings.CharacterSettings.Instance.ProtectedBagSlots)
+            {
                 BackpackSlotBlocked[square.Column, square.Row] = true;
+            }
 
             // Map out all the items already in the backpack
             foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)

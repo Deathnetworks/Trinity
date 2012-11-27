@@ -40,6 +40,7 @@ namespace GilesTrinity.Settings.Combat
         private float _AvoidZoltBubbleHealth;
         private float _AvoidZoltTwisterHealth;
         private bool _HasInnaSet;
+        private bool _SweepingWindWeaponSwap;
         #endregion Fields
 
         #region Events
@@ -190,8 +191,11 @@ namespace GilesTrinity.Settings.Combat
 
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
-        public bool HasInnaSet
-        { get; set; }
+        public bool HasInnaSet { get; set; }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SweepingWindWeaponSwap { get; set; }
         #endregion Properties
 
         #region Methods
