@@ -1,0 +1,32 @@
+﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ut="clr-namespace:GilesTrinity.UIComponents"
+             mc:Ignorable="d" 
+             d:DesignHeight="350" d:DesignWidth="390"
+             DataContext="{Binding 'Combat.Misc'}">
+    <UserControl.Resources>
+        <ut:EnumBooleanConverter x:Key="enumBooleanConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="299*"/>
+        </Grid.RowDefinitions>
+        <!--Goblin Settings-->
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Treasure Goblins :" FontWeight="Bold" TextAlignment="Center"/>
+            <UniformGrid Grid.Row="1" Margin="25,0,25,0" Columns="4">
+                <RadioButton GroupName="GoblinMode" Content="Ignore" IsChecked="{Binding Path=GoblinPriority, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Ignore}" />
+                <RadioButton GroupName="GoblinMode" Content="Normal" IsChecked="{Binding Path=GoblinPriority, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Normal}" />
+                <RadioButton GroupName="GoblinMode" Content="Prioritize" IsChecked="{Binding Path=GoblinPriority, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Prioritize}" />
+                <RadioButton GroupName="GoblinMode" Content="Kamikaze" IsChecked="{Binding Path=GoblinPriority, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Kamikaze}" />
+            </UniformGrid>
+        </Grid>
+    </Grid>
+</UserControl>
