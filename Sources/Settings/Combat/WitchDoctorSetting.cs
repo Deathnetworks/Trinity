@@ -64,140 +64,542 @@ namespace GilesTrinity.Settings.Combat
         [DataMember(IsRequired = false)]
         [DefaultValue(0.7f)]
         public float PotionLevel
-        { get; set; }
+        {
+            get
+            {
+                return _PotionLevel;
+            }
+            set
+            {
+                if (_PotionLevel != value)
+                {
+                    _PotionLevel = value;
+                    OnPropertyChanged("PotionLevel");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.8f)]
         public float HealthGlobeLevel
-        { get; set; }
+        {
+            get
+            {
+                return _HealthGlobeLevel;
+            }
+            set
+            {
+                if (_HealthGlobeLevel != value)
+                {
+                    _HealthGlobeLevel = value;
+                    OnPropertyChanged("HealthGlobeLevel");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(10)]
         public int KiteLimit
-        { get; set; }
+        {
+            get
+            {
+                return _KiteLimit;
+            }
+            set
+            {
+                if (_KiteLimit != value)
+                {
+                    _KiteLimit = value;
+                    OnPropertyChanged("KiteLimit");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidArcaneHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidArcaneHealth;
+            }
+            set
+            {
+                if (_AvoidArcaneHealth != value)
+                {
+                    _AvoidArcaneHealth = value;
+                    OnPropertyChanged("AvoidArcaneHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidDesecratorHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidDesecratorHealth;
+            }
+            set
+            {
+                if (_AvoidDesecratorHealth != value)
+                {
+                    _AvoidDesecratorHealth = value;
+                    OnPropertyChanged("AvoidDesecratorHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidMoltenCoreHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidMoltenCoreHealth;
+            }
+            set
+            {
+                if (_AvoidMoltenCoreHealth != value)
+                {
+                    _AvoidMoltenCoreHealth = value;
+                    OnPropertyChanged("AvoidMoltenCoreHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.9f)]
         public float AvoidMoltenTrailHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidMoltenTrailHealth;
+            }
+            set
+            {
+                if (_AvoidMoltenTrailHealth != value)
+                {
+                    _AvoidMoltenTrailHealth = value;
+                    OnPropertyChanged("AvoidMoltenTrailHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.9f)]
         public float AvoidPoisonTreeHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidPoisonTreeHealth;
+            }
+            set
+            {
+                if (_AvoidPoisonTreeHealth != value)
+                {
+                    _AvoidPoisonTreeHealth = value;
+                    OnPropertyChanged("AvoidPoisonTreeHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.9f)]
         public float AvoidPlagueCloudHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidPlagueCloudHealth;
+            }
+            set
+            {
+                if (_AvoidPlagueCloudHealth != value)
+                {
+                    _AvoidPlagueCloudHealth = value;
+                    OnPropertyChanged("AvoidPlagueCloudHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidIceBallsHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidIceBallsHealth;
+            }
+            set
+            {
+                if (_AvoidIceBallsHealth != value)
+                {
+                    _AvoidIceBallsHealth = value;
+                    OnPropertyChanged("AvoidIceBallsHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidPlagueHandsHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidPlagueHandsHealth;
+            }
+            set
+            {
+                if (_AvoidPlagueHandsHealth != value)
+                {
+                    _AvoidPlagueHandsHealth = value;
+                    OnPropertyChanged("AvoidPlagueHandsHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidBeesWaspsHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidBeesWaspsHealth;
+            }
+            set
+            {
+                if (_AvoidBeesWaspsHealth != value)
+                {
+                    _AvoidBeesWaspsHealth = value;
+                    OnPropertyChanged("AvoidBeesWaspsHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidAzmoPoolsHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidAzmoPoolsHealth;
+            }
+            set
+            {
+                if (_AvoidAzmoPoolsHealth != value)
+                {
+                    _AvoidAzmoPoolsHealth = value;
+                    OnPropertyChanged("AvoidAzmoPoolsHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidAzmoBodiesHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidAzmoBodiesHealth;
+            }
+            set
+            {
+                if (_AvoidAzmoBodiesHealth != value)
+                {
+                    _AvoidAzmoBodiesHealth = value;
+                    OnPropertyChanged("AvoidAzmoBodiesHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.85f)]
         public float AvoidShamanFireHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidShamanFireHealth;
+            }
+            set
+            {
+                if (_AvoidShamanFireHealth != value)
+                {
+                    _AvoidShamanFireHealth = value;
+                    OnPropertyChanged("AvoidShamanFireHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidGhomGasHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidGhomGasHealth;
+            }
+            set
+            {
+                if (_AvoidGhomGasHealth != value)
+                {
+                    _AvoidGhomGasHealth = value;
+                    OnPropertyChanged("AvoidGhomGasHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidAzmoFireBallHealth
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidAzmoFireBallHealth;
+            }
+            set
+            {
+                if (_AvoidAzmoFireBallHealth != value)
+                {
+                    _AvoidAzmoFireBallHealth = value;
+                    OnPropertyChanged("AvoidAzmoFireBallHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
-        public float AvoidBelialHealth { get; set; }
+        public float AvoidBelialHealth
+        {
+            get
+            {
+                return _AvoidBelialHealth;
+            }
+            set
+            {
+                if (_AvoidBelialHealth != value)
+                {
+                    _AvoidBelialHealth = value;
+                    OnPropertyChanged("AvoidBelialHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
-        public float AvoidButcherFloorPanelHealth { get; set; }
+        public float AvoidButcherFloorPanelHealth
+        {
+            get
+            {
+                return _AvoidButcherFloorPanelHealth;
+            }
+            set
+            {
+                if (_AvoidButcherFloorPanelHealth != value)
+                {
+                    _AvoidButcherFloorPanelHealth = value;
+                    OnPropertyChanged("AvoidButcherFloorPanelHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.8f)]
-        public float AvoidDiabloMeteorHealth { get; set; }
+        public float AvoidDiabloMeteorHealth
+        {
+            get
+            {
+                return _AvoidDiabloMeteorHealth;
+            }
+            set
+            {
+                if (_AvoidDiabloMeteorHealth != value)
+                {
+                    _AvoidDiabloMeteorHealth = value;
+                    OnPropertyChanged("AvoidDiabloMeteorHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
-        public float AvoidDiabloPrisonHealth { get; set; }
+        public float AvoidDiabloPrisonHealth
+        {
+            get
+            {
+                return _AvoidDiabloPrisonHealth;
+            }
+            set
+            {
+                if (_AvoidDiabloPrisonHealth != value)
+                {
+                    _AvoidDiabloPrisonHealth = value;
+                    OnPropertyChanged("AvoidDiabloPrisonHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.9f)]
-        public float AvoidDiabloRingOfFireHealth { get; set; }
+        public float AvoidDiabloRingOfFireHealth
+        {
+            get
+            {
+                return _AvoidDiabloRingOfFireHealth;
+            }
+            set
+            {
+                if (_AvoidDiabloRingOfFireHealth != value)
+                {
+                    _AvoidDiabloRingOfFireHealth = value;
+                    OnPropertyChanged("AvoidDiabloRingOfFireHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
-        public float AvoidIceTrailHealth { get; set; }
+        public float AvoidIceTrailHealth
+        {
+            get
+            {
+                return _AvoidIceTrailHealth;
+            }
+            set
+            {
+                if (_AvoidIceTrailHealth != value)
+                {
+                    _AvoidIceTrailHealth = value;
+                    OnPropertyChanged("AvoidIceTrailHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.3f)]
-        public float AvoidMageFireHealth { get; set; }
+        public float AvoidMageFireHealth
+        {
+            get
+            {
+                return _AvoidMageFireHealth;
+            }
+            set
+            {
+                if (_AvoidMageFireHealth != value)
+                {
+                    _AvoidMageFireHealth = value;
+                    OnPropertyChanged("AvoidMageFireHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.7f)]
-        public float AvoidMaghdaProjectilleHealth { get; set; }
+        public float AvoidMaghdaProjectilleHealth
+        {
+            get
+            {
+                return _AvoidMaghdaProjectilleHealth;
+            }
+            set
+            {
+                if (_AvoidMaghdaProjectilleHealth != value)
+                {
+                    _AvoidMaghdaProjectilleHealth = value;
+                    OnPropertyChanged("AvoidMaghdaProjectilleHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.1f)]
-        public float AvoidMoltenBallHealth { get; set; }
+        public float AvoidMoltenBallHealth
+        {
+            get
+            {
+                return _AvoidMoltenBallHealth;
+            }
+            set
+            {
+                if (_AvoidMoltenBallHealth != value)
+                {
+                    _AvoidMoltenBallHealth = value;
+                    OnPropertyChanged("AvoidMoltenBallHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.5f)]
-        public float AvoidWallOfFireHealth { get; set; }
+        public float AvoidWallOfFireHealth
+        {
+            get
+            {
+                return _AvoidWallOfFireHealth;
+            }
+            set
+            {
+                if (_AvoidWallOfFireHealth != value)
+                {
+                    _AvoidWallOfFireHealth = value;
+                    OnPropertyChanged("AvoidWallOfFireHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
-        public float AvoidZoltBubbleHealth { get; set; }
+        public float AvoidZoltBubbleHealth
+        {
+            get
+            {
+                return _AvoidZoltBubbleHealth;
+            }
+            set
+            {
+                if (_AvoidZoltBubbleHealth != value)
+                {
+                    _AvoidZoltBubbleHealth = value;
+                    OnPropertyChanged("AvoidZoltBubbleHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.7f)]
-        public float AvoidZoltTwisterHealth { get; set; }
+        public float AvoidZoltTwisterHealth
+        {
+            get
+            {
+                return _AvoidZoltTwisterHealth;
+            }
+            set
+            {
+                if (_AvoidZoltTwisterHealth != value)
+                {
+                    _AvoidZoltTwisterHealth = value;
+                    OnPropertyChanged("AvoidZoltTwisterHealth");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool GraveInjustice
-        { get; set; }
+        {
+            get
+            {
+                return _GraveInjustice;
+            }
+            set
+            {
+                if (_GraveInjustice != value)
+                {
+                    _GraveInjustice = value;
+                    OnPropertyChanged("GraveInjustice");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods

@@ -10,124 +10,523 @@ namespace GilesTrinity.Settings.Combat
     [DataContract]
     public class AvoidanceRadiusSetting : ITrinitySetting<AvoidanceRadiusSetting>, INotifyPropertyChanged
     {
+        #region Fields
+        private int _Arcane;
+        private int _Desecrator;
+        private int _MoltenCore;
+        private int _MoltenTrail;
+        private int _PoisonTree;
+        private int _PlagueCloud;
+        private int _IceBalls;
+        private int _PlagueHands;
+        private int _BeesWasps;
+        private int _AzmoPools;
+        private int _AzmoBodies;
+        private int _ShamanFire;
+        private int _GhomGas;
+        private int _AzmoFireBall;
+        private int _Belial;
+        private int _ButcherFloorPanel;
+        private int _DiabloMeteor;
+        private int _DiabloPrison;
+        private int _DiabloRingOfFire;
+        private int _IceTrail;
+        private int _MageFire;
+        private int _MaghdaProjectille;
+        private int _MoltenBall;
+        private int _WallOfFire;
+        private int _ZoltBubble;
+        private int _ZoltTwister;
+        #endregion Fields
+
+        #region Events
+        /// <summary>
+        /// Occurs when property changed.
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Events
+
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AvoidanceRadiusSetting" /> class.
+        /// </summary>
+        public AvoidanceRadiusSetting()
+        {
+            Reset();
+        }
+        #endregion Constructors
+
+        #region Properties
         [DataMember(IsRequired = false)]
         [DefaultValue(12)]
         public int Arcane
-        { get; set; }
+        {
+            get
+            {
+                return _Arcane;
+            }
+            set
+            {
+                if (_Arcane != value)
+                {
+                    _Arcane = value;
+                    OnPropertyChanged("Arcane");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(10)]
         public int Desecrator
-        { get; set; }
+        {
+            get
+            {
+                return _Desecrator;
+            }
+            set
+            {
+                if (_Desecrator != value)
+                {
+                    _Desecrator = value;
+                    OnPropertyChanged("Desecrator");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(19)]
         public int MoltenCore
-        { get; set; }
+        {
+            get
+            {
+                return _MoltenCore;
+            }
+            set
+            {
+                if (_MoltenCore != value)
+                {
+                    _MoltenCore = value;
+                    OnPropertyChanged("MoltenCore");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(6)]
         public int MoltenTrail
-        { get; set; }
+        {
+            get
+            {
+                return _MoltenTrail;
+            }
+            set
+            {
+                if (_MoltenTrail != value)
+                {
+                    _MoltenTrail = value;
+                    OnPropertyChanged("MoltenTrail");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(14)]
         public int PoisonTree
-        { get; set; }
+        {
+            get
+            {
+                return _PoisonTree;
+            }
+            set
+            {
+                if (_PoisonTree != value)
+                {
+                    _PoisonTree = value;
+                    OnPropertyChanged("PoisonTree");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(14)]
         public int PlagueCloud
-        { get; set; }
+        {
+            get
+            {
+                return _PlagueCloud;
+            }
+            set
+            {
+                if (_PlagueCloud != value)
+                {
+                    _PlagueCloud = value;
+                    OnPropertyChanged("PlagueCloud");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(20)]
         public int IceBalls
-        { get; set; }
+        {
+            get
+            {
+                return _IceBalls;
+            }
+            set
+            {
+                if (_IceBalls != value)
+                {
+                    _IceBalls = value;
+                    OnPropertyChanged("IceBalls");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(12)]
         public int PlagueHands
-        { get; set; }
+        {
+            get
+            {
+                return _PlagueHands;
+            }
+            set
+            {
+                if (_PlagueHands != value)
+                {
+                    _PlagueHands = value;
+                    OnPropertyChanged("PlagueHands");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(10)]
         public int BeesWasps
-        { get; set; }
+        {
+            get
+            {
+                return _BeesWasps;
+            }
+            set
+            {
+                if (_BeesWasps != value)
+                {
+                    _BeesWasps = value;
+                    OnPropertyChanged("BeesWasps");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(54)]
         public int AzmoPools
-        { get; set; }
+        {
+            get
+            {
+                return _AzmoPools;
+            }
+            set
+            {
+                if (_AzmoPools != value)
+                {
+                    _AzmoPools = value;
+                    OnPropertyChanged("AzmoPools");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(47)]
         public int AzmoBodies
-        { get; set; }
+        {
+            get
+            {
+                return _AzmoBodies;
+            }
+            set
+            {
+                if (_AzmoBodies != value)
+                {
+                    _AzmoBodies = value;
+                    OnPropertyChanged("AzmoBodies");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(8)]
         public int ShamanFire
-        { get; set; }
+        {
+            get
+            {
+                return _ShamanFire;
+            }
+            set
+            {
+                if (_ShamanFire != value)
+                {
+                    _ShamanFire = value;
+                    OnPropertyChanged("ShamanFire");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(25)]
         public int GhomGas
-        { get; set; }
+        {
+            get
+            {
+                return _GhomGas;
+            }
+            set
+            {
+                if (_GhomGas != value)
+                {
+                    _GhomGas = value;
+                    OnPropertyChanged("GhomGas");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(30)]
-        public int AzmoFireBall 
-        { get; set; }
+        public int AzmoFireBall
+        {
+            get
+            {
+                return _AzmoFireBall;
+            }
+            set
+            {
+                if (_AzmoFireBall != value)
+                {
+                    _AzmoFireBall = value;
+                    OnPropertyChanged("AzmoFireBall");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(20)]
-        public int Belial { get; set; }
+        public int Belial
+        {
+            get
+            {
+                return _Belial;
+            }
+            set
+            {
+                if (_Belial != value)
+                {
+                    _Belial = value;
+                    OnPropertyChanged("Belial");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(40)]
-        public int ButcherFloorPanel { get; set; }
+        public int ButcherFloorPanel
+        {
+            get
+            {
+                return _ButcherFloorPanel;
+            }
+            set
+            {
+                if (_ButcherFloorPanel != value)
+                {
+                    _ButcherFloorPanel = value;
+                    OnPropertyChanged("ButcherFloorPanel");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(28)]
-        public int DiabloMeteor { get; set; }
+        public int DiabloMeteor
+        {
+            get
+            {
+                return _DiabloMeteor;
+            }
+            set
+            {
+                if (_DiabloMeteor != value)
+                {
+                    _DiabloMeteor = value;
+                    OnPropertyChanged("DiabloMeteor");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(15)]
-        public int DiabloPrison { get; set; }
+        public int DiabloPrison
+        {
+            get
+            {
+                return _DiabloPrison;
+            }
+            set
+            {
+                if (_DiabloPrison != value)
+                {
+                    _DiabloPrison = value;
+                    OnPropertyChanged("DiabloPrison");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(50)]
-        public int DiabloRingOfFire { get; set; }
+        public int DiabloRingOfFire
+        {
+            get
+            {
+                return _DiabloRingOfFire;
+            }
+            set
+            {
+                if (_DiabloRingOfFire != value)
+                {
+                    _DiabloRingOfFire = value;
+                    OnPropertyChanged("DiabloRingOfFire");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(6)]
-        public int IceTrail { get; set; }
+        public int IceTrail
+        {
+            get
+            {
+                return _IceTrail;
+            }
+            set
+            {
+                if (_IceTrail != value)
+                {
+                    _IceTrail = value;
+                    OnPropertyChanged("IceTrail");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(10)]
-        public int MageFire { get; set; }
+        public int MageFire
+        {
+            get
+            {
+                return _MageFire;
+            }
+            set
+            {
+                if (_MageFire != value)
+                {
+                    _MageFire = value;
+                    OnPropertyChanged("MageFire");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(8)]
-        public int MaghdaProjectille { get; set; }
+        public int MaghdaProjectille
+        {
+            get
+            {
+                return _MaghdaProjectille;
+            }
+            set
+            {
+                if (_MaghdaProjectille != value)
+                {
+                    _MaghdaProjectille = value;
+                    OnPropertyChanged("MaghdaProjectille");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(8)]
-        public int MoltenBall { get; set; }
+        public int MoltenBall
+        {
+            get
+            {
+                return _MoltenBall;
+            }
+            set
+            {
+                if (_MoltenBall != value)
+                {
+                    _MoltenBall = value;
+                    OnPropertyChanged("MoltenBall");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(10)]
-        public int WallOfFire { get; set; }
+        public int WallOfFire
+        {
+            get
+            {
+                return _WallOfFire;
+            }
+            set
+            {
+                if (_WallOfFire != value)
+                {
+                    _WallOfFire = value;
+                    OnPropertyChanged("WallOfFire");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(20)]
-        public int ZoltBubble { get; set; }
+        public int ZoltBubble
+        {
+            get
+            {
+                return _ZoltBubble;
+            }
+            set
+            {
+                if (_ZoltBubble != value)
+                {
+                    _ZoltBubble = value;
+                    OnPropertyChanged("ZoltBubble");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(12)]
-        public int ZoltTwister { get; set; }
+        public int ZoltTwister
+        {
+            get
+            {
+                return _ZoltTwister;
+            }
+            set
+            {
+                if (_ZoltTwister != value)
+                {
+                    _ZoltTwister = value;
+                    OnPropertyChanged("ZoltTwister");
+                }
+            }
+        }
+        #endregion Properties
 
+        #region Methods
         public void Reset()
         {
             TrinitySetting.Reset(this);
@@ -143,8 +542,10 @@ namespace GilesTrinity.Settings.Combat
             return TrinitySetting.Clone(this);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
+        /// <summary>
+        /// Called when property changed.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
         private void OnPropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
@@ -152,5 +553,6 @@ namespace GilesTrinity.Settings.Combat
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+        #endregion Methods
     }
 }
