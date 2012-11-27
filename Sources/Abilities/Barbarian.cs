@@ -327,7 +327,7 @@ namespace GilesTrinity
                     (Settings.Combat.Barbarian.FuryDumpAlways && playerStatus.CurrentEnergyPct >= 0.95) ||
                     ((GilesUseTimer(SNOPower.Barbarian_Sprint) && !GilesHasBuff(SNOPower.Barbarian_Sprint)) &&
                 // Always keep up if we are whirlwinding, if the target is a goblin, or if we are 16 feet away from the target
-                    (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) || CurrentTarget.IsTreasureGoblin || (targetCurrent.fCentreDistance >= 16f && playerStatus.dCurrentEnergy >= 40)))
+                    (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) || CurrentTarget.IsTreasureGoblin || (CurrentTarget.CentreDistance >= 16f && playerStatus.CurrentEnergy >= 40)))
                 ) &&
                 // If they have battle-rage, make sure it's up
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_BattleRage) || (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_BattleRage) && GilesHasBuff(SNOPower.Barbarian_BattleRage))) &&
