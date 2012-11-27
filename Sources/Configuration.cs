@@ -1,6 +1,7 @@
 ﻿﻿using GilesTrinity.DbProvider;
 using GilesTrinity.Settings.Combat;
 using GilesTrinity.Settings.Loot;
+using GilesTrinity.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,6 +70,8 @@ namespace GilesTrinity
         {
             get
             {
+                return UILoader.GetDisplayWindow(Path.Combine(sTrinityPluginPath, "UI"));
+
                 // Check we can actually find the .xaml file first - if not, report an error
                 if (!File.Exists(sTrinityPluginPath + "GilesTrinity.xaml"))
                     Log("ERROR: Can't find \"" + sTrinityPluginPath + "GilesTrinity.xaml\"");
