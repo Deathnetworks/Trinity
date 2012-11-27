@@ -92,7 +92,6 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 11f -- 1, 2
             }
             // Sweeping wind
-            //intell -- inna
             if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && !GilesHasBuff(SNOPower.Monk_SweepingWind) &&
                 (iElitesWithinRange[RANGE_25] > 0 || iAnythingWithinRange[RANGE_20] >= 3 || (iAnythingWithinRange[RANGE_20] >= 1 && Settings.Combat.Monk.HasInnaSet) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 25f)) &&
                 // Check if either we don't have blinding flash, or we do and it's been cast in the last 6000ms
@@ -117,14 +116,10 @@ namespace GilesTrinity
                     SweepWindSpam = DateTime.Now;
                     return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 2,2
                 }
-
-                SweepWindSpam = DateTime.Now;
-                return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 2,2
             }
             // Sweeping wind: spam it if inna set
-            //intell -- inna
             if (hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && Settings.Combat.Monk.HasInnaSet && GilesHasBuff(SNOPower.Monk_SweepingWind) &&
-                playerStatus.CurrentEnergy >= 5 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 5000)
+                playerStatus.CurrentEnergy >= 5 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 4950 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5950)
             {
                 SweepWindSpam = DateTime.Now;
                 return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
