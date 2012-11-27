@@ -51,7 +51,6 @@ namespace GilesTrinity
                 bWaitingForSpecial = true;
             }
             // Wrath of the berserker, elites only (wrath of berserker)
-            //intell
             if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && 
                 // If using WOTB on all elites, or if we should only use on "hard" affixes
                 (!Settings.Combat.Barbarian.WOTBHardOnly || (bUseBerserker && Settings.Combat.Barbarian.WOTBHardOnly)) &&
@@ -66,12 +65,12 @@ namespace GilesTrinity
                    (!bAnyBossesInRange || hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind)) &&
                    ((iElitesWithinRange[RANGE_20] >= 1 || CurrentTarget.IsEliteRareUnique) && (CurrentTarget.HitPoints >= 0.30 || playerStatus.CurrentHealthPct <= 0.60))
                  )) &&
+				//Do not activate too far from targets (for bosses / uber elites)
+				CurrentTarget.CentreDistance <= 35f &&
                 // Don't still have the buff
-                !GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker, true) && PowerManager.CanCast(SNOPower.Barbarian_WrathOfTheBerserker))
+                !GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) && PowerManager.CanCast(SNOPower.Barbarian_WrathOfTheBerserker))
             {
-                if (playerStatus.CurrentEnergy >= 56)
-                //intell
+                if (playerStatus.CurrentEnergy >= 50)
                 {
                     if (CurrentTarget.ActorSNO == 255996)
                         Logging.Write("[Trinity] Berserk being used: Act 1 Warden, Odeg!");
@@ -81,10 +80,8 @@ namespace GilesTrinity
                         Logging.Write("[Trinity] Berserk being used: Act 3 Warden, Xah'rith!");
                     else
                         Logging.Write("[Trinity] Berserk being used!");
-                    Logging.Write("[Trinity] Berserk being used!");
                     bUseBerserker = false;
                     return new GilesPower(SNOPower.Barbarian_WrathOfTheBerserker, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
-                    //intell -- 4, 4
                 }
                 else
                 {
@@ -126,12 +123,11 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.Barbarian_WarCry, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
             }
             // Threatening shout
-            //intell -- added spam usage if fury is low AND is a ww build or waiting for special
             if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_ThreateningShout) && !playerStatus.IsIncapacitated &&
               (
-                  iElitesWithinRange[RANGE_20] > 1 || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 20) ||
-                  (iAnythingWithinRange[RANGE_20] > 2 && !bAnyBossesInRange && (iElitesWithinRange[RANGE_50] == 0 || hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_SeismicSlam))) ||
-                  playerStatus.CurrentHealthPct <= 0.75 || (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) && playerStatus.CurrentEnergy < 10) ||
+                  iElitesWithinRange[RANGE_20] >= 2 || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 20) ||
+                  (iAnythingWithinRange[RANGE_20] >= 3 && !bAnyBossesInRange && (iElitesWithinRange[RANGE_50] == 0 || hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_SeismicSlam))) ||
+                  playerStatus.CurrentHealthPct <= 0.75 || (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) && playerStatus.CurrentEnergy <= 10) ||
                   (bWaitingForSpecial && playerStatus.CurrentEnergy <= 50)
                   ) &&
               GilesUseTimer(SNOPower.Barbarian_ThreateningShout, true) && PowerManager.CanCast(SNOPower.Barbarian_ThreateningShout))
@@ -139,7 +135,6 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.Barbarian_ThreateningShout, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
             }
             // Threatening shout out-of-combat: helps battle rage and sprint (5+15=20)
-            //intell
             if (bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_ThreateningShout) &&
                 (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Sprint) || hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_BattleRage)) &&
                 !playerStatus.IsIncapacitated && playerStatus.CurrentEnergy >= 5 && playerStatus.CurrentEnergy < 20 &&
@@ -165,14 +160,14 @@ namespace GilesTrinity
             {
                 // Note - we have LONGER animation times for whirlwind-users
                 // Since whirlwind seems to interrupt rend so easily
-                int iPreDelay = 3;
-                int iPostDelay = 3;
+                int iPreDelay = 0;
+                int iPostDelay = 0;
                 if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind))
                 {
                     if (powerLastSnoPowerUsed == SNOPower.Barbarian_Whirlwind)
                     {
-                        iPreDelay = 5;
-                        iPostDelay = 5;
+                        iPreDelay = 3;
+                        iPostDelay = 3;
                     }
                 }
                 return new GilesPower(SNOPower.Barbarian_Revenge, 0f, playerStatus.CurrentPosition, iCurrentWorldID, -1, iPreDelay, iPostDelay, USE_SLOWLY);
@@ -260,8 +255,8 @@ namespace GilesTrinity
                 iACDGUIDLastRend = CurrentTarget.ACDGuid;
                 // Note - we have LONGER animation times for whirlwind-users
                 // Since whirlwind seems to interrupt rend so easily
-                int iPreDelay = 3;
-                int iPostDelay = 3;
+                int iPreDelay = 0;
+                int iPostDelay = 1;
                 if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind))
                 {
                     if (powerLastSnoPowerUsed == SNOPower.Barbarian_Whirlwind || powerLastSnoPowerUsed == SNOPower.None)
@@ -274,25 +269,20 @@ namespace GilesTrinity
             }
             // Overpower used off-cooldown
             if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Overpower) && !playerStatus.IsIncapacitated &&
-                // Doesn't need CURRENT target to be in range, just needs ANYTHING to be within 9 foot, since it's an AOE!
-                //(iAnythingWithinRange[RANGE_5] > 0 || targetCurrent.fRadiusDistance <= 6f) &&
-                //intell -- now used on melee goblin
-                (
-                    iAnythingWithinRange[RANGE_6] >= 1 ||
-                    (CurrentTarget.RadiusDistance <= 5f) ||
+				(CurrentTarget.RadiusDistance <= 6f ||
                     (
-                        iAnythingWithinRange[RANGE_6] >= 1 &&
+						iAnythingWithinRange[RANGE_6] >= 1 &&
                         (CurrentTarget.IsEliteRareUnique || CurrentTarget.IsMinion || CurrentTarget.IsBoss || GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) ||
                         (CurrentTarget.IsTreasureGoblin && CurrentTarget.CentreDistance <= 6f) || hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_SeismicSlam))
-                        )
-                ) &&
+					)
+				) &&
                 GilesUseTimer(SNOPower.Barbarian_Overpower) && PowerManager.CanCast(SNOPower.Barbarian_Overpower))
             {
+                int iPreDelay = 0;
+                int iPostDelay = 0;
                 // Note - we have LONGER animation times for whirlwind-users
                 // Since whirlwind seems to interrupt rend so easily
-                /*int iPreDelay = 3;
-                int iPostDelay = 3;
-                if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind))
+                /*if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind))
                 {
                     if (powerLastSnoPowerUsed == SNOPower.Barbarian_Whirlwind || powerLastSnoPowerUsed == SNOPower.None)
                     {
@@ -300,8 +290,6 @@ namespace GilesTrinity
                         iPostDelay = 5;
                     }
                 }*/
-                int iPreDelay = 0;
-                int iPostDelay = 0;
                 return new GilesPower(SNOPower.Barbarian_Overpower, 0f, playerStatus.CurrentPosition, iCurrentWorldID, -1, iPreDelay, iPostDelay, USE_SLOWLY);
             }
             // Seismic slam enemies within close range
@@ -315,9 +303,8 @@ namespace GilesTrinity
             }
             // Ancient spear 
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_AncientSpear) &&
-                GilesUseTimer(SNOPower.Barbarian_AncientSpear) &&
-                PowerManager.CanCast(SNOPower.Barbarian_AncientSpear) &&
-          CurrentTarget.HitPoints >= 0.20)
+                GilesUseTimer(SNOPower.Barbarian_AncientSpear) && PowerManager.CanCast(SNOPower.Barbarian_AncientSpear) &&
+				CurrentTarget.HitPoints >= 0.20)
             {
                 // For close-by monsters, try to leap a little further than their centre-point
                 float fExtraDistance = CurrentTarget.Radius;
@@ -332,22 +319,19 @@ namespace GilesTrinity
             }
             // Sprint buff, if same suitable targets as elites, keep maintained for WW users
             if (!bOOCBuff && !bDontSpamOutofCombat && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Sprint) && !playerStatus.IsIncapacitated &&
-                //intell -- Let's check if is not spaming to much
+                // Let's check if is not spaming too much
                 DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Sprint]).TotalMilliseconds >= 200 &&
                 // Fury Dump Options for sprint: use at max energy constantly, or on a timer
                 (
                     (Settings.Combat.Barbarian.FuryDumpWOTB && playerStatus.CurrentEnergyPct >= 0.95 && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
                     (Settings.Combat.Barbarian.FuryDumpAlways && playerStatus.CurrentEnergyPct >= 0.95) ||
                     ((GilesUseTimer(SNOPower.Barbarian_Sprint) && !GilesHasBuff(SNOPower.Barbarian_Sprint)) &&
-                // Always keep up if we are whirlwinding, or if the target is a goblin
-                        (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) || CurrentTarget.IsTreasureGoblin))
+                // Always keep up if we are whirlwinding, if the target is a goblin, or if we are 16 feet away from the target
+                    (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) || CurrentTarget.IsTreasureGoblin || (targetCurrent.fCentreDistance >= 16f && playerStatus.dCurrentEnergy >= 40)))
                 ) &&
-                // Or if the target is >16 feet away and we have 50+ fury
-                //(targetCurrent.fCentreDistance >= 16f && playerStatus.dCurrentEnergy >= 50)
                 // If they have battle-rage, make sure it's up
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_BattleRage) || (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_BattleRage) && GilesHasBuff(SNOPower.Barbarian_BattleRage))) &&
-                // Check for reserved-energy waiting or not
-                //((playerStatus.dCurrentEnergy >= 40 && !playerStatus.bWaitingForReserveEnergy) || playerStatus.dCurrentEnergy >= iWaitingReservedAmount) &&
+                // Check for minimum energy
                 playerStatus.CurrentEnergy >= 20)
             {
                 return new GilesPower(SNOPower.Barbarian_Sprint, 0f, vNullLocation, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
@@ -398,7 +382,6 @@ namespace GilesTrinity
                 ) &&
                 playerStatus.CurrentEnergy >= 20 && PowerManager.CanCast(SNOPower.Barbarian_BattleRage))
             {
-                //intell
                 return new GilesPower(SNOPower.Barbarian_BattleRage, 0f, vNullLocation, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
             }
             // Hammer of the ancients spam-attacks - never use if waiting for special
