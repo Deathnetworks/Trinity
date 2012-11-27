@@ -6,28 +6,22 @@
 // | Created by darkfriend ... idear from D2 Pickit
 // +--------------------------------------------------------------------------------------+
 // +--------------------------------------------------------------------------------------+
-// | Thanx to:
-// | - ReDev1L for his rares selection
-// | - Tinnvec for his legendary selection
-// +--------------------------------------------------------------------------------------+
-// +--------------------------------------------------------------------------------------+
 // |   __|   _ \   \ |  __| _ _|   __|  |  | _ \    \ __ __| _ _|   _ \   \ | 
 // |  (     (   | .  |  _|    |   (_ |  |  |   /   _ \   |     |   (   | .  | 
 // | \___| \___/ _|\_| _|   ___| \___| \__/ _|_\ _/  _\ _|   ___| \___/ _|\_| 
 // +--------------------------------------------------------------------------------------+   
-$$ [DEBUG]		== true				// verbose logging ... unused at the moment
-$$ [LOG]		== true					// log all information to the log file
-$$ [TRASHLOG]	== true					// log all trashed items ... legendary only for now
+$$ [DEBUG]		== false            // verbose logging ... unused at the moment
+$$ [LOG]		== true             // log all information to the log file
+$$ [TRASHLOG]	== true             // log all trashed items ... legendary only for now
 // +--------------------------------------------------------------------------------------+   
 // |  _ \  |  | |     __|    __| _ _|  |     __|   __| 
 // |    /  |  | |     _|     _|    |   |     _|  \__ \ 
 // | _|_\ \__/ ____| ___|   _|   ___| ____| ___| ____/ 
 // +--------------------------------------------------------------------------------------+  
-
-// Uncomment this 3 line for activate Item Rules 
-//$$ [FILE]	== legendary.dis		// legendary item rules
-//$$ [FILE]	== rare.dis				// rare item rules
-//$$ [FILE]	== magic.dis			// magic item rules
-
+$$ [FILE]	== special.dis		    // special item rules
+$$ [FILE]	== legendary.dis		// legendary item rules
+$$ [FILE]	== rare.dis				// rare item rules
+$$ [FILE]	== magic.dis			// magic item rules
+//$$ [FILE]	== test.dis				// test item rules
 
  

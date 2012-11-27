@@ -9,7 +9,7 @@ using System.Web;
 namespace GilesTrinity.Notifications
 {
     //TODO: Add mail management here 
-    
+
     internal static class NotificationManager
     {
         public static Queue<ProwlNotification> pushQueue = new Queue<ProwlNotification>();
@@ -65,8 +65,8 @@ namespace GilesTrinity.Notifications
         }
         public static void PostNotification(ProwlNotification notification_, bool android = false)
         {
-            string prowlUrlSb = !android ? 
-                                    @"https://prowl.weks.net/publicapi/add" : 
+            string prowlUrlSb = !android ?
+                                    @"https://prowl.weks.net/publicapi/add" :
                                     @"https://www.notifymyandroid.com/publicapi/notify";
             string sThisAPIKey = !android ? GilesTrinity.Settings.Notification.IPhoneKey : GilesTrinity.Settings.Notification.AndroidKey;
             prowlUrlSb += "?apikey=" + HttpUtility.UrlEncode(sThisAPIKey) +
