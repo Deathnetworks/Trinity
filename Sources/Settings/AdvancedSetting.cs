@@ -216,7 +216,7 @@ namespace GilesTrinity.Settings
                 if (_LogStuckLocation != value)
                 {
                     _LogStuckLocation = value;
-                    OnPropertyChanged("Password");
+                    OnPropertyChanged("LogStuckLocation");
                 }
             }
         }
