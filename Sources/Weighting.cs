@@ -559,7 +559,7 @@ namespace GilesTrinity
                 if (bDebugLogWeights && Settings.Advanced.DebugInStatusBar)
                 {
                     Logging.WriteDiagnostic("[Trinity] Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5}",
-                        cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, bRequireAvoidance);
+                        cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance);
                 }
 
                 // Is the weight of this one higher than the current-highest weight? Then make this the new primary target!
@@ -577,15 +577,22 @@ namespace GilesTrinity
                     // Kiting and Avoidance
                     if (CurrentTarget.Type == GObjectType.Unit)
                     {
-                        // if there's any obstacle within a specified distance of the avoidance radius *1.2 
-                        if (hashAvoidanceObstacleCache.Any(o =>
+                        var AvoidanceList = hashAvoidanceObstacleCache.Where(o =>
                             // Distance from avoidance to target is less than avoidance radius
                             o.Location.Distance(CurrentTarget.Position) <= (GetAvoidanceRadius(o.ActorSNO) * 1.2) &&
                             // Distance from obstacle to me is <= cacheObject.RadiusDistance
                             o.Location.Distance(playerStatus.CurrentPosition) <= (cacheObject.RadiusDistance - 4f)
-                            )
-                            )
+                            );
+
+                        // if there's any obstacle within a specified distance of the avoidance radius *1.2 
+                        if (AvoidanceList.Any())
                         {
+                            if (bDebugLogSpecial && Settings.Advanced.DebugInStatusBar)
+                            foreach (GilesObstacle o in AvoidanceList)
+                            {
+                                Logging.WriteDiagnostic("[Trinity] Avoidance: Id={0} Weight={1} Loc={2} Radius={3} Name={4}", o.ActorSNO, o.Weight, o.Location, o.Radius, o.Name);
+                            }
+
                             vKitePointAvoid = CurrentTarget.Position;
                             NeedToKite = true;
                         }

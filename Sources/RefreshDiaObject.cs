@@ -2041,11 +2041,14 @@ namespace GilesTrinity
             {
                 // Generate a "weight" for how badly we want to avoid this obstacle, based on a percentage of 100% the avoidance health is, multiplied into a max of 200 weight
                 double dThisWeight = (200 * dThisHealthAvoid);
-                hashAvoidanceObstacleCache.Add(new GilesObstacle(c_Position, (float)GetAvoidanceRadius(), c_ActorSNO, dThisWeight));
+
+                hashAvoidanceObstacleCache.Add(new GilesObstacle(c_Position, (float)GetAvoidanceRadius(), c_ActorSNO, dThisWeight, c_Name));
+
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
                 if (c_CentreDistance <= GetAvoidanceRadius())
                 {
-                    bRequireAvoidance = true;
+                    StandingInAvoidance = true;
+
                     // Note if this is a travelling projectile or not so we can constantly update our safe points
                     if (hashAvoidanceSNOProjectiles.Contains(c_ActorSNO))
                         IsAvoidingProjectiles = true;

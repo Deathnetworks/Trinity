@@ -39,7 +39,7 @@ namespace GilesTrinity
             // But only if we aren't force-cancelling avoidance for XX time
             bool bFoundSafeSpot = false;
             // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
-            if (bRequireAvoidance && (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
+            if (StandingInAvoidance && (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
                 DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
             {
                 Vector3 vAnySafePoint = FindSafeZone(false, 1, vSafePointNear);
@@ -77,7 +77,7 @@ namespace GilesTrinity
             }
             // Not heading straight for a safe-spot?
             // No valid targets but we were told to stay put?
-            if (CurrentTarget == null && bStayPutDuringAvoidance && !bRequireAvoidance)
+            if (CurrentTarget == null && bStayPutDuringAvoidance && !StandingInAvoidance)
             {
                 CurrentTarget = new GilesObject()
                                     {
@@ -262,7 +262,7 @@ namespace GilesTrinity
             iAnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
             bAnyBossesInRange = false;
             // Flag for if we should search for an avoidance spot or not
-            bRequireAvoidance = false;
+            StandingInAvoidance = false;
             // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
             w_HighestWeightFound = 0;
             // Here's the list we'll use to store each object

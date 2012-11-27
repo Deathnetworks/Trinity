@@ -9,7 +9,8 @@ namespace GilesTrinity
         public float Radius { get; set; }
         public int ActorSNO { get; set; }
         public double Weight { get; set; }
-        public GilesObstacle(Vector3 location, float radius, int snoId, double weight = 0)
+        public string Name { get; set; }
+        public GilesObstacle(Vector3 location, float radius, int snoId, double weight = 0, string name = "")
         {
             Location = location;
             Radius = radius;

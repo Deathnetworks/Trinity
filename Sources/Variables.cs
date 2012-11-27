@@ -333,7 +333,7 @@ namespace GilesTrinity
         /// <summary>
         /// Whether or not we need avoidance this target-search-loop
         /// </summary>
-        private static bool bRequireAvoidance = false;
+        private static bool StandingInAvoidance = false;
 
         /// <summary>
         /// Whether or not there are projectiles to avoid
