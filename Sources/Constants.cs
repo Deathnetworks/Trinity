@@ -73,28 +73,59 @@ namespace GilesTrinity
         // Stores the apparent maximums of each stat for each item slot
         // Note that while these SHOULD be *actual* maximums for most stats - for things like DPS, these can just be more sort of "what a best-in-slot DPS would be"
 
-        // Variable name                                                  Dex, Int, Str, Vit, Life%,  LOH,Steal%, LPS, MF, GF, MS, Rad, Sox,  Crit%, CDam%, ASPD,  Min+, Max+, Blk, Thorn, AR, SR,  DPS, ARMOR, Disc, Mana, Arc.,  Regen, Globes
-        private static double[] MaxPointsWeaponOneHand = new double[29] { 400, 400, 400, 400, 00000, 1000, 00003, 000, 00, 00, 00, 000, 0001, 00000, 00100, 00021, 0000, 0000, 000, 00000, 00, 00, 1500, 00000, 0010, 0000, 00010, 00014, 00000 };
-        private static double[] MaxPointsWeaponTwoHand = new double[29] { 700, 700, 700, 700, 00000, 1800, 00008, 000, 00, 00, 00, 000, 0001, 00000, 00200, 00020, 0000, 0000, 000, 00000, 00, 00, 1700, 00000, 0010, 0000, 00010, 00014, 00000 };
-        private static double[] MaxPointsWeaponRanged = new double[29]  { 320, 000, 000, 000, 00000, 0000, 00000, 000, 00, 00, 00, 000, 0000, 00000, 00000, 00000, 0000, 0000, 000, 00000, 00, 00, 0000, 00000, 0000, 0000, 00000, 00000, 00000 };
-        private static double[] MaxPointsOffHand = new double[29]       { 350, 350, 350, 350, 00012, 0000, 00000, 350, 20, 25, 00, 000, 0001, 00010, 00000, 00020, 0000, 0000, 000, 01450, 00, 00, 0000, 00000, 0010, 0119, 00010, 00011, 05977 };
-        private static double[] MaxPointsShield = new double[29]        { 350, 350, 350, 350, 00016, 0000, 00000, 350, 20, 25, 00, 000, 0001, 00010, 00000, 00000, 0000, 0000, 030, 02544, 80, 60, 0000, 00397, 0000, 0000, 00000, 00000, 12794 };
-        private static double[] MaxPointsRing = new double[29]          { 262, 262, 262, 262, 00012, 0479, 00000, 342, 20, 25, 00, 000, 0001, 00006, 00050, 00009, 0036, 0100, 000, 00979, 80, 60, 0000, 00265, 0000, 0000, 00000, 00000, 05977 };
-        private static double[] MaxPointsAmulet = new double[29]        { 350, 350, 350, 350, 00016, 0959, 00000, 600, 45, 50, 00, 000, 0001, 00010, 00100, 00009, 0036, 0100, 000, 02544, 80, 60, 0000, 00397, 0000, 0000, 00000, 00000, 05977 };
-        private static double[] MaxPointsShoulders = new double[29]     { 300, 300, 300, 200, 00012, 0000, 00000, 342, 20, 25, 00, 007, 0000, 00000, 00000, 00000, 0000, 0000, 000, 02544, 80, 60, 0000, 00265, 0000, 0000, 00000, 00000, 12794 };
-        private static double[] MaxPointsHelm = new double[29]          { 300, 300, 300, 200, 00012, 0000, 00000, 342, 20, 25, 00, 007, 0001, 00006, 00000, 00000, 0000, 0000, 000, 01454, 80, 60, 0000, 00397, 0000, 0000, 00000, 00000, 12794 };
-        private static double[] MaxPointsPants = new double[29]         { 296, 296, 296, 375, 00000, 0000, 00000, 342, 20, 25, 00, 007, 0002, 00000, 00000, 00000, 0000, 0000, 000, 01454, 80, 60, 0000, 00397, 0000, 0000, 00000, 00000, 12794 };
-        private static double[] MaxPointsGloves = new double[29]        { 300, 300, 300, 235, 00000, 0000, 00000, 342, 20, 25, 00, 007, 0000, 00010, 00050, 00009, 0000, 0000, 000, 01454, 80, 60, 0000, 00265, 0000, 0000, 00000, 00000, 12794 };
-        private static double[] MaxPointsChest = new double[29]         { 300, 300, 300, 300, 00012, 0000, 00000, 599, 20, 25, 00, 007, 0003, 00000, 00000, 00000, 0000, 0000, 000, 02544, 80, 60, 0000, 00397, 0000, 0000, 00000, 00000, 12794 };
-        private static double[] MaxPointsBracer = new double[29]        { 267, 267, 267, 200, 00000, 0000, 00000, 342, 20, 25, 00, 007, 0000, 00006, 00000, 00000, 0000, 0000, 000, 01454, 80, 60, 0000, 00265, 0000, 0000, 00000, 00000, 12794 };
-        private static double[] MaxPointsBoots = new double[29]         { 300, 300, 300, 200, 00000, 0000, 00000, 342, 20, 25, 12, 007, 0000, 00000, 00000, 00000, 0000, 0000, 000, 01454, 80, 60, 0000, 00265, 0000, 0000, 00000, 00000, 12794 };
-        private static double[] MaxPointsBelt = new double[29]          { 300, 300, 300, 200, 00012, 0000, 00000, 342, 20, 25, 00, 007, 0000, 00000, 00000, 00000, 0000, 0000, 000, 02544, 80, 60, 0000, 00265, 0000, 0000, 00000, 00000, 12794 };
-        private static double[] MaxPointsCloak = new double[29]         { 200, 200, 200, 300, 00012, 0000, 00000, 410, 20, 25, 00, 007, 0003, 00000, 00000, 00000, 0000, 0000, 000, 02544, 70, 50, 0000, 00397, 0010, 0000, 00000, 00000, 12794 };
-        private static double[] MaxPointsMightyBelt = new double[29]    { 200, 200, 300, 200, 00012, 0000, 00003, 342, 20, 25, 00, 007, 0000, 00000, 00000, 00000, 0000, 0000, 000, 02544, 70, 50, 0000, 00265, 0000, 0000, 00000, 00000, 12794 };
-        private static double[] MaxPointsSpiritStone = new double[29]   { 200, 300, 200, 200, 00012, 0000, 00000, 342, 20, 25, 00, 007, 0001, 00006, 00000, 00000, 0000, 0000, 000, 01454, 70, 50, 0000, 00397, 0000, 0000, 00000, 00000, 12794 };
-        private static double[] MaxPointsVoodooMask = new double[29]    { 200, 300, 200, 200, 00012, 0000, 00000, 342, 20, 25, 00, 007, 0001, 00006, 00000, 00000, 0000, 0000, 000, 01454, 70, 50, 0000, 00397, 0000, 0119, 00000, 00011, 12794 };
-        private static double[] MaxPointsWizardHat = new double[29]     { 200, 300, 200, 200, 00012, 0000, 00000, 342, 20, 25, 00, 007, 0001, 00006, 00000, 00000, 0000, 0000, 000, 01454, 70, 50, 0000, 00397, 0000, 0000, 00010, 00000, 12794 };
-        private static double[] MaxPointsFollower = new double[29]      { 350, 350, 350, 350, 00000, 1000, 00000, 600, 00, 00, 00, 000, 0000, 00000, 00055, 00000, 0000, 0000, 000, 00000, 80, 60, 0000, 00000, 0000, 0000, 00000, 00000, 00000 };
+        // Variable name                                                  Dex, Int, Str, Vit, Life%,  LOH,Steal%, LPS, MF, GF, MS, Rad, Sox,  Crit%, CDam%, ASPD,  Min+, Max+, Blk, Thrn, AR, SR,  DPS, ARMOR, Disc, Mana, Arc.,  Regen, Globes
+        private static double[] MaxPointsWeaponTwoHand = new double[29] { 595, 595, 595, 595, 00000, 1918, 00006, 000, 00, 00, 00, 000, 0001, 00000, 00200, 00011, 0000, 0000, 000, 0000, 00, 00, 1700, 00000, 0010, 0150, 00010, 00014, 00000 };
+        private static double[] MaxPointsWeaponOneHand = new double[29] { 350, 350, 350, 350, 00000, 0959, 00003, 000, 00, 00, 00, 000, 0001, 00000, 00100, 00011, 0000, 0000, 000, 0000, 00, 00, 1500, 00000, 0010, 0150, 00010, 00014, 00000 };
+        private static double[] MaxPointsWeaponRanged = new double[29]  { 000, 000, 000, 000, 00000, 0000, 00000, 000, 00, 00, 00, 000, 0000, 00000, 00000, 00000, 0000, 0000, 000, 0000, 00, 00, 0000, 00000, 0000, 0000, 00000, 00000, 00000 };
+        private static double[] MaxPointsOffHand = new double[29]       { 301, 301, 301, 301, 00012, 0000, 00000, 234, 18, 20, 00, 000, 0001, 00008, 00000, 00015, 0000, 0000, 000, 0979, 00, 00, 0000, 00000, 0010, 0119, 00010, 00011, 05977 };
+        private static double[] MaxPointsShield = new double[29]        { 350, 350, 350, 350, 00016, 0000, 00000, 342, 20, 25, 00, 000, 0001, 00010, 00000, 00000, 0000, 0000, 009, 2544, 80, 55, 0000, 00397, 0000, 0000, 00000, 00000, 12794 };
+        private static double[] MaxPointsRing = new double[29]          { 200, 200, 200, 200, 00012, 0479, 00000, 342, 20, 25, 00, 000, 0001, 00006, 00050, 00009, 0036, 0100, 000, 0979, 80, 55, 0000, 00265, 0000, 0000, 00000, 00000, 05977 };
+        private static double[] MaxPointsAmulet = new double[29]        { 350, 350, 350, 350, 00016, 0959, 00000, 599, 45, 50, 00, 000, 0001, 00010, 00100, 00009, 0036, 0100, 000, 1712, 80, 55, 0000, 00397, 0000, 0000, 00000, 00000, 05977 };
+        private static double[] MaxPointsShoulders = new double[29]     { 200, 200, 300, 200, 00012, 0000, 00000, 342, 20, 25, 00, 007, 0000, 00000, 00000, 00000, 0000, 0000, 000, 2544, 80, 55, 0000, 00265, 0000, 0000, 00000, 00000, 12794 };
+        private static double[] MaxPointsHelm = new double[29]          { 200, 300, 200, 200, 00012, 0000, 00000, 342, 20, 25, 00, 007, 0001, 00006, 00000, 00000, 0000, 0000, 000, 1454, 80, 55, 0000, 00397, 0000, 0000, 00000, 00000, 12794 };
+        private static double[] MaxPointsPants = new double[29]         { 200, 200, 200, 300, 00000, 0000, 00000, 342, 20, 25, 00, 007, 0002, 00000, 00000, 00000, 0000, 0000, 000, 1454, 80, 55, 0000, 00397, 0000, 0000, 00000, 00000, 12794 };
+        private static double[] MaxPointsGloves = new double[29]        { 300, 300, 200, 200, 00000, 0000, 00000, 342, 20, 25, 00, 007, 0000, 00010, 00050, 00009, 0000, 0000, 000, 1454, 80, 55, 0000, 00265, 0000, 0000, 00000, 00000, 12794 };
+        private static double[] MaxPointsChest = new double[29]         { 200, 200, 200, 300, 00012, 0000, 00000, 599, 20, 25, 00, 007, 0003, 00000, 00000, 00000, 0000, 0000, 000, 2544, 80, 55, 0000, 00397, 0000, 0000, 00000, 00000, 12794 };
+        private static double[] MaxPointsBracer = new double[29]        { 200, 200, 200, 200, 00000, 0000, 00000, 342, 20, 25, 00, 007, 0000, 00006, 00000, 00000, 0000, 0000, 000, 1454, 80, 55, 0000, 00265, 0000, 0000, 00000, 00000, 12794 };
+        private static double[] MaxPointsBoots = new double[29]         { 300, 200, 200, 200, 00000, 0000, 00000, 342, 20, 25, 12, 007, 0000, 00000, 00000, 00000, 0000, 0000, 000, 1454, 80, 55, 0000, 00265, 0000, 0000, 00000, 00000, 12794 };
+        private static double[] MaxPointsBelt = new double[29]          { 200, 200, 300, 200, 00012, 0000, 00000, 342, 20, 25, 00, 007, 0000, 00000, 00000, 00000, 0000, 0000, 000, 2544, 80, 55, 0000, 00265, 0000, 0000, 00000, 00000, 12794 };
+        private static double[] MaxPointsCloak = new double[29]         { 200, 200, 200, 300, 00012, 0000, 00000, 410, 20, 25, 00, 007, 0003, 00000, 00000, 00000, 0000, 0000, 000, 2544, 80, 55, 0000, 00397, 0010, 0000, 00000, 00000, 12794 };
+        private static double[] MaxPointsMightyBelt = new double[29]    { 200, 200, 300, 200, 00012, 0000, 00003, 342, 20, 25, 00, 007, 0000, 00000, 00000, 00000, 0000, 0000, 000, 2544, 70, 55, 0000, 00265, 0000, 0000, 00000, 00000, 12794 };
+        private static double[] MaxPointsSpiritStone = new double[29]   { 200, 300, 200, 200, 00012, 0000, 00000, 342, 20, 25, 00, 007, 0001, 00006, 00000, 00000, 0000, 0000, 000, 1454, 80, 55, 0000, 00397, 0000, 0000, 00000, 00000, 12794 };
+        private static double[] MaxPointsVoodooMask = new double[29]    { 200, 300, 200, 200, 00012, 0000, 00000, 342, 20, 25, 00, 007, 0001, 00006, 00000, 00000, 0000, 0000, 000, 1454, 70, 50, 0000, 00397, 0000, 0119, 00000, 00011, 12794 };
+        private static double[] MaxPointsWizardHat = new double[29]     { 200, 300, 200, 200, 00012, 0000, 00000, 342, 20, 25, 00, 007, 0001, 00006, 00000, 00000, 0000, 0000, 000, 1454, 70, 55, 0000, 00397, 0000, 0000, 00010, 00000, 12794 };
+        private static double[] MaxPointsFollower = new double[29]      { 350, 350, 350, 350, 00000, 0959, 00000, 600, 00, 00, 00, 000, 0000, 00000, 00055, 00000, 0000, 0000, 000, 0000, 80, 55, 0000, 00000, 0000, 0000, 00000, 00000, 00000 };
+
+        /* These are all missing from the valuation calculations: 
+
+        Life Per Spirit Spent
+        Bonus Experience
+        Reduced Level Requirement
+        Weapon % Damange modifier
+        Bonus Elemental Dmg
+        Bonus Cold Damage
+        Reduced Dmg from Melee %
+        Reduced Dmg from Ranged %
+        Reduced Dmg from Elites %
+        Crowd Control Reduction %
+
+        (All Chance % to crowd control)
+        Chance to Stun %
+        Chance to Knockback %
+        Chance to Slow %
+        Chance to Immobilize %
+        Chance to Freeze %
+        Chance to Fear %
+        Chance to Chill %
+        Chance to Blind %
+
+        Spirit Regen per second
+        Hatred regen per second
+        Extra max fury
+        Extra max arcane
+
+        */
+
         // Stores the total points this stat is worth at the above % point of maximum
         // Note that these values get all sorts of bonuses+ multipliers+ and extra things applied in the actual scoring routine. These values are more of a base value.
         // Variable name                                                Dex,   Int,   Str,   Vit,    L%,   LOH, Stl%, LPS,    MF,   GF,   MS,  Rad,   Sox, Crit%, CDam%, ASPD, Min+, Max+,  Blk,  Thn,    AR,   SR,   DPS, ARMR,  Disc, Mana, Arc.,  Regn, Globe
