@@ -70,7 +70,7 @@ namespace GilesTrinity
                     // Not enough DPS, so analyse for possibility to blacklist
                     if (quality < ItemQuality.Magic1)
                     {
-
+                        
                         // White item, blacklist
                         return false;
                     }

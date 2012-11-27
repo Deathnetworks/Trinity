@@ -244,5 +244,14 @@ namespace GilesTrinity
         {
             return (other.Name == Name) && (other.Version == Version);
         }
+
+
+        public GilesTrinity()
+        {
+            Instance = this;
+        }
+
+        public static GilesTrinity Instance { get; private set; }
+
     }
 }

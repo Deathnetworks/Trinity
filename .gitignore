@@ -17,3 +17,6 @@
 /Sources/*.log
 
 Deploy.cmd
+
+GilesBlankCombatRoutine/TrinityCombatRoutine/bin
+GilesBlankCombatRoutine/TrinityCombatRoutine/obj
