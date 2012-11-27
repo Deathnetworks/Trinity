@@ -38,22 +38,74 @@ namespace GilesTrinity.Settings.Loot
         [DataMember(IsRequired = false)]
         [DefaultValue(TrashMode.Selling)]
         public TrashMode TrashMode
-        { get; set; }
+        {
+            get
+            {
+                return _TrashMode;
+            }
+            set
+            {
+                if (_TrashMode != value)
+                {
+                    _TrashMode = value;
+                    OnPropertyChanged("TrashMode");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(70000)]
         public int WeaponScore
-        { get; set; }
+        {
+            get
+            {
+                return _WeaponScore;
+            }
+            set
+            {
+                if (_WeaponScore != value)
+                {
+                    _WeaponScore = value;
+                    OnPropertyChanged("WeaponScore");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(16000)]
         public int ArmorScore
-        { get; set; }
+        {
+            get
+            {
+                return _ArmorScore;
+            }
+            set
+            {
+                if (_ArmorScore != value)
+                {
+                    _ArmorScore = value;
+                    OnPropertyChanged("ArmorScore");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(15000)]
         public int JewelryScore
-        { get; set; }
+        {
+            get
+            {
+                return _JewelryScore;
+            }
+            set
+            {
+                if (_JewelryScore != value)
+                {
+                    _JewelryScore = value;
+                    OnPropertyChanged("JewelryScore");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods

@@ -307,15 +307,18 @@ namespace GilesTrinity.Settings
                 {
                     DataContractSerializer serializer = new DataContractSerializer(typeof(T));
                     serializer.WriteObject(ms, setting);
-                    ms.Seek(0, SeekOrigin.Begin);
+                    //ms.Seek(0, SeekOrigin.Begin);
                     return (T)serializer.ReadObject(ms);
                 }
-                DbHelper.Log(TrinityLogLevel.Verbose, "End Clone Object {0}", typeof(T).Name);
             }
             catch (Exception ex)
             {
                 DbHelper.Log(TrinityLogLevel.Error, "Error while Clone Setting {1} : {0}", ex.Message, typeof(T).Name);
                 return null;
+            }
+            finally
+            {
+                DbHelper.Log(TrinityLogLevel.Verbose, "End Clone Object {0}", typeof(T).Name);
             }
         }
         #endregion Static Methods

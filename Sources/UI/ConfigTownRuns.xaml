@@ -1,0 +1,85 @@
+﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ut="clr-namespace:GilesTrinity.UIComponents"
+             mc:Ignorable="d" 
+             d:DesignHeight="350" d:DesignWidth="390">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <!-- Don't format this line otherwise Db can't open config window -->
+            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Template.xaml"/></ResourceDictionary.MergedDictionaries>
+
+            <ut:EnumBooleanConverter x:Key="enumBooleanConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <!--Junk items Settings-->
+        <Grid Grid.Row="0" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Savlvage or Sell junk items :" FontWeight="Bold" TextAlignment="Center"/>
+            <UniformGrid Grid.Row="1" Margin="50,0,50,0" Columns="2" HorizontalAlignment="Center">
+                <RadioButton GroupName="TownRunTrashMode" Content="Salvage" 
+                             ToolTip="Only salvage inferno items"
+                             IsChecked="{Binding Path=TownRun.TrashMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Salvaging}" Margin="5"/>
+                <RadioButton GroupName="TownRunTrashMode" Content="Sell" IsChecked="{Binding Path=TownRun.TrashMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Selling}" Margin="5"/>
+            </UniformGrid>
+        </Grid>
+        <!--Junk items Settings-->
+        <Grid Grid.Row="1" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Stash/Keep Score Requirements :" FontWeight="Bold" TextAlignment="Center"/>
+            <StackPanel Grid.Row="1" Margin="50,0,50,0"  HorizontalAlignment="Center" Orientation="Vertical">
+                <TextBlock Text="Weapon Score : (70 000+ recommended)" Margin="5"/>
+                <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
+                    Interval="500" 
+                    Maximum="100000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="2000" TickPlacement="BottomRight" 
+                    Value="{Binding Path=TownRun.WeaponScore}" 
+                    HorizontalAlignment="Stretch" Margin="2"/>
+                <TextBlock Text="Armor Score : (16 000+ recommended)" Margin="5"/>
+                <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
+                    Interval="500" 
+                    Maximum="50000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" 
+                    Value="{Binding Path=TownRun.ArmorScore}" 
+                    HorizontalAlignment="Stretch" Margin="2"/>
+                <TextBlock Text="Jewelry Score : (15 000+ recommended)" Margin="5"/>
+                <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
+                    Interval="500" 
+                    Maximum="50000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" 
+                    Value="{Binding Path=TownRun.JewelryScore}" 
+                    HorizontalAlignment="Stretch" Margin="2"/>
+            </StackPanel>
+        </Grid>
+        <!--Test Score-->
+        <Grid Grid.Row="2" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="See sample Backpack Score :" FontWeight="Bold" TextAlignment="Center"/>
+            <Button Grid.Row="1" Margin="50,0,50,0" HorizontalAlignment="Center" Content="Test Backpack Scores"/>
+        </Grid>
+        <!--Test Score-->
+        <Grid Grid.Row="3" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Order stash by Score (Use carefully!):" FontWeight="Bold" TextAlignment="Center"/>
+            <Button Grid.Row="1" Margin="50,0,50,0" HorizontalAlignment="Center" Content="Order Stash"/>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.DbProvider;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -9,52 +10,179 @@ namespace GilesTrinity.Settings.Combat
 {
     [DataContract]
     public class MiscCombatSetting : ITrinitySetting<MiscCombatSetting>, INotifyPropertyChanged
-    {
+    { 
+        #region Fields
+        private GoblinPriority _GoblinPriority;
+        private int _NonEliteRange;
+        private bool _ExtendedTrashKill;
+        private bool _AvoidAOE;
+        private bool _CollectHealthGlobe;
+        private bool _AllowOOCMovement;
+        private bool _AllowBacktracking;
+        private int _DelayAfterKill;
+        #endregion Fields
+
+        #region Events
+        /// <summary>
+        /// Occurs when property changed.
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Events
+
+        #region Constructors
         public MiscCombatSetting()
         {
             Reset();
         }
+        #endregion Constructors
 
+        #region Properties
         [DataMember(IsRequired = false)]
-        [DefaultValue(GoblinPriority.Prioritize)]
+        [DefaultValue(GoblinPriority.Normal)]
         public GoblinPriority GoblinPriority
-        { get; set; }
+        {
+            get
+            {
+                return _GoblinPriority;
+            }
+            set
+            {
+                if (_GoblinPriority != value)
+                {
+                    _GoblinPriority = value;
+                    OnPropertyChanged("GoblinPriority");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(40)]
         public int NonEliteRange
-        { get; set; }
+        {
+            get
+            {
+                return _NonEliteRange;
+            }
+            set
+            {
+                if (_NonEliteRange != value)
+                {
+                    _NonEliteRange = value;
+                    OnPropertyChanged("NonEliteRange");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool ExtendedTrashKill
-        { get; set; }
+        {
+            get
+            {
+                return _ExtendedTrashKill;
+            }
+            set
+            {
+                if (_ExtendedTrashKill != value)
+                {
+                    _ExtendedTrashKill = value;
+                    OnPropertyChanged("ExtendedTrashKill");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool AvoidAOE
-        { get; set; }
+        {
+            get
+            {
+                return _AvoidAOE;
+            }
+            set
+            {
+                if (_AvoidAOE != value)
+                {
+                    _AvoidAOE = value;
+                    OnPropertyChanged("AvoidAOE");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool CollectHealthGlobe
-        { get; set; }
+        {
+            get
+            {
+                return _CollectHealthGlobe;
+            }
+            set
+            {
+                if (_CollectHealthGlobe != value)
+                {
+                    _CollectHealthGlobe = value;
+                    OnPropertyChanged("CollectHealthGlobe");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool AllowOOCMovement
-        { get; set; }
+        {
+            get
+            {
+                return _AllowOOCMovement;
+            }
+            set
+            {
+                if (_AllowOOCMovement != value)
+                {
+                    _AllowOOCMovement = value;
+                    OnPropertyChanged("AllowOOCMovement");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool AllowBacktracking
-        { get; set; }
+        {
+            get
+            {
+                return _AllowBacktracking;
+            }
+            set
+            {
+                if (_AllowBacktracking != value)
+                {
+                    _AllowBacktracking = value;
+                    OnPropertyChanged("AllowBacktracking");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(800)]
         public int DelayAfterKill
-        { get; set; }
+        {
+            get
+            {
+                return _DelayAfterKill;
+            }
+            set
+            {
+                if (_DelayAfterKill != value)
+                {
+                    _DelayAfterKill = value;
+                    OnPropertyChanged("DelayAfterKill");
+                }
+            }
+        }
+        #endregion Properties
 
+        #region Methods
         public void Reset()
         {
             TrinitySetting.Reset(this);
@@ -70,8 +198,10 @@ namespace GilesTrinity.Settings.Combat
             return TrinitySetting.Clone(this);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
+        /// <summary>
+        /// Called when property changed.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
         private void OnPropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
@@ -79,5 +209,6 @@ namespace GilesTrinity.Settings.Combat
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+        #endregion Methods
     }
 }

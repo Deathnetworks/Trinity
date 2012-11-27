@@ -10,16 +10,32 @@ namespace GilesTrinity.Settings
     [DataContract]
     public class WorldObjectSetting : ITrinitySetting<WorldObjectSetting>, INotifyPropertyChanged
     {
+
+        #region Fields
         private int _ContainerOpenRange;
         private int _DestructibleRange;
         private bool _UseShrine;
         private bool _IgnoreNonBlocking;
+        #endregion Fields
 
+        #region Events
+        /// <summary>
+        /// Occurs when property changed.
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Events
+
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WorldObjectSetting" /> class.
+        /// </summary>
         public WorldObjectSetting()
         {
             Reset();
         }
+        #endregion Constructors
 
+        #region Properties
         [DataMember(IsRequired = false)]
         [DefaultValue(15)]
         public int ContainerOpenRange
@@ -91,8 +107,9 @@ namespace GilesTrinity.Settings
                 }
             }
         }
+        #endregion Properties
 
-
+        #region Methods
         public void Reset()
         {
             TrinitySetting.Reset(this);
@@ -108,8 +125,10 @@ namespace GilesTrinity.Settings
             return TrinitySetting.Clone(this);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
+        /// <summary>
+        /// Called when property changed.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
         private void OnPropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
@@ -117,5 +136,6 @@ namespace GilesTrinity.Settings
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+        #endregion Methods
     }
 }
