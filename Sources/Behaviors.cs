@@ -590,7 +590,7 @@ namespace GilesTrinity
                     Vector3 point = vCurrentDestination;
                     foreach (GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
                                     GilesTrinity.GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, point) &&
-                                    cp.Location.Distance(playerStatus.CurrentPosition) > GilesTrinity.dictSNONavigationSize[cp.SNOID]))
+                                    cp.Location.Distance(playerStatus.CurrentPosition) > GilesTrinity.dictSNONavigationSize[cp.ActorSNO]))
                     {
                         if (vShiftedPosition == Vector3.Zero)
                         {

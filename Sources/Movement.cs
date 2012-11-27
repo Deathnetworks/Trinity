@@ -168,7 +168,7 @@ namespace GilesTrinity
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
                 if (!bKitingSpot && iMyCachedActorClass == ActorClass.Wizard && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_WaveOfForce) && playerStatus.CurrentEnergy >= 25 &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_WaveOfForce] &&
-                    !playerStatus.IsIncapacitated && hashAvoidanceObstacleCache.Count(u => u.SNOID == 5212 && u.Location.Distance(playerStatus.CurrentPosition) <= 15f) >= 2 &&
+                    !playerStatus.IsIncapacitated && hashAvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(playerStatus.CurrentPosition) <= 15f) >= 2 &&
                     (Settings.Combat.Wizard.CriticalMass || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, vNullLocation, iCurrentWorldID, -1);
@@ -255,7 +255,7 @@ namespace GilesTrinity
                     }
                     Vector3 vTestPoint = MathEx.GetPointAt(playerStatus.CurrentPosition, iDistanceOut, MathEx.ToRadians(iPosition));
                     // First check no avoidance obstacles in this spot
-                    if (!hashAvoidanceObstacleCache.Any(u => u.Location.Distance(vTestPoint) <= GetAvoidanceRadius(u.SNOID)))
+                    if (!hashAvoidanceObstacleCache.Any(u => u.Location.Distance(vTestPoint) <= GetAvoidanceRadius(u.ActorSNO)))
                     {
                         bool bAvoidBlackspot = hashAvoidanceBlackspot.Any(cp => Vector3.Distance(cp.Location, vTestPoint) <= cp.Radius);
                         bool bCanRaycast = false;

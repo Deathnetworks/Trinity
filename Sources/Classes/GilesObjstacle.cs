@@ -7,13 +7,13 @@ namespace GilesTrinity
     {
         public Vector3 Location { get; set; }
         public float Radius { get; set; }
-        public int SNOID { get; set; }
+        public int ActorSNO { get; set; }
         public double Weight { get; set; }
         public GilesObstacle(Vector3 location, float radius, int snoId, double weight = 0)
         {
             Location = location;
             Radius = radius;
-            SNOID = snoId;
+            ActorSNO = snoId;
             Weight = weight;
         }
     }

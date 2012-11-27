@@ -212,7 +212,7 @@ namespace GilesTrinity
                                     float fWeightRemoval = 0;
                                     foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp =>
                                         GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, point) &&
-                                        cp.Location.Distance(point) > GetAvoidanceRadius(cp.SNOID)))
+                                        cp.Location.Distance(point) > GetAvoidanceRadius(cp.ActorSNO)))
                                     {
                                         fWeightRemoval += (float)tempobstacle.Weight * 8;
                                     }
@@ -222,7 +222,7 @@ namespace GilesTrinity
 
                                     // Lower the priority if there is AOE *UNDER* the target, by the HIGHEST weight there only
                                     fWeightRemoval = 0;
-                                    foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => cp.Location.Distance(point) <= GetAvoidanceRadius(cp.SNOID) &&
+                                    foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => cp.Location.Distance(point) <= GetAvoidanceRadius(cp.ActorSNO) &&
                                         cp.Location.Distance(playerStatus.CurrentPosition) <= (cacheObject.RadiusDistance - 4f)))
                                     {
 
@@ -571,20 +571,23 @@ namespace GilesTrinity
                     w_HighestWeightFound = cacheObject.Weight;
 
                     // See if we can try attempting kiting later
-                    bNeedToKite = false;
+                    NeedToKite = false;
                     vKitePointAvoid = vNullLocation;
 
-                    // Kiting
+                    // Kiting and Avoidance
                     if (CurrentTarget.Type == GObjectType.Unit)
                     {
-                        Vector3 point = CurrentTarget.Position;
-
                         // if there's any obstacle within a specified distance of the avoidance radius *1.2 
-                        if (hashAvoidanceObstacleCache.Any(cp => cp.Location.Distance(point) <= (GetAvoidanceRadius(cp.SNOID) * 1.2) &&
-                            cp.Location.Distance(playerStatus.CurrentPosition) <= (cacheObject.RadiusDistance - 4f)))
+                        if (hashAvoidanceObstacleCache.Any(o =>
+                            // Distance from avoidance to target is less than avoidance radius
+                            o.Location.Distance(CurrentTarget.Position) <= (GetAvoidanceRadius(o.ActorSNO) * 1.2) &&
+                            // Distance from obstacle to me is <= cacheObject.RadiusDistance
+                            o.Location.Distance(playerStatus.CurrentPosition) <= (cacheObject.RadiusDistance - 4f)
+                            )
+                            )
                         {
                             vKitePointAvoid = CurrentTarget.Position;
-                            bNeedToKite = true;
+                            NeedToKite = true;
                         }
                     }
                 }

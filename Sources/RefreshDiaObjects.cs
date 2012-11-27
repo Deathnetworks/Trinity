@@ -73,7 +73,7 @@ namespace GilesTrinity
             if (!bFoundSafeSpot)
             {
                 RefreshDiaGetWeights();
-                RefreshSetKiting(ref vKitePointAvoid, bNeedToKite, ref bShouldTryKiting);
+                RefreshSetKiting(ref vKitePointAvoid, NeedToKite, ref TryToKite);
             }
             // Not heading straight for a safe-spot?
             // No valid targets but we were told to stay put?
@@ -620,25 +620,25 @@ namespace GilesTrinity
                                     };
             }
         }
-        private static void RefreshSetKiting(ref Vector3 vKitePointAvoid, bool bNeedToKite, ref bool bShouldTryKiting)
+        private static void RefreshSetKiting(ref Vector3 vKitePointAvoid, bool NeedToKite, ref bool TryToKite)
         {
-            bShouldTryKiting = false;
+            TryToKite = false;
             if (
                 (((CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance) ||
                 hashMonsterObstacleCache.Any(m => m.Location.Distance(playerStatus.CurrentPosition) <= PlayerKiteDistance)) &&
                 (iMyCachedActorClass != ActorClass.Wizard || IsWizardShouldKite())) || playerStatus.CurrentHealthPct <= 0.15
                 )
             {
-                bShouldTryKiting = true;
+                TryToKite = true;
 
                 // lets try this... 
                 vKitePointAvoid = playerStatus.CurrentPosition;
             }
             // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
-            if ((bShouldTryKiting || bNeedToKite) && (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
+            if ((TryToKite || NeedToKite) && (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
                 DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds &&
                 (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= cancelledKiteMoveForMilliseconds ||
-                (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= 2500 && bNeedToKite)))
+                (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= 2500 && NeedToKite)))
             {
                 Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true);
                 // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
@@ -649,7 +649,7 @@ namespace GilesTrinity
                         Logging.Write("[Trinity] Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}", 
                             vAnySafePoint, vAnySafePoint.Distance(Me.Position), FindDirectionDegree(Me.Position, vAnySafePoint),
                             playerStatus.CurrentHealthPct, PlayerKiteDistance, hashMonsterObstacleCache.Count(m => m.Location.Distance(playerStatus.CurrentPosition) <= PlayerKiteDistance),
-                            bNeedToKite, bShouldTryKiting);
+                            NeedToKite, TryToKite);
                     }
                     CurrentTarget = new GilesObject()
                                         {

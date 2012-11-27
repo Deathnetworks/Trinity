@@ -209,7 +209,8 @@ namespace GilesTrinity
             c_item_GilesItemType = GItemType.Unknown;
             c_unit_MonsterSize = MonsterSize.Unknown;
             c_diaObject = null;
-        }
+            c_CurrentAnimation = SNOAnim.Invalid;
+       }
         /// <summary>
         /// Inserts the ActorSNO <see cref="dictGilesActorSNOCache"/> and sets <see cref="c_ActorSNO"/>
         /// </summary>
@@ -875,6 +876,13 @@ namespace GilesTrinity
             c_diaObject = null;
             // See if this is a boss
             c_unit_bIsBoss = hashBossSNO.Contains(c_ActorSNO);
+
+            try
+            {
+                c_CurrentAnimation = thisUnit.CommonData.CurrentAnimation;
+            }
+            catch { }
+
             // hax for Diablo_shadowClone
             c_unit_bIsAttackable = c_Name.StartsWith("Diablo_shadowClone");
             try
@@ -1978,6 +1986,13 @@ namespace GilesTrinity
             //    
             //return bWantThis;
             //}
+
+            try
+            {
+                c_CurrentAnimation = c_CommonData.CurrentAnimation;
+            }
+            catch { }
+
             bool bIgnoreThisAvoidance = false;
             double dThisHealthAvoid = GetAvoidanceHealth();
             // Monks with Serenity up ignore all AOE's

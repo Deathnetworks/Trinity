@@ -556,6 +556,7 @@ namespace GilesTrinity
         private static MonsterSize c_unit_MonsterSize = MonsterSize.Unknown;
         private static DiaObject c_diaObject = null;
         private static ACD c_CommonData = null;
+        private static SNOAnim c_CurrentAnimation = SNOAnim.Invalid;
         private static bool c_unit_bIsElite = false;
         private static bool c_unit_bIsRare = false;
         private static bool c_unit_bIsUnique = false;
@@ -574,8 +575,8 @@ namespace GilesTrinity
         private static int iUnitsSurrounding;
         private static double w_HighestWeightFound;
         private static HashSet<int> hashDoneThisRactor;
-        private static bool bNeedToKite = false;
-        private static bool bShouldTryKiting = false;
+        private static bool NeedToKite = false;
+        private static bool TryToKite = false;
 
 
         /// <summary>

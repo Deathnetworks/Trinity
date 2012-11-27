@@ -175,28 +175,36 @@ namespace GilesTrinity.DbProvider
             if (iTimesReachedMaxUnstucks == 2)
             {
                 Logging.Write("[Trinity] Anti-stuck measures failed. Now attempting to reload current profile.");
+
                 // First see if we need to, and can, teleport to town
-                while (!ZetaDia.Me.IsInTown)
-                {
-                    iSafetyLoops++;
-                    GilesTrinity.WaitWhileAnimating(5, true);
-                    ZetaDia.Me.UsePower(SNOPower.UseStoneOfRecall, ZetaDia.Me.Position, ZetaDia.Me.WorldDynamicId, -1);
-                    Thread.Sleep(1000);
-                    GilesTrinity.WaitWhileAnimating(1000, true);
-                    if (iSafetyLoops > 5)
-                        break;
-                }
-                Thread.Sleep(1000);
-                // As long as we successfully reached town, reload the profile
-                if (ZetaDia.Me.IsInTown)
-                {
-                    ProfileManager.Load(Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
-                    Logging.Write("[Trinity] Anti-stuck successfully reloaded current profile, DemonBuddy now navigating again.");
-                    Thread.Sleep(3000);
-                    return vSafeMovementLocation;
-                }
+                //while (!ZetaDia.Me.IsInTown)
+                //{
+                //    iSafetyLoops++;
+                //    GilesTrinity.WaitWhileAnimating(5, true);
+                //    ZetaDia.Me.UsePower(SNOPower.UseStoneOfRecall, ZetaDia.Me.Position, ZetaDia.Me.WorldDynamicId, -1);
+                //    Thread.Sleep(1000);
+                //    GilesTrinity.WaitWhileAnimating(1000, true);
+                //    if (iSafetyLoops > 5)
+                //        break;
+                //}
+                //Thread.Sleep(1000);
+                //// As long as we successfully reached town, reload the profile
+                //if (ZetaDia.Me.IsInTown)
+                //{
+                //    ProfileManager.Load(Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
+                //    Logging.Write("[Trinity] Anti-stuck successfully reloaded current profile, DemonBuddy now navigating again.");
+                //    Thread.Sleep(3000);
+                //    return vSafeMovementLocation;
+                //}
+
+                Navigator.Clear();
+
+                ProfileManager.Load(Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
+                Logging.Write("[Trinity] Anti-stuck successfully reloaded current profile, DemonBuddy now navigating again.");
+                return vSafeMovementLocation;
+
                 // Didn't make it to town, so skip instantly to the exit game system
-                iTimesReachedMaxUnstucks = 3;
+                //iTimesReachedMaxUnstucks = 3;
             }
             // Exit the game and reload the profile
             if (GilesTrinity.Settings.Advanced.AllowRestartGame && DateTime.Now.Subtract(timeLastRestartedGame).TotalMinutes >= 15)
@@ -207,7 +215,7 @@ namespace GilesTrinity.DbProvider
                 // Load the first profile seen last run
                 ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
                                         ? sUseProfile
-                                        : Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
+                                        : Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
                 Thread.Sleep(1000);
                 GilesTrinity.GilesResetEverythingNewGame();
                 ZetaDia.Service.Games.LeaveGame();
@@ -370,7 +378,7 @@ namespace GilesTrinity.DbProvider
             Vector3 point = vMoveToTarget;
             foreach (GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
                             GilesTrinity.GilesIntersectsPath(cp.Location, cp.Radius, vMyCurrentPosition, point) &&
-                            cp.Location.Distance(vMyCurrentPosition) > GilesTrinity.dictSNONavigationSize[cp.SNOID]))
+                            cp.Location.Distance(vMyCurrentPosition) > GilesTrinity.dictSNONavigationSize[cp.ActorSNO]))
             {
                 if (vShiftedPosition == Vector3.Zero)
                 {
