@@ -11,10 +11,10 @@ using Zeta.Common;
 using System.Reflection;
 using Zeta.CommonBot;
 
-namespace GilesTrinity
+namespace GilesTrinity.ItemRules
 {
 
-    public class Interpreter
+    class Interpreter
     {
         string[] strArrayString = new string[] { "[BASETYPE]", "[TYPE]", "[QUALITY]", "[NAME]" };
 
@@ -31,40 +31,48 @@ namespace GilesTrinity
                                                 "[MAXFURY]","[MAXDISCIP]","[LS%]","[WEAPMINDMG]","[DMGREDPHYSICAL]",
                                                 "[HATREDREG]","[MAXMANA]","[MANAREG]","[MAXSTAT]","[MAXSTATVIT]",
                                                 "[MAXONERES]","[TOTRES]", "[STRVIT]","[DEXVIT]","[INTVIT]",
-                                                "[DMGFACTOR]","[AVGDMG]"};
+                                                "[DMGFACTOR]","[AVGDMG]","[OFFSTATS]","[DEFSTATS]"};
 
-        public enum LogType { LOG, TRASH, ERROR };
+        public enum LogType { LOG, TRASH, DEBUG, ERROR };
 
         public enum InterpreterAction { KEEP, TRASH, NULL };
 
         string[] comparators = new string[] { "==", "!=", "<=", ">=", "<", ">" };
 
+        string[] operators = new string[] { "+" };
+
         ArrayList ruleSet;
-
-        GilesCachedACDItem item;
-        GItemType truetype;
-        GBaseItemType basetype;
-
+        ACDItem item;
         TextWriter log;
 
         bool debugFlag = false, logFlag = false, trashLogFlag = false;
 
-        string startTimestamp = DateTime.Now.ToString("ddMMyyyyHHmm");
+        string startTimestamp,customPath,logPath;
 
-        string customPath;
-
-        string logPath;
-
-
-        public Interpreter()
+        static void Main()
         {
-            //init();
+            //Interpreter interpreter = new Interpreter();
+            //interpreter.init();
+            //interpreter.checkItem(null);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public Interpreter()
+        {
+            init();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void init()
         {
-            customPath = GilesTrinity.sTrinityPluginPath + @"Specification\";
-            logPath = GilesTrinity.sTrinityPluginPath + @"Log\";
+            startTimestamp = DateTime.Now.ToString("ddMMyyyyHHmmss");
+            customPath = @"Plugins\GilesTrinity\ItemRules\";
+            logPath = @"Plugins\GilesTrinity\Log\";
+
             ruleSet = new ArrayList();
 
             string disFileName = "config.dis";
@@ -92,14 +100,18 @@ namespace GilesTrinity
 
             foreach (string itemFileName in itemFileNames)
             {
-                logOut("... reading file: " + itemFileName, LogType.LOG);
+                logOut("... reading file: " + itemFileName, LogType.DEBUG);
                 readItemFile(new StreamReader(customPath + itemFileName));
             }
-            logOut("initialized " + ruleSet.Count + " itemrulesets!", LogType.LOG);
+            logOut("initialized " + ruleSet.Count + " itemrulesets!", LogType.DEBUG);
             Logging.Write("initialized " + ruleSet.Count + " itemrulesets!");
             Logging.Write("finished initializing Item Rule Set!");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stream"></param>
         private void readItemFile(StreamReader stream)
         {
             string str;
@@ -112,22 +124,27 @@ namespace GilesTrinity
                 if (rule[0].IndexOf('#') != -1 && testRule(rule[0]))
                 {
                     ruleSet.Add(rule[0]);
-                    logOut(ruleSet.Count + ":" + rule[0], LogType.LOG);
+                    logOut(ruleSet.Count + ":" + rule[0], LogType.DEBUG);
                 }
                 else if (rule[0].Length > 0)
                 {
-                    logOut("#WARNING(BAD LINE): " + rule[0], LogType.LOG);
+                    logOut("#WARNING(BAD LINE): " + rule[0], LogType.ERROR);
                 }
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rule"></param>
+        /// <returns></returns>
         private bool testRule(string rule)
         {
 
             // count test
             if (rule.Split('(').Length - 1 != rule.Split(')').Length - 1)
                 return false;
-            
+
             if (rule.Split('[').Length - 1 != rule.Split(']').Length - 1)
                 return false;
 
@@ -149,7 +166,7 @@ namespace GilesTrinity
 
             if (nullTest.Split('[').Length > 1)
             {
-                logOut(nullTest, LogType.LOG);
+                logOut(nullTest, LogType.ERROR);
                 return false;
             }
 
@@ -167,18 +184,30 @@ namespace GilesTrinity
             return checkFlag;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         private string interpretConfig(string str)
         {
             string fileName = "";
-            if (hasComparator(str) != null)
+            if (hasStrFromArrayIn(comparators, str) != null)
             {
-                string comparator = hasComparator(str);
+                string comparator = hasStrFromArrayIn(comparators, str);
                 string[] strings = str.Split(new string[] { comparator }, StringSplitOptions.None);
                 fileName = interpret(strings[0], comparator, strings[1]);
             }
             return fileName;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str1"></param>
+        /// <param name="comparator"></param>
+        /// <param name="str2"></param>
+        /// <returns></returns>
         private string interpret(string str1, string comparator, string str2)
         {
             string fileName = "";
@@ -186,15 +215,15 @@ namespace GilesTrinity
             {
                 case "[DEBUG]":
                     debugFlag = Boolean.Parse(str2);
-                    logOut("Debugging set to " + logFlag, LogType.LOG);
+                    logOut("Debugging set to " + logFlag, LogType.DEBUG);
                     break;
                 case "[LOG]":
                     logFlag = Boolean.Parse(str2);
-                    logOut("Logging set to " + logFlag, LogType.LOG);
+                    logOut("Logging set to " + logFlag, LogType.DEBUG);
                     break;
                 case "[TRASHLOG]":
                     trashLogFlag = Boolean.Parse(str2);
-                    logOut("Logging trashed legendarys set to " + logFlag, LogType.LOG);
+                    logOut("Logging trashed legendarys set to " + logFlag, LogType.DEBUG);
                     break;
                 case "[FILE]":
                     if (File.Exists(customPath + str2))
@@ -206,15 +235,26 @@ namespace GilesTrinity
             return fileName;
         }
 
-        public InterpreterAction checkItem(GilesCachedACDItem item, GItemType thisGilesItemType, GBaseItemType thisGilesBaseType)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public InterpreterAction checkItem(ACDItem item)
         {
             this.item = item;
-            truetype = thisGilesItemType;
-            basetype = thisGilesBaseType;
+
+            if (debugFlag)
+            {
+                logOut("- CHECK ITEM START ----------------------------------------------", LogType.DEBUG);
+                if (item != null) logOut("checkItem: " + getItemTag(item), LogType.DEBUG);
+            }
 
             bool checkFlag = true;
 
             InterpreterAction action = InterpreterAction.NULL;
+
+            string validRule = "";
 
             foreach (string str in ruleSet)
             {
@@ -222,39 +262,60 @@ namespace GilesTrinity
 
                 if (!checkFlag)
                 {
-                    logOut("#WARNING(RULE): " + str, LogType.LOG);
-                    logItemFullTag(item, LogType.LOG);
+                    logOut("#WARNING(RULE): " + str, LogType.ERROR);
+                    logItemFullTag(item, LogType.ERROR);
                     return InterpreterAction.NULL;
                 }
 
                 if (action != InterpreterAction.NULL)
                 {
+                    validRule = str;
                     loggingAction(item, action, str);
                     break;
                 }
+
             }
+
+            if (item != null && debugFlag)
+            {
+                if (item != null) logItemFullTag(item, LogType.DEBUG);
+                logOut("Matching rule: " + validRule, LogType.DEBUG);
+                logOut("Performing action: " + action.ToString(), LogType.DEBUG);
+                logOut("- CHECK ITEM END ------------------------------------------------", LogType.DEBUG);
+            }
+
             return action;
         }
 
-        private void loggingAction(GilesCachedACDItem item, InterpreterAction action, string rule)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="action"></param>
+        /// <param name="rule"></param>
+        private void loggingAction(ACDItem item, InterpreterAction action, string rule)
         {
-            if (trashLogFlag && action == InterpreterAction.TRASH && (item == null || item.Quality == ItemQuality.Legendary))
+            if (trashLogFlag && action == InterpreterAction.TRASH && (item == null || item.ItemQualityLevel == ItemQuality.Legendary))
             {
                 logOut("-----------------------------------------------------------------", LogType.TRASH);
                 if (item != null) logOut(action.ToString() + ": " + getItemTag(item), LogType.TRASH);
                 logOut("Rule:" + rule, LogType.TRASH);
                 if (item != null) logItemFullTag(item, LogType.TRASH);
             }
-            else if (logFlag && action == InterpreterAction.KEEP || debugFlag)
+            else if (logFlag && action == InterpreterAction.KEEP)
             {
                 logOut("-----------------------------------------------------------------", LogType.LOG);
                 if (item != null) logOut(action.ToString() + ": " + getItemTag(item), LogType.LOG);
                 logOut("Rule:" + rule, LogType.LOG);
-                if (debugFlag)
-                    if (item != null) logItemFullTag(item, LogType.LOG);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="checkFlag"></param>
+        /// <returns></returns>
         private InterpreterAction interpret(string line, ref bool checkFlag)
         {
 
@@ -271,6 +332,12 @@ namespace GilesTrinity
             return InterpreterAction.NULL;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="checkFlag"></param>
+        /// <returns></returns>
         private bool checkTruth(string str, ref bool checkFlag)
         {
             if (!checkFlag)
@@ -300,9 +367,25 @@ namespace GilesTrinity
                     result |= checkTruth(hold, ref checkFlag);
                 return result;
             }
-            else if (hasComparator(str) != null)
+            //else if (hasStrFromArrayIn(operators, str) != null)
+            //{
+            //    string[] strNoComparators = new string[] {str};
+            //    string comparator = hasStrFromArrayIn(comparators, str);
+            //    if (comparator != null)
+            //        strNoComparators = str.Split(new string[] { comparator }, StringSplitOptions.None);
+            //    for (int i = 0; i < strNoComparators.Length; i++)
+            //        strNoComparators[i] = doMath(strNoComparators[i]);
+            //    str = "";
+            //    for (int i = 0; i < strNoComparators.Length; i++)
+            //    {
+            //        str += strNoComparators[i];
+            //        if (comparator != null && i < strNoComparators.Length - 1)
+            //            str += comparator;
+            //    }
+            //}
+            else if (hasStrFromArrayIn(comparators, str) != null)
             {
-                string comparator = hasComparator(str);
+                string comparator = hasStrFromArrayIn(comparators, str);
                 string[] strings = str.Split(new string[] { comparator }, StringSplitOptions.None);
                 return checkExpression(strings[0], comparator, strings[1], ref checkFlag);
             }
@@ -315,6 +398,34 @@ namespace GilesTrinity
             return false;
         }
 
+        //private string doMath(string str)
+        //{
+        //    string signOperator = hasStrFromArrayIn(operators, str);
+        //    string[] strNoOperators = new string[] { str };
+        //    if (signOperator != null)
+        //        strNoOperators = str.Split(new string[] { signOperator }, StringSplitOptions.None);
+
+        //    bool checkFlag = true;
+        //    float result;
+        //    for (int i = 0; i < strNoOperators.Length; i++)
+        //        if (!Single.TryParse(strNoOperators[i], out result))
+        //            strNoOperators[i] = ((float) getValueFromString(strNoOperators[0], ref checkFlag)).ToString();
+
+        //    result = 0;
+        //    foreach (string partStr in strNoOperators)
+        //        result += Single.Parse(partStr);
+
+        //    return result.ToString();
+        //}
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str1"></param>
+        /// <param name="comparator"></param>
+        /// <param name="str2"></param>
+        /// <param name="checkFlag"></param>
+        /// <returns></returns>
         private bool compare(string str1, string comparator, string str2, ref bool checkFlag)
         {
             switch (comparator)
@@ -329,6 +440,14 @@ namespace GilesTrinity
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bool1"></param>
+        /// <param name="comparator"></param>
+        /// <param name="bool2"></param>
+        /// <param name="checkFlag"></param>
+        /// <returns></returns>
         private bool compare(bool bool1, string comparator, bool bool2, ref bool checkFlag)
         {
             switch (comparator)
@@ -343,6 +462,14 @@ namespace GilesTrinity
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="float1"></param>
+        /// <param name="comparator"></param>
+        /// <param name="float2"></param>
+        /// <param name="checkFlag"></param>
+        /// <returns></returns>
         private bool compare(float float1, string comparator, float float2, ref bool checkFlag)
         {
             switch (comparator)
@@ -365,6 +492,11 @@ namespace GilesTrinity
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         private InterpreterAction getInterpreterAction(string str)
         {
             foreach (InterpreterAction action in Enum.GetValues(typeof(InterpreterAction)))
@@ -373,170 +505,229 @@ namespace GilesTrinity
             return InterpreterAction.NULL;
         }
 
-        private string hasComparator(string str)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private string hasStrFromArrayIn(string[] array, string str)
         {
-            foreach (string comparator in comparators)
-                if (str.IndexOf(comparator) != -1)
-                    return comparator;
+            foreach (string hold in array)
+                if (str.IndexOf(hold) != -1)
+                    return hold;
             return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="checkFlag"></param>
+        /// <returns></returns>
         private Object getValueFromString(string str, ref bool checkFlag)
         {
+            string result = "";
             switch (str)
             {
                 case "[BASETYPE]":
-                    return basetype.ToString();
+                    return item.ItemBaseType.ToString();
                 case "[TYPE]":
-                    return truetype.ToString();
+                    // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
+                    if (item.ItemType == ItemType.Unknown && item.Name.Contains("Plan"))
+                        result = ItemType.CraftingPlan.ToString();
+                    else
+                        result = item.ItemType.ToString();
+                    return result;
                 case "[QUALITY]":
-                   return Regex.Replace(item.Quality.ToString(), @"[\d-]", string.Empty);
+                    // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
+                    if ((item.ItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.ItemType == ItemType.CraftingPlan)
+                    {
+                        if (item.Name.Contains("ffbf642f"))
+                            result = ItemQuality.Legendary.ToString();
+                        else if (item.Name.Contains("Exalted Grand"))
+                            result = ItemQuality.Rare6.ToString();
+                        else if (item.Name.Contains("Exalted Fine"))
+                            result = ItemQuality.Rare5.ToString();
+                        else if (item.Name.Contains("Exalted"))
+                            result = ItemQuality.Rare4.ToString();
+                        else
+                            result = ItemQuality.Normal.ToString();
+                    }
+                    else
+                        result = Regex.Replace(item.ItemQualityLevel.ToString(), @"[\d-]", string.Empty);
+                    return result;
                 case "[NAME]":
-                    return item.RealName.ToString().Replace(" ","");
+                    return item.Name.ToString().Replace(" ", "");
                 case "[LEVEL]":
                     return item.Level;
                 case "[ONEHAND]":
-                    return item.OneHanded;
+                    return item.IsOneHand;
                 case "[TWOHAND]":
-                    return item.TwoHanded;
+                    return item.IsTwoHand;
                 case "[STR]":
-                    return item.Strength;
+                    return item.Stats.Strength;
                 case "[DEX]":
-                    return item.Dexterity;
+                    return item.Stats.Dexterity;
                 case "[INT]":
-                    return item.Intelligence;
+                    return item.Stats.Intelligence;
                 case "[VIT]":
-                    return item.Vitality;
+                    return item.Stats.Vitality;
                 case "[AS%]":
-                    return item.AttackSpeedPercent;
+                    return item.Stats.AttackSpeedPercent;
                 case "[MS%]":
-                    return item.MovementSpeed;
+                    return item.Stats.MovementSpeed;
 
                 case "[LIFE%]":
-                    return item.LifePercent;
+                    return item.Stats.LifePercent;
                 case "[LS%]":
-                    return item.LifeSteal;
+                    return item.Stats.LifeSteal;
                 case "[LOH]":
-                    return item.LifeOnHit;
+                    return item.Stats.LifeOnHit;
                 case "[REGEN]":
-                    return item.HealthPerSecond;
+                    return item.Stats.HealthPerSecond;
                 case "[GLOBEBONUS]":
-                    return item.HealthGlobeBonus;
+                    return item.Stats.HealthGlobeBonus;
 
                 case "[DPS]":
-                    return item.WeaponDamagePerSecond;
+                    return item.Stats.WeaponDamagePerSecond;
                 case "[WEAPAS]":
-                    return item.WeaponAttacksPerSecond;
+                    return item.Stats.WeaponAttacksPerSecond;
                 case "[WEAPMAXDMG]":
-                    return item.WeaponMaxDamage;
+                    return item.Stats.WeaponMaxDamage;
                 case "[WEAPMINDMG]":
-                    return item.WeaponMinDamage;
+                    return item.Stats.WeaponMinDamage;
                 case "[CRIT%]":
-                    return item.CritPercent;
+                    return item.Stats.CritPercent;
                 case "[CRITDMG%]":
-                    return item.CritDamagePercent;
+                    return item.Stats.CritDamagePercent;
                 case "[BLOCK%]":
-                    return item.BlockChance;
+                    return item.Stats.BlockChance;
                 case "[MINDMG]":
-                    return item.MinDamage;
+                    return item.Stats.MinDamage;
                 case "[MAXDMG]":
-                    return item.MaxDamage;
+                    return item.Stats.MaxDamage;
 
                 case "[ALLRES]":
-                    return item.ResistAll;
+                    return item.Stats.ResistAll;
                 case "[RESPHYSICAL]":
-                    return item.ResistPhysical;
+                    return item.Stats.ResistPhysical;
                 case "[RESFIRE]":
-                    return item.ResistFire;
+                    return item.Stats.ResistFire;
                 case "[RESLIGHTNING]":
-                    return item.ResistLightning;
+                    return item.Stats.ResistLightning;
                 case "[RESHOLY]":
-                    return item.ResistHoly;
+                    return item.Stats.ResistHoly;
                 case "[RESARCAN]":
-                    return item.ResistArcane;
+                    return item.Stats.ResistArcane;
                 case "[RESCOLD]":
-                    return item.ResistCold;
+                    return item.Stats.ResistCold;
                 case "[RESPOISON]":
-                    return item.ResistPoison;
+                    return item.Stats.ResistPoison;
 
                 case "[FIREDMG%]":
-                    return item.FireDamagePercent;
+                    return item.Stats.FireDamagePercent;
                 case "[LIGHTNINGDMG%]":
-                    return item.LightningDamagePercent;
+                    return item.Stats.LightningDamagePercent;
                 case "[COLDDMG%]":
-                    return item.ColdDamagePercent;
+                    return item.Stats.ColdDamagePercent;
                 case "[POISONDMG%]":
-                    return item.PoisonDamagePercent;
+                    return item.Stats.PoisonDamagePercent;
                 case "[ARCANEDMG%]":
-                    return item.ArcaneDamagePercent;
+                    return item.Stats.ArcaneDamagePercent;
                 case "[HOLYDMG%]":
-                    return item.HolyDamagePercent;
+                    return item.Stats.HolyDamagePercent;
+
                 case "[ARMOR]":
-                    return item.Armor;
+                    return item.Stats.Armor;
                 case "[ARMORBONUS]":
-                    return item.ArmorBonus;
+                    return item.Stats.ArmorBonus;
                 case "[ARMORTOT]":
-                    return item.ArmorTotal;
+                    return item.Stats.ArmorTotal;
                 case "[GF%]":
-                    return item.GoldFind;
+                    return item.Stats.GoldFind;
                 case "[MF%]":
-                    return item.MagicFind;
+                    return item.Stats.MagicFind;
                 case "[PICKUP]":
-                    return item.PickUpRadius;
+                    return item.Stats.PickUpRadius;
 
                 case "[SOCKETS]":
-                    return item.Sockets;
+                    return item.Stats.Sockets;
                 case "[THORNS]":
-                    return item.Thorns;
+                    return item.Stats.Thorns;
                 case "[DMGREDPHYSICAL]":
-                    return item.DamageReductionPhysicalPercent;
+                    return item.Stats.DamageReductionPhysicalPercent;
 
                 case "[MAXARCPOWER]":
-                    return item.MaxArcanePower;
+                    return item.Stats.MaxArcanePower;
                 case "[HEALTHSPIRIT]":
-                    return item.HealthPerSpiritSpent;
+                    return item.Stats.HealthPerSpiritSpent;
                 case "[MAXSPIRIT]":
-                    return item.MaxSpirit;
+                    return item.Stats.MaxSpirit;
                 case "[SPIRITREG]":
-                    return item.SpiritRegen;
+                    return item.Stats.SpiritRegen;
                 case "[ARCONCRIT]":
-                    return item.ArcaneOnCrit;
+                    return item.Stats.ArcaneOnCrit;
                 case "[MAXFURY]":
-                    return item.MaxFury;
+                    return item.Stats.MaxFury;
                 case "[MAXDISCIP]":
-                    return item.MaxDiscipline;
+                    return item.Stats.MaxDiscipline;
                 case "[HATREDREG]":
-                    return item.HatredRegen;
+                    return item.Stats.HatredRegen;
                 case "[MAXMANA]":
-                    return item.MaxMana;
+                    return item.Stats.MaxMana;
                 case "[MANAREG]":
-                    return item.ManaRegen;
+                    return item.Stats.ManaRegen;
 
-                /* ---------------------- *
-                 * SPECIAL FUNCTIONS      *
-                 * ---------------------- */
+                // +- Special functions -------------------------------------------------------+ 
                 case "[MAXSTAT]":
-                    return new float[] { item.Strength, item.Intelligence, item.Dexterity }.Max();
+                    return new float[] { item.Stats.Strength, item.Stats.Intelligence, item.Stats.Dexterity }.Max();
                 case "[MAXSTATVIT]":
-                    return new float[] { item.Strength, item.Intelligence, item.Dexterity }.Max() + item.Vitality;
-                case "[MAXONERES]":
-                    return new float[] { item.ResistArcane, item.ResistCold, item.ResistFire, item.ResistHoly, item.ResistLightning, item.ResistPhysical, item.ResistPoison }.Max();
-                
-                case "[TOTRES]":
-                    return item.ResistArcane + item.ResistCold + item.ResistFire + item.ResistHoly + item.ResistLightning + item.ResistPhysical + item.ResistPoison + item.ResistAll;
-                case "[DMGFACTOR]":
-                    return item.AttackSpeedPercent / 2 + item.CritPercent * 2 + item.CritDamagePercent / 5 + (item.MinDamage + item.MaxDamage) / 20;
-                
+                    return new float[] { item.Stats.Strength, item.Stats.Intelligence, item.Stats.Dexterity }.Max() + item.Stats.Vitality;
                 case "[STRVIT]":
-                    return item.Strength + item.Vitality;
+                    return item.Stats.Strength + item.Stats.Vitality;
                 case "[DEXVIT]":
-                    return item.Dexterity + item.Vitality;
+                    return item.Stats.Dexterity + item.Stats.Vitality;
                 case "[INTVIT]":
-                    return item.Intelligence + item.Vitality;
-
+                    return item.Stats.Intelligence + item.Stats.Vitality;
+                case "[MAXONERES]":
+                    return new float[] { item.Stats.ResistArcane, item.Stats.ResistCold, item.Stats.ResistFire, item.Stats.ResistHoly, item.Stats.ResistLightning, item.Stats.ResistPhysical, item.Stats.ResistPoison }.Max();
+                case "[TOTRES]":
+                    return item.Stats.ResistArcane + item.Stats.ResistCold + item.Stats.ResistFire + item.Stats.ResistHoly + item.Stats.ResistLightning + item.Stats.ResistPhysical + item.Stats.ResistPoison + item.Stats.ResistAll;
+                case "[DMGFACTOR]":
+                    return item.Stats.AttackSpeedPercent + item.Stats.CritPercent * 2 + item.Stats.CritDamagePercent / 5 + (item.Stats.MinDamage + item.Stats.MaxDamage) / 20;
                 case "[AVGDMG]":
-                    return (item.MinDamage + item.MaxDamage)/2;
+                    return (item.Stats.MinDamage + item.Stats.MaxDamage) / 2;
+                case "[OFFSTATS]":
+                    float offstats = 0;
+                    //if (new float[] { item.Stats.Strength, item.Stats.Intelligence, item.Stats.Dexterity }.Max() > 0)
+                    //    offstats += 1;
+                    if (item.Stats.CritPercent > 0)
+                        offstats += 1;
+                    if (item.Stats.CritDamagePercent > 0)
+                        offstats += 1;
+                    if (item.Stats.AttackSpeedPercent > 0)
+                        offstats += 1;
+                    if (item.Stats.MinDamage + item.Stats.MaxDamage > 0)
+                        offstats += 1;
+                    return offstats;
+                case "[DEFSTATS]":
+                    float defstats = 0;
+                    //if (item.Stats.Vitality > 0)
+                    defstats += 1;
+                    if (item.Stats.ResistAll > 0)
+                        defstats += 1;
+                    if (item.Stats.ArmorBonus > 0)
+                        defstats += 1;
+                    if (item.Stats.BlockChance > 0)
+                        defstats += 1;
+                    if (item.Stats.LifePercent > 0)
+                        defstats += 1;
+                    //if (item.Stats.HealthPerSecond > 0)
+                    //    defstats += 1;
+                    return defstats;
 
+                // +- Test functions ----------------------------------------------------------+ 
                 case "[0]":
                     return 0;
                 case "[1]":
@@ -553,8 +744,27 @@ namespace GilesTrinity
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private bool isAttribute(string str)
+        {
+            return str.Contains("[") && str.Contains("]");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str1"></param>
+        /// <param name="comparator"></param>
+        /// <param name="str2"></param>
+        /// <param name="checkFlag"></param>
+        /// <returns></returns>
         private bool checkExpression(string str1, string comparator, string str2, ref bool checkFlag)
         {
+
             Object value = getValueFromString(str1, ref checkFlag);
 
             if (!checkFlag)
@@ -576,22 +786,37 @@ namespace GilesTrinity
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="logType"></param>
         public void logOut(string str, LogType logType)
         {
             log = new StreamWriter(logPath + (logType.ToString().ToLower() + "_" + startTimestamp) + ".txt", true);
-            log.WriteLine(DateTime.Now.ToString("ddMMyyyyHHmmss") + ": " + str);
+            log.WriteLine(DateTime.Now.ToString("G") + ": " + str);
             log.Close();
         }
 
-        public string getItemTag(GilesCachedACDItem item)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public string getItemTag(ACDItem item)
         {
             if (item == null)
                 return "nullItem";
             else
-                return item.RealName + "," + item.Quality + "," + item.DBItemType + " (" + item.Level + ") " + item.BalanceID;
+                return item.Name + "," + item.ItemQualityLevel + "," + item.ItemType + "(" + item.Level + ")"+ "["+ item.InternalName + "]" + "[" + item.GameBalanceId + "]";
         }
 
-        public void logItemFullTag(GilesCachedACDItem item, LogType logType)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="logType"></param>
+        public void logItemFullTag(ACDItem item, LogType logType)
         {
             bool checkFlag = true;
             logOut("---" + getItemTag(item), logType);
@@ -616,7 +841,7 @@ namespace GilesTrinity
                 Object obj = getValueFromString(str, ref checkFlag);
                 if (obj.GetType().Name == "Single")
                 {
-                    float hold = (float) obj;
+                    float hold = (float)obj;
                     if (hold > 0)
                         logOut("\t" + str + ": " + hold, logType);
                 }
