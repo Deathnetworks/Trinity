@@ -42,7 +42,7 @@ namespace GilesTrinity
             }
             // Earthquake, elites close-range only
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Earthquake) && !playerStatus.IsIncapacitated &&
-                (iElitesWithinRange[RANGE_15] > 0 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 13f)) &&
+                (iElitesWithinRange[RANGE_15] > 0 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 13f)) &&
                 GilesUseTimer(SNOPower.Barbarian_Earthquake, true) &&
                 PowerManager.CanCast(SNOPower.Barbarian_Earthquake))
             {
@@ -52,7 +52,9 @@ namespace GilesTrinity
             }
             // Wrath of the berserker, elites only (wrath of berserker)
             //intell
-            if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && bUseBerserker &&
+            if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && 
+                // If using WOTB on all elites, or if we should only use on "hard" affixes
+                (!Settings.Combat.Barbarian.WOTBHardOnly || (bUseBerserker && Settings.Combat.Barbarian.WOTBHardOnly)) &&
                 // Not on heart of sin after Cydaea
                 CurrentTarget.ActorSNO != 193077 &&
                 // Make sure we are allowed to use wrath on goblins, else make sure this isn't a goblin
@@ -247,7 +249,7 @@ namespace GilesTrinity
                             (iAnythingWithinRange[RANGE_15] >= 3 && iElitesWithinRange[RANGE_12] >= 1) ||
                             (iAnythingWithinRange[RANGE_15] >= 3 && CurrentTarget.IsTreasureGoblin && CurrentTarget.RadiusDistance <= 13f) ||
                             iAnythingWithinRange[RANGE_15] >= 5 ||
-                            ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 13f && iAnythingWithinRange[RANGE_15] >= 3)
+                            (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 13f && iAnythingWithinRange[RANGE_15] >= 3)
                          )
                      )
                 ) &&

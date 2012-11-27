@@ -42,7 +42,7 @@ namespace GilesTrinity
             // Gargantuan, Recast on 1+ Elites or Bosses to trigger Restless Giant
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_Gargantuan) && !playerStatus.IsIncapacitated && playerStatus.CurrentEnergy >= 147 &&
                 (iElitesWithinRange[RANGE_15] >= 1 ||
-                 (CurrentTarget != null && ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 15f)) || iPlayerOwnedGargantuan == 0) &&
+                 (CurrentTarget != null && (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) || iPlayerOwnedGargantuan == 0) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_Gargantuan))
             {
                 return new GilesPower(SNOPower.Witchdoctor_Gargantuan, 0f, vNullLocation, iCurrentWorldID, -1, 2, 1, USE_SLOWLY);
@@ -64,7 +64,7 @@ namespace GilesTrinity
             }
             // Mass Confuse, elites only or big mobs or to escape on low health
             if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_MassConfusion) && !playerStatus.IsIncapacitated && playerStatus.CurrentEnergy >= 74 &&
-                (iElitesWithinRange[RANGE_12] >= 1 || iAnythingWithinRange[RANGE_12] >= 6 || playerStatus.CurrentHealthPct <= 0.25 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 12f)) &&
+                (iElitesWithinRange[RANGE_12] >= 1 || iAnythingWithinRange[RANGE_12] >= 6 || playerStatus.CurrentHealthPct <= 0.25 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 12f)) &&
                 !CurrentTarget.IsTreasureGoblin && PowerManager.CanCast(SNOPower.Witchdoctor_MassConfusion))
             {
                 return new GilesPower(SNOPower.Witchdoctor_MassConfusion, 0f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
@@ -72,7 +72,7 @@ namespace GilesTrinity
             // Big Bad Voodoo, elites and bosses only
             if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_BigBadVoodoo) && !playerStatus.IsIncapacitated &&
                 !CurrentTarget.IsTreasureGoblin &&
-                (iElitesWithinRange[RANGE_6] > 0 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 12f)) &&
+                (iElitesWithinRange[RANGE_6] > 0 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 12f)) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_BigBadVoodoo))
             {
                 return new GilesPower(SNOPower.Witchdoctor_BigBadVoodoo, 0f, vNullLocation, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);

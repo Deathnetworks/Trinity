@@ -63,12 +63,12 @@ namespace GilesTrinity
             // Make sure we got a valid item here, otherwise score it a big fat 0
             if (IsInvalidItem)
             {
-                if (fullItemAnalysis) 
+                if (Settings.Advanced.DebugItemValuation) 
                     Log("-- Invalid Item Type or Unidentified?");
                 return 0;
             }
 
-            if (fullItemAnalysis)
+            if (Settings.Advanced.DebugItemValuation)
                 Log("NEXT ITEM= " + item.RealName + " - " + item.InternalName + " [" + baseItemType.ToString() + " - " + itemType.ToString() + "]");
 
             ValueItemStatString = "";
@@ -141,7 +141,7 @@ namespace GilesTrinity
                     // Now multiply the "max points" value, by that percentage, as the start/basis of the scoring for this statistic
                     double iTempPoints = ItemMaxPoints[i] * itemStatRatio;
 
-                    if (fullItemAnalysis) 
+                    if (Settings.Advanced.DebugItemValuation) 
                         Log("--- " + StatNames[i] + ": " + TempStatistic.ToString("0") + " out of " + ItemMaxStats[i].ToString() + " (" + ItemMaxPoints[i].ToString() + " * " + itemStatRatio.ToString("0.000") + " = " + iTempPoints.ToString("0") + ")");
 
                     // Check if this statistic is over the "bonus threshold" array value for this stat - if it is, then it gets a score bonus when over a certain % of max-stat
@@ -435,7 +435,7 @@ namespace GilesTrinity
                         if (itemType == GItemType.Shield)
                             SpecialBonus *= 0.7;
 
-                        if (fullItemAnalysis && SpecialBonus > 0) 
+                        if (Settings.Advanced.DebugItemValuation && SpecialBonus > 0) 
                             Log("------- special bonus =" + SpecialBonus.ToString(), true);
 
                         FinalBonusGranted += SpecialBonus;
@@ -815,7 +815,7 @@ namespace GilesTrinity
                     // If it's a primary stat, log the highest scoring primary... else add these points to the running total
                     if (i == DEXTERITY || i == STRENGTH || i == INTELLIGENCE)
                     {
-                        if (fullItemAnalysis)
+                        if (Settings.Advanced.DebugItemValuation)
                             Log("---- +" + iTempPoints.ToString("0") + " (*" + FinalBonusGranted.ToString("0.00") + " multiplier) [MUST BE MAX STAT SCORE TO COUNT]", true);
 
                         if (iTempPoints > HighestScoringPrimary)
@@ -827,7 +827,7 @@ namespace GilesTrinity
                     }
                     else
                     {
-                        if (fullItemAnalysis)
+                        if (Settings.Advanced.DebugItemValuation)
                             Log("---- +" + iTempPoints.ToString("0") + " score (*" + FinalBonusGranted.ToString("0.00") + " multiplier)", true);
 
                         TotalItemPoints += iTempPoints;
@@ -864,7 +864,7 @@ namespace GilesTrinity
                 junkItemStatString = StatNames[WhichPrimaryIsHighest] + "=" + Math.Round(AmountHighestScoringPrimary).ToString() + ". " + junkItemStatString;
 
             }
-            if (fullItemAnalysis)
+            if (Settings.Advanced.DebugItemValuation)
                 Log("--- +" + TotalItemPoints.ToString("0") + " total score pre-special reductions. (GlobalMultiplier=" + GlobalMultiplier.ToString("0.000") + ")", true);
 
             // Global multiplier
@@ -1040,17 +1040,17 @@ namespace GilesTrinity
                 }
             }
 
-            if (fullItemAnalysis)
+            if (Settings.Advanced.DebugItemValuation)
                 Log("--- +" + TotalItemPoints.ToString("0") + " total score after special reductions. (TotalRequirements=" + TotalRequirements + ")", true);
 
             GetBestFinalPoints(itemType);
 
             TotalItemPoints *= BestFinalBonus;
 
-            if (fullItemAnalysis)
+            if (Settings.Advanced.DebugItemValuation)
                 Log("TOTAL: " + TotalItemPoints.ToString("0") + "(Final Bonus=" + BestFinalBonus.ToString("0.00") + ")");
 
-            if (fullItemAnalysis)
+            if (Settings.Advanced.DebugItemValuation)
                 Log("");
 
             return Math.Round(TotalItemPoints);

@@ -159,9 +159,9 @@ namespace GilesTrinity
             // Another Cydaea
             137139,
             // Diablo shadow clones (needs all of them, there is a male & female version of each class!)
-            144001, 144003, 143996, 143994,
-            // Jondar, Chancellor, Queen Araneae (act 1 dungeons), Skeleton King
-            86624, 156353, 51341, 5350,
+            144001, 144003, 143996, 143994, 
+            // Jondar, Chancellor, Queen Araneae (act 1 dungeons), Skeleton King, Butcher
+            86624, 156353, 51341, 5350, 3526,
             // Corrupt Growths, Act 4, Istaku
             210120, 215103,
          };
@@ -588,6 +588,7 @@ namespace GilesTrinity
 		/// Summoned-by ID for units (RactorGUID based)
 		/// </summary>
         private static Dictionary<int, int> dictSummonedByID = new Dictionary<int, int>();
+
         // Giant Super Special Sauce Dictionary
         // Here's the a huuuuuge dictionary I have been building up containing cached data on items to minimize D3 memory reads and help prevent some DB mis-handling of items
         // Note that even if an item is not on the list - it will add it to the cache "temporarily" (lasting for the duration of the bot run) - so if your bot encounters the
@@ -1354,5 +1355,6 @@ namespace GilesTrinity
         //    //Axe_norm_unique_flippy_04-39065
         //};
         //#endregion
+
     }
 }

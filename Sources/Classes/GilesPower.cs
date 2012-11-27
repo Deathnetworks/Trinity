@@ -5,7 +5,7 @@ using Zeta.Internals.Actors;
 namespace GilesTrinity
 {
     /// <summary>
-    /// Giles Power - used when picking a power to use to cache where/how to use it
+    /// Giles Power - used when picking a power and where/how to use it
     /// </summary>
     internal class GilesPower
     {

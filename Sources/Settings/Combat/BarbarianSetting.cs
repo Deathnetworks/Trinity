@@ -46,6 +46,7 @@ namespace GilesTrinity.Settings.Combat
         private bool _UseWOTBGoblin;
         private bool _FuryDumpWOTB;
         private bool _FuryDumpAlways;
+        private bool _WOTBHardOnly;
         #endregion Fields
 
         #region Events
@@ -80,7 +81,7 @@ namespace GilesTrinity.Settings.Combat
         [DefaultValue(0)]
         public int KiteLimit
         { get; set; }
-        
+
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidArcaneHealth
@@ -200,36 +201,33 @@ namespace GilesTrinity.Settings.Combat
         [DefaultValue(0.7f)]
         public float AvoidZoltTwisterHealth { get; set; }
 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SelectiveWirlwind { get; set; }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
-        public bool SelectiveWirlwind
-        { get; set; }
+        public bool BoonBulKathosPassive { get; set; }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool WaitWOTB { get; set; }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseWOTBGoblin { get; set; }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool FuryDumpWOTB { get; set; }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
-        public bool BoonBulKathosPassive
-        { get; set; }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
-        public bool WaitWOTB
-        { get; set; }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
-        public bool UseWOTBGoblin
-        { get; set; }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
-        public bool FuryDumpWOTB
-        { get; set; }
+        public bool FuryDumpAlways { get; set; }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
-        public bool FuryDumpAlways
-        { get; set; }
+        public bool WOTBHardOnly { get; set; }
         #endregion Properties
 
         #region Methods

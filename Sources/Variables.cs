@@ -10,6 +10,7 @@ using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
 using Zeta.Pathfinding;
+using GilesTrinity.Swap;
 
 namespace GilesTrinity
 {
@@ -27,27 +28,6 @@ namespace GilesTrinity
             }
         }
 
-        /// <summary>
-        /// Special debugging
-        /// </summary>
-        private static bool bDebugLogSpecial = true;
-
-        /// <summary>
-        /// Dumps info every tick about object caching... this will dump hundreds of MB of data in an hour, be careful!
-        /// </summary>
-        private static bool bDebugLogRefreshDiaObject = true;
-
-        /// <summary>
-        /// Dumps info every tick about object/target weighting... this will dump hundreds of MB of data in an hour, be careful!
-        /// </summary>
-        private static bool bDebugLogWeights = false;
-
-        /// <summary>
-        /// Used for letting noobs know they started the bot without Trinity enabled in the plugins tab.
-        /// </summary>
-        private static bool bPluginEnabled = false;
-
-
         /* A few special variables, mainly for Giles use, just at the top for easy access
          * Set the following to true, to disable file-logging for performance increase
          * WARNING: IF YOU GET CRASHES, ISSUES, OR PROBLEMS AND HAVE LOG-FILES DISABLED...
@@ -59,13 +39,7 @@ namespace GilesTrinity
         /// <summary>
         /// This will log item stat balancing data to special log files
         /// </summary>
-        private const bool LogItemBalanceData = true;
-
-        /// <summary>
-        /// Full Analysis SPAMS like hell. But useful for seeing how the score-calculator is adding/removing points
-        /// Really this is only for Giles to debug and improve the formula, users likely won't find this useful
-        /// </summary>
-        private static bool fullItemAnalysis = true;
+        private const bool LogItemBalanceData = false;
 
 
         /* I create so many variables that it's a pain in the arse to categorize them
@@ -73,6 +47,11 @@ namespace GilesTrinity
          * I've tried to make most variable names be pretty damned obvious what they are for!
          * I've also commented a lot of variables/sections of variables to explain what they are for, incase you are trying to work them all out!
          */
+        /// <summary>
+        /// Used for letting noobs know they started the bot without Trinity enabled in the plugins tab.
+        /// </summary>
+        private static bool bPluginEnabled = false;
+
         /// <summary>
         /// A flag to say whether any NON-hashActorSNOWhirlwindIgnore things are around
         /// </summary>
@@ -405,10 +384,27 @@ namespace GilesTrinity
         private static float iCurrentMaxKillRadius = 0f;
         private static float iCurrentMaxLootRadius = 0f;
 
-        // Goblinney things
+        /// <summary>
+        /// Use Beserker Only with "Hard" elites (specific affixes)
+        /// </summary>
         private static bool bUseBerserker = false;
+        /// <summary>
+        /// Are we waiting for a special? Don't waste mana/rage/disc/hate etc.
+        /// </summary>
         private static bool bWaitingForSpecial = false;
+
+        /// <summary>
+        /// Check LoS if waller avoidance detected
+        /// </summary>
         private static bool bCheckGround = false;
+
+        /// <summary>
+        /// Weapon swapping (Monk Sweeping Wind for higher DPS)
+        /// </summary>
+        private static WeaponSwap weaponSwap = new WeaponSwap();
+        private static DateTime WeaponSwapTime = DateTime.Today;
+
+        // Goblinney things
         private static int iTotalNumberGoblins = 0;
         private static DateTime lastGoblinTime = DateTime.Today;
 

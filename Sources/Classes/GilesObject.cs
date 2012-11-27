@@ -42,6 +42,7 @@ namespace GilesTrinity
         public bool IsTreasureGoblin { get; set; }
         public bool IsEliteRareUnique { get; set; }
         public bool IsBoss { get; set; }
+        public bool IsBossOrEliteRareUnique { get { return (IsEliteRareUnique || IsBoss); } }
         public bool IsAttackable { get; set; }
         public double HitPoints { get; set; }
         public float Radius { get; set; }

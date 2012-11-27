@@ -32,16 +32,20 @@ namespace GilesTrinity
         // Later on we will "Link" these variables to the ACTUAL items within the XAML file, so we can do things with the XAML stuff
         // I try to match the names of the variables here, with the "Name=" I give the item in the XAML - this isn't necessary, but makes things simpler
 
-        private Button saveButton, defaultButton, testButton, sortButton, resetCombat, resetAOE0, resetAOE1, resetAOE2, resetAOE3, resetAOE4, resetWorld, resetItems, resetTown, 
+        private Button saveButton, defaultButton, testButton, sortButton, resetCombat, resetAOE0, resetAOE1, resetAOE2, resetAOE3, resetAOE4, resetWorld, resetItems, resetTown,
             resetAdvanced, resetMobile;
 
-        private RadioButton checkTreasureIgnore, checkTreasureNormal, checkTreasurePrioritize, checkTreasureKamikaze, btnRulesGiles, btnRulesCustom, btnRulesTrinityWithScript, 
+        private RadioButton checkTreasureIgnore, checkTreasureNormal, checkTreasurePrioritize, checkTreasureKamikaze, btnRulesGiles, btnRulesCustom, btnRulesTrinityWithScript,
             btnSalvage, btnSell, checkIgnoreAll, checkIgnoreNone;
 
-        private CheckBox checkAvoidance, checkGlobes, checkCritical, checkGrave, checkBacktracking, checkCraftTomes, checkDesigns, checkFollower, checkGemEmerald, 
-            checkGemAmethyst, checkGemTopaz, checkGemRuby,checkIgnoreCorpses, checkMovementAbilities, checkTPS, checkLogStucks, checkUnstucker, checkExtendedRange, checkDebugInfo, 
-            checkProwl, checkAndroid, checkSelectiveWW,checkWaitWrath, checkGoblinWrath, checkFuryDumpWrath, checkFuryDumpAlways, checkProfileReload, checkMonkInna, checkKiteArchonOnly, 
-            checkWaitArchonAzmo, checkWrath90, checkEmail, checkLegendaryNotify;
+        private CheckBox checkAvoidance, checkGlobes, checkCritical, checkGrave, checkBacktracking, checkCraftTomes, checkDesigns, checkFollower, checkGemEmerald,
+            checkGemAmethyst, checkGemTopaz, checkGemRuby, checkIgnoreCorpses, checkMovementAbilities, checkExtendedRange, checkProwl, checkAndroid, checkSelectiveWW, checkWaitWrath,
+            checkGoblinWrath, checkFuryDumpWrath, checkFuryDumpAlways, checkMonkInna, checkMonkSWWeaponSwap, checkKiteArchonOnly, checkWaitArchonAzmo, checkWrath90, checkWOTBHardOnly, checkEmail, checkLegendaryNotify;
+
+        /// <summary>
+        /// Advance tab CheckBox
+        /// </summary>
+        private CheckBox checkDebugTargetting, checkDebugCache, checkDebugWeights, checkDebugItems, checkTPS, checkLogStucks, checkUnstucker, checkDebugInfo, checkProfileReload;
 
         private Slider slideTriggerRange, slideWeapon, slideJewelry, slideArmor, slideGoldAmount, slideContainerRange, slideDestructibleRange, slideTPS,
             slideNotifyWeapon, slideNotifyJewelry, slideNotifyArmor, slideLootDelay, slideVaultDelay, slideKite0, slideKite2, slideKite3, slideKite4;
@@ -187,12 +191,19 @@ namespace GilesTrinity
                     checkMovementAbilities = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkMovementAbilities") as CheckBox;
                     checkMovementAbilities.Checked += checkMovementAbilities_check;
                     checkMovementAbilities.Unchecked += checkMovementAbilities_uncheck;
+                    /*
+                     * Loot Rules Type
+                     */
                     btnRulesGiles = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnRulesGiles") as RadioButton;
                     btnRulesGiles.Checked += btnRulesGiles_check;
                     btnRulesCustom = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnRulesCustom") as RadioButton;
                     btnRulesCustom.Checked += btnRulesCustom_check;
                     btnRulesTrinityWithScript = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnRulesTrinityWithScript") as RadioButton;
                     btnRulesTrinityWithScript.Checked += btnRulesTrinityWithScript_check;
+
+                    /*
+                     * Town Runs
+                     */
                     btnSalvage = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnSalvage") as RadioButton;
                     btnSalvage.Checked += btnSalvage_check;
                     btnSell = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnSell") as RadioButton;
@@ -209,9 +220,26 @@ namespace GilesTrinity
                     checkTreasurePrioritize.Checked += checkTreasurePrioritize_check;
                     checkTreasureKamikaze = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnTreasureKamikaze") as RadioButton;
                     checkTreasureKamikaze.Checked += checkTreasureKamikaze_check;
+                    /*
+                     * Debugging!
+                     */
                     checkDebugInfo = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkDebugInfo") as CheckBox;
                     checkDebugInfo.Checked += checkDebugInfo_check;
                     checkDebugInfo.Unchecked += checkDebugInfo_uncheck;
+
+                    checkDebugCache = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkDebugCache") as CheckBox;
+                    checkDebugTargetting = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkDebugTargetting") as CheckBox;
+                    checkDebugWeights = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkDebugWeights") as CheckBox;
+                    checkDebugItems = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkDebugItems") as CheckBox;
+                    checkDebugCache.Checked += checkDebugCache_check;
+                    checkDebugCache.Unchecked += checkDebugCache_uncheck;
+                    checkDebugTargetting.Checked += checkDebugTargetting_check;
+                    checkDebugTargetting.Unchecked += checkDebugTargetting_uncheck;
+                    checkDebugWeights.Checked += checkDebugWeights_check;
+                    checkDebugWeights.Unchecked += checkDebugWeights_uncheck;
+                    checkDebugItems.Checked += checkDebugItems_check;
+                    checkDebugItems.Unchecked += checkDebugItems_uncheck;
+
                     // prowl stuff
                     checkProwl = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkProwl") as CheckBox;
                     checkProwl.Checked += checkProwl_check;
@@ -237,9 +265,11 @@ namespace GilesTrinity
                     checkAndroid.Unchecked += checkAndroid_uncheck;
                     textAndroidKey = LogicalTreeHelper.FindLogicalNode(xamlContent, "txtAndroidAPI") as TextBox;
                     textAndroidKey.TextChanged += textAndroid_change;
+
                     checkTPS = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkTPS") as CheckBox;
                     checkTPS.Checked += checkTPS_check;
                     checkTPS.Unchecked += checkTPS_uncheck;
+
                     textTPS = LogicalTreeHelper.FindLogicalNode(xamlContent, "textTPS") as TextBox;
                     slideTPS = LogicalTreeHelper.FindLogicalNode(xamlContent, "slideTPS") as Slider;
                     slideTPS.ValueChanged += trackTPS_Scroll;
@@ -247,24 +277,34 @@ namespace GilesTrinity
                     slideTPS.LargeChange = 1;
                     slideTPS.TickFrequency = 5;
                     slideTPS.IsSnapToTickEnabled = false;
+
                     checkLogStucks = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkLogStucks") as CheckBox;
                     checkLogStucks.Checked += checkLogStucks_check;
                     checkLogStucks.Unchecked += checkLogStucks_uncheck;
+                    // Trinity unstucker
                     checkUnstucker = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkUnstucker") as CheckBox;
                     checkUnstucker.Checked += checkUnstucker_check;
                     checkUnstucker.Unchecked += checkUnstucker_uncheck;
+                    // reload profile on long stucks 
                     checkProfileReload = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkProfileReload") as CheckBox;
                     checkProfileReload.Checked += checkProfileReload_check;
                     checkProfileReload.Unchecked += checkProfileReload_uncheck;
+
                     checkExtendedRange = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkExtendedRange") as CheckBox;
                     checkExtendedRange.Checked += checkExtendedRange_check;
                     checkExtendedRange.Unchecked += checkExtendedRange_uncheck;
                     checkSelectiveWW = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkSelectiveWW") as CheckBox;
                     checkSelectiveWW.Checked += checkSelectiveWW_check;
                     checkSelectiveWW.Unchecked += checkSelectiveWW_uncheck;
+
                     checkWrath90 = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkWrath90") as CheckBox;
                     checkWrath90.Checked += checkWrath90_check;
                     checkWrath90.Unchecked += checkWrath90_uncheck;
+
+                    checkWOTBHardOnly = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkWOTBHardOnly") as CheckBox;
+                    checkWOTBHardOnly.Checked += checkWOTBHardOnly_check;
+                    checkWOTBHardOnly.Unchecked += checkWOTBHardOnly_uncheck;
+
                     checkKiteArchonOnly = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkKiteArchonOnly") as CheckBox;
                     checkKiteArchonOnly.Checked += checkKiteArchonOnly_check;
                     checkKiteArchonOnly.Unchecked += checkKiteArchonOnly_uncheck;
@@ -284,8 +324,13 @@ namespace GilesTrinity
                     checkFuryDumpAlways.Checked += checkFuryDumpAlways_check;
                     checkFuryDumpAlways.Unchecked += checkFuryDumpAlways_uncheck;
                     checkMonkInna = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkMonkInna") as CheckBox;
+
                     checkMonkInna.Checked += checkMonkInna_check;
                     checkMonkInna.Unchecked += checkMonkInna_uncheck;
+                    checkMonkSWWeaponSwap = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkMonkSWWeaponSwap") as CheckBox;
+                    checkMonkSWWeaponSwap.Checked += checkMonkSWWeaponSwap_check;
+                    checkMonkSWWeaponSwap.Unchecked += checkMonkSWWeaponSwap_uncheck;
+
                     checkBacktracking = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkBacktracking") as CheckBox;
                     checkBacktracking.Checked += checkBacktracking_check;
                     checkBacktracking.Unchecked += checkBacktracking_uncheck;
@@ -473,6 +518,7 @@ namespace GilesTrinity
                 return configWindow;
             }
         }
+
         // The below are all event handlers for all the window-elements within the config window
         // WARNING: If you use code to alter the value of something that has an event attached...
         // For example a slider - then your code automatically also fires the event for that slider
@@ -1244,18 +1290,70 @@ namespace GilesTrinity
                 return;
             Settings.Combat.Misc.AllowBacktracking = false;
         }
+        // Debug Check
         private void checkDebugInfo_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
+
             Settings.Advanced.DebugInStatusBar = true;
         }
+        private void checkDebugCache_check(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Advanced.DebugCache = true;
+        }
+        private void checkDebugTargetting_check(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Advanced.DebugTargetting = true;
+        }
+        private void checkDebugWeights_check(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Advanced.DebugWeights = true;
+        }
+        private void checkDebugItems_check(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Advanced.DebugItemValuation = true;
+        }
+        // Debug UnCheck
         private void checkDebugInfo_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
             Settings.Advanced.DebugInStatusBar = false;
         }
+        private void checkDebugCache_uncheck(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Advanced.DebugCache = false;
+        }
+        private void checkDebugTargetting_uncheck(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Advanced.DebugTargetting = false;
+        }
+        private void checkDebugWeights_uncheck(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Advanced.DebugWeights = false;
+        }
+        private void checkDebugItems_uncheck(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Advanced.DebugItemValuation = false;
+        }
+
         private void checkTPS_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
@@ -1332,6 +1430,21 @@ namespace GilesTrinity
                 return;
             Settings.Combat.Barbarian.BoonBulKathosPassive = false;
         }
+
+        private void checkWOTBHardOnly_check(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Combat.Barbarian.WOTBHardOnly = true;
+        }
+        private void checkWOTBHardOnly_uncheck(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Combat.Barbarian.WOTBHardOnly = false;
+        }
+
+
         private void checkSelectiveWW_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
@@ -1404,6 +1517,23 @@ namespace GilesTrinity
                 return;
             Settings.Combat.Monk.HasInnaSet = false;
         }
+
+        // Sweeping Wind Weapon Swap Checkbox
+        private void checkMonkSWWeaponSwap_check(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            MessageBox.Show("Remember to protect your bag slots so your 2H weapon isn't stashed!");
+
+            Settings.Combat.Monk.SweepingWindWeaponSwap = true;
+        }
+        private void checkMonkSWWeaponSwap_uncheck(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Combat.Monk.SweepingWindWeaponSwap = false;
+        }
+
         private void checkFuryDumpWrath_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
@@ -1964,6 +2094,7 @@ namespace GilesTrinity
             checkGemTopaz.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Topaz) == TrinityGemType.Topaz;
             checkGemRuby.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Ruby) == TrinityGemType.Ruby;
 
+            // Town Run
             if (Settings.Loot.TownRun.TrashMode == TrashMode.Salvaging)
             {
                 btnSalvage.IsChecked = true;
@@ -1979,7 +2110,7 @@ namespace GilesTrinity
                 btnRulesGiles.IsChecked = true;
                 btnRulesCustom.IsChecked = false;
                 btnRulesTrinityWithScript.IsChecked = false;
-          }
+            }
             else if (Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
             {
                 btnRulesCustom.IsChecked = true;
@@ -2013,6 +2144,8 @@ namespace GilesTrinity
             textLootDelay.Text = Settings.Combat.Misc.DelayAfterKill.ToString();
             slideVaultDelay.Value = Settings.Combat.DemonHunter.VaultMovementDelay;
             textVaultDelay.Text = Settings.Combat.DemonHunter.VaultMovementDelay.ToString();
+
+            // Kiting
             slideKite0.Value = Settings.Combat.Barbarian.KiteLimit;
             textKite0.Text = Settings.Combat.Barbarian.KiteLimit.ToString();
             slideKite2.Value = Settings.Combat.Wizard.KiteLimit;
@@ -2021,7 +2154,7 @@ namespace GilesTrinity
             textKite3.Text = Settings.Combat.WitchDoctor.KiteLimit.ToString();
             slideKite4.Value = Settings.Combat.DemonHunter.KiteLimit;
             textKite4.Text = Settings.Combat.DemonHunter.KiteLimit.ToString();
-            switch(Settings.Combat.Misc.GoblinPriority )
+            switch (Settings.Combat.Misc.GoblinPriority)
             {
                 case GoblinPriority.Ignore:
                     checkTreasureNormal.IsChecked = false;
@@ -2069,32 +2202,28 @@ namespace GilesTrinity
             textDestructibleRange.Text = Settings.WorldObject.DestructibleRange.ToString();
             checkIgnoreCorpses.IsChecked = Settings.WorldObject.IgnoreNonBlocking;
             checkMovementAbilities.IsChecked = Settings.Combat.Misc.AllowOOCMovement;
-            textTPS.Text = Settings.Advanced.TPSLimit.ToString();
-            slideTPS.Value = Settings.Advanced.TPSLimit;
-            checkTPS.IsChecked = Settings.Advanced.TPSEnabled;
-            checkLogStucks.IsChecked = Settings.Advanced.LogStuckLocation;
             checkProwl.IsChecked = Settings.Notification.IPhoneEnabled;
             textProwlKey.Text = Settings.Notification.IPhoneKey;
             checkEmail.IsChecked = Settings.Notification.MailEnabled;
             checkLegendaryNotify.IsChecked = Settings.Notification.LegendaryScoring;
             txtEmailAddress.Text = Settings.Notification.EmailAddress;
             txtEmailPassword.Text = Settings.Notification.EmailPassword;
-            txtBotName.Text = Settings.Notification.BotName; 
+            txtBotName.Text = Settings.Notification.BotName;
             checkAndroid.IsChecked = Settings.Notification.AndroidEnabled;
             textAndroidKey.Text = Settings.Notification.AndroidKey;
-            checkUnstucker.IsChecked = Settings.Advanced.UnstuckerEnabled;
-            checkProfileReload.IsChecked = Settings.Advanced.AllowRestartGame;
             checkExtendedRange.IsChecked = Settings.Combat.Misc.ExtendedTrashKill;
             checkSelectiveWW.IsChecked = Settings.Combat.Barbarian.SelectiveWirlwind;
             checkWrath90.IsChecked = Settings.Combat.Barbarian.BoonBulKathosPassive;
+            checkWOTBHardOnly.IsChecked = Settings.Combat.Barbarian.WOTBHardOnly;
+
             checkWaitWrath.IsChecked = Settings.Combat.Barbarian.WaitWOTB;
             checkKiteArchonOnly.IsChecked = Settings.Combat.Wizard.OnlyKiteInArchon;
             checkWaitArchonAzmo.IsChecked = Settings.Combat.Wizard.WaitArchon;
             checkGoblinWrath.IsChecked = Settings.Combat.Barbarian.UseWOTBGoblin;
             checkFuryDumpWrath.IsChecked = Settings.Combat.Barbarian.FuryDumpWOTB;
             checkFuryDumpAlways.IsChecked = Settings.Combat.Barbarian.FuryDumpAlways;
-            checkDebugInfo.IsChecked = Settings.Advanced.DebugInStatusBar;
             checkMonkInna.IsChecked = Settings.Combat.Monk.HasInnaSet;
+            checkMonkSWWeaponSwap.IsChecked = Settings.Combat.Monk.SweepingWindWeaponSwap;
             slidePot0.Value = Math.Floor(Settings.Combat.Barbarian.PotionLevel * 100);
             slidePot1.Value = Math.Floor(Settings.Combat.Monk.PotionLevel * 100);
             slidePot2.Value = Math.Floor(Settings.Combat.Wizard.PotionLevel * 100);
@@ -2115,6 +2244,22 @@ namespace GilesTrinity
             textGlobe2.Text = Math.Floor(Settings.Combat.Wizard.HealthGlobeLevel * 100).ToString();
             textGlobe3.Text = Math.Floor(Settings.Combat.WitchDoctor.HealthGlobeLevel * 100).ToString();
             textGlobe4.Text = Math.Floor(Settings.Combat.DemonHunter.HealthGlobeLevel * 100).ToString();
+
+            // Advanced Tab
+            checkUnstucker.IsChecked = Settings.Advanced.UnstuckerEnabled;
+            checkProfileReload.IsChecked = Settings.Advanced.AllowRestartGame;
+            textTPS.Text = Settings.Advanced.TPSLimit.ToString();
+            slideTPS.Value = Settings.Advanced.TPSLimit;
+            checkTPS.IsChecked = Settings.Advanced.TPSEnabled;
+            checkLogStucks.IsChecked = Settings.Advanced.LogStuckLocation;
+
+            //Debug
+            checkDebugInfo.IsChecked = Settings.Advanced.DebugInStatusBar;
+            checkDebugCache.IsChecked = Settings.Advanced.DebugCache;
+            checkDebugItems.IsChecked = Settings.Advanced.DebugItemValuation;
+            checkDebugTargetting.IsChecked = Settings.Advanced.DebugTargetting;
+            checkDebugWeights.IsChecked = Settings.Advanced.DebugWeights;
+
             bSuppressEventChanges = false;
         }
         #endregion

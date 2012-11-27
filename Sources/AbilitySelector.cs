@@ -10,7 +10,7 @@ namespace GilesTrinity
         private static GilesPower defaultPower = new GilesPower(SNOPower.None, 0, vNullLocation, -1, -1, 0, 0, false);
 
         /// <summary>
-        /// Returns an appropriately selected SNOPower and related information
+        /// Returns an appropriately selected GilesPower and related information
         /// </summary>
         /// <param name="bCurrentlyAvoiding">Are we currently avoiding?</param>
         /// <param name="bOOCBuff">Buff Out Of Combat</param>
@@ -28,7 +28,7 @@ namespace GilesTrinity
             // Switch based on the cached character class
             switch (iMyCachedActorClass)
             {
-                // * Barbs
+                // Barbs
                 case ActorClass.Barbarian: 
                     return GetBarbarianPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
 
@@ -49,6 +49,18 @@ namespace GilesTrinity
                     return GetDemonHunterPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
             }
             return defaultPower;
+        }
+
+        /// <summary>
+        /// Returns true if we have the ability and the buff is up, or if we don't have the ability in our hotbar
+        /// </summary>
+        /// <param name="snoPower"></param>
+        /// <returns></returns>
+        internal static bool CheckAbilityAndBuff(SNOPower snoPower)
+        {
+            return
+                (!hashPowerHotbarAbilities.Contains(snoPower) || (hashPowerHotbarAbilities.Contains(snoPower) && GilesHasBuff(snoPower)));
+
         }
 
     }

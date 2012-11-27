@@ -14,6 +14,7 @@ namespace GilesTrinity
             {
                 return GetMonkDestroyPower();
             }
+
             // Monks need 80 for special spam like tempest rushing
             iWaitingReservedAmount = 80;
             // 4 Mantras for the initial buff (slow-use)
@@ -93,18 +94,30 @@ namespace GilesTrinity
             // Sweeping wind
             //intell -- inna
             if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && !GilesHasBuff(SNOPower.Monk_SweepingWind) &&
-                (iElitesWithinRange[RANGE_25] > 0 || iAnythingWithinRange[RANGE_20] >= 3 || (iAnythingWithinRange[RANGE_20] >= 1 && Settings.Combat.Monk.HasInnaSet) || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 25f)) &&
+                (iElitesWithinRange[RANGE_25] > 0 || iAnythingWithinRange[RANGE_20] >= 3 || (iAnythingWithinRange[RANGE_20] >= 1 && Settings.Combat.Monk.HasInnaSet) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 25f)) &&
                 // Check if either we don't have blinding flash, or we do and it's been cast in the last 6000ms
                 //DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 6000)) &&
-                (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_BlindingFlash) ||
-                (hashPowerHotbarAbilities.Contains(SNOPower.Monk_BlindingFlash) && GilesHasBuff(SNOPower.Monk_BlindingFlash))) &&
+                CheckAbilityAndBuff(SNOPower.Monk_BlindingFlash) &&
                 // Check our mantras, if we have them, are up first
-                (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfEvasion) || (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfEvasion) && GilesHasBuff(SNOPower.Monk_MantraOfEvasion))) &&
-                (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfConviction) || (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfConviction) && GilesHasBuff(SNOPower.Monk_MantraOfConviction))) &&
-                (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfRetribution) || (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfRetribution) && GilesHasBuff(SNOPower.Monk_MantraOfRetribution))) &&
+                CheckAbilityAndBuff(SNOPower.Monk_MantraOfConviction) &&
+                CheckAbilityAndBuff(SNOPower.Monk_MantraOfEvasion) && 
+                CheckAbilityAndBuff(SNOPower.Monk_MantraOfRetribution) &&
                 // Check the re-use timer and energy costs
                 (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5)))
             {
+
+                if (!weaponSwap.DpsGearOn() && Settings.Combat.Monk.HasInnaSet)
+                {
+                    weaponSwap.SwapGear();
+                    WeaponSwapTime = DateTime.Now;
+                    //return null;
+                }
+                if (!(weaponSwap.DpsGearOn() && Settings.Combat.Monk.HasInnaSet && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds <= 200))
+                {
+                    SweepWindSpam = DateTime.Now;
+                    return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 2,2
+                }
+
                 SweepWindSpam = DateTime.Now;
                 return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 2,2
             }
@@ -118,7 +131,7 @@ namespace GilesTrinity
             }
             // Seven Sided Strike
             if (!bOOCBuff && !bCurrentlyAvoiding && !playerStatus.IsIncapacitated &&
-                (iElitesWithinRange[RANGE_15] >= 1 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 15f) || playerStatus.CurrentHealthPct <= 0.55) &&
+                (iElitesWithinRange[RANGE_15] >= 1 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) || playerStatus.CurrentHealthPct <= 0.55) &&
                 hashPowerHotbarAbilities.Contains(SNOPower.Monk_SevenSidedStrike) && ((playerStatus.CurrentEnergy >= 50 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= iWaitingReservedAmount) &&
                 GilesUseTimer(SNOPower.Monk_SevenSidedStrike, true) && PowerManager.CanCast(SNOPower.Monk_SevenSidedStrike))
             {
@@ -126,7 +139,7 @@ namespace GilesTrinity
             }
             // Exploding Palm
             if (!bOOCBuff && !bCurrentlyAvoiding && !playerStatus.IsIncapacitated &&
-                (iElitesWithinRange[RANGE_25] > 0 || iAnythingWithinRange[RANGE_15] >= 3 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 14f)) &&
+                (iElitesWithinRange[RANGE_25] > 0 || iAnythingWithinRange[RANGE_15] >= 3 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 14f)) &&
                 hashPowerHotbarAbilities.Contains(SNOPower.Monk_ExplodingPalm) &&
                 ((playerStatus.CurrentEnergy >= 40 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= iWaitingReservedAmount) &&
                 GilesUseTimer(SNOPower.Monk_ExplodingPalm) && PowerManager.CanCast(SNOPower.Monk_ExplodingPalm))
@@ -135,7 +148,7 @@ namespace GilesTrinity
             }
             // Cyclone Strike
             if (!bOOCBuff && !bCurrentlyAvoiding && !playerStatus.IsIncapacitated &&
-                (iElitesWithinRange[RANGE_20] >= 1 || iAnythingWithinRange[RANGE_20] >= 2 || playerStatus.CurrentEnergyPct >= 0.5 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 18f)) &&
+                (iElitesWithinRange[RANGE_20] >= 1 || iAnythingWithinRange[RANGE_20] >= 2 || playerStatus.CurrentEnergyPct >= 0.5 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 18f)) &&
                 hashPowerHotbarAbilities.Contains(SNOPower.Monk_CycloneStrike) &&
                 ((playerStatus.CurrentEnergy >= 70 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= iWaitingReservedAmount) &&
                 GilesUseTimer(SNOPower.Monk_CycloneStrike) && PowerManager.CanCast(SNOPower.Monk_CycloneStrike))
@@ -174,7 +187,7 @@ namespace GilesTrinity
             }
             // Lashing Tail Kick
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Monk_LashingTailKick) && !playerStatus.IsIncapacitated &&
-                (iElitesWithinRange[RANGE_15] > 0 || iAnythingWithinRange[RANGE_15] > 4 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 10f)) &&
+                (iElitesWithinRange[RANGE_15] > 0 || iAnythingWithinRange[RANGE_15] > 4 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 10f)) &&
                 // Either doesn't have sweeping wind, or does but the buff is already up
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) || (hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && GilesHasBuff(SNOPower.Monk_SweepingWind))) &&
                 GilesUseTimer(SNOPower.Monk_LashingTailKick) &&
@@ -185,7 +198,7 @@ namespace GilesTrinity
             // Wave of light
             if (!bOOCBuff && !bCurrentlyAvoiding && !playerStatus.IsIncapacitated &&
                 (iElitesWithinRange[RANGE_25] > 0 ||
-                ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 14f) ||
+                (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 14f) ||
                 iAnythingWithinRange[RANGE_15] > 2) &&
                 hashPowerHotbarAbilities.Contains(SNOPower.Monk_WaveOfLight) &&
                 GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
@@ -195,7 +208,7 @@ namespace GilesTrinity
             }
             // Tempest rush at elites or groups of mobs
             if (!bOOCBuff && !bCurrentlyAvoiding && !playerStatus.IsIncapacitated && !playerStatus.IsRooted &&
-                (iElitesWithinRange[RANGE_25] > 0 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 14f) || iAnythingWithinRange[RANGE_15] > 2) &&
+                (iElitesWithinRange[RANGE_25] > 0 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 14f) || iAnythingWithinRange[RANGE_15] > 2) &&
                 hashPowerHotbarAbilities.Contains(SNOPower.Monk_TempestRush) && ((playerStatus.CurrentEnergy >= 20 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= iWaitingReservedAmount) &&
                 PowerManager.CanCast(SNOPower.Monk_TempestRush))
             {
@@ -217,7 +230,7 @@ namespace GilesTrinity
             }
             // Dashing Strike
             if (!bOOCBuff && !bCurrentlyAvoiding && !playerStatus.IsIncapacitated &&
-                (iElitesWithinRange[RANGE_25] > 0 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 14f) || iAnythingWithinRange[RANGE_15] > 2) &&
+                (iElitesWithinRange[RANGE_25] > 0 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 14f) || iAnythingWithinRange[RANGE_15] > 2) &&
                 hashPowerHotbarAbilities.Contains(SNOPower.Monk_DashingStrike) && ((playerStatus.CurrentEnergy >= 30 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= iWaitingReservedAmount))
             {
                 return new GilesPower(SNOPower.Monk_DashingStrike, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
@@ -272,6 +285,10 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.Monk_WayOfTheHundredFists, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             return new GilesPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
         }
+        /// <summary>
+        /// Returns true if we have a mantra and it's up, or if we don't have a Mantra at all
+        /// </summary>
+        /// <returns></returns>
         private static bool HasMonkMantraAbilityAndBuff()
         {
             return
@@ -285,6 +302,15 @@ namespace GilesTrinity
                 GilesHasBuff(SNOPower.Monk_MantraOfHealing) ||
                 GilesHasBuff(SNOPower.Monk_MantraOfRetribution));
         }
+        private static bool DoesNotHaveMonkMantraAbility()
+        {
+            return
+                (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfConviction) &&
+                !hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfEvasion) &&
+                !hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfHealing) &&
+                !hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfRetribution));
+        }
+
 
     }
 }

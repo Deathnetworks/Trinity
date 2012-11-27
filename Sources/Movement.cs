@@ -138,7 +138,7 @@ namespace GilesTrinity
         // Find A Safe Movement Location
         private static bool bAvoidDirectionBlacklisting = false;
         private static float fAvoidBlacklistDirection = 0f;
-        public static Vector3 FindSafeZone(bool bFindAntiStuckSpot, int iAntiStuckAttempts, Vector3 vNearbyPoint, bool bKitingSpot = false)
+        public static Vector3 FindSafeZone(bool bFindAntiStuckSpot, int iAntiStuckAttempts, Vector3 vNearbyPoint, bool bKitingSpot = false, bool avoidDeath = false)
         {
             if (!bFindAntiStuckSpot)
             {
@@ -194,7 +194,7 @@ namespace GilesTrinity
                 int iDistanceOut = 10;
 
                 int iKiteStepSize = 6;
-                if (bKitingSpot)
+                if (bKitingSpot && !avoidDeath)
                 {
                     iDistanceOut = PlayerKiteDistance + (iKiteStepSize * iStepDistance);
 

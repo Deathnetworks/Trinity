@@ -20,15 +20,17 @@ namespace GilesTrinity.DbProvider
         private static readonly HashSet<int> hashAvoidLeapingToSNO = new HashSet<int> { 138989, 176074, 176076, 176077, 176536, 260330 };
         // 138989 = health pool, 176074 = protection, 176076 = fortune, 176077 = frenzied, 176536 = portal in leorics, 260330 = cooldown shrine
         // Exp shrines = ???? Other shrines ????
+
         private static bool ShrinesInArea(Vector3 targetpos)
         {
             return ZetaDia.Actors.GetActorsOfType<DiaObject>(true).Any(u => hashAvoidLeapingToSNO.Contains(u.ActorSNO) && Vector3.Distance(u.Position, targetpos) <= 10f);
         }
-        // ShrinesInArea checker
+
         public void MoveStop()
         {
             ZetaDia.Me.UsePower(SNOPower.Walk, ZetaDia.Me.Position, GilesTrinity.iCurrentWorldID, -1);
         }
+
         // Anti-stuck variables
         public static Vector3 vOldMoveToTarget = Vector3.Zero;
         public static int iTimesReachedStuckPoint = 0;
@@ -242,8 +244,11 @@ namespace GilesTrinity.DbProvider
         private static Vector3 vShiftedPosition = Vector3.Zero;
         private static DateTime lastShiftedPosition = DateTime.Today;
         private static int iShiftPositionFor = 0;
+
+
         public void MoveTowards(Vector3 vMoveToTarget)
         {
+            // rrrix-note: This really shouldn't be here... 
             // Recording of all the XML's in use this run
             string sThisProfile = Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile;
             if (sThisProfile != GilesTrinity.sLastProfileSeen)
@@ -262,6 +267,8 @@ namespace GilesTrinity.DbProvider
                 if (GilesTrinity.sFirstProfileSeen == "")
                     GilesTrinity.sFirstProfileSeen = sThisProfile;
             }
+
+
             // The below code is to help profile/routine makers avoid waypoints with a long distance between them.
             // Long-distances between waypoints is bad - it increases stucks, and forces the DB nav-server to be called.
             if (GilesTrinity.Settings.Advanced.LogStuckLocation)
@@ -294,13 +301,17 @@ namespace GilesTrinity.DbProvider
                         bLastWaypointWasTown = true;
                 }
             }
+
             // Make sure GilesTrinity doesn't want us to avoid routine-movement
-            // if (GilesTrinity.bDontMoveMeIAmDoingShit)
+            //if (GilesTrinity.bDontMoveMeIAmDoingShit)
             //    return;
             // Store player current position
+            
             vMyCurrentPosition = ZetaDia.Me.Position;
+            
             // Store distance to current moveto target
             float fDistanceFromTarget;
+            
             // Do unstuckery things
             if (GilesTrinity.Settings.Advanced.UnstuckerEnabled)
             {
@@ -494,7 +505,7 @@ namespace GilesTrinity.DbProvider
                     return;
                 }
             }
-            // Allowed to use movement powers to move out-of-combat?
+
             ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
             // ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
         }

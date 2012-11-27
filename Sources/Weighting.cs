@@ -463,7 +463,7 @@ namespace GilesTrinity
 
                             // rrrix added this as a single "weight" source based on the DestructableRange.
                             // Calculate the weight based on distance, where a distance = 1 is 5000
-                            cacheObject.Weight = 5000 * ( 1 - (cacheObject.RadiusDistance / Settings.WorldObject.DestructibleRange));
+                            cacheObject.Weight = 5000 * (1 - (cacheObject.RadiusDistance / Settings.WorldObject.DestructibleRange));
 
                             // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                             if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
@@ -556,7 +556,7 @@ namespace GilesTrinity
 
                 //    bStayPutDuringAvoidance = true;
                 //}
-                if (bDebugLogWeights && Settings.Advanced.DebugInStatusBar)
+                if (Settings.Advanced.DebugWeights)
                 {
                     Logging.WriteDiagnostic("[Trinity] Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5}",
                         cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance);
@@ -580,17 +580,19 @@ namespace GilesTrinity
                         var AvoidanceList = hashAvoidanceObstacleCache.Where(o =>
                             // Distance from avoidance to target is less than avoidance radius
                             o.Location.Distance(CurrentTarget.Position) <= (GetAvoidanceRadius(o.ActorSNO) * 1.2) &&
-                            // Distance from obstacle to me is <= cacheObject.RadiusDistance
+                                // Distance from obstacle to me is <= cacheObject.RadiusDistance
                             o.Location.Distance(playerStatus.CurrentPosition) <= (cacheObject.RadiusDistance - 4f)
                             );
 
                         // if there's any obstacle within a specified distance of the avoidance radius *1.2 
                         if (AvoidanceList.Any())
                         {
-                            if (bDebugLogSpecial && Settings.Advanced.DebugInStatusBar)
-                            foreach (GilesObstacle o in AvoidanceList)
+                            if (Settings.Advanced.DebugTargetting)
                             {
-                                Logging.WriteDiagnostic("[Trinity] Avoidance: Id={0} Weight={1} Loc={2} Radius={3} Name={4}", o.ActorSNO, o.Weight, o.Location, o.Radius, o.Name);
+                                foreach (GilesObstacle o in AvoidanceList)
+                                {
+                                    Logging.WriteDiagnostic("[Trinity] Avoidance: Id={0} Weight={1} Loc={2} Radius={3} Name={4}", o.ActorSNO, o.Weight, o.Location, o.Radius, o.Name);
+                                }
                             }
 
                             vKitePointAvoid = CurrentTarget.Position;
@@ -601,7 +603,7 @@ namespace GilesTrinity
             }
 
             // Loop through all the objects and give them a weight
-            if (bDebugLogSpecial && !Settings.Advanced.DebugInStatusBar && CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.Type != GObjectType.Unknown)
+            if (Settings.Advanced.DebugTargetting && CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0)
             {
                 Logging.WriteVerbose("[Trinity] Target changed to {2} {0} ({1})",
                                 CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.Type);
