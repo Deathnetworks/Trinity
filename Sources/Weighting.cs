@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using GilesTrinity.Settings.Combat;
+using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
@@ -282,9 +283,6 @@ namespace GilesTrinity
                     case GObjectType.Item:
                     case GObjectType.Gold:
                         {
-
-                            // 
-
                             // Weight Items
 
                             // We'll weight them based on distance, giving gold less weight and close objects more
@@ -313,16 +311,16 @@ namespace GilesTrinity
                             if (PrioritizeCloseRangeUnits)
                                 cacheObject.Weight = 18000 - (Math.Floor(cacheObject.CentreDistance) * 200);
 
-                            // If there's a monster in the path-line to the item, reduce the weight by 25%
-                            if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
-                                cacheObject.Weight *= 0.75;
+                            // If there's a monster in the path-line to the item, reduce the weight to 1
+                            if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius*1.2f, playerStatus.CurrentPosition, cacheObject.Position)))
+                                cacheObject.Weight = 1;
 
                             // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
                             if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
                                 cacheObject.Weight = 1;
 
-                            // ignore any items/gold if there is mobs in kill radius
-                            if (bAnyMobsInCloseRange)
+                            // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
+                            if (bAnyMobsInCloseRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting)
                                 cacheObject.Weight = 1;
 
                             // Calculate a spot reaching a little bit further out from the item, to help pickup-movements
@@ -337,9 +335,6 @@ namespace GilesTrinity
                         }
                     case GObjectType.Globe:
                         {
-
-                            // 
-
                             // Weight Health Globes
 
                             // Give all globes 0 weight (so never gone-to), unless we have low health, then go for them
