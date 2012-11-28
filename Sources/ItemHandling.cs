@@ -13,6 +13,7 @@ using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
+using GilesTrinity.ItemRules;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -694,7 +695,7 @@ namespace GilesTrinity
                     Log("Always make sure you empty your backpack, open the stash, then RESTART DEMONBUDDY before sorting!");
                     return;
                 }
-                GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId,
+                GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(item, item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId,
                     item.DynamicId, item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.IsTwoHand, item.DyeType, item.ItemType, item.ItemBaseType, item.FollowerSpecialType,
                     item.IsUnidentified, item.ItemStackQuantity, item.Stats);
 
@@ -817,7 +818,7 @@ namespace GilesTrinity
                     }
                     else
                     {
-                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId, item.DynamicId,
+                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(item, item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId, item.DynamicId,
                             item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.IsTwoHand, item.DyeType, item.ItemType, item.ItemBaseType, item.FollowerSpecialType, item.IsUnidentified, item.ItemStackQuantity,
                             item.Stats);
                         bool bShouldStashTest = ShouldWeStashThis(thiscacheditem);
@@ -918,7 +919,7 @@ namespace GilesTrinity
 
             if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
-                switch (StashRule.checkItem(thisitem, TrueItemType, thisGilesBaseType))
+                switch (StashRule.checkItem(thisitem.item))
                 {
                     case Interpreter.InterpreterAction.KEEP:
                         return true;

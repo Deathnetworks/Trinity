@@ -78,8 +78,10 @@ namespace GilesTrinity
         public float WeaponAttacksPerSecond { get; set; }
         public float WeaponMaxDamage { get; set; }
         public float WeaponMinDamage { get; set; }
+        public ACDItem item { get; set; }
 
         public GilesCachedACDItem(
+            ACDItem acdItem,
             string internalName, 
             string realName, 
             int level, 
@@ -98,6 +100,7 @@ namespace GilesTrinity
             int stackQuantity, 
             ItemStats itemStats)
         {
+            item = acdItem;
             InternalName = internalName;
             RealName = realName;
             Level = level;
