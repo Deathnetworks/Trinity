@@ -226,6 +226,54 @@ namespace GilesTrinity.UIComponents
         }
 
         /// <summary>
+        /// Gets the Demon Hunter Configuration Model.
+        /// </summary>
+        /// <value>The Demon Hunter Configuration Model.</value>
+        public DemonHunterSetting DH
+        {
+            get
+            {
+                return _Model.Combat.DemonHunter;
+            }
+        }
+
+        /// <summary>
+        /// Gets the Monk Configuration Model.
+        /// </summary>
+        /// <value>The Monk Configuration Model.</value>
+        public MonkSetting Monk
+        {
+            get
+            {
+                return _Model.Combat.Monk;
+            }
+        }
+
+        /// <summary>
+        /// Gets the Witch Doctor Configuration Model.
+        /// </summary>
+        /// <value>The Witch Doctor Configuration Model.</value>
+        public WitchDoctorSetting WD
+        {
+            get
+            {
+                return _Model.Combat.WitchDoctor;
+            }
+        }
+
+        /// <summary>
+        /// Gets the Wizard Configuration Model.
+        /// </summary>
+        /// <value>The Wizard Configuration Model.</value>
+        public WizardSetting Wiz
+        {
+            get
+            {
+                return _Model.Combat.Wizard;
+            }
+        }
+
+        /// <summary>
         /// Gets the World Object Configuration Model.
         /// </summary>
         /// <value>The World Object Configuration Model.</value>

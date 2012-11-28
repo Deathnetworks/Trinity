@@ -37,12 +37,6 @@
             <TabItem Header="Mobile">
                 <Border Tag="ConfigMobile.xaml"/>
             </TabItem>
-            <TabItem Header="Email">
-                <Border Tag="ConfigEmail.xaml"/>
-            </TabItem>
-            <TabItem Header="Log">
-                <Border Tag="ConfigLog.xaml"/>
-            </TabItem>
         </TabControl>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

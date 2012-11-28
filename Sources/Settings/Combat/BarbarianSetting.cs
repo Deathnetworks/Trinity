@@ -602,7 +602,7 @@ namespace GilesTrinity.Settings.Combat
                 if (_SelectiveWirlwind != value)
                 {
                     _SelectiveWirlwind = value;
-                    OnPropertyChanged("SelectiveWirlwind");
+                    OnPropertyChanged("SelectiveWhirlwind");
                 }
             }
         }
