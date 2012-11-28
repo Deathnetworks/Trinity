@@ -551,6 +551,12 @@ namespace GilesTrinity
                     addToCache = true;
                     c_IgnoreSubStep = "";
                 }
+                // Always pickup Infernal Keys whether or not in LoS
+                if (hashForceSNOToItemList.Contains(c_ActorSNO))
+                {
+                    addToCache = true;
+                    c_IgnoreSubStep = "";
+                }
                 //if (!thisobj.InLineOfSight && thisobj.ZDiff < 14f && !tmp_unit_bThisBoss)
                 //{
                 //    bWantThis = false;
