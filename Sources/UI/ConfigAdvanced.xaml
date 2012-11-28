@@ -40,7 +40,7 @@
             <TextBlock Text="Ticks Per Second " FontWeight="Bold" TextAlignment="Center" Margin="5"/>
             <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Stretch">
                 <CheckBox Margin="25,5" IsChecked="{Binding Path=Advanced.TPSEnabled}">Enable TPS modification</CheckBox>
-                <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
+                <Slider Grid.Row="1" Template="{DynamicResource Slider}" IsEnabled="{Binding Path=Advanced.TPSEnabled}"
                     Interval="500" Maximum="15" Minimum="1" SmallChange="1" TickFrequency="3" TickPlacement="BottomRight"
                     Value="{Binding Path=Advanced.TPSLimit}" 
                     HorizontalAlignment="Stretch" Margin="25,0,25,0"

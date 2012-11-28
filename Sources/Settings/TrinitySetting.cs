@@ -192,7 +192,7 @@ namespace GilesTrinity.Settings
         {
             lock (this)
             {
-                string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), @"Settings\GilesTrinity.xml");
+                string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "GilesTrinity.xml");
                 try
                 {
                     DbHelper.Log(TrinityLogLevel.Verbose, "Save Config file : {0}", filename);

@@ -317,6 +317,18 @@ namespace GilesTrinity.UIComponents
             {
                 return _Model.Loot;
             }
+        }
+
+        /// <summary>
+        /// Gets the Pickup Configuration Model.
+        /// </summary>
+        /// <value>The Pickup Configuration Model.</value>
+        public NotificationSetting Notification
+        {
+            get
+            {
+                return _Model.Notification;
+            }
         }        
 
         /// <summary>

@@ -145,10 +145,6 @@
     <Compile Include="XmlTags\TrinityUseStop.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="GilesTrinity.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="UI\Combat\ConfigMisc.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

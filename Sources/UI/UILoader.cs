@@ -41,10 +41,10 @@ namespace GilesTrinity.UI
 
                 Zeta.Common.Logging.Write("Configure Window");
                 _ConfigWindow.Content = mainControl;
-                _ConfigWindow.Height = 510;
+                _ConfigWindow.Height = 520;
                 _ConfigWindow.Width = 480;
-                _ConfigWindow.MinHeight = 470 + 40;
-                _ConfigWindow.MinWidth = 432 + 40;
+                _ConfigWindow.MinHeight = 520;
+                _ConfigWindow.MinWidth = 480;
                 _ConfigWindow.Title = "Giles Trinity";
                 
                 // Event handling for the config window loading up/closing
