@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
+using Zeta;
 
 namespace GilesTrinity.Settings
 {
@@ -147,12 +148,19 @@ namespace GilesTrinity.Settings
             return (TrinitySetting)TrinitySetting.Clone(this);
         }
 
-        public void Load(string filename)
+        public void Load()
         {
+            string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "GilesTrinity.xml");
             lock (this)
             {
                 try
                 {
+                    if (!File.Exists(filename))
+                    {
+                        DbHelper.Log(TrinityLogLevel.Verbose, "No Config file for BattleTag, General file is considered.");
+                        filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", "GilesTrinity.xml");
+                    }
+                
                     DbHelper.Log(TrinityLogLevel.Verbose, "Load Config file : {0}", filename);
                     if (File.Exists(filename))
                     {
@@ -180,10 +188,11 @@ namespace GilesTrinity.Settings
             }
         }
 
-        public void Save(string filename)
+        public void Save()
         {
             lock (this)
             {
+                string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), @"Settings\GilesTrinity.xml");
                 try
                 {
                     DbHelper.Log(TrinityLogLevel.Verbose, "Save Config file : {0}", filename);

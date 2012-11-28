@@ -7,7 +7,7 @@ namespace GilesTrinity.Settings.Loot
     {
         Emerald = 1,
         Topaz = 2,
-        Amethys = 4,
+        Amethyst = 4,
         Ruby = 8
     }
 }

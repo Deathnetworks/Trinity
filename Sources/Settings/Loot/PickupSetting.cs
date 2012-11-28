@@ -175,7 +175,7 @@ namespace GilesTrinity.Settings.Loot
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1)]
-        public int Potionlevel
+        public int PotionLevel
         {
             get
             {
@@ -186,13 +186,13 @@ namespace GilesTrinity.Settings.Loot
                 if (_Potionlevel != value)
                 {
                     _Potionlevel = value;
-                    OnPropertyChanged("Potionlevel");
+                    OnPropertyChanged("PotionLevel");
                 }
             }
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(TrinityGemType.Ruby | TrinityGemType.Amethys | TrinityGemType.Emerald | TrinityGemType.Topaz)]
+        [DefaultValue(TrinityGemType.Ruby | TrinityGemType.Amethyst | TrinityGemType.Emerald | TrinityGemType.Topaz)]
         public TrinityGemType GemType
         {
             get

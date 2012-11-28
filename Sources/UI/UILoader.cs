@@ -41,8 +41,8 @@ namespace GilesTrinity.UI
 
                 Zeta.Common.Logging.Write("Configure Window");
                 _ConfigWindow.Content = mainControl;
-                _ConfigWindow.Height = mainControl.Height + 40;
-                _ConfigWindow.Width = mainControl.Width + 40;
+                _ConfigWindow.Height = 510;
+                _ConfigWindow.Width = 480;
                 _ConfigWindow.MinHeight = 470 + 40;
                 _ConfigWindow.MinWidth = 432 + 40;
                 _ConfigWindow.Title = "Giles Trinity";
@@ -80,6 +80,7 @@ namespace GilesTrinity.UI
         /// <returns><see cref="Stream"/> which contains transformed XAML file.</returns>
         private static T LoadAndTransformXamlFile<T>(string filename)
         {
+            Zeta.Common.Logging.Write("Load XAML file : {0}", filename);
             string filecontent = File.ReadAllText(filename);
             // Change reference to custom Trinity class
             filecontent = filecontent.Replace("xmlns:ut=\"clr-namespace:GilesTrinity.UIComponents\"", "xmlns:ut=\"clr-namespace:GilesTrinity.UIComponents;assembly=" + Assembly.GetExecutingAssembly().GetName().Name + "\"");

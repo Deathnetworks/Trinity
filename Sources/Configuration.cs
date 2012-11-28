@@ -20,12 +20,12 @@ namespace GilesTrinity
         // Save Configuration
         private void SaveConfiguration()
         {
-            Settings.Save(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), @"Settings\GilesTrinity.xml"));
+            Settings.Save();
         }
         // Load Configuration
         private void LoadConfiguration()
         {
-            Settings.Load(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), @"Settings\GilesTrinity.xml"));
+            Settings.Load();
         }
         // * CONFIG WINDOW REGION
         #region configWindow
@@ -75,7 +75,7 @@ namespace GilesTrinity
             get
             {
                 // Uncomment here to use the new UI system
-                // return UILoader.GetDisplayWindow(Path.Combine(sTrinityPluginPath, "UI"));
+                return UILoader.GetDisplayWindow(Path.Combine(sTrinityPluginPath, "UI"));
 
                 // Check we can actually find the .xaml file first - if not, report an error
                 if (!File.Exists(sTrinityPluginPath + "GilesTrinity.xaml"))
@@ -1028,7 +1028,7 @@ namespace GilesTrinity
         {
             if (bSuppressEventChanges)
                 return;
-            Settings.Loot.Pickup.Potionlevel = Convert.ToInt32(comboPotionLevel.SelectedValue);
+            Settings.Loot.Pickup.PotionLevel = Convert.ToInt32(comboPotionLevel.SelectedValue);
         }
         private void checkFollower_check(object sender, RoutedEventArgs e)
         {
@@ -1115,15 +1115,15 @@ namespace GilesTrinity
         {
             if (bSuppressEventChanges)
                 return;
-            Settings.Loot.Pickup.GemType = Settings.Loot.Pickup.GemType | TrinityGemType.Amethys;
+            Settings.Loot.Pickup.GemType = Settings.Loot.Pickup.GemType | TrinityGemType.Amethyst;
         }
         private void checkAmethyst_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            if ((Settings.Loot.Pickup.GemType & TrinityGemType.Amethys) == TrinityGemType.Amethys)
+            if ((Settings.Loot.Pickup.GemType & TrinityGemType.Amethyst) == TrinityGemType.Amethyst)
             {
-                Settings.Loot.Pickup.GemType = (int)Settings.Loot.Pickup.GemType - TrinityGemType.Amethys;
+                Settings.Loot.Pickup.GemType = (int)Settings.Loot.Pickup.GemType - TrinityGemType.Amethyst;
             }
         }
         private void checkTopaz_check(object sender, RoutedEventArgs e)
@@ -2089,12 +2089,12 @@ namespace GilesTrinity
             comboGems.SelectedIndex = comboGems.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.GemLevel.ToString())).Count();
             comboMisc.SelectedIndex = comboMisc.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.MiscItemLevel.ToString())).Count();
             comboPotions.SelectedIndex = comboPotions.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(((int)Settings.Loot.Pickup.PotionMode).ToString())).Count();
-            comboPotionLevel.SelectedIndex = comboPotionLevel.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.Potionlevel.ToString())).Count();
+            comboPotionLevel.SelectedIndex = comboPotionLevel.Items.Cast<ComboBoxItem>().TakeWhile(cbi => !(cbi.Tag).Equals(Settings.Loot.Pickup.PotionLevel.ToString())).Count();
             checkCraftTomes.IsChecked = Settings.Loot.Pickup.CraftTomes;
             checkDesigns.IsChecked = Settings.Loot.Pickup.DesignPlan;
             checkFollower.IsChecked = Settings.Loot.Pickup.FollowerItem;
             checkGemEmerald.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Emerald) == TrinityGemType.Emerald;
-            checkGemAmethyst.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Amethys) == TrinityGemType.Amethys;
+            checkGemAmethyst.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Amethyst) == TrinityGemType.Amethyst;
             checkGemTopaz.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Topaz) == TrinityGemType.Topaz;
             checkGemRuby.IsChecked = (Settings.Loot.Pickup.GemType & TrinityGemType.Ruby) == TrinityGemType.Ruby;
 

@@ -108,6 +108,7 @@
     <Compile Include="StashSellSalvage.cs" />
     <Compile Include="UIComponents\BoolInverterConverter.cs" />
     <Compile Include="UIComponents\ConfigViewModel.cs" />
+    <Compile Include="UIComponents\FlagEnumValueConverter.cs" />
     <Compile Include="UIComponents\PercentConverter.cs" />
     <Compile Include="UIComponents\EnumBooleanConverter.cs" />
     <Compile Include="UIComponents\RelayCommand.cs" />

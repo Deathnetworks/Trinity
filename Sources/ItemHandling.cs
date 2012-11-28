@@ -162,7 +162,7 @@ namespace GilesTrinity
                     if (level < Settings.Loot.Pickup.GemLevel || 
                         (itemType == GItemType.Ruby && (Settings.Loot.Pickup.GemType & TrinityGemType.Ruby) != TrinityGemType.Ruby) || 
                         (itemType == GItemType.Emerald && (Settings.Loot.Pickup.GemType & TrinityGemType.Emerald) != TrinityGemType.Emerald) ||
-                        (itemType == GItemType.Amethyst && (Settings.Loot.Pickup.GemType & TrinityGemType.Amethys) != TrinityGemType.Amethys) ||
+                        (itemType == GItemType.Amethyst && (Settings.Loot.Pickup.GemType & TrinityGemType.Amethyst) != TrinityGemType.Amethyst) ||
                         (itemType == GItemType.Topaz && (Settings.Loot.Pickup.GemType & TrinityGemType.Topaz) != TrinityGemType.Topaz))
                     {
                         return false;
@@ -187,7 +187,7 @@ namespace GilesTrinity
                     // Potion filtering
                     if (itemType == GItemType.HealthPotion)
                     {
-                        if (Settings.Loot.Pickup.PotionMode == PotionMode.Ignore || level < Settings.Loot.Pickup.Potionlevel)
+                        if (Settings.Loot.Pickup.PotionMode == PotionMode.Ignore || level < Settings.Loot.Pickup.PotionLevel)
                         {
                             return false;
                         }

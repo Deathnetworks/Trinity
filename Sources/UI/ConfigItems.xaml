@@ -4,13 +4,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:GilesTrinity.UIComponents"
              mc:Ignorable="d" 
-             d:DesignHeight="350" d:DesignWidth="390" DataContext="{Binding ItemSetting}">
+             d:DesignHeight="350" d:DesignWidth="390">
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
-            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Template.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Template.xaml"/></ResourceDictionary.MergedDictionaries>
+            
+            <ut:FlagsEnumValueConverter x:Key="flagsEnumValueConverter"/>
+        </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -18,21 +21,21 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>            
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Margin="2" HorizontalAlignment="Center">
-            <Label FontWeight="Bold">Choose Item Rules Type:</Label>
+        <Grid Grid.Row="0">
+            <TextBlock FontWeight="Bold" Text="Choose Item Rules Type :" TextAlignment="Center" Margin="2"/>
         </Grid>
         <Grid Grid.Row="1" Margin="2" HorizontalAlignment="Center">
-            <ComboBox Width="180" SelectedIndex="0" SelectedValuePath="Tag" SelectedValue="{Binding ItemFilterMode}"  >
+            <ComboBox Width="180" SelectedValuePath="Tag" SelectedValue="{Binding Path=Loot.ItemFilterMode}"  >
                 <ComboBoxItem Content="Trinity Scoring Only" Tag="TrinityOnly" IsSelected="True" ToolTip="Uses Trinity Scoring Only (see Trinity Town-Runs Tab)" />
                 <ComboBoxItem Content="Trinity Scoring With Script Rules" Tag="TrinityWithItemRules" ToolTip="Utilizes Item Rulesets (see ItemRules directory)" />
                 <ComboBoxItem Content="Demonbuddy Loot Rules" Tag="DemonBuddy" ToolTip="Use the Built-in Demonbuddy loot rule logic (see Demonbuddy Settings tab)" />
             </ComboBox>
         </Grid>
-        <Grid Grid.Row="2" Margin="0,2,0,-4" HorizontalAlignment="Center">
-            <Label FontWeight="Bold" Margin="-2,-6,-2,-6">Trinity Loot Pickup Configuration:</Label>
+        <Grid Grid.Row="2">
+            <TextBlock FontWeight="Bold" Margin="2" Text="Trinity Loot Pickup Configuration :" TextAlignment="Center"/>
         </Grid>
         <Grid Grid.Row="3" Margin="2" HorizontalAlignment="Center">
             <Grid MinWidth="375">
@@ -49,28 +52,16 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Row="0" Grid.Column="0">
-                    <!-- This is Empty! -->
-                </Grid>
-                <Grid Grid.Row="0" Grid.Column="1">
-                    <Label FontWeight="Bold" Margin="2">Magic Items:</Label>
-                </Grid>
-                <Grid Grid.Row="0" Grid.Column="2">
-                    <Label Foreground="Black" FontWeight="Bold" Margin="2">Rare Items:</Label>
-                </Grid>
-                <Grid Grid.Row="0" Grid.Column="3">
-                    <Label FontWeight="Bold" Margin="2">Misc Items:</Label>
-                </Grid>
-                <Grid Grid.Row="1" Grid.Column="0">
-                    <Label FontWeight="Bold" Margin="-4">Weapons:</Label>
-                </Grid>
-                <Grid Grid.Row="1" Grid.Column="1">
-                    <ComboBox Tag="WeaponBlueLevel" SelectedValue="{Binding Path=Pickup.WeaponBlueLevel}" SelectedValuePath="Tag" Width="60">
+                <TextBlock Grid.Row="0" Grid.Column="1" FontWeight="Bold" Margin="2" Text="Magic Items:"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Foreground="Black" FontWeight="Bold" Margin="2" Text="Rare Items:"/>
+                <TextBlock Grid.Row="0" Grid.Column="3" FontWeight="Bold" Margin="2" Text="Misc Items:"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" Text="Weapons:"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" SelectedValue="{Binding Path=Pickup.WeaponBlueLevel}" SelectedValuePath="Tag" Margin="8,2">
                         <ComboBoxItem Content="None" Tag="0" />
                         <ComboBoxItem Content="1+" Tag="1" />
                         <ComboBoxItem Content="5+" Tag="5" />
@@ -97,9 +88,7 @@
                         <ComboBoxItem Content="62+" Tag="62" />
                         <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
                     </ComboBox>
-                </Grid>
-                <Grid Grid.Row="1" Grid.Column="2">
-                    <ComboBox Tag="WeaponYellowLevel" SelectedValue="{Binding Path=Pickup.WeaponYellowLevel}" SelectedValuePath="Tag" Width="60">
+                <ComboBox Grid.Row="1" Grid.Column="2" SelectedValue="{Binding Path=Pickup.WeaponYellowLevel}" SelectedValuePath="Tag" Margin="8,2">
                         <ComboBoxItem Content="None" Tag="0" />
                         <ComboBoxItem Content="1+" Tag="1" />
                         <ComboBoxItem Content="5+" Tag="5" />
@@ -126,18 +115,39 @@
                         <ComboBoxItem Content="62+" Tag="62" />
                         <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
                     </ComboBox>
-                </Grid>
-                <Grid Grid.Row="1" Grid.Column="3">
-                    <ComboBox Name="comboMisc" Height="23" SelectedValuePath="Tag" >
-                        <ComboBoxItem Content="All Level Misc+" Tag="1" />
-                        <ComboBoxItem Content="Inferno Misc+" IsSelected="True" Tag="60" />
-                    </ComboBox>
-                </Grid>
-                <Grid Grid.Row="2" Grid.Column="0">
-                    <Label FontWeight="Bold" Margin="-4">Armor:</Label>
-                </Grid>
-                <Grid Grid.Row="2" Grid.Column="1">
-                    <ComboBox Tag="ArmorBlueLevel" SelectedValue="{Binding Path=Pickup.ArmorBlueLevel}" SelectedValuePath="Tag" Width="60">
+                <ComboBox Grid.Row="1" Grid.Column="3" SelectedValuePath="Tag" Margin="2">
+                    <ComboBoxItem Content="All Level Misc+" Tag="1" />
+                    <ComboBoxItem Content="Inferno Misc+" IsSelected="True" Tag="60" />
+                </ComboBox>
+                <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="Bold" Text="Armor:"/>
+                <ComboBox Grid.Row="2" Grid.Column="1" SelectedValue="{Binding Path=Pickup.ArmorBlueLevel}" SelectedValuePath="Tag" Margin="8,2">
+                    <ComboBoxItem Content="None" Tag="0" />
+                    <ComboBoxItem Content="1+" Tag="1" />
+                    <ComboBoxItem Content="5+" Tag="5" />
+                    <ComboBoxItem Content="10+" Tag="10" />
+                    <ComboBoxItem Content="15+" Tag="15" />
+                    <ComboBoxItem Content="20+" Tag="20" />
+                    <ComboBoxItem Content="25+" Tag="25" />
+                    <ComboBoxItem Content="30+" Tag="30" />
+                    <ComboBoxItem Content="35+" Tag="35" />
+                    <ComboBoxItem Content="40+" Tag="40" />
+                    <ComboBoxItem Content="45+" Tag="45" />
+                    <ComboBoxItem Content="50+" Tag="50" />
+                    <ComboBoxItem Content="51+" Tag="51" />
+                    <ComboBoxItem Content="52+" Tag="52" />
+                    <ComboBoxItem Content="53+" Tag="53" />
+                    <ComboBoxItem Content="54+" Tag="54" />
+                    <ComboBoxItem Content="55+" Tag="55" />
+                    <ComboBoxItem Content="56+" Tag="56" />
+                    <ComboBoxItem Content="57+" Tag="57" />
+                    <ComboBoxItem Content="58+" Tag="58" />
+                    <ComboBoxItem Content="59+" Tag="59" />
+                    <ComboBoxItem Content="60+" Tag="60" />
+                    <ComboBoxItem Content="61+" Tag="61" />
+                    <ComboBoxItem Content="62+" Tag="62" />
+                    <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
+                </ComboBox>
+                <ComboBox Grid.Row="2" Grid.Column="2" SelectedValue="{Binding Path=Pickup.ArmorYellowLevel}" SelectedValuePath="Tag" Margin="8,2">
                         <ComboBoxItem Content="None" Tag="0" />
                         <ComboBoxItem Content="1+" Tag="1" />
                         <ComboBoxItem Content="5+" Tag="5" />
@@ -164,9 +174,9 @@
                         <ComboBoxItem Content="62+" Tag="62" />
                         <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
                     </ComboBox>
-                </Grid>
-                <Grid Grid.Row="2" Grid.Column="2">
-                    <ComboBox Tag="ArmorYellowLevel" SelectedValue="{Binding Path=Pickup.ArmorYellowLevel}" SelectedValuePath="Tag" Width="60">
+                <CheckBox Grid.Row="2" Grid.Column="3" Content="Pickup Craft Tomes" IsChecked="{Binding Path=Pickup.CraftTomes}" Margin="2"/>
+                <TextBlock Grid.Row="3" Grid.Column="0" FontWeight="Bold" Text="Jewlery:"/>
+                <ComboBox Grid.Row="3" Grid.Column="1" SelectedValue="{Binding Path=Pickup.JewelryBlueLevel}" SelectedValuePath="Tag" Margin="8,2">
                         <ComboBoxItem Content="None" Tag="0" />
                         <ComboBoxItem Content="1+" Tag="1" />
                         <ComboBoxItem Content="5+" Tag="5" />
@@ -193,15 +203,7 @@
                         <ComboBoxItem Content="62+" Tag="62" />
                         <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
                     </ComboBox>
-                </Grid>
-                <Grid Grid.Row="2" Grid.Column="3">
-                    <CheckBox Content="Pickup Craft Tomes" IsChecked="{Binding Path=Pickup.CraftTomes}" Margin="3,3,-3,-3"/>
-                </Grid>
-                <Grid Grid.Row="3" Grid.Column="0">
-                    <Label FontWeight="Bold" Margin="-4">Jewlery:</Label>
-                </Grid>
-                <Grid Grid.Row="3" Grid.Column="1">
-                    <ComboBox Tag="JewelryBlueLevel" SelectedValue="{Binding Path=Pickup.JewelryBlueLevel}" SelectedValuePath="Tag" Width="60">
+                <ComboBox Grid.Row="3" Grid.Column="2" SelectedValue="{Binding Path=Pickup.JewelryYellowLevel}" SelectedValuePath="Tag" Margin="8,2">
                         <ComboBoxItem Content="None" Tag="0" />
                         <ComboBoxItem Content="1+" Tag="1" />
                         <ComboBoxItem Content="5+" Tag="5" />
@@ -228,44 +230,9 @@
                         <ComboBoxItem Content="62+" Tag="62" />
                         <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
                     </ComboBox>
-                </Grid>
-                <Grid Grid.Row="3" Grid.Column="2">
-                    <ComboBox Tag="JewelryYellowLevel" SelectedValue="{Binding Path=Pickup.JewelryYellowLevel}" SelectedValuePath="Tag" Width="60">
-                        <ComboBoxItem Content="None" Tag="0" />
-                        <ComboBoxItem Content="1+" Tag="1" />
-                        <ComboBoxItem Content="5+" Tag="5" />
-                        <ComboBoxItem Content="10+" Tag="10" />
-                        <ComboBoxItem Content="15+" Tag="15" />
-                        <ComboBoxItem Content="20+" Tag="20" />
-                        <ComboBoxItem Content="25+" Tag="25" />
-                        <ComboBoxItem Content="30+" Tag="30" />
-                        <ComboBoxItem Content="35+" Tag="35" />
-                        <ComboBoxItem Content="40+" Tag="40" />
-                        <ComboBoxItem Content="45+" Tag="45" />
-                        <ComboBoxItem Content="50+" Tag="50" />
-                        <ComboBoxItem Content="51+" Tag="51" />
-                        <ComboBoxItem Content="52+" Tag="52" />
-                        <ComboBoxItem Content="53+" Tag="53" />
-                        <ComboBoxItem Content="54+" Tag="54" />
-                        <ComboBoxItem Content="55+" Tag="55" />
-                        <ComboBoxItem Content="56+" Tag="56" />
-                        <ComboBoxItem Content="57+" Tag="57" />
-                        <ComboBoxItem Content="58+" Tag="58" />
-                        <ComboBoxItem Content="59+" Tag="59" />
-                        <ComboBoxItem Content="60+" Tag="60" />
-                        <ComboBoxItem Content="61+" Tag="61" />
-                        <ComboBoxItem Content="62+" Tag="62" />
-                        <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
-                    </ComboBox>
-                </Grid>
-                <Grid Grid.Row="3" Grid.Column="3">
-                    <CheckBox Content="Pickup Designs/Plans" IsChecked="{Binding Path=Pickup.DesignPlan}" Margin="3,3,-3,-3"/>
-                </Grid>
-                <Grid Grid.Row="4" Grid.Column="0" HorizontalAlignment="Stretch">
-                    <Label Content="Legendaries:" Margin="-10,0" FontWeight="Bold" Foreground="#FFA73B1E" Height="30"  Width="111" />
-                </Grid>
-                <Grid Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
-                    <ComboBox Height="23" SelectedValuePath="Tag" Width="90">
+                <CheckBox Grid.Row="3" Grid.Column="3" Content="Pickup Designs/Plans" IsChecked="{Binding Path=Pickup.DesignPlan}" Margin="2"/>
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Legendaries:" FontWeight="Bold" Foreground="#FFA73B1E" />
+                <ComboBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" SelectedValuePath="Tag" Margin="30,2" SelectedValue="{Binding Path=Pickup.LegendaryLevel}">
                         <ComboBoxItem Content="None" Tag="0" />
                         <ComboBoxItem Content="ilvl 1+" IsSelected="True" Tag="1" />
                         <ComboBoxItem Content="5+" Tag="5" />
@@ -292,122 +259,81 @@
                         <ComboBoxItem Content="62+" Tag="62" />
                         <ComboBoxItem Content="63+" Tag="63" />
                     </ComboBox>
-                </Grid>
-                <Grid Grid.Row="4" Grid.Column="2">
-                    <!-- Empty cell -->
-                </Grid>
-                <Grid Grid.Row="4" Grid.Column="3">
-                    <CheckBox Content="Pickup Follower Items" IsChecked="{Binding Path=Pickup.FollowerItem}" Margin="3,3,-3,-3"/>
-                </Grid>
+                <CheckBox Grid.Row="4" Grid.Column="3" Content="Pickup Follower Items" IsChecked="{Binding Path=Pickup.FollowerItem}" Margin="2"/>
             </Grid>
         </Grid>
-        <Grid Grid.Row="4" Margin="2" HorizontalAlignment="Center">
-            <Grid MinWidth="375" HorizontalAlignment="Center">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="2*" />
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center">
-                    <Label FontWeight="Bold" Margin="-4">Potion Cap:</Label>
-                </Grid>
-                <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center">
-                    <ComboBox SelectedValuePath="Tag" Width="90">
-                        <ComboBoxItem Content="Ignore All" IsSelected="True" Tag="3" />
-                        <ComboBoxItem Content="Cap At 100" Tag="2" />
-                        <ComboBoxItem Content="Pickup All" Tag="1" />
-                    </ComboBox>
-                </Grid>
-                <Grid Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center">
-                    <Label FontWeight="Bold" Margin="-4">Potion Types:</Label>
-
-                </Grid>
-                <Grid Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
-                    <ComboBox SelectedValuePath="Tag" Width="90">
-                        <ComboBoxItem Content="Minor+" Tag="1" />
-                        <ComboBoxItem Content="Lesser+" Tag="10" />
-                        <ComboBoxItem Content="(plain)+" Tag="15" />
-                        <ComboBoxItem Content="Greater+" Tag="20" />
-                        <ComboBoxItem Content="Major+" Tag="25" />
-                        <ComboBoxItem Content="Super+" Tag="30" />
-                        <ComboBoxItem Content="Heroic+" Tag="40" />
-                        <ComboBoxItem Content="Resplendent+" Tag="50" />
-                        <ComboBoxItem Content="Runic+" Tag="55" />
-                        <ComboBoxItem Content="Mythic+" IsSelected="True" Tag="60" />
-                    </ComboBox>
-                </Grid>
-
-                <Grid Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center">
-                    <Label FontWeight="Bold">Minimum Gold Pile:</Label>
-                </Grid>
-                <Grid Grid.Row="1" Grid.Column="2" MinWidth="120">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="4*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="0" HorizontalAlignment="Right">
-                            <Slider Interval="100" Maximum="1000" Minimum="1" SmallChange="50" TickFrequency="100" TickPlacement="BottomRight" Value="1" Width="120" />
-                        </Grid>
-                        <Grid Grid.Column="1" HorizontalAlignment="Left">
-                            <TextBox IsReadOnly="True" Text="1" Width="32" Height="24" TextAlignment="Center" />
-                        </Grid>
-                    </Grid>
-                </Grid>
-            </Grid>
+        <Grid Grid.Row="4" Margin="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock FontWeight="Bold" Margin="2" Text="Potion Cap:"/>
+            <ComboBox Grid.Row="0" Grid.Column="1" SelectedValuePath="Tag" Margin="2" SelectedValue="{Binding Path=Pickup.PotionMode}">
+                <ComboBoxItem Content="Ignore All" IsSelected="True" Tag="Ignore" />
+                <ComboBoxItem Content="Cap At 100" Tag="Cap" />
+                <ComboBoxItem Content="Pickup All" Tag="All" />
+            </ComboBox>
+            <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" Margin="2" Text="Potion Types:"/>
+            <ComboBox Grid.Row="1" Grid.Column="1" SelectedValuePath="Tag" Margin="2" SelectedValue="{Binding Path=Pickup.PotionLevel, StringFormat='{}{0:0}'}">
+                <ComboBoxItem Content="Minor+" Tag="1" />
+                <ComboBoxItem Content="Lesser+" Tag="10" />
+                <ComboBoxItem Content="(plain)+" Tag="15" />
+                <ComboBoxItem Content="Greater+" Tag="20" />
+                <ComboBoxItem Content="Major+" Tag="25" />
+                <ComboBoxItem Content="Super+" Tag="30" />
+                <ComboBoxItem Content="Heroic+" Tag="40" />
+                <ComboBoxItem Content="Resplendent+" Tag="50" />
+                <ComboBoxItem Content="Runic+" Tag="55" />
+                <ComboBoxItem Content="Mythic+" IsSelected="True" Tag="60" />
+            </ComboBox>
+            <TextBlock Grid.Row="0" Grid.Column="2" FontWeight="Bold" Text="Minimum Gold Pile :"/>
+            <Slider Grid.Row="1" Grid.Column="2" Template="{DynamicResource Slider}"
+                    Interval="100" Maximum="4000" Minimum="0" SmallChange="1" LargeChange="100"
+                    TickFrequency="100" TickPlacement="BottomRight" 
+                    Value="{Binding Path=Pickup.MinimumGoldStack}" />
         </Grid>
-        <Grid Grid.Row="6">
+        <Grid Grid.Row="5">
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0" />
-                    <ColumnDefinition Width="5*" />
-                    <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right">
-                    <Label FontWeight="Bold" Margin="0,0,0,0">Gems:</Label>
-                </Grid>
-                <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left">
-                    <ComboBox SelectedValuePath="Tag" Width="120" Height="24">
-                        <ComboBoxItem Content="Chipped+" Tag="14" />
-                        <ComboBoxItem Content="Flawed+" Tag="22" />
-                        <ComboBoxItem Content="(plain)+" Tag="30" />
-                        <ComboBoxItem Content="Flawless+" Tag="36" />
-                        <ComboBoxItem Content="Perfect+" Tag="42" />
-                        <ComboBoxItem Content="Radiant+" Tag="48" />
-                        <ComboBoxItem Content="Square+" Tag="54" />
-                        <ComboBoxItem Content="Flawless Square+" IsSelected="True" Tag="60" />
-                        <ComboBoxItem Content="Perfect Square+" Tag="61" />
-                    </ComboBox>
-
-                </Grid>
-                <Grid Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left">
-                    <CheckBox Content="Emerald" Height="18" IsChecked="True" />
-
-                </Grid>
-                <Grid Grid.Row="0" Grid.Column="3" HorizontalAlignment="Left">
-                    <CheckBox Content="Topaz" Height="18" IsChecked="True" />
-
-                </Grid>
-                <Grid Grid.Row="0" Grid.Column="4" HorizontalAlignment="Left">
-                    <CheckBox Content="Amethyst" Height="18" IsChecked="True" />
-
-                </Grid>
-                <Grid Grid.Row="0" Grid.Column="5" HorizontalAlignment="Left">
-                    <CheckBox Content="Ruby" Height="18" IsChecked="True"/>
-
-                </Grid>
+                <Label FontWeight="Bold" Margin="2">Gems:</Label>
+                <ComboBox Grid.Column="1" SelectedValuePath="Tag" Margin="2" SelectedValue="{Binding Path=Pickup.GemLevel, StringFormat='{}{0:0}'}" >
+                    <ComboBoxItem Content="Chipped+" Tag="14" />
+                    <ComboBoxItem Content="Flawed+" Tag="22" />
+                    <ComboBoxItem Content="(plain)+" Tag="30" />
+                    <ComboBoxItem Content="Flawless+" Tag="36" />
+                    <ComboBoxItem Content="Perfect+" Tag="42" />
+                    <ComboBoxItem Content="Radiant+" Tag="48" />
+                    <ComboBoxItem Content="Square+" Tag="54" />
+                    <ComboBoxItem Content="Flawless Square+" IsSelected="True" Tag="60" />
+                    <ComboBoxItem Content="Perfect Square+" Tag="61" />
+                </ComboBox>
+                <CheckBox Grid.Row="0" Grid.Column="2" Content="Emerald" 
+                          IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Emerald'}" 
+                          Margin="2" VerticalAlignment="Center"/>
+                <CheckBox Grid.Row="0" Grid.Column="3" Content="Topaz" 
+                          IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Topaz'}" 
+                          Margin="2" VerticalAlignment="Center"/>
+                <CheckBox Grid.Row="0" Grid.Column="4" Content="Amethyst" 
+                          IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Amethyst'}" 
+                          Margin="2" VerticalAlignment="Center"/>
+                <CheckBox Grid.Row="0" Grid.Column="5" Content="Ruby" 
+                          IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Ruby'}" 
+                          Margin="2" VerticalAlignment="Center"/>
             </Grid>
         </Grid>
+        <!--Reset Button-->
+        <Button Grid.Row="7" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetItemCommand}">Reset</Button>
     </Grid>
 </UserControl>

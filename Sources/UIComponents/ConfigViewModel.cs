@@ -32,7 +32,7 @@ namespace GilesTrinity.UIComponents
                                     (parameter) =>
                                     {
                                         _Model.CopyTo(_OriginalModel);
-                                        // Execute Save Here
+                                        _OriginalModel.Save();
                                     });
 
         }
@@ -294,6 +294,30 @@ namespace GilesTrinity.UIComponents
                 return _Model.Loot.TownRun;
             }
         }
+
+        /// <summary>
+        /// Gets the Pickup Configuration Model.
+        /// </summary>
+        /// <value>The Pickup Configuration Model.</value>
+        public PickupSetting Pickup
+        {
+            get
+            {
+                return _Model.Loot.Pickup;
+            }
+        }
+
+        /// <summary>
+        /// Gets the Pickup Configuration Model.
+        /// </summary>
+        /// <value>The Pickup Configuration Model.</value>
+        public ItemSetting Loot
+        {
+            get
+            {
+                return _Model.Loot;
+            }
+        }        
 
         /// <summary>
         /// Initializes the Reset commands.
