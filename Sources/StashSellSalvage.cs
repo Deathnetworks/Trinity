@@ -237,7 +237,7 @@ namespace GilesTrinity
                     // Find out if this item's in a protected bag slot
                     if (!ItemManager.ItemIsProtected(thisitem))
                     {
-                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
+                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
                             thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
                         bool bShouldStashThis = Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? ShouldWeStashThis(thiscacheditem) : ItemManager.ShouldStashItem(thisitem);
@@ -464,7 +464,7 @@ namespace GilesTrinity
                 {
                     if (!ItemManager.ItemIsProtected(thisitem))
                     {
-                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
+                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
                             thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
                         bool bShouldSellThis = Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy
@@ -839,7 +839,7 @@ namespace GilesTrinity
                 {
                     if (!ItemManager.ItemIsProtected(thisitem))
                     {
-                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
+                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
                             thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
                         bool bShouldSalvageThis = Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesSalvageValidation(thiscacheditem.InternalName, thiscacheditem.Level, thiscacheditem.Quality, thiscacheditem.DBItemType, thiscacheditem.FollowerType) : ItemManager.ShouldSalvageItem(thisitem);

@@ -1,16 +1,17 @@
-﻿using GilesTrinity.Settings;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
+using GilesTrinity.ItemRules;
+using GilesTrinity.Settings;
+using GilesTrinity.Swap;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
 using Zeta.Pathfinding;
-using GilesTrinity.Swap;
 
 namespace GilesTrinity
 {
