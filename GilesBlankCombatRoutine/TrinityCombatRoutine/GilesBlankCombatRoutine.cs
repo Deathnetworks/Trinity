@@ -15,12 +15,12 @@ namespace GilesTrinity
         }
 
         public override void Dispose()
-        {
+        { 
         }
 
-        public override string Name { get { return GilesTrinity.Instance.Name; } }
+        public override string Name { get { return "GilesPlugin"; } }
 
-        public override Window ConfigWindow { get { return GilesTrinity.Instance.DisplayWindow; } }
+        public override Window ConfigWindow { get { return null; } }
 
         public override ActorClass Class { get { return ZetaDia.Me.ActorClass; } }
 

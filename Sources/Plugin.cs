@@ -100,8 +100,9 @@ namespace GilesTrinity
 
             BotMain.OnStart += GilesTrinityStart;
             // Force logging to disabled
-            if (bDisableFileLogging)
-                Zeta.Common.Logging.LogFileLevel = Zeta.Common.LogLevel.None;
+            //if (bDisableFileLogging)
+            //    Zeta.Common.Logging.LogFileLevel = Zeta.Common.LogLevel.None;
+
             // Set up the pause button
             Application.Current.Dispatcher.Invoke(
             new System.Action(

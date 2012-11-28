@@ -525,7 +525,7 @@ namespace GilesTrinity
         /// <summary>
         /// This will eventually be come our single source of truth and we can get rid of most/all of the below "c_" variables
         /// </summary>
-        private static GilesObject cacheEntry = null;
+        // private static GilesObject cacheEntry = null;
 
         private static Vector3 c_Position = Vector3.Zero;
         private static GObjectType c_ObjectType = GObjectType.Unknown;

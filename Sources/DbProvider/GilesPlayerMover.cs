@@ -171,7 +171,7 @@ namespace GilesTrinity.DbProvider
             iTimesReachedStuckPoint = 0;
             timeLastRecordedPosition = DateTime.Today;
             timeStartedUnstuckMeasure = DateTime.Today;
-            int iSafetyLoops = 0;
+            // int iSafetyLoops = 0;
             if (iTimesReachedMaxUnstucks == 1)
             {
                 Navigator.Clear();
