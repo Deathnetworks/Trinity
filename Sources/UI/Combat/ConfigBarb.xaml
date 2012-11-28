@@ -13,7 +13,7 @@
             <ut:PercentConverter x:Key="percentConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
