@@ -74,7 +74,8 @@ namespace GilesTrinity
         {
             get
             {
-                return UILoader.GetDisplayWindow(Path.Combine(sTrinityPluginPath, "UI"));
+                // Uncomment here to use the new UI system
+                // return UILoader.GetDisplayWindow(Path.Combine(sTrinityPluginPath, "UI"));
 
                 // Check we can actually find the .xaml file first - if not, report an error
                 if (!File.Exists(sTrinityPluginPath + "GilesTrinity.xaml"))
