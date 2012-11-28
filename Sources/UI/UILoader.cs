@@ -43,11 +43,15 @@ namespace GilesTrinity.UI
                 _ConfigWindow.Content = mainControl;
                 _ConfigWindow.Height = mainControl.Height + 40;
                 _ConfigWindow.Width = mainControl.Width + 40;
+                _ConfigWindow.MinHeight = 470 + 40;
+                _ConfigWindow.MinWidth = 432 + 40;
                 _ConfigWindow.Title = "Giles Trinity";
                 
                 // Event handling for the config window loading up/closing
                 //configWindow.Loaded += configWindow_Loaded;
                 _ConfigWindow.Closed += WindowClosed;
+
+                Demonbuddy.App.Current.Exit += WindowClosed;
 
                 Zeta.Common.Logging.Write("Put MainControl to Window");
                 // And finally put all of this content in effect
