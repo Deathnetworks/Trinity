@@ -320,7 +320,7 @@ namespace GilesTrinity
                                 cacheObject.Weight = 1;
 
                             // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
-                            if (bAnyMobsInCloseRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting)
+                            if (bAnyMobsInCloseRange)
                                 cacheObject.Weight = 1;
 
                             // Calculate a spot reaching a little bit further out from the item, to help pickup-movements
