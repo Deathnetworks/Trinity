@@ -26,16 +26,40 @@
             <Label FontWeight="Bold">Choose Item Rule Type:</Label>
         </Grid>
         <Grid Grid.Row="1" Margin="2" HorizontalAlignment="Center">
-
             <ComboBox Width="240" SelectedIndex="0" SelectedValuePath="Tag" SelectedValue="{Binding ItemFilterMode}"  >
                 <ComboBoxItem Content="Trinity Scoring Only" Tag="TrinityOnly" />
                 <ComboBoxItem Content="Trinity Scoring With Script Rules" Tag="TrinityWithItemRules" />
                 <ComboBoxItem Content="Demonbuddy Loot Rules" Tag="DemonBuddy" />
             </ComboBox>
-
         </Grid>
         <Grid Grid.Row="2" Margin="2" HorizontalAlignment="Center">
-            
+            <Grid MinWidth="375">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="5*" />
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Row="0" Grid.Column="0">
+                    <!-- This is Empty! -->
+                </Grid>
+                <Grid Grid.Row="0" Grid.Column="1">
+                    <Label Foreground="Blue" FontWeight="Bold" Margin="2">Magic Items:</Label>
+                </Grid>
+                <Grid Grid.Row="0" Grid.Column="2">
+                    <Label Foreground="Orange" FontWeight="Bold" Margin="2">Rare Items:</Label>
+                </Grid>
+                <Grid Grid.Row="0" Grid.Column="3">
+                    <Label Foreground="Orange" FontWeight="Bold" Margin="2">Misc Items:</Label>
+                </Grid>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

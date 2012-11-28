@@ -217,12 +217,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Specification\config.dis" />
-    <None Include="Specification\legendary.dis" />
-    <None Include="Specification\magic.dis" />
-    <None Include="Specification\rare.dis" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Log\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
