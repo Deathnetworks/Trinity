@@ -69,43 +69,50 @@ namespace GilesTrinity.ItemRules
         /// </summary>
         public void init()
         {
-            startTimestamp = DateTime.Now.ToString("ddMMyyyyHHmmss");
-            customPath = @"Plugins\GilesTrinity\ItemRules\";
-            logPath = @"Plugins\GilesTrinity\Log\";
-
-            ruleSet = new ArrayList();
-
-            string disFileName = "config.dis";
-            StreamReader stream = new StreamReader(customPath + disFileName);
-
-            string str;
-            string[] rule;
-
-            Logging.Write("starting initializing Item Rule Set!");
-
-            logOut("--- STARTING A NEW SESSION WITH ITEMRULESET ---", LogType.LOG);
-            List<string> itemFileNames = new List<string>();
-            while ((str = stream.ReadLine()) != null)
+            try
             {
-                string fileName = "";
-                rule = str.Replace(" ", "").Replace("\t", "").Split(new string[] { "//" }, StringSplitOptions.None);
-                if (rule[0].IndexOf("$$") != -1)
+                startTimestamp = DateTime.Now.ToString("ddMMyyyyHHmmss");
+                customPath = @"Plugins\GilesTrinity\ItemRules\";
+                logPath = @"Plugins\GilesTrinity\Log\";
+
+                ruleSet = new ArrayList();
+
+                string disFileName = "config.dis";
+                StreamReader stream = new StreamReader(customPath + disFileName);
+
+                string str;
+                string[] rule;
+
+                Logging.Write("starting initializing Item Rule Set!");
+
+                logOut("--- STARTING A NEW SESSION WITH ITEMRULESET ---", LogType.LOG);
+                List<string> itemFileNames = new List<string>();
+                while ((str = stream.ReadLine()) != null)
                 {
-                    fileName = interpretConfig(rule[0].Replace("$$", ""));
-                    if (fileName.Length > 0 && fileName.Contains(".dis"))
-                        itemFileNames.Add(fileName);
+                    string fileName = "";
+                    rule = str.Replace(" ", "").Replace("\t", "").Split(new string[] { "//" }, StringSplitOptions.None);
+                    if (rule[0].IndexOf("$$") != -1)
+                    {
+                        fileName = interpretConfig(rule[0].Replace("$$", ""));
+                        if (fileName.Length > 0 && fileName.Contains(".dis"))
+                            itemFileNames.Add(fileName);
+                    }
                 }
+
+
+                foreach (string itemFileName in itemFileNames)
+                {
+                    logOut("... reading file: " + itemFileName, LogType.DEBUG);
+                    readItemFile(new StreamReader(customPath + itemFileName));
+                }
+                logOut("initialized " + ruleSet.Count + " itemrulesets!", LogType.DEBUG);
+                Logging.Write("initialized " + ruleSet.Count + " itemrulesets!");
+                Logging.Write("finished initializing Item Rule Set!");
             }
-
-
-            foreach (string itemFileName in itemFileNames)
+            catch (Exception ex)
             {
-                logOut("... reading file: " + itemFileName, LogType.DEBUG);
-                readItemFile(new StreamReader(customPath + itemFileName));
+                Logging.Write("Initialization of Item Rule Set Failed: {0}", ex);
             }
-            logOut("initialized " + ruleSet.Count + " itemrulesets!", LogType.DEBUG);
-            Logging.Write("initialized " + ruleSet.Count + " itemrulesets!");
-            Logging.Write("finished initializing Item Rule Set!");
         }
 
         /// <summary>

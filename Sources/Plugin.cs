@@ -248,10 +248,10 @@ namespace GilesTrinity
 
         public GilesTrinity()
         {
-            Instance = this;
+           // Instance = this;
         }
 
-        public static GilesTrinity Instance { get; private set; }
+        //public static GilesTrinity Instance { get; private set; }
 
     }
 }
