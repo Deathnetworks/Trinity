@@ -267,7 +267,7 @@
                                 <TextBox Name="textKite2" Height="23" HorizontalAlignment="Left" IsReadOnly="True" Margin="333,48,0,0" Text="0" VerticalAlignment="Top" Width="38" />
                                 <Slider Name="slideKite2" Height="23" HorizontalAlignment="Left" Interval="1" Margin="200,52,0,0" Maximum="40" Minimum="0" SmallChange="100" TickFrequency="1" TickPlacement="BottomRight" Value="0" VerticalAlignment="Top" Width="130" />
 
-                                <CheckBox Name="checkCritical" Content="Wiz Crit-Mass / WD Grave Injustice*" Height="18" Margin="4,80,151,0" VerticalAlignment="Top" />
+                                <CheckBox Name="checkCritical" Content="Wiz Crit-Mass*" Height="18" Margin="4,80,151,0" VerticalAlignment="Top" />
                                 <Label Content="(*allows rapid-spam of certain spells)" Height="24" HorizontalAlignment="Left" Margin="10,87,0,0" VerticalAlignment="Top" Width="208" />
 
                                 <ScrollViewer Height="220" HorizontalAlignment="Left" Margin="0,120,0,0" VerticalAlignment="Top" Width="388" CanContentScroll="True">
@@ -374,7 +374,7 @@
                                 <TextBox Name="textKite3" Height="23" HorizontalAlignment="Left" IsReadOnly="True" Margin="333,48,0,0" Text="0" VerticalAlignment="Top" Width="38" />
                                 <Slider Name="slideKite3" Height="23" HorizontalAlignment="Left" Interval="1" Margin="200,52,0,0" Maximum="40" Minimum="0" SmallChange="100" TickFrequency="1" TickPlacement="BottomRight" Value="0" VerticalAlignment="Top" Width="130" />
 
-                                <CheckBox Name="checkGrave" Content="Wiz Crit-Mass / WD Grave Injustice*" Height="18" Margin="4,80,151,0" VerticalAlignment="Top" />
+                                <CheckBox Name="checkGrave" Content="Grave Injustice*" Height="18" Margin="4,80,151,0" VerticalAlignment="Top" />
                                 <Label Content="(*allows rapid-spam of certain spells)" Height="24" HorizontalAlignment="Left" Margin="10,87,0,0" VerticalAlignment="Top" Width="208" />
 
                                 <ScrollViewer Height="220" HorizontalAlignment="Left" Margin="0,120,0,0" VerticalAlignment="Top" Width="388" CanContentScroll="True">
