@@ -108,6 +108,7 @@ namespace GilesTrinity
                         // What health % should we use a potion, or look for a globe
                         PlayerEmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;
                         PlayerEmergencyHealthGlobeLimit = Settings.Combat.Monk.HealthGlobeLevel;
+                        // Monks never kite :)
                         PlayerKiteDistance = 0;
                         break;
                     case ActorClass.Wizard:

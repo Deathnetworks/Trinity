@@ -350,6 +350,8 @@ namespace GilesTrinity
                     checkGrave = LogicalTreeHelper.FindLogicalNode(xamlContent, "checkGrave") as CheckBox;
                     checkGrave.Checked += checkCritical_check;
                     checkGrave.Unchecked += checkCritical_uncheck;
+                    checkGrave.Checked += checkGrave_check;
+                    checkGrave.Unchecked += checkGrave_uncheck;
                     textTriggerRange = LogicalTreeHelper.FindLogicalNode(xamlContent, "textTriggerRange") as TextBox;
                     slideTriggerRange = LogicalTreeHelper.FindLogicalNode(xamlContent, "slideTriggerRange") as Slider;
                     slideTriggerRange.ValueChanged += trackTriggerRange_Scroll;
@@ -1610,6 +1612,20 @@ namespace GilesTrinity
                 return;
             Settings.Combat.Wizard.CriticalMass = false;
         }
+        // WD Grave Injustice
+        private void checkGrave_check(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Combat.WitchDoctor.GraveInjustice = true;
+        }
+        private void checkGrave_uncheck(object sender, RoutedEventArgs e)
+        {
+            if (bSuppressEventChanges)
+                return;
+            Settings.Combat.WitchDoctor.GraveInjustice = false;
+        }
+
         private void checkMovementAbilities_check(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
