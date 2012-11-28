@@ -4,14 +4,38 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:GilesTrinity.UIComponents"
              mc:Ignorable="d" 
-             d:DesignHeight="350" d:DesignWidth="390">
+             d:DesignHeight="350" d:DesignWidth="390" DataContext="{Binding ItemSetting}">
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
-            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Template.xaml"/></ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Template.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
+    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Margin="2" HorizontalAlignment="Center">
+            <Label FontWeight="Bold">Choose Item Rule Type:</Label>
+        </Grid>
+        <Grid Grid.Row="1" Margin="2" HorizontalAlignment="Center">
 
+            <ComboBox Width="240" SelectedIndex="0" SelectedValuePath="Tag" SelectedValue="{Binding ItemFilterMode}"  >
+                <ComboBoxItem Content="Trinity Scoring Only" Tag="TrinityOnly" />
+                <ComboBoxItem Content="Trinity Scoring With Script Rules" Tag="TrinityWithItemRules" />
+                <ComboBoxItem Content="Demonbuddy Loot Rules" Tag="DemonBuddy" />
+            </ComboBox>
+
+        </Grid>
+        <Grid Grid.Row="2" Margin="2" HorizontalAlignment="Center">
+            
+        </Grid>
     </Grid>
 </UserControl>
