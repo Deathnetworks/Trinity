@@ -75,6 +75,11 @@ namespace GilesTrinity.ItemRules
                 customPath = @"Plugins\GilesTrinity\ItemRules\";
                 logPath = @"Plugins\GilesTrinity\Log\";
 
+                if (!Directory.Exists(logPath))
+                {
+                    Directory.CreateDirectory(logPath);
+                }
+
                 ruleSet = new ArrayList();
 
                 string disFileName = "config.dis";
