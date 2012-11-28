@@ -339,7 +339,7 @@ namespace GilesTrinity
             // Whirlwind spam as long as necessary pre-buffs are up
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) && !playerStatus.IsIncapacitated && !playerStatus.IsRooted &&
                 // Don't WW against goblins, units in the special SNO list
-                (!Settings.Combat.Barbarian.SelectiveWirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)) &&
+                (!Settings.Combat.Barbarian.SelectiveWhirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)) &&
                 // Only if within 15 foot of main target
                 ((CurrentTarget.RadiusDistance <= 25f || iAnythingWithinRange[RANGE_25] >= 1)) &&
                 (iAnythingWithinRange[RANGE_50] >= 2 || CurrentTarget.HitPoints >= 0.30 || CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || playerStatus.CurrentHealthPct <= 0.60) &&

@@ -591,7 +591,7 @@ namespace GilesTrinity.Settings.Combat
 
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
-        public bool SelectiveWirlwind
+        public bool SelectiveWhirlwind
         {
             get
             {

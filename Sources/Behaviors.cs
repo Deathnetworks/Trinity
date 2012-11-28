@@ -700,7 +700,7 @@ namespace GilesTrinity
                     (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && fDistanceFromTarget >= 6f) &&
                     (CurrentTarget.Type != GObjectType.Unit ||
                     (CurrentTarget.Type == GObjectType.Unit && !CurrentTarget.IsTreasureGoblin &&
-                        (!Settings.Combat.Barbarian.SelectiveWirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)))))
+                        (!Settings.Combat.Barbarian.SelectiveWhirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)))))
                 {
                     // Special code to prevent whirlwind double-spam, this helps save fury
                     bool bUseThisLoop = SNOPower.Barbarian_Whirlwind != powerLastSnoPowerUsed;

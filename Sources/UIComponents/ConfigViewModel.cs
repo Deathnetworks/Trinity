@@ -202,6 +202,30 @@ namespace GilesTrinity.UIComponents
         }
 
         /// <summary>
+        /// Gets the Avoidance Configuration Model.
+        /// </summary>
+        /// <value>The Avoidance Configuration Model.</value>
+        public AvoidanceRadiusSetting Avoid
+        {
+            get
+            {
+                return _Model.Combat.AvoidanceRadius;
+            }
+        }
+
+        /// <summary>
+        /// Gets the Barbarian Configuration Model.
+        /// </summary>
+        /// <value>The Barbarian Configuration Model.</value>
+        public BarbarianSetting Barb
+        {
+            get
+            {
+                return _Model.Combat.Barbarian;
+            }
+        }
+
+        /// <summary>
         /// Gets the World Object Configuration Model.
         /// </summary>
         /// <value>The World Object Configuration Model.</value>

@@ -1452,13 +1452,13 @@ namespace GilesTrinity
         {
             if (bSuppressEventChanges)
                 return;
-            Settings.Combat.Barbarian.SelectiveWirlwind = true;
+            Settings.Combat.Barbarian.SelectiveWhirlwind = true;
         }
         private void checkSelectiveWW_uncheck(object sender, RoutedEventArgs e)
         {
             if (bSuppressEventChanges)
                 return;
-            Settings.Combat.Barbarian.SelectiveWirlwind = false;
+            Settings.Combat.Barbarian.SelectiveWhirlwind = false;
         }
         private void checkKiteArchonOnly_check(object sender, RoutedEventArgs e)
         {
@@ -2215,7 +2215,7 @@ namespace GilesTrinity
             checkAndroid.IsChecked = Settings.Notification.AndroidEnabled;
             textAndroidKey.Text = Settings.Notification.AndroidKey;
             checkExtendedRange.IsChecked = Settings.Combat.Misc.ExtendedTrashKill;
-            checkSelectiveWW.IsChecked = Settings.Combat.Barbarian.SelectiveWirlwind;
+            checkSelectiveWW.IsChecked = Settings.Combat.Barbarian.SelectiveWhirlwind;
             checkWrath90.IsChecked = Settings.Combat.Barbarian.BoonBulKathosPassive;
             checkWOTBHardOnly.IsChecked = Settings.Combat.Barbarian.WOTBHardOnly;
 
