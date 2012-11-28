@@ -61,7 +61,7 @@ namespace GilesTrinity.ItemRules
         /// </summary>
         public Interpreter()
         {
-            init();
+            //init();
         }
 
         /// <summary>

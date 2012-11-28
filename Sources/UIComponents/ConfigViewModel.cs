@@ -396,11 +396,6 @@ namespace GilesTrinity.UIComponents
                                     {
                                         _Model.Notification.Reset();
                                     });
-            ResetLogCommand = new RelayCommand(
-                                    (parameter) =>
-                                    {
-                                        //_Model.Lo.Reset();
-                                    });
 
             ResetAllCommand = new RelayCommand(
                                     (parameter) =>

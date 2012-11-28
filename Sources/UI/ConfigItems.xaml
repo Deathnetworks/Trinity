@@ -115,7 +115,7 @@
                         <ComboBoxItem Content="62+" Tag="62" />
                         <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
                     </ComboBox>
-                <ComboBox Grid.Row="1" Grid.Column="3" SelectedValuePath="Tag" Margin="2">
+                <ComboBox Grid.Row="1" Grid.Column="3" SelectedValuePath="Tag" Margin="2" SelectedValue="{Binding Path=Pickup.MiscItemLevel}">
                     <ComboBoxItem Content="All Level Misc+" Tag="1" />
                     <ComboBoxItem Content="Inferno Misc+" IsSelected="True" Tag="60" />
                 </ComboBox>

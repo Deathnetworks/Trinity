@@ -305,6 +305,12 @@ namespace GilesTrinity
                             SmtpServer,
                             Settings.Notification.EmailPassword);
                     EmailMessage.Clear();
+
+
+                    while (NotificationManager.pushQueue.Count > 0)
+                    {
+                        NotificationManager.SendNotification(NotificationManager.pushQueue.Dequeue());
+                    }
                 }
                 catch (IOException)
                 {

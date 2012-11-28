@@ -210,7 +210,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(14)]
         public int GemLevel
         {
             get
@@ -258,7 +258,7 @@ namespace GilesTrinity.Settings.Loot
                 if (_MinimumGoldStack != value)
                 {
                     _MinimumGoldStack = value;
-                    OnPropertyChanged("ServerAddress");
+                    OnPropertyChanged("MinimumGoldStack");
                 }
             }
         }

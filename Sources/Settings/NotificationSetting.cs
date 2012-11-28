@@ -109,7 +109,7 @@ namespace GilesTrinity.Settings
             {
                 if (_AndroidKey != value)
                 {
-                    _AndroidKey = value;
+                    _AndroidKey = value.Trim();
                     OnPropertyChanged("AndroidKey");
                 }
             }

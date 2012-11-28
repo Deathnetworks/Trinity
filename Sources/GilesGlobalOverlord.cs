@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.Notifications;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Zeta;
@@ -9,6 +10,7 @@ using Zeta.CommonBot.Profile;
 using Zeta.Internals.Actors;
 using Zeta.Navigation;
 using Zeta.Pathfinding;
+
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -28,6 +30,7 @@ namespace GilesTrinity
             gp.Update();
             if (pf == null)
                 pf = new PathFinder(gp);
+
             // Big main-bot pause button
             if (bMainBotPaused)
             {
