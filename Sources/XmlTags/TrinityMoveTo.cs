@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.Technicals;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Zeta;
@@ -53,7 +54,7 @@ namespace GilesTrinity.XmlTags
                     {
                         if (thisObject.Location.Distance(Position) <= thisObject.Radius)
                         {
-                            Logging.WriteDiagnostic("[Trinity] Skipping ahead from moveto " + Position.ToString() + " to next moveto.");
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "Skipping ahead from moveto {0} to next moveto.", Position);
                             GilesTrinity.bSkipAheadAGo = true;
                             return RunStatus.Success;
                         }

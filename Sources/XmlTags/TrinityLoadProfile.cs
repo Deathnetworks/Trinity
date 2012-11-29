@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.Technicals;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -49,7 +50,7 @@ namespace GilesTrinity.XmlTags
 
                 // And prepare a full string of the path, and the new .xml file name
                 string sNextProfile = sCurrentProfilePath + @"\" + sThisProfileString;
-                Logging.Write("[Trinity] Loading new profile.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Loading new profile."); 
                 ProfileManager.Load(sNextProfile);
 
                 // A quick nap-time helps prevent some funny issues
@@ -61,7 +62,7 @@ namespace GilesTrinity.XmlTags
                 // See if the XML tag requested we exit the game after loading this profile or not
                 if (bExitGame)
                 {
-                    Logging.Write("[Trinity] Exiting game to continue with next profile.");
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Exiting game to continue with next profile."); 
 
                     // Attempt to teleport to town first for a quicker exit
                     int iSafetyLoops = 0;

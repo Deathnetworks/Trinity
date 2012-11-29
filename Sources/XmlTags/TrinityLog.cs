@@ -1,4 +1,5 @@
-﻿using Zeta.Common;
+﻿using GilesTrinity.Technicals;
+using Zeta.Common;
 using Zeta.CommonBot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
@@ -22,10 +23,7 @@ namespace GilesTrinity.XmlTags
         {
             return new Zeta.TreeSharp.Action(ret =>
             {
-                if (Level != null && Level.ToLower() == "diagnostic")
-                    Logging.WriteDiagnostic(Output);
-                else
-                    Logging.Write(Output);
+                DbHelper.Log((Level != null && Level.ToLower() == "diagnostic") ? TrinityLogLevel.Debug : TrinityLogLevel.Normal, LogCategory.UserInformation, Output);
                 m_IsDone = true;
             });
         }

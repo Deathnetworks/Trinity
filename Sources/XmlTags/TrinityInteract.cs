@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using GilesTrinity.Technicals;
+using System.Linq;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot.Profile;
@@ -43,7 +44,7 @@ namespace GilesTrinity.XmlTags
                     }
                     catch
                     {
-                        Logging.WriteDiagnostic("[Trinity] There was a memory/DB failure trying to follow the TrinityInteract XML tag on SNO " + SNOID.ToString());
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "There was a memory/DB failure trying to follow the TrinityInteract XML tag on SNO {0}", SNOID);
                     }
                 }
                 m_IsDone = true;
