@@ -746,7 +746,9 @@ namespace GilesTrinity
                 Log("Emergency Stop: You need repairs but don't have enough money. Stopping the bot to prevent infinite death loop.");
                 BotMain.Stop();
             }
-            ZetaDia.Me.Inventory.RepairEquippedItems();
+
+            //ZetaDia.Me.Inventory.RepairEquippedItems();
+            ZetaDia.Me.Inventory.RepairAllItems();
 
             bNeedsEquipmentRepairs = false;
             if (loggedJunkThisStash)
