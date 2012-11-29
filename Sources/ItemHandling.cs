@@ -841,6 +841,19 @@ namespace GilesTrinity
         /// <returns></returns>
         private static bool ShouldWeStashThis(GilesCachedACDItem thisitem)
         {
+            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
+            {
+                switch (StashRule.checkItem(thisitem.item))
+                {
+                    case Interpreter.InterpreterAction.KEEP:
+                        return true;
+                    case Interpreter.InterpreterAction.TRASH:
+                        return false;
+                    default:
+                        break;
+                }
+            } 
+
             // auto trash blue items
             if ((thisitem.DBBaseType == ItemBaseType.Armor || thisitem.DBBaseType == ItemBaseType.Jewelry || thisitem.DBBaseType == ItemBaseType.Weapon) && thisitem.Quality < ItemQuality.Rare4)
             {
@@ -914,19 +927,6 @@ namespace GilesTrinity
                 if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep legendaries)");
                 return true;
             }
-
-            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
-            {
-                switch (StashRule.checkItem(thisitem.item))
-                {
-                    case Interpreter.InterpreterAction.KEEP:
-                        return true;
-                    case Interpreter.InterpreterAction.TRASH:
-                        return false;
-                    default:
-                        break;
-                }
-            } 
 
 
             // Ok now try to do some decent item scoring based on item types

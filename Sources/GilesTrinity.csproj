@@ -217,6 +217,20 @@
   <ItemGroup>
     <Folder Include="Log\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="ItemRules\changeLog.txt" />
+    <Content Include="ItemRules\RulesReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ItemRules\config.dis" />
+    <None Include="ItemRules\legendary.dis" />
+    <None Include="ItemRules\legendary_it.dis" />
+    <None Include="ItemRules\legendary_ru.dis" />
+    <None Include="ItemRules\magic.dis" />
+    <None Include="ItemRules\rare.dis" />
+    <None Include="ItemRules\special.dis" />
+    <None Include="ItemRules\test.dis" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />
