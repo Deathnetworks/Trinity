@@ -340,7 +340,7 @@ namespace GilesTrinity
                     }
                     
                     // Checking for BuffVisualEffect - for Butcher, maybe useful other places?
-                    if (hashAvoidanceBuffSNOList.Contains(c_ActorSNO))
+                    if (hashAvoidanceBuffSNOList.Contains(c_ActorSNO) && Settings.Combat.Misc.AvoidAOE)
                     {
                         bool hasBuff = false;
                         try
