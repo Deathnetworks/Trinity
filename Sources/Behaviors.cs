@@ -1437,7 +1437,7 @@ namespace GilesTrinity
                     ItemsPickedStats.TotalPotions++;
                     ItemsPickedStats.PotionsPerLevel[CurrentTarget.Level]++;
                 }
-                else if (c_item_GilesItemType == GItemType.InfernalKey)
+                else if (c_item_GItemType == GItemType.InfernalKey)
                 {
                     ItemsPickedStats.TotalInfernalKeys++;
                 }

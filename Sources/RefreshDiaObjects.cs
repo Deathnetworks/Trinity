@@ -452,7 +452,7 @@ namespace GilesTrinity
                 if (dUseKillRadius <= 60) dUseKillRadius = 60;
             }
             // Elitey type mobs and things
-            else if ((c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_bIsMinion))
+            else if ((c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion))
             {
                 c_ForceLeapAgainst = true;
                 if (c_HitPoints <= 0.99)
@@ -491,7 +491,7 @@ namespace GilesTrinity
             c_unit_IsElite = theseaffixes.HasFlag(MonsterAffixes.Elite);
             c_unit_IsRare = theseaffixes.HasFlag(MonsterAffixes.Rare);
             c_unit_IsUnique = theseaffixes.HasFlag(MonsterAffixes.Unique);
-            c_unit_bIsMinion = theseaffixes.HasFlag(MonsterAffixes.Minion);
+            c_unit_IsMinion = theseaffixes.HasFlag(MonsterAffixes.Minion);
             return theseaffixes;
         }
         private static void RefreshCachedHealth(int iLastCheckedHealth, double dThisCurrentHealth, bool bHasCachedHealth)
