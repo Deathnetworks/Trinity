@@ -440,7 +440,7 @@ namespace GilesTrinity
                 // Handle Unit-type Objects
                 case GObjectType.Unit:
                     {
-                        AddToCache = RefreshGilesUnit(AddToCache, c_diaObject, c_CommonData);
+                        AddToCache = RefreshGilesUnit(AddToCache);
                         break;
                     }
                 // Handle Item-type Objects
@@ -873,10 +873,10 @@ namespace GilesTrinity
             }
             return bWantThis;
         }
-        private static bool RefreshGilesUnit(bool bWantThis, DiaObject thisobj, ACD tempCommonData)
+        private static bool RefreshGilesUnit(bool AddToCache)
         {
-            DiaUnit thisUnit = (DiaUnit)thisobj;
-            bWantThis = true;
+            DiaUnit thisUnit = (DiaUnit)c_diaObject;
+            AddToCache = true;
             // Store the dia unit reference (we'll be able to remove this if we update ractor list every single loop, yay!)
             c_diaObject = null;
             // See if this is a boss
@@ -899,13 +899,13 @@ namespace GilesTrinity
             }
             catch
             {
-                bWantThis = false;
+                AddToCache = false;
                 c_IgnoreSubStep = "NotAUnit";
                 //return bWantThis;
             }
-            if (tempCommonData.ACDGuid == -1)
+            if (c_CommonData.ACDGuid == -1)
             {
-                bWantThis = false;
+                AddToCache = false;
             }
             // Dictionary based caching of monster types based on the SNO codes
             MonsterType monsterType;
@@ -931,7 +931,7 @@ namespace GilesTrinity
             {
                 try
                 {
-                    monsterType = RefreshMonsterType(tempCommonData, monsterType, bAddToDictionary);
+                    monsterType = RefreshMonsterType(c_CommonData, monsterType, bAddToDictionary);
                 }
                 catch (Exception ex)
                 {
@@ -939,7 +939,7 @@ namespace GilesTrinity
                     Logging.WriteDiagnostic(ex.ToString());
                     Logging.WriteDiagnostic("ActorTypeAttempt=");
                     Logging.WriteDiagnostic(thisUnit.ActorType.ToString());
-                    bWantThis = false;
+                    AddToCache = false;
                     //return bWantThis;
                 }
             }
@@ -951,7 +951,7 @@ namespace GilesTrinity
                 case MonsterType.Helper:
                 case MonsterType.Team:
                     {
-                        bWantThis = false;
+                        AddToCache = false;
                         c_IgnoreSubStep = "AllySceneryHelperTeam";
                         //return bWantThis;
                     }
@@ -964,13 +964,13 @@ namespace GilesTrinity
             {
                 try
                 {
-                    dThisMaxHealth = tempCommonData.GetAttribute<float>(ActorAttributeType.HitpointsMax);
+                    dThisMaxHealth = c_CommonData.GetAttribute<float>(ActorAttributeType.HitpointsMax);
                 }
                 catch (Exception ex)
                 {
                     Logging.WriteDiagnostic("[Trinity] Safely handled exception getting attribute max health for unit " + c_Name + " [" + c_ActorSNO.ToString() + "]");
                     Logging.WriteDiagnostic(ex.ToString());
-                    bWantThis = false;
+                    AddToCache = false;
                     //return bWantThis;
                 }
                 dictGilesMaxHealthCache.Add(c_RActorGuid, dThisMaxHealth);
@@ -1000,7 +1000,7 @@ namespace GilesTrinity
             {
                 try
                 {
-                    dThisCurrentHealth = tempCommonData.GetAttribute<float>(ActorAttributeType.HitpointsCur);
+                    dThisCurrentHealth = c_CommonData.GetAttribute<float>(ActorAttributeType.HitpointsCur);
                 }
                 catch
                 {
@@ -1013,7 +1013,7 @@ namespace GilesTrinity
                         dateSinceBlacklist3Clear = DateTime.Now;
                         NeedToClearBlacklist3 = true;
                     }
-                    bWantThis = false;
+                    AddToCache = false;
                     //return bWantThis;
                 }
                 RefreshCachedHealth(iLastCheckedHealth, dThisCurrentHealth, bHasCachedHealth);
@@ -1032,7 +1032,7 @@ namespace GilesTrinity
                 hashRGUIDBlacklist3.Add(c_RActorGuid);
                 dateSinceBlacklist3Clear = DateTime.Now;
                 NeedToClearBlacklist3 = true;
-                bWantThis = false;
+                AddToCache = false;
                 c_IgnoreSubStep = "0HitPoints";
                 //return bWantThis;
             }
@@ -1047,13 +1047,13 @@ namespace GilesTrinity
                 }
                 else
                 {
-                    bWantThis = false;
+                    AddToCache = false;
                     c_IgnoreSubStep = "IgnoreTreasureGoblins";
                     //return bWantThis;
                 }
             }
             // Pull up the Monster Affix cached data
-            MonsterAffixes theseaffixes = RefreshAffixes(tempCommonData);
+            MonsterAffixes theseaffixes = RefreshAffixes(c_CommonData);
             //intell -- Other dangerous: Nightmarish, Mortar, Desecrator, Fire Chains, Knockback, Electrified
             if (GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker, true))
             {
@@ -1079,36 +1079,36 @@ namespace GilesTrinity
             // Now ignore any unit not within our kill or extended kill radius
             if (c_RadiusDistance > dUseKillRadius)
             {
-                bWantThis = false;
+                AddToCache = false;
                 c_IgnoreSubStep = "OutsideofKillRadius";
             }
             if (thisUnit.IsUntargetable)
             {
-                bWantThis = false;
+                AddToCache = false;
                 c_IgnoreSubStep += "Untargettable+";
             }
             if (thisUnit.IsHidden)
             {
-                bWantThis = false;
+                AddToCache = false;
                 c_IgnoreSubStep += "IsHidden+";
             }
             if (thisUnit.IsInvulnerable)
             {
-                bWantThis = false;
+                AddToCache = false;
                 c_IgnoreSubStep += "IsInvulnerable+";
             }
             if (thisUnit.IsBurrowed)
             {
-                bWantThis = false;
+                AddToCache = false;
                 c_IgnoreSubStep += "IsBurrowed+";
             }
             if (thisUnit.IsHelper || thisUnit.IsNPC || thisUnit.IsTownVendor)
             {
-                bWantThis = false;
+                AddToCache = false;
                 c_IgnoreSubStep += "IsNPCOrHelper+";
             }
             // Safe is-attackable detection
-            if (bWantThis)
+            if (AddToCache)
                 c_unit_bIsAttackable = true;
             else
                 c_unit_bIsAttackable = false;
@@ -1184,7 +1184,7 @@ namespace GilesTrinity
                 {
                     Logging.WriteDiagnostic("[Trinity] Safely handled exception getting monstersize info for unit " + c_Name + " [" + c_ActorSNO.ToString() + "]");
                     Logging.WriteDiagnostic(ex.ToString());
-                    bWantThis = false;
+                    AddToCache = false;
                     //return bWantThis;
                 }
             }
@@ -1208,7 +1208,7 @@ namespace GilesTrinity
                 {
                     Logging.WriteDiagnostic("[Trinity] Safely handled exception getting collisionsphere radius for unit " + c_Name + " [" + c_ActorSNO.ToString() + "]");
                     Logging.WriteDiagnostic(ex.ToString());
-                    bWantThis = false;
+                    AddToCache = false;
                     //return bWantThis;
                 }
                 dictGilesCollisionSphereCache.Add(c_ActorSNO, c_Radius);
@@ -1225,12 +1225,12 @@ namespace GilesTrinity
             // Extended kill radius after last fighting, or when we want to force a town run
             if ((Settings.Combat.Misc.ExtendedTrashKill && iKeepKillRadiusExtendedFor > 0) || ForceVendorRunASAP)
             {
-                if (c_RadiusDistance <= dUseKillRadius && bWantThis)
+                if (c_RadiusDistance <= dUseKillRadius && AddToCache)
                     bAnyMobsInCloseRange = true;
             }
             else
             {
-                if (c_RadiusDistance <= Settings.Combat.Misc.NonEliteRange && bWantThis)
+                if (c_RadiusDistance <= Settings.Combat.Misc.NonEliteRange && AddToCache)
                     bAnyMobsInCloseRange = true;
             }
             if (c_unit_bIsTreasureGoblin)
@@ -1252,7 +1252,7 @@ namespace GilesTrinity
                     }
                 }
             }
-            return bWantThis;
+            return AddToCache;
         }
         private static bool RefreshGilesItem(bool AddTocache)
         {

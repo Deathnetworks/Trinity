@@ -35,7 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Demonbuddy">
-      <HintPath>..\Demonbuddy.exe</HintPath>
+      <HintPath>..\..\Demonbuddy.exe</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
@@ -215,9 +215,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Log\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="ItemRules\changeLog.txt" />
     <Content Include="ItemRules\RulesReadMe.txt" />
