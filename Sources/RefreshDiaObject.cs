@@ -13,89 +13,91 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        private static bool CacheDiaObject(DiaObject thisObj)
+        private static bool CacheDiaObject(DiaObject freshObject)
         {
             /*
              *  Initialize Variables
              */
-            bool AddTocache;
+            bool AddToCache;
 
-            RefreshStepInit(out AddTocache);
+            RefreshStepInit(out AddToCache);
             /*
              *  Get primary reference objects and keys
              */
-            c_diaObject = thisObj;
+            c_diaObject = freshObject;
 
             /*
              * Set Common Data
              */
-            AddTocache = RefreshStepGetCommonData(thisObj);
-            if (!AddTocache) { c_IgnoreReason = "GetCommonData"; return AddTocache; }
+            AddToCache = RefreshStepGetCommonData(freshObject);
+            if (!AddToCache) { c_IgnoreReason = "GetCommonData"; return AddToCache; }
 
             /*
              * Safely Get Data Keys and ID's from internal caches if possible
              */
             // Ractor GUID
-            c_RActorGuid = thisObj.RActorGuid;
+            c_RActorGuid = freshObject.RActorGuid;
             // Check to see if we've already looked at this GUID
-            AddTocache = RefreshStepSkipDoubleCheckGuid(AddTocache);
-            if (!AddTocache) { c_IgnoreReason = "SkipDoubleCheckGuid"; return AddTocache; }
+            AddToCache = RefreshStepSkipDoubleCheckGuid(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "SkipDoubleCheckGuid"; return AddToCache; }
             // ActorSNO
-            AddTocache = RefreshStepCachedActorSNO(AddTocache);
-            if (!AddTocache) { c_IgnoreReason = "CachedActorSNO"; return AddTocache; }
-            // Get Internal Name
-            AddTocache = RefreshInternalName(AddTocache);
-            if (!AddTocache) { c_IgnoreReason = "InternalName"; return AddTocache; }
-            // Get ACDGuid
-            AddTocache = RefreshStepCachedACDGuid(AddTocache, c_IsObstacle);
+            AddToCache = RefreshStepCachedActorSNO(AddToCache);
 
-            if (!AddTocache) { c_IgnoreReason = "CachedPlayerSummons"; return AddTocache; }
-            // Check for navigation obstacle hashlist
+            // Have ActorSNO Check for SNO based navigation obstacle hashlist
             c_IsObstacle = hashSNONavigationObstacles.Contains(c_ActorSNO);
+
+            if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
+            // Get Internal Name
+            AddToCache = RefreshInternalName(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "InternalName"; return AddToCache; }
+            // Get ACDGuid
+            AddToCache = RefreshStepCachedACDGuid(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
+
+            if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
             /*
              * Begin main refresh routine
              */
             // Set Giles Object Type
-            AddTocache = RefreshStepCachedObjectType(AddTocache, c_IsObstacle);
-            if (!AddTocache) { c_IgnoreReason = "CachedObjectType"; return AddTocache; }
+            AddToCache = RefreshStepCachedObjectType(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "CachedObjectType"; return AddToCache; }
             // Check Blacklists
-            AddTocache = RefreshStepCheckBlacklists(AddTocache);
-            if (!AddTocache) { c_IgnoreReason = "CheckBlacklists"; return AddTocache; }
-            if (!AddTocache) { c_IgnoreReason = "CachedACDGuid"; return AddTocache; }
+            AddToCache = RefreshStepCheckBlacklists(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "CheckBlacklists"; return AddToCache; }
             // Get Cached Position
-            AddTocache = RefreshStepCachedPosition(AddTocache);
-            if (!AddTocache) { c_IgnoreReason = "CachedPosition"; return AddTocache; }
+            AddToCache = RefreshStepCachedPosition(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "CachedPosition"; return AddToCache; }
             // Always Refresh Distance for every object
             RefreshStepCalculateDistance();
             // Always Refresh ZDiff for every object
-            AddTocache = RefreshStepNewObjectTypeZDiff(AddTocache);
-            if (!AddTocache) { c_IgnoreReason = "ZDiff"; return AddTocache; }
+            AddToCache = RefreshStepNewObjectTypeZDiff(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "ZDiff"; return AddToCache; }
             // Add new Obstacle to cache
-            AddTocache = RefreshStepAddObstacleToCache(AddTocache, c_IsObstacle);
-            if (!AddTocache) { c_IgnoreReason = "AddObstacleToCache"; return AddTocache; }
+            AddToCache = RefreshStepAddObstacleToCache(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "AddObstacleToCache"; return AddToCache; }
             // Get DynamicId and GameBalanceId
-            AddTocache = RefreshStepCachedDynamicIds(AddTocache);
-            if (!AddTocache) { c_IgnoreReason = "CachedDynamicIds"; return AddTocache; }
+            AddToCache = RefreshStepCachedDynamicIds(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "CachedDynamicIds"; return AddToCache; }
             // Summons by the player 
-            AddTocache = RefreshStepCachedPlayerSummons(AddTocache, c_CommonData);
+            AddToCache = RefreshStepCachedPlayerSummons(AddToCache);
             /* 
              * Main Switch on Object Type - Refresh individual object types (Units, Items, Gizmos)
              */
-            RefreshStepMainObjectType(ref AddTocache);
-            if (!AddTocache) { c_IgnoreReason = "MainObjectType"; return AddTocache; }
+            RefreshStepMainObjectType(ref AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "MainObjectType"; return AddToCache; }
 
             // Ignore all LoS
-            AddTocache = RefreshStepIgnoreLoS(AddTocache);
-            if (!AddTocache) { c_IgnoreReason = "IgnoreLoS"; return AddTocache; }
+            AddToCache = RefreshStepIgnoreLoS(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "IgnoreLoS"; return AddToCache; }
             // Ignore anything unknown
-            AddTocache = RefreshStepIgnoreUnknown(AddTocache, c_IsObstacle);
-            if (!AddTocache) { c_IgnoreReason = "IgnoreUnknown"; return AddTocache; }
+            AddToCache = RefreshStepIgnoreUnknown(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "IgnoreUnknown"; return AddToCache; }
             // Double Check Blacklists
-            AddTocache = RefreshStepCheckBlacklists(AddTocache);
-            if (!AddTocache) { c_IgnoreReason = "DoubleCheckBlacklists"; return AddTocache; }
+            AddToCache = RefreshStepCheckBlacklists(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "DoubleCheckBlacklists"; return AddToCache; }
             // If it's a unit, add it to the monster cache
-            AddUnitToMonsterObstacleCache(AddTocache);
-            if (AddTocache)
+            AddUnitToMonsterObstacleCache(AddToCache);
+            if (AddToCache)
             {
                 c_IgnoreReason = "None";
                 GilesObjectCache.Add(
@@ -118,19 +120,19 @@ namespace GilesTrinity
                         ItemQuality = c_ItemQuality,
                         DBItemType = c_DBItemType,
                         FollowerType = c_item_tFollowerType,
-                        GilesItemType = c_item_GilesItemType,
-                        IsElite = c_unit_bIsElite,
-                        IsRare = c_unit_bIsRare,
-                        IsUnique = c_unit_bIsUnique,
-                        IsMinion = c_unit_bIsMinion,
-                        IsTreasureGoblin = c_unit_bIsTreasureGoblin,
-                        IsBoss = c_unit_bIsBoss,
-                        IsAttackable = c_unit_bIsAttackable,
+                        GilesItemType = c_item_GItemType,
+                        IsElite = c_unit_IsElite,
+                        IsRare = c_unit_IsRare,
+                        IsUnique = c_unit_IsUnique,
+                        IsMinion = c_unit_IsMinion,
+                        IsTreasureGoblin = c_unit_IsTreasureGoblin,
+                        IsBoss = c_unit_IsBoss,
+                        IsAttackable = c_unit_IsAttackable,
                         HitPoints = c_HitPoints,
                         Radius = c_Radius,
                         MonsterStyle = c_unit_MonsterSize,
-                        IsEliteRareUnique = c_bIsEliteRareUnique,
-                        ForceLeapAgainst = c_bForceLeapAgainst
+                        IsEliteRareUnique = c_IsEliteRareUnique,
+                        ForceLeapAgainst = c_ForceLeapAgainst
                     });
             }
             return true;
@@ -138,16 +140,16 @@ namespace GilesTrinity
         /// <summary>
         /// Adds a unit to cache hashMonsterObstacleCache
         /// </summary>
-        /// <param name="bWantThis"></param>
-        private static void AddUnitToMonsterObstacleCache(bool bWantThis)
+        /// <param name="AddToCache"></param>
+        private static void AddUnitToMonsterObstacleCache(bool AddToCache)
         {
-            if (bWantThis && c_ObjectType == GObjectType.Unit)
+            if (AddToCache && c_ObjectType == GObjectType.Unit)
             {
                 // Handle bosses
-                if (c_unit_bIsBoss)
+                if (c_unit_IsBoss)
                 {
                     // Force to elite and add to the collision list
-                    c_unit_bIsElite = true;
+                    c_unit_IsElite = true;
                     hashMonsterObstacleCache.Add(new GilesObstacle(c_Position, (c_Radius * 0.15f), c_ActorSNO));
                 }
                 else
@@ -188,20 +190,20 @@ namespace GilesTrinity
             c_GoldStackSize = -1;
             c_HitPoints = -1;
             c_IsOneHandedItem = false;
-            c_unit_bIsElite = false;
-            c_unit_bIsRare = false;
-            c_unit_bIsUnique = false;
-            c_unit_bIsMinion = false;
-            c_unit_bIsTreasureGoblin = false;
-            c_unit_bIsBoss = false;
-            c_unit_bIsAttackable = false;
-            c_bIsEliteRareUnique = false;
-            c_bForceLeapAgainst = false;
+            c_unit_IsElite = false;
+            c_unit_IsRare = false;
+            c_unit_IsUnique = false;
+            c_unit_IsMinion = false;
+            c_unit_IsTreasureGoblin = false;
+            c_unit_IsBoss = false;
+            c_unit_IsAttackable = false;
+            c_IsEliteRareUnique = false;
+            c_ForceLeapAgainst = false;
             c_IsObstacle = false;
             c_ItemQuality = ItemQuality.Invalid;
             c_DBItemType = ItemType.Unknown;
             c_item_tFollowerType = FollowerType.None;
-            c_item_GilesItemType = GItemType.Unknown;
+            c_item_GItemType = GItemType.Unknown;
             c_unit_MonsterSize = MonsterSize.Unknown;
             c_diaObject = null;
             c_CurrentAnimation = SNOAnim.Invalid;
@@ -226,7 +228,6 @@ namespace GilesTrinity
                     Logging.WriteDiagnostic("[Trinity] Safely handled exception getting ActorSNO for an object.");
                     Logging.WriteDiagnostic(ex.ToString());
                     AddToCache = false;
-                    //return bWantThis;
                 }
                 dictGilesActorSNOCache.Add(c_RActorGuid, c_ActorSNO);
             }
@@ -246,7 +247,6 @@ namespace GilesTrinity
                     Logging.WriteDiagnostic("[Trinity] Safely handled exception getting InternalName for an object [" + c_ActorSNO.ToString() + "]");
                     Logging.WriteDiagnostic(ex.ToString());
                     AddToCache = false;
-                    //return bWantThis;
                 }
                 dictGilesInternalNameCache.Add(c_RActorGuid, c_Name);
             }
@@ -268,32 +268,31 @@ namespace GilesTrinity
                 return true;
             }
         }
-        private static bool RefreshStepIgnoreNullCommonData(bool bWantThis, ACD tempCommonData)
+        private static bool RefreshStepIgnoreNullCommonData(bool AddToCache)
         {
             // Null Common Data makes a DiaUseless!
             if (c_ObjectType == GObjectType.Unit || c_ObjectType == GObjectType.Item || c_ObjectType == GObjectType.Gold)
             {
-                if (tempCommonData == null)
+                if (c_CommonData == null)
                 {
-                    bWantThis = false;
-                    //return bWantThis;
+                    AddToCache = false;
                 }
-                if (tempCommonData != null && !tempCommonData.IsValid)
+                if (c_CommonData != null && !c_CommonData.IsValid)
                 {
-                    bWantThis = false;
+                    AddToCache = false;
                 }
             }
-            return bWantThis;
+            return AddToCache;
         }
-        private static bool RefreshStepAddObstacleToCache(bool bWantThis, bool bThisObstacle)
+        private static bool RefreshStepAddObstacleToCache(bool AddToCache)
         {
             // Have Position, Now store the location etc. of this obstacle and continue
-            if (bThisObstacle)
+            if (c_IsObstacle)
             {
                 hashNavigationObstacleCache.Add(new GilesObstacle(c_Position, dictSNONavigationSize[c_ActorSNO], c_ActorSNO));
-                bWantThis = false;
+                AddToCache = false;
             }
-            return bWantThis;
+            return AddToCache;
         }
         private static void RefreshStepCalculateDistance()
         {
@@ -302,27 +301,27 @@ namespace GilesTrinity
             // Set radius-distance to centre distance at first
             c_RadiusDistance = c_CentreDistance;
         }
-        private static bool RefreshStepSkipDoubleCheckGuid(bool bWantThis)
+        private static bool RefreshStepSkipDoubleCheckGuid(bool AddToCache)
         {
             // See if we've already checked this ractor, this loop
             if (hashDoneThisRactor.Contains(c_RActorGuid))
             {
-                bWantThis = false;
+                AddToCache = false;
                 //return bWantThis;
             }
             else
             {
                 hashDoneThisRactor.Add(c_RActorGuid);
             }
-            return bWantThis;
+            return AddToCache;
         }
-        private static bool RefreshStepCachedObjectType(bool AddToCache, bool bThisObstacle)
+        private static bool RefreshStepCachedObjectType(bool AddToCache)
         {
             // Set the object type
             // begin with default... 
             c_ObjectType = GObjectType.Unknown;
             // Either get the cached Giles object type, or calculate it fresh
-            if (!bThisObstacle && !dictGilesObjectTypeCache.TryGetValue(c_RActorGuid, out c_ObjectType))
+            if (!c_IsObstacle && !dictGilesObjectTypeCache.TryGetValue(c_RActorGuid, out c_ObjectType))
             {
                 // See if it's an avoidance first from the SNO
                 if (hashAvoidanceSNOList.Contains(c_ActorSNO) || hashAvoidanceBuffSNOList.Contains(c_ActorSNO) || hashAvoidanceSNOProjectiles.Contains(c_ActorSNO))
@@ -508,371 +507,6 @@ namespace GilesTrinity
                     }
             }
         }
-
-        /// <summary>
-        /// Special handling for whether or not we want to cache an object that's not in LoS
-        /// </summary>
-        /// <param name="c_diaObject"></param>
-        /// <param name="addToCache"></param>
-        /// <returns></returns>
-        private static bool RefreshStepIgnoreLoS(bool addToCache = false)
-        {
-            try
-            {
-
-                bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
-                if (!isNavigable)
-                {
-                    addToCache = false;
-                    c_IgnoreSubStep = "NotNavigable";
-                }
-                // Ignore units not in LoS except bosses, rares, champs
-                if (c_ObjectType == GObjectType.Unit && !c_diaObject.InLineOfSight && !(c_unit_bIsBoss && c_unit_bIsElite || c_unit_bIsRare))
-                {
-                    addToCache = false;
-                    c_IgnoreSubStep = "UnitNotInLoS";
-                }
-                // always set true for bosses nearby
-                if (c_unit_bIsBoss && c_RadiusDistance < 100f)
-                {
-                    addToCache = true;
-                    c_IgnoreSubStep = "";
-                }
-                // always take the current target even if not in LoS
-                if (c_RActorGuid == CurrentTargetRactorGUID)
-                {
-                    addToCache = true;
-                    c_IgnoreSubStep = "";
-                }
-                // Simple whitelist for LoS 
-                if (LineOfSightWhitelist.Contains(c_ActorSNO))
-                {
-                    addToCache = true;
-                    c_IgnoreSubStep = "";
-                }
-                // Always pickup Infernal Keys whether or not in LoS
-                if (hashForceSNOToItemList.Contains(c_ActorSNO))
-                {
-                    addToCache = true;
-                    c_IgnoreSubStep = "";
-                }
-                //if (!thisobj.InLineOfSight && thisobj.ZDiff < 14f && !tmp_unit_bThisBoss)
-                //{
-                //    bWantThis = false;
-                //    tmp_cacheIgnoreSubStep = "IgnoreLoS";
-                //    
-                //return bWantThis;
-                //}
-            }
-            catch
-            {
-                addToCache = false;
-                c_IgnoreSubStep = "IgnoreLoSException";
-            }
-            return addToCache;
-        }
-        private static bool RefreshStepIgnoreUnknown(bool bWantThis, bool bThisObstacle)
-        {
-            // We couldn't get a valid object type, so ignore it
-            if (!bThisObstacle && c_ObjectType == GObjectType.Unknown)
-            {
-                bWantThis = false;
-                //return bWantThis;
-            }
-            return bWantThis;
-        }
-        private static bool RefreshStepCachedACDGuid(bool AddToCache, bool c_IsObjstacle)
-        {
-            // Get the ACDGUID, cached if possible, only for non-avoidance stuff
-            if (!c_IsObjstacle && c_ObjectType != GObjectType.Avoidance)
-            {
-                if (!dictGilesACDGUIDCache.TryGetValue(c_RActorGuid, out c_ACDGUID))
-                {
-                    try
-                    {
-                        c_ACDGUID = c_diaObject.ACDGuid;
-                    }
-                    catch (Exception ex)
-                    {
-                        Logging.WriteDiagnostic("[Trinity] Safely handled exception getting ACDGUID for an object [" + c_ActorSNO.ToString() + "]");
-                        Logging.WriteDiagnostic(ex.ToString());
-                        AddToCache = false;
-                        //return bWantThis;
-                    }
-                    dictGilesACDGUIDCache.Add(c_RActorGuid, c_ACDGUID);
-                }
-                // No ACDGUID, so shouldn't be anything we want to deal with
-                if (c_ACDGUID == -1)
-                {
-                    AddToCache = false;
-                    //return bWantThis;
-                }
-            }
-            else
-            {
-                // Give AOE's -1 ACDGUID, since it's not needed for avoidance stuff
-                c_ACDGUID = -1;
-            }
-            return AddToCache;
-        }
-        private static bool RefreshStepCachedPosition(bool bWantThis)
-        {
-            // Try and get a cached position for anything that isn't avoidance or units (avoidance and units can move, sadly, so we risk DB mis-reads for those things!
-            if (c_ObjectType != GObjectType.Avoidance && c_ObjectType != GObjectType.Unit)
-            {
-                // Get the position, cached if possible
-                if (!dictGilesVectorCache.TryGetValue(c_RActorGuid, out c_Position))
-                {
-                    try
-                    {
-                        //c_vPosition = thisobj.Position;
-                        Vector3 pos = c_diaObject.Position;
-
-                        // always get Height of wherever the nav says it is (for flying things..)
-                        c_Position = new Vector3(pos.X, pos.Y, gp.GetHeight(pos.ToVector2()));
-                    }
-                    catch (Exception ex)
-                    {
-                        Logging.WriteDiagnostic("[Trinity] Safely handled exception getting position for a static object [" + c_ActorSNO.ToString() + "]");
-                        Logging.WriteDiagnostic(ex.ToString());
-                        bWantThis = false;
-                    }
-                    // Now cache it
-                    dictGilesVectorCache.Add(c_RActorGuid, c_Position);
-                }
-            }
-            // Ok pull up live-position data for units/avoidance now...
-            else
-            {
-                try
-                {
-                    c_Position = c_diaObject.Position;
-                }
-                catch (Exception ex)
-                {
-                    Logging.WriteDiagnostic("[Trinity] Safely handled exception getting position for a unit or avoidance object [" + c_ActorSNO.ToString() + "]");
-                    Logging.WriteDiagnostic(ex.ToString());
-                }
-            }
-            return bWantThis;
-        }
-        private static bool RefreshStepCachedDynamicIds(bool bWantThis)
-        {
-            // Try and grab the dynamic id and game balance id, if necessary and if possible
-            if (c_ObjectType == GObjectType.Item)
-            {
-                // Get the Dynamic ID, cached if possible
-                if (!dictGilesDynamicIDCache.TryGetValue(c_RActorGuid, out c_GameDynamicID))
-                {
-                    try
-                    {
-                        c_GameDynamicID = c_CommonData.DynamicId;
-                    }
-                    catch (Exception ex)
-                    {
-                        Logging.WriteDiagnostic("[Trinity] Safely handled exception getting DynamicID for item " + c_Name + " [" + c_ActorSNO.ToString() + "]");
-                        Logging.WriteDiagnostic(ex.ToString());
-                        bWantThis = false;
-                        //return bWantThis;
-                    }
-                    dictGilesDynamicIDCache.Add(c_RActorGuid, c_GameDynamicID);
-                }
-                // Get the Game Balance ID, cached if possible
-                if (!dictGilesGameBalanceIDCache.TryGetValue(c_RActorGuid, out c_BalanceID))
-                {
-                    try
-                    {
-                        c_BalanceID = c_CommonData.GameBalanceId;
-                    }
-                    catch (Exception ex)
-                    {
-                        Logging.WriteDiagnostic("[Trinity] Safely handled exception getting GameBalanceID for item " + c_Name + " [" + c_ActorSNO.ToString() + "]");
-                        Logging.WriteDiagnostic(ex.ToString());
-                        bWantThis = false;
-                        //return bWantThis;
-                    }
-                    dictGilesGameBalanceIDCache.Add(c_RActorGuid, c_BalanceID);
-                }
-            }
-            else
-            {
-                c_GameDynamicID = -1;
-                c_BalanceID = -1;
-            }
-            return bWantThis;
-        }
-        private static bool RefreshStepNewObjectTypeZDiff(bool bWantThis)
-        {
-            // Ignore stuff which has a Z-height-difference too great, it's probably on a different level etc. - though not avoidance!
-            if (c_ObjectType != GObjectType.Avoidance)
-            {
-                // Calculate the z-height difference between our current position, and this object's position
-                c_ZDiff = Math.Abs(playerStatus.CurrentPosition.Z - c_Position.Z);
-                switch (c_ObjectType)
-                {
-                    case GObjectType.Door:
-                    case GObjectType.Unit:
-                    case GObjectType.Barricade:
-                        // Ignore monsters (units) who's Z-height is 14 foot or more than our own z-height
-                        // rrrix: except bosses like Belial :)
-                        if (c_ZDiff >= 14f && !c_unit_bIsBoss)
-                        {
-                            bWantThis = false;
-                            //return bWantThis;
-                        }
-                        break;
-                    case GObjectType.Item:
-                    case GObjectType.HealthWell:
-                        // Items at 26+ z-height difference (we don't want to risk missing items so much)
-                        if (c_ZDiff >= 26f)
-                        {
-                            bWantThis = false;
-                            //return bWantThis;
-                        }
-                        break;
-                    case GObjectType.Gold:
-                    case GObjectType.Globe:
-                        // Gold/Globes at 11+ z-height difference
-                        if (c_ZDiff >= 11f)
-                        {
-                            bWantThis = false;
-                            //return bWantThis;
-                        }
-                        break;
-                    case GObjectType.Destructible:
-                    case GObjectType.Shrine:
-                    case GObjectType.Container:
-                        // Destructibles, shrines and containers are the least important, so a z-height change of only 7 is enough to ignore (help avoid stucks at stairs etc.)
-                        if (c_ZDiff >= 7f)
-                        {
-                            bWantThis = false;
-                            //return bWantThis;
-                        }
-                        break;
-                    case GObjectType.Interactable:
-                        // Special interactable objects
-                        if (c_ZDiff >= 9f)
-                        {
-                            bWantThis = false;
-                            //return bWantThis;
-                        }
-                        break;
-                    case GObjectType.Unknown:
-                    default:
-                        {
-                            // Don't touch it!
-                        }
-                        break;
-                }
-            }
-            else
-            {
-                bWantThis = true;
-            }
-            return bWantThis;
-        }
-        private static bool RefreshStepCachedPlayerSummons(bool bWantThis, ACD tempCommonData)
-        {
-            // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
-            if (iMyCachedActorClass == ActorClass.Monk)
-            {
-                if (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MysticAlly) && hashMysticAlly.Contains(c_ActorSNO))
-                {
-                    iPlayerOwnedMysticAlly++;
-                    bWantThis = false;
-                }
-            }
-            // Count up Demon Hunter pets
-            if (iMyCachedActorClass == ActorClass.DemonHunter)
-            {
-                if (hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Companion) && hashDHPets.Contains(c_ActorSNO))
-                {
-                    iPlayerOwnedDHPets++;
-                    bWantThis = false;
-                }
-            }
-            // Count up zombie dogs and gargantuans next
-            if (iMyCachedActorClass == ActorClass.WitchDoctor)
-            {
-                if (hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_Gargantuan) && hashGargantuan.Contains(c_ActorSNO))
-                {
-                    iPlayerOwnedGargantuan++;
-                    bWantThis = false;
-                }
-                if (hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_SummonZombieDog) && hashZombie.Contains(c_ActorSNO))
-                {
-                    iPlayerOwnedZombieDog++;
-                    bWantThis = false;
-                }
-            }
-            return bWantThis;
-        }
-        private static bool RefreshStepCheckBlacklists(bool bWantThis)
-        {
-            if (!hashAvoidanceSNOList.Contains(c_ActorSNO) && !hashAvoidanceBuffSNOList.Contains(c_ActorSNO))
-            {
-                // See if it's something we should always ignore like ravens etc.
-                if (!c_IsObstacle && hashActorSNOIgnoreBlacklist.Contains(c_ActorSNO))
-                {
-                    bWantThis = false;
-                    c_IgnoreSubStep = "hashActorSNOIgnoreBlacklist";
-                    return bWantThis;
-                }
-                if (!c_IsObstacle && hashSNOIgnoreBlacklist.Contains(c_ActorSNO))
-                {
-                    bWantThis = false;
-                    c_IgnoreSubStep = "hashSNOIgnoreBlacklist";
-                    return bWantThis;
-                }
-                // Temporary ractor GUID ignoring, to prevent 2 interactions in a very short time which can cause stucks
-                if (IgnoreTargetForLoops > 0 && IgnoreRactorGUID == c_RActorGuid)
-                {
-                    bWantThis = false;
-                    c_IgnoreSubStep = "iIgnoreThisRactorGUID";
-                    return bWantThis;
-                }
-                // Check our extremely short-term destructible-blacklist
-                if (hashRGUIDDestructible3SecBlacklist.Contains(c_RActorGuid))
-                {
-                    bWantThis = false;
-                    c_IgnoreSubStep = "hashRGUIDDestructible3SecBlacklist";
-                    return bWantThis;
-                }
-                // Check our extremely short-term destructible-blacklist
-                if (hashRGUIDBlacklist3.Contains(c_RActorGuid))
-                {
-                    bWantThis = false;
-                    c_IgnoreSubStep = "hashRGUIDBlacklist3";
-                    return bWantThis;
-                }
-                // See if it's on our 90 second blacklist (from being stuck targeting it), as long as it's distance is not extremely close
-                if (hashRGUIDBlacklist90.Contains(c_RActorGuid))
-                {
-                    bWantThis = false;
-                    c_IgnoreSubStep = "hashRGUIDBlacklist90";
-                    return bWantThis;
-                }
-                // 60 second blacklist
-                if (hashRGUIDBlacklist60.Contains(c_RActorGuid))
-                {
-                    bWantThis = false;
-                    c_IgnoreSubStep = "hashRGUIDBlacklist60";
-                    return bWantThis;
-                }
-                // 15 second blacklist
-                if (hashRGUIDBlacklist15.Contains(c_RActorGuid))
-                {
-                    bWantThis = false;
-                    c_IgnoreSubStep = "hashRGUIDBlacklist15";
-                    return bWantThis;
-                }
-            }
-            else
-            {
-                bWantThis = true;
-            }
-            return bWantThis;
-        }
         private static bool RefreshGilesUnit(bool AddToCache)
         {
             DiaUnit thisUnit = (DiaUnit)c_diaObject;
@@ -880,7 +514,7 @@ namespace GilesTrinity
             // Store the dia unit reference (we'll be able to remove this if we update ractor list every single loop, yay!)
             c_diaObject = null;
             // See if this is a boss
-            c_unit_bIsBoss = hashBossSNO.Contains(c_ActorSNO);
+            c_unit_IsBoss = hashBossSNO.Contains(c_ActorSNO);
 
             try
             {
@@ -889,7 +523,7 @@ namespace GilesTrinity
             catch { }
 
             // hax for Diablo_shadowClone
-            c_unit_bIsAttackable = c_Name.StartsWith("Diablo_shadowClone");
+            c_unit_IsAttackable = c_Name.StartsWith("Diablo_shadowClone");
             try
             {
                 c_diaObject = (DiaUnit)thisUnit;
@@ -901,7 +535,6 @@ namespace GilesTrinity
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotAUnit";
-                //return bWantThis;
             }
             if (c_CommonData.ACDGuid == -1)
             {
@@ -914,7 +547,7 @@ namespace GilesTrinity
             bool bRefreshMonsterType = bAddToDictionary;
             // If it's a boss and it was an ally, keep refreshing until it's not an ally
             // Because some bosses START as allied for cutscenes etc. until they become hostile
-            if (c_unit_bIsBoss && !bRefreshMonsterType)
+            if (c_unit_IsBoss && !bRefreshMonsterType)
             {
                 switch (monsterType)
                 {
@@ -940,9 +573,9 @@ namespace GilesTrinity
                     Logging.WriteDiagnostic("ActorTypeAttempt=");
                     Logging.WriteDiagnostic(thisUnit.ActorType.ToString());
                     AddToCache = false;
-                    //return bWantThis;
                 }
             }
+
             // Make sure it's a valid monster type
             switch (monsterType)
             {
@@ -1007,14 +640,13 @@ namespace GilesTrinity
                     // This happens so frequently in DB/D3 that this fails, let's not even bother logging it anymore
                     //Logging.WriteDiagnostic("[Trinity] Safely handled exception getting current health for unit " + tmp_sThisInternalName + " [" + tmp_iThisActorSNO.ToString() + "]");
                     // Add this monster to our very short-term ignore list
-                    if (!c_unit_bIsBoss)
+                    if (!c_unit_IsBoss)
                     {
                         hashRGUIDBlacklist3.Add(c_RActorGuid);
                         dateSinceBlacklist3Clear = DateTime.Now;
                         NeedToClearBlacklist3 = true;
                     }
                     AddToCache = false;
-                    //return bWantThis;
                 }
                 RefreshCachedHealth(iLastCheckedHealth, dThisCurrentHealth, bHasCachedHealth);
             }
@@ -1026,7 +658,7 @@ namespace GilesTrinity
             // And finally put the two together for a current health percentage
             c_HitPoints = dThisCurrentHealth / dThisMaxHealth;
             // Unit is already dead
-            if (c_HitPoints <= 0d && !c_unit_bIsBoss)
+            if (c_HitPoints <= 0d && !c_unit_IsBoss)
             {
                 // Add this monster to our very short-term ignore list
                 hashRGUIDBlacklist3.Add(c_RActorGuid);
@@ -1034,22 +666,20 @@ namespace GilesTrinity
                 NeedToClearBlacklist3 = true;
                 AddToCache = false;
                 c_IgnoreSubStep = "0HitPoints";
-                //return bWantThis;
             }
             // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
-            c_unit_bIsTreasureGoblin = false;
+            c_unit_IsTreasureGoblin = false;
             // Flag this as a treasure goblin *OR* ignore this object altogether if treasure goblins are set to ignore
             if (hashActorSNOGoblins.Contains(c_ActorSNO))
             {
                 if (Settings.Combat.Misc.GoblinPriority != 0)
                 {
-                    c_unit_bIsTreasureGoblin = true;
+                    c_unit_IsTreasureGoblin = true;
                 }
                 else
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "IgnoreTreasureGoblins";
-                    //return bWantThis;
                 }
             }
             // Pull up the Monster Affix cached data
@@ -1062,7 +692,7 @@ namespace GilesTrinity
                     theseaffixes.HasFlag(MonsterAffixes.Jailer) || theseaffixes.HasFlag(MonsterAffixes.Molten) ||
                    (theseaffixes.HasFlag(MonsterAffixes.Electrified) && theseaffixes.HasFlag(MonsterAffixes.ReflectsDamage)) ||
                     //Bosses and uber elites
-                    c_unit_bIsBoss || c_ActorSNO == 256015 || c_ActorSNO == 256000 || c_ActorSNO == 255996 ||
+                    c_unit_IsBoss || c_ActorSNO == 256015 || c_ActorSNO == 256000 || c_ActorSNO == 255996 ||
                     //...or more than 4 elite mobs in range (only elites/rares/uniques, not minions!)
                     iElitesWithinRange[RANGE_50] > 4)
                     bUseBerserker = true;
@@ -1074,7 +704,7 @@ namespace GilesTrinity
             else
                 bCheckGround = false;
             // Is this something we should try to force leap/other movement abilities against?
-            c_bForceLeapAgainst = false;
+            c_ForceLeapAgainst = false;
             double dUseKillRadius = RefreshKillRadius();
             // Now ignore any unit not within our kill or extended kill radius
             if (c_RadiusDistance > dUseKillRadius)
@@ -1109,21 +739,21 @@ namespace GilesTrinity
             }
             // Safe is-attackable detection
             if (AddToCache)
-                c_unit_bIsAttackable = true;
+                c_unit_IsAttackable = true;
             else
-                c_unit_bIsAttackable = false;
-            if (c_unit_bIsBoss || theseaffixes.HasFlag(MonsterAffixes.Shielding))
+                c_unit_IsAttackable = false;
+            if (c_unit_IsBoss || theseaffixes.HasFlag(MonsterAffixes.Shielding))
             {
                 try
                 {
 
-                    c_unit_bIsAttackable = !thisUnit.IsInvulnerable;
+                    c_unit_IsAttackable = !thisUnit.IsInvulnerable;
                 }
                 catch (Exception ex)
                 {
                     Logging.WriteDiagnostic("[Trinity] Safely handled exception getting is-invulnerable attribute for unit " + c_Name + " [" + c_ActorSNO.ToString() + "]");
                     Logging.WriteDiagnostic(ex.ToString());
-                    c_unit_bIsAttackable = true;
+                    c_unit_IsAttackable = true;
                 }
             }
 
@@ -1163,6 +793,7 @@ namespace GilesTrinity
             //        }
             //    }
             //}
+
             // Only if at full health, else don't bother checking each loop
             // See if we already have this monster's size stored, if not get it and cache it
             if (!dictionaryStoredMonsterSizes.TryGetValue(c_ActorSNO, out c_unit_MonsterSize))
@@ -1195,7 +826,7 @@ namespace GilesTrinity
                 {
                     c_Radius = thisUnit.CollisionSphere.Radius;
                     // Take 6 from the radius
-                    if (!c_unit_bIsBoss)
+                    if (!c_unit_IsBoss)
                         c_Radius -= 6f;
                     // Minimum range clamp
                     if (c_Radius <= 1f)
@@ -1218,9 +849,9 @@ namespace GilesTrinity
             if (c_RadiusDistance <= 1f)
                 c_RadiusDistance = 1f;
             // All-in-one flag for quicker if checks throughout
-            c_bIsEliteRareUnique = (c_unit_bIsElite || c_unit_bIsRare || c_unit_bIsUnique || c_unit_bIsMinion);
+            c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion);
             // Special flags to decide whether to target anything at all
-            if (c_bIsEliteRareUnique || c_unit_bIsBoss)
+            if (c_IsEliteRareUnique || c_unit_IsBoss)
                 bAnyChampionsPresent = true;
             // Extended kill radius after last fighting, or when we want to force a town run
             if ((Settings.Combat.Misc.ExtendedTrashKill && iKeepKillRadiusExtendedFor > 0) || ForceVendorRunASAP)
@@ -1233,7 +864,7 @@ namespace GilesTrinity
                 if (c_RadiusDistance <= Settings.Combat.Misc.NonEliteRange && AddToCache)
                     bAnyMobsInCloseRange = true;
             }
-            if (c_unit_bIsTreasureGoblin)
+            if (c_unit_IsTreasureGoblin)
                 bAnyTreasureGoblinsPresent = true;
             // Units with very high priority (1900+) allow an extra 50% on the non-elite kill slider range
             if (!bAnyMobsInCloseRange && !bAnyChampionsPresent && !bAnyTreasureGoblinsPresent && c_RadiusDistance <= (Settings.Combat.Misc.NonEliteRange * 1.5))
@@ -1254,12 +885,12 @@ namespace GilesTrinity
             }
             return AddToCache;
         }
-        private static bool RefreshGilesItem(bool AddTocache)
+        private static bool RefreshGilesItem(bool AddToCache)
         {
-            AddTocache = false;
+            AddToCache = false;
             if (c_BalanceID == -1)
             {
-                AddTocache = false;
+                AddToCache = false;
                 c_IgnoreSubStep = "InvalidBalanceID";
             }
             // Try and pull up cached item data on this item, if not, add to our local memory cache
@@ -1279,7 +910,7 @@ namespace GilesTrinity
                         // Add to session cache
                         dictGilesGameBalanceDataCache.Add(c_BalanceID, new GilesGameBalanceDataCache(c_ItemLevel, c_DBItemType, c_IsOneHandedItem, c_item_tFollowerType));
 
-                        /* This is for the old game balance data cache. We're not using this anymore. We need to find a better way than a static hard-coded list.
+                        /* rrrix note: This is for the old game balance data cache. We're not using this anymore. We need to find a better way than a static hard-coded list.
                          * The game balance cache should be dynamically generated and intelligently persisted through game sessions, holding data that *does not change*
                          */
                         //if (LogItemBalanceData)
@@ -1298,14 +929,14 @@ namespace GilesTrinity
                     {
                         Logging.WriteDiagnostic("[Trinity] Safely handled exception getting un-cached ACD Item data (level/item type etc.) for item " + c_Name + " [" + c_ActorSNO.ToString() + "]");
                         Logging.WriteDiagnostic(ex.ToString());
-                        AddTocache = false;
+                        AddToCache = false;
                         c_IgnoreSubStep = "CommonDataException";
                     }
                 }
                 else
                 {
                     // Couldn't get the game balance data for this item, so ignore it for now
-                    AddTocache = false;
+                    AddToCache = false;
                     c_IgnoreSubStep = "NoBalanceData";
                 }
             }
@@ -1319,11 +950,11 @@ namespace GilesTrinity
             }
 
             // Calculate custom Giles item type
-            c_item_GilesItemType = DetermineItemType(c_Name, c_DBItemType, c_item_tFollowerType);
+            c_item_GItemType = DetermineItemType(c_Name, c_DBItemType, c_item_tFollowerType);
             // And temporarily store the base type
-            GBaseItemType itemBaseType = DetermineBaseType(c_item_GilesItemType);
+            GBaseItemType itemBaseType = DetermineBaseType(c_item_GItemType);
             // Treat all globes as a yes
-            if (c_item_GilesItemType == GItemType.HealthGlobe)
+            if (c_item_GItemType == GItemType.HealthGlobe)
             {
                 c_ObjectType = GObjectType.Globe;
                 // Create or alter this cached object type
@@ -1332,7 +963,7 @@ namespace GilesTrinity
                     dictGilesObjectTypeCache.Add(c_RActorGuid, c_ObjectType);
                 else
                     dictGilesObjectTypeCache[c_RActorGuid] = c_ObjectType;
-                AddTocache = true;
+                AddToCache = true;
             }
 
             // Quality of item for "genuine" items
@@ -1350,7 +981,7 @@ namespace GilesTrinity
                     catch
                     {
                         Logging.WriteDiagnostic("[Trinity] Safely handled exception getting item-quality for item " + c_Name + " [" + c_ActorSNO.ToString() + "]");
-                        AddTocache = false;
+                        AddToCache = false;
                         c_IgnoreSubStep = "ItemQualityLevelException";
                     }
                     dictGilesQualityCache.Add(c_RActorGuid, c_ItemQuality);
@@ -1397,57 +1028,47 @@ namespace GilesTrinity
             }
             if (c_CentreDistance > (iCurrentMaxLootRadius + fExtraRange))
             {
-                AddTocache = false;
+                AddToCache = false;
                 c_IgnoreSubStep = "OutOfRange";
             }
 
             // Get whether or not we want this item, cached if possible
-            if (!dictGilesPickupItem.TryGetValue(c_RActorGuid, out AddTocache))
+            if (!dictGilesPickupItem.TryGetValue(c_RActorGuid, out AddToCache))
             {
                 if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
                 {
-                    AddTocache = ItemManager.EvaluateItem((ACDItem)c_CommonData, ItemManager.RuleType.PickUp);
+                    AddToCache = ItemManager.EvaluateItem((ACDItem)c_CommonData, ItemManager.RuleType.PickUp);
                 }
                 else
                 {
-                    AddTocache = GilesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemType, c_item_tFollowerType, c_GameDynamicID);
+                    AddToCache = GilesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemType, c_item_tFollowerType, c_GameDynamicID);
                 }
-                dictGilesPickupItem.Add(c_RActorGuid, AddTocache);
+                dictGilesPickupItem.Add(c_RActorGuid, AddToCache);
             }
             // Using DB built-in item rules
-            if (AddTocache)
+            if (AddToCache)
             {
                 if (ForceVendorRunASAP)
                 {
-                    AddTocache = false;
+                    AddToCache = false;
                     c_IgnoreSubStep = "ForcedVendoring";
                 }
-                AddTocache = true;
+                AddToCache = true;
             }
 
-            AddTocache = MosterObstacleInPathCacheObject(AddTocache);
+            AddToCache = MosterObstacleInPathCacheObject(AddToCache);
 
             // Didn't pass giles pickup rules/DB internal rule match, so ignore it
-            if (!AddTocache)
+            if (!AddToCache)
                 c_IgnoreSubStep = "NoMatchingRule";
 
-            return AddTocache;
+            return AddToCache;
         }
-
-        private static bool MosterObstacleInPathCacheObject(bool AddTocache)
-        {
-            // Don't add an item if a monster is blocking our path
-            if (hashMonsterObstacleCache.Any(o => GilesIntersectsPath(o.Location, o.Radius, playerStatus.CurrentPosition, c_Position)))
-            {
-                AddTocache = false;
-            }
-            return AddTocache;
-        }
-        private static bool RefreshGilesGold(bool AddTocache)
+        private static bool RefreshGilesGold(bool AddToCache)
         {
             double iPercentage = 0;
             int rangedMinimumStackSize = 0;
-            AddTocache = true;
+            AddToCache = true;
             // Get the gold amount of this pile, cached if possible
             if (!dictGilesGoldAmountCache.TryGetValue(c_RActorGuid, out c_GoldStackSize))
             {
@@ -1458,7 +1079,7 @@ namespace GilesTrinity
                 catch
                 {
                     Logging.WriteDiagnostic("[Trinity] Safely handled exception getting gold pile amount for item " + c_Name + " [" + c_ActorSNO.ToString() + "]");
-                    AddTocache = false;
+                    AddToCache = false;
                     //return bWantThis;
                 }
                 dictGilesGoldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
@@ -1481,7 +1102,7 @@ namespace GilesTrinity
             // Now check if this gold pile is currently less than this limit
             if (c_GoldStackSize < rangedMinimumStackSize)
             {
-                AddTocache = false;
+                AddToCache = false;
             }
 
             // Blacklist gold piles already in pickup radius range
@@ -1489,10 +1110,10 @@ namespace GilesTrinity
             {
                 hashRGUIDBlacklist3.Add(c_RActorGuid);
                 hashRGUIDBlacklist60.Add(c_RActorGuid);
-                AddTocache = false;
+                AddToCache = false;
             }
 
-            return AddTocache;
+            return AddToCache;
         }
         private static bool RefreshGilesGizmo(bool AddToCache)
         {
@@ -1894,9 +1515,9 @@ namespace GilesTrinity
             }
             return AddToCache;
         }
-        private static bool RefreshGilesAvoidance(bool bWantThis)
+        private static bool RefreshGilesAvoidance(bool AddToCache)
         {
-            bWantThis = true;
+            AddToCache = true;
             // Note if you are looking here - an AOE object won't even appear at this stage if you have Settings.Combat.Misc.AvoidAOE switched off!
             //if (!hashAvoidanceSNOList.Contains(tmp_iThisActorSNO))
             //{
@@ -1984,7 +1605,379 @@ namespace GilesTrinity
             //{
             //}
             // continue because we aren't actually treating this as a TARGET - avoidance has special handling after all targets are found
-            return bWantThis;
+            return AddToCache;
+        }
+        /// <summary>
+        /// Special handling for whether or not we want to cache an object that's not in LoS
+        /// </summary>
+        /// <param name="c_diaObject"></param>
+        /// <param name="AddToCache"></param>
+        /// <returns></returns>
+        private static bool RefreshStepIgnoreLoS(bool AddToCache = false)
+        {
+            try
+            {
+
+                bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
+                if (!isNavigable)
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "NotNavigable";
+                }
+                // Ignore units not in LoS except bosses, rares, champs
+                if (c_ObjectType == GObjectType.Unit && !c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "UnitNotInLoS";
+                }
+                // always set true for bosses nearby
+                if (c_unit_IsBoss && c_RadiusDistance < 100f)
+                {
+                    AddToCache = true;
+                    c_IgnoreSubStep = "";
+                }
+                // always take the current target even if not in LoS
+                if (c_RActorGuid == CurrentTargetRactorGUID)
+                {
+                    AddToCache = true;
+                    c_IgnoreSubStep = "";
+                }
+                // Simple whitelist for LoS 
+                if (LineOfSightWhitelist.Contains(c_ActorSNO))
+                {
+                    AddToCache = true;
+                    c_IgnoreSubStep = "";
+                }
+                // Always pickup Infernal Keys whether or not in LoS
+                if (hashForceSNOToItemList.Contains(c_ActorSNO))
+                {
+                    AddToCache = true;
+                    c_IgnoreSubStep = "";
+                }
+                //if (!thisobj.InLineOfSight && thisobj.ZDiff < 14f && !tmp_unit_bThisBoss)
+                //{
+                //    bWantThis = false;
+                //    tmp_cacheIgnoreSubStep = "IgnoreLoS";
+                //    
+                //return bWantThis;
+                //}
+            }
+            catch
+            {
+                AddToCache = false;
+                c_IgnoreSubStep = "IgnoreLoSException";
+            }
+            return AddToCache;
+        }
+        private static bool RefreshStepIgnoreUnknown(bool AddToCache)
+        {
+            // We couldn't get a valid object type, so ignore it
+            if (!c_IsObstacle && c_ObjectType == GObjectType.Unknown)
+            {
+                AddToCache = false;
+            }
+            return AddToCache;
+        }
+        private static bool RefreshStepCachedACDGuid(bool AddToCache)
+        {
+            // Get the ACDGUID, cached if possible, only for non-avoidance stuff
+            if (!c_IsObstacle && c_ObjectType != GObjectType.Avoidance)
+            {
+                if (!dictGilesACDGUIDCache.TryGetValue(c_RActorGuid, out c_ACDGUID))
+                {
+                    try
+                    {
+                        c_ACDGUID = c_diaObject.ACDGuid;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logging.WriteDiagnostic("[Trinity] Safely handled exception getting ACDGUID for an object [" + c_ActorSNO.ToString() + "]");
+                        Logging.WriteDiagnostic(ex.ToString());
+                        AddToCache = false;
+                    }
+                    dictGilesACDGUIDCache.Add(c_RActorGuid, c_ACDGUID);
+                }
+                // No ACDGUID, so shouldn't be anything we want to deal with
+                if (c_ACDGUID == -1)
+                {
+                    AddToCache = false;
+                }
+            }
+            else
+            {
+                // Give AOE's -1 ACDGUID, since it's not needed for avoidance stuff
+                c_ACDGUID = -1;
+            }
+            return AddToCache;
+        }
+        private static bool RefreshStepCachedPosition(bool AddToCache)
+        {
+            // Try and get a cached position for anything that isn't avoidance or units (avoidance and units can move, sadly, so we risk DB mis-reads for those things!
+            if (c_ObjectType != GObjectType.Avoidance && c_ObjectType != GObjectType.Unit)
+            {
+                // Get the position, cached if possible
+                if (!dictGilesVectorCache.TryGetValue(c_RActorGuid, out c_Position))
+                {
+                    try
+                    {
+                        //c_vPosition = thisobj.Position;
+                        Vector3 pos = c_diaObject.Position;
+
+                        // always get Height of wherever the nav says it is (for flying things..)
+                        c_Position = new Vector3(pos.X, pos.Y, gp.GetHeight(pos.ToVector2()));
+                    }
+                    catch (Exception ex)
+                    {
+                        Logging.WriteDiagnostic("[Trinity] Safely handled exception getting position for a static object [" + c_ActorSNO.ToString() + "]");
+                        Logging.WriteDiagnostic(ex.ToString());
+                        AddToCache = false;
+                    }
+                    // Now cache it
+                    dictGilesVectorCache.Add(c_RActorGuid, c_Position);
+                }
+            }
+            // Ok pull up live-position data for units/avoidance now...
+            else
+            {
+                try
+                {
+                    c_Position = c_diaObject.Position;
+                }
+                catch (Exception ex)
+                {
+                    Logging.WriteDiagnostic("[Trinity] Safely handled exception getting position for a unit or avoidance object [" + c_ActorSNO.ToString() + "]");
+                    Logging.WriteDiagnostic(ex.ToString());
+                }
+            }
+            return AddToCache;
+        }
+        private static bool RefreshStepCachedDynamicIds(bool AddToCache)
+        {
+            // Try and grab the dynamic id and game balance id, if necessary and if possible
+            if (c_ObjectType == GObjectType.Item)
+            {
+                // Get the Dynamic ID, cached if possible
+                if (!dictGilesDynamicIDCache.TryGetValue(c_RActorGuid, out c_GameDynamicID))
+                {
+                    try
+                    {
+                        c_GameDynamicID = c_CommonData.DynamicId;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logging.WriteDiagnostic("[Trinity] Safely handled exception getting DynamicID for item " + c_Name + " [" + c_ActorSNO.ToString() + "]");
+                        Logging.WriteDiagnostic(ex.ToString());
+                        AddToCache = false;
+                        //return bWantThis;
+                    }
+                    dictGilesDynamicIDCache.Add(c_RActorGuid, c_GameDynamicID);
+                }
+                // Get the Game Balance ID, cached if possible
+                if (!dictGilesGameBalanceIDCache.TryGetValue(c_RActorGuid, out c_BalanceID))
+                {
+                    try
+                    {
+                        c_BalanceID = c_CommonData.GameBalanceId;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logging.WriteDiagnostic("[Trinity] Safely handled exception getting GameBalanceID for item " + c_Name + " [" + c_ActorSNO.ToString() + "]");
+                        Logging.WriteDiagnostic(ex.ToString());
+                        AddToCache = false;
+                        //return bWantThis;
+                    }
+                    dictGilesGameBalanceIDCache.Add(c_RActorGuid, c_BalanceID);
+                }
+            }
+            else
+            {
+                c_GameDynamicID = -1;
+                c_BalanceID = -1;
+            }
+            return AddToCache;
+        }
+        private static bool RefreshStepNewObjectTypeZDiff(bool AddToCache)
+        {
+            // Ignore stuff which has a Z-height-difference too great, it's probably on a different level etc. - though not avoidance!
+            if (c_ObjectType != GObjectType.Avoidance)
+            {
+                // Calculate the z-height difference between our current position, and this object's position
+                c_ZDiff = Math.Abs(playerStatus.CurrentPosition.Z - c_Position.Z);
+                switch (c_ObjectType)
+                {
+                    case GObjectType.Door:
+                    case GObjectType.Unit:
+                    case GObjectType.Barricade:
+                        // Ignore monsters (units) who's Z-height is 14 foot or more than our own z-height
+                        // rrrix: except bosses like Belial :)
+                        if (c_ZDiff >= 14f && !c_unit_IsBoss)
+                        {
+                            AddToCache = false;
+                            //return bWantThis;
+                        }
+                        break;
+                    case GObjectType.Item:
+                    case GObjectType.HealthWell:
+                        // Items at 26+ z-height difference (we don't want to risk missing items so much)
+                        if (c_ZDiff >= 26f)
+                        {
+                            AddToCache = false;
+                            //return bWantThis;
+                        }
+                        break;
+                    case GObjectType.Gold:
+                    case GObjectType.Globe:
+                        // Gold/Globes at 11+ z-height difference
+                        if (c_ZDiff >= 11f)
+                        {
+                            AddToCache = false;
+                            //return bWantThis;
+                        }
+                        break;
+                    case GObjectType.Destructible:
+                    case GObjectType.Shrine:
+                    case GObjectType.Container:
+                        // Destructibles, shrines and containers are the least important, so a z-height change of only 7 is enough to ignore (help avoid stucks at stairs etc.)
+                        if (c_ZDiff >= 7f)
+                        {
+                            AddToCache = false;
+                            //return bWantThis;
+                        }
+                        break;
+                    case GObjectType.Interactable:
+                        // Special interactable objects
+                        if (c_ZDiff >= 9f)
+                        {
+                            AddToCache = false;
+                            //return bWantThis;
+                        }
+                        break;
+                    case GObjectType.Unknown:
+                    default:
+                        {
+                            // Don't touch it!
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                AddToCache = true;
+            }
+            return AddToCache;
+        }
+        private static bool RefreshStepCachedPlayerSummons(bool AddToCache)
+        {
+            // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
+            if (iMyCachedActorClass == ActorClass.Monk)
+            {
+                if (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MysticAlly) && hashMysticAlly.Contains(c_ActorSNO))
+                {
+                    iPlayerOwnedMysticAlly++;
+                    AddToCache = false;
+                }
+            }
+            // Count up Demon Hunter pets
+            if (iMyCachedActorClass == ActorClass.DemonHunter)
+            {
+                if (hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Companion) && hashDHPets.Contains(c_ActorSNO))
+                {
+                    iPlayerOwnedDHPets++;
+                    AddToCache = false;
+                }
+            }
+            // Count up zombie dogs and gargantuans next
+            if (iMyCachedActorClass == ActorClass.WitchDoctor)
+            {
+                if (hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_Gargantuan) && hashGargantuan.Contains(c_ActorSNO))
+                {
+                    iPlayerOwnedGargantuan++;
+                    AddToCache = false;
+                }
+                if (hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_SummonZombieDog) && hashZombie.Contains(c_ActorSNO))
+                {
+                    iPlayerOwnedZombieDog++;
+                    AddToCache = false;
+                }
+            }
+            return AddToCache;
+        }
+        private static bool RefreshStepCheckBlacklists(bool AddToCache)
+        {
+            if (!hashAvoidanceSNOList.Contains(c_ActorSNO) && !hashAvoidanceBuffSNOList.Contains(c_ActorSNO))
+            {
+                // See if it's something we should always ignore like ravens etc.
+                if (!c_IsObstacle && hashActorSNOIgnoreBlacklist.Contains(c_ActorSNO))
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "hashActorSNOIgnoreBlacklist";
+                    return AddToCache;
+                }
+                if (!c_IsObstacle && hashSNOIgnoreBlacklist.Contains(c_ActorSNO))
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "hashSNOIgnoreBlacklist";
+                    return AddToCache;
+                }
+                // Temporary ractor GUID ignoring, to prevent 2 interactions in a very short time which can cause stucks
+                if (IgnoreTargetForLoops > 0 && IgnoreRactorGUID == c_RActorGuid)
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "iIgnoreThisRactorGUID";
+                    return AddToCache;
+                }
+                // Check our extremely short-term destructible-blacklist
+                if (hashRGUIDDestructible3SecBlacklist.Contains(c_RActorGuid))
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "hashRGUIDDestructible3SecBlacklist";
+                    return AddToCache;
+                }
+                // Check our extremely short-term destructible-blacklist
+                if (hashRGUIDBlacklist3.Contains(c_RActorGuid))
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "hashRGUIDBlacklist3";
+                    return AddToCache;
+                }
+                // See if it's on our 90 second blacklist (from being stuck targeting it), as long as it's distance is not extremely close
+                if (hashRGUIDBlacklist90.Contains(c_RActorGuid))
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "hashRGUIDBlacklist90";
+                    return AddToCache;
+                }
+                // 60 second blacklist
+                if (hashRGUIDBlacklist60.Contains(c_RActorGuid))
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "hashRGUIDBlacklist60";
+                    return AddToCache;
+                }
+                // 15 second blacklist
+                if (hashRGUIDBlacklist15.Contains(c_RActorGuid))
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "hashRGUIDBlacklist15";
+                    return AddToCache;
+                }
+            }
+            else
+            {
+                AddToCache = true;
+            }
+            return AddToCache;
+        }
+
+
+        private static bool MosterObstacleInPathCacheObject(bool AddToCache)
+        {
+            // Don't add an item if a monster is blocking our path
+            if (hashMonsterObstacleCache.Any(o => GilesIntersectsPath(o.Location, o.Radius, playerStatus.CurrentPosition, c_Position)))
+            {
+                AddToCache = false;
+            }
+            return AddToCache;
         }
         private static string UtilSpacedConcat(params object[] args)
         {

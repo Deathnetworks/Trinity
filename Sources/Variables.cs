@@ -549,20 +549,20 @@ namespace GilesTrinity
         private static ItemQuality c_ItemQuality = ItemQuality.Invalid;
         private static ItemType c_DBItemType = ItemType.Unknown;
         private static FollowerType c_item_tFollowerType = FollowerType.None;
-        private static GItemType c_item_GilesItemType = GItemType.Unknown;
+        private static GItemType c_item_GItemType = GItemType.Unknown;
         private static MonsterSize c_unit_MonsterSize = MonsterSize.Unknown;
         private static DiaObject c_diaObject = null;
         private static ACD c_CommonData = null;
         private static SNOAnim c_CurrentAnimation = SNOAnim.Invalid;
-        private static bool c_unit_bIsElite = false;
-        private static bool c_unit_bIsRare = false;
-        private static bool c_unit_bIsUnique = false;
-        private static bool c_unit_bIsMinion = false;
-        private static bool c_unit_bIsTreasureGoblin = false;
-        private static bool c_bIsEliteRareUnique = false;
-        private static bool c_unit_bIsBoss = false;
-        private static bool c_unit_bIsAttackable = false;
-        private static bool c_bForceLeapAgainst = false;
+        private static bool c_unit_IsElite = false;
+        private static bool c_unit_IsRare = false;
+        private static bool c_unit_IsUnique = false;
+        private static bool c_unit_IsMinion = false;
+        private static bool c_unit_IsTreasureGoblin = false;
+        private static bool c_IsEliteRareUnique = false;
+        private static bool c_unit_IsBoss = false;
+        private static bool c_unit_IsAttackable = false;
+        private static bool c_ForceLeapAgainst = false;
         private static bool c_IsObstacle = false;
 
         // From main RefreshDiaobjects
