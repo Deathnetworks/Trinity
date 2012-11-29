@@ -1,7 +1,7 @@
 ﻿using System.Windows.Media;
 using Zeta.Common;
 
-namespace GilesTrinity.DbProvider
+namespace GilesTrinity.Technicals
 {
     /// <summary>
     /// Utilities help developer interact with DemonBuddy

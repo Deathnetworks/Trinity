@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace GilesTrinity.DbProvider
+namespace GilesTrinity.Technicals
 {
     /// <summary>
     /// Enumerate all log categories
     /// </summary>
+    [Flags]
     public enum LogCategory
     {
         UserInformation = 0,
@@ -17,7 +18,8 @@ namespace GilesTrinity.DbProvider
         Configuration,
         UI,
         WeaponSwap,
-        Behavior
+        Behavior,
+        Performance
 
     }
 }
