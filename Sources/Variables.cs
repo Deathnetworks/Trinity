@@ -557,7 +557,7 @@ namespace GilesTrinity
         private static bool c_unit_IsElite = false;
         private static bool c_unit_IsRare = false;
         private static bool c_unit_IsUnique = false;
-        private static bool c_unit_bIsMinion = false;
+        private static bool c_unit_IsMinion = false;
         private static bool c_unit_IsTreasureGoblin = false;
         private static bool c_IsEliteRareUnique = false;
         private static bool c_unit_IsBoss = false;

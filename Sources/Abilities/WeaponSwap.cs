@@ -1,3 +1,5 @@
+using GilesTrinity.DbProvider;
+using GilesTrinity.Technicals;
 using System.Collections.Generic;
 using System.Linq;
 using Zeta;
@@ -40,7 +42,7 @@ namespace GilesTrinity.Swap
                             key => key.InventorySlot, v => v);
                     IgnoreItems.Clear();
 
-                    Logging.Write("[Trinity] Swapping to 2H");
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.WeaponSwap, "Swapping to 2H");
                     Equip(InventorySlot.PlayerLeftHand);
 
 
@@ -49,7 +51,7 @@ namespace GilesTrinity.Swap
                 }
                 else
                 {
-                    Logging.Write("[Trinity] Swapping to Dual Wield");
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.WeaponSwap, "Swapping to Dual Wield");
 
                     // Go back to our original set of gear, in their exact places!
                     foreach (var i in originalItems)

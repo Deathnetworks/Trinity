@@ -11,6 +11,7 @@
             <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Template.xaml"/></ResourceDictionary.MergedDictionaries>
             
             <ut:FlagsEnumValueConverter x:Key="flagsEnumValueConverter"/>
+            <ut:EnumVisibilityConverter x:Key="enumVisibilityConverter" />
             <ut:IntToStringConverter x:Key="intToStringConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -29,11 +30,22 @@
             <TextBlock FontWeight="Bold" Text="Choose Item Rules Type :" TextAlignment="Center" Margin="2"/>
         </Grid>
         <Grid Grid.Row="1" Margin="2" HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <ComboBox Width="180" SelectedValuePath="Tag" SelectedValue="{Binding Path=Loot.ItemFilterMode}"  >
                 <ComboBoxItem Content="Trinity Scoring Only" Tag="TrinityOnly" IsSelected="True" ToolTip="Uses Trinity Scoring Only (see Trinity Town-Runs Tab)" />
                 <ComboBoxItem Content="Trinity Scoring With Script Rules" Tag="TrinityWithItemRules" ToolTip="Utilizes Item Rulesets (see ItemRules directory)" />
                 <ComboBoxItem Content="Demonbuddy Loot Rules" Tag="DemonBuddy" ToolTip="Use the Built-in Demonbuddy loot rule logic (see Demonbuddy Settings tab)" />
             </ComboBox>
+            <Button Grid.Row="1" 
+                    Style="{DynamicResource LinkButton}"
+                    Command="{Binding Path=HelpLinkCommand}" 
+                    CommandParameter="http://www.thebuddyforum.com/demonbuddy-forum/plugins/81682-plugin-addon-item-rules-file-based-scripting-language.html"
+                    Visibility="{Binding Path=Loot.ItemFilterMode, Converter={StaticResource enumVisibilityConverter}, ConverterParameter=TrinityWithItemRules}">
+                Explainations of Script Rules by Original developer
+            </Button>
         </Grid>
         <Grid Grid.Row="2">
             <TextBlock FontWeight="Bold" Margin="2" Text="Trinity Loot Pickup Configuration :" TextAlignment="Center"/>
@@ -294,7 +306,7 @@
             </ComboBox>
             <TextBlock Grid.Row="0" Grid.Column="2" FontWeight="Bold" Text="Minimum Gold Pile :"/>
             <Slider Grid.Row="1" Grid.Column="2" Template="{DynamicResource Slider}"
-                    Interval="100" Maximum="4000" Minimum="0" SmallChange="1" LargeChange="100"
+                    Interval="500" Maximum="4000" Minimum="0" SmallChange="1" LargeChange="100"
                     TickFrequency="100" TickPlacement="BottomRight" 
                     Value="{Binding Path=Pickup.MinimumGoldStack}" />
         </Grid>

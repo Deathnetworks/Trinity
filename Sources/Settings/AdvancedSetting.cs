@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using GilesTrinity.Technicals;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace GilesTrinity.Settings
@@ -17,6 +18,7 @@ namespace GilesTrinity.Settings
         private bool _DebugTargetting;
         private bool _DebugWeights;
         private bool _DebugItemValuation;
+        private LogCategory _LogCategories;
         #endregion Fields
 
         #region Events
@@ -37,6 +39,24 @@ namespace GilesTrinity.Settings
         #endregion Constructors
 
         #region Properties
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public LogCategory LogCategories
+        {
+            get
+            {
+                return _LogCategories;
+            }
+            set
+            {
+                if (_LogCategories != value)
+                {
+                    _LogCategories = value;
+                    OnPropertyChanged("LogCategories");
+                }
+            }
+        }
+
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool UnstuckerEnabled

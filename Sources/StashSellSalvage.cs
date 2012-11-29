@@ -30,15 +30,9 @@ namespace GilesTrinity
         {
 
             // Check this isn't something we want to salvage
-            if (Settings.Loot.TownRun.TrashMode == TrashMode.Salvaging)
-            {
-                if (GilesSalvageValidation(thisinternalname, thislevel, thisquality, thisdbitemtype, thisfollowertype))
-                    return false;
-            }
+            if (GilesSalvageValidation(thisinternalname, thislevel, thisquality, thisdbitemtype, thisfollowertype))
+                return false;
 
-            // Make sure it's not legendary
-            //if (thisquality >= ItemQuality.Legendary)
-            //    return false;
             GItemType thisGilesItemType = DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
             GBaseItemType thisGilesBaseType = DetermineBaseType(thisGilesItemType);
             switch (thisGilesBaseType)
@@ -72,14 +66,12 @@ namespace GilesTrinity
         /// <returns></returns>
         private static bool GilesSalvageValidation(string thisinternalname, int thislevel, ItemQuality thisquality, ItemType thisdbitemtype, FollowerType thisfollowertype)
         {
-            if (Settings.Loot.TownRun.TrashMode != TrashMode.Salvaging)
-                return false;
-
-            // Make sure it's not legendary
-            //if (thisquality >= ItemQuality.Legendary)
-            //    return false;
             GItemType thisGilesItemType = DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
             GBaseItemType thisGilesBaseType = DetermineBaseType(thisGilesItemType);
+
+            // Take Salvage Option corresponding to ItemLevel
+            SalvageOption salvageOption = GetSalvageOption(thisquality);
+
             switch (thisGilesBaseType)
             {
                 case GBaseItemType.WeaponRange:
@@ -87,23 +79,11 @@ namespace GilesTrinity
                 case GBaseItemType.WeaponTwoHand:
                 case GBaseItemType.Armor:
                 case GBaseItemType.Offhand:
-                    if (thislevel >= 61 && thisquality >= ItemQuality.Magic1)
-                    {
-                        return true;
-                    }
-                    return false;
+                    return ((thislevel >= 61 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
                 case GBaseItemType.Jewelry:
-                    if (thislevel >= 59 && thisquality >= ItemQuality.Magic1)
-                    {
-                        return true;
-                    }
-                    return false;
+                    return ((thislevel >= 59 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
                 case GBaseItemType.FollowerItem:
-                    if (thislevel >= 60 && thisquality >= ItemQuality.Magic1)
-                    {
-                        return true;
-                    }
-                    return false;
+                    return ((thislevel >= 60 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
                 case GBaseItemType.Gem:
                 case GBaseItemType.Misc:
                 case GBaseItemType.Unknown:
@@ -112,6 +92,23 @@ namespace GilesTrinity
 
             // Switch giles base item type
             return false;
+        }
+
+        private static SalvageOption GetSalvageOption(ItemQuality thisquality)
+        {
+            if (thisquality >= ItemQuality.Magic1 && thisquality <= ItemQuality.Magic3)
+            {
+                return Settings.Loot.TownRun.SalvageBlueItemOption;
+            }
+            else if (thisquality >= ItemQuality.Rare4 && thisquality <= ItemQuality.Rare6)
+            {
+                return Settings.Loot.TownRun.SalvageYellowItemOption;
+            }
+            else if (thisquality >= ItemQuality.Legendary)
+            {
+                return Settings.Loot.TownRun.SalvageLegendaryItemOption;
+            }
+            return SalvageOption.None;
         }
 
         private static DateTime lastTownRunAttempt = DateTime.Now;
@@ -749,7 +746,9 @@ namespace GilesTrinity
                 Log("Emergency Stop: You need repairs but don't have enough money. Stopping the bot to prevent infinite death loop.");
                 BotMain.Stop();
             }
-            ZetaDia.Me.Inventory.RepairEquippedItems();
+
+            //ZetaDia.Me.Inventory.RepairEquippedItems();
+            ZetaDia.Me.Inventory.RepairAllItems();
 
             bNeedsEquipmentRepairs = false;
             if (loggedJunkThisStash)
@@ -1163,7 +1162,7 @@ namespace GilesTrinity
                     {
                         if (!Settings.Notification.LegendaryScoring)
                             bShouldNotify = true;
-                        else if (Settings.Notification.LegendaryScoring && EvaluateItemScoreForNotification(thisgilesbaseitemtype, ithisitemvalue))
+                        else if (Settings.Notification.LegendaryScoring && CheckScoreForNotification(thisgilesbaseitemtype, ithisitemvalue))
                             bShouldNotify = true;
                         if (bShouldNotify)
                             NotificationManager.AddNotificationToQueue(thisgooditem.RealName + " [" + thisgilesitemtype.ToString() +
@@ -1182,7 +1181,7 @@ namespace GilesTrinity
                     {
 
                         // Check for non-legendary notifications
-                        bShouldNotify = EvaluateItemScoreForNotification(thisgilesbaseitemtype, ithisitemvalue);
+                        bShouldNotify = CheckScoreForNotification(thisgilesbaseitemtype, ithisitemvalue);
                         if (bShouldNotify)
                             NotificationManager.AddNotificationToQueue(thisgooditem.RealName + " [" + thisgilesitemtype.ToString() + "] (Score=" + ithisitemvalue.ToString() + ". " + ValueItemStatString + ")", ZetaDia.Service.CurrentHero.Name + " new item!", ProwlNotificationPriority.Emergency);
                     }

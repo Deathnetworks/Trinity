@@ -1,7 +1,9 @@
-﻿using GilesTrinity.Settings;
+﻿using GilesTrinity.DbProvider;
+using GilesTrinity.Settings;
 using GilesTrinity.Settings.Combat;
 using GilesTrinity.Settings.Loot;
 using GilesTrinity.UI;
+using System.Diagnostics;
 using System.Windows.Input;
 
 namespace GilesTrinity.UIComponents
@@ -43,11 +45,29 @@ namespace GilesTrinity.UIComponents
                                         GilesTrinity.SortStash();
                                         UILoader.CloseWindow();
                                     });
-
+            HelpLinkCommand = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        string link = parameter as string;
+                                        if (!string.IsNullOrWhiteSpace(link))
+                                        {
+                                            Process.Start(link);
+                                        }
+                                    });
         }
 
         /// <summary>
-        /// Gets the save command.
+        /// Gets the HelpLink command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand HelpLinkCommand
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the test score command.
         /// </summary>
         /// <value>The save command.</value>
         public ICommand TestScoreCommand
@@ -57,7 +77,7 @@ namespace GilesTrinity.UIComponents
         }
 
         /// <summary>
-        /// Gets the save command.
+        /// Gets the order stash command.
         /// </summary>
         /// <value>The save command.</value>
         public ICommand OrderStashCommand

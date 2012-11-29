@@ -66,13 +66,15 @@
     <Compile Include="Classes\GilesCachedACDItem.cs" />
     <Compile Include="Classes\GilesGameBalanceDataCache.cs" />
     <Compile Include="Classes\GilesItemStats.cs" />
+    <Compile Include="Classes\GilesStashSort.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotStart.cs" />
-    <Compile Include="DbProvider\DbHelper.cs" />
-    <Compile Include="DbProvider\TrinitiyLogLevel.cs" />
+    <Compile Include="Technicals\DbHelper.cs" />
+    <Compile Include="Technicals\LogCategory.cs" />
+    <Compile Include="Technicals\TrinitiyLogLevel.cs" />
     <Compile Include="ItemValuation.cs" />
     <Compile Include="DbProvider\GilesCombatTargetingReplacer.cs" />
     <Compile Include="DbProvider\GilesLootTargetingProvider.cs" />
@@ -99,6 +101,7 @@
     <Compile Include="Settings\Loot\ItemSetting.cs" />
     <Compile Include="Settings\Loot\PickupSetting.cs" />
     <Compile Include="Settings\Loot\PotionMode.cs" />
+    <Compile Include="Settings\Loot\SalvageOption.cs" />
     <Compile Include="Settings\Loot\TownRunSetting.cs" />
     <Compile Include="Settings\Loot\TrashMode.cs" />
     <Compile Include="Settings\MailServerSetting.cs" />
@@ -106,8 +109,10 @@
     <Compile Include="Settings\TrinitySetting.cs" />
     <Compile Include="Settings\WorldObjectSetting.cs" />
     <Compile Include="StashSellSalvage.cs" />
+    <Compile Include="Technicals\PerformanceMonitor.cs" />
     <Compile Include="UIComponents\BoolInverterConverter.cs" />
     <Compile Include="UIComponents\ConfigViewModel.cs" />
+    <Compile Include="UIComponents\EnumVisibilityConverter.cs" />
     <Compile Include="UIComponents\IntToStringConverter.cs" />
     <Compile Include="UIComponents\FlagEnumValueConverter.cs" />
     <Compile Include="UIComponents\PercentConverter.cs" />
