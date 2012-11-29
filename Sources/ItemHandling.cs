@@ -1,19 +1,17 @@
 ﻿using GilesTrinity.DbProvider;
+using GilesTrinity.ItemRules;
 using GilesTrinity.Settings.Loot;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 using System.Threading;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
-using GilesTrinity.ItemRules;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -609,7 +607,7 @@ namespace GilesTrinity
         /// <summary>
         /// Sorts the stash
         /// </summary>
-        private static void SortStash()
+        internal static void SortStash()
         {
 
             // Try and update the player-data
@@ -796,7 +794,7 @@ namespace GilesTrinity
         /// <summary>
         /// Output test scores for everything in the backpack
         /// </summary>
-        private static void TestScoring()
+        internal static void TestScoring()
         {
             if (testingBackpack) return;
             testingBackpack = true;

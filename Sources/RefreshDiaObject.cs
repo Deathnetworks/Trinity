@@ -1,6 +1,7 @@
 ﻿using GilesTrinity.DbProvider;
 using GilesTrinity.Settings.Loot;
 using System;
+using System.IO;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -8,7 +9,6 @@ using Zeta.CommonBot;
 using Zeta.Internals.Actors;
 using Zeta.Internals.Actors.Gizmos;
 using Zeta.Internals.SNO;
-using System.IO;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin

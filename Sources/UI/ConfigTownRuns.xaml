@@ -70,7 +70,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="See sample Backpack Score :" FontWeight="Bold" TextAlignment="Center"/>
-            <Button Grid.Row="1" Margin="50,0,50,0" HorizontalAlignment="Center" Content="Test Backpack Scores"/>
+            <Button Grid.Row="1" Margin="50,0,50,0" HorizontalAlignment="Center" Content="Test Backpack Scores" Command="{Binding Path=TestScoreCommand}"/>
         </Grid>
         <!--Test Score-->
         <Grid Grid.Row="3" Margin="5">
@@ -79,7 +79,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="Order stash by Score (Use carefully!):" FontWeight="Bold" TextAlignment="Center"/>
-            <Button Grid.Row="1" Margin="50,0,50,0" HorizontalAlignment="Center" Content="Order Stash"/>
+            <Button Grid.Row="1" Margin="50,0,50,0" HorizontalAlignment="Center" Content="Order Stash" Command="{Binding Path=OrderStashCommand}"/>
         </Grid>
     </Grid>
 </UserControl>

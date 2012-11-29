@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.IO;
 using System.Collections;
-using Zeta.Internals.Actors;
-using Zeta.Internals;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Zeta.Common;
-using System.Reflection;
-using Zeta.CommonBot;
+using Zeta.Internals.Actors;
 
 namespace GilesTrinity.ItemRules
 {

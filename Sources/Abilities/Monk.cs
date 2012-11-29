@@ -3,7 +3,6 @@ using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
-using GilesTrinity.Swap;
 
 namespace GilesTrinity
 {

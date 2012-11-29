@@ -1,6 +1,5 @@
 ﻿using System;
 using Zeta.Common;
-using Zeta.Common.Plugins;
 
 namespace GilesTrinity
 {

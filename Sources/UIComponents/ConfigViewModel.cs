@@ -1,11 +1,7 @@
 ﻿using GilesTrinity.Settings;
 using GilesTrinity.Settings.Combat;
 using GilesTrinity.Settings.Loot;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
+using GilesTrinity.UI;
 using System.Windows.Input;
 
 namespace GilesTrinity.UIComponents
@@ -17,7 +13,7 @@ namespace GilesTrinity.UIComponents
     {
         private TrinitySetting _Model;
         private TrinitySetting _OriginalModel; 
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigViewModel" /> class.
         /// </summary>
@@ -33,8 +29,41 @@ namespace GilesTrinity.UIComponents
                                     {
                                         _Model.CopyTo(_OriginalModel);
                                         _OriginalModel.Save();
+                                        UILoader.CloseWindow();
+                                    });
+            TestScoreCommand = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        GilesTrinity.TestScoring();
+                                        UILoader.CloseWindow();
+                                    });
+            OrderStashCommand = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        GilesTrinity.SortStash();
+                                        UILoader.CloseWindow();
                                     });
 
+        }
+
+        /// <summary>
+        /// Gets the save command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand TestScoreCommand
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the save command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand OrderStashCommand
+        {
+            get;
+            private set;
         }
 
         /// <summary>

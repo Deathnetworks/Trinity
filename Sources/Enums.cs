@@ -1,5 +1,4 @@
-﻿using Zeta.Common.Plugins;
-namespace GilesTrinity
+﻿namespace GilesTrinity
 {
     /// <summary>
     /// Primary "lowest level" item type (eg EXACTLY what kind of item it is)

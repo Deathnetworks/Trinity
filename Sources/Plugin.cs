@@ -1,11 +1,10 @@
-﻿using System;
+﻿using GilesTrinity.DbProvider;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using GilesTrinity.DbProvider;
 using Zeta;
-using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Navigation;

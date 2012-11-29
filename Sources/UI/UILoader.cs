@@ -1,5 +1,4 @@
 ﻿using GilesTrinity.UIComponents;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,7 +12,11 @@ namespace GilesTrinity.UI
     public class UILoader
     {
         public static Window _ConfigWindow;
-        
+
+        public static void CloseWindow()
+        {
+            _ConfigWindow.Close();
+        }
         public static Window GetDisplayWindow(string uiPath)
         {
             // Check we can actually find the .xaml file first - if not, report an error

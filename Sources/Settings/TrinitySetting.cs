@@ -2,13 +2,10 @@
 using GilesTrinity.Settings.Combat;
 using GilesTrinity.Settings.Loot;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
 using Zeta;
 
 namespace GilesTrinity.Settings

@@ -1,7 +1,6 @@
-﻿using System;
+﻿using GilesTrinity.Settings.Combat;
+using System;
 using System.Linq;
-using GilesTrinity.Settings.Combat;
-using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;

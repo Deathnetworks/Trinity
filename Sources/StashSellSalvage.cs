@@ -1,4 +1,5 @@
 ﻿using GilesTrinity.Notifications;
+using GilesTrinity.Settings.Loot;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +12,6 @@ using Zeta.Internals;
 using Zeta.Internals.Actors;
 using Zeta.Internals.Actors.Gizmos;
 using Zeta.TreeSharp;
-using GilesTrinity.Settings.Loot;
 
 namespace GilesTrinity
 {
@@ -306,7 +306,7 @@ namespace GilesTrinity
                             Settings.Notification.EmailPassword);
                     EmailMessage.Clear();
 
-
+                    // Send notification to IPhone & Android
                     while (NotificationManager.pushQueue.Count > 0)
                     {
                         NotificationManager.SendNotification(NotificationManager.pushQueue.Dequeue());

@@ -1,11 +1,11 @@
-﻿using System;
+﻿using GilesTrinity.ItemRules;
+using GilesTrinity.Settings;
+using GilesTrinity.Swap;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
-using GilesTrinity.ItemRules;
-using GilesTrinity.Settings;
-using GilesTrinity.Swap;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;

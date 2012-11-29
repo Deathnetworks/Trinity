@@ -1,22 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using System.Collections;
 using Zeta;
-using Zeta.Common;
-using Zeta.Common.Plugins;
-using Zeta.CommonBot;
-using Zeta.CommonBot.Profile;
-using Zeta.CommonBot.Profile.Composites;
-using Zeta.Internals;
 using Zeta.Internals.Actors;
-using Zeta.Internals.Actors.Gizmos;
-using Zeta.Internals.SNO;
-using Zeta.Navigation;
-using Zeta.TreeSharp;
-using System.Reflection;
-using System.Threading;
 
 namespace GilesTrinity.Swap
 {

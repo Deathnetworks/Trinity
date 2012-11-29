@@ -1,5 +1,4 @@
 ﻿using Zeta.Common;
-using Zeta.Common.Plugins;
 namespace GilesTrinity
 {
     // Obstacles for quick mapping of paths etc.

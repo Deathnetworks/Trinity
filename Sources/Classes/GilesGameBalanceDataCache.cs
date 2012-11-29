@@ -1,5 +1,4 @@
-﻿using Zeta.Common.Plugins;
-using Zeta.Internals.Actors;
+﻿using Zeta.Internals.Actors;
 
 namespace GilesTrinity
 {

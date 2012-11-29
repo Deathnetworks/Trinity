@@ -3,7 +3,6 @@ using System.Linq;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot.Profile;
-using Zeta.CommonBot.Profile.Composites;
 using Zeta.Internals.Actors;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;

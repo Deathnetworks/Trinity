@@ -1,8 +1,5 @@
 ﻿using GilesTrinity.Settings.Combat;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Zeta.Internals.Actors;
 
 namespace GilesTrinity
