@@ -11,6 +11,7 @@
             <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Template.xaml"/></ResourceDictionary.MergedDictionaries>
             
             <ut:FlagsEnumValueConverter x:Key="flagsEnumValueConverter"/>
+            <ut:IntToStringConverter x:Key="intToStringConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -279,7 +280,7 @@
                 <ComboBoxItem Content="Pickup All" Tag="All" />
             </ComboBox>
             <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" Margin="2" Text="Potion Types:"/>
-            <ComboBox Grid.Row="1" Grid.Column="1" SelectedValuePath="Tag" Margin="2" SelectedValue="{Binding Path=Pickup.PotionLevel, StringFormat='{}{0:0}'}">
+            <ComboBox Grid.Row="1" Grid.Column="1" SelectedValuePath="Tag" Margin="2" SelectedValue="{Binding Path=Pickup.PotionLevel, Converter={StaticResource intToStringConverter}}">
                 <ComboBoxItem Content="Minor+" Tag="1" />
                 <ComboBoxItem Content="Lesser+" Tag="10" />
                 <ComboBoxItem Content="(plain)+" Tag="15" />
@@ -308,7 +309,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label FontWeight="Bold" Margin="2">Gems:</Label>
-                <ComboBox Grid.Column="1" SelectedValuePath="Tag" Margin="2" SelectedValue="{Binding Path=Pickup.GemLevel, StringFormat='{}{0:0}'}" >
+                <ComboBox Grid.Column="1" SelectedValuePath="Tag" Margin="2" SelectedValue="{Binding Path=Pickup.GemLevel, Converter={StaticResource intToStringConverter}}" >
                     <ComboBoxItem Content="Chipped+" Tag="14" />
                     <ComboBoxItem Content="Flawed+" Tag="22" />
                     <ComboBoxItem Content="(plain)+" Tag="30" />
