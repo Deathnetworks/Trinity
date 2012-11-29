@@ -294,7 +294,7 @@
             </ComboBox>
             <TextBlock Grid.Row="0" Grid.Column="2" FontWeight="Bold" Text="Minimum Gold Pile :"/>
             <Slider Grid.Row="1" Grid.Column="2" Template="{DynamicResource Slider}"
-                    Interval="100" Maximum="4000" Minimum="0" SmallChange="1" LargeChange="100"
+                    Interval="500" Maximum="4000" Minimum="0" SmallChange="1" LargeChange="100"
                     TickFrequency="100" TickPlacement="BottomRight" 
                     Value="{Binding Path=Pickup.MinimumGoldStack}" />
         </Grid>

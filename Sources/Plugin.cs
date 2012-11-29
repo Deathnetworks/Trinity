@@ -78,10 +78,6 @@ namespace GilesTrinity
         /// </summary>
         public void OnEnabled()
         {
-#if DEBUG
-            Settings.Advanced.DebugItemValuation = true;
-#endif
-
             string battleTagName = "";
             try
             {
