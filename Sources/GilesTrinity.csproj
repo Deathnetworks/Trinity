@@ -99,6 +99,7 @@
     <Compile Include="Settings\Loot\ItemSetting.cs" />
     <Compile Include="Settings\Loot\PickupSetting.cs" />
     <Compile Include="Settings\Loot\PotionMode.cs" />
+    <Compile Include="Settings\Loot\SalvageOption.cs" />
     <Compile Include="Settings\Loot\TownRunSetting.cs" />
     <Compile Include="Settings\Loot\TrashMode.cs" />
     <Compile Include="Settings\MailServerSetting.cs" />

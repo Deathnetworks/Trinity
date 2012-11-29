@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:GilesTrinity.UIComponents"
              mc:Ignorable="d" 
-             d:DesignHeight="350" d:DesignWidth="390">
+             d:DesignHeight="420" d:DesignWidth="390">
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
@@ -27,12 +27,22 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Savlvage or Sell junk items :" FontWeight="Bold" TextAlignment="Center"/>
-            <UniformGrid Grid.Row="1" Margin="50,0,50,0" Columns="2" HorizontalAlignment="Center">
-                <RadioButton GroupName="TownRunTrashMode" Content="Salvage" 
-                             ToolTip="Only salvage inferno items"
-                             IsChecked="{Binding Path=TownRun.TrashMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Salvaging}" Margin="5"/>
-                <RadioButton GroupName="TownRunTrashMode" Content="Sell" IsChecked="{Binding Path=TownRun.TrashMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Selling}" Margin="5"/>
+            <TextBlock Text="Savlvage options :" FontWeight="Bold" TextAlignment="Center"/>
+            <UniformGrid Grid.Row="1" Columns="4" Margin="25,2">
+                <TextBlock Margin="2" Text="Magics" FontWeight="Bold" VerticalAlignment="Center"/>
+                <RadioButton GroupName="BlueSalvage" Content="None" IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="BlueSalvage" Content="Inferno" IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="BlueSalvage" Content="All levels" IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
+
+                <TextBlock Margin="2" Text="Rares" FontWeight="Bold" VerticalAlignment="Center"/>
+                <RadioButton GroupName="YellowSalvage" Content="None" IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="YellowSalvage" Content="Inferno" IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="YellowSalvage" Content="All levels" IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
+
+                <TextBlock Margin="2" Text="Legendaries" FontWeight="Bold" VerticalAlignment="Center"/>
+                <RadioButton GroupName="LegendarySalvage" Content="None" IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="LegendarySalvage" Content="Inferno" IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="LegendarySalvage" Content="All levels" IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
             </UniformGrid>
         </Grid>
         <!--Junk items Settings-->
@@ -81,5 +91,7 @@
             <TextBlock Text="Order stash by Score (Use carefully!):" FontWeight="Bold" TextAlignment="Center"/>
             <Button Grid.Row="1" Margin="50,0,50,0" HorizontalAlignment="Center" Content="Order Stash" Command="{Binding Path=OrderStashCommand}"/>
         </Grid>
+        <!--Reset Button-->
+        <Button Grid.Row="4" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetWorldObjetCommand}">Reset</Button>
     </Grid>
 </UserControl>

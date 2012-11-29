@@ -4,13 +4,16 @@ using System.Runtime.Serialization;
 namespace GilesTrinity.Settings.Loot
 {
     [DataContract]
-    public class TownRunSetting : ITrinitySetting<TownRunSetting>, INotifyPropertyChanged
+    public class TownRunSetting : ITrinitySetting<TownRunSetting>, INotifyPropertyChanged, IExtensibleDataObject
     {
         #region Fields
         private TrashMode _TrashMode;
         private int _WeaponScore;
         private int _ArmorScore;
         private int _JewelryScore;
+        private SalvageOption _SalvageBlueItemOption;
+        private SalvageOption _SalvageYellowItemOption;
+        private SalvageOption _SalvageLegendaryItemOption;
         #endregion Fields
 
         #region Events
@@ -31,24 +34,6 @@ namespace GilesTrinity.Settings.Loot
         #endregion Constructors
 
         #region Properties
-        [DataMember(IsRequired = false)]
-        [DefaultValue(TrashMode.Selling)]
-        public TrashMode TrashMode
-        {
-            get
-            {
-                return _TrashMode;
-            }
-            set
-            {
-                if (_TrashMode != value)
-                {
-                    _TrashMode = value;
-                    OnPropertyChanged("TrashMode");
-                }
-            }
-        }
-
         [DataMember(IsRequired = false)]
         [DefaultValue(70000)]
         public int WeaponScore
@@ -102,6 +87,61 @@ namespace GilesTrinity.Settings.Loot
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(SalvageOption.None)]
+        public SalvageOption SalvageBlueItemOption
+        {
+            get
+            {
+                return _SalvageBlueItemOption;
+            }
+            set
+            {
+                if (_SalvageBlueItemOption != value)
+                {
+                    _SalvageBlueItemOption = value;
+                    OnPropertyChanged("SalvageBlueItemOption");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(SalvageOption.None)]
+        public SalvageOption SalvageYellowItemOption
+        {
+            get
+            {
+                return _SalvageYellowItemOption;
+            }
+            set
+            {
+                if (_SalvageYellowItemOption != value)
+                {
+                    _SalvageYellowItemOption = value;
+                    OnPropertyChanged("SalvageYellowItemOption");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(SalvageOption.None)]
+        public SalvageOption SalvageLegendaryItemOption
+        {
+            get
+            {
+                return _SalvageLegendaryItemOption;
+            }
+            set
+            {
+                if (_SalvageLegendaryItemOption != value)
+                {
+                    _SalvageLegendaryItemOption = value;
+                    OnPropertyChanged("SalvageLegendaryItemOption");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -132,5 +172,17 @@ namespace GilesTrinity.Settings.Loot
             }
         }
         #endregion Methods
+
+        public ExtensionDataObject ExtensionData
+        {
+            get
+            {
+                return null;
+            }
+            set
+            {
+                //_ExtendedData = value;
+            }
+        }
     }
 }
