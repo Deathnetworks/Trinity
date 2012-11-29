@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -785,9 +786,9 @@ namespace GilesTrinity.ItemRules
                 case "Boolean":
                     return compare((bool)value, comparator, Boolean.Parse(str2), ref checkFlag);
                 case "Int32":
-                    return compare((int)value, comparator, Int32.Parse(str2), ref checkFlag);
+                    return compare((int)value, comparator, Int32.Parse(str2, CultureInfo.InvariantCulture), ref checkFlag);
                 case "Single":
-                    return compare((float)value, comparator, Single.Parse(str2), ref checkFlag);
+                    return compare((float)value, comparator, Single.Parse(str2, CultureInfo.InvariantCulture), ref checkFlag);
                 default:
                     checkFlag = false;
                     return false;
