@@ -72,9 +72,9 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotStart.cs" />
-    <Compile Include="DbProvider\DbHelper.cs" />
-    <Compile Include="DbProvider\LogCategory.cs" />
-    <Compile Include="DbProvider\TrinitiyLogLevel.cs" />
+    <Compile Include="Technicals\DbHelper.cs" />
+    <Compile Include="Technicals\LogCategory.cs" />
+    <Compile Include="Technicals\TrinitiyLogLevel.cs" />
     <Compile Include="ItemValuation.cs" />
     <Compile Include="DbProvider\GilesCombatTargetingReplacer.cs" />
     <Compile Include="DbProvider\GilesLootTargetingProvider.cs" />
@@ -109,6 +109,7 @@
     <Compile Include="Settings\TrinitySetting.cs" />
     <Compile Include="Settings\WorldObjectSetting.cs" />
     <Compile Include="StashSellSalvage.cs" />
+    <Compile Include="Technicals\PerformanceMonitor.cs" />
     <Compile Include="UIComponents\BoolInverterConverter.cs" />
     <Compile Include="UIComponents\ConfigViewModel.cs" />
     <Compile Include="UIComponents\EnumVisibilityConverter.cs" />

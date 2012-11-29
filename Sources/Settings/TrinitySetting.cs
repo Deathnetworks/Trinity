@@ -1,6 +1,7 @@
 ﻿using GilesTrinity.DbProvider;
 using GilesTrinity.Settings.Combat;
 using GilesTrinity.Settings.Loot;
+using GilesTrinity.Technicals;
 using System;
 using System.ComponentModel;
 using System.IO;

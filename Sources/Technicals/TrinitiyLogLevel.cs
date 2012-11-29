@@ -1,5 +1,5 @@
 ﻿
-namespace GilesTrinity.DbProvider
+namespace GilesTrinity.Technicals
 {
     /// <summary>
     /// Enumerate severity level for logging 

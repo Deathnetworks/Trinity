@@ -1,5 +1,6 @@
 ﻿using GilesTrinity.DbProvider;
 using GilesTrinity.Settings.Combat;
+using GilesTrinity.Technicals;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -167,7 +168,7 @@ namespace GilesTrinity
                         catch
                         {
                             // Keep going anyway if we failed to get a new position from DemonBuddy
-                            Logging.WriteDiagnostic("GSDEBUG: Caught position read failure in main target handler loop.");
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "GSDEBUG: Caught position read failure in main target handler loop.");
                         }
                     }
                 }
