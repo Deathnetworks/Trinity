@@ -1,4 +1,4 @@
-Unified Trinity Community Edition
+﻿Unified Trinity Community Edition
 =================================
 
 Major new features: 
