@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.Technicals;
+using System;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -18,8 +19,8 @@ namespace GilesTrinity
         {
             if (!bPluginEnabled && bot != null)
             {
-                Logging.Write("WARNING: Giles Trinity is NOT YET ENABLED. Bot start detected");
-                Logging.Write("Ignore this message if you are not currently using Giles Trinity.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: Giles Trinity is NOT YET ENABLED. Bot start detected");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Ignore this message if you are not currently using Giles Trinity.");
                 return;
             }
             // Recording of all the XML's in use this run

@@ -34,7 +34,7 @@
                 <RowDefinition />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <ComboBox Width="180" SelectedValuePath="Tag" SelectedValue="{Binding Path=Loot.ItemFilterMode}"  >
+            <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{Binding Path=Loot.ItemFilterMode}"  >
                 <ComboBoxItem Content="Trinity Scoring Only" Tag="TrinityOnly" IsSelected="True" ToolTip="Uses Trinity Scoring Only (see Trinity Town-Runs Tab)" />
                 <ComboBoxItem Content="Trinity Scoring With Script Rules" Tag="TrinityWithItemRules" ToolTip="Utilizes Item Rulesets (see ItemRules directory)" />
                 <ComboBoxItem Content="Demonbuddy Loot Rules" Tag="DemonBuddy" ToolTip="Use the Built-in Demonbuddy loot rule logic (see Demonbuddy Settings tab)" />

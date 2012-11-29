@@ -1,4 +1,5 @@
-﻿using GilesTrinity.UIComponents;
+﻿using GilesTrinity.Technicals;
+using GilesTrinity.UIComponents;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -17,32 +18,33 @@ namespace GilesTrinity.UI
         {
             _ConfigWindow.Close();
         }
+
         public static Window GetDisplayWindow(string uiPath)
         {
             // Check we can actually find the .xaml file first - if not, report an error
             if (!File.Exists(Path.Combine(uiPath, "MainView.xaml")))
             {
-                Zeta.Common.Logging.Write("MainView.xaml not found {0}", Path.Combine(uiPath, "MainView.xaml"));
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "MainView.xaml not found {0}", Path.Combine(uiPath, "MainView.xaml"));
                 return null;
             }
             try
             {
-                Zeta.Common.Logging.Write("MainView.xaml found");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "MainView.xaml found");
                 if (_ConfigWindow == null)
                 {
                     _ConfigWindow = new Window();
                 }
-                Zeta.Common.Logging.Write("Load Context");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Context");
                 _ConfigWindow.DataContext = new ConfigViewModel(GilesTrinity.Settings);
 
-                Zeta.Common.Logging.Write("Load MainView.xaml");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load MainView.xaml");
                 UserControl mainControl = LoadAndTransformXamlFile<UserControl>(Path.Combine(uiPath, "MainView.xaml"));
-                Zeta.Common.Logging.Write("Load Children");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Children");
                 LoadChild(mainControl, uiPath);
-                Zeta.Common.Logging.Write("Load Resources");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Resources");
                 LoadResourceForWindow(Path.Combine(uiPath, "Template.xaml"), mainControl);
 
-                Zeta.Common.Logging.Write("Configure Window");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Configure Window");
                 _ConfigWindow.Content = mainControl;
                 _ConfigWindow.Height = 520;
                 _ConfigWindow.Width = 480;
@@ -56,14 +58,14 @@ namespace GilesTrinity.UI
 
                 Demonbuddy.App.Current.Exit += WindowClosed;
 
-                Zeta.Common.Logging.Write("Put MainControl to Window");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Put MainControl to Window");
                 // And finally put all of this content in effect
                 _ConfigWindow.Content = mainControl;
-                Zeta.Common.Logging.Write("End");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window build finished."); 
             }
             catch (XamlParseException ex)
             {
-                Zeta.Common.Logging.WriteException(ex);
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UI, "{0}", ex);
                 return _ConfigWindow;
             }
             return _ConfigWindow;
@@ -83,7 +85,7 @@ namespace GilesTrinity.UI
         /// <returns><see cref="Stream"/> which contains transformed XAML file.</returns>
         private static T LoadAndTransformXamlFile<T>(string filename)
         {
-            Zeta.Common.Logging.Write("Load XAML file : {0}", filename);
+            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load XAML file : {0}", filename);
             string filecontent = File.ReadAllText(filename);
             // Change reference to custom Trinity class
             filecontent = filecontent.Replace("xmlns:ut=\"clr-namespace:GilesTrinity.UIComponents\"", "xmlns:ut=\"clr-namespace:GilesTrinity.UIComponents;assembly=" + Assembly.GetExecutingAssembly().GetName().Name + "\"");
@@ -100,6 +102,7 @@ namespace GilesTrinity.UI
         /// <exception cref="System.NotImplementedException"></exception>
         static void WindowClosed(object sender, System.EventArgs e)
         {
+            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window closed."); 
             _ConfigWindow = null;
         }
 
@@ -149,7 +152,7 @@ namespace GilesTrinity.UI
                 // Otherwise, log control where you try to put dynamic tag
                 else
                 {
-                    Zeta.Common.Logging.Write("ctrl : {0}", ctrl.GetType().FullName);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Control of type '{0}' can't be used for dynamic loading.", ctrl.GetType().FullName);
                     return;
                 }
                 // Content added to parent control, try to search dynamic control in children
@@ -157,7 +160,7 @@ namespace GilesTrinity.UI
             }
             else
             {
-                Zeta.Common.Logging.Write("Error XAML file not found : '{0}'", filename);
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UI, "Error XAML file not found : '{0}'", filename);
             }
         }
     }

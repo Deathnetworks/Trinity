@@ -1,4 +1,5 @@
 ﻿using GilesTrinity.Settings.Combat;
+using GilesTrinity.Technicals;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -322,21 +323,21 @@ namespace GilesTrinity
 
                         double duration = t1.Elapsed.TotalMilliseconds;
 
-                        Logging.WriteDiagnostic("[Trinity] Cache:"
-                            + " [" + duration.ToString("0000.0000") + "]"
-                            + (AddToCache ? "Added  " : " Ignored")
-                            + (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "")
-                            + " Type: " + c_ObjectType
-                            + " (" + c_diaObject.ActorType + ")"
-                            + " Name: " + c_Name
-                            + " (" + c_ActorSNO + ")"
-                            + (c_unit_bIsBoss ? " IsBoss" : "")
-                            + " Dist2Mid: " + c_CentreDistance.ToString("0")
-                            + " Dist2Rad: " + c_RadiusDistance.ToString("0")
-                            + " ZDiff: " + c_ZDiff.ToString("0")
-                            + " Radius: " + c_Radius
-                            + (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : "")
-                           );
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, 
+                            "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}){7} Dist2Mid: {8:0} Dist2Rad: {9:0} ZDiff: {10:0} Radius: {11}",
+                            (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""), 
+                            duration, 
+                            (AddToCache ? "Added  " : " Ignored"), 
+                            (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""), 
+                            c_ObjectType, 
+                            c_diaObject.ActorType, 
+                            c_Name, 
+                            c_ActorSNO, 
+                            (c_unit_bIsBoss ? " IsBoss" : ""), 
+                            c_CentreDistance, 
+                            c_RadiusDistance, 
+                            c_ZDiff,
+                            c_Radius);
                         // }
                     }
                 }
@@ -344,10 +345,9 @@ namespace GilesTrinity
                 {
                     if (Settings.Advanced.DebugCache)
                     {
-                        Logging.WriteDiagnostic("[Trinity] error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
                             currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance);
-                        Logging.WriteDiagnostic(ex.Message);
-                        Logging.WriteDiagnostic(ex.StackTrace);
+                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
                     }
                 }
             }
@@ -593,6 +593,7 @@ namespace GilesTrinity
                 iTotalBacktracks = 0;
             }
             // End of backtracking check
+            //TODO : If this code is obselete remove it (Check that) 
             // Finally, a special check for waiting for wrath of the berserker cooldown before engaging Azmodan
             //if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Barbarian.WaitWOTB && !GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
             //    ZetaDia.CurrentWorldId == 121214 &&
@@ -614,7 +615,7 @@ namespace GilesTrinity
             if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Archon) && !GilesUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && ZetaDia.CurrentWorldId == 121214 &&
                 (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
-                Logging.Write("[Trinity] Waiting for Wizard Archon cooldown before continuing to Azmodan.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for Wizard Archon cooldown before continuing to Azmodan.");
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
@@ -629,7 +630,7 @@ namespace GilesTrinity
             if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_BigBadVoodoo) && !PowerManager.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && ZetaDia.CurrentWorldId == 121214 &&
                 (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
-                Logging.Write("[Trinity] Waiting for WD BigBadVoodoo cooldown before continuing to Azmodan.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for WD BigBadVoodoo cooldown before continuing to Azmodan.");
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
@@ -671,9 +672,9 @@ namespace GilesTrinity
                 // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
                 if (vAnySafePoint != vNullLocation)
                 {
-                    if (Settings.Advanced.DebugTargetting)
+                    if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Targetting))
                     {
-                        Logging.Write("[Trinity] Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
                             vAnySafePoint, vAnySafePoint.Distance(Me.Position), FindDirectionDegree(Me.Position, vAnySafePoint),
                             playerStatus.CurrentHealthPct, PlayerKiteDistance, hashMonsterObstacleCache.Count(m => m.Location.Distance(playerStatus.CurrentPosition) <= PlayerKiteDistance),
                             NeedToKite, TryToKite);

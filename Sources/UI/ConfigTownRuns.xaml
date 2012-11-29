@@ -30,19 +30,28 @@
             <TextBlock Text="Savlvage options :" FontWeight="Bold" TextAlignment="Center"/>
             <UniformGrid Grid.Row="1" Columns="4" Margin="25,2">
                 <TextBlock Margin="2" Text="Magics" FontWeight="Bold" VerticalAlignment="Center"/>
-                <RadioButton GroupName="BlueSalvage" Content="None" IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
-                <RadioButton GroupName="BlueSalvage" Content="Inferno" IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
-                <RadioButton GroupName="BlueSalvage" Content="All levels" IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="BlueSalvage" Content="None" ToolTip="Sell all items"
+                             IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="BlueSalvage" Content="Inferno" ToolTip="Salvage Only 59/60+ Items"
+                             IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="BlueSalvage" Content="All levels" ToolTip="Salvage all items, will not sell"
+                             IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
 
                 <TextBlock Margin="2" Text="Rares" FontWeight="Bold" VerticalAlignment="Center"/>
-                <RadioButton GroupName="YellowSalvage" Content="None" IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
-                <RadioButton GroupName="YellowSalvage" Content="Inferno" IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
-                <RadioButton GroupName="YellowSalvage" Content="All levels" IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="YellowSalvage" Content="None" ToolTip="Sell all items"
+                             IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="YellowSalvage" Content="Inferno" ToolTip="Salvage Only 59/60+ Items"
+                             IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="YellowSalvage" Content="All levels" ToolTip="Salvage all items, will not sell"
+                             IsChecked="{Binding Path=TownRun.SalvageYellowItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
 
                 <TextBlock Margin="2" Text="Legendaries" FontWeight="Bold" VerticalAlignment="Center"/>
-                <RadioButton GroupName="LegendarySalvage" Content="None" IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
-                <RadioButton GroupName="LegendarySalvage" Content="Inferno" IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
-                <RadioButton GroupName="LegendarySalvage" Content="All levels" IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="LegendarySalvage" Content="None" ToolTip="Sell all items"
+                             IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="LegendarySalvage" Content="Inferno" ToolTip="Salvage Only 59/60+ Items"
+                             IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="LegendarySalvage" Content="All levels" ToolTip="Salvage all items, will not sell"
+                             IsChecked="{Binding Path=TownRun.SalvageLegendaryItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
             </UniformGrid>
         </Grid>
         <!--Junk items Settings-->

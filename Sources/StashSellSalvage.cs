@@ -1,5 +1,6 @@
 ﻿using GilesTrinity.Notifications;
 using GilesTrinity.Settings.Loot;
+using GilesTrinity.Technicals;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -1148,6 +1149,8 @@ namespace GilesTrinity
             try
             {
                 LogStream = File.Open(sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - StashLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
+
+                //TODO : Change File Log writing
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
                 {
                     if (!loggedAnythingThisStash)
@@ -1171,11 +1174,11 @@ namespace GilesTrinity
                         sLegendaryString = " {legendary item}";
 
                         // Change made by bombastic
-                        Logging.Write("+=+=+=+=+=+=+=+=+ LEGENDARY FOUND +=+=+=+=+=+=+=+=+");
-                        Logging.Write("+  Name:       " + thisgooditem.RealName + " (" + thisgilesitemtype.ToString() + ")");
-                        Logging.Write("+  Score:       " + ithisitemvalue.ToString("0"));
-                        Logging.Write("+  Attributes: " + ValueItemStatString);
-                        Logging.Write("+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+=+=+=+=+=+=+=+=+ LEGENDARY FOUND +=+=+=+=+=+=+=+=+");
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Name:       {0} ({1})", thisgooditem.RealName, thisgilesitemtype);
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Score:       {0:0}", ithisitemvalue);
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Attributes: {0}", ValueItemStatString);
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
                     }
                     else
                     {

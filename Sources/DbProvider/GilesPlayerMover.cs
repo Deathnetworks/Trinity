@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.Technicals;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -123,22 +124,21 @@ namespace GilesTrinity.DbProvider
                     iCancelUnstuckerForSeconds = 20;
                 timeCancelledUnstuckerFor = DateTime.Now;
                 Navigator.Clear();
-                Logging.WriteDiagnostic("[Trinity] Clearing old route and trying new path find to: " + vOldMoveToTarget.ToString());
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Clearing old route and trying new path find to: " + vOldMoveToTarget.ToString());
                 Navigator.MoveTo(vOldMoveToTarget, "original destination", false);
                 return vSafeMovementLocation;
             }
             // Only try an unstuck 10 times maximum in XXX period of time
             if (Vector3.Distance(vOriginalDestination, vMyCurrentPosition) >= 700f)
             {
-                Logging.Write("[Trinity] You are " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away from your destination.");
-                Logging.Write("[Trinity] This is too far for the unstucker, and is likely a sign of ending up in the wrong map zone.");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "You are " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away from your destination.");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "This is too far for the unstucker, and is likely a sign of ending up in the wrong map zone.");
                 iTotalAntiStuckAttempts = 20;
             }
             // intell
             if (iTotalAntiStuckAttempts <= 15)
             {
-                Logging.Write(
-                    "[Trinity] Your bot got stuck! Trying to unstuck (attempt #{0} of 15 attempts) {1} {2} {3} {4}",
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Your bot got stuck! Trying to unstuck (attempt #{0} of 15 attempts) {1} {2} {3} {4}",
                     iTotalAntiStuckAttempts.ToString(),
                     "Act=\"" + ZetaDia.CurrentAct + "\"",
                     "questId=\"" + ZetaDia.CurrentQuest.QuestSNO + "\"",
@@ -146,7 +146,7 @@ namespace GilesTrinity.DbProvider
                     "worldId=\"" + ZetaDia.CurrentWorldId + "\""
                 );
 
-                Logging.WriteDiagnostic("(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
                 GilesTrinity.playerStatus.CurrentPosition = vMyCurrentPosition;
                 vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, Vector3.Zero);
                 // Temporarily log stuff
@@ -175,7 +175,7 @@ namespace GilesTrinity.DbProvider
             if (iTimesReachedMaxUnstucks == 1)
             {
                 Navigator.Clear();
-                Logging.Write("[Trinity] Anti-stuck measures now attempting to kickstart DB's path-finder into action.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Anti-stuck measures now attempting to kickstart DB's path-finder into action.");
                 Navigator.MoveTo(vOriginalDestination, "original destination", false);
                 iCancelUnstuckerForSeconds = 40;
                 timeCancelledUnstuckerFor = DateTime.Now;
@@ -183,7 +183,7 @@ namespace GilesTrinity.DbProvider
             }
             if (iTimesReachedMaxUnstucks == 2)
             {
-                Logging.Write("[Trinity] Anti-stuck measures failed. Now attempting to reload current profile.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Anti-stuck measures failed. Now attempting to reload current profile.");
 
                 // First see if we need to, and can, teleport to town
                 //while (!ZetaDia.Me.IsInTown)
@@ -322,7 +322,7 @@ namespace GilesTrinity.DbProvider
                     }
                     else
                     {
-                        Logging.WriteDiagnostic("[Trinity] Clearing old route and trying new path find to: " + vOldMoveToTarget.ToString());
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Clearing old route and trying new path find to: " + vOldMoveToTarget.ToString());
                         // Reset the path and allow a whole "New" unstuck generation next cycle
                         iTimesReachedStuckPoint = 0;
                         // And cancel unstucking for 9 seconds so DB can try to navigate
@@ -473,7 +473,7 @@ namespace GilesTrinity.DbProvider
                 vShiftedPosition = vMoveToTarget;
                 iShiftPositionFor = 900;
                 lastShiftedPosition = DateTime.Now;
-                Logging.WriteDiagnostic("[Trinity] Navigation handler position shift to: " + vMoveToTarget.ToString() + " (was " + point.ToString() + ")");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Navigation handler position shift to: " + vMoveToTarget.ToString() + " (was " + point.ToString() + ")");
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using GilesTrinity.Settings.Combat;
+using GilesTrinity.Technicals;
 using System;
 using System.Linq;
 using Zeta.Common;
@@ -245,7 +246,7 @@ namespace GilesTrinity
                                         {
                                             iTotalNumberGoblins++;
                                             lastGoblinTime = DateTime.Now;
-                                            Logging.Write("[Trinity] Goblin #" + iTotalNumberGoblins.ToString() + " in sight. Distance=" + cacheObject.CentreDistance);
+                                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Weight, "[Trinity] Goblin #{0} in sight. Distance={1}", iTotalNumberGoblins, cacheObject.CentreDistance);
                                         }
                                         else
                                         {
@@ -552,7 +553,7 @@ namespace GilesTrinity
                 //}
                 if (Settings.Advanced.DebugWeights)
                 {
-                    Logging.WriteDiagnostic("[Trinity] Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5}",
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5}",
                         cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance);
                 }
 
@@ -585,7 +586,7 @@ namespace GilesTrinity
                             {
                                 foreach (GilesObstacle o in AvoidanceList)
                                 {
-                                    Logging.WriteDiagnostic("[Trinity] Avoidance: Id={0} Weight={1} Loc={2} Radius={3} Name={4}", o.ActorSNO, o.Weight, o.Location, o.Radius, o.Name);
+                                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Avoidance: Id={0} Weight={1} Loc={2} Radius={3} Name={4}", o.ActorSNO, o.Weight, o.Location, o.Radius, o.Name);
                                 }
                             }
 
@@ -599,8 +600,12 @@ namespace GilesTrinity
             // Loop through all the objects and give them a weight
             if (Settings.Advanced.DebugTargetting && CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0)
             {
-                Logging.WriteVerbose("[Trinity] Target changed to {2} {0} ({1})",
-                                CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.Type);
+                DbHelper.Log(TrinityLogLevel.Verbose, 
+                                LogCategory.Weight, 
+                                "Target changed to {2} {0} ({1})",
+                                CurrentTarget.InternalName, 
+                                CurrentTarget.ActorSNO, 
+                                CurrentTarget.Type);
             }
         }
     }

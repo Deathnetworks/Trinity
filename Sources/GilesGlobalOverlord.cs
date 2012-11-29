@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.Technicals;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Zeta;
@@ -55,7 +56,7 @@ namespace GilesTrinity
                 }
                 catch
                 {
-                    Logging.WriteDiagnostic("[Trinity] Safely handled exception trying to get character class.");
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.GlobalHandler, "Safely handled exception trying to get character class.");
                 }
                 if (tempClass != ActorClass.Invalid)
                     iMyCachedActorClass = ZetaDia.Actors.Me.ActorClass;
@@ -252,7 +253,7 @@ namespace GilesTrinity
             CurrentTarget = null;
 
             // Ok let DemonBuddy do stuff this loop, since we're done for the moment
-            //Logging.WriteDiagnostic(sStatusText);
+            //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.GlobalHandler, sStatusText);
 
             return false;
         }
@@ -288,7 +289,7 @@ namespace GilesTrinity
             {
                 if (!hashSNOIgnoreBlacklist.Contains(b.ActorId))
                 {
-                    Logging.WriteDiagnostic("Adding Profile TargetBlacklist {0} to Giles Blacklists", b.ActorId);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.GlobalHandler, "Adding Profile TargetBlacklist {0} to Giles Blacklists", b.ActorId);
                     hashSNOIgnoreBlacklist.Add(b.ActorId);
                 }
                 if (!hashActorSNOIgnoreBlacklist.Contains(b.ActorId))

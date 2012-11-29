@@ -305,7 +305,7 @@ namespace GilesTrinity
                                 Vector2 ValidLocation = FindValidBackpackLocation(true);
                                 if (ValidLocation.X < 0 || ValidLocation.Y < 0)
                                 {
-                                    Logging.Write("No more space to pickup a 2-slot item, town-run requested at next free moment.");
+                                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, town-run requested at next free moment.");
                                     ForceVendorRunASAP = true;
                                     runStatus = HandlerRunStatus.TreeSuccess;
                                 }
@@ -408,15 +408,29 @@ namespace GilesTrinity
                                 {
                                     if (CurrentTarget.Type == GObjectType.Barricade)
                                     {
-                                        Logging.WriteDiagnostic("[Trinity] Barricade: Name=" + CurrentTarget.InternalName + ". SNO=" + CurrentTarget.ActorSNO.ToString() +
-                                            ", Range=" + CurrentTarget.CentreDistance.ToString() + ". Needed range=" + fRangeRequired.ToString() + ". Radius=" +
-                                            CurrentTarget.Radius.ToString() + ". Type=" + CurrentTarget.Type.ToString() + ". Using power=" + currentPower.SNOPower.ToString());
+                                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior,
+                                            "Barricade: Name={0}. SNO={1}, Range={2}. Needed range={3}. Radius={4}. Type={5}. Using power={6}",
+                                            CurrentTarget.InternalName,
+                                            CurrentTarget.ActorSNO,
+                                            CurrentTarget.CentreDistance,
+                                            fRangeRequired,
+                                            CurrentTarget.Radius,
+                                            CurrentTarget.Type,
+                                            currentPower.SNOPower
+                                            );
                                     }
                                     else
                                     {
-                                        Logging.WriteDiagnostic("[Trinity] Destructible: Name=" + CurrentTarget.InternalName + ". SNO=" + CurrentTarget.ActorSNO.ToString() +
-                                               ", Range=" + CurrentTarget.CentreDistance.ToString() + ". Needed range=" + fRangeRequired.ToString() + ". Radius=" +
-                                               CurrentTarget.Radius.ToString() + ". Type=" + CurrentTarget.Type.ToString() + ". Using power=" + currentPower.SNOPower.ToString());
+                                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, 
+                                            "Destructible: Name={0}. SNO={1}, Range={2}. Needed range={3}. Radius={4}. Type={5}. Using power={7}",
+                                            CurrentTarget.InternalName,
+                                            CurrentTarget.ActorSNO,
+                                            CurrentTarget.CentreDistance,
+                                            fRangeRequired,
+                                            CurrentTarget.Radius,
+                                            CurrentTarget.Type,
+                                            currentPower.SNOPower
+                                            );
                                     }
 
                                     WaitWhileAnimating(12, true);
@@ -431,7 +445,7 @@ namespace GilesTrinity
                                             vAttackPoint = CurrentTarget.Position;
 
                                         vAttackPoint.Z += 1.5f;
-                                        Logging.WriteDiagnostic("[Trinity] (NB: Attacking location of destructable)");
+                                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "(NB: Attacking location of destructable)");
                                         ZetaDia.Me.UsePower(currentPower.SNOPower, vAttackPoint, iCurrentWorldID, -1);
                                     }
                                     else
@@ -566,7 +580,7 @@ namespace GilesTrinity
                                     vShiftedPosition = vCurrentDestination;
                                     iShiftPositionFor = 1000;
                                     lastShiftedPosition = DateTime.Now;
-                                    Logging.WriteDiagnostic("[Trinity] Mid-Target-Handle position shift location to: " + vCurrentDestination.ToString() + " (was " + point.ToString() + ")");
+                                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Mid-Target-Handle position shift location to: {0} (was {1})", vCurrentDestination, point);
                                 }
                             }
                             // Make sure we only shift max once every 10 seconds
@@ -682,8 +696,7 @@ namespace GilesTrinity
             }
             catch (Exception ex)
             {
-                Logging.WriteDiagnostic(ex.ToString());
-                Logging.WriteException(ex);
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.Behavior, "{0}", ex);
                 return RunStatus.Failure;
             }
 
@@ -726,7 +739,7 @@ namespace GilesTrinity
                 {
                     if (CurrentTarget.Type == GObjectType.Unit)
                     {
-                        Logging.Write("[Trinity] Blacklisting a monster because of possible stuck issues. " +
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Blacklisting a monster because of possible stuck issues. " +
                             "Monster=" + CurrentTarget.InternalName + " {" +
                             CurrentTarget.ActorSNO + "} Range=" + CurrentTarget.CentreDistance.ToString("0") + " health %=" + CurrentTarget.HitPoints.ToString("0") +
                             " RActorGUID=" + CurrentTarget.RActorGuid
@@ -734,7 +747,7 @@ namespace GilesTrinity
                     }
                     else
                     {
-                        Logging.Write("[Trinity] Blacklisting an object because of possible stuck issues. Object=" + CurrentTarget.InternalName + " {" +
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Blacklisting an object because of possible stuck issues. Object=" + CurrentTarget.InternalName + " {" +
                             CurrentTarget.ActorSNO + "}. Range=" + CurrentTarget.CentreDistance.ToString("0") +
                             " RActorGUID=" + CurrentTarget.RActorGuid
                             );
@@ -777,9 +790,9 @@ namespace GilesTrinity
                         if (DateTime.Now.Subtract(lastRemindedAboutAbilities).TotalSeconds > 60 && iNoAbilitiesAvailableInARow >= 4)
                         {
                             lastRemindedAboutAbilities = DateTime.Now;
-                            Logging.Write("Fatal Error: Couldn't find a valid attack ability. Not enough resource for any abilities or all on cooldown");
-                            Logging.Write("If you get this message frequently, you should consider changing your build");
-                            Logging.Write("Perhaps you don't have enough critical hit chance % for your current build, or just have a bad skill setup?");
+                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.Behavior, "Fatal Error: Couldn't find a valid attack ability. Not enough resource for any abilities or all on cooldown");
+                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.Behavior, "If you get this message frequently, you should consider changing your build");
+                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.Behavior, "Perhaps you don't have enough critical hit chance % for your current build, or just have a bad skill setup?");
                         }
                     }
                     else
@@ -849,7 +862,7 @@ namespace GilesTrinity
                             }
                             catch
                             {
-                                Logging.WriteDiagnostic("[Trinity] Safely handled exception getting attribute max health #2 for unit " + c_Name + " [" + c_ActorSNO.ToString() + "]");
+                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit " + c_Name + " [" + c_ActorSNO.ToString() + "]");
                                 StaleCache = true;
                             }
                         }
@@ -1067,7 +1080,7 @@ namespace GilesTrinity
             }
             if (Settings.Advanced.DebugTargetting)
             {
-                Logging.WriteDiagnostic(sStatusText);
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, sStatusText);
             }
             bResetStatusText = true;
         }
@@ -1120,7 +1133,7 @@ namespace GilesTrinity
             }
             if (Settings.Advanced.DebugTargetting)
             {
-                Logging.WriteDiagnostic(sStatusText);
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, sStatusText);
             }
             bResetStatusText = true;
         }
@@ -1333,7 +1346,6 @@ namespace GilesTrinity
             }
             if (bUsePowerSuccess)
             {
-                //Logging.WriteDiagnostic("Used power {0} at {1} on target {2} successfully", powerPrime.SNOPower, powerPrime.vTargetLocation, powerPrime.iTargetGUID);
                 dictAbilityLastUse[currentPower.SNOPower] = DateTime.Now;
                 lastGlobalCooldownUse = DateTime.Now;
                 powerLastSnoPowerUsed = currentPower.SNOPower;
@@ -1341,14 +1353,6 @@ namespace GilesTrinity
                 // Wait for animating AFTER the attack
                 if (currentPower.bWaitWhileAnimating)
                     WaitWhileAnimating(3, false);
-            }
-            else
-            {
-                //Logging.Write(powerPrime.powerThis.ToString() + " reported failure");
-                //dictAbilityLastFailed[powerPrime.powerThis] = DateTime.Now;
-                //*Logging.WriteDiagnostic("GSDebug: Skill use apparently failed=" + powerPrime.powerThis.ToString() + ", against enemy: " + targetCurrent.sThisInternalName +
-                //    " (skill use range=" + powerPrime.iMinimumRange.ToString() + ", enemy centre range=" + targetCurrent.fCentreDistance.ToString() + ", radius range=" +
-                //    targetCurrent.fRadiusDistance.ToString() + " (radius=" + targetCurrent.fThisRadius.ToString() + ")");*/
             }
             // Wait for animating AFTER the attack
             if (currentPower.bWaitWhileAnimating)
@@ -1378,7 +1382,6 @@ namespace GilesTrinity
             bWaitingAfterPower = false;
             if (currentPower.iForceWaitLoopsAfter >= 1)
             {
-                //Logging.WriteDiagnostic("Force waiting AFTER ability " + powerPrime.powerThis.ToString() + "...");
                 bWaitingAfterPower = true;
             }
         }

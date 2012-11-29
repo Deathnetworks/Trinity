@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.Technicals;
+using System;
 using Zeta.Common;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Profile;
@@ -42,7 +43,7 @@ namespace GilesTrinity.XmlTags
             }
             catch (Exception exception)
             {
-                Logging.WriteDiagnostic(ScriptManager.FormatSyntaxErrorException(exception));
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.XmlTag, ScriptManager.FormatSyntaxErrorException(exception)); 
                 BotMain.Stop(false, "");
                 throw;
             }
