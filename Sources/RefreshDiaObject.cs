@@ -124,7 +124,7 @@ namespace GilesTrinity
                         IsElite = c_unit_IsElite,
                         IsRare = c_unit_IsRare,
                         IsUnique = c_unit_IsUnique,
-                        IsMinion = c_unit_bIsMinion,
+                        IsMinion = c_unit_IsMinion,
                         IsTreasureGoblin = c_unit_IsTreasureGoblin,
                         IsBoss = c_unit_IsBoss,
                         IsAttackable = c_unit_IsAttackable,
@@ -193,7 +193,7 @@ namespace GilesTrinity
             c_unit_IsElite = false;
             c_unit_IsRare = false;
             c_unit_IsUnique = false;
-            c_unit_bIsMinion = false;
+            c_unit_IsMinion = false;
             c_unit_IsTreasureGoblin = false;
             c_unit_IsBoss = false;
             c_unit_IsAttackable = false;
@@ -849,7 +849,7 @@ namespace GilesTrinity
             if (c_RadiusDistance <= 1f)
                 c_RadiusDistance = 1f;
             // All-in-one flag for quicker if checks throughout
-            c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_bIsMinion);
+            c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion);
             // Special flags to decide whether to target anything at all
             if (c_IsEliteRareUnique || c_unit_IsBoss)
                 bAnyChampionsPresent = true;
