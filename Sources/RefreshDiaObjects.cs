@@ -275,8 +275,6 @@ namespace GilesTrinity
             "MarkerLocation", "Generic_Proxy", "Hireling", "Barbarian","Barbarian", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint",
         };
 
-
-
         private static void RefreshCacheMainLoop()
         {
             var refreshSource =
@@ -322,11 +320,12 @@ namespace GilesTrinity
                         // if (!ignore)
                         // {
 
-                        long duration = t1.ElapsedMilliseconds;
+                        double duration = t1.Elapsed.TotalMilliseconds;
+
                         Logging.WriteDiagnostic("[Trinity] Cache:"
-                            + (AddToCache ? "Added  " : "Ignored")
+                            + " [" + duration.ToString("0000.0000") + "]"
+                            + (AddToCache ? "Added  " : " Ignored")
                             + (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "")
-                            + String.Format(" [{0}]", duration)
                             + " Type: " + c_ObjectType
                             + " (" + c_diaObject.ActorType + ")"
                             + " Name: " + c_Name
