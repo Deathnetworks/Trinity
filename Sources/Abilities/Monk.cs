@@ -119,7 +119,7 @@ namespace GilesTrinity
                     weaponSwap.SwapGear();
                     WeaponSwapTime = DateTime.Now;
                 }
-                if (!(weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds <= 200))
+                if (!(weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds <= 200) || !Settings.Combat.Monk.SweepingWindWeaponSwap)
                 {
                     SweepWindSpam = DateTime.Now;
                     return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 2,2
