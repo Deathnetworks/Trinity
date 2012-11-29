@@ -154,11 +154,11 @@ namespace GilesTrinity.Settings
                 {
                     if (!File.Exists(filename))
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, "No Config file for BattleTag, General file is considered.");
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "No Config file for BattleTag, General file is considered.");
                         filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", "GilesTrinity.xml");
                     }
-                
-                    DbHelper.Log(TrinityLogLevel.Verbose, "Load Config file : {0}", filename);
+
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Load Config file : {0}", filename);
                     if (File.Exists(filename))
                     {
                         using (Stream stream = File.Open(filename, FileMode.Open))
@@ -169,18 +169,18 @@ namespace GilesTrinity.Settings
                             TrinitySetting loadedSetting = (TrinitySetting)serializer.ReadObject(stream);
                             stream.Close();
                             loadedSetting.CopyTo(this);
-                            DbHelper.Log(TrinityLogLevel.Verbose, "Configuration file loaded: {0}", filename);
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Configuration file loaded: {0}", filename);
                         }
                     }
                     else
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, "Config file '{0}' not found.", filename);
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Config file '{0}' not found.", filename);
                         Reset();
                     }
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Critical, "Error while loading Config file '{0}' :{1}{2}", filename, Environment.NewLine, ex);
+                    DbHelper.Log(TrinityLogLevel.Critical, LogCategory.UserInformation, "Error while loading Config file '{0}' :{1}{2}", filename, Environment.NewLine, ex);
                 }
             }
         }
@@ -192,7 +192,7 @@ namespace GilesTrinity.Settings
                 string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "GilesTrinity.xml");
                 try
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, "Save Config file : {0}", filename);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Save Config file : {0}", filename);
                     using (Stream stream = File.Open(filename, FileMode.Create))
                     {
                         DataContractSerializer serializer = new DataContractSerializer(typeof(TrinitySetting));
@@ -202,7 +202,7 @@ namespace GilesTrinity.Settings
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Critical, "Error while saving Config file '{0}' :{1}{2}", filename, Environment.NewLine, ex);
+                    DbHelper.Log(TrinityLogLevel.Critical, LogCategory.UserInformation, "Error while saving Config file '{0}' :{1}{2}", filename, Environment.NewLine, ex);
                 }
             }
         }
@@ -226,7 +226,7 @@ namespace GilesTrinity.Settings
             try
             {
                 Type type = typeof(T);
-                DbHelper.Log(TrinityLogLevel.Verbose, "Starting Reset Object {0}", type.Name);
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Starting Reset Object {0}", type.Name);
                 foreach (PropertyInfo prop in type.GetProperties(BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
                 {
                     if (prop.PropertyType.IsValueType || prop.PropertyType == typeof(string))
@@ -254,11 +254,11 @@ namespace GilesTrinity.Settings
                         }
                     }
                 }
-                DbHelper.Log(TrinityLogLevel.Verbose, "End Reset Object {0}", type.Name);
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "End Reset Object {0}", type.Name);
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Error, "Error while Reset Setting {1} : {0}", ex.Message, typeof(T).Name);
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while Reset Setting {1} : {0}", ex.Message, typeof(T).Name);
             }
         }
 
@@ -267,7 +267,7 @@ namespace GilesTrinity.Settings
             try
             {
                 Type type = typeof(T);
-                DbHelper.Log(TrinityLogLevel.Verbose, "Starting CopyTo Object {0}", type.Name);
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Starting CopyTo Object {0}", type.Name);
                 foreach (PropertyInfo prop in type.GetProperties(BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
                 {
                     if (prop.PropertyType.IsValueType || prop.PropertyType == typeof(string))
@@ -296,11 +296,11 @@ namespace GilesTrinity.Settings
                         }
                     }
                 }
-                DbHelper.Log(TrinityLogLevel.Verbose, "End CopyTo Object {0}", type.Name);
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "End CopyTo Object {0}", type.Name);
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Error, "Error while CopyTo Setting {1} : {0}", ex.Message, typeof(T).Name);
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while CopyTo Setting {1} : {0}", ex.Message, typeof(T).Name);
             }
         }
 
@@ -308,7 +308,7 @@ namespace GilesTrinity.Settings
         {
             try
             {
-                DbHelper.Log(TrinityLogLevel.Verbose, "Starting Clone Object {0}", typeof(T).Name);
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Starting Clone Object {0}", typeof(T).Name);
                 using (MemoryStream ms = new MemoryStream())
                 {
                     DataContractSerializer serializer = new DataContractSerializer(typeof(T));
@@ -319,12 +319,12 @@ namespace GilesTrinity.Settings
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Error, "Error while Clone Setting {1} : {0}", ex.Message, typeof(T).Name);
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while Clone Setting {1} : {0}", ex.Message, typeof(T).Name);
                 return null;
             }
             finally
             {
-                DbHelper.Log(TrinityLogLevel.Verbose, "End Clone Object {0}", typeof(T).Name);
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "End Clone Object {0}", typeof(T).Name);
             }
         }
         #endregion Static Methods
