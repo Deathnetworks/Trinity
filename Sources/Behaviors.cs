@@ -131,7 +131,7 @@ namespace GilesTrinity
                     wasRootedLastTick = false;
                 if (CurrentTarget == null)
                 {
-                    Logging.WriteDiagnostic("[Trinity] targetCurrent was passed as null!");
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget was passed as null!");
                 }
                 CheckStaleCache();
                 // So, after all that, do we actually want a new target list?

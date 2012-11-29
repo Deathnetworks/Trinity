@@ -136,7 +136,6 @@ namespace GilesTrinity
                 case GBaseItemType.Unknown:
                     return false;
                 default:
-                    DbHelper.Log("default case");
                     return false;
             }
 

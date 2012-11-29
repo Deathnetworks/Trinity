@@ -10,11 +10,12 @@ namespace GilesTrinity.DbProvider
     {
         /// <summary>Logs the specified level.</summary>
         /// <param name="level">The logging level.</param>
+        /// <param name="category">The category.</param>
         /// <param name="formatMessage">The format message.</param>
         /// <param name="args">The parameters used when format message.</param>
-        public static void Log(TrinityLogLevel level, string formatMessage, params object[] args)
+        public static void Log(TrinityLogLevel level,LogCategory category, string formatMessage, params object[] args)
         {
-            string msg = "[Trinity]: " + formatMessage;
+            string msg = string.Format("[Trinity]{0}{1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
             if (level == TrinityLogLevel.Critical)
             {
                 Logging.Write(ConvertToLogLevel(level), Colors.Red, msg, args);
@@ -26,11 +27,12 @@ namespace GilesTrinity.DbProvider
         }
 
         /// <summary>Logs the specified level.</summary>
+        /// <param name="category">The category.</param>
         /// <param name="formatMessage">The format message.</param>
         /// <param name="args">The parameters used when format message.</param>
-        public static void Log(string formatMessage, params object[] args)
+        public static void Log(LogCategory category, string formatMessage, params object[] args)
         {
-            Log(TrinityLogLevel.Debug, formatMessage, args);
+            Log(TrinityLogLevel.Debug, category, formatMessage, args);
         }
 
         /// <summary>Converts <see cref="TrinityLogLevel"/> to <see cref="LogLevel"/>.</summary>

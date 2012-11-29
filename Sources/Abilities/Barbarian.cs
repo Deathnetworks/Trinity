@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.DbProvider;
+using System;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
@@ -72,20 +73,13 @@ namespace GilesTrinity
             {
                 if (playerStatus.CurrentEnergy >= 50)
                 {
-                    if (CurrentTarget.ActorSNO == 255996)
-                        Logging.Write("[Trinity] Berserk being used: Act 1 Warden, Odeg!");
-                    else if (CurrentTarget.ActorSNO == 256000)
-                        Logging.Write("[Trinity] Berserk being used: Act 2 Warden, Sokahr!");
-                    else if (CurrentTarget.ActorSNO == 256015)
-                        Logging.Write("[Trinity] Berserk being used: Act 3 Warden, Xah'rith!");
-                    else
-                        Logging.Write("[Trinity] Berserk being used!");
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Berserk being used!({0})", CurrentTarget.InternalName);
                     bUseBerserker = false;
                     return new GilesPower(SNOPower.Barbarian_WrathOfTheBerserker, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
                 }
                 else
                 {
-                    Logging.Write("[Trinity] Berserk ready, waiting for fury...");
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Berserk ready, waiting for fury..."); 
                     bWaitingForSpecial = true;
                 }
             }
