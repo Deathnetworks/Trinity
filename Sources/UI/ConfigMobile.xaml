@@ -93,9 +93,9 @@
             <CheckBox Grid.ColumnSpan="1" IsChecked="{Binding Path=Notification.MailEnabled}" Margin="2">Enable Email Address</CheckBox>
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Address" Margin="2"/>
             <TextBox Grid.Row="2" Grid.Column="0" Text="{Binding Path=Notification.EmailAddress}" IsEnabled="{Binding Path=Notification.MailEnabled}" Margin="2"/>
-            <TextBlock Grid.Row="1" Grid.Column="1" Text="Address" Margin="2"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="Password" Margin="2"/>
             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=Notification.EmailPassword}" IsEnabled="{Binding Path=Notification.MailEnabled}" Margin="2"/>
-            <TextBlock Grid.Row="1" Grid.Column="2" Text="Address" Margin="2"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="BotName" Margin="2"/>
             <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding Path=Notification.BotName}" IsEnabled="{Binding Path=Notification.MailEnabled}" Margin="2"/>
         </Grid>
         <!--Reset Button-->

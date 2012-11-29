@@ -410,26 +410,26 @@ namespace GilesTrinity
                                     {
                                         DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior,
                                             "Barricade: Name={0}. SNO={1}, Range={2}. Needed range={3}. Radius={4}. Type={5}. Using power={6}",
-                                            CurrentTarget.InternalName,
-                                            CurrentTarget.ActorSNO,
-                                            CurrentTarget.CentreDistance,
-                                            fRangeRequired,
-                                            CurrentTarget.Radius,
-                                            CurrentTarget.Type,
-                                            currentPower.SNOPower
+                                            CurrentTarget.InternalName,     // 0
+                                            CurrentTarget.ActorSNO,         // 1
+                                            CurrentTarget.CentreDistance,   // 2
+                                            fRangeRequired,                 // 3
+                                            CurrentTarget.Radius,           // 4
+                                            CurrentTarget.Type,             // 5
+                                            currentPower.SNOPower           // 6
                                             );
                                     }
                                     else
                                     {
                                         DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, 
                                             "Destructible: Name={0}. SNO={1}, Range={2}. Needed range={3}. Radius={4}. Type={5}. Using power={7}",
-                                            CurrentTarget.InternalName,
-                                            CurrentTarget.ActorSNO,
-                                            CurrentTarget.CentreDistance,
-                                            fRangeRequired,
-                                            CurrentTarget.Radius,
-                                            CurrentTarget.Type,
-                                            currentPower.SNOPower
+                                            CurrentTarget.InternalName,     // 0
+                                            CurrentTarget.ActorSNO,         // 1
+                                            CurrentTarget.CentreDistance,   // 2
+                                            fRangeRequired,                 // 3 
+                                            CurrentTarget.Radius,           // 4
+                                            CurrentTarget.Type,             // 5
+                                            currentPower.SNOPower           // 6
                                             );
                                     }
 
@@ -740,15 +740,15 @@ namespace GilesTrinity
                     if (CurrentTarget.Type == GObjectType.Unit)
                     {
                         DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Blacklisting a monster because of possible stuck issues. " +
-                            "Monster=" + CurrentTarget.InternalName + " {" +
-                            CurrentTarget.ActorSNO + "} Range=" + CurrentTarget.CentreDistance.ToString("0") + " health %=" + CurrentTarget.HitPoints.ToString("0") +
+                            "Monster=" + CurrentTarget.InternalName + " {{" +
+                            CurrentTarget.ActorSNO + "}} Range=" + CurrentTarget.CentreDistance.ToString("0") + " health %=" + CurrentTarget.HitPoints.ToString("0") +
                             " RActorGUID=" + CurrentTarget.RActorGuid
                             );
                     }
                     else
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Blacklisting an object because of possible stuck issues. Object=" + CurrentTarget.InternalName + " {" +
-                            CurrentTarget.ActorSNO + "}. Range=" + CurrentTarget.CentreDistance.ToString("0") +
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Blacklisting an object because of possible stuck issues. Object=" + CurrentTarget.InternalName + " {{" +
+                            CurrentTarget.ActorSNO + "}}. Range=" + CurrentTarget.CentreDistance.ToString("0") +
                             " RActorGUID=" + CurrentTarget.RActorGuid
                             );
                     }
@@ -1067,7 +1067,7 @@ namespace GilesTrinity
                     sStatusText += "Click ";
                     break;
             }
-            sStatusText += "Target=" + CurrentTarget.InternalName + " [" + CurrentTarget.ActorSNO + "]. ";
+            sStatusText += "Target=" + CurrentTarget.InternalName + " {{" + CurrentTarget.ActorSNO + "}}. ";
             sStatusText += "Type=" + CurrentTarget.Type + " C-Dist=" + CurrentTarget.CentreDistance.ToString("0") + ". ";
             sStatusText += "R-Dist=" + Math.Round(CurrentTarget.RadiusDistance, 2).ToString() + ". ";
             sStatusText += "RangeReq'd: " + fRangeRequired.ToString("0") + ". ";
@@ -1122,7 +1122,7 @@ namespace GilesTrinity
                     sStatusText += "Click ";
                     break;
             }
-            sStatusText += "Target=" + CurrentTarget.InternalName + " [" + CurrentTarget.ActorSNO + "]. C-Dist=" + Math.Round(CurrentTarget.CentreDistance, 2).ToString() + ". " +
+            sStatusText += "Target=" + CurrentTarget.InternalName + " {{" + CurrentTarget.ActorSNO + "}}. C-Dist=" + Math.Round(CurrentTarget.CentreDistance, 2).ToString() + ". " +
                 "R-Dist=" + Math.Round(CurrentTarget.RadiusDistance, 2).ToString() + ". ";
             if (CurrentTarget.Type == GObjectType.Unit && currentPower.SNOPower != SNOPower.None)
                 sStatusText += "Power=" + currentPower.SNOPower.ToString() + " (range " + fRangeRequired.ToString() + ") ";
