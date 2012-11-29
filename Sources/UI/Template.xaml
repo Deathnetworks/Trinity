@@ -4,6 +4,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ut="clr-namespace:GilesTrinity.UIComponents">
     <ut:IntToStringConverter x:Key="intToStringConverter"/>
+
+    <Style x:Key="LinkButton" TargetType="Button">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <TextBlock TextDecorations="Underline">
+                        <ContentPresenter />
+                    </TextBlock>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Foreground" Value="Blue" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="true">
+                <Setter Property="Foreground" Value="Red" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
     
     <ControlTemplate x:Key="Slider" TargetType="{x:Type Slider}">
         <Grid>
