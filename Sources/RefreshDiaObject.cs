@@ -331,8 +331,14 @@ namespace GilesTrinity
                     if (!Settings.Combat.Misc.AvoidAOE)
                     {
                         AddToCache = false;
-                        //return bWantThis;
+                        c_IgnoreSubStep = "AvoidanceDisabled";
                     }
+                    else
+                    {
+                        // Avoidance isn't disabled, so set this object type to avoidance
+                        c_ObjectType = GObjectType.Avoidance;
+                    }
+                    
                     // Checking for BuffVisualEffect - for Butcher, maybe useful other places?
                     if (hashAvoidanceBuffSNOList.Contains(c_ActorSNO))
                     {
@@ -341,7 +347,10 @@ namespace GilesTrinity
                         {
                             hasBuff = c_CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) > 0;
                         }
-                        catch { }
+                        catch {
+                            // Remove on exception, otherwise it may get stuck in the cache
+                            dictGilesObjectTypeCache.Remove(c_RActorGuid);
+                        }
                         if (hasBuff)
                         {
                             AddToCache = true;
@@ -351,13 +360,10 @@ namespace GilesTrinity
                         {
                             dictGilesObjectTypeCache.Remove(c_RActorGuid);
                             AddToCache = false;
+                            c_IgnoreSubStep = "NoBuffVisualEffect";
                         }
                     }
-                    else
-                    {
-                        // Avoidance isn't disabled, so set this object type to avoidance
-                        c_ObjectType = GObjectType.Avoidance;
-                    }
+                    
                 }
                 // It's not an avoidance, so let's calculate it's object type "properly"
                 else
@@ -443,7 +449,7 @@ namespace GilesTrinity
                         if (!ForceVendorRunASAP)
                         {
                             AddToCache = RefreshGilesItem(AddToCache);
-                            c_IgnoreSubStep = "RefreshGilesItem";
+                            c_IgnoreReason = "RefreshGilesItem";
                         }
                         else
                         {
@@ -1254,7 +1260,7 @@ namespace GilesTrinity
             if (c_BalanceID == -1)
             {
                 AddTocache = false;
-                //return bWantThis;
+                c_IgnoreSubStep = "InvalidBalanceID";
             }
             // Try and pull up cached item data on this item, if not, add to our local memory cache
             GilesGameBalanceDataCache balanceCachEntry;
@@ -1293,14 +1299,14 @@ namespace GilesTrinity
                         Logging.WriteDiagnostic("[Trinity] Safely handled exception getting un-cached ACD Item data (level/item type etc.) for item " + c_Name + " [" + c_ActorSNO.ToString() + "]");
                         Logging.WriteDiagnostic(ex.ToString());
                         AddTocache = false;
-                        //return bWantThis;
+                        c_IgnoreSubStep = "CommonDataException";
                     }
                 }
                 else
                 {
                     // Couldn't get the game balance data for this item, so ignore it for now
                     AddTocache = false;
-                    //return bWantThis;
+                    c_IgnoreSubStep = "NoBalanceData";
                 }
             }
             else
@@ -1311,13 +1317,7 @@ namespace GilesTrinity
                 c_IsOneHandedItem = balanceCachEntry.OneHand;
                 c_item_tFollowerType = balanceCachEntry.FollowerType;
             }
-            // Able to get cached data or not?
-            // Error reading the item?
-            if (c_BalanceID == -1)
-            {
-                AddTocache = false;
-                //return bWantThis;
-            }
+
             // Calculate custom Giles item type
             c_item_GilesItemType = DetermineItemType(c_Name, c_DBItemType, c_item_tFollowerType);
             // And temporarily store the base type
@@ -1351,6 +1351,7 @@ namespace GilesTrinity
                     {
                         Logging.WriteDiagnostic("[Trinity] Safely handled exception getting item-quality for item " + c_Name + " [" + c_ActorSNO.ToString() + "]");
                         AddTocache = false;
+                        c_IgnoreSubStep = "ItemQualityLevelException";
                     }
                     dictGilesQualityCache.Add(c_RActorGuid, c_ItemQuality);
                     dictGilesQualityRechecked.Add(c_RActorGuid, false);
@@ -1397,6 +1398,7 @@ namespace GilesTrinity
             if (c_CentreDistance > (iCurrentMaxLootRadius + fExtraRange))
             {
                 AddTocache = false;
+                c_IgnoreSubStep = "OutOfRange";
             }
 
             // Get whether or not we want this item, cached if possible
@@ -1426,6 +1428,8 @@ namespace GilesTrinity
             AddTocache = MosterObstacleInPathCacheObject(AddTocache);
 
             // Didn't pass giles pickup rules/DB internal rule match, so ignore it
+            if (!AddTocache)
+                c_IgnoreSubStep = "NoMatchingRule";
 
             return AddTocache;
         }
