@@ -1402,7 +1402,7 @@ namespace GilesTrinity
             // Get whether or not we want this item, cached if possible
             if (!dictGilesPickupItem.TryGetValue(c_RActorGuid, out AddTocache))
             {
-                if (Settings.Loot.ItemFilterMode != global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+                if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
                 {
                     AddTocache = ItemManager.EvaluateItem((ACDItem)c_CommonData, ItemManager.RuleType.PickUp);
                 }
