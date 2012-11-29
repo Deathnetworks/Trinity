@@ -169,6 +169,10 @@ namespace GilesTrinity
                 return false;
             }
 
+            // For Monk SweepingWind WeaponSwap
+            if (weaponSwap.DpsGearOn())
+                weaponSwap.SwapGear();
+
             // We have a target, start the target handler!
             if (CurrentTarget != null)
             {
