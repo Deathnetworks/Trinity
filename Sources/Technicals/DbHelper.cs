@@ -52,7 +52,6 @@ namespace GilesTrinity.Technicals
                 case TrinityLogLevel.Normal:
                     logLevel = LogLevel.Normal;
                     break;
-                case TrinityLogLevel.LootRules:
                 case TrinityLogLevel.Verbose:
                     logLevel = LogLevel.Verbose;
                     break;

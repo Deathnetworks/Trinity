@@ -9,7 +9,6 @@ namespace GilesTrinity.Technicals
         Critical,
         Error,
         Normal,
-        LootRules,
         Verbose,
         Debug
     }

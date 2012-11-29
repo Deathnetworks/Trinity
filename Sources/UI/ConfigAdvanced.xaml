@@ -54,14 +54,14 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <TextBlock Text="Debug Informations :" FontWeight="Bold" TextAlignment="Center" Margin="5"/>
-            <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Stretch">
+            <UniformGrid Grid.Row="1" Columns="2" HorizontalAlignment="Stretch">
                 <CheckBox Margin="25,2" IsChecked="{Binding Path=Advanced.LogStuckLocation}" ToolTip="Create a separated file for stuck locations">Log stuck locations</CheckBox>
                 <CheckBox Margin="25,2" IsChecked="{Binding Path=Advanced.DebugInStatusBar}" ToolTip="Useful for tracking down problem, but can be CPU intensive">Debug info in status bar</CheckBox>
                 <CheckBox Margin="25,2" IsChecked="{Binding Path=Advanced.DebugTargetting}">Debug Targetting System</CheckBox>
                 <CheckBox Margin="25,2" IsChecked="{Binding Path=Advanced.DebugWeights}">Debug Weight System</CheckBox>
                 <CheckBox Margin="25,2" IsChecked="{Binding Path=Advanced.DebugItemValuation}">Debug Item Valuations</CheckBox>
                 <CheckBox Margin="25,2" IsChecked="{Binding Path=Advanced.DebugCache}">Debug Cache System</CheckBox>
-            </StackPanel>
+            </UniformGrid>
         </Grid>
         <!--Reset Button-->
         <Button Grid.Row="4" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetAdvancedCommand}">Reset</Button>
