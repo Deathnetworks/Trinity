@@ -1067,7 +1067,7 @@ namespace GilesTrinity
                     sStatusText += "Click ";
                     break;
             }
-            sStatusText += "Target=" + CurrentTarget.InternalName + " {" + CurrentTarget.ActorSNO + "}. ";
+            sStatusText += "Target=" + CurrentTarget.InternalName + " [" + CurrentTarget.ActorSNO + "]. ";
             sStatusText += "Type=" + CurrentTarget.Type + " C-Dist=" + CurrentTarget.CentreDistance.ToString("0") + ". ";
             sStatusText += "R-Dist=" + Math.Round(CurrentTarget.RadiusDistance, 2).ToString() + ". ";
             sStatusText += "RangeReq'd: " + fRangeRequired.ToString("0") + ". ";
@@ -1122,7 +1122,7 @@ namespace GilesTrinity
                     sStatusText += "Click ";
                     break;
             }
-            sStatusText += "Target=" + CurrentTarget.InternalName + " {" + CurrentTarget.ActorSNO + "}. C-Dist=" + Math.Round(CurrentTarget.CentreDistance, 2).ToString() + ". " +
+            sStatusText += "Target=" + CurrentTarget.InternalName + " [" + CurrentTarget.ActorSNO + "]. C-Dist=" + Math.Round(CurrentTarget.CentreDistance, 2).ToString() + ". " +
                 "R-Dist=" + Math.Round(CurrentTarget.RadiusDistance, 2).ToString() + ". ";
             if (CurrentTarget.Type == GObjectType.Unit && currentPower.SNOPower != SNOPower.None)
                 sStatusText += "Power=" + currentPower.SNOPower.ToString() + " (range " + fRangeRequired.ToString() + ") ";
@@ -1440,7 +1440,7 @@ namespace GilesTrinity
                     ItemsPickedStats.TotalPotions++;
                     ItemsPickedStats.PotionsPerLevel[CurrentTarget.Level]++;
                 }
-                else if (c_item_GilesItemType == GItemType.InfernalKey)
+                else if (c_item_GItemType == GItemType.InfernalKey)
                 {
                     ItemsPickedStats.TotalInfernalKeys++;
                 }

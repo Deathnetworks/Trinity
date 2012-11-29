@@ -40,7 +40,7 @@ namespace GilesTrinity.Settings
 
         #region Properties
         [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
+        [DefaultValue(LogCategory.UserInformation)]
         public LogCategory LogCategories
         {
             get

@@ -333,7 +333,7 @@ namespace GilesTrinity
                             c_diaObject.ActorType, 
                             c_Name, 
                             c_ActorSNO, 
-                            (c_unit_bIsBoss ? " IsBoss" : ""), 
+                            (c_unit_IsBoss ? " IsBoss" : ""), 
                             c_CentreDistance, 
                             c_RadiusDistance, 
                             c_ZDiff,
@@ -380,24 +380,24 @@ namespace GilesTrinity
                 {
                     int iThisGemType = 0;
                     ItemsDroppedStats.TotalGems++;
-                    if (c_item_GilesItemType == GItemType.Topaz)
+                    if (c_item_GItemType == GItemType.Topaz)
                         iThisGemType = GEMTOPAZ;
-                    if (c_item_GilesItemType == GItemType.Ruby)
+                    if (c_item_GItemType == GItemType.Ruby)
                         iThisGemType = GEMRUBY;
-                    if (c_item_GilesItemType == GItemType.Emerald)
+                    if (c_item_GItemType == GItemType.Emerald)
                         iThisGemType = GEMEMERALD;
-                    if (c_item_GilesItemType == GItemType.Amethyst)
+                    if (c_item_GItemType == GItemType.Amethyst)
                         iThisGemType = GEMAMETHYST;
                     ItemsDroppedStats.GemsPerType[iThisGemType]++;
                     ItemsDroppedStats.GemsPerLevel[c_ItemLevel]++;
                     ItemsDroppedStats.GemsPerTPerL[iThisGemType, c_ItemLevel]++;
                 }
-                else if (c_item_GilesItemType == GItemType.HealthPotion)
+                else if (c_item_GItemType == GItemType.HealthPotion)
                 {
                     ItemsDroppedStats.TotalPotions++;
                     ItemsDroppedStats.PotionsPerLevel[c_ItemLevel]++;
                 }
-                else if (c_item_GilesItemType == GItemType.InfernalKey)
+                else if (c_item_GItemType == GItemType.InfernalKey)
                 {
                     ItemsDroppedStats.TotalInfernalKeys++;
                 }
@@ -414,7 +414,7 @@ namespace GilesTrinity
             // Cancel altogether if it's not even in range, unless it's a boss or an injured treasure goblin
             double dUseKillRadius = iCurrentMaxKillRadius;
             // Bosses get extra radius
-            if (c_unit_bIsBoss)
+            if (c_unit_IsBoss)
             {
                 if (c_ActorSNO != 80509)
                     // Kulle Exception
@@ -441,9 +441,9 @@ namespace GilesTrinity
             if (c_ActorSNO == 256015 || c_ActorSNO == 256000 || c_ActorSNO == 255996)
                 dUseKillRadius = 80;
             // Injured treasure goblins get a huge extra radius - since they don't stay on the map long if injured, anyway!
-            if (c_unit_bIsTreasureGoblin && (c_CentreDistance <= 60 || c_HitPoints <= 0.99))
+            if (c_unit_IsTreasureGoblin && (c_CentreDistance <= 60 || c_HitPoints <= 0.99))
             {
-                c_bForceLeapAgainst = true;
+                c_ForceLeapAgainst = true;
                 if (Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize)
                     dUseKillRadius *= 2.5;
                 else
@@ -452,9 +452,9 @@ namespace GilesTrinity
                 if (dUseKillRadius <= 60) dUseKillRadius = 60;
             }
             // Elitey type mobs and things
-            else if ((c_unit_bIsElite || c_unit_bIsRare || c_unit_bIsUnique || c_unit_bIsMinion))
+            else if ((c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion))
             {
-                c_bForceLeapAgainst = true;
+                c_ForceLeapAgainst = true;
                 if (c_HitPoints <= 0.99)
                 {
                     dUseKillRadius *= 2;
@@ -488,10 +488,10 @@ namespace GilesTrinity
                     theseaffixes = MonsterAffixes.None;
                 }
             }
-            c_unit_bIsElite = theseaffixes.HasFlag(MonsterAffixes.Elite);
-            c_unit_bIsRare = theseaffixes.HasFlag(MonsterAffixes.Rare);
-            c_unit_bIsUnique = theseaffixes.HasFlag(MonsterAffixes.Unique);
-            c_unit_bIsMinion = theseaffixes.HasFlag(MonsterAffixes.Minion);
+            c_unit_IsElite = theseaffixes.HasFlag(MonsterAffixes.Elite);
+            c_unit_IsRare = theseaffixes.HasFlag(MonsterAffixes.Rare);
+            c_unit_IsUnique = theseaffixes.HasFlag(MonsterAffixes.Unique);
+            c_unit_IsMinion = theseaffixes.HasFlag(MonsterAffixes.Minion);
             return theseaffixes;
         }
         private static void RefreshCachedHealth(int iLastCheckedHealth, double dThisCurrentHealth, bool bHasCachedHealth)
