@@ -269,7 +269,6 @@ namespace GilesTrinity
             GilesObjectCache = new List<GilesObject>();
             hashDoneThisRactor = new HashSet<int>();
         }
-        private static Stopwatch swTimeSinceLastDebug = new Stopwatch();
 
         private static HashSet<string> ignoreNames = new HashSet<string>
         {
@@ -278,40 +277,67 @@ namespace GilesTrinity
 
         private static void RefreshCacheMainLoop()
         {
-            if (!swTimeSinceLastDebug.IsRunning)
-                swTimeSinceLastDebug.Start();
             var refreshSource =
                 from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
                 where o.IsValid
                 orderby o.ActorType, o.Distance
                 select o;
+
+            Stopwatch t1 = new Stopwatch();
+
+
             foreach (DiaObject currentObject in refreshSource)
             {
                 try
                 {
-                    bool bWantThis = CacheDiaObject(currentObject);
-                    if (Settings.Advanced.DebugCache)
-                    {
-                        bool ignore = (from n in ignoreNames
-                                       where c_Name.StartsWith(n)
-                                       select true).FirstOrDefault();
+                    bool AddToCache = false;
 
-                        //if (!ignore)
-                        //{
-                            Logging.WriteDiagnostic("[Trinity] Cache:"
-                                + (bWantThis ? "Added  " : "Ignored")
-                                + (!bWantThis ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "")
-                                + " Type: " + c_ObjectType
-                                + " (" + c_diaObject.ActorType + ")"
-                                + " Name: " + c_Name
-                                + " (" + c_ActorSNO + ")"
-                                + (c_unit_bIsBoss ? " isBossSNO" : "")
-                                + " Dist2Mid: " + c_CentreDistance.ToString("0")
-                                + " Dist2Rad: " + c_RadiusDistance.ToString("0")
-                                + " ZDiff: " + c_ZDiff.ToString("0")
-                                + " Radius: " + c_Radius
-                               );
-                        //}
+                    if (!Settings.Advanced.DebugCache)
+                    {
+                        /*
+                         *  Main Cache Function
+                         */
+                        AddToCache = CacheDiaObject(currentObject);
+                    }
+                    else
+                    {
+                        // We're debugging, slightly slower, calculate performance metrics and dump debugging to log 
+                        t1.Reset();
+                        t1.Start();
+
+                        /*
+                         *  Main Cache Function
+                         */
+                        AddToCache = CacheDiaObject(currentObject);
+
+                        if (t1.IsRunning)
+                            t1.Stop();
+
+                        // Disabled, was missing some things on output... ServerProps maybe?
+                        // bool ignore = (from n in ignoreNames
+                        //               where c_Name.StartsWith(n)
+                        //               select true).FirstOrDefault();
+                        // if (!ignore)
+                        // {
+
+                        double duration = t1.Elapsed.TotalMilliseconds;
+
+                        Logging.WriteDiagnostic("[Trinity] Cache:"
+                            + " [" + duration.ToString("0000.0000") + "]"
+                            + (AddToCache ? "Added  " : " Ignored")
+                            + (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "")
+                            + " Type: " + c_ObjectType
+                            + " (" + c_diaObject.ActorType + ")"
+                            + " Name: " + c_Name
+                            + " (" + c_ActorSNO + ")"
+                            + (c_unit_bIsBoss ? " IsBoss" : "")
+                            + " Dist2Mid: " + c_CentreDistance.ToString("0")
+                            + " Dist2Rad: " + c_RadiusDistance.ToString("0")
+                            + " ZDiff: " + c_ZDiff.ToString("0")
+                            + " Radius: " + c_Radius
+                            + (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : "")
+                           );
+                        // }
                     }
                 }
                 catch (Exception ex)
@@ -324,10 +350,6 @@ namespace GilesTrinity
                         Logging.WriteDiagnostic(ex.StackTrace);
                     }
                 }
-            }
-            if (swTimeSinceLastDebug.ElapsedMilliseconds > 1000)
-            {
-                swTimeSinceLastDebug.Restart();
             }
         }
 
@@ -651,7 +673,7 @@ namespace GilesTrinity
                 {
                     if (Settings.Advanced.DebugTargetting)
                     {
-                        Logging.Write("[Trinity] Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}", 
+                        Logging.Write("[Trinity] Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
                             vAnySafePoint, vAnySafePoint.Distance(Me.Position), FindDirectionDegree(Me.Position, vAnySafePoint),
                             playerStatus.CurrentHealthPct, PlayerKiteDistance, hashMonsterObstacleCache.Count(m => m.Location.Distance(playerStatus.CurrentPosition) <= PlayerKiteDistance),
                             NeedToKite, TryToKite);
