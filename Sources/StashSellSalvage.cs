@@ -1160,7 +1160,7 @@ namespace GilesTrinity
                     {
                         if (!Settings.Notification.LegendaryScoring)
                             bShouldNotify = true;
-                        else if (Settings.Notification.LegendaryScoring && EvaluateItemScoreForNotification(thisgilesbaseitemtype, ithisitemvalue))
+                        else if (Settings.Notification.LegendaryScoring && CheckScoreForNotification(thisgilesbaseitemtype, ithisitemvalue))
                             bShouldNotify = true;
                         if (bShouldNotify)
                             NotificationManager.AddNotificationToQueue(thisgooditem.RealName + " [" + thisgilesitemtype.ToString() +
@@ -1179,7 +1179,7 @@ namespace GilesTrinity
                     {
 
                         // Check for non-legendary notifications
-                        bShouldNotify = EvaluateItemScoreForNotification(thisgilesbaseitemtype, ithisitemvalue);
+                        bShouldNotify = CheckScoreForNotification(thisgilesbaseitemtype, ithisitemvalue);
                         if (bShouldNotify)
                             NotificationManager.AddNotificationToQueue(thisgooditem.RealName + " [" + thisgilesitemtype.ToString() + "] (Score=" + ithisitemvalue.ToString() + ". " + ValueItemStatString + ")", ZetaDia.Service.CurrentHero.Name + " new item!", ProwlNotificationPriority.Emergency);
                     }
