@@ -222,7 +222,7 @@ namespace GilesTrinity
                 Logging.Write("[Trinity] You can only force a town run while DemonBuddy is started and running!");
                 return;
             }
-            bGilesForcedVendoring = true;
+            ForceVendorRunASAP = true;
             Logging.Write("[Trinity] Town-run request received, will town-run at next possible moment.");
         }
         // Pause Button

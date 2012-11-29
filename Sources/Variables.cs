@@ -95,12 +95,12 @@ namespace GilesTrinity
         private static bool bWaitingForPower = false;
 
         /// <summary>
-        /// A special post power use pause
+        /// A special post power use pause, causes targetHandler to wait on any new decisions
         /// </summary>
         private static bool bWaitingAfterPower = false;
 
         /// <summary>
-        /// If we are waiting before popping a potion
+        /// If TargetHandle is waiting waiting before popping a potion - we won't refresh cache/change targets/unstuck/etc
         /// </summary>
         private static bool bWaitingForPotion = false;
 
@@ -277,7 +277,7 @@ namespace GilesTrinity
         private static DateTime dateSinceBlacklist90Clear = DateTime.Today;
 
         /// <summary>
-        /// Short - 3 second blacklist
+        /// Use RActorGUID to blacklist an object/monster for 3 seconds
         /// </summary>
         private static HashSet<int> hashRGUIDBlacklist3 = new HashSet<int>();
         /// <summary>
@@ -494,7 +494,7 @@ namespace GilesTrinity
         private static HashSet<GilesCachedACDItem> hashGilesCachedSellItems = new HashSet<GilesCachedACDItem>();
 
         // Whether to try forcing a vendor-run for custom reasons
-        public static bool bGilesForcedVendoring = false;
+        public static bool ForceVendorRunASAP = false;
         public static bool bWantToTownRun = false;
         private static bool bLastTownRunCheckResult = false;
 
@@ -563,7 +563,7 @@ namespace GilesTrinity
         private static bool c_unit_bIsBoss = false;
         private static bool c_unit_bIsAttackable = false;
         private static bool c_bForceLeapAgainst = false;
-        private static bool c_bIsObstacle = false;
+        private static bool c_IsObstacle = false;
 
         // From main RefreshDiaobjects
         private static Vector3 vSafePointNear;

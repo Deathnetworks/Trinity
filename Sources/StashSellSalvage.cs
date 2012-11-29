@@ -131,7 +131,7 @@ namespace GilesTrinity
                 return false;
 
             // Check if we should be forcing a town-run
-            if (bGilesForcedVendoring || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+            if (ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
             {
                 if (!bLastTownRunCheckResult)
                 {
@@ -227,7 +227,7 @@ namespace GilesTrinity
         {
             hashGilesCachedKeepItems = new HashSet<GilesCachedACDItem>();
             bNeedsEquipmentRepairs = false;
-            bGilesForcedVendoring = false;
+            ForceVendorRunASAP = false;
             bool bShouldVisitStash = false;
             foreach (ACDItem thisitem in ZetaDia.Me.Inventory.Backpack)
             {
@@ -444,7 +444,7 @@ namespace GilesTrinity
         /// <returns></returns>
         private static bool GilesSellOverlord(object ret)
         {
-            bGilesForcedVendoring = false;
+            ForceVendorRunASAP = false;
             hashGilesCachedSellItems = new HashSet<GilesCachedACDItem>();
             bool bShouldVisitVendor = false;
 
@@ -834,7 +834,7 @@ namespace GilesTrinity
         /// <returns></returns>
         private static bool GilesSalvageOverlord(object ret)
         {
-            bGilesForcedVendoring = false;
+            ForceVendorRunASAP = false;
             hashGilesCachedSalvageItems = new HashSet<GilesCachedACDItem>();
             bool bShouldVisitSmith = false;
 

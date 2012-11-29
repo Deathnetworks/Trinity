@@ -319,7 +319,7 @@ namespace GilesTrinity
                                 cacheObject.Weight = 1;
 
                             // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
-                            if (bAnyMobsInCloseRange)
+                            if (bAnyMobsInCloseRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting)
                                 cacheObject.Weight = 1;
 
                             // Calculate a spot reaching a little bit further out from the item, to help pickup-movements
@@ -488,8 +488,8 @@ namespace GilesTrinity
                             //    cacheObject.Weight += 20000d;
 
                             //// Fix for WhimsyShire Pinata
-                            //if (hashSNOContainerResplendant.Contains(cacheObject.ActorSNO))
-                            //    cacheObject.Weight = 100 + cacheObject.RadiusDistance;
+                            if (hashSNOContainerResplendant.Contains(cacheObject.ActorSNO))
+                                cacheObject.Weight = 100 + cacheObject.RadiusDistance;
                             break;
                         }
                     case GObjectType.Interactable:

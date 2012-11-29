@@ -194,8 +194,14 @@ namespace GilesTrinity
                 int iDistanceOut = 10;
 
                 int iKiteStepSize = 6;
-                if (bKitingSpot && !avoidDeath)
+                if (avoidDeath)
                 {
+                    // 90-(6*1), 90-(6*2), 90-(6*n)... 
+                    iDistanceOut = 90 - (iKiteStepSize * iStepDistance);
+                }
+                else if (bKitingSpot)
+                {
+                    // 10+(6*1), 10+(6*2), 10+(6*n)... 
                     iDistanceOut = PlayerKiteDistance + (iKiteStepSize * iStepDistance);
 
                     //switch (iStepDistance)
@@ -385,6 +391,14 @@ namespace GilesTrinity
             return vBestLocation;
         }
         // Check if an obstacle is blocking our path
+        /// <summary>
+        /// Checks if <see cref="obstacle"/> with <see cref="radius"/> is blocking the ray between <see cref="start"/> and <see cref="destination"/>
+        /// </summary>
+        /// <param name="obstacle"></param>
+        /// <param name="radius"></param>
+        /// <param name="start"></param>
+        /// <param name="destination"></param>
+        /// <returns></returns>
         public static bool GilesIntersectsPath(Vector3 obstacle, float radius, Vector3 start, Vector3 destination)
         {
             float fDirectionToTarget = NormalizeRadian((float)Math.Atan2(destination.Y - start.Y, destination.X - start.X));
