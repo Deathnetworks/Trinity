@@ -169,6 +169,10 @@ namespace GilesTrinity
                 return false;
             }
 
+            // For Monk SweepingWind WeaponSwap
+            if (weaponSwap.DpsGearOn())
+                weaponSwap.SwapGear();
+
             // We have a target, start the target handler!
             if (CurrentTarget != null)
             {
@@ -207,7 +211,7 @@ namespace GilesTrinity
             vPositionLastZigZagCheck = Vector3.Zero;
             // Out of combat buffing etc. but only if we don't want to return to town etc.
             ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
-            if (!playerStatus.IsInTown && !bWantToTownRun && !bGilesForcedVendoring && myAnimationState != null
+            if (!playerStatus.IsInTown && !bWantToTownRun && !ForceVendorRunASAP && myAnimationState != null
                 && myAnimationState.State != AnimationState.Attacking
                 && myAnimationState.State != AnimationState.Casting
                 && myAnimationState.State != AnimationState.Channeling)

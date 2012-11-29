@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Zeta;
+using Zeta.Common;
 using Zeta.Internals.Actors;
 
 namespace GilesTrinity.Swap
@@ -39,6 +40,7 @@ namespace GilesTrinity.Swap
                             key => key.InventorySlot, v => v);
                     IgnoreItems.Clear();
 
+                    Logging.Write("[Trinity] Swapping to 2H");
                     Equip(InventorySlot.PlayerLeftHand);
 
 
@@ -47,6 +49,8 @@ namespace GilesTrinity.Swap
                 }
                 else
                 {
+                    Logging.Write("[Trinity] Swapping to Dual Wield");
+
                     // Go back to our original set of gear, in their exact places!
                     foreach (var i in originalItems)
                     {

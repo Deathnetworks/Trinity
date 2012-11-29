@@ -296,8 +296,8 @@ namespace GilesTrinity
                                        where c_Name.StartsWith(n)
                                        select true).FirstOrDefault();
 
-                        if (!ignore)
-                        {
+                        //if (!ignore)
+                        //{
                             Logging.WriteDiagnostic("[Trinity] Cache:"
                                 + (bWantThis ? "Added  " : "Ignored")
                                 + (!bWantThis ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : "")
@@ -311,7 +311,7 @@ namespace GilesTrinity
                                 + " ZDiff: " + c_ZDiff.ToString("0")
                                 + " Radius: " + c_Radius
                                );
-                        }
+                        //}
                     }
                 }
                 catch (Exception ex)
@@ -444,7 +444,7 @@ namespace GilesTrinity
                 }
             }
             // Safety for Giles own portal-back-to-town for full-backpack
-            else if (bGilesForcedVendoring)
+            else if (ForceVendorRunASAP)
             {
                 if (dUseKillRadius <= 60) dUseKillRadius = 60;
                 //intell

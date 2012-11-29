@@ -21,7 +21,7 @@ namespace GilesTrinity.XmlTags
             return new Zeta.TreeSharp.Action(ret =>
             {
                 Logging.Write("[Trinity] Town-run request received, will town-run at next possible moment.");
-                GilesTrinity.bGilesForcedVendoring = true;
+                GilesTrinity.ForceVendorRunASAP = true;
                 m_IsDone = true;
             });
         }

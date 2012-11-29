@@ -54,7 +54,7 @@ namespace GilesTrinity.DbProvider
             if (DateTime.Now.Subtract(timeLastRecordedPosition).TotalMilliseconds >= 3000)
             {
                 // We're not stuck if we're vendoring!
-                if (GilesTrinity.bGilesForcedVendoring || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                 {
                     return false;
                 }
