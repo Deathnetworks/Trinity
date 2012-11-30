@@ -6,7 +6,7 @@ using System.Text;
 
 namespace GilesTrinity.Technicals
 {
-    internal class CacheObject
+    internal abstract class CacheObject
     {
         #region Constructors
         /// <summary>
@@ -58,14 +58,7 @@ namespace GilesTrinity.Technicals
         /// Clones this instance.
         /// </summary>
         /// <returns>Cloned instance of <see cref="CacheObject"/>.</returns>
-        public CacheObject Clone()
-        {
-            //TODO : Clone object here 
-            return new CacheObject(RActorGuid)
-                {
-                    LastAccessDate = this.LastAccessDate
-                };
-        }
+        public abstract CacheObject Clone();
         #endregion Methods
     }
 }
