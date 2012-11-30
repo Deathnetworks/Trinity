@@ -31,31 +31,35 @@ namespace GilesTrinity
              * Set Common Data
              */
             AddToCache = RefreshStepGetCommonData(freshObject);
-            if (!AddToCache) { c_IgnoreReason = "GetCommonData"; return AddToCache; }
+            //if (!AddToCache) { c_IgnoreReason = "GetCommonData"; return AddToCache; }
 
             /*
              * Safely Get Data Keys and ID's from internal caches if possible
+             * 
+             * rrrix: the check on AddToCache and return on the 4 ID/Sno/Name/GUID collection methods are disabled, since this was causing problems attacking chickens.
+             * Yeah... chickens... 
              */
             // Ractor GUID
             c_RActorGuid = freshObject.RActorGuid;
             // Check to see if we've already looked at this GUID
+
             AddToCache = RefreshStepSkipDoubleCheckGuid(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "SkipDoubleCheckGuid"; return AddToCache; }
+            //if (!AddToCache) { c_IgnoreReason = "SkipDoubleCheckGuid"; return AddToCache; }
             // ActorSNO
             AddToCache = RefreshStepCachedActorSNO(AddToCache);
 
             // Have ActorSNO Check for SNO based navigation obstacle hashlist
             c_IsObstacle = hashSNONavigationObstacles.Contains(c_ActorSNO);
 
-            if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
+            //if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
             // Get Internal Name
             AddToCache = RefreshInternalName(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "InternalName"; return AddToCache; }
+            //if (!AddToCache) { c_IgnoreReason = "InternalName"; return AddToCache; }
             // Get ACDGuid
             AddToCache = RefreshStepCachedACDGuid(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
+            //if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
 
-            if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
+            //if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
             /*
              * Begin main refresh routine
              */
@@ -70,7 +74,7 @@ namespace GilesTrinity
             if (!AddToCache) { c_IgnoreReason = "CachedPosition"; return AddToCache; }
             // Always Refresh Distance for every object
             RefreshStepCalculateDistance();
-            // Always Refresh ZDiff for every object
+            //// Always Refresh ZDiff for every object
             AddToCache = RefreshStepNewObjectTypeZDiff(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "ZDiff"; return AddToCache; }
             // Add new Obstacle to cache
