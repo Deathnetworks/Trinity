@@ -10,7 +10,7 @@
             <!-- Don't format this line otherwise Db can't open config window -->
             <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Template.xaml"/></ResourceDictionary.MergedDictionaries>
 
-            <ut:EnumBooleanConverter x:Key="enumBooleanConverter"/>
+            <ut:FlagsEnumValueConverter x:Key="flagsEnumValueBooleanConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -59,19 +59,21 @@
             <UniformGrid Grid.Row="1" Columns="2" HorizontalAlignment="Stretch">
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogStuckLocation}" ToolTip="Create a separated file for stuck locations">Log stuck locations</CheckBox>
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.DebugInStatusBar}" ToolTip="Useful for tracking down problem, but can be CPU intensive">Debug info in status bar</CheckBox>
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Targetting}">Debug Targetting System</CheckBox>
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Weight}">Debug Weight System</CheckBox>
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource enumBooleanConverter}, ConverterParameter=ItemValuation}">Debug Item Valuations</CheckBox>
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource enumBooleanConverter}, ConverterParameter=CacheManagement}">Debug Cache System</CheckBox>
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Configuration}">Debug Configuration System</CheckBox>
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource enumBooleanConverter}, ConverterParameter=UI}">Debug UI Loading</CheckBox>
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource enumBooleanConverter}, ConverterParameter=WeaponSwap}">Debug Weapon Swap System</CheckBox>
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Behavior}">Debug Behavior System</CheckBox>
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource enumBooleanConverter}, ConverterParameter=XmlTag}">Debug XmlTag</CheckBox>
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Moving}">Debug Movement System</CheckBox>
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource enumBooleanConverter}, ConverterParameter=GlobalHandler}">Debug Global Handling System</CheckBox>
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource enumBooleanConverter}, ConverterParameter=ScriptRule}">Debug Script Rules System</CheckBox>
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Performance}">Debug System Performance</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Targetting}">Debug Targetting System</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Weight}">Debug Weight System</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=ItemValuation}">Debug Item Valuations</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=CacheManagement}">Debug Cache System</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Configuration}">Debug Configuration System</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=UI}">Debug UI Loading</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=WeaponSwap}">Debug Weapon Swap System</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Behavior}">Debug Behavior System</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=XmlTag}">Debug XmlTag</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Moving}">Debug Movement System</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=GlobalHandler}">Debug Global Handling System</CheckBox>
+                <CheckBox Margin="2,2" IsEnabled="False"
+                          IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=ScriptRule}">Debug Script Rules System</CheckBox>
+                <CheckBox IsEnabled="False"
+                          Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Performance}">Debug System Performance</CheckBox>
             </UniformGrid>
         </Grid>
         <!--Reset Button-->

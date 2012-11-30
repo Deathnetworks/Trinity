@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -268,7 +269,7 @@ namespace GilesTrinity
                     if (runStatus != HandlerRunStatus.NotFinished)
                         return GetTreeSharpRunStatus(runStatus);
 
-                    UpdateStatusTextUseTarget();
+                    UpdateStatusTextTarget();
 
                     // An integer to log total interact attempts on a particular object or item
                     int iInteractAttempts;
@@ -422,7 +423,7 @@ namespace GilesTrinity
                                     else
                                     {
                                         DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, 
-                                            "Destructible: Name={0}. SNO={1}, Range={2}. Needed range={3}. Radius={4}. Type={5}. Using power={7}",
+                                            "Destructible: Name={0}. SNO={1}, Range={2}. Needed range={3}. Radius={4}. Type={5}. Using power={6}",
                                             CurrentTarget.InternalName,     // 0
                                             CurrentTarget.ActorSNO,         // 1
                                             CurrentTarget.CentreDistance,   // 2
@@ -502,7 +503,7 @@ namespace GilesTrinity
                     return RunStatus.Running;
                 }
                 // Out-of-range, so move towards the target
-                UpdateStatusTextRangedTarget();
+                UpdateStatusTextTarget();
                 // Are we currently incapacitated? If so then wait...
                 if (playerStatus.IsIncapacitated || playerStatus.IsRooted)
                 {
@@ -739,17 +740,23 @@ namespace GilesTrinity
                 {
                     if (CurrentTarget.Type == GObjectType.Unit)
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Blacklisting a monster because of possible stuck issues. " +
-                            "Monster=" + CurrentTarget.InternalName + " {{" +
-                            CurrentTarget.ActorSNO + "}} Range=" + CurrentTarget.CentreDistance.ToString("0") + " health %=" + CurrentTarget.HitPoints.ToString("0") +
-                            " RActorGUID=" + CurrentTarget.RActorGuid
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, 
+                            "Blacklisting a monster because of possible stuck issues. Monster={0} [{1}] Range={2:0} health %={3:0} RActorGUID={4}",
+                            CurrentTarget.InternalName,         // 0
+                            CurrentTarget.ActorSNO,             // 1
+                            CurrentTarget.CentreDistance,       // 2
+                            CurrentTarget.HitPoints,            // 3
+                            CurrentTarget.RActorGuid            // 4
                             );
                     }
                     else
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Blacklisting an object because of possible stuck issues. Object=" + CurrentTarget.InternalName + " {{" +
-                            CurrentTarget.ActorSNO + "}}. Range=" + CurrentTarget.CentreDistance.ToString("0") +
-                            " RActorGUID=" + CurrentTarget.RActorGuid
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, 
+                            "Blacklisting an object because of possible stuck issues. Object={0} [{1}]. Range={2:0} RActorGUID={3}",
+                            CurrentTarget.InternalName,         // 0
+                            CurrentTarget.ActorSNO,             // 1 
+                            CurrentTarget.CentreDistance,       // 2
+                            CurrentTarget.RActorGuid            // 3
                             );
                     }
 
@@ -862,7 +869,7 @@ namespace GilesTrinity
                             }
                             catch
                             {
-                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit " + c_Name + " [" + c_ActorSNO.ToString() + "]");
+                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit {0} [{1}]", c_Name, c_ActorSNO);
                                 StaleCache = true;
                             }
                         }
@@ -1033,102 +1040,71 @@ namespace GilesTrinity
         /// <summary>
         /// Updates bot status text with appropriate information if we are moving into range of our <see cref="CurrentTarget"/>
         /// </summary>
-        private static void UpdateStatusTextRangedTarget()
+        private static void UpdateStatusTextTarget()
         {
-            sStatusText = "[Trinity] ";
+            StringBuilder statusText = new StringBuilder();
             switch (CurrentTarget.Type)
             {
                 case GObjectType.Avoidance:
-                    sStatusText += "Avoid ";
+                    statusText.Append("Avoid ");
                     break;
                 case GObjectType.Unit:
-                    sStatusText += "Attack ";
+                    statusText.Append("Attack ");
                     break;
                 case GObjectType.Item:
                 case GObjectType.Gold:
                 case GObjectType.Globe:
-                    sStatusText += "Pickup ";
+                    statusText.Append("Pickup ");
                     break;
                 case GObjectType.Backtrack:
-                    sStatusText += "Backtrack ";
+                    statusText.Append("Backtrack ");
                     break;
                 case GObjectType.Interactable:
-                    sStatusText += "Interact ";
+                    statusText.Append("Interact ");
                     break;
                 case GObjectType.Door:
                 case GObjectType.Container:
-                    sStatusText += "Open ";
+                    statusText.Append("Open ");
                     break;
                 case GObjectType.Destructible:
                 case GObjectType.Barricade:
-                    sStatusText += "Destroy ";
+                    statusText.Append("Destroy ");
                     break;
                 case GObjectType.Shrine:
-                    sStatusText += "Click ";
+                    statusText.Append("Click ");
                     break;
             }
-            sStatusText += "Target=" + CurrentTarget.InternalName + " {{" + CurrentTarget.ActorSNO + "}}. ";
-            sStatusText += "Type=" + CurrentTarget.Type + " C-Dist=" + CurrentTarget.CentreDistance.ToString("0") + ". ";
-            sStatusText += "R-Dist=" + Math.Round(CurrentTarget.RadiusDistance, 2).ToString() + ". ";
-            sStatusText += "RangeReq'd: " + fRangeRequired.ToString("0") + ". ";
+            statusText.Append("Target=");
+            statusText.Append(CurrentTarget.InternalName);
+            statusText.Append(" {");
+            statusText.Append(CurrentTarget.ActorSNO);
+            statusText.Append("}. ");
+            statusText.Append("Type=");
+            statusText.Append(CurrentTarget.Type);
+            statusText.Append(" C-Dist=");
+            statusText.Append(CurrentTarget.CentreDistance.ToString("0"));
+            statusText.Append(". R-Dist=");
+            statusText.Append(Math.Round(CurrentTarget.RadiusDistance, 2));
+            statusText.Append(". RangeReq'd: ");
+            statusText.Append(fRangeRequired.ToString("0"));
+            statusText.Append(". ");
             if (CurrentTarget.Type == GObjectType.Unit && currentPower.SNOPower != SNOPower.None)
-                sStatusText += "Power=" + currentPower.SNOPower.ToString() + " (range " + fRangeRequired.ToString() + ") ";
-            sStatusText += "Weight=" + CurrentTarget.Weight.ToString() + " MOVING INTO RANGE";
+            {
+                statusText.Append("Power=");
+                statusText.Append(currentPower.SNOPower);
+                statusText.Append(" (range ");
+                statusText.Append(fRangeRequired);
+                statusText.Append(") ");
+            }
+            statusText.Append("Weight=");
+            statusText.Append(CurrentTarget.Weight);
+            statusText.Append(" MOVING INTO RANGE");
             if (Settings.Advanced.DebugInStatusBar)
             {
+                sStatusText = "[Trinity] " + statusText.ToString();
                 BotMain.StatusText = sStatusText;
             }
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, sStatusText);
-            bResetStatusText = true;
-        }
-        /// <summary>
-        /// Updates bot status text with appropriate information if we are in range of our <see cref="CurrentTarget"/>
-        /// </summary>
-        private static void UpdateStatusTextUseTarget()
-        {
-            sStatusText = "[Trinity] ";
-            switch (CurrentTarget.Type)
-            {
-                case GObjectType.Avoidance:
-                    sStatusText += "Avoid ";
-                    break;
-                case GObjectType.Unit:
-                    sStatusText += "Attack ";
-                    break;
-                case GObjectType.Item:
-                case GObjectType.Gold:
-                case GObjectType.Globe:
-                    sStatusText += "Pickup ";
-                    break;
-                case GObjectType.Backtrack:
-                    sStatusText += "Backtrack ";
-                    break;
-                case GObjectType.Interactable:
-                    sStatusText += "Interact ";
-                    break;
-                case GObjectType.Door:
-                case GObjectType.Container:
-                    sStatusText += "Open ";
-                    break;
-                case GObjectType.Destructible:
-                case GObjectType.Barricade:
-                    sStatusText += "Destroy ";
-                    break;
-                case GObjectType.HealthWell:
-                case GObjectType.Shrine:
-                    sStatusText += "Click ";
-                    break;
-            }
-            sStatusText += "Target=" + CurrentTarget.InternalName + " {{" + CurrentTarget.ActorSNO + "}}. C-Dist=" + Math.Round(CurrentTarget.CentreDistance, 2).ToString() + ". " +
-                "R-Dist=" + Math.Round(CurrentTarget.RadiusDistance, 2).ToString() + ". ";
-            if (CurrentTarget.Type == GObjectType.Unit && currentPower.SNOPower != SNOPower.None)
-                sStatusText += "Power=" + currentPower.SNOPower.ToString() + " (range " + fRangeRequired.ToString() + ") ";
-            sStatusText += "Weight=" + Math.Round(CurrentTarget.Weight, 2).ToString() + " IN RANGE, NOW INTERACTING";
-            if (Settings.Advanced.DebugInStatusBar)
-            {
-                BotMain.StatusText = sStatusText;
-            }
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, sStatusText);
+            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "{0}", statusText.ToString());
             bResetStatusText = true;
         }
 

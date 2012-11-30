@@ -15,14 +15,17 @@ namespace GilesTrinity.Technicals
         /// <param name="args">The parameters used when format message.</param>
         public static void Log(TrinityLogLevel level, LogCategory category, string formatMessage, params object[] args)
         {
-            string msg = string.Format("[Trinity]{0}{1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
-            if (level == TrinityLogLevel.Critical)
+            if (category == LogCategory.UserInformation || level >= TrinityLogLevel.Error || (GilesTrinity.Settings != null && GilesTrinity.Settings.Advanced.LogCategories.HasFlag(category)))
             {
-                Logging.Write(ConvertToLogLevel(level), Colors.Red, msg, args);
-            }
-            else
-            {
-                Logging.Write(ConvertToLogLevel(level), msg, args);
+                string msg = string.Format("[Trinity]{0}{1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
+                if (level == TrinityLogLevel.Critical)
+                {
+                    Logging.Write(ConvertToLogLevel(level), Colors.Red, msg, args);
+                }
+                else
+                {
+                    Logging.Write(ConvertToLogLevel(level), msg, args);
+                }
             }
         }
 

@@ -6,10 +6,10 @@ namespace GilesTrinity.Technicals
     /// </summary>
     internal enum TrinityLogLevel
     {
-        Critical,
-        Error,
-        Normal,
-        Verbose,
-        Debug
+        Critical = 5,
+        Error = 4,
+        Normal = 3,
+        Verbose = 2,
+        Debug = 1
     }
 }
