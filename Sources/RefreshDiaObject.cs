@@ -44,20 +44,20 @@ namespace GilesTrinity
             // Check to see if we've already looked at this GUID
 
             AddToCache = RefreshStepSkipDoubleCheckGuid(AddToCache);
-            //if (!AddToCache) { c_IgnoreReason = "SkipDoubleCheckGuid"; return AddToCache; }
+            if (!AddToCache) { c_IgnoreReason = "SkipDoubleCheckGuid"; return AddToCache; }
             // ActorSNO
             AddToCache = RefreshStepCachedActorSNO(AddToCache);
 
             // Have ActorSNO Check for SNO based navigation obstacle hashlist
             c_IsObstacle = hashSNONavigationObstacles.Contains(c_ActorSNO);
 
-            //if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
+            if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
             // Get Internal Name
             AddToCache = RefreshInternalName(AddToCache);
-            //if (!AddToCache) { c_IgnoreReason = "InternalName"; return AddToCache; }
+            if (!AddToCache) { c_IgnoreReason = "InternalName"; return AddToCache; }
             // Get ACDGuid
             AddToCache = RefreshStepCachedACDGuid(AddToCache);
-            //if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
+            if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
 
             //if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
 
@@ -733,11 +733,12 @@ namespace GilesTrinity
                 AddToCache = false;
                 c_IgnoreSubStep += "Untargettable+";
             }
-            if (thisUnit.IsHidden)
-            {
-                AddToCache = false;
-                c_IgnoreSubStep += "IsHidden+";
-            }
+            // Disabled because of chickens
+            // if (thisUnit.IsHidden)
+            // {
+            //    AddToCache = false;
+            //    c_IgnoreSubStep += "IsHidden+";
+            // }
             if (thisUnit.IsInvulnerable)
             {
                 AddToCache = false;
