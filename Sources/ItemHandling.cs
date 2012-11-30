@@ -1,13 +1,12 @@
-﻿using GilesTrinity.DbProvider;
-using GilesTrinity.ItemRules;
-using GilesTrinity.Settings.Loot;
-using GilesTrinity.Technicals;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using GilesTrinity.ItemRules;
+using GilesTrinity.Settings.Loot;
+using GilesTrinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -56,7 +55,7 @@ namespace GilesTrinity
             ItemType gilesDBItemType = GilesToDBItemType(itemType);
             if (gilesDBItemType != dbItemType)
             {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, 
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation,
                     "GSError: Item type mis-match detected: Item Internal={0}. DemonBuddy ItemType thinks item type is={1}. Giles thinks item type is={2}. [pickup]", name, dbItemType, gilesDBItemType);
             }
             switch (baseType)
@@ -82,8 +81,8 @@ namespace GilesTrinity
                     }
                     break;
                 case GBaseItemType.Gem:
-                    if (level < Settings.Loot.Pickup.GemLevel || 
-                        (itemType == GItemType.Ruby && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Ruby))|| 
+                    if (level < Settings.Loot.Pickup.GemLevel ||
+                        (itemType == GItemType.Ruby && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Ruby)) ||
                         (itemType == GItemType.Emerald && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Emerald)) ||
                         (itemType == GItemType.Amethyst && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Amethyst)) ||
                         (itemType == GItemType.Topaz && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Topaz)))
@@ -119,9 +118,9 @@ namespace GilesTrinity
 
                             // Map out all the items already in the backpack
                             int iTotalPotions =
-                                (from tempitem in ZetaDia.Me.Inventory.Backpack 
-                                 where tempitem.BaseAddress != IntPtr.Zero 
-                                 where tempitem.GameBalanceId == balanceId 
+                                (from tempitem in ZetaDia.Me.Inventory.Backpack
+                                 where tempitem.BaseAddress != IntPtr.Zero
+                                 where tempitem.GameBalanceId == balanceId
                                  select tempitem.ItemStackQuantity).Sum();
                             if (iTotalPotions > 98)
                             {
@@ -641,13 +640,13 @@ namespace GilesTrinity
                 }
             }
 
-            
+
             // Sort the items in the stash by their row number, lowest to highest
             listSortMyStash.Sort((p1, p2) => p1.InventoryRow.CompareTo(p2.InventoryRow));
 
             // Now move items into your backpack until full, then into the END of the stash
             Vector2 vFreeSlot;
-            
+
             // Loop through all stash items
             foreach (GilesStashSort thisstashsort in listSortMyStash)
             {
@@ -782,7 +781,7 @@ namespace GilesTrinity
 
             if (TrueItemType == GItemType.StaffOfHerding)
             {
-                DbHelper.Log( TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.CraftingMaterial)
@@ -872,7 +871,7 @@ namespace GilesTrinity
             double iNeedScore = ScoreNeeded(TrueItemType);
             double iMyScore = ValueThisItem(thisitem, TrueItemType);
 
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", thisitem.RealName, thisitem.InternalName, TrueItemType,iMyScore);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", thisitem.RealName, thisitem.InternalName, TrueItemType, iMyScore);
             if (iMyScore >= iNeedScore) return true;
 
             // If we reached this point, then we found no reason to keep the item!
