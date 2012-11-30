@@ -33,6 +33,9 @@
   <PropertyGroup>
     <RootNamespace>GilesTrinity</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Demonbuddy">
       <HintPath>..\..\Demonbuddy.exe</HintPath>
@@ -239,4 +242,15 @@
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
+  <PropertyGroup>
+    <PreBuildEvent>rd $(ProjectDir)obj\
+rd $(ProjectDir)bin\
+
+</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>rd /S /Q "C:\UnifiedTrinity\UnifiedTrinity\Sources\obj\"
+rd /S /Q "C:\UnifiedTrinity\UnifiedTrinity\Sources\bin\"
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>

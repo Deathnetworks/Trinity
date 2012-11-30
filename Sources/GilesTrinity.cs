@@ -48,7 +48,7 @@ namespace GilesTrinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception for grabbing player data.{0}{1}", Environment.NewLine, ex);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception for grabbing player data.{0}{1}", Environment.NewLine, ex);
             }
         }
 
