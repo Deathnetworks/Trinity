@@ -770,38 +770,12 @@ namespace GilesTrinity
         }
 
         /// <summary>
-        /// Determine if we should stash this item or not based on item type and score
+        /// Determine if we should stash this item or not based on item type and score, and/or loot rule scripting
         /// </summary>
         /// <param name="thisitem"></param>
         /// <returns></returns>
         private static bool ShouldWeStashThis(GilesCachedACDItem thisitem)
         {
-            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
-            {
-                switch (StashRule.checkItem(thisitem.item))
-                {
-                    case Interpreter.InterpreterAction.KEEP:
-                        return true;
-                    case Interpreter.InterpreterAction.TRASH:
-                        return false;
-                    default:
-                        break;
-                }
-            } 
-
-            // auto trash blue items
-            if ((thisitem.DBBaseType == ItemBaseType.Armor || thisitem.DBBaseType == ItemBaseType.Jewelry || thisitem.DBBaseType == ItemBaseType.Weapon) && thisitem.Quality < ItemQuality.Rare4)
-            {
-                return false;
-            }
-
-            // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
-            if (thisitem.IsUnidentified)
-            {
-                DbHelper.Log( TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] = (autokeep unidentified items)", thisitem.RealName, thisitem.InternalName);
-                return true;
-            }
-
             // Now look for Misc items we might want to keep
             GItemType TrueItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
             GBaseItemType thisGilesBaseType = DetermineBaseType(TrueItemType);
@@ -857,6 +831,36 @@ namespace GilesTrinity
                 return false;
             }
 
+            /*
+             * Run Scripted rules for Weapons/Armor/Jewelry
+             */
+            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules && IsWeaponArmorJewlery(thisitem))
+            {
+
+                switch (StashRule.checkItem(thisitem.item))
+                {
+                    case Interpreter.InterpreterAction.KEEP:
+                        return true;
+                    case Interpreter.InterpreterAction.TRASH:
+                        return false;
+                    default:
+                        break;
+                }
+            }
+
+            // auto trash blue weapons/armor/jewlery
+            if (IsWeaponArmorJewlery(thisitem) && thisitem.Quality < ItemQuality.Rare4)
+            {
+                return false;
+            }
+
+            // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
+            if (thisitem.IsUnidentified)
+            {
+                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] = (autokeep unidentified items)");
+                return true;
+            }
+
             if (thisitem.Quality >= ItemQuality.Legendary)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep legendaries)", thisitem.RealName, thisitem.InternalName, TrueItemType);
@@ -873,6 +877,11 @@ namespace GilesTrinity
 
             // If we reached this point, then we found no reason to keep the item!
             return false;
+        }
+
+        private static bool IsWeaponArmorJewlery(GilesCachedACDItem thisitem)
+        {
+            return (thisitem.DBBaseType == ItemBaseType.Armor || thisitem.DBBaseType == ItemBaseType.Jewelry || thisitem.DBBaseType == ItemBaseType.Weapon);
         }
 
         /// <summary>

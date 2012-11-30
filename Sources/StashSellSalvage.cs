@@ -296,10 +296,10 @@ namespace GilesTrinity
                     LogStream.Close();
                     if (Settings.Notification.MailEnabled && EmailMessage.Length > 0)
                         NotificationManager.SendEmail(
-                            Settings.Notification.EmailAddress, 
-                            Settings.Notification.EmailAddress, 
-                            "New DB stash loot - " + ZetaDia.Service.CurrentHero.BattleTagName, 
-                            EmailMessage.ToString(), 
+                            Settings.Notification.EmailAddress,
+                            Settings.Notification.EmailAddress,
+                            "New DB stash loot - " + ZetaDia.Service.CurrentHero.BattleTagName,
+                            EmailMessage.ToString(),
                             SmtpServer,
                             Settings.Notification.EmailPassword);
                     EmailMessage.Clear();
@@ -329,6 +329,9 @@ namespace GilesTrinity
         /// <returns></returns>
         private static RunStatus GilesOptimisedStash(object ret)
         {
+            /*
+             *  Move to Stash
+             */
             ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
@@ -338,8 +341,11 @@ namespace GilesTrinity
             Vector3 vectorPlayerPosition = ZetaDia.Me.Position;
             Vector3 vectorStashLocation = new Vector3(0f, 0f, 0f);
             DiaObject objPlayStash = ZetaDia.Actors.GetActorsOfType<GizmoPlayerSharedStash>(true).FirstOrDefault<GizmoPlayerSharedStash>();
+
             if (objPlayStash != null)
+            {
                 vectorStashLocation = objPlayStash.Position;
+            }
             else
                 switch (ZetaDia.CurrentAct)
                 {
@@ -354,6 +360,8 @@ namespace GilesTrinity
             float iDistanceFromStash = Vector3.Distance(vectorPlayerPosition, vectorStashLocation);
             if (iDistanceFromStash > 120f)
                 return RunStatus.Failure;
+
+
             if (iDistanceFromStash > 7f)
             {
                 ZetaDia.Me.UsePower(SNOPower.Walk, vectorStashLocation, ZetaDia.Me.WorldDynamicId);
@@ -361,30 +369,48 @@ namespace GilesTrinity
             }
             if (objPlayStash == null)
                 return RunStatus.Failure;
+            /*
+             *  Interact with Stash
+             */
             if (!UIElements.StashWindow.IsVisible)
             {
                 objPlayStash.Interact();
                 return RunStatus.Running;
             }
+
+            /*
+             *  Get XY Map of used/blocked stash cells
+             */
             if (!updatedStashMap)
             {
 
                 // Array for what blocks are or are not blocked
                 for (int iRow = 0; iRow <= 29; iRow++)
+                {
                     for (int iColumn = 0; iColumn <= 6; iColumn++)
+                    {
                         StashSlotBlocked[iColumn, iRow] = false;
-
+                    }
+                }
                 // Block off the entire of any "protected stash pages"
                 foreach (int iProtPage in Zeta.CommonBot.Settings.CharacterSettings.Instance.ProtectedStashPages)
+                {
                     for (int iProtRow = 0; iProtRow <= 9; iProtRow++)
+                    {
                         for (int iProtColumn = 0; iProtColumn <= 6; iProtColumn++)
+                        {
                             StashSlotBlocked[iProtColumn, iProtRow + (iProtPage * 10)] = true;
-
+                        }
+                    }
+                }
                 // Remove rows we don't have
                 for (int iRow = (ZetaDia.Me.NumSharedStashSlots / 7); iRow <= 29; iRow++)
+                {
                     for (int iColumn = 0; iColumn <= 6; iColumn++)
+                    {
                         StashSlotBlocked[iColumn, iRow] = true;
-
+                    }
+                }
                 // Map out all the items already in the stash
                 foreach (ACDItem tempitem in ZetaDia.Me.Inventory.StashItems)
                 {
@@ -398,11 +424,11 @@ namespace GilesTrinity
 
                         // Try and reliably find out if this is a two slot item or not
                         GItemType tempItemType = DetermineItemType(tempitem.InternalName, tempitem.ItemType, tempitem.FollowerSpecialType);
-                        if (DetermineIsTwoSlot(tempItemType) && inventoryRow != 19 && inventoryRow != 9 && inventoryRow != 29)
+                        if (DetermineIsTwoSlot(tempItemType) && inventoryRow != 9 && inventoryRow != 19 && inventoryRow != 29)
                         {
                             StashSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                         }
-                        else if (DetermineIsTwoSlot(tempItemType) && (inventoryRow == 19 || inventoryRow == 9 || inventoryRow == 29))
+                        else if (DetermineIsTwoSlot(tempItemType) && (inventoryRow == 9 || inventoryRow == 19 || inventoryRow == 29))
                         {
                             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, 
                                 "GSError: DemonBuddy thinks this item is 2 slot even though it's at bottom row of a stash page: {0} [{1}] type={2} @ slot {3}/{4}", 
