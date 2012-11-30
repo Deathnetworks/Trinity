@@ -70,9 +70,8 @@
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=XmlTag}">Debug XmlTag</CheckBox>
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Moving}">Debug Movement System</CheckBox>
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=GlobalHandler}">Debug Global Handling System</CheckBox>
-                <CheckBox Margin="2,2" IsEnabled="False"
-                          IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=ScriptRule}">Debug Script Rules System</CheckBox>
-                <CheckBox IsEnabled="False"
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=ScriptRule}">Debug Script Rules System</CheckBox>
+                <CheckBox IsEnabled="False" ToolTip="Coming soon..."
                           Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Performance}">Debug System Performance</CheckBox>
             </UniformGrid>
         </Grid>
