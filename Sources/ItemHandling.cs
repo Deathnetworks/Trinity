@@ -856,7 +856,7 @@ namespace GilesTrinity
             // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
             if (thisitem.IsUnidentified)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep legendaries)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] = (autokeep unidentified items)", thisitem.RealName, thisitem.InternalName);
                 return true;
             }
 

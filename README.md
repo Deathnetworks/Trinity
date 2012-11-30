@@ -34,7 +34,7 @@ Code Cleanup TODO:
 
 Future Planned Improvements: 
 
-* Add stayInTown attribut for <TrinityTownRun /> 
+* Add stayInTown attribut for TrinityTownRun Profile Tag 
 
 * Default Loot Settings options for Questing, Champion Farming
 
@@ -44,7 +44,7 @@ Future Planned Improvements:
 
 Changelog 1.7.1.3:
 
-* UI options have been added for managing Selling and Salvaging of Magic, Rare, and Legendary Items. This is still a WORK IN PROGRESS. More documentation and help text to come soon.
+* Tooltips describe each new UI option for managing Selling and Salvaging of Magic, Rare, and Legendary items. Note: Legendaries are never salvaged/sold when using only Trinity Scoring.
 
 * Combat Looting re-activated. Will use Demonbuddy > Settings > Enable combat looting checkbox
 
@@ -52,11 +52,13 @@ Changelog 1.7.1.3:
 
 * Whimsyshire Pinata's are now used if within Container Open range (make sure to increase this if you're in Whimsywhire!)
 
-* Infernal Keys are now forced combat looting regardless of Demonbuddy setting
+* Trinity has a hunger for chickens once again! 
 
-* Trinity will now repair all inventory instead of just equipped items. Shout if you want this as an option in GUI.
+* Infernal Keys are now always combat looted regardless of Combat Looting setting
 
-* Avoid AOE checkbox works again
+* Trinity will now repair all inventory instead of just equipped items. Tell me if you want this as an option in GUI.
+
+* Avoidance checkbox works again
 
 * Script rule selection screen now includes a link to the forum thread for people who don't understand what it's for or what it does.
 
@@ -70,7 +72,8 @@ Changelog 1.7.1.3:
 
 * Lots of refactoring of Caching System and Target Handler
 
-* Lots of refactoring for Logging mechanism
+* Lots of refactoring for Logging, many new advanced options for logging selection
+
 
 
 
