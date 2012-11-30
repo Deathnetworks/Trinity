@@ -1078,10 +1078,7 @@ namespace GilesTrinity
             {
                 BotMain.StatusText = sStatusText;
             }
-            if (Settings.Advanced.DebugTargetting)
-            {
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, sStatusText);
-            }
+            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, sStatusText);
             bResetStatusText = true;
         }
         /// <summary>
@@ -1131,10 +1128,7 @@ namespace GilesTrinity
             {
                 BotMain.StatusText = sStatusText;
             }
-            if (Settings.Advanced.DebugTargetting)
-            {
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, sStatusText);
-            }
+            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, sStatusText);
             bResetStatusText = true;
         }
 

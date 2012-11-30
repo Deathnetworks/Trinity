@@ -112,11 +112,8 @@ namespace GilesTrinity
             // Record the last time our target changed etc.
             if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
             {
-                if (Settings.Advanced.DebugTargetting)
-                {
-                    Logging.WriteDiagnostic("[Trinity] Setting dateSincePicked to {0} iCurrentTargetRactorGUID: {1} CurrentTarget.iRActorGuid: {2}",
-                        DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
-                }
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Setting dateSincePicked to {0} iCurrentTargetRactorGUID: {1} CurrentTarget.iRActorGuid: {2}",
+                                DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
                 dateSincePickedTarget = DateTime.Now;
                 iTargetLastHealth = 0f;
             }
@@ -128,11 +125,8 @@ namespace GilesTrinity
                     // Check if the health has changed, if so update the target-pick time before we blacklist them again
                     if (CurrentTarget.HitPoints != iTargetLastHealth)
                     {
-                        if (Settings.Advanced.DebugTargetting)
-                        {
-                            Logging.WriteDiagnostic("[Trinity] Setting dateSincePicked to {0} CurrentTarget.iHitPoints: {1}  iTargetLastHealth: {2} ",
-                                DateTime.Now, CurrentTarget.HitPoints, iTargetLastHealth);
-                        }
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Setting dateSincePicked to {0} CurrentTarget.iHitPoints: {1}  iTargetLastHealth: {2} ",
+                                        DateTime.Now, CurrentTarget.HitPoints, iTargetLastHealth);
                         dateSincePickedTarget = DateTime.Now;
                     }
                     // Now store the target's last-known health
@@ -293,7 +287,7 @@ namespace GilesTrinity
                 {
                     bool AddToCache = false;
 
-                    if (!Settings.Advanced.DebugCache)
+                    if (!Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
                     {
                         /*
                          *  Main Cache Function
@@ -343,12 +337,10 @@ namespace GilesTrinity
                 }
                 catch (Exception ex)
                 {
-                    if (Settings.Advanced.DebugCache)
-                    {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
                             currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance);
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
-                    }
+                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                    
                 }
             }
         }

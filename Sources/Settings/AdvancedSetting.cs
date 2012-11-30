@@ -15,7 +15,6 @@ namespace GilesTrinity.Settings
         private bool _LogStuckLocation;
         private bool _DebugInStatusBar;
         private bool _DebugCache;
-        private bool _DebugTargetting;
         private bool _DebugWeights;
         private bool _DebugItemValuation;
         private LogCategory _LogCategories;
@@ -125,78 +124,6 @@ namespace GilesTrinity.Settings
                 {
                     _TPSLimit = value;
                     OnPropertyChanged("TPSLimit");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool DebugCache
-        {
-            get
-            {
-                return _DebugCache;
-            }
-            set
-            {
-                if (_DebugCache != value)
-                {
-                    _DebugCache = value;
-                    OnPropertyChanged("DebugCache");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool DebugTargetting
-        {
-            get
-            {
-                return _DebugTargetting;
-            }
-            set
-            {
-                if (_DebugTargetting != value)
-                {
-                    _DebugTargetting = value;
-                    OnPropertyChanged("DebugTargetting");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool DebugWeights
-        {
-            get
-            {
-                return _DebugWeights;
-            }
-            set
-            {
-                if (_DebugWeights != value)
-                {
-                    _DebugWeights = value;
-                    OnPropertyChanged("DebugWeights");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool DebugItemValuation
-        {
-            get
-            {
-                return _DebugItemValuation;
-            }
-            set
-            {
-                if (_DebugItemValuation != value)
-                {
-                    _DebugItemValuation = value;
-                    OnPropertyChanged("DebugItemValuation");
                 }
             }
         }

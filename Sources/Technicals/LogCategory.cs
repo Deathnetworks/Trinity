@@ -12,18 +12,18 @@ namespace GilesTrinity.Technicals
     public enum LogCategory
     {
         UserInformation = 0,
-        ItemValuation = 1,
-        CacheManagement = 2,
+        ItemValuation = 1,      //
+        CacheManagement = 2,    //
         ScriptRule = 4,
-        Configuration = 8,
-        UI = 16,
-        WeaponSwap = 32,
-        Behavior = 64,
+        Configuration = 8,      //
+        UI = 16,                //
+        WeaponSwap = 32,        //
+        Behavior = 64,          //
         Performance = 128,
-        Targetting = 256,
-        Weight = 512,
-        XmlTag = 1024,
-        Moving = 2048,
-        GlobalHandler = 4096
+        Targetting = 256,       //
+        Weight = 512,           //
+        XmlTag = 1024,          //
+        Moving = 2048,          //
+        GlobalHandler = 4096    //
     }
 }

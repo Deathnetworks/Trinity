@@ -551,12 +551,9 @@ namespace GilesTrinity
 
                 //    bStayPutDuringAvoidance = true;
                 //}
-                if (Settings.Advanced.DebugWeights)
-                {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5}",
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5}",
                         cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance);
-                }
-
+                
                 // Is the weight of this one higher than the current-highest weight? Then make this the new primary target!
                 if (cacheObject.Weight > w_HighestWeightFound && cacheObject.Weight > 0)
                 {
@@ -582,14 +579,11 @@ namespace GilesTrinity
                         // if there's any obstacle within a specified distance of the avoidance radius *1.2 
                         if (AvoidanceList.Any())
                         {
-                            if (Settings.Advanced.DebugTargetting)
+                            foreach (GilesObstacle o in AvoidanceList)
                             {
-                                foreach (GilesObstacle o in AvoidanceList)
-                                {
-                                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Avoidance: Id={0} Weight={1} Loc={2} Radius={3} Name={4}", o.ActorSNO, o.Weight, o.Location, o.Radius, o.Name);
-                                }
+                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Avoidance: Id={0} Weight={1} Loc={2} Radius={3} Name={4}", o.ActorSNO, o.Weight, o.Location, o.Radius, o.Name);
                             }
-
+                            
                             vKitePointAvoid = CurrentTarget.Position;
                             NeedToKite = true;
                         }
@@ -598,10 +592,10 @@ namespace GilesTrinity
             }
 
             // Loop through all the objects and give them a weight
-            if (Settings.Advanced.DebugTargetting && CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0)
+            if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0)
             {
                 DbHelper.Log(TrinityLogLevel.Verbose, 
-                                LogCategory.Weight, 
+                                LogCategory.Targetting, 
                                 "Target changed to {2} {0} ({1})",
                                 CurrentTarget.InternalName, 
                                 CurrentTarget.ActorSNO, 
