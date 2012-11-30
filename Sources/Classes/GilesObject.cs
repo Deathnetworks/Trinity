@@ -49,14 +49,10 @@ namespace GilesTrinity
         {
             get
             {
-                try
-                {
-                    return (DiaUnit)DiaObject;
-                }
-                catch
-                {
+                if (DiaObject is DiaUnit)
+                    return DiaObject as DiaUnit;
+                else
                     return null;
-                }
             }
         }
         public DiaObject DiaObject { get; set; }

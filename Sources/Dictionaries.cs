@@ -7,6 +7,8 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
+        public static readonly HashSet<int> BossLevelAreaIDs = new HashSet<int> { 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235 };
+
         /// <summary>
         /// This list is used when an actor has an attribute BuffVisualEffect=1, e.g. fire floors in The Butcher arena
         /// </summary>

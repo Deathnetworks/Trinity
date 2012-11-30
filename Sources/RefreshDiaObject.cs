@@ -342,7 +342,7 @@ namespace GilesTrinity
                         // Avoidance isn't disabled, so set this object type to avoidance
                         c_ObjectType = GObjectType.Avoidance;
                     }
-                    
+
                     // Checking for BuffVisualEffect - for Butcher, maybe useful other places?
                     if (hashAvoidanceBuffSNOList.Contains(c_ActorSNO) && Settings.Combat.Misc.AvoidAOE)
                     {
@@ -351,7 +351,8 @@ namespace GilesTrinity
                         {
                             hasBuff = c_CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) > 0;
                         }
-                        catch {
+                        catch
+                        {
                             // Remove on exception, otherwise it may get stuck in the cache
                             dictGilesObjectTypeCache.Remove(c_RActorGuid);
                         }
@@ -367,7 +368,7 @@ namespace GilesTrinity
                             c_IgnoreSubStep = "NoBuffVisualEffect";
                         }
                     }
-                    
+
                 }
                 // It's not an avoidance, so let's calculate it's object type "properly"
                 else
@@ -380,11 +381,14 @@ namespace GilesTrinity
                         {
                             AddToCache = false;
                         }
-                        if (c_CommonData != null && c_diaObject.ACDGuid != c_CommonData.ACDGuid)
+                        else if (c_diaObject.ACDGuid != c_CommonData.ACDGuid)
                         {
                             AddToCache = false;
                         }
-                        c_ObjectType = GObjectType.Unit;
+                        else
+                        {
+                            c_ObjectType = GObjectType.Unit;
+                        }
                     }
                     else if (hashForceSNOToItemList.Contains(c_ActorSNO) || c_diaObject.ActorType == ActorType.Item)
                     {
@@ -392,7 +396,7 @@ namespace GilesTrinity
                         {
                             AddToCache = false;
                         }
-                        if (c_diaObject.ACDGuid != c_CommonData.ACDGuid)
+                        if (c_CommonData != null && c_diaObject.ACDGuid != c_CommonData.ACDGuid)
                         {
                             AddToCache = false;
                         }
@@ -931,7 +935,7 @@ namespace GilesTrinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, 
+                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement,
                             "Safely handled exception getting un-cached ACD Item data (level/item type etc.) for item {0} [{1}]", c_Name, c_ActorSNO);
                         DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
@@ -1014,7 +1018,7 @@ namespace GilesTrinity
                         }
                         catch
                         {
-                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, 
+                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement,
                                 "Safely handled exception double-checking item-quality for item {0} [{1}]", c_Name, c_ActorSNO);
                         }
                     }
@@ -1185,7 +1189,7 @@ namespace GilesTrinity
             }
             catch
             {
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, 
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement,
                     "Safely handled exception getting Gizmo-Disabled-By-Script attribute for object {0} [{1}]", c_Name, c_ActorSNO);
                 AddToCache = false;
             }
@@ -1487,7 +1491,7 @@ namespace GilesTrinity
                         }
                         else if (c_Name.ToLower().Contains("chest") && !c_Name.ToLower().Contains("chest_rare"))
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "GSDebug: Possible Chest SNO: {0}, SNO={1}",c_Name, c_ActorSNO);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "GSDebug: Possible Chest SNO: {0}, SNO={1}", c_Name, c_ActorSNO);
                         }
                         // Superlist for rare chests etc.
                         if (hashSNOContainerResplendant.Contains(c_ActorSNO))
