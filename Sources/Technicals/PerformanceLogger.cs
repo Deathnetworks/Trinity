@@ -9,18 +9,17 @@ namespace GilesTrinity.Technicals
 {
     public class PerformanceLogger : IDisposable
     {
-        private readonly string _blockName;
-        private readonly bool _isEnabled;
-        private readonly Stopwatch _stopwatch;
-        private bool _isDisposed;
+        private readonly string _BlockName;
+        private readonly Stopwatch _Stopwatch;
+        private bool _IsDisposed;
 
         public PerformanceLogger(string blockName)
         {
-            _blockName = blockName;
+            _BlockName = blockName;
             if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
             {
-                _stopwatch = new Stopwatch();
-                _stopwatch.Start();
+                _Stopwatch = new Stopwatch();
+                _Stopwatch.Start();
             }
         }
 
@@ -28,14 +27,14 @@ namespace GilesTrinity.Technicals
 
         public void Dispose()
         {
-            if (!_isDisposed)
+            if (!_IsDisposed)
             {
-                _isDisposed = true;
+                _IsDisposed = true;
                 if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
                 {
-                    _stopwatch.Stop();
-                    Logging.WriteVerbose("[Trinity][Performance] Execution of the block {0} took {1}ms.", _blockName,
-                                        _stopwatch.ElapsedMilliseconds);
+                    _Stopwatch.Stop();
+                    Logging.WriteVerbose("[Trinity][Performance] Execution of the block {0} took {1}ms.", _BlockName,
+                                        _Stopwatch.ElapsedMilliseconds);
                 }
                 GC.SuppressFinalize(this);
             }

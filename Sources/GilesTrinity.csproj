@@ -72,6 +72,8 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotStart.cs" />
+    <Compile Include="Technicals\CacheManager.cs" />
+    <Compile Include="Technicals\CacheObject.cs" />
     <Compile Include="Technicals\DbHelper.cs" />
     <Compile Include="Technicals\LogCategory.cs" />
     <Compile Include="Technicals\TrinitiyLogLevel.cs" />
@@ -109,7 +111,7 @@
     <Compile Include="Settings\TrinitySetting.cs" />
     <Compile Include="Settings\WorldObjectSetting.cs" />
     <Compile Include="StashSellSalvage.cs" />
-    <Compile Include="Technicals\PerformanceMonitor.cs" />
+    <Compile Include="Technicals\PerformanceLogger.cs" />
     <Compile Include="UIComponents\BoolInverterConverter.cs" />
     <Compile Include="UIComponents\ConfigViewModel.cs" />
     <Compile Include="UIComponents\EnumVisibilityConverter.cs" />
