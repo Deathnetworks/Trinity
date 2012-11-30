@@ -20,6 +20,7 @@ namespace GilesTrinity.Technicals
         private static readonly object _Synchronizer = new object();
         private static Thread _CacheCleaner;
         private static readonly IDictionary<GObjectType, uint> _CacheTimeout = new Dictionary<GObjectType, uint>();
+        private static uint _MaxRefreshRate = 300;
         #endregion Fields
 
         #region Properties
@@ -70,6 +71,26 @@ namespace GilesTrinity.Technicals
             get
             {
                 return _CacheTimeout;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the max refresh rate.
+        /// </summary>
+        /// <value>The max refresh rate.</value>
+        public static uint MaxRefreshRate
+        {
+            get
+            {
+                return _MaxRefreshRate;
+            }
+            set
+            {
+                if (MaxRefreshRate != value)
+                {
+                    _MaxRefreshRate = value;
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.CacheManagement, "Your refresh rate on cache have been set to {0}.", value);
+                }
             }
         }
         #endregion Properties
@@ -144,7 +165,10 @@ namespace GilesTrinity.Technicals
                         }
                         else
                         {
-                            CacheObjectRefresher.Invoke(rActorGuid, cacheObject);
+                            if (DateTime.UtcNow.Subtract(cacheObject.LastAccessDate).TotalMilliseconds >= MaxRefreshRate)
+                            {
+                                CacheObjectRefresher.Invoke(rActorGuid, cacheObject);
+                            }
                         }
                     }
                     else

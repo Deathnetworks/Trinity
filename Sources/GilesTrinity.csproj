@@ -75,6 +75,10 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotStart.cs" />
+    <Compile Include="ScriptedRules\Dynamic.cs" />
+    <Compile Include="ScriptedRules\ExpressionManager.cs" />
+    <Compile Include="ScriptedRules\ScriptedRuleAction.cs" />
+    <Compile Include="ScriptedRules\ScriptedRule.cs" />
     <Compile Include="Technicals\CacheManager.cs" />
     <Compile Include="Technicals\CacheObject.cs" />
     <Compile Include="Technicals\DbHelper.cs" />
