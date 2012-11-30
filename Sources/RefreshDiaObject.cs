@@ -44,45 +44,53 @@ namespace GilesTrinity
             // Check to see if we've already looked at this GUID
 
             AddToCache = RefreshStepSkipDoubleCheckGuid(AddToCache);
-            //if (!AddToCache) { c_IgnoreReason = "SkipDoubleCheckGuid"; return AddToCache; }
+            if (!AddToCache) { c_IgnoreReason = "SkipDoubleCheckGuid"; return AddToCache; }
             // ActorSNO
             AddToCache = RefreshStepCachedActorSNO(AddToCache);
 
             // Have ActorSNO Check for SNO based navigation obstacle hashlist
             c_IsObstacle = hashSNONavigationObstacles.Contains(c_ActorSNO);
 
-            //if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
+            if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
             // Get Internal Name
             AddToCache = RefreshInternalName(AddToCache);
-            //if (!AddToCache) { c_IgnoreReason = "InternalName"; return AddToCache; }
+            if (!AddToCache) { c_IgnoreReason = "InternalName"; return AddToCache; }
             // Get ACDGuid
             AddToCache = RefreshStepCachedACDGuid(AddToCache);
-            //if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
+            if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
 
             //if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
+
             /*
              * Begin main refresh routine
              */
             // Set Giles Object Type
             AddToCache = RefreshStepCachedObjectType(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedObjectType"; return AddToCache; }
+
             // Check Blacklists
             AddToCache = RefreshStepCheckBlacklists(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CheckBlacklists"; return AddToCache; }
+
             // Get Cached Position
             AddToCache = RefreshStepCachedPosition(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedPosition"; return AddToCache; }
+
             // Always Refresh Distance for every object
             RefreshStepCalculateDistance();
-            //// Always Refresh ZDiff for every object
+
+            // Always Refresh ZDiff for every object
             AddToCache = RefreshStepNewObjectTypeZDiff(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "ZDiff"; return AddToCache; }
+
             // Add new Obstacle to cache
             AddToCache = RefreshStepAddObstacleToCache(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "AddObstacleToCache"; return AddToCache; }
+
             // Get DynamicId and GameBalanceId
             AddToCache = RefreshStepCachedDynamicIds(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedDynamicIds"; return AddToCache; }
+
             // Summons by the player 
             AddToCache = RefreshStepCachedPlayerSummons(AddToCache);
             /* 
@@ -230,8 +238,8 @@ namespace GilesTrinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting ActorSNO for an object.");
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting ActorSNO for an object.");
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                 }
                 dictGilesActorSNOCache.Add(c_RActorGuid, c_ActorSNO);
@@ -249,8 +257,8 @@ namespace GilesTrinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting InternalName for an object [{0}]", c_ActorSNO);
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting InternalName for an object [{0}]", c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                 }
                 dictGilesInternalNameCache.Add(c_RActorGuid, c_Name);
@@ -577,8 +585,8 @@ namespace GilesTrinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting monsterinfo and monstertype for unit {0} [{1}]", c_Name, c_ActorSNO);
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monsterinfo and monstertype for unit {0} [{1}]", c_Name, c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "ActorTypeAttempt={0}", thisUnit.ActorType);
                     AddToCache = false;
                 }
@@ -609,8 +617,8 @@ namespace GilesTrinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting attribute max health for unit {0} [{1}]", c_Name, c_ActorSNO);
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting attribute max health for unit {0} [{1}]", c_Name, c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                     //return bWantThis;
                 }
@@ -725,11 +733,12 @@ namespace GilesTrinity
                 AddToCache = false;
                 c_IgnoreSubStep += "Untargettable+";
             }
-            if (thisUnit.IsHidden)
-            {
-                AddToCache = false;
-                c_IgnoreSubStep += "IsHidden+";
-            }
+            // Disabled because of chickens
+            // if (thisUnit.IsHidden)
+            // {
+            //    AddToCache = false;
+            //    c_IgnoreSubStep += "IsHidden+";
+            // }
             if (thisUnit.IsInvulnerable)
             {
                 AddToCache = false;
@@ -759,8 +768,8 @@ namespace GilesTrinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting is-invulnerable attribute for unit {0} [{1}]", c_Name, c_ActorSNO);
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting is-invulnerable attribute for unit {0} [{1}]", c_Name, c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     c_unit_IsAttackable = true;
                 }
             }
@@ -821,8 +830,8 @@ namespace GilesTrinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting monstersize info for unit {0} [{1}]", c_Name, c_ActorSNO);
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monstersize info for unit {0} [{1}]", c_Name, c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                     //return bWantThis;
                 }
@@ -845,8 +854,8 @@ namespace GilesTrinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for unit {0} [{1}]", c_Name, c_ActorSNO);
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for unit {0} [{1}]", c_Name, c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                     //return bWantThis;
                 }
@@ -935,9 +944,9 @@ namespace GilesTrinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement,
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                             "Safely handled exception getting un-cached ACD Item data (level/item type etc.) for item {0} [{1}]", c_Name, c_ActorSNO);
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                         c_IgnoreSubStep = "CommonDataException";
                     }
@@ -989,7 +998,7 @@ namespace GilesTrinity
                     }
                     catch
                     {
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting item-quality for item {0} [{1}]", c_Name, c_ActorSNO);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting item-quality for item {0} [{1}]", c_Name, c_ActorSNO);
                         AddToCache = false;
                         c_IgnoreSubStep = "ItemQualityLevelException";
                     }
@@ -1018,7 +1027,7 @@ namespace GilesTrinity
                         }
                         catch
                         {
-                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement,
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                 "Safely handled exception double-checking item-quality for item {0} [{1}]", c_Name, c_ActorSNO);
                         }
                     }
@@ -1088,7 +1097,7 @@ namespace GilesTrinity
                 }
                 catch
                 {
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", c_Name, c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", c_Name, c_ActorSNO);
                     AddToCache = false;
                     //return bWantThis;
                 }
@@ -1169,7 +1178,7 @@ namespace GilesTrinity
                 }
                 catch
                 {
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for object {0} [{1}]", c_Name, c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for object {0} [{1}]", c_Name, c_ActorSNO);
                     AddToCache = false;
                     //return bWantThis;
                 }
@@ -1189,7 +1198,7 @@ namespace GilesTrinity
             }
             catch
             {
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement,
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                     "Safely handled exception getting Gizmo-Disabled-By-Script attribute for object {0} [{1}]", c_Name, c_ActorSNO);
                 AddToCache = false;
             }
@@ -1230,14 +1239,25 @@ namespace GilesTrinity
                         {
                             try
                             {
-                                DiaGizmo door = (GizmoDoor)c_diaObject;
-                                if (door.IsGizmoDisabledByScript)
+                                DiaGizmo door = null;
+                                if (c_diaObject is GizmoDoor)
                                 {
-                                    hashRGUIDBlacklist90.Add(c_RActorGuid);
+                                    door = (GizmoDoor)c_diaObject;
+
+                                    if (door != null && door.IsGizmoDisabledByScript)
+                                    {
+                                        hashRGUIDBlacklist90.Add(c_RActorGuid);
+                                        AddToCache = false;
+                                        c_IgnoreSubStep = "DoorDisabledbyScript";
+                                    }
+                                }
+                                else
+                                {
                                     AddToCache = false;
-                                    c_IgnoreSubStep = "DoorDisabledbyScript";
+                                    c_IgnoreSubStep = "InvalidCastToDoor";
                                 }
                             }
+                            
                             catch { }
                         }
                     }
@@ -1261,7 +1281,7 @@ namespace GilesTrinity
                         }
                         catch
                         {
-                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_Name, c_ActorSNO);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_Name, c_ActorSNO);
                             AddToCache = true;
                             //return bWantThis;
                         }
@@ -1293,7 +1313,7 @@ namespace GilesTrinity
                         }
                         catch
                         {
-                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_Name, c_ActorSNO);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_Name, c_ActorSNO);
                             AddToCache = false;
                             //return bWantThis;
                         }
@@ -1321,7 +1341,7 @@ namespace GilesTrinity
                             }
                             catch
                             {
-                                DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_Name, c_ActorSNO);
+                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_Name, c_ActorSNO);
                                 AddToCache = false;
                                 //return bWantThis;
                             }
@@ -1366,7 +1386,7 @@ namespace GilesTrinity
                             }
                             catch
                             {
-                                DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_Name, c_ActorSNO);
+                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_Name, c_ActorSNO);
                                 AddToCache = false;
                                 //return bWantThis;
                             }
@@ -1433,7 +1453,7 @@ namespace GilesTrinity
                         }
                         catch
                         {
-                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting container-been-opened attribute for object {0} [{1}]", c_Name, c_ActorSNO);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting container-been-opened attribute for object {0} [{1}]", c_Name, c_ActorSNO);
                             AddToCache = false;
                             //return bWantThis;
                         }
@@ -1461,7 +1481,7 @@ namespace GilesTrinity
                             }
                             catch
                             {
-                                DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_Name, c_ActorSNO);
+                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_Name, c_ActorSNO);
                                 AddToCache = false;
                                 //return bWantThis;
                             }
@@ -1702,8 +1722,8 @@ namespace GilesTrinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting ACDGUID for an object [{0}]", c_ActorSNO);
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting ACDGUID for an object [{0}]", c_ActorSNO);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                     }
                     dictGilesACDGUIDCache.Add(c_RActorGuid, c_ACDGUID);
@@ -1739,8 +1759,8 @@ namespace GilesTrinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting position for a static object [{0}]", c_ActorSNO);
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting position for a static object [{0}]", c_ActorSNO);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                     }
                     // Now cache it
@@ -1756,8 +1776,8 @@ namespace GilesTrinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting position for a unit or avoidance object [{0}]", c_ActorSNO);
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting position for a unit or avoidance object [{0}]", c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                 }
             }
             return AddToCache;
@@ -1776,8 +1796,8 @@ namespace GilesTrinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting DynamicID for item {0} [{1}]", c_Name, c_ActorSNO);
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting DynamicID for item {0} [{1}]", c_Name, c_ActorSNO);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                         //return bWantThis;
                     }
@@ -1792,8 +1812,8 @@ namespace GilesTrinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting GameBalanceID for item {0} [{1}]", c_Name, c_ActorSNO);
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting GameBalanceID for item {0} [{1}]", c_Name, c_ActorSNO);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                         //return bWantThis;
                     }

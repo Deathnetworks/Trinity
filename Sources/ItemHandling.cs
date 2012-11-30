@@ -52,11 +52,11 @@ namespace GilesTrinity
             GBaseItemType baseType = DetermineBaseType(itemType);
 
             // Error logging for DemonBuddy item mis-reading
-            ItemType gilesDBItemType = GilesToDBItemType(itemType);
-            if (gilesDBItemType != dbItemType)
+            ItemType internalItemType = GilesToDBItemType(itemType);
+            if (internalItemType != dbItemType)
             {
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation,
-                    "GSError: Item type mis-match detected: Item Internal={0}. DemonBuddy ItemType thinks item type is={1}. Giles thinks item type is={2}. [pickup]", name, dbItemType, gilesDBItemType);
+                    "GSError: Item type mis-match detected: Item Internal={0}. DemonBuddy ItemType thinks item type is={1}. Giles thinks item type is={2}. [pickup]", name, dbItemType, internalItemType);
             }
             switch (baseType)
             {
@@ -285,6 +285,12 @@ namespace GilesTrinity
             if (name.StartsWith("demonkey_") || name.StartsWith("demontrebuchetkey"))
             {
                 return GItemType.InfernalKey;
+            }
+
+            // hax for fuimusbruce's horadric hamburger
+            if (name.StartsWith("offHand_"))
+            {
+                return GItemType.Dagger;
             }
 
             // ORGANS QUICK HACK IN
