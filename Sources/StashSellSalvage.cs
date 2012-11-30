@@ -136,7 +136,7 @@ namespace GilesTrinity
                     bPreStashPauseDone = false;
                     if (Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                     {
-                        Log("Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
                     }
                 }
                 bWantToTownRun = true;
@@ -151,7 +151,7 @@ namespace GilesTrinity
                 Vector2 ValidLocation = FindValidBackpackLocation(true);
                 if (ValidLocation.X < 0 || ValidLocation.Y < 0)
                 {
-                    Log("No more space to pickup a 2-slot item, now running town-run routine.");
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, now running town-run routine.");
                     if (!bLastTownRunCheckResult)
                     {
                         bPreStashPauseDone = false;
@@ -168,7 +168,7 @@ namespace GilesTrinity
                     {
                         if (tempitem.DurabilityPercent <= Zeta.CommonBot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow)
                         {
-                            Log("Items may need repair, now running town-run routine.");
+                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Items may need repair, now running town-run routine.");
                             if (!bLastTownRunCheckResult)
                             {
                                 bPreStashPauseDone = false;
@@ -248,7 +248,7 @@ namespace GilesTrinity
                 }
                 else
                 {
-                    Log("GSError: Diablo 3 memory read error, or item became invalid [StashOver-1]", true);
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [StashOver-1]", true);
                 }
             }
             return bShouldVisitStash;
@@ -263,7 +263,7 @@ namespace GilesTrinity
         {
             if (Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Stash routine started";
-            Log("GSDebug: Stash routine started.", true);
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Stash routine started.");
             loggedAnythingThisStash = false;
             updatedStashMap = false;
             currentItemLoops = 0;
@@ -278,7 +278,7 @@ namespace GilesTrinity
         /// <returns></returns>
         private static RunStatus GilesOptimisedPostStash(object ret)
         {
-            Log("GSDebug: Stash routine ending sequence...", true);
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Stash routine ending sequence...");
 
             // Lock memory (probably not actually necessary anymore, since we handle all item stuff ourselves!?)
             using (ZetaDia.Memory.AcquireFrame())
@@ -312,13 +312,13 @@ namespace GilesTrinity
                 }
                 catch (IOException)
                 {
-                    Log("Fatal Error: File access error for signing off the stash log file.");
+                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Fatal Error: File access error for signing off the stash log file.");
                     if (LogStream != null)
                         LogStream.Close();
                 }
                 loggedAnythingThisStash = false;
             }
-            Log("GSDebug: Stash routine finished.", true);
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Stash routine finished.");
             return RunStatus.Success;
         }
 
@@ -332,7 +332,7 @@ namespace GilesTrinity
             ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
-                Log("GSError: Diablo 3 memory read error, or item became invalid [CoreStash-1]", true);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [CoreStash-1]");
                 return RunStatus.Failure;
             }
             Vector3 vectorPlayerPosition = ZetaDia.Me.Position;
@@ -404,9 +404,13 @@ namespace GilesTrinity
                         }
                         else if (DetermineIsTwoSlot(tempItemType) && (inventoryRow == 19 || inventoryRow == 9 || inventoryRow == 29))
                         {
-                            Log("GSError: DemonBuddy thinks this item is 2 slot even though it's at bottom row of a stash page: " + tempitem.Name + " [" + tempitem.InternalName +
-                                "] type=" + tempItemType.ToString() + " @ slot " + (inventoryRow + 1).ToString() + "/" +
-                                (inventoryColumn + 1).ToString(), true);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, 
+                                "GSError: DemonBuddy thinks this item is 2 slot even though it's at bottom row of a stash page: {0} [{1}] type={2} @ slot {3}/{4}", 
+                                tempitem.Name,
+                                tempitem.InternalName,
+                                tempItemType,
+                                (inventoryRow + 1),
+                                (inventoryColumn + 1));
                         }
                     }
                 }
@@ -426,7 +430,7 @@ namespace GilesTrinity
                 GilesCachedACDItem thisitem = hashGilesCachedKeepItems.FirstOrDefault();
                 bool bDidStashSucceed = GilesStashAttempt(thisitem);
                 if (!bDidStashSucceed)
-                    Log("There was an unknown error stashing an item.", true);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "There was an unknown error stashing an item.");
                 if (thisitem != null)
                     hashGilesCachedKeepItems.Remove(thisitem);
                 if (hashGilesCachedKeepItems.Count > 0)
@@ -495,7 +499,7 @@ namespace GilesTrinity
                 }
                 else
                 {
-                    Log("GSError: Diablo 3 memory read error, or item became invalid [SellOver-1]", true);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [SellOver-1]");
                 }
             }
             return bShouldVisitVendor;
@@ -510,11 +514,11 @@ namespace GilesTrinity
         {
             if (Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Sell routine started";
-            Log("GSDebug: Sell routine started.", true);
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Sell routine started.");
             ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
-                Log("GSError: Diablo 3 memory read error, or item became invalid [PreSell-1]", true);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [PreSell-1]");
                 return RunStatus.Failure;
             }
             bGoToSafetyPointFirst = true;
@@ -734,7 +738,7 @@ namespace GilesTrinity
         /// <returns></returns>
         private static RunStatus GilesOptimisedPostSell(object ret)
         {
-            Log("GSDebug: Sell routine ending sequence...", true);
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Sell routine ending sequence...");
             using (ZetaDia.Memory.AcquireFrame())
             {
                 ZetaDia.Actors.Update();
@@ -743,8 +747,8 @@ namespace GilesTrinity
             // Always repair, but only if we have enough money
             if (bNeedsEquipmentRepairs && iLowestDurabilityFound < 20 && iLowestDurabilityFound > -1 && ZetaDia.Me.Inventory.Coinage < 40000)
             {
-                Log("*");
-                Log("Emergency Stop: You need repairs but don't have enough money. Stopping the bot to prevent infinite death loop.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "*");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Emergency Stop: You need repairs but don't have enough money. Stopping the bot to prevent infinite death loop.");
                 BotMain.Stop();
             }
 
@@ -764,7 +768,7 @@ namespace GilesTrinity
                 }
                 catch (IOException)
                 {
-                    Log("Fatal Error: File access error for signing off the junk log file.");
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error: File access error for signing off the junk log file.");
                     if (LogStream != null)
                         LogStream.Close();
                 }
@@ -823,7 +827,7 @@ namespace GilesTrinity
                 bCurrentlyMoving = false;
                 bReachedSafety = true;
             }*/
-            Log("GSDebug: Sell routine finished.", true);
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Sell routine finished.");
             return RunStatus.Success;
         }
 
@@ -858,7 +862,7 @@ namespace GilesTrinity
                 }
                 else
                 {
-                    Log("GSError: Diablo 3 memory read error, or item became invalid [SalvageOver-1]", true);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [SalvageOver-1]");
                 }
             }
             return bShouldVisitSmith;
@@ -873,11 +877,11 @@ namespace GilesTrinity
         {
             if (Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Salvage routine started";
-            Log("GSDebug: Salvage routine started.", true);
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Salvage routine started.");
             ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
-                Log("GSError: Diablo 3 memory read error, or item became invalid [PreSalvage-1]", true);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [PreSalvage-1]");
                 return RunStatus.Failure;
             }
             bGoToSafetyPointFirst = true;
@@ -1079,7 +1083,7 @@ namespace GilesTrinity
         /// <returns></returns>
         private static RunStatus GilesOptimisedPostSalvage(object ret)
         {
-            Log("GSDebug: Salvage routine ending sequence...", true);
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Salvage routine ending sequence...");
             using (ZetaDia.Memory.AcquireFrame())
             {
                 ZetaDia.Actors.Update();
@@ -1096,7 +1100,7 @@ namespace GilesTrinity
                 }
                 catch (IOException)
                 {
-                    Log("Fatal Error: File access error for signing off the junk log file.");
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error: File access error for signing off the junk log file.");
                     if (LogStream != null)
                         LogStream.Close();
                 }
@@ -1132,7 +1136,7 @@ namespace GilesTrinity
                 bCurrentlyMoving = false;
                 bReachedSafety = true;
             }
-            Log("GSDebug: Salvage routine finished.", true);
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Salvage routine finished.");
             return RunStatus.Success;
         }
 
@@ -1202,7 +1206,7 @@ namespace GilesTrinity
             }
             catch (IOException)
             {
-                Log("Fatal Error: File access error for stash log file.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error: File access error for stash log file.");
                 if (LogStream != null)
                     LogStream.Close();
             }
@@ -1243,7 +1247,7 @@ namespace GilesTrinity
             }
             catch (IOException)
             {
-                Log("Fatal Error: File access error for junk log file.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error: File access error for junk log file.");
                 if (LogStream != null)
                     LogStream.Close();
             }
@@ -1269,13 +1273,13 @@ namespace GilesTrinity
             int iAttempts;
             if (_dictItemStashAttempted.TryGetValue(iOriginalDynamicID, out iAttempts))
             {
-                Log("GSError: Detected a duplicate stash attempt, DB item mis-read error, now forcing this item as a 2-slot item");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "GSError: Detected a duplicate stash attempt, DB item mis-read error, now forcing this item as a 2-slot item");
                 _dictItemStashAttempted[iOriginalDynamicID] = iAttempts + 1;
                 bOriginalTwoSlot = true;
                 bOriginalIsStackable = false;
                 if (iAttempts > 6)
                 {
-                    Log("GSError: Detected an item stash loop risk, now re-mapping stash treating everything as 2-slot and re-attempting");
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "GSError: Detected an item stash loop risk, now re-mapping stash treating everything as 2-slot and re-attempting");
 
                     // Array for what blocks are or are not blocked
                     for (int iRow = 0; iRow <= 29; iRow++)
@@ -1315,8 +1319,8 @@ namespace GilesTrinity
                 }
                 if (iAttempts > 15)
                 {
-                    Log("*");
-                    Log("GSError: Emergency Stop: No matter what we tried, we couldn't prevent an infinite stash loop. Sorry. Now stopping the bot.");
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "*");
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "GSError: Emergency Stop: No matter what we tried, we couldn't prevent an infinite stash loop. Sorry. Now stopping the bot.");
                     BotMain.Stop();
                     return false;
                 }
@@ -1352,7 +1356,7 @@ namespace GilesTrinity
                 {
                     if (tempitem.BaseAddress == IntPtr.Zero)
                     {
-                        Log("GSError: Diablo 3 memory read error, or stash item became invalid [StashAttempt-5]", true);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or stash item became invalid [StashAttempt-5]");
                         return false;
                     }
 
@@ -1496,9 +1500,9 @@ namespace GilesTrinity
         FoundStashLocation:
             if ((iPointX < 0) || (iPointY < 0))
             {
-                Log("Fatal Error: No valid stash location found for '" + sOriginalItemName + "' [" + sOriginalInternalName + " - " + OriginalGilesItemType.ToString() + "]", true);
-                Log("*");
-                Log("GSError: Emergency Stop: You need to stash an item but no valid space could be found. Stash is full? Stopping the bot to prevent infinite town-run loop.");
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Fatal Error: No valid stash location found for '{0}' [{1} - {2}]", sOriginalItemName, sOriginalInternalName, OriginalGilesItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "*");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "GSError: Emergency Stop: You need to stash an item but no valid space could be found. Stash is full? Stopping the bot to prevent infinite town-run loop.");
                 BotMain.Stop();
                 return false;
             }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.Technicals;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
@@ -116,7 +117,7 @@ namespace GilesTrinity.Notifications
             }
             catch (Exception e)
             {
-                GilesTrinity.Log("Error sending email." + Environment.NewLine + e.ToString());
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error sending email.{0}{1}", Environment.NewLine, e.ToString());
             }
         }
     }

@@ -209,7 +209,7 @@ namespace GilesTrinity.DbProvider
                 Navigator.Clear();
 
                 ProfileManager.Load(Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
-                Logging.Write("[Trinity] Anti-stuck successfully reloaded current profile, DemonBuddy now navigating again.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck successfully reloaded current profile, DemonBuddy now navigating again.");
                 return vSafeMovementLocation;
 
                 // Didn't make it to town, so skip instantly to the exit game system
@@ -220,7 +220,7 @@ namespace GilesTrinity.DbProvider
             {
                 timeLastRestartedGame = DateTime.Now;
                 string sUseProfile = GilesTrinity.sFirstProfileSeen;
-                Logging.Write("[Trinity] Anti-stuck measures exiting current game.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck measures exiting current game.");
                 // Load the first profile seen last run
                 ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
                                         ? sUseProfile
@@ -236,7 +236,7 @@ namespace GilesTrinity.DbProvider
             }
             else
             {
-                Logging.Write("[Trinity] Unstucking measures failed. Now stopping Trinity unstucker for 12 minutes to inactivity timers to kick in or DB to auto-fix.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Unstucking measures failed. Now stopping Trinity unstucker for 12 minutes to inactivity timers to kick in or DB to auto-fix.");
                 iCancelUnstuckerForSeconds = 720;
                 timeCancelledUnstuckerFor = DateTime.Now;
                 return vSafeMovementLocation;

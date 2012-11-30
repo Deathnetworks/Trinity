@@ -1,6 +1,7 @@
 ﻿using GilesTrinity.DbProvider;
 using GilesTrinity.ItemRules;
 using GilesTrinity.Settings.Loot;
+using GilesTrinity.Technicals;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -55,8 +56,8 @@ namespace GilesTrinity
             ItemType gilesDBItemType = GilesToDBItemType(itemType);
             if (gilesDBItemType != dbItemType)
             {
-                Log("GSError: Item type mis-match detected: Item Internal=" + name + ". DemonBuddy ItemType thinks item type is=" + dbItemType.ToString() + ". Giles thinks item type is=" +
-                    gilesDBItemType.ToString() + ". [pickup]", true);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, 
+                    "GSError: Item type mis-match detected: Item Internal={0}. DemonBuddy ItemType thinks item type is={1}. Giles thinks item type is={2}. [pickup]", name, dbItemType, gilesDBItemType);
             }
             switch (baseType)
             {
@@ -554,12 +555,12 @@ namespace GilesTrinity
             }
             catch
             {
-                Log("Failure getting your player data from DemonBuddy, abandoning the sort!");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure getting your player data from DemonBuddy, abandoning the sort!");
                 return;
             }
             if (iPlayerDynamicID == -1)
             {
-                Log("Failure getting your player data, abandoning the sort!");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure getting your player data, abandoning the sort!");
                 return;
             }
 
@@ -622,8 +623,8 @@ namespace GilesTrinity
                 }
                 else if (isTwoSlot && (inventoryRow == 19 || inventoryRow == 9 || inventoryRow == 29))
                 {
-                    Log("WARNING: There was an error reading your stash, abandoning the process.");
-                    Log("Always make sure you empty your backpack, open the stash, then RESTART DEMONBUDDY before sorting!");
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: There was an error reading your stash, abandoning the process.");
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Always make sure you empty your backpack, open the stash, then RESTART DEMONBUDDY before sorting!");
                     return;
                 }
                 GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(item, item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId,
@@ -698,7 +699,7 @@ namespace GilesTrinity
                 vFreeSlot = SortingFindLocationStash(thisstashsort.bIsTwoSlot, false);
                 if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
                 {
-                    Log("Failure trying to put things back into stash, no stash slots free? Abandoning...");
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure trying to put things back into stash, no stash slots free? Abandoning...");
                     return;
                 }
                 ZetaDia.Me.Inventory.MoveItem(thisstashsort.iDynamicID, iPlayerDynamicID, InventorySlot.PlayerSharedStash, (int)vFreeSlot.X, (int)vFreeSlot.Y);
@@ -722,7 +723,7 @@ namespace GilesTrinity
                 thisstashsort.iInventoryColumn = (int)vFreeSlot.X;
                 Thread.Sleep(150);
             }
-            Log("Stash sorted!");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Stash sorted!");
         }
 
         /// <summary>
@@ -735,18 +736,18 @@ namespace GilesTrinity
             ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
-                Logging.Write("Error testing scores - not in game world?");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error testing scores - not in game world?");
                 return;
             }
             if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
             {
                 bOutputItemScores = true;
-                Logging.Write("===== Outputting Test Scores =====");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "===== Outputting Test Scores =====");
                 foreach (ACDItem item in ZetaDia.Actors.Me.Inventory.Backpack)
                 {
                     if (item.BaseAddress == IntPtr.Zero)
                     {
-                        Logging.Write("GSError: Diablo 3 memory read error, or item became invalid [TestScore-1]");
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [TestScore-1]");
                     }
                     else
                     {
@@ -754,16 +755,16 @@ namespace GilesTrinity
                             item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.IsTwoHand, item.DyeType, item.ItemType, item.ItemBaseType, item.FollowerSpecialType, item.IsUnidentified, item.ItemStackQuantity,
                             item.Stats);
                         bool bShouldStashTest = ShouldWeStashThis(thiscacheditem);
-                        Logging.Write(bShouldStashTest ? "* KEEP *" : "-- TRASH --");
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, bShouldStashTest ? "* KEEP *" : "-- TRASH --");
                     }
                 }
-                Logging.Write("===== Finished Test Score Outputs =====");
-                Logging.Write("Note: See bad scores? Wrong item types? Known DB bug - restart DB before using the test button!");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "===== Finished Test Score Outputs =====");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: See bad scores? Wrong item types? Known DB bug - restart DB before using the test button!");
                 bOutputItemScores = false;
             }
             else
             {
-                Logging.Write("Error testing scores - not in game world?");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error testing scores - not in game world?");
             }
             testingBackpack = false;
         }
@@ -797,7 +798,7 @@ namespace GilesTrinity
             // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
             if (thisitem.IsUnidentified)
             {
-                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] = (autokeep unidentified items)");
+                DbHelper.Log( TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] = (autokeep unidentified items)", thisitem.RealName, thisitem.InternalName);
                 return true;
             }
 
@@ -807,58 +808,58 @@ namespace GilesTrinity
 
             if (TrueItemType == GItemType.StaffOfHerding)
             {
-                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep staff of herding)");
+                DbHelper.Log( TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.CraftingMaterial)
             {
-                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep craft materials)");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.CraftingPlan)
             {
-                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep plans)");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep plans)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.Emerald)
             {
-                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep gems)");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.Amethyst)
             {
-                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep gems)");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.Topaz)
             {
-                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep gems)");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.Ruby)
             {
-                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep gems)");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.CraftTome)
             {
-                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep tomes)");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.InfernalKey)
             {
-                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep infernal key)");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep infernal key)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.HealthPotion)
             {
-                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (ignoring potions)");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return false;
             }
 
             if (thisitem.Quality >= ItemQuality.Legendary)
             {
-                if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = (autokeep legendaries)");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep legendaries)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
 
@@ -867,7 +868,7 @@ namespace GilesTrinity
             double iNeedScore = ScoreNeeded(TrueItemType);
             double iMyScore = ValueThisItem(thisitem, TrueItemType);
 
-            if (bOutputItemScores) Log(thisitem.RealName + " [" + thisitem.InternalName + "] [" + TrueItemType.ToString() + "] = " + iMyScore.ToString());
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", thisitem.RealName, thisitem.InternalName, TrueItemType,iMyScore);
             if (iMyScore >= iNeedScore) return true;
 
             // If we reached this point, then we found no reason to keep the item!

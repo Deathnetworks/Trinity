@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.Technicals;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -85,7 +86,7 @@ namespace GilesTrinity.ItemRules
                 string str;
                 string[] rule;
 
-                Logging.Write("starting initializing Item Rule Set!");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "starting initializing Item Rule Set!");
 
                 logOut("--- STARTING A NEW SESSION WITH ITEMRULESET ---", LogType.LOG);
                 List<string> itemFileNames = new List<string>();
@@ -108,12 +109,12 @@ namespace GilesTrinity.ItemRules
                     readItemFile(new StreamReader(customPath + itemFileName));
                 }
                 logOut("initialized " + ruleSet.Count + " itemrulesets!", LogType.DEBUG);
-                Logging.Write("initialized " + ruleSet.Count + " itemrulesets!");
-                Logging.Write("finished initializing Item Rule Set!");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "initialized {0} itemrulesets!", ruleSet.Count);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "finished initializing Item Rule Set!");
             }
             catch (Exception ex)
             {
-                Logging.Write("Initialization of Item Rule Set Failed: {0}", ex);
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.ScriptRule, "Initialization of Item Rule Set Failed: {0}", ex);
             }
         }
 

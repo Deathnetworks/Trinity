@@ -89,7 +89,7 @@ namespace GilesTrinity
                                         RadiusDistance = 2f,
                                         InternalName = "GilesStayPutPoint"
                                     };
-                Logging.WriteDiagnostic("Staying Put During Avoidance");
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Staying Put During Avoidance");
             }
             // Still no target, let's see if we should backtrack or wait for wrath to come off cooldown...
             if (CurrentTarget == null)

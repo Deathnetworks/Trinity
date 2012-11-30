@@ -1,4 +1,5 @@
 ﻿using GilesTrinity.DbProvider;
+using GilesTrinity.Technicals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,9 +46,9 @@ namespace GilesTrinity
                 playerStatus.MyDynamicID = me.CommonData.DynamicId;
                 playerStatus.Level = me.Level;
             }
-            catch
+            catch (Exception ex)
             {
-                Logging.WriteDiagnostic("[Trinity] Safely handled exception for grabbing player data.");
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception for grabbing player data.{0}{1}", Environment.NewLine, ex);
             }
         }
 
@@ -195,20 +196,6 @@ namespace GilesTrinity
         // Special check to force re-buffing before castign archon
         private static bool CanCastArchon = false;
 
-        /// <summary>
-        /// Writes a log message (default is LogLevel=Normal)
-        /// </summary>
-        /// <param name="message">The message</param>
-        /// <param name="isDiagnostic">If true, will be loglevel=Diagnostic, else, loglevel=Normal</param>
-        internal static void Log(string message, bool isDiagnostic = false)
-        {
-            string totalMessage = String.Format("[Trinity] {0}", message);
-            if (!isDiagnostic)
-                Logging.Write(totalMessage);
-            else
-                Logging.WriteDiagnostic(totalMessage);
-        }
-
         private static bool BotIsPaused()
         {
             return bMainBotPaused;
@@ -219,11 +206,11 @@ namespace GilesTrinity
         {
             if (!BotMain.IsRunning || !ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
             {
-                Logging.Write("[Trinity] You can only force a town run while DemonBuddy is started and running!");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "You can only force a town run while DemonBuddy is started and running!");
                 return;
             }
             ForceVendorRunASAP = true;
-            Logging.Write("[Trinity] Town-run request received, will town-run at next possible moment.");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Town-run request received, will town-run at next possible moment.");
         }
         // Pause Button
         private static void buttonPause_Click(object sender, RoutedEventArgs e)
@@ -262,7 +249,7 @@ namespace GilesTrinity
                 {
                     if (iDeathsThisRun >= iMaxDeathsAllowed)
                     {
-                        Logging.Write("[Trinity] You have died too many times. Now restarting the game.");
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "You have died too many times. Now restarting the game.");
                         string sUseProfile = GilesTrinity.sFirstProfileSeen;
                         ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
                                                 ? sUseProfile
@@ -274,7 +261,7 @@ namespace GilesTrinity
                     }
                     else
                     {
-                        Logging.Write("[Trinity] I'm sorry, but I seem to have let you die :( Now restarting the current profile.");
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "I'm sorry, but I seem to have let you die :( Now restarting the current profile.");
                         ProfileManager.Load(Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
                         Thread.Sleep(2000);
                     }

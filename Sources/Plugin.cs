@@ -1,4 +1,5 @@
 ﻿using GilesTrinity.DbProvider;
+using GilesTrinity.Technicals;
 using System;
 using System.IO;
 using System.Reflection;
@@ -138,9 +139,9 @@ namespace GilesTrinity
             }));
             if (!Directory.Exists(sTrinityPluginPath))
             {
-                Log("Fatal Error - cannot enable plugin. Invalid path: " + sTrinityPluginPath);
-                Log("Please check you have installed the plugin to the correct location, and then restart DemonBuddy and re-enable the plugin.");
-                Log(@"Plugin should be installed to \<DemonBuddyFolder>\Plugins\GilesTrinity\");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error - cannot enable plugin. Invalid path: {0}", sTrinityPluginPath);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Please check you have installed the plugin to the correct location, and then restart DemonBuddy and re-enable the plugin.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, @"Plugin should be installed to \<DemonBuddyFolder>\Plugins\GilesTrinity\");
             }
             else
             {
@@ -171,9 +172,9 @@ namespace GilesTrinity
                 {
                     BotMain.TicksPerSecond = (int)Settings.Advanced.TPSLimit;
                 }
-                Log("");
-                Log("ENABLED: " + Description + " now in action!"); ;
-                Log("");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
             }
             try
             {
@@ -197,7 +198,9 @@ namespace GilesTrinity
             BotMain.OnStop -= GilesTrinityHandleBotStop;
             GameEvents.OnGameJoined -= GilesTrinityOnJoinGame;
             GameEvents.OnGameLeft -= GilesTrinityOnLeaveGame;
-            Log("DISABLED: Giles Trinity is now shut down...");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DISABLED: Giles Trinity is now shut down...");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
         }
 
         /// <summary>
