@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Zeta.Internals.Actors;
 
 namespace GilesTrinity.Cache
 {
     internal static class CacheManager
     {
         #region Delegates
-        public delegate CacheObject CacheObjectGetterDelegate(int rActorGUID);
-        public delegate void CacheObjectRefresherDelegate(int rActorGUID, CacheObject cacheObject);
+        public delegate CacheObject CacheObjectGetterDelegate(int acdGuid, ACD acdObject);
+        public delegate void CacheObjectRefresherDelegate(int acdGuid, ACD acdObject, CacheObject cacheObject);
         #endregion Delegates
 
         #region Fields
@@ -147,28 +148,48 @@ namespace GilesTrinity.Cache
         }
 
         /// <summary>Gets an object from cache.</summary>
-        /// <param name="rActorGuid">The RActorGUID.</param>
-        /// <returns>Cached object corresponding to the <paramref name="rActorGuid"/></returns>
-        /// <exception cref="System.InvalidOperationException">You must set CacheObjectGetter property before calling GetObject</exception>
-        public static CacheObject GetObject(int rActorGuid)
+        /// <param name="acdObject">The acd object.</param>
+        /// <returns>
+        /// Cached object corresponding to the <paramref name="acdObject" />
+        /// </returns>
+        public static CacheObject GetObject(ACD acdObject)
+        {
+            if (acdObject == null)
+            {
+                return null;
+            }
+
+            return GetObject(acdObject.ACDGuid, acdObject);
+        }
+
+        /// <summary>Gets the object from cache.</summary>
+        /// <param name="acdGuid">The ACDGuid.</param>
+        /// <returns>Cached object corresponding to the <paramref name="acdGuid" /></returns>
+        public static CacheObject GetObject(int acdGuid)
+        {
+            return GetObject(acdGuid, null);
+        }
+
+        private static CacheObject GetObject(int acdGuid, ACD acdObject)
         {
             using (new PerformanceLogger("CacheManager.GetObject"))
             {
                 CacheObject cacheObject;
                 lock (_Synchronizer)
                 {
-                    if (_Cache.ContainsKey(rActorGuid))
+                    if (_Cache.ContainsKey(acdGuid))
                     {
-                        cacheObject = _Cache[rActorGuid];
+                        cacheObject = _Cache[acdGuid];
                         if (CacheObjectRefresher == null)
                         {
                             DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "You haven't defined CacheObjectRefresher before calling GetObject");
                         }
                         else
                         {
-                            if (DateTime.UtcNow.Subtract(cacheObject.LastAccessDate).TotalMilliseconds >= MaxRefreshRate)
+                            if (DateTime.UtcNow.Subtract(cacheObject.LastRefreshDate).TotalMilliseconds >= MaxRefreshRate)
                             {
-                                CacheObjectRefresher.Invoke(rActorGuid, cacheObject);
+                                CacheObjectRefresher.Invoke(acdGuid, acdObject, cacheObject);
+                                cacheObject.LastRefreshDate = DateTime.UtcNow;
                             }
                         }
                     }
@@ -178,10 +199,10 @@ namespace GilesTrinity.Cache
                         {
                             throw new InvalidOperationException("You must set CacheObjectGetter property before calling GetObject");
                         }
-                        cacheObject = _CacheObjectGetter.Invoke(rActorGuid);
+                        cacheObject = _CacheObjectGetter.Invoke(acdGuid, acdObject);
                         if (cacheObject != null)
                         {
-                            _Cache.Add(rActorGuid, cacheObject);
+                            _Cache.Add(acdGuid, cacheObject);
                         }
                     }
                 }
@@ -192,6 +213,22 @@ namespace GilesTrinity.Cache
                 }
                 // Return clone of cached object (You can modify returned copy without impact on cache system) 
                 return cacheObject.Clone();
+            }
+        }
+
+        /// <summary>Gets all cached object corresponding to the type.</summary>
+        /// <typeparam name="T">Type of cached object</typeparam>
+        /// <param name="type">The type.</param>
+        /// <returns><see cref="IEnumerable"/> corresponding to all objects of this type in cache.</returns>
+        public static IEnumerable<T> GetAllObjectByType<T>(GObjectType type) 
+            where T : CacheObject
+        {
+            foreach (CacheObject obj in _Cache.Values.Where(o=>o.Type == type))
+            {
+                if (obj is T)
+                {
+                    yield return (T)obj.Clone();
+                }
             }
         }
 

@@ -50,6 +50,16 @@ namespace GilesTrinity.Cache
         }
 
         /// <summary>
+        /// Gets or sets the last refresh date.
+        /// </summary>
+        /// <value>The last refresh date.</value>
+        public DateTime LastRefreshDate 
+        { 
+            get; 
+            set; 
+        }
+
+        /// <summary>
         /// Gets or sets the object type.
         /// </summary>
         /// <value>The object type.</value>
