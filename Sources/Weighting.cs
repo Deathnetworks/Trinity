@@ -37,7 +37,7 @@ namespace GilesTrinity
                 // Now do different calculations based on the object type
                 switch (cacheObject.Type)
                 {
-                    case GObjectType.Unit:
+                    case ObjectType.Unit:
                         {
 
                             // Weight Units
@@ -280,8 +280,8 @@ namespace GilesTrinity
                             // This is an attackable unit
                             break;
                         }
-                    case GObjectType.Item:
-                    case GObjectType.Gold:
+                    case ObjectType.Item:
+                    case ObjectType.Gold:
                         {
                             // Weight Items
 
@@ -333,7 +333,7 @@ namespace GilesTrinity
                             }*/
                             break;
                         }
-                    case GObjectType.Globe:
+                    case ObjectType.Globe:
                         {
                             // Weight Health Globes
 
@@ -383,21 +383,21 @@ namespace GilesTrinity
                             }
                             break;
                         }
-                    case GObjectType.HealthWell:
+                    case ObjectType.HealthWell:
                         {
 
                             // Healths Wells get handled correctly ... 
-                            if (cacheObject.Type == GObjectType.HealthWell && playerStatus.CurrentHealthPct <= .75)
+                            if (cacheObject.Type == ObjectType.HealthWell && playerStatus.CurrentHealthPct <= .75)
                             {
                                 cacheObject.Weight += 7500;
                             }
-                            if (cacheObject.Type == GObjectType.HealthWell && playerStatus.CurrentHealthPct <= .25)
+                            if (cacheObject.Type == ObjectType.HealthWell && playerStatus.CurrentHealthPct <= .25)
                             {
                                 cacheObject.Weight += 20000d;
                             }
                             break;
                         }
-                    case GObjectType.Shrine:
+                    case ObjectType.Shrine:
                         {
 
                             // Weight Shrines
@@ -442,7 +442,7 @@ namespace GilesTrinity
                             }
                             break;
                         }
-                    case GObjectType.Door:
+                    case ObjectType.Door:
                         {
                             if (cacheObject.RadiusDistance <= 20f)
                                 cacheObject.Weight += 15000d;
@@ -452,8 +452,8 @@ namespace GilesTrinity
                                 cacheObject.Weight += 250000d;
                             break;
                         }
-                    case GObjectType.Destructible:
-                    case GObjectType.Barricade:
+                    case ObjectType.Destructible:
+                    case ObjectType.Barricade:
                         {
 
                             // rrrix added this as a single "weight" source based on the DestructableRange.
@@ -493,7 +493,7 @@ namespace GilesTrinity
                                 cacheObject.Weight = 100 + cacheObject.RadiusDistance;
                             break;
                         }
-                    case GObjectType.Interactable:
+                    case ObjectType.Interactable:
                         {
 
                             // Weight Interactable Specials
@@ -516,7 +516,7 @@ namespace GilesTrinity
                                 cacheObject.Weight = 1;
                             break;
                         }
-                    case GObjectType.Container:
+                    case ObjectType.Container:
                         {
 
                             // Weight Containers
@@ -567,7 +567,7 @@ namespace GilesTrinity
                     vKitePointAvoid = vNullLocation;
 
                     // Kiting and Avoidance
-                    if (CurrentTarget.Type == GObjectType.Unit)
+                    if (CurrentTarget.Type == ObjectType.Unit)
                     {
                         var AvoidanceList = hashAvoidanceObstacleCache.Where(o =>
                             // Distance from avoidance to target is less than avoidance radius

@@ -1,10 +1,10 @@
-﻿using GilesTrinity.DbProvider;
-using GilesTrinity.Technicals;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Windows;
+using GilesTrinity.DbProvider;
+using GilesTrinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -52,154 +52,13 @@ namespace GilesTrinity
             }
         }
 
-        /// <summary>
-        /// Quick and Dirty routine just to force a wait until the character is "free"
-        /// </summary>
-        /// <param name="maxSafetyLoops">The max safety loops.</param>
-        /// <param name="waitForAttacking">if set to <c>true</c> wait for attacking.</param>
-        public static void WaitWhileAnimating(int maxSafetyLoops = 10, bool waitForAttacking = false)
-        {
-            bool bKeepLooping = true;
-            int iSafetyLoops = 0;
-            while (bKeepLooping)
-            {
-                iSafetyLoops++;
-                if (iSafetyLoops > maxSafetyLoops)
-                    bKeepLooping = false;
-                bool bIsAnimating = false;
-                try
-                {
-                    ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
-                    if (myAnimationState == null || myAnimationState.State == AnimationState.Casting || myAnimationState.State == AnimationState.Channeling)
-                        bIsAnimating = true;
-                    if (waitForAttacking && (myAnimationState == null || myAnimationState.State == AnimationState.Attacking))
-                        bIsAnimating = true;
-                }
-                catch
-                {
-                    bIsAnimating = true;
-                }
-                if (!bIsAnimating)
-                    bKeepLooping = false;
-            }
-        }
 
-        /// <summary>
-        /// Check re-use timers on skills
-        /// </summary>
-        /// <param name="power">The power.</param>
-        /// <param name="recheck">if set to <c>true</c> check again.</param>
-        /// <returns>
-        /// Returns whether or not we can use a skill, or if it's on our own internal Trinity cooldown timer
-        /// </returns>
-        private static bool GilesUseTimer(SNOPower power, bool recheck = false)
-        {
-            if (DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds >= dictAbilityRepeatDelay[power])
-                return true;
-            if (recheck && DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds >= 150 && DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds <= 600)
-                return true;
-            return false;
-        }
-        // This function checks when the spell last failed (according to D3 memory, which isn't always reliable)
-        // To prevent Trinity getting stuck re-trying the same spell over and over and doing nothing else
-        // No longer used but keeping this here incase I re-use it
-        private static bool GilesCanRecastAfterFailure(SNOPower power, int maxRecheckTime = 250)
-        {
-            if (DateTime.Now.Subtract(dictAbilityLastFailed[power]).TotalMilliseconds <= maxRecheckTime)
-                return false;
-            return true;
-        }
+        // How many total leave games, for stat-tracking?
+        public static int iTotalJoinGames = 0;
+        // How many total leave games, for stat-tracking?
+        public static int TotalLeaveGames = 0;
+        public static int TotalProfileRecycles = 0;
 
-        // When last hit the power-manager for this - not currently used, saved here incase I use it again in the future!
-        // This is a safety function to prevent spam of the CPU and time-intensive "PowerManager.CanCast" function in DB
-        // No longer used but keeping this here incase I re-use it
-        private static bool GilesPowerManager(SNOPower power, int maxRecheckTime)
-        {
-            if (DateTime.Now.Subtract(dictAbilityLastPowerChecked[power]).TotalMilliseconds <= maxRecheckTime)
-                return false;
-            dictAbilityLastPowerChecked[power] = DateTime.Now;
-            if (PowerManager.CanCast(power))
-                return true;
-            return false;
-        }
-
-        // Checking for buffs and caching the buff list
-        // Cache all current buffs on character
-        public static void GilesRefreshBuffs()
-        {
-            listCachedBuffs = new List<Buff>();
-            dictCachedBuffs = new Dictionary<int, int>();
-            listCachedBuffs = ZetaDia.Me.GetAllBuffs().ToList();
-            // Special flag for detecting the activation and de-activation of archon
-            bool bThisArchonBuff = false;
-            int iTempStackCount;
-            // Store how many stacks of each buff we have
-            foreach (Buff thisbuff in listCachedBuffs)
-            {
-                // Store the stack count of this buff
-                if (!dictCachedBuffs.TryGetValue(thisbuff.SNOId, out iTempStackCount))
-                    dictCachedBuffs.Add(thisbuff.SNOId, thisbuff.StackCount);
-                // Check for archon stuff
-                if (thisbuff.SNOId == (int)SNOPower.Wizard_Archon)
-                    bThisArchonBuff = true;
-            }
-            // Archon stuff
-            if (bThisArchonBuff)
-            {
-                if (!bHasHadArchonbuff)
-                    bRefreshHotbarAbilities = true;
-                bHasHadArchonbuff = true;
-            }
-            else
-            {
-                if (bHasHadArchonbuff)
-                {
-                    hashPowerHotbarAbilities = new HashSet<SNOPower>(hashCachedPowerHotbarAbilities);
-                }
-                bHasHadArchonbuff = false;
-            }
-            //"g_killElitePack : 1, snoid=230745" <- Noting this here incase I ever want to monitor NV stacks, this is the SNO ID code for it!
-        }
-
-        // Check if a particular buff is present
-        public static bool GilesHasBuff(SNOPower power)
-        {
-            int id = (int)power;
-            return listCachedBuffs.Any(u => u.SNOId == id);
-        }
-
-        // Returns how many stacks of a particular buff there are
-        public static int GilesBuffStacks(SNOPower power)
-        {
-            int stacks;
-            if (dictCachedBuffs.TryGetValue((int)power, out stacks))
-            {
-                return stacks;
-            }
-            return 0;
-        }
-
-        // Refresh the skills in our hotbar
-        // Also caches the values after - but ONLY if we aren't in archon mode (or if this function is told NOT to cache this)
-        public static void GilesRefreshHotbar(bool dontCacheThis = false)
-        {
-            bMappedPlayerAbilities = true;
-            hashPowerHotbarAbilities = new HashSet<SNOPower>();
-            for (int i = 0; i <= 5; i++)
-                hashPowerHotbarAbilities.Add(ZetaDia.Me.GetHotbarPowerId((HotbarSlot)i));
-            bRefreshHotbarAbilities = false;
-            if (!dontCacheThis)
-                hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(hashPowerHotbarAbilities);
-        }
-
-        // Now Find the best ability to use
-        // Special check to force re-buffing before castign archon
-        private static bool CanCastArchon = false;
-
-        private static bool BotIsPaused()
-        {
-            return bMainBotPaused;
-        }
 
         // Force town-run button
         private static void buttonTownRun_Click(object sender, RoutedEventArgs e)
@@ -232,6 +91,10 @@ namespace GilesTrinity
             }
         }
 
+        private static bool BotIsPaused()
+        {
+            return bMainBotPaused;
+        }
         private void GilesTrinityOnDeath(object src, EventArgs mea)
         {
             if (DateTime.Now.Subtract(lastDied).TotalSeconds > 10)
@@ -268,49 +131,18 @@ namespace GilesTrinity
                 }
             }
         }
-
-        // When the bot stops, output a final item-stats report so it is as up-to-date as can be
-        private void TrinityBotStop(IBot bot)
-        {
-            // Issue final reports
-            OutputReport();
-            vBacktrackList = new SortedList<int, Vector3>();
-            iTotalBacktracks = 0;
-            GilesPlayerMover.iTotalAntiStuckAttempts = 1;
-            GilesPlayerMover.vSafeMovementLocation = Vector3.Zero;
-            GilesPlayerMover.vOldPosition = Vector3.Zero;
-            GilesPlayerMover.iTimesReachedStuckPoint = 0;
-            GilesPlayerMover.timeLastRecordedPosition = DateTime.Today;
-            GilesPlayerMover.timeStartedUnstuckMeasure = DateTime.Today;
-            hashUseOnceID = new HashSet<int>();
-            dictUseOnceID = new Dictionary<int, int>();
-            dictRandomID = new Dictionary<int, int>();
-            iMaxDeathsAllowed = 0;
-            iDeathsThisRun = 0;
-        }
-
-        // How many total leave games, for stat-tracking?
-        public static int iTotalJoinGames = 0;
-
         // Each time we join & leave a game, might as well clear the hashset of looked-at dropped items - just to keep it smaller
         private static void GilesTrinityOnJoinGame(object src, EventArgs mea)
         {
             iTotalJoinGames++;
             GilesResetEverythingNewGame();
         }
-
-        // How many total leave games, for stat-tracking?
-        public static int TotalLeaveGames = 0;
-
         // Each time we join & leave a game, might as well clear the hashset of looked-at dropped items - just to keep it smaller
         private static void GilesTrinityOnLeaveGame(object src, EventArgs mea)
         {
             TotalLeaveGames++;
             GilesResetEverythingNewGame();
         }
-
-        public static int TotalProfileRecycles = 0;
-
         public static void GilesResetEverythingNewGame()
         {
             hashUseOnceID = new HashSet<int>();
@@ -337,7 +169,7 @@ namespace GilesTrinity
             GilesPlayerMover.iCancelUnstuckerForSeconds = 0;
             GilesPlayerMover.timeCancelledUnstuckerFor = DateTime.Today;
             // Reset all the caches
-            dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
+            dictGilesObjectTypeCache = new Dictionary<int, ObjectType>();
             dictGilesMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
             dictGilesMaxHealthCache = new Dictionary<int, double>();
             dictGilesLastHealthCache = new Dictionary<int, double>();
@@ -360,5 +192,4 @@ namespace GilesTrinity
             sFirstProfileSeen = "";
         }
     }
-    // End of main routines
 }

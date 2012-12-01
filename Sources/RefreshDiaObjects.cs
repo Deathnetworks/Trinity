@@ -51,7 +51,7 @@ namespace GilesTrinity
                     CurrentTarget = new GilesObject()
                         {
                             Position = vAnySafePoint,
-                            Type = GObjectType.Avoidance,
+                            Type = ObjectType.Avoidance,
                             Weight = 20000,
                             CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
                             RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
@@ -83,7 +83,7 @@ namespace GilesTrinity
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
-                                        Type = GObjectType.Avoidance,
+                                        Type = ObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
@@ -102,7 +102,7 @@ namespace GilesTrinity
                 return;
             }
             // Ok record the time we last saw any unit at all
-            if (CurrentTarget.Type == GObjectType.Unit)
+            if (CurrentTarget.Type == ObjectType.Unit)
             {
                 lastHadUnitInSights = DateTime.Now;
                 // And record when we last saw any form of elite
@@ -120,7 +120,7 @@ namespace GilesTrinity
             else
             {
                 // We're sticking to the same target, so update the target's health cache to check for stucks
-                if (CurrentTarget.Type == GObjectType.Unit)
+                if (CurrentTarget.Type == ObjectType.Unit)
                 {
                     // Check if the health has changed, if so update the target-pick time before we blacklist them again
                     if (CurrentTarget.HitPoints != iTargetLastHealth)
@@ -219,7 +219,7 @@ namespace GilesTrinity
                 {
                     case 1:
                         dictGilesVectorCache = new Dictionary<int, Vector3>();
-                        dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
+                        dictGilesObjectTypeCache = new Dictionary<int, ObjectType>();
                         dictGilesActorSNOCache = new Dictionary<int, int>();
                         dictGilesACDGUIDCache = new Dictionary<int, int>();
                         dictGilesLastHealthCache = new Dictionary<int, double>();
@@ -267,7 +267,7 @@ namespace GilesTrinity
 
         private static HashSet<string> ignoreNames = new HashSet<string>
         {
-            "MarkerLocation", "Generic_Proxy", "Hireling", "Barbarian","Barbarian", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint",
+            "MarkerLocation", "Generic_Proxy", "Hireling", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint",
         };
 
         private static void RefreshCacheMainLoop()
@@ -345,14 +345,14 @@ namespace GilesTrinity
             }
         }
 
-        private static void RefreshItemStats(GBaseItemType tempbasetype)
+        private static void RefreshItemStats(ItemBaseType tempbasetype)
         {
             if (!_hashsetItemStatsLookedAt.Contains(c_RActorGuid))
             {
                 _hashsetItemStatsLookedAt.Add(c_RActorGuid);
-                if (tempbasetype == GBaseItemType.Armor || tempbasetype == GBaseItemType.WeaponOneHand || tempbasetype == GBaseItemType.WeaponTwoHand ||
-                    tempbasetype == GBaseItemType.WeaponRange || tempbasetype == GBaseItemType.Jewelry || tempbasetype == GBaseItemType.FollowerItem ||
-                    tempbasetype == GBaseItemType.Offhand)
+                if (tempbasetype == ItemBaseType.Armor || tempbasetype == ItemBaseType.WeaponOneHand || tempbasetype == ItemBaseType.WeaponTwoHand ||
+                    tempbasetype == ItemBaseType.WeaponRange || tempbasetype == ItemBaseType.Jewelry || tempbasetype == ItemBaseType.FollowerItem ||
+                    tempbasetype == ItemBaseType.Offhand)
                 {
                     int iThisQuality;
                     ItemsDroppedStats.Total++;
@@ -368,28 +368,28 @@ namespace GilesTrinity
                     ItemsDroppedStats.TotalPerLevel[c_ItemLevel]++;
                     ItemsDroppedStats.TotalPerQPerL[iThisQuality, c_ItemLevel]++;
                 }
-                else if (tempbasetype == GBaseItemType.Gem)
+                else if (tempbasetype == ItemBaseType.Gem)
                 {
                     int iThisGemType = 0;
                     ItemsDroppedStats.TotalGems++;
-                    if (c_item_GItemType == GItemType.Topaz)
+                    if (c_item_GItemType == ItemType.Topaz)
                         iThisGemType = GEMTOPAZ;
-                    if (c_item_GItemType == GItemType.Ruby)
+                    if (c_item_GItemType == ItemType.Ruby)
                         iThisGemType = GEMRUBY;
-                    if (c_item_GItemType == GItemType.Emerald)
+                    if (c_item_GItemType == ItemType.Emerald)
                         iThisGemType = GEMEMERALD;
-                    if (c_item_GItemType == GItemType.Amethyst)
+                    if (c_item_GItemType == ItemType.Amethyst)
                         iThisGemType = GEMAMETHYST;
                     ItemsDroppedStats.GemsPerType[iThisGemType]++;
                     ItemsDroppedStats.GemsPerLevel[c_ItemLevel]++;
                     ItemsDroppedStats.GemsPerTPerL[iThisGemType, c_ItemLevel]++;
                 }
-                else if (c_item_GItemType == GItemType.HealthPotion)
+                else if (c_item_GItemType == ItemType.HealthPotion)
                 {
                     ItemsDroppedStats.TotalPotions++;
                     ItemsDroppedStats.PotionsPerLevel[c_ItemLevel]++;
                 }
-                else if (c_item_GItemType == GItemType.InfernalKey)
+                else if (c_item_GItemType == ItemType.InfernalKey)
                 {
                     ItemsDroppedStats.TotalInfernalKeys++;
                 }
@@ -533,7 +533,7 @@ namespace GilesTrinity
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
-                                        Type = GObjectType.Avoidance,
+                                        Type = ObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
@@ -571,7 +571,7 @@ namespace GilesTrinity
                     CurrentTarget = new GilesObject()
                                         {
                                             Position = vBacktrackList[iTotalBacktracks],
-                                            Type = GObjectType.Backtrack,
+                                            Type = ObjectType.Backtrack,
                                             Weight = 20000,
                                             CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
                                             RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
@@ -611,7 +611,7 @@ namespace GilesTrinity
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
-                                        Type = GObjectType.Avoidance,
+                                        Type = ObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
@@ -626,7 +626,7 @@ namespace GilesTrinity
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
-                                        Type = GObjectType.Avoidance,
+                                        Type = ObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
@@ -638,7 +638,7 @@ namespace GilesTrinity
         {
             TryToKite = false;
 
-            if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
+            if (CurrentTarget != null && CurrentTarget.Type == ObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
             {
                 TryToKite = true;
                 vKitePointAvoid = playerStatus.CurrentPosition;
@@ -674,7 +674,7 @@ namespace GilesTrinity
                     CurrentTarget = new GilesObject()
                                         {
                                             Position = vAnySafePoint,
-                                            Type = GObjectType.Avoidance,
+                                            Type = ObjectType.Avoidance,
                                             Weight = 20000,
                                             CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
                                             RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),

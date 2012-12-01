@@ -10,7 +10,7 @@ namespace GilesTrinity
         private static double[] ItemMaxPoints = new double[TOTALSTATS];
         private static bool IsInvalidItem = true;
         private static double TotalItemPoints = 0;
-        private static GBaseItemType baseItemType = GBaseItemType.Unknown;
+        private static ItemBaseType baseItemType = ItemBaseType.Unknown;
 
         /// <summary>
         /// This is a bonus applied at the end of valuation 
@@ -35,7 +35,7 @@ namespace GilesTrinity
         /// <param name="item"></param>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        private static double ValueThisItem(GilesCachedACDItem item, GItemType itemType) 
+        private static double ValueThisItem(GilesCachedACDItem item, ItemType itemType) 
         {
             // Reset static variables
             TotalItemPoints = 0;
@@ -162,7 +162,7 @@ namespace GilesTrinity
                     }
 
                     // This *REMOVES* score from follower items for stats that followers don't care about
-                    if (baseItemType == GBaseItemType.FollowerItem && (i == CRITDAMAGE || i == LIFEONHIT || i == ALLRESIST))
+                    if (baseItemType == ItemBaseType.FollowerItem && (i == CRITDAMAGE || i == LIFEONHIT || i == ALLRESIST))
                         FinalBonusGranted -= 0.9;
 
                     // Bonus 15% for being *at* the stat cap (ie - completely maxed out, or very very close to), but not for the socket stat (since sockets are usually 0 or 1!)
@@ -185,13 +185,13 @@ namespace GilesTrinity
                     {
 
                         // Off-handers get less value from sockets
-                        if (baseItemType == GBaseItemType.Offhand)
+                        if (baseItemType == ItemBaseType.Offhand)
                         {
                             FinalBonusGranted -= 0.35;
                         }
 
                         // Chest
-                        if (itemType == GItemType.Chest || itemType == GItemType.Cloak)
+                        if (itemType == ItemType.Chest || itemType == ItemType.Cloak)
                         {
                             if (TempStatistic >= 2)
                             {
@@ -202,7 +202,7 @@ namespace GilesTrinity
                         }
 
                         // Pants
-                        if (itemType == GItemType.Legs)
+                        if (itemType == ItemType.Legs)
                         {
                             if (TempStatistic >= 2)
                             {
@@ -212,14 +212,14 @@ namespace GilesTrinity
                         }
 
                         // Helmets can have a bonus for a socket since it gives amazing MF/GF
-                        if (TempStatistic >= 1 && (itemType == GItemType.Helm || itemType == GItemType.WizardHat || itemType == GItemType.VoodooMask ||
-                            itemType == GItemType.SpiritStone))
+                        if (TempStatistic >= 1 && (itemType == ItemType.Helm || itemType == ItemType.WizardHat || itemType == ItemType.VoodooMask ||
+                            itemType == ItemType.SpiritStone))
                         {
                             SocketsCanReplacePrimaries = true;
                         }
 
                         // And rings and amulets too
-                        if (TempStatistic >= 1 && (itemType == GItemType.Ring || itemType == GItemType.Amulet))
+                        if (TempStatistic >= 1 && (itemType == ItemType.Ring || itemType == ItemType.Amulet))
                         {
                             SocketsCanReplacePrimaries = true;
                         }
@@ -228,7 +228,7 @@ namespace GilesTrinity
                     // Right, here's quite a long bit of code, but this is basically all about granting all sorts of bonuses based on primary stat values of all different ranges
 
                     // For all item types *EXCEPT* weapons
-                    if (baseItemType != GBaseItemType.WeaponRange && baseItemType != GBaseItemType.WeaponOneHand && baseItemType != GBaseItemType.WeaponTwoHand)
+                    if (baseItemType != ItemBaseType.WeaponRange && baseItemType != ItemBaseType.WeaponOneHand && baseItemType != ItemBaseType.WeaponTwoHand)
                     {
                         double SpecialBonus = 0;
                         if (i > LIFEPERCENT)
@@ -253,13 +253,13 @@ namespace GilesTrinity
                                     ((HadStat[STRENGTH] / ItemMaxStats[STRENGTH]) < (StatMinimumPrimary[i] + 0.1)) && ((HadStat[INTELLIGENCE] / ItemMaxStats[INTELLIGENCE]) < StatMinimumPrimary[i]) &&
                                     ((HadStat[VITALITY] / ItemMaxStats[VITALITY]) < StatMinimumPrimary[i]) && (SafeLifePercentage < (StatMinimumPrimary[i] * 2.5)) && !SocketsCanReplacePrimaries)
                                 {
-                                    if (itemType != GItemType.Ring && itemType != GItemType.Amulet)
+                                    if (itemType != ItemType.Ring && itemType != ItemType.Amulet)
                                         FinalBonusGranted -= 0.4;
                                     else
                                         FinalBonusGranted -= 0.3;
 
                                     // And another 25% off for armor and all resist which are more useful with primaries, as long as not jewelry
-                                    if ((i == ARMOR || i == ALLRESIST || i == RANDOMRESIST) && itemType != GItemType.Ring && itemType != GItemType.Amulet && !SocketsCanReplacePrimaries)
+                                    if ((i == ARMOR || i == ALLRESIST || i == RANDOMRESIST) && itemType != ItemType.Ring && itemType != ItemType.Amulet && !SocketsCanReplacePrimaries)
                                         FinalBonusGranted -= 0.15;
                                 }
                             }
@@ -271,7 +271,7 @@ namespace GilesTrinity
                                 {
 
                                     // So 35% off for all items except jewelry which is 20% off
-                                    if (itemType != GItemType.Ring && itemType != GItemType.Amulet)
+                                    if (itemType != ItemType.Ring && itemType != ItemType.Amulet)
                                     {
                                         FinalBonusGranted -= 0.35;
 
@@ -285,7 +285,7 @@ namespace GilesTrinity
                                     }
                                 }
                             }
-                            if (baseItemType == GBaseItemType.Armor || baseItemType == GBaseItemType.Jewelry)
+                            if (baseItemType == ItemBaseType.Armor || baseItemType == ItemBaseType.Jewelry)
                             {
 
                                 // Grant a 50% bonus to stats if a primary is above 200 AND (vitality above 200 or life% within 90% max)
@@ -383,7 +383,7 @@ namespace GilesTrinity
                                     if (0.03 > SpecialBonus) SpecialBonus = 0.03;
                                 }
                             }
-                            if (itemType == GItemType.Ring || itemType == GItemType.Amulet)
+                            if (itemType == ItemType.Ring || itemType == ItemType.Amulet)
                             {
                                 if ((HadStat[DEXTERITY] / ItemMaxStats[DEXTERITY]) > .4 || (HadStat[STRENGTH] / ItemMaxStats[STRENGTH]) > .4 || (HadStat[INTELLIGENCE] / ItemMaxStats[INTELLIGENCE]) > .4)
                                 {
@@ -430,7 +430,7 @@ namespace GilesTrinity
                         // This stat is one after life percent stat
 
                         // Shields get less of a special bonus from high prime stats
-                        if (itemType == GItemType.Shield)
+                        if (itemType == ItemType.Shield)
                             SpecialBonus *= 0.7;
 
                         if (SpecialBonus > 0)
@@ -441,7 +441,7 @@ namespace GilesTrinity
 
                     // NOT A WEAPON!?
                     //intell -- sugerir
-                    if (i == LIFESTEAL && itemType == GItemType.MightyBelt)
+                    if (i == LIFESTEAL && itemType == ItemType.MightyBelt)
                         FinalBonusGranted += 0.3;
 
                     if (i == TOTALDPS)
@@ -464,8 +464,8 @@ namespace GilesTrinity
                         FinalBonusGranted += 0.2;
 
                     // Blue item point reduction for non-weapons
-                    if (item.Quality < ItemQuality.Rare4 && (baseItemType == GBaseItemType.Armor || baseItemType == GBaseItemType.Offhand ||
-                        baseItemType == GBaseItemType.Jewelry || baseItemType == GBaseItemType.FollowerItem) && ((TempStatistic / ItemMaxStats[i]) < 0.88))
+                    if (item.Quality < ItemQuality.Rare4 && (baseItemType == ItemBaseType.Armor || baseItemType == ItemBaseType.Offhand ||
+                        baseItemType == ItemBaseType.Jewelry || baseItemType == ItemBaseType.FollowerItem) && ((TempStatistic / ItemMaxStats[i]) < 0.88))
                         FinalBonusGranted -= 0.9;
 
                     // Special all-resist bonuses
@@ -473,7 +473,7 @@ namespace GilesTrinity
                     {
 
                         // Shields with < 60% max all resist, lost some all resist score
-                        if (itemType == GItemType.Shield && (TempStatistic / ItemMaxStats[i]) <= 0.6)
+                        if (itemType == ItemType.Shield && (TempStatistic / ItemMaxStats[i]) <= 0.6)
                             FinalBonusGranted -= 0.30;
                         double iSpecialBonus = 0;
 
@@ -512,11 +512,11 @@ namespace GilesTrinity
                     }
 
                     // All resist special bonuses
-                    if (itemType != GItemType.Ring && itemType != GItemType.Amulet)
+                    if (itemType != ItemType.Ring && itemType != ItemType.Amulet)
                     {
 
                         // Shields get 10% less on everything
-                        if (itemType == GItemType.Shield)
+                        if (itemType == ItemType.Shield)
                             FinalBonusGranted -= 0.10;
 
                         // Prime stat gets a 20% bonus if 50 from max possible
@@ -654,7 +654,7 @@ namespace GilesTrinity
                     }
 
                     // And now for jewelry checks...
-                    if (itemType == GItemType.Ring || itemType == GItemType.Amulet)
+                    if (itemType == ItemType.Ring || itemType == ItemType.Amulet)
                     {
 
                         // Global bonus to everything if jewelry has an all resist above 50%
@@ -686,7 +686,7 @@ namespace GilesTrinity
                             FinalBonusGranted += 0.2;
 
                         // Special stat handling stuff for jewelry
-                        if (itemType == GItemType.Ring)
+                        if (itemType == ItemType.Ring)
                         {
 
                             // Prime stat gets a 25% bonus if 30 from max possible
@@ -771,34 +771,34 @@ namespace GilesTrinity
                     // All the "set to 0" checks now
 
                     // Disable specific primary stat scoring for certain class-specific item types
-                    if ((itemType == GItemType.VoodooMask || itemType == GItemType.WizardHat || itemType == GItemType.Wand ||
-                        itemType == GItemType.CeremonialKnife || itemType == GItemType.Mojo || itemType == GItemType.Orb)
+                    if ((itemType == ItemType.VoodooMask || itemType == ItemType.WizardHat || itemType == ItemType.Wand ||
+                        itemType == ItemType.CeremonialKnife || itemType == ItemType.Mojo || itemType == ItemType.Orb)
                         && (i == STRENGTH || i == DEXTERITY))
                         FinalBonusGranted = 0;
-                    if ((itemType == GItemType.Quiver || itemType == GItemType.HandCrossbow || itemType == GItemType.Cloak ||
-                        itemType == GItemType.SpiritStone || itemType == GItemType.TwoHandDaibo || itemType == GItemType.FistWeapon)
+                    if ((itemType == ItemType.Quiver || itemType == ItemType.HandCrossbow || itemType == ItemType.Cloak ||
+                        itemType == ItemType.SpiritStone || itemType == ItemType.TwoHandDaibo || itemType == ItemType.FistWeapon)
                         && (i == STRENGTH || i == INTELLIGENCE))
                         FinalBonusGranted = 0;
-                    if ((itemType == GItemType.MightyBelt || itemType == GItemType.MightyWeapon || itemType == GItemType.TwoHandMighty)
+                    if ((itemType == ItemType.MightyBelt || itemType == ItemType.MightyWeapon || itemType == ItemType.TwoHandMighty)
                         && (i == DEXTERITY || i == INTELLIGENCE))
                         FinalBonusGranted = 0;
 
                     // Remove unwanted follower stats for specific follower types
-                    if (itemType == GItemType.FollowerEnchantress && (i == STRENGTH || i == DEXTERITY))
+                    if (itemType == ItemType.FollowerEnchantress && (i == STRENGTH || i == DEXTERITY))
                         FinalBonusGranted = 0;
-                    if (itemType == GItemType.FollowerEnchantress && (i == INTELLIGENCE || i == VITALITY))
+                    if (itemType == ItemType.FollowerEnchantress && (i == INTELLIGENCE || i == VITALITY))
                         FinalBonusGranted -= 0.4;
-                    if (itemType == GItemType.FollowerScoundrel && (i == STRENGTH || i == INTELLIGENCE))
+                    if (itemType == ItemType.FollowerScoundrel && (i == STRENGTH || i == INTELLIGENCE))
                         FinalBonusGranted = 0;
-                    if (itemType == GItemType.FollowerScoundrel && (i == DEXTERITY || i == VITALITY))
+                    if (itemType == ItemType.FollowerScoundrel && (i == DEXTERITY || i == VITALITY))
                         FinalBonusGranted -= 0.4;
-                    if (itemType == GItemType.FollowerTemplar && (i == DEXTERITY || i == INTELLIGENCE))
+                    if (itemType == ItemType.FollowerTemplar && (i == DEXTERITY || i == INTELLIGENCE))
                         FinalBonusGranted = 0;
-                    if (itemType == GItemType.FollowerTemplar && (i == STRENGTH || i == VITALITY))
+                    if (itemType == ItemType.FollowerTemplar && (i == STRENGTH || i == VITALITY))
                         FinalBonusGranted -= 0.4;
 
                     // Attack speed is always on a quiver so forget it
-                    if ((itemType == GItemType.Quiver) && (i == ATTACKSPEED))
+                    if ((itemType == ItemType.Quiver) && (i == ATTACKSPEED))
                         FinalBonusGranted = 0;
 
                     // Single resists worth nothing without all-resist
@@ -866,14 +866,14 @@ namespace GilesTrinity
             TotalItemPoints *= GlobalMultiplier;
 
             // 2 handed weapons and ranged weapons lose a large score for low DPS
-            if (baseItemType == GBaseItemType.WeaponRange || baseItemType == GBaseItemType.WeaponTwoHand)
+            if (baseItemType == ItemBaseType.WeaponRange || baseItemType == ItemBaseType.WeaponTwoHand)
             {
                 if ((HadStat[TOTALDPS] / ItemMaxStats[TOTALDPS]) <= 0.7)
                     TotalItemPoints *= 0.75;
             }
 
             // Weapons should get a nice 15% bonus score for having very high primaries
-            if (baseItemType == GBaseItemType.WeaponRange || baseItemType == GBaseItemType.WeaponOneHand || baseItemType == GBaseItemType.WeaponTwoHand)
+            if (baseItemType == ItemBaseType.WeaponRange || baseItemType == ItemBaseType.WeaponOneHand || baseItemType == ItemBaseType.WeaponTwoHand)
             {
                 if (HighestScoringPrimary > 0 && (HighestScoringPrimary >= ItemMaxPoints[WhichPrimaryIsHighest] * 0.9))
                 {
@@ -894,7 +894,7 @@ namespace GilesTrinity
             }
 
             // Shields 
-            if (itemType == GItemType.Shield)
+            if (itemType == ItemType.Shield)
             {
 
                 // Strength/Dex based shield calculations
@@ -919,7 +919,7 @@ namespace GilesTrinity
             }
 
             // Quivers
-            if (itemType == GItemType.Quiver)
+            if (itemType == ItemType.Quiver)
             {
                 TotalRequirements = 0;
                 if (HadStat[DEXTERITY] >= 100)
@@ -961,7 +961,7 @@ namespace GilesTrinity
             }
 
             // Mojos and Sources
-            if (itemType == GItemType.Orb || itemType == GItemType.Mojo)
+            if (itemType == ItemType.Orb || itemType == ItemType.Mojo)
             {
                 TotalRequirements = 0;
                 if (HadStat[INTELLIGENCE] >= 100)
@@ -1011,15 +1011,15 @@ namespace GilesTrinity
             }
 
             // Chests/cloaks/pants without a socket lose 17% of total score
-            if ((itemType == GItemType.Chest || itemType == GItemType.Cloak || itemType == GItemType.Legs) && HadStat[SOCKETS] == 0)
+            if ((itemType == ItemType.Chest || itemType == ItemType.Cloak || itemType == ItemType.Legs) && HadStat[SOCKETS] == 0)
                 TotalItemPoints *= 0.83;
 
             // Boots with no movement speed get reduced score
-            if ((itemType == GItemType.Boots) && HadStat[MOVEMENTSPEED] <= 6)
+            if ((itemType == ItemType.Boots) && HadStat[MOVEMENTSPEED] <= 6)
                 TotalItemPoints *= 0.75;
 
             // Helmets
-            if (itemType == GItemType.Helm || itemType == GItemType.WizardHat || itemType == GItemType.VoodooMask || itemType == GItemType.SpiritStone)
+            if (itemType == ItemType.Helm || itemType == ItemType.WizardHat || itemType == ItemType.VoodooMask || itemType == ItemType.SpiritStone)
             {
                 // Helmets without a socket lose 20% of total score, and most of any MF/GF bonus
                 if (HadStat[SOCKETS] == 0)
@@ -1048,13 +1048,13 @@ namespace GilesTrinity
             return Math.Round(TotalItemPoints);
         }
 
-        private static void CheckForInvalidItemType(GItemType itemType)
+        private static void CheckForInvalidItemType(ItemType itemType)
         {
             // One Handed Weapons 
-            if (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
-                 itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
-                 itemType == GItemType.Spear || itemType == GItemType.Sword || itemType == GItemType.Wand || 
-                 itemType == GItemType.HandCrossbow)
+            if (itemType == ItemType.Axe || itemType == ItemType.CeremonialKnife || itemType == ItemType.Dagger ||
+                 itemType == ItemType.FistWeapon || itemType == ItemType.Mace || itemType == ItemType.MightyWeapon ||
+                 itemType == ItemType.Spear || itemType == ItemType.Sword || itemType == ItemType.Wand || 
+                 itemType == ItemType.HandCrossbow)
             {
                 Array.Copy(MaxPointsWeaponOneHand, ItemMaxStats, TOTALSTATS);
                 Array.Copy(WeaponPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1062,10 +1062,10 @@ namespace GilesTrinity
             }
 
             // Two Handed Weapons
-            if (itemType == GItemType.TwoHandAxe || itemType == GItemType.TwoHandDaibo || itemType == GItemType.TwoHandMace ||
-                itemType == GItemType.TwoHandMighty || itemType == GItemType.TwoHandPolearm || itemType == GItemType.TwoHandStaff ||
-                itemType == GItemType.TwoHandSword ||
-                itemType == GItemType.TwoHandCrossbow || itemType == GItemType.TwoHandBow)
+            if (itemType == ItemType.TwoHandAxe || itemType == ItemType.TwoHandDaibo || itemType == ItemType.TwoHandMace ||
+                itemType == ItemType.TwoHandMighty || itemType == ItemType.TwoHandPolearm || itemType == ItemType.TwoHandStaff ||
+                itemType == ItemType.TwoHandSword ||
+                itemType == ItemType.TwoHandCrossbow || itemType == ItemType.TwoHandBow)
             {
                 Array.Copy(MaxPointsWeaponTwoHand, ItemMaxStats, TOTALSTATS);
                 Array.Copy(WeaponPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1088,7 +1088,7 @@ namespace GilesTrinity
             // Off-handed stuff
 
             // Mojo, Source, Quiver
-            if (itemType == GItemType.Mojo || itemType == GItemType.Orb || itemType == GItemType.Quiver)
+            if (itemType == ItemType.Mojo || itemType == ItemType.Orb || itemType == ItemType.Quiver)
             {
                 Array.Copy(MaxPointsOffHand, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1096,7 +1096,7 @@ namespace GilesTrinity
             }
 
             // Shields
-            if (itemType == GItemType.Shield)
+            if (itemType == ItemType.Shield)
             {
                 Array.Copy(MaxPointsShield, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1106,7 +1106,7 @@ namespace GilesTrinity
             // Jewelry
 
             // Ring
-            if (itemType == GItemType.Amulet)
+            if (itemType == ItemType.Amulet)
             {
                 Array.Copy(MaxPointsAmulet, ItemMaxStats, TOTALSTATS);
                 Array.Copy(JewelryPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1114,7 +1114,7 @@ namespace GilesTrinity
             }
 
             // Ring
-            if (itemType == GItemType.Ring)
+            if (itemType == ItemType.Ring)
             {
                 Array.Copy(MaxPointsRing, ItemMaxStats, TOTALSTATS);
                 Array.Copy(JewelryPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1124,7 +1124,7 @@ namespace GilesTrinity
             // Armor
 
             // Belt
-            if (itemType == GItemType.Belt)
+            if (itemType == ItemType.Belt)
             {
                 Array.Copy(MaxPointsBelt, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1132,7 +1132,7 @@ namespace GilesTrinity
             }
 
             // Boots
-            if (itemType == GItemType.Boots)
+            if (itemType == ItemType.Boots)
             {
                 Array.Copy(MaxPointsBoots, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1140,7 +1140,7 @@ namespace GilesTrinity
             }
 
             // Bracers
-            if (itemType == GItemType.Bracer)
+            if (itemType == ItemType.Bracer)
             {
                 Array.Copy(MaxPointsBracer, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1148,13 +1148,13 @@ namespace GilesTrinity
             }
 
             // Chest
-            if (itemType == GItemType.Chest)
+            if (itemType == ItemType.Chest)
             {
                 Array.Copy(MaxPointsChest, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
                 IsInvalidItem = false;
             }
-            if (itemType == GItemType.Cloak)
+            if (itemType == ItemType.Cloak)
             {
                 Array.Copy(MaxPointsCloak, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1162,7 +1162,7 @@ namespace GilesTrinity
             }
 
             // Gloves
-            if (itemType == GItemType.Gloves)
+            if (itemType == ItemType.Gloves)
             {
                 Array.Copy(MaxPointsGloves, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1170,7 +1170,7 @@ namespace GilesTrinity
             }
 
             // Helm
-            if (itemType == GItemType.Helm)
+            if (itemType == ItemType.Helm)
             {
                 Array.Copy(MaxPointsHelm, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1178,13 +1178,13 @@ namespace GilesTrinity
             }
 
             // Pants
-            if (itemType == GItemType.Legs)
+            if (itemType == ItemType.Legs)
             {
                 Array.Copy(MaxPointsPants, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
                 IsInvalidItem = false;
             }
-            if (itemType == GItemType.MightyBelt)
+            if (itemType == ItemType.MightyBelt)
             {
                 Array.Copy(MaxPointsMightyBelt, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1192,19 +1192,19 @@ namespace GilesTrinity
             }
 
             // Shoulders
-            if (itemType == GItemType.Shoulder)
+            if (itemType == ItemType.Shoulder)
             {
                 Array.Copy(MaxPointsShoulders, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
                 IsInvalidItem = false;
             }
-            if (itemType == GItemType.SpiritStone)
+            if (itemType == ItemType.SpiritStone)
             {
                 Array.Copy(MaxPointsSpiritStone, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
                 IsInvalidItem = false;
             }
-            if (itemType == GItemType.VoodooMask)
+            if (itemType == ItemType.VoodooMask)
             {
                 Array.Copy(MaxPointsVoodooMask, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1212,7 +1212,7 @@ namespace GilesTrinity
             }
 
             // Wizard Hat
-            if (itemType == GItemType.WizardHat)
+            if (itemType == ItemType.WizardHat)
             {
                 Array.Copy(MaxPointsWizardHat, ItemMaxStats, TOTALSTATS);
                 Array.Copy(ArmorPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1220,7 +1220,7 @@ namespace GilesTrinity
             }
 
             // Follower Items
-            if (itemType == GItemType.FollowerEnchantress || itemType == GItemType.FollowerScoundrel || itemType == GItemType.FollowerTemplar)
+            if (itemType == ItemType.FollowerEnchantress || itemType == ItemType.FollowerScoundrel || itemType == ItemType.FollowerTemplar)
             {
                 Array.Copy(MaxPointsFollower, ItemMaxStats, TOTALSTATS);
                 Array.Copy(JewelryPointsAtMax, ItemMaxPoints, TOTALSTATS);
@@ -1232,7 +1232,7 @@ namespace GilesTrinity
         /// Define Special Reductions
         /// </summary>
         /// <param name="itemType"></param>
-        private static void GetBestFinalPoints(GItemType itemType)
+        private static void GetBestFinalPoints(ItemType itemType)
         {
             // Gold-find and pickup radius combined
             if ((HadStat[GOLDFIND] / ItemMaxStats[GOLDFIND] > 0.55) && (HadStat[PICKUPRADIUS] / ItemMaxStats[PICKUPRADIUS] > 0.5))
@@ -1245,7 +1245,7 @@ namespace GilesTrinity
             // Special crit hit/crit chance/attack speed combos a.k.a Trifecta!
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.8)) && (HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.8)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.8)))
             {
-                if (BestFinalBonus < 3.2 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 3.2 && itemType != ItemType.Quiver)
                     BestFinalBonus = 3.2;
             }
 
@@ -1261,13 +1261,13 @@ namespace GilesTrinity
             // 80% of crit chance, 80% of attack speed of max for item
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.8)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.8)))
             {
-                if (BestFinalBonus < 2.1 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 2.1 && itemType != ItemType.Quiver)
                     BestFinalBonus = 2.1;
             }
             // 80% of crit damage, 80% of attack speed of max for item
             if ((HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.8)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.8)))
             {
-                if (BestFinalBonus < 1.8 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 1.8 && itemType != ItemType.Quiver)
                     BestFinalBonus = 1.8;
             }
             /*
@@ -1276,7 +1276,7 @@ namespace GilesTrinity
             // 65% crit chance, 65% crit damage, 65% attack speed of max for item
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.65)) && (HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.65)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.65)))
             {
-                if (BestFinalBonus < 2.1 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 2.1 && itemType != ItemType.Quiver)
                     BestFinalBonus = 2.1;
             }
             // 65% crit chance, 65% crit damage
@@ -1287,13 +1287,13 @@ namespace GilesTrinity
             // 65% crit chance, 65% attack speed of max for item
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.65)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.65)))
             {
-                if (BestFinalBonus < 1.7 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 1.7 && itemType != ItemType.Quiver)
                     BestFinalBonus = 1.7;
             }
             // 65% crit damage, 65% attack speed of max for item
             if ((HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.65)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.65)))
             {
-                if (BestFinalBonus < 1.5 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 1.5 && itemType != ItemType.Quiver)
                     BestFinalBonus = 1.5;
             }
             /*
@@ -1302,7 +1302,7 @@ namespace GilesTrinity
             // 45% crit chance, 45% crit damage, 45% attack speed of max for item
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.45)) && (HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.45)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.45)))
             {
-                if (BestFinalBonus < 1.7 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 1.7 && itemType != ItemType.Quiver)
                     BestFinalBonus = 1.7;
             }
             // 45% crit chance, 45% crit damage, 45% attack speed of max for item
@@ -1313,13 +1313,13 @@ namespace GilesTrinity
             // 45% crit chance, 45% attack speed of max for item
             if ((HadStat[CRITCHANCE] > (ItemMaxStats[CRITCHANCE] * 0.45)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.45)))
             {
-                if (BestFinalBonus < 1.3 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 1.3 && itemType != ItemType.Quiver)
                     BestFinalBonus = 1.3;
             }
             // 45% crit damage, 45% attack speed of max for item
             if ((HadStat[CRITDAMAGE] > (ItemMaxStats[CRITDAMAGE] * 0.45)) && (HadStat[ATTACKSPEED] > (ItemMaxStats[ATTACKSPEED] * 0.45)))
             {
-                if (BestFinalBonus < 1.1 && itemType != GItemType.Quiver)
+                if (BestFinalBonus < 1.1 && itemType != ItemType.Quiver)
                     BestFinalBonus = 1.1;
             }
         }

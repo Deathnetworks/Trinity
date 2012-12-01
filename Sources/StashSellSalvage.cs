@@ -27,28 +27,28 @@ namespace GilesTrinity
         /// <param name="thisdbitemtype"></param>
         /// <param name="thisfollowertype"></param>
         /// <returns></returns>
-        private static bool GilesSellValidation(string thisinternalname, int thislevel, ItemQuality thisquality, ItemType thisdbitemtype, FollowerType thisfollowertype)
+        private static bool GilesSellValidation(string thisinternalname, int thislevel, ItemQuality thisquality, Zeta.Internals.Actors.ItemType thisdbitemtype, FollowerType thisfollowertype)
         {
 
             // Check this isn't something we want to salvage
             if (GilesSalvageValidation(thisinternalname, thislevel, thisquality, thisdbitemtype, thisfollowertype))
                 return false;
 
-            GItemType thisGilesItemType = DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
-            GBaseItemType thisGilesBaseType = DetermineBaseType(thisGilesItemType);
+            ItemType thisGilesItemType = DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
+            ItemBaseType thisGilesBaseType = DetermineBaseType(thisGilesItemType);
             switch (thisGilesBaseType)
             {
-                case GBaseItemType.WeaponRange:
-                case GBaseItemType.WeaponOneHand:
-                case GBaseItemType.WeaponTwoHand:
-                case GBaseItemType.Armor:
-                case GBaseItemType.Offhand:
-                case GBaseItemType.Jewelry:
-                case GBaseItemType.FollowerItem:
+                case ItemBaseType.WeaponRange:
+                case ItemBaseType.WeaponOneHand:
+                case ItemBaseType.WeaponTwoHand:
+                case ItemBaseType.Armor:
+                case ItemBaseType.Offhand:
+                case ItemBaseType.Jewelry:
+                case ItemBaseType.FollowerItem:
                     return true;
-                case GBaseItemType.Gem:
-                case GBaseItemType.Misc:
-                case GBaseItemType.Unknown:
+                case ItemBaseType.Gem:
+                case ItemBaseType.Misc:
+                case ItemBaseType.Unknown:
                     return false;
             }
 
@@ -65,29 +65,29 @@ namespace GilesTrinity
         /// <param name="thisdbitemtype"></param>
         /// <param name="thisfollowertype"></param>
         /// <returns></returns>
-        private static bool GilesSalvageValidation(string thisinternalname, int thislevel, ItemQuality thisquality, ItemType thisdbitemtype, FollowerType thisfollowertype)
+        private static bool GilesSalvageValidation(string thisinternalname, int thislevel, ItemQuality thisquality, Zeta.Internals.Actors.ItemType thisdbitemtype, FollowerType thisfollowertype)
         {
-            GItemType thisGilesItemType = DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
-            GBaseItemType thisGilesBaseType = DetermineBaseType(thisGilesItemType);
+            ItemType thisGilesItemType = DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
+            ItemBaseType thisGilesBaseType = DetermineBaseType(thisGilesItemType);
 
             // Take Salvage Option corresponding to ItemLevel
             SalvageOption salvageOption = GetSalvageOption(thisquality);
 
             switch (thisGilesBaseType)
             {
-                case GBaseItemType.WeaponRange:
-                case GBaseItemType.WeaponOneHand:
-                case GBaseItemType.WeaponTwoHand:
-                case GBaseItemType.Armor:
-                case GBaseItemType.Offhand:
+                case ItemBaseType.WeaponRange:
+                case ItemBaseType.WeaponOneHand:
+                case ItemBaseType.WeaponTwoHand:
+                case ItemBaseType.Armor:
+                case ItemBaseType.Offhand:
                     return ((thislevel >= 61 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
-                case GBaseItemType.Jewelry:
+                case ItemBaseType.Jewelry:
                     return ((thislevel >= 59 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
-                case GBaseItemType.FollowerItem:
+                case ItemBaseType.FollowerItem:
                     return ((thislevel >= 60 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
-                case GBaseItemType.Gem:
-                case GBaseItemType.Misc:
-                case GBaseItemType.Unknown:
+                case ItemBaseType.Gem:
+                case ItemBaseType.Misc:
+                case ItemBaseType.Unknown:
                     return false;
             }
 
@@ -423,7 +423,7 @@ namespace GilesTrinity
                         StashSlotBlocked[inventoryColumn, inventoryRow] = true;
 
                         // Try and reliably find out if this is a two slot item or not
-                        GItemType tempItemType = DetermineItemType(tempitem.InternalName, tempitem.ItemType, tempitem.FollowerSpecialType);
+                        ItemType tempItemType = DetermineItemType(tempitem.InternalName, tempitem.ItemType, tempitem.FollowerSpecialType);
                         if (DetermineIsTwoSlot(tempItemType) && inventoryRow != 9 && inventoryRow != 19 && inventoryRow != 29)
                         {
                             StashSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
@@ -736,11 +736,11 @@ namespace GilesTrinity
                 // Item log for cool stuff sold
                 if (thisitem != null)
                 {
-                    GItemType OriginalGilesItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
-                    GBaseItemType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
-                    if (thisGilesBaseType == GBaseItemType.WeaponTwoHand || thisGilesBaseType == GBaseItemType.WeaponOneHand || thisGilesBaseType == GBaseItemType.WeaponRange ||
-                        thisGilesBaseType == GBaseItemType.Armor || thisGilesBaseType == GBaseItemType.Jewelry || thisGilesBaseType == GBaseItemType.Offhand ||
-                        thisGilesBaseType == GBaseItemType.FollowerItem)
+                    ItemType OriginalGilesItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
+                    ItemBaseType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
+                    if (thisGilesBaseType == ItemBaseType.WeaponTwoHand || thisGilesBaseType == ItemBaseType.WeaponOneHand || thisGilesBaseType == ItemBaseType.WeaponRange ||
+                        thisGilesBaseType == ItemBaseType.Armor || thisGilesBaseType == ItemBaseType.Jewelry || thisGilesBaseType == ItemBaseType.Offhand ||
+                        thisGilesBaseType == ItemBaseType.FollowerItem)
                     {
                         double iThisItemValue = ValueThisItem(thisitem, OriginalGilesItemType);
                         LogJunkItems(thisitem, thisGilesBaseType, OriginalGilesItemType, iThisItemValue);
@@ -1081,11 +1081,11 @@ namespace GilesTrinity
                 {
 
                     // Item log for cool stuff stashed
-                    GItemType OriginalGilesItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
-                    GBaseItemType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
-                    if (thisGilesBaseType == GBaseItemType.WeaponTwoHand || thisGilesBaseType == GBaseItemType.WeaponOneHand || thisGilesBaseType == GBaseItemType.WeaponRange ||
-                        thisGilesBaseType == GBaseItemType.Armor || thisGilesBaseType == GBaseItemType.Jewelry || thisGilesBaseType == GBaseItemType.Offhand ||
-                        thisGilesBaseType == GBaseItemType.FollowerItem)
+                    ItemType OriginalGilesItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
+                    ItemBaseType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
+                    if (thisGilesBaseType == ItemBaseType.WeaponTwoHand || thisGilesBaseType == ItemBaseType.WeaponOneHand || thisGilesBaseType == ItemBaseType.WeaponRange ||
+                        thisGilesBaseType == ItemBaseType.Armor || thisGilesBaseType == ItemBaseType.Jewelry || thisGilesBaseType == ItemBaseType.Offhand ||
+                        thisGilesBaseType == ItemBaseType.FollowerItem)
                     {
                         double iThisItemValue = ValueThisItem(thisitem, OriginalGilesItemType);
                         LogJunkItems(thisitem, thisGilesBaseType, OriginalGilesItemType, iThisItemValue);
@@ -1173,7 +1173,7 @@ namespace GilesTrinity
         /// <param name="thisgilesbaseitemtype"></param>
         /// <param name="thisgilesitemtype"></param>
         /// <param name="ithisitemvalue"></param>
-        internal static void LogGoodItems(GilesCachedACDItem thisgooditem, GBaseItemType thisgilesbaseitemtype, GItemType thisgilesitemtype, double ithisitemvalue)
+        internal static void LogGoodItems(GilesCachedACDItem thisgooditem, ItemBaseType thisgilesbaseitemtype, ItemType thisgilesitemtype, double ithisitemvalue)
         {
             FileStream LogStream = null;
             try
@@ -1245,7 +1245,7 @@ namespace GilesTrinity
         /// <param name="thisgilesbaseitemtype"></param>
         /// <param name="thisgilesitemtype"></param>
         /// <param name="ithisitemvalue"></param>
-        internal static void LogJunkItems(GilesCachedACDItem thisgooditem, GBaseItemType thisgilesbaseitemtype, GItemType thisgilesitemtype, double ithisitemvalue)
+        internal static void LogJunkItems(GilesCachedACDItem thisgooditem, ItemBaseType thisgilesbaseitemtype, ItemType thisgilesitemtype, double ithisitemvalue)
         {
             FileStream LogStream = null;
             try
@@ -1292,8 +1292,8 @@ namespace GilesTrinity
             int iOriginalStackQuantity = item.ItemStackQuantity;
             string sOriginalItemName = item.RealName;
             string sOriginalInternalName = item.InternalName;
-            GItemType OriginalGilesItemType = DetermineItemType(item.InternalName, item.DBItemType, item.FollowerType);
-            GBaseItemType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
+            ItemType OriginalGilesItemType = DetermineItemType(item.InternalName, item.DBItemType, item.FollowerType);
+            ItemBaseType thisGilesBaseType = DetermineBaseType(OriginalGilesItemType);
             bool bOriginalTwoSlot = DetermineIsTwoSlot(OriginalGilesItemType);
             bool bOriginalIsStackable = DetermineIsStackable(OriginalGilesItemType);
             int iAttempts;
@@ -1365,9 +1365,9 @@ namespace GilesTrinity
             int iLeftoverStackQuantity = 0;
 
             // Item log for cool stuff stashed
-            if (thisGilesBaseType == GBaseItemType.WeaponTwoHand || thisGilesBaseType == GBaseItemType.WeaponOneHand || thisGilesBaseType == GBaseItemType.WeaponRange ||
-                thisGilesBaseType == GBaseItemType.Armor || thisGilesBaseType == GBaseItemType.Jewelry || thisGilesBaseType == GBaseItemType.Offhand ||
-                thisGilesBaseType == GBaseItemType.FollowerItem)
+            if (thisGilesBaseType == ItemBaseType.WeaponTwoHand || thisGilesBaseType == ItemBaseType.WeaponOneHand || thisGilesBaseType == ItemBaseType.WeaponRange ||
+                thisGilesBaseType == ItemBaseType.Armor || thisGilesBaseType == ItemBaseType.Jewelry || thisGilesBaseType == ItemBaseType.Offhand ||
+                thisGilesBaseType == ItemBaseType.FollowerItem)
             {
                 double iThisItemValue = ValueThisItem(item, OriginalGilesItemType);
                 LogGoodItems(item, thisGilesBaseType, OriginalGilesItemType, iThisItemValue);

@@ -1,5 +1,7 @@
-﻿using GilesTrinity.Technicals;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using GilesTrinity.DbProvider;
+using GilesTrinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -54,7 +56,9 @@ namespace GilesTrinity
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: Maintaining item stats from previous run. To reset stats fully, please restart DB.");
             }
+
             RefreshProfileBlacklists();
+
             ReplaceTreeHooks();
 
             try
@@ -66,6 +70,26 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Error Initializing CacheManager");
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
             }
+        }
+
+        // When the bot stops, output a final item-stats report so it is as up-to-date as can be
+        private void TrinityBotStop(IBot bot)
+        {
+            // Issue final reports
+            OutputReport();
+            vBacktrackList = new SortedList<int, Vector3>();
+            iTotalBacktracks = 0;
+            GilesPlayerMover.iTotalAntiStuckAttempts = 1;
+            GilesPlayerMover.vSafeMovementLocation = Vector3.Zero;
+            GilesPlayerMover.vOldPosition = Vector3.Zero;
+            GilesPlayerMover.iTimesReachedStuckPoint = 0;
+            GilesPlayerMover.timeLastRecordedPosition = DateTime.Today;
+            GilesPlayerMover.timeStartedUnstuckMeasure = DateTime.Today;
+            hashUseOnceID = new HashSet<int>();
+            dictUseOnceID = new Dictionary<int, int>();
+            dictRandomID = new Dictionary<int, int>();
+            iMaxDeathsAllowed = 0;
+            iDeathsThisRun = 0;
         }
 
         /// <summary>

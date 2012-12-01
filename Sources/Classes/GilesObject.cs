@@ -11,7 +11,7 @@ namespace GilesTrinity
     internal class GilesObject
     {
         // Generic stuff applicable to all objects
-        public GObjectType Type { get; set; }
+        public ObjectType Type { get; set; }
         public double Weight { get; set; }
         public Vector3 Position { get; set; }
         public float CentreDistance { get; set; }
@@ -27,9 +27,9 @@ namespace GilesTrinity
         public int GoldAmount { get; set; }
         public bool OneHanded { get; set; }
         public ItemQuality ItemQuality { get; set; }
-        public ItemType DBItemType { get; set; }
+        public Zeta.Internals.Actors.ItemType DBItemType { get; set; }
         public FollowerType FollowerType { get; set; }
-        public GItemType GilesItemType { get; set; }
+        public ItemType GilesItemType { get; set; }
         // Monster/unit stuff
         public bool IsElite { get; set; }
         public bool IsRare { get; set; }
