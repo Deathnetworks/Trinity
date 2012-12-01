@@ -12,7 +12,7 @@ using Zeta.Internals.Actors;
 namespace GilesTrinity.ItemRules
 {
 
-    class Interpreter
+    public class Interpreter
     {
         string[] strArrayString = new string[] { "[BASETYPE]", "[TYPE]", "[QUALITY]", "[NAME]" };
 

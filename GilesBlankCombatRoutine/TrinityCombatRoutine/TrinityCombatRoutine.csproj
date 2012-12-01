@@ -51,12 +51,6 @@
     <Compile Include="GilesBlankCombatRoutine.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Sources\GilesTrinity.csproj">
-      <Project>{997f24e1-4cd7-42c7-a5b5-4983636d5f2b}</Project>
-      <Name>GilesTrinity</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

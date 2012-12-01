@@ -1,4 +1,5 @@
-﻿using GilesTrinity.DbProvider;
+﻿using GilesTrinity.Cache;
+using GilesTrinity.DbProvider;
 using GilesTrinity.Technicals;
 using System;
 using System.Collections.Generic;
@@ -48,7 +49,7 @@ namespace GilesTrinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception for grabbing player data.{0}{1}", Environment.NewLine, ex);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception for grabbing player data.{0}{1}", Environment.NewLine, ex);
             }
         }
 
@@ -270,7 +271,7 @@ namespace GilesTrinity
         }
 
         // When the bot stops, output a final item-stats report so it is as up-to-date as can be
-        private void GilesTrinityHandleBotStop(IBot bot)
+        private void TrinityBotStop(IBot bot)
         {
             // Issue final reports
             OutputReport();
@@ -287,6 +288,16 @@ namespace GilesTrinity
             dictRandomID = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;
             iDeathsThisRun = 0;
+
+            try
+            {
+                CacheManager.Destroy();
+            }
+            catch (Exception ex)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Error Destroying CacheManager");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
+            }
         }
 
         // How many total leave games, for stat-tracking?

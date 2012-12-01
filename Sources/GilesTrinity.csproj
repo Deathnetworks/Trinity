@@ -33,6 +33,9 @@
   <PropertyGroup>
     <RootNamespace>GilesTrinity</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Demonbuddy">
       <HintPath>..\..\Demonbuddy.exe</HintPath>
@@ -61,6 +64,8 @@
     <Compile Include="Abilities\WitchDoctor.cs" />
     <Compile Include="AvoidanceManager.cs" />
     <Compile Include="AvoidanceType.cs" />
+    <Compile Include="Cache\CacheItem.cs" />
+    <Compile Include="Cache\TrinityItemQuality.cs" />
     <Compile Include="Classes\GilesObjstacle.cs" />
     <Compile Include="Classes\GilesPower.cs" />
     <Compile Include="Classes\GilesCachedACDItem.cs" />
@@ -72,6 +77,12 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotStart.cs" />
+    <Compile Include="ScriptedRules\Dynamic.cs" />
+    <Compile Include="ScriptedRules\RulesManager.cs" />
+    <Compile Include="ScriptedRules\ScriptedRuleAction.cs" />
+    <Compile Include="ScriptedRules\ScriptedRule.cs" />
+    <Compile Include="Cache\CacheManager.cs" />
+    <Compile Include="Cache\CacheObject.cs" />
     <Compile Include="Technicals\DbHelper.cs" />
     <Compile Include="Technicals\LogCategory.cs" />
     <Compile Include="Technicals\TrinitiyLogLevel.cs" />
@@ -109,7 +120,7 @@
     <Compile Include="Settings\TrinitySetting.cs" />
     <Compile Include="Settings\WorldObjectSetting.cs" />
     <Compile Include="StashSellSalvage.cs" />
-    <Compile Include="Technicals\PerformanceMonitor.cs" />
+    <Compile Include="Technicals\PerformanceLogger.cs" />
     <Compile Include="UIComponents\BoolInverterConverter.cs" />
     <Compile Include="UIComponents\ConfigViewModel.cs" />
     <Compile Include="UIComponents\EnumVisibilityConverter.cs" />
@@ -239,4 +250,15 @@
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
+  <PropertyGroup>
+    <PreBuildEvent>rd $(ProjectDir)obj\
+rd $(ProjectDir)bin\
+
+</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>rd /S /Q "C:\UnifiedTrinity\UnifiedTrinity\Sources\obj\"
+rd /S /Q "C:\UnifiedTrinity\UnifiedTrinity\Sources\bin\"
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>
