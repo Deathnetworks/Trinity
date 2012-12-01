@@ -169,7 +169,7 @@ namespace GilesTrinity
                         }
                     }
                     // Ok we didn't want a new target list, should we at least update the position of the current target, if it's a monster?
-                    else if (CurrentTarget.Type == ObjectType.Unit && CurrentTarget.Unit != null && CurrentTarget.Unit.BaseAddress != IntPtr.Zero)
+                    else if (CurrentTarget.Type == GObjectType.Unit && CurrentTarget.Unit != null && CurrentTarget.Unit.BaseAddress != IntPtr.Zero)
                     {
                         try
                         {
@@ -214,7 +214,7 @@ namespace GilesTrinity
                 UseHealthPotionIfNeeded();
 
                 // See if we can use any special buffs etc. while in avoidance
-                if (CurrentTarget.Type == ObjectType.Avoidance)
+                if (CurrentTarget.Type == GObjectType.Avoidance)
                 {
                     powerBuff = GilesAbilitySelector(true, false, false);
                     if (powerBuff.SNOPower != SNOPower.None)
@@ -242,7 +242,7 @@ namespace GilesTrinity
                     }
                 }
                 // Maintain a backtrack list only while fighting monsters
-                if (CurrentTarget.Type == ObjectType.Unit && Settings.Combat.Misc.AllowBacktracking &&
+                if (CurrentTarget.Type == GObjectType.Unit && Settings.Combat.Misc.AllowBacktracking &&
                     (iTotalBacktracks == 0 || Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]) >= 10f))
                 {
                     bool bAddThisBacktrack = true;
@@ -268,7 +268,7 @@ namespace GilesTrinity
                 if (fRangeRequired <= 0f || fDistanceFromTarget <= fRangeRequired)
                 {
                     // If avoidance, instantly skip
-                    if (CurrentTarget.Type == ObjectType.Avoidance)
+                    if (CurrentTarget.Type == GObjectType.Avoidance)
                     {
                         //vlastSafeSpot = vNullLocation;
                         bForceTargetUpdate = true;
@@ -286,7 +286,7 @@ namespace GilesTrinity
                     switch (CurrentTarget.Type)
                     {
                         // Unit, use our primary power to attack
-                        case ObjectType.Unit:
+                        case GObjectType.Unit:
                             {
                                 if (currentPower.SNOPower != SNOPower.None)
                                 {
@@ -310,7 +310,7 @@ namespace GilesTrinity
                                 break;
                             }
                         // Item, interact with it and log item stats
-                        case ObjectType.Item:
+                        case GObjectType.Item:
                             {
                                 // Check if we actually have room for this item first
                                 Vector2 ValidLocation = FindValidBackpackLocation(true);
@@ -330,8 +330,8 @@ namespace GilesTrinity
                                 break;
                             }
                         // * Gold & Globe - need to get within pickup radius only
-                        case ObjectType.Gold:
-                        case ObjectType.Globe:
+                        case GObjectType.Gold:
+                        case GObjectType.Globe:
                             {
                                 // Count how many times we've tried interacting
                                 if (!dictTotalInteractionAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
@@ -363,22 +363,22 @@ namespace GilesTrinity
                                 break;
                             }
                         // * Shrine & Container - need to get within 8 feet and interact
-                        case ObjectType.Door:
-                        case ObjectType.HealthWell:
-                        case ObjectType.Shrine:
-                        case ObjectType.Container:
-                        case ObjectType.Interactable:
+                        case GObjectType.Door:
+                        case GObjectType.HealthWell:
+                        case GObjectType.Shrine:
+                        case GObjectType.Container:
+                        case GObjectType.Interactable:
                             {
                                 WaitWhileAnimating(5, true);
                                 ZetaDia.Me.UsePower(SNOPower.Axe_Operate_Gizmo, Vector3.Zero, 0, CurrentTarget.ACDGuid);
                                 //iIgnoreThisRactorGUID = CurrentTarget.iRActorGuid;
                                 //iIgnoreThisForLoops = 2;
                                 // Interactables can have a long channeling time...
-                                if (CurrentTarget.Type == ObjectType.Interactable)
+                                if (CurrentTarget.Type == GObjectType.Interactable)
                                     WaitWhileAnimating(1500, true);
                                 else
                                     WaitWhileAnimating(12, true);
-                                if (CurrentTarget.Type == ObjectType.Interactable)
+                                if (CurrentTarget.Type == GObjectType.Interactable)
                                 {
                                     IgnoreTargetForLoops = 30;
                                     hashRGUIDDestructible3SecBlacklist.Add(CurrentTarget.RActorGuid);
@@ -393,8 +393,8 @@ namespace GilesTrinity
                                     dictTotalInteractionAttempts[CurrentTarget.RActorGuid]++;
                                 }
                                 // If we've tried interacting too many times, blacklist this for a while
-                                if ((iInteractAttempts > 5 || (CurrentTarget.Type == ObjectType.Interactable && iInteractAttempts > 3)) &&
-                                    !(CurrentTarget.Type != ObjectType.HealthWell))
+                                if ((iInteractAttempts > 5 || (CurrentTarget.Type == GObjectType.Interactable && iInteractAttempts > 3)) &&
+                                    !(CurrentTarget.Type != GObjectType.HealthWell))
                                 {
                                     hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
                                     //dateSinceBlacklist90Clear = DateTime.Now;
@@ -412,12 +412,12 @@ namespace GilesTrinity
                                 break;
                             }
                         // * Destructible - need to pick an ability and attack it
-                        case ObjectType.Destructible:
-                        case ObjectType.Barricade:
+                        case GObjectType.Destructible:
+                        case GObjectType.Barricade:
                             {
                                 if (currentPower.SNOPower != SNOPower.None)
                                 {
-                                    if (CurrentTarget.Type == ObjectType.Barricade)
+                                    if (CurrentTarget.Type == GObjectType.Barricade)
                                     {
                                         DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior,
                                             "Barricade: Name={0}. SNO={1}, Range={2}. Needed range={3}. Radius={4}. Type={5}. Using power={6}",
@@ -497,7 +497,7 @@ namespace GilesTrinity
                             }
                             return RunStatus.Running;
                         // * Backtrack - clear this waypoint
-                        case ObjectType.Backtrack:
+                        case GObjectType.Backtrack:
                             // Remove the current backtrack location now we reached it
                             vBacktrackList.Remove(iTotalBacktracks);
                             iTotalBacktracks--;
@@ -534,7 +534,7 @@ namespace GilesTrinity
                         // And tell Trinity to get a new target
                         bForceTargetUpdate = true;
                         // Blacklist an 80 degree direction for avoidance
-                        if (CurrentTarget.Type == ObjectType.Avoidance)
+                        if (CurrentTarget.Type == GObjectType.Avoidance)
                         {
                             bAvoidDirectionBlacklisting = true;
                             fAvoidBlacklistDirection = FindDirectionDegree(playerStatus.CurrentPosition, CurrentTarget.Position);
@@ -542,7 +542,7 @@ namespace GilesTrinity
                         // Handle body blocking by blacklisting
                         GilesHandleBodyBlocking();
                         // If we were backtracking and failed, remove the current backtrack and try and move to the next
-                        if (CurrentTarget.Type == ObjectType.Backtrack && TimesBlockedMoving >= 2)
+                        if (CurrentTarget.Type == GObjectType.Backtrack && TimesBlockedMoving >= 2)
                         {
                             vBacktrackList.Remove(iTotalBacktracks);
                             iTotalBacktracks--;
@@ -565,7 +565,7 @@ namespace GilesTrinity
                 // Update the last distance stored
                 fLastDistanceFromTarget = fDistanceFromTarget;
                 // See if there's an obstacle in our way, if so try to navigate around it
-                if (CurrentTarget.Type != ObjectType.Avoidance)
+                if (CurrentTarget.Type != GObjectType.Avoidance)
                 {
                     Vector3 point = vCurrentDestination;
                     foreach (GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
@@ -617,14 +617,14 @@ namespace GilesTrinity
                     return RunStatus.Running;
                 }
                 // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
-                if ((CurrentTarget.Type == ObjectType.Avoidance ||
-                    CurrentTarget.Type == ObjectType.Globe ||
-                    (CurrentTarget.Type == ObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
+                if ((CurrentTarget.Type == GObjectType.Avoidance ||
+                    CurrentTarget.Type == GObjectType.Globe ||
+                    (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
                     && GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk)
                     )
                 {
                     bool bFoundSpecialMovement = UsedSpecialMovement();
-                    if (CurrentTarget.Type != ObjectType.Backtrack)
+                    if (CurrentTarget.Type != GObjectType.Backtrack)
                     {
                         // Whirlwind for a barb
                         //intell
@@ -674,12 +674,12 @@ namespace GilesTrinity
                 }
                 // Whirlwind against everything within range (except backtrack points)
                 //intell
-                if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) && playerStatus.CurrentEnergy >= 10 && iAnythingWithinRange[RANGE_20] >= 1 && !bWaitingForSpecial && currentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && fDistanceFromTarget <= 12f && CurrentTarget.Type != ObjectType.Container && CurrentTarget.Type != ObjectType.Backtrack &&
+                if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) && playerStatus.CurrentEnergy >= 10 && iAnythingWithinRange[RANGE_20] >= 1 && !bWaitingForSpecial && currentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && fDistanceFromTarget <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
                     (!hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Sprint) || GilesHasBuff(SNOPower.Barbarian_Sprint)) &&
-                    CurrentTarget.Type != ObjectType.Backtrack &&
-                    (CurrentTarget.Type != ObjectType.Item && CurrentTarget.Type != ObjectType.Gold && fDistanceFromTarget >= 6f) &&
-                    (CurrentTarget.Type != ObjectType.Unit ||
-                    (CurrentTarget.Type == ObjectType.Unit && !CurrentTarget.IsTreasureGoblin &&
+                    CurrentTarget.Type != GObjectType.Backtrack &&
+                    (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && fDistanceFromTarget >= 6f) &&
+                    (CurrentTarget.Type != GObjectType.Unit ||
+                    (CurrentTarget.Type == GObjectType.Unit && !CurrentTarget.IsTreasureGoblin &&
                         (!Settings.Combat.Barbarian.SelectiveWhirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)))))
                 {
                     // Special code to prevent whirlwind double-spam, this helps save fury
@@ -737,7 +737,7 @@ namespace GilesTrinity
                 bool isNavigable = pf.IsNavigable(gp.WorldToGrid(CurrentTarget.Position.ToVector2()));
                 bool bBlacklistThis = true;
                 // PREVENT blacklisting a monster on less than 90% health unless we haven't damaged it for more than 2 minutes
-                if (CurrentTarget.Type == ObjectType.Unit && isNavigable)
+                if (CurrentTarget.Type == GObjectType.Unit && isNavigable)
                 {
                     if (CurrentTarget.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Kamikaze)
                         bBlacklistThis = false;
@@ -748,7 +748,7 @@ namespace GilesTrinity
                 }
                 if (bBlacklistThis)
                 {
-                    if (CurrentTarget.Type == ObjectType.Unit)
+                    if (CurrentTarget.Type == GObjectType.Unit)
                     {
                         DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, 
                             "Blacklisting a monster because of possible stuck issues. Monster={0} [{1}] Range={2:0} health %={3:0} RActorGUID={4}",
@@ -797,7 +797,7 @@ namespace GilesTrinity
             if (bPickNewAbilities && !bWaitingForPower && !bWaitingForPotion)
             {
                 bPickNewAbilities = false;
-                if (CurrentTarget.Type == ObjectType.Unit)
+                if (CurrentTarget.Type == GObjectType.Unit)
                 {
                     // Pick a suitable ability
                     currentPower = GilesAbilitySelector(false, false, false);
@@ -818,7 +818,7 @@ namespace GilesTrinity
                     }
                 }
                 // Select an ability for destroying a destructible with in advance
-                if (CurrentTarget.Type == ObjectType.Destructible || CurrentTarget.Type == ObjectType.Barricade)
+                if (CurrentTarget.Type == GObjectType.Destructible || CurrentTarget.Type == GObjectType.Barricade)
                     currentPower = GilesAbilitySelector(false, false, true);
             }
         }
@@ -859,7 +859,7 @@ namespace GilesTrinity
                     StaleCache = true;
                 }
                 // If we AREN'T getting new targets - find out if we SHOULD because the current unit has died etc.
-                if (!StaleCache && CurrentTarget.Type == ObjectType.Unit)
+                if (!StaleCache && CurrentTarget.Type == GObjectType.Unit)
                 {
                     if (CurrentTarget.Unit == null || CurrentTarget.Unit.BaseAddress == IntPtr.Zero)
                     {
@@ -973,15 +973,15 @@ namespace GilesTrinity
 
         private static bool CurrentTargetIsNotAvoidance()
         {
-            return CurrentTarget.Type != ObjectType.Avoidance;
+            return CurrentTarget.Type != GObjectType.Avoidance;
         }
         private static bool CurrentTargetIsNonUnit()
         {
-            return CurrentTarget.Type != ObjectType.Unit;
+            return CurrentTarget.Type != GObjectType.Unit;
         }
         private static bool CurrentTargetIsUnit()
         {
-            return CurrentTarget.Type == ObjectType.Unit;
+            return CurrentTarget.Type == GObjectType.Unit;
         }
         private static double GetSecondsSinceTargetAssigned()
         {
@@ -1008,11 +1008,11 @@ namespace GilesTrinity
                     // Check for raycastability against objects
                     switch (CurrentTarget.Type)
                     {
-                        case ObjectType.Container:
-                        case ObjectType.Shrine:
-                        case ObjectType.Globe:
-                        case ObjectType.Gold:
-                        case ObjectType.Item:
+                        case GObjectType.Container:
+                        case GObjectType.Shrine:
+                        case GObjectType.Globe:
+                        case GObjectType.Gold:
+                        case GObjectType.Item:
                             // No raycast available, try and force-ignore this for a little while, and blacklist for a few seconds
                             if (!GilesCanRayCast(playerStatus.CurrentPosition, CurrentTarget.Position, NavCellFlags.AllowWalk))
                             {
@@ -1031,7 +1031,7 @@ namespace GilesTrinity
                     timeCancelledEmergencyMove = DateTime.Now;
                     vlastSafeSpot = vNullLocation;
                     // Blacklist the current avoidance target area for the next avoidance-spot find
-                    if (CurrentTarget.Type == ObjectType.Avoidance)
+                    if (CurrentTarget.Type == GObjectType.Avoidance)
                         hashAvoidanceBlackspot.Add(new GilesObstacle(CurrentTarget.Position, 12f, -1, 0));
                     break;
                 default:
@@ -1041,7 +1041,7 @@ namespace GilesTrinity
                     timeCancelledEmergencyMove = DateTime.Now;
                     vlastSafeSpot = vNullLocation;
                     // Blacklist the current avoidance target area for the next avoidance-spot find
-                    if (TimesBlockedMoving == 4 && CurrentTarget.Type == ObjectType.Avoidance)
+                    if (TimesBlockedMoving == 4 && CurrentTarget.Type == GObjectType.Avoidance)
                         hashAvoidanceBlackspot.Add(new GilesObstacle(CurrentTarget.Position, 16f, -1, 0));
                     break;
             }
@@ -1055,32 +1055,32 @@ namespace GilesTrinity
             StringBuilder statusText = new StringBuilder();
             switch (CurrentTarget.Type)
             {
-                case ObjectType.Avoidance:
+                case GObjectType.Avoidance:
                     statusText.Append("Avoid ");
                     break;
-                case ObjectType.Unit:
+                case GObjectType.Unit:
                     statusText.Append("Attack ");
                     break;
-                case ObjectType.Item:
-                case ObjectType.Gold:
-                case ObjectType.Globe:
+                case GObjectType.Item:
+                case GObjectType.Gold:
+                case GObjectType.Globe:
                     statusText.Append("Pickup ");
                     break;
-                case ObjectType.Backtrack:
+                case GObjectType.Backtrack:
                     statusText.Append("Backtrack ");
                     break;
-                case ObjectType.Interactable:
+                case GObjectType.Interactable:
                     statusText.Append("Interact ");
                     break;
-                case ObjectType.Door:
-                case ObjectType.Container:
+                case GObjectType.Door:
+                case GObjectType.Container:
                     statusText.Append("Open ");
                     break;
-                case ObjectType.Destructible:
-                case ObjectType.Barricade:
+                case GObjectType.Destructible:
+                case GObjectType.Barricade:
                     statusText.Append("Destroy ");
                     break;
-                case ObjectType.Shrine:
+                case GObjectType.Shrine:
                     statusText.Append("Click ");
                     break;
             }
@@ -1098,7 +1098,7 @@ namespace GilesTrinity
             statusText.Append(". RangeReq'd: ");
             statusText.Append(fRangeRequired.ToString("0"));
             statusText.Append(". ");
-            if (CurrentTarget.Type == ObjectType.Unit && currentPower.SNOPower != SNOPower.None)
+            if (CurrentTarget.Type == GObjectType.Unit && currentPower.SNOPower != SNOPower.None)
             {
                 statusText.Append("Power=");
                 statusText.Append(currentPower.SNOPower);
@@ -1154,7 +1154,7 @@ namespace GilesTrinity
             switch (CurrentTarget.Type)
             {
                 // * Unit, we need to pick an ability to use and get within range
-                case ObjectType.Unit:
+                case GObjectType.Unit:
                     {
                         // Treat the distance as closer based on the radius of monsters
                         fDistanceReduction = CurrentTarget.Radius;
@@ -1167,7 +1167,7 @@ namespace GilesTrinity
                         break;
                     }
                 // * Item - need to get within 6 feet and then interact with it
-                case ObjectType.Item:
+                case GObjectType.Item:
                     {
                         fRangeRequired = 5f;
                         // If we're having stuck issues, try forcing us to get closer to this item
@@ -1185,7 +1185,7 @@ namespace GilesTrinity
                         break;
                     }
                 // * Gold - need to get within pickup radius only
-                case ObjectType.Gold:
+                case GObjectType.Gold:
                     {
                         fRangeRequired = (float)ZetaDia.Me.GoldPickUpRadius;
                         if (fRangeRequired < 2f)
@@ -1193,7 +1193,7 @@ namespace GilesTrinity
                         break;
                     }
                 // * Globes - need to get within pickup radius only
-                case ObjectType.Globe:
+                case GObjectType.Globe:
                     {
                         fRangeRequired = (float)ZetaDia.Me.GoldPickUpRadius;
                         if (fRangeRequired < 2f)
@@ -1203,7 +1203,7 @@ namespace GilesTrinity
                         break;
                     }
                 // * Shrine & Container - need to get within 8 feet and interact
-                case ObjectType.HealthWell:
+                case GObjectType.HealthWell:
                     {
                         fRangeRequired = CurrentTarget.Radius + 5f;
                         fRangeRequired = 5f;
@@ -1214,8 +1214,8 @@ namespace GilesTrinity
                         }
                         break;
                     }
-                case ObjectType.Shrine:
-                case ObjectType.Container:
+                case GObjectType.Shrine:
+                case GObjectType.Container:
                     {
                         // Treat the distance as closer based on the radius of the object
                         fDistanceReduction = CurrentTarget.Radius;
@@ -1232,7 +1232,7 @@ namespace GilesTrinity
                         }
                         break;
                     }
-                case ObjectType.Interactable:
+                case GObjectType.Interactable:
                     {
                         // Treat the distance as closer based on the radius of the object
                         fDistanceReduction = CurrentTarget.Radius;
@@ -1251,8 +1251,8 @@ namespace GilesTrinity
                         break;
                     }
                 // * Destructible - need to pick an ability and attack it
-                case ObjectType.Destructible:
-                case ObjectType.Barricade:
+                case GObjectType.Destructible:
+                case GObjectType.Barricade:
                     {
                         // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
                         fRangeRequired = currentPower.SNOPower == SNOPower.None ? 9f : currentPower.iMinimumRange;
@@ -1267,7 +1267,7 @@ namespace GilesTrinity
                         break;
                     }
                 // * Avoidance - need to pick an avoid location and move there
-                case ObjectType.Avoidance:
+                case GObjectType.Avoidance:
                     {
                         fRangeRequired = 2f;
                         // Treat the distance as closer if the X & Y distance are almost point-blank, for avoidance spots
@@ -1276,14 +1276,14 @@ namespace GilesTrinity
                         break;
                     }
                 // * Backtrack Destination
-                case ObjectType.Backtrack:
+                case GObjectType.Backtrack:
                     {
                         fRangeRequired = 5f;
                         if (ForceCloseRangeTarget)
                             fRangeRequired -= 2f;
                         break;
                     }
-                case ObjectType.Door:
+                case GObjectType.Door:
                     fRangeRequired = CurrentTarget.Radius + 2f;
                     break;
                 default:

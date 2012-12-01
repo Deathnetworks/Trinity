@@ -171,7 +171,7 @@ namespace GilesTrinity
             GilesPlayerMover.iCancelUnstuckerForSeconds = 0;
             GilesPlayerMover.timeCancelledUnstuckerFor = DateTime.Today;
             // Reset all the caches
-            dictGilesObjectTypeCache = new Dictionary<int, ObjectType>();
+            dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
             dictGilesMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
             dictGilesMaxHealthCache = new Dictionary<int, double>();
             dictGilesLastHealthCache = new Dictionary<int, double>();

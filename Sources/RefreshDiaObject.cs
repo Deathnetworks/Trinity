@@ -157,7 +157,7 @@ namespace GilesTrinity
         /// <param name="AddToCache"></param>
         private static void AddUnitToMonsterObstacleCache(bool AddToCache)
         {
-            if (AddToCache && c_ObjectType == ObjectType.Unit)
+            if (AddToCache && c_ObjectType == GObjectType.Unit)
             {
                 // Handle bosses
                 if (c_unit_IsBoss)
@@ -182,11 +182,11 @@ namespace GilesTrinity
         {
             AddTocache = true;
             // Start this object as off as unknown type
-            c_ObjectType = ObjectType.Unknown;
+            c_ObjectType = GObjectType.Unknown;
             // We will set weight up later in RefreshDiaObjects after we process all valid items
             c_Weight = 0;
             c_Position = Vector3.Zero;
-            c_ObjectType = ObjectType.Unknown;
+            c_ObjectType = GObjectType.Unknown;
             c_Weight = 0d;
             c_CentreDistance = 0f;
             c_RadiusDistance = 0f;
@@ -285,7 +285,7 @@ namespace GilesTrinity
         private static bool RefreshStepIgnoreNullCommonData(bool AddToCache)
         {
             // Null Common Data makes a DiaUseless!
-            if (c_ObjectType == ObjectType.Unit || c_ObjectType == ObjectType.Item || c_ObjectType == ObjectType.Gold)
+            if (c_ObjectType == GObjectType.Unit || c_ObjectType == GObjectType.Item || c_ObjectType == GObjectType.Gold)
             {
                 if (c_CommonData == null)
                 {
@@ -333,7 +333,7 @@ namespace GilesTrinity
         {
             // Set the object type
             // begin with default... 
-            c_ObjectType = ObjectType.Unknown;
+            c_ObjectType = GObjectType.Unknown;
             // Either get the cached Giles object type, or calculate it fresh
             if (!c_IsObstacle && !dictGilesObjectTypeCache.TryGetValue(c_RActorGuid, out c_ObjectType))
             {
@@ -349,7 +349,7 @@ namespace GilesTrinity
                     else
                     {
                         // Avoidance isn't disabled, so set this object type to avoidance
-                        c_ObjectType = ObjectType.Avoidance;
+                        c_ObjectType = GObjectType.Avoidance;
                     }
 
                     // Checking for BuffVisualEffect - for Butcher, maybe useful other places?
@@ -368,7 +368,7 @@ namespace GilesTrinity
                         if (hasBuff)
                         {
                             AddToCache = true;
-                            c_ObjectType = ObjectType.Avoidance;
+                            c_ObjectType = GObjectType.Avoidance;
                         }
                         else
                         {
@@ -396,7 +396,7 @@ namespace GilesTrinity
                         }
                         else
                         {
-                            c_ObjectType = ObjectType.Unit;
+                            c_ObjectType = GObjectType.Unit;
                         }
                     }
                     else if (hashForceSNOToItemList.Contains(c_ActorSNO) || c_diaObject.ActorType == ActorType.Item)
@@ -411,38 +411,38 @@ namespace GilesTrinity
                         }
                         if (c_Name.ToLower().StartsWith("gold"))
                         {
-                            c_ObjectType = ObjectType.Gold;
+                            c_ObjectType = GObjectType.Gold;
                         }
                         else
                         {
-                            c_ObjectType = ObjectType.Item;
+                            c_ObjectType = GObjectType.Item;
                         }
                     }
                     else if (c_diaObject.ActorType == ActorType.Gizmo)
                     {
                         if (c_diaObject.ActorInfo.GizmoType == GizmoType.Shrine)
-                            c_ObjectType = ObjectType.Shrine;
+                            c_ObjectType = GObjectType.Shrine;
                         else if (c_diaObject.ActorInfo.GizmoType == GizmoType.Healthwell)
-                            c_ObjectType = ObjectType.HealthWell;
+                            c_ObjectType = GObjectType.HealthWell;
                         else if (c_diaObject.ActorInfo.GizmoType == GizmoType.DestructibleLootContainer)
-                            c_ObjectType = ObjectType.Destructible;
+                            c_ObjectType = GObjectType.Destructible;
                         else if (c_diaObject.ActorInfo.GizmoType == GizmoType.Destructible)
-                            c_ObjectType = ObjectType.Destructible;
+                            c_ObjectType = GObjectType.Destructible;
                         else if (c_diaObject.ActorInfo.GizmoType == GizmoType.Barricade)
-                            c_ObjectType = ObjectType.Barricade;
+                            c_ObjectType = GObjectType.Barricade;
                         else if (c_diaObject.ActorInfo.GizmoType == GizmoType.LootContainer)
-                            c_ObjectType = ObjectType.Container;
+                            c_ObjectType = GObjectType.Container;
                         else if (hashSNOInteractWhitelist.Contains(c_ActorSNO))
-                            c_ObjectType = ObjectType.Interactable;
+                            c_ObjectType = GObjectType.Interactable;
                         else if (c_diaObject.ActorInfo.GizmoType == GizmoType.Door)
-                            c_ObjectType = ObjectType.Door;
+                            c_ObjectType = GObjectType.Door;
                         else if (c_diaObject.ActorInfo.GizmoType == GizmoType.WeirdGroup57)
-                            c_ObjectType = ObjectType.Interactable;
+                            c_ObjectType = GObjectType.Interactable;
                         else
-                            c_ObjectType = ObjectType.Unknown;
+                            c_ObjectType = GObjectType.Unknown;
                     }
                     else
-                        c_ObjectType = ObjectType.Unknown;
+                        c_ObjectType = GObjectType.Unknown;
                 }
                 // Now cache the object type
                 dictGilesObjectTypeCache.Add(c_RActorGuid, c_ObjectType);
@@ -455,13 +455,13 @@ namespace GilesTrinity
             switch (c_ObjectType)
             {
                 // Handle Unit-type Objects
-                case ObjectType.Unit:
+                case GObjectType.Unit:
                     {
                         AddToCache = RefreshGilesUnit(AddToCache);
                         break;
                     }
                 // Handle Item-type Objects
-                case ObjectType.Item:
+                case GObjectType.Item:
                     {
                         if (!ForceVendorRunASAP)
                         {
@@ -478,7 +478,7 @@ namespace GilesTrinity
                     }
                 // Handle Gold
                 // NOTE: Only identified as gold after *FIRST* loop as an "item" by above code
-                case ObjectType.Gold:
+                case GObjectType.Gold:
                     {
                         AddToCache = RefreshGilesGold(AddToCache);
                         c_IgnoreSubStep = "RefreshGilesGold";
@@ -486,7 +486,7 @@ namespace GilesTrinity
                     }
                 // Handle Globes
                 // NOTE: Only identified as globe after *FIRST* loop as an "item" by above code
-                case ObjectType.Globe:
+                case GObjectType.Globe:
                     {
                         // Ignore it if it's not in range yet
                         if (c_CentreDistance > iCurrentMaxLootRadius || c_CentreDistance > 37f)
@@ -498,7 +498,7 @@ namespace GilesTrinity
                         break;
                     }
                 // Handle Avoidance Objects
-                case ObjectType.Avoidance:
+                case GObjectType.Avoidance:
                     {
                         AddToCache = RefreshGilesAvoidance(AddToCache);
                         if (!AddToCache) { c_IgnoreSubStep = "RefreshGilesAvoidance"; }
@@ -506,19 +506,19 @@ namespace GilesTrinity
                         break;
                     }
                 // Handle Other-type Objects
-                case ObjectType.Destructible:
-                case ObjectType.Door:
-                case ObjectType.Barricade:
-                case ObjectType.Container:
-                case ObjectType.Shrine:
-                case ObjectType.Interactable:
-                case ObjectType.HealthWell:
+                case GObjectType.Destructible:
+                case GObjectType.Door:
+                case GObjectType.Barricade:
+                case GObjectType.Container:
+                case GObjectType.Shrine:
+                case GObjectType.Interactable:
+                case GObjectType.HealthWell:
                     {
                         AddToCache = RefreshGilesGizmo(AddToCache);
                         break;
                     }
                 // Object switch on type (to seperate shrines, destructibles, barricades etc.)
-                case ObjectType.Unknown:
+                case GObjectType.Unknown:
                 default:
                     {
                         break;
@@ -975,9 +975,9 @@ namespace GilesTrinity
             // Treat all globes as a yes
             if (c_item_GItemType == GItemType.HealthGlobe)
             {
-                c_ObjectType = ObjectType.Globe;
+                c_ObjectType = GObjectType.Globe;
                 // Create or alter this cached object type
-                ObjectType objectType;
+                GObjectType objectType;
                 if (!dictGilesObjectTypeCache.TryGetValue(c_RActorGuid, out objectType))
                     dictGilesObjectTypeCache.Add(c_RActorGuid, c_ObjectType);
                 else
@@ -1160,7 +1160,7 @@ namespace GilesTrinity
                 //return bWantThis;
             }
             // Ignore it if it's not in range yet, except health wells
-            if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != ObjectType.HealthWell)
+            if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotInRange";
@@ -1228,7 +1228,7 @@ namespace GilesTrinity
             bool GizmoUsed = false;
             switch (c_ObjectType)
             {
-                case ObjectType.Door:
+                case GObjectType.Door:
                     {
                         AddToCache = true;
                         try
@@ -1276,7 +1276,7 @@ namespace GilesTrinity
                         }
                     }
                     break;
-                case ObjectType.Interactable:
+                case GObjectType.Interactable:
                     AddToCache = true;
                     // Special interactables
                     if (c_CentreDistance > 30f)
@@ -1286,7 +1286,7 @@ namespace GilesTrinity
                     }
                     c_Radius = 4f;
                     break;
-                case ObjectType.HealthWell:
+                case GObjectType.HealthWell:
                     {
                         AddToCache = true;
                         try
@@ -1308,7 +1308,7 @@ namespace GilesTrinity
                         bWaitingAfterPower = true;
                     }
                     break;
-                case ObjectType.Shrine:
+                case GObjectType.Shrine:
                     {
                         AddToCache = true;
                         // Shrines
@@ -1343,7 +1343,7 @@ namespace GilesTrinity
                         c_Radius = 4f;
                         break;
                     }
-                case ObjectType.Barricade:
+                case GObjectType.Barricade:
                     {
                         AddToCache = true;
                         // Get the cached physics SNO of this object
@@ -1388,7 +1388,7 @@ namespace GilesTrinity
                         }
                         break;
                     }
-                case ObjectType.Destructible:
+                case GObjectType.Destructible:
                     {
                         AddToCache = true;
                         // Get the cached physics SNO of this object
@@ -1451,7 +1451,7 @@ namespace GilesTrinity
 
                         break;
                     }
-                case ObjectType.Container:
+                case GObjectType.Container:
                     {
                         // We want to do some vendoring, so don't open anything new yet
                         if (ForceVendorRunASAP)
@@ -1663,7 +1663,7 @@ namespace GilesTrinity
             try
             {
 
-                if (c_ObjectType == ObjectType.Unit)
+                if (c_ObjectType == GObjectType.Unit)
                 {
                     bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
 
@@ -1673,7 +1673,7 @@ namespace GilesTrinity
                         c_IgnoreSubStep = "NotNavigable";
                     }
                     // Ignore units not in LoS except bosses, rares, champs
-                    if (c_ObjectType == ObjectType.Unit && !c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
+                    if (c_ObjectType == GObjectType.Unit && !c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
                     {
                         AddToCache = false;
                         c_IgnoreSubStep = "UnitNotInLoS";
@@ -1724,7 +1724,7 @@ namespace GilesTrinity
         private static bool RefreshStepIgnoreUnknown(bool AddToCache)
         {
             // We couldn't get a valid object type, so ignore it
-            if (!c_IsObstacle && c_ObjectType == ObjectType.Unknown)
+            if (!c_IsObstacle && c_ObjectType == GObjectType.Unknown)
             {
                 AddToCache = false;
             }
@@ -1733,7 +1733,7 @@ namespace GilesTrinity
         private static bool RefreshStepCachedACDGuid(bool AddToCache)
         {
             // Get the ACDGUID, cached if possible, only for non-avoidance stuff
-            if (!c_IsObstacle && c_ObjectType != ObjectType.Avoidance)
+            if (!c_IsObstacle && c_ObjectType != GObjectType.Avoidance)
             {
                 if (!dictGilesACDGUIDCache.TryGetValue(c_RActorGuid, out c_ACDGUID))
                 {
@@ -1765,7 +1765,7 @@ namespace GilesTrinity
         private static bool RefreshStepCachedPosition(bool AddToCache)
         {
             // Try and get a cached position for anything that isn't avoidance or units (avoidance and units can move, sadly, so we risk DB mis-reads for those things!
-            if (c_ObjectType != ObjectType.Avoidance && c_ObjectType != ObjectType.Unit)
+            if (c_ObjectType != GObjectType.Avoidance && c_ObjectType != GObjectType.Unit)
             {
                 // Get the position, cached if possible
                 if (!dictGilesVectorCache.TryGetValue(c_RActorGuid, out c_Position))
@@ -1806,7 +1806,7 @@ namespace GilesTrinity
         private static bool RefreshStepCachedDynamicIds(bool AddToCache)
         {
             // Try and grab the dynamic id and game balance id, if necessary and if possible
-            if (c_ObjectType == ObjectType.Item)
+            if (c_ObjectType == GObjectType.Item)
             {
                 // Get the Dynamic ID, cached if possible
                 if (!dictGilesDynamicIDCache.TryGetValue(c_RActorGuid, out c_GameDynamicID))
@@ -1851,15 +1851,15 @@ namespace GilesTrinity
         private static bool RefreshStepNewObjectTypeZDiff(bool AddToCache)
         {
             // Ignore stuff which has a Z-height-difference too great, it's probably on a different level etc. - though not avoidance!
-            if (c_ObjectType != ObjectType.Avoidance)
+            if (c_ObjectType != GObjectType.Avoidance)
             {
                 // Calculate the z-height difference between our current position, and this object's position
                 c_ZDiff = Math.Abs(playerStatus.CurrentPosition.Z - c_Position.Z);
                 switch (c_ObjectType)
                 {
-                    case ObjectType.Door:
-                    case ObjectType.Unit:
-                    case ObjectType.Barricade:
+                    case GObjectType.Door:
+                    case GObjectType.Unit:
+                    case GObjectType.Barricade:
                         // Ignore monsters (units) who's Z-height is 14 foot or more than our own z-height
                         // rrrix: except bosses like Belial :)
                         if (c_ZDiff >= 14f && !c_unit_IsBoss)
@@ -1868,8 +1868,8 @@ namespace GilesTrinity
                             //return bWantThis;
                         }
                         break;
-                    case ObjectType.Item:
-                    case ObjectType.HealthWell:
+                    case GObjectType.Item:
+                    case GObjectType.HealthWell:
                         // Items at 26+ z-height difference (we don't want to risk missing items so much)
                         if (c_ZDiff >= 26f)
                         {
@@ -1877,8 +1877,8 @@ namespace GilesTrinity
                             //return bWantThis;
                         }
                         break;
-                    case ObjectType.Gold:
-                    case ObjectType.Globe:
+                    case GObjectType.Gold:
+                    case GObjectType.Globe:
                         // Gold/Globes at 11+ z-height difference
                         if (c_ZDiff >= 11f)
                         {
@@ -1886,9 +1886,9 @@ namespace GilesTrinity
                             //return bWantThis;
                         }
                         break;
-                    case ObjectType.Destructible:
-                    case ObjectType.Shrine:
-                    case ObjectType.Container:
+                    case GObjectType.Destructible:
+                    case GObjectType.Shrine:
+                    case GObjectType.Container:
                         // Destructibles, shrines and containers are the least important, so a z-height change of only 7 is enough to ignore (help avoid stucks at stairs etc.)
                         if (c_ZDiff >= 7f)
                         {
@@ -1896,7 +1896,7 @@ namespace GilesTrinity
                             //return bWantThis;
                         }
                         break;
-                    case ObjectType.Interactable:
+                    case GObjectType.Interactable:
                         // Special interactable objects
                         if (c_ZDiff >= 9f)
                         {
@@ -1904,7 +1904,7 @@ namespace GilesTrinity
                             //return bWantThis;
                         }
                         break;
-                    case ObjectType.Unknown:
+                    case GObjectType.Unknown:
                     default:
                         {
                             // Don't touch it!

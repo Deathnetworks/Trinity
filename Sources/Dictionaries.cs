@@ -526,7 +526,7 @@ namespace GilesTrinity
         /// <summary>
         /// Caches the GilesObjectType of each object as we find it (RactorGUID based)
         /// </summary>
-        private static Dictionary<int, ObjectType> dictGilesObjectTypeCache = new Dictionary<int, ObjectType>();
+        private static Dictionary<int, GObjectType> dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
         /// <summary>
         /// Caches monster affixes for the monster ID, as this value can be a pain to get and slow (RactorGUID based)
         /// </summary>

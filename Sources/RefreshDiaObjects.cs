@@ -51,7 +51,7 @@ namespace GilesTrinity
                     CurrentTarget = new GilesObject()
                         {
                             Position = vAnySafePoint,
-                            Type = ObjectType.Avoidance,
+                            Type = GObjectType.Avoidance,
                             Weight = 20000,
                             CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
                             RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
@@ -83,7 +83,7 @@ namespace GilesTrinity
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
-                                        Type = ObjectType.Avoidance,
+                                        Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
@@ -102,7 +102,7 @@ namespace GilesTrinity
                 return;
             }
             // Ok record the time we last saw any unit at all
-            if (CurrentTarget.Type == ObjectType.Unit)
+            if (CurrentTarget.Type == GObjectType.Unit)
             {
                 lastHadUnitInSights = DateTime.Now;
                 // And record when we last saw any form of elite
@@ -120,7 +120,7 @@ namespace GilesTrinity
             else
             {
                 // We're sticking to the same target, so update the target's health cache to check for stucks
-                if (CurrentTarget.Type == ObjectType.Unit)
+                if (CurrentTarget.Type == GObjectType.Unit)
                 {
                     // Check if the health has changed, if so update the target-pick time before we blacklist them again
                     if (CurrentTarget.HitPoints != iTargetLastHealth)
@@ -219,7 +219,7 @@ namespace GilesTrinity
                 {
                     case 1:
                         dictGilesVectorCache = new Dictionary<int, Vector3>();
-                        dictGilesObjectTypeCache = new Dictionary<int, ObjectType>();
+                        dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
                         dictGilesActorSNOCache = new Dictionary<int, int>();
                         dictGilesACDGUIDCache = new Dictionary<int, int>();
                         dictGilesLastHealthCache = new Dictionary<int, double>();
@@ -533,7 +533,7 @@ namespace GilesTrinity
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
-                                        Type = ObjectType.Avoidance,
+                                        Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
@@ -571,7 +571,7 @@ namespace GilesTrinity
                     CurrentTarget = new GilesObject()
                                         {
                                             Position = vBacktrackList[iTotalBacktracks],
-                                            Type = ObjectType.Backtrack,
+                                            Type = GObjectType.Backtrack,
                                             Weight = 20000,
                                             CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
                                             RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
@@ -611,7 +611,7 @@ namespace GilesTrinity
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
-                                        Type = ObjectType.Avoidance,
+                                        Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
@@ -626,7 +626,7 @@ namespace GilesTrinity
                 CurrentTarget = new GilesObject()
                                     {
                                         Position = playerStatus.CurrentPosition,
-                                        Type = ObjectType.Avoidance,
+                                        Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
@@ -638,7 +638,7 @@ namespace GilesTrinity
         {
             TryToKite = false;
 
-            if (CurrentTarget != null && CurrentTarget.Type == ObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
+            if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
             {
                 TryToKite = true;
                 vKitePointAvoid = playerStatus.CurrentPosition;
@@ -674,7 +674,7 @@ namespace GilesTrinity
                     CurrentTarget = new GilesObject()
                                         {
                                             Position = vAnySafePoint,
-                                            Type = ObjectType.Avoidance,
+                                            Type = GObjectType.Avoidance,
                                             Weight = 20000,
                                             CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
                                             RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),

@@ -20,7 +20,7 @@ namespace GilesTrinity.Cache
         private static CacheObjectRefresherDelegate _CacheObjectRefresher;
         private static readonly object _Synchronizer = new object();
         private static Thread _CacheCleaner;
-        private static readonly IDictionary<ObjectType, uint> _CacheTimeout = new Dictionary<ObjectType, uint>();
+        private static readonly IDictionary<GObjectType, uint> _CacheTimeout = new Dictionary<GObjectType, uint>();
         private static uint _MaxRefreshRate = 300;
         #endregion Fields
 
@@ -64,10 +64,10 @@ namespace GilesTrinity.Cache
         }
 
         /// <summary>
-        /// Gets the cache timeout by <see cref="ObjectType"/>.
+        /// Gets the cache timeout by <see cref="GObjectType"/>.
         /// </summary>
         /// <value>The cache timeout.</value>
-        public static IDictionary<ObjectType, uint> CacheTimeout
+        public static IDictionary<GObjectType, uint> CacheTimeout
         {
             get
             {
@@ -109,27 +109,27 @@ namespace GilesTrinity.Cache
                     throw new InvalidOperationException("CacheManager is already initialized.");
                 }
 
-                _CacheTimeout.Add(ObjectType.Avoidance, 60000);
-                _CacheTimeout.Add(ObjectType.Backtrack, 60000);
-                _CacheTimeout.Add(ObjectType.Barricade, 60000);
-                _CacheTimeout.Add(ObjectType.Checkpoint, 60000);
-                _CacheTimeout.Add(ObjectType.Container, 60000);
-                _CacheTimeout.Add(ObjectType.Destructible, 60000);
-                _CacheTimeout.Add(ObjectType.Door, 60000);
-                _CacheTimeout.Add(ObjectType.Globe, 60000);
-                _CacheTimeout.Add(ObjectType.Gold, 120000);
-                _CacheTimeout.Add(ObjectType.HealthWell, 60000);
-                _CacheTimeout.Add(ObjectType.Interactable, 60000);
-                _CacheTimeout.Add(ObjectType.Item, 120000);
-                _CacheTimeout.Add(ObjectType.MarkerLocation, 60000);
-                _CacheTimeout.Add(ObjectType.Proxy, 60000);
-                _CacheTimeout.Add(ObjectType.Shrine, 60000);
-                _CacheTimeout.Add(ObjectType.ServerProp, 60000);
-                _CacheTimeout.Add(ObjectType.StartLocation, 60000);
-                _CacheTimeout.Add(ObjectType.SavePoint, 60000);
-                _CacheTimeout.Add(ObjectType.Trigger, 60000);
-                _CacheTimeout.Add(ObjectType.Unit, 120000);
-                _CacheTimeout.Add(ObjectType.Unknown, 60000);
+                _CacheTimeout.Add(GObjectType.Avoidance, 60000);
+                _CacheTimeout.Add(GObjectType.Backtrack, 60000);
+                _CacheTimeout.Add(GObjectType.Barricade, 60000);
+                _CacheTimeout.Add(GObjectType.Checkpoint, 60000);
+                _CacheTimeout.Add(GObjectType.Container, 60000);
+                _CacheTimeout.Add(GObjectType.Destructible, 60000);
+                _CacheTimeout.Add(GObjectType.Door, 60000);
+                _CacheTimeout.Add(GObjectType.Globe, 60000);
+                _CacheTimeout.Add(GObjectType.Gold, 120000);
+                _CacheTimeout.Add(GObjectType.HealthWell, 60000);
+                _CacheTimeout.Add(GObjectType.Interactable, 60000);
+                _CacheTimeout.Add(GObjectType.Item, 120000);
+                _CacheTimeout.Add(GObjectType.MarkerLocation, 60000);
+                _CacheTimeout.Add(GObjectType.Proxy, 60000);
+                _CacheTimeout.Add(GObjectType.Shrine, 60000);
+                _CacheTimeout.Add(GObjectType.ServerProp, 60000);
+                _CacheTimeout.Add(GObjectType.StartLocation, 60000);
+                _CacheTimeout.Add(GObjectType.SavePoint, 60000);
+                _CacheTimeout.Add(GObjectType.Trigger, 60000);
+                _CacheTimeout.Add(GObjectType.Unit, 120000);
+                _CacheTimeout.Add(GObjectType.Unknown, 60000);
 
                 _CacheCleaner = new Thread(MaintainCache);
                 _CacheCleaner.Priority = ThreadPriority.Lowest;

@@ -528,7 +528,7 @@ namespace GilesTrinity
         // private static GilesObject cacheEntry = null;
 
         private static Vector3 c_Position = Vector3.Zero;
-        private static ObjectType c_ObjectType = ObjectType.Unknown;
+        private static GObjectType c_ObjectType = GObjectType.Unknown;
         private static double c_Weight = 0d;
         private static double c_HitPoints = 0d;
         private static float c_CentreDistance = 0f;

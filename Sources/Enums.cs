@@ -83,7 +83,7 @@
     /// <summary>
     /// Generic object types - eg a monster, an item to pickup, a shrine to click etc.
     /// </summary>
-    public enum ObjectType
+    public enum GObjectType
     {
         Unknown,
         Unit,

@@ -11,7 +11,7 @@ namespace GilesTrinity
     internal class GilesObject
     {
         // Generic stuff applicable to all objects
-        public ObjectType Type { get; set; }
+        public GObjectType Type { get; set; }
         public double Weight { get; set; }
         public Vector3 Position { get; set; }
         public float CentreDistance { get; set; }

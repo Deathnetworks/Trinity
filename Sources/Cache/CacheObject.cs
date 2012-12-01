@@ -26,7 +26,7 @@ namespace GilesTrinity.Cache
         public CacheObject(int rActorGuid)
         {
             RActorGuid = rActorGuid;
-            Type = ObjectType.Unknown;
+            Type = GObjectType.Unknown;
             LastAccessDate = DateTime.UtcNow;
 
             CacheType = Cache.CacheType.Other;
@@ -36,7 +36,7 @@ namespace GilesTrinity.Cache
         {
             RActorGuid = acd.AsRActor.RActorGuid;
             
-            Type = ObjectType.Unknown;
+            Type = GObjectType.Unknown;
             CacheType = Cache.CacheType.Other;
             LastAccessDate = DateTime.UtcNow;
 
@@ -74,7 +74,7 @@ namespace GilesTrinity.Cache
         /// Gets or sets the object type.
         /// </summary>
         /// <value>The object type.</value>
-        public ObjectType Type
+        public GObjectType Type
         {
             get;
             set;
@@ -123,7 +123,7 @@ namespace GilesTrinity.Cache
         /// <summary>
         /// Gets the Trinity ObjectType
         /// </summary>
-        public ObjectType ObjectType { get; set; }
+        public GObjectType ObjectType { get; set; }
 
         /// <summary>
         /// Gets the Distance to the center of the object
