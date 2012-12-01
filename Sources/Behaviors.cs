@@ -1379,11 +1379,11 @@ namespace GilesTrinity
             if (!_hashsetItemPicksLookedAt.Contains(CurrentTarget.RActorGuid))
             {
                 _hashsetItemPicksLookedAt.Add(CurrentTarget.RActorGuid);
-                ItemType thisgilesitemtype = DetermineItemType(CurrentTarget.InternalName, CurrentTarget.DBItemType, CurrentTarget.FollowerType);
-                ItemBaseType thisgilesbasetype = DetermineBaseType(thisgilesitemtype);
-                if (thisgilesbasetype == ItemBaseType.Armor || thisgilesbasetype == ItemBaseType.WeaponOneHand || thisgilesbasetype == ItemBaseType.WeaponTwoHand ||
-                    thisgilesbasetype == ItemBaseType.WeaponRange || thisgilesbasetype == ItemBaseType.Jewelry || thisgilesbasetype == ItemBaseType.FollowerItem ||
-                    thisgilesbasetype == ItemBaseType.Offhand)
+                GItemType thisgilesitemtype = DetermineItemType(CurrentTarget.InternalName, CurrentTarget.DBItemType, CurrentTarget.FollowerType);
+                GItemBaseType thisgilesbasetype = DetermineBaseType(thisgilesitemtype);
+                if (thisgilesbasetype == GItemBaseType.Armor || thisgilesbasetype == GItemBaseType.WeaponOneHand || thisgilesbasetype == GItemBaseType.WeaponTwoHand ||
+                    thisgilesbasetype == GItemBaseType.WeaponRange || thisgilesbasetype == GItemBaseType.Jewelry || thisgilesbasetype == GItemBaseType.FollowerItem ||
+                    thisgilesbasetype == GItemBaseType.Offhand)
                 {
                     int iQuality;
                     ItemsPickedStats.Total++;
@@ -1399,28 +1399,28 @@ namespace GilesTrinity
                     ItemsPickedStats.TotalPerLevel[CurrentTarget.Level]++;
                     ItemsPickedStats.TotalPerQPerL[iQuality, CurrentTarget.Level]++;
                 }
-                else if (thisgilesbasetype == ItemBaseType.Gem)
+                else if (thisgilesbasetype == GItemBaseType.Gem)
                 {
                     int iGemType = 0;
                     ItemsPickedStats.TotalGems++;
-                    if (thisgilesitemtype == ItemType.Topaz)
+                    if (thisgilesitemtype == GItemType.Topaz)
                         iGemType = GEMTOPAZ;
-                    if (thisgilesitemtype == ItemType.Ruby)
+                    if (thisgilesitemtype == GItemType.Ruby)
                         iGemType = GEMRUBY;
-                    if (thisgilesitemtype == ItemType.Emerald)
+                    if (thisgilesitemtype == GItemType.Emerald)
                         iGemType = GEMEMERALD;
-                    if (thisgilesitemtype == ItemType.Amethyst)
+                    if (thisgilesitemtype == GItemType.Amethyst)
                         iGemType = GEMAMETHYST;
                     ItemsPickedStats.GemsPerType[iGemType]++;
                     ItemsPickedStats.GemsPerLevel[CurrentTarget.Level]++;
                     ItemsPickedStats.GemsPerTPerL[iGemType, CurrentTarget.Level]++;
                 }
-                else if (thisgilesitemtype == ItemType.HealthPotion)
+                else if (thisgilesitemtype == GItemType.HealthPotion)
                 {
                     ItemsPickedStats.TotalPotions++;
                     ItemsPickedStats.PotionsPerLevel[CurrentTarget.Level]++;
                 }
-                else if (c_item_GItemType == ItemType.InfernalKey)
+                else if (c_item_GItemType == GItemType.InfernalKey)
                 {
                     ItemsPickedStats.TotalInfernalKeys++;
                 }

@@ -91,6 +91,15 @@ namespace GilesTrinity
             dictRandomID = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;
             iDeathsThisRun = 0;
+            try
+            {
+                CacheManager.Destroy();
+            }
+            catch (Exception ex)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Error Destroying CacheManager");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
+            }
         }
 
         /// <summary>

@@ -547,9 +547,9 @@ namespace GilesTrinity
         private static int c_GoldStackSize = 0;
         private static bool c_IsOneHandedItem = false;
         private static ItemQuality c_ItemQuality = ItemQuality.Invalid;
-        private static Zeta.Internals.Actors.ItemType c_DBItemType = Zeta.Internals.Actors.ItemType.Unknown;
+        private static ItemType c_DBItemType = ItemType.Unknown;
         private static FollowerType c_item_tFollowerType = FollowerType.None;
-        private static ItemType c_item_GItemType = ItemType.Unknown;
+        private static GItemType c_item_GItemType = GItemType.Unknown;
         private static MonsterSize c_unit_MonsterSize = MonsterSize.Unknown;
         private static DiaObject c_diaObject = null;
         private static ACD c_CommonData = null;

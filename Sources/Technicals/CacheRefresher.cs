@@ -9,7 +9,7 @@ using Zeta.Internals.Actors.Gizmos;
 using GilesTrinity;
 using Zeta.CommonBot;
 
-namespace GilesTrinity.Technicals
+namespace GilesTrinity.Cache
 {
     internal static class CacheRefresher
     {

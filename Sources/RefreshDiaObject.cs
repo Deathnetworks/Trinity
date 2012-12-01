@@ -215,9 +215,9 @@ namespace GilesTrinity
             c_ForceLeapAgainst = false;
             c_IsObstacle = false;
             c_ItemQuality = ItemQuality.Invalid;
-            c_DBItemType = Zeta.Internals.Actors.ItemType.Unknown;
+            c_DBItemType = ItemType.Unknown;
             c_item_tFollowerType = FollowerType.None;
-            c_item_GItemType = ItemType.Unknown;
+            c_item_GItemType = GItemType.Unknown;
             c_unit_MonsterSize = MonsterSize.Unknown;
             c_diaObject = null;
             c_CurrentAnimation = SNOAnim.Invalid;
@@ -971,9 +971,9 @@ namespace GilesTrinity
             // Calculate custom Giles item type
             c_item_GItemType = DetermineItemType(c_Name, c_DBItemType, c_item_tFollowerType);
             // And temporarily store the base type
-            ItemBaseType itemBaseType = DetermineBaseType(c_item_GItemType);
+            GItemBaseType itemBaseType = DetermineBaseType(c_item_GItemType);
             // Treat all globes as a yes
-            if (c_item_GItemType == ItemType.HealthGlobe)
+            if (c_item_GItemType == GItemType.HealthGlobe)
             {
                 c_ObjectType = ObjectType.Globe;
                 // Create or alter this cached object type
@@ -987,7 +987,7 @@ namespace GilesTrinity
 
             // Quality of item for "genuine" items
             c_ItemQuality = ItemQuality.Invalid;
-            if (itemBaseType != ItemBaseType.Unknown && itemBaseType != ItemBaseType.HealthGlobe && itemBaseType != ItemBaseType.Gem && itemBaseType != ItemBaseType.Misc &&
+            if (itemBaseType != GItemBaseType.Unknown && itemBaseType != GItemBaseType.HealthGlobe && itemBaseType != GItemBaseType.Gem && itemBaseType != GItemBaseType.Misc &&
                 !hashForceSNOToItemList.Contains(c_ActorSNO))
             {
                 // Get the quality of this item, cached if possible

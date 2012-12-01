@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Zeta;
 using Zeta.Common;
 using Db = Zeta.Internals.Actors;
+using GilesTrinity;
 
 namespace GilesTrinity.Cache
 {
@@ -120,7 +121,7 @@ namespace GilesTrinity.Cache
             private set;
         }
 
-        public GBaseItemType BaseType
+        public GItemBaseType BaseType
         {
             get;
             private set;
@@ -369,29 +370,29 @@ namespace GilesTrinity.Cache
         /// </summary>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        private static GBaseItemType DetermineBaseType(GItemType itemType)
+        private static GItemBaseType DetermineBaseType(GItemType itemType)
         {
-            GBaseItemType baseType = GBaseItemType.Unknown;
+            GItemBaseType baseType = GItemBaseType.Unknown;
             if (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
                 itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
                 itemType == GItemType.Spear || itemType == GItemType.Sword || itemType == GItemType.Wand)
             {
-                baseType = GBaseItemType.WeaponOneHand;
+                baseType = GItemBaseType.WeaponOneHand;
             }
             else if (itemType == GItemType.TwoHandDaibo || itemType == GItemType.TwoHandMace ||
                 itemType == GItemType.TwoHandMighty || itemType == GItemType.TwoHandPolearm || itemType == GItemType.TwoHandStaff ||
                 itemType == GItemType.TwoHandSword || itemType == GItemType.TwoHandAxe)
             {
-                baseType = GBaseItemType.WeaponTwoHand;
+                baseType = GItemBaseType.WeaponTwoHand;
             }
             else if (itemType == GItemType.TwoHandCrossbow || itemType == GItemType.HandCrossbow || itemType == GItemType.TwoHandBow)
             {
-                baseType = GBaseItemType.WeaponRange;
+                baseType = GItemBaseType.WeaponRange;
             }
             else if (itemType == GItemType.Mojo || itemType == GItemType.Orb ||
                 itemType == GItemType.Quiver || itemType == GItemType.Shield)
             {
-                baseType = GBaseItemType.Offhand;
+                baseType = GItemBaseType.Offhand;
             }
             else if (itemType == GItemType.Boots || itemType == GItemType.Bracer || itemType == GItemType.Chest ||
                 itemType == GItemType.Cloak || itemType == GItemType.Gloves || itemType == GItemType.Helm ||
@@ -399,31 +400,31 @@ namespace GilesTrinity.Cache
                 itemType == GItemType.VoodooMask || itemType == GItemType.WizardHat || itemType == GItemType.Belt ||
                 itemType == GItemType.MightyBelt)
             {
-                baseType = GBaseItemType.Armor;
+                baseType = GItemBaseType.Armor;
             }
             else if (itemType == GItemType.Amulet || itemType == GItemType.Ring)
             {
-                baseType = GBaseItemType.Jewelry;
+                baseType = GItemBaseType.Jewelry;
             }
             else if (itemType == GItemType.FollowerEnchantress || itemType == GItemType.FollowerScoundrel ||
                 itemType == GItemType.FollowerTemplar)
             {
-                baseType = GBaseItemType.FollowerItem;
+                baseType = GItemBaseType.FollowerItem;
             }
             else if (itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome ||
                 itemType == GItemType.SpecialItem || itemType == GItemType.CraftingPlan || itemType == GItemType.HealthPotion ||
                 itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey)
             {
-                baseType = GBaseItemType.Misc;
+                baseType = GItemBaseType.Misc;
             }
             else if (itemType == GItemType.Ruby || itemType == GItemType.Emerald || itemType == GItemType.Topaz ||
                 itemType == GItemType.Amethyst)
             {
-                baseType = GBaseItemType.Gem;
+                baseType = GItemBaseType.Gem;
             }
             else if (itemType == GItemType.HealthGlobe)
             {
-                baseType = GBaseItemType.HealthGlobe;
+                baseType = GItemBaseType.HealthGlobe;
             }
             return baseType;
         }

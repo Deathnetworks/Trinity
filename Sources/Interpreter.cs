@@ -544,14 +544,14 @@ namespace GilesTrinity.ItemRules
                     return item.ItemBaseType.ToString();
                 case "[TYPE]":
                     // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
-                    if (item.ItemType == Zeta.Internals.Actors.ItemType.Unknown && item.Name.Contains("Plan"))
-                        result = Zeta.Internals.Actors.ItemType.CraftingPlan.ToString();
+                    if (item.ItemType == ItemType.Unknown && item.Name.Contains("Plan"))
+                        result = ItemType.CraftingPlan.ToString();
                     else
                         result = item.ItemType.ToString();
                     return result;
                 case "[QUALITY]":
                     // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
-                    if ((item.ItemType == Zeta.Internals.Actors.ItemType.Unknown && item.Name.Contains("Plan")) || item.ItemType == Zeta.Internals.Actors.ItemType.CraftingPlan)
+                    if ((item.ItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.ItemType == ItemType.CraftingPlan)
                     {
                         if (item.Name.Contains("ffbf642f"))
                             result = ItemQuality.Legendary.ToString();

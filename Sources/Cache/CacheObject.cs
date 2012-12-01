@@ -29,7 +29,7 @@ namespace GilesTrinity.Cache
             Type = ObjectType.Unknown;
             LastAccessDate = DateTime.UtcNow;
 
-            CacheType = Technicals.CacheType.Other;
+            CacheType = Cache.CacheType.Other;
 
         }
         public CacheObject(ACD acd)
@@ -37,7 +37,7 @@ namespace GilesTrinity.Cache
             RActorGuid = acd.AsRActor.RActorGuid;
             
             Type = ObjectType.Unknown;
-            CacheType = Technicals.CacheType.Other;
+            CacheType = Cache.CacheType.Other;
             LastAccessDate = DateTime.UtcNow;
 
         }
@@ -264,9 +264,9 @@ namespace GilesTrinity.Cache
     /// <summary>
     /// Cached Items
     /// </summary>
-    internal class CacheItem : CacheObject
+    internal class CacheItem2 : CacheObject
     {
-        public CacheItem(int rActorGUID)
+        public CacheItem2(int rActorGUID)
             : base(rActorGUID)
         {
 
@@ -275,9 +275,9 @@ namespace GilesTrinity.Cache
         /// Gets the DiaItem
         /// </summary>
         public DiaItem InternalItem { get; set; }
-        public ItemType ItemType { get; set; }
+        public GItemType ItemType { get; set; }
         public ItemQuality ItemQuality { get; set; }
-        public ItemType InternalItemType { get; set; }
+        public GItemType InternalItemType { get; set; }
         public FollowerType FollowerType { get; set; }
         public int ItemLevel { get; set; }
         public int GoldStackSize { get; set; }

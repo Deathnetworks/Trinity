@@ -18,7 +18,7 @@ namespace GilesTrinity
         public bool OneHanded { get; set; }
         public bool TwoHanded { get; set; }
         public DyeType DyeType { get; set; }
-        public Zeta.Internals.Actors.ItemType DBItemType { get; set; }
+        public ItemType DBItemType { get; set; }
         public Zeta.Internals.Actors.ItemBaseType DBBaseType { get; set; }
         public FollowerType FollowerType { get; set; }
         public bool IsUnidentified { get; set; }
@@ -92,7 +92,7 @@ namespace GilesTrinity
             bool oneHanded, 
             bool twoHanded,
             DyeType dyeType, 
-            Zeta.Internals.Actors.ItemType itemType,
+            ItemType itemType,
             Zeta.Internals.Actors.ItemBaseType itembasetype, 
             FollowerType followerType, 
             bool unidentified, 

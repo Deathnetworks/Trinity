@@ -3,7 +3,7 @@
     /// <summary>
     /// Primary "lowest level" item type (eg EXACTLY what kind of item it is)
     /// </summary>
-    public enum ItemType
+    public enum GItemType
     {
         Unknown,
         Axe,
@@ -65,7 +65,7 @@
     /// <summary>
     /// Base types, eg "one handed weapons" "armors" etc.
     /// </summary>
-    public enum ItemBaseType
+    public enum GItemBaseType
     {
         Unknown,
         WeaponOneHand,

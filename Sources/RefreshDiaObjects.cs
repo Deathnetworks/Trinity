@@ -345,14 +345,14 @@ namespace GilesTrinity
             }
         }
 
-        private static void RefreshItemStats(ItemBaseType tempbasetype)
+        private static void RefreshItemStats(GItemBaseType tempbasetype)
         {
             if (!_hashsetItemStatsLookedAt.Contains(c_RActorGuid))
             {
                 _hashsetItemStatsLookedAt.Add(c_RActorGuid);
-                if (tempbasetype == ItemBaseType.Armor || tempbasetype == ItemBaseType.WeaponOneHand || tempbasetype == ItemBaseType.WeaponTwoHand ||
-                    tempbasetype == ItemBaseType.WeaponRange || tempbasetype == ItemBaseType.Jewelry || tempbasetype == ItemBaseType.FollowerItem ||
-                    tempbasetype == ItemBaseType.Offhand)
+                if (tempbasetype == GItemBaseType.Armor || tempbasetype == GItemBaseType.WeaponOneHand || tempbasetype == GItemBaseType.WeaponTwoHand ||
+                    tempbasetype == GItemBaseType.WeaponRange || tempbasetype == GItemBaseType.Jewelry || tempbasetype == GItemBaseType.FollowerItem ||
+                    tempbasetype == GItemBaseType.Offhand)
                 {
                     int iThisQuality;
                     ItemsDroppedStats.Total++;
@@ -368,28 +368,28 @@ namespace GilesTrinity
                     ItemsDroppedStats.TotalPerLevel[c_ItemLevel]++;
                     ItemsDroppedStats.TotalPerQPerL[iThisQuality, c_ItemLevel]++;
                 }
-                else if (tempbasetype == ItemBaseType.Gem)
+                else if (tempbasetype == GItemBaseType.Gem)
                 {
                     int iThisGemType = 0;
                     ItemsDroppedStats.TotalGems++;
-                    if (c_item_GItemType == ItemType.Topaz)
+                    if (c_item_GItemType == GItemType.Topaz)
                         iThisGemType = GEMTOPAZ;
-                    if (c_item_GItemType == ItemType.Ruby)
+                    if (c_item_GItemType == GItemType.Ruby)
                         iThisGemType = GEMRUBY;
-                    if (c_item_GItemType == ItemType.Emerald)
+                    if (c_item_GItemType == GItemType.Emerald)
                         iThisGemType = GEMEMERALD;
-                    if (c_item_GItemType == ItemType.Amethyst)
+                    if (c_item_GItemType == GItemType.Amethyst)
                         iThisGemType = GEMAMETHYST;
                     ItemsDroppedStats.GemsPerType[iThisGemType]++;
                     ItemsDroppedStats.GemsPerLevel[c_ItemLevel]++;
                     ItemsDroppedStats.GemsPerTPerL[iThisGemType, c_ItemLevel]++;
                 }
-                else if (c_item_GItemType == ItemType.HealthPotion)
+                else if (c_item_GItemType == GItemType.HealthPotion)
                 {
                     ItemsDroppedStats.TotalPotions++;
                     ItemsDroppedStats.PotionsPerLevel[c_ItemLevel]++;
                 }
-                else if (c_item_GItemType == ItemType.InfernalKey)
+                else if (c_item_GItemType == GItemType.InfernalKey)
                 {
                     ItemsDroppedStats.TotalInfernalKeys++;
                 }
