@@ -620,6 +620,6 @@ namespace GilesTrinity
         private static float fDistanceReduction = 0f;
 
         // Darkfriend's Looting Rule
-        private static Interpreter StashRule = new Interpreter();
+        public static Interpreter StashRule = new Interpreter();
     }
 }

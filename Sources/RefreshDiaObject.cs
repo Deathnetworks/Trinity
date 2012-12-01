@@ -1662,30 +1662,35 @@ namespace GilesTrinity
             try
             {
 
-                bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
-                if (!isNavigable)
+                if (c_ObjectType == GObjectType.Unit)
                 {
-                    AddToCache = false;
-                    c_IgnoreSubStep = "NotNavigable";
+                    bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
+
+                    if (!isNavigable)
+                    {
+                        AddToCache = false;
+                        c_IgnoreSubStep = "NotNavigable";
+                    }
+                    // Ignore units not in LoS except bosses, rares, champs
+                    if (c_ObjectType == GObjectType.Unit && !c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
+                    {
+                        AddToCache = false;
+                        c_IgnoreSubStep = "UnitNotInLoS";
+                    }
+                    // always set true for bosses nearby
+                    if (c_unit_IsBoss && c_RadiusDistance < 100f)
+                    {
+                        AddToCache = true;
+                        c_IgnoreSubStep = "";
+                    }
+                    // always take the current target even if not in LoS
+                    if (c_RActorGuid == CurrentTargetRactorGUID)
+                    {
+                        AddToCache = true;
+                        c_IgnoreSubStep = "";
+                    }
                 }
-                // Ignore units not in LoS except bosses, rares, champs
-                if (c_ObjectType == GObjectType.Unit && !c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
-                {
-                    AddToCache = false;
-                    c_IgnoreSubStep = "UnitNotInLoS";
-                }
-                // always set true for bosses nearby
-                if (c_unit_IsBoss && c_RadiusDistance < 100f)
-                {
-                    AddToCache = true;
-                    c_IgnoreSubStep = "";
-                }
-                // always take the current target even if not in LoS
-                if (c_RActorGuid == CurrentTargetRactorGUID)
-                {
-                    AddToCache = true;
-                    c_IgnoreSubStep = "";
-                }
+
                 // Simple whitelist for LoS 
                 if (LineOfSightWhitelist.Contains(c_ActorSNO))
                 {
@@ -1698,6 +1703,8 @@ namespace GilesTrinity
                     AddToCache = true;
                     c_IgnoreSubStep = "";
                 }
+
+
                 //if (!thisobj.InLineOfSight && thisobj.ZDiff < 14f && !tmp_unit_bThisBoss)
                 //{
                 //    bWantThis = false;

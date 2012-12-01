@@ -270,7 +270,7 @@ namespace GilesTrinity
         }
 
         // When the bot stops, output a final item-stats report so it is as up-to-date as can be
-        private void GilesTrinityHandleBotStop(IBot bot)
+        private void TrinityBotStop(IBot bot)
         {
             // Issue final reports
             OutputReport();

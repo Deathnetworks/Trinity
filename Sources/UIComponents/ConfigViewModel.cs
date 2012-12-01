@@ -187,6 +187,15 @@ namespace GilesTrinity.UIComponents
         }
 
         /// <summary>
+        /// Reloads Script Rules
+        /// </summary>
+        public ICommand ReloadScriptRulesCommand
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets the reset command for Advanced Tab.
         /// </summary>
         /// <value>The reset command for Advanced Tab.</value>
@@ -430,6 +439,12 @@ namespace GilesTrinity.UIComponents
                                     {
                                         _Model.Loot.Pickup.Reset();
                                     });
+            ReloadScriptRulesCommand = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        GilesTrinity.StashRule.init();
+                                    }
+                                    );
             ResetTownRunCommand = new RelayCommand(
                                     (parameter) =>
                                     {

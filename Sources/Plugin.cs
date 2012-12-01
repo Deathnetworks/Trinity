@@ -92,51 +92,14 @@ namespace GilesTrinity
 
             sTrinityEmailConfigFile = Path.GetDirectoryName(sDemonBuddyPath) + @"\Settings\" + battleTagName + @"-Email.cfg";
 
-            //Logging.WriteDiagnostic("Trinity Initialization, settings location=" + sTrinityConfigFile);
-
-            BotMain.OnStart += GilesTrinityStart;
-            // Force logging to disabled
-            //if (bDisableFileLogging)
-            //    Zeta.Common.Logging.LogFileLevel = Zeta.Common.LogLevel.None;
+            BotMain.OnStart += TrinityBotStart;
+            BotMain.OnStop += TrinityBotStop;
 
             // Set up the pause button
             Application.Current.Dispatcher.Invoke(
-            new System.Action(
-            () =>
-            {
-                Window mainWindow = Application.Current.MainWindow;
-                try
-                {
-                    mainWindow.Title = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
-                }
-                catch { }
-                var tab = mainWindow.FindName("tabControlMain") as TabControl;
-                if (tab == null) return;
-                var infoDumpTab = tab.Items[0] as TabItem;
-                if (infoDumpTab == null) return;
-                btnPauseBot = new Button
-                {
-                    Width = 100,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Top,
-                    Margin = new Thickness(232, 6, 0, 0),
-                    Content = "Pause Bot"
-                };
-                btnPauseBot.Click += buttonPause_Click;
-                btnTownRun = new Button
-                {
-                    Width = 100,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Top,
-                    Margin = new Thickness(232, 32, 0, 0),
-                    Content = "Force Town Run"
-                };
-                btnTownRun.Click += buttonTownRun_Click;
-                var grid = infoDumpTab.Content as Grid;
-                if (grid == null) return;
-                grid.Children.Add(btnPauseBot);
-                grid.Children.Add(btnTownRun);
-            }));
+
+            PaintMainWindowButtons(battleTagName));
+
             if (!Directory.Exists(sTrinityPluginPath))
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error - cannot enable plugin. Invalid path: {0}", sTrinityPluginPath);
@@ -147,11 +110,12 @@ namespace GilesTrinity
             {
                 bMappedPlayerAbilities = false;
                 bPluginEnabled = true;
+
                 LoadConfiguration();
+
                 Navigator.PlayerMover = new GilesPlayerMover();
                 Navigator.StuckHandler = new GilesStuckHandler();
                 GameEvents.OnPlayerDied += GilesTrinityOnDeath;
-                BotMain.OnStop += GilesTrinityHandleBotStop;
                 GameEvents.OnGameJoined += GilesTrinityOnJoinGame;
                 GameEvents.OnGameLeft += GilesTrinityOnLeaveGame;
                 ITargetingProvider newCombatTargetingProvider = new GilesCombatTargetingReplacer();
@@ -160,10 +124,11 @@ namespace GilesTrinity
                 LootTargeting.Instance.Provider = newLootTargetingProvider;
                 ITargetingProvider newObstacleTargetingProvider = new GilesObstacleTargetingProvider();
                 ObstacleTargeting.Instance.Provider = newObstacleTargetingProvider;
+
                 // Safety check incase DB "OnStart" event didn't fire properly
                 if (BotMain.IsRunning)
                 {
-                    GilesTrinityStart(null);
+                    TrinityBotStart(null);
                     if (ZetaDia.IsInGame)
                         GilesTrinityOnJoinGame(null, null);
                 }
@@ -172,6 +137,7 @@ namespace GilesTrinity
                 {
                     BotMain.TicksPerSecond = (int)Settings.Advanced.TPSLimit;
                 }
+
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
@@ -181,6 +147,51 @@ namespace GilesTrinity
                 StashRule.init();
             }
             catch { }
+        }
+
+        /// <summary>
+        /// Adds the Pause and Town Run buttons to Demonbuddy's main window. Sets Window Title.
+        /// </summary>
+        /// <param name="battleTagName"></param>
+        /// <returns></returns>
+        private static Action PaintMainWindowButtons(string battleTagName)
+        {
+            return new System.Action(
+                        () =>
+                        {
+                            Window mainWindow = Application.Current.MainWindow;
+                            try
+                            {
+                                mainWindow.Title = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
+                            }
+                            catch { }
+                            var tab = mainWindow.FindName("tabControlMain") as TabControl;
+                            if (tab == null) return;
+                            var infoDumpTab = tab.Items[0] as TabItem;
+                            if (infoDumpTab == null) return;
+                            btnPauseBot = new Button
+                            {
+                                Width = 100,
+                                HorizontalAlignment = HorizontalAlignment.Left,
+                                VerticalAlignment = VerticalAlignment.Top,
+                                Margin = new Thickness(232, 6, 0, 0),
+                                Content = "Pause Bot"
+                            };
+                            btnPauseBot.Click += buttonPause_Click;
+                            btnTownRun = new Button
+                            {
+                                Width = 100,
+                                HorizontalAlignment = HorizontalAlignment.Left,
+                                VerticalAlignment = VerticalAlignment.Top,
+                                Margin = new Thickness(232, 32, 0, 0),
+                                Content = "Force Town Run"
+                            };
+                            btnTownRun.Click += buttonTownRun_Click;
+                            var grid = infoDumpTab.Content as Grid;
+                            if (grid == null) return;
+                            grid.Children.Add(btnPauseBot);
+                            grid.Children.Add(btnTownRun);
+                        });
         }
 
         /// <summary>
@@ -195,7 +206,7 @@ namespace GilesTrinity
             LootTargeting.Instance.Provider = new DefaultLootTargetingProvider();
             ObstacleTargeting.Instance.Provider = new DefaultObstacleTargetingProvider();
             GameEvents.OnPlayerDied -= GilesTrinityOnDeath;
-            BotMain.OnStop -= GilesTrinityHandleBotStop;
+            BotMain.OnStop -= TrinityBotStop;
             GameEvents.OnGameJoined -= GilesTrinityOnJoinGame;
             GameEvents.OnGameLeft -= GilesTrinityOnLeaveGame;
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");

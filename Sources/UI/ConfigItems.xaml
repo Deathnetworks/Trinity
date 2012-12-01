@@ -9,7 +9,7 @@
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
             <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Template.xaml"/></ResourceDictionary.MergedDictionaries>
-            
+
             <ut:FlagsEnumValueConverter x:Key="flagsEnumValueConverter"/>
             <ut:EnumVisibilityConverter x:Key="enumVisibilityConverter" />
             <ut:IntToStringConverter x:Key="intToStringConverter"/>
@@ -24,7 +24,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>            
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <TextBlock FontWeight="Bold" Text="Choose Item Rules Type :" TextAlignment="Center" Margin="2"/>
@@ -75,59 +75,59 @@
                 <TextBlock Grid.Row="0" Grid.Column="3" FontWeight="Bold" Margin="2" Text="Misc Items:"/>
                 <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" Text="Weapons:"/>
                 <ComboBox Grid.Row="1" Grid.Column="1" SelectedValue="{Binding Path=Pickup.WeaponBlueLevel}" SelectedValuePath="Tag" Margin="8,2">
-                        <ComboBoxItem Content="None" Tag="0" />
-                        <ComboBoxItem Content="1+" Tag="1" />
-                        <ComboBoxItem Content="5+" Tag="5" />
-                        <ComboBoxItem Content="10+" Tag="10" />
-                        <ComboBoxItem Content="15+" Tag="15" />
-                        <ComboBoxItem Content="20+" Tag="20" />
-                        <ComboBoxItem Content="25+" Tag="25" />
-                        <ComboBoxItem Content="30+" Tag="30" />
-                        <ComboBoxItem Content="35+" Tag="35" />
-                        <ComboBoxItem Content="40+" Tag="40" />
-                        <ComboBoxItem Content="45+" Tag="45" />
-                        <ComboBoxItem Content="50+" Tag="50" />
-                        <ComboBoxItem Content="51+" Tag="51" />
-                        <ComboBoxItem Content="52+" Tag="52" />
-                        <ComboBoxItem Content="53+" Tag="53" />
-                        <ComboBoxItem Content="54+" Tag="54" />
-                        <ComboBoxItem Content="55+" Tag="55" />
-                        <ComboBoxItem Content="56+" Tag="56" />
-                        <ComboBoxItem Content="57+" Tag="57" />
-                        <ComboBoxItem Content="58+" Tag="58" />
-                        <ComboBoxItem Content="59+" Tag="59" />
-                        <ComboBoxItem Content="60+" Tag="60" />
-                        <ComboBoxItem Content="61+" Tag="61" />
-                        <ComboBoxItem Content="62+" Tag="62" />
-                        <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
-                    </ComboBox>
+                    <ComboBoxItem Content="None" Tag="0" />
+                    <ComboBoxItem Content="1+" Tag="1" />
+                    <ComboBoxItem Content="5+" Tag="5" />
+                    <ComboBoxItem Content="10+" Tag="10" />
+                    <ComboBoxItem Content="15+" Tag="15" />
+                    <ComboBoxItem Content="20+" Tag="20" />
+                    <ComboBoxItem Content="25+" Tag="25" />
+                    <ComboBoxItem Content="30+" Tag="30" />
+                    <ComboBoxItem Content="35+" Tag="35" />
+                    <ComboBoxItem Content="40+" Tag="40" />
+                    <ComboBoxItem Content="45+" Tag="45" />
+                    <ComboBoxItem Content="50+" Tag="50" />
+                    <ComboBoxItem Content="51+" Tag="51" />
+                    <ComboBoxItem Content="52+" Tag="52" />
+                    <ComboBoxItem Content="53+" Tag="53" />
+                    <ComboBoxItem Content="54+" Tag="54" />
+                    <ComboBoxItem Content="55+" Tag="55" />
+                    <ComboBoxItem Content="56+" Tag="56" />
+                    <ComboBoxItem Content="57+" Tag="57" />
+                    <ComboBoxItem Content="58+" Tag="58" />
+                    <ComboBoxItem Content="59+" Tag="59" />
+                    <ComboBoxItem Content="60+" Tag="60" />
+                    <ComboBoxItem Content="61+" Tag="61" />
+                    <ComboBoxItem Content="62+" Tag="62" />
+                    <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
+                </ComboBox>
                 <ComboBox Grid.Row="1" Grid.Column="2" SelectedValue="{Binding Path=Pickup.WeaponYellowLevel}" SelectedValuePath="Tag" Margin="8,2">
-                        <ComboBoxItem Content="None" Tag="0" />
-                        <ComboBoxItem Content="1+" Tag="1" />
-                        <ComboBoxItem Content="5+" Tag="5" />
-                        <ComboBoxItem Content="10+" Tag="10" />
-                        <ComboBoxItem Content="15+" Tag="15" />
-                        <ComboBoxItem Content="20+" Tag="20" />
-                        <ComboBoxItem Content="25+" Tag="25" />
-                        <ComboBoxItem Content="30+" Tag="30" />
-                        <ComboBoxItem Content="35+" Tag="35" />
-                        <ComboBoxItem Content="40+" Tag="40" />
-                        <ComboBoxItem Content="45+" Tag="45" />
-                        <ComboBoxItem Content="50+" Tag="50" />
-                        <ComboBoxItem Content="51+" Tag="51" />
-                        <ComboBoxItem Content="52+" Tag="52" />
-                        <ComboBoxItem Content="53+" Tag="53" />
-                        <ComboBoxItem Content="54+" Tag="54" />
-                        <ComboBoxItem Content="55+" Tag="55" />
-                        <ComboBoxItem Content="56+" Tag="56" />
-                        <ComboBoxItem Content="57+" Tag="57" />
-                        <ComboBoxItem Content="58+" Tag="58" />
-                        <ComboBoxItem Content="59+" Tag="59" />
-                        <ComboBoxItem Content="60+" Tag="60" />
-                        <ComboBoxItem Content="61+" Tag="61" />
-                        <ComboBoxItem Content="62+" Tag="62" />
-                        <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
-                    </ComboBox>
+                    <ComboBoxItem Content="None" Tag="0" />
+                    <ComboBoxItem Content="1+" Tag="1" />
+                    <ComboBoxItem Content="5+" Tag="5" />
+                    <ComboBoxItem Content="10+" Tag="10" />
+                    <ComboBoxItem Content="15+" Tag="15" />
+                    <ComboBoxItem Content="20+" Tag="20" />
+                    <ComboBoxItem Content="25+" Tag="25" />
+                    <ComboBoxItem Content="30+" Tag="30" />
+                    <ComboBoxItem Content="35+" Tag="35" />
+                    <ComboBoxItem Content="40+" Tag="40" />
+                    <ComboBoxItem Content="45+" Tag="45" />
+                    <ComboBoxItem Content="50+" Tag="50" />
+                    <ComboBoxItem Content="51+" Tag="51" />
+                    <ComboBoxItem Content="52+" Tag="52" />
+                    <ComboBoxItem Content="53+" Tag="53" />
+                    <ComboBoxItem Content="54+" Tag="54" />
+                    <ComboBoxItem Content="55+" Tag="55" />
+                    <ComboBoxItem Content="56+" Tag="56" />
+                    <ComboBoxItem Content="57+" Tag="57" />
+                    <ComboBoxItem Content="58+" Tag="58" />
+                    <ComboBoxItem Content="59+" Tag="59" />
+                    <ComboBoxItem Content="60+" Tag="60" />
+                    <ComboBoxItem Content="61+" Tag="61" />
+                    <ComboBoxItem Content="62+" Tag="62" />
+                    <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
+                </ComboBox>
                 <ComboBox Grid.Row="1" Grid.Column="3" SelectedValuePath="Tag" Margin="2" SelectedValue="{Binding Path=Pickup.MiscItemLevel}">
                     <ComboBoxItem Content="All Level Misc+" Tag="1" />
                     <ComboBoxItem Content="Inferno Misc+" IsSelected="True" Tag="60" />
@@ -161,117 +161,117 @@
                     <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
                 </ComboBox>
                 <ComboBox Grid.Row="2" Grid.Column="2" SelectedValue="{Binding Path=Pickup.ArmorYellowLevel}" SelectedValuePath="Tag" Margin="8,2">
-                        <ComboBoxItem Content="None" Tag="0" />
-                        <ComboBoxItem Content="1+" Tag="1" />
-                        <ComboBoxItem Content="5+" Tag="5" />
-                        <ComboBoxItem Content="10+" Tag="10" />
-                        <ComboBoxItem Content="15+" Tag="15" />
-                        <ComboBoxItem Content="20+" Tag="20" />
-                        <ComboBoxItem Content="25+" Tag="25" />
-                        <ComboBoxItem Content="30+" Tag="30" />
-                        <ComboBoxItem Content="35+" Tag="35" />
-                        <ComboBoxItem Content="40+" Tag="40" />
-                        <ComboBoxItem Content="45+" Tag="45" />
-                        <ComboBoxItem Content="50+" Tag="50" />
-                        <ComboBoxItem Content="51+" Tag="51" />
-                        <ComboBoxItem Content="52+" Tag="52" />
-                        <ComboBoxItem Content="53+" Tag="53" />
-                        <ComboBoxItem Content="54+" Tag="54" />
-                        <ComboBoxItem Content="55+" Tag="55" />
-                        <ComboBoxItem Content="56+" Tag="56" />
-                        <ComboBoxItem Content="57+" Tag="57" />
-                        <ComboBoxItem Content="58+" Tag="58" />
-                        <ComboBoxItem Content="59+" Tag="59" />
-                        <ComboBoxItem Content="60+" Tag="60" />
-                        <ComboBoxItem Content="61+" Tag="61" />
-                        <ComboBoxItem Content="62+" Tag="62" />
-                        <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
-                    </ComboBox>
+                    <ComboBoxItem Content="None" Tag="0" />
+                    <ComboBoxItem Content="1+" Tag="1" />
+                    <ComboBoxItem Content="5+" Tag="5" />
+                    <ComboBoxItem Content="10+" Tag="10" />
+                    <ComboBoxItem Content="15+" Tag="15" />
+                    <ComboBoxItem Content="20+" Tag="20" />
+                    <ComboBoxItem Content="25+" Tag="25" />
+                    <ComboBoxItem Content="30+" Tag="30" />
+                    <ComboBoxItem Content="35+" Tag="35" />
+                    <ComboBoxItem Content="40+" Tag="40" />
+                    <ComboBoxItem Content="45+" Tag="45" />
+                    <ComboBoxItem Content="50+" Tag="50" />
+                    <ComboBoxItem Content="51+" Tag="51" />
+                    <ComboBoxItem Content="52+" Tag="52" />
+                    <ComboBoxItem Content="53+" Tag="53" />
+                    <ComboBoxItem Content="54+" Tag="54" />
+                    <ComboBoxItem Content="55+" Tag="55" />
+                    <ComboBoxItem Content="56+" Tag="56" />
+                    <ComboBoxItem Content="57+" Tag="57" />
+                    <ComboBoxItem Content="58+" Tag="58" />
+                    <ComboBoxItem Content="59+" Tag="59" />
+                    <ComboBoxItem Content="60+" Tag="60" />
+                    <ComboBoxItem Content="61+" Tag="61" />
+                    <ComboBoxItem Content="62+" Tag="62" />
+                    <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
+                </ComboBox>
                 <CheckBox Grid.Row="2" Grid.Column="3" Content="Pickup Craft Tomes" IsChecked="{Binding Path=Pickup.CraftTomes}" Margin="2"/>
                 <TextBlock Grid.Row="3" Grid.Column="0" FontWeight="Bold" Text="Jewlery:"/>
                 <ComboBox Grid.Row="3" Grid.Column="1" SelectedValue="{Binding Path=Pickup.JewelryBlueLevel}" SelectedValuePath="Tag" Margin="8,2">
-                        <ComboBoxItem Content="None" Tag="0" />
-                        <ComboBoxItem Content="1+" Tag="1" />
-                        <ComboBoxItem Content="5+" Tag="5" />
-                        <ComboBoxItem Content="10+" Tag="10" />
-                        <ComboBoxItem Content="15+" Tag="15" />
-                        <ComboBoxItem Content="20+" Tag="20" />
-                        <ComboBoxItem Content="25+" Tag="25" />
-                        <ComboBoxItem Content="30+" Tag="30" />
-                        <ComboBoxItem Content="35+" Tag="35" />
-                        <ComboBoxItem Content="40+" Tag="40" />
-                        <ComboBoxItem Content="45+" Tag="45" />
-                        <ComboBoxItem Content="50+" Tag="50" />
-                        <ComboBoxItem Content="51+" Tag="51" />
-                        <ComboBoxItem Content="52+" Tag="52" />
-                        <ComboBoxItem Content="53+" Tag="53" />
-                        <ComboBoxItem Content="54+" Tag="54" />
-                        <ComboBoxItem Content="55+" Tag="55" />
-                        <ComboBoxItem Content="56+" Tag="56" />
-                        <ComboBoxItem Content="57+" Tag="57" />
-                        <ComboBoxItem Content="58+" Tag="58" />
-                        <ComboBoxItem Content="59+" Tag="59" />
-                        <ComboBoxItem Content="60+" Tag="60" />
-                        <ComboBoxItem Content="61+" Tag="61" />
-                        <ComboBoxItem Content="62+" Tag="62" />
-                        <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
-                    </ComboBox>
+                    <ComboBoxItem Content="None" Tag="0" />
+                    <ComboBoxItem Content="1+" Tag="1" />
+                    <ComboBoxItem Content="5+" Tag="5" />
+                    <ComboBoxItem Content="10+" Tag="10" />
+                    <ComboBoxItem Content="15+" Tag="15" />
+                    <ComboBoxItem Content="20+" Tag="20" />
+                    <ComboBoxItem Content="25+" Tag="25" />
+                    <ComboBoxItem Content="30+" Tag="30" />
+                    <ComboBoxItem Content="35+" Tag="35" />
+                    <ComboBoxItem Content="40+" Tag="40" />
+                    <ComboBoxItem Content="45+" Tag="45" />
+                    <ComboBoxItem Content="50+" Tag="50" />
+                    <ComboBoxItem Content="51+" Tag="51" />
+                    <ComboBoxItem Content="52+" Tag="52" />
+                    <ComboBoxItem Content="53+" Tag="53" />
+                    <ComboBoxItem Content="54+" Tag="54" />
+                    <ComboBoxItem Content="55+" Tag="55" />
+                    <ComboBoxItem Content="56+" Tag="56" />
+                    <ComboBoxItem Content="57+" Tag="57" />
+                    <ComboBoxItem Content="58+" Tag="58" />
+                    <ComboBoxItem Content="59+" Tag="59" />
+                    <ComboBoxItem Content="60+" Tag="60" />
+                    <ComboBoxItem Content="61+" Tag="61" />
+                    <ComboBoxItem Content="62+" Tag="62" />
+                    <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
+                </ComboBox>
                 <ComboBox Grid.Row="3" Grid.Column="2" SelectedValue="{Binding Path=Pickup.JewelryYellowLevel}" SelectedValuePath="Tag" Margin="8,2">
-                        <ComboBoxItem Content="None" Tag="0" />
-                        <ComboBoxItem Content="1+" Tag="1" />
-                        <ComboBoxItem Content="5+" Tag="5" />
-                        <ComboBoxItem Content="10+" Tag="10" />
-                        <ComboBoxItem Content="15+" Tag="15" />
-                        <ComboBoxItem Content="20+" Tag="20" />
-                        <ComboBoxItem Content="25+" Tag="25" />
-                        <ComboBoxItem Content="30+" Tag="30" />
-                        <ComboBoxItem Content="35+" Tag="35" />
-                        <ComboBoxItem Content="40+" Tag="40" />
-                        <ComboBoxItem Content="45+" Tag="45" />
-                        <ComboBoxItem Content="50+" Tag="50" />
-                        <ComboBoxItem Content="51+" Tag="51" />
-                        <ComboBoxItem Content="52+" Tag="52" />
-                        <ComboBoxItem Content="53+" Tag="53" />
-                        <ComboBoxItem Content="54+" Tag="54" />
-                        <ComboBoxItem Content="55+" Tag="55" />
-                        <ComboBoxItem Content="56+" Tag="56" />
-                        <ComboBoxItem Content="57+" Tag="57" />
-                        <ComboBoxItem Content="58+" Tag="58" />
-                        <ComboBoxItem Content="59+" Tag="59" />
-                        <ComboBoxItem Content="60+" Tag="60" />
-                        <ComboBoxItem Content="61+" Tag="61" />
-                        <ComboBoxItem Content="62+" Tag="62" />
-                        <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
-                    </ComboBox>
+                    <ComboBoxItem Content="None" Tag="0" />
+                    <ComboBoxItem Content="1+" Tag="1" />
+                    <ComboBoxItem Content="5+" Tag="5" />
+                    <ComboBoxItem Content="10+" Tag="10" />
+                    <ComboBoxItem Content="15+" Tag="15" />
+                    <ComboBoxItem Content="20+" Tag="20" />
+                    <ComboBoxItem Content="25+" Tag="25" />
+                    <ComboBoxItem Content="30+" Tag="30" />
+                    <ComboBoxItem Content="35+" Tag="35" />
+                    <ComboBoxItem Content="40+" Tag="40" />
+                    <ComboBoxItem Content="45+" Tag="45" />
+                    <ComboBoxItem Content="50+" Tag="50" />
+                    <ComboBoxItem Content="51+" Tag="51" />
+                    <ComboBoxItem Content="52+" Tag="52" />
+                    <ComboBoxItem Content="53+" Tag="53" />
+                    <ComboBoxItem Content="54+" Tag="54" />
+                    <ComboBoxItem Content="55+" Tag="55" />
+                    <ComboBoxItem Content="56+" Tag="56" />
+                    <ComboBoxItem Content="57+" Tag="57" />
+                    <ComboBoxItem Content="58+" Tag="58" />
+                    <ComboBoxItem Content="59+" Tag="59" />
+                    <ComboBoxItem Content="60+" Tag="60" />
+                    <ComboBoxItem Content="61+" Tag="61" />
+                    <ComboBoxItem Content="62+" Tag="62" />
+                    <ComboBoxItem Content="63+" IsSelected="True" Tag="63" />
+                </ComboBox>
                 <CheckBox Grid.Row="3" Grid.Column="3" Content="Pickup Designs/Plans" IsChecked="{Binding Path=Pickup.DesignPlan}" Margin="2"/>
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Legendaries:" FontWeight="Bold" Foreground="#FFA73B1E" />
                 <ComboBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" SelectedValuePath="Tag" Margin="30,2" SelectedValue="{Binding Path=Pickup.LegendaryLevel}">
-                        <ComboBoxItem Content="None" Tag="0" />
-                        <ComboBoxItem Content="ilvl 1+" IsSelected="True" Tag="1" />
-                        <ComboBoxItem Content="5+" Tag="5" />
-                        <ComboBoxItem Content="10+" Tag="10" />
-                        <ComboBoxItem Content="15+" Tag="15" />
-                        <ComboBoxItem Content="20+" Tag="20" />
-                        <ComboBoxItem Content="25+" Tag="25" />
-                        <ComboBoxItem Content="30+" Tag="30" />
-                        <ComboBoxItem Content="35+" Tag="35" />
-                        <ComboBoxItem Content="40+" Tag="40" />
-                        <ComboBoxItem Content="45+" Tag="45" />
-                        <ComboBoxItem Content="50+" Tag="50" />
-                        <ComboBoxItem Content="51+" Tag="51" />
-                        <ComboBoxItem Content="52+" Tag="52" />
-                        <ComboBoxItem Content="53+" Tag="53" />
-                        <ComboBoxItem Content="54+" Tag="54" />
-                        <ComboBoxItem Content="55+" Tag="55" />
-                        <ComboBoxItem Content="56+" Tag="56" />
-                        <ComboBoxItem Content="57+" Tag="57" />
-                        <ComboBoxItem Content="58+" Tag="58" />
-                        <ComboBoxItem Content="59+" Tag="59" />
-                        <ComboBoxItem Content="60+" Tag="60" />
-                        <ComboBoxItem Content="61+" Tag="61" />
-                        <ComboBoxItem Content="62+" Tag="62" />
-                        <ComboBoxItem Content="63+" Tag="63" />
-                    </ComboBox>
+                    <ComboBoxItem Content="None" Tag="0" />
+                    <ComboBoxItem Content="ilvl 1+" IsSelected="True" Tag="1" />
+                    <ComboBoxItem Content="5+" Tag="5" />
+                    <ComboBoxItem Content="10+" Tag="10" />
+                    <ComboBoxItem Content="15+" Tag="15" />
+                    <ComboBoxItem Content="20+" Tag="20" />
+                    <ComboBoxItem Content="25+" Tag="25" />
+                    <ComboBoxItem Content="30+" Tag="30" />
+                    <ComboBoxItem Content="35+" Tag="35" />
+                    <ComboBoxItem Content="40+" Tag="40" />
+                    <ComboBoxItem Content="45+" Tag="45" />
+                    <ComboBoxItem Content="50+" Tag="50" />
+                    <ComboBoxItem Content="51+" Tag="51" />
+                    <ComboBoxItem Content="52+" Tag="52" />
+                    <ComboBoxItem Content="53+" Tag="53" />
+                    <ComboBoxItem Content="54+" Tag="54" />
+                    <ComboBoxItem Content="55+" Tag="55" />
+                    <ComboBoxItem Content="56+" Tag="56" />
+                    <ComboBoxItem Content="57+" Tag="57" />
+                    <ComboBoxItem Content="58+" Tag="58" />
+                    <ComboBoxItem Content="59+" Tag="59" />
+                    <ComboBoxItem Content="60+" Tag="60" />
+                    <ComboBoxItem Content="61+" Tag="61" />
+                    <ComboBoxItem Content="62+" Tag="62" />
+                    <ComboBoxItem Content="63+" Tag="63" />
+                </ComboBox>
                 <CheckBox Grid.Row="4" Grid.Column="3" Content="Pickup Follower Items" IsChecked="{Binding Path=Pickup.FollowerItem}" Margin="2"/>
             </Grid>
         </Grid>
@@ -346,7 +346,14 @@
                           Margin="2" VerticalAlignment="Center"/>
             </Grid>
         </Grid>
-        <!--Reset Button-->
-        <Button Grid.Row="7" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetItemCommand}">Reset</Button>
+        <!--Reset Buttons -->
+        <Grid Grid.Row="7" Margin="5" HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button Margin="5" Grid.Column="0" HorizontalAlignment="Center" Command="{Binding ResetItemCommand}">Reset Trinity Defaults</Button>
+            <Button Margin="5" Grid.Column="1" HorizontalAlignment="Center" Command="{Binding ReloadScriptRulesCommand}">Reload Script Rules</Button>
+        </Grid>
     </Grid>
 </UserControl>

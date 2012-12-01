@@ -15,7 +15,7 @@ namespace GilesTrinity
         /// This is wired up by Plugin.OnEnabled, and called when the bot is started
         /// </summary>
         /// <param name="bot"></param>
-        private static void GilesTrinityStart(IBot bot)
+        private static void TrinityBotStart(IBot bot)
         {
             if (!bPluginEnabled && bot != null)
             {
@@ -56,6 +56,16 @@ namespace GilesTrinity
             }
             RefreshProfileBlacklists();
             ReplaceTreeHooks();
+
+            try
+            {
+                CacheManager.Initialize();
+            }
+            catch (Exception ex)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Error Initializing CacheManager");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
+            }
         }
 
         /// <summary>

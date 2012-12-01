@@ -161,7 +161,7 @@ namespace GilesTrinity.Technicals
                         cacheObject = _Cache[rActorGuid];
                         if (CacheObjectRefresher == null)
                         {
-                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "You don't have define CacheObjectRefresher before colling GetObject");
+                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "You haven't defined CacheObjectRefresher before calling GetObject");
                         }
                         else
                         {
