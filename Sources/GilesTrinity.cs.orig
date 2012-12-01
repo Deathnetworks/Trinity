@@ -1,5 +1,11 @@
+<<<<<<< HEAD
+﻿using System;
+=======
 ﻿using GilesTrinity.Cache;
+using GilesTrinity.DbProvider;
+using GilesTrinity.Technicals;
 using System;
+>>>>>>> origin/DeveloperOnly
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -132,6 +138,27 @@ namespace GilesTrinity
                 }
             }
         }
+<<<<<<< HEAD
+=======
+
+        // When the bot stops, output a final item-stats report so it is as up-to-date as can be
+        private void TrinityBotStop(IBot bot)
+        {
+            // Issue final reports
+            OutputReport();
+            vBacktrackList = new SortedList<int, Vector3>();
+            iTotalBacktracks = 0;
+            GilesPlayerMover.iTotalAntiStuckAttempts = 1;
+            GilesPlayerMover.vSafeMovementLocation = Vector3.Zero;
+            GilesPlayerMover.vOldPosition = Vector3.Zero;
+            GilesPlayerMover.iTimesReachedStuckPoint = 0;
+            GilesPlayerMover.timeLastRecordedPosition = DateTime.Today;
+            GilesPlayerMover.timeStartedUnstuckMeasure = DateTime.Today;
+            hashUseOnceID = new HashSet<int>();
+            dictUseOnceID = new Dictionary<int, int>();
+            dictRandomID = new Dictionary<int, int>();
+            iMaxDeathsAllowed = 0;
+            iDeathsThisRun = 0;
 
             try
             {
@@ -142,6 +169,12 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Error Destroying CacheManager");
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
             }
+        }
+
+        // How many total leave games, for stat-tracking?
+        public static int iTotalJoinGames = 0;
+
+>>>>>>> origin/DeveloperOnly
         // Each time we join & leave a game, might as well clear the hashset of looked-at dropped items - just to keep it smaller
         private static void GilesTrinityOnJoinGame(object src, EventArgs mea)
         {

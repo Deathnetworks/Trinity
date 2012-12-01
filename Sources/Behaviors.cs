@@ -31,6 +31,12 @@ namespace GilesTrinity
             return RunStatus.Success;
         }
 
+        private static RunStatus ActionRunningDelegate(object ret)
+        {
+            return RunStatus.Running;
+        }
+
+
         public static DiaActivePlayer Me
         {
             get { return ZetaDia.Me; }
@@ -46,6 +52,9 @@ namespace GilesTrinity
                 new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && !bMainBotPaused,
 
                     new Action(ctx => GilesHandleTarget(ctx))
+                ),
+                new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && bMainBotPaused,
+                    new Action(ret => ActionRunningDelegate(ret))
                 )
             );
         }
@@ -178,6 +187,7 @@ namespace GilesTrinity
                 if (runStatus != HandlerRunStatus.NotFinished)
                     return GetTreeSharpRunStatus(runStatus);
 
+                // Blacklist the current target
                 runStatus = HandleTargetTimeout(runStatus);
 
                 //check if we are returning to the tree

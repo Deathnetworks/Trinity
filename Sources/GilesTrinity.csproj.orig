@@ -81,9 +81,14 @@
     <Compile Include="ScriptedRules\RulesManager.cs" />
     <Compile Include="ScriptedRules\ScriptedRuleAction.cs" />
     <Compile Include="ScriptedRules\ScriptedRule.cs" />
+<<<<<<< HEAD
+    <Compile Include="Technicals\CacheManager.cs" />
+    <Compile Include="Technicals\CacheObject.cs" />
+    <Compile Include="Technicals\CacheRefresher.cs" />
+=======
     <Compile Include="Cache\CacheManager.cs" />
     <Compile Include="Cache\CacheObject.cs" />
-    <Compile Include="Technicals\CacheRefresher.cs" />
+>>>>>>> origin/DeveloperOnly
     <Compile Include="Technicals\DbHelper.cs" />
     <Compile Include="Technicals\LogCategory.cs" />
     <Compile Include="Technicals\TrinitiyLogLevel.cs" />
