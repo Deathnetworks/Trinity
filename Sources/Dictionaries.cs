@@ -503,6 +503,13 @@ namespace GilesTrinity
         /// And a "global cooldown" to prevent non-signature-spells being used too fast
         /// </summary>
         public static DateTime lastGlobalCooldownUse = DateTime.Today;
+
+        /* 
+         * This set of dictionaries are used for performance increases throughout, and a minimization of DB mis-read/null exception errors
+         * Uses a little more ram - but for a massive CPU gain. And ram is cheap, CPU is not!
+         */
+
+
         /// <summary>
         /// Used only for certain skills that spam the powermanager regularly, to limit their CPU hits
         /// </summary>
@@ -565,30 +572,30 @@ namespace GilesTrinity
         /// Caches the position for each object (only used for non-units, as this data is static so can be cached) (RactorGUID based)
         /// </summary>
         private static Dictionary<int, Vector3> dictGilesVectorCache = new Dictionary<int, Vector3>();
-		/// <summary>
-		/// Same as above but for gold-amount of pile (RactorGUID based)
-		/// </summary>
+        /// <summary>
+        /// Same as above but for gold-amount of pile (RactorGUID based)
+        /// </summary>
         private static Dictionary<int, int> dictGilesGoldAmountCache = new Dictionary<int, int>();
-		/// <summary>
-		/// Same as above but for quality of item, we check this twice to make bloody sure we don't miss a legendary from a mis-read though (RactorGUID based)
-		/// </summary>
+        /// <summary>
+        /// Same as above but for quality of item, we check this twice to make bloody sure we don't miss a legendary from a mis-read though (RactorGUID based)
+        /// </summary>
         private static Dictionary<int, ItemQuality> dictGilesQualityCache = new Dictionary<int, ItemQuality>();
         private static Dictionary<int, bool> dictGilesQualityRechecked = new Dictionary<int, bool>();
-		/// <summary>
-		/// Same as above but for whether we want to pick it up or not (RactorGUID based)
-		/// </summary>
+        /// <summary>
+        /// Same as above but for whether we want to pick it up or not (RactorGUID based)
+        /// </summary>
         private static Dictionary<int, bool> dictGilesPickupItem = new Dictionary<int, bool>();
-		/// <summary>
-		/// How many times the player tried to interact with this object in total
-		/// </summary>
+        /// <summary>
+        /// How many times the player tried to interact with this object in total
+        /// </summary>
         private static Dictionary<int, int> dictTotalInteractionAttempts = new Dictionary<int, int>();
-		/// <summary>
-		/// Physics SNO for certain objects (SNO based)
-		/// </summary>
+        /// <summary>
+        /// Physics SNO for certain objects (SNO based)
+        /// </summary>
         private static Dictionary<int, int> dictPhysicsSNO = new Dictionary<int, int>();
-		/// <summary>
-		/// Summoned-by ID for units (RactorGUID based)
-		/// </summary>
+        /// <summary>
+        /// Summoned-by ID for units (RactorGUID based)
+        /// </summary>
         private static Dictionary<int, int> dictSummonedByID = new Dictionary<int, int>();
 
         // Giant Super Special Sauce Dictionary

@@ -59,7 +59,6 @@ namespace GilesTrinity
             AddToCache = RefreshStepCachedACDGuid(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
 
-            //if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
 
             /*
              * Begin main refresh routine
@@ -93,9 +92,11 @@ namespace GilesTrinity
 
             // Summons by the player 
             AddToCache = RefreshStepCachedPlayerSummons(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
+
             /* 
-             * Main Switch on Object Type - Refresh individual object types (Units, Items, Gizmos)
-             */
+               * Main Switch on Object Type - Refresh individual object types (Units, Items, Gizmos)
+               */
             RefreshStepMainObjectType(ref AddToCache);
             if (!AddToCache) { c_IgnoreReason = "MainObjectType"; return AddToCache; }
 
@@ -970,7 +971,7 @@ namespace GilesTrinity
             // Calculate custom Giles item type
             c_item_GItemType = DetermineItemType(c_Name, c_DBItemType, c_item_tFollowerType);
             // And temporarily store the base type
-            GBaseItemType itemBaseType = DetermineBaseType(c_item_GItemType);
+            GItemBaseType itemBaseType = DetermineBaseType(c_item_GItemType);
             // Treat all globes as a yes
             if (c_item_GItemType == GItemType.HealthGlobe)
             {
@@ -986,7 +987,7 @@ namespace GilesTrinity
 
             // Quality of item for "genuine" items
             c_ItemQuality = ItemQuality.Invalid;
-            if (itemBaseType != GBaseItemType.Unknown && itemBaseType != GBaseItemType.HealthGlobe && itemBaseType != GBaseItemType.Gem && itemBaseType != GBaseItemType.Misc &&
+            if (itemBaseType != GItemBaseType.Unknown && itemBaseType != GItemBaseType.HealthGlobe && itemBaseType != GItemBaseType.Gem && itemBaseType != GItemBaseType.Misc &&
                 !hashForceSNOToItemList.Contains(c_ActorSNO))
             {
                 // Get the quality of this item, cached if possible

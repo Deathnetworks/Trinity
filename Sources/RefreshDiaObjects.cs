@@ -267,7 +267,7 @@ namespace GilesTrinity
 
         private static HashSet<string> ignoreNames = new HashSet<string>
         {
-            "MarkerLocation", "Generic_Proxy", "Hireling", "Barbarian","Barbarian", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint",
+            "MarkerLocation", "Generic_Proxy", "Hireling", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint",
         };
 
         private static void RefreshCacheMainLoop()
@@ -345,14 +345,14 @@ namespace GilesTrinity
             }
         }
 
-        private static void RefreshItemStats(GBaseItemType tempbasetype)
+        private static void RefreshItemStats(GItemBaseType tempbasetype)
         {
             if (!_hashsetItemStatsLookedAt.Contains(c_RActorGuid))
             {
                 _hashsetItemStatsLookedAt.Add(c_RActorGuid);
-                if (tempbasetype == GBaseItemType.Armor || tempbasetype == GBaseItemType.WeaponOneHand || tempbasetype == GBaseItemType.WeaponTwoHand ||
-                    tempbasetype == GBaseItemType.WeaponRange || tempbasetype == GBaseItemType.Jewelry || tempbasetype == GBaseItemType.FollowerItem ||
-                    tempbasetype == GBaseItemType.Offhand)
+                if (tempbasetype == GItemBaseType.Armor || tempbasetype == GItemBaseType.WeaponOneHand || tempbasetype == GItemBaseType.WeaponTwoHand ||
+                    tempbasetype == GItemBaseType.WeaponRange || tempbasetype == GItemBaseType.Jewelry || tempbasetype == GItemBaseType.FollowerItem ||
+                    tempbasetype == GItemBaseType.Offhand)
                 {
                     int iThisQuality;
                     ItemsDroppedStats.Total++;
@@ -368,7 +368,7 @@ namespace GilesTrinity
                     ItemsDroppedStats.TotalPerLevel[c_ItemLevel]++;
                     ItemsDroppedStats.TotalPerQPerL[iThisQuality, c_ItemLevel]++;
                 }
-                else if (tempbasetype == GBaseItemType.Gem)
+                else if (tempbasetype == GItemBaseType.Gem)
                 {
                     int iThisGemType = 0;
                     ItemsDroppedStats.TotalGems++;

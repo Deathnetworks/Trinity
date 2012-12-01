@@ -581,11 +581,6 @@ namespace GilesTrinity
         /// </summary>
         private static Regex nameNumberTrimRegex = new Regex(@"-\d+$");
 
-        /* Special Sauce Dictionaries for SPEEEEEEED
-         * This set of dictionaries are used for huge performance increases throughout, and a minimization of DB mis-read/null exception errors
-         * Uses a little more ram - but for a massive CPU gain. And ram is cheap, CPU is not!
-         */
-
         // The following 2 variables are used to clear the dictionaries out - clearing one dictionary out per maximum every 2 seconds, working through in sequential order
         private static DateTime lastClearedCacheDictionary = DateTime.Today;
         private static int iLastClearedCacheDictionary = 0;
@@ -601,23 +596,48 @@ namespace GilesTrinity
         // When did we last send a move-power command?
         private static DateTime lastSentMovePower = DateTime.Today;
 
-        // Email stuff
+        /// <summary>
+        /// Email Notification SMTP Server
+        /// </summary>
         public static string SmtpServer = "smtp.gmail.com";
+        /// <summary>
+        /// Email Notification Message
+        /// </summary>
         public static StringBuilder EmailMessage = new StringBuilder();
 
-        // HandleTarget
+        /// <summary>
+        /// If we should force movement
+        /// </summary>
         private static bool bForceNewMovement = false;
 
-        // Store player current position
+        /// <summary>
+        /// Store player current position
+        /// </summary>
         Vector3 vMyCurrentPosition = Vector3.Zero;
 
         // For path finding
+        /// <summary>
+        /// The Grid Provider for Navigation checks
+        /// </summary>
         private static ISearchAreaProvider gp;
+        /// <summary>
+        /// The PathFinder for Navigation checks
+        /// </summary>
         private static PathFinder pf;
 
-        // Behaviors: How close we need to get to the target before we consider it "reached"
+        /// <summary>
+        /// Behaviors: How close we need to get to the target before we consider it "reached"
+        /// </summary>
         private static float fRangeRequired = 1f;
+        /// <summary>
+        /// Behaviors: How close we need to get to the target before we consider it "reached"
+        /// </summary>
         private static float fDistanceReduction = 0f;
+
+        /// <summary>
+        /// Special check to force re-buffing before castign archon
+        /// </summary>
+        private static bool CanCastArchon = false;
 
         // Darkfriend's Looting Rule
         public static Interpreter StashRule = new Interpreter();

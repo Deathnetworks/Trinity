@@ -49,27 +49,20 @@ namespace GilesTrinity
 
             // Calculate giles item types and base types etc.
             GItemType itemType = DetermineItemType(name, dbItemType, followerType);
-            GBaseItemType baseType = DetermineBaseType(itemType);
+            GItemBaseType baseType = DetermineBaseType(itemType);
 
-            // Error logging for DemonBuddy item mis-reading
-            ItemType internalItemType = GilesToDBItemType(itemType);
-            if (internalItemType != dbItemType)
-            {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation,
-                    "GSError: Item type mis-match detected: Item Internal={0}. DemonBuddy ItemType thinks item type is={1}. Giles thinks item type is={2}. [pickup]", name, dbItemType, internalItemType);
-            }
             switch (baseType)
             {
-                case GBaseItemType.WeaponTwoHand:
-                case GBaseItemType.WeaponOneHand:
-                case GBaseItemType.WeaponRange:
+                case GItemBaseType.WeaponTwoHand:
+                case GItemBaseType.WeaponOneHand:
+                case GItemBaseType.WeaponRange:
                     return CheckLevelRequirements(level, quality, Settings.Loot.Pickup.WeaponBlueLevel, Settings.Loot.Pickup.WeaponYellowLevel);
-                case GBaseItemType.Armor:
-                case GBaseItemType.Offhand:
+                case GItemBaseType.Armor:
+                case GItemBaseType.Offhand:
                     return CheckLevelRequirements(level, quality, Settings.Loot.Pickup.ArmorBlueLevel, Settings.Loot.Pickup.ArmorYellowLevel);
-                case GBaseItemType.Jewelry:
+                case GItemBaseType.Jewelry:
                     return CheckLevelRequirements(level, quality, Settings.Loot.Pickup.JewelryBlueLevel, Settings.Loot.Pickup.JewelryYellowLevel);
-                case GBaseItemType.FollowerItem:
+                case GItemBaseType.FollowerItem:
                     if (level < 60 || !Settings.Loot.Pickup.FollowerItem || quality < ItemQuality.Rare4)
                     {
                         if (!_hashsetItemFollowersIgnored.Contains(dynamicID))
@@ -80,7 +73,7 @@ namespace GilesTrinity
                         return false;
                     }
                     break;
-                case GBaseItemType.Gem:
+                case GItemBaseType.Gem:
                     if (level < Settings.Loot.Pickup.GemLevel ||
                         (itemType == GItemType.Ruby && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Ruby)) ||
                         (itemType == GItemType.Emerald && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Emerald)) ||
@@ -90,7 +83,7 @@ namespace GilesTrinity
                         return false;
                     }
                     break;
-                case GBaseItemType.Misc:
+                case GItemBaseType.Misc:
 
                     // Note; Infernal keys are misc, so should be picked up here - we aren't filtering them out, so should default to true at the end of this function
                     if (itemType == GItemType.CraftingMaterial && level < Settings.Loot.Pickup.MiscItemLevel)
@@ -131,9 +124,9 @@ namespace GilesTrinity
                         return true;
                     }
                     break;
-                case GBaseItemType.HealthGlobe:
+                case GItemBaseType.HealthGlobe:
                     return false;
-                case GBaseItemType.Unknown:
+                case GItemBaseType.Unknown:
                     return false;
                 default:
                     return false;
@@ -306,29 +299,29 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        private static GBaseItemType DetermineBaseType(GItemType itemType)
+        private static GItemBaseType DetermineBaseType(GItemType itemType)
         {
-            GBaseItemType thisGilesBaseType = GBaseItemType.Unknown;
+            GItemBaseType thisGilesBaseType = GItemBaseType.Unknown;
             if (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
                 itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
                 itemType == GItemType.Spear || itemType == GItemType.Sword || itemType == GItemType.Wand)
             {
-                thisGilesBaseType = GBaseItemType.WeaponOneHand;
+                thisGilesBaseType = GItemBaseType.WeaponOneHand;
             }
             else if (itemType == GItemType.TwoHandDaibo || itemType == GItemType.TwoHandMace ||
                 itemType == GItemType.TwoHandMighty || itemType == GItemType.TwoHandPolearm || itemType == GItemType.TwoHandStaff ||
                 itemType == GItemType.TwoHandSword || itemType == GItemType.TwoHandAxe)
             {
-                thisGilesBaseType = GBaseItemType.WeaponTwoHand;
+                thisGilesBaseType = GItemBaseType.WeaponTwoHand;
             }
             else if (itemType == GItemType.TwoHandCrossbow || itemType == GItemType.HandCrossbow || itemType == GItemType.TwoHandBow)
             {
-                thisGilesBaseType = GBaseItemType.WeaponRange;
+                thisGilesBaseType = GItemBaseType.WeaponRange;
             }
             else if (itemType == GItemType.Mojo || itemType == GItemType.Orb ||
                 itemType == GItemType.Quiver || itemType == GItemType.Shield)
             {
-                thisGilesBaseType = GBaseItemType.Offhand;
+                thisGilesBaseType = GItemBaseType.Offhand;
             }
             else if (itemType == GItemType.Boots || itemType == GItemType.Bracer || itemType == GItemType.Chest ||
                 itemType == GItemType.Cloak || itemType == GItemType.Gloves || itemType == GItemType.Helm ||
@@ -336,31 +329,31 @@ namespace GilesTrinity
                 itemType == GItemType.VoodooMask || itemType == GItemType.WizardHat || itemType == GItemType.Belt ||
                 itemType == GItemType.MightyBelt)
             {
-                thisGilesBaseType = GBaseItemType.Armor;
+                thisGilesBaseType = GItemBaseType.Armor;
             }
             else if (itemType == GItemType.Amulet || itemType == GItemType.Ring)
             {
-                thisGilesBaseType = GBaseItemType.Jewelry;
+                thisGilesBaseType = GItemBaseType.Jewelry;
             }
             else if (itemType == GItemType.FollowerEnchantress || itemType == GItemType.FollowerScoundrel ||
                 itemType == GItemType.FollowerTemplar)
             {
-                thisGilesBaseType = GBaseItemType.FollowerItem;
+                thisGilesBaseType = GItemBaseType.FollowerItem;
             }
             else if (itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome ||
                 itemType == GItemType.SpecialItem || itemType == GItemType.CraftingPlan || itemType == GItemType.HealthPotion ||
                 itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey)
             {
-                thisGilesBaseType = GBaseItemType.Misc;
+                thisGilesBaseType = GItemBaseType.Misc;
             }
             else if (itemType == GItemType.Ruby || itemType == GItemType.Emerald || itemType == GItemType.Topaz ||
                 itemType == GItemType.Amethyst)
             {
-                thisGilesBaseType = GBaseItemType.Gem;
+                thisGilesBaseType = GItemBaseType.Gem;
             }
             else if (itemType == GItemType.HealthGlobe)
             {
-                thisGilesBaseType = GBaseItemType.HealthGlobe;
+                thisGilesBaseType = GItemBaseType.HealthGlobe;
             }
             return thisGilesBaseType;
         }
@@ -397,72 +390,6 @@ namespace GilesTrinity
                     itemType == GItemType.Gloves || itemType == GItemType.Helm || itemType == GItemType.Legs ||
                     itemType == GItemType.Shoulder || itemType == GItemType.SpiritStone ||
                     itemType == GItemType.VoodooMask || itemType == GItemType.WizardHat || itemType == GItemType.StaffOfHerding);
-        }
-
-        /// <summary>
-        /// This is for DemonBuddy error checking - see what sort of item DB THINKS it is
-        /// </summary>
-        /// <param name="itemType"></param>
-        /// <returns></returns>
-        private static ItemType GilesToDBItemType(GItemType itemType)
-        {
-            switch (itemType)
-            {
-                case GItemType.Axe: return ItemType.Axe;
-                case GItemType.CeremonialKnife: return ItemType.CeremonialDagger;
-                case GItemType.HandCrossbow: return ItemType.HandCrossbow;
-                case GItemType.Dagger: return ItemType.Dagger;
-                case GItemType.FistWeapon: return ItemType.FistWeapon;
-                case GItemType.Mace: return ItemType.Mace;
-                case GItemType.MightyWeapon: return ItemType.MightyWeapon;
-                case GItemType.Spear: return ItemType.Spear;
-                case GItemType.Sword: return ItemType.Sword;
-                case GItemType.Wand: return ItemType.Wand;
-                case GItemType.TwoHandAxe: return ItemType.Axe;
-                case GItemType.TwoHandBow: return ItemType.Bow;
-                case GItemType.TwoHandDaibo: return ItemType.Daibo;
-                case GItemType.TwoHandCrossbow: return ItemType.Crossbow;
-                case GItemType.TwoHandMace: return ItemType.Mace;
-                case GItemType.TwoHandMighty: return ItemType.MightyWeapon;
-                case GItemType.TwoHandPolearm: return ItemType.Polearm;
-                case GItemType.TwoHandStaff: return ItemType.Staff;
-                case GItemType.TwoHandSword: return ItemType.Sword;
-                case GItemType.StaffOfHerding: return ItemType.Staff;
-                case GItemType.Mojo: return ItemType.Mojo;
-                case GItemType.Orb: return ItemType.Orb;
-                case GItemType.Quiver: return ItemType.Quiver;
-                case GItemType.Shield: return ItemType.Shield;
-                case GItemType.Amulet: return ItemType.Amulet;
-                case GItemType.Ring: return ItemType.Ring;
-                case GItemType.Belt: return ItemType.Belt;
-                case GItemType.Boots: return ItemType.Boots;
-                case GItemType.Bracer: return ItemType.Bracer;
-                case GItemType.Chest: return ItemType.Chest;
-                case GItemType.Cloak: return ItemType.Cloak;
-                case GItemType.Gloves: return ItemType.Gloves;
-                case GItemType.Helm: return ItemType.Helm;
-                case GItemType.Legs: return ItemType.Legs;
-                case GItemType.MightyBelt: return ItemType.MightyBelt;
-                case GItemType.Shoulder: return ItemType.Shoulder;
-                case GItemType.SpiritStone: return ItemType.SpiritStone;
-                case GItemType.VoodooMask: return ItemType.VoodooMask;
-                case GItemType.WizardHat: return ItemType.WizardHat;
-                case GItemType.FollowerEnchantress: return ItemType.FollowerSpecial;
-                case GItemType.FollowerScoundrel: return ItemType.FollowerSpecial;
-                case GItemType.FollowerTemplar: return ItemType.FollowerSpecial;
-                case GItemType.CraftingMaterial: return ItemType.CraftingReagent;
-                case GItemType.CraftTome: return ItemType.CraftingPage;
-                case GItemType.Ruby: return ItemType.Gem;
-                case GItemType.Emerald: return ItemType.Gem;
-                case GItemType.Topaz: return ItemType.Gem;
-                case GItemType.Amethyst: return ItemType.Gem;
-                case GItemType.SpecialItem: return ItemType.Unknown;
-                case GItemType.CraftingPlan: return ItemType.CraftingPlan;
-                case GItemType.HealthPotion: return ItemType.Potion;
-                case GItemType.Dye: return ItemType.Unknown;
-                case GItemType.InfernalKey: return ItemType.Unknown;
-            }
-            return ItemType.Unknown;
         }
 
         /// <summary>
@@ -783,7 +710,7 @@ namespace GilesTrinity
         {
             // Now look for Misc items we might want to keep
             GItemType TrueItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
-            GBaseItemType thisGilesBaseType = DetermineBaseType(TrueItemType);
+            GItemBaseType thisGilesBaseType = DetermineBaseType(TrueItemType);
 
             if (TrueItemType == GItemType.StaffOfHerding)
             {
@@ -886,7 +813,7 @@ namespace GilesTrinity
 
         private static bool IsWeaponArmorJewlery(GilesCachedACDItem thisitem)
         {
-            return (thisitem.DBBaseType == ItemBaseType.Armor || thisitem.DBBaseType == ItemBaseType.Jewelry || thisitem.DBBaseType == ItemBaseType.Weapon);
+            return (thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Armor || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Jewelry || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Weapon);
         }
 
         /// <summary>
@@ -929,18 +856,18 @@ namespace GilesTrinity
         /// <param name="thisgilesbaseitemtype">The thisgilesbaseitemtype.</param>
         /// <param name="ithisitemvalue">The ithisitemvalue.</param>
         /// <returns></returns>
-        public static bool CheckScoreForNotification(GBaseItemType thisgilesbaseitemtype, double ithisitemvalue)
+        public static bool CheckScoreForNotification(GItemBaseType thisgilesbaseitemtype, double ithisitemvalue)
         {
             switch (thisgilesbaseitemtype)
             {
-                case GBaseItemType.WeaponOneHand:
-                case GBaseItemType.WeaponRange:
-                case GBaseItemType.WeaponTwoHand:
+                case GItemBaseType.WeaponOneHand:
+                case GItemBaseType.WeaponRange:
+                case GItemBaseType.WeaponTwoHand:
                     return (ithisitemvalue >= Settings.Notification.WeaponScore);
-                case GBaseItemType.Armor:
-                case GBaseItemType.Offhand:
+                case GItemBaseType.Armor:
+                case GItemBaseType.Offhand:
                     return (ithisitemvalue >= Settings.Notification.ArmorScore);
-                case GBaseItemType.Jewelry:
+                case GItemBaseType.Jewelry:
                     return (ithisitemvalue >= Settings.Notification.JewelryScore);
             }
             return false;

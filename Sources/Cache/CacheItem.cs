@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Zeta;
 using Zeta.Common;
 using Db = Zeta.Internals.Actors;
+using GilesTrinity;
 
 namespace GilesTrinity.Cache
 {
@@ -53,6 +54,7 @@ namespace GilesTrinity.Cache
             HolyDamagePercent = (int)Math.Floor(ACDItem.Stats.HolyDamagePercent);
             LifeOnHit = (int)Math.Floor(ACDItem.Stats.LifeOnHit);
             LifePercent = (int)Math.Floor(ACDItem.Stats.LifePercent);
+            LifeSteal = (int)Math.Floor(ACDItem.Stats.LifeSteal);
             MagicFind = (int)Math.Floor(ACDItem.Stats.MagicFind);
             ManaRegen = (int)Math.Floor(ACDItem.Stats.ManaRegen);
             MaxArcanePower = (int)Math.Floor(ACDItem.Stats.MaxArcanePower);

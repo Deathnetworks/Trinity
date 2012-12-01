@@ -1380,10 +1380,10 @@ namespace GilesTrinity
             {
                 _hashsetItemPicksLookedAt.Add(CurrentTarget.RActorGuid);
                 GItemType thisgilesitemtype = DetermineItemType(CurrentTarget.InternalName, CurrentTarget.DBItemType, CurrentTarget.FollowerType);
-                GBaseItemType thisgilesbasetype = DetermineBaseType(thisgilesitemtype);
-                if (thisgilesbasetype == GBaseItemType.Armor || thisgilesbasetype == GBaseItemType.WeaponOneHand || thisgilesbasetype == GBaseItemType.WeaponTwoHand ||
-                    thisgilesbasetype == GBaseItemType.WeaponRange || thisgilesbasetype == GBaseItemType.Jewelry || thisgilesbasetype == GBaseItemType.FollowerItem ||
-                    thisgilesbasetype == GBaseItemType.Offhand)
+                GItemBaseType thisgilesbasetype = DetermineBaseType(thisgilesitemtype);
+                if (thisgilesbasetype == GItemBaseType.Armor || thisgilesbasetype == GItemBaseType.WeaponOneHand || thisgilesbasetype == GItemBaseType.WeaponTwoHand ||
+                    thisgilesbasetype == GItemBaseType.WeaponRange || thisgilesbasetype == GItemBaseType.Jewelry || thisgilesbasetype == GItemBaseType.FollowerItem ||
+                    thisgilesbasetype == GItemBaseType.Offhand)
                 {
                     int iQuality;
                     ItemsPickedStats.Total++;
@@ -1399,7 +1399,7 @@ namespace GilesTrinity
                     ItemsPickedStats.TotalPerLevel[CurrentTarget.Level]++;
                     ItemsPickedStats.TotalPerQPerL[iQuality, CurrentTarget.Level]++;
                 }
-                else if (thisgilesbasetype == GBaseItemType.Gem)
+                else if (thisgilesbasetype == GItemBaseType.Gem)
                 {
                     int iGemType = 0;
                     ItemsPickedStats.TotalGems++;
