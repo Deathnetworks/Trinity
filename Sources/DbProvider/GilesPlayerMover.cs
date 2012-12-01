@@ -330,8 +330,10 @@ namespace GilesTrinity.DbProvider
                         if (iCancelUnstuckerForSeconds < 20)
                             iCancelUnstuckerForSeconds = 20;
                         timeCancelledUnstuckerFor = DateTime.Now;
+
                         Navigator.Clear();
                         Navigator.MoveTo(vOldMoveToTarget, "original destination", false);
+
                         return;
                     }
                 }

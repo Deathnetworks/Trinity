@@ -1099,11 +1099,13 @@ namespace GilesTrinity
                 {
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", c_Name, c_ActorSNO);
                     AddToCache = false;
-                    //return bWantThis;
                 }
                 dictGilesGoldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
             }
 
+            /* 
+             * Giles Black Magic gold formula
+             * 
             // Ignore gold piles that are (currently) too small...
             // Up to 40% less gold limit needed at close range
             if (c_CentreDistance <= 20f)
@@ -1118,8 +1120,16 @@ namespace GilesTrinity
                 rangedMinimumStackSize += (int)Math.Floor(iPercentage * Settings.Loot.Pickup.MinimumGoldStack);
             }
 
+
             // Now check if this gold pile is currently less than this limit
             if (c_GoldStackSize < rangedMinimumStackSize)
+            {
+                AddToCache = false;
+            }
+            */
+
+            // rrrix thinks this is better!
+            if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)
             {
                 AddToCache = false;
             }
@@ -1131,6 +1141,9 @@ namespace GilesTrinity
                 hashRGUIDBlacklist60.Add(c_RActorGuid);
                 AddToCache = false;
             }
+
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Gold Stack {0} has iPercentage {1} with rangeMinimumStackSize: {2} Distance: {3} MininumGoldStack: {4} PickupRadius: {5} AddToCache: {6}",
+                c_GoldStackSize, iPercentage, rangedMinimumStackSize, c_CentreDistance, Settings.Loot.Pickup.MinimumGoldStack, ZetaDia.Me.GoldPickUpRadius, AddToCache);
 
             return AddToCache;
         }
@@ -1257,7 +1270,7 @@ namespace GilesTrinity
                                     c_IgnoreSubStep = "InvalidCastToDoor";
                                 }
                             }
-                            
+
                             catch { }
                         }
                     }
