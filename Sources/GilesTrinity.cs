@@ -1,4 +1,5 @@
-﻿using GilesTrinity.DbProvider;
+﻿using GilesTrinity.Cache;
+using GilesTrinity.DbProvider;
 using GilesTrinity.Technicals;
 using System;
 using System.Collections.Generic;
@@ -287,6 +288,16 @@ namespace GilesTrinity
             dictRandomID = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;
             iDeathsThisRun = 0;
+
+            try
+            {
+                CacheManager.Destroy();
+            }
+            catch (Exception ex)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Error Destroying CacheManager");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
+            }
         }
 
         // How many total leave games, for stat-tracking?

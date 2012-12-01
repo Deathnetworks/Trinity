@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 
-namespace GilesTrinity.Technicals
+namespace GilesTrinity.Cache
 {
     internal abstract class CacheObject
     {
@@ -32,6 +33,12 @@ namespace GilesTrinity.Technicals
             private set;
         }
 
+        public string InternalName
+        {
+            get;
+            protected set;
+        }
+
         /// <summary>
         /// Gets or sets the last access date.
         /// </summary>
@@ -52,6 +59,8 @@ namespace GilesTrinity.Technicals
             set; 
         }
         #endregion Properties
+
+        protected readonly static Regex NameNumberRemover = new Regex(@"-\d+$", RegexOptions.Compiled);
 
         #region Methods
         /// <summary>

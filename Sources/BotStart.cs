@@ -1,4 +1,5 @@
-﻿using GilesTrinity.Technicals;
+﻿using GilesTrinity.Cache;
+using GilesTrinity.Technicals;
 using System;
 using Zeta;
 using Zeta.Common;

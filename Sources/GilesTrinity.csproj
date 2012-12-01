@@ -64,6 +64,8 @@
     <Compile Include="Abilities\WitchDoctor.cs" />
     <Compile Include="AvoidanceManager.cs" />
     <Compile Include="AvoidanceType.cs" />
+    <Compile Include="Cache\CacheItem.cs" />
+    <Compile Include="Cache\TrinityItemQuality.cs" />
     <Compile Include="Classes\GilesObjstacle.cs" />
     <Compile Include="Classes\GilesPower.cs" />
     <Compile Include="Classes\GilesCachedACDItem.cs" />
@@ -76,11 +78,11 @@
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotStart.cs" />
     <Compile Include="ScriptedRules\Dynamic.cs" />
-    <Compile Include="ScriptedRules\ExpressionManager.cs" />
+    <Compile Include="ScriptedRules\RulesManager.cs" />
     <Compile Include="ScriptedRules\ScriptedRuleAction.cs" />
     <Compile Include="ScriptedRules\ScriptedRule.cs" />
-    <Compile Include="Technicals\CacheManager.cs" />
-    <Compile Include="Technicals\CacheObject.cs" />
+    <Compile Include="Cache\CacheManager.cs" />
+    <Compile Include="Cache\CacheObject.cs" />
     <Compile Include="Technicals\DbHelper.cs" />
     <Compile Include="Technicals\LogCategory.cs" />
     <Compile Include="Technicals\TrinitiyLogLevel.cs" />
