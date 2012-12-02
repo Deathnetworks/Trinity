@@ -8,6 +8,7 @@ namespace GilesTrinity.Settings.Loot
         Emerald = 1,
         Topaz = 2,
         Amethyst = 4,
-        Ruby = 8
+        Ruby = 8,
+        All = Emerald | Topaz | Amethyst | Ruby
     }
 }
