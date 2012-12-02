@@ -14,9 +14,6 @@ namespace GilesTrinity.Settings
         private int _TPSLimit;
         private bool _LogStuckLocation;
         private bool _DebugInStatusBar;
-        private bool _DebugCache;
-        private bool _DebugWeights;
-        private bool _DebugItemValuation;
         private LogCategory _LogCategories;
         #endregion Fields
 

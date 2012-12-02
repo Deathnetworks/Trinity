@@ -7,7 +7,6 @@ namespace GilesTrinity.Settings.Loot
     public class TownRunSetting : ITrinitySetting<TownRunSetting>, INotifyPropertyChanged, IExtensibleDataObject
     {
         #region Fields
-        private TrashMode _TrashMode;
         private int _WeaponScore;
         private int _ArmorScore;
         private int _JewelryScore;
