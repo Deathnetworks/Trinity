@@ -75,8 +75,8 @@ namespace GilesTrinity.DbProvider
            
                 lastCheckBag = DateTime.Now;
                 int currentcoin = ZetaDia.Me.Inventory.Coinage;
-				DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Last Know Coin is " + lastKnowCoin);
-				DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Current   Coin is " + currentcoin);
+				//DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Last Know Coin is " + lastKnowCoin);
+				//DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Current   Coin is " + currentcoin);
 				
                 if (currentcoin != lastKnowCoin && currentcoin != 0)
                 {
@@ -84,18 +84,15 @@ namespace GilesTrinity.DbProvider
                     lastKnowCoin = currentcoin;
                 }
                 int notpickupgoldsec = Convert.ToInt32(DateTime.Now.Subtract(lastRefreshCoin).TotalSeconds);
-				DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Gold Non Change Timer is  " + notpickupgoldsec);
-                if (notpickupgoldsec != 0)
-                {
-					DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Not Picking Up Gold For " + notpickupgoldsec + " Seconds");
-                }
                 if (notpickupgoldsec >= expireSeconds)
                 {
-					DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Sent Restart Request");
+					DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Gold inactivity after " + notpickupgoldsec + "s. Sending abort.");
                     lastRefreshCoin = DateTime.Now;
                     lastKnowCoin = currentcoin;
                     notpickupgoldsec = 0;
                     return true;
+                } else if (notpickupgoldsec > 0) {
+					DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Gold unchanged for " + notpickupgoldsec + "s");
                 }
             }catch (Exception e)
             {
