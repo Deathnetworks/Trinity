@@ -458,9 +458,9 @@ namespace GilesTrinity
                 }
             }
             // Safety for Giles own portal-back-to-town for full-backpack
-            else if (ForceVendorRunASAP)
+            if (ForceVendorRunASAP)
             {
-                if (dUseKillRadius <= 60) dUseKillRadius = 60;
+                if (dUseKillRadius <= 90) dUseKillRadius = 90;
                 //intell
             }
             return dUseKillRadius;
