@@ -8,11 +8,11 @@
 // this is a saftey line ... as long it isn't removed it will keep all items
 // specifyed by the rule ... the action of commenting it out
 // will apply all following rules ... this set of rules is no where of complete
-[QUALITY] == Special # True # [KEEP]
+[QUALITY] == "Special" -> [KEEP]
 
 // crafting plans setting
-[QUALITY] == Legendary && [TYPE] == CraftingPlan # True # [KEEP]
-[QUALITY] == Rare6     && [TYPE] == CraftingPlan # True # [KEEP]
-[QUALITY] == Rare5     && [TYPE] == CraftingPlan # True # [TRASH]
-[QUALITY] == Rare4     && [TYPE] == CraftingPlan # True # [TRASH]
+[QUALITY] == "Legendary" && [TYPE] == "CraftingPlan" -> [KEEP]
+[QUALITY] == "Rare6" && [TYPE] == "CraftingPlan" -> [KEEP]
+[QUALITY] == "Rare5" && [TYPE] == "CraftingPlan" -> [TRASH]
+[QUALITY] == "Rare4" && [TYPE] == "CraftingPlan" -> [TRASH]
 

@@ -1055,6 +1055,13 @@ namespace GilesTrinity
                 {
                     AddToCache = ItemManager.EvaluateItem((ACDItem)c_CommonData, ItemManager.RuleType.PickUp);
                 }
+                else if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
+                {
+                    if (c_CommonData is ACDItem)
+                        AddToCache = GilesPickupItemValidation((ACDItem)c_CommonData);
+                    else
+                        AddToCache = false;
+                }
                 else
                 {
                     AddToCache = GilesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemType, c_item_tFollowerType, c_GameDynamicID);

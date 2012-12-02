@@ -1,5 +1,0 @@
-﻿// keep all magic items
-// this is a saftey line ... as long it isn't removed it will keep all items
-// specifyed by the rule ... the action of commenting it out
-// will apply all following rules ... this set of rules is no where of complete
-//[QUALITY] == Magic # True # [KEEP]
