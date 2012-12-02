@@ -15,8 +15,65 @@ namespace GilesTrinity.ScriptedRules
         private static readonly IDictionary<int, ScriptedRule> _RuleCache = new Dictionary<int, ScriptedRule>();
         private static readonly IDictionary<string, string> _StandardKeyword = new Dictionary<string, string>
             {
-                // Primary Stat
-                {"DEX", "item.Dexterity"}, 
+#region Fill Standard Keyword
+                { "ArcaneOnCrit", "item.ArcaneOnCrit"},
+                { "Armor", "item.Armor"},
+                { "ArmorBonus", "item.ArmorBonus"},
+                { "ArmorTotal", "item.ArmorTotal"},
+                { "AS", "item.AttackSpeedPercent"},
+                { "BlockChance", "item.BlockChance"},
+                { "CritDmg", "item.CritDamagePercent"},
+                { "Crit", "item.CritPercent"},
+                { "DmgReductionPhys%", "item.DamageReductionPhysicalPercent"},
+                { "GF", "item.GoldFind"},
+                { "HatredRegen", "item.HatredRegen"},
+                { "HealthGlobeBonus", "item.HealthGlobeBonus"},
+                { "HealthPerSecond", "item.HealthPerSecond"},
+                { "HealthPerSpiritSpent", "item.HealthPerSpiritSpent"},
+                { "LoH", "item.LifeOnHit"},
+                { "Life%", "item.LifePercent"},
+                { "LS", "item.LifeSteal"},
+                { "MF", "item.MagicFind"},
+                { "ManaRegen", "item.ManaRegen"},
+                { "MaxArcane", "item.MaxArcanePower"},
+                { "MaxDmg", "item.MaxDamage"},
+                { "MaxDiscipline", "item.MaxDiscipline"},
+                { "MaxFury", "item.MaxFury"},
+                { "MaxMana", "item.MaxMana"},
+                { "MaxSpirit", "item.MaxSpirit"},
+                { "MinDmg", "item.MinDamage"},
+                { "MvtSpeed", "item.MovementSpeed"},
+                { "PickUpRadius", "item.PickUpRadius"},
+                { "ResistAll", "item.ResistAll"},
+                { "ResistArcane", "item.ResistArcane"},
+                { "ResistCold", "item.ResistCold"},
+                { "ResistFire", "item.ResistFire"},
+                { "ResistHoly", "item.ResistHoly"},
+                { "ResistLightning", "item.ResistLightning"},
+                { "ResistPhysical", "item.ResistPhysical"},
+                { "ResistPoison", "item.ResistPoison"},
+                { "Sockets", "item.Sockets"},
+                { "SpiritRegen", "item.SpiritRegen"},
+                { "Thorns", "item.Thorns"},
+                { "AttacksPerSecond", "item.WeaponAttacksPerSecond"},
+                { "DPS", "item.WeaponDamagePerSecond"},
+                { "WMaxDmg", "item.WeaponMaxDamage"},
+                { "WMinDmg", "item.WeaponMinDamage"},
+                { "FollowerType", "item.FollowerSpecialType.ToString()"},
+                { "InternalName", "item.InternalName"},
+                { "TwoHand", "item.IsTwoHand"},
+                { "Quality", "item.ItemQualityLevel.ToString()"},
+                { "Name", "item.Name"},
+                { "Dex", "item.Dexterity"},
+                { "Str", "item.Strength"},
+                { "Int", "item.Intelligence"},
+                { "Vita", "item.Vitality"},
+                { "LvlReduction", "item.LevelReduction"},
+                { "BaseType", "item.BaseType.ToString()"},
+                { "Type", "item.ItemType.ToString()"},
+                { "Quality", "item.Quality.ToString()"},
+                { "RequiredLevel", "item.RequiredLevel"},
+#endregion
             };
         private static Delegate ConstructOperation(string lambdaExpression, Type inputParameterType, Type targetType)
         {
@@ -42,115 +99,123 @@ namespace GilesTrinity.ScriptedRules
 
         public static void LoadLootRules()
         {
-            string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Plugins", "GilesTrinity", "ItemRules", ZetaDia.Service.CurrentHero.BattleTagName, "Loot.utr");
-            if (!File.Exists(filename))
+            using (new PerformanceLogger("RulesManager.LoadLootRules"))
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "No Loot Rules file for BattleTag found in '{0}', General file is considered.", filename);
-                filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Plugins", "GilesTrinity", "ItemRules", "Loot.utr");
+                string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Plugins", "GilesTrinity", "ItemRules", ZetaDia.Service.CurrentHero.BattleTagName, "Loot.utr");
+                if (!File.Exists(filename))
+                {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "No Loot Rules file for BattleTag found in '{0}', General file is considered.", filename);
+                    filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Plugins", "GilesTrinity", "ItemRules", "Loot.utr");
+                }
+                if (!File.Exists(filename))
+                {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "No General Loot Rules file found in '{0}' by default all Item are routed to Trinity Scoring.", filename);
+                    ScriptedRule rule = new ScriptedRule()
+                                        {
+                                            Name = "Default Error rule",
+                                            Expression = "true",
+                                            LambdaExpression = ConstructOperation("true", typeof(Object), typeof(bool)),
+                                            Action = ScriptedRuleAction.Route
+                                        };
+                    _RuleCache.Add(1, rule);
+                }
+                ParseFile(filename, null);
             }
-            if (!File.Exists(filename))
-            {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "No General Loot Rules file found in '{0}' by default all Item are routed to Trinity Scoring.", filename);
-                ScriptedRule rule = new ScriptedRule() 
-                                    { 
-                                        Name = "Default Error rule", 
-                                        Expression = "true", 
-                                        LambdaExpression = ConstructOperation("true", typeof(Object), typeof(bool)), 
-                                        Action = ScriptedRuleAction.Route 
-                                    };
-                _RuleCache.Add(1, rule);
-            }
-            ParseFile(filename, null);
         }
 
         private static void ParseFile(string filename, IDictionary<string, string> existingMacros)
         {
-            using (TextReader reader = File.OpenText(filename))
+            using (new PerformanceLogger("RulesManager.ParseFile"))
             {
-                IDictionary<string, string> listMacros = null;
-                if (existingMacros != null)
+                using (TextReader reader = File.OpenText(filename))
                 {
-                    listMacros = new Dictionary<string, string>(existingMacros);
-                }
-                else
-                {
-                    listMacros = new Dictionary<string, string>();
-                }
-
-                string line = reader.ReadLine();
-                while (line != null)
-                {
-                    line = CleanLine(line);
-
-                    if (line.Length > 1) // Tag + 1 char min
+                    IDictionary<string, string> listMacros = null;
+                    if (existingMacros != null)
                     {
-                        switch (line.Substring(0, 1))
+                        listMacros = new Dictionary<string, string>(existingMacros);
+                    }
+                    else
+                    {
+                        listMacros = new Dictionary<string, string>();
+                    }
+
+                    string line = reader.ReadLine();
+                    while (line != null)
+                    {
+                        line = CleanLine(line);
+
+                        if (line.Length > 1) // Tag + 1 char min
                         {
-                            case "@":
-                                // include file
-                                string fileToInclude = Path.Combine(Path.GetDirectoryName(filename), line.Substring(1));
-                                if (File.Exists(fileToInclude))
-                                {
-                                    ParseFile(fileToInclude, listMacros);
-                                }
-                                else
-                                {
-                                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "Include tag with file not found in '{0}'.", fileToInclude);
-                                }
-                                break;
-                            case "%":
-                                // Macro
-                                KeyValuePair<string, string> macro = ParseMacro(line.Substring(1));
-                                if (!string.IsNullOrWhiteSpace(macro.Key))
-                                {
-                                    if (listMacros.ContainsKey(macro.Key))
+                            switch (line.Substring(0, 1))
+                            {
+                                case "@":
+                                    // include file
+                                    string fileToInclude = Path.Combine(Path.GetDirectoryName(filename), line.Substring(1));
+                                    if (File.Exists(fileToInclude))
                                     {
-                                        listMacros[macro.Key] = macro.Value;
+                                        ParseFile(fileToInclude, listMacros);
                                     }
                                     else
                                     {
-                                        listMacros.Add(macro);
+                                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "Include tag with file not found in '{0}'.", fileToInclude);
                                     }
-                                }
-                                else
-                                {
-                                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "This macro line have incorrect format '%{0}'.", line);
-                                }
-                                break;
-                            case "#":
-                                ScriptedRule rule = ParseRule(line.Substring(1));
-                                if (rule != null)
-                                {
-                                    if (string.IsNullOrWhiteSpace(rule.Name))
+                                    break;
+                                case "%":
+                                    // Macro
+                                    KeyValuePair<string, string> macro = ParseMacro(line.Substring(1));
+                                    if (!string.IsNullOrWhiteSpace(macro.Key))
                                     {
-                                        rule.Name = string.Format("Rule {0:000}", _RuleCache.Count + 1);
+                                        if (listMacros.ContainsKey(macro.Key))
+                                        {
+                                            listMacros[macro.Key] = macro.Value;
+                                        }
+                                        else
+                                        {
+                                            listMacros.Add(macro);
+                                        }
                                     }
-                                    _RuleCache.Add(_RuleCache.Count + 1, rule);
-                                }
-                                else
-                                {
-                                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "This rule have incorrect format '#{0}'.", line);
-                                }
-                                break;
+                                    else
+                                    {
+                                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "This macro line have incorrect format '%{0}'.", line);
+                                    }
+                                    break;
+                                case "#":
+                                    ScriptedRule rule = ParseRule(line.Substring(1));
+                                    if (rule != null)
+                                    {
+                                        if (string.IsNullOrWhiteSpace(rule.Name))
+                                        {
+                                            rule.Name = string.Format("Rule {0:000}", _RuleCache.Count + 1);
+                                        }
+                                        _RuleCache.Add(_RuleCache.Count + 1, rule);
+                                    }
+                                    else
+                                    {
+                                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "This rule have incorrect format '#{0}'.", line);
+                                    }
+                                    break;
+                            }
                         }
+                        // Next line
+                        line = reader.ReadLine();
                     }
-                    // Next line
-                    line = reader.ReadLine();
-                }
-                foreach (ScriptedRule rule in _RuleCache.Values.Where(r => r.LambdaExpression == null))
-                {
-                    ReplaceMacro(rule, listMacros);
-                    if (rule.LambdaExpression == null)
+                    using (new PerformanceLogger("RulesManager.ParseFile - Replace Macro and Keyword"))
                     {
-                        FormatExpression(rule);
-                        ReplaceMacro(rule, _StandardKeyword);
-                        if (rule.LambdaExpression == null)
+                        foreach (ScriptedRule rule in _RuleCache.Values.Where(r => r.LambdaExpression == null))
                         {
-                            rule.LambdaExpression = ConstructOperation(string.Format("(item)=>{0}", rule.Expression), typeof(Object), typeof(bool));
+                            ReplaceMacro(rule, listMacros);
+                            if (rule.LambdaExpression == null)
+                            {
+                                FormatExpression(rule);
+                                ReplaceMacro(rule, _StandardKeyword);
+                                if (rule.LambdaExpression == null)
+                                {
+                                    rule.LambdaExpression = ConstructOperation(string.Format("(item)=>{0}", rule.Expression), typeof(Object), typeof(bool));
+                                }
+
+                            }
                         }
-
                     }
-
                 }
             }
         }

@@ -77,6 +77,8 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotStart.cs" />
+    <Compile Include="PowerManager.cs" />
+    <Compile Include="ScheduledPower.cs" />
     <Compile Include="ScriptedRules\Dynamic.cs" />
     <Compile Include="ScriptedRules\RulesManager.cs" />
     <Compile Include="ScriptedRules\ScriptedRuleAction.cs" />
@@ -238,6 +240,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ItemRules\config.dis" />
+    <None Include="ItemRules\Items.utr" />
     <None Include="ItemRules\legendary.dis" />
     <None Include="ItemRules\legendary_it.dis" />
     <None Include="ItemRules\legendary_ru.dis" />
