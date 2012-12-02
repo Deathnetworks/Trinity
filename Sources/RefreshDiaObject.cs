@@ -1039,14 +1039,19 @@ namespace GilesTrinity
             RefreshItemStats(itemBaseType);
             // Ignore it if it's not in range yet - allow legendary items to have 15 feet extra beyond our profile max loot radius
             float fExtraRange = 0f;
-            if (iKeepLootRadiusExtendedFor > 0 || c_ItemQuality >= ItemQuality.Rare4)
-            {
+			// !sp - loot range extension range for legendaries
+            if (iKeepLootRadiusExtendedFor > 0) {
                 fExtraRange = 30f;
-            }
-            if (iKeepLootRadiusExtendedFor > 0 || c_ItemQuality >= ItemQuality.Legendary)
+			}
+            if (c_ItemQuality >= ItemQuality.Rare4)
             {
-                fExtraRange = 50f;
+                fExtraRange = iCurrentMaxLootRadius; //!sp - double range for Rares
             }
+            if (c_ItemQuality >= ItemQuality.Legendary)
+            {
+                fExtraRange = 10*iCurrentMaxLootRadius; //!sp - mega range for Legendaries
+            }
+
             if (c_CentreDistance > (iCurrentMaxLootRadius + fExtraRange))
             {
                 AddToCache = false;
