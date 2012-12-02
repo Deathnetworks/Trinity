@@ -1109,34 +1109,34 @@ namespace GilesTrinity
                 }
                 dictGilesGoldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
             }
-
-            /* 
-             * Giles Black Magic gold formula
-             * 
-            // Ignore gold piles that are (currently) too small...
-            // Up to 40% less gold limit needed at close range
-            if (c_CentreDistance <= 20f)
-            {
-                iPercentage = (1 - (c_CentreDistance / 20)) * 0.4;
-                rangedMinimumStackSize -= (int)Math.Floor(iPercentage * Settings.Loot.Pickup.MinimumGoldStack);
-            }
-            // And up to 40% or even higher extra gold limit at distant range
-            else if (c_CentreDistance >= 30f)
-            {
-                iPercentage = (c_CentreDistance / 40) * 0.4;
-                rangedMinimumStackSize += (int)Math.Floor(iPercentage * Settings.Loot.Pickup.MinimumGoldStack);
-            }
-
-
-            // Now check if this gold pile is currently less than this limit
-            if (c_GoldStackSize < rangedMinimumStackSize)
-            {
-                AddToCache = false;
-            }
-            */
+			
+			// Ignore gold piles that are (currently) too small...
+            rangedMinimumStackSize = Settings.Loot.Pickup.MinimumGoldStack;
+			int min_cash = 100;	//absolute min cash to consider
+			int max_distance = 80;
+			if (c_GoldStackSize < min_cash) {
+				rangedMinimumStackSize = min_cash;
+			} else if (c_CentreDistance >= max_distance) {
+				rangedMinimumStackSize = 0;	//too far away
+			} else {
+				//scale the min stack size based on distance
+				//this will enable smaller, local cash values to be picked up
+				//while enroute, picking up items or larger amounts
+				//better for toons with low pickup range
+				int min_range = 6; //anything below this should be collected
+				int max_range = 30; //anything beyond this should be at the upper threshold
+				int max_cash = Math.Max(min_cash, rangedMinimumStackSize);
+				double cash_range = Math.Max(0, c_CentreDistance-min_range);
+				double rangedPerc = cash_range/(max_range-min_range); //no ceiling on this to capture distant, high values. twice distance=twice value
+				int newMinStack = (int)Math.Floor(rangedPerc * (max_cash-min_cash))+min_cash;
+				rangedMinimumStackSize = newMinStack;
+				if (c_GoldStackSize >= rangedMinimumStackSize) {
+					//Logging.Write("[SP] Gold v=" + c_GoldStackSize + " ,d=" + c_CentreDistance + ",w=" + rangedPerc + ",nms="+newMinStack);
+				}
+			}
 
             // rrrix thinks this is better!
-            if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)
+            if (c_GoldStackSize < rangedMinimumStackSize)
             {
                 AddToCache = false;
             }
