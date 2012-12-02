@@ -1340,6 +1340,7 @@ namespace GilesTrinity
             bPickNewAbilities = true;
             // Keep looking for monsters at "normal kill range" a few moments after we successfully attack a monster incase we can pull them into range
             iKeepKillRadiusExtendedFor = 8;
+            timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
             iKeepLootRadiusExtendedFor = 8;
             // if at full or nearly full health, see if we can raycast to it, if not, ignore it for 2000 ms
             if (CurrentTarget.HitPoints >= 0.9d && iAnythingWithinRange[RANGE_50] > 3)
