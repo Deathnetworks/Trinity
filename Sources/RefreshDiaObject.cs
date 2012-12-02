@@ -89,8 +89,8 @@ namespace GilesTrinity
             if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
 
             /* 
-               * Main Switch on Object Type - Refresh individual object types (Units, Items, Gizmos)
-               */
+             * Main Switch on Object Type - Refresh individual object types (Units, Items, Gizmos)
+             */
             RefreshStepMainObjectType(ref AddToCache);
             if (!AddToCache) { c_IgnoreReason = "MainObjectType"; return AddToCache; }
 
@@ -471,6 +471,7 @@ namespace GilesTrinity
 
                     }
                 // Handle Gold
+                // NOTE: Only identified as gold after *FIRST* loop as an "item" by above code
                 case GObjectType.Gold:
                     {
                         AddToCache = RefreshGilesGold(AddToCache);
@@ -478,6 +479,7 @@ namespace GilesTrinity
                         break;
                     }
                 // Handle Globes
+                // NOTE: Only identified as globe after *FIRST* loop as an "item" by above code
                 case GObjectType.Globe:
                     {
                         // Ignore it if it's not in range yet
@@ -1032,8 +1034,13 @@ namespace GilesTrinity
             }
             if (c_ItemQuality >= ItemQuality.Legendary)
             {
-                fExtraRange = 50f;
+                fExtraRange = iCurrentMaxLootRadius; //!sp - double range for Rares
             }
+            if (c_ItemQuality >= ItemQuality.Legendary)
+            {
+                fExtraRange = 10*iCurrentMaxLootRadius; //!sp - mega range for Legendaries
+            }
+
             if (c_CentreDistance > (iCurrentMaxLootRadius + fExtraRange))
             {
                 AddToCache = false;

@@ -304,6 +304,7 @@ namespace GilesTrinity
 
         // The number of loops to extend kill range for after a fight to try to maximize kill bonus exp etc.
         private static int iKeepKillRadiusExtendedFor = 0;
+        private static DateTime timeKeepKillRadiusExtendedUntil = DateTime.Today;
 
         // The number of loops to extend loot range for after a fight to try to stop missing loot
         private static int iKeepLootRadiusExtendedFor = 0;

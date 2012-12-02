@@ -169,9 +169,22 @@ namespace GilesTrinity
             {
                 iCurrentMaxLootRadius /= 4;
             }
+            if (iMyCachedActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+            { //!sp - keep looking for kills while WOTB is up
+                iKeepKillRadiusExtendedFor = Math.Max(3, iKeepKillRadiusExtendedFor);
+                timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
+            }
             // Counter for how many cycles we extend or reduce our attack/kill radius, and our loot radius, after a last kill
             if (iKeepKillRadiusExtendedFor > 0)
-                iKeepKillRadiusExtendedFor--;
+            {
+                TimeSpan diffResult = DateTime.Now.Subtract(timeKeepKillRadiusExtendedUntil);
+                iKeepKillRadiusExtendedFor = (int)diffResult.Seconds;
+                //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kill Radius remaining " + diffResult.Seconds + "s");
+                if (timeKeepKillRadiusExtendedUntil <= DateTime.Now)
+                {
+                    iKeepKillRadiusExtendedFor = 0;
+                }
+            }
             if (iKeepLootRadiusExtendedFor > 0)
                 iKeepLootRadiusExtendedFor--;
             // Refresh buffs (so we can check for wrath being up to ignore ice balls and anything else like that)
@@ -458,9 +471,9 @@ namespace GilesTrinity
                 }
             }
             // Safety for Giles own portal-back-to-town for full-backpack
-            else if (ForceVendorRunASAP)
+            if (ForceVendorRunASAP)
             {
-                if (dUseKillRadius <= 60) dUseKillRadius = 60;
+                if (dUseKillRadius <= 90) dUseKillRadius = 90;
                 //intell
             }
             return dUseKillRadius;

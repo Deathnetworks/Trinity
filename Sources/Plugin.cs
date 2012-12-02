@@ -73,6 +73,7 @@ namespace GilesTrinity
         /// </summary>
         public void OnPulse()
         { }
+
         /// <summary>
         /// Called when user Enable the plugin.
         /// </summary>

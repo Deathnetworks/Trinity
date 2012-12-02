@@ -254,6 +254,7 @@ namespace GilesTrinity
                         case SNOAnim.Demonhunter_Male_HTH_recall_channel:
                         case SNOAnim.Demonhunter_Female_HTH_recall_channel:
                             iKeepKillRadiusExtendedFor = 20;
+                            timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
                             break;
                     }
                 }
