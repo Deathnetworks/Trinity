@@ -15,7 +15,7 @@ namespace GilesTrinity.Cache
         public CacheGizmo(ACD acd)
             : base(acd)
         {
-
+            CacheType = CacheType.Gizmo;
         }
         /// <summary>
         /// Gets the DiaGizmo

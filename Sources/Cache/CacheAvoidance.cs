@@ -13,7 +13,7 @@ namespace GilesTrinity.Cache
         public CacheAvoidance(ACD acd)
             : base(acd)
         {
-
+            CacheType = CacheType.Avoidance;
         }
 
         public bool IsProjectile { get; set; }

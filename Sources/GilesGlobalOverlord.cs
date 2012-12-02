@@ -38,7 +38,7 @@ namespace GilesTrinity
             if (pf == null)
                 pf = new PathFinder(gp);
 
-            if (false)
+            if (true)
                 CacheRefresher.RefreshAll();
 
             // World ID safety caching incase it's ever unavailable

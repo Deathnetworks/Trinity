@@ -14,6 +14,7 @@ namespace GilesTrinity.Cache
             : base(acd)
         {
             ActorSNO = acd.ActorSNO;
+            CacheType = CacheType.Unit;
 
             DynamicID = acd.DynamicId;
             GameBalanceID = acd.GameBalanceId;

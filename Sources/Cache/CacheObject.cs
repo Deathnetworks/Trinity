@@ -193,7 +193,7 @@ namespace GilesTrinity.Cache
         public CacheOther(ACD acd)
             : base(acd)
         {
-
+            CacheType = CacheType.Other;
         }
 
         public override CacheObject Clone()

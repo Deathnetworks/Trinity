@@ -16,88 +16,19 @@ namespace GilesTrinity.Cache
     {
         private static DiaActivePlayer Me = ZetaDia.Me;
 
-        public static void CacheObjectRefresher(int? acdGuid = null, ACD acd = null, CacheObject cacheObject = null)
-        {
-            if (acdGuid == null && acd == null && cacheObject == null)
-            {
-                throw new ArgumentNullException("All arguments cannot be null");
-            }
-
-            if (cacheObject != null)
-            {
-                acdGuid = cacheObject.ACDGuid;
-                acd = cacheObject.CommonData;
-            }
-            else if (acd != null)
-            {
-                acdGuid = acd.ACDGuid;
-            }
-            else if (acdGuid != null)
-            {
-                acd = ZetaDia.Actors.GetACDByGuid((int)acdGuid);
-            }
-
-            // Initialize a new Cache Object
-            if (cacheObject == null)
-            {
-                int actorSNO = acd.ActorSNO;
-                if (CacheUtils.IsAvoidanceSNO(actorSNO))
-                {
-                    cacheObject = new CacheAvoidance(acd);
-                }
-                else
-                {
-                    switch (acd.ActorType)
-                    {
-                        case ActorType.Unit:
-                            cacheObject = new CacheUnit(acd);
-                            break;
-                        case ActorType.Gizmo:
-                            cacheObject = new CacheGizmo(acd);
-                            break;
-                        case ActorType.Item:
-                            cacheObject = new CacheItem(acd);
-                            break;
-                        default:
-                            cacheObject = new CacheOther(acd);
-                            break;
-                    }
-                }
-            }
-            else
-            {
-                switch (cacheObject.CacheType)
-                {
-                    case CacheType.Unit:
-                        RefreshUnit((CacheUnit)cacheObject);
-                        break;
-                    case CacheType.Item:
-                        RefreshItem((CacheItem)cacheObject);
-                        break;
-                    case CacheType.Gizmo:
-                        RefreshGizmo((CacheGizmo)cacheObject);
-                        break;
-                    case CacheType.Other:
-                        RefreshOther((CacheOther)cacheObject);
-                        break;
-                }
-
-            }
-
-        }
-
         /// <summary>
         /// Refreshes a unit
         /// </summary>
         /// <param name="unit"></param>
         private static void RefreshUnit(CacheUnit unit)
         {
-            unit.Position = unit.CommonData.Position;
-
-
-
-            CacheManager.PutObject(unit);
-
+            try
+            {
+                unit.Position = unit.CommonData.Position;
+            }
+            catch
+            {
+            } 
         }
         /// <summary>
         /// Refreshes an Item
@@ -105,7 +36,13 @@ namespace GilesTrinity.Cache
         /// <param name="item"></param>
         private static void RefreshItem(CacheItem item)
         {
-            CacheManager.PutObject(item);
+            try
+            {
+
+            }
+            catch
+            {
+            }
         }
 
         /// <summary>
@@ -114,10 +51,13 @@ namespace GilesTrinity.Cache
         /// <param name="gizmo"></param>
         private static void RefreshGizmo(CacheGizmo gizmo)
         {
+            try
+            {
 
-
-            CacheManager.PutObject(gizmo);
-
+            }
+            catch
+            {
+            }
         }
 
         /// <summary>
@@ -126,11 +66,13 @@ namespace GilesTrinity.Cache
         /// <param name="other"></param>
         private static void RefreshOther(CacheOther other)
         {
-         
+            try
+            {
 
-
-            CacheManager.PutObject(other);
-
+            }
+            catch
+            {
+            }
         }
 
         /// <summary>
@@ -138,9 +80,52 @@ namespace GilesTrinity.Cache
         /// </summary>
         public static void RefreshAll()
         {
+            CacheManager.CacheObjectGetter = GetCache;
+            CacheManager.CacheObjectRefresher = RefreshCache;
             foreach (ACD acd in ZetaDia.Actors.ACDList)
             {
-                CacheObjectRefresher(null, acd, null);
+                CacheManager.GetObject(acd);
+            }
+        }
+
+        private static void RefreshCache(int acdGuid, ACD acdObject, CacheObject cacheObject)
+        {
+            switch (cacheObject.CacheType)
+            {
+                case CacheType.Unit:
+                    RefreshUnit((CacheUnit)cacheObject);
+                    break;
+                case CacheType.Item:
+                    RefreshItem((CacheItem)cacheObject);
+                    break;
+                case CacheType.Gizmo:
+                    RefreshGizmo((CacheGizmo)cacheObject);
+                    break;
+                case CacheType.Other:
+                    RefreshOther((CacheOther)cacheObject);
+                    break;
+            }
+        }
+
+        private static CacheObject GetCache(int acdGuid, ACD acdObject)
+        {
+            switch (acdObject.ActorType)
+            {
+                case ActorType.Unit:
+                    return new CacheUnit(acdObject);
+                case ActorType.Gizmo:
+                    return new CacheGizmo(acdObject);
+                case ActorType.Item:
+                    return new CacheItem(acdObject);
+                default:
+                    if (CacheUtils.IsAvoidanceSNO(acdObject.ActorSNO))
+                    {
+                        return new CacheAvoidance(acdObject);
+                    }
+                    else
+                    {
+                        return new CacheOther(acdObject);
+                    }
             }
         }
     }

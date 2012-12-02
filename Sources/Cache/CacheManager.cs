@@ -21,7 +21,7 @@ namespace GilesTrinity.Cache
         private static CacheObjectRefresherDelegate _CacheObjectRefresher;
         private static readonly object _Synchronizer = new object();
         private static Thread _CacheCleaner;
-        private static readonly IDictionary<GObjectType, uint> _CacheTimeout = new Dictionary<GObjectType, uint>();
+        private static readonly IDictionary<CacheType, uint> _CacheTimeout = new Dictionary<CacheType, uint>();
         private static uint _MaxRefreshRate = 300;
         #endregion Fields
 
@@ -68,7 +68,7 @@ namespace GilesTrinity.Cache
         /// Gets the cache timeout by <see cref="GObjectType"/>.
         /// </summary>
         /// <value>The cache timeout.</value>
-        public static IDictionary<GObjectType, uint> CacheTimeout
+        public static IDictionary<CacheType, uint> CacheTimeout
         {
             get
             {
@@ -125,28 +125,13 @@ namespace GilesTrinity.Cache
                     throw new InvalidOperationException("CacheManager is already initialized.");
                 }
 
-                _CacheTimeout.Add(GObjectType.Avoidance, 60000);
-                _CacheTimeout.Add(GObjectType.Backtrack, 60000);
-                _CacheTimeout.Add(GObjectType.Barricade, 60000);
-                _CacheTimeout.Add(GObjectType.Checkpoint, 60000);
-                _CacheTimeout.Add(GObjectType.Container, 60000);
-                _CacheTimeout.Add(GObjectType.Destructible, 60000);
-                _CacheTimeout.Add(GObjectType.Door, 60000);
-                _CacheTimeout.Add(GObjectType.Globe, 60000);
-                _CacheTimeout.Add(GObjectType.Gold, 120000);
-                _CacheTimeout.Add(GObjectType.HealthWell, 60000);
-                _CacheTimeout.Add(GObjectType.Interactable, 60000);
-                _CacheTimeout.Add(GObjectType.Item, 120000);
-                _CacheTimeout.Add(GObjectType.MarkerLocation, 60000);
-                _CacheTimeout.Add(GObjectType.Proxy, 60000);
-                _CacheTimeout.Add(GObjectType.Shrine, 60000);
-                _CacheTimeout.Add(GObjectType.ServerProp, 60000);
-                _CacheTimeout.Add(GObjectType.StartLocation, 60000);
-                _CacheTimeout.Add(GObjectType.SavePoint, 60000);
-                _CacheTimeout.Add(GObjectType.Trigger, 60000);
-                _CacheTimeout.Add(GObjectType.Unit, 120000);
-                _CacheTimeout.Add(GObjectType.Unknown, 60000);
-
+                _CacheTimeout.Add(CacheType.Avoidance, 60000);
+                _CacheTimeout.Add(CacheType.Gizmo, 60000);
+                _CacheTimeout.Add(CacheType.Item, 60000);
+                _CacheTimeout.Add(CacheType.Object, 60000);
+                _CacheTimeout.Add(CacheType.Other, 60000);
+                _CacheTimeout.Add(CacheType.Unit, 60000);
+                
                 _CacheCleaner = new Thread(MaintainCache);
                 _CacheCleaner.Priority = ThreadPriority.Lowest;
                 _CacheCleaner.IsBackground = true;
@@ -238,41 +223,14 @@ namespace GilesTrinity.Cache
             }
         }
 
-        /// <summary>
-        /// Adds an entry to the cache
-        /// </summary>
-        /// <param name="cacheObject"></param>
-        public static void PutObject(CacheObject cacheObject)
-        {
-            using (new PerformanceLogger("CacheManager.GetObject"))
-            {
-                if (cacheObject == null)
-                {
-                    return;
-                }
-
-                lock (_Synchronizer)
-                {
-                    if (_Cache.ContainsKey(cacheObject.ACDGuid))
-                    {
-                        _Cache[cacheObject.ACDGuid] = cacheObject;
-                    }
-                    else
-                    {
-                        _Cache.Add(cacheObject.ACDGuid, cacheObject);
-                    }
-                }
-            }
-        }
-
         /// <summary>Gets all cached object corresponding to the type.</summary>
         /// <typeparam name="T">Type of cached object</typeparam>
         /// <param name="type">The type.</param>
         /// <returns><see cref="IEnumerable"/> corresponding to all objects of this type in cache.</returns>
-        public static IEnumerable<T> GetAllObjectByType<T>(GObjectType type)
+        public static IEnumerable<T> GetAllObjectByType<T>(CacheType type)
             where T : CacheObject
         {
-            foreach (CacheObject obj in _Cache.Values.Where(o => o.Type == type))
+            foreach (CacheObject obj in _Cache.Values.Where(o => o.CacheType == type))
             {
                 if (obj is T)
                 {
@@ -296,7 +254,7 @@ namespace GilesTrinity.Cache
                     // Find which RActorGuid can be deleted from cache and store it 
                     foreach (KeyValuePair<int, CacheObject> keyPair in _Cache)
                     {
-                        if (DateTime.UtcNow.Subtract(keyPair.Value.LastAccessDate).TotalSeconds > _CacheTimeout[keyPair.Value.Type])
+                        if (DateTime.UtcNow.Subtract(keyPair.Value.LastAccessDate).TotalSeconds > _CacheTimeout[keyPair.Value.CacheType])
                         {
                             removableKey.Add(keyPair.Key);
                         }
