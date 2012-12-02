@@ -728,32 +728,34 @@ namespace GilesTrinity
                 AddToCache = false;
                 c_IgnoreSubStep = "OutsideofKillRadius";
             }
-            if (thisUnit.IsUntargetable)
-            {
-                AddToCache = false;
-                c_IgnoreSubStep += "Untargettable+";
-            }
-            // Disabled because of chickens
-            // if (thisUnit.IsHidden)
-            // {
-            //    AddToCache = false;
-            //    c_IgnoreSubStep += "IsHidden+";
-            // }
-            if (thisUnit.IsInvulnerable)
-            {
-                AddToCache = false;
-                c_IgnoreSubStep += "IsInvulnerable+";
-            }
-            if (thisUnit.IsBurrowed)
-            {
-                AddToCache = false;
-                c_IgnoreSubStep += "IsBurrowed+";
-            }
-            if (thisUnit.IsHelper || thisUnit.IsNPC || thisUnit.IsTownVendor)
-            {
-                AddToCache = false;
-                c_IgnoreSubStep += "IsNPCOrHelper+";
-            }
+			try {
+				if (thisUnit.IsUntargetable)
+				{
+					AddToCache = false;
+					c_IgnoreSubStep += "Untargettable+";
+				}
+				// Disabled because of chickens
+				// if (thisUnit.IsHidden)
+				// {
+				//    AddToCache = false;
+				//    c_IgnoreSubStep += "IsHidden+";
+				// }
+				if (thisUnit.IsInvulnerable)
+				{
+					AddToCache = false;
+					c_IgnoreSubStep += "IsInvulnerable+";
+				}
+				if (thisUnit.IsBurrowed)
+				{
+					AddToCache = false;
+					c_IgnoreSubStep += "IsBurrowed+";
+				}
+				if (thisUnit.IsHelper || thisUnit.IsNPC || thisUnit.IsTownVendor)
+				{
+					AddToCache = false;
+					c_IgnoreSubStep += "IsNPCOrHelper+";
+				}
+			} catch {}
             // Safe is-attackable detection
             if (AddToCache)
                 c_unit_IsAttackable = true;
