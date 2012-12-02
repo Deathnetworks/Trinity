@@ -14,17 +14,10 @@ namespace GilesTrinity.Cache
             : base(acd)
         {
             ActorSNO = acd.ActorSNO;
-            InternalUnit = (DiaUnit)acd.AsRActor;
-            RActorGUID = InternalUnit.RActorGuid;
+
             DynamicID = acd.DynamicId;
             GameBalanceID = acd.GameBalanceId;
             Name = acd.Name;
-
-
-            HitpointsCurrent = InternalUnit.HitpointsCurrent;
-            HitpointsMax = InternalUnit.HitpointsMax;
-            HitpointsMaxTotal = InternalUnit.HitpointsMaxTotal;
-            HitpointsCurrentPct = HitpointsCurrent / HitpointsMaxTotal;
 
             CurrentAnimation = acd.CurrentAnimation;
             MonsterSize = acd.MonsterInfo.MonsterSize;
@@ -32,9 +25,21 @@ namespace GilesTrinity.Cache
             IsElite = acd.IsElite;
             IsRare = acd.IsRare;
             IsUnique = acd.IsUnique;
-            IsMinion = InternalUnit.SummonedByACDId > 0;
             IsEliteRareUnique = (IsElite || IsRare || IsUnique);
             IsBoss = CacheUtils.IsBossSNO(ActorSNO);
+
+            DiaObject rActor = acd.AsRActor;
+            if (rActor is DiaUnit)
+            {
+                InternalUnit = (DiaUnit)rActor;
+
+                RActorGUID = InternalUnit.RActorGuid;
+                HitpointsCurrent = InternalUnit.HitpointsCurrent;
+                HitpointsMax = InternalUnit.HitpointsMax;
+                HitpointsMaxTotal = InternalUnit.HitpointsMaxTotal;
+                HitpointsCurrentPct = HitpointsCurrent / HitpointsMaxTotal;
+                IsMinion = InternalUnit.SummonedByACDId > 0;
+            }
         }
 
         /// <summary>

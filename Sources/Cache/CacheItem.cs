@@ -27,10 +27,13 @@ namespace GilesTrinity.Cache
         public CacheItem(ACD acd)
             : base(acd)
         {
+            ACDItem = (ACDItem)acd;
             DiaItem item = ((DiaItem)acd.AsRActor);
             CachedObject = item;
+
+            InternalName = ACDItem.InternalName;
             Quality = DetermineQuality(ACDItem.ItemQualityLevel);
-            ItemType = DetermineItemType(InternalName, item.CommonData.ItemType);
+            ItemType = DetermineItemType(InternalName, ACDItem.ItemType);
             BaseType = DetermineBaseType(ItemType);
 
             int standardRequiredLevel = (ACDItem.Stats.Level > 60) ? 60 : ACDItem.Stats.Level - 1;
@@ -90,7 +93,6 @@ namespace GilesTrinity.Cache
             FollowerSpecialType = ACDItem.FollowerSpecialType;
             Gold = ACDItem.Gold;
             IdentifyCost = ACDItem.IdentifyCost;
-            InternalName = ACDItem.InternalName;
             InventoryColumn = ACDItem.InventoryColumn;
             InventoryRow = ACDItem.InventoryRow;
             IsTwoHand = ACDItem.IsTwoHand;
@@ -113,10 +115,8 @@ namespace GilesTrinity.Cache
         #region Properties
         private Db.ACDItem ACDItem
         {
-            get
-            {
-                return CachedObject.CommonData;
-            }
+            get;
+            set;
         }
 
         public Db.DiaItem CachedObject
