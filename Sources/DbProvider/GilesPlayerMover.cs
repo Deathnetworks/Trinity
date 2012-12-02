@@ -52,24 +52,25 @@ namespace GilesTrinity.DbProvider
         private static DateTime lastCheckBag;
         private static DateTime lastRefreshCoin;
 
-		private static void resetCheckGold() {
+		private static void ResetCheckGold() {
 			lastCheckBag=DateTime.Now;
 			lastRefreshCoin=DateTime.Now;
 			lastKnowCoin=0;
 		}
 	
-		private static bool goldInactive()
+		private static bool GoldInactive()
         {
             if (!GilesTrinity.Settings.Advanced.GoldInactivityEnabled)
             {
                 // timer isn't enabled so move along!
-                resetCheckGold();
+                ResetCheckGold();
                 return false;
             }
-			try{
+			try
+            {
 				if (!ZetaDia.IsInGame)
 				{
-					resetCheckGold(); //If not in game, reset the timer
+					ResetCheckGold(); //If not in game, reset the timer
 					return false;
 				}
 				if (ZetaDia.IsLoadingWorld || lastCheckBag == null)
@@ -79,8 +80,6 @@ namespace GilesTrinity.DbProvider
            
                 lastCheckBag = DateTime.Now;
                 int currentcoin = ZetaDia.Me.Inventory.Coinage;
-				//DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Last Know Coin is " + lastKnowCoin);
-				//DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Current   Coin is " + currentcoin);
 				
                 if (currentcoin != lastKnowCoin && currentcoin != 0)
                 {
@@ -90,15 +89,18 @@ namespace GilesTrinity.DbProvider
                 int notpickupgoldsec = Convert.ToInt32(DateTime.Now.Subtract(lastRefreshCoin).TotalSeconds);
                 if (notpickupgoldsec >= GilesTrinity.Settings.Advanced.GoldInactivityTimer)
                 {
-					DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Gold inactivity after " + notpickupgoldsec + "s. Sending abort.");
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Gold inactivity after {0}s. Sending abort.", notpickupgoldsec);
                     lastRefreshCoin = DateTime.Now;
                     lastKnowCoin = currentcoin;
                     notpickupgoldsec = 0;
                     return true;
-                } else if (notpickupgoldsec > 0) {
-					DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Gold unchanged for " + notpickupgoldsec + "s");
+                } 
+                else if (notpickupgoldsec > 0) 
+                {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Gold unchanged for {0}s", notpickupgoldsec);
                 }
-            }catch (Exception e)
+            }
+            catch (Exception e)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, e.Message);
             }

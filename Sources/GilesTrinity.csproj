@@ -257,8 +257,8 @@ rd $(ProjectDir)bin\
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>rd /S /Q "C:\UnifiedTrinity\UnifiedTrinity\Sources\obj\"
-rd /S /Q "C:\UnifiedTrinity\UnifiedTrinity\Sources\bin\"
+    <PostBuildEvent>REM rd /S /Q "C:\UnifiedTrinity\UnifiedTrinity\Sources\obj\"
+REM rd /S /Q "C:\UnifiedTrinity\UnifiedTrinity\Sources\bin\"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
