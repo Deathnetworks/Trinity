@@ -77,7 +77,7 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotStart.cs" />
-    <Compile Include="PowerManager.cs" />
+    <Compile Include="TrinityPowerManager.cs" />
     <Compile Include="ScheduledPower.cs" />
     <Compile Include="ScriptedRules\Dynamic.cs" />
     <Compile Include="ScriptedRules\RulesManager.cs" />
