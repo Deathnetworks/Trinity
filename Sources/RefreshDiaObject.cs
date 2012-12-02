@@ -637,8 +637,8 @@ namespace GilesTrinity
                 bHasCachedHealth = false;
                 iLastCheckedHealth = 1;
             }
-            // Update health once every 5 cycles, except for current target, which is every cycle
-            if (iLastCheckedHealth == 1)
+            // Update health once every 5 cycles, except for current target, which is every cycle (rrrix: done through TargetHandler for some WTF reason)
+            if (iLastCheckedHealth == 1 || dictActorSNOPriority.Any(p => p.Key == c_ActorSNO && p.Value > 500))
             {
                 try
                 {

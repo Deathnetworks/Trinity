@@ -272,75 +272,83 @@ namespace GilesTrinity
 
         private static void RefreshCacheMainLoop()
         {
-            var refreshSource =
-                from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                where o.IsValid
-                orderby o.ActorType, o.Distance
-                select o;
-
-            Stopwatch t1 = new Stopwatch();
-
-
-            foreach (DiaObject currentObject in refreshSource)
+            using (new PerformanceLogger("CacheManagement.RefreshCacheMainLoop"))
             {
-                try
+                using (ZetaDia.Memory.AcquireFrame())
                 {
-                    bool AddToCache = false;
+                    ZetaDia.Actors.Update();
 
-                    if (!Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
+                    var refreshSource =
+                    from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                    where o.IsValid
+                    orderby o.ActorType, o.Distance
+                    select o;
+
+                    Stopwatch t1 = new Stopwatch();
+
+
+                    foreach (DiaObject currentObject in refreshSource)
                     {
-                        /*
-                         *  Main Cache Function
-                         */
-                        AddToCache = CacheDiaObject(currentObject);
+                        try
+                        {
+                            bool AddToCache = false;
+
+                            if (!Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
+                            {
+                                /*
+                                 *  Main Cache Function
+                                 */
+                                AddToCache = CacheDiaObject(currentObject);
+                            }
+                            else
+                            {
+                                // We're debugging, slightly slower, calculate performance metrics and dump debugging to log 
+                                t1.Reset();
+                                t1.Start();
+
+                                /*
+                                 *  Main Cache Function
+                                 */
+                                AddToCache = CacheDiaObject(currentObject);
+
+                                if (t1.IsRunning)
+                                    t1.Stop();
+
+                                // Disabled, was missing some things on output... ServerProps maybe?
+                                // bool ignore = (from n in ignoreNames
+                                //               where c_Name.StartsWith(n)
+                                //               select true).FirstOrDefault();
+                                // if (!ignore)
+                                // {
+
+                                double duration = t1.Elapsed.TotalMilliseconds;
+
+                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement,
+                                    "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}){7} Dist2Mid: {8:0} Dist2Rad: {9:0} ZDiff: {10:0} Radius: {11}",
+                                    duration,
+                                    (AddToCache ? "Added  " : " Ignored"),
+                                    (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
+                                    (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
+                                    c_ObjectType,
+                                    c_diaObject.ActorType,
+                                    c_Name,
+                                    c_ActorSNO,
+                                    (c_unit_IsBoss ? " IsBoss" : ""),
+                                    c_CentreDistance,
+                                    c_RadiusDistance,
+                                    c_ZDiff,
+                                    c_Radius);
+                                // }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
+                                    currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+
+                        }
                     }
-                    else
-                    {
-                        // We're debugging, slightly slower, calculate performance metrics and dump debugging to log 
-                        t1.Reset();
-                        t1.Start();
-
-                        /*
-                         *  Main Cache Function
-                         */
-                        AddToCache = CacheDiaObject(currentObject);
-
-                        if (t1.IsRunning)
-                            t1.Stop();
-
-                        // Disabled, was missing some things on output... ServerProps maybe?
-                        // bool ignore = (from n in ignoreNames
-                        //               where c_Name.StartsWith(n)
-                        //               select true).FirstOrDefault();
-                        // if (!ignore)
-                        // {
-
-                        double duration = t1.Elapsed.TotalMilliseconds;
-
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement,
-                            "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}){7} Dist2Mid: {8:0} Dist2Rad: {9:0} ZDiff: {10:0} Radius: {11}",
-                            duration,
-                            (AddToCache ? "Added  " : " Ignored"),
-                            (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
-                            (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
-                            c_ObjectType,
-                            c_diaObject.ActorType,
-                            c_Name,
-                            c_ActorSNO,
-                            (c_unit_IsBoss ? " IsBoss" : ""),
-                            c_CentreDistance,
-                            c_RadiusDistance,
-                            c_ZDiff,
-                            c_Radius);
-                        // }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
-                            currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance);
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
-
                 }
             }
         }

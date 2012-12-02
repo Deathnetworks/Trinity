@@ -200,6 +200,8 @@ namespace GilesTrinity
             205756, 5509, 200371,
             // rrrix act 3
             60108,
+            // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
+            263014, 54908,
          };
         // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
         internal static HashSet<int> hashMysticAlly = new HashSet<int> { 169123, 123885, 169890, 168878, 169891, 169077, 169904, 169907, 169906, 169908, 169905, 169909 };
@@ -290,7 +292,9 @@ namespace GilesTrinity
             201680,
             //trOut_Leor_painting
             217285,
-         };
+            // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
+            263014, 54908,
+      };
 
         /// <summary>
         /// Timers for abilities and selection of best ability etc.
