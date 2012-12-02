@@ -51,7 +51,6 @@ namespace GilesTrinity.DbProvider
         private static int lastKnowCoin;
         private static DateTime lastCheckBag;
         private static DateTime lastRefreshCoin;
-        public static int expireSeconds = 225;
 
 		private static void resetCheckGold() {
 			lastCheckBag=DateTime.Now;
@@ -61,6 +60,12 @@ namespace GilesTrinity.DbProvider
 	
 		private static bool goldInactive()
         {
+            if (!GilesTrinity.Settings.Advanced.GoldInactivityEnabled)
+            {
+                // timer isn't enabled so move along!
+                resetCheckGold();
+                return false;
+            }
 			try{
 				if (!ZetaDia.IsInGame)
 				{
@@ -83,7 +88,7 @@ namespace GilesTrinity.DbProvider
                     lastKnowCoin = currentcoin;
                 }
                 int notpickupgoldsec = Convert.ToInt32(DateTime.Now.Subtract(lastRefreshCoin).TotalSeconds);
-                if (notpickupgoldsec >= expireSeconds)
+                if (notpickupgoldsec >= GilesTrinity.Settings.Advanced.GoldInactivityTimer)
                 {
 					DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Gold inactivity after " + notpickupgoldsec + "s. Sending abort.");
                     lastRefreshCoin = DateTime.Now;
