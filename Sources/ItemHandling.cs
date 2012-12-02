@@ -20,7 +20,7 @@ namespace GilesTrinity
         /// <summary>
         /// Randomize the timer between stashing/salvaging etc.
         /// </summary>
-        private static void RandomizeTheTimer()
+        internal static void RandomizeTheTimer()
         {
             Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
             int rnd = rndNum.Next(7);
@@ -38,7 +38,7 @@ namespace GilesTrinity
         /// <param name="followerType"></param>
         /// <param name="dynamicID"></param>
         /// <returns></returns>
-        private static bool GilesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemType dbItemType, FollowerType followerType, int dynamicID = 0)
+        internal static bool GilesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemType dbItemType, FollowerType followerType, int dynamicID = 0)
         {
 
             // If it's legendary, we always want it *IF* it's level is right
@@ -146,7 +146,7 @@ namespace GilesTrinity
         /// <param name="requiredBlueLevel">The blue level required.</param>
         /// <param name="requiredYellowLevel">The yellow level required.</param>
         /// <returns></returns>
-        private static bool CheckLevelRequirements(int level, ItemQuality quality, int requiredBlueLevel, int requiredYellowLevel)
+        internal static bool CheckLevelRequirements(int level, ItemQuality quality, int requiredBlueLevel, int requiredYellowLevel)
         {
             if (quality < ItemQuality.Magic1)
             {
@@ -179,7 +179,7 @@ namespace GilesTrinity
         /// <param name="dbItemType"></param>
         /// <param name="dbFollowerType"></param>
         /// <returns></returns>
-        private static GItemType DetermineItemType(string name, ItemType dbItemType, FollowerType dbFollowerType = FollowerType.None)
+        internal static GItemType DetermineItemType(string name, ItemType dbItemType, FollowerType dbFollowerType = FollowerType.None)
         {
             name = name.ToLower();
             if (name.StartsWith("axe_")) return GItemType.Axe;
@@ -299,7 +299,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        private static GItemBaseType DetermineBaseType(GItemType itemType)
+        internal static GItemBaseType DetermineBaseType(GItemType itemType)
         {
             GItemBaseType thisGilesBaseType = GItemBaseType.Unknown;
             if (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
@@ -363,7 +363,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        private static bool DetermineIsStackable(GItemType itemType)
+        internal static bool DetermineIsStackable(GItemType itemType)
         {
             return itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome || itemType == GItemType.Ruby ||
                    itemType == GItemType.Emerald || itemType == GItemType.Topaz || itemType == GItemType.Amethyst ||
@@ -376,7 +376,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        private static bool DetermineIsTwoSlot(GItemType itemType)
+        internal static bool DetermineIsTwoSlot(GItemType itemType)
         {
             return (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
                     itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
@@ -395,8 +395,8 @@ namespace GilesTrinity
         /// <summary>
         /// Search backpack to see if we have room for a 2-slot item anywhere
         /// </summary>
-        private static bool[,] BackpackSlotBlocked = new bool[10, 6];
-        private static Vector2 SortingFindLocationBackpack(bool isOriginalTwoSlot)
+        internal static bool[,] BackpackSlotBlocked = new bool[10, 6];
+        internal static Vector2 SortingFindLocationBackpack(bool isOriginalTwoSlot)
         {
             int iPointX = -1;
             int iPointY = -1;
@@ -432,7 +432,7 @@ namespace GilesTrinity
             }
             return new Vector2(iPointX, iPointY);
         }
-        private static Vector2 SortingFindLocationStash(bool isOriginalTwoSlot, bool endOfStash = false)
+        internal static Vector2 SortingFindLocationStash(bool isOriginalTwoSlot, bool endOfStash = false)
         {
             int iPointX = -1;
             int iPointY = -1;
@@ -706,7 +706,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="thisitem"></param>
         /// <returns></returns>
-        private static bool ShouldWeStashThis(GilesCachedACDItem thisitem)
+        internal static bool ShouldWeStashThis(GilesCachedACDItem thisitem)
         {
             // Now look for Misc items we might want to keep
             GItemType TrueItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
@@ -811,7 +811,7 @@ namespace GilesTrinity
             return false;
         }
 
-        private static bool IsWeaponArmorJewlery(GilesCachedACDItem thisitem)
+        internal static bool IsWeaponArmorJewlery(GilesCachedACDItem thisitem)
         {
             return (thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Armor || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Jewelry || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Weapon);
         }
@@ -821,7 +821,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="thisGilesItemType"></param>
         /// <returns></returns>
-        private static double ScoreNeeded(GItemType thisGilesItemType)
+        internal static double ScoreNeeded(GItemType thisGilesItemType)
         {
             double iThisNeedScore = 0;
 
@@ -876,7 +876,7 @@ namespace GilesTrinity
         /// <summary>
         /// Full Output Of Item Stats
         /// </summary>
-        private static void OutputReport()
+        internal static void OutputReport()
         {
             TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
             string sLogFileName = ZetaDia.Service.CurrentHero.BattleTagName + " - Stats - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log";
@@ -1073,7 +1073,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="IsOriginalTwoSlot"></param>
         /// <returns></returns>
-        private static Vector2 FindValidBackpackLocation(bool IsOriginalTwoSlot)
+        internal static Vector2 FindValidBackpackLocation(bool IsOriginalTwoSlot)
         {
             bool[,] BackpackSlotBlocked = new bool[10, 6];
 

@@ -12,7 +12,7 @@ namespace GilesTrinity
         /// <summary>
         /// This list is used when an actor has an attribute BuffVisualEffect=1, e.g. fire floors in The Butcher arena
         /// </summary>
-        private static HashSet<int> hashAvoidanceBuffSNOList = new HashSet<int>
+        internal static HashSet<int> hashAvoidanceBuffSNOList = new HashSet<int>
         {
             // Butcher Floor Panels
             201454, 201464, 201426, 201438, 200969, 201423, 201242,
@@ -24,7 +24,7 @@ namespace GilesTrinity
         /// <summary>
         /// A list of all the SNO's to avoid - you could add
         /// </summary>
-        private static HashSet<int> hashAvoidanceSNOList = new HashSet<int>
+        internal static HashSet<int> hashAvoidanceSNOList = new HashSet<int>
         {
             // Arcane        Arcane 2      Desecrator   Poison Tree    Molten Core   Molten Core 2   Molten Trail   Plague Cloud   Ice Balls
             219702,          221225,       84608,       5482,6578,     4803, 4804,   224225, 247987, 95868,         108869,        402, 223675,
@@ -43,7 +43,7 @@ namespace GilesTrinity
         /// <summary>
         /// A list of SNO's that are projectiles (so constantly look for new locations while avoiding)
         /// </summary>
-        private static HashSet<int> hashAvoidanceSNOProjectiles = new HashSet<int>
+        internal static HashSet<int> hashAvoidanceSNOProjectiles = new HashSet<int>
             {
                 // Bees-Wasps  Sha-Ball   Mol Ball   Azmo fireball	Zolt Twister	Maghda Projectile   Succubus Stars  Diablo Expanding Fire           Diablo Lightning Breath
                 5212,          4103,      160154,    123842,		139741,			166686,             164829,         185999, 196526, 136533
@@ -56,26 +56,26 @@ namespace GilesTrinity
         /// <summary>
         /// A special list of things *NOT* to use whirlwind on (eg because they move too quick/WW is ineffective on)
         /// </summary>
-        private static HashSet<int> hashActorSNOWhirlwindIgnore = new HashSet<int> {
+        internal static HashSet<int> hashActorSNOWhirlwindIgnore = new HashSet<int> {
             4304, 5984, 5985, 5987, 5988,
          };
 
         /// <summary>
         /// Very fast moving mobs (eg wasps), for special skill-selection decisions
         /// </summary>
-        private static HashSet<int> hashActorSNOFastMobs = new HashSet<int> {
+        internal static HashSet<int> hashActorSNOFastMobs = new HashSet<int> {
             5212
          };
         /// <summary>
         /// A list of crappy "summoned mobs" we should always ignore unless they are very close to us, eg "grunts", summoned skeletons etc.
         /// </summary>
-        private static HashSet<int> hashActorSNOShortRangeOnly = new HashSet<int> {
+        internal static HashSet<int> hashActorSNOShortRangeOnly = new HashSet<int> {
             4084, 4085, 5395, 144315,
          };
         /// <summary>
         /// Dictionary for priorities, like the skeleton summoner cos it keeps bringing new stuff
         /// </summary>
-        private static Dictionary<int, int> dictActorSNOPriority = new Dictionary<int, int> {
+        internal static Dictionary<int, int> dictActorSNOPriority = new Dictionary<int, int> {
             // Wood wraiths all this line (495 & 496 & 6572 & 139454 & 139456 & 170324 & 170325)
             {495, 901}, {496, 901}, {6572, 901}, {139454, 901}, {139456, 901}, {170324, 901}, {170325, 901},
             //intell -- added 4099 (act 2 fallen shaman)
@@ -138,7 +138,7 @@ namespace GilesTrinity
         /// <summary>
         /// A list of all known SNO's of treasure goblins/bandits etc.
         /// </summary>
-        private static HashSet<int> hashActorSNOGoblins = new HashSet<int> {
+        internal static HashSet<int> hashActorSNOGoblins = new HashSet<int> {
             5984, 5985, 5987, 5988
          };
         // A list of ranged mobs that should be attacked even if they are outside of the routines current kill radius
@@ -147,14 +147,14 @@ namespace GilesTrinity
         /// <summary>
         /// Contains ActorSNO of ranged units that should be attacked even if outside of kill radius
         /// </summary>
-        private static HashSet<int> hashActorSNORanged = new HashSet<int> {
+        internal static HashSet<int> hashActorSNORanged = new HashSet<int> {
             365, 4100, 4304, 4300, 4738, 4299, 62736, 130794, 5508, 210120, 5388, 4286
          };
         // A list of bosses in the game, just to make CERTAIN they are treated as elites
         /// <summary>
         /// Contains ActorSNO of known Bosses
         /// </summary>
-        private static HashSet<int> hashBossSNO = new HashSet<int>
+        internal static HashSet<int> hashBossSNO = new HashSet<int>
         {
             // Siegebreaker (96192), Azmodan (89690), Cydea (95250), Heart-thing (193077), Kulle (80509), Small Belial (220160), Big Belial (3349), Diablo 1 (114917), terror Diablo (133562)
             96192, 89690, 95250, 193077, 80509, 220160, 3349, 114917, 133562, 255929, 256711, 256508, 256187, 256189, 256709,
@@ -173,7 +173,7 @@ namespace GilesTrinity
         /// <summary>
         /// Contains ActorSNO of Units that should be blacklisted
         /// </summary>
-        private static HashSet<int> hashActorSNOIgnoreBlacklist = new HashSet<int>
+        internal static HashSet<int> hashActorSNOIgnoreBlacklist = new HashSet<int>
         {
             5840, 111456, 5013, 5014, 205756, 205746, 4182, 4183, 4644, 4062, 4538, 52693, 162575, 2928, 51291, 51292,
             96132, 90958, 90959, 80980, 51292, 51291, 2928, 3546, 129345, 81857, 138428, 81857, 60583, 170038, 174854, 190390,
@@ -202,21 +202,21 @@ namespace GilesTrinity
             60108,
          };
         // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
-        private static HashSet<int> hashMysticAlly = new HashSet<int> { 169123, 123885, 169890, 168878, 169891, 169077, 169904, 169907, 169906, 169908, 169905, 169909 };
-        private static HashSet<int> hashGargantuan = new HashSet<int> { 179780, 179778, 179772, 179779, 179776, 122305 };
-        private static HashSet<int> hashZombie = new HashSet<int> { 110959, 103235, 103215, 105763, 103217, 51353 };
-        private static HashSet<int> hashDHPets = new HashSet<int> { 178664, 173827, 133741, 159144, 181748, 159098 };
+        internal static HashSet<int> hashMysticAlly = new HashSet<int> { 169123, 123885, 169890, 168878, 169891, 169077, 169904, 169907, 169906, 169908, 169905, 169909 };
+        internal static HashSet<int> hashGargantuan = new HashSet<int> { 179780, 179778, 179772, 179779, 179776, 122305 };
+        internal static HashSet<int> hashZombie = new HashSet<int> { 110959, 103235, 103215, 105763, 103217, 51353 };
+        internal static HashSet<int> hashDHPets = new HashSet<int> { 178664, 173827, 133741, 159144, 181748, 159098 };
 
         /// <summary>
         /// World-object dictionaries eg large object lists, ignore lists etc.
         /// A list of SNO's to *FORCE* to type: Item. (BE CAREFUL WITH THIS!).
         /// 166943 = infernal key
         /// </summary>
-        private static HashSet<int> hashForceSNOToItemList = new HashSet<int> {
+        internal static HashSet<int> hashForceSNOToItemList = new HashSet<int> {
             166943,
          };
         // Interactable whitelist - things that need interacting with like special wheels, levers - they will be blacklisted for 30 seconds after one-use
-        private static HashSet<int> hashSNOInteractWhitelist = new HashSet<int> {
+        internal static HashSet<int> hashSNOInteractWhitelist = new HashSet<int> {
             54908, 56686, 54850,
             211999, 52685, 54882,  180575,
          };
@@ -224,26 +224,26 @@ namespace GilesTrinity
         /// NOTE: you don't NEED interactable SNO's listed here. But if they are listed here, *THIS* is the range at which your character will try to walk to within the object
         /// BEFORE trying to actually "click it". Certain objects need you to get very close, so it's worth having them listed with low interact ranges
         /// </summary>
-        private static Dictionary<int, int> dictInteractableRange = new Dictionary<int, int> {
+        internal static Dictionary<int, int> dictInteractableRange = new Dictionary<int, int> {
             {56686, 4}, {52685, 4}, {54850, 14},  {54882, 40}, {54908, 4}, {3349, 25}, {225270, 35}, {180575, 10}
          };
         /// <summary>
         /// Navigation obstacles for standard navigation down dungeons etc. to help DB movement
         /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
         /// </summary>
-        private static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
+        internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
             174900, 191459, 104632
         };
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
-        public static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
+        internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
             {174900, 10}, {191459, 13}, {54908, 10}, {104632, 20},
          };
         /// <summary>
         /// Destructible things that are very large and need breaking at a bigger distance - eg logstacks, large crates, carts, etc.
         /// </summary>
-        private static Dictionary<int, int> dictSNOExtendedDestructRange = new Dictionary<int, int> {
+        internal static Dictionary<int, int> dictSNOExtendedDestructRange = new Dictionary<int, int> {
             {2972, 10}, {80357, 16}, {116508, 10}, {113932, 8}, {197514, 18}, {108587, 8}, {108618, 8}, {108612, 8}, {116409, 18}, {121586, 18},
             {195101, 10}, {195108, 25}, {170657, 8}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 8}, {193963, 10}, {159066, 12}, {160570, 12},
             {55325, 14}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 20}, {192867, 8}, {155255, 8}
@@ -251,19 +251,19 @@ namespace GilesTrinity
         /// <summary>
         /// Destructible things that need targeting by a location instead of an ACDGUID (stuff you can't "click on" to destroy in-game)
         /// </summary>
-        private static HashSet<int> hashDestructableLocationTarget = new HashSet<int> {
+        internal static HashSet<int> hashDestructableLocationTarget = new HashSet<int> {
             170657, 116409, 121586,
          };
         /// <summary>
         /// Resplendent chest SNO list
         /// </summary>
-        private static HashSet<int> hashSNOContainerResplendant = new HashSet<int> {
+        internal static HashSet<int> hashSNOContainerResplendant = new HashSet<int> {
             62873, 95011, 81424, 108230, 111808, 111809, 211861,
          };
         /// <summary>
         /// Objects that should never be ignored due to no Line of Sight (LoS)
         /// </summary>
-        private static HashSet<int> LineOfSightWhitelist = new HashSet<int>
+        internal static HashSet<int> LineOfSightWhitelist = new HashSet<int>
         {
             116807, // Butcher Health Well
             180575, // Diablo arena Health Well
@@ -271,7 +271,7 @@ namespace GilesTrinity
         /// <summary>
         /// Chests/average-level containers that deserve a bit of extra radius (ie - they are more worthwhile to loot than "random" misc/junk containers)
         /// </summary>
-        private static HashSet<int> hashSNOContainerWhitelist = new HashSet<int> {
+        internal static HashSet<int> hashSNOContainerWhitelist = new HashSet<int> {
             62859, 62865, 62872, 78790, 79016, 94708, 96522, 130170, 108122, 111870, 111947, 213447, 213446, 51300, 179865, 109264, 212491, 210422, 211861,
          };
         // IGNORE LIST / BLACKLIST - for world objects
@@ -279,7 +279,7 @@ namespace GilesTrinity
         /// <summary>
         /// Contains ActorSNO's of world objects that should be blacklisted
         /// </summary>
-        private static HashSet<int> hashSNOIgnoreBlacklist = new HashSet<int> {
+        internal static HashSet<int> hashSNOIgnoreBlacklist = new HashSet<int> {
             163449, 78030, 2909, 58283, 58299, 58309, 58321, 87809, 88005, 90150, 91600, 97023, 97350, 97381, 72689, 121327, 54952, 54515, 3340, 122076, 123640,
             60665, 60844, 78554, 86400, 86428, 81699, 86266, 86400, 110769, 192466, 211456, 6190, 80002, 104596, 58836, 104827, 74909, 6155, 6156, 6158, 6159, 75132,
             181504, 91688, 3016, 3007, 3011, 3014, 130858, 131573, 214396, 182730, 226087, 141639, 206569, 15119, 54413, 54926, 2979, 56416, 53802, 5776, 3949,

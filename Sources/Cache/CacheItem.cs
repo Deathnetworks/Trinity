@@ -7,6 +7,8 @@ using Zeta;
 using Zeta.Common;
 using Db = Zeta.Internals.Actors;
 using GilesTrinity;
+using Zeta.Internals.Actors;
+using Zeta.CommonBot;
 
 namespace GilesTrinity.Cache
 {
@@ -22,10 +24,11 @@ namespace GilesTrinity.Cache
         /// </summary>
         /// <param name="rActorGuid">The RActorGUID.</param>
         /// <param name="item">The item.</param>
-        public CacheItem(int rActorGuid, Db.DiaItem item)
-            : base(rActorGuid)
+        public CacheItem(ACD acd)
+            : base(acd)
         {
-            CachedObject = item; 
+            DiaItem item = ((DiaItem)acd.AsRActor);
+            CachedObject = item;
             Quality = DetermineQuality(ACDItem.Stats.Quality);
             ItemType = DetermineItemType(InternalName, item.CommonData.ItemType);
             BaseType = DetermineBaseType(ItemType);
@@ -81,9 +84,9 @@ namespace GilesTrinity.Cache
             WeaponDamageType = ACDItem.Stats.WeaponDamageType;
             WeaponMaxDamage = (int)Math.Floor(ACDItem.Stats.WeaponMaxDamage);
             WeaponMinDamage = (int)Math.Floor(ACDItem.Stats.WeaponMinDamage);
-            
+
             LifeSteal = ACDItem.Stats.LifeSteal;
-            
+
             Sockets = ACDItem.Stats.Sockets;
             FollowerSpecialType = ACDItem.FollowerSpecialType;
             Gold = ACDItem.Gold;
@@ -99,6 +102,12 @@ namespace GilesTrinity.Cache
             Name = ACDItem.Name;
             Position = ACDItem.Position;
             Level = ACDItem.Stats.Level;
+
+            if (Gold > 0)
+                ShouldPickup = ShouldPickupGold(Gold);
+            else
+                ShouldPickup = ShouldPickupItem(ACDItem);
+
         }
         #endregion Constructors
 
@@ -165,352 +174,346 @@ namespace GilesTrinity.Cache
             set;
         }
 
-        public int ArcaneOnCrit 
-        { 
-            get; 
-            set; 
-        }
-        
-        public int Armor 
-        { 
-            get; 
-            set; 
+        public int ArcaneOnCrit
+        {
+            get;
+            set;
         }
 
-        public int ArmorBonus 
-        { 
-            get; 
-            set; 
+        public int Armor
+        {
+            get;
+            set;
         }
 
-        public int ArmorTotal 
-        { 
-            get; 
-            set; 
+        public int ArmorBonus
+        {
+            get;
+            set;
         }
 
-        public int AttackSpeedPercent 
-        { 
-            get; 
-            set; 
+        public int ArmorTotal
+        {
+            get;
+            set;
         }
 
-        public int BlockChance 
-        { 
-            get; 
-            set; 
+        public int AttackSpeedPercent
+        {
+            get;
+            set;
         }
 
-        public int CritDamagePercent 
-        { 
-            get; 
-            set; 
+        public int BlockChance
+        {
+            get;
+            set;
         }
 
-        public int CritPercent 
-        { 
-            get; 
-            set; 
+        public int CritDamagePercent
+        {
+            get;
+            set;
         }
 
-        public int DamageReductionPhysicalPercent 
-        { 
-            get; 
-            set; 
-        }
-        
-        public int GoldFind 
-        { 
-            get; 
-            set; 
+        public int CritPercent
+        {
+            get;
+            set;
         }
 
-        public int HatredRegen 
-        { 
-            get; 
-            set; 
+        public int DamageReductionPhysicalPercent
+        {
+            get;
+            set;
         }
 
-        public int HealthGlobeBonus 
-        { 
-            get; 
-            set; 
+        public int GoldFind
+        {
+            get;
+            set;
         }
 
-        public int HealthPerSecond 
-        { 
-            get; 
-            set; 
+        public int HatredRegen
+        {
+            get;
+            set;
         }
 
-        public int HealthPerSpiritSpent 
-        { 
-            get; 
-            set; 
-        }
-        
-        public int HolyDamagePercent 
-        { 
-            get; 
-            set; 
+        public int HealthGlobeBonus
+        {
+            get;
+            set;
         }
 
-        public int LifeOnHit 
-        { 
-            get; 
-            set; 
-        }
-        
-        public int LifePercent 
-        { 
-            get; 
-            set; 
+        public int HealthPerSecond
+        {
+            get;
+            set;
         }
 
-        public float LifeSteal 
-        { 
-            get; 
-            set; 
+        public int HealthPerSpiritSpent
+        {
+            get;
+            set;
         }
 
-        public int MagicFind 
-        { 
-            get; 
-            set; 
+        public int HolyDamagePercent
+        {
+            get;
+            set;
         }
 
-        public int ManaRegen 
-        { 
-            get; 
-            set; 
+        public int LifeOnHit
+        {
+            get;
+            set;
         }
 
-        public int MaxArcanePower 
-        { 
-            get; 
-            set; 
+        public int LifePercent
+        {
+            get;
+            set;
         }
 
-        public int MaxDamage 
-        { 
-            get; 
-            set; 
+        public float LifeSteal
+        {
+            get;
+            set;
         }
 
-        public int MaxDiscipline 
-        { 
-            get; 
-            set; 
+        public int MagicFind
+        {
+            get;
+            set;
         }
 
-        public int MaxFury 
-        { 
-            get; 
-            set; 
+        public int ManaRegen
+        {
+            get;
+            set;
         }
 
-        public int MaxMana 
-        { 
-            get; 
-            set; 
+        public int MaxArcanePower
+        {
+            get;
+            set;
         }
 
-        public int MaxSpirit 
-        { 
-            get; 
-            set; 
+        public int MaxDamage
+        {
+            get;
+            set;
         }
 
-        public int MinDamage 
-        { 
-            get; 
-            set; 
-        }
-        
-        public int MovementSpeed 
-        { 
-            get; 
-            set; 
+        public int MaxDiscipline
+        {
+            get;
+            set;
         }
 
-        public int PickUpRadius 
-        { 
-            get; 
-            set; 
+        public int MaxFury
+        {
+            get;
+            set;
         }
 
-        public TrinityItemQuality Quality 
-        { 
-            get; 
-            set; 
+        public int MaxMana
+        {
+            get;
+            set;
         }
 
-        public int ResistAll 
-        { 
-            get; 
-            set; 
+        public int MaxSpirit
+        {
+            get;
+            set;
         }
 
-        public int ResistArcane 
-        { 
-            get; 
-            set; 
+        public int MinDamage
+        {
+            get;
+            set;
         }
 
-        public int ResistCold 
-        { 
-            get; 
-            set; 
+        public int MovementSpeed
+        {
+            get;
+            set;
         }
 
-        public int ResistFire 
-        { 
-            get; 
-            set; 
+        public int PickUpRadius
+        {
+            get;
+            set;
         }
 
-        public int ResistHoly 
-        { 
-            get; 
-            set; 
+        public TrinityItemQuality Quality
+        {
+            get;
+            set;
         }
 
-        public int ResistLightning 
-        { 
-            get; 
-            set; 
+        public int ResistAll
+        {
+            get;
+            set;
         }
 
-        public int ResistPhysical 
-        { 
-            get; 
-            set; 
+        public int ResistArcane
+        {
+            get;
+            set;
         }
 
-        public int ResistPoison 
-        { 
-            get; 
-            set; 
+        public int ResistCold
+        {
+            get;
+            set;
         }
 
-        public int Sockets 
-        { 
-            get; 
-            set; 
-        }
-        
-        public int SpiritRegen 
-        { 
-            get; 
-            set; 
+        public int ResistFire
+        {
+            get;
+            set;
         }
 
-        public int Thorns 
-        { 
-            get; 
-            set; 
+        public int ResistHoly
+        {
+            get;
+            set;
         }
 
-        public int WeaponAttacksPerSecond 
-        { 
-            get; 
-            set; 
+        public int ResistLightning
+        {
+            get;
+            set;
         }
 
-        public int WeaponDamagePerSecond 
-        { 
-            get; 
-            set; 
+        public int ResistPhysical
+        {
+            get;
+            set;
         }
 
-        public DamageType WeaponDamageType 
-        { 
-            get; 
-            set; 
+        public int ResistPoison
+        {
+            get;
+            set;
         }
 
-        public int WeaponMaxDamage 
-        { 
-            get; 
-            set; 
-        }
-        
-        public int WeaponMinDamage 
-        { 
-            get; 
-            set; 
+        public int Sockets
+        {
+            get;
+            set;
         }
 
-        public Db.FollowerType FollowerSpecialType 
-        { 
-            get; 
-            set; 
+        public int SpiritRegen
+        {
+            get;
+            set;
         }
 
-        public int Gold 
-        { 
-            get; 
-            set; 
+        public int Thorns
+        {
+            get;
+            set;
         }
 
-        public int IdentifyCost 
-        { 
-            get; 
-            set; 
+        public int WeaponAttacksPerSecond
+        {
+            get;
+            set;
         }
 
-        public int InventoryColumn 
-        { 
-            get; 
-            set; 
+        public int WeaponDamagePerSecond
+        {
+            get;
+            set;
         }
 
-        public int InventoryRow 
-        { 
-            get; 
-            set; 
+        public DamageType WeaponDamageType
+        {
+            get;
+            set;
         }
 
-        public bool IsTwoHand 
-        { 
-            get; 
-            set; 
+        public int WeaponMaxDamage
+        {
+            get;
+            set;
         }
 
-        public bool IsTwoSquareItem 
-        { 
-            get; 
-            set; 
+        public int WeaponMinDamage
+        {
+            get;
+            set;
         }
 
-        public bool IsUnidentified 
-        { 
-            get; 
-            set; 
+        public Db.FollowerType FollowerSpecialType
+        {
+            get;
+            set;
         }
 
-        public int ItemStackQuantity 
-        { 
-            get; 
-            set; 
+        public int Gold
+        {
+            get;
+            set;
         }
 
-        public int MaxStackCount 
-        { 
-            get; 
-            set; 
+        public int IdentifyCost
+        {
+            get;
+            set;
         }
 
-        public string Name 
-        { 
-            get; 
-            set; 
+        public int InventoryColumn
+        {
+            get;
+            set;
         }
-        
-        public Vector3 Position
-        { 
-            get; 
-            set; 
+
+        public int InventoryRow
+        {
+            get;
+            set;
+        }
+
+        public bool IsTwoHand
+        {
+            get;
+            set;
+        }
+
+        public bool IsTwoSquareItem
+        {
+            get;
+            set;
+        }
+
+        public bool IsUnidentified
+        {
+            get;
+            set;
+        }
+
+        public int ItemStackQuantity
+        {
+            get;
+            set;
+        }
+
+        public int MaxStackCount
+        {
+            get;
+            set;
+        }
+
+        public bool ShouldPickup
+        {
+            get;
+            set;
         }
 
         public float Score
@@ -531,7 +534,7 @@ namespace GilesTrinity.Cache
         /// <returns>Cloned instance of <see cref="CacheObject" />.</returns>
         public override CacheObject Clone()
         {
-            CacheItem item = new CacheItem(RActorGuid, CachedObject);
+            CacheItem item = new CacheItem(CachedObject.CommonData);
             item.LastAccessDate = LastAccessDate;
             item.Type = Type;
             item.ItemType = ItemType;
@@ -752,6 +755,28 @@ namespace GilesTrinity.Cache
         private static float CalculateScore(CacheItem cacheItem)
         {
             throw new NotImplementedException();
+        }
+
+        private static bool ShouldPickupGold(int GoldStackSize)
+        {
+            return GoldStackSize >= GilesTrinity.Settings.Loot.Pickup.MinimumGoldStack;
+        }
+
+        private static bool ShouldPickupItem(ACDItem item)
+        {
+
+            if (GilesTrinity.Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+            {
+                return ItemManager.EvaluateItem(item, ItemManager.RuleType.PickUp);
+            }
+            /*
+             * Add darkfriend77 pickup filter here
+             */
+            else
+            {
+                return GilesTrinity.GilesPickupItemValidation(item.Name, item.Level, item.ItemQualityLevel, item.GameBalanceId, item.ItemType, item.FollowerSpecialType, item.DynamicId);
+            }
+
         }
         #endregion Methods
     }

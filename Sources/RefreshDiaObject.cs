@@ -33,12 +33,6 @@ namespace GilesTrinity
             AddToCache = RefreshStepGetCommonData(freshObject);
             //if (!AddToCache) { c_IgnoreReason = "GetCommonData"; return AddToCache; }
 
-            /*
-             * Safely Get Data Keys and ID's from internal caches if possible
-             * 
-             * rrrix: the check on AddToCache and return on the 4 ID/Sno/Name/GUID collection methods are disabled, since this was causing problems attacking chickens.
-             * Yeah... chickens... 
-             */
             // Ractor GUID
             c_RActorGuid = freshObject.RActorGuid;
             // Check to see if we've already looked at this GUID
@@ -477,7 +471,6 @@ namespace GilesTrinity
 
                     }
                 // Handle Gold
-                // NOTE: Only identified as gold after *FIRST* loop as an "item" by above code
                 case GObjectType.Gold:
                     {
                         AddToCache = RefreshGilesGold(AddToCache);
@@ -485,7 +478,6 @@ namespace GilesTrinity
                         break;
                     }
                 // Handle Globes
-                // NOTE: Only identified as globe after *FIRST* loop as an "item" by above code
                 case GObjectType.Globe:
                     {
                         // Ignore it if it's not in range yet
@@ -927,21 +919,6 @@ namespace GilesTrinity
 
                         // Add to session cache
                         dictGilesGameBalanceDataCache.Add(c_BalanceID, new GilesGameBalanceDataCache(c_ItemLevel, c_DBItemType, c_IsOneHandedItem, c_item_tFollowerType));
-
-                        /* rrrix note: This is for the old game balance data cache. We're not using this anymore. We need to find a better way than a static hard-coded list.
-                         * The game balance cache should be dynamically generated and intelligently persisted through game sessions, holding data that *does not change*
-                         */
-                        //if (LogItemBalanceData)
-                        //{
-                        //    FileStream LogStream = File.Open(sTrinityPluginPath + "_BalanceData_" + ZetaDia.Service.CurrentHero.BattleTagName + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
-                        //    using (StreamWriter LogWriter = new StreamWriter(LogStream))
-                        //    {
-                        //        LogWriter.WriteLine("{" + c_BalanceID.ToString() + ", new GilesGameBalanceDataCache(" +
-                        //           c_ItemLevel.ToString() + ", ItemType." + c_DBItemType.ToString() + ", " +
-                        //           c_IsOneHandedItem.ToString().ToLower() + ", FollowerType." + c_item_tFollowerType.ToString() + ")}, " + c_Name + " [" + c_ActorSNO.ToString() + "]");
-                        //    }
-                        //    LogStream.Close();
-                        //}
                     }
                     catch (Exception ex)
                     {
@@ -1089,6 +1066,7 @@ namespace GilesTrinity
             double iPercentage = 0;
             int rangedMinimumStackSize = 0;
             AddToCache = true;
+
             // Get the gold amount of this pile, cached if possible
             if (!dictGilesGoldAmountCache.TryGetValue(c_RActorGuid, out c_GoldStackSize))
             {
@@ -1103,33 +1081,8 @@ namespace GilesTrinity
                 }
                 dictGilesGoldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
             }
+            
 
-            /* 
-             * Giles Black Magic gold formula
-             * 
-            // Ignore gold piles that are (currently) too small...
-            // Up to 40% less gold limit needed at close range
-            if (c_CentreDistance <= 20f)
-            {
-                iPercentage = (1 - (c_CentreDistance / 20)) * 0.4;
-                rangedMinimumStackSize -= (int)Math.Floor(iPercentage * Settings.Loot.Pickup.MinimumGoldStack);
-            }
-            // And up to 40% or even higher extra gold limit at distant range
-            else if (c_CentreDistance >= 30f)
-            {
-                iPercentage = (c_CentreDistance / 40) * 0.4;
-                rangedMinimumStackSize += (int)Math.Floor(iPercentage * Settings.Loot.Pickup.MinimumGoldStack);
-            }
-
-
-            // Now check if this gold pile is currently less than this limit
-            if (c_GoldStackSize < rangedMinimumStackSize)
-            {
-                AddToCache = false;
-            }
-            */
-
-            // rrrix thinks this is better!
             if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)
             {
                 AddToCache = false;

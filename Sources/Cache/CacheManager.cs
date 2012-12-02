@@ -17,7 +17,7 @@ namespace GilesTrinity.Cache
 
         #region Fields
         private static CacheObjectGetterDelegate _CacheObjectGetter;
-        private static readonly IDictionary<int, CacheObject> _Cache = new Dictionary<int, CacheObject>();
+        private static IDictionary<int, CacheObject> _Cache = new Dictionary<int, CacheObject>();
         private static CacheObjectRefresherDelegate _CacheObjectRefresher;
         private static readonly object _Synchronizer = new object();
         private static Thread _CacheCleaner;
@@ -73,6 +73,21 @@ namespace GilesTrinity.Cache
             get
             {
                 return _CacheTimeout;
+            }
+        }
+
+        public static IDictionary<int, CacheObject> Cache
+        {
+            get
+            {
+                return _Cache;
+            }
+            set
+            {
+                if (_Cache != null)
+                {
+                    _Cache = value;
+                }
             }
         }
 
@@ -223,14 +238,41 @@ namespace GilesTrinity.Cache
             }
         }
 
+        /// <summary>
+        /// Adds an entry to the cache
+        /// </summary>
+        /// <param name="cacheObject"></param>
+        public static void PutObject(CacheObject cacheObject)
+        {
+            using (new PerformanceLogger("CacheManager.GetObject"))
+            {
+                if (cacheObject == null)
+                {
+                    return;
+                }
+
+                lock (_Synchronizer)
+                {
+                    if (_Cache.ContainsKey(cacheObject.ACDGuid))
+                    {
+                        _Cache[cacheObject.ACDGuid] = cacheObject;
+                    }
+                    else
+                    {
+                        _Cache.Add(cacheObject.ACDGuid, cacheObject);
+                    }
+                }
+            }
+        }
+
         /// <summary>Gets all cached object corresponding to the type.</summary>
         /// <typeparam name="T">Type of cached object</typeparam>
         /// <param name="type">The type.</param>
         /// <returns><see cref="IEnumerable"/> corresponding to all objects of this type in cache.</returns>
-        public static IEnumerable<T> GetAllObjectByType<T>(GObjectType type) 
+        public static IEnumerable<T> GetAllObjectByType<T>(GObjectType type)
             where T : CacheObject
         {
-            foreach (CacheObject obj in _Cache.Values.Where(o=>o.Type == type))
+            foreach (CacheObject obj in _Cache.Values.Where(o => o.Type == type))
             {
                 if (obj is T)
                 {

@@ -10,6 +10,7 @@ using Zeta.CommonBot.Profile;
 using Zeta.Internals.Actors;
 using Zeta.Navigation;
 using Zeta.Pathfinding;
+using GilesTrinity.Cache;
 
 namespace GilesTrinity
 {
@@ -25,23 +26,29 @@ namespace GilesTrinity
                 vPositionLastZigZagCheck = Vector3.Zero;
                 return false;
             }
+            // Big main-bot pause button
+            if (bMainBotPaused)
+            {
+                return true;
+            }
+
             if (gp == null)
                 gp = Navigator.SearchGridProvider;
             gp.Update();
             if (pf == null)
                 pf = new PathFinder(gp);
 
-            // Big main-bot pause button
-            if (bMainBotPaused)
-            {
-                return true;
-            }
+            CacheRefresher.RefreshAll();
+
             // World ID safety caching incase it's ever unavailable
             if (ZetaDia.CurrentWorldDynamicId != -1)
                 iCurrentWorldID = ZetaDia.CurrentWorldDynamicId;
             // Game difficulty, used really for vault on DH's
             if (ZetaDia.Service.CurrentHero.CurrentDifficulty != GameDifficulty.Invalid)
                 iCurrentGameDifficulty = ZetaDia.Service.CurrentHero.CurrentDifficulty;
+
+
+
             // Refresh player buffs (to check for archon)
             GilesRefreshBuffs();
             // Store all of the player's abilities every now and then, to keep it cached and handy, also check for critical-mass timer changes etc.
