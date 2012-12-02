@@ -9,6 +9,7 @@ using Zeta.Internals.Actors.Gizmos;
 using GilesTrinity;
 using Zeta.CommonBot;
 using Zeta.Internals.SNO;
+using Zeta.Common;
 
 namespace GilesTrinity.Cache
 {
@@ -24,11 +25,33 @@ namespace GilesTrinity.Cache
         {
             try
             {
-                unit.Position = unit.CommonData.Position;
+                try
+                {
+                    ACD acd = unit.CommonData;
+
+                    unit.Position = acd.Position;
+                    unit.CentreDistance = Vector3.Distance(GilesTrinity.playerStatus.CurrentPosition, acd.Position);
+                    
+                    unit.HitpointsCurrent = unit.InternalUnit.HitpointsCurrent;
+                    if (unit.HitpointsCurrent <= 0)
+                        unit.IsDead = true;
+                    
+                    unit.IsBurrowed = unit.InternalUnit.IsBurrowed;
+                    unit.IsUntargetable = unit.InternalUnit.IsUntargetable;
+                    unit.IsInvulnerable = unit.InternalUnit.IsInvulnerable;
+                    unit.CurrentAnimation = acd.CurrentAnimation;
+
+                    if (unit.IsBoss)
+                    {
+                        unit.MonsterType = acd.MonsterInfo.MonsterType;
+                    }
+
+                }
+                catch { }
             }
             catch
             {
-            } 
+            }
         }
         /// <summary>
         /// Refreshes an Item
@@ -83,7 +106,7 @@ namespace GilesTrinity.Cache
             CacheManager.CacheObjectGetter = GetCache;
             CacheManager.CacheObjectRefresher = RefreshCache;
             CacheManager.MaxRefreshRate = 100;
-            foreach (DiaObject obj in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Where( o => o.IsACDBased && o.CommonData != null))
+            foreach (DiaObject obj in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Where(o => o.IsACDBased && o.CommonData != null))
             {
                 CacheManager.GetObject(obj.CommonData);
             }
@@ -107,7 +130,6 @@ namespace GilesTrinity.Cache
                     break;
             }
         }
-
         private static CacheObject GetCache(int acdGuid, ACD acdObject)
         {
             switch (acdObject.ActorType)

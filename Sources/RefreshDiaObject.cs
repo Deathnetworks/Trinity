@@ -694,6 +694,11 @@ namespace GilesTrinity
             // Pull up the Monster Affix cached data
             MonsterAffixes theseaffixes = RefreshAffixes(c_CommonData);
             //intell -- Other dangerous: Nightmarish, Mortar, Desecrator, Fire Chains, Knockback, Electrified
+            /*
+             * 
+             * This should be moved to HandleTarget
+             * 
+             */
             if (GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker, true))
             {
                 //WotB only used on Arcane, Frozen, Jailer, Molten and Electrified+Reflect Damage elites
@@ -712,6 +717,9 @@ namespace GilesTrinity
                 bCheckGround = true;
             else
                 bCheckGround = false;
+            /**/
+            
+
             // Is this something we should try to force leap/other movement abilities against?
             c_ForceLeapAgainst = false;
             double dUseKillRadius = RefreshKillRadius();

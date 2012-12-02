@@ -673,7 +673,6 @@ namespace GilesTrinity
             }
             if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
             {
-                bOutputItemScores = true;
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "===== Outputting Test Scores =====");
                 foreach (ACDItem item in ZetaDia.Actors.Me.Inventory.Backpack)
                 {
@@ -692,7 +691,6 @@ namespace GilesTrinity
                 }
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "===== Finished Test Score Outputs =====");
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: See bad scores? Wrong item types? Known DB bug - restart DB before using the test button!");
-                bOutputItemScores = false;
             }
             else
             {

@@ -14,6 +14,7 @@ namespace GilesTrinity.Cache
             : base(acd)
         {
             ActorSNO = acd.ActorSNO;
+            CacheType = CacheType.Unit;
 
             DynamicID = acd.DynamicId;
             GameBalanceID = acd.GameBalanceId;
@@ -28,18 +29,22 @@ namespace GilesTrinity.Cache
             IsEliteRareUnique = (IsElite || IsRare || IsUnique);
             IsBoss = CacheUtils.IsBossSNO(ActorSNO);
 
-            DiaObject rActor = acd.AsRActor;
-            if (rActor is DiaUnit)
+            try
             {
-                InternalUnit = (DiaUnit)rActor;
-
-                RActorGUID = InternalUnit.RActorGuid;
-                HitpointsCurrent = InternalUnit.HitpointsCurrent;
-                HitpointsMax = InternalUnit.HitpointsMax;
-                HitpointsMaxTotal = InternalUnit.HitpointsMaxTotal;
-                HitpointsCurrentPct = HitpointsCurrent / HitpointsMaxTotal;
-                IsMinion = InternalUnit.SummonedByACDId > 0;
+                if (InternalObject is DiaUnit)
+                {
+                    InternalUnit = InternalObject as DiaUnit;
+                    RActorGUID = InternalUnit.RActorGuid;
+                    HitpointsCurrent = InternalUnit.HitpointsCurrent;
+                    HitpointsMax = InternalUnit.HitpointsMax;
+                    HitpointsMaxTotal = InternalUnit.HitpointsMaxTotal;
+                    HitpointsCurrentPct = HitpointsCurrent / HitpointsMaxTotal;
+                    IsMinion = InternalUnit.SummonedByACDId > 0;
+                    MonsterType = acd.MonsterInfo.MonsterType;
+                    IsNPC = (InternalUnit.IsHelper || InternalUnit.IsNPC || InternalUnit.IsTownVendor);
+                }
             }
+            catch { }
         }
 
         /// <summary>
@@ -63,6 +68,7 @@ namespace GilesTrinity.Cache
         /// MonsterSize 
         /// </summary>
         public MonsterSize MonsterSize { get; set; }
+        public MonsterType MonsterType { get; set; }
 
         public bool IsElite { get; set; }
         public bool IsRare { get; set; }
@@ -77,6 +83,7 @@ namespace GilesTrinity.Cache
         public bool IsTreasureGoblin { get; set; }
 
         public bool IsAttackable { get; set; }
+        public bool IsInvulnerable { get; set; }
         public bool IsHireling { get; set; }
         public bool IsBurrowed { get; set; }
         public bool IsDead { get; set; }
