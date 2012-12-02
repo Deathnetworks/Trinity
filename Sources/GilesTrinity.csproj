@@ -246,7 +246,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ItemRules\config.dis" />
-    <None Include="ItemRules\Items.utr" />
+    <None Include="ItemRules\Loot.utr" />
     <None Include="ItemRules\legendary.dis" />
     <None Include="ItemRules\legendary_it.dis" />
     <None Include="ItemRules\legendary_ru.dis" />
@@ -260,8 +260,7 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <PreBuildEvent>rd $(ProjectDir)obj\
-rd $(ProjectDir)bin\
+    <PreBuildEvent>rd /Q /S $(ProjectDir)Log\
 
 </PreBuildEvent>
   </PropertyGroup>

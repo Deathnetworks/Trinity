@@ -8,8 +8,10 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
+using Zeta.Internals.Actors;
+using GilesTrinity.Cache;
 
-namespace System.Linq.Dynamic
+namespace GilesTrinity.ScriptedRules
 {
     public static class DynamicQueryable
     {
@@ -562,7 +564,13 @@ namespace System.Linq.Dynamic
             typeof(TimeSpan),
             typeof(Guid),
             typeof(Math),
-            typeof(Convert)
+            typeof(Convert),
+            typeof(TrinityItemQuality), 
+            typeof(GItemType),
+            typeof(GItemBaseType),
+            typeof(FollowerType),
+            typeof(Zeta.DamageType),
+            typeof(Enum)
         };
 
         static readonly Expression trueLiteral = Expression.Constant(true);

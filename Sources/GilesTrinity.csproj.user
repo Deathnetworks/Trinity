@@ -4,7 +4,8 @@
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartAction>Project</StartAction>
+    <StartAction>Program</StartAction>
     <StartProgram>C:\db\Demonbuddy.exe</StartProgram>
+    <StartWorkingDirectory>C:\Db\</StartWorkingDirectory>
   </PropertyGroup>
 </Project>

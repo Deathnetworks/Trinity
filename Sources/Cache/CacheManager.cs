@@ -180,6 +180,22 @@ namespace GilesTrinity.Cache
             return GetObject(acdObject.ACDGuid, acdObject);
         }
 
+        /// <summary>Gets an object from cache.</summary>
+        /// <param name="acdObject">The acd object.</param>
+        /// <returns>
+        /// Cached object corresponding to the <paramref name="acdObject" />
+        /// </returns>
+        public static T GetObject<T>(ACD acdObject)
+            where T : CacheObject
+        {
+            if (acdObject == null)
+            {
+                return null;
+            }
+
+            return (T)GetObject(acdObject.ACDGuid, acdObject);
+        }
+
         /// <summary>Gets the object from cache.</summary>
         /// <param name="acdGuid">The ACDGuid.</param>
         /// <returns>Cached object corresponding to the <paramref name="acdGuid" /></returns>

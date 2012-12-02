@@ -116,7 +116,7 @@ namespace GilesTrinity.Cache
                 if (Gold > 0)
                     ShouldPickup = ShouldPickupGold(Gold);
                 else
-                    ShouldPickup = ShouldPickupItem(ACDItem);
+                    ShouldPickup = ShouldPickupItem(this);
             }
             catch { }
         }
@@ -787,19 +787,26 @@ namespace GilesTrinity.Cache
             return GoldStackSize >= GilesTrinity.Settings.Loot.Pickup.MinimumGoldStack;
         }
 
-        private static bool ShouldPickupItem(ACDItem item)
+        private static bool _RuleLoaded = false;
+        private static bool ShouldPickupItem(CacheItem item)
         {
+            if (!_RuleLoaded)
+            {
+                ScriptedRules.RulesManager.LoadLootRules();
+                _RuleLoaded = true;
+            }
+            ScriptedRules.RulesManager.ShouldPickup(item);
 
             if (GilesTrinity.Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
             {
-                return ItemManager.EvaluateItem(item, ItemManager.RuleType.PickUp);
+                return ItemManager.EvaluateItem(item.ACDItem, ItemManager.RuleType.PickUp);
             }
             /*
              * Add darkfriend77 pickup filter here
              */
             else
             {
-                return GilesTrinity.GilesPickupItemValidation(item.Name, item.Level, item.ItemQualityLevel, item.GameBalanceId, item.ItemType, item.FollowerSpecialType, item.DynamicId);
+                return GilesTrinity.GilesPickupItemValidation(item.ACDItem.Name, item.ACDItem.Level, item.ACDItem.ItemQualityLevel, item.ACDItem.GameBalanceId, item.ACDItem.ItemType, item.ACDItem.FollowerSpecialType, item.ACDItem.DynamicId);
             }
 
         }

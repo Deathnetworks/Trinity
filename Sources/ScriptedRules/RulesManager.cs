@@ -1,4 +1,5 @@
-﻿using GilesTrinity.Technicals;
+﻿using GilesTrinity.Cache;
+using GilesTrinity.Technicals;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -62,7 +63,6 @@ namespace GilesTrinity.ScriptedRules
                 { "FollowerType", "item.FollowerSpecialType.ToString()"},
                 { "InternalName", "item.InternalName"},
                 { "TwoHand", "item.IsTwoHand"},
-                { "Quality", "item.ItemQualityLevel.ToString()"},
                 { "Name", "item.Name"},
                 { "Dex", "item.Dexterity"},
                 { "Str", "item.Strength"},
@@ -84,7 +84,7 @@ namespace GilesTrinity.ScriptedRules
             string param = lambdaExpression.Substring(0, opi);
             string body = lambdaExpression.Substring(opi + 2);
             ParameterExpression p = Expression.Parameter(inputParameterType, param);
-            LambdaExpression lambda = System.Linq.Dynamic.DynamicExpression.ParseLambda(
+            LambdaExpression lambda = DynamicExpression.ParseLambda(
                                         new ParameterExpression[] { p },
                                         targetType,
                                         body);
@@ -92,7 +92,7 @@ namespace GilesTrinity.ScriptedRules
             return lambda.Compile();
         }
 
-        private static void Clean()
+        public static void Clean()
         {
             _RuleCache.Clear();
         }
@@ -101,6 +101,7 @@ namespace GilesTrinity.ScriptedRules
         {
             using (new PerformanceLogger("RulesManager.LoadLootRules"))
             {
+                Clean();
                 string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Plugins", "GilesTrinity", "ItemRules", ZetaDia.Service.CurrentHero.BattleTagName, "Loot.utr");
                 if (!File.Exists(filename))
                 {
@@ -114,13 +115,26 @@ namespace GilesTrinity.ScriptedRules
                                         {
                                             Name = "Default Error rule",
                                             Expression = "true",
-                                            LambdaExpression = ConstructOperation("true", typeof(Object), typeof(bool)),
+                                            LambdaExpression = ConstructOperation("item => true", typeof(Object), typeof(bool)),
                                             Action = ScriptedRuleAction.Route
                                         };
                     _RuleCache.Add(1, rule);
                 }
                 ParseFile(filename, null);
             }
+        }
+
+        public static bool ShouldPickup(CacheItem item)
+        {
+            foreach (ScriptedRule rule in _RuleCache.Where(r => r.Value.Action != ScriptedRuleAction.Trash).Select(r=>r.Value))
+            {
+                if ((bool)rule.UnidentifiedLambdaExpression.DynamicInvoke(item))
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "{0} Pickup Item : '{1}'", rule.Name, rule.UnidentifiedExpression);
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static void ParseFile(string filename, IDictionary<string, string> existingMacros)
@@ -160,7 +174,7 @@ namespace GilesTrinity.ScriptedRules
                                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "Include tag with file not found in '{0}'.", fileToInclude);
                                     }
                                     break;
-                                case "%":
+                                case "&":
                                     // Macro
                                     KeyValuePair<string, string> macro = ParseMacro(line.Substring(1));
                                     if (!string.IsNullOrWhiteSpace(macro.Key))
@@ -203,14 +217,15 @@ namespace GilesTrinity.ScriptedRules
                     {
                         foreach (ScriptedRule rule in _RuleCache.Values.Where(r => r.LambdaExpression == null))
                         {
+                            FormatExpression(rule);
                             ReplaceMacro(rule, listMacros);
                             if (rule.LambdaExpression == null)
                             {
-                                FormatExpression(rule);
                                 ReplaceMacro(rule, _StandardKeyword);
                                 if (rule.LambdaExpression == null)
                                 {
-                                    rule.LambdaExpression = ConstructOperation(string.Format("(item)=>{0}", rule.Expression), typeof(Object), typeof(bool));
+                                    rule.LambdaExpression = ConstructOperation(string.Format("item=>{0}", rule.Expression), typeof(CacheItem), typeof(bool));
+                                    rule.UnidentifiedLambdaExpression = ConstructOperation(string.Format("item=>{0}", rule.UnidentifiedExpression), typeof(CacheItem), typeof(bool));
                                 }
 
                             }
@@ -222,7 +237,7 @@ namespace GilesTrinity.ScriptedRules
 
         private static void FormatExpression(ScriptedRule rule)
         {
-            rule.Expression = rule.Expression.Replace("(", " ( ")
+            rule.Expression = (" " + rule.Expression.Replace("(", " ( ")
                                              .Replace(")", " ) ")
                                              .Replace("&", " & ")
                                              .Replace("|", " | ")
@@ -246,7 +261,33 @@ namespace GilesTrinity.ScriptedRules
                                              .Replace(">  =", ">=")
                                              .Replace("^  =", "^=")
                                              .Replace("|  =", "|=")
-                                             .Replace("&  =", "&=")
+                                             .Replace("&  =", "&=") + " ")
+                                             .Replace("  ", " ");
+            rule.UnidentifiedExpression = (" " + rule.UnidentifiedExpression.Replace("(", " ( ")
+                                             .Replace(")", " ) ")
+                                             .Replace("&", " & ")
+                                             .Replace("|", " | ")
+                                             .Replace("=", " = ")
+                                             .Replace(":", " : ")
+                                             .Replace(",", " , ")
+                                             .Replace(";", " ; ")
+                                             .Replace("<", " < ")
+                                             .Replace(">", " > ")
+                                             .Replace("^", " ^ ")
+                                             .Replace("+", " + ")
+                                             .Replace("-", " - ")
+                                             .Replace("*", " * ")
+                                             .Replace("/", " / ")
+                                             .Replace("%", " % ")
+                                             .Replace("\\", " \\ ")
+                                             .Replace("=  =", "==")
+                                             .Replace("&  &", "&&")
+                                             .Replace("|  |", "||")
+                                             .Replace("<  =", "<=")
+                                             .Replace(">  =", ">=")
+                                             .Replace("^  =", "^=")
+                                             .Replace("|  =", "|=")
+                                             .Replace("&  =", "&=") + " ")
                                              .Replace("  ", " ");
         }
 
@@ -259,7 +300,12 @@ namespace GilesTrinity.ScriptedRules
             {
                 if (rule.Expression.IndexOf(string.Format(" {0} ", macro.Key)) > -1 && !string.IsNullOrWhiteSpace(macro.Key))
                 {
-                    rule.Expression.Replace(string.Format(" {0} ", macro.Key), macro.Value);
+                    rule.Expression = rule.Expression.Replace(string.Format(" {0} ", macro.Key), macro.Value);
+                }
+
+                if (rule.UnidentifiedExpression.IndexOf(string.Format(" {0} ", macro.Key)) > -1 && !string.IsNullOrWhiteSpace(macro.Key))
+                {
+                    rule.UnidentifiedExpression = rule.UnidentifiedExpression.Replace(string.Format(" {0} ", macro.Key), macro.Value);
                 }
             }
         }
@@ -273,11 +319,11 @@ namespace GilesTrinity.ScriptedRules
         private static string CleanLine(string line)
         {
             int commentPosition = line.IndexOf("//");
-            if (commentPosition > 0)
+            if (commentPosition >= 0)
             {
                 return line.Substring(0, commentPosition).Trim();
             }
-            return string.Empty;
+            return line.Trim();
         }
 
         /// <summary>Parses the line with rule.</summary>
@@ -285,32 +331,36 @@ namespace GilesTrinity.ScriptedRules
         /// <returns>The rule</returns>
         private static ScriptedRule ParseRule(string line)
         {
-            string[] parts = line.Split(new char[] { '#' }, 3);
-            if (parts != null && parts.Length >= 1)
+            string[] parts = line.Split(new char[] { '#' }, 4);
+            if (parts != null && parts.Length >= 2)
             {
                 ScriptedRule rule = new ScriptedRule();
                 ScriptedRuleAction parsedAction = ScriptedRuleAction.Stash;
-                if (parts.Length == 1)
+                if (parts.Length == 2)
                 {
-                    rule.Expression = parts[0].Trim();
+                    rule.UnidentifiedExpression = parts[0].Trim();
+                    rule.Expression = parts[1].Trim();
                 }
-                else if (parts.Length == 2)
+                else if (parts.Length == 3)
                 {
-                    if (Enum.TryParse(parts[1].Trim(), true, out parsedAction))
+                    if (Enum.TryParse(parts[2].Trim(), true, out parsedAction))
                     {
-                        rule.Expression = parts[0].Trim();
+                        rule.UnidentifiedExpression = parts[0].Trim();
+                        rule.Expression = parts[1].Trim();
                     }
                     else
                     {
                         rule.Name = parts[0].Trim();
-                        rule.Expression = parts[1].Trim();
+                        rule.UnidentifiedExpression = parts[1].Trim();
+                        rule.Expression = parts[2].Trim();
                     }
                 }
                 else
                 {
                     rule.Name = parts[0].Trim();
-                    rule.Expression = parts[1].Trim();
-                    Enum.TryParse(parts[2].Trim(), true, out parsedAction);
+                    rule.UnidentifiedExpression = parts[1].Trim();
+                    rule.Expression = parts[2].Trim();
+                    Enum.TryParse(parts[3].Trim(), true, out parsedAction);
                 }
                 rule.Action = parsedAction;
                 return rule;
