@@ -10,6 +10,7 @@ using GilesTrinity;
 using Zeta.CommonBot;
 using Zeta.Internals.SNO;
 using Zeta.Common;
+using GilesTrinity.Technicals;
 
 namespace GilesTrinity.Cache
 {
@@ -23,7 +24,7 @@ namespace GilesTrinity.Cache
         /// <param name="unit"></param>
         private static void RefreshUnit(CacheUnit unit)
         {
-            try
+            using (new PerformanceLogger("CacheManagement.RefreshUnit"))
             {
                 try
                 {
@@ -31,11 +32,11 @@ namespace GilesTrinity.Cache
 
                     unit.Position = acd.Position;
                     unit.CentreDistance = Vector3.Distance(GilesTrinity.playerStatus.CurrentPosition, acd.Position);
-                    
+
                     unit.HitpointsCurrent = unit.InternalUnit.HitpointsCurrent;
                     if (unit.HitpointsCurrent <= 0)
                         unit.IsDead = true;
-                    
+
                     unit.IsBurrowed = unit.InternalUnit.IsBurrowed;
                     unit.IsUntargetable = unit.InternalUnit.IsUntargetable;
                     unit.IsInvulnerable = unit.InternalUnit.IsInvulnerable;
@@ -45,13 +46,12 @@ namespace GilesTrinity.Cache
                     {
                         unit.MonsterType = acd.MonsterInfo.MonsterType;
                     }
-
                 }
-                catch { }
+                catch
+                {
+                }
             }
-            catch
-            {
-            }
+
         }
         /// <summary>
         /// Refreshes an Item
