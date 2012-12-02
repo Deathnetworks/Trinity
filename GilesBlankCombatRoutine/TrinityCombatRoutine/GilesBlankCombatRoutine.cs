@@ -5,6 +5,7 @@ using Zeta.CommonBot;
 using Zeta.Internals.Actors;
 using Zeta.TreeSharp;
 using GilesTrinity;
+using Zeta.Common.Plugins;
 
 namespace GilesTrinity
 {
@@ -12,6 +13,13 @@ namespace GilesTrinity
     {
         public override void Initialize()
         {
+            foreach (PluginContainer plugin in PluginManager.Plugins)
+            {
+                if (plugin.Plugin.Name == "GilesTrinity" && !plugin.Enabled)
+                {
+                    plugin.Enabled = true;
+                }
+            }
         }
 
         public override void Dispose()
@@ -20,7 +28,20 @@ namespace GilesTrinity
 
         public override string Name { get { return "GilesPlugin"; } }
 
-        public override Window ConfigWindow { get { return null; } }
+        public override Window ConfigWindow 
+        { 
+            get 
+            {
+                foreach (PluginContainer plugin in PluginManager.Plugins)
+                {
+                    if (plugin.Plugin.Name == "GilesTrinity")
+                    {
+                        return plugin.Plugin.DisplayWindow;
+                    }
+                }
+                return null;
+            } 
+        }
 
         public override ActorClass Class { get { return ZetaDia.Me.ActorClass; } }
 
@@ -28,8 +49,6 @@ namespace GilesTrinity
 
         public override float DestroyObjectDistance { get { return 15; } }
 
-        /*private Composite _combat;
-        private Composite _buff;*/
         public override Composite Combat { get { return new PrioritySelector(); } }
         public override Composite Buff { get { return new PrioritySelector(); } }
 

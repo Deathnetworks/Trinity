@@ -29,7 +29,7 @@ namespace GilesTrinity.Cache
         {
             DiaItem item = ((DiaItem)acd.AsRActor);
             CachedObject = item;
-            Quality = DetermineQuality(ACDItem.Stats.Quality);
+            Quality = DetermineQuality(ACDItem.ItemQualityLevel);
             ItemType = DetermineItemType(InternalName, item.CommonData.ItemType);
             BaseType = DetermineBaseType(ItemType);
 
@@ -47,14 +47,13 @@ namespace GilesTrinity.Cache
             AttackSpeedPercent = (int)Math.Floor(ACDItem.Stats.AttackSpeedPercent);
             BlockChance = (int)Math.Floor(ACDItem.Stats.BlockChance);
             CritDamagePercent = (int)Math.Floor(ACDItem.Stats.CritDamagePercent);
-            CritPercent = (int)Math.Floor(ACDItem.Stats.CritPercent);
+            CritPercent = ACDItem.Stats.CritPercent;
             DamageReductionPhysicalPercent = (int)Math.Floor(ACDItem.Stats.DamageReductionPhysicalPercent);
             GoldFind = (int)Math.Floor(ACDItem.Stats.GoldFind);
             HatredRegen = (int)Math.Floor(ACDItem.Stats.HatredRegen);
             HealthGlobeBonus = (int)Math.Floor(ACDItem.Stats.HealthGlobeBonus);
             HealthPerSecond = (int)Math.Floor(ACDItem.Stats.HealthPerSecond);
             HealthPerSpiritSpent = (int)Math.Floor(ACDItem.Stats.HealthPerSpiritSpent);
-            HolyDamagePercent = (int)Math.Floor(ACDItem.Stats.HolyDamagePercent);
             LifeOnHit = (int)Math.Floor(ACDItem.Stats.LifeOnHit);
             LifePercent = (int)Math.Floor(ACDItem.Stats.LifePercent);
             LifeSteal = (int)Math.Floor(ACDItem.Stats.LifeSteal);
@@ -168,6 +167,12 @@ namespace GilesTrinity.Cache
             set;
         }
 
+        public int RequiredLevel
+        {
+            get;
+            set;
+        }
+
         public int LevelReduction
         {
             get;
@@ -216,7 +221,7 @@ namespace GilesTrinity.Cache
             set;
         }
 
-        public int CritPercent
+        public float CritPercent 
         {
             get;
             set;
@@ -253,12 +258,6 @@ namespace GilesTrinity.Cache
         }
 
         public int HealthPerSpiritSpent
-        {
-            get;
-            set;
-        }
-
-        public int HolyDamagePercent
         {
             get;
             set;
