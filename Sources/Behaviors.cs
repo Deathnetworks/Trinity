@@ -1395,6 +1395,15 @@ namespace GilesTrinity
                         iQuality = QUALITYBLUE;
                     else
                         iQuality = QUALITYWHITE;
+                    //asserts	
+                    if (iQuality > QUALITYORANGE)
+                    {
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Item type (" + iQuality + ") out of range");
+                    }
+                    if ((CurrentTarget.Level < 0) || (CurrentTarget.Level >= 64))
+                    {
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Item level (" + CurrentTarget.Level + ") out of range");
+                    }
                     ItemsPickedStats.TotalPerQuality[iQuality]++;
                     ItemsPickedStats.TotalPerLevel[CurrentTarget.Level]++;
                     ItemsPickedStats.TotalPerQPerL[iQuality, CurrentTarget.Level]++;
@@ -1411,6 +1420,12 @@ namespace GilesTrinity
                         iGemType = GEMEMERALD;
                     if (thisgilesitemtype == GItemType.Amethyst)
                         iGemType = GEMAMETHYST;
+                    // !sp - asserts	
+                    if (iGemType >= GEMEMERALD)
+                    { DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Gem type (" + iGemType + ") out of range"); }
+                    if ((CurrentTarget.Level < 0) || (CurrentTarget.Level >= 64))
+                    { DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Gem level (" + CurrentTarget.Level + ") out of range"); }
+
                     ItemsPickedStats.GemsPerType[iGemType]++;
                     ItemsPickedStats.GemsPerLevel[CurrentTarget.Level]++;
                     ItemsPickedStats.GemsPerTPerL[iGemType, CurrentTarget.Level]++;
@@ -1418,6 +1433,10 @@ namespace GilesTrinity
                 else if (thisgilesitemtype == GItemType.HealthPotion)
                 {
                     ItemsPickedStats.TotalPotions++;
+                    if ((CurrentTarget.Level < 0) || (CurrentTarget.Level >= 64))
+                    {
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Potion level (" + CurrentTarget.Level + ") out of range");
+                    }
                     ItemsPickedStats.PotionsPerLevel[CurrentTarget.Level]++;
                 }
                 else if (c_item_GItemType == GItemType.InfernalKey)
