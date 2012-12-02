@@ -717,9 +717,6 @@ namespace GilesTrinity
                 bCheckGround = true;
             else
                 bCheckGround = false;
-            /**/
-            
-
             // Is this something we should try to force leap/other movement abilities against?
             c_ForceLeapAgainst = false;
             double dUseKillRadius = RefreshKillRadius();
@@ -729,32 +726,34 @@ namespace GilesTrinity
                 AddToCache = false;
                 c_IgnoreSubStep = "OutsideofKillRadius";
             }
-            if (thisUnit.IsUntargetable)
-            {
-                AddToCache = false;
-                c_IgnoreSubStep += "Untargettable+";
-            }
-            // Disabled because of chickens
-            // if (thisUnit.IsHidden)
-            // {
-            //    AddToCache = false;
-            //    c_IgnoreSubStep += "IsHidden+";
-            // }
-            if (thisUnit.IsInvulnerable)
-            {
-                AddToCache = false;
-                c_IgnoreSubStep += "IsInvulnerable+";
-            }
-            if (thisUnit.IsBurrowed)
-            {
-                AddToCache = false;
-                c_IgnoreSubStep += "IsBurrowed+";
-            }
-            if (thisUnit.IsHelper || thisUnit.IsNPC || thisUnit.IsTownVendor)
-            {
-                AddToCache = false;
-                c_IgnoreSubStep += "IsNPCOrHelper+";
-            }
+			try {
+				if (thisUnit.IsUntargetable)
+				{
+					AddToCache = false;
+					c_IgnoreSubStep += "Untargettable+";
+				}
+				// Disabled because of chickens
+				// if (thisUnit.IsHidden)
+				// {
+				//    AddToCache = false;
+				//    c_IgnoreSubStep += "IsHidden+";
+				// }
+				if (thisUnit.IsInvulnerable)
+				{
+					AddToCache = false;
+					c_IgnoreSubStep += "IsInvulnerable+";
+				}
+				if (thisUnit.IsBurrowed)
+				{
+					AddToCache = false;
+					c_IgnoreSubStep += "IsBurrowed+";
+				}
+				if (thisUnit.IsHelper || thisUnit.IsNPC || thisUnit.IsTownVendor)
+				{
+					AddToCache = false;
+					c_IgnoreSubStep += "IsNPCOrHelper+";
+				}
+			} catch {}
             // Safe is-attackable detection
             if (AddToCache)
                 c_unit_IsAttackable = true;
@@ -1023,11 +1022,15 @@ namespace GilesTrinity
             RefreshItemStats(itemBaseType);
             // Ignore it if it's not in range yet - allow legendary items to have 15 feet extra beyond our profile max loot radius
             float fExtraRange = 0f;
-            if (iKeepLootRadiusExtendedFor > 0 || c_ItemQuality >= ItemQuality.Rare4)
-            {
+			// !sp - loot range extension range for legendaries
+            if (iKeepLootRadiusExtendedFor > 0) {
                 fExtraRange = 30f;
+			}
+            if (c_ItemQuality >= ItemQuality.Rare4)
+            {
+                fExtraRange = iCurrentMaxLootRadius; //!sp - double range for Rares
             }
-            if (iKeepLootRadiusExtendedFor > 0 || c_ItemQuality >= ItemQuality.Legendary)
+            if (c_ItemQuality >= ItemQuality.Legendary)
             {
                 fExtraRange = 50f;
             }
@@ -1089,9 +1092,32 @@ namespace GilesTrinity
                 }
                 dictGilesGoldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
             }
-            
-
-            if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)
+			
+			// Ignore gold piles that are (currently) too small...
+            rangedMinimumStackSize = Settings.Loot.Pickup.MinimumGoldStack;
+			int min_cash = 100;	//absolute min cash to consider
+			int max_distance = 80;
+			if (c_GoldStackSize < min_cash) {
+				rangedMinimumStackSize = min_cash;
+			} else if (c_CentreDistance >= max_distance) {
+				rangedMinimumStackSize = 0;	//too far away
+			} else {
+				//scale the min stack size based on distance
+				//this will enable smaller, local cash values to be picked up
+				//while enroute, picking up items or larger amounts
+				//better for toons with low pickup range
+				int min_range = 6; //anything below this should be collected
+				int max_range = 30; //anything beyond this should be at the upper threshold
+				int max_cash = Math.Max(min_cash, rangedMinimumStackSize);
+				double cash_range = Math.Max(0, c_CentreDistance-min_range);
+				double rangedPerc = cash_range/(max_range-min_range); //no ceiling on this to capture distant, high values. twice distance=twice value
+				int newMinStack = (int)Math.Floor(rangedPerc * (max_cash-min_cash))+min_cash;
+				rangedMinimumStackSize = newMinStack;
+				if (c_GoldStackSize >= rangedMinimumStackSize) {
+					//Logging.Write("[SP] Gold v=" + c_GoldStackSize + " ,d=" + c_CentreDistance + ",w=" + rangedPerc + ",nms="+newMinStack);
+				}
+			}
+            if (c_GoldStackSize < rangedMinimumStackSize)
             {
                 AddToCache = false;
             }
