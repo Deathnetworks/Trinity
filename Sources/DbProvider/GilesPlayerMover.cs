@@ -51,7 +51,6 @@ namespace GilesTrinity.DbProvider
         private static int lastKnowCoin;
         private static DateTime lastCheckBag;
         private static DateTime lastRefreshCoin;
-		private static bool leaveGameRequest = false;
         public static int expireSeconds = 225;
 
 		private static void resetCheckGold() {
