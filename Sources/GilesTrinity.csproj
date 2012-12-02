@@ -81,6 +81,7 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotManager.cs" />
+    <Compile Include="Technicals\Loader.cs" />
     <Compile Include="TrinityPowerManager.cs" />
     <Compile Include="ScheduledPower.cs" />
     <Compile Include="ScriptedRules\Dynamic.cs" />
@@ -239,6 +240,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="Dictionaries.xml" />
     <Content Include="ItemRules\changeLog.txt" />
     <Content Include="ItemRules\RulesReadMe.txt" />
   </ItemGroup>
