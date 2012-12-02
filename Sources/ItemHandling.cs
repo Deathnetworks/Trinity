@@ -879,10 +879,17 @@ namespace GilesTrinity
         internal static void OutputReport()
         {
             TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
-            string sLogFileName = ZetaDia.Service.CurrentHero.BattleTagName + " - Stats - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log";
+            
+            string LogDirectory = "TrinityLogs";
+            if (!Directory.Exists(LogDirectory))
+            {
+                Directory.CreateDirectory(LogDirectory);
+            }
+
+            string logFileName = Path.Combine(LogDirectory, String.Format(" {0} - Stats - {1}.log", playerStatus.BattleTag, playerStatus.ActorClass));
 
             // Create whole new file
-            FileStream LogStream = File.Open(sTrinityPluginPath + sLogFileName, FileMode.Create, FileAccess.Write, FileShare.Read);
+            FileStream LogStream = File.Open(Path.Combine(Path.GetDirectoryName(sDemonBuddyPath),logFileName), FileMode.Create, FileAccess.Write, FileShare.Read);
             using (StreamWriter LogWriter = new StreamWriter(LogStream))
             {
                 LogWriter.WriteLine("===== Misc Statistics =====");

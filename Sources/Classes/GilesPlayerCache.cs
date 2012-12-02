@@ -1,5 +1,6 @@
 ﻿using System;
 using Zeta.Common;
+using Zeta.Internals.Actors;
 
 namespace GilesTrinity
 {
@@ -20,9 +21,13 @@ namespace GilesTrinity
         public bool WaitingForReserveEnergy { get; set; }
         public int MyDynamicID { get; set; }
         public int Level { get; set; }
+        public ActorClass ActorClass { get; set; }
+        public string BattleTag { get; set; }
 
-        public GilesPlayerCache(DateTime lastUpdated, bool incapacitated, bool isRooted, bool isInTown, double currentHealth, double currentEnergy, double currentEnergyPct,
-            double discipline, double disciplinePct, Vector3 currentPosition, bool waitingReserve, int dynamicId, int level)
+
+        public GilesPlayerCache(
+            DateTime lastUpdated, bool incapacitated, bool isRooted, bool isInTown, double currentHealth, double currentEnergy, double currentEnergyPct,
+            double discipline, double disciplinePct, Vector3 currentPosition, bool waitingReserve, int dynamicId, int level, ActorClass actorClass, string battleTag)
         {
             LastUpdated = lastUpdated;
             IsIncapacitated = incapacitated;
@@ -37,6 +42,8 @@ namespace GilesTrinity
             WaitingForReserveEnergy = waitingReserve;
             MyDynamicID = dynamicId;
             Level = level;
+            ActorClass = actorClass;
+            BattleTag = battleTag;
         }
     }
 }

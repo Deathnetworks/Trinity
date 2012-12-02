@@ -46,6 +46,8 @@ namespace GilesTrinity
                     playerStatus.WaitingForReserveEnergy = true;
                 playerStatus.MyDynamicID = me.CommonData.DynamicId;
                 playerStatus.Level = me.Level;
+                playerStatus.ActorClass = me.ActorClass;
+                playerStatus.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
             }
             catch (Exception ex)
             {

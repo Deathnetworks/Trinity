@@ -154,7 +154,7 @@ namespace GilesTrinity
         /// <summary>
         /// Holds all of the player's current info handily cached, updated once per loop with a minimum timer on updates to save D3 memory hits
         /// </summary>
-        public static GilesPlayerCache playerStatus = new GilesPlayerCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, vNullLocation, false, 0, 1);
+        public static GilesPlayerCache playerStatus = new GilesPlayerCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, vNullLocation, false, 0, 1, ActorClass.Invalid, String.Empty);
 
         /// <summary>
         /// Obstacle cache, things we can't or shouldn't move through
@@ -374,10 +374,15 @@ namespace GilesTrinity
         public static bool bDontSpamOutofCombat = false;
         public static bool bOnlyTarget = false;
 
-        // Target provider and core routine variables
+
+        // Configuration variables
         public static string sTrinityPluginPath = "";
-        private static string sTrinityConfigFile = "";
+        internal static string sTrinityConfigFile = "";
+        internal static string sDemonBuddyPath = "";
         private static string sTrinityEmailConfigFile = "";
+
+
+        // Target provider and core routine variables
         public static ActorClass iMyCachedActorClass = ActorClass.Invalid;
         private static bool bAnyChampionsPresent = false;
         private static bool bAnyTreasureGoblinsPresent = false;

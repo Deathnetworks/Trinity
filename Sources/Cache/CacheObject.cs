@@ -24,15 +24,14 @@ namespace GilesTrinity.Cache
         /// Initializes a new instance of the <see cref="CacheObject" /> class.
         /// </summary>
         /// <param name="acdGuid">The Actor GUID.</param>
-        public CacheObject(int acdGuid)
-        {
-            ACDGuid = acdGuid;
-            Type = GObjectType.Unknown;
-            LastAccessDate = DateTime.UtcNow;
-
-            CacheType = Cache.CacheType.Other;
-
-        }
+        //public CacheObject(int acdGuid)
+        //{
+        //    ACDGuid = acdGuid;
+        //    Type = GObjectType.Unknown;
+        //    CacheType = Cache.CacheType.Other;
+        //    LastAccessDate = DateTime.UtcNow;
+        //    LastRefreshDate = DateTime.Now;
+        //}
         public CacheObject(ACD acd)
         {
             ACDGuid = acd.ACDGuid;
@@ -41,7 +40,23 @@ namespace GilesTrinity.Cache
             Type = GObjectType.Unknown;
             CacheType = Cache.CacheType.Other;
             LastAccessDate = DateTime.UtcNow;
+            LastRefreshDate = DateTime.Now;
+            Name = acd.Name;
+            ActorSNO = acd.ActorSNO;
+            DynamicID = acd.DynamicId;
+            DynamicID = acd.DynamicId;
+            Position = acd.Position;
+            CentreDistance = acd.Distance;
+            CacheType = Cache.CacheType.Object;
 
+            InternalObject = acd.AsRActor;
+
+            if (InternalObject != null)
+            {
+                ZDiff = InternalObject.ZDiff;
+                RActorGUID = InternalObject.RActorGuid;
+            }
+            
         }
         #endregion Constructors
 
@@ -121,7 +136,7 @@ namespace GilesTrinity.Cache
         /// Gets the Position
         /// </summary>
         public Vector3 Position { get; set; }
-        
+
         /// <summary>
         /// Gets the Distance to the center of the object
         /// </summary>
@@ -130,12 +145,12 @@ namespace GilesTrinity.Cache
         /// <summary>
         /// Gets the distance to the radius of the object
         /// </summary>
-        public float RadiusDistance { get; set; }
+        public abstract float RadiusDistance { get; set; }
 
         /// <summary>
         /// Gets the Radius of the object
         /// </summary>
-        public float Radius { get; set; }
+        public abstract float Radius { get; set; }
 
         /// <summary>
         /// Gets the difference in Z axis of the object in relation to the Player
@@ -145,12 +160,12 @@ namespace GilesTrinity.Cache
         /// <summary>
         /// A reason, if any, that this was not further processed in the caching mechanism
         /// </summary>
-        public string IgnoreReason { get; set; }
+        public abstract string IgnoreReason { get; set; }
 
         /// <summary>
         /// A more detailed reason, if any, that this was not processed in the caching mechanism
         /// </summary>
-        public string IgnoreSubStep { get; set; }
+        public abstract string IgnoreSubStep { get; set; }
 
         /// <summary>
         /// Gets the original DiaObject
@@ -193,12 +208,36 @@ namespace GilesTrinity.Cache
         public CacheOther(ACD acd)
             : base(acd)
         {
-
+            CacheType = CacheType.Other;
         }
 
         public override CacheObject Clone()
         {
             return (CacheObject)this.MemberwiseClone();
+        }
+
+        public override float RadiusDistance
+        {
+            get;
+            set;
+        }
+
+        public override float Radius
+        {
+            get;
+            set;
+        }
+
+        public override string IgnoreReason
+        {
+            get;
+            set;
+        }
+
+        public override string IgnoreSubStep
+        {
+            get;
+            set;
         }
     }
 
@@ -206,30 +245,30 @@ namespace GilesTrinity.Cache
     /// <summary>
     /// Cached Items
     /// </summary>
-    internal class CacheItem2 : CacheObject
-    {
-        public CacheItem2(ACD acd)
-            : base(acd)
-        {
+    //internal class CacheItem2 : CacheObject
+    //{
+    //    public CacheItem2(ACD acd)
+    //        : base(acd)
+    //    {
 
-        }
-        /// <summary>
-        /// Gets the DiaItem
-        /// </summary>
-        public DiaItem InternalItem { get; set; }
-        public GItemType ItemType { get; set; }
-        public ItemQuality ItemQuality { get; set; }
-        public GItemType InternalItemType { get; set; }
-        public FollowerType FollowerType { get; set; }
-        public int ItemLevel { get; set; }
-        public int GoldStackSize { get; set; }
-        public bool IsOneHandedItem { get; set; }
+    //    }
+    //    /// <summary>
+    //    /// Gets the DiaItem
+    //    /// </summary>
+    //    public DiaItem InternalItem { get; set; }
+    //    public GItemType ItemType { get; set; }
+    //    public ItemQuality ItemQuality { get; set; }
+    //    public GItemType InternalItemType { get; set; }
+    //    public FollowerType FollowerType { get; set; }
+    //    public int ItemLevel { get; set; }
+    //    public int GoldStackSize { get; set; }
+    //    public bool IsOneHandedItem { get; set; }
 
-        public override CacheObject Clone()
-        {
-            return (CacheObject)this.MemberwiseClone();
-        }
-    }
+    //    public override CacheObject Clone()
+    //    {
+    //        return (CacheObject)this.MemberwiseClone();
+    //    }
+    //}
 
 
 }

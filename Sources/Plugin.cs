@@ -73,7 +73,6 @@ namespace GilesTrinity
         /// </summary>
         public void OnPulse()
         { }
-
         /// <summary>
         /// Called when user Enable the plugin.
         /// </summary>
@@ -86,7 +85,7 @@ namespace GilesTrinity
             }
             catch { }
 
-            string sDemonBuddyPath = Assembly.GetEntryAssembly().Location;
+            sDemonBuddyPath = Assembly.GetEntryAssembly().Location;
             sTrinityPluginPath = Path.GetDirectoryName(sDemonBuddyPath) + @"\Plugins\GilesTrinity\";
             sTrinityConfigFile = Path.GetDirectoryName(sDemonBuddyPath) + @"\Settings\GilesTrinity.cfg";
 

@@ -15,7 +15,7 @@ namespace GilesTrinity.Cache
         public CacheGizmo(ACD acd)
             : base(acd)
         {
-
+            CacheType = CacheType.Gizmo;
         }
         /// <summary>
         /// Gets the DiaGizmo
@@ -35,6 +35,33 @@ namespace GilesTrinity.Cache
             return (CacheObject)this.MemberwiseClone();
         }
 
+
+        public override float RadiusDistance
+        {
+            get;
+            set;
+        }
+
+        public override float Radius
+        {
+            get;
+            set;
+
+        }
+
+        public override string IgnoreReason
+        {
+            get;
+            set;
+
+        }
+
+        public override string IgnoreSubStep
+        {
+            get;
+            set;
+
+        }
     }
 
 }

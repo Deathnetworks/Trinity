@@ -27,88 +27,98 @@ namespace GilesTrinity.Cache
         public CacheItem(ACD acd)
             : base(acd)
         {
+            CacheType = CacheType.Item;
             ACDItem = (ACDItem)acd;
-            DiaItem item = ((DiaItem)acd.AsRActor);
-            CachedObject = item;
 
             InternalName = ACDItem.InternalName;
-            Quality = DetermineQuality(ACDItem.ItemQualityLevel);
-            ItemType = DetermineItemType(InternalName, ACDItem.ItemType);
+            try
+            {
+                Quality = DetermineQuality(ACDItem.ItemQualityLevel);
+            }
+            catch { }
+            try
+            {
+                ItemType = DetermineItemType(InternalName, ACDItem.ItemType);
+            }
+            catch { }
             BaseType = DetermineBaseType(ItemType);
 
-            int standardRequiredLevel = (ACDItem.Stats.Level > 60) ? 60 : ACDItem.Stats.Level - 1;
-            LevelReduction = standardRequiredLevel - ACDItem.Stats.RequiredLevel;
+            try
+            {
+                int standardRequiredLevel = (ACDItem.Stats.Level > 60) ? 60 : ACDItem.Stats.Level - 1;
+                LevelReduction = standardRequiredLevel - ACDItem.Stats.RequiredLevel;
 
-            Vitality = (int)Math.Floor(ACDItem.Stats.Vitality);
-            Strength = (int)Math.Floor(ACDItem.Stats.Strength);
-            Intelligence = (int)Math.Floor(ACDItem.Stats.Intelligence);
-            Dexterity = (int)Math.Floor(ACDItem.Stats.Dexterity);
-            ArcaneOnCrit = (int)Math.Floor(ACDItem.Stats.ArcaneOnCrit);
-            Armor = (int)Math.Floor(ACDItem.Stats.Armor);
-            ArmorBonus = (int)Math.Floor(ACDItem.Stats.ArmorBonus);
-            ArmorTotal = (int)Math.Floor(ACDItem.Stats.ArmorTotal);
-            AttackSpeedPercent = (int)Math.Floor(ACDItem.Stats.AttackSpeedPercent);
-            BlockChance = (int)Math.Floor(ACDItem.Stats.BlockChance);
-            CritDamagePercent = (int)Math.Floor(ACDItem.Stats.CritDamagePercent);
-            CritPercent = ACDItem.Stats.CritPercent;
-            DamageReductionPhysicalPercent = (int)Math.Floor(ACDItem.Stats.DamageReductionPhysicalPercent);
-            GoldFind = (int)Math.Floor(ACDItem.Stats.GoldFind);
-            HatredRegen = (int)Math.Floor(ACDItem.Stats.HatredRegen);
-            HealthGlobeBonus = (int)Math.Floor(ACDItem.Stats.HealthGlobeBonus);
-            HealthPerSecond = (int)Math.Floor(ACDItem.Stats.HealthPerSecond);
-            HealthPerSpiritSpent = (int)Math.Floor(ACDItem.Stats.HealthPerSpiritSpent);
-            LifeOnHit = (int)Math.Floor(ACDItem.Stats.LifeOnHit);
-            LifePercent = (int)Math.Floor(ACDItem.Stats.LifePercent);
-            LifeSteal = (int)Math.Floor(ACDItem.Stats.LifeSteal);
-            MagicFind = (int)Math.Floor(ACDItem.Stats.MagicFind);
-            ManaRegen = (int)Math.Floor(ACDItem.Stats.ManaRegen);
-            MaxArcanePower = (int)Math.Floor(ACDItem.Stats.MaxArcanePower);
-            MaxDamage = (int)Math.Floor(ACDItem.Stats.MaxDamage);
-            MaxDiscipline = (int)Math.Floor(ACDItem.Stats.MaxDiscipline);
-            MaxFury = (int)Math.Floor(ACDItem.Stats.MaxFury);
-            MaxMana = (int)Math.Floor(ACDItem.Stats.MaxMana);
-            MaxSpirit = (int)Math.Floor(ACDItem.Stats.MaxSpirit);
-            MinDamage = (int)Math.Floor(ACDItem.Stats.MinDamage);
-            MovementSpeed = (int)Math.Floor(ACDItem.Stats.MovementSpeed);
-            PickUpRadius = (int)Math.Floor(ACDItem.Stats.PickUpRadius);
-            ResistAll = (int)Math.Floor(ACDItem.Stats.ResistAll);
-            ResistArcane = (int)Math.Floor(ACDItem.Stats.ResistArcane);
-            ResistCold = (int)Math.Floor(ACDItem.Stats.ResistCold);
-            ResistFire = (int)Math.Floor(ACDItem.Stats.ResistFire);
-            ResistHoly = (int)Math.Floor(ACDItem.Stats.ResistHoly);
-            ResistLightning = (int)Math.Floor(ACDItem.Stats.ResistLightning);
-            ResistPhysical = (int)Math.Floor(ACDItem.Stats.ResistPhysical);
-            ResistPoison = (int)Math.Floor(ACDItem.Stats.ResistPoison);
-            SpiritRegen = (int)Math.Floor(ACDItem.Stats.SpiritRegen);
-            Thorns = (int)Math.Floor(ACDItem.Stats.Thorns);
-            WeaponAttacksPerSecond = (int)Math.Floor(ACDItem.Stats.WeaponAttacksPerSecond);
-            WeaponDamagePerSecond = (int)Math.Floor(ACDItem.Stats.WeaponDamagePerSecond);
-            WeaponDamageType = ACDItem.Stats.WeaponDamageType;
-            WeaponMaxDamage = (int)Math.Floor(ACDItem.Stats.WeaponMaxDamage);
-            WeaponMinDamage = (int)Math.Floor(ACDItem.Stats.WeaponMinDamage);
+                Vitality = (int)Math.Floor(ACDItem.Stats.Vitality);
+                Strength = (int)Math.Floor(ACDItem.Stats.Strength);
+                Intelligence = (int)Math.Floor(ACDItem.Stats.Intelligence);
+                Dexterity = (int)Math.Floor(ACDItem.Stats.Dexterity);
+                ArcaneOnCrit = (int)Math.Floor(ACDItem.Stats.ArcaneOnCrit);
+                Armor = (int)Math.Floor(ACDItem.Stats.Armor);
+                ArmorBonus = (int)Math.Floor(ACDItem.Stats.ArmorBonus);
+                ArmorTotal = (int)Math.Floor(ACDItem.Stats.ArmorTotal);
+                AttackSpeedPercent = (int)Math.Floor(ACDItem.Stats.AttackSpeedPercent);
+                BlockChance = (int)Math.Floor(ACDItem.Stats.BlockChance);
+                CritDamagePercent = (int)Math.Floor(ACDItem.Stats.CritDamagePercent);
+                CritPercent = ACDItem.Stats.CritPercent;
+                DamageReductionPhysicalPercent = (int)Math.Floor(ACDItem.Stats.DamageReductionPhysicalPercent);
+                GoldFind = (int)Math.Floor(ACDItem.Stats.GoldFind);
+                HatredRegen = (int)Math.Floor(ACDItem.Stats.HatredRegen);
+                HealthGlobeBonus = (int)Math.Floor(ACDItem.Stats.HealthGlobeBonus);
+                HealthPerSecond = (int)Math.Floor(ACDItem.Stats.HealthPerSecond);
+                HealthPerSpiritSpent = (int)Math.Floor(ACDItem.Stats.HealthPerSpiritSpent);
+                LifeOnHit = (int)Math.Floor(ACDItem.Stats.LifeOnHit);
+                LifePercent = (int)Math.Floor(ACDItem.Stats.LifePercent);
+                LifeSteal = (int)Math.Floor(ACDItem.Stats.LifeSteal);
+                MagicFind = (int)Math.Floor(ACDItem.Stats.MagicFind);
+                ManaRegen = (int)Math.Floor(ACDItem.Stats.ManaRegen);
+                MaxArcanePower = (int)Math.Floor(ACDItem.Stats.MaxArcanePower);
+                MaxDamage = (int)Math.Floor(ACDItem.Stats.MaxDamage);
+                MaxDiscipline = (int)Math.Floor(ACDItem.Stats.MaxDiscipline);
+                MaxFury = (int)Math.Floor(ACDItem.Stats.MaxFury);
+                MaxMana = (int)Math.Floor(ACDItem.Stats.MaxMana);
+                MaxSpirit = (int)Math.Floor(ACDItem.Stats.MaxSpirit);
+                MinDamage = (int)Math.Floor(ACDItem.Stats.MinDamage);
+                MovementSpeed = (int)Math.Floor(ACDItem.Stats.MovementSpeed);
+                PickUpRadius = (int)Math.Floor(ACDItem.Stats.PickUpRadius);
+                ResistAll = (int)Math.Floor(ACDItem.Stats.ResistAll);
+                ResistArcane = (int)Math.Floor(ACDItem.Stats.ResistArcane);
+                ResistCold = (int)Math.Floor(ACDItem.Stats.ResistCold);
+                ResistFire = (int)Math.Floor(ACDItem.Stats.ResistFire);
+                ResistHoly = (int)Math.Floor(ACDItem.Stats.ResistHoly);
+                ResistLightning = (int)Math.Floor(ACDItem.Stats.ResistLightning);
+                ResistPhysical = (int)Math.Floor(ACDItem.Stats.ResistPhysical);
+                ResistPoison = (int)Math.Floor(ACDItem.Stats.ResistPoison);
+                SpiritRegen = (int)Math.Floor(ACDItem.Stats.SpiritRegen);
+                Thorns = (int)Math.Floor(ACDItem.Stats.Thorns);
+                WeaponAttacksPerSecond = (int)Math.Floor(ACDItem.Stats.WeaponAttacksPerSecond);
+                WeaponDamagePerSecond = (int)Math.Floor(ACDItem.Stats.WeaponDamagePerSecond);
+                WeaponDamageType = ACDItem.Stats.WeaponDamageType;
+                WeaponMaxDamage = (int)Math.Floor(ACDItem.Stats.WeaponMaxDamage);
+                WeaponMinDamage = (int)Math.Floor(ACDItem.Stats.WeaponMinDamage);
 
-            LifeSteal = ACDItem.Stats.LifeSteal;
+                LifeSteal = ACDItem.Stats.LifeSteal;
 
-            Sockets = ACDItem.Stats.Sockets;
-            FollowerSpecialType = ACDItem.FollowerSpecialType;
-            Gold = ACDItem.Gold;
-            IdentifyCost = ACDItem.IdentifyCost;
-            InventoryColumn = ACDItem.InventoryColumn;
-            InventoryRow = ACDItem.InventoryRow;
-            IsTwoHand = ACDItem.IsTwoHand;
-            IsTwoSquareItem = ACDItem.IsTwoSquareItem;
-            IsUnidentified = ACDItem.IsUnidentified;
-            ItemStackQuantity = ACDItem.ItemStackQuantity;
-            MaxStackCount = ACDItem.MaxStackCount;
-            Name = ACDItem.Name;
-            Position = ACDItem.Position;
-            Level = ACDItem.Stats.Level;
+                Sockets = ACDItem.Stats.Sockets;
+                FollowerSpecialType = ACDItem.FollowerSpecialType;
+                Gold = ACDItem.Gold;
+                IdentifyCost = ACDItem.IdentifyCost;
+                InventoryColumn = ACDItem.InventoryColumn;
+                InventoryRow = ACDItem.InventoryRow;
+                IsTwoHand = ACDItem.IsTwoHand;
+                IsTwoSquareItem = ACDItem.IsTwoSquareItem;
+                IsUnidentified = ACDItem.IsUnidentified;
+                ItemStackQuantity = ACDItem.ItemStackQuantity;
+                MaxStackCount = ACDItem.MaxStackCount;
+                Name = ACDItem.Name;
+                Position = ACDItem.Position;
+                Level = ACDItem.Stats.Level;
 
-            if (Gold > 0)
-                ShouldPickup = ShouldPickupGold(Gold);
-            else
-                ShouldPickup = ShouldPickupItem(ACDItem);
-
+                if (Gold > 0)
+                    ShouldPickup = ShouldPickupGold(Gold);
+                else
+                    ShouldPickup = ShouldPickupItem(ACDItem);
+            }
+            catch { }
         }
         #endregion Constructors
 
@@ -117,12 +127,6 @@ namespace GilesTrinity.Cache
         {
             get;
             set;
-        }
-
-        public Db.DiaItem CachedObject
-        {
-            get;
-            private set;
         }
 
         public GItemType ItemType
@@ -515,6 +519,33 @@ namespace GilesTrinity.Cache
             set;
         }
 
+        public override float RadiusDistance
+        {
+            get;
+            set;
+        }
+
+        public override float Radius
+        {
+            get;
+            set;
+
+        }
+
+        public override string IgnoreReason
+        {
+            get;
+            set;
+
+        }
+
+        public override string IgnoreSubStep
+        {
+            get;
+            set;
+
+        }
+
         public float Score
         {
             get
@@ -533,12 +564,7 @@ namespace GilesTrinity.Cache
         /// <returns>Cloned instance of <see cref="CacheObject" />.</returns>
         public override CacheObject Clone()
         {
-            CacheItem item = new CacheItem(CachedObject.CommonData);
-            item.LastAccessDate = LastAccessDate;
-            item.Type = Type;
-            item.ItemType = ItemType;
-
-            return item;
+            return (CacheObject)this.MemberwiseClone();
         }
 
         /// <summary>
