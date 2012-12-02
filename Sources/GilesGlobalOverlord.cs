@@ -38,7 +38,8 @@ namespace GilesTrinity
             if (pf == null)
                 pf = new PathFinder(gp);
 
-            CacheRefresher.RefreshAll();
+            if (false)
+                CacheRefresher.RefreshAll();
 
             // World ID safety caching incase it's ever unavailable
             if (ZetaDia.CurrentWorldDynamicId != -1)
