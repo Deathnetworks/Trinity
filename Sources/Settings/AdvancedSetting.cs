@@ -15,6 +15,8 @@ namespace GilesTrinity.Settings
         private bool _LogStuckLocation;
         private bool _DebugInStatusBar;
         private LogCategory _LogCategories;
+        private bool _GoldInactivityEnabled;
+        private int _GoldInactivityTimer;
         #endregion Fields
 
         #region Events
@@ -85,6 +87,42 @@ namespace GilesTrinity.Settings
                 {
                     _AllowRestartGame = value;
                     OnPropertyChanged("AllowRestartGame");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool GoldInactivityEnabled
+        {
+            get
+            {
+                return _GoldInactivityEnabled;
+            }
+            set
+            {
+                if (_GoldInactivityEnabled != value)
+                {
+                    _GoldInactivityEnabled = value;
+                    OnPropertyChanged("GoldInactivityEnabled");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(225)]
+        public int GoldInactivityTimer
+        {
+            get
+            {
+                return _GoldInactivityTimer;
+            }
+            set
+            {
+                if (_GoldInactivityTimer != value)
+                {
+                    _GoldInactivityTimer = value;
+                    OnPropertyChanged("GoldInactivityTimer");
                 }
             }
         }
