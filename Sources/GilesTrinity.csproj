@@ -38,7 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Demonbuddy">
-      <HintPath>..\..\Demonbuddy.exe</HintPath>
+      <HintPath>..\Demonbuddy.exe</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
@@ -77,6 +77,12 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotStart.cs" />
+    <Compile Include="Interpreter.cs" />
+    <Compile Include="ItemRules\Core\Formula.cs" />
+    <Compile Include="ItemRules\Core\Parser.cs" />
+    <Compile Include="ItemRules\Core\ParseTree.cs" />
+    <Compile Include="ItemRules\Core\Scanner.cs" />
+    <Compile Include="ItemRules\Core\TextHighlighter.cs" />
     <Compile Include="ScriptedRules\Dynamic.cs" />
     <Compile Include="ScriptedRules\RulesManager.cs" />
     <Compile Include="ScriptedRules\ScriptedRuleAction.cs" />
@@ -91,7 +97,6 @@
     <Compile Include="DbProvider\GilesLootTargetingProvider.cs" />
     <Compile Include="DbProvider\GilesObstacleTargetingProvider.cs" />
     <Compile Include="Classes\GilesObject.cs" />
-    <Compile Include="Interpreter.cs" />
     <Compile Include="Notifications\NotificationManager.cs" />
     <Compile Include="Notifications\ProwlNotification.cs" />
     <Compile Include="Notifications\ProwlNotificationPriority.cs" />
@@ -231,20 +236,17 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Content Include="ItemRules\changeLog.txt" />
-    <Content Include="ItemRules\RulesReadMe.txt" />
+    <Content Include="ItemRules\ItemRules2.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ItemRules\config.dis" />
-    <None Include="ItemRules\legendary.dis" />
-    <None Include="ItemRules\legendary_it.dis" />
-    <None Include="ItemRules\legendary_ru.dis" />
-    <None Include="ItemRules\magic.dis" />
-    <None Include="ItemRules\rare.dis" />
-    <None Include="ItemRules\special.dis" />
-    <None Include="ItemRules\test.dis" />
+    <None Include="ItemRules\Rules\config.dis" />
+    <None Include="ItemRules\Rules\legendary.dis" />
+    <None Include="ItemRules\Rules\magic.dis" />
+    <None Include="ItemRules\Rules\pickup.dis" />
+    <None Include="ItemRules\Rules\rare.dis" />
+    <None Include="ItemRules\Rules\special.dis" />
+    <None Include="ItemRules\Rules\test.dis" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>

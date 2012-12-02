@@ -795,11 +795,6 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
-            if (TrueItemType == GItemType.CraftingPlan)
-            {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep plans)", thisitem.RealName, thisitem.InternalName, TrueItemType);
-                return true;
-            }
             if (TrueItemType == GItemType.Emerald)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
@@ -836,19 +831,27 @@ namespace GilesTrinity
                 return false;
             }
 
+            // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
+            if (thisitem.IsUnidentified)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] = (autokeep unidentified items)", thisitem.RealName, thisitem.InternalName);
+                return true;
+            }
+
             /*
              * Run Scripted rules for Weapons/Armor/Jewelry
              */
-            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules && IsWeaponArmorJewlery(thisitem))
+            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
-
-                switch (StashRule.checkItem(thisitem.item))
+                Interpreter.InterpreterAction action = StashRule.checkItem(thisitem.item, false);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (" + action + ")", thisitem.item.Name, thisitem.item.InternalName, thisitem.item.ItemType);
+                switch (action)
                 {
                     case Interpreter.InterpreterAction.KEEP:
                         return true;
                     case Interpreter.InterpreterAction.TRASH:
                         return false;
-                    default:
+                    case Interpreter.InterpreterAction.SCORE:
                         break;
                 }
             }
@@ -859,19 +862,16 @@ namespace GilesTrinity
                 return false;
             }
 
-            // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
-            if (thisitem.IsUnidentified)
-            {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] = (autokeep unidentified items)", thisitem.RealName, thisitem.InternalName);
-                return true;
-            }
-
             if (thisitem.Quality >= ItemQuality.Legendary)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep legendaries)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
-
+            if (TrueItemType == GItemType.CraftingPlan)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep plans)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                return true;
+            }
 
             // Ok now try to do some decent item scoring based on item types
             double iNeedScore = ScoreNeeded(TrueItemType);
