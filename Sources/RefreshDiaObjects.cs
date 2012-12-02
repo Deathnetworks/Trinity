@@ -19,7 +19,12 @@ namespace GilesTrinity
         /// </summary>
         public static void RefreshDiaObjects()
         {
-            RefreshDiaObjectCache();
+            using (ZetaDia.Memory.AcquireFrame())
+            {
+                ZetaDia.Actors.Update();
+
+                RefreshDiaObjectCache();
+            }
         }
 
         /// <summary>

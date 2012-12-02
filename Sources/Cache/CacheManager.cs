@@ -257,7 +257,7 @@ namespace GilesTrinity.Cache
         public static IEnumerable<T> GetAllObjectByType<T>(CacheType type)
             where T : CacheObject
         {
-            foreach (CacheObject obj in _Cache.Values.Where(o => o.CacheType == type))
+            foreach (CacheObject obj in _Cache.Values.Where(o => o.CacheType == type).ToList())
             {
                 if (obj is T)
                 {
@@ -278,21 +278,15 @@ namespace GilesTrinity.Cache
                     // Search obselete object in cache dictionary
                     IList<int> removableKey = new List<int>();
 
-                    // Find which RActorGuid can be deleted from cache and store it 
-                    foreach (KeyValuePair<int, CacheObject> keyPair in _Cache)
+                    // Find and delete useless CacheObject
+                    foreach (KeyValuePair<int, CacheObject> keyPair in _Cache.ToList())
                     {
                         if (DateTime.UtcNow.Subtract(keyPair.Value.LastAccessDate).TotalSeconds > _CacheTimeout[keyPair.Value.CacheType])
                         {
-                            removableKey.Add(keyPair.Key);
-                        }
-                    }
-
-                    // Delete from cache all stored RActorGuid
-                    foreach (int rActorGuid in removableKey)
-                    {
-                        lock (_Synchronizer)
-                        {
-                            _Cache.Remove(rActorGuid);
+                            lock (_Synchronizer)
+                            {
+                                _Cache.Remove(keyPair.Key);
+                            }
                         }
                     }
 

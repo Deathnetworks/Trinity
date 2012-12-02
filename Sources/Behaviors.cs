@@ -1422,10 +1422,14 @@ namespace GilesTrinity
                     if (thisgilesitemtype == GItemType.Amethyst)
                         iGemType = GEMAMETHYST;
                     // !sp - asserts	
-                    if (iGemType >= GEMEMERALD)
-                    { DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Gem type (" + iGemType + ") out of range"); }
-                    if ((CurrentTarget.Level < 0) || (CurrentTarget.Level >= 64))
-                    { DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Gem level (" + CurrentTarget.Level + ") out of range"); }
+                    if (iGemType > GEMEMERALD)
+                    {
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Gem type ({0}) out of range", iGemType); 
+                    }
+                    if ((CurrentTarget.Level < 0) || (CurrentTarget.Level > 63))
+                    {
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Gem level ({0}) out of range", CurrentTarget.Level); 
+                    }
 
                     ItemsPickedStats.GemsPerType[iGemType]++;
                     ItemsPickedStats.GemsPerLevel[CurrentTarget.Level]++;
@@ -1434,9 +1438,9 @@ namespace GilesTrinity
                 else if (thisgilesitemtype == GItemType.HealthPotion)
                 {
                     ItemsPickedStats.TotalPotions++;
-                    if ((CurrentTarget.Level < 0) || (CurrentTarget.Level >= 64))
+                    if ((CurrentTarget.Level < 0) || (CurrentTarget.Level > 63))
                     {
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Potion level (" + CurrentTarget.Level + ") out of range");
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Potion level ({0}) out of range", CurrentTarget.Level);
                     }
                     ItemsPickedStats.PotionsPerLevel[CurrentTarget.Level]++;
                 }
