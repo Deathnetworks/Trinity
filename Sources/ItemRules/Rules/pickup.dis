@@ -27,7 +27,7 @@
 // +--------------------------------------------------------------------------------------+
 
 // Test
-[QUALITY] == "Rare"
+//[QUALITY] == "Rare"
 
 [QUALITY] == "Rare"  && [LEVEL] > 61  && [BASETYPE] == "Weapon"
 //ignore rule
@@ -50,7 +50,7 @@
 // +---------------------------------------------------------------------------+
 
 // Test
-[QUALITY] == "Magic"
+//[QUALITY] == "Magic"
 
 //ignore rule
 [QUALITY] == "Magic" -> [IGNORE]

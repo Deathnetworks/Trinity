@@ -408,8 +408,8 @@ namespace GilesTrinity
         /// <summary>
         /// Weapon swapping (Monk Sweeping Wind for higher DPS)
         /// </summary>
-        private static WeaponSwap weaponSwap = new WeaponSwap();
-        private static DateTime WeaponSwapTime = DateTime.Today;
+        internal static WeaponSwap weaponSwap = new WeaponSwap();
+        internal static DateTime WeaponSwapTime = DateTime.Today;
 
         // Goblinney things
         private static int iTotalNumberGoblins = 0;

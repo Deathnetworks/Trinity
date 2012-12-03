@@ -10,14 +10,18 @@ namespace GilesTrinity
     {
         private static GilesPower GetMonkPower(bool bCurrentlyAvoiding, bool bOOCBuff, bool bDestructiblePower)
         {
-            if (weaponSwap.DpsGearOn() && GilesHasBuff(SNOPower.Monk_SweepingWind) && Settings.Combat.Monk.SweepingWindWeaponSwap && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800)
-                weaponSwap.SwapGear();
 
             // Pick the best destructible power available
             if (bDestructiblePower)
             {
                 return GetMonkDestroyPower();
             }
+
+
+
+
+
+
             // Monks need 80 for special spam like tempest rushing
             iWaitingReservedAmount = 80;
             // 4 Mantras for the initial buff (slow-use)
@@ -68,6 +72,49 @@ namespace GilesTrinity
             {
                 return new GilesPower(SNOPower.Monk_BreathOfHeaven, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
             }
+
+            /*
+             * Tesslerc's Sweeping Wind + Binding Flash Weapon Swap
+             * 
+             */
+
+            if (Settings.Combat.Monk.SweepingWindWeaponSwap)
+            {
+                if (weaponSwap.DpsGearOn())
+                {
+                    
+                }
+
+            }
+
+            // Weapon Swap + Sweeping Wind Priority for weapon swap + inna's set
+            if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && Settings.Combat.Monk.HasInnaSet)
+            {
+                // If we have a 2H, it's been more than 200ms since last swap, we don't already have Sweeping Wind buff, we can use Blinding Flash, and our energy is > 15
+                // Cast Blinding Flash before Sweeping Wind
+                if (weaponSwap.MillisecondsSinceLastSwap() >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind) &&
+                    GilesUseTimer(SNOPower.Monk_BlindingFlash) && playerStatus.CurrentEnergy >= 15 && hashPowerHotbarAbilities.Contains(SNOPower.Monk_BlindingFlash))
+                {
+                    return new GilesPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
+                }
+                // If we have a 2H, it's been more than 400ms since last swap, and we don't have sweeping wind buff
+                // Cast Sweeping Wind
+                else if (weaponSwap.MillisecondsSinceLastSwap() >= 400 && !GilesHasBuff(SNOPower.Monk_SweepingWind) 
+                    && playerStatus.CurrentEnergy >= 5 && hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
+                {
+                    SweepWindSpam = DateTime.Now;
+                    return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
+                }
+                // If we have a 2H, Sweeping Wind is up and it's been more than 800ms since last swap, OR if it's been 3 sec since last swap 
+                else if (GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.MillisecondsSinceLastSwap() >= 800 || weaponSwap.MillisecondsSinceLastSwap() >= 3000)
+                {
+                    weaponSwap.SwapGear();
+                }
+
+            }
+            /*
+             *  Regular Bindinf Flash wind logic
+             */
             // Blinding Flash
             if (!bOOCBuff && playerStatus.CurrentEnergy >= 20 && hashPowerHotbarAbilities.Contains(SNOPower.Monk_BlindingFlash) &&
                 (
@@ -77,13 +124,15 @@ namespace GilesTrinity
                 ) &&
                 // Check if we don't have breath of heaven
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_BreathOfHeaven) ||
-                (hashPowerHotbarAbilities.Contains(SNOPower.Monk_BreathOfHeaven) && (!Settings.Combat.Monk.HasInnaSet || GilesHasBuff(SNOPower.Monk_BreathOfHeaven)))) &&
+                 (hashPowerHotbarAbilities.Contains(SNOPower.Monk_BreathOfHeaven) && (!Settings.Combat.Monk.HasInnaSet || GilesHasBuff(SNOPower.Monk_BreathOfHeaven)))
+                 ) &&
                 // Check if either we don't have sweeping winds, or we do and it's ready to cast in a moment
                 (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) ||
                 (hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 85 ||
-                (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15) || GilesHasBuff(SNOPower.Monk_SweepingWind))) ||
-                playerStatus.CurrentHealthPct <= 0.25) &&
-                GilesUseTimer(SNOPower.Monk_BlindingFlash) && PowerManager.CanCast(SNOPower.Monk_BlindingFlash))
+                (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15) || GilesHasBuff(SNOPower.Monk_SweepingWind))
+                ) ||
+                playerStatus.CurrentHealthPct <= 0.25) && GilesUseTimer(SNOPower.Monk_BlindingFlash) && PowerManager.CanCast(SNOPower.Monk_BlindingFlash)
+                )
             {
                 if (!weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && !GilesHasBuff(SNOPower.Monk_SweepingWind))
                 {
@@ -100,8 +149,9 @@ namespace GilesTrinity
             {
                 return new GilesPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 11f -- 1, 2
             }
+
+
             // Sweeping wind
-            //intell -- inna
             if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && !GilesHasBuff(SNOPower.Monk_SweepingWind) &&
                 (iElitesWithinRange[RANGE_25] > 0 || iAnythingWithinRange[RANGE_20] >= 3 || (iAnythingWithinRange[RANGE_20] >= 1 && Settings.Combat.Monk.HasInnaSet) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 25f)) &&
                 // Check if either we don't have blinding flash, or we do and it's been cast in the last 6000ms
@@ -122,17 +172,22 @@ namespace GilesTrinity
                 if (!(weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds <= 200) || !Settings.Combat.Monk.SweepingWindWeaponSwap)
                 {
                     SweepWindSpam = DateTime.Now;
-                    return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 2,2
+                    return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); 
                 }
             }
             // Sweeping wind: spam it if inna set
-            //intell -- inna
             if (hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && Settings.Combat.Monk.HasInnaSet && GilesHasBuff(SNOPower.Monk_SweepingWind) &&
                 playerStatus.CurrentEnergy >= 5 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 4950 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5950)
             {
                 SweepWindSpam = DateTime.Now;
                 return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
             }
+
+
+
+
+
+
             // Seven Sided Strike
             if (!bOOCBuff && !bCurrentlyAvoiding && !playerStatus.IsIncapacitated &&
                 (iElitesWithinRange[RANGE_15] >= 1 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) || playerStatus.CurrentHealthPct <= 0.55) &&

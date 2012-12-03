@@ -1,101 +1,141 @@
-using GilesTrinity.DbProvider;
-using GilesTrinity.Technicals;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.Collections;
 using Zeta;
 using Zeta.Common;
+using Zeta.Common.Plugins;
+using Zeta.CommonBot;
+using Zeta.CommonBot.Profile;
+using Zeta.CommonBot.Profile.Composites;
+using Zeta.Internals;
 using Zeta.Internals.Actors;
+using Zeta.Internals.Actors.Gizmos;
+using Zeta.Internals.SNO;
+using Zeta.Navigation;
+using Zeta.TreeSharp;
+using System.Reflection;
+using System.Threading;
+using GilesTrinity.Technicals;
 
 namespace GilesTrinity.Swap
 {
     class WeaponSwap
     {
-		private static Dictionary<InventorySlot, ACDItem> originalItems;
-		private static readonly HashSet<int> IgnoreItems = new HashSet<int>();
-		private static bool wearingDPSGear = false;
+        private static bool wearingDPSGear = false;
+        private static bool MainIsTwoHander = false;
+        private static bool hasChecked = false;
+        private static bool crashedDuringSwap = false;
 
         static void Main()
         {
             WeaponSwap weaponSwap = new WeaponSwap();
-			wearingDPSGear = false;
+            wearingDPSGear = false;
         }
 
         public WeaponSwap()
         {
-            //init();
         }
-		
-		public bool DpsGearOn()
-		{
-			return wearingDPSGear;
-		}
-		
-		public void SwapGear()
+
+        public bool CanSwap()
+        {
+            if (hasChecked == false)
+            {
+                SecurityCheck();
+            }
+            if (crashedDuringSwap == true)
+            {
+                return (true);
+            }
+            else
+            {
+                return (!ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 9, 5) && !ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 9, 4));
+            }
+        }
+
+        private void SecurityCheck()
+        {
+            int row = 0; int column = 0;
+            var myItem = ZetaDia.Me.Inventory.Backpack.Where(i => i.InventoryColumn == column && i.InventoryRow == row).FirstOrDefault();
+            if (myItem.IsTwoHand && ZetaDia.Me.Inventory.Equipped.FirstOrDefault(i => i.InventorySlot == InventorySlot.PlayerLeftHand).IsTwoHand)
+            {
+                MainIsTwoHander = true;
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.WeaponSwap, "Detected you are using a Two-Hander as main.");
+            }
+            else if (!myItem.IsTwoHand)
+            {
+                crashedDuringSwap = true;
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.WeaponSwap, "Crashed during a swap, no fear all is ok.");
+            }
+            hasChecked = true;
+        }
+
+        public bool DpsGearOn()
+        {
+            return wearingDPSGear;
+        }
+
+        public void SwapGear()
         {
             using (ZetaDia.Memory.AcquireFrame())
             {
                 ZetaDia.Actors.Update();
-                if (!wearingDPSGear)
+                int row = 0; int column = 0;
+                var myItem = ZetaDia.Me.Inventory.Backpack.Where(i => i.InventoryColumn == column && i.InventoryRow == row).FirstOrDefault();
+                if (hasChecked == false)
                 {
-                    originalItems =
-                        ZetaDia.Me.Inventory.Equipped.ToDictionary(
-                            key => key.InventorySlot, v => v);
-                    IgnoreItems.Clear();
-
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.WeaponSwap, "Swapping to 2H");
-                    Equip(InventorySlot.PlayerLeftHand);
-
-
-                    // Simple state holder so we know when we're wearing MF gear.
-                    wearingDPSGear = true;
+                    SecurityCheck();
                 }
-                else
+                if (!wearingDPSGear && !crashedDuringSwap)
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.WeaponSwap, "Swapping to Dual Wield");
-
-                    // Go back to our original set of gear, in their exact places!
-                    foreach (var i in originalItems)
+                    if (!ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 9, 5) && !ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 9, 4))
                     {
-                        ZetaDia.Me.Inventory.EquipItem(i.Value.DynamicId, i.Key);
+                        if (!MainIsTwoHander)
+                        {
+                            //Move Offhand to bottom right corner
+                            ZetaDia.Me.Inventory.MoveItem(ZetaDia.Me.Inventory.Equipped.FirstOrDefault(i => i.InventorySlot == InventorySlot.PlayerRightHand).DynamicId,
+                                    ZetaDia.Me.CommonData.DynamicId, InventorySlot.PlayerBackpack, 9, 4);
+                        }
+                        //Swap other shiz
+                        row = 0; column = 0;
+                        myItem = ZetaDia.Me.Inventory.Backpack.Where(i => i.InventoryColumn == column && i.InventoryRow == row).FirstOrDefault();
+                        ZetaDia.Me.Inventory.EquipItem(myItem.DynamicId, InventorySlot.PlayerLeftHand);
+                        wearingDPSGear = true;
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.WeaponSwap, "Swapped to strong 2 hander.");
+                    }
+                    else
+                    {
+                        //Force town run due to last spot taken!
+                        GilesTrinity.bWantToTownRun = true;
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.WeaponSwap, "For some reason bottom right corner isn't protected, initializing town run to clear it up.");
+                    }
+                }
+                else if (!crashedDuringSwap)
+                {
+                    row = 0; column = 0;
+                    myItem = ZetaDia.Me.Inventory.Backpack.Where(i => i.InventoryColumn == column && i.InventoryRow == row).FirstOrDefault();
+                    ZetaDia.Me.Inventory.EquipItem(myItem.DynamicId, InventorySlot.PlayerLeftHand);
+                    if (!MainIsTwoHander)
+                    {
+                        //Equip offhand
+                        row = 4; column = 9;
+                        myItem = ZetaDia.Me.Inventory.Backpack.Where(i => i.InventoryColumn == column && i.InventoryRow == row).FirstOrDefault();
+                        ZetaDia.Me.Inventory.EquipItem(myItem.DynamicId, InventorySlot.PlayerRightHand);
                     }
                     wearingDPSGear = false;
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.WeaponSwap, "Swapped back to normal gear.");
                 }
+                if (crashedDuringSwap == true)
+                {
+                    wearingDPSGear = true;
+                }
+                crashedDuringSwap = false;
             }
         }
-
-
-        private static ACDItem GetBestDPSItem(InventorySlot slot)
+        public double MillisecondsSinceLastSwap()
         {
-            List<int> ignoreItemIds = originalItems.Values.Select(i => i.DynamicId).ToList();
-
-            
-            // For each item that matches the slot we're requesting, get the highest DPS.
-            return (from i in ZetaDia.Me.Inventory.Backpack
-                    // Ensure the item is valid.
-                    // Correct slot, and not on ignore lists.
-                    where i.ValidInventorySlots.Contains(slot) &&
-                          !ignoreItemIds.Contains(i.DynamicId) &&
-                          !IgnoreItems.Contains(i.DynamicId) &&
-                          // Make sure the item actually is a weapon!
-                          i.Stats.WeaponDamagePerSecond > 0
-                    // Order by highest DPS
-                    orderby i.Stats.WeaponDamagePerSecond descending
-                    
-                    // Grab the first.
-                    select i).FirstOrDefault();
-        }
-
-
-        private static void Equip(InventorySlot slot)
-        {
-            ACDItem i = GetBestDPSItem(slot);
-            if (i != null)
-            {
-                ZetaDia.Me.Inventory.EquipItem(i.DynamicId, slot);
-                // We equipped the item, so lets ignore it for the next run of getting best equip.
-                // This avoids a bug with equipping the same ring twice!
-                IgnoreItems.Add(i.DynamicId);
-            }
+            return DateTime.Now.Subtract(GilesTrinity.WeaponSwapTime).TotalMilliseconds;
         }
     }
 }

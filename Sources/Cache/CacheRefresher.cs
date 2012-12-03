@@ -103,12 +103,16 @@ namespace GilesTrinity.Cache
         /// </summary>
         public static void RefreshAll()
         {
-            CacheManager.CacheObjectGetter = GetCache;
-            CacheManager.CacheObjectRefresher = RefreshCache;
-            CacheManager.MaxRefreshRate = 100;
-            foreach (DiaObject obj in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Where(o => o.IsACDBased && o.CommonData != null))
+            using (ZetaDia.Memory.AcquireFrame())
             {
-                CacheManager.GetObject(obj.CommonData);
+                ZetaDia.Actors.Update();
+                CacheManager.CacheObjectGetter = GetCache;
+                CacheManager.CacheObjectRefresher = RefreshCache;
+                CacheManager.MaxRefreshRate = 100;
+                foreach (DiaObject obj in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Where(o => o.IsACDBased && o.CommonData != null))
+                {
+                    CacheManager.GetObject(obj.CommonData);
+                }
             }
         }
 
