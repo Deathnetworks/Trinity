@@ -105,13 +105,20 @@ namespace GilesTrinity.Cache
         {
             using (ZetaDia.Memory.AcquireFrame())
             {
-                ZetaDia.Actors.Update();
-                CacheManager.CacheObjectGetter = GetCache;
-                CacheManager.CacheObjectRefresher = RefreshCache;
-                CacheManager.MaxRefreshRate = 100;
-                foreach (DiaObject obj in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Where(o => o.IsACDBased && o.CommonData != null))
+                try
                 {
-                    CacheManager.GetObject(obj.CommonData);
+                    ZetaDia.Actors.Update();
+                    CacheManager.CacheObjectGetter = GetCache;
+                    CacheManager.CacheObjectRefresher = RefreshCache;
+                    CacheManager.MaxRefreshRate = 100;
+                    foreach (DiaObject obj in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Where(o => o.IsACDBased && o.CommonData != null))
+                    {
+                        CacheManager.GetObject(obj.CommonData);
+                    }
+                }
+                catch (Exception ex) {
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Exception occured refreshing cache: {0}", ex.Message);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex.StackTrace);
                 }
             }
         }
