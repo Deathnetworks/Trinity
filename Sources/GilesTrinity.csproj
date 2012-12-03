@@ -50,6 +50,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
@@ -81,6 +82,11 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotManager.cs" />
+    <Compile Include="ItemRules\Core\Formula.cs" />
+    <Compile Include="ItemRules\Core\Parser.cs" />
+    <Compile Include="ItemRules\Core\ParseTree.cs" />
+    <Compile Include="ItemRules\Core\Scanner.cs" />
+    <Compile Include="ItemRules\Core\TextHighlighter.cs" />
     <Compile Include="Technicals\Loader.cs" />
     <Compile Include="TrinityPowerManager.cs" />
     <Compile Include="ScheduledPower.cs" />
@@ -241,19 +247,17 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="Dictionaries.xml" />
-    <Content Include="ItemRules\changeLog.txt" />
-    <Content Include="ItemRules\RulesReadMe.txt" />
+    <Content Include="ItemRules\ItemRules2.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ItemRules\config.dis" />
     <None Include="ItemRules\Loot.utr" />
-    <None Include="ItemRules\legendary.dis" />
-    <None Include="ItemRules\legendary_it.dis" />
-    <None Include="ItemRules\legendary_ru.dis" />
-    <None Include="ItemRules\magic.dis" />
-    <None Include="ItemRules\rare.dis" />
-    <None Include="ItemRules\special.dis" />
-    <None Include="ItemRules\test.dis" />
+    <None Include="ItemRules\Rules\config.dis" />
+    <None Include="ItemRules\Rules\legendary.dis" />
+    <None Include="ItemRules\Rules\magic.dis" />
+    <None Include="ItemRules\Rules\pickup.dis" />
+    <None Include="ItemRules\Rules\rare.dis" />
+    <None Include="ItemRules\Rules\special.dis" />
+    <None Include="ItemRules\Rules\test.dis" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>

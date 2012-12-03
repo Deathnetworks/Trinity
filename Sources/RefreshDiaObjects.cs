@@ -19,12 +19,8 @@ namespace GilesTrinity
         /// </summary>
         public static void RefreshDiaObjects()
         {
-            using (ZetaDia.Memory.AcquireFrame())
-            {
-                ZetaDia.Actors.Update();
-
-                RefreshDiaObjectCache();
-            }
+            // Framelock should happen in the MainLoop, where we read all the actual ACD's
+            RefreshDiaObjectCache();
         }
 
         /// <summary>

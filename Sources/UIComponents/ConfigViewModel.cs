@@ -472,7 +472,7 @@ namespace GilesTrinity.UIComponents
             ReloadScriptRulesCommand = new RelayCommand(
                                     (parameter) =>
                                     {
-                                        GilesTrinity.StashRule.init();
+                                        GilesTrinity.StashRule.readConfiguration();
                                     }
                                     );
             ResetTownRunCommand = new RelayCommand(

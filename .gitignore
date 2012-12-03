@@ -16,6 +16,8 @@ DemonBuddy.exe
 
 /Sources/*.log
 
+Sources/ItemRules/Log/*
+
 Deploy.cmd
 
 GilesBlankCombatRoutine/TrinityCombatRoutine/bin

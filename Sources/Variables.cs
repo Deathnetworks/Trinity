@@ -363,7 +363,8 @@ namespace GilesTrinity
 
         // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
         private static bool[,] StashSlotBlocked = new bool[7, 30];
-        
+        private static bool bOutputItemScores = false;
+
         // Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
         private static GilesPower powerBuff;
         private static GilesPower currentPower;

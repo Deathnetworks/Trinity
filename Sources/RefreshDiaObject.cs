@@ -728,34 +728,49 @@ namespace GilesTrinity
                 AddToCache = false;
                 c_IgnoreSubStep = "OutsideofKillRadius";
             }
-			try {
-				if (thisUnit.IsUntargetable)
-				{
-					AddToCache = false;
-					c_IgnoreSubStep += "Untargettable+";
-				}
-				// Disabled because of chickens
-				// if (thisUnit.IsHidden)
-				// {
-				//    AddToCache = false;
-				//    c_IgnoreSubStep += "IsHidden+";
-				// }
-				if (thisUnit.IsInvulnerable)
-				{
-					AddToCache = false;
-					c_IgnoreSubStep += "IsInvulnerable+";
-				}
-				if (thisUnit.IsBurrowed)
-				{
-					AddToCache = false;
-					c_IgnoreSubStep += "IsBurrowed+";
-				}
-				if (thisUnit.IsHelper || thisUnit.IsNPC || thisUnit.IsTownVendor)
-				{
-					AddToCache = false;
-					c_IgnoreSubStep += "IsNPCOrHelper+";
-				}
-			} catch {}
+            try
+            {
+                if (thisUnit.IsUntargetable)
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep += "Untargettable+";
+                }
+                // Disabled because of chickens
+                // if (thisUnit.IsHidden)
+                // {
+                //    AddToCache = false;
+                //    c_IgnoreSubStep += "IsHidden+";
+                // }
+            }
+            catch { } 
+            try
+            {
+                if (thisUnit.IsInvulnerable)
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep += "IsInvulnerable+";
+                }
+            }
+            catch { } 
+            try
+            {
+                if (thisUnit.IsBurrowed)
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep += "IsBurrowed+";
+                }
+            }
+            catch { } 
+            try
+            {
+                if (thisUnit.IsHelper || thisUnit.IsNPC || thisUnit.IsTownVendor)
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep += "IsNPCOrHelper+";
+                }
+            }
+            catch { }
+
             // Safe is-attackable detection
             if (AddToCache)
                 c_unit_IsAttackable = true;
@@ -1024,11 +1039,11 @@ namespace GilesTrinity
             RefreshItemStats(itemBaseType);
             // Ignore it if it's not in range yet - allow legendary items to have 15 feet extra beyond our profile max loot radius
             float fExtraRange = 0f;
-			// !sp - loot range extension range for legendaries
-            if (iKeepLootRadiusExtendedFor > 0) 
+            // !sp - loot range extension range for legendaries
+            if (iKeepLootRadiusExtendedFor > 0)
             {
                 fExtraRange = 30f;
-			}
+            }
             if (c_ItemQuality >= ItemQuality.Rare4)
             {
                 fExtraRange = iCurrentMaxLootRadius; //!sp - double range for Rares
@@ -1039,7 +1054,7 @@ namespace GilesTrinity
             }
             if (c_ItemQuality >= ItemQuality.Legendary)
             {
-                fExtraRange = 10*iCurrentMaxLootRadius; //!sp - mega range for Legendaries
+                fExtraRange = 10 * iCurrentMaxLootRadius; //!sp - mega range for Legendaries
             }
 
             if (c_CentreDistance > (iCurrentMaxLootRadius + fExtraRange))
@@ -1107,31 +1122,33 @@ namespace GilesTrinity
                 }
                 dictGilesGoldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
             }
-			
-			// Ignore gold piles that are (currently) too small...
+
+            // Ignore gold piles that are (currently) too small...
             rangedMinimumStackSize = Settings.Loot.Pickup.MinimumGoldStack;
-			int min_cash = 100;	//absolute min cash to consider
-			int max_distance = 80;
-			if (c_GoldStackSize < min_cash) {
-				rangedMinimumStackSize = min_cash;
-			} else if (c_CentreDistance >= max_distance) {
-				rangedMinimumStackSize = 0;	//too far away
-			} else {
-				//scale the min stack size based on distance
-				//this will enable smaller, local cash values to be picked up
-				//while enroute, picking up items or larger amounts
-				//better for toons with low pickup range
-				int min_range = 6; //anything below this should be collected
-				int max_range = 30; //anything beyond this should be at the upper threshold
-				int max_cash = Math.Max(min_cash, rangedMinimumStackSize);
-				double cash_range = Math.Max(0, c_CentreDistance-min_range);
-				double rangedPerc = cash_range/(max_range-min_range); //no ceiling on this to capture distant, high values. twice distance=twice value
-				int newMinStack = (int)Math.Floor(rangedPerc * (max_cash-min_cash))+min_cash;
-				rangedMinimumStackSize = newMinStack;
-				if (c_GoldStackSize >= rangedMinimumStackSize) {
-					//Logging.Write("[SP] Gold v=" + c_GoldStackSize + " ,d=" + c_CentreDistance + ",w=" + rangedPerc + ",nms="+newMinStack);
-				}
-			}
+            int min_cash = Settings.Loot.Pickup.MinimumGoldStack;	//absolute min cash to consider
+            int max_distance = 80;
+            if (c_GoldStackSize < min_cash)
+            {
+                rangedMinimumStackSize = min_cash;
+            }
+            else if (c_CentreDistance >= max_distance)
+            {
+                rangedMinimumStackSize = 0;	//too far away
+            }
+            else
+            {
+                //scale the min stack size based on distance
+                //this will enable smaller, local cash values to be picked up
+                //while enroute, picking up items or larger amounts
+                //better for toons with low pickup range
+                int min_range = 6; //anything below this should be collected
+                int max_range = 30; //anything beyond this should be at the upper threshold
+                int max_cash = Math.Max(min_cash, rangedMinimumStackSize);
+                double cash_range = Math.Max(0, c_CentreDistance - min_range);
+                double rangedPerc = cash_range / (max_range - min_range); //no ceiling on this to capture distant, high values. twice distance=twice value
+                int newMinStack = (int)Math.Floor(rangedPerc * (max_cash - min_cash)) + min_cash;
+                rangedMinimumStackSize = newMinStack;
+            }
             if (c_GoldStackSize < rangedMinimumStackSize)
             {
                 AddToCache = false;
@@ -1145,8 +1162,8 @@ namespace GilesTrinity
                 AddToCache = false;
             }
 
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Gold Stack {0} has iPercentage {1} with rangeMinimumStackSize: {2} Distance: {3} MininumGoldStack: {4} PickupRadius: {5} AddToCache: {6}",
-                c_GoldStackSize, iPercentage, rangedMinimumStackSize, c_CentreDistance, Settings.Loot.Pickup.MinimumGoldStack, ZetaDia.Me.GoldPickUpRadius, AddToCache);
+            //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Gold Stack {0} has iPercentage {1} with rangeMinimumStackSize: {2} Distance: {3} MininumGoldStack: {4} PickupRadius: {5} AddToCache: {6}",
+            //    c_GoldStackSize, iPercentage, rangedMinimumStackSize, c_CentreDistance, Settings.Loot.Pickup.MinimumGoldStack, ZetaDia.Me.GoldPickUpRadius, AddToCache);
 
             return AddToCache;
         }
