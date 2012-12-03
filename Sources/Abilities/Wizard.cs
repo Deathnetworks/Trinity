@@ -227,7 +227,7 @@ namespace GilesTrinity
                     float fThisRange = 28f;
                     if (Settings.Combat.Wizard.CriticalMass)
                         fThisRange = 9f;
-                    return new GilesPower(SNOPower.Wizard_EnergyTwister, fThisRange, new Vector3(CurrentTarget.Position.X, CurrentTarget.Position.Y, CurrentTarget.Position.Z), iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
+                    return new GilesPower(SNOPower.Wizard_EnergyTwister, fThisRange, CurrentTarget.Position, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
                 }
                 // Disintegrate
                 if (!bOOCBuff && !playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Disintegrate) &&
