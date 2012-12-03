@@ -546,8 +546,10 @@ namespace GilesTrinity
         private static int c_ItemLevel = 0;
         private static int c_GoldStackSize = 0;
         private static bool c_IsOneHandedItem = false;
+        private static bool c_IsTwoHandedItem = false;
         private static ItemQuality c_ItemQuality = ItemQuality.Invalid;
         private static ItemType c_DBItemType = ItemType.Unknown;
+        private static ItemBaseType c_DBItemBaseType = ItemBaseType.None;
         private static FollowerType c_item_tFollowerType = FollowerType.None;
         private static GItemType c_item_GItemType = GItemType.Unknown;
         private static MonsterSize c_unit_MonsterSize = MonsterSize.Unknown;

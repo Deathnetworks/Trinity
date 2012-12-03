@@ -227,6 +227,10 @@ namespace GilesTrinity
             bNeedsEquipmentRepairs = false;
             ForceVendorRunASAP = false;
             bool bShouldVisitStash = false;
+
+            // try updating fix#1 try for name bug -> doesn't work
+            //ZetaDia.Actors.Update();
+
             foreach (ACDItem thisitem in ZetaDia.Me.Inventory.Backpack)
             {
                 if (thisitem.BaseAddress != IntPtr.Zero)
@@ -235,6 +239,16 @@ namespace GilesTrinity
                     // Find out if this item's in a protected bag slot
                     if (!ItemManager.ItemIsProtected(thisitem))
                     {
+                        // try updating fix#2 try for name bug -> doesn't work
+                        //ACDItem itemz = ZetaDia.Actors.GetACDByGuid(thisitem.ACDGuid) as ACDItem;
+                        //ACDItem itemz = ZetaDia.Actors.GetACDItemByGuid(thisitem.ACDGuid);
+                        //DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DEBUG: item.name: {0}, item.basetype: {1}, item.type: {2} !!!", itemz.Name, itemz.ItemBaseType, itemz.ItemType);
+                        //GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(itemz, itemz.InternalName, itemz.Name, itemz.Level, itemz.ItemQualityLevel, itemz.Gold, itemz.GameBalanceId,
+                        //   itemz.DynamicId, itemz.Stats.WeaponDamagePerSecond, itemz.IsOneHand, itemz.IsTwoHand, itemz.DyeType, itemz.ItemType, itemz.ItemBaseType, itemz.FollowerSpecialType,
+                        //   thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
+                        //bool bShouldStashThis = Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? ShouldWeStashThis(thiscacheditem) : ItemManager.ShouldStashItem(itemz);
+
+                        //DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DEBUG: item.name: {0}, item.basetype: {1}, item.type: {2} !!!", thisitem.Name, thisitem.ItemBaseType, thisitem.ItemType);
                         GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
                             thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
@@ -430,8 +444,8 @@ namespace GilesTrinity
                         }
                         else if (DetermineIsTwoSlot(tempItemType) && (inventoryRow == 9 || inventoryRow == 19 || inventoryRow == 29))
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, 
-                                "GSError: DemonBuddy thinks this item is 2 slot even though it's at bottom row of a stash page: {0} [{1}] type={2} @ slot {3}/{4}", 
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation,
+                                "GSError: DemonBuddy thinks this item is 2 slot even though it's at bottom row of a stash page: {0} [{1}] type={2} @ slot {3}/{4}",
                                 tempitem.Name,
                                 tempitem.InternalName,
                                 tempItemType,

@@ -165,16 +165,28 @@ namespace GilesTrinity.ItemRules
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... loaded: " + ruleSet.Count + " item rules");
         }
 
+        public InterpreterAction checkPickUpItem(string name, int level, ItemQuality quality, ItemBaseType itemBaseType, ItemType itemType, bool isOneHand, bool isTwoHand, int gameBalanceID)
+        {
+            fillPickupDic(name, level, quality, itemBaseType, itemType, isOneHand, isTwoHand, gameBalanceID);
+
+            return checkItem(true); 
+        }
+
+        public InterpreterAction checkItem(ACDItem item, bool pickUp)
+        {
+            fillDic(item);
+
+            return checkItem(false);
+        }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public InterpreterAction checkItem(ACDItem item, bool pickUp)
+        public InterpreterAction checkItem(bool pickUp)
         {
-            fillDic(item);
 
-            if (debugFlag) logOut(getFullItem(item), LogType.DEBUG);
+            if (debugFlag) logOut(getFullItem(), LogType.DEBUG);
 
             InterpreterAction action = InterpreterAction.NULL;
             string validRule = "";
@@ -194,11 +206,12 @@ namespace GilesTrinity.ItemRules
 
                 string[] strings = str.Split(new string[] { assign }, StringSplitOptions.None);
                 if (strings.Count() > 1)
+                {
                     tempAction = getInterpreterAction(strings[1]);
-
+                }
                 try
                 {
-                    if (evaluate(strings[0], item, out parseErrors))
+                    if (evaluate(strings[0], out parseErrors))
                     {
                         validRule = str;
                         action = tempAction;
@@ -206,7 +219,7 @@ namespace GilesTrinity.ItemRules
                             logOut("DEBUG: Have errors with out a catch!"
                                 + lineBreak + "last use rule: " + str
                                 + lineBreak + getParseErrors(parseErrors)
-                                + lineBreak + getFullItem(item)
+                                + lineBreak + getFullItem()
                                 + lineBreak, LogType.ERROR);
                         break;
                     }
@@ -216,81 +229,26 @@ namespace GilesTrinity.ItemRules
                     logOut("ERROR: " + e.Message
                         + lineBreak + "last use rule: " + str
                         + lineBreak + getParseErrors(parseErrors)
-                        + lineBreak + getFullItem(item)
+                        + lineBreak + getFullItem()
                         + lineBreak, LogType.ERROR);
                 }
             }
 
-            if (action == InterpreterAction.TRASH && (debugFlag || item.ItemQualityLevel == ItemQuality.Legendary))
-                logOut(getFullItem(item) + lineBreak, LogType.TRASH);
+            if (action == InterpreterAction.TRASH)
+            //if (action == InterpreterAction.TRASH && (debugFlag || item.ItemQualityLevel == ItemQuality.Legendary))
+                logOut(getFullItem() + lineBreak, LogType.TRASH);
             else if (action == InterpreterAction.KEEP || (!pickUp || debugFlag))
                 if (pickUp)
-                    logOut("PICKUP: " + getItemTag(item)
+                    logOut("PICKUP: " + getItemTag()
                         + lineBreak + validRule + " [ACTION = " + action + "]"
                         + lineBreak, LogType.DEBUG);
                 else
-                    logOut(getFullItem(item)
+                    logOut(getFullItem()
                         + lineBreak + validRule + " [ACTION = " + action + "]"
                         + lineBreak, LogType.LOG);
 
             return action;
-
-            //return checkItem(item.item);
         }
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="item"></param>
-        ///// <returns></returns>
-        //private InterpreterAction checkItem(ACDItem item)
-        //{
-        //    fillDic(item);
-
-        //    if (debugFlag && item != null)
-        //        logOut(getFullItem(item), LogType.DEBUG);
-
-        //    InterpreterAction action = InterpreterAction.NULL;
-        //    string validRule = "";
-        //    foreach (string str in ruleSet)
-        //    {
-        //        ParseErrors parseErrors = null;
-        //        InterpreterAction tempAction = InterpreterAction.KEEP;
-        //        string[] strings = str.Split(new string[] { assign }, StringSplitOptions.None);
-        //        if (strings.Count() > 1)
-        //            tempAction = getInterpreterAction(strings[1]);
-
-        //        try
-        //        {
-        //            if (evaluate(strings[0], item, out parseErrors))
-        //            {
-        //                validRule = str;
-        //                action = tempAction;
-        //                break;
-        //            }
-        //        }
-        //        catch
-        //        {
-        //            logOut("compiler error occured!!!", LogType.ERROR);
-        //            logOut("last use rule: " + str, LogType.ERROR);
-        //            logOut("tree.Errors = " + parseErrors.Count(), LogType.ERROR);
-        //            if (parseErrors != null)
-        //                foreach (ParseError parseError in parseErrors)
-        //                    logOut("parseError" + parseError.Code + ":" + parseError.Message, LogType.ERROR);
-        //            if (item != null) logOut(item, LogType.ERROR);
-        //        }
-        //    }
-
-        //    if (debugFlag)
-        //        logOut(validRule + " [ACTION = " + action + "]" + lineBreak, LogType.DEBUG);
-
-        //    if (action == InterpreterAction.TRASH && item.ItemQualityLevel == ItemQuality.Legendary)
-        //        logOut(getFullItem(item) + lineBreak, LogType.TRASH);
-        //    else if (action == InterpreterAction.KEEP)
-        //        logOut(item + lineBreak + validRule + " [ACTION = " + action + "]" + lineBreak, LogType.LOG);
-
-        //    return action;
-        //}
 
         /// <summary>
         /// 
@@ -299,10 +257,8 @@ namespace GilesTrinity.ItemRules
         /// <param name="item"></param>
         /// <param name="parseErrors"></param>
         /// <returns></returns>
-        //public bool evaluate(string str, ACDItem item, out ParseErrors parseErrors)
-        private bool evaluate(string str, ACDItem item, out ParseErrors parseErrors)
+        private bool evaluate(string str, out ParseErrors parseErrors)
         {
-            //if (debugFlag) logOut("starting to use '" + str + "'", LogType.DEBUG);
             bool result = false;
             ItemRules.Core.ParseTree tree = parser.Parse(str);
             parseErrors = tree.Errors;
@@ -310,8 +266,6 @@ namespace GilesTrinity.ItemRules
 
             if (!Boolean.TryParse(obj.ToString(), out result))
                 tree.Errors.Add(new ParseError("TryParse Boolean failed!", 101, 0, 0, 0, 0));
-
-            //if (debugFlag) logOut("rule result = " + result, LogType.DEBUG);
 
             return result;
         }
@@ -348,16 +302,6 @@ namespace GilesTrinity.ItemRules
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="item"></param>
-        /// <param name="logType"></param>
-        public void logOut(ACDItem item, LogType logType)
-        {
-            logOut(getItemTag(item), logType);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="parseErrors"></param>
         /// <returns></returns>
         private string getParseErrors(ParseErrors parseErrors)
@@ -386,7 +330,14 @@ namespace GilesTrinity.ItemRules
                 + " " + item.ItemType
                 + " [" + item.GameBalanceId + "]";
         }
-
+        public string getItemTag()
+        {
+            return itemDic["[NAME]"]
+                + "(" + itemDic["[LEVEL]"] + ")"
+                + " " + itemDic["[QUALITY]"]
+                + " " + itemDic["[BASETYPE]"]
+                + " " + itemDic["[TYPE]"];
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -424,7 +375,86 @@ namespace GilesTrinity.ItemRules
             result += lineBreak + "+--------------------------------------------------------------";
             return result;
         }
+        public string getFullItem()
+        {
+            // add item info
+            string result = getItemTag();
 
+
+            //if (itemDic["[TYPE]"] == ItemType.Unknown.ToString()
+            //    || item.ItemBaseType == ItemBaseType.Gem
+            //    || item.ItemBaseType == ItemBaseType.Misc)
+            //    return result;
+
+            // add stats            
+            result += lineBreak + "+--------------------------------------------------------------";
+            foreach (string key in itemDic.Keys)
+            {
+                object value;
+                if (itemDic.TryGetValue(key, out value))
+                {
+                    if (value is float && (float)value > 0)
+                        result += lineBreak + "| - " + key.ToUpper() + ": " + ((float)value).ToString("0.00");
+                    else if (value is string && (string)value != "")
+                        result += lineBreak + "| - " + key.ToUpper() + ": " + value.ToString();
+                    else if (value is bool)
+                        result += lineBreak + "| - " + key.ToUpper() + ": " + value.ToString();
+                }
+            }
+            result += lineBreak + "+--------------------------------------------------------------";
+            return result;
+        }
+
+        private void fillPickupDic(string name, int level, ItemQuality itemQuality, ItemBaseType itemBaseType, ItemType itemType, bool isOneHand, bool isTwoHand, int balanceId)
+        {
+            object result;
+            itemDic = new Dictionary<string, object>();
+
+            // - BASETYPE ---------------------------------------------------------//
+            itemDic.Add("[BASETYPE]", itemBaseType.ToString());
+
+            // - TYPE -------------------------------------------------------------//
+            // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
+            if (itemType == ItemType.Unknown && name.Contains("Plan"))
+                result = ItemType.CraftingPlan.ToString();
+            else result = itemType.ToString();
+            itemDic.Add("[TYPE]", result);
+
+            // - QUALITY -------------------------------------------------------//
+            // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
+            if ((itemType == ItemType.Unknown && name.Contains("Plan")) || itemType == ItemType.CraftingPlan)
+            {
+                if (name.Contains("ffbf642f"))
+                    result = ItemQuality.Legendary.ToString();
+                else if (name.Contains("Exalted Grand"))
+                    result = ItemQuality.Rare6.ToString();
+                else if (name.Contains("Exalted Fine"))
+                    result = ItemQuality.Rare5.ToString();
+                else if (name.Contains("Exalted"))
+                    result = ItemQuality.Rare4.ToString();
+                else
+                    result = ItemQuality.Normal.ToString();
+            }
+            else
+                result = Regex.Replace(itemQuality.ToString(), @"[\d-]", string.Empty);
+            itemDic.Add("[QUALITY]", result);
+
+            // - NAME -------------------------------------------------------------//
+            if ((itemType == ItemType.Unknown && name.Contains("Plan")) || itemType == ItemType.CraftingPlan)
+            {
+                //{c:ffffff00}Plan: Exalted Fine Doomcaster{/c}
+                itemDic.Add("[NAME]", Regex.Replace(name, @"{[/:a-zA-Z0-9 ]*}", string.Empty).Replace(" ", ""));
+            }
+            else
+                itemDic.Add("[NAME]", name.ToString().Replace(" ", ""));
+
+            // - LEVEL ------------------------------------------------------------//
+            itemDic.Add("[LEVEL]", (float)level);
+            itemDic.Add("[ONEHAND]", isOneHand);
+            itemDic.Add("[TWOHAND]", isTwoHand);
+            itemDic.Add("[UNIDENT]", (bool) true);
+            //itemDic.Add("[GAMEBALANCEID]", (float)item.GameBalanceId);
+        }
 
         private void fillDic(ACDItem item)
         {
@@ -447,6 +477,7 @@ namespace GilesTrinity.ItemRules
 
             // - BASETYPE ---------------------------------------------------------//
             itemDic.Add("[BASETYPE]", item.ItemBaseType.ToString());
+
             // - TYPE -------------------------------------------------------------//
             // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
             if (item.ItemType == ItemType.Unknown && item.Name.Contains("Plan"))
@@ -472,6 +503,7 @@ namespace GilesTrinity.ItemRules
             else
                 result = Regex.Replace(item.ItemQualityLevel.ToString(), @"[\d-]", string.Empty);
             itemDic.Add("[QUALITY]", result);
+
             // - NAME -------------------------------------------------------------//
             if ((item.ItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.ItemType == ItemType.CraftingPlan)
             {
@@ -480,6 +512,7 @@ namespace GilesTrinity.ItemRules
             }
             else
                 itemDic.Add("[NAME]", item.Name.ToString().Replace(" ", ""));
+
             // - LEVEL ------------------------------------------------------------//
             itemDic.Add("[LEVEL]", (float)item.Level);
             itemDic.Add("[ONEHAND]", item.IsOneHand);
@@ -579,181 +612,10 @@ namespace GilesTrinity.ItemRules
             //if (item.Stats.HealthPerSecond > 0)
             //    defstats += 1;
             itemDic.Add("[DEFSTATS]", defstats);
-            itemDic.Add("[GAMEBALANCEID]", (float)item.GameBalanceId);
+            //itemDic.Add("[GAMEBALANCEID]", (float)item.GameBalanceId);
         }
 
-        //private void fillDic2(GilesCachedACDItem item)
-        //{
-        //    object result;
-        //    itemDic = new Dictionary<string, object>();
-
-        //    // test values
-        //    //itemDic.Add("[O]", (float)0);
-        //    //itemDic.Add("[I]", (float)1);
-        //    //itemDic.Add("[IO]", (float)10);
-        //    //itemDic.Add("[TEST]", "TEST");
-        //    //itemDic.Add("[TRUE]", true);
-
-        //    // return if no item available
-        //    if (item == null)
-        //    {
-        //        logOut("We received an item with a null reference!", LogType.ERROR);
-        //        return;
-        //    }
-
-        //    GItemType gType = GilesTrinity.DetermineItemType(item.InternalName, item.DBItemType, item.FollowerType);
-        //    //GBaseItemType gBaseType = GilesTrinity.DetermineBaseType(gType);
-        //    bool gTwoHand = GilesTrinity.DetermineIsTwoSlot(gType);
-
-
-        //    //if (debugFlag && gTwoHand != item.item.IsTwoSquareItem)
-        //    //{
-        //    //    logOut(item.item, LogType.ERROR);
-        //    //    logOut("2-slot: Giles pharao say 2-slot = " + gTwoHand + " and Demon buddys say 2-slot = " + item.item.IsTwoSquareItem + lineBreak, LogType.ERROR);
-        //    //}
-
-        //    //if (debugFlag && gType.ToString() != item.DBItemType.ToString())
-        //    //{
-        //    //    logOut(item.item, LogType.ERROR);
-        //    //    logOut("ITEMTYPE: Giles pharao say " + gType + " and Demon buddys say " + item.DBItemType + "!" + lineBreak, LogType.ERROR);
-        //    //}
-
-        //    itemDic.Add("[BASETYPE]", item.DBBaseType.ToString());
-
-        //    // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
-        //    if (item.DBItemType == ItemType.Unknown && item.RealName.Contains("Plan"))
-        //    {
-        //        //logOut(item.item, LogType.ERROR);
-        //        logOut(item, LogType.ERROR);
-        //        logOut("we needed to get the plan by hand " + item.DBItemType + "!", LogType.ERROR);
-        //        result = ItemType.CraftingPlan.ToString();
-        //    }
-        //    else result = item.DBItemType.ToString();
-
-        //    itemDic.Add("[TYPE]", result);
-
-        //    // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
-        //    if ((item.DBItemType == ItemType.Unknown && item.RealName.Contains("Plan")) || item.DBItemType == ItemType.CraftingPlan)
-        //    {
-        //        if (item.RealName.Contains("ffbf642f"))
-        //            result = ItemQuality.Legendary.ToString();
-        //        else if (item.RealName.Contains("Exalted Grand"))
-        //            result = ItemQuality.Rare6.ToString();
-        //        else if (item.RealName.Contains("Exalted Fine"))
-        //            result = ItemQuality.Rare5.ToString();
-        //        else if (item.RealName.Contains("Exalted"))
-        //            result = ItemQuality.Rare4.ToString();
-        //        else
-        //            result = ItemQuality.Normal.ToString();
-        //    }
-        //    else
-        //        result = Regex.Replace(item.Quality.ToString(), @"[\d-]", string.Empty);
-        //    itemDic.Add("[QUALITY]", result);
-
-        //    if ((item.DBItemType == ItemType.Unknown && item.RealName.Contains("Plan")) || item.DBItemType == ItemType.CraftingPlan)
-        //    {
-        //        //{c:ffffff00}Plan: Exalted Fine Doomcaster{/c}
-        //        itemDic.Add("[NAME]", Regex.Replace(item.RealName, @"{[/:a-zA-Z0-9 ]*}", string.Empty).Replace(" ", ""));
-        //    }
-        //    else
-        //        itemDic.Add("[NAME]", item.RealName.ToString().Replace(" ", ""));
-
-        //    itemDic.Add("[LEVEL]", (float)item.Level);
-        //    itemDic.Add("[ONEHAND]", item.OneHanded);
-        //    itemDic.Add("[TWOHAND]", item.TwoHanded);
-        //    itemDic.Add("[UNIDENT]", item.IsUnidentified);
-        //    itemDic.Add("[STR]", item.Strength);
-        //    itemDic.Add("[DEX]", item.Dexterity);
-        //    itemDic.Add("[INT]", item.Intelligence);
-        //    itemDic.Add("[VIT]", item.Vitality);
-        //    itemDic.Add("[AS%]", item.AttackSpeedPercent);
-        //    itemDic.Add("[MS%]", item.MovementSpeed);
-        //    itemDic.Add("[LIFE%]", item.LifePercent);
-        //    itemDic.Add("[LS%]", item.LifeSteal);
-        //    itemDic.Add("[LOH]", item.LifeOnHit);
-        //    itemDic.Add("[REGEN]", item.HealthPerSecond);
-        //    itemDic.Add("[GLOBEBONUS]", item.HealthGlobeBonus);
-        //    itemDic.Add("[DPS]", item.WeaponDamagePerSecond);
-        //    itemDic.Add("[WEAPAS]", item.WeaponAttacksPerSecond);
-        //    itemDic.Add("[WEAPMAXDMG]", item.WeaponMaxDamage);
-        //    itemDic.Add("[WEAPMINDMG]", item.WeaponMinDamage);
-        //    itemDic.Add("[CRIT%]", item.CritPercent);
-        //    itemDic.Add("[CRITDMG%]", item.CritDamagePercent);
-        //    itemDic.Add("[BLOCK%]", item.BlockChance);
-        //    itemDic.Add("[MINDMG]", item.MinDamage);
-        //    itemDic.Add("[MAXDMG]", item.MaxDamage);
-        //    itemDic.Add("[ALLRES]", item.ResistAll);
-        //    itemDic.Add("[RESPHYSICAL]", item.ResistPhysical);
-        //    itemDic.Add("[RESFIRE]", item.ResistFire);
-        //    itemDic.Add("[RESLIGHTNING]", item.ResistLightning);
-        //    itemDic.Add("[RESHOLY]", item.ResistHoly);
-        //    itemDic.Add("[RESARCAN]", item.ResistArcane);
-        //    itemDic.Add("[RESCOLD]", item.ResistCold);
-        //    itemDic.Add("[RESPOISON]", item.ResistPoison);
-        //    itemDic.Add("[FIREDMG%]", item.FireDamagePercent);
-        //    itemDic.Add("[LIGHTNINGDMG%]", item.LightningDamagePercent);
-        //    itemDic.Add("[COLDDMG%]", item.ColdDamagePercent);
-        //    itemDic.Add("[POISONDMG%]", item.PoisonDamagePercent);
-        //    itemDic.Add("[ARCANEDMG%]", item.ArcaneDamagePercent);
-        //    itemDic.Add("[HOLYDMG%]", item.HolyDamagePercent);
-        //    itemDic.Add("[ARMOR]", item.Armor);
-        //    itemDic.Add("[ARMORBONUS]", item.ArmorBonus);
-        //    itemDic.Add("[ARMORTOT]", item.ArmorTotal);
-        //    itemDic.Add("[GF%]", item.GoldFind);
-        //    itemDic.Add("[MF%]", item.MagicFind);
-        //    itemDic.Add("[PICKUP]", item.PickUpRadius);
-        //    itemDic.Add("[SOCKETS]", (float)item.Sockets);
-        //    itemDic.Add("[THORNS]", item.Thorns);
-        //    itemDic.Add("[DMGREDPHYSICAL]", item.DamageReductionPhysicalPercent);
-        //    itemDic.Add("[MAXARCPOWER]", item.MaxArcanePower);
-        //    itemDic.Add("[HEALTHSPIRIT]", item.HealthPerSpiritSpent);
-        //    itemDic.Add("[MAXSPIRIT]", item.MaxSpirit);
-        //    itemDic.Add("[SPIRITREG]", item.SpiritRegen);
-        //    itemDic.Add("[ARCONCRIT]", item.ArcaneOnCrit);
-        //    itemDic.Add("[MAXFURY]", item.MaxFury);
-        //    itemDic.Add("[MAXDISCIP]", item.MaxDiscipline);
-        //    itemDic.Add("[HATREDREG]", item.HatredRegen);
-        //    itemDic.Add("[MAXMANA]", item.MaxMana);
-        //    itemDic.Add("[MANAREG]", item.ManaRegen);
-        //    itemDic.Add("[MAXSTAT]", new float[] { item.Strength, item.Intelligence, item.Dexterity }.Max());
-        //    itemDic.Add("[MAXSTATVIT]", new float[] { item.Strength, item.Intelligence, item.Dexterity }.Max() + item.Vitality);
-        //    itemDic.Add("[STRVIT]", item.Strength + item.Vitality);
-        //    itemDic.Add("[DEXVIT]", item.Dexterity + item.Vitality);
-        //    itemDic.Add("[INTVIT]", item.Intelligence + item.Vitality);
-        //    itemDic.Add("[MAXONERES]", new float[] { item.ResistArcane, item.ResistCold, item.ResistFire, item.ResistHoly, item.ResistLightning, item.ResistPhysical, item.ResistPoison }.Max());
-        //    itemDic.Add("[TOTRES]", item.ResistArcane + item.ResistCold + item.ResistFire + item.ResistHoly + item.ResistLightning + item.ResistPhysical + item.ResistPoison + item.ResistAll);
-        //    itemDic.Add("[DMGFACTOR]", item.AttackSpeedPercent + item.CritPercent * 2 + item.CritDamagePercent / 5 + (item.MinDamage + item.MaxDamage) / 20);
-        //    itemDic.Add("[AVGDMG]", (item.MinDamage + item.MaxDamage) / 2);
-
-        //    float offstats = 0;
-        //    //if (new float[] { item.Stats.Strength, item.Stats.Intelligence, item.Stats.Dexterity }.Max() > 0)
-        //    //    offstats += 1;
-        //    if (item.CritPercent > 0)
-        //        offstats += 1;
-        //    if (item.CritDamagePercent > 0)
-        //        offstats += 1;
-        //    if (item.AttackSpeedPercent > 0)
-        //        offstats += 1;
-        //    if (item.MinDamage + item.MaxDamage > 0)
-        //        offstats += 1;
-        //    itemDic.Add("[OFFSTATS]", offstats);
-
-        //    float defstats = 0;
-        //    //if (item.Stats.Vitality > 0)
-        //    defstats += 1;
-        //    if (item.ResistAll > 0)
-        //        defstats += 1;
-        //    if (item.ArmorBonus > 0)
-        //        defstats += 1;
-        //    if (item.BlockChance > 0)
-        //        defstats += 1;
-        //    if (item.LifePercent > 0)
-        //        defstats += 1;
-        //    //if (item.Stats.HealthPerSecond > 0)
-        //    //    defstats += 1;
-        //    itemDic.Add("[DEFSTATS]", defstats);
-        //    itemDic.Add("[GAMEBALANCEID]", (float)item.BalanceID);
-        //}
     }
+
     #endregion Interpreter
 }

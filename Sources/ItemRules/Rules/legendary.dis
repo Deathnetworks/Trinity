@@ -2,24 +2,23 @@
 // |  _____   _______ _______ _______ _______ _____  _______ ______ ___ ___ 
 // | |     |_|    ___|     __|    ___|    |  |     \|   _   |   __ \   |   |
 // | |       |    ___|    |  |    ___|       |  --  |       |      <\     / 
-// | |_______|_______|_______|_______|__|____|_____/|___|___|___|__| |___|  
-// | +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                                       
+// | |_______|_______|_______|_______|__|____|_____/|___|___|___|__| |___|                                                                     
 // +---------------------------------------------------------------------------+
 
-// keep all legendarys items
+// keep all legendarys and special items
 // this is a saftey line ... as long it isn't removed it will keep all items
 // specifyed by the rule ... the action of commenting it out
 // will apply all following rules ... this set of rules is no where of complete
-//[QUALITY] == "Legendary" -> [KEEP]
+//[QUALITY] == "Legendary" || [QUALITY] == Special
 
 // keep all Weapon for now
-//[QUALITY] == "Legendary" && [BASETYPE] == "Weapon" -> [KEEP]
+//[QUALITY] == "Legendary" && [BASETYPE] == "Weapon"
 
 // keep all Armor for now
-//[QUALITY] == "Legendary" && [BASETYPE] == "Armor" -> [KEEP]
+//[QUALITY] == "Legendary" && [BASETYPE] == "Armor"
 
 // keep all jewelerys for now
-//[QUALITY] == "Legendary" && [BASETYPE] == "Jewelry" -> [KEEP]
+//[QUALITY] == "Legendary" && [BASETYPE] == "Jewelry"
 
 // +---------------------------------------------------------------------------+ 
 // |  _ _ _ _____ _____ _____ _____ _____ 
@@ -49,10 +48,7 @@
 // 20-25% chance to drag enemies to you when attacking.
 // +2 Random Magic Properties
 // Item Level: 60
-//[QUALITY] == "Legendary" && [NAME] == "The Butcher's Sickle" # [DPS] > 800 && [SOCKETS] > 0 // soft
-[QUALITY] == "Legendary" && [NAME] == "The Butcher's Sickle" # [DPS] > 800 && [SOCKETS] > 0 && ([LOH] > 0 || [MAXSTATVIT] > 100) 
-[QUALITY] == "Legendary" && [NAME] == "The Butcher's Sickle" # [DPS] > 900 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "The Butcher's Sickle" # [DPS] > 1000
+[QUALITY] == "Legendary" && [NAME] == "The Butcher's Sickle"
 
 // - The Burning Axe of Sankis ------------------------------------------------+
 // "Legendary" Axe
@@ -68,8 +64,7 @@
 // Chance to fight through the pain when enemies hit you.
 // +1 Random Magic Properties
 // Item Level: 62
-//[QUALITY] == "Legendary" && [NAME] == "The Burning Axe of Sankis" # [DPS] > 800 && ([SOCKETS] > 0 || [CRITDMG%] > 0) // soft
-[QUALITY] == "Legendary" && [NAME] == "The Burning Axe of Sankis" # [DPS] > 900 && ([SOCKETS] > 0 || [CRITDMG%] > 75)
+[QUALITY] == "Legendary" && [NAME] == "The Burning Axe of Sankis"
 
 // - Sky Splitter -------------------------------------------------------------+
 // "Legendary" Axe
@@ -87,8 +82,7 @@
 // +170-200 Strength
 // +1 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Sky Splitter" # [DPS] > 900 && ([SOCKETS] > 0 || [CRITDMG%] > 50 || [LOH] > 0) // soft
-[QUALITY] == "Legendary" && [NAME] == "Sky Splitter" # [DPS] > 1000 && [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "Sky Splitter"
 
 // +---------------------------------------------------------------------------+
 // +--- Daggers
@@ -106,8 +100,7 @@
 // Ignores Durability Loss
 // 20-35% chance to hurl a frozen orb when attacking.
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Wizardspike" # [DPS] > 1000 // soft
-[QUALITY] == "Legendary" && [NAME] == "Wizardspike" # [DPS] > 1000 && [ALLRES] == 80
+[QUALITY] == "Legendary" && [NAME] == "Wizardspike"
 
 // +---------------------------------------------------------------------------+
 // +--- Maces
@@ -124,7 +117,7 @@
 // Melee attackers take 552-811 damage per hit.
 // +2 Random Magic Properties
 // Item Level: 60
-//[QUALITY] == "Legendary" && [NAME] == "Nailbiter" # [DPS] > 900 && [SOCKETS] > 0 && [CRITDMG%] > 0 //soft
+[QUALITY] == "Legendary" && [NAME] == "Nailbiter"
 
 // - Echoing Fury -------------------------------------------------------------+
 // "Legendary" Mace
@@ -142,11 +135,7 @@
 // +150-169 Strength
 // +2 Random Magic Properties
 // Item Level: 62
-//[QUALITY] == "Legendary" && [NAME] == "Echoing Fury" # [DPS] > 800 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LOH] > 0) //soft
-[QUALITY] == "Legendary" && [NAME] == "Echoing Fury" # [DPS] > 800 && [SOCKETS] > 0 && ([CRITDMG%]*[LS%] > 0)
-[QUALITY] == "Legendary" && [NAME] == "Echoing Fury" # [DPS] > 1000 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "Echoing Fury" # [DPS] > 1100 && ([CRITDMG%] > 50|| [LOH]*[LS%] > 0)
-[QUALITY] == "Legendary" && [NAME] == "Echoing Fury" # [DPS] > 1200
+[QUALITY] == "Legendary" && [NAME] == "Echoing Fury"
 
 // - Sun Keeper ---------------------------------------------------------------+
 // "Legendary" Mace
@@ -162,11 +151,7 @@
 // +170-200 Dexterity
 // +170-200 Strength
 // +2 Random Magic Properties
-//[QUALITY] == "Legendary" && [NAME] == "Sun Keeper" # [DPS] > 800 && ([SOCKETS] > 0 && [CRITDMG%] > 0 || [LOH] > 0 || [LS%] > 0) //soft
-[QUALITY] == "Legendary" && [NAME] == "Sun Keeper" # [DPS] > 850 && [SOCKETS] > 0 && ([CRITDMG%] > 0 || [LS%] > 0)
-[QUALITY] == "Legendary" && [NAME] == "Sun Keeper" # [DPS] > 900 && [SOCKETS] > 0 && [LOH] > 0
-[QUALITY] == "Legendary" && [NAME] == "Sun Keeper" # [DPS] > 1000 && [SOCKETS] > 0 
-[QUALITY] == "Legendary" && [NAME] == "Sun Keeper" # [DPS] > 1100
+[QUALITY] == "Legendary" && [NAME] == "Sun Keeper"
 
 // +---------------------------------------------------------------------------+
 // +--- Spears
@@ -186,9 +171,7 @@
 // Increases Ancient Spear Damage by 35-50% (Barbarian Only)
 // +1 Random Magic Properties
 // Item Level: 60
-//[QUALITY] == "Legendary" && [NAME] == "The Three Hundredth Spear" # [DPS] > 900 //soft
-[QUALITY] == "Legendary" && [NAME] == "The Three Hundredth Spear" # [DPS] > 950 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "The Three Hundredth Spear" # [DPS] > 1100
+[QUALITY] == "Legendary" && [NAME] == "The Three Hundredth Spear"
 
 // - Empyrean Messenger -------------------------------------------------------+
 // "Legendary" Spear
@@ -205,8 +188,7 @@
 // Increases Damage Against Elites by 3-6%
 // +1 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Empyrean Messenger" # [DPS] > 900 //soft
-[QUALITY] == "Legendary" && [NAME] == "Empyrean Messenger" # [DPS] > 1000 && [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "Empyrean Messenger"
 
 // +---------------------------------------------------------------------------+
 // +--- Swords
@@ -226,7 +208,7 @@
 // +112-129 Strength
 // +1 Random Magic Properties
 // Item Level: 60
-//[QUALITY] == "Legendary" && [NAME] == "Doombringer" # [DPS] > 900 && [SOCKETS] > 0 //soft
+[QUALITY] == "Legendary" && [NAME] == "Doombringer"
 
 // - Skycutter ----------------------------------------------------------------+
 // "Legendary" Sword
@@ -244,8 +226,7 @@
 // +112-129 Strength
 // +1 Random Magic Properties
 // Item Level: 60
-//[QUALITY] == "Legendary" && [NAME] == "Skycutter" # [DPS] > 800 && ([SOCKETS] > 0 || [LOH] > 0 || [MAXSTATVIT] > 200) //soft
-[QUALITY] == "Legendary" && [NAME] == "Skycutter" # [DPS] > 900 && [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "Skycutter"
 
 // - Sever --------------------------------------------------------------------+
 // "Legendary" Sword
@@ -261,10 +242,7 @@
 // Slain enemies rest in pieces.
 // +1 Random Magic Properties
 // Item Level: 62
-//[QUALITY] == "Legendary" && [NAME] == "Sever" # [DPS] > 800 && [SOCKETS] > 0 //soft
-//[QUALITY] == "Legendary" && [NAME] == "Sever" # [DPS] > 9 //soft
-[QUALITY] == "Legendary" && [NAME] == "Sever" # [DPS] > 1000 && ([SOCKETS]*[CRITDMG%]*[LS%] > 0)
-[QUALITY] == "Legendary" && [NAME] == "Sever" # [DPS] > 1100
+[QUALITY] == "Legendary" && [NAME] == "Sever"
 
 // - Azurewrath ---------------------------------------------------------------+
 // "Legendary" Sword
@@ -281,7 +259,7 @@
 // 5.0-15.0% Chance to Freeze on Hit
 // This weapon will forcefully repel undead enemies.
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Azurewrath" # [DPS] > 900 //soft
+[QUALITY] == "Legendary" && [NAME] == "Azurewrath"
 
 // - Devil Tongue -------------------------------------------------------------+
 // "Legendary" Sword
@@ -300,11 +278,7 @@
 // +170-200 Strength
 // +2 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Devil Tongue" # [DPS] > 800 && [SOCKETS] > 0 && ([CRITDMG%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 300) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Devil Tongue" # [DPS] > 900 //soft
-[QUALITY] == "Legendary" && [NAME] == "Devil Tongue" # [DPS] > 850 && [SOCKETS] > 0 && ([CRITDMG%]*[LOH]*[LS%] > 0)
-[QUALITY] == "Legendary" && [NAME] == "Devil Tongue" # [DPS] > 950 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "Devil Tongue" # [DPS] > 1050
+[QUALITY] == "Legendary" && [NAME] == "Devil Tongue"
 
 // +---------------------------------------------------------------------------+
 // +--- Ceremonial Knives
@@ -322,8 +296,7 @@
 // Chance to summon a Fetish when attacking.
 // +1 Random Magic Properties
 // Item Level: 61
-//[QUALITY] == "Legendary" && [NAME] == "The Gidbinn" # [DPS] > 800 && [SOCKETS] > 0 //soft
-[QUALITY] == "Legendary" && [NAME] == "The Gidbinn" # [DPS] > 925 && [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "The Gidbinn"
 
 // - Last Breath --------------------------------------------------------------+
 // "Legendary" Ceremonial Knife
@@ -342,8 +315,7 @@
 // Increases Plague of Toads Damage by 5-14% (Witch Doctor Only)
 // +1 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Last Breath" # [DPS] > 800 && [SOCKETS] > 0 //soft
-[QUALITY] == "Legendary" && [NAME] == "Last Breath" # [DPS] > 950 && [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "Last Breath"
 
 // - Manajuma's Carving Knife -------------------------------------------------+
 // Set Ceremonial Knife
@@ -358,10 +330,7 @@
 // +1 Random Magic Properties
 // Manajuma's Ornaments
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Manajuma's Carving Knife" # [DPS] > 600 && ([SOCKETS] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 300) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "Manajuma's Carving Knife" # [DPS] > 800 //soft
-[QUALITY] == "Legendary" && [NAME] == "Manajuma's Carving Knife" # [DPS] > 750 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "Manajuma's Carving Knife" # [DPS] > 950
+[QUALITY] == "Legendary" && [NAME] == "Manajuma's Carving Knife"
 
 // +---------------------------------------------------------------------------+
 // +--- Fist Weapons
@@ -378,12 +347,7 @@
 // +150-169 Dexterity
 // +2 Random Magic Properties
 // Item Level: 62
-//[QUALITY] == "Legendary" && [NAME] == "Won Khim Lau" # [DPS] > 700 && [SOCKETS] > 0 && ([LS%]*[CRITDMG%]*[LOH] > 0 || [MAXSTATVIT] > 300) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "Won Khim Lau" # [DPS] > 900 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 300) //soft
-[QUALITY] == "Legendary" && [NAME] == "Won Khim Lau" # [DPS] > 700 && [SOCKETS] > 0 && [LS%] > 0 
-[QUALITY] == "Legendary" && [NAME] == "Won Khim Lau" # [DPS] > 800 && [SOCKETS] > 0 && ([CRITDMG%]*[LOH] > 0 || [DEXVIT] > 300) 
-[QUALITY] == "Legendary" && [NAME] == "Won Khim Lau" # [DPS] > 900 && ([SOCKETS] > 0 || [CRITDMG%]*[LOH] > 0 || [DEXVIT] > 300) 
-[QUALITY] == "Legendary" && [NAME] == "Won Khim Lau" # [DPS] > 1000
+[QUALITY] == "Legendary" && [NAME] == "Won Khim Lau"
 
 // - Crystal Fist -------------------------------------------------------------+
 // "Legendary" Fist Weapon
@@ -397,12 +361,7 @@
 // Ignores Durability Loss
 // +2 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Crystal Fist" # [DPS] > 700 && [SOCKETS] > 0 && [LS%] > 0 //soft 
-//[QUALITY] == "Legendary" && [NAME] == "Crystal Fist" # [DPS] > 800 && [SOCKETS] > 0 && ([CRITDMG%]*[LOH] > 0 || [DEXVIT]  > 300) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "Crystal Fist" # [DPS] > 900 && ([SOCKETS] > 0 || [CRITDMG%]*[LOH] > 0 || [DEXVIT]  > 300) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Crystal Fist" # [DPS] > 1000 //soft
-[QUALITY] == "Legendary" && [NAME] == "Crystal Fist" # [DPS] > 800 && [SOCKETS] > 0 && ([CRITDMG%]*[LS%]*[LOH] > 0)
-[QUALITY] == "Legendary" && [NAME] == "Crystal Fist" # [DPS] > 950 && [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "Crystal Fist"
 
 // - The Fist of Az'Turrasq ---------------------------------------------------+
 // "Legendary" Fist Weapon
@@ -418,13 +377,7 @@
 // 3.0-5.6% Chance to Stun on Hit
 // +1 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "The Fist of Az'Turrasq" # [DPS] > 800 && [SOCKETS] > 0 //soft
-//[QUALITY] == "Legendary" && [NAME] == "The Fist of Az'Turrasq" # [DPS] > 900 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LOH] > 0 || [DEXVIT]  > 300) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "The Fist of Az'Turrasq" # [DPS] > 1000
-[QUALITY] == "Legendary" && [NAME] == "The Fist of Az'Turrasq" # [DPS] > 950 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "The Fist of Az'Turrasq" # [DPS] > 1050 && [LS%] > 0
-[QUALITY] == "Legendary" && [NAME] == "The Fist of Az'Turrasq" # [DPS] > 1150 && ([CRITDMG%]*[LOH] > 0)
-[QUALITY] == "Legendary" && [NAME] == "The Fist of Az'Turrasq" # [DPS] > 1200
+[QUALITY] == "Legendary" && [NAME] == "The Fist of Az'Turrasq"
 
 // - Shenlong's Fist of Legend ------------------------------------------------+
 // Set Fist Weapon
@@ -439,9 +392,7 @@
 // +1 Random Magic Properties
 // Shenlong's Noble Path
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Shenlong's Fist of Legend" # [DPS] > 700 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "Shenlong's Fist of Legend" # [DPS] > 800 && ([SOCKETS]*[LOH]*[LS%] > 0 || [DEXVIT] > 300) 
-[QUALITY] == "Legendary" && [NAME] == "Shenlong's Fist of Legend" # [DPS] > 900
+[QUALITY] == "Legendary" && [NAME] == "Shenlong's Fist of Legend"
 
 // - Shenlong's Relentless Assault --------------------------------------------+
 // Set Fist Weapon
@@ -456,10 +407,7 @@
 // +1 Random Magic Properties
 // Shenlong's Noble Path
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Shenlong's Relentless Assault" # [DPS] > 700 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "Shenlong's Relentless Assault" # [DPS] > 800 && [CRITDMG%] > 0
-[QUALITY] == "Legendary" && [NAME] == "Shenlong's Relentless Assault" # [DPS] > 900 && [LS%] > 0
-[QUALITY] == "Legendary" && [NAME] == "Shenlong's Relentless Assault" # [DPS] > 1000
+[QUALITY] == "Legendary" && [NAME] == "Shenlong's Relentless Assault"
 
 // +---------------------------------------------------------------------------+
 // +--- Mighty Weapons
@@ -476,11 +424,7 @@
 // Gain 19-20 Life per Fury Spent (Barbarian Only)
 // +1 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Blade of the Warlord" # [DPS] > 800 && [SOCKETS] > 0 //soft
-//[QUALITY] == "Legendary" && [NAME] == "Blade of the Warlord" # [DPS] > 900 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 300) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "Blade of the Warlord" # [DPS] > 1000 //soft
-[QUALITY] == "Legendary" && [NAME] == "Blade of the Warlord" # [DPS] > 1000 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "Blade of the Warlord" # [DPS] > 1100
+[QUALITY] == "Legendary" && [NAME] == "Blade of the Warlord"
 
 // - Bul-Kathos's Solemn Vow --------------------------------------------------+
 // Set Mighty Weapon
@@ -495,10 +439,7 @@
 // +1 Random Magic Properties
 // Bul-Kathos's Glory
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Bul-Kathos's Solemn Vow" # [SOCKETS] > 0 //soft
-//[QUALITY] == "Legendary" && [NAME] == "Bul-Kathos's Solemn Vow" # [DPS] > 900 //soft
-[QUALITY] == "Legendary" && [NAME] == "Bul-Kathos's Solemn Vow" # [DPS] > 800 && [SOCKETS] > 0 
-[QUALITY] == "Legendary" && [NAME] == "Bul-Kathos's Solemn Vow" # [DPS] > 1000
+[QUALITY] == "Legendary" && [NAME] == "Bul-Kathos's Solemn Vow"
 
 // - Bul-Kathos's Warrior Blood -----------------------------------------------+
 // Set Mighty Weapon
@@ -513,8 +454,7 @@
 // +1 Random Magic Properties
 // Bul-Kathos's Glory
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Bul-Kathos's Warrior Blood" //soft
-[QUALITY] == "Legendary" && [NAME] == "Bul-Kathos's Warrior Blood" # [DPS] > 900 || [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "Bul-Kathos's Warrior Blood"
 
 // +---------------------------------------------------------------------------+ 
 // +---------- Two-Handed
@@ -538,10 +478,7 @@
 // +122-131 Vitality
 // +3 Random Magic Properties
 // Item Level: 60
-//[QUALITY] == "Legendary" && [NAME] == "Messerschmidt's Reaver" # [DPS] > 1100 && [SOCKETS] > 0 && ([CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 400) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Messerschmidt's Reaver" # [DPS] > 1200 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 400) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "Messerschmidt's Reaver" # [DPS] > 1300 //soft
-[QUALITY] == "Legendary" && [NAME] == "Messerschmidt's Reaver" # [DPS] > 1200 && [SOCKETS] > 0 && [CRITDMG%] > 0 && [LS%] > 0
+[QUALITY] == "Legendary" && [NAME] == "Messerschmidt's Reaver"
 
 // - Skorn --------------------------------------------------------------------+
 // "Legendary" Two-Handed Axe
@@ -559,10 +496,7 @@
 // +1 Random Magic Properties
 // Empty Socket
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Skorn" # [DPS] > 1200 //soft
-[QUALITY] == "Legendary" && [NAME] == "Skorn" # [DPS] > 1200 && [LS%] > 0 
-[QUALITY] == "Legendary" && [NAME] == "Skorn" # [DPS] > 1300 && ([CRITDMG%] > 150 || [MAXSTATVIT]  > 450) 
-[QUALITY] == "Legendary" && [NAME] == "Skorn" # [DPS] > 1400
+[QUALITY] == "Legendary" && [NAME] == "Skorn"
 
 // +---------------------------------------------------------------------------+ 
 // +--- Maces
@@ -579,10 +513,7 @@
 // +12% Movement Speed
 // +2 Random Magic Properties
 // Item Level: 62
-//[QUALITY] == "Legendary" && [NAME] == "Sledge of Athskeleng" # [DPS] > 1100 && [SOCKETS] > 0 && ([CRITDMG%] > 180 || [LS%] > 0 || [MAXSTATVIT]  > 200) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Sledge of Athskeleng" # [DPS] > 1200 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LS%] > 0 || [MAXSTATVIT]  > 100) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Sledge of Athskeleng" # [DPS] > 1300 //soft
-[QUALITY] == "Legendary" && [NAME] == "Sledge of Athskeleng" # [DPS] > 1300 && [SOCKETS] > 0 && ([CRITDMG%]*[LS%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Sledge of Athskeleng"
 
 // - Schaefers's Hammer -------------------------------------------------------+
 // "Legendary" Two-Handed Mace
@@ -598,9 +529,7 @@
 // 25-50% chance to be protected by Lightning when you are hit.
 // +1 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Schaefers's Hammer" # [DPS] > 900 && [SOCKETS] > 0 //soft
-//[QUALITY] == "Legendary" && [NAME] == "Schaefers's Hammer" # [DPS] > 1000 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LOH] > 0 || [LS%] > 0 || [MAXSTATVIT]  > 100) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Schaefers's Hammer" # [DPS] > 1100 //soft
+[QUALITY] == "Legendary" && [NAME] == "Schaefers's Hammer"
 
 // +---------------------------------------------------------------------------+ 
 // +--- Polearms
@@ -618,9 +547,7 @@
 // Critical Hit Damage Increased by 102-110%
 // +1 Random Magic Properties
 // Item Level: 60
-//[QUALITY] == "Legendary" && [NAME] == "Heart Slaughter" # [DPS] > 800 && [SOCKETS] > 0 //soft
-//[QUALITY] == "Legendary" && [NAME] == "Heart Slaughter" # [DPS] > 900 && ([SOCKETS] > 0 || [LOH] > 0 || [LS%] > 0 || [MAXSTATVIT]  > 100) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Heart Slaughter" # [DPS] > 1000 //soft
+[QUALITY] == "Legendary" && [NAME] == "Heart Slaughter"
 
 // - Vigilance ----------------------------------------------------------------+
 // "Legendary" Polearm
@@ -643,10 +570,7 @@
 // 1.0-5.1% Chance to Fear on Hit
 // +1 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Vigilance" # [DPS] > 1200 && [SOCKETS] > 0 //soft
-//[QUALITY] == "Legendary" && [NAME] == "Vigilance" # [DPS] > 1300 && ([SOCKETS] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 100) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "Vigilance" # [DPS] > 1400 //soft
-[QUALITY] == "Legendary" && [NAME] == "Vigilance" # [DPS] > 1450 && [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "Vigilance"
 
 // +---------------------------------------------------------------------------+ 
 // +--- Staves
@@ -663,10 +587,7 @@
 // Chance to charm enemies when you hit them.
 // +2 Random Magic Properties
 // Item Level: 61
-//[QUALITY] == "Legendary" && [NAME] == "The Tormentor" # [DPS] > 800 && [SOCKETS] > 0 && ([LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 300) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "The Tormentor" # [DPS] > 900 && ([SOCKETS] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 300) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "The Tormentor" # [DPS] > 1000
-[QUALITY] == "Legendary" && [NAME] == "The Tormentor" # [DPS] > 1000 && [SOCKETS] > 0 && [LS%] > 0
+[QUALITY] == "Legendary" && [NAME] == "The Tormentor"
 
 // - The Grand Vizier ---------------------------------------------------------+
 // "Legendary" Staff
@@ -680,10 +601,7 @@
 // 41-45% Better Chance of Finding Magical Items
 // +1 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "The Grand Vizier" # [DPS] > 1100 && ([SOCKETS] > 0 || [CRITDMG%] > 100) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "The Grand Vizier" # [DPS] > 1200 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 400) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "The Grand Vizier" # [DPS] > 1300 //soft
-[QUALITY] == "Legendary" && [NAME] == "The Grand Vizier" # [DPS] > 1300 && [SOCKETS] > 0 && [GF%] > 49 && && [MF%] > 44  
+[QUALITY] == "Legendary" && [NAME] == "The Grand Vizier"
 
 // +---------------------------------------------------------------------------+ 
 // +--- Swords
@@ -701,9 +619,7 @@
 // 5.0-15.0% Chance to Blind on Hit
 // +1 Random Magic Properties
 // Item Level: 60
-//[QUALITY] == "Legendary" && [NAME] == "The Sultan of Blinding Sand" # [DPS] > 900 && [SOCKETS] > 0 //soft
-//[QUALITY] == "Legendary" && [NAME] == "The Sultan of Blinding Sand" # [DPS] > 1000 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 400) //soft
-//[QUALITY] == "Legendary" && [NAME] == "The Sultan of Blinding Sand" # [DPS] > 1100 //soft
+[QUALITY] == "Legendary" && [NAME] == "The Sultan of Blinding Sand"
 
 // - Warmonger ----------------------------------------------------------------+
 // "Legendary" Two-Handed Sword
@@ -717,9 +633,7 @@
 // 5.60-6.00% of Damage Dealt Is Converted to Life
 // +2 Random Magic Properties
 // Item Level: 62
-//[QUALITY] == "Legendary" && [NAME] == "Warmonger" # [DPS] > 1000 && [SOCKETS] > 0 && ([CRITDMG%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 100) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Warmonger" # [DPS] > 1100 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 100) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Warmonger" # [DPS] > 1200 //soft
+[QUALITY] == "Legendary" && [NAME] == "Warmonger"
 
 // - Maximus ------------------------------------------------------------------+
 // "Legendary" Two-Handed Sword
@@ -737,10 +651,7 @@
 // +290-340 Strength
 // +2 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Maximus" # [DPS] > 1000 && [SOCKETS] > 0 && ([CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 500) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Maximus" # [DPS] > 1100 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 400) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "Maximus" # [DPS] > 1200 //soft
-[QUALITY] == "Legendary" && [NAME] == "Maximus" # [DPS] > 1250 && [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "Maximus"
 
 // - The Grandfather ----------------------------------------------------------+
 // "Legendary" Two-Handed Sword
@@ -759,10 +670,7 @@
 // Ignores Durability Loss
 // +1 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "The Grandfather" # [DPS] > 1300 && [SOCKETS] > 0 //soft
-//[QUALITY] == "Legendary" && [NAME] == "The Grandfather" # [DPS] > 1400 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 300) //soft
-[QUALITY] == "Legendary" && [NAME] == "The Grandfather" # [DPS] > 1400 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "The Grandfather" # [DPS] > 1500
+[QUALITY] == "Legendary" && [NAME] == "The Grandfather"
 
 // +---------------------------------------------------------------------------+ 
 // +--- Daibo
@@ -783,10 +691,7 @@
 // Increases Critical Hit Chance of Tempest Rush by 2-8% (Monk Only)
 // +2 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Flying Dragon" # [DPS] > 1100 && [SOCKETS] > 0 && ([CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 500) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Flying Dragon" # [DPS] > 1200 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 400) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Flying Dragon" # [DPS] > 1300 //soft
-[QUALITY] == "Legendary" && [NAME] == "Flying Dragon" # [DPS] > 1300 && [SOCKETS] > 0 && [CRITDMG%] > 0
+[QUALITY] == "Legendary" && [NAME] == "Flying Dragon"
 
 // - Inna's Reach -------------------------------------------------------------+
 // Set Daibo
@@ -805,9 +710,7 @@
 // +1 Random Magic Properties
 // Inna's Grandeur
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Inna's Reach" # [DPS] > 1200 && [SOCKETS] > 0 //soft
-//[QUALITY] == "Legendary" && [NAME] == "Inna's Reach" # [DPS] > 1300 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 400) //soft 
-[QUALITY] == "Legendary" && [NAME] == "Inna's Reach" # [DPS] > 1400 && [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "Inna's Reach"
 
 // +---------------------------------------------------------------------------+ 
 // +--- Mighty Weapons
@@ -822,10 +725,8 @@
 // +179-207 Strength
 // 5.00-5.40% of Damage Dealt Is Converted to Life
 // +2 Random Magic Properties
-// Item Level: 60
-//[QUALITY] == "Legendary" && [NAME] == "The Gavel of Judgment" # [DPS] > 800 && [SOCKETS] > 0 && ([CRITDMG%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 300) //soft
-//[QUALITY] == "Legendary" && [NAME] == "The Gavel of Judgment" # [DPS] > 900 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 200) //soft
-//[QUALITY] == "Legendary" && [NAME] == "The Gavel of Judgment" # [DPS] > 1000 //soft
+//// Item Level: 60
+[QUALITY] == "Legendary" && [NAME] == "The Gavel of Judgment"
 
 // - Fury of the Vanished Peak ------------------------------------------------+
 // "Legendary" Two-Handed Mighty Weapon
@@ -842,10 +743,8 @@
 // Reduces resource cost of Hammer of the Ancients by 1-5 Fury. (Barbarian Only)
 // +1 Random Magic Properties
 // Empty Socket
-//[QUALITY] == "Legendary" && [NAME] == "Fury of the Vanished Peak" # [DPS] > 1100 && ([CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 500) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "Fury of the Vanished Peak" # [DPS] > 1200 && ([CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 400) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Fury of the Vanished Peak" # [DPS] > 1300 //soft
-                                                               
+[QUALITY] == "Legendary" && [NAME] == "Fury of the Vanished Peak"
+
 // - Immortal King's Boulder Breaker ------------------------------------------+
 // Set Two-Handed Mighty Weapon
 // 1194.3–1678.3 Damage Per Second
@@ -865,11 +764,7 @@
 // +1 Random Magic Properties
 // Immortal King's Legend
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Immortal King's Boulder Breaker" # [DPS] > 1300 && [SOCKETS] > 0 && ([CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 500) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "Immortal King's Boulder Breaker" # [DPS] > 1400 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 400) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Immortal King's Boulder Breaker" # [DPS] > 1500 //soft
-[QUALITY] == "Legendary" && [NAME] == "Immortal King's Boulder Breaker" # [DPS] > 1500 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "Immortal King's Boulder Breaker" # [DPS] > 1600
+[QUALITY] == "Legendary" && [NAME] == "Immortal King's Boulder Breaker"
 
 // +---------------------------------------------------------------------------+ 
 // +---------- Ranged
@@ -892,8 +787,7 @@
 // 30.0-50.0% Chance to Knockback on Hit
 // +1 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Windforce" # [DPS] > 1200 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "Windforce" # [DPS] > 1300
+[QUALITY] == "Legendary" && [NAME] == "Windforce"
 
 // +---------------------------------------------------------------------------+
 // +--- Crossbows
@@ -910,7 +804,7 @@
 // 25-50% chance to lob an acid blob when attacking.
 // +2 Random Magic Properties
 // Item Level: 60
-//[QUALITY] == "Legendary" && [NAME] == "Pus Spitter" # [DPS] > 800 && [SOCKETS] > 0 && ([CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [MAXSTATVIT]  > 100) //soft
+[QUALITY] == "Legendary" && [NAME] == "Pus Spitter"
 
 // - Hellrack -----------------------------------------------------------------+
 // "Legendary" Crossbow
@@ -924,7 +818,7 @@
 // +2 Random Magic Properties
 // Empty Socket
 // Item Level: 61
-//[QUALITY] == "Legendary" && [NAME] == "Hellrack" # [DPS] > 900 && ([CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [DEX] > 95) //soft 
+[QUALITY] == "Legendary" && [NAME] == "Hellrack"
 
 // - Manticore ----------------------------------------------------------------+
 // "Legendary" Crossbow
@@ -940,12 +834,8 @@
 // +2 Random Magic Properties
 // Empty Socket
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Manticore" # [DPS] > 900 && [SOCKETS] > 0 && ([LS%] > 0 || [LOH] > 0 || [DEX] > 200) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "Manticore" # [DPS] > 1000 && ([SOCKETS] > 0 || [LS%] > 0 || [LOH] > 0 || [DEX] > 195) //soft 
-//[QUALITY] == "Legendary" && [NAME] == "Manticore" # [DPS] > 1100 //soft
-[QUALITY] == "Legendary" && [NAME] == "Manticore" # [DPS] > 1000 && [SOCKETS] > 1
-[QUALITY] == "Legendary" && [NAME] == "Manticore" # [DPS] > 1100 && [SOCKETS] > 0 && [DEX] > 0 
-[QUALITY] == "Legendary" && [NAME] == "Manticore" # [DPS] > 1200
+[QUALITY] == "Legendary" && [NAME] == "Manticore"
+
 // +---------------------------------------------------------------------------+
 // +--- Hand Crossbows
 
@@ -960,7 +850,7 @@
 // Increases Attack Speed by 5%
 // +2 Random Magic Properties
 // Item Level: 60
-//[QUALITY] == "Legendary" && [NAME] == "Balefire Caster" # [DPS] > 900 && [SOCKETS] > 0 && ([CRITDMG%] > 0 || [LS%] > 0 || [LOH] > 0 || [DEX] > 150) //soft 
+[QUALITY] == "Legendary" && [NAME] == "Balefire Caster"
 
 // - Dawn ---------------------------------------------------------------------+
 // "Legendary" Hand Crossbow
@@ -975,9 +865,7 @@
 // 1.0-2.0% Chance to Stun on Hit
 // +1 Random Magic Properties
 // Item Level: 62
-//[QUALITY] == "Legendary" && [NAME] == "Dawn" # [DPS] > 900 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LS%] > 0 || [DEX] > 165) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Dawn" # [DPS] > 1050 //soft
-[QUALITY] == "Legendary" && [NAME] == "Dawn" # [DPS] > 1000 && [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "Dawn"
 
 // - Calamity -----------------------------------------------------------------+
 // "Legendary" Hand Crossbow
@@ -996,8 +884,7 @@
 // +191-381 Maximum Damage
 // +1 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Calamity" # [DPS] > 900 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "Calamity" # [DPS] > 1200
+[QUALITY] == "Legendary" && [NAME] == "Calamity"
 
 // - Danetta's Revenge --------------------------------------------------------+
 // Set Hand Crossbow
@@ -1013,8 +900,7 @@
 // +1 Random Magic Properties
 // Danetta's Creed
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Danetta's Revenge" # [DPS] > 900 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "Danetta's Revenge" # [DPS] > 1000
+[QUALITY] == "Legendary" && [NAME] == "Danetta's Revenge"
 
 // - Danetta's Spite ----------------------------------------------------------+
 // Set Hand Crossbow
@@ -1030,8 +916,7 @@
 // +1 Random Magic Properties
 // Danetta's Creed
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Danetta's Spite" # [DPS] > 800 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "Danetta's Spite" # [DPS] > 900
+[QUALITY] == "Legendary" && [NAME] == "Danetta's Spite"
 
 // - Natalya's Slayer ---------------------------------------------------------+
 // Set Hand Crossbow
@@ -1046,7 +931,7 @@
 // +1 Random Magic Properties
 // Natalya's Solace
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Natalya's Slayer" # [DPS] > 800 && [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "Natalya's Slayer"
 
 // +---------------------------------------------------------------------------+
 // +--- Wands
@@ -1065,7 +950,7 @@
 // Increases Attack Speed by 5%
 // Increases Spectral Blade Damage by 15-30% (Wizard Only)
 // Item Level: 60
-//[QUALITY] == "Legendary" && [NAME] == "Fragment of Destiny" # [DPS] > 900 //soft
+[QUALITY] == "Legendary" && [NAME] == "Fragment of Destiny"
 
 // - Slorak's Madness ---------------------------------------------------------+
 // "Legendary" Wand
@@ -1082,10 +967,7 @@
 // Increases Magic Missile Damage by 5-14% (Wizard Only)
 // +1 Random Magic Properties
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Slorak's Madness" # [DPS] > 700 && ([SOCKETS] > 0 || [LOH] > 0 || [LS%] > 0 || [INT] > 195) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Slorak's Madness" # [DPS] > 900 //soft
-[QUALITY] == "Legendary" && [NAME] == "Slorak's Madness" # [DPS] > 800 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "Slorak's Madness" # [DPS] > 1000
+[QUALITY] == "Legendary" && [NAME] == "Slorak's Madness"
 
 // - Chantodo's Will ----------------------------------------------------------+
 // Set Wand
@@ -1100,10 +982,8 @@
 // +1 Random Magic Properties
 // Chantodo's Return
 // Item Level: 63
-//[QUALITY] == "Legendary" && [NAME] == "Chantodo's Will" # [DPS] > 800 && ([SOCKETS] > 0 || [CRITDMG%] > 0 || [LOH] > 0 || [LS%] > 0 || [INT] > 195) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Chantodo's Will" # [DPS] > 900 //soft
-[QUALITY] == "Legendary" && [NAME] == "Chantodo's Will" # [DPS] > 800 && [SOCKETS] > 0
-[QUALITY] == "Legendary" && [NAME] == "Chantodo's Will" # [DPS] > 1100
+[QUALITY] == "Legendary" && [NAME] == "Chantodo's Will"
+
 // +---------------------------------------------------------------------------+ 
 // |  _____ _____ _____     _____ _____ _____ ____  
 // | |     |   __|   __|___|  |  |  _  |   | |    \ 
@@ -1128,7 +1008,7 @@
 // +11-12% Life
 // +2 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "Ivory Tower" # [DMGFACTOR] > 9 || [DMGFACTOR] > 8 && [MAXSTATVIT] > 100 || [MAXSTATVIT] > 200 
+[QUALITY] == "Legendary" && [NAME] == "Ivory Tower"
 
 // - Stormshield --------------------------------------------------------------+
 // "Legendary" Shield
@@ -1143,7 +1023,7 @@
 // Reduces damage from elites by 6-7%.
 // +1 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Stormshield" # [DMGFACTOR] > 0 || [BLOCK%] > 30 || [MAXSTATVIT] > 300 
+[QUALITY] == "Legendary" && [NAME] == "Stormshield"
 
 // +---------------------------------------------------------------------------+
 // +--- Mojos
@@ -1158,7 +1038,7 @@
 // Increases Gold and Health Pickup by 20 Yards.
 // +2 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Thing of the Deep" # [DMGFACTOR] > 8 || [ALLRES] > 50 || [MAXSTATVIT] > 300 
+[QUALITY] == "Legendary" && [NAME] == "Thing of the Deep"
 
 // - Uhkapian Serpent ---------------------------------------------------------+
 // "Legendary" Mojo
@@ -1174,7 +1054,7 @@
 // Increases Poison Dart Damage by 5-14% (Witch Doctor Only)
 // +2 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Uhkapian Serpent" # [DMGFACTOR] > 9 || [ALLRES] > 50 || [MAXSTATVIT] > 300 
+[QUALITY] == "Legendary" && [NAME] == "Uhkapian Serpent"
 
 // - Manajuma's Gory Fetch ----------------------------------------------------+
 // Set Mojo
@@ -1192,7 +1072,7 @@
 // +1 Random Magic Properties
 // Manajuma's Ornaments
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Manajuma's Gory Fetch" # [DMGFACTOR] > 9 || [ALLRES] > 50 || [MAXSTATVIT] > 300
+[QUALITY] == "Legendary" && [NAME] == "Manajuma's Gory Fetch"
 
 // - Zunimassa's String of Skulls ---------------------------------------------+
 // Set Mojo
@@ -1209,7 +1089,7 @@
 // +2 Random Magic Properties
 // Zunimassa's Whispers
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Zunimassa's String of Skulls" # [DMGFACTOR] > 9 || [ALLRES] > 50 || [MAXSTATVIT] > 300
+[QUALITY] == "Legendary" && [NAME] == "Zunimassa's String of Skulls"
 
 // +---------------------------------------------------------------------------+
 // +--- Orbs
@@ -1225,8 +1105,8 @@
 // Critical Hit Chance Increased by 8.0-8.5%
 // +1 Random Magic Properties
 // Item Level: 62
- [QUALITY] == "Legendary" && [NAME] == "Triumvirate" # [DMGFACTOR] > 9 || [ALLRES] > 50 || [MAXSTATVIT] > 250
- 
+ [QUALITY] == "Legendary" && [NAME] == "Triumvirate"
+  
 // - The Oculus ---------------------------------------------------------------+
 // "Legendary" Source
 // +(32-130)–(33-484) Damage
@@ -1243,8 +1123,8 @@
 // Increases Shock Pulse Damage by 5-14% (Wizard Only)
 // +1 Random Magic Properties
 // Item Level: 63
- [QUALITY] == "Legendary" && [NAME] == "The Oculus" # [DMGFACTOR] > 10 || [ALLRES] > 50 || [MAXSTATVIT] > 300
- 
+ [QUALITY] == "Legendary" && [NAME] == "The Oculus"
+  
 // - Chantodo's Force ---------------------------------------------------------+
 // Set Source
 // +(32-130)–(33-484) Damage
@@ -1261,7 +1141,7 @@
 // +1 Random Magic Properties
 // Chantodo's Return
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Chantodo's Force" 
+[QUALITY] == "Legendary" && [NAME] == "Chantodo's Force"
 
 // - Tal Rasha's Unwavering Glare ---------------------------------------------+
 // Set Source
@@ -1278,7 +1158,7 @@
 // +2 Random Magic Properties
 // Tal Rasha's Sacrifice
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Tal Rasha's Unwavering Glare" # [DMGFACTOR] > 10 || [ALLRES] > 50 || [MAXSTATVIT] > 300
+[QUALITY] == "Legendary" && [NAME] == "Tal Rasha's Unwavering Glare"
 
 // +---------------------------------------------------------------------------+
 // +--- Quivers
@@ -1300,7 +1180,7 @@
 // Increases Hungering Arrow Damage by 5-14% (Demon Hunter Only)
 // +1 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Dead Man's Legacy" # [DMGFACTOR] > 25 || [ALLRES] > 50 || [MAXSTATVIT] > 380
+[QUALITY] == "Legendary" && [NAME] == "Dead Man's Legacy"
 
 // +---------------------------------------------------------------------------+ 
 // |  _____ _____ _____ _____ _____ 
@@ -1332,7 +1212,7 @@
 // +150-169 Strength
 // +1 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Andariel's Visage" # ([SOCKETS] > 0 || [ALLRES] > 0 || [MAXSTATVIT] > 200 || [CRITDMG%] > 0 || [LIFE%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Andariel's Visage"
 
 // - Mempo of Twilight --------------------------------------------------------+
 // "Legendary" Helm
@@ -1347,7 +1227,7 @@
 // +1 Random Magic Properties
 // Empty Socket
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Mempo of Twilight" # ([MAXSTATVIT] > 195 || [CRITDMG%] > 0 || [CRIT%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Mempo of Twilight"
 
 // - Immortal King's Triumph --------------------------------------------------+
 // Set Helm
@@ -1362,7 +1242,7 @@
 // Empty Socket
 // Immortal King's Legend
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Immortal King's Triumph" # ([ALLRES] > 0 || [MAXSTATVIT] > 195 || [CRITDMG%] > 0 || [AS%] > 0 || [LIFE%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Immortal King's Triumph"
 
 // - Natalya's Sight ----------------------------------------------------------+
 // Set Helm
@@ -1377,7 +1257,7 @@
 // Empty Socket
 // Natalya's Solace
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Natalya's Sight" # ([ALLRES] > 0 || [MAXSTATVIT] > 100 || [CRIT%] > 0 || [CRITDMG%] > 0 || [AS%] > 0 || [LIFE%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Natalya's Sight"
 
 // - Tal Rasha's Guise of Wisdom ----------------------------------------------+
 // Set Helm
@@ -1391,7 +1271,7 @@
 // Empty Socket
 // Tal Rasha's Sacrifice
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Tal Rasha's Guise of Wisdom" # ([ALLRES] > 0 || [MAXSTATVIT] > 200 || [CRITDMG%] > 0 || [AS%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Tal Rasha's Guise of Wisdom"
 
 // +---------------------------------------------------------------------------+
 // +--- Spirit Stones
@@ -1406,7 +1286,7 @@
 // Gain 15.1-29.8 Life per Spirit Spent (Monk Only)
 // +1 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "Tzo Krin's Gaze" # ([SOCKETS] > 0 || [ALLRES] > 0 || [MAXSTATVIT] > 200 || [CRIT%] > 0 || [CRITDMG%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Tzo Krin's Gaze"
 
 // - Madstone -----------------------------------------------------------------+
 // "Legendary" Spirit Stone
@@ -1425,7 +1305,7 @@
 // Increases Fists of Thunder Damage by 5-14% (Monk Only)
 // +1 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Madstone" # ([SOCKETS] > 0 || [MAXSTATVIT] > 150 || [CRIT%] > 0 || [CRITDMG%] > 0 || [AS%] > 0 || [LIFE%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Madstone"
 
 // - Inna's Radiance ----------------------------------------------------------+
 // Set Spirit Stone
@@ -1437,7 +1317,7 @@
 // Empty Socket
 // Inna's Grandeur
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Inna's Radiance" # ([ALLRES] > 0 || [MAXSTATVIT] > 300 || [CRITDMG%] > 0 || [AS%] > 0 || [LIFE%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Inna's Radiance"
 
 // +---------------------------------------------------------------------------+
 // +--- Voodoo Masks
@@ -1453,7 +1333,7 @@
 // +150-169 Intelligence
 // +2 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Tiklandian Visage" # ([SOCKETS] > 0 || [ALLRES] > 0 || [MAXSTATVIT] > 170 || [CRIT%] > 0 || [CRITDMG%] > 0 || [AS%] > 0 || [LIFE%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Tiklandian Visage"
 
 // - Visage of Giyua ----------------------------------------------------------+
 // "Legendary" Voodoo Mask
@@ -1471,7 +1351,7 @@
 // +1 Random Magic Properties
 // Empty Socket
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Visage of Giyua" # ([ALLRES] > 0 || [MAXSTATVIT] > 200 || [CRIT%] > 0 || [CRITDMG%] > 0 || [AS%] > 0 || [LIFE%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Visage of Giyua"
 
 // - Zunimassa's Vision -------------------------------------------------------+
 // Set Voodoo Mask
@@ -1487,7 +1367,7 @@
 // Empty Socket
 // Zunimassa's Whispers
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Zunimassa's Vision" # ([ALLRES] > 0 || [MAXSTATVIT] > 400 || [CRIT%] > 0 || [CRITDMG%] > 0 || [AS%] > 0 || [LIFE%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Zunimassa's Vision"
 
 // +---------------------------------------------------------------------------+
 // +--- Wizard Hats
@@ -1506,7 +1386,7 @@
 // 20-40% chance to cast a fiery ball when attacking.
 // +1 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Storm Crow" # ([SOCKETS] > 0 || [ALLRES] > 0 || [INT] > 100 || [CRIT%] > 0 || [CRITDMG%] > 0 || [AS%] > 0 || [LIFE%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Storm Crow"
 
 // +---------------------------------------------------------------------------+
 // +--- Shoulders
@@ -1527,7 +1407,7 @@
 // +170-200 Strength
 // +2 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Vile Ward" # [MAXSTATVIT] > 195 && [LIFE%] > 0
+[QUALITY] == "Legendary" && [NAME] == "Vile Ward"
 
 // +---------------------------------------------------------------------------+
 // +--- Torso
@@ -1549,7 +1429,7 @@
 // +112-129 Strength
 // +3 Random Magic Properties
 // Item Level: 60
-[QUALITY] == "Legendary" && [NAME] == "Cindercoat" # [MAXSTATVIT] > 300 || ([SOCKETS] > 0 && [MAXSTATVIT] > 200)
+[QUALITY] == "Legendary" && [NAME] == "Cindercoat"
 
 // - Tyrael's Might -----------------------------------------------------------+
 // "Legendary" Chest Armor
@@ -1565,7 +1445,7 @@
 // +170-200 Strength
 // +1 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Tyrael's Might" # ([MAXSTATVIT] > 199 && [LIFE%] > 0) || [LIFE%] == 12
+[QUALITY] == "Legendary" && [NAME] == "Tyrael's Might"
 
 // - Blackthorne's Surcoat ----------------------------------------------------+
 // Set Chest Armor
@@ -1581,8 +1461,7 @@
 // Empty Socket
 // Blackthorne's Armor
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Blackthorne's Surcoat" # [MAXSTATVIT] > 195 && ([LIFE%] > 5 || [ARMORBONUS] > 200)
-[QUALITY] == "Legendary" && [NAME] == "Blackthorne's Surcoat" # [MAXSTATVIT] > 300 || [LIFE%] > 10
+[QUALITY] == "Legendary" && [NAME] == "Blackthorne's Surcoat"
 
 // - Immortal King's Eternal Reign --------------------------------------------+
 // Set Chest Armor
@@ -1599,7 +1478,7 @@
 // Empty Socket
 // Immortal King's Legend
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Immortal King's Eternal Reign" 
+[QUALITY] == "Legendary" && [NAME] == "Immortal King's Eternal Reign"
 
 // - Inna's Vast Expanse ------------------------------------------------------+
 // Set Chest Armor
@@ -1614,7 +1493,7 @@
 // Empty Socket
 // Inna's Grandeur
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Inna's Vast Expanse" # [MAXSTATVIT] > 250 || [ALLRES] > 0 || [MAXONERES] > 0
+[QUALITY] == "Legendary" && [NAME] == "Inna's Vast Expanse"
 
 // - Tal Rasha's Relentless Pursuit -------------------------------------------+
 // Set Chest Armor
@@ -1628,7 +1507,7 @@
 // Empty Socket
 // Tal Rasha's Sacrifice
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Tal Rasha's Relentless Pursuit" 
+[QUALITY] == "Legendary" && [NAME] == "Tal Rasha's Relentless Pursuit"
 
 // - Zunimassa's Marrow -------------------------------------------------------+
 // Set Chest Armor
@@ -1642,7 +1521,7 @@
 // Empty Socket
 // Zunimassa's Whispers
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Zunimassa's Marrow" 
+[QUALITY] == "Legendary" && [NAME] == "Zunimassa's Marrow"
 
 // +---------------------------------------------------------------------------+
 // +--- Cloaks
@@ -1665,7 +1544,7 @@
 // Increases Evasive Fire Damage by 5-14% (Demon Hunter Only)
 // +1 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "The Inquisitor" # [MAXSTATVIT] > 200
+[QUALITY] == "Legendary" && [NAME] == "The Inquisitor"
 
 // - Natalya's Embrace --------------------------------------------------------+
 // Set Cloak
@@ -1685,7 +1564,7 @@
 // Empty Socket
 // Natalya's Solace
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Natalya's Embrace" # [MAXSTATVIT] > 200 || [ALLRES] > 0
+[QUALITY] == "Legendary" && [NAME] == "Natalya's Embrace"
 
 // +---------------------------------------------------------------------------+
 // +--- Wrists
@@ -1706,7 +1585,7 @@
 // +112-129 Strength
 // +2 Random Magic Properties
 // Item Level: 60
-[QUALITY] == "Legendary" && [NAME] == "Promise of Glory" # [MAXSTATVIT] > 150 && [ALLRES] > 0
+[QUALITY] == "Legendary" && [NAME] == "Promise of Glory"
 
 // - Strongarm Bracers --------------------------------------------------------+
 // "Legendary" Bracers
@@ -1721,7 +1600,7 @@
 // +150-169 Strength
 // +1 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Strongarm Bracers" # [MAXSTATVIT] > 200 || [ALLRES] > 0
+[QUALITY] == "Legendary" && [NAME] == "Strongarm Bracers"
 
 // - Lacuni Prowlers ----------------------------------------------------------+
 // "Legendary" Bracers
@@ -1731,7 +1610,7 @@
 // Melee attackers take 980-1454 damage per hit.
 // +3 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Lacuni Prowlers" # [CRIT%] > 0 || ([MAXSTATVIT] > 100 && [ALLRES] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Lacuni Prowlers"
 
 // +---------------------------------------------------------------------------+
 // +--- Hands
@@ -1750,7 +1629,7 @@
 // Reduces duration of control impairing effects by 11-12%
 // +1 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "Gladiator Gauntlets" # [DMGFACTOR] > 10 || [MAXSTATVIT] > 100 || [ALLRES] > 50
+[QUALITY] == "Legendary" && [NAME] == "Gladiator Gauntlets"
 
 // - Frostburn Gauntlets ------------------------------------------------------+
 // "Legendary" Gloves
@@ -1761,7 +1640,7 @@
 // Health Globes and Potions Grant +3733-5977 Life.
 // Increases Gold and Health Pickup by 7 Yards.
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Frostburn Gauntlets" # [COLDDMG%] > 5 && [ARMORTOT] > 750
+[QUALITY] == "Legendary" && [NAME] == "Frostburn Gauntlets"
 
 // - Tasker and Theo ----------------------------------------------------------+
 // "Legendary" Gloves
@@ -1775,9 +1654,7 @@
 // +2 Random Magic Properties
 // Empty Socket
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Tasker and Theo" # [DMGFACTOR] > 9 && [MAXSTATVIT] > 100 && [ALLRES] > 0
-[QUALITY] == "Legendary" && [NAME] == "Tasker and Theo" # [DMGFACTOR] > 14 && ([MAXSTATVIT] > 100 || [ALLRES] > 0)
-[QUALITY] == "Legendary" && [NAME] == "Tasker and Theo" # [DMGFACTOR] > 17
+[QUALITY] == "Legendary" && [NAME] == "Tasker and Theo"
 
 // - Immortal King's Irons ----------------------------------------------------+
 // Set Gloves
@@ -1791,7 +1668,7 @@
 // +2 Random Magic Properties
 // Immortal King's Legend
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Immortal King's Irons" # [DMGFACTOR] > 10 || [MAXSTATVIT] > 169 || [ALLRES] > 0
+[QUALITY] == "Legendary" && [NAME] == "Immortal King's Irons"
 
 // +---------------------------------------------------------------------------+
 // +--- Waist
@@ -1812,7 +1689,7 @@
 // +130-149 Strength
 // +2 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "Hellcat Waistguard" # [MAXSTATVIT] > 250 && ([ALLRES] > 0 || [LIFE%] > 0 || [LS%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Hellcat Waistguard"
 
 // - The Witching Hour --------------------------------------------------------+
 // "Legendary" Belt
@@ -1822,7 +1699,7 @@
 // Critical Hit Damage Increased by 35-50%
 // +3 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "The Witching Hour" 
+[QUALITY] == "Legendary" && [NAME] == "The Witching Hour"
 
 // - Blackthorne's Notched Belt -----------------------------------------------+
 // Set Belt
@@ -1837,7 +1714,7 @@
 // +2 Random Magic Properties
 // Blackthorne's Armor
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Blackthorne's Notched Belt" # [MAXSTATVIT] > 195 && ([ALLRES] > 0 || [LIFE%] > 0 || [LS%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Blackthorne's Notched Belt"
 
 // - Inna's Favor -------------------------------------------------------------+
 // Set Belt
@@ -1850,7 +1727,7 @@
 // +1 Random Magic Properties
 // Inna's Grandeur
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Inna's Favor" # [MAXSTATVIT] > 200 || [ALLRES] > 0 || [LIFE%] > 0 || [LS%] > 0
+[QUALITY] == "Legendary" && [NAME] == "Inna's Favor"
 
 // - Tal Rasha's Brace --------------------------------------------------------+
 // Set Belt
@@ -1861,7 +1738,7 @@
 // +3 Random Magic Properties
 // Tal Rasha's Sacrifice
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Tal Rasha's Brace" # [MAXSTATVIT] > 150 || [ALLRES] > 0 || [LIFE%] > 0 || [LS%] > 0
+[QUALITY] == "Legendary" && [NAME] == "Tal Rasha's Brace"
 
 // +---------------------------------------------------------------------------+
 // +--- Mighty Belts
@@ -1877,7 +1754,7 @@
 // Melee attackers take 812-1242 damage per hit.
 // +2 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "Ageless Might" # [STR] > 50 || [LIFE%] > 0 || [LS%] > 0
+[QUALITY] == "Legendary" && [NAME] == "Ageless Might"
 
 // - Lamentation --------------------------------------------------------------+
 // "Legendary" Mighty Belt
@@ -1896,7 +1773,7 @@
 // Reduces resource cost of Rend by 1-5 Fury. (Barbarian Only)
 // +2 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Lamentation" # [STR] > 169 || [VIT] > 50 || [ALLRES] > 0 || [LIFE%] > 0
+[QUALITY] == "Legendary" && [NAME] == "Lamentation"
 
 // - Immortal King's Tribal Binding -------------------------------------------+
 // Set Mighty Belt
@@ -1917,7 +1794,7 @@
 // +1 Random Magic Properties
 // Immortal King's Legend
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Immortal King's Tribal Binding" # [STR] > 169 || [VIT] > 50 || [LIFE%] > 0
+[QUALITY] == "Legendary" && [NAME] == "Immortal King's Tribal Binding"
 
 // +---------------------------------------------------------------------------+
 // +--- Legs
@@ -1938,7 +1815,7 @@
 // +170-200 Strength
 // +2 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Depth Diggers" # [MAXSTATVIT] > 200 || [SOCKETS] == 2 || [ARMORBONUS] > 200
+[QUALITY] == "Legendary" && [NAME] == "Depth Diggers"
 
 // - Blackthorne's Jousting Mail ----------------------------------------------+
 // Set Pants
@@ -1953,7 +1830,7 @@
 // +2 Random Magic Properties
 // Blackthorne's Armor
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Blackthorne's Jousting Mail" 
+[QUALITY] == "Legendary" && [NAME] == "Blackthorne's Jousting Mail"
 
 // - Inna's Temperance --------------------------------------------------------+
 // Set Pants
@@ -1967,7 +1844,7 @@
 // Empty Socket
 // Inna's Grandeur
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Inna's Temperance" 
+[QUALITY] == "Legendary" && [NAME] == "Inna's Temperance"
 
 // +---------------------------------------------------------------------------+
 // +--- Feet
@@ -1989,7 +1866,7 @@
 // +150-169 Strength
 // +2 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Fire Walkers" # [MAXSTATVIT] > 200 || [ALLRES] > 0
+[QUALITY] == "Legendary" && [NAME] == "Fire Walkers"
 
 // - Ice Climbers -------------------------------------------------------------+
 // "Legendary" Boots
@@ -2004,7 +1881,7 @@
 // +3 Random Magic Properties
 // Empty Socket
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Ice Climbers" 
+[QUALITY] == "Legendary" && [NAME] == "Ice Climbers"
 
 // - Blackthorne's Spurs ------------------------------------------------------+
 // Set Boots
@@ -2016,7 +1893,7 @@
 // +2 Random Magic Properties
 // Blackthorne's Armor
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Blackthorne's Spurs" # [MAXSTATVIT] > 100 && [ALLRES] > 0
+[QUALITY] == "Legendary" && [NAME] == "Blackthorne's Spurs"
 
 // - Immortal King's Stride ---------------------------------------------------+
 // Set Boots
@@ -2029,7 +1906,7 @@
 // +1 Random Magic Properties
 // Immortal King's Legend
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Immortal King's Stride" 
+[QUALITY] == "Legendary" && [NAME] == "Immortal King's Stride"
 
 // - Natalya's Bloody Footprints ----------------------------------------------+
 // Set Boots
@@ -2044,7 +1921,7 @@
 // +1 Random Magic Properties
 // Natalya's Solace
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Natalya's Bloody Footprints" 
+[QUALITY] == "Legendary" && [NAME] == "Natalya's Bloody Footprints"
 
 // - Zunimassa's Trail --------------------------------------------------------+
 // Set Boots
@@ -2056,7 +1933,7 @@
 // +2 Random Magic Properties
 // Zunimassa's Whispers
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Zunimassa's Trail" 
+[QUALITY] == "Legendary" && [NAME] == "Zunimassa's Trail"
 
 // +---------------------------------------------------------------------------+ 
 // |     __ _____ _ _ _ _____ __    _____ __ __ 
@@ -2078,9 +1955,7 @@
 // Reduces duration of control impairing effects by 9-10%
 // +2 Random Magic Properties
 // Item Level: 56
-[QUALITY] == "Legendary" && [NAME] == "The Flavor of Time" # [MAXSTATVIT] > 120 && [ALLRES] > 40
-[QUALITY] == "Legendary" && [NAME] == "The Flavor of Time" # [MAXSTATVIT] > 120 && ([DMGFACTOR] > 10 ||[ALLRES] > 40 || [MINDMG] > 25)
-[QUALITY] == "Legendary" && [NAME] == "The Flavor of Time" # [DMGFACTOR] > 15
+[QUALITY] == "Legendary" && [NAME] == "The Flavor of Time"
 
 // - Kymbo's Gold -------------------------------------------------------------+
 // "Legendary" Amulet
@@ -2094,7 +1969,7 @@
 // +112-129 Strength
 // +1 Random Magic Properties
 // Item Level: 59
-[QUALITY] == "Legendary" && [NAME] == "Kymbo's Gold" # [MAXSTATVIT] > 200 || [DMGFACTOR] > 5
+[QUALITY] == "Legendary" && [NAME] == "Kymbo's Gold"
 
 // - Ouroboros ----------------------------------------------------------------+
 // "Legendary" Amulet
@@ -2107,7 +1982,7 @@
 // +130-149 Strength
 // +2 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "Ouroboros" 
+[QUALITY] == "Legendary" && [NAME] == "Ouroboros"
                                                                                         
 // - The Star of Azkaranth ----------------------------------------------------+
 // "Legendary" Amulet
@@ -2125,7 +2000,7 @@
 // 1.0-5.1% Chance to Fear on Hit
 // +1 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "The Star of Azkaranth" 
+[QUALITY] == "Legendary" && [NAME] == "The Star of Azkaranth"
 
 // - Mara's Kaleidoscope ------------------------------------------------------+
 // "Legendary" Amulet
@@ -2195,8 +2070,8 @@
 // Reduces resource cost of Hammer of the Ancients by 1-5 Fury. (Barbarian Only)
 // +3 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Mara's Kaleidoscope" # [DMGFACTOR] > 0
- 
+[QUALITY] == "Legendary" && [NAME] == "Mara's Kaleidoscope"
+
 // - Xephirian Amulet ---------------------------------------------------------+
 // "Legendary" Amulet
 // +36-40% Extra Gold from Monsters
@@ -2210,7 +2085,7 @@
 // +13-15 Maximum Fury (Barbarian Only)
 // +2 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Xephirian Amulet" # [DMGFACTOR] > 10 || [MAXSTATVIT] > 100 && [ALLRES] > 50
+[QUALITY] == "Legendary" && [NAME] == "Xephirian Amulet"
 
 // - Blackthorne's Duncraig Cross ---------------------------------------------+
 // Set Amulet
@@ -2220,7 +2095,7 @@
 // +2 Random Magic Properties
 // Blackthorne's Armor
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Blackthorne's Duncraig Cross" 
+[QUALITY] == "Legendary" && [NAME] == "Blackthorne's Duncraig Cross"
 
 // - Tal Rasha's Allegiance ---------------------------------------------------+
 // Set Amulet
@@ -2237,7 +2112,7 @@
 // +2 Random Magic Properties
 // Tal Rasha's Sacrifice
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Tal Rasha's Allegiance" 
+[QUALITY] == "Legendary" && [NAME] == "Tal Rasha's Allegiance"
 
 // - The Traveler's Pledge ----------------------------------------------------+
 // Set Amulet
@@ -2248,7 +2123,7 @@
 // +2 Random Magic Properties
 // Endless Path
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "The Traveler's Pledge" # [DMGFACTOR] > 10 || [MAXSTATVIT] > 100 && [ALLRES] > 50
+[QUALITY] == "Legendary" && [NAME] == "The Traveler's Pledge"
 
 // +---------------------------------------------------------------------------+
 // +--- Ring
@@ -2263,7 +2138,7 @@
 // You drain life from enemies around you.
 // +2 Random Magic Properties
 // Item Level: 59
-[QUALITY] == "Legendary" && [NAME] == "Bul-Kathos's Wedding Band" # [DMGFACTOR] > 3 || [MAXSTATVIT] > 100 && [ALLRES] > 50 || [MAXSTATVIT] > 200
+[QUALITY] == "Legendary" && [NAME] == "Bul-Kathos's Wedding Band"
 
 // - Eternal Union ------------------------------------------------------------+
 // "Legendary" Ring
@@ -2276,7 +2151,7 @@
 // +112-129 Strength
 // +2 Random Magic Properties
 // Item Level: 59
-[QUALITY] == "Legendary" && [NAME] == "Eternal Union" # [DMGFACTOR] > 4 || [ALLRES] > 40 || [MAXSTATVIT] > 200
+[QUALITY] == "Legendary" && [NAME] == "Eternal Union"
 
 // - Band of Hollow Whispers --------------------------------------------------+
 // "Legendary" Ring
@@ -2287,7 +2162,7 @@
 // This ring occasionally haunts nearby enemies.
 // +1 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "Band of Hollow Whispers" # [DMGFACTOR] > 3 || [MAXSTATVIT] > 100 || [MAXSTATVIT] > 200
+[QUALITY] == "Legendary" && [NAME] == "Band of Hollow Whispers"
 
 // - Hierophant's Seal --------------------------------------------------------+
 // "Legendary" Ring
@@ -2299,7 +2174,7 @@
 // Regenerates 116-160 Life per Second
 // +1 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "Hierophant's Seal" # [DMGFACTOR] > 7 || [MAXSTATVIT] > 50 || [ALLRES] > 40
+[QUALITY] == "Legendary" && [NAME] == "Heirophant's Seal"
 
 // - Skull Grasp --------------------------------------------------------------+
 // "Legendary" Ring
@@ -2372,7 +2247,7 @@
 // Reduces resource cost of Hammer of the Ancients by 1-4 Fury. (Barbarian Only)
 // +1 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "Skull Grasp" # [DMGFACTOR] > 7 || [MAXSTATVIT] > 200 || [ALLRES] > 40
+[QUALITY] == "Legendary" && [NAME] == "Skull Grasp"
 
 // - Oculus Ring --------------------------------------------------------------+
 // "Legendary" Ring
@@ -2387,7 +2262,7 @@
 // +150-169 Strength
 // +1 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Oculus Ring" 
+[QUALITY] == "Legendary" && [NAME] == "Oculus Ring"
 
 // - Stone of Jordan ----------------------------------------------------------+
 // "Legendary" Ring
@@ -2465,7 +2340,7 @@
 // Adds 5-6% to Cold Damage
 // Adds 5-6% to Fire Damage
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Stone of Jordan" 
+[QUALITY] == "Legendary" && [NAME] == "Stone of Jordan"
 
 // - Unity --------------------------------------------------------------------+
 // "Legendary" Ring
@@ -2479,7 +2354,7 @@
 // +150-169 Strength
 // +1 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Unity" 
+[QUALITY] == "Legendary" && [NAME] == "Unity"
 
 // - Litany of the Undaunted --------------------------------------------------+
 // Set Ring
@@ -2494,7 +2369,7 @@
 // +1 Random Magic Properties
 // Legacy of Wicked Dreams
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Litany of the Undaunted" 
+[QUALITY] == "Legendary" && [NAME] == "Litany of the Undaunted"
 
 // - Natalya's Reflection -----------------------------------------------------+
 // Set Ring
@@ -2504,7 +2379,7 @@
 // +3 Random Magic Properties
 // Natalya's Solace
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Natalya's Reflection" 
+[QUALITY] == "Legendary" && [NAME] == "Natalya's Reflection"
 
 // - The Compass Rose ---------------------------------------------------------+
 // Set Ring
@@ -2515,7 +2390,7 @@
 // +2 Random Magic Properties
 // Endless Path
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "The Compass Rose" # [DMGFACTOR] > 5 || [MAXSTATVIT] > 100 && [ALLRES] > 40
+[QUALITY] == "Legendary" && [NAME] == "The Compass Rose"
 
 // - The Wailing Host ---------------------------------------------------------+
 // Set Ring
@@ -2529,7 +2404,7 @@
 // +2 Random Magic Properties
 // Legacy of Wicked Dreams
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "The Wailing Host" 
+[QUALITY] == "Legendary" && [NAME] == "The Wailing Host"
 
 // - Zunimassa's Pox ----------------------------------------------------------+
 // Set Ring
@@ -2539,7 +2414,7 @@
 // +3 Random Magic Properties
 // Zunimassa's Whispers
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Zunimassa's Pox" 
+[QUALITY] == "Legendary" && [NAME] == "Zunimassa's Pox"
 
 // +---------------------------------------------------------------------------+ 
 // | _____ _____ _____ _____ _____ 
@@ -2549,17 +2424,7 @@
 // | ++++++++++++++++++++++++++++++                                           
 // +---------------------------------------------------------------------------+
 
-// safety rule
-[QUALITY] == "Legendary" && [BASETYPE] == "Weapon" && [ONEHAND] == true # [DPS] > 900 && [SOCKETS] > 0 && ([CRITDMG%] > 50 || [LOH] > 400 || [LS%] > 3 || [MAXSTATVIT] > 200)
-[QUALITY] == "Legendary" && [BASETYPE] == "Weapon" && [TWOHAND] == true # [DPS] > 1200 && [SOCKETS] > 0 && ([CRITDMG%] > 100 || [LOH] > 800 || [LS%] > 6 || [MAXSTATVIT] > 400) 
-[QUALITY] == "Legendary" && [BASETYPE] == "Armor" # [MAXSTATVIT] > 400 || [DMGFACTOR] > 15
-[QUALITY] == "Legendary" && [BASETYPE] == "Armor" # [MAXSTATVIT] > 300 && ([DMGFACTOR] > 12 || [ALLRES] > 60)
-[QUALITY] == "Legendary" && [BASETYPE] == "Armor" # [MAXSTATVIT] > 200 && [DMGFACTOR] > 9 && [ALLRES] > 60
-[QUALITY] == "Legendary" && [BASETYPE] == "Jewelry" # [MAXSTATVIT] > 300 || [DMGFACTOR] > 6
-[QUALITY] == "Legendary" && [BASETYPE] == "Jewelry" # [MAXSTATVIT] > 200 && ([DMGFACTOR] > 4 || [ALLRES] > 60)
-[QUALITY] == "Legendary" && [BASETYPE] == "Jewelry" # [MAXSTATVIT] > 100 && [DMGFACTOR] > 3 && [ALLRES] > 60
-
-// cleanup rule trashing all other stuff
+// cleanup rule trashing all other weapon legendarys
 [QUALITY] == "Legendary" && [BASETYPE] == "Weapon" -> [TRASH]
 [QUALITY] == "Legendary" && [BASETYPE] == "Armor" -> [TRASH]
 [QUALITY] == "Legendary" && [BASETYPE] == "Jewelry" -> [TRASH]
