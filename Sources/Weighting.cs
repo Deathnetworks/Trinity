@@ -515,7 +515,7 @@ namespace GilesTrinity
                             if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
                                 cacheObject.Weight = 1;
 
-                            if (bAnyMobsInCloseRange || CurrentTarget.IsBossOrEliteRareUnique)
+                            if (bAnyMobsInCloseRange || (CurrentTarget != null && CurrentTarget.IsBossOrEliteRareUnique))
                                 cacheObject.Weight = 1;
 
                             break;

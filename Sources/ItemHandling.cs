@@ -37,6 +37,9 @@ namespace GilesTrinity
 
                     case Interpreter.InterpreterAction.IGNORE:
                         return false;
+
+                    default:
+                        break;
                 }
             }
 

@@ -219,15 +219,14 @@ namespace GilesTrinity
          };
         // Interactable whitelist - things that need interacting with like special wheels, levers - they will be blacklisted for 30 seconds after one-use
         internal static HashSet<int> hashSNOInteractWhitelist = new HashSet<int> {
-            56686, 54850,
-            211999, 52685, 54882,  180575,
+            56686, 211999, 52685, 54882,  180575,
          };
         /// <summary>
         /// NOTE: you don't NEED interactable SNO's listed here. But if they are listed here, *THIS* is the range at which your character will try to walk to within the object
         /// BEFORE trying to actually "click it". Certain objects need you to get very close, so it's worth having them listed with low interact ranges
         /// </summary>
         internal static Dictionary<int, int> dictInteractableRange = new Dictionary<int, int> {
-            {56686, 4}, {52685, 4}, {54850, 14},  {54882, 40}, {3349, 25}, {225270, 35}, {180575, 10}
+            {56686, 4}, {52685, 4}, {54882, 40}, {3349, 25}, {225270, 35}, {180575, 10}
          };
         /// <summary>
         /// Navigation obstacles for standard navigation down dungeons etc. to help DB movement

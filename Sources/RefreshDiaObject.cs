@@ -1047,15 +1047,11 @@ namespace GilesTrinity
             }
             if (c_ItemQuality >= ItemQuality.Rare4)
             {
-                fExtraRange = iCurrentMaxLootRadius; //!sp - double range for Rares
+                fExtraRange = iCurrentMaxLootRadius; 
             }
             if (c_ItemQuality >= ItemQuality.Legendary)
             {
-                fExtraRange = iCurrentMaxLootRadius; //!sp - double range for Rares
-            }
-            if (c_ItemQuality >= ItemQuality.Legendary)
-            {
-                fExtraRange = 10 * iCurrentMaxLootRadius; //!sp - mega range for Legendaries
+                fExtraRange = 10 * iCurrentMaxLootRadius; 
             }
 
             if (c_CentreDistance > (iCurrentMaxLootRadius + fExtraRange))
