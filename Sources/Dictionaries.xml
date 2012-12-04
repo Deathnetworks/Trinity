@@ -19,6 +19,9 @@
   <HashSet Name="FastMonsterSNO">
     <Entry Value="5212"/>
   </HashSet>
+  <Dictionary Name="NoTownPortalLevelAreaIds">
+    <Entry SNO="55313" Type="Act2CaldeumBazaar"/>
+  </Dictionary>
   <Dictionary Name="AvoidanceType">
     <Entry SNO="219702" Type="Arcane" />
     <Entry SNO="221225" Type="Arcane" />

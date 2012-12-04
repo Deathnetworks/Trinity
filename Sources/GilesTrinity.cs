@@ -157,7 +157,7 @@ namespace GilesTrinity
             _hashsetItemStatsLookedAt = new HashSet<int>();
             _hashsetItemPicksLookedAt = new HashSet<int>();
             _hashsetItemFollowersIgnored = new HashSet<int>();
-            _dictItemStashAttempted = new Dictionary<int, int>();
+            TownRun._dictItemStashAttempted = new Dictionary<int, int>();
             hashRGUIDBlacklist60 = new HashSet<int>();
             hashRGUIDBlacklist90 = new HashSet<int>();
             hashRGUIDBlacklist15 = new HashSet<int>();

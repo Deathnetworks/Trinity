@@ -42,7 +42,7 @@ namespace GilesTrinity.UIComponents
             OrderStashCommand = new RelayCommand(
                                     (parameter) =>
                                     {
-                                        GilesTrinity.SortStash();
+                                        global::GilesTrinity.TownRun.SortStash();
                                         UILoader.CloseWindow();
                                     });
             HelpLinkCommand = new RelayCommand(

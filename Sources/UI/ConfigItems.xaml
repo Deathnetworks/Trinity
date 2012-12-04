@@ -43,7 +43,7 @@
             <Button Grid.Row="1" 
                     Style="{DynamicResource LinkButton}"
                     Command="{Binding Path=HelpLinkCommand}" 
-                    CommandParameter="http://www.thebuddyforum.com/demonbuddy-forum/plugins/81682-plugin-addon-item-rules-file-based-scripting-language.html"
+                    CommandParameter="http://www.thebuddyforum.com/demonbuddy-forum/plugins/trinity/91602-plugin-item-rules-2-file-based-scripting-language.html"
                     Visibility="{Binding Path=Loot.ItemFilterMode, Converter={StaticResource enumVisibilityConverter}, ConverterParameter=TrinityWithItemRules}">
                 Explainations of Script Rules by Original developer
             </Button>

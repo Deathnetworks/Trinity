@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
 using System.Web;
+using System.Text;
 
 namespace GilesTrinity.Notifications
 {
@@ -11,6 +12,15 @@ namespace GilesTrinity.Notifications
 
     internal static class NotificationManager
     {
+        /// <summary>
+        /// Email Notification SMTP Server
+        /// </summary>
+        public static string SmtpServer = "smtp.gmail.com";
+        /// <summary>
+        /// Email Notification Message
+        /// </summary>
+        public static StringBuilder EmailMessage = new StringBuilder();
+        
         public static Queue<ProwlNotification> pushQueue = new Queue<ProwlNotification>();
 
         public static void AddNotificationToQueue(string description, string eventName, ProwlNotificationPriority priority)

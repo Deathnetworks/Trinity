@@ -17,7 +17,7 @@ namespace GilesTrinity
     public partial class GilesTrinity : IPlugin
     {
         // Find fresh targets, start main BT if needed, cast any buffs needed etc.
-        private static bool GilesGlobalOverlord(object ret)
+        internal static bool GilesGlobalOverlord(object ret)
         {
             using (new PerformanceLogger("GilesTrinity.GilesGlobalOverlord"))
             {

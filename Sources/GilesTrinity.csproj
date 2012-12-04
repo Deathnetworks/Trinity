@@ -88,8 +88,8 @@
     <Compile Include="ItemRules\Core\Scanner.cs" />
     <Compile Include="ItemRules\Core\TextHighlighter.cs" />
     <Compile Include="ScriptedRules\Dynamic.cs" />
-    <Compile Include="ScriptedRules\FunctionHelper.cs" />
     <Compile Include="Technicals\Loader.cs" />
+    <Compile Include="TownRun.cs" />
     <Compile Include="TrinityPowerManager.cs" />
     <Compile Include="ScheduledPower.cs" />
     <Compile Include="ScriptedRules\RulesManager.cs" />

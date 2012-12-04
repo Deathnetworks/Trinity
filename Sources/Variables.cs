@@ -239,8 +239,6 @@ namespace GilesTrinity
         // Date time we were last told to stick to close range targets
         private static DateTime lastForcedKeepCloseRange = DateTime.Today;
 
-        // The distance last loop, so we can compare to current distance to work out if we moved
-        private static float lastDistance = 0f;
 
         // Caching of the current primary target's health, to detect if we AREN'T damaging it for a period of time
         private static double iTargetLastHealth = 0f;
@@ -351,19 +349,6 @@ namespace GilesTrinity
         // Variable to let us force new target creations immediately after a root
         private static bool wasRootedLastTick = false;
 
-        // Random variables used during item handling and town-runs
-        private static int itemDelayLoopLimit = 0;
-        private static int currentItemLoops = 0;
-        private static bool loggedAnythingThisStash = false;
-        private static bool updatedStashMap = false;
-        private static bool loggedJunkThisStash = false;
-        private static string ValueItemStatString = "";
-        private static string junkItemStatString = "";
-        private static bool testingBackpack = false;
-
-        // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
-        private static bool[,] StashSlotBlocked = new bool[7, 30];
-        
         // Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
         private static GilesPower powerBuff;
         private static GilesPower currentPower;
@@ -480,32 +465,18 @@ namespace GilesTrinity
         private static HashSet<int> _hashsetItemPicksLookedAt = new HashSet<int>();
         private static HashSet<int> _hashsetItemFollowersIgnored = new HashSet<int>();
 
-        // This dictionary stores attempted stash counts on items, to help detect any stash stucks on the same item etc.
-        private static Dictionary<int, int> _dictItemStashAttempted = new Dictionary<int, int>();
 
         // These objects are instances of my stats class above, holding identical types of data for two different things - one holds item DROP stats, one holds item PICKUP stats
-        private static GItemStats ItemsDroppedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
-        private static GItemStats ItemsPickedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
-        private static HashSet<GilesCachedACDItem> hashGilesCachedKeepItems = new HashSet<GilesCachedACDItem>();
-        private static HashSet<GilesCachedACDItem> hashGilesCachedSalvageItems = new HashSet<GilesCachedACDItem>();
-        private static HashSet<GilesCachedACDItem> hashGilesCachedSellItems = new HashSet<GilesCachedACDItem>();
-
+        internal static GItemStats ItemsDroppedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
+        internal static GItemStats ItemsPickedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
+        
+        
         // Whether to try forcing a vendor-run for custom reasons
         public static bool ForceVendorRunASAP = false;
         public static bool bWantToTownRun = false;
-        private static bool bLastTownRunCheckResult = false;
 
-        // Whether salvage/sell run should go to a middle-waypoint first to help prevent stucks
-        private static bool bGoToSafetyPointFirst = false;
-        private static bool bGoToSafetyPointSecond = false;
-        private static bool bReachedSafety = false;
-
-        // DateTime check to prevent inventory-check spam when looking for repairs being needed
-        private static DateTime timeLastAttemptedTownRun = DateTime.Now;
-        private static bool bCurrentlyMoving = false;
-        private static bool bReachedDestination = false;
-        private static bool bNeedsEquipmentRepairs = false;
-        private static float iLowestDurabilityFound = -1;
+        // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
+        private static bool[,] StashSlotBlocked = new bool[7, 30];
 
         /*
          * From RefreshDiaObject
@@ -593,14 +564,6 @@ namespace GilesTrinity
         // When did we last send a move-power command?
         private static DateTime lastSentMovePower = DateTime.Today;
 
-        /// <summary>
-        /// Email Notification SMTP Server
-        /// </summary>
-        public static string SmtpServer = "smtp.gmail.com";
-        /// <summary>
-        /// Email Notification Message
-        /// </summary>
-        public static StringBuilder EmailMessage = new StringBuilder();
 
         /// <summary>
         /// If we should force movement

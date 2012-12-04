@@ -6,6 +6,9 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
+        internal static string ValueItemStatString = "";
+        internal static string junkItemStatString = "";
+        
         private static double[] ItemMaxStats = new double[TOTALSTATS];
         private static double[] ItemMaxPoints = new double[TOTALSTATS];
         private static bool IsInvalidItem = true;
@@ -35,7 +38,7 @@ namespace GilesTrinity
         /// <param name="item"></param>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        private static double ValueThisItem(GilesCachedACDItem item, GItemType itemType) 
+        internal static double ValueThisItem(GilesCachedACDItem item, GItemType itemType) 
         {
             // Reset static variables
             TotalItemPoints = 0;
@@ -70,8 +73,8 @@ namespace GilesTrinity
 
             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "NEXT ITEM= " + item.RealName + " - " + item.InternalName + " [" + baseItemType.ToString() + " - " + itemType.ToString() + "]");
 
-            ValueItemStatString = "";
-            junkItemStatString = "";
+            TownRun.ValueItemStatString = "";
+            TownRun.junkItemStatString = "";
 
             // We loop through all of the stats, in a particular order. The order *IS* important, because it pulls up primary stats first, BEFORE other stats
             for (int i = 0; i <= (TOTALSTATS - 1); i++)

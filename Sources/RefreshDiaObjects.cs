@@ -202,7 +202,7 @@ namespace GilesTrinity
             hashNavigationObstacleCache = new HashSet<GilesObstacle>();
             bAnyChampionsPresent = false;
             bAnyMobsInCloseRange = false;
-            lastDistance = 0f;
+            TownRun.lastDistance = 0f;
             IsAvoidingProjectiles = false;
             // Every 15 seconds, clear the "blackspots" where avoidance failed, so we can re-check them
             if (DateTime.Now.Subtract(lastClearedAvoidanceBlackspots).TotalSeconds > 15)

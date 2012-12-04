@@ -17,15 +17,7 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        /// <summary>
-        /// Randomize the timer between stashing/salvaging etc.
-        /// </summary>
-        internal static void RandomizeTheTimer()
-        {
-            Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
-            int rnd = rndNum.Next(7);
-            itemDelayLoopLimit = 4 + rnd;
-        }
+
 
         /// <summary>
         /// Pickup Validation for scripted rulesets
@@ -456,239 +448,14 @@ namespace GilesTrinity
             }
             return new Vector2(iPointX, iPointY);
         }
-        internal static Vector2 SortingFindLocationStash(bool isOriginalTwoSlot, bool endOfStash = false)
-        {
-            int iPointX = -1;
-            int iPointY = -1;
-            for (int iRow = 0; iRow <= 29; iRow++)
-            {
-                for (int iColumn = 0; iColumn <= 6; iColumn++)
-                {
-                    if (!StashSlotBlocked[iColumn, iRow])
-                    {
-                        bool bNotEnoughSpace = false;
-                        if (iRow != 9 && iRow != 19 && iRow != 29)
-                        {
-                            bNotEnoughSpace = (isOriginalTwoSlot && StashSlotBlocked[iColumn, iRow + 1]);
-                        }
-                        else
-                        {
-                            if (isOriginalTwoSlot)
-                                bNotEnoughSpace = true;
-                        }
-                        if (!bNotEnoughSpace)
-                        {
-                            iPointX = iColumn;
-                            iPointY = iRow;
-                            if (!endOfStash)
-                                goto FoundStashLocation;
-                        }
-                    }
-                }
-            }
-        FoundStashLocation:
-            if ((iPointX < 0) || (iPointY < 0))
-            {
-                return new Vector2(-1, -1);
-            }
-            return new Vector2(iPointX, iPointY);
-        }
-
-        /// <summary>
-        /// Sorts the stash
-        /// </summary>
-        internal static void SortStash()
-        {
-
-            // Try and update the player-data
-            ZetaDia.Actors.Update();
-
-            // Check we can get the player dynamic ID
-            int iPlayerDynamicID = -1;
-            try
-            {
-                iPlayerDynamicID = ZetaDia.Me.CommonData.DynamicId;
-            }
-            catch
-            {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure getting your player data from DemonBuddy, abandoning the sort!");
-                return;
-            }
-            if (iPlayerDynamicID == -1)
-            {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure getting your player data, abandoning the sort!");
-                return;
-            }
-
-            // List used for all the sorting
-            List<GilesStashSort> listSortMyStash = new List<GilesStashSort>();
-
-            // Map out the backpack free slots
-            for (int iRow = 0; iRow <= 5; iRow++)
-                for (int iColumn = 0; iColumn <= 9; iColumn++)
-                    BackpackSlotBlocked[iColumn, iRow] = false;
-
-            foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
-            {
-                int inventoryRow = item.InventoryRow;
-                int inventoryColumn = item.InventoryColumn;
-
-                // Mark this slot as not-free
-                BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
-
-                // Try and reliably find out if this is a two slot item or not
-                GItemType tempItemType = DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType);
-                if (DetermineIsTwoSlot(tempItemType) && inventoryRow < 5)
-                {
-                    BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
-                }
-            }
-
-            // Map out the stash free slots
-            for (int iRow = 0; iRow <= 29; iRow++)
-                for (int iColumn = 0; iColumn <= 6; iColumn++)
-                    StashSlotBlocked[iColumn, iRow] = false;
-
-            // Block off the entire of any "protected stash pages"
-            foreach (int iProtPage in Zeta.CommonBot.Settings.CharacterSettings.Instance.ProtectedStashPages)
-                for (int iProtRow = 0; iProtRow <= 9; iProtRow++)
-                    for (int iProtColumn = 0; iProtColumn <= 6; iProtColumn++)
-                        StashSlotBlocked[iProtColumn, iProtRow + (iProtPage * 10)] = true;
-
-            // Remove rows we don't have
-            for (int iRow = (ZetaDia.Me.NumSharedStashSlots / 7); iRow <= 29; iRow++)
-                for (int iColumn = 0; iColumn <= 6; iColumn++)
-                    StashSlotBlocked[iColumn, iRow] = true;
-
-            // Map out all the items already in the stash and store their scores if appropriate
-            foreach (ACDItem item in ZetaDia.Me.Inventory.StashItems)
-            {
-                int inventoryRow = item.InventoryRow;
-                int inventoryColumn = item.InventoryColumn;
-
-                // Mark this slot as not-free
-                StashSlotBlocked[inventoryColumn, inventoryRow] = true;
-
-                // Try and reliably find out if this is a two slot item or not
-                GItemType itemType = DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType);
-
-                bool isTwoSlot = DetermineIsTwoSlot(itemType);
-                if (isTwoSlot && inventoryRow != 19 && inventoryRow != 9 && inventoryRow != 29)
-                {
-                    StashSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
-                }
-                else if (isTwoSlot && (inventoryRow == 19 || inventoryRow == 9 || inventoryRow == 29))
-                {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: There was an error reading your stash, abandoning the process.");
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Always make sure you empty your backpack, open the stash, then RESTART DEMONBUDDY before sorting!");
-                    return;
-                }
-                GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(item, item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId,
-                    item.DynamicId, item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.IsTwoHand, item.DyeType, item.ItemType, item.ItemBaseType, item.FollowerSpecialType,
-                    item.IsUnidentified, item.ItemStackQuantity, item.Stats);
-
-                double ItemValue = ValueThisItem(thiscacheditem, itemType);
-                double NeedScore = ScoreNeeded(itemType);
-
-                // Ignore stackable items
-                if (!DetermineIsStackable(itemType) && itemType != GItemType.StaffOfHerding)
-                {
-                    listSortMyStash.Add(new GilesStashSort(((ItemValue / NeedScore) * 1000), 1, inventoryColumn, inventoryRow, item.DynamicId, isTwoSlot));
-                }
-            }
-
-
-            // Sort the items in the stash by their row number, lowest to highest
-            listSortMyStash.Sort((p1, p2) => p1.InventoryRow.CompareTo(p2.InventoryRow));
-
-            // Now move items into your backpack until full, then into the END of the stash
-            Vector2 vFreeSlot;
-
-            // Loop through all stash items
-            foreach (GilesStashSort thisstashsort in listSortMyStash)
-            {
-                vFreeSlot = SortingFindLocationBackpack(thisstashsort.bIsTwoSlot);
-                int iStashOrPack = 1;
-                if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
-                {
-                    vFreeSlot = SortingFindLocationStash(thisstashsort.bIsTwoSlot, true);
-                    if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
-                        continue;
-                    iStashOrPack = 2;
-                }
-                if (iStashOrPack == 1)
-                {
-                    ZetaDia.Me.Inventory.MoveItem(thisstashsort.iDynamicID, iPlayerDynamicID, InventorySlot.PlayerBackpack, (int)vFreeSlot.X, (int)vFreeSlot.Y);
-                    StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow] = false;
-                    if (thisstashsort.bIsTwoSlot)
-                        StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow + 1] = false;
-                    BackpackSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y] = true;
-                    if (thisstashsort.bIsTwoSlot)
-                        BackpackSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y + 1] = true;
-                    thisstashsort.iInventoryColumn = (int)vFreeSlot.X;
-                    thisstashsort.InventoryRow = (int)vFreeSlot.Y;
-                    thisstashsort.iStashOrPack = 2;
-                }
-                else
-                {
-                    ZetaDia.Me.Inventory.MoveItem(thisstashsort.iDynamicID, iPlayerDynamicID, InventorySlot.PlayerSharedStash, (int)vFreeSlot.X, (int)vFreeSlot.Y);
-                    StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow] = false;
-                    if (thisstashsort.bIsTwoSlot)
-                        StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow + 1] = false;
-                    StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y] = true;
-                    if (thisstashsort.bIsTwoSlot)
-                        StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y + 1] = true;
-                    thisstashsort.iInventoryColumn = (int)vFreeSlot.X;
-                    thisstashsort.InventoryRow = (int)vFreeSlot.Y;
-                    thisstashsort.iStashOrPack = 1;
-                }
-                Thread.Sleep(150);
-            }
-
-            // Now sort the items by their score, highest to lowest
-            listSortMyStash.Sort((p1, p2) => p1.dStashScore.CompareTo(p2.dStashScore));
-            listSortMyStash.Reverse();
-
-            // Now fill the stash in ordered-order
-            foreach (GilesStashSort thisstashsort in listSortMyStash)
-            {
-                vFreeSlot = SortingFindLocationStash(thisstashsort.bIsTwoSlot, false);
-                if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
-                {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure trying to put things back into stash, no stash slots free? Abandoning...");
-                    return;
-                }
-                ZetaDia.Me.Inventory.MoveItem(thisstashsort.iDynamicID, iPlayerDynamicID, InventorySlot.PlayerSharedStash, (int)vFreeSlot.X, (int)vFreeSlot.Y);
-                if (thisstashsort.iStashOrPack == 1)
-                {
-                    StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow] = false;
-                    if (thisstashsort.bIsTwoSlot)
-                        StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow + 1] = false;
-                }
-                else
-                {
-                    BackpackSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow] = false;
-                    if (thisstashsort.bIsTwoSlot)
-                        BackpackSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow + 1] = false;
-                }
-                StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y] = true;
-                if (thisstashsort.bIsTwoSlot)
-                    StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y + 1] = true;
-                thisstashsort.iStashOrPack = 1;
-                thisstashsort.InventoryRow = (int)vFreeSlot.Y;
-                thisstashsort.iInventoryColumn = (int)vFreeSlot.X;
-                Thread.Sleep(150);
-            }
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Stash sorted!");
-        }
 
         /// <summary>
         /// Output test scores for everything in the backpack
         /// </summary>
         internal static void TestScoring()
         {
-            if (testingBackpack) return;
-            testingBackpack = true;
+            if (TownRun.testingBackpack) return;
+            TownRun.testingBackpack = true;
             ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
@@ -720,7 +487,7 @@ namespace GilesTrinity
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error testing scores - not in game world?");
             }
-            testingBackpack = false;
+            TownRun.testingBackpack = false;
         }
 
         /// <summary>

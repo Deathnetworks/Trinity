@@ -1,8 +1,9 @@
 // +---------------------------------------------------------------------------+
-// |   __|  _ \ __|   __| _ _|    \    |    
-// | \__ \  __/ _|   (      |    _ \   |    
-// | ____/ _|  ___| \___| ___| _/  _\ ____| 
-// +---------------------------------------------------------------------------+
+// |  _______ ______ _______ ______ _______ _______ _____   
+// | |     __|   __ \    ___|      |_     _|   _   |     |_ 
+// | |__     |    __/    ___|   ---|_|   |_|       |       |
+// | |_______|___|  |_______|______|_______|___|___|_______|
+// +---------------------------------------------------------------------------+  
 
 // keep all special items
 // this is a saftey line ... as long it isn't removed it will keep all items
@@ -11,8 +12,8 @@
 [QUALITY] == "Special" -> [KEEP]
 
 // crafting plans setting
-[QUALITY] == "Legendary" && [TYPE] == "CraftingPlan" -> [KEEP]
-[QUALITY] == "Rare6" && [TYPE] == "CraftingPlan" -> [KEEP]
+[QUALITY] == "Legendary" && [TYPE] == "CraftingPlan"
+[QUALITY] == "Rare6" && [TYPE] == "CraftingPlan"
 [QUALITY] == "Rare5" && [TYPE] == "CraftingPlan" -> [TRASH]
 [QUALITY] == "Rare4" && [TYPE] == "CraftingPlan" -> [TRASH]
 
