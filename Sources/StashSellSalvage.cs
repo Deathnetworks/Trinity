@@ -48,6 +48,10 @@ namespace GilesTrinity
                     return true;
                 case GItemBaseType.Gem:
                 case GItemBaseType.Misc:
+                    if (thisGilesItemType == GItemType.CraftingPlan)
+                        return true;
+                    else
+                        return false;
                 case GItemBaseType.Unknown:
                     return false;
             }
@@ -240,9 +244,9 @@ namespace GilesTrinity
                         GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
                             thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
-                        
+
                         bool bShouldStashThis = Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? ShouldWeStashThis(thiscacheditem) : ItemManager.ShouldStashItem(thisitem);
-                        
+
                         if (bShouldStashThis)
                         {
                             hashGilesCachedKeepItems.Add(thiscacheditem);
@@ -294,7 +298,7 @@ namespace GilesTrinity
                 FileStream LogStream = null;
                 try
                 {
-                    LogStream = File.Open(Path.Combine(FileManager.LoggingPath,"StashLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
+                    LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "StashLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
                         LogWriter.WriteLine("");
                     LogStream.Close();
@@ -434,8 +438,8 @@ namespace GilesTrinity
                         }
                         else if (DetermineIsTwoSlot(tempItemType) && (inventoryRow == 9 || inventoryRow == 19 || inventoryRow == 29))
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, 
-                                "GSError: DemonBuddy thinks this item is 2 slot even though it's at bottom row of a stash page: {0} [{1}] type={2} @ slot {3}/{4}", 
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation,
+                                "GSError: DemonBuddy thinks this item is 2 slot even though it's at bottom row of a stash page: {0} [{1}] type={2} @ slot {3}/{4}",
                                 tempitem.Name,
                                 tempitem.InternalName,
                                 tempItemType,
@@ -791,7 +795,7 @@ namespace GilesTrinity
                 FileStream LogStream = null;
                 try
                 {
-                    LogStream = File.Open(Path.Combine(FileManager.LoggingPath,"JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
+                    LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
                         LogWriter.WriteLine("");
                     LogStream.Close();
@@ -1123,7 +1127,7 @@ namespace GilesTrinity
                 FileStream LogStream = null;
                 try
                 {
-                    LogStream = File.Open(Path.Combine(FileManager.LoggingPath,"JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
+                    LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
                         LogWriter.WriteLine("");
                     LogStream.Close();
@@ -1182,7 +1186,7 @@ namespace GilesTrinity
             FileStream LogStream = null;
             try
             {
-                LogStream = File.Open(Path.Combine(FileManager.LoggingPath,"StashLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
+                LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "StashLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
 
                 //TODO : Change File Log writing
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
@@ -1254,7 +1258,7 @@ namespace GilesTrinity
             FileStream LogStream = null;
             try
             {
-                LogStream = File.Open(Path.Combine(FileManager.LoggingPath,"JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
+                LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
                 {
                     if (!loggedJunkThisStash)

@@ -45,7 +45,7 @@ namespace GilesTrinity.ItemRules
         };
 
         // final variables
-        readonly string version = "2.0.0.5";
+        readonly string version = "2.0.0.6";
         readonly string customPath = @"Plugins\GilesTrinity\ItemRules\Rules\";
         readonly string logPath = @"Plugins\GilesTrinity\ItemRules\Log\";
         readonly string configFile = "config.dis";
@@ -114,55 +114,88 @@ namespace GilesTrinity.ItemRules
                 if (str.Length == 0) continue;
 
                 // match files
-
                 match1 = Regex.Match(str, filePattern);
-
                 // match flags
                 match2 = Regex.Match(str, flagPattern);
 
                 if (match1.Success && File.Exists(customPath + match1.Groups[1].Value))
-
                     itemFileNames.Add(match1.Groups[1].Value);
-
                 else if (match2.Success)
                 {
                     if (match2.Groups[1].Value.Contains("DEBUG"))
                         debugFlag = Boolean.Parse(match2.Groups[2].Value);
-                    if (debugFlag) logOut("debug flag ... " + debugFlag, LogType.DEBUG);
                 }
 
             }
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "debug flag ... {0}", debugFlag);
 
             // parse pickup file
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... reading: " + pickupFile);
-            if (debugFlag) logOut("... reading file: " + pickupFile, LogType.DEBUG);
-            streamReader = new StreamReader(customPath + pickupFile);
-            while ((str = streamReader.ReadLine()) != null)
-            {
-                str = str.Split(new string[] { "//" }, StringSplitOptions.None)[0].Replace(" ", "").Replace("\t", "");
-
-                if (str.Length == 0) continue;
-                pickUpRuleSet.Add(str);
-                if (debugFlag) logOut(pickUpRuleSet.Count + ":" + str, LogType.DEBUG);
-            }
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... loaded: " + pickUpRuleSet.Count + " item pick up rules");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "reading ... {0}", pickupFile);
+            pickUpRuleSet = readLinesToArray(new StreamReader(customPath + pickupFile), pickUpRuleSet);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... loaded: {0} pickup rules", pickUpRuleSet.Count);
 
             // parse all item files
             foreach (string itemFileName in itemFileNames)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... reading: " + itemFileName);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "reading ... {0}", itemFileName);
                 if (debugFlag) logOut("... reading file: " + itemFileName, LogType.DEBUG);
-                streamReader = new StreamReader(customPath + itemFileName);
-                while ((str = streamReader.ReadLine()) != null)
-                {
-                    str = str.Split(new string[] { "//" }, StringSplitOptions.None)[0].Replace(" ", "").Replace("\t", "");
-
-                    if (str.Length == 0) continue;
-                    ruleSet.Add(str);
-                    if (debugFlag) logOut(ruleSet.Count + ":" + str, LogType.DEBUG);
-                }
+                ruleSet = readLinesToArray(new StreamReader(customPath + itemFileName), ruleSet);
             }
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... loaded: " + ruleSet.Count + " item rules");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... loaded: {0} item rules", ruleSet.Count);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="streamReader"></param>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        private ArrayList readLinesToArray(StreamReader streamReader, ArrayList array)
+        {
+            string str = "";
+            while ((str = streamReader.ReadLine()) != null)
+            {
+                str = str.Split(new string[] { "//" }, StringSplitOptions.None)[0]
+                    .Replace(" ", "")
+                    .Replace("\t", "");
+                if (str.Length == 0)
+                    continue;
+                array.Add(str);
+                if (debugFlag) logOut(array.Count + ":" + str, LogType.DEBUG);
+            }
+            return array;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="level"></param>
+        /// <param name="quality"></param>
+        /// <param name="itemBaseType"></param>
+        /// <param name="itemType"></param>
+        /// <param name="isOneHand"></param>
+        /// <param name="isTwoHand"></param>
+        /// <param name="gameBalanceID"></param>
+        /// <returns></returns>
+        public InterpreterAction checkPickUpItem(string name, int level, ItemQuality quality, ItemBaseType itemBaseType, ItemType itemType, bool isOneHand, bool isTwoHand, int gameBalanceID)
+        {
+            fillPickupDic(name, level, quality, itemBaseType, itemType, isOneHand, isTwoHand, gameBalanceID);
+
+            return checkItem(true); 
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="pickUp"></param>
+        /// <returns></returns>
+        public InterpreterAction checkItem(ACDItem item, bool pickUp)
+        {
+            fillDic(item);
+
+            return checkItem(false);
         }
 
         /// <summary>
@@ -170,11 +203,10 @@ namespace GilesTrinity.ItemRules
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public InterpreterAction checkItem(ACDItem item, bool pickUp)
+        public InterpreterAction checkItem(bool pickUp)
         {
-            fillDic(item);
 
-            if (debugFlag) logOut(getFullItem(item), LogType.DEBUG);
+            if (debugFlag) logOut(getFullItem(), LogType.DEBUG);
 
             InterpreterAction action = InterpreterAction.NULL;
             string validRule = "";
@@ -189,14 +221,13 @@ namespace GilesTrinity.ItemRules
 
                 // default configuration for positive rules is pickup and keep
                 InterpreterAction tempAction;
-                if (pickUp) tempAction = InterpreterAction.KEEP;
+                if (pickUp) tempAction = InterpreterAction.PICKUP;
                 else tempAction = InterpreterAction.KEEP;
 
                 string[] strings = str.Split(new string[] { assign }, StringSplitOptions.None);
                 if (strings.Count() > 1)
-                {
                     tempAction = getInterpreterAction(strings[1]);
-                }
+
                 try
                 {
                     if (evaluate(strings[0], out parseErrors))
@@ -207,7 +238,7 @@ namespace GilesTrinity.ItemRules
                             logOut("DEBUG: Have errors with out a catch!"
                                 + lineBreak + "last use rule: " + str
                                 + lineBreak + getParseErrors(parseErrors)
-                                + lineBreak + getFullItem(item)
+                                + lineBreak + getFullItem()
                                 + lineBreak, LogType.ERROR);
                         break;
                     }
@@ -217,22 +248,26 @@ namespace GilesTrinity.ItemRules
                     logOut("ERROR: " + e.Message
                         + lineBreak + "last use rule: " + str
                         + lineBreak + getParseErrors(parseErrors)
-                        + lineBreak + getFullItem(item)
+                        + lineBreak + getFullItem()
                         + lineBreak, LogType.ERROR);
                 }
             }
 
-            if (action == InterpreterAction.TRASH && (debugFlag || item.ItemQualityLevel == ItemQuality.Legendary))
-                logOut(getFullItem(item) + lineBreak, LogType.TRASH);
+            if (action == InterpreterAction.TRASH)
+            //if (action == InterpreterAction.TRASH && (debugFlag || item.ItemQualityLevel == ItemQuality.Legendary))
+                logOut(getFullItem()
+                    + lineBreak, LogType.TRASH);
             else if (action == InterpreterAction.KEEP || (!pickUp || debugFlag))
+            {
                 if (pickUp)
-                    logOut("PICKUP: " + getItemTag(item)
+                    logOut("PICKUP: " + getItemTag()
                         + lineBreak + validRule + " [ACTION = " + action + "]"
                         + lineBreak, LogType.DEBUG);
                 else
-                    logOut(getFullItem(item)
+                    logOut(getFullItem()
                         + lineBreak + validRule + " [ACTION = " + action + "]"
                         + lineBreak, LogType.LOG);
+            }
 
             return action;
         }
@@ -317,7 +352,14 @@ namespace GilesTrinity.ItemRules
                 + " " + item.ItemType
                 + " [" + item.GameBalanceId + "]";
         }
-
+        public string getItemTag()
+        {
+            return itemDic["[NAME]"]
+                + "(" + itemDic["[LEVEL]"] + ")"
+                + " " + itemDic["[QUALITY]"]
+                + " " + itemDic["[BASETYPE]"]
+                + " " + itemDic["[TYPE]"];
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -355,7 +397,86 @@ namespace GilesTrinity.ItemRules
             result += lineBreak + "+--------------------------------------------------------------";
             return result;
         }
+        public string getFullItem()
+        {
+            // add item info
+            string result = getItemTag();
 
+
+            //if (itemDic["[TYPE]"] == ItemType.Unknown.ToString()
+            //    || item.ItemBaseType == ItemBaseType.Gem
+            //    || item.ItemBaseType == ItemBaseType.Misc)
+            //    return result;
+
+            // add stats            
+            result += lineBreak + "+--------------------------------------------------------------";
+            foreach (string key in itemDic.Keys)
+            {
+                object value;
+                if (itemDic.TryGetValue(key, out value))
+                {
+                    if (value is float && (float)value > 0)
+                        result += lineBreak + "| - " + key.ToUpper() + ": " + ((float)value).ToString("0.00");
+                    else if (value is string && (string)value != "")
+                        result += lineBreak + "| - " + key.ToUpper() + ": " + value.ToString();
+                    else if (value is bool)
+                        result += lineBreak + "| - " + key.ToUpper() + ": " + value.ToString();
+                }
+            }
+            result += lineBreak + "+--------------------------------------------------------------";
+            return result;
+        }
+
+        private void fillPickupDic(string name, int level, ItemQuality itemQuality, ItemBaseType itemBaseType, ItemType itemType, bool isOneHand, bool isTwoHand, int balanceId)
+        {
+            object result;
+            itemDic = new Dictionary<string, object>();
+
+            // - BASETYPE ---------------------------------------------------------//
+            itemDic.Add("[BASETYPE]", itemBaseType.ToString());
+
+            // - TYPE -------------------------------------------------------------//
+            // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
+            if (itemType == ItemType.Unknown && name.Contains("Plan"))
+                result = ItemType.CraftingPlan.ToString();
+            else result = itemType.ToString();
+            itemDic.Add("[TYPE]", result);
+
+            // - QUALITY -------------------------------------------------------//
+            // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
+            if ((itemType == ItemType.Unknown && name.Contains("Plan")) || itemType == ItemType.CraftingPlan)
+            {
+                if (name.Contains("ffbf642f"))
+                    result = ItemQuality.Legendary.ToString();
+                else if (name.Contains("Exalted Grand"))
+                    result = ItemQuality.Rare6.ToString();
+                else if (name.Contains("Exalted Fine"))
+                    result = ItemQuality.Rare5.ToString();
+                else if (name.Contains("Exalted"))
+                    result = ItemQuality.Rare4.ToString();
+                else
+                    result = ItemQuality.Normal.ToString();
+            }
+            else
+                result = Regex.Replace(itemQuality.ToString(), @"[\d-]", string.Empty);
+            itemDic.Add("[QUALITY]", result);
+
+            // - NAME -------------------------------------------------------------//
+            if ((itemType == ItemType.Unknown && name.Contains("Plan")) || itemType == ItemType.CraftingPlan)
+            {
+                //{c:ffffff00}Plan: Exalted Fine Doomcaster{/c}
+                itemDic.Add("[NAME]", Regex.Replace(name, @"{[/:a-zA-Z0-9 ]*}", string.Empty).Replace(" ", ""));
+            }
+            else
+                itemDic.Add("[NAME]", name.ToString().Replace(" ", ""));
+
+            // - LEVEL ------------------------------------------------------------//
+            itemDic.Add("[LEVEL]", (float)level);
+            itemDic.Add("[ONEHAND]", isOneHand);
+            itemDic.Add("[TWOHAND]", isTwoHand);
+            itemDic.Add("[UNIDENT]", (bool) true);
+            //itemDic.Add("[GAMEBALANCEID]", (float)item.GameBalanceId);
+        }
 
         private void fillDic(ACDItem item)
         {
