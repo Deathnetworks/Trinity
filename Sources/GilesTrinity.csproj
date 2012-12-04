@@ -251,6 +251,9 @@
     <Content Include="ItemRules\ItemRules2.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Dictionaries.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="ItemRules\Loot.utr" />
     <None Include="ItemRules\Rules\config.dis" />
     <None Include="ItemRules\Rules\legendary.dis" />

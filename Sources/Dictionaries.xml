@@ -1,114 +1,137 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Datas>
-    <HashSet Name="AvoidanceBuffSNO">
-        <Entry Value="201454"/>
-        <Entry Value="201464"/>
-        <Entry Value="201426"/>
-        <Entry Value="201438"/>
-        <Entry Value="200969"/>
-        <Entry Value="201423"/>
-        <Entry Value="201242"/>
-    </HashSet>
-    <Dictionary Name="AvoidanceType">
-        <Entry SNO="219702" Type="Arcane" />
-        <Entry SNO="221225" Type="Arcane" />
-        <Entry SNO="84608" Type="Desecrator" />
-        <Entry SNO="5482" Type="PoisonTree" />
-        <Entry SNO="6578" Type="PoisonTree" />
-        <Entry SNO="4803" Type="MoltenCore" />
-        <Entry SNO="4804" Type="MoltenCore" />
-        <Entry SNO="224225" Type="MoltenCore" />
-        <Entry SNO="247987" Type="MoltenCore" />
-        <Entry SNO="95868" Type="MoltenTrail" />
-        <Entry SNO="108869" Type="PlagueCloud" />
-        <Entry SNO="402" Type="IceBall" />
-        <Entry SNO="223675" Type="IceBall" />
-        <Entry SNO="4103" Type="ShamanFire" />
-        <Entry SNO="5212" Type="BeeWasp" />
-        <Entry SNO="3865" Type="PlagueHand" />
-        <Entry SNO="123124" Type="AzmodanPool" />
-        <Entry SNO="93837" Type="GhomGas" />
-        <Entry SNO="123839" Type="AzmodanBody" />
-        <Entry SNO="161822" Type="Belial" />
-        <Entry SNO="161833" Type="Belial" />
-        <Entry SNO="123842" Type="AzmodanFireball" />
-        <Entry SNO="432" Type="MageFire" />
-        <Entry SNO="168031" Type="DiabloPrison" />
-        <Entry SNO="214845" Type="DiabloMeteor" />
-        <Entry SNO="260377" Type="IceTrail" />
-        <Entry SNO="160154" Type="MoltenBall" />
-        <Entry SNO="199997" Type="WallOfFire" />
-        <Entry SNO="199998" Type="WallOfFire" />
-        <Entry SNO="185924" Type="ZoltBubble" />
-        <Entry SNO="139741" Type="ZoltTwister" />
-        <Entry SNO="166686" Type="MaghdaProjectille" />
-        <Entry SNO="201454" Type="ButcherFloorPanel" />
-        <Entry SNO="201464" Type="ButcherFloorPanel" />
-        <Entry SNO="201426" Type="ButcherFloorPanel" />
-        <Entry SNO="201438" Type="ButcherFloorPanel" />
-        <Entry SNO="200969" Type="ButcherFloorPanel" />
-        <Entry SNO="201423" Type="ButcherFloorPanel" />
-        <Entry SNO="201242" Type="ButcherFloorPanel" />
-        <Entry SNO="226350" Type="DiabloRingOfFire" />
-        <Entry SNO="226525" Type="DiabloRingOfFire" />
-    </Dictionary>
-    <Dictionary Name="ItemRuleKeywords">
-        <Entry Keyword="ArcaneOnCrit" Code="item.ArcaneOnCrit"/>
-        <Entry Keyword="Armor" Code="item.Armor"/>
-        <Entry Keyword="ArmorBonus" Code="item.ArmorBonus"/>
-        <Entry Keyword="ArmorTotal" Code="item.ArmorTotal"/>
-        <Entry Keyword="AS" Code="item.AttackSpeedPercent"/>
-        <Entry Keyword="BlockChance" Code="item.BlockChance"/>
-        <Entry Keyword="CritDmg" Code="item.CritDamagePercent"/>
-        <Entry Keyword="Crit" Code="item.CritPercent"/>
-        <Entry Keyword="DmgReductionPhys%" Code="item.DamageReductionPhysicalPercent"/>
-        <Entry Keyword="GF" Code="item.GoldFind"/>
-        <Entry Keyword="HatredRegen" Code="item.HatredRegen"/>
-        <Entry Keyword="HealthGlobeBonus" Code="item.HealthGlobeBonus"/>
-        <Entry Keyword="HealthPerSecond" Code="item.HealthPerSecond"/>
-        <Entry Keyword="HealthPerSpiritSpent" Code="item.HealthPerSpiritSpent"/>
-        <Entry Keyword="LoH" Code="item.LifeOnHit"/>
-        <Entry Keyword="Life%" Code="item.LifePercent"/>
-        <Entry Keyword="LS" Code="item.LifeSteal"/>
-        <Entry Keyword="MF" Code="item.MagicFind"/>
-        <Entry Keyword="ManaRegen" Code="item.ManaRegen"/>
-        <Entry Keyword="MaxArcane" Code="item.MaxArcanePower"/>
-        <Entry Keyword="MaxDmg" Code="item.MaxDamage"/>
-        <Entry Keyword="MaxDiscipline" Code="item.MaxDiscipline"/>
-        <Entry Keyword="MaxFury" Code="item.MaxFury"/>
-        <Entry Keyword="MaxMana" Code="item.MaxMana"/>
-        <Entry Keyword="MaxSpirit" Code="item.MaxSpirit"/>
-        <Entry Keyword="MinDmg" Code="item.MinDamage"/>
-        <Entry Keyword="MvtSpeed" Code="item.MovementSpeed"/>
-        <Entry Keyword="PickUpRadius" Code="item.PickUpRadius"/>
-        <Entry Keyword="ResistAll" Code="item.ResistAll"/>
-        <Entry Keyword="ResistArcane" Code="item.ResistArcane"/>
-        <Entry Keyword="ResistCold" Code="item.ResistCold"/>
-        <Entry Keyword="ResistFire" Code="item.ResistFire"/>
-        <Entry Keyword="ResistHoly" Code="item.ResistHoly"/>
-        <Entry Keyword="ResistLightning" Code="item.ResistLightning"/>
-        <Entry Keyword="ResistPhysical" Code="item.ResistPhysical"/>
-        <Entry Keyword="ResistPoison" Code="item.ResistPoison"/>
-        <Entry Keyword="Sockets" Code="item.Sockets"/>
-        <Entry Keyword="SpiritRegen" Code="item.SpiritRegen"/>
-        <Entry Keyword="Thorns" Code="item.Thorns"/>
-        <Entry Keyword="AttacksPerSecond" Code="item.WeaponAttacksPerSecond"/>
-        <Entry Keyword="DPS" Code="item.WeaponDamagePerSecond"/>
-        <Entry Keyword="WMaxDmg" Code="item.WeaponMaxDamage"/>
-        <Entry Keyword="WMinDmg" Code="item.WeaponMinDamage"/>
-        <Entry Keyword="FollowerType" Code="item.FollowerSpecialType.ToString()"/>
-        <Entry Keyword="InternalName" Code="item.InternalName"/>
-        <Entry Keyword="TwoHand" Code="item.IsTwoHand"/>
-        <Entry Keyword="Name" Code="item.Name"/>
-        <Entry Keyword="Dex" Code="item.Dexterity"/>
-        <Entry Keyword="Str" Code="item.Strength"/>
-        <Entry Keyword="Int" Code="item.Intelligence"/>
-        <Entry Keyword="Vita" Code="item.Vitality"/>
-        <Entry Keyword="LvlReduction" Code="item.LevelReduction"/>
-        <Entry Keyword="BaseType" Code="item.BaseType.ToString()"/>
-        <Entry Keyword="Type" Code="item.ItemType.ToString()"/>
-        <Entry Keyword="Quality" Code="item.Quality.ToString()"/>
-        <Entry Keyword="RequiredLevel" Code="item.RequiredLevel"/>
-        <Entry Keyword="Level" Code="item.Level"/>
-    </Dictionary>
+  <HashSet Name="AvoidanceBuffSNO">
+    <Entry Value="201454"/>
+    <Entry Value="201464"/>
+    <Entry Value="201426"/>
+    <Entry Value="201438"/>
+    <Entry Value="200969"/>
+    <Entry Value="201423"/>
+    <Entry Value="201242"/>
+  </HashSet>
+  <HashSet Name="WhirlWindIgnoreSNO">
+    <Entry Value="4304"/>
+    <Entry Value="5984"/>
+    <Entry Value="5985"/>
+    <Entry Value="5987"/>
+    <Entry Value="5988"/>
+  </HashSet>
+  <HashSet Name="FastMonsterSNO">
+    <Entry Value="5212"/>
+  </HashSet>
+  <Dictionary Name="AvoidanceType">
+    <Entry SNO="219702" Type="Arcane" />
+    <Entry SNO="221225" Type="Arcane" />
+    <Entry SNO="84608" Type="Desecrator" />
+    <Entry SNO="5482" Type="PoisonTree" />
+    <Entry SNO="6578" Type="PoisonTree" />
+    <Entry SNO="4803" Type="MoltenCore" />
+    <Entry SNO="4804" Type="MoltenCore" />
+    <Entry SNO="224225" Type="MoltenCore" />
+    <Entry SNO="247987" Type="MoltenCore" />
+    <Entry SNO="95868" Type="MoltenTrail" />
+    <Entry SNO="108869" Type="PlagueCloud" />
+    <Entry SNO="402" Type="IceBall" />
+    <Entry SNO="223675" Type="IceBall" />
+    <Entry SNO="4103" Type="ShamanFire" />
+    <Entry SNO="5212" Type="BeeWasp" />
+    <Entry SNO="3865" Type="PlagueHand" />
+    <Entry SNO="123124" Type="AzmodanPool" />
+    <Entry SNO="93837" Type="GhomGas" />
+    <Entry SNO="123839" Type="AzmodanBody" />
+    <Entry SNO="161822" Type="Belial" />
+    <Entry SNO="161833" Type="Belial" />
+    <Entry SNO="123842" Type="AzmodanFireball" />
+    <Entry SNO="432" Type="MageFire" />
+    <Entry SNO="168031" Type="DiabloPrison" />
+    <Entry SNO="214845" Type="DiabloMeteor" />
+    <Entry SNO="260377" Type="IceTrail" />
+    <Entry SNO="160154" Type="MoltenBall" />
+    <Entry SNO="199997" Type="WallOfFire" />
+    <Entry SNO="199998" Type="WallOfFire" />
+    <Entry SNO="185924" Type="ZoltBubble" />
+    <Entry SNO="139741" Type="ZoltTwister" />
+    <Entry SNO="166686" Type="MaghdaProjectille" />
+    <Entry SNO="201454" Type="ButcherFloorPanel" />
+    <Entry SNO="201464" Type="ButcherFloorPanel" />
+    <Entry SNO="201426" Type="ButcherFloorPanel" />
+    <Entry SNO="201438" Type="ButcherFloorPanel" />
+    <Entry SNO="200969" Type="ButcherFloorPanel" />
+    <Entry SNO="201423" Type="ButcherFloorPanel" />
+    <Entry SNO="201242" Type="ButcherFloorPanel" />
+    <Entry SNO="226350" Type="DiabloRingOfFire" />
+    <Entry SNO="226525" Type="DiabloRingOfFire" />
+  </Dictionary>
+  <Dictionary Name="AvoidanceProjectileSNO">
+    <Entry SNO="5212" Type="BeesWasps"/>
+    <Entry SNO="4103" Type="ShaBall"/>
+    <Entry SNO="160154" Type="MolBall"/>
+    <Entry SNO="123842" Type="AzmoFireball"/>
+    <Entry SNO="139741" Type="ZoltTwister"/>
+    <Entry SNO="166686" Type="MagdhaProjectile"/>
+    <Entry SNO="164829" Type="SuccubusStar"/>
+    <Entry SNO="185999" Type="DiabloFire"/>
+    <Entry SNO="196526" Type="DiabloFire"/>
+    <Entry SNO="136533" Type="DiabloLightning"/>
+  </Dictionary>
+
+  <Dictionary Name="ItemRuleKeywords">
+    <Entry Keyword="ArcaneOnCrit" Code="item.ArcaneOnCrit"/>
+    <Entry Keyword="Armor" Code="item.Armor"/>
+    <Entry Keyword="ArmorBonus" Code="item.ArmorBonus"/>
+    <Entry Keyword="ArmorTotal" Code="item.ArmorTotal"/>
+    <Entry Keyword="AS" Code="item.AttackSpeedPercent"/>
+    <Entry Keyword="BlockChance" Code="item.BlockChance"/>
+    <Entry Keyword="CritDmg" Code="item.CritDamagePercent"/>
+    <Entry Keyword="Crit" Code="item.CritPercent"/>
+    <Entry Keyword="DmgReductionPhys%" Code="item.DamageReductionPhysicalPercent"/>
+    <Entry Keyword="GF" Code="item.GoldFind"/>
+    <Entry Keyword="HatredRegen" Code="item.HatredRegen"/>
+    <Entry Keyword="HealthGlobeBonus" Code="item.HealthGlobeBonus"/>
+    <Entry Keyword="HealthPerSecond" Code="item.HealthPerSecond"/>
+    <Entry Keyword="HealthPerSpiritSpent" Code="item.HealthPerSpiritSpent"/>
+    <Entry Keyword="LoH" Code="item.LifeOnHit"/>
+    <Entry Keyword="Life%" Code="item.LifePercent"/>
+    <Entry Keyword="LS" Code="item.LifeSteal"/>
+    <Entry Keyword="MF" Code="item.MagicFind"/>
+    <Entry Keyword="ManaRegen" Code="item.ManaRegen"/>
+    <Entry Keyword="MaxArcane" Code="item.MaxArcanePower"/>
+    <Entry Keyword="MaxDmg" Code="item.MaxDamage"/>
+    <Entry Keyword="MaxDiscipline" Code="item.MaxDiscipline"/>
+    <Entry Keyword="MaxFury" Code="item.MaxFury"/>
+    <Entry Keyword="MaxMana" Code="item.MaxMana"/>
+    <Entry Keyword="MaxSpirit" Code="item.MaxSpirit"/>
+    <Entry Keyword="MinDmg" Code="item.MinDamage"/>
+    <Entry Keyword="MvtSpeed" Code="item.MovementSpeed"/>
+    <Entry Keyword="PickUpRadius" Code="item.PickUpRadius"/>
+    <Entry Keyword="ResistAll" Code="item.ResistAll"/>
+    <Entry Keyword="ResistArcane" Code="item.ResistArcane"/>
+    <Entry Keyword="ResistCold" Code="item.ResistCold"/>
+    <Entry Keyword="ResistFire" Code="item.ResistFire"/>
+    <Entry Keyword="ResistHoly" Code="item.ResistHoly"/>
+    <Entry Keyword="ResistLightning" Code="item.ResistLightning"/>
+    <Entry Keyword="ResistPhysical" Code="item.ResistPhysical"/>
+    <Entry Keyword="ResistPoison" Code="item.ResistPoison"/>
+    <Entry Keyword="Sockets" Code="item.Sockets"/>
+    <Entry Keyword="SpiritRegen" Code="item.SpiritRegen"/>
+    <Entry Keyword="Thorns" Code="item.Thorns"/>
+    <Entry Keyword="AttacksPerSecond" Code="item.WeaponAttacksPerSecond"/>
+    <Entry Keyword="DPS" Code="item.WeaponDamagePerSecond"/>
+    <Entry Keyword="WMaxDmg" Code="item.WeaponMaxDamage"/>
+    <Entry Keyword="WMinDmg" Code="item.WeaponMinDamage"/>
+    <Entry Keyword="FollowerType" Code="item.FollowerSpecialType.ToString()"/>
+    <Entry Keyword="InternalName" Code="item.InternalName"/>
+    <Entry Keyword="TwoHand" Code="item.IsTwoHand"/>
+    <Entry Keyword="Name" Code="item.Name"/>
+    <Entry Keyword="Dex" Code="item.Dexterity"/>
+    <Entry Keyword="Str" Code="item.Strength"/>
+    <Entry Keyword="Int" Code="item.Intelligence"/>
+    <Entry Keyword="Vita" Code="item.Vitality"/>
+    <Entry Keyword="LvlReduction" Code="item.LevelReduction"/>
+    <Entry Keyword="BaseType" Code="item.BaseType.ToString()"/>
+    <Entry Keyword="Type" Code="item.ItemType.ToString()"/>
+    <Entry Keyword="Quality" Code="item.Quality.ToString()"/>
+    <Entry Keyword="RequiredLevel" Code="item.RequiredLevel"/>
+    <Entry Keyword="Level" Code="item.Level"/>
+  </Dictionary>
 </Datas>

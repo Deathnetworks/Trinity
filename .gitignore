@@ -13,7 +13,7 @@ DemonBuddy.exe
 /Sources/log/
 
 /Sources/log/*
-
+/Sources/Logs/*
 /Sources/*.log
 
 Sources/ItemRules/Log/*
