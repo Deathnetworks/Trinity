@@ -87,10 +87,11 @@
     <Compile Include="ItemRules\Core\ParseTree.cs" />
     <Compile Include="ItemRules\Core\Scanner.cs" />
     <Compile Include="ItemRules\Core\TextHighlighter.cs" />
+    <Compile Include="ScriptedRules\Dynamic.cs" />
+    <Compile Include="ScriptedRules\FunctionHelper.cs" />
     <Compile Include="Technicals\Loader.cs" />
     <Compile Include="TrinityPowerManager.cs" />
     <Compile Include="ScheduledPower.cs" />
-    <Compile Include="ScriptedRules\Dynamic.cs" />
     <Compile Include="ScriptedRules\RulesManager.cs" />
     <Compile Include="ScriptedRules\ScriptedRuleAction.cs" />
     <Compile Include="ScriptedRules\ScriptedRule.cs" />
@@ -269,8 +270,8 @@
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>REM rd /S /Q "C:\UnifiedTrinity\UnifiedTrinity\Sources\obj\"
-REM rd /S /Q "C:\UnifiedTrinity\UnifiedTrinity\Sources\bin\"
+    <PostBuildEvent>rd /S /Q "$(ProjectDir)obj\"
+REM rd /S /Q "$(ProjectDir)bin\"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>

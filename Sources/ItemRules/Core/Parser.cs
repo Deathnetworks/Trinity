@@ -67,8 +67,6 @@ namespace GilesTrinity.ItemRules.Core
 
         private void ParseExpr(ParseNode parent)
         {
-            Token tok;
-            ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Expr), "Expr");
             parent.Nodes.Add(node);
 

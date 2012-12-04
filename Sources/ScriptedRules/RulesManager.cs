@@ -14,67 +14,13 @@ namespace GilesTrinity.ScriptedRules
     internal static class RulesManager
     {
         private static readonly IDictionary<int, ScriptedRule> _RuleCache = new Dictionary<int, ScriptedRule>();
-        private static readonly IDictionary<string, string> _StandardKeyword = new Dictionary<string, string>
-            {
-#region Fill Standard Keyword
-                { "ArcaneOnCrit", "item.ArcaneOnCrit"},
-                { "Armor", "item.Armor"},
-                { "ArmorBonus", "item.ArmorBonus"},
-                { "ArmorTotal", "item.ArmorTotal"},
-                { "AS", "item.AttackSpeedPercent"},
-                { "BlockChance", "item.BlockChance"},
-                { "CritDmg", "item.CritDamagePercent"},
-                { "Crit", "item.CritPercent"},
-                { "DmgReductionPhys%", "item.DamageReductionPhysicalPercent"},
-                { "GF", "item.GoldFind"},
-                { "HatredRegen", "item.HatredRegen"},
-                { "HealthGlobeBonus", "item.HealthGlobeBonus"},
-                { "HealthPerSecond", "item.HealthPerSecond"},
-                { "HealthPerSpiritSpent", "item.HealthPerSpiritSpent"},
-                { "LoH", "item.LifeOnHit"},
-                { "Life%", "item.LifePercent"},
-                { "LS", "item.LifeSteal"},
-                { "MF", "item.MagicFind"},
-                { "ManaRegen", "item.ManaRegen"},
-                { "MaxArcane", "item.MaxArcanePower"},
-                { "MaxDmg", "item.MaxDamage"},
-                { "MaxDiscipline", "item.MaxDiscipline"},
-                { "MaxFury", "item.MaxFury"},
-                { "MaxMana", "item.MaxMana"},
-                { "MaxSpirit", "item.MaxSpirit"},
-                { "MinDmg", "item.MinDamage"},
-                { "MvtSpeed", "item.MovementSpeed"},
-                { "PickUpRadius", "item.PickUpRadius"},
-                { "ResistAll", "item.ResistAll"},
-                { "ResistArcane", "item.ResistArcane"},
-                { "ResistCold", "item.ResistCold"},
-                { "ResistFire", "item.ResistFire"},
-                { "ResistHoly", "item.ResistHoly"},
-                { "ResistLightning", "item.ResistLightning"},
-                { "ResistPhysical", "item.ResistPhysical"},
-                { "ResistPoison", "item.ResistPoison"},
-                { "Sockets", "item.Sockets"},
-                { "SpiritRegen", "item.SpiritRegen"},
-                { "Thorns", "item.Thorns"},
-                { "AttacksPerSecond", "item.WeaponAttacksPerSecond"},
-                { "DPS", "item.WeaponDamagePerSecond"},
-                { "WMaxDmg", "item.WeaponMaxDamage"},
-                { "WMinDmg", "item.WeaponMinDamage"},
-                { "FollowerType", "item.FollowerSpecialType.ToString()"},
-                { "InternalName", "item.InternalName"},
-                { "TwoHand", "item.IsTwoHand"},
-                { "Name", "item.Name"},
-                { "Dex", "item.Dexterity"},
-                { "Str", "item.Strength"},
-                { "Int", "item.Intelligence"},
-                { "Vita", "item.Vitality"},
-                { "LvlReduction", "item.LevelReduction"},
-                { "BaseType", "item.BaseType.ToString()"},
-                { "Type", "item.ItemType.ToString()"},
-                { "Quality", "item.Quality.ToString()"},
-                { "RequiredLevel", "item.RequiredLevel"},
-#endregion
-            };
+        private static readonly IDictionary<string, string> _StandardKeyword;
+
+        static RulesManager()
+        {
+            _StandardKeyword = FileManager.Load<string, string>("ItemRuleKeywords", "Keyword", "Code");
+        }
+
         private static Delegate ConstructOperation(string lambdaExpression, Type inputParameterType, Type targetType)
         {
             int opi = lambdaExpression.IndexOf("=>");
@@ -84,7 +30,7 @@ namespace GilesTrinity.ScriptedRules
             string param = lambdaExpression.Substring(0, opi);
             string body = lambdaExpression.Substring(opi + 2);
             ParameterExpression p = Expression.Parameter(inputParameterType, param);
-            LambdaExpression lambda = DynamicExpression.ParseLambda(
+            LambdaExpression lambda = System.Linq.Dynamic.DynamicExpression.ParseLambda(
                                         new ParameterExpression[] { p },
                                         targetType,
                                         body);
@@ -92,21 +38,28 @@ namespace GilesTrinity.ScriptedRules
             return lambda.Compile();
         }
 
+        /// <summary>
+        /// Cleans All Rules.
+        /// </summary>
         public static void Clean()
         {
             _RuleCache.Clear();
         }
 
+        /// <summary>
+        /// Loads the Scripted Rules.
+        /// </summary>
         public static void LoadLootRules()
         {
             using (new PerformanceLogger("RulesManager.LoadLootRules"))
             {
+            
                 Clean();
-                string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Plugins", "GilesTrinity", "ItemRules", ZetaDia.Service.CurrentHero.BattleTagName, "Loot.utr");
+                string filename = Path.Combine(FileManager.SpecificItemRulePath, "Loot.utr");
                 if (!File.Exists(filename))
                 {
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "No Loot Rules file for BattleTag found in '{0}', General file is considered.", filename);
-                    filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Plugins", "GilesTrinity", "ItemRules", "Loot.utr");
+                    filename = Path.Combine(FileManager.ItemRulePath, "Loot.utr");
                 }
                 if (!File.Exists(filename))
                 {
@@ -124,19 +77,74 @@ namespace GilesTrinity.ScriptedRules
             }
         }
 
+        /// <summary>
+        /// Determine if item should be pickup.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>
+        /// <c>true</c> if item should be pickup, otherwise <c>false</c>
+        /// </returns>
         public static bool ShouldPickup(CacheItem item)
         {
-            foreach (ScriptedRule rule in _RuleCache.Where(r => r.Value.Action != ScriptedRuleAction.Trash).Select(r=>r.Value))
+            if (_RuleCache.Count < 1)
             {
-                if ((bool)rule.UnidentifiedLambdaExpression.DynamicInvoke(item))
-                {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "{0} Pickup Item : '{1}'", rule.Name, rule.UnidentifiedExpression);
-                    return true;
-                }
+                LoadLootRules();
             }
-            return false;
+            using (new PerformanceLogger("RulesManager.ShoulPickup"))
+            {
+                foreach (ScriptedRule rule in _RuleCache.Where(r => r.Value.Action != ScriptedRuleAction.Trash).Select(r => r.Value))
+                {
+                    if ((bool)rule.UnidentifiedLambdaExpression.DynamicInvoke(item))
+                    {
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "{0} Pickup Item : '{1}'", rule.Name, rule.UnidentifiedExpression);
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
 
+        /// <summary>
+        /// Determine if item should be stash.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>
+        /// <c>true</c> if item should be stash, otherwise <c>false</c>
+        /// </returns>
+        public static bool? ShouldStash(CacheItem item)
+        {
+            if (_RuleCache.Count < 1)
+            {
+                LoadLootRules();
+            }
+            using (new PerformanceLogger("RulesManager.ShoulStash"))
+            {
+                foreach (ScriptedRule rule in _RuleCache.Where(r => r.Value.Action != ScriptedRuleAction.Trash).Select(r => r.Value))
+                {
+                    if ((bool)rule.UnidentifiedLambdaExpression.DynamicInvoke(item) && (bool)rule.LambdaExpression.DynamicInvoke(item))
+                    {
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "{0} {2} Item : '{1}'", rule.Name, rule.UnidentifiedExpression, rule.Action);
+                        switch (rule.Action)
+                        {
+                            case ScriptedRuleAction.Route:
+                                return null;
+                            case ScriptedRuleAction.Stash:
+                                return true;
+                            case ScriptedRuleAction.Trash:
+                                return false;
+                        }
+
+                    }
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Parses Sripted Rule file.
+        /// </summary>
+        /// <param name="filename">The filename.</param>
+        /// <param name="existingMacros">The existing macros.</param>
         private static void ParseFile(string filename, IDictionary<string, string> existingMacros)
         {
             using (new PerformanceLogger("RulesManager.ParseFile"))
@@ -217,13 +225,14 @@ namespace GilesTrinity.ScriptedRules
                     {
                         foreach (ScriptedRule rule in _RuleCache.Values.Where(r => r.LambdaExpression == null))
                         {
-                            FormatExpression(rule);
                             ReplaceMacro(rule, listMacros);
                             if (rule.LambdaExpression == null)
                             {
                                 ReplaceMacro(rule, _StandardKeyword);
                                 if (rule.LambdaExpression == null)
                                 {
+                                    System.Diagnostics.Debug.WriteLine("{0} Unidentified >> {1}", rule.Name, rule.UnidentifiedExpression);
+                                    System.Diagnostics.Debug.WriteLine("{0} Identified   >> {1}", rule.Name, rule.Expression);
                                     rule.LambdaExpression = ConstructOperation(string.Format("item=>{0}", rule.Expression), typeof(CacheItem), typeof(bool));
                                     rule.UnidentifiedLambdaExpression = ConstructOperation(string.Format("item=>{0}", rule.UnidentifiedExpression), typeof(CacheItem), typeof(bool));
                                 }
@@ -235,6 +244,10 @@ namespace GilesTrinity.ScriptedRules
             }
         }
 
+        /// <summary>
+        /// Formats the expression before parsing.
+        /// </summary>
+        /// <param name="rule">The rule.</param>
         private static void FormatExpression(ScriptedRule rule)
         {
             rule.Expression = (" " + rule.Expression.Replace("(", " ( ")
@@ -253,8 +266,10 @@ namespace GilesTrinity.ScriptedRules
                                              .Replace("*", " * ")
                                              .Replace("/", " / ")
                                              .Replace("%", " % ")
+                                             .Replace("!", " ! ")
                                              .Replace("\\", " \\ ")
                                              .Replace("=  =", "==")
+                                             .Replace("!  =", " != ")
                                              .Replace("&  &", "&&")
                                              .Replace("|  |", "||")
                                              .Replace("<  =", "<=")
@@ -279,8 +294,10 @@ namespace GilesTrinity.ScriptedRules
                                              .Replace("*", " * ")
                                              .Replace("/", " / ")
                                              .Replace("%", " % ")
+                                             .Replace("!", " ! ")
                                              .Replace("\\", " \\ ")
                                              .Replace("=  =", "==")
+                                             .Replace("!  =", " != ")
                                              .Replace("&  &", "&&")
                                              .Replace("|  |", "||")
                                              .Replace("<  =", "<=")
@@ -291,21 +308,24 @@ namespace GilesTrinity.ScriptedRules
                                              .Replace("  ", " ");
         }
 
-        /// <summary>Replaces the macro in expression by macro expression.</summary>
+        /// <summary>
+        /// Replaces the macro in expression by macro expression.
+        /// </summary>
         /// <param name="rule">The rule.</param>
         /// <param name="listMacros">The list macros.</param>
         private static void ReplaceMacro(ScriptedRule rule, IDictionary<string, string> listMacros)
         {
             foreach (KeyValuePair<string, string> macro in listMacros.OrderByDescending(kp => kp.Key.Length)) 
             {
+                FormatExpression(rule);
                 if (rule.Expression.IndexOf(string.Format(" {0} ", macro.Key)) > -1 && !string.IsNullOrWhiteSpace(macro.Key))
                 {
-                    rule.Expression = rule.Expression.Replace(string.Format(" {0} ", macro.Key), macro.Value);
+                    rule.Expression = rule.Expression.Replace(string.Format(" {0} ", macro.Key), string.Format(" {0} ", macro.Value));
                 }
 
                 if (rule.UnidentifiedExpression.IndexOf(string.Format(" {0} ", macro.Key)) > -1 && !string.IsNullOrWhiteSpace(macro.Key))
                 {
-                    rule.UnidentifiedExpression = rule.UnidentifiedExpression.Replace(string.Format(" {0} ", macro.Key), macro.Value);
+                    rule.UnidentifiedExpression = rule.UnidentifiedExpression.Replace(string.Format(" {0} ", macro.Key), string.Format(" {0} ", macro.Value));
                 }
             }
         }
@@ -326,7 +346,9 @@ namespace GilesTrinity.ScriptedRules
             return line.Trim();
         }
 
-        /// <summary>Parses the line with rule.</summary>
+        /// <summary>
+        /// Parses the line with rule.
+        /// </summary>
         /// <param name="line">The line.</param>
         /// <returns>The rule</returns>
         private static ScriptedRule ParseRule(string line)
@@ -368,7 +390,9 @@ namespace GilesTrinity.ScriptedRules
             return null;
         }
 
-        /// <summary>Parses the line with macro.</summary>
+        /// <summary>
+        /// Parses the line with macro.
+        /// </summary>
         /// <param name="line">The line.</param>
         /// <returns>The macro</returns>
         private static KeyValuePair<string, string> ParseMacro(string line)

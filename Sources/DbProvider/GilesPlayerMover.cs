@@ -219,7 +219,7 @@ namespace GilesTrinity.DbProvider
                 // Temporarily log stuff
                 if (iTotalAntiStuckAttempts == 1 && GilesTrinity.Settings.Advanced.LogStuckLocation)
                 {
-                    FileStream LogStream = File.Open(GilesTrinity.sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - Stucks - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
+                    FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "Stucks - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
                     {
                         LogWriter.WriteLine(DateTime.Now.ToString() + ": Original Destination=" + vOldMoveToTarget.ToString() + ". Current player position when stuck=" + vMyCurrentPosition.ToString());
@@ -562,7 +562,7 @@ namespace GilesTrinity.DbProvider
                         if (!hashDoneThisVector.Contains(vMoveToTarget))
                         {
                             // Log it
-                            FileStream LogStream = File.Open(GilesTrinity.sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - LongPaths - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
+                            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath ,"LongPaths - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                             using (StreamWriter LogWriter = new StreamWriter(LogStream))
                             {
                                 LogWriter.WriteLine(DateTime.Now.ToString() + ":");

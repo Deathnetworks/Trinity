@@ -1,4 +1,5 @@
-﻿﻿using GilesTrinity.UI;
+﻿﻿using GilesTrinity.Technicals;
+using GilesTrinity.UI;
 using System.IO;
 using System.Windows;
 using Zeta.Common.Plugins;
@@ -26,7 +27,7 @@ namespace GilesTrinity
         {
             get
             {
-                return UILoader.GetDisplayWindow(Path.Combine(sTrinityPluginPath, "UI"));
+                return UILoader.GetDisplayWindow(Path.Combine(FileManager.PluginPath, "UI"));
             }
         }
     }

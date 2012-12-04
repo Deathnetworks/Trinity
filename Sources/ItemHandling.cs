@@ -697,7 +697,6 @@ namespace GilesTrinity
             }
             if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
             {
-                bOutputItemScores = true;
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "===== Outputting Test Scores =====");
                 foreach (ACDItem item in ZetaDia.Actors.Me.Inventory.Backpack)
                 {
@@ -716,7 +715,6 @@ namespace GilesTrinity
                 }
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "===== Finished Test Score Outputs =====");
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: See bad scores? Wrong item types? Known DB bug - restart DB before using the test button!");
-                bOutputItemScores = false;
             }
             else
             {
@@ -904,16 +902,8 @@ namespace GilesTrinity
         {
             TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
             
-            string LogDirectory = "TrinityLogs";
-            if (!Directory.Exists(LogDirectory))
-            {
-                Directory.CreateDirectory(LogDirectory);
-            }
-
-            string logFileName = Path.Combine(LogDirectory, String.Format(" {0} - Stats - {1}.log", playerStatus.BattleTag, playerStatus.ActorClass));
-
             // Create whole new file
-            FileStream LogStream = File.Open(Path.Combine(Path.GetDirectoryName(sDemonBuddyPath),logFileName), FileMode.Create, FileAccess.Write, FileShare.Read);
+            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("Stats - {0}.log", playerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read);
             using (StreamWriter LogWriter = new StreamWriter(LogStream))
             {
                 LogWriter.WriteLine("===== Misc Statistics =====");

@@ -112,6 +112,25 @@ namespace GilesTrinity
                 }
 
             }
+            else if (Settings.Combat.Monk.HasInnaSet)
+            {
+                if (!GilesHasBuff(SNOPower.Monk_SweepingWind) && GilesUseTimer(SNOPower.Monk_BreathOfHeaven) &&
+                    playerStatus.CurrentEnergy >= 45 && hashPowerHotbarAbilities.Contains(SNOPower.Monk_BreathOfHeaven))
+                {
+                    return new GilesPower(SNOPower.Monk_BreathOfHeaven, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
+                }
+                else if (!GilesHasBuff(SNOPower.Monk_SweepingWind) && GilesUseTimer(SNOPower.Monk_BlindingFlash) &&
+                    playerStatus.CurrentEnergy >= 15 && hashPowerHotbarAbilities.Contains(SNOPower.Monk_BlindingFlash))
+                {
+                    return new GilesPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
+                }
+                else if (!GilesHasBuff(SNOPower.Monk_SweepingWind) && playerStatus.CurrentEnergy >= 5 && 
+                        hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
+                {
+                    SweepWindSpam = DateTime.Now;
+                    return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
+                }
+            }
             /*
              *  Regular Bindinf Flash wind logic
              */

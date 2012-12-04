@@ -54,9 +54,14 @@ namespace GilesTrinity
                     new Action(ctx => GilesHandleTarget(ctx))
                 ),
                 new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && bMainBotPaused,
-                    new Action(ret => ActionRunningDelegate(ret))
+                    new Action(ret => PausedAction(ret))
                 )
             );
+        }
+
+        private static RunStatus PausedAction(object ret)
+        {
+            return bMainBotPaused ? RunStatus.Running: RunStatus.Success;
         }
 
         private enum HandlerRunStatus

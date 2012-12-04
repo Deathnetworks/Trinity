@@ -1104,7 +1104,6 @@ namespace GilesTrinity
         }
         private static bool RefreshGilesGold(bool AddToCache)
         {
-            double iPercentage = 0;
             int rangedMinimumStackSize = 0;
             AddToCache = true;
 

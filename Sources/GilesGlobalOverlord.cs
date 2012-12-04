@@ -40,8 +40,27 @@ namespace GilesTrinity
                 if (pf == null)
                     pf = new PathFinder(gp);
 
-                if (true)
-                    CacheRefresher.RefreshAll();
+                CacheRefresher.RefreshAll();
+
+                using (ZetaDia.Memory.AcquireFrame())
+                {
+                    ZetaDia.Actors.Update();
+                    foreach (ACDItem item in Me.Inventory.Backpack)
+                    {
+                        CacheManager.GetObject(item);
+                    }
+                    try
+                    {
+                        foreach (ACDItem item in Me.Inventory.StashItems)
+                        {
+                            CacheManager.GetObject(item);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine(ex);
+                    }
+                }
 
                 // World ID safety caching incase it's ever unavailable
                 if (ZetaDia.CurrentWorldDynamicId != -1)
