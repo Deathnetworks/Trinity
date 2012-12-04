@@ -1,0 +1,1258 @@
+<<<<<<< HEAD
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.IO;
+using System.Collections;
+using Zeta.Internals.Actors;
+using Zeta.Common;
+using GilesTrinity.ItemRules.Core;
+using GilesTrinity.Technicals;
+
+namespace GilesTrinity.ItemRules
+{
+    #region Interpreter
+
+    /// <summary>
+    /// +---------------------------------------------------------------------------+
+    /// | _______ __                     ______         __                   ______ 
+    /// ||_     _|  |_.-----.--------.  |   __ \.--.--.|  |.-----.-----.    |__    |
+    /// | _|   |_|   _|  -__|        |  |      <|  |  ||  ||  -__|__ --|    |    __|
+    /// ||_______|____|_____|__|__|__|  |___|__||_____||__||_____|_____|    |______|
+    /// |+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+    /// +---------------------------------------------------------------------------+
+    /// | - Created by darkfriend77
+    /// +---------------------------------------------------------------------------+
+    /// </summary>
+    public class Interpreter
+    {
+        // enumerations
+        public enum LogType
+        {
+            LOG,
+            TRASH,
+            DEBUG,
+            ERROR
+        };
+        public enum InterpreterAction
+        {
+            PICKUP,
+            IGNORE,
+            KEEP,
+            TRASH,
+            SCORE,
+            NULL
+        };
+
+        // final variables
+        readonly string version = "2.0.0.5";
+        readonly string customPath = @"Plugins\GilesTrinity\ItemRules\Rules\";
+        readonly string logPath = @"Plugins\GilesTrinity\ItemRules\Log\";
+        readonly string configFile = "config.dis";
+        readonly string pickupFile = "pickup.dis";
+        readonly string assign = "->", lineBreak = "\r\n";
+        readonly string filePattern = @"\[FILE\][ ]*==[ ]*([A-Za-z]+.dis)";
+        readonly string flagPattern = @"\[([A-Z]+)\]==([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])";
+
+        // variables
+        string startTimestamp;
+
+        // objects
+        ArrayList ruleSet, pickUpRuleSet;
+        TextWriter log;
+        Scanner scanner;
+        Parser parser;
+        //TextHighlighter highlighter;
+
+        // flags
+        bool debugFlag = false;
+
+        // dictonary for the item
+        public static Dictionary<string, object> itemDic;
+
+        //static void Main()
+        //{
+        //    Interpreter interpreter = new Interpreter();
+        //    interpreter.checkItem((ACDItem)null, false);
+        //}
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Interpreter()
+        {
+            // initialize parser objects
+            scanner = new Scanner();
+            parser = new Parser(scanner);
+            //highlighter = new TextHighlighter(richTextBox, scanner, parser);
+
+            // read configuration file and item files now
+            readConfiguration();
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " _______________________________________");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ___-|: Darkfriend's Item Rules 2 :|-___");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ___________________Rel.-v" + version + "_______");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void readConfiguration()
+        {
+            startTimestamp = DateTime.Now.ToString("ddMMyyyyHHmmss");
+            StreamReader streamReader = new StreamReader(customPath + configFile);
+
+            // initialize or reset ruleSet array
+            ruleSet = new ArrayList();
+            pickUpRuleSet = new ArrayList();
+            List<string> itemFileNames = new List<string>();
+
+            string str;
+            Match match1, match2;
+            while ((str = streamReader.ReadLine()) != null)
+            {
+                str = str.Split(new string[] { "//" }, StringSplitOptions.None)[0].Replace(" ", "").Replace("\t", "");
+                if (str.Length == 0) continue;
+
+                // match files
+
+                match1 = Regex.Match(str, filePattern);
+
+                // match flags
+                match2 = Regex.Match(str, flagPattern);
+
+                if (match1.Success && File.Exists(customPath + match1.Groups[1].Value))
+
+                    itemFileNames.Add(match1.Groups[1].Value);
+
+                else if (match2.Success)
+                {
+                    if (match2.Groups[1].Value.Contains("DEBUG"))
+                        debugFlag = Boolean.Parse(match2.Groups[2].Value);
+                    if (debugFlag) logOut("debug flag ... " + debugFlag, LogType.DEBUG);
+                }
+
+            }
+
+            // parse pickup file
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... reading: " + pickupFile);
+            if (debugFlag) logOut("... reading file: " + pickupFile, LogType.DEBUG);
+            streamReader = new StreamReader(customPath + pickupFile);
+            while ((str = streamReader.ReadLine()) != null)
+            {
+                str = str.Split(new string[] { "//" }, StringSplitOptions.None)[0].Replace(" ", "").Replace("\t", "");
+
+                if (str.Length == 0) continue;
+                pickUpRuleSet.Add(str);
+                if (debugFlag) logOut(pickUpRuleSet.Count + ":" + str, LogType.DEBUG);
+            }
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... loaded: " + pickUpRuleSet.Count + " item pick up rules");
+
+            // parse all item files
+            foreach (string itemFileName in itemFileNames)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... reading: " + itemFileName);
+                if (debugFlag) logOut("... reading file: " + itemFileName, LogType.DEBUG);
+                streamReader = new StreamReader(customPath + itemFileName);
+                while ((str = streamReader.ReadLine()) != null)
+                {
+                    str = str.Split(new string[] { "//" }, StringSplitOptions.None)[0].Replace(" ", "").Replace("\t", "");
+
+                    if (str.Length == 0) continue;
+                    ruleSet.Add(str);
+                    if (debugFlag) logOut(ruleSet.Count + ":" + str, LogType.DEBUG);
+                }
+            }
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... loaded: " + ruleSet.Count + " item rules");
+        }
+
+        public InterpreterAction checkPickUpItem(string name, int level, ItemQuality quality, ItemBaseType itemBaseType, ItemType itemType, bool isOneHand, bool isTwoHand, int gameBalanceID)
+        {
+            fillPickupDic(name, level, quality, itemBaseType, itemType, isOneHand, isTwoHand, gameBalanceID);
+
+            return checkItem(true); 
+        }
+
+        public InterpreterAction checkItem(ACDItem item, bool pickUp)
+        {
+            fillDic(item);
+
+            return checkItem(false);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public InterpreterAction checkItem(bool pickUp)
+        {
+
+            if (debugFlag) logOut(getFullItem(), LogType.DEBUG);
+
+            InterpreterAction action = InterpreterAction.NULL;
+            string validRule = "";
+
+            ArrayList rules;
+            if (pickUp) rules = pickUpRuleSet;
+            else rules = ruleSet;
+
+            foreach (string str in rules)
+            {
+                ParseErrors parseErrors = null;
+
+                // default configuration for positive rules is pickup and keep
+                InterpreterAction tempAction;
+                if (pickUp) tempAction = InterpreterAction.KEEP;
+                else tempAction = InterpreterAction.KEEP;
+
+                string[] strings = str.Split(new string[] { assign }, StringSplitOptions.None);
+                if (strings.Count() > 1)
+                {
+                    tempAction = getInterpreterAction(strings[1]);
+                }
+                try
+                {
+                    if (evaluate(strings[0], out parseErrors))
+                    {
+                        validRule = str;
+                        action = tempAction;
+                        if (debugFlag && parseErrors.Count > 0)
+                            logOut("DEBUG: Have errors with out a catch!"
+                                + lineBreak + "last use rule: " + str
+                                + lineBreak + getParseErrors(parseErrors)
+                                + lineBreak + getFullItem()
+                                + lineBreak, LogType.ERROR);
+                        break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    logOut("ERROR: " + e.Message
+                        + lineBreak + "last use rule: " + str
+                        + lineBreak + getParseErrors(parseErrors)
+                        + lineBreak + getFullItem()
+                        + lineBreak, LogType.ERROR);
+                }
+            }
+
+            if (action == InterpreterAction.TRASH)
+            //if (action == InterpreterAction.TRASH && (debugFlag || item.ItemQualityLevel == ItemQuality.Legendary))
+                logOut(getFullItem() + lineBreak, LogType.TRASH);
+            else if (action == InterpreterAction.KEEP || (!pickUp || debugFlag))
+                if (pickUp)
+                    logOut("PICKUP: " + getItemTag()
+                        + lineBreak + validRule + " [ACTION = " + action + "]"
+                        + lineBreak, LogType.DEBUG);
+                else
+                    logOut(getFullItem()
+                        + lineBreak + validRule + " [ACTION = " + action + "]"
+                        + lineBreak, LogType.LOG);
+
+            return action;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="item"></param>
+        /// <param name="parseErrors"></param>
+        /// <returns></returns>
+        private bool evaluate(string str, out ParseErrors parseErrors)
+        {
+            bool result = false;
+            ItemRules.Core.ParseTree tree = parser.Parse(str);
+            parseErrors = tree.Errors;
+            object obj = tree.Eval(null);
+
+            if (!Boolean.TryParse(obj.ToString(), out result))
+                tree.Errors.Add(new ParseError("TryParse Boolean failed!", 101, 0, 0, 0, 0));
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private InterpreterAction getInterpreterAction(string str)
+        {
+            foreach (InterpreterAction action in Enum.GetValues(typeof(InterpreterAction)))
+                if (str.IndexOf(action.ToString()) != -1)
+                    return action;
+            return InterpreterAction.NULL;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="logType"></param>
+        public void logOut(string str, LogType logType)
+        {
+            // create directory if it doesn't exists
+            if (!Directory.Exists(logPath))
+                Directory.CreateDirectory(logPath);
+
+            log = new StreamWriter(logPath + (logType.ToString().ToLower() + "_" + startTimestamp) + ".txt", true);
+            log.WriteLine(DateTime.Now.ToString("G") + ": " + str);
+            log.Close();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parseErrors"></param>
+        /// <returns></returns>
+        private string getParseErrors(ParseErrors parseErrors)
+        {
+            if (parseErrors == null) return null;
+            string result = "tree.Errors = " + parseErrors.Count() + lineBreak;
+            foreach (ParseError parseError in parseErrors)
+                result += "ParseError( " + parseError.Code + "): " + parseError.Message + lineBreak;
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public string getItemTag(ACDItem item)
+        {
+            if (item == null)
+                return "nullItem";
+
+            return item.Name
+                + "(" + item.Level + ")"
+                + " " + item.ItemQualityLevel
+                + " " + item.ItemBaseType
+                + " " + item.ItemType
+                + " [" + item.GameBalanceId + "]";
+        }
+        public string getItemTag()
+        {
+            return itemDic["[NAME]"]
+                + "(" + itemDic["[LEVEL]"] + ")"
+                + " " + itemDic["[QUALITY]"]
+                + " " + itemDic["[BASETYPE]"]
+                + " " + itemDic["[TYPE]"];
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public string getFullItem(ACDItem item)
+        {
+            // add item info
+            string result = getItemTag(item);
+
+            if (item == null) return result;
+            if (item.IsUnidentified) return result + " (unidentified)";
+
+
+            if (item.ItemType == ItemType.Unknown
+                || item.ItemBaseType == ItemBaseType.Gem
+                || item.ItemBaseType == ItemBaseType.Misc)
+                return result;
+
+            // add stats            
+            result += lineBreak + "+--------------------------------------------------------------";
+            foreach (string key in itemDic.Keys)
+            {
+                object value;
+                if (itemDic.TryGetValue(key, out value))
+                {
+                    if (value is float && (float)value > 0)
+                        result += lineBreak + "| - " + key.ToUpper() + ": " + ((float)value).ToString("0.00");
+                    else if (value is string && (string)value != "")
+                        result += lineBreak + "| - " + key.ToUpper() + ": " + value.ToString();
+                    else if (value is bool)
+                        result += lineBreak + "| - " + key.ToUpper() + ": " + value.ToString();
+                }
+            }
+            result += lineBreak + "+--------------------------------------------------------------";
+            return result;
+        }
+        public string getFullItem()
+        {
+            // add item info
+            string result = getItemTag();
+
+
+            //if (itemDic["[TYPE]"] == ItemType.Unknown.ToString()
+            //    || item.ItemBaseType == ItemBaseType.Gem
+            //    || item.ItemBaseType == ItemBaseType.Misc)
+            //    return result;
+
+            // add stats            
+            result += lineBreak + "+--------------------------------------------------------------";
+            foreach (string key in itemDic.Keys)
+            {
+                object value;
+                if (itemDic.TryGetValue(key, out value))
+                {
+                    if (value is float && (float)value > 0)
+                        result += lineBreak + "| - " + key.ToUpper() + ": " + ((float)value).ToString("0.00");
+                    else if (value is string && (string)value != "")
+                        result += lineBreak + "| - " + key.ToUpper() + ": " + value.ToString();
+                    else if (value is bool)
+                        result += lineBreak + "| - " + key.ToUpper() + ": " + value.ToString();
+                }
+            }
+            result += lineBreak + "+--------------------------------------------------------------";
+            return result;
+        }
+
+        private void fillPickupDic(string name, int level, ItemQuality itemQuality, ItemBaseType itemBaseType, ItemType itemType, bool isOneHand, bool isTwoHand, int balanceId)
+        {
+            object result;
+            itemDic = new Dictionary<string, object>();
+
+            // - BASETYPE ---------------------------------------------------------//
+            itemDic.Add("[BASETYPE]", itemBaseType.ToString());
+
+            // - TYPE -------------------------------------------------------------//
+            // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
+            if (itemType == ItemType.Unknown && name.Contains("Plan"))
+                result = ItemType.CraftingPlan.ToString();
+            else result = itemType.ToString();
+            itemDic.Add("[TYPE]", result);
+
+            // - QUALITY -------------------------------------------------------//
+            // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
+            if ((itemType == ItemType.Unknown && name.Contains("Plan")) || itemType == ItemType.CraftingPlan)
+            {
+                if (name.Contains("ffbf642f"))
+                    result = ItemQuality.Legendary.ToString();
+                else if (name.Contains("Exalted Grand"))
+                    result = ItemQuality.Rare6.ToString();
+                else if (name.Contains("Exalted Fine"))
+                    result = ItemQuality.Rare5.ToString();
+                else if (name.Contains("Exalted"))
+                    result = ItemQuality.Rare4.ToString();
+                else
+                    result = ItemQuality.Normal.ToString();
+            }
+            else
+                result = Regex.Replace(itemQuality.ToString(), @"[\d-]", string.Empty);
+            itemDic.Add("[QUALITY]", result);
+
+            // - NAME -------------------------------------------------------------//
+            if ((itemType == ItemType.Unknown && name.Contains("Plan")) || itemType == ItemType.CraftingPlan)
+            {
+                //{c:ffffff00}Plan: Exalted Fine Doomcaster{/c}
+                itemDic.Add("[NAME]", Regex.Replace(name, @"{[/:a-zA-Z0-9 ]*}", string.Empty).Replace(" ", ""));
+            }
+            else
+                itemDic.Add("[NAME]", name.ToString().Replace(" ", ""));
+
+            // - LEVEL ------------------------------------------------------------//
+            itemDic.Add("[LEVEL]", (float)level);
+            itemDic.Add("[ONEHAND]", isOneHand);
+            itemDic.Add("[TWOHAND]", isTwoHand);
+            itemDic.Add("[UNIDENT]", (bool) true);
+            //itemDic.Add("[GAMEBALANCEID]", (float)item.GameBalanceId);
+        }
+
+        private void fillDic(ACDItem item)
+        {
+            object result;
+            itemDic = new Dictionary<string, object>();
+
+            // test values
+            //itemDic.Add("[O]", (float)0);
+            //itemDic.Add("[I]", (float)1);
+            //itemDic.Add("[IO]", (float)10);
+            //itemDic.Add("[TEST]", "TEST");
+            //itemDic.Add("[TRUE]", true);
+
+            // return if no item available
+            if (item == null)
+            {
+                logOut("We received an item with a null reference!", LogType.ERROR);
+                return;
+            }
+
+            // - BASETYPE ---------------------------------------------------------//
+            itemDic.Add("[BASETYPE]", item.ItemBaseType.ToString());
+
+            // - TYPE -------------------------------------------------------------//
+            // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
+            if (item.ItemType == ItemType.Unknown && item.Name.Contains("Plan"))
+                result = ItemType.CraftingPlan.ToString();
+            else result = item.ItemType.ToString();
+            itemDic.Add("[TYPE]", result);
+
+            // - QUALITY -------------------------------------------------------//
+            // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
+            if ((item.ItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.ItemType == ItemType.CraftingPlan)
+            {
+                if (item.Name.Contains("ffbf642f"))
+                    result = ItemQuality.Legendary.ToString();
+                else if (item.Name.Contains("Exalted Grand"))
+                    result = ItemQuality.Rare6.ToString();
+                else if (item.Name.Contains("Exalted Fine"))
+                    result = ItemQuality.Rare5.ToString();
+                else if (item.Name.Contains("Exalted"))
+                    result = ItemQuality.Rare4.ToString();
+                else
+                    result = ItemQuality.Normal.ToString();
+            }
+            else
+                result = Regex.Replace(item.ItemQualityLevel.ToString(), @"[\d-]", string.Empty);
+            itemDic.Add("[QUALITY]", result);
+
+            // - NAME -------------------------------------------------------------//
+            if ((item.ItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.ItemType == ItemType.CraftingPlan)
+            {
+                //{c:ffffff00}Plan: Exalted Fine Doomcaster{/c}
+                itemDic.Add("[NAME]", Regex.Replace(item.Name, @"{[/:a-zA-Z0-9 ]*}", string.Empty).Replace(" ", ""));
+            }
+            else
+                itemDic.Add("[NAME]", item.Name.ToString().Replace(" ", ""));
+
+            // - LEVEL ------------------------------------------------------------//
+            itemDic.Add("[LEVEL]", (float)item.Level);
+            itemDic.Add("[ONEHAND]", item.IsOneHand);
+            itemDic.Add("[TWOHAND]", item.IsTwoHand);
+            itemDic.Add("[UNIDENT]", item.IsUnidentified);
+
+            // if there are no stats return
+            //if (item.Stats == null) return;
+
+            itemDic.Add("[STR]", item.Stats.Strength);
+            itemDic.Add("[DEX]", item.Stats.Dexterity);
+            itemDic.Add("[INT]", item.Stats.Intelligence);
+            itemDic.Add("[VIT]", item.Stats.Vitality);
+            itemDic.Add("[AS%]", item.Stats.AttackSpeedPercent);
+            itemDic.Add("[MS%]", item.Stats.MovementSpeed);
+            itemDic.Add("[LIFE%]", item.Stats.LifePercent);
+            itemDic.Add("[LS%]", item.Stats.LifeSteal);
+            itemDic.Add("[LOH]", item.Stats.LifeOnHit);
+            itemDic.Add("[REGEN]", item.Stats.HealthPerSecond);
+            itemDic.Add("[GLOBEBONUS]", item.Stats.HealthGlobeBonus);
+            itemDic.Add("[DPS]", item.Stats.WeaponDamagePerSecond);
+            itemDic.Add("[WEAPAS]", item.Stats.WeaponAttacksPerSecond);
+            itemDic.Add("[WEAPMAXDMG]", item.Stats.WeaponMaxDamage);
+            itemDic.Add("[WEAPMINDMG]", item.Stats.WeaponMinDamage);
+            itemDic.Add("[CRIT%]", item.Stats.CritPercent);
+            itemDic.Add("[CRITDMG%]", item.Stats.CritDamagePercent);
+            itemDic.Add("[BLOCK%]", item.Stats.BlockChance);
+            itemDic.Add("[MINDMG]", item.Stats.MinDamage);
+            itemDic.Add("[MAXDMG]", item.Stats.MaxDamage);
+            itemDic.Add("[ALLRES]", item.Stats.ResistAll);
+            itemDic.Add("[RESPHYSICAL]", item.Stats.ResistPhysical);
+            itemDic.Add("[RESFIRE]", item.Stats.ResistFire);
+            itemDic.Add("[RESLIGHTNING]", item.Stats.ResistLightning);
+            itemDic.Add("[RESHOLY]", item.Stats.ResistHoly);
+            itemDic.Add("[RESARCAN]", item.Stats.ResistArcane);
+            itemDic.Add("[RESCOLD]", item.Stats.ResistCold);
+            itemDic.Add("[RESPOISON]", item.Stats.ResistPoison);
+            itemDic.Add("[FIREDMG%]", item.Stats.FireDamagePercent);
+            itemDic.Add("[LIGHTNINGDMG%]", item.Stats.LightningDamagePercent);
+            itemDic.Add("[COLDDMG%]", item.Stats.ColdDamagePercent);
+            itemDic.Add("[POISONDMG%]", item.Stats.PoisonDamagePercent);
+            itemDic.Add("[ARCANEDMG%]", item.Stats.ArcaneDamagePercent);
+            itemDic.Add("[HOLYDMG%]", item.Stats.HolyDamagePercent);
+            itemDic.Add("[ARMOR]", item.Stats.Armor);
+            itemDic.Add("[ARMORBONUS]", item.Stats.ArmorBonus);
+            itemDic.Add("[ARMORTOT]", item.Stats.ArmorTotal);
+            itemDic.Add("[GF%]", item.Stats.GoldFind);
+            itemDic.Add("[MF%]", item.Stats.MagicFind);
+            itemDic.Add("[PICKUP]", item.Stats.PickUpRadius);
+            itemDic.Add("[SOCKETS]", (float)item.Stats.Sockets);
+            itemDic.Add("[THORNS]", item.Stats.Thorns);
+            itemDic.Add("[DMGREDPHYSICAL]", item.Stats.DamageReductionPhysicalPercent);
+            itemDic.Add("[MAXARCPOWER]", item.Stats.MaxArcanePower);
+            itemDic.Add("[HEALTHSPIRIT]", item.Stats.HealthPerSpiritSpent);
+            itemDic.Add("[MAXSPIRIT]", item.Stats.MaxSpirit);
+            itemDic.Add("[SPIRITREG]", item.Stats.SpiritRegen);
+            itemDic.Add("[ARCONCRIT]", item.Stats.ArcaneOnCrit);
+            itemDic.Add("[MAXFURY]", item.Stats.MaxFury);
+            itemDic.Add("[MAXDISCIP]", item.Stats.MaxDiscipline);
+            itemDic.Add("[HATREDREG]", item.Stats.HatredRegen);
+            itemDic.Add("[MAXMANA]", item.Stats.MaxMana);
+            itemDic.Add("[MANAREG]", item.Stats.ManaRegen);
+            itemDic.Add("[MAXSTAT]", new float[] { item.Stats.Strength, item.Stats.Intelligence, item.Stats.Dexterity }.Max());
+            itemDic.Add("[MAXSTATVIT]", new float[] { item.Stats.Strength, item.Stats.Intelligence, item.Stats.Dexterity }.Max() + item.Stats.Vitality);
+            itemDic.Add("[STRVIT]", item.Stats.Strength + item.Stats.Vitality);
+            itemDic.Add("[DEXVIT]", item.Stats.Dexterity + item.Stats.Vitality);
+            itemDic.Add("[INTVIT]", item.Stats.Intelligence + item.Stats.Vitality);
+            itemDic.Add("[MAXONERES]", new float[] { item.Stats.ResistArcane, item.Stats.ResistCold, item.Stats.ResistFire, item.Stats.ResistHoly, item.Stats.ResistLightning, item.Stats.ResistPhysical, item.Stats.ResistPoison }.Max());
+            itemDic.Add("[TOTRES]", item.Stats.ResistArcane + item.Stats.ResistCold + item.Stats.ResistFire + item.Stats.ResistHoly + item.Stats.ResistLightning + item.Stats.ResistPhysical + item.Stats.ResistPoison + item.Stats.ResistAll);
+            itemDic.Add("[DMGFACTOR]", item.Stats.AttackSpeedPercent + item.Stats.CritPercent * 2 + item.Stats.CritDamagePercent / 5 + (item.Stats.MinDamage + item.Stats.MaxDamage) / 20);
+            itemDic.Add("[AVGDMG]", (item.Stats.MinDamage + item.Stats.MaxDamage) / 2);
+
+            float offstats = 0;
+            //if (new float[] { item.Stats.Strength, item.Stats.Intelligence, item.Stats.Dexterity }.Max() > 0)
+            //    offstats += 1;
+            if (item.Stats.CritPercent > 0)
+                offstats += 1;
+            if (item.Stats.CritDamagePercent > 0)
+                offstats += 1;
+            if (item.Stats.AttackSpeedPercent > 0)
+                offstats += 1;
+            if (item.Stats.MinDamage + item.Stats.MaxDamage > 0)
+                offstats += 1;
+            itemDic.Add("[OFFSTATS]", offstats);
+
+            float defstats = 0;
+            //if (item.Stats.Vitality > 0)
+            defstats += 1;
+            if (item.Stats.ResistAll > 0)
+                defstats += 1;
+            if (item.Stats.ArmorBonus > 0)
+                defstats += 1;
+            if (item.Stats.BlockChance > 0)
+                defstats += 1;
+            if (item.Stats.LifePercent > 0)
+                defstats += 1;
+            //if (item.Stats.HealthPerSecond > 0)
+            //    defstats += 1;
+            itemDic.Add("[DEFSTATS]", defstats);
+            //itemDic.Add("[GAMEBALANCEID]", (float)item.GameBalanceId);
+        }
+
+    }
+
+    #endregion Interpreter
+}
+=======
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.IO;
+using System.Collections;
+using Zeta.Internals.Actors;
+using Zeta.Internals;
+using Zeta.Common;
+using System.Reflection;
+using Zeta.CommonBot;
+
+namespace GilesTrinity
+{
+
+    public class Interpreter
+    {
+        string[] strArrayString = new string[] { "[BASETYPE]", "[TYPE]", "[QUALITY]", "[NAME]" };
+
+        string[] strArrayBool = new string[] { "[ONEHAND]", "[TWOHAND]" };
+
+        string[] strArrayFloat = new string[] { "[LEVEL]","[STR]","[DEX]","[INT]","[VIT]","[AS%]","[MS%]","[LIFE%]",
+                                                "[LOH]","[REGEN]","[GLOBEBONUS]","[DPS]", "[WEAPAS]","[WEAPMAXDMG]",
+                                                "[CRIT%]","[CRITDMG%]","[BLOCK%]","[MINDMG]","[MAXDMG]","[ALLRES]",
+                                                "[RESPHYSICAL]","[RESFIRE]","[RESLIGHTNING]","[RESHOLY]","[RESARCAN]",
+                                                "[RESCOLD]","[RESPOISON]","[FIREDMG%]","[LIGHTNINGDMG%]","[COLDDMG%]",
+                                                "[POISONDMG%]","[ARCANEDMG%]","[HOLYDMG%]","[ARMOR]","[ARMORBONUS]",
+                                                "[ARMORTOT]","[GF%]","[MF%]","[PICKUP]","[SOCKETS]","[THORNS]",
+                                                "[MAXARCPOWER]","[HEALTHSPIRIT]","[MAXSPIRIT]","[SPIRITREG]","[ARCONCRIT]",
+                                                "[MAXFURY]","[MAXDISCIP]","[LS%]","[WEAPMINDMG]","[DMGREDPHYSICAL]",
+                                                "[HATREDREG]","[MAXMANA]","[MANAREG]","[MAXSTAT]","[MAXSTATVIT]",
+                                                "[MAXONERES]","[TOTRES]", "[STRVIT]","[DEXVIT]","[INTVIT]",
+                                                "[DMGFACTOR]","[AVGDMG]"};
+
+        public enum LogType { LOG, TRASH, ERROR };
+
+        public enum InterpreterAction { KEEP, TRASH, NULL };
+
+        string[] comparators = new string[] { "==", "!=", "<=", ">=", "<", ">" };
+
+        ArrayList ruleSet;
+
+        GilesCachedACDItem item;
+        GilesItemType truetype;
+        GilesBaseItemType basetype;
+
+        TextWriter log;
+
+        bool debugFlag = false, logFlag = false, trashLogFlag = false;
+
+        string startTimestamp = DateTime.Now.ToString("ddMMyyyyHHmm");
+
+        string customPath;
+
+        string logPath;
+
+
+        public Interpreter()
+        {
+            //init();
+        }
+
+        public void init()
+        {
+            customPath = GilesTrinity.sTrinityPluginPath + @"Specification\";
+            logPath = GilesTrinity.sTrinityPluginPath + @"Log\";
+            ruleSet = new ArrayList();
+
+            string disFileName = "config.dis";
+            StreamReader stream = new StreamReader(customPath + disFileName);
+
+            string str;
+            string[] rule;
+
+            Logging.Write("starting initializing Item Rule Set!");
+
+            logOut("--- STARTING A NEW SESSION WITH ITEMRULESET ---", LogType.LOG);
+            List<string> itemFileNames = new List<string>();
+            while ((str = stream.ReadLine()) != null)
+            {
+                string fileName = "";
+                rule = str.Replace(" ", "").Replace("\t", "").Split(new string[] { "//" }, StringSplitOptions.None);
+                if (rule[0].IndexOf("$$") != -1)
+                {
+                    fileName = interpretConfig(rule[0].Replace("$$", ""));
+                    if (fileName.Length > 0 && fileName.Contains(".dis"))
+                        itemFileNames.Add(fileName);
+                }
+            }
+
+
+            foreach (string itemFileName in itemFileNames)
+            {
+                logOut("... reading file: " + itemFileName, LogType.LOG);
+                readItemFile(new StreamReader(customPath + itemFileName));
+            }
+            logOut("initialized " + ruleSet.Count + " itemrulesets!", LogType.LOG);
+            Logging.Write("initialized " + ruleSet.Count + " itemrulesets!");
+            Logging.Write("finished initializing Item Rule Set!");
+        }
+
+        private void readItemFile(StreamReader stream)
+        {
+            string str;
+            string[] rule;
+
+            while ((str = stream.ReadLine()) != null)
+            {
+                rule = str.Replace(" ", "").Replace("\t", "").Split(new string[] { "//" }, StringSplitOptions.None);
+
+                if (rule[0].IndexOf('#') != -1 && testRule(rule[0]))
+                {
+                    ruleSet.Add(rule[0]);
+                    logOut(ruleSet.Count + ":" + rule[0], LogType.LOG);
+                }
+                else if (rule[0].Length > 0)
+                {
+                    logOut("#WARNING(BAD LINE): " + rule[0], LogType.LOG);
+                }
+            }
+        }
+
+        private bool testRule(string rule)
+        {
+
+            // count test
+            if (rule.Split('(').Length - 1 != rule.Split(')').Length - 1)
+                return false;
+            
+            if (rule.Split('[').Length - 1 != rule.Split(']').Length - 1)
+                return false;
+
+            // syntax null rest test
+            string nullTest = rule;
+            foreach (string str in strArrayString)
+                nullTest = nullTest.Replace(str, "");
+            foreach (string str in strArrayBool)
+                nullTest = nullTest.Replace(str, "");
+            foreach (string str in strArrayFloat)
+                nullTest = nullTest.Replace(str, "");
+            foreach (string str in comparators)
+                nullTest = nullTest.Replace(str, "");
+            nullTest = nullTest.Replace("[1]", "");
+            nullTest = nullTest.Replace("[TEST]", "");
+            nullTest = nullTest.Replace("[TRUE]", "");
+            nullTest = nullTest.Replace("[KEEP]", "");
+            nullTest = nullTest.Replace("[TRASH]", "");
+
+            if (nullTest.Split('[').Length > 1)
+            {
+                logOut(nullTest, LogType.LOG);
+                return false;
+            }
+
+            bool checkFlag = true;
+
+            // logical testing
+            foreach (string str in strArrayString)
+                rule = rule.Replace(str, "[TEST]");
+            foreach (string str in strArrayBool)
+                rule = rule.Replace(str, "[TRUE]");
+            foreach (string str in strArrayFloat)
+                rule = rule.Replace(str, "[0]");
+
+            interpret(rule, ref checkFlag);
+            return checkFlag;
+        }
+
+        private string interpretConfig(string str)
+        {
+            string fileName = "";
+            if (hasComparator(str) != null)
+            {
+                string comparator = hasComparator(str);
+                string[] strings = str.Split(new string[] { comparator }, StringSplitOptions.None);
+                fileName = interpret(strings[0], comparator, strings[1]);
+            }
+            return fileName;
+        }
+
+        private string interpret(string str1, string comparator, string str2)
+        {
+            string fileName = "";
+            switch (str1)
+            {
+                case "[DEBUG]":
+                    debugFlag = Boolean.Parse(str2);
+                    logOut("Debugging set to " + logFlag, LogType.LOG);
+                    break;
+                case "[LOG]":
+                    logFlag = Boolean.Parse(str2);
+                    logOut("Logging set to " + logFlag, LogType.LOG);
+                    break;
+                case "[TRASHLOG]":
+                    trashLogFlag = Boolean.Parse(str2);
+                    logOut("Logging trashed legendarys set to " + logFlag, LogType.LOG);
+                    break;
+                case "[FILE]":
+                    if (File.Exists(customPath + str2))
+                        fileName = str2;
+                    break;
+                default:
+                    break;
+            }
+            return fileName;
+        }
+
+        public InterpreterAction checkItem(GilesCachedACDItem item, GilesItemType thisGilesItemType, GilesBaseItemType thisGilesBaseType)
+        {
+            this.item = item;
+            this.truetype = thisGilesItemType;
+            this.basetype = thisGilesBaseType;
+
+            bool checkFlag = true;
+
+            InterpreterAction action = InterpreterAction.NULL;
+
+            foreach (string str in ruleSet)
+            {
+                action = interpret(str, ref checkFlag);
+
+                if (!checkFlag)
+                {
+                    logOut("#WARNING(RULE): " + str, LogType.LOG);
+                    logItemFullTag(item, LogType.LOG);
+                    return InterpreterAction.NULL;
+                }
+
+                if (action != InterpreterAction.NULL)
+                {
+                    loggingAction(item, action, str);
+                    break;
+                }
+            }
+            return action;
+        }
+
+        private void loggingAction(GilesCachedACDItem item, InterpreterAction action, string rule)
+        {
+            if (trashLogFlag && action == InterpreterAction.TRASH && (item == null || item.Quality == ItemQuality.Legendary))
+            {
+                logOut("-----------------------------------------------------------------", LogType.TRASH);
+                if (item != null) logOut(action.ToString() + ": " + getItemTag(item), LogType.TRASH);
+                logOut("Rule:" + rule, LogType.TRASH);
+                if (item != null) logItemFullTag(item, LogType.TRASH);
+            }
+            else if (logFlag && action == InterpreterAction.KEEP || debugFlag)
+            {
+                logOut("-----------------------------------------------------------------", LogType.LOG);
+                if (item != null) logOut(action.ToString() + ": " + getItemTag(item), LogType.LOG);
+                logOut("Rule:" + rule, LogType.LOG);
+                if (debugFlag)
+                    if (item != null) logItemFullTag(item, LogType.LOG);
+            }
+        }
+
+        private InterpreterAction interpret(string line, ref bool checkFlag)
+        {
+
+            InterpreterAction action = InterpreterAction.KEEP;
+
+            string[] strings = line.Split('#');
+
+            if (strings.Length == 3)
+                action = getInterpreterAction(strings[2]);
+
+            if (checkTruth(strings[0], ref checkFlag) && checkTruth(strings[1], ref checkFlag))
+                return action;
+
+            return InterpreterAction.NULL;
+        }
+
+        private bool checkTruth(string str, ref bool checkFlag)
+        {
+            if (!checkFlag)
+                return false;
+
+            int firstBracket = str.IndexOf(')');
+
+            if (firstBracket != -1)
+            {
+                int closetBracket = str.Substring(0, firstBracket).LastIndexOf('(');
+                string bracketContainer = str.Substring(closetBracket + 1, firstBracket - closetBracket - 1);
+                return checkTruth(str.Replace("(" + bracketContainer + ")", checkTruth(bracketContainer, ref checkFlag).ToString()), ref checkFlag);
+            }
+            else if (str.IndexOf("&&") != -1)
+            {
+                bool result = true;
+                string[] strings = str.Split(new string[] { "&&" }, StringSplitOptions.None);
+                foreach (string hold in strings)
+                    result &= checkTruth(hold, ref checkFlag);
+                return result;
+            }
+            else if (str.IndexOf("||") != -1)
+            {
+                bool result = false;
+                string[] strings = str.Split(new string[] { "||" }, StringSplitOptions.None);
+                foreach (string hold in strings)
+                    result |= checkTruth(hold, ref checkFlag);
+                return result;
+            }
+            else if (hasComparator(str) != null)
+            {
+                string comparator = hasComparator(str);
+                string[] strings = str.Split(new string[] { comparator }, StringSplitOptions.None);
+                return checkExpression(strings[0], comparator, strings[1], ref checkFlag);
+            }
+            else if (str == "True")
+                return true;
+            else if (str == "False")
+                return false;
+
+            checkFlag = false;
+            return false;
+        }
+
+        private bool compare(string str1, string comparator, string str2, ref bool checkFlag)
+        {
+            switch (comparator)
+            {
+                case "==":
+                    return str1 == str2;
+                case "!=":
+                    return str1 != str2;
+                default:
+                    checkFlag = false;
+                    return false;
+            }
+        }
+
+        private bool compare(bool bool1, string comparator, bool bool2, ref bool checkFlag)
+        {
+            switch (comparator)
+            {
+                case "==":
+                    return bool1 == bool2;
+                case "!=":
+                    return bool1 != bool2;
+                default:
+                    checkFlag = false;
+                    return false;
+            }
+        }
+
+        private bool compare(float float1, string comparator, float float2, ref bool checkFlag)
+        {
+            switch (comparator)
+            {
+                case "<":
+                    return float1 < float2;
+                case "<=":
+                    return float1 <= float2;
+                case ">":
+                    return float1 > float2;
+                case ">=":
+                    return float1 >= float2;
+                case "==":
+                    return float1 == float2;
+                case "!=":
+                    return float1 != float2;
+                default:
+                    checkFlag = false;
+                    return false;
+            }
+        }
+
+        private InterpreterAction getInterpreterAction(string str)
+        {
+            foreach (InterpreterAction action in Enum.GetValues(typeof(InterpreterAction)))
+                if (str.IndexOf(action.ToString()) != -1)
+                    return action;
+            return InterpreterAction.NULL;
+        }
+
+        private string hasComparator(string str)
+        {
+            foreach (string comparator in comparators)
+                if (str.IndexOf(comparator) != -1)
+                    return comparator;
+            return null;
+        }
+
+        private Object getValueFromString(string str, ref bool checkFlag)
+        {
+            switch (str)
+            {
+                case "[BASETYPE]":
+                    return basetype.ToString();
+                case "[TYPE]":
+                    return truetype.ToString();
+                case "[QUALITY]":
+                   return Regex.Replace(item.Quality.ToString(), @"[\d-]", string.Empty);
+                case "[NAME]":
+                    return item.RealName.ToString().Replace(" ","");
+                case "[LEVEL]":
+                    return item.Level;
+                case "[ONEHAND]":
+                    return item.OneHanded;
+                case "[TWOHAND]":
+                    return item.TwoHanded;
+                case "[STR]":
+                    return item.Strength;
+                case "[DEX]":
+                    return item.Dexterity;
+                case "[INT]":
+                    return item.Intelligence;
+                case "[VIT]":
+                    return item.Vitality;
+                case "[AS%]":
+                    return item.AttackSpeedPercent;
+                case "[MS%]":
+                    return item.MovementSpeed;
+
+                case "[LIFE%]":
+                    return item.LifePercent;
+                case "[LS%]":
+                    return item.LifeSteal;
+                case "[LOH]":
+                    return item.LifeOnHit;
+                case "[REGEN]":
+                    return item.HealthPerSecond;
+                case "[GLOBEBONUS]":
+                    return item.HealthGlobeBonus;
+
+                case "[DPS]":
+                    return item.WeaponDamagePerSecond;
+                case "[WEAPAS]":
+                    return item.WeaponAttacksPerSecond;
+                case "[WEAPMAXDMG]":
+                    return item.WeaponMaxDamage;
+                case "[WEAPMINDMG]":
+                    return item.WeaponMinDamage;
+                case "[CRIT%]":
+                    return item.CritPercent;
+                case "[CRITDMG%]":
+                    return item.CritDamagePercent;
+                case "[BLOCK%]":
+                    return item.BlockChance;
+                case "[MINDMG]":
+                    return item.MinDamage;
+                case "[MAXDMG]":
+                    return item.MaxDamage;
+
+                case "[ALLRES]":
+                    return item.ResistAll;
+                case "[RESPHYSICAL]":
+                    return item.ResistPhysical;
+                case "[RESFIRE]":
+                    return item.ResistFire;
+                case "[RESLIGHTNING]":
+                    return item.ResistLightning;
+                case "[RESHOLY]":
+                    return item.ResistHoly;
+                case "[RESARCAN]":
+                    return item.ResistArcane;
+                case "[RESCOLD]":
+                    return item.ResistCold;
+                case "[RESPOISON]":
+                    return item.ResistPoison;
+
+                case "[FIREDMG%]":
+                    return item.FireDamagePercent;
+                case "[LIGHTNINGDMG%]":
+                    return item.LightningDamagePercent;
+                case "[COLDDMG%]":
+                    return item.ColdDamagePercent;
+                case "[POISONDMG%]":
+                    return item.PoisonDamagePercent;
+                case "[ARCANEDMG%]":
+                    return item.ArcaneDamagePercent;
+                case "[HOLYDMG%]":
+                    return item.HolyDamagePercent;
+                case "[ARMOR]":
+                    return item.Armor;
+                case "[ARMORBONUS]":
+                    return item.ArmorBonus;
+                case "[ARMORTOT]":
+                    return item.ArmorTotal;
+                case "[GF%]":
+                    return item.GoldFind;
+                case "[MF%]":
+                    return item.MagicFind;
+                case "[PICKUP]":
+                    return item.PickUpRadius;
+
+                case "[SOCKETS]":
+                    return item.Sockets;
+                case "[THORNS]":
+                    return item.Thorns;
+                case "[DMGREDPHYSICAL]":
+                    return item.DamageReductionPhysicalPercent;
+
+                case "[MAXARCPOWER]":
+                    return item.MaxArcanePower;
+                case "[HEALTHSPIRIT]":
+                    return item.HealthPerSpiritSpent;
+                case "[MAXSPIRIT]":
+                    return item.MaxSpirit;
+                case "[SPIRITREG]":
+                    return item.SpiritRegen;
+                case "[ARCONCRIT]":
+                    return item.ArcaneOnCrit;
+                case "[MAXFURY]":
+                    return item.MaxFury;
+                case "[MAXDISCIP]":
+                    return item.MaxDiscipline;
+                case "[HATREDREG]":
+                    return item.HatredRegen;
+                case "[MAXMANA]":
+                    return item.MaxMana;
+                case "[MANAREG]":
+                    return item.ManaRegen;
+
+                /* ---------------------- *
+                 * SPECIAL FUNCTIONS      *
+                 * ---------------------- */
+                case "[MAXSTAT]":
+                    return new float[] { item.Strength, item.Intelligence, item.Dexterity }.Max();
+                case "[MAXSTATVIT]":
+                    return new float[] { item.Strength, item.Intelligence, item.Dexterity }.Max() + item.Vitality;
+                case "[MAXONERES]":
+                    return new float[] { item.ResistArcane, item.ResistCold, item.ResistFire, item.ResistHoly, item.ResistLightning, item.ResistPhysical, item.ResistPoison }.Max();
+                
+                case "[TOTRES]":
+                    return item.ResistArcane + item.ResistCold + item.ResistFire + item.ResistHoly + item.ResistLightning + item.ResistPhysical + item.ResistPoison + item.ResistAll;
+                case "[DMGFACTOR]":
+                    return item.AttackSpeedPercent / 2 + item.CritPercent * 2 + item.CritDamagePercent / 5 + (item.MinDamage + item.MaxDamage) / 20;
+                
+                case "[STRVIT]":
+                    return item.Strength + item.Vitality;
+                case "[DEXVIT]":
+                    return item.Dexterity + item.Vitality;
+                case "[INTVIT]":
+                    return item.Intelligence + item.Vitality;
+
+                case "[AVGDMG]":
+                    return (item.MinDamage + item.MaxDamage)/2;
+
+                case "[0]":
+                    return 0;
+                case "[1]":
+                    return 1;
+                case "[TEST]":
+                    return "Test";
+                case "[TRUE]":
+                    return true;
+
+                default:
+                    checkFlag = false;
+                    return null;
+            }
+
+        }
+
+        private bool checkExpression(string str1, string comparator, string str2, ref bool checkFlag)
+        {
+            Object value = getValueFromString(str1, ref checkFlag);
+
+            if (!checkFlag)
+                return false;
+
+            switch (value.GetType().Name)
+            {
+                case "String":
+                    return compare((string)value, comparator, str2, ref checkFlag);
+                case "Boolean":
+                    return compare((bool)value, comparator, Boolean.Parse(str2), ref checkFlag);
+                case "Int32":
+                    return compare((int)value, comparator, Int32.Parse(str2), ref checkFlag);
+                case "Single":
+                    return compare((float)value, comparator, Single.Parse(str2), ref checkFlag);
+                default:
+                    checkFlag = false;
+                    return false;
+            }
+        }
+
+        public void logOut(string str, LogType logType)
+        {
+            log = new StreamWriter(logPath + (logType.ToString().ToLower() + "_" + startTimestamp) + ".txt", true);
+            log.WriteLine(DateTime.Now.ToString("G") + ": " + str);
+            log.Close();
+        }
+
+        public string getItemTag(GilesCachedACDItem item)
+        {
+            if (item == null)
+                return "nullItem";
+            else
+                return item.RealName + "," + item.Quality + "," + truetype + " (" + item.Level + ") " + item.BalanceID;
+        }
+
+        public void logItemFullTag(GilesCachedACDItem item, LogType logType)
+        {
+            bool checkFlag = true;
+            logOut("---" + getItemTag(item), logType);
+            foreach (string str in strArrayString)
+            {
+                Object obj = getValueFromString(str, ref checkFlag);
+                if (obj.GetType().Name == "String")
+                    logOut("\t" + str + ": " + (string)obj, logType);
+                else
+                    logOut("INFO " + obj.GetType().Name + " strArrayString", logType);
+            }
+            foreach (string str in strArrayBool)
+            {
+                Object obj = getValueFromString(str, ref checkFlag);
+                if (obj.GetType().Name == "Boolean")
+                    logOut("\t" + str + ": " + (bool)obj, logType);
+                else
+                    logOut("INFO: " + obj.GetType().Name + " strArrayBool", logType);
+            }
+            foreach (string str in strArrayFloat)
+            {
+                Object obj = getValueFromString(str, ref checkFlag);
+                if (obj.GetType().Name == "Single")
+                {
+                    float hold = (float) obj;
+                    if (hold > 0)
+                        logOut("\t" + str + ": " + hold, logType);
+                }
+                else if (obj.GetType().Name == "Int32")
+                {
+                    int hold = (int)obj;
+                    if (hold > 0)
+                        logOut("\t" + str + ": " + hold, logType);
+                }
+                else
+                    logOut("INFO " + obj.GetType().Name + " strArrayFloat", logType);
+            }
+        }
+    }
+}
+>>>>>>> 4eea1b37d1a71efd6b6a7c661cf477d57e606378

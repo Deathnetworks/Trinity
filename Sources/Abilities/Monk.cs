@@ -10,8 +10,13 @@ namespace GilesTrinity
     {
         private static GilesPower GetMonkPower(bool bCurrentlyAvoiding, bool bOOCBuff, bool bDestructiblePower)
         {
-            if (weaponSwap.DpsGearOn() && GilesHasBuff(SNOPower.Monk_SweepingWind) && Settings.Combat.Monk.SweepingWindWeaponSwap && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800)
-                weaponSwap.SwapGear();
+			if (!bOOCBuff && GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds <= 4000 && !playerStatus.IsIncapacitated &&
+				iAnythingWithinRange[RANGE_15] >= 1 && CurrentTarget.RadiusDistance <= 10f)
+			{
+				SweepWindSpam = DateTime.Now;
+			}
+			if (weaponSwap.DpsGearOn() && GilesHasBuff(SNOPower.Monk_SweepingWind) && Settings.Combat.Monk.SweepingWindWeaponSwap && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800)
+				weaponSwap.SwapGear();
 
             // Pick the best destructible power available
             if (bDestructiblePower)
@@ -85,12 +90,13 @@ namespace GilesTrinity
                 playerStatus.CurrentHealthPct <= 0.25) &&
                 GilesUseTimer(SNOPower.Monk_BlindingFlash) && PowerManager.CanCast(SNOPower.Monk_BlindingFlash))
             {
-                if (!weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && !GilesHasBuff(SNOPower.Monk_SweepingWind))
+                if (!weaponSwap.DpsGearOn() && weaponSwap.CanSwap() && Settings.Combat.Monk.SweepingWindWeaponSwap && !GilesHasBuff(SNOPower.Monk_SweepingWind))
                 {
                     weaponSwap.SwapGear();
                     WeaponSwapTime = DateTime.Now;
                 }
-                if (!(weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds <= 100 && !GilesHasBuff(SNOPower.Monk_SweepingWind)))
+                if (weaponSwap.DpsGearOn() && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && 
+					!GilesHasBuff(SNOPower.Monk_SweepingWind) || !Settings.Combat.Monk.SweepingWindWeaponSwap)
                     return new GilesPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 11f -- 1, 2
             }
             // Blinding Flash as a DEFENSE
@@ -114,12 +120,12 @@ namespace GilesTrinity
                 // Check the re-use timer and energy costs
                 (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5)))
             {
-                if (!weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap)
+                if (!weaponSwap.DpsGearOn() && weaponSwap.CanSwap() && Settings.Combat.Monk.SweepingWindWeaponSwap && !GilesHasBuff(SNOPower.Monk_SweepingWind))
                 {
                     weaponSwap.SwapGear();
                     WeaponSwapTime = DateTime.Now;
                 }
-                if (!(weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds <= 200) || !Settings.Combat.Monk.SweepingWindWeaponSwap)
+                if (!(weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds <= 400))
                 {
                     SweepWindSpam = DateTime.Now;
                     return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 2,2
@@ -128,7 +134,7 @@ namespace GilesTrinity
             // Sweeping wind: spam it if inna set
             //intell -- inna
             if (hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && Settings.Combat.Monk.HasInnaSet && GilesHasBuff(SNOPower.Monk_SweepingWind) &&
-                playerStatus.CurrentEnergy >= 5 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 4950 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5950)
+                playerStatus.CurrentEnergy >= 5 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3900 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
             {
                 SweepWindSpam = DateTime.Now;
                 return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);

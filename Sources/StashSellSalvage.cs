@@ -48,6 +48,10 @@ namespace GilesTrinity
                     return true;
                 case GBaseItemType.Gem:
                 case GBaseItemType.Misc:
+                    if (thisGilesItemType == GItemType.CraftingPlan)
+                        return true;
+                    else
+                        return false;
                 case GBaseItemType.Unknown:
                     return false;
             }

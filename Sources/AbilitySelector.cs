@@ -1,4 +1,5 @@
-﻿using Zeta.Common.Plugins;
+﻿using System;
+using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
 namespace GilesTrinity
 {
@@ -34,8 +35,26 @@ namespace GilesTrinity
 
                 // Monks
                 case ActorClass.Monk: 
-                    return GetMonkPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
-
+				{
+					if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && 
+						DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind) &&
+						GilesUseTimer(SNOPower.Monk_BlindingFlash) && playerStatus.CurrentEnergy >= 15)
+					{
+						return new GilesPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
+					}
+					else if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && 
+						DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400 && !GilesHasBuff(SNOPower.Monk_SweepingWind)) {
+						SweepWindSpam = DateTime.Now;
+						return new GilesPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
+					}
+					else if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && (GilesHasBuff(SNOPower.Monk_SweepingWind) &&
+							DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 3000))
+					{
+						weaponSwap.SwapGear();
+					}
+					return GetMonkPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
+				}
+				
                 // Wizards
                 case ActorClass.Wizard: 
                     return GetWizardPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
