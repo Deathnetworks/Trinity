@@ -134,6 +134,8 @@ namespace GilesTrinity
             //{256508, 2999}, {256187, 1899},
             // Uber Bosses - Ghom {256709} & Rakanot {256711}
             {256709, 2999}, {256711, 1899},
+            // Iron Gates
+            {54908, 100},
          };
         /// <summary>
         /// A list of all known SNO's of treasure goblins/bandits etc.
@@ -201,7 +203,7 @@ namespace GilesTrinity
             // rrrix act 3
             60108,
             // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
-            263014, 54908,
+            263014, 
          };
         // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
         internal static HashSet<int> hashMysticAlly = new HashSet<int> { 169123, 123885, 169890, 168878, 169891, 169077, 169904, 169907, 169906, 169908, 169905, 169909 };
@@ -293,7 +295,7 @@ namespace GilesTrinity
             //trOut_Leor_painting
             217285,
             // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
-            263014, 54908,
+            263014, 
       };
 
         /// <summary>

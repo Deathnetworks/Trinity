@@ -449,6 +449,7 @@ namespace GilesTrinity
                             // We're standing on the damn thing... open it!!
                             if (cacheObject.RadiusDistance <= 12f)
                                 cacheObject.Weight += 250000d;
+
                             break;
                         }
                     case GObjectType.Destructible:
@@ -513,6 +514,10 @@ namespace GilesTrinity
                             // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
                             if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
                                 cacheObject.Weight = 1;
+
+                            if (bAnyMobsInCloseRange || CurrentTarget.IsBossOrEliteRareUnique)
+                                cacheObject.Weight = 1;
+
                             break;
                         }
                     case GObjectType.Container:
