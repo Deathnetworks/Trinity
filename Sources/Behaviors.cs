@@ -61,7 +61,7 @@ namespace GilesTrinity
 
         private static RunStatus PausedAction(object ret)
         {
-            return bMainBotPaused ? RunStatus.Running: RunStatus.Success;
+            return bMainBotPaused ? RunStatus.Running : RunStatus.Success;
         }
 
         private enum HandlerRunStatus
@@ -109,6 +109,13 @@ namespace GilesTrinity
                     GilesPlayerMover.vSafeMovementLocation = Vector3.Zero;
                     GilesPlayerMover.timeLastRecordedPosition = DateTime.Now;
 
+                    using (ZetaDia.Memory.AcquireFrame())
+                    {
+                        // Update player-data cache
+                        UpdateCachedPlayerData();
+                    }
+
+
                     // Whether we should refresh the target list or not
                     // See if we should update hotbar abilities
                     if (bRefreshHotbarAbilities)
@@ -126,9 +133,6 @@ namespace GilesTrinity
                             bWaitingAfterPower = false;
                         return RunStatus.Running;
                     }
-
-                    // Update player-data cache
-                    UpdateCachedPlayerData();
 
                     // Check for death / player being dead
                     if (playerStatus.CurrentHealthPct <= 0)
@@ -1176,19 +1180,26 @@ namespace GilesTrinity
                 // * Item - need to get within 6 feet and then interact with it
                 case GObjectType.Item:
                     {
-                        fRangeRequired = 5f;
-                        // If we're having stuck issues, try forcing us to get closer to this item
-                        if (ForceCloseRangeTarget)
-                            fRangeRequired -= 1f;
-                        // Try and randomize the distances required if we have problems looting this
-                        if (IgnoreRactorGUID == CurrentTarget.RActorGuid)
-                        {
-                            Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
-                            fRangeRequired = (rndNum.Next(5)) + 2f;
-                        }
-                        // Treat the distance as closer if the X & Y distance are almost point-blank, for items
-                        if (fDistanceToDestination <= 1.5f)
-                            fDistanceReduction += 1f;
+                        fRangeRequired = 6f;
+
+
+                        /*
+                         * rrrix disabled this. 6 yards to radius is 6 yards to radius, why make it so complicated? 
+                         * 
+                         */
+                        //// If we're having stuck issues, try forcing us to get closer to this item
+                        //if (ForceCloseRangeTarget)
+                        //    fRangeRequired -= 1f;
+                        //// Try and randomize the distances required if we have problems looting this
+                        //if (IgnoreRactorGUID == CurrentTarget.RActorGuid)
+                        //{
+                        //    Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
+                        //    fRangeRequired = (rndNum.Next(5)) + 2f;
+                        //}
+                        //// Treat the distance as closer if the X & Y distance are almost point-blank, for items
+                        //if (fDistanceToDestination <= 1.5f)
+                        //    fDistanceReduction += 1f;
+
                         break;
                     }
                 // * Gold - need to get within pickup radius only

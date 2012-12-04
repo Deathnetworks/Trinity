@@ -40,39 +40,39 @@ namespace GilesTrinity
                 if (pf == null)
                     pf = new PathFinder(gp);
 
-                CacheRefresher.RefreshAll();
+                // Refresh World Objects
+                //CacheRefresher.RefreshAll();
 
+                // Refresh Player, Backpack, Stash
                 using (ZetaDia.Memory.AcquireFrame())
                 {
+
                     ZetaDia.Actors.Update();
-                    foreach (ACDItem item in Me.Inventory.Backpack)
-                    {
-                        CacheManager.GetObject(item);
-                    }
-                    try
-                    {
-                        foreach (ACDItem item in Me.Inventory.StashItems)
-                        {
-                            CacheManager.GetObject(item);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine(ex);
-                    }
+
+                    // Update player-data cache
+                    UpdateCachedPlayerData();
+
+                    //foreach (ACDItem item in Me.Inventory.Backpack)
+                    //{
+                    //    CacheManager.GetObject(item);
+                    //}
+                    //try
+                    //{
+                    //    foreach (ACDItem item in Me.Inventory.StashItems)
+                    //    {
+                    //        CacheManager.GetObject(item);
+                    //    }
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    System.Diagnostics.Debug.WriteLine(ex);
+                    //}
                 }
-
-                // World ID safety caching incase it's ever unavailable
-                if (ZetaDia.CurrentWorldDynamicId != -1)
-                    iCurrentWorldID = ZetaDia.CurrentWorldDynamicId;
-                // Game difficulty, used really for vault on DH's
-                if (ZetaDia.Service.CurrentHero.CurrentDifficulty != GameDifficulty.Invalid)
-                    iCurrentGameDifficulty = ZetaDia.Service.CurrentHero.CurrentDifficulty;
-
-
 
                 // Refresh player buffs (to check for archon)
                 GilesRefreshBuffs();
+
+
                 // Store all of the player's abilities every now and then, to keep it cached and handy, also check for critical-mass timer changes etc.
                 iCombatLoops++;
                 if (!bMappedPlayerAbilities || iCombatLoops >= 50 || bRefreshHotbarAbilities)
@@ -81,7 +81,7 @@ namespace GilesTrinity
                     ActorClass tempClass = ActorClass.Invalid;
                     try
                     {
-                        tempClass = ZetaDia.Actors.Me.ActorClass;
+                        tempClass = playerStatus.ActorClass;
                     }
                     catch
                     {
@@ -183,8 +183,8 @@ namespace GilesTrinity
                 // So, do we want a new target or not?
                 if (bShouldRefreshDiaObjects)
                 {
-                    // Update player data
-                    UpdateCachedPlayerData();
+                    //// Update player data
+                    //UpdateCachedPlayerData();
                     // Check for death / player being dead
                     if (playerStatus.CurrentHealthPct <= 0)
                     {

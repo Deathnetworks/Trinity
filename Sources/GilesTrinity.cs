@@ -16,7 +16,7 @@ namespace GilesTrinity
     public partial class GilesTrinity : IPlugin
     {
         /// <summary>
-        /// Update the cached data on the player status - health, location etc.
+        /// Update the cached data on the player status - health, location etc. This must be called with a Framelock!
         /// </summary>
         private static void UpdateCachedPlayerData()
         {
@@ -28,6 +28,7 @@ namespace GilesTrinity
             var me = ZetaDia.Me;
             if (me == null)
                 return;
+
             try
             {
                 playerStatus.LastUpdated = DateTime.Now;
@@ -48,6 +49,13 @@ namespace GilesTrinity
                 playerStatus.Level = me.Level;
                 playerStatus.ActorClass = me.ActorClass;
                 playerStatus.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
+
+                // World ID safety caching incase it's ever unavailable
+                if (ZetaDia.CurrentWorldDynamicId != -1)
+                    iCurrentWorldID = ZetaDia.CurrentWorldDynamicId;
+                // Game difficulty, used really for vault on DH's
+                if (ZetaDia.Service.CurrentHero.CurrentDifficulty != GameDifficulty.Invalid)
+                    iCurrentGameDifficulty = ZetaDia.Service.CurrentHero.CurrentDifficulty;
             }
             catch (Exception ex)
             {

@@ -596,7 +596,7 @@ namespace GilesTrinity
             }
 
             // Loop through all the objects and give them a weight
-            if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0)
+            if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.RActorGuid != CurrentTargetRactorGUID)
             {
                 DbHelper.Log(TrinityLogLevel.Verbose, 
                                 LogCategory.Targetting, 

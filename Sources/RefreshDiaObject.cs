@@ -1455,6 +1455,7 @@ namespace GilesTrinity
                         if (c_RadiusDistance <= 2f)
                         {
                             AddToCache = true;
+                            c_IgnoreSubStep = "";
                         }
 
                         // special mojo for whitelists

@@ -32,18 +32,13 @@ namespace GilesTrinity
 
                 switch (action)
                 {
-                    case Interpreter.InterpreterAction.KEEP:
-                        return true;
-
-                    case Interpreter.InterpreterAction.IGNORE:
-                        return false;
-
-                    default:
-                        break;
+                    case Interpreter.InterpreterAction.IGNORE: return false;
+                    case Interpreter.InterpreterAction.PICKUP: return true;
+                    default: break;
                 }
             }
 
-            return GilesPickupItemValidation(item.Name, item.Level, item.ItemQualityLevel, item.GameBalanceId, item.ItemType, item.FollowerSpecialType, item.DynamicId);
+            return GilesPickupItemValidation(item.InternalName, item.Level, item.ItemQualityLevel, item.GameBalanceId, item.ItemType, item.FollowerSpecialType, item.DynamicId);
         }
 
         /// <summary>
@@ -59,7 +54,6 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool GilesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemType dbItemType, FollowerType followerType, int dynamicID = 0)
         {
-
             // If it's legendary, we always want it *IF* it's level is right
             if (quality >= ItemQuality.Legendary)
             {
@@ -550,7 +544,7 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return false;
             }
-            
+
             // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
             if (thisitem.IsUnidentified)
             {
@@ -671,7 +665,7 @@ namespace GilesTrinity
         internal static void OutputReport()
         {
             TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
-            
+
             // Create whole new file
             FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("Stats - {0}.log", playerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read);
             using (StreamWriter LogWriter = new StreamWriter(LogStream))

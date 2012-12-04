@@ -294,8 +294,8 @@ namespace GilesTrinity
 
                     var refreshSource =
                     from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                    where o.IsValid
-                    orderby o.ActorType, o.Distance
+                    //where o.IsValid
+                    //orderby o.ActorType, o.Distance
                     select o;
 
                     Stopwatch t1 = new Stopwatch();
@@ -338,16 +338,16 @@ namespace GilesTrinity
                                 double duration = t1.Elapsed.TotalMilliseconds;
 
                                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement,
-                                    "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}){7} Dist2Mid: {8:0} Dist2Rad: {9:0} ZDiff: {10:0} Radius: {11}",
+                                    "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12}",
                                     duration,
                                     (AddToCache ? "Added  " : " Ignored"),
                                     (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
-                                    (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
-                                    c_ObjectType,
                                     c_diaObject.ActorType,
+                                    c_ObjectType,
                                     c_Name,
                                     c_ActorSNO,
                                     (c_unit_IsBoss ? " IsBoss" : ""),
+                                    (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
                                     c_CentreDistance,
                                     c_RadiusDistance,
                                     c_ZDiff,
