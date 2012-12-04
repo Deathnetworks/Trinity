@@ -1255,9 +1255,9 @@ namespace GilesTrinity
                             GizmoUsed = currentAnimation.EndsWith("open") || currentAnimation.EndsWith("opening");
 
                             // special hax for A3 Iron Gates
-                            if (currentAnimation.Contains("IronGate") && currentAnimation.Contains("Open"))
+                            if (currentAnimation.Contains("irongate") && currentAnimation.Contains("open"))
                                 GizmoUsed = false;
-                            if (currentAnimation.Contains("IronGate") && currentAnimation.Contains("idle"))
+                            if (currentAnimation.Contains("irongate") && currentAnimation.Contains("idle"))
                                 GizmoUsed = true;
                         }
                         catch { }
