@@ -305,7 +305,7 @@ namespace GilesTrinity
             }
 
             // hax for fuimusbruce's horadric hamburger
-            if (name.StartsWith("offHand_"))
+            if (name.StartsWith("offhand_"))
             {
                 return GItemType.Dagger;
             }
