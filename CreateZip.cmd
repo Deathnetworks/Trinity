@@ -9,6 +9,8 @@ PAUSE
 REM Clean Directory
 rd /S /Q "Sources\bin"
 rd /S /Q "Sources\obj"
+rd /S /Q "Sources\Logs"
+del /S /Q "Sources\ItemRules\Log\*"
 
 REM Clean Old Zip file
 del Latest-GilesTrinity.zip
