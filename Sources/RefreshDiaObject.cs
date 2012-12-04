@@ -61,6 +61,10 @@ namespace GilesTrinity
             AddToCache = RefreshStepCachedObjectType(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedObjectType"; return AddToCache; }
 
+            // Summons by the player 
+            AddToCache = RefreshStepCachedPlayerSummons(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
+
             // Check Blacklists
             AddToCache = RefreshStepCheckBlacklists(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CheckBlacklists"; return AddToCache; }
@@ -84,9 +88,6 @@ namespace GilesTrinity
             AddToCache = RefreshStepCachedDynamicIds(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedDynamicIds"; return AddToCache; }
 
-            // Summons by the player 
-            AddToCache = RefreshStepCachedPlayerSummons(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
 
             /* 
              * Main Switch on Object Type - Refresh individual object types (Units, Items, Gizmos)
