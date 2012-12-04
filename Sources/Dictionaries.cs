@@ -134,8 +134,6 @@ namespace GilesTrinity
             //{256508, 2999}, {256187, 1899},
             // Uber Bosses - Ghom {256709} & Rakanot {256711}
             {256709, 2999}, {256711, 1899},
-            // Iron Gates
-            {54908, 100},
          };
         /// <summary>
         /// A list of all known SNO's of treasure goblins/bandits etc.
@@ -221,7 +219,7 @@ namespace GilesTrinity
          };
         // Interactable whitelist - things that need interacting with like special wheels, levers - they will be blacklisted for 30 seconds after one-use
         internal static HashSet<int> hashSNOInteractWhitelist = new HashSet<int> {
-            54908, 56686, 54850,
+            56686, 54850,
             211999, 52685, 54882,  180575,
          };
         /// <summary>
@@ -229,7 +227,7 @@ namespace GilesTrinity
         /// BEFORE trying to actually "click it". Certain objects need you to get very close, so it's worth having them listed with low interact ranges
         /// </summary>
         internal static Dictionary<int, int> dictInteractableRange = new Dictionary<int, int> {
-            {56686, 4}, {52685, 4}, {54850, 14},  {54882, 40}, {54908, 4}, {3349, 25}, {225270, 35}, {180575, 10}
+            {56686, 4}, {52685, 4}, {54850, 14},  {54882, 40}, {3349, 25}, {225270, 35}, {180575, 10}
          };
         /// <summary>
         /// Navigation obstacles for standard navigation down dungeons etc. to help DB movement
@@ -242,7 +240,7 @@ namespace GilesTrinity
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 10}, {191459, 13}, {54908, 10}, {104632, 20},
+            {174900, 10}, {191459, 13}, {104632, 20},
          };
         /// <summary>
         /// Destructible things that are very large and need breaking at a bigger distance - eg logstacks, large crates, carts, etc.
