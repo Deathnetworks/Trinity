@@ -40,7 +40,7 @@ namespace GilesTrinity.Cache
             Type = GObjectType.Unknown;
             CacheType = Cache.CacheType.Other;
             LastAccessDate = DateTime.UtcNow;
-            LastRefreshDate = DateTime.Now;
+            LastRefreshDate = DateTime.UtcNow;
             Name = acd.Name;
             ActorSNO = acd.ActorSNO;
             DynamicID = acd.DynamicId;

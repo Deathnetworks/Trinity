@@ -294,7 +294,7 @@ namespace GilesTrinity
                 FileStream LogStream = null;
                 try
                 {
-                    LogStream = File.Open(sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - StashLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
+                    LogStream = File.Open(Path.Combine(FileManager.LoggingPath,"StashLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
                         LogWriter.WriteLine("");
                     LogStream.Close();
@@ -791,7 +791,7 @@ namespace GilesTrinity
                 FileStream LogStream = null;
                 try
                 {
-                    LogStream = File.Open(sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
+                    LogStream = File.Open(Path.Combine(FileManager.LoggingPath,"JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
                         LogWriter.WriteLine("");
                     LogStream.Close();
@@ -1123,7 +1123,7 @@ namespace GilesTrinity
                 FileStream LogStream = null;
                 try
                 {
-                    LogStream = File.Open(sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
+                    LogStream = File.Open(Path.Combine(FileManager.LoggingPath,"JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
                         LogWriter.WriteLine("");
                     LogStream.Close();
@@ -1182,7 +1182,7 @@ namespace GilesTrinity
             FileStream LogStream = null;
             try
             {
-                LogStream = File.Open(sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - StashLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
+                LogStream = File.Open(Path.Combine(FileManager.LoggingPath,"StashLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
 
                 //TODO : Change File Log writing
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
@@ -1254,7 +1254,7 @@ namespace GilesTrinity
             FileStream LogStream = null;
             try
             {
-                LogStream = File.Open(sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
+                LogStream = File.Open(Path.Combine(FileManager.LoggingPath,"JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
                 {
                     if (!loggedJunkThisStash)

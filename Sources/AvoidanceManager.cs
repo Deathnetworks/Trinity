@@ -1,64 +1,25 @@
 ﻿using GilesTrinity.Settings.Combat;
+using GilesTrinity.Technicals;
 using System.Collections.Generic;
+using System.IO;
 using Zeta.Internals.Actors;
 
 namespace GilesTrinity
 {
     public static class AvoidanceManager
     {
+        /// <summary>
+        /// Initializes the <see cref="AvoidanceManager" /> class.
+        /// </summary>
         static AvoidanceManager()
         {
-            SNOAvoidanceType = new Dictionary<int, AvoidanceType>
-                                    {
-                                        {219702, AvoidanceType.Arcane},
-                                        {221225, AvoidanceType.Arcane},
-                                        {84608, AvoidanceType.Desecrator},
-                                        {5482, AvoidanceType.PoisonTree},
-                                        {6578, AvoidanceType.PoisonTree},
-                                        {4803, AvoidanceType.MoltenCore},
-                                        {4804, AvoidanceType.MoltenCore},
-                                        {224225, AvoidanceType.MoltenCore},
-                                        {247987, AvoidanceType.MoltenCore},
-                                        {95868, AvoidanceType.MoltenTrail},
-                                        {108869, AvoidanceType.PlagueCloud},
-                                        {402, AvoidanceType.IceBall},
-                                        {223675, AvoidanceType.IceBall},
-                                        {4103, AvoidanceType.ShamanFire},
-                                        {5212, AvoidanceType.BeeWasp},
-                                        {3865, AvoidanceType.PlagueHand},
-                                        {123124, AvoidanceType.AzmodanPool},
-                                        {93837, AvoidanceType.GhomGas},                   
-                                        {123839, AvoidanceType.AzmodanBody},                    // BARB     MONK    W*2     DH
-                                        {161822, AvoidanceType.Belial},                         // 100%     100%    100%    100%
-                                        {161833, AvoidanceType.Belial},                         // 100%     100%    100%    100%
-                                        {123842, AvoidanceType.AzmodanFireball},
-                                        {432, AvoidanceType.MageFire},                          // 30%      30%     10%     20%
-                                        {168031, AvoidanceType.DiabloPrison},                   // 100%     100%    100%    100%
-                                        {214845, AvoidanceType.DiabloMeteor},                   // 50%      50%     80%     100%
-                                        {260377, AvoidanceType.IceTrail},                       // 50%      50%     90%     90%
-                                        {160154, AvoidanceType.MoltenBall},                     // 0%       0%      10%     20%
-                                        {199997, AvoidanceType.WallOfFire},                     // 50%      50%     50%     50%
-                                        {199998, AvoidanceType.WallOfFire},                     // 50%      50%     50%     50%
-                                        {185924, AvoidanceType.ZoltBubble},                     // 100%     100%    100%    100%
-                                        {139741, AvoidanceType.ZoltTwister},                    // 70%      70%     70%     70%
-                                        {166686, AvoidanceType.MaghdaProjectille},              // 70%      70%     70%     70%
-                                        {201454, AvoidanceType.ButcherFloorPanel},              // 100%     100%    100%    100%    
-                                        {201464, AvoidanceType.ButcherFloorPanel},              // 100%     100%    100%    100%
-                                        {201426, AvoidanceType.ButcherFloorPanel},              // 100%     100%    100%    100%
-                                        {201438, AvoidanceType.ButcherFloorPanel},              // 100%     100%    100%    100%
-                                        {200969, AvoidanceType.ButcherFloorPanel},              // 100%     100%    100%    100%
-                                        {201423, AvoidanceType.ButcherFloorPanel},              // 100%     100%    100%    100%
-                                        {201242, AvoidanceType.ButcherFloorPanel},              // 100%     100%    100%    100%
-                                        {226350, AvoidanceType.DiabloRingOfFire},               // 100%     100%    100%    100%
-                                        {226525, AvoidanceType.DiabloRingOfFire},               // 100%     100%    100%    100%
-                                    };
+            SNOAvoidanceType = FileManager.Load<int, AvoidanceType>("AvoidanceType", "SNO", "Type");
         }
 
-
-        public static IDictionary<int, AvoidanceType> SNOAvoidanceType
+        private static IDictionary<int, AvoidanceType> SNOAvoidanceType
         {
             get;
-            private set;
+            set;
         }
 
         public static float GetAvoidanceRadius(AvoidanceType type, float defaultValue)

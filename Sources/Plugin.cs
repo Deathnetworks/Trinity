@@ -86,12 +86,6 @@ namespace GilesTrinity
             }
             catch { }
 
-            sDemonBuddyPath = Assembly.GetEntryAssembly().Location;
-            sTrinityPluginPath = Path.GetDirectoryName(sDemonBuddyPath) + @"\Plugins\GilesTrinity\";
-            sTrinityConfigFile = Path.GetDirectoryName(sDemonBuddyPath) + @"\Settings\GilesTrinity.cfg";
-
-            sTrinityEmailConfigFile = Path.GetDirectoryName(sDemonBuddyPath) + @"\Settings\" + battleTagName + @"-Email.cfg";
-
             BotMain.OnStart += TrinityBotStart;
             BotMain.OnStop += TrinityBotStop;
 
@@ -100,9 +94,9 @@ namespace GilesTrinity
 
             PaintMainWindowButtons(battleTagName));
 
-            if (!Directory.Exists(sTrinityPluginPath))
+            if (!Directory.Exists(FileManager.PluginPath))
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error - cannot enable plugin. Invalid path: {0}", sTrinityPluginPath);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error - cannot enable plugin. Invalid path: {0}", FileManager.PluginPath);
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Please check you have installed the plugin to the correct location, and then restart DemonBuddy and re-enable the plugin.");
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, @"Plugin should be installed to \<DemonBuddyFolder>\Plugins\GilesTrinity\");
             }
@@ -221,6 +215,7 @@ namespace GilesTrinity
         /// </summary>
         public void OnInitialize()
         {
+            AvoidanceManager.GetAvoidanceHealth(AvoidanceType.Arcane, 0);
         }
 
         /// <summary>

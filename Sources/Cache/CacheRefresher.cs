@@ -33,15 +33,20 @@ namespace GilesTrinity.Cache
                     unit.Position = acd.Position;
                     unit.CentreDistance = Vector3.Distance(GilesTrinity.playerStatus.CurrentPosition, acd.Position);
 
-                    unit.HitpointsCurrent = unit.InternalUnit.HitpointsCurrent;
-                    if (unit.HitpointsCurrent <= 0)
-                        unit.IsDead = true;
+                    if (unit.InternalUnit != null)
+                    {
+                        unit.HitpointsCurrent = unit.InternalUnit.HitpointsCurrent;
+                        if (unit.HitpointsCurrent <= 0)
+                        {
+                            unit.IsDead = true;
+                        }
 
-                    unit.IsBurrowed = unit.InternalUnit.IsBurrowed;
-                    unit.IsUntargetable = unit.InternalUnit.IsUntargetable;
-                    unit.IsInvulnerable = unit.InternalUnit.IsInvulnerable;
+                        unit.IsBurrowed = unit.InternalUnit.IsBurrowed;
+                        unit.IsUntargetable = unit.InternalUnit.IsUntargetable;
+                        unit.IsInvulnerable = unit.InternalUnit.IsInvulnerable;
+                    }
                     unit.CurrentAnimation = acd.CurrentAnimation;
-
+                    
                     if (unit.IsBoss)
                     {
                         unit.MonsterType = acd.MonsterInfo.MonsterType;
@@ -61,7 +66,12 @@ namespace GilesTrinity.Cache
         {
             try
             {
-
+                ACDItem acd = (ACDItem)item.CommonData;
+                item.Distance = acd.Position.Distance(ZetaDia.Me.Position);
+                if (acd.IsUnidentified != item.IsUnidentified || item.Gold>0)
+                {
+                    CacheItem.ComputeItemProperty(item);
+                }
             }
             catch
             {

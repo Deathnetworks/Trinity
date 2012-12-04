@@ -12,7 +12,6 @@ namespace GilesTrinity
     {
         private static void RefreshDiaGetWeights()
         {
-
             // Store if we are ignoring all units this cycle or not
             bool bIgnoreAllUnits = !bAnyChampionsPresent &&
                                     !bAnyMobsInCloseRange &&

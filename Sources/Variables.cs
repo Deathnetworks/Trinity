@@ -363,8 +363,7 @@ namespace GilesTrinity
 
         // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
         private static bool[,] StashSlotBlocked = new bool[7, 30];
-        private static bool bOutputItemScores = false;
-
+        
         // Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
         private static GilesPower powerBuff;
         private static GilesPower currentPower;
@@ -374,14 +373,6 @@ namespace GilesTrinity
         public static bool bDontMoveMeIAmDoingShit = false;
         public static bool bDontSpamOutofCombat = false;
         public static bool bOnlyTarget = false;
-
-
-        // Configuration variables
-        public static string sTrinityPluginPath = "";
-        internal static string sTrinityConfigFile = "";
-        internal static string sDemonBuddyPath = "";
-        private static string sTrinityEmailConfigFile = "";
-
 
         // Target provider and core routine variables
         public static ActorClass iMyCachedActorClass = ActorClass.Invalid;
