@@ -574,7 +574,6 @@ namespace System.Linq.Dynamic
             typeof(TrinityItemQuality),
             typeof(DamageType),
             typeof(FollowerType),
-            typeof(FunctionHelper),
             typeof(Enum)
         };
 
