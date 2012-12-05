@@ -391,7 +391,7 @@ namespace GilesTrinity
         private static int iTotalNumberGoblins = 0;
         private static DateTime lastGoblinTime = DateTime.Today;
 
-        private static DateTime SweepWindSpam = DateTime.Today; //intell -- inna
+        internal static DateTime SweepWindSpam = DateTime.Today; //intell -- inna
 
         // Variables relating to quick-reference of monsters within sepcific ranges (if anyone has suggestion for similar functionality with reduced CPU use, lemme know, but this is fast atm!)
         private static int[] iElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };

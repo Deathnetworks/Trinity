@@ -26,41 +26,41 @@ namespace GilesTrinity.Swap
     class WeaponSwap
     {
         private static bool wearingDPSGear = false;
-            // Whether or not both weapons are 2 handers OR if can't find the offhand.
+        // Whether or not both weapons are 2 handers OR if can't find the offhand.
         private static bool MainIsTwoHander = false;
         private static bool hasChecked = false;
         private static bool crashedDuringSwap = false;
-            // Is able to swap or not??
+        // Is able to swap or not??
         private static bool ableToSwap = true;
         private static int sGamesCreated = -1;
-            /// <summary>
-            /// Make sure rows and columns have the same amount of numbers inside (top left corner is row=0,column=0, bottom right corner is row=5,column=9). 
-            /// Each combination of Row and Column is an item location, for instance Row 0, Column 3 -> Top row, 4th column from the left.
-            /// Then we look at the array "items" -> if first item in rows is 0, first item in columns is 3 and first item in items is InventorySlot.PlayerLeftFinger -> 
-            ///         It will be the location we put the left ring for swapping.
-            /// </summary>
-        private static int[] rows = new int[] {};
-        private static int[] columns = new int[] {};
+        /// <summary>
+        /// Make sure rows and columns have the same amount of numbers inside (top left corner is row=0,column=0, bottom right corner is row=5,column=9). 
+        /// Each combination of Row and Column is an item location, for instance Row 0, Column 3 -> Top row, 4th column from the left.
+        /// Then we look at the array "items" -> if first item in rows is 0, first item in columns is 3 and first item in items is InventorySlot.PlayerLeftFinger -> 
+        ///         It will be the location we put the left ring for swapping.
+        /// </summary>
+        private static int[] rows = new int[] { };
+        private static int[] columns = new int[] { };
 
-            /// <summary>
-            /// Possible Inventory Slots:
-            ///     InventorySlot.PlayerNeck
-            ///     InventorySlot.PlayerRightFinger
-            ///     InventorySlot.PlayerLeftFinger
-            ///     InventorySlot.PlayerHead
-            ///     InventorySlot.PlayerShoulders
-            ///     InventorySlot.PlayerTorso
-            ///     InventorySlot.PlayerBracers
-            ///     InventorySlot.PlayerHands
-            ///     InventorySlot.PlayerWaist
-            ///     InventorySlot.PlayerLegs
-            ///     InventorySlot.PlayerFeet
-            /// </summary>
+        /// <summary>
+        /// Possible Inventory Slots:
+        ///     InventorySlot.PlayerNeck
+        ///     InventorySlot.PlayerRightFinger
+        ///     InventorySlot.PlayerLeftFinger
+        ///     InventorySlot.PlayerHead
+        ///     InventorySlot.PlayerShoulders
+        ///     InventorySlot.PlayerTorso
+        ///     InventorySlot.PlayerBracers
+        ///     InventorySlot.PlayerHands
+        ///     InventorySlot.PlayerWaist
+        ///     InventorySlot.PlayerLegs
+        ///     InventorySlot.PlayerFeet
+        /// </summary>
 
-        private static InventorySlot[] items = new InventorySlot[] {};
-            // Last slot is reserved for Offhand (if exists) and the slot before last for the main hand
+        private static InventorySlot[] items = new InventorySlot[] { };
+        // Last slot is reserved for Offhand (if exists) and the slot before last for the main hand
         private static int[] mainID = new int[rows.Length + 3];
-            // Last slot is reserved for the 2 Handed weapon we swap to.
+        // Last slot is reserved for the 2 Handed weapon we swap to.
         private static int[] altID = new int[rows.Length + 1];
 
         static void Main()
@@ -69,7 +69,7 @@ namespace GilesTrinity.Swap
             wearingDPSGear = false;
         }
 
-            // Returns if this item is protected by the swapper or not -> should make items safe from town run routine
+        // Returns if this item is protected by the swapper or not -> should make items safe from town run routine
         public bool SwapperUsing(ACDItem thisItem)
         {
             if (!GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap)
@@ -80,7 +80,7 @@ namespace GilesTrinity.Swap
             {
                 SecurityCheck();
             }
-            return (mainID.Contains(thisItem.DynamicId) || altID.Contains(thisItem.DynamicId)) ;
+            return (mainID.Contains(thisItem.DynamicId) || altID.Contains(thisItem.DynamicId));
         }
 
         public WeaponSwap()
@@ -156,29 +156,29 @@ namespace GilesTrinity.Swap
                 {
                     equipItem = ZetaDia.Me.Inventory.Equipped.FirstOrDefault(i => i.InventorySlot == InventorySlot.PlayerLeftHand);
                 }
-                    // Make sure both main items exist and are weapons
-                if (equipItem != null && invItem != null && 
+                // Make sure both main items exist and are weapons
+                if (equipItem != null && invItem != null &&
                     equipItem.ValidInventorySlots.Contains(InventorySlot.PlayerLeftHand) && invItem.ValidInventorySlots.Contains(InventorySlot.PlayerLeftHand) && !invItem.IsUnidentified)
                 {
-                        // Check if we are swapping 2x 2 Handed weapons
+                    // Check if we are swapping 2x 2 Handed weapons
                     if (invItem.IsTwoHand && equipItem.IsTwoHand)
-            {
-                MainIsTwoHander = true;
+                    {
+                        MainIsTwoHander = true;
                         Logging.Write("[Swapper] Detected you are using a Two-Hander as main.");
-                            // Two Hand
+                        // Two Hand
                         altID[altID.Length - 1] = invItem.DynamicId;
-                            // Main hand
+                        // Main hand
                         mainID[mainID.Length - 2] = equipItem.DynamicId;
-            }
-                        // Check if no offhand can be found
+                    }
+                    // Check if no offhand can be found
                     else if ((offHand == null || offHand.ItemType != ItemType.Shield && !offHand.IsOneHand) && (offHandEQ == null || offHandEQ.ItemType != ItemType.Shield && !offHandEQ.IsOneHand || offHandEQ.IsUnidentified))
                     {
                         Logging.Write("[Swapper] Can't find offhand, please post this log and the one before this -> on the forums.");
                         Logging.Write("[Swapper] Will continue without offhand.");
                         MainIsTwoHander = true;
                         if (equipItem.IsTwoHand)
-            {
-                crashedDuringSwap = true;
+                        {
+                            crashedDuringSwap = true;
                             // Two hand
                             altID[altID.Length - 1] = equipItem.DynamicId;
                             // Main hand
@@ -192,19 +192,19 @@ namespace GilesTrinity.Swap
                             mainID[mainID.Length - 2] = equipItem.DynamicId;
                         }
                     }
-                        // Check if we crashed during swap
+                    // Check if we crashed during swap
                     else if (invItem != null && equipItem.IsTwoHand)
                     {
                         crashedDuringSwap = true;
                         Logging.Write("[Swapper] Crashed during a swap, no fear all is ok.");
-                            // Two hand
+                        // Two hand
                         altID[altID.Length - 1] = equipItem.DynamicId;
-                            // Main hand
+                        // Main hand
                         mainID[mainID.Length - 2] = invItem.DynamicId;
-                            // Offhand
+                        // Offhand
                         mainID[mainID.Length - 1] = offHand.DynamicId;
                     }
-                        // Default
+                    // Default
                     else
                     {
                         // Main hand
@@ -216,8 +216,8 @@ namespace GilesTrinity.Swap
                     }
                     Logging.Write("[Swapper] Saving item ID's for later use.");
                     if (crashedDuringSwap == true)
-                    {   
-                            // If crashed during swapped, the currently equipped items are the alternative items and the items in the inventory are the MAIN items.
+                    {
+                        // If crashed during swapped, the currently equipped items are the alternative items and the items in the inventory are the MAIN items.
                         for (int i = 0; i < items.Length; i++)
                         {
                             try
@@ -231,7 +231,7 @@ namespace GilesTrinity.Swap
                                     Logging.Write("[Swapper] Problem with item at location: Row = " + rows[i] + ", Column = " + columns[i]);
                                     items[i] = InventorySlot.Gold;
                                 }
-                                
+
                             }
                             catch
                             {
@@ -240,7 +240,7 @@ namespace GilesTrinity.Swap
                             }
                         }
                     }
-                    else 
+                    else
                     {
                         for (int i = 0; i < items.Length; i++)
                         {
@@ -262,9 +262,9 @@ namespace GilesTrinity.Swap
                                 items[i] = InventorySlot.Gold;
                             }
                         }
-            }
-            hasChecked = true;
-        }
+                    }
+                    hasChecked = true;
+                }
                 else
                 {
                     Logging.Write("[Swapper] Unable to swap - there is no weapon in the top left corner.");
@@ -288,21 +288,21 @@ namespace GilesTrinity.Swap
             {
                 if (crashedDuringSwap == false)
                 {
-            using (ZetaDia.Memory.AcquireFrame())
-            {
-                ZetaDia.Actors.Update();
+                    using (ZetaDia.Memory.AcquireFrame())
+                    {
+                        ZetaDia.Actors.Update();
                         if (!wearingDPSGear)
-                {
+                        {
                             if (MainIsTwoHander ||
                                 !MainIsTwoHander && !ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 9, 5) && !ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 9, 4))
-                    {
-                        if (!MainIsTwoHander)
-                        {
-                            //Move Offhand to bottom right corner
+                            {
+                                if (!MainIsTwoHander)
+                                {
+                                    //Move Offhand to bottom right corner
                                     ZetaDia.Me.Inventory.MoveItem(mainID[mainID.Length - 1],
                                     ZetaDia.Me.CommonData.DynamicId, InventorySlot.PlayerBackpack, 9, 4);
-                        }
-                        //Swap other shiz
+                                }
+                                //Swap other shiz
                                 for (int i = 0; i < rows.Length; i++)
                                 {
                                     if (items[i] != InventorySlot.Gold)
@@ -312,18 +312,18 @@ namespace GilesTrinity.Swap
                                 }
                                 // Equip the 2 handed weapon
                                 ZetaDia.Me.Inventory.EquipItem(altID[altID.Length - 1], InventorySlot.PlayerLeftHand);
-                        wearingDPSGear = true;
+                                wearingDPSGear = true;
                                 Logging.Write("[Swapper] Swapped to strong 2 hander.");
-                    }
-                    else
-                    {
-                        //Force town run due to last spot taken!
-                        GilesTrinity.bWantToTownRun = true;
+                            }
+                            else
+                            {
+                                //Force town run due to last spot taken!
+                                GilesTrinity.bWantToTownRun = true;
                                 Logging.Write("[Swapper] For some reason bottom right corner isn't protected, initializing town run to clear it up.");
-                    }
-                }
+                            }
+                        }
                         else
-                {
+                        {
                             // Equip non weapon items
                             for (int i = 0; i < rows.Length; i++)
                             {
@@ -334,12 +334,12 @@ namespace GilesTrinity.Swap
                             }
                             // Equip main hand
                             ZetaDia.Me.Inventory.EquipItem(mainID[mainID.Length - 2], InventorySlot.PlayerLeftHand);
-                    if (!MainIsTwoHander)
-                    {
-                        //Equip offhand
+                            if (!MainIsTwoHander)
+                            {
+                                //Equip offhand
                                 ZetaDia.Me.Inventory.EquipItem(mainID[mainID.Length - 1], InventorySlot.PlayerRightHand);
-                    }
-                    wearingDPSGear = false;
+                            }
+                            wearingDPSGear = false;
                             Logging.Write("[Swapper] Swapped back to normal gear.");
                         }
                     }
@@ -350,6 +350,11 @@ namespace GilesTrinity.Swap
                 }
                 crashedDuringSwap = false;
             }
+        }
+
+        public double MillisecondsSinceLastSwap()
+        {
+            return DateTime.Now.Subtract(GilesTrinity.WeaponSwapTime).TotalMilliseconds;
         }
     }
 }
