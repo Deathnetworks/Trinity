@@ -1679,7 +1679,8 @@ namespace GilesTrinity
             try
             {
 
-                if (c_ObjectType == GObjectType.Unit)
+                // Everything except items (including gold)
+                if (c_ObjectType != GObjectType.Item)
                 {
                     bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
 

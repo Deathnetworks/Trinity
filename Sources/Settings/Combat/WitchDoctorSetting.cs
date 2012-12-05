@@ -94,7 +94,7 @@ namespace GilesTrinity.Settings.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(10)]
+        [DefaultValue(0)]
         public int KiteLimit
         {
             get

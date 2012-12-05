@@ -286,12 +286,12 @@ namespace GilesTrinity
 
                             // We'll weight them based on distance, giving gold less weight and close objects more
                             if (cacheObject.GoldAmount > 0)
-                                cacheObject.Weight = 11000d - (Math.Floor(cacheObject.CentreDistance) * 200d);
+                                cacheObject.Weight = 5000d - (Math.Floor(cacheObject.CentreDistance) * 200d);
                             else
-                                cacheObject.Weight = 13000d - (Math.Floor(cacheObject.CentreDistance) * 190d);
+                                cacheObject.Weight = 8000d - (Math.Floor(cacheObject.CentreDistance) * 190d);
 
                             // Point-blank items get a weight increase 
-                            if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 12f)
+                            if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 8f)
                                 cacheObject.Weight += 600d;
 
                             // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
@@ -448,7 +448,7 @@ namespace GilesTrinity
 
                             // We're standing on the damn thing... open it!!
                             if (cacheObject.RadiusDistance <= 12f)
-                                cacheObject.Weight += 250000d;
+                                cacheObject.Weight += 30000d;
 
                             break;
                         }
