@@ -278,7 +278,7 @@ namespace GilesTrinity
                 {
 
                     // Find out if this item's in a protected bag slot
-                    if (!ItemManager.ItemIsProtected(thisitem))
+                    if (!ItemManager.ItemIsProtected(thisitem) && !weaponSwap.SwapperUsing(thisitem))
                     {
                         // test
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DEBUG: {0},{1},{2}", thisitem.InternalName, thisitem.Name, thisitem.Level);
@@ -545,7 +545,7 @@ namespace GilesTrinity
             {
                 if (thisitem.BaseAddress != IntPtr.Zero)
                 {
-                    if (!ItemManager.ItemIsProtected(thisitem))
+                    if (!ItemManager.ItemIsProtected(thisitem) && !weaponSwap.SwapperUsing(thisitem))
                     {
                         GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
@@ -922,7 +922,7 @@ namespace GilesTrinity
             {
                 if (thisitem.BaseAddress != IntPtr.Zero)
                 {
-                    if (!ItemManager.ItemIsProtected(thisitem))
+                    if (!ItemManager.ItemIsProtected(thisitem) && !weaponSwap.SwapperUsing(thisitem))
                     {
                         GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
