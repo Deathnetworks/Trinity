@@ -333,22 +333,10 @@ namespace GilesTrinity
             if (!c_IsObstacle && !dictGilesObjectTypeCache.TryGetValue(c_RActorGuid, out c_ObjectType))
             {
                 // See if it's an avoidance first from the SNO
-                if (hashAvoidanceSNOList.Contains(c_ActorSNO) || hashAvoidanceBuffSNOList.Contains(c_ActorSNO) || hashAvoidanceSNOProjectiles.Contains(c_ActorSNO))
+                if (Settings.Combat.Misc.AvoidAOE && (hashAvoidanceSNOList.Contains(c_ActorSNO) || hashAvoidanceBuffSNOList.Contains(c_ActorSNO) || hashAvoidanceSNOProjectiles.Contains(c_ActorSNO)))
                 {
-                    // If avoidance is disabled, ignore this avoidance stuff
-                    if (!Settings.Combat.Misc.AvoidAOE)
-                    {
-                        AddToCache = false;
-                        c_IgnoreSubStep = "AvoidanceDisabled";
-                    }
-                    else
-                    {
-                        // Avoidance isn't disabled, so set this object type to avoidance
-                        c_ObjectType = GObjectType.Avoidance;
-                    }
-
                     // Checking for BuffVisualEffect - for Butcher, maybe useful other places?
-                    if (hashAvoidanceBuffSNOList.Contains(c_ActorSNO) && Settings.Combat.Misc.AvoidAOE)
+                    if (hashAvoidanceBuffSNOList.Contains(c_ActorSNO))
                     {
                         bool hasBuff = false;
                         try
@@ -372,7 +360,11 @@ namespace GilesTrinity
                             c_IgnoreSubStep = "NoBuffVisualEffect";
                         }
                     }
-
+                    else
+                    {
+                        // Avoidance isn't disabled, so set this object type to avoidance
+                        c_ObjectType = GObjectType.Avoidance;
+                    }
                 }
                 // It's not an avoidance, so let's calculate it's object type "properly"
                 else

@@ -236,14 +236,14 @@ namespace GilesTrinity
                 }
                 int iRandomUse = 3 + ((iStepDistance - 1) * 4);
                 // Try to return "early", or as soon as possible, beyond step 4, except when unstucking, when the max steps is based on the unstuck attempt
-                //if (fHighestWeight > 0 &&
-                //    ((!bFindAntiStuckSpot && iStepDistance > 5) || (bFindAntiStuckSpot && iStepDistance > iAntiStuckAttempts))
-                //    )
-                //{
-                //    lastFoundSafeSpot = DateTime.Now;
-                //    vlastSafeSpot = vBestLocation;
-                //    break;
-                //}
+                if (fHighestWeight > 0 &&
+                    ((!bFindAntiStuckSpot && iStepDistance > 5) || (bFindAntiStuckSpot && iStepDistance > iAntiStuckAttempts))
+                    )
+                {
+                    lastFoundSafeSpot = DateTime.Now;
+                    vlastSafeSpot = vBestLocation;
+                    break;
+                }
                 // Loop through all possible radii
                 for (int iThisRadius = 0; iThisRadius < iMaxRadiusChecks; iThisRadius++)
                 {
