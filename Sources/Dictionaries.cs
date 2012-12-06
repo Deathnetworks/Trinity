@@ -259,7 +259,7 @@ namespace GilesTrinity
         /// Resplendent chest SNO list
         /// </summary>
         internal static HashSet<int> hashSNOContainerResplendant = new HashSet<int> {
-            62873, 95011, 81424, 108230, 111808, 111809, 211861,
+            62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866,
          };
         /// <summary>
         /// Objects that should never be ignored due to no Line of Sight (LoS)

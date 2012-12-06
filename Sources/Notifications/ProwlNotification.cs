@@ -1,7 +1,7 @@
 ﻿
 namespace GilesTrinity.Notifications
 {
-    internal struct ProwlNotification
+    public struct ProwlNotification
     {
         public string Event { get; set; }
         public string Description { get; set; }

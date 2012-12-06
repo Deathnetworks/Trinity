@@ -1,7 +1,7 @@
 ﻿
 namespace GilesTrinity.Notifications
 {
-    internal enum ProwlNotificationPriority : sbyte
+    public enum ProwlNotificationPriority : sbyte
     {
         VeryLow = -2,
         Moderate = -1,
