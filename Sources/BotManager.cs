@@ -22,8 +22,8 @@ namespace GilesTrinity
         {
             if (!bPluginEnabled && bot != null)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: Giles Trinity is NOT YET ENABLED. Bot start detected");
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Ignore this message if you are not currently using Giles Trinity.");
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "WARNING: Giles Trinity is NOT YET ENABLED. Bot start detected");
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Ignore this message if you are not currently using Giles Trinity.");
                 return;
             }
             // Recording of all the XML's in use this run
@@ -56,6 +56,7 @@ namespace GilesTrinity
             else
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: Maintaining item stats from previous run. To reset stats fully, please restart DB.");
+				weaponSwap.Reset();
             }
 
             RefreshProfileBlacklists();
@@ -68,8 +69,8 @@ namespace GilesTrinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Error Initializing CacheManager");
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Error Initializing CacheManager");
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
             }
         }
 
@@ -97,8 +98,8 @@ namespace GilesTrinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Error Destroying CacheManager");
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Error Destroying CacheManager");
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
             }
         }
 

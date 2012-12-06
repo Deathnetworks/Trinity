@@ -55,7 +55,7 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.Monk_MantraOfEvasion, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
             }
             if (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MantraOfConviction) && !GilesHasBuff(SNOPower.Monk_MantraOfConviction) &&
-                playerStatus.CurrentEnergy >= 50 && GilesUseTimer(SNOPower.Monk_MantraOfConviction, true))
+                (playerStatus.CurrentEnergy >= 50 && !Settings.Combat.Monk.SweepingWindWeaponSwap || playerStatus.CurrentEnergy >= 85) && GilesUseTimer(SNOPower.Monk_MantraOfConviction, true))
             {
                 return new GilesPower(SNOPower.Monk_MantraOfConviction, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
             }
@@ -137,9 +137,10 @@ namespace GilesTrinity
                 //DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 6000)) &&
                 CheckAbilityAndBuff(SNOPower.Monk_BlindingFlash) &&
                 // Check our mantras, if we have them, are up first
+				(Settings.Combat.Monk.SweepingWindWeaponSwap || 
                 CheckAbilityAndBuff(SNOPower.Monk_MantraOfConviction) &&
                 CheckAbilityAndBuff(SNOPower.Monk_MantraOfEvasion) &&
-                CheckAbilityAndBuff(SNOPower.Monk_MantraOfRetribution) &&
+                CheckAbilityAndBuff(SNOPower.Monk_MantraOfRetribution)) &&				
                 // Check the re-use timer and energy costs
                 (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5)))
             {
@@ -190,8 +191,9 @@ namespace GilesTrinity
             if (!bOOCBuff && (!hashPowerHotbarAbilities.Contains(SNOPower.Monk_TempestRush) || playerStatus.CurrentEnergy >= 98 ||
                 (playerStatus.CurrentHealthPct <= 0.55 && playerStatus.CurrentEnergy >= 75) || CurrentTarget.IsBoss) &&
                     (playerStatus.CurrentEnergy >= 135 ||
-                    (GilesHasBuff(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 60 ||
-                    (playerStatus.CurrentEnergy >= 50 && playerStatus.CurrentHealthPct >= 0.6)) &&
+                    (GilesHasBuff(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 60 && !Settings.Combat.Monk.SweepingWindWeaponSwap || 
+					playerStatus.CurrentEnergy >= 110 || (playerStatus.CurrentEnergy >= 100 && playerStatus.CurrentHealthPct >= 0.6) ||
+					(playerStatus.CurrentEnergy >= 50 && playerStatus.CurrentHealthPct >= 0.6 && !Settings.Combat.Monk.SweepingWindWeaponSwap)) &&
                 // Checking we have no expensive finishers
                     !hashPowerHotbarAbilities.Contains(SNOPower.Monk_SevenSidedStrike) && !hashPowerHotbarAbilities.Contains(SNOPower.Monk_LashingTailKick) &&
                     !hashPowerHotbarAbilities.Contains(SNOPower.Monk_WaveOfLight) && !hashPowerHotbarAbilities.Contains(SNOPower.Monk_CycloneStrike) &&

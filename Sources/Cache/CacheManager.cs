@@ -117,7 +117,7 @@ namespace GilesTrinity.Cache
                 if (MaxRefreshRate != value)
                 {
                     _MaxRefreshRate = value;
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.CacheManagement, "Your refresh rate on cache have been set to {0}.", value);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "Your refresh rate on cache have been set to {0}.", value);
                 }
             }
         }
@@ -300,7 +300,7 @@ namespace GilesTrinity.Cache
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "MaintainCache occurs an error : {0}", ex);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "An error occured in Cache Maintenance system: {0}", ex);
                 }
             }
         }

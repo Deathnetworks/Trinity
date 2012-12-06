@@ -635,6 +635,31 @@ namespace GilesTrinity
                         )
                     {
                         bool bFoundSpecialMovement = UsedSpecialMovement();
+						
+						if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap)
+						{
+							if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind) 
+								&& (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
+								{
+									ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
+									return RunStatus.Running;
+								}
+							else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800 
+									&& GilesHasBuff(SNOPower.Monk_SweepingWind))
+							{
+								weaponSwap.SwapGear();
+							}
+						}
+						// Spam sweeping winds
+						if ((playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
+							&& (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
+							|| !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
+						{
+							ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
+							SweepWindSpam = DateTime.Now;
+							return RunStatus.Running;
+						}	
+						
                         if (CurrentTarget.Type != GObjectType.Backtrack)
                         {
                             // Whirlwind for a barb
@@ -718,7 +743,7 @@ namespace GilesTrinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.Behavior, "{0}", ex);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0}", ex);
                     return RunStatus.Failure;
                 }
 
@@ -890,7 +915,7 @@ namespace GilesTrinity
                             }
                             catch
                             {
-                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit {0} [{1}]", c_Name, c_ActorSNO);
+                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit {0} [{1}]", c_Name, c_ActorSNO);
                                 StaleCache = true;
                             }
                         }

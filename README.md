@@ -62,6 +62,10 @@ Changelog 1.7.1.5:
 
 * New gold pickup logic from user !sp
 
+* Hopefully fixed kiting & Changed Kiting defaults for WIZ/WD to 0
+
+* Hopefully fixed the possibilities of not picking up items (legendaries) even if not in LoS or not navigable.
+
 * Started implimenting new cache system
 
 * Started implimenting new item rule scripting system
