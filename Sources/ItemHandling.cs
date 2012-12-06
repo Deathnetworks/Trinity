@@ -17,18 +17,10 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        /// <summary>
-        /// Randomize the timer between stashing/salvaging etc.
-        /// </summary>
-        private static void RandomizeTheTimer()
-        {
-            Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
-            int rnd = rndNum.Next(7);
-            itemDelayLoopLimit = 4 + rnd;
-        }
+
 
         /// <summary>
-        /// 
+        /// Pickup Validation for scripted rulesets
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
@@ -62,9 +54,7 @@ namespace GilesTrinity
         /// <param name="followerType"></param>
         /// <param name="dynamicID"></param>
         /// <returns></returns>
-        //private static bool GilesPickupItemValidation(ACD acd, string name, int level, ItemQuality quality, int balanceId, ItemBaseType itemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
-        private static bool GilesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
-        //private static bool GilesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemType dbItemType, FollowerType followerType, int dynamicID = 0)
+        internal static bool GilesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
         {
 
             if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
@@ -94,27 +84,20 @@ namespace GilesTrinity
 
             // Calculate giles item types and base types etc.
             GItemType itemType = DetermineItemType(name, dbItemType, followerType);
-            GBaseItemType baseType = DetermineBaseType(itemType);
+            GItemBaseType baseType = DetermineBaseType(itemType);
 
-            // Error logging for DemonBuddy item mis-reading
-            ItemType internalItemType = GilesToDBItemType(itemType);
-            if (internalItemType != dbItemType)
-            {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation,
-                    "GSError: Item type mis-match detected: Item Internal={0}. DemonBuddy ItemType thinks item type is={1}. Giles thinks item type is={2}. [pickup]", name, dbItemType, internalItemType);
-            }
             switch (baseType)
             {
-                case GBaseItemType.WeaponTwoHand:
-                case GBaseItemType.WeaponOneHand:
-                case GBaseItemType.WeaponRange:
+                case GItemBaseType.WeaponTwoHand:
+                case GItemBaseType.WeaponOneHand:
+                case GItemBaseType.WeaponRange:
                     return CheckLevelRequirements(level, quality, Settings.Loot.Pickup.WeaponBlueLevel, Settings.Loot.Pickup.WeaponYellowLevel);
-                case GBaseItemType.Armor:
-                case GBaseItemType.Offhand:
+                case GItemBaseType.Armor:
+                case GItemBaseType.Offhand:
                     return CheckLevelRequirements(level, quality, Settings.Loot.Pickup.ArmorBlueLevel, Settings.Loot.Pickup.ArmorYellowLevel);
-                case GBaseItemType.Jewelry:
+                case GItemBaseType.Jewelry:
                     return CheckLevelRequirements(level, quality, Settings.Loot.Pickup.JewelryBlueLevel, Settings.Loot.Pickup.JewelryYellowLevel);
-                case GBaseItemType.FollowerItem:
+                case GItemBaseType.FollowerItem:
                     if (level < 60 || !Settings.Loot.Pickup.FollowerItem || quality < ItemQuality.Rare4)
                     {
                         if (!_hashsetItemFollowersIgnored.Contains(dynamicID))
@@ -125,7 +108,7 @@ namespace GilesTrinity
                         return false;
                     }
                     break;
-                case GBaseItemType.Gem:
+                case GItemBaseType.Gem:
                     if (level < Settings.Loot.Pickup.GemLevel ||
                         (itemType == GItemType.Ruby && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Ruby)) ||
                         (itemType == GItemType.Emerald && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Emerald)) ||
@@ -135,7 +118,7 @@ namespace GilesTrinity
                         return false;
                     }
                     break;
-                case GBaseItemType.Misc:
+                case GItemBaseType.Misc:
 
                     // Note; Infernal keys are misc, so should be picked up here - we aren't filtering them out, so should default to true at the end of this function
                     if (itemType == GItemType.CraftingMaterial && level < Settings.Loot.Pickup.MiscItemLevel)
@@ -176,9 +159,9 @@ namespace GilesTrinity
                         return true;
                     }
                     break;
-                case GBaseItemType.HealthGlobe:
+                case GItemBaseType.HealthGlobe:
                     return false;
-                case GBaseItemType.Unknown:
+                case GItemBaseType.Unknown:
                     return false;
                 default:
                     return false;
@@ -198,7 +181,7 @@ namespace GilesTrinity
         /// <param name="requiredBlueLevel">The blue level required.</param>
         /// <param name="requiredYellowLevel">The yellow level required.</param>
         /// <returns></returns>
-        private static bool CheckLevelRequirements(int level, ItemQuality quality, int requiredBlueLevel, int requiredYellowLevel)
+        internal static bool CheckLevelRequirements(int level, ItemQuality quality, int requiredBlueLevel, int requiredYellowLevel)
         {
             if (quality < ItemQuality.Magic1)
             {
@@ -231,7 +214,7 @@ namespace GilesTrinity
         /// <param name="dbItemType"></param>
         /// <param name="dbFollowerType"></param>
         /// <returns></returns>
-        private static GItemType DetermineItemType(string name, ItemType dbItemType, FollowerType dbFollowerType = FollowerType.None)
+        internal static GItemType DetermineItemType(string name, ItemType dbItemType, FollowerType dbFollowerType = FollowerType.None)
         {
             name = name.ToLower();
             if (name.StartsWith("axe_")) return GItemType.Axe;
@@ -333,7 +316,7 @@ namespace GilesTrinity
             }
 
             // hax for fuimusbruce's horadric hamburger
-            if (name.StartsWith("offHand_"))
+            if (name.StartsWith("offhand_"))
             {
                 return GItemType.Dagger;
             }
@@ -351,29 +334,29 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        private static GBaseItemType DetermineBaseType(GItemType itemType)
+        internal static GItemBaseType DetermineBaseType(GItemType itemType)
         {
-            GBaseItemType thisGilesBaseType = GBaseItemType.Unknown;
+            GItemBaseType thisGilesBaseType = GItemBaseType.Unknown;
             if (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
                 itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
                 itemType == GItemType.Spear || itemType == GItemType.Sword || itemType == GItemType.Wand)
             {
-                thisGilesBaseType = GBaseItemType.WeaponOneHand;
+                thisGilesBaseType = GItemBaseType.WeaponOneHand;
             }
             else if (itemType == GItemType.TwoHandDaibo || itemType == GItemType.TwoHandMace ||
                 itemType == GItemType.TwoHandMighty || itemType == GItemType.TwoHandPolearm || itemType == GItemType.TwoHandStaff ||
                 itemType == GItemType.TwoHandSword || itemType == GItemType.TwoHandAxe)
             {
-                thisGilesBaseType = GBaseItemType.WeaponTwoHand;
+                thisGilesBaseType = GItemBaseType.WeaponTwoHand;
             }
             else if (itemType == GItemType.TwoHandCrossbow || itemType == GItemType.HandCrossbow || itemType == GItemType.TwoHandBow)
             {
-                thisGilesBaseType = GBaseItemType.WeaponRange;
+                thisGilesBaseType = GItemBaseType.WeaponRange;
             }
             else if (itemType == GItemType.Mojo || itemType == GItemType.Orb ||
                 itemType == GItemType.Quiver || itemType == GItemType.Shield)
             {
-                thisGilesBaseType = GBaseItemType.Offhand;
+                thisGilesBaseType = GItemBaseType.Offhand;
             }
             else if (itemType == GItemType.Boots || itemType == GItemType.Bracer || itemType == GItemType.Chest ||
                 itemType == GItemType.Cloak || itemType == GItemType.Gloves || itemType == GItemType.Helm ||
@@ -381,31 +364,31 @@ namespace GilesTrinity
                 itemType == GItemType.VoodooMask || itemType == GItemType.WizardHat || itemType == GItemType.Belt ||
                 itemType == GItemType.MightyBelt)
             {
-                thisGilesBaseType = GBaseItemType.Armor;
+                thisGilesBaseType = GItemBaseType.Armor;
             }
             else if (itemType == GItemType.Amulet || itemType == GItemType.Ring)
             {
-                thisGilesBaseType = GBaseItemType.Jewelry;
+                thisGilesBaseType = GItemBaseType.Jewelry;
             }
             else if (itemType == GItemType.FollowerEnchantress || itemType == GItemType.FollowerScoundrel ||
                 itemType == GItemType.FollowerTemplar)
             {
-                thisGilesBaseType = GBaseItemType.FollowerItem;
+                thisGilesBaseType = GItemBaseType.FollowerItem;
             }
             else if (itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome ||
                 itemType == GItemType.SpecialItem || itemType == GItemType.CraftingPlan || itemType == GItemType.HealthPotion ||
                 itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey)
             {
-                thisGilesBaseType = GBaseItemType.Misc;
+                thisGilesBaseType = GItemBaseType.Misc;
             }
             else if (itemType == GItemType.Ruby || itemType == GItemType.Emerald || itemType == GItemType.Topaz ||
                 itemType == GItemType.Amethyst)
             {
-                thisGilesBaseType = GBaseItemType.Gem;
+                thisGilesBaseType = GItemBaseType.Gem;
             }
             else if (itemType == GItemType.HealthGlobe)
             {
-                thisGilesBaseType = GBaseItemType.HealthGlobe;
+                thisGilesBaseType = GItemBaseType.HealthGlobe;
             }
             return thisGilesBaseType;
         }
@@ -415,7 +398,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        private static bool DetermineIsStackable(GItemType itemType)
+        internal static bool DetermineIsStackable(GItemType itemType)
         {
             return itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome || itemType == GItemType.Ruby ||
                    itemType == GItemType.Emerald || itemType == GItemType.Topaz || itemType == GItemType.Amethyst ||
@@ -428,7 +411,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        private static bool DetermineIsTwoSlot(GItemType itemType)
+        internal static bool DetermineIsTwoSlot(GItemType itemType)
         {
             return (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
                     itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
@@ -445,76 +428,10 @@ namespace GilesTrinity
         }
 
         /// <summary>
-        /// This is for DemonBuddy error checking - see what sort of item DB THINKS it is
-        /// </summary>
-        /// <param name="itemType"></param>
-        /// <returns></returns>
-        private static ItemType GilesToDBItemType(GItemType itemType)
-        {
-            switch (itemType)
-            {
-                case GItemType.Axe: return ItemType.Axe;
-                case GItemType.CeremonialKnife: return ItemType.CeremonialDagger;
-                case GItemType.HandCrossbow: return ItemType.HandCrossbow;
-                case GItemType.Dagger: return ItemType.Dagger;
-                case GItemType.FistWeapon: return ItemType.FistWeapon;
-                case GItemType.Mace: return ItemType.Mace;
-                case GItemType.MightyWeapon: return ItemType.MightyWeapon;
-                case GItemType.Spear: return ItemType.Spear;
-                case GItemType.Sword: return ItemType.Sword;
-                case GItemType.Wand: return ItemType.Wand;
-                case GItemType.TwoHandAxe: return ItemType.Axe;
-                case GItemType.TwoHandBow: return ItemType.Bow;
-                case GItemType.TwoHandDaibo: return ItemType.Daibo;
-                case GItemType.TwoHandCrossbow: return ItemType.Crossbow;
-                case GItemType.TwoHandMace: return ItemType.Mace;
-                case GItemType.TwoHandMighty: return ItemType.MightyWeapon;
-                case GItemType.TwoHandPolearm: return ItemType.Polearm;
-                case GItemType.TwoHandStaff: return ItemType.Staff;
-                case GItemType.TwoHandSword: return ItemType.Sword;
-                case GItemType.StaffOfHerding: return ItemType.Staff;
-                case GItemType.Mojo: return ItemType.Mojo;
-                case GItemType.Orb: return ItemType.Orb;
-                case GItemType.Quiver: return ItemType.Quiver;
-                case GItemType.Shield: return ItemType.Shield;
-                case GItemType.Amulet: return ItemType.Amulet;
-                case GItemType.Ring: return ItemType.Ring;
-                case GItemType.Belt: return ItemType.Belt;
-                case GItemType.Boots: return ItemType.Boots;
-                case GItemType.Bracer: return ItemType.Bracer;
-                case GItemType.Chest: return ItemType.Chest;
-                case GItemType.Cloak: return ItemType.Cloak;
-                case GItemType.Gloves: return ItemType.Gloves;
-                case GItemType.Helm: return ItemType.Helm;
-                case GItemType.Legs: return ItemType.Legs;
-                case GItemType.MightyBelt: return ItemType.MightyBelt;
-                case GItemType.Shoulder: return ItemType.Shoulder;
-                case GItemType.SpiritStone: return ItemType.SpiritStone;
-                case GItemType.VoodooMask: return ItemType.VoodooMask;
-                case GItemType.WizardHat: return ItemType.WizardHat;
-                case GItemType.FollowerEnchantress: return ItemType.FollowerSpecial;
-                case GItemType.FollowerScoundrel: return ItemType.FollowerSpecial;
-                case GItemType.FollowerTemplar: return ItemType.FollowerSpecial;
-                case GItemType.CraftingMaterial: return ItemType.CraftingReagent;
-                case GItemType.CraftTome: return ItemType.CraftingPage;
-                case GItemType.Ruby: return ItemType.Gem;
-                case GItemType.Emerald: return ItemType.Gem;
-                case GItemType.Topaz: return ItemType.Gem;
-                case GItemType.Amethyst: return ItemType.Gem;
-                case GItemType.SpecialItem: return ItemType.Unknown;
-                case GItemType.CraftingPlan: return ItemType.CraftingPlan;
-                case GItemType.HealthPotion: return ItemType.Potion;
-                case GItemType.Dye: return ItemType.Unknown;
-                case GItemType.InfernalKey: return ItemType.Unknown;
-            }
-            return ItemType.Unknown;
-        }
-
-        /// <summary>
         /// Search backpack to see if we have room for a 2-slot item anywhere
         /// </summary>
-        private static bool[,] BackpackSlotBlocked = new bool[10, 6];
-        private static Vector2 SortingFindLocationBackpack(bool isOriginalTwoSlot)
+        internal static bool[,] BackpackSlotBlocked = new bool[10, 6];
+        internal static Vector2 SortingFindLocationBackpack(bool isOriginalTwoSlot)
         {
             int iPointX = -1;
             int iPointY = -1;
@@ -550,239 +467,14 @@ namespace GilesTrinity
             }
             return new Vector2(iPointX, iPointY);
         }
-        private static Vector2 SortingFindLocationStash(bool isOriginalTwoSlot, bool endOfStash = false)
-        {
-            int iPointX = -1;
-            int iPointY = -1;
-            for (int iRow = 0; iRow <= 29; iRow++)
-            {
-                for (int iColumn = 0; iColumn <= 6; iColumn++)
-                {
-                    if (!StashSlotBlocked[iColumn, iRow])
-                    {
-                        bool bNotEnoughSpace = false;
-                        if (iRow != 9 && iRow != 19 && iRow != 29)
-                        {
-                            bNotEnoughSpace = (isOriginalTwoSlot && StashSlotBlocked[iColumn, iRow + 1]);
-                        }
-                        else
-                        {
-                            if (isOriginalTwoSlot)
-                                bNotEnoughSpace = true;
-                        }
-                        if (!bNotEnoughSpace)
-                        {
-                            iPointX = iColumn;
-                            iPointY = iRow;
-                            if (!endOfStash)
-                                goto FoundStashLocation;
-                        }
-                    }
-                }
-            }
-        FoundStashLocation:
-            if ((iPointX < 0) || (iPointY < 0))
-            {
-                return new Vector2(-1, -1);
-            }
-            return new Vector2(iPointX, iPointY);
-        }
-
-        /// <summary>
-        /// Sorts the stash
-        /// </summary>
-        internal static void SortStash()
-        {
-
-            // Try and update the player-data
-            ZetaDia.Actors.Update();
-
-            // Check we can get the player dynamic ID
-            int iPlayerDynamicID = -1;
-            try
-            {
-                iPlayerDynamicID = ZetaDia.Me.CommonData.DynamicId;
-            }
-            catch
-            {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure getting your player data from DemonBuddy, abandoning the sort!");
-                return;
-            }
-            if (iPlayerDynamicID == -1)
-            {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure getting your player data, abandoning the sort!");
-                return;
-            }
-
-            // List used for all the sorting
-            List<GilesStashSort> listSortMyStash = new List<GilesStashSort>();
-
-            // Map out the backpack free slots
-            for (int iRow = 0; iRow <= 5; iRow++)
-                for (int iColumn = 0; iColumn <= 9; iColumn++)
-                    BackpackSlotBlocked[iColumn, iRow] = false;
-
-            foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
-            {
-                int inventoryRow = item.InventoryRow;
-                int inventoryColumn = item.InventoryColumn;
-
-                // Mark this slot as not-free
-                BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
-
-                // Try and reliably find out if this is a two slot item or not
-                GItemType tempItemType = DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType);
-                if (DetermineIsTwoSlot(tempItemType) && inventoryRow < 5)
-                {
-                    BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
-                }
-            }
-
-            // Map out the stash free slots
-            for (int iRow = 0; iRow <= 29; iRow++)
-                for (int iColumn = 0; iColumn <= 6; iColumn++)
-                    StashSlotBlocked[iColumn, iRow] = false;
-
-            // Block off the entire of any "protected stash pages"
-            foreach (int iProtPage in Zeta.CommonBot.Settings.CharacterSettings.Instance.ProtectedStashPages)
-                for (int iProtRow = 0; iProtRow <= 9; iProtRow++)
-                    for (int iProtColumn = 0; iProtColumn <= 6; iProtColumn++)
-                        StashSlotBlocked[iProtColumn, iProtRow + (iProtPage * 10)] = true;
-
-            // Remove rows we don't have
-            for (int iRow = (ZetaDia.Me.NumSharedStashSlots / 7); iRow <= 29; iRow++)
-                for (int iColumn = 0; iColumn <= 6; iColumn++)
-                    StashSlotBlocked[iColumn, iRow] = true;
-
-            // Map out all the items already in the stash and store their scores if appropriate
-            foreach (ACDItem item in ZetaDia.Me.Inventory.StashItems)
-            {
-                int inventoryRow = item.InventoryRow;
-                int inventoryColumn = item.InventoryColumn;
-
-                // Mark this slot as not-free
-                StashSlotBlocked[inventoryColumn, inventoryRow] = true;
-
-                // Try and reliably find out if this is a two slot item or not
-                GItemType itemType = DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType);
-
-                bool isTwoSlot = DetermineIsTwoSlot(itemType);
-                if (isTwoSlot && inventoryRow != 19 && inventoryRow != 9 && inventoryRow != 29)
-                {
-                    StashSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
-                }
-                else if (isTwoSlot && (inventoryRow == 19 || inventoryRow == 9 || inventoryRow == 29))
-                {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: There was an error reading your stash, abandoning the process.");
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Always make sure you empty your backpack, open the stash, then RESTART DEMONBUDDY before sorting!");
-                    return;
-                }
-                GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(item, item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId,
-                    item.DynamicId, item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.IsTwoHand, item.DyeType, item.ItemType, item.ItemBaseType, item.FollowerSpecialType,
-                    item.IsUnidentified, item.ItemStackQuantity, item.Stats);
-
-                double ItemValue = ValueThisItem(thiscacheditem, itemType);
-                double NeedScore = ScoreNeeded(itemType);
-
-                // Ignore stackable items
-                if (!DetermineIsStackable(itemType) && itemType != GItemType.StaffOfHerding)
-                {
-                    listSortMyStash.Add(new GilesStashSort(((ItemValue / NeedScore) * 1000), 1, inventoryColumn, inventoryRow, item.DynamicId, isTwoSlot));
-                }
-            }
-
-
-            // Sort the items in the stash by their row number, lowest to highest
-            listSortMyStash.Sort((p1, p2) => p1.InventoryRow.CompareTo(p2.InventoryRow));
-
-            // Now move items into your backpack until full, then into the END of the stash
-            Vector2 vFreeSlot;
-
-            // Loop through all stash items
-            foreach (GilesStashSort thisstashsort in listSortMyStash)
-            {
-                vFreeSlot = SortingFindLocationBackpack(thisstashsort.bIsTwoSlot);
-                int iStashOrPack = 1;
-                if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
-                {
-                    vFreeSlot = SortingFindLocationStash(thisstashsort.bIsTwoSlot, true);
-                    if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
-                        continue;
-                    iStashOrPack = 2;
-                }
-                if (iStashOrPack == 1)
-                {
-                    ZetaDia.Me.Inventory.MoveItem(thisstashsort.iDynamicID, iPlayerDynamicID, InventorySlot.PlayerBackpack, (int)vFreeSlot.X, (int)vFreeSlot.Y);
-                    StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow] = false;
-                    if (thisstashsort.bIsTwoSlot)
-                        StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow + 1] = false;
-                    BackpackSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y] = true;
-                    if (thisstashsort.bIsTwoSlot)
-                        BackpackSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y + 1] = true;
-                    thisstashsort.iInventoryColumn = (int)vFreeSlot.X;
-                    thisstashsort.InventoryRow = (int)vFreeSlot.Y;
-                    thisstashsort.iStashOrPack = 2;
-                }
-                else
-                {
-                    ZetaDia.Me.Inventory.MoveItem(thisstashsort.iDynamicID, iPlayerDynamicID, InventorySlot.PlayerSharedStash, (int)vFreeSlot.X, (int)vFreeSlot.Y);
-                    StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow] = false;
-                    if (thisstashsort.bIsTwoSlot)
-                        StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow + 1] = false;
-                    StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y] = true;
-                    if (thisstashsort.bIsTwoSlot)
-                        StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y + 1] = true;
-                    thisstashsort.iInventoryColumn = (int)vFreeSlot.X;
-                    thisstashsort.InventoryRow = (int)vFreeSlot.Y;
-                    thisstashsort.iStashOrPack = 1;
-                }
-                Thread.Sleep(150);
-            }
-
-            // Now sort the items by their score, highest to lowest
-            listSortMyStash.Sort((p1, p2) => p1.dStashScore.CompareTo(p2.dStashScore));
-            listSortMyStash.Reverse();
-
-            // Now fill the stash in ordered-order
-            foreach (GilesStashSort thisstashsort in listSortMyStash)
-            {
-                vFreeSlot = SortingFindLocationStash(thisstashsort.bIsTwoSlot, false);
-                if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
-                {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure trying to put things back into stash, no stash slots free? Abandoning...");
-                    return;
-                }
-                ZetaDia.Me.Inventory.MoveItem(thisstashsort.iDynamicID, iPlayerDynamicID, InventorySlot.PlayerSharedStash, (int)vFreeSlot.X, (int)vFreeSlot.Y);
-                if (thisstashsort.iStashOrPack == 1)
-                {
-                    StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow] = false;
-                    if (thisstashsort.bIsTwoSlot)
-                        StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow + 1] = false;
-                }
-                else
-                {
-                    BackpackSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow] = false;
-                    if (thisstashsort.bIsTwoSlot)
-                        BackpackSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow + 1] = false;
-                }
-                StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y] = true;
-                if (thisstashsort.bIsTwoSlot)
-                    StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y + 1] = true;
-                thisstashsort.iStashOrPack = 1;
-                thisstashsort.InventoryRow = (int)vFreeSlot.Y;
-                thisstashsort.iInventoryColumn = (int)vFreeSlot.X;
-                Thread.Sleep(150);
-            }
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Stash sorted!");
-        }
 
         /// <summary>
         /// Output test scores for everything in the backpack
         /// </summary>
         internal static void TestScoring()
         {
-            if (testingBackpack) return;
-            testingBackpack = true;
+            if (TownRun.testingBackpack) return;
+            TownRun.testingBackpack = true;
             ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
@@ -791,7 +483,6 @@ namespace GilesTrinity
             }
             if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
             {
-                bOutputItemScores = true;
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "===== Outputting Test Scores =====");
                 foreach (ACDItem item in ZetaDia.Actors.Me.Inventory.Backpack)
                 {
@@ -810,13 +501,12 @@ namespace GilesTrinity
                 }
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "===== Finished Test Score Outputs =====");
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: See bad scores? Wrong item types? Known DB bug - restart DB before using the test button!");
-                bOutputItemScores = false;
             }
             else
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error testing scores - not in game world?");
             }
-            testingBackpack = false;
+            TownRun.testingBackpack = false;
         }
 
         /// <summary>
@@ -824,11 +514,11 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="thisitem"></param>
         /// <returns></returns>
-        private static bool ShouldWeStashThis(GilesCachedACDItem thisitem)
+        internal static bool ShouldWeStashThis(GilesCachedACDItem thisitem)
         {
             // Now look for Misc items we might want to keep
             GItemType TrueItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
-            GBaseItemType thisGilesBaseType = DetermineBaseType(TrueItemType);
+            GItemBaseType thisGilesBaseType = DetermineBaseType(TrueItemType);
 
             if (TrueItemType == GItemType.StaffOfHerding)
             {
@@ -840,6 +530,7 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
+
             if (TrueItemType == GItemType.Emerald)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
@@ -883,9 +574,6 @@ namespace GilesTrinity
                 return true;
             }
 
-            /*
-             * Run Scripted rules for Weapons/Armor/Jewelry
-             */
             if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
                 Interpreter.InterpreterAction action = StashRule.checkItem(thisitem.item, false);
@@ -907,11 +595,13 @@ namespace GilesTrinity
                 return false;
             }
 
+
             if (thisitem.Quality >= ItemQuality.Legendary)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep legendaries)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
+
             if (TrueItemType == GItemType.CraftingPlan)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep plans)", thisitem.RealName, thisitem.InternalName, TrueItemType);
@@ -929,9 +619,9 @@ namespace GilesTrinity
             return false;
         }
 
-        private static bool IsWeaponArmorJewlery(GilesCachedACDItem thisitem)
+        internal static bool IsWeaponArmorJewlery(GilesCachedACDItem thisitem)
         {
-            return (thisitem.DBBaseType == ItemBaseType.Armor || thisitem.DBBaseType == ItemBaseType.Jewelry || thisitem.DBBaseType == ItemBaseType.Weapon);
+            return (thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Armor || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Jewelry || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Weapon);
         }
 
         /// <summary>
@@ -939,7 +629,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="thisGilesItemType"></param>
         /// <returns></returns>
-        private static double ScoreNeeded(GItemType thisGilesItemType)
+        internal static double ScoreNeeded(GItemType thisGilesItemType)
         {
             double iThisNeedScore = 0;
 
@@ -974,18 +664,18 @@ namespace GilesTrinity
         /// <param name="thisgilesbaseitemtype">The thisgilesbaseitemtype.</param>
         /// <param name="ithisitemvalue">The ithisitemvalue.</param>
         /// <returns></returns>
-        public static bool CheckScoreForNotification(GBaseItemType thisgilesbaseitemtype, double ithisitemvalue)
+        public static bool CheckScoreForNotification(GItemBaseType thisgilesbaseitemtype, double ithisitemvalue)
         {
             switch (thisgilesbaseitemtype)
             {
-                case GBaseItemType.WeaponOneHand:
-                case GBaseItemType.WeaponRange:
-                case GBaseItemType.WeaponTwoHand:
+                case GItemBaseType.WeaponOneHand:
+                case GItemBaseType.WeaponRange:
+                case GItemBaseType.WeaponTwoHand:
                     return (ithisitemvalue >= Settings.Notification.WeaponScore);
-                case GBaseItemType.Armor:
-                case GBaseItemType.Offhand:
+                case GItemBaseType.Armor:
+                case GItemBaseType.Offhand:
                     return (ithisitemvalue >= Settings.Notification.ArmorScore);
-                case GBaseItemType.Jewelry:
+                case GItemBaseType.Jewelry:
                     return (ithisitemvalue >= Settings.Notification.JewelryScore);
             }
             return false;
@@ -994,13 +684,12 @@ namespace GilesTrinity
         /// <summary>
         /// Full Output Of Item Stats
         /// </summary>
-        private static void OutputReport()
+        internal static void OutputReport()
         {
             TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
-            string sLogFileName = ZetaDia.Service.CurrentHero.BattleTagName + " - Stats - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log";
 
             // Create whole new file
-            FileStream LogStream = File.Open(sTrinityPluginPath + sLogFileName, FileMode.Create, FileAccess.Write, FileShare.Read);
+            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("Stats - {0}.log", playerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read);
             using (StreamWriter LogWriter = new StreamWriter(LogStream))
             {
                 LogWriter.WriteLine("===== Misc Statistics =====");
@@ -1191,7 +880,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="IsOriginalTwoSlot"></param>
         /// <returns></returns>
-        private static Vector2 FindValidBackpackLocation(bool IsOriginalTwoSlot)
+        internal static Vector2 FindValidBackpackLocation(bool IsOriginalTwoSlot)
         {
             bool[,] BackpackSlotBlocked = new bool[10, 6];
 

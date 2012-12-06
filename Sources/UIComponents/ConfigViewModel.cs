@@ -42,7 +42,7 @@ namespace GilesTrinity.UIComponents
             OrderStashCommand = new RelayCommand(
                                     (parameter) =>
                                     {
-                                        GilesTrinity.SortStash();
+                                        global::GilesTrinity.TownRun.SortStash();
                                         UILoader.CloseWindow();
                                     });
             HelpLinkCommand = new RelayCommand(
@@ -54,6 +54,16 @@ namespace GilesTrinity.UIComponents
                                             Process.Start(link);
                                         }
                                     });
+            ConfigureLootToHunting = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        ConfigHuntingLoot();
+                                    });
+            ConfigureLootToQuesting = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        ConfigQuestingLoot();
+                                    });
         }
 
         /// <summary>
@@ -61,6 +71,26 @@ namespace GilesTrinity.UIComponents
         /// </summary>
         /// <value>The save command.</value>
         public ICommand HelpLinkCommand
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the HelpLink command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand ConfigureLootToQuesting
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the HelpLink command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand ConfigureLootToHunting
         {
             get;
             private set;
@@ -466,6 +496,46 @@ namespace GilesTrinity.UIComponents
                                     {
                                         _Model.Reset();
                                     });
+        }
+
+        private void ConfigQuestingLoot()
+        {
+            _Model.Loot.Pickup.ArmorBlueLevel = 1;
+            _Model.Loot.Pickup.ArmorYellowLevel = 1;
+            _Model.Loot.Pickup.WeaponBlueLevel = 1;
+            _Model.Loot.Pickup.WeaponYellowLevel = 1;
+            _Model.Loot.Pickup.JewelryBlueLevel = 1;
+            _Model.Loot.Pickup.JewelryYellowLevel = 1;
+            _Model.Loot.Pickup.LegendaryLevel = 1;
+            _Model.Loot.Pickup.GemLevel = 14;
+            _Model.Loot.Pickup.GemType = TrinityGemType.All;
+            _Model.Loot.Pickup.FollowerItem = true;
+            _Model.Loot.Pickup.MinimumGoldStack = 0;
+            _Model.Loot.Pickup.MiscItemLevel = 1;
+            _Model.Loot.Pickup.PotionLevel = 1;
+            _Model.Loot.Pickup.PotionMode = PotionMode.Cap;
+            _Model.Loot.Pickup.DesignPlan = true;
+            _Model.Loot.Pickup.CraftTomes = true;
+        }
+
+        private void ConfigHuntingLoot()
+        {
+            _Model.Loot.Pickup.ArmorBlueLevel = 0;
+            _Model.Loot.Pickup.ArmorYellowLevel = 62;
+            _Model.Loot.Pickup.WeaponBlueLevel = 0;
+            _Model.Loot.Pickup.WeaponYellowLevel = 62;
+            _Model.Loot.Pickup.JewelryBlueLevel = 0;
+            _Model.Loot.Pickup.JewelryYellowLevel = 62;
+            _Model.Loot.Pickup.LegendaryLevel = 60;
+            _Model.Loot.Pickup.GemLevel = 60;
+            _Model.Loot.Pickup.GemType = TrinityGemType.All;
+            _Model.Loot.Pickup.FollowerItem = true;
+            _Model.Loot.Pickup.MinimumGoldStack = 300;
+            _Model.Loot.Pickup.MiscItemLevel = 60;
+            _Model.Loot.Pickup.PotionLevel = 60;
+            _Model.Loot.Pickup.PotionMode = PotionMode.Cap;
+            _Model.Loot.Pickup.DesignPlan = true;
+            _Model.Loot.Pickup.CraftTomes = true;
         }
     }
 }

@@ -1,19 +1,19 @@
 // +---------------------------------------------------------------------------+
-// | _______ ______ _______ ______ _______ _______ _____   
-// ||     __|   __ \    ___|      |_     _|   _   |     |_ 
-// ||__     |    __/    ___|   ---|_|   |_|       |       |
-// ||_______|___|  |_______|______|_______|___|___|_______|
-// |+++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                     
-// +---------------------------------------------------------------------------+
+// |  _______ ______ _______ ______ _______ _______ _____   
+// | |     __|   __ \    ___|      |_     _|   _   |     |_ 
+// | |__     |    __/    ___|   ---|_|   |_|       |       |
+// | |_______|___|  |_______|______|_______|___|___|_______|
+// +---------------------------------------------------------------------------+  
 
 // keep all special items
 // this is a saftey line ... as long it isn't removed it will keep all items
 // specifyed by the rule ... the action of commenting it out
 // will apply all following rules ... this set of rules is no where of complete
-[QUALITY] == "Special"
+[QUALITY] == "Special" -> [KEEP]
 
 // crafting plans setting
 [QUALITY] == "Legendary" && [TYPE] == "CraftingPlan"
-[QUALITY] == "Rare6"     && [TYPE] == "CraftingPlan" -> [TRASH]
-[QUALITY] == "Rare5"     && [TYPE] == "CraftingPlan" -> [TRASH]
-[QUALITY] == "Rare4"     && [TYPE] == "CraftingPlan" -> [TRASH]
+[QUALITY] == "Rare6" && [TYPE] == "CraftingPlan"
+[QUALITY] == "Rare5" && [TYPE] == "CraftingPlan" -> [TRASH]
+[QUALITY] == "Rare4" && [TYPE] == "CraftingPlan" -> [TRASH]
+

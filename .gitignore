@@ -13,8 +13,10 @@ DemonBuddy.exe
 /Sources/log/
 
 /Sources/log/*
-
+/Sources/Logs/*
 /Sources/*.log
+
+Sources/ItemRules/Log/*
 
 Deploy.cmd
 
@@ -22,4 +24,6 @@ GilesBlankCombatRoutine/TrinityCombatRoutine/bin
 GilesBlankCombatRoutine/TrinityCombatRoutine/obj
 
 *.bak
+*.orig
 Latest-GilesTrinity.zip
+Sources/GilesTrinity.csproj.user

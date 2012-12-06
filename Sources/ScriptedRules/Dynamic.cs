@@ -8,6 +8,12 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
+using System.Globalization;
+using GilesTrinity;
+using GilesTrinity.Cache;
+using Zeta.Internals.SNO;
+using Zeta.Internals.Actors;
+using GilesTrinity.ScriptedRules;
 
 namespace System.Linq.Dynamic
 {
@@ -432,7 +438,7 @@ namespace System.Linq.Dynamic
             LessGreater,
             DoubleEqual,
             GreaterThanEqual,
-            DoubleBar
+            DoubleBar,
         }
 
         interface ILogicalSignatures
@@ -562,7 +568,13 @@ namespace System.Linq.Dynamic
             typeof(TimeSpan),
             typeof(Guid),
             typeof(Math),
-            typeof(Convert)
+            typeof(Convert),
+            typeof(GItemType),
+            typeof(GItemBaseType),
+            typeof(TrinityItemQuality),
+            typeof(DamageType),
+            typeof(FollowerType),
+            typeof(Enum)
         };
 
         static readonly Expression trueLiteral = Expression.Constant(true);
@@ -904,7 +916,7 @@ namespace System.Linq.Dynamic
             string text = token.text;
             if (text[0] != '-') {
                 ulong value;
-                if (!UInt64.TryParse(text, out value))
+                if (!UInt64.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
                     throw ParseError(Res.InvalidIntegerLiteral, text);
                 NextToken();
                 if (value <= (ulong)Int32.MaxValue) return CreateLiteral((int)value, text);
@@ -914,7 +926,7 @@ namespace System.Linq.Dynamic
             }
             else {
                 long value;
-                if (!Int64.TryParse(text, out value))
+                if (!Int64.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
                     throw ParseError(Res.InvalidIntegerLiteral, text);
                 NextToken();
                 if (value >= Int32.MinValue && value <= Int32.MaxValue)
@@ -930,11 +942,11 @@ namespace System.Linq.Dynamic
             char last = text[text.Length - 1];
             if (last == 'F' || last == 'f') {
                 float f;
-                if (Single.TryParse(text.Substring(0, text.Length - 1), out f)) value = f;
+                if (Single.TryParse(text.Substring(0, text.Length - 1), NumberStyles.Any, CultureInfo.InvariantCulture, out f)) value = f;
             }
             else {
                 double d;
-                if (Double.TryParse(text, out d)) value = d;
+                if (Double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out d)) value = d;
             }
             if (value == null) throw ParseError(Res.InvalidRealLiteral, text);
             NextToken();
@@ -980,6 +992,7 @@ namespace System.Linq.Dynamic
                 NextToken();
                 return expr;
             }
+
             if (it != null) return ParseMemberAccess(null, it);
             throw ParseError(Res.UnknownIdentifier, token.text);
         }
@@ -991,7 +1004,8 @@ namespace System.Linq.Dynamic
             return it;
         }
 
-        Expression ParseIif() {
+        Expression ParseIif()
+        {
             int errorPos = token.pos;
             NextToken();
             Expression[] args = ParseArgumentList();
@@ -1475,47 +1489,47 @@ namespace System.Linq.Dynamic
             switch (Type.GetTypeCode(GetNonNullableType(type))) {
                 case TypeCode.SByte:
                     sbyte sb;
-                    if (sbyte.TryParse(text, out sb)) return sb;
+                    if (sbyte.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out sb)) return sb;
                     break;
                 case TypeCode.Byte:
                     byte b;
-                    if (byte.TryParse(text, out b)) return b;
+                    if (byte.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out b)) return b;
                     break;
                 case TypeCode.Int16:
                     short s;
-                    if (short.TryParse(text, out s)) return s;
+                    if (short.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out s)) return s;
                     break;
                 case TypeCode.UInt16:
                     ushort us;
-                    if (ushort.TryParse(text, out us)) return us;
+                    if (ushort.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out us)) return us;
                     break;
                 case TypeCode.Int32:
                     int i;
-                    if (int.TryParse(text, out i)) return i;
+                    if (int.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out i)) return i;
                     break;
                 case TypeCode.UInt32:
                     uint ui;
-                    if (uint.TryParse(text, out ui)) return ui;
+                    if (uint.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out ui)) return ui;
                     break;
                 case TypeCode.Int64:
                     long l;
-                    if (long.TryParse(text, out l)) return l;
+                    if (long.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out l)) return l;
                     break;
                 case TypeCode.UInt64:
                     ulong ul;
-                    if (ulong.TryParse(text, out ul)) return ul;
+                    if (ulong.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out ul)) return ul;
                     break;
                 case TypeCode.Single:
                     float f;
-                    if (float.TryParse(text, out f)) return f;
+                    if (float.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out f)) return f;
                     break;
                 case TypeCode.Double:
                     double d;
-                    if (double.TryParse(text, out d)) return d;
+                    if (double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out d)) return d;
                     break;
                 case TypeCode.Decimal:
                     decimal e;
-                    if (decimal.TryParse(text, out e)) return e;
+                    if (decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out e)) return e;
                     break;
             }
             return null;

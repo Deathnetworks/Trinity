@@ -12,7 +12,6 @@ namespace GilesTrinity
     {
         private static void RefreshDiaGetWeights()
         {
-
             // Store if we are ignoring all units this cycle or not
             bool bIgnoreAllUnits = !bAnyChampionsPresent &&
                                     !bAnyMobsInCloseRange &&
@@ -287,12 +286,12 @@ namespace GilesTrinity
 
                             // We'll weight them based on distance, giving gold less weight and close objects more
                             if (cacheObject.GoldAmount > 0)
-                                cacheObject.Weight = 11000d - (Math.Floor(cacheObject.CentreDistance) * 200d);
+                                cacheObject.Weight = 5000d - (Math.Floor(cacheObject.CentreDistance) * 200d);
                             else
-                                cacheObject.Weight = 13000d - (Math.Floor(cacheObject.CentreDistance) * 190d);
+                                cacheObject.Weight = 8000d - (Math.Floor(cacheObject.CentreDistance) * 190d);
 
                             // Point-blank items get a weight increase 
-                            if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 12f)
+                            if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 8f)
                                 cacheObject.Weight += 600d;
 
                             // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
@@ -449,7 +448,8 @@ namespace GilesTrinity
 
                             // We're standing on the damn thing... open it!!
                             if (cacheObject.RadiusDistance <= 12f)
-                                cacheObject.Weight += 250000d;
+                                cacheObject.Weight += 30000d;
+
                             break;
                         }
                     case GObjectType.Destructible:
@@ -514,6 +514,10 @@ namespace GilesTrinity
                             // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
                             if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
                                 cacheObject.Weight = 1;
+
+                            if (bAnyMobsInCloseRange || (CurrentTarget != null && CurrentTarget.IsBossOrEliteRareUnique))
+                                cacheObject.Weight = 1;
+
                             break;
                         }
                     case GObjectType.Container:
@@ -592,7 +596,7 @@ namespace GilesTrinity
             }
 
             // Loop through all the objects and give them a weight
-            if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0)
+            if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.RActorGuid != CurrentTargetRactorGUID)
             {
                 DbHelper.Log(TrinityLogLevel.Verbose, 
                                 LogCategory.Targetting, 

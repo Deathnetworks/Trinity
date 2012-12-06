@@ -154,7 +154,7 @@ namespace GilesTrinity
         /// <summary>
         /// Holds all of the player's current info handily cached, updated once per loop with a minimum timer on updates to save D3 memory hits
         /// </summary>
-        public static GilesPlayerCache playerStatus = new GilesPlayerCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, vNullLocation, false, 0, 1);
+        public static GilesPlayerCache playerStatus = new GilesPlayerCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, vNullLocation, false, 0, 1, ActorClass.Invalid, String.Empty);
 
         /// <summary>
         /// Obstacle cache, things we can't or shouldn't move through
@@ -239,8 +239,6 @@ namespace GilesTrinity
         // Date time we were last told to stick to close range targets
         private static DateTime lastForcedKeepCloseRange = DateTime.Today;
 
-        // The distance last loop, so we can compare to current distance to work out if we moved
-        private static float lastDistance = 0f;
 
         // Caching of the current primary target's health, to detect if we AREN'T damaging it for a period of time
         private static double iTargetLastHealth = 0f;
@@ -304,6 +302,7 @@ namespace GilesTrinity
 
         // The number of loops to extend kill range for after a fight to try to maximize kill bonus exp etc.
         private static int iKeepKillRadiusExtendedFor = 0;
+        private static DateTime timeKeepKillRadiusExtendedUntil = DateTime.Today;
 
         // The number of loops to extend loot range for after a fight to try to stop missing loot
         private static int iKeepLootRadiusExtendedFor = 0;
@@ -350,20 +349,6 @@ namespace GilesTrinity
         // Variable to let us force new target creations immediately after a root
         private static bool wasRootedLastTick = false;
 
-        // Random variables used during item handling and town-runs
-        private static int itemDelayLoopLimit = 0;
-        private static int currentItemLoops = 0;
-        private static bool loggedAnythingThisStash = false;
-        private static bool updatedStashMap = false;
-        private static bool loggedJunkThisStash = false;
-        private static string ValueItemStatString = "";
-        private static string junkItemStatString = "";
-        private static bool testingBackpack = false;
-
-        // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
-        private static bool[,] StashSlotBlocked = new bool[7, 30];
-        private static bool bOutputItemScores = false;
-
         // Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
         private static GilesPower powerBuff;
         private static GilesPower currentPower;
@@ -375,9 +360,6 @@ namespace GilesTrinity
         public static bool bOnlyTarget = false;
 
         // Target provider and core routine variables
-        public static string sTrinityPluginPath = "";
-        private static string sTrinityConfigFile = "";
-        private static string sTrinityEmailConfigFile = "";
         public static ActorClass iMyCachedActorClass = ActorClass.Invalid;
         private static bool bAnyChampionsPresent = false;
         private static bool bAnyTreasureGoblinsPresent = false;
@@ -402,14 +384,14 @@ namespace GilesTrinity
         /// <summary>
         /// Weapon swapping (Monk Sweeping Wind for higher DPS)
         /// </summary>
-        private static WeaponSwap weaponSwap = new WeaponSwap();
-        private static DateTime WeaponSwapTime = DateTime.Today;
+        internal static WeaponSwap weaponSwap = new WeaponSwap();
+        internal static DateTime WeaponSwapTime = DateTime.Today;
 
         // Goblinney things
         private static int iTotalNumberGoblins = 0;
         private static DateTime lastGoblinTime = DateTime.Today;
 
-        private static DateTime SweepWindSpam = DateTime.Today; //intell -- inna
+        internal static DateTime SweepWindSpam = DateTime.Today; //intell -- inna
 
         // Variables relating to quick-reference of monsters within sepcific ranges (if anyone has suggestion for similar functionality with reduced CPU use, lemme know, but this is fast atm!)
         private static int[] iElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
@@ -483,32 +465,18 @@ namespace GilesTrinity
         private static HashSet<int> _hashsetItemPicksLookedAt = new HashSet<int>();
         private static HashSet<int> _hashsetItemFollowersIgnored = new HashSet<int>();
 
-        // This dictionary stores attempted stash counts on items, to help detect any stash stucks on the same item etc.
-        private static Dictionary<int, int> _dictItemStashAttempted = new Dictionary<int, int>();
 
         // These objects are instances of my stats class above, holding identical types of data for two different things - one holds item DROP stats, one holds item PICKUP stats
-        private static GItemStats ItemsDroppedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
-        private static GItemStats ItemsPickedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
-        private static HashSet<GilesCachedACDItem> hashGilesCachedKeepItems = new HashSet<GilesCachedACDItem>();
-        private static HashSet<GilesCachedACDItem> hashGilesCachedSalvageItems = new HashSet<GilesCachedACDItem>();
-        private static HashSet<GilesCachedACDItem> hashGilesCachedSellItems = new HashSet<GilesCachedACDItem>();
-
+        internal static GItemStats ItemsDroppedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
+        internal static GItemStats ItemsPickedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
+        
+        
         // Whether to try forcing a vendor-run for custom reasons
         public static bool ForceVendorRunASAP = false;
         public static bool bWantToTownRun = false;
-        private static bool bLastTownRunCheckResult = false;
 
-        // Whether salvage/sell run should go to a middle-waypoint first to help prevent stucks
-        private static bool bGoToSafetyPointFirst = false;
-        private static bool bGoToSafetyPointSecond = false;
-        private static bool bReachedSafety = false;
-
-        // DateTime check to prevent inventory-check spam when looking for repairs being needed
-        private static DateTime timeLastAttemptedTownRun = DateTime.Now;
-        private static bool bCurrentlyMoving = false;
-        private static bool bReachedDestination = false;
-        private static bool bNeedsEquipmentRepairs = false;
-        private static float iLowestDurabilityFound = -1;
+        // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
+        private static bool[,] StashSlotBlocked = new bool[7, 30];
 
         /*
          * From RefreshDiaObject
@@ -583,11 +551,6 @@ namespace GilesTrinity
         /// </summary>
         private static Regex nameNumberTrimRegex = new Regex(@"-\d+$");
 
-        /* Special Sauce Dictionaries for SPEEEEEEED
-         * This set of dictionaries are used for huge performance increases throughout, and a minimization of DB mis-read/null exception errors
-         * Uses a little more ram - but for a massive CPU gain. And ram is cheap, CPU is not!
-         */
-
         // The following 2 variables are used to clear the dictionaries out - clearing one dictionary out per maximum every 2 seconds, working through in sequential order
         private static DateTime lastClearedCacheDictionary = DateTime.Today;
         private static int iLastClearedCacheDictionary = 0;
@@ -603,23 +566,40 @@ namespace GilesTrinity
         // When did we last send a move-power command?
         private static DateTime lastSentMovePower = DateTime.Today;
 
-        // Email stuff
-        public static string SmtpServer = "smtp.gmail.com";
-        public static StringBuilder EmailMessage = new StringBuilder();
 
-        // HandleTarget
+        /// <summary>
+        /// If we should force movement
+        /// </summary>
         private static bool bForceNewMovement = false;
 
-        // Store player current position
+        /// <summary>
+        /// Store player current position
+        /// </summary>
         Vector3 vMyCurrentPosition = Vector3.Zero;
 
         // For path finding
+        /// <summary>
+        /// The Grid Provider for Navigation checks
+        /// </summary>
         private static ISearchAreaProvider gp;
+        /// <summary>
+        /// The PathFinder for Navigation checks
+        /// </summary>
         private static PathFinder pf;
 
-        // Behaviors: How close we need to get to the target before we consider it "reached"
+        /// <summary>
+        /// Behaviors: How close we need to get to the target before we consider it "reached"
+        /// </summary>
         private static float fRangeRequired = 1f;
+        /// <summary>
+        /// Behaviors: How close we need to get to the target before we consider it "reached"
+        /// </summary>
         private static float fDistanceReduction = 0f;
+
+        /// <summary>
+        /// Special check to force re-buffing before castign archon
+        /// </summary>
+        private static bool CanCastArchon = false;
 
         // Darkfriend's Looting Rule
         public static Interpreter StashRule = new Interpreter();

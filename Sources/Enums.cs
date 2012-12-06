@@ -65,7 +65,7 @@
     /// <summary>
     /// Base types, eg "one handed weapons" "armors" etc.
     /// </summary>
-    public enum GBaseItemType
+    public enum GItemBaseType
     {
         Unknown,
         WeaponOneHand,
@@ -98,6 +98,15 @@
         Interactable,
         Destructible,
         Barricade,
-        Backtrack
+        Backtrack,
+        ServerProp,
+        MarkerLocation,
+        StartLocation, 
+        SavePoint,
+        Checkpoint,
+        Proxy,
+        Trigger
+        
+
     }
 }

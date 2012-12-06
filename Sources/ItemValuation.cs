@@ -6,11 +6,14 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
+        internal static string ValueItemStatString = "";
+        internal static string junkItemStatString = "";
+        
         private static double[] ItemMaxStats = new double[TOTALSTATS];
         private static double[] ItemMaxPoints = new double[TOTALSTATS];
         private static bool IsInvalidItem = true;
         private static double TotalItemPoints = 0;
-        private static GBaseItemType baseItemType = GBaseItemType.Unknown;
+        private static GItemBaseType baseItemType = GItemBaseType.Unknown;
 
         /// <summary>
         /// This is a bonus applied at the end of valuation 
@@ -35,7 +38,7 @@ namespace GilesTrinity
         /// <param name="item"></param>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        private static double ValueThisItem(GilesCachedACDItem item, GItemType itemType) 
+        internal static double ValueThisItem(GilesCachedACDItem item, GItemType itemType) 
         {
             // Reset static variables
             TotalItemPoints = 0;
@@ -70,8 +73,8 @@ namespace GilesTrinity
 
             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "NEXT ITEM= " + item.RealName + " - " + item.InternalName + " [" + baseItemType.ToString() + " - " + itemType.ToString() + "]");
 
-            ValueItemStatString = "";
-            junkItemStatString = "";
+            TownRun.ValueItemStatString = "";
+            TownRun.junkItemStatString = "";
 
             // We loop through all of the stats, in a particular order. The order *IS* important, because it pulls up primary stats first, BEFORE other stats
             for (int i = 0; i <= (TOTALSTATS - 1); i++)
@@ -162,7 +165,7 @@ namespace GilesTrinity
                     }
 
                     // This *REMOVES* score from follower items for stats that followers don't care about
-                    if (baseItemType == GBaseItemType.FollowerItem && (i == CRITDAMAGE || i == LIFEONHIT || i == ALLRESIST))
+                    if (baseItemType == GItemBaseType.FollowerItem && (i == CRITDAMAGE || i == LIFEONHIT || i == ALLRESIST))
                         FinalBonusGranted -= 0.9;
 
                     // Bonus 15% for being *at* the stat cap (ie - completely maxed out, or very very close to), but not for the socket stat (since sockets are usually 0 or 1!)
@@ -185,7 +188,7 @@ namespace GilesTrinity
                     {
 
                         // Off-handers get less value from sockets
-                        if (baseItemType == GBaseItemType.Offhand)
+                        if (baseItemType == GItemBaseType.Offhand)
                         {
                             FinalBonusGranted -= 0.35;
                         }
@@ -228,7 +231,7 @@ namespace GilesTrinity
                     // Right, here's quite a long bit of code, but this is basically all about granting all sorts of bonuses based on primary stat values of all different ranges
 
                     // For all item types *EXCEPT* weapons
-                    if (baseItemType != GBaseItemType.WeaponRange && baseItemType != GBaseItemType.WeaponOneHand && baseItemType != GBaseItemType.WeaponTwoHand)
+                    if (baseItemType != GItemBaseType.WeaponRange && baseItemType != GItemBaseType.WeaponOneHand && baseItemType != GItemBaseType.WeaponTwoHand)
                     {
                         double SpecialBonus = 0;
                         if (i > LIFEPERCENT)
@@ -285,7 +288,7 @@ namespace GilesTrinity
                                     }
                                 }
                             }
-                            if (baseItemType == GBaseItemType.Armor || baseItemType == GBaseItemType.Jewelry)
+                            if (baseItemType == GItemBaseType.Armor || baseItemType == GItemBaseType.Jewelry)
                             {
 
                                 // Grant a 50% bonus to stats if a primary is above 200 AND (vitality above 200 or life% within 90% max)
@@ -464,8 +467,8 @@ namespace GilesTrinity
                         FinalBonusGranted += 0.2;
 
                     // Blue item point reduction for non-weapons
-                    if (item.Quality < ItemQuality.Rare4 && (baseItemType == GBaseItemType.Armor || baseItemType == GBaseItemType.Offhand ||
-                        baseItemType == GBaseItemType.Jewelry || baseItemType == GBaseItemType.FollowerItem) && ((TempStatistic / ItemMaxStats[i]) < 0.88))
+                    if (item.Quality < ItemQuality.Rare4 && (baseItemType == GItemBaseType.Armor || baseItemType == GItemBaseType.Offhand ||
+                        baseItemType == GItemBaseType.Jewelry || baseItemType == GItemBaseType.FollowerItem) && ((TempStatistic / ItemMaxStats[i]) < 0.88))
                         FinalBonusGranted -= 0.9;
 
                     // Special all-resist bonuses
@@ -866,14 +869,14 @@ namespace GilesTrinity
             TotalItemPoints *= GlobalMultiplier;
 
             // 2 handed weapons and ranged weapons lose a large score for low DPS
-            if (baseItemType == GBaseItemType.WeaponRange || baseItemType == GBaseItemType.WeaponTwoHand)
+            if (baseItemType == GItemBaseType.WeaponRange || baseItemType == GItemBaseType.WeaponTwoHand)
             {
                 if ((HadStat[TOTALDPS] / ItemMaxStats[TOTALDPS]) <= 0.7)
                     TotalItemPoints *= 0.75;
             }
 
             // Weapons should get a nice 15% bonus score for having very high primaries
-            if (baseItemType == GBaseItemType.WeaponRange || baseItemType == GBaseItemType.WeaponOneHand || baseItemType == GBaseItemType.WeaponTwoHand)
+            if (baseItemType == GItemBaseType.WeaponRange || baseItemType == GItemBaseType.WeaponOneHand || baseItemType == GItemBaseType.WeaponTwoHand)
             {
                 if (HighestScoringPrimary > 0 && (HighestScoringPrimary >= ItemMaxPoints[WhichPrimaryIsHighest] * 0.9))
                 {

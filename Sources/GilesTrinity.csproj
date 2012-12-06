@@ -38,7 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Demonbuddy">
-      <HintPath>..\Demonbuddy.exe</HintPath>
+      <HintPath>..\..\Demonbuddy.exe</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
@@ -50,6 +50,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
@@ -64,7 +65,11 @@
     <Compile Include="Abilities\WitchDoctor.cs" />
     <Compile Include="AvoidanceManager.cs" />
     <Compile Include="AvoidanceType.cs" />
+    <Compile Include="Cache\CacheAvoidance.cs" />
+    <Compile Include="Cache\CacheGizmo.cs" />
     <Compile Include="Cache\CacheItem.cs" />
+    <Compile Include="Cache\CacheUnit.cs" />
+    <Compile Include="Cache\CacheUtils.cs" />
     <Compile Include="Cache\TrinityItemQuality.cs" />
     <Compile Include="Classes\GilesObjstacle.cs" />
     <Compile Include="Classes\GilesPower.cs" />
@@ -76,19 +81,23 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
-    <Compile Include="BotStart.cs" />
-    <Compile Include="Interpreter.cs" />
+    <Compile Include="BotManager.cs" />
     <Compile Include="ItemRules\Core\Formula.cs" />
     <Compile Include="ItemRules\Core\Parser.cs" />
     <Compile Include="ItemRules\Core\ParseTree.cs" />
     <Compile Include="ItemRules\Core\Scanner.cs" />
     <Compile Include="ItemRules\Core\TextHighlighter.cs" />
     <Compile Include="ScriptedRules\Dynamic.cs" />
+    <Compile Include="Technicals\Loader.cs" />
+    <Compile Include="TownRun.cs" />
+    <Compile Include="TrinityPowerManager.cs" />
+    <Compile Include="ScheduledPower.cs" />
     <Compile Include="ScriptedRules\RulesManager.cs" />
     <Compile Include="ScriptedRules\ScriptedRuleAction.cs" />
     <Compile Include="ScriptedRules\ScriptedRule.cs" />
     <Compile Include="Cache\CacheManager.cs" />
     <Compile Include="Cache\CacheObject.cs" />
+    <Compile Include="Cache\CacheRefresher.cs" />
     <Compile Include="Technicals\DbHelper.cs" />
     <Compile Include="Technicals\LogCategory.cs" />
     <Compile Include="Technicals\TrinitiyLogLevel.cs" />
@@ -97,6 +106,7 @@
     <Compile Include="DbProvider\GilesLootTargetingProvider.cs" />
     <Compile Include="DbProvider\GilesObstacleTargetingProvider.cs" />
     <Compile Include="Classes\GilesObject.cs" />
+    <Compile Include="Interpreter.cs" />
     <Compile Include="Notifications\NotificationManager.cs" />
     <Compile Include="Notifications\ProwlNotification.cs" />
     <Compile Include="Notifications\ProwlNotificationPriority.cs" />
@@ -119,7 +129,6 @@
     <Compile Include="Settings\Loot\PotionMode.cs" />
     <Compile Include="Settings\Loot\SalvageOption.cs" />
     <Compile Include="Settings\Loot\TownRunSetting.cs" />
-    <Compile Include="Settings\Loot\TrashMode.cs" />
     <Compile Include="Settings\MailServerSetting.cs" />
     <Compile Include="Settings\NotificationSetting.cs" />
     <Compile Include="Settings\TrinitySetting.cs" />
@@ -236,10 +245,16 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
+    <Content Include="Dictionaries.xml" />
     <Content Include="ItemRules\ItemRules2.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Dictionaries.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ItemRules\Loot.utr" />
     <None Include="ItemRules\Rules\config.dis" />
     <None Include="ItemRules\Rules\legendary.dis" />
     <None Include="ItemRules\Rules\magic.dis" />
@@ -253,14 +268,13 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <PreBuildEvent>rd $(ProjectDir)obj\
-rd $(ProjectDir)bin\
+    <PreBuildEvent>rd /Q /S $(ProjectDir)Log\
 
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>rd /S /Q "C:\UnifiedTrinity\UnifiedTrinity\Sources\obj\"
-rd /S /Q "C:\UnifiedTrinity\UnifiedTrinity\Sources\bin\"
+    <PostBuildEvent>rd /S /Q "$(ProjectDir)obj\"
+REM rd /S /Q "$(ProjectDir)bin\"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>

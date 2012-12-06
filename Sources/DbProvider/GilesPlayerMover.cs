@@ -47,6 +47,70 @@ namespace GilesTrinity.DbProvider
         public static DateTime timeLastRestartedGame = DateTime.Today;
         // Store player current position
         public static Vector3 vMyCurrentPosition = Vector3.Zero;
+
+        private static int lastKnowCoin;
+        private static DateTime lastCheckBag;
+        private static DateTime lastRefreshCoin;
+
+        private static void ResetCheckGold()
+        {
+            lastCheckBag = DateTime.Now;
+            lastRefreshCoin = DateTime.Now;
+            lastKnowCoin = 0;
+        }
+
+        private static bool GoldInactive()
+        {
+            if (!GilesTrinity.Settings.Advanced.GoldInactivityEnabled)
+            {
+                // timer isn't enabled so move along!
+                ResetCheckGold();
+                return false;
+            }
+            try
+            {
+                if (!ZetaDia.IsInGame)
+                {
+                    ResetCheckGold(); //If not in game, reset the timer
+                    return false;
+                }
+                if (ZetaDia.IsLoadingWorld || lastCheckBag == null)
+                    return false;
+                if ((DateTime.Now.Subtract(lastCheckBag).TotalSeconds < 5))
+                    return false;
+
+                lastCheckBag = DateTime.Now;
+                int currentcoin = ZetaDia.Me.Inventory.Coinage;
+
+                if (currentcoin != lastKnowCoin && currentcoin != 0)
+                {
+                    lastRefreshCoin = DateTime.Now;
+                    lastKnowCoin = currentcoin;
+                }
+                int notpickupgoldsec = Convert.ToInt32(DateTime.Now.Subtract(lastRefreshCoin).TotalSeconds);
+                if (notpickupgoldsec >= GilesTrinity.Settings.Advanced.GoldInactivityTimer)
+                {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Gold inactivity after {0}s. Sending abort.", notpickupgoldsec);
+                    lastRefreshCoin = DateTime.Now;
+                    lastKnowCoin = currentcoin;
+                    notpickupgoldsec = 0;
+                    return true;
+                }
+                else if (notpickupgoldsec > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Gold unchanged for {0}s", notpickupgoldsec);
+                }
+            }
+            catch (Exception e)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, e.Message);
+            }
+            return false;
+        }
+
+
+
+
         // Check if we are stuck or not
         // Simply checks for position changing max once every 3 seconds, to decide on stuck
         public static bool UnstuckChecker(Vector3 vMyCurrentPosition)
@@ -74,12 +138,14 @@ namespace GilesTrinity.DbProvider
                 if (c != null && c.GetType() == typeof(WaitTimerTag))
                 {
                     vOldPosition = Vector3.Zero;
+                    ResetCheckGold();
                     return false;
                 }
                 // We're not stuck if we're doing stuff!
                 if (ZetaDia.Me.IsInConversation || ZetaDia.IsPlayingCutscene || ZetaDia.IsLoadingWorld || (vendorWindow.IsValid && vendorWindow.IsVisible))
                 {
                     vOldPosition = Vector3.Zero;
+                    ResetCheckGold();
                     return false;
                 }
                 // We're not stuck if we're doing stuff!
@@ -88,6 +154,7 @@ namespace GilesTrinity.DbProvider
                     aState == AnimationState.Channeling)
                 {
                     vOldPosition = Vector3.Zero;
+                    ResetCheckGold();
                     return false;
                 }
                 if (vOldPosition != Vector3.Zero && vOldPosition.Distance(vMyCurrentPosition) <= 4f)
@@ -152,7 +219,7 @@ namespace GilesTrinity.DbProvider
                 // Temporarily log stuff
                 if (iTotalAntiStuckAttempts == 1 && GilesTrinity.Settings.Advanced.LogStuckLocation)
                 {
-                    FileStream LogStream = File.Open(GilesTrinity.sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - Stucks - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
+                    FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "Stucks - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
                     {
                         LogWriter.WriteLine(DateTime.Now.ToString() + ": Original Destination=" + vOldMoveToTarget.ToString() + ". Current player position when stuck=" + vMyCurrentPosition.ToString());
@@ -184,27 +251,6 @@ namespace GilesTrinity.DbProvider
             if (iTimesReachedMaxUnstucks == 2)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Anti-stuck measures failed. Now attempting to reload current profile.");
-
-                // First see if we need to, and can, teleport to town
-                //while (!ZetaDia.Me.IsInTown)
-                //{
-                //    iSafetyLoops++;
-                //    GilesTrinity.WaitWhileAnimating(5, true);
-                //    ZetaDia.Me.UsePower(SNOPower.UseStoneOfRecall, ZetaDia.Me.Position, ZetaDia.Me.WorldDynamicId, -1);
-                //    Thread.Sleep(1000);
-                //    GilesTrinity.WaitWhileAnimating(1000, true);
-                //    if (iSafetyLoops > 5)
-                //        break;
-                //}
-                //Thread.Sleep(1000);
-                //// As long as we successfully reached town, reload the profile
-                //if (ZetaDia.Me.IsInTown)
-                //{
-                //    ProfileManager.Load(Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
-                //    Logging.Write("[Trinity] Anti-stuck successfully reloaded current profile, DemonBuddy now navigating again.");
-                //    Thread.Sleep(3000);
-                //    return vSafeMovementLocation;
-                //}
 
                 Navigator.Clear();
 
@@ -267,15 +313,35 @@ namespace GilesTrinity.DbProvider
             //if (GilesTrinity.bDontMoveMeIAmDoingShit)
             //    return;
             // Store player current position
-            
+
             vMyCurrentPosition = ZetaDia.Me.Position;
-            
+
             // Store distance to current moveto target
             float fDistanceFromTarget;
-            
+
             // Do unstuckery things
             if (GilesTrinity.Settings.Advanced.UnstuckerEnabled)
             {
+                if (GoldInactive())
+                {
+                    // Exit the game and reload the profile
+                    timeLastRestartedGame = DateTime.Now;
+                    string sUseProfile = GilesTrinity.sFirstProfileSeen;
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck measures exiting current game.");
+                    // Load the first profile seen last run
+                    ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
+                                            ? sUseProfile
+                                            : Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
+                    Thread.Sleep(1000);
+                    GilesTrinity.GilesResetEverythingNewGame();
+                    ZetaDia.Service.Games.LeaveGame();
+                    // Wait for 10 second log out timer if not in town
+                    if (!ZetaDia.Me.IsInTown)
+                    {
+                        Thread.Sleep(10000);
+                    }
+                    return;
+                }
                 // Store the "real" (not anti-stuck) destination
                 vOldMoveToTarget = vMoveToTarget;
                 // See if we can reset the 10-limit unstuck counter, if >120 seconds since we last generated an unstuck location
@@ -496,7 +562,7 @@ namespace GilesTrinity.DbProvider
                         if (!hashDoneThisVector.Contains(vMoveToTarget))
                         {
                             // Log it
-                            FileStream LogStream = File.Open(GilesTrinity.sTrinityPluginPath + ZetaDia.Service.CurrentHero.BattleTagName + " - LongPaths - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log", FileMode.Append, FileAccess.Write, FileShare.Read);
+                            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath ,"LongPaths - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                             using (StreamWriter LogWriter = new StreamWriter(LogStream))
                             {
                                 LogWriter.WriteLine(DateTime.Now.ToString() + ":");

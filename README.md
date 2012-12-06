@@ -3,43 +3,82 @@
 
 Major new features: 
 
+* Source control :)
+
 * Split Monolithic single file into seperate files by Class
 
 * Split GilesTrinity class into separate files by Feature
 
 * Repair Cache System for Gizmo's
 
-* Create a setting class hierarchy for replace All private fields in Plugin class.
+* Create a settings class hierarchy which replaces all private fields in Plugin class.
 
 * Rebuild entire UI system to utilize XAML/WPF
 
-* Improve Readability
+* Improved code Readability
 
 
 
 Code Cleanup TODO: 
 
-* More Refactoring
+* More Refactoring, cleaning, optimization (does it ever end?)
 
-* Separate TownRun in simple class : TownRunManager
+* Put XML Comment on all classes and members
 
-* Put XML Comment on all class and member
-
-* Refactor logging system to use DbHelper class
-
-* Refactor Ability Selector for readability
+* Refactor AbilitySelector for readability, maybe we can even get to behavior trees someday
 
 * Refactor TargetHandler for readability / flow
 
 
 Future Planned Improvements: 
 
-* Add stayInTown attribut for TrinityTownRun Profile Tag 
+* New cache system, trash the HashSet's and Dictionaries for an object based system
+
+* Add stayInTown attribute for TrinityTownRun Profile Tag 
 
 * Default Loot Settings options for Questing, Champion Farming
 
 
 
+Changelog 1.7.1.5:
+
+* Fixed memory read errors
+
+* Fixed incorrect log level for cache refresh exceptions
+
+* Darkfriend77 ItemRules2 included
+
+* Latest version of tesslerc's Monk WeaponSwap
+
+* Fixes for Magi's Uber run profiles
+
+* Can now set item pickup default levels - Questing / Champion Hunting
+
+* Fixed "Iron Gate" for good :)
+
+* Fixed player summons being blacklisted prior to being counted
+
+* Fixed stuck after killing the Butcher
+
+* New gold pickup logic from user !sp
+
+* Hopefully fixed kiting & Changed Kiting defaults for WIZ/WD to 0
+
+* Hopefully fixed the possibilities of not picking up items (legendaries) even if not in LoS or not navigable.
+
+* Started implimenting new cache system
+
+* Started implimenting new item rule scripting system
+  
+
+
+Changelog 1.7.1.4:
+
+* Fixes gold pickup radius
+
+* Fixes errors/exceptions in incorrect log level
+
+* Can now reload script rules from GUI
 
 
 Changelog 1.7.1.3:

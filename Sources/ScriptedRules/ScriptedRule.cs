@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GilesTrinity.Cache;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,19 @@ namespace GilesTrinity.ScriptedRules
             set;
         }
 
+        public Delegate UnidentifiedLambdaExpression
+        {
+            get;
+            set;
+        }
+
         public string Expression
+        {
+            get;
+            set;
+        }
+
+        public string UnidentifiedExpression
         {
             get;
             set;

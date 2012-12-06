@@ -4,23 +4,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Zeta.Internals.Actors;
 
 namespace GilesTrinity.Cache
 {
     internal static class CacheManager
     {
         #region Delegates
-        public delegate CacheObject CacheObjectGetterDelegate(int rActorGUID);
-        public delegate void CacheObjectRefresherDelegate(int rActorGUID, CacheObject cacheObject);
+        public delegate CacheObject CacheObjectGetterDelegate(int acdGuid, ACD acdObject);
+        public delegate void CacheObjectRefresherDelegate(int acdGuid, ACD acdObject, CacheObject cacheObject);
         #endregion Delegates
 
         #region Fields
         private static CacheObjectGetterDelegate _CacheObjectGetter;
-        private static readonly IDictionary<int, CacheObject> _Cache = new Dictionary<int, CacheObject>();
+        private static IDictionary<int, CacheObject> _Cache = new Dictionary<int, CacheObject>();
         private static CacheObjectRefresherDelegate _CacheObjectRefresher;
         private static readonly object _Synchronizer = new object();
         private static Thread _CacheCleaner;
-        private static readonly IDictionary<GObjectType, uint> _CacheTimeout = new Dictionary<GObjectType, uint>();
+        private static readonly IDictionary<CacheType, uint> _CacheTimeout = new Dictionary<CacheType, uint>();
         private static uint _MaxRefreshRate = 300;
         #endregion Fields
 
@@ -67,11 +68,37 @@ namespace GilesTrinity.Cache
         /// Gets the cache timeout by <see cref="GObjectType"/>.
         /// </summary>
         /// <value>The cache timeout.</value>
-        public static IDictionary<GObjectType, uint> CacheTimeout
+        public static IDictionary<CacheType, uint> CacheTimeout
         {
             get
             {
                 return _CacheTimeout;
+            }
+        }
+
+        public static IDictionary<int, CacheObject> Cache
+        {
+            get
+            {
+                return _Cache;
+            }
+            set
+            {
+                if (_Cache != null)
+                {
+                    _Cache = value;
+                }
+            }
+        }
+
+        public static bool ContainsKey(int acdGuid)
+        {
+            using (new PerformanceLogger("CacheManager.PutObject"))
+            {
+                lock (_Synchronizer)
+                {
+                    return _Cache.ContainsKey(acdGuid);
+                }
             }
         }
 
@@ -90,7 +117,7 @@ namespace GilesTrinity.Cache
                 if (MaxRefreshRate != value)
                 {
                     _MaxRefreshRate = value;
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.CacheManagement, "Your refresh rate on cache have been set to {0}.", value);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "Your refresh rate on cache have been set to {0}.", value);
                 }
             }
         }
@@ -109,21 +136,13 @@ namespace GilesTrinity.Cache
                     throw new InvalidOperationException("CacheManager is already initialized.");
                 }
 
-                _CacheTimeout.Add(GObjectType.Avoidance, 60000);
-                _CacheTimeout.Add(GObjectType.Backtrack, 60000);
-                _CacheTimeout.Add(GObjectType.Barricade, 60000);
-                _CacheTimeout.Add(GObjectType.Container, 60000);
-                _CacheTimeout.Add(GObjectType.Destructible, 60000);
-                _CacheTimeout.Add(GObjectType.Door, 60000);
-                _CacheTimeout.Add(GObjectType.Globe, 60000);
-                _CacheTimeout.Add(GObjectType.Gold, 60000);
-                _CacheTimeout.Add(GObjectType.HealthWell, 60000);
-                _CacheTimeout.Add(GObjectType.Interactable, 60000);
-                _CacheTimeout.Add(GObjectType.Item, 60000);
-                _CacheTimeout.Add(GObjectType.Shrine, 60000);
-                _CacheTimeout.Add(GObjectType.Unit, 60000);
-                _CacheTimeout.Add(GObjectType.Unknown, 60000);
-
+                _CacheTimeout.Add(CacheType.Avoidance, 60000);
+                _CacheTimeout.Add(CacheType.Gizmo, 60000);
+                _CacheTimeout.Add(CacheType.Item, 60000);
+                _CacheTimeout.Add(CacheType.Object, 60000);
+                _CacheTimeout.Add(CacheType.Other, 60000);
+                _CacheTimeout.Add(CacheType.Unit, 60000);
+                
                 _CacheCleaner = new Thread(MaintainCache);
                 _CacheCleaner.Priority = ThreadPriority.Lowest;
                 _CacheCleaner.IsBackground = true;
@@ -136,39 +155,77 @@ namespace GilesTrinity.Cache
         /// </summary>
         public static void Destroy()
         {
-            using (new PerformanceLogger("CacheManager.Initialize"))
+            using (new PerformanceLogger("CacheManager.Destroy"))
             {
                 _CacheCleaner.Abort();
+                _CacheCleaner = null;
                 lock (_Synchronizer)
                 {
                     _Cache.Clear();
+                    _CacheTimeout.Clear();
                 }
             }
         }
 
         /// <summary>Gets an object from cache.</summary>
-        /// <param name="rActorGuid">The RActorGUID.</param>
-        /// <returns>Cached object corresponding to the <paramref name="rActorGuid"/></returns>
-        /// <exception cref="System.InvalidOperationException">You must set CacheObjectGetter property before calling GetObject</exception>
-        public static CacheObject GetObject(int rActorGuid)
+        /// <param name="acdObject">The acd object.</param>
+        /// <returns>
+        /// Cached object corresponding to the <paramref name="acdObject" />
+        /// </returns>
+        public static CacheObject GetObject(ACD acdObject)
+        {
+            if (acdObject == null)
+            {
+                return null;
+            }
+
+            return GetObject(acdObject.ACDGuid, acdObject);
+        }
+
+        /// <summary>Gets an object from cache.</summary>
+        /// <param name="acdObject">The acd object.</param>
+        /// <returns>
+        /// Cached object corresponding to the <paramref name="acdObject" />
+        /// </returns>
+        public static T GetObject<T>(ACD acdObject)
+            where T : CacheObject
+        {
+            if (acdObject == null)
+            {
+                return null;
+            }
+
+            return (T)GetObject(acdObject.ACDGuid, acdObject);
+        }
+
+        /// <summary>Gets the object from cache.</summary>
+        /// <param name="acdGuid">The ACDGuid.</param>
+        /// <returns>Cached object corresponding to the <paramref name="acdGuid" /></returns>
+        public static CacheObject GetObject(int acdGuid)
+        {
+            return GetObject(acdGuid, null);
+        }
+
+        private static CacheObject GetObject(int acdGuid, ACD acdObject)
         {
             using (new PerformanceLogger("CacheManager.GetObject"))
             {
                 CacheObject cacheObject;
                 lock (_Synchronizer)
                 {
-                    if (_Cache.ContainsKey(rActorGuid))
+                    if (_Cache.ContainsKey(acdGuid))
                     {
-                        cacheObject = _Cache[rActorGuid];
+                        cacheObject = _Cache[acdGuid];
                         if (CacheObjectRefresher == null)
                         {
                             DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "You haven't defined CacheObjectRefresher before calling GetObject");
                         }
                         else
                         {
-                            if (DateTime.UtcNow.Subtract(cacheObject.LastAccessDate).TotalMilliseconds >= MaxRefreshRate)
+                            if (DateTime.UtcNow.Subtract(cacheObject.LastRefreshDate).TotalMilliseconds >= MaxRefreshRate)
                             {
-                                CacheObjectRefresher.Invoke(rActorGuid, cacheObject);
+                                CacheObjectRefresher.Invoke(acdGuid, acdObject, cacheObject);
+                                cacheObject.LastRefreshDate = DateTime.UtcNow;
                             }
                         }
                     }
@@ -178,10 +235,10 @@ namespace GilesTrinity.Cache
                         {
                             throw new InvalidOperationException("You must set CacheObjectGetter property before calling GetObject");
                         }
-                        cacheObject = _CacheObjectGetter.Invoke(rActorGuid);
+                        cacheObject = _CacheObjectGetter.Invoke(acdGuid, acdObject);
                         if (cacheObject != null)
                         {
-                            _Cache.Add(rActorGuid, cacheObject);
+                            _Cache.Add(acdGuid, cacheObject);
                         }
                     }
                 }
@@ -192,6 +249,22 @@ namespace GilesTrinity.Cache
                 }
                 // Return clone of cached object (You can modify returned copy without impact on cache system) 
                 return cacheObject.Clone();
+            }
+        }
+
+        /// <summary>Gets all cached object corresponding to the type.</summary>
+        /// <typeparam name="T">Type of cached object</typeparam>
+        /// <param name="type">The type.</param>
+        /// <returns><see cref="IEnumerable"/> corresponding to all objects of this type in cache.</returns>
+        public static IEnumerable<T> GetAllObjectByType<T>(CacheType type)
+            where T : CacheObject
+        {
+            foreach (CacheObject obj in _Cache.Values.Where(o => o.CacheType == type).ToList())
+            {
+                if (obj is T)
+                {
+                    yield return (T)obj.Clone();
+                }
             }
         }
 
@@ -206,22 +279,16 @@ namespace GilesTrinity.Cache
                 {
                     // Search obselete object in cache dictionary
                     IList<int> removableKey = new List<int>();
-                    
-                    // Find which RActorGuid can be deleted from cache and store it 
-                    foreach (KeyValuePair<int, CacheObject> keyPair in _Cache)
-                    {
-                        if (DateTime.UtcNow.Subtract(keyPair.Value.LastAccessDate).TotalSeconds > _CacheTimeout[keyPair.Value.Type])
-                        {
-                            removableKey.Add(keyPair.Key);
-                        }
-                    }
 
-                    // Delete from cache all stored RActorGuid
-                    foreach (int rActorGuid in removableKey)
+                    // Find and delete useless CacheObject
+                    foreach (KeyValuePair<int, CacheObject> keyPair in _Cache.ToList())
                     {
-                        lock (_Synchronizer)
+                        if (DateTime.UtcNow.Subtract(keyPair.Value.LastAccessDate).TotalSeconds > _CacheTimeout[keyPair.Value.CacheType])
                         {
-                            _Cache.Remove(rActorGuid);
+                            lock (_Synchronizer)
+                            {
+                                _Cache.Remove(keyPair.Key);
+                            }
                         }
                     }
 
@@ -233,7 +300,7 @@ namespace GilesTrinity.Cache
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "MaintainCache occurs an error : {0}", ex);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "An error occured in Cache Maintenance system: {0}", ex);
                 }
             }
         }

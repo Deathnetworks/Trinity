@@ -18,6 +18,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -29,28 +30,41 @@
             </Grid.RowDefinitions>
             <TextBlock Text="Trinity Unstucker :" FontWeight="Bold" TextAlignment="Center" Margin="5"/>
             <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Stretch">
-                <CheckBox Margin="25,5" IsChecked="{Binding Path=Advanced.UnstuckerEnabled}">Enable Trinity unstucker</CheckBox>
-                <CheckBox Margin="25,5" IsChecked="{Binding Path=Advanced.AllowRestartGame}">Allow game restarting for long stuck</CheckBox>
+                <CheckBox Margin="5" IsChecked="{Binding Advanced.UnstuckerEnabled}" Content="Enable Trinity unstucker"/>
+                <CheckBox Margin="5" IsChecked="{Binding Advanced.AllowRestartGame}" Content="Allow game restarting for long stuck"/>
             </StackPanel>
         </Grid>
-        <!--TPS-->
         <Grid Grid.Row="1" Margin="2">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <UniformGrid Grid.Row="1" Columns="2" HorizontalAlignment="Stretch">
+                <CheckBox IsChecked="{Binding Advanced.GoldInactivityEnabled}" Content="Enable Gold Inactivity" Height="20" Margin="5,0"/>
+                <Slider Template="{DynamicResource Slider}" IsEnabled="{Binding Advanced.GoldInactivityEnabled}"
+                	Interval="500" Maximum="600" Minimum="30" SmallChange="1" TickFrequency="10" TickPlacement="BottomRight"
+                	Value="{Binding Advanced.GoldInactivityTimer}"
+                	ToolTip="Number of seconds after which if no gold is collected the game will restart" Margin="5,0,5,0"/>
+            </UniformGrid>
+
+        </Grid>
+        <!--TPS-->
+        <Grid Grid.Row="2" Margin="2">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <TextBlock Text="Ticks Per Second " FontWeight="Bold" TextAlignment="Center" Margin="5"/>
-            <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Stretch">
-                <CheckBox Margin="25,5" IsChecked="{Binding Path=Advanced.TPSEnabled}">Enable TPS modification</CheckBox>
+            <UniformGrid Grid.Row="1" Columns="2" HorizontalAlignment="Stretch">
+                <CheckBox Margin="5,5" IsChecked="{Binding Path=Advanced.TPSEnabled}">Enable TPS modification</CheckBox>
                 <Slider Grid.Row="1" Template="{DynamicResource Slider}" IsEnabled="{Binding Path=Advanced.TPSEnabled}"
                     Interval="500" Maximum="15" Minimum="1" SmallChange="1" TickFrequency="3" TickPlacement="BottomRight"
                     Value="{Binding Path=Advanced.TPSLimit}" 
-                    HorizontalAlignment="Stretch" Margin="25,0,25,0"
+                    HorizontalAlignment="Stretch" Margin="5,0,5,0"
                         ToolTip="Set below 10 to reduce CPU use (but dumb the bot down). You can experiment above 10 (Db Default), but this will eat CPU)"/>
-            </StackPanel>
+            </UniformGrid>
         </Grid>
         <!--Debug Statusbar-->
-        <Grid Grid.Row="2" Margin="2">
+        <Grid Grid.Row="3" Margin="2">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -71,8 +85,7 @@
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Moving}">Debug Movement System</CheckBox>
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=GlobalHandler}">Debug Global Handling System</CheckBox>
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=ScriptRule}">Debug Script Rules System</CheckBox>
-                <CheckBox IsEnabled="False" ToolTip="Coming soon..."
-                          Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Performance}">Debug System Performance</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Performance}">Debug System Performance</CheckBox>
             </UniformGrid>
         </Grid>
         <!--Reset Button-->

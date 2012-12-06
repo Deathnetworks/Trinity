@@ -1,6 +1,8 @@
 ﻿using GilesTrinity.Cache;
-using GilesTrinity.Technicals;
 using System;
+using System.Collections.Generic;
+using GilesTrinity.DbProvider;
+using GilesTrinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -20,8 +22,8 @@ namespace GilesTrinity
         {
             if (!bPluginEnabled && bot != null)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: Giles Trinity is NOT YET ENABLED. Bot start detected");
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Ignore this message if you are not currently using Giles Trinity.");
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "WARNING: Giles Trinity is NOT YET ENABLED. Bot start detected");
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Ignore this message if you are not currently using Giles Trinity.");
                 return;
             }
             // Recording of all the XML's in use this run
@@ -54,8 +56,11 @@ namespace GilesTrinity
             else
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: Maintaining item stats from previous run. To reset stats fully, please restart DB.");
+				weaponSwap.Reset();
             }
+
             RefreshProfileBlacklists();
+
             ReplaceTreeHooks();
 
             try
@@ -64,8 +69,37 @@ namespace GilesTrinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Error Initializing CacheManager");
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Error Initializing CacheManager");
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
+            }
+        }
+
+        // When the bot stops, output a final item-stats report so it is as up-to-date as can be
+        private void TrinityBotStop(IBot bot)
+        {
+            // Issue final reports
+            OutputReport();
+            vBacktrackList = new SortedList<int, Vector3>();
+            iTotalBacktracks = 0;
+            GilesPlayerMover.iTotalAntiStuckAttempts = 1;
+            GilesPlayerMover.vSafeMovementLocation = Vector3.Zero;
+            GilesPlayerMover.vOldPosition = Vector3.Zero;
+            GilesPlayerMover.iTimesReachedStuckPoint = 0;
+            GilesPlayerMover.timeLastRecordedPosition = DateTime.Today;
+            GilesPlayerMover.timeStartedUnstuckMeasure = DateTime.Today;
+            hashUseOnceID = new HashSet<int>();
+            dictUseOnceID = new Dictionary<int, int>();
+            dictRandomID = new Dictionary<int, int>();
+            iMaxDeathsAllowed = 0;
+            iDeathsThisRun = 0;
+            try
+            {
+                CacheManager.Destroy();
+            }
+            catch (Exception ex)
+            {
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Error Destroying CacheManager");
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
             }
         }
 
@@ -85,16 +119,16 @@ namespace GilesTrinity
                 // Vendor run hook
                 // Wipe the vendorrun and loot behavior trees, since we no longer want them
                 if (hook.Key.Contains("VendorRun"))
-                {   
+                {
                     Decorator VendorRunDecorator = hook.Value[0] as Decorator;
                     PrioritySelector VendorRunPrioritySelector = VendorRunDecorator.Children[0] as PrioritySelector;
 
-                    VendorRunPrioritySelector.Children[3] = GetPreStashDecorator();
-                    VendorRunPrioritySelector.Children[4] = GetStashDecorator();
-                    VendorRunPrioritySelector.Children[5] = GetSellDecorator();
-                    VendorRunPrioritySelector.Children[6] = GetSalvageDecorator();
+                    VendorRunPrioritySelector.Children[3] = TownRun.Decorators.GetPreStashDecorator();
+                    VendorRunPrioritySelector.Children[4] = TownRun.Decorators.GetStashDecorator();
+                    VendorRunPrioritySelector.Children[5] = TownRun.Decorators.GetSellDecorator();
+                    VendorRunPrioritySelector.Children[6] = TownRun.Decorators.GetSalvageDecorator();
 
-                    hook.Value[0] = new Decorator(ret => GilesTownRunCheckOverlord(ret), VendorRunPrioritySelector);
+                    hook.Value[0] = new Decorator(ret => TownRun.GilesTownRunCheckOverlord(ret), VendorRunPrioritySelector);
 
                 }
 
@@ -107,61 +141,6 @@ namespace GilesTrinity
                 }
 
             }
-        }
-
-        private static Decorator GetPreStashDecorator()
-        {
-            return new Decorator(ctx => GilesPreStashPauseOverlord(ctx),
-                new Sequence(
-                    new Action(ctx => GilesStashPrePause(ctx)),
-                    new Action(ctx => GilesStashPause(ctx))
-                )
-            );
-        }
-
-        private static Decorator GetStashDecorator()
-        {
-            return new Decorator(ctx => GilesStashOverlord(ctx),
-                new Sequence(
-                    new Action(ctx => GilesOptimisedPreStash(ctx)),
-                    new Action(ctx => GilesOptimisedStash(ctx)),
-                    new Action(ctx => GilesOptimisedPostStash(ctx)),
-                    new Sequence(
-                        new Action(ctx => GilesStashPrePause(ctx)),
-                        new Action(ctx => GilesStashPause(ctx))
-                    )
-                )
-            );
-        }
-
-        private static Decorator GetSellDecorator()
-        {
-            return new Decorator(ctx => GilesSellOverlord(ctx),
-                new Sequence(
-                    new Action(ctx => GilesOptimisedPreSell(ctx)),
-                    new Action(ctx => GilesOptimisedSell(ctx)),
-                    new Action(ctx => GilesOptimisedPostSell(ctx)),
-                    new Sequence(
-                        new Action(ctx => GilesStashPrePause(ctx)),
-                        new Action(ctx => GilesStashPause(ctx))
-                    )
-                )
-            );
-        }
-
-        private static Decorator GetSalvageDecorator()
-        {
-            return new Decorator(ctx => GilesSalvageOverlord(ctx),
-                new Sequence(
-                    new Action(ctx => GilesOptimisedPreSalvage(ctx)),
-                    new Action(ctx => GilesOptimisedSalvage(ctx)),
-                    new Action(ctx => GilesOptimisedPostSalvage(ctx)),
-                    new Sequence(
-                        new Action(ctx => GilesStashPrePause(ctx)),
-                        new Action(ctx => GilesStashPause(ctx))
-                    )
-                )
-            );
         }
     }
 }

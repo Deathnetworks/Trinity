@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
 using System.Web;
+using System.Text;
 
 namespace GilesTrinity.Notifications
 {
@@ -11,6 +12,15 @@ namespace GilesTrinity.Notifications
 
     internal static class NotificationManager
     {
+        /// <summary>
+        /// Email Notification SMTP Server
+        /// </summary>
+        public static string SmtpServer = "smtp.gmail.com";
+        /// <summary>
+        /// Email Notification Message
+        /// </summary>
+        public static StringBuilder EmailMessage = new StringBuilder();
+        
         public static Queue<ProwlNotification> pushQueue = new Queue<ProwlNotification>();
 
         public static void AddNotificationToQueue(string description, string eventName, ProwlNotificationPriority priority)
@@ -27,7 +37,7 @@ namespace GilesTrinity.Notifications
         }
         public static void SendNotification(ProwlNotification notification)
         {
-            if (GilesTrinity.Settings.Notification.IPhoneEnabled && GilesTrinity.Settings.Notification.IPhoneKey != "")
+            if (GilesTrinity.Settings.Notification.IPhoneEnabled && !string.IsNullOrWhiteSpace(GilesTrinity.Settings.Notification.IPhoneKey))
             {
                 var newNotification =
                         new ProwlNotification
@@ -44,7 +54,7 @@ namespace GilesTrinity.Notifications
                 {
                 }
             }
-            if (GilesTrinity.Settings.Notification.AndroidEnabled && GilesTrinity.Settings.Notification.AndroidKey != "")
+            if (GilesTrinity.Settings.Notification.AndroidEnabled && !string.IsNullOrWhiteSpace(GilesTrinity.Settings.Notification.AndroidKey))
             {
                 var newNotification =
                         new ProwlNotification
@@ -68,7 +78,7 @@ namespace GilesTrinity.Notifications
                                     @"https://prowl.weks.net/publicapi/add" :
                                     @"https://www.notifymyandroid.com/publicapi/notify";
             string sThisAPIKey = !android ? GilesTrinity.Settings.Notification.IPhoneKey : GilesTrinity.Settings.Notification.AndroidKey;
-            prowlUrlSb += "?apikey=" + HttpUtility.UrlEncode(sThisAPIKey) +
+            prowlUrlSb += "?apikey=" + HttpUtility.UrlEncode(sThisAPIKey.Trim()) +
                           "&application=" + HttpUtility.UrlEncode("GilesTrinity") +
                           "&description=" + HttpUtility.UrlEncode(notification_.Description) +
                           "&event=" + HttpUtility.UrlEncode(notification_.Event) +

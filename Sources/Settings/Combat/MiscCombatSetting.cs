@@ -33,7 +33,7 @@ namespace GilesTrinity.Settings.Combat
 
         #region Properties
         [DataMember(IsRequired = false)]
-        [DefaultValue(GoblinPriority.Normal)]
+        [DefaultValue(GoblinPriority.Prioritize)]
         public GoblinPriority GoblinPriority
         {
             get

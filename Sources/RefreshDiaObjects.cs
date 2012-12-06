@@ -19,6 +19,7 @@ namespace GilesTrinity
         /// </summary>
         public static void RefreshDiaObjects()
         {
+            // Framelock should happen in the MainLoop, where we read all the actual ACD's
             RefreshDiaObjectCache();
         }
 
@@ -28,11 +29,14 @@ namespace GilesTrinity
         /// </summary>
         public static void RefreshDiaObjectCache()
         {
-            //RefreshInit(out vSafePointNear, out vKitePointAvoid, out iCurrentTargetRactorGUID, out iUnitsSurrounding, out iHighestWeightFound, out listGilesObjectCache, out hashDoneThisRactor);
-            RefreshCacheInit();
-            // Now pull up all the data and store anything we want to handle in the super special cache list
-            // Also use many cache dictionaries to minimize DB<->D3 memory hits, and speed everything up a lot
-            RefreshCacheMainLoop();
+            using (ZetaDia.Memory.AcquireFrame())
+            {
+                //RefreshInit(out vSafePointNear, out vKitePointAvoid, out iCurrentTargetRactorGUID, out iUnitsSurrounding, out iHighestWeightFound, out listGilesObjectCache, out hashDoneThisRactor);
+                RefreshCacheInit();
+                // Now pull up all the data and store anything we want to handle in the super special cache list
+                // Also use many cache dictionaries to minimize DB<->D3 memory hits, and speed everything up a lot
+                RefreshCacheMainLoop();
+            }
             // Reduce ignore-for-loops counter
             if (IgnoreTargetForLoops > 0)
                 IgnoreTargetForLoops--;
@@ -169,13 +173,28 @@ namespace GilesTrinity
             {
                 iCurrentMaxLootRadius /= 4;
             }
+            if (iMyCachedActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+            { //!sp - keep looking for kills while WOTB is up
+                iKeepKillRadiusExtendedFor = Math.Max(3, iKeepKillRadiusExtendedFor);
+                timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
+            }
             // Counter for how many cycles we extend or reduce our attack/kill radius, and our loot radius, after a last kill
             if (iKeepKillRadiusExtendedFor > 0)
-                iKeepKillRadiusExtendedFor--;
+            {
+                TimeSpan diffResult = DateTime.Now.Subtract(timeKeepKillRadiusExtendedUntil);
+                iKeepKillRadiusExtendedFor = (int)diffResult.Seconds;
+                //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kill Radius remaining " + diffResult.Seconds + "s");
+                if (timeKeepKillRadiusExtendedUntil <= DateTime.Now)
+                {
+                    iKeepKillRadiusExtendedFor = 0;
+                }
+            }
             if (iKeepLootRadiusExtendedFor > 0)
                 iKeepLootRadiusExtendedFor--;
+
             // Refresh buffs (so we can check for wrath being up to ignore ice balls and anything else like that)
             GilesRefreshBuffs();
+
             // Clear forcing close-range priority on mobs after XX period of time
             if (ForceCloseRangeTarget && DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds)
             {
@@ -188,7 +207,7 @@ namespace GilesTrinity
             hashNavigationObstacleCache = new HashSet<GilesObstacle>();
             bAnyChampionsPresent = false;
             bAnyMobsInCloseRange = false;
-            lastDistance = 0f;
+            TownRun.lastDistance = 0f;
             IsAvoidingProjectiles = false;
             // Every 15 seconds, clear the "blackspots" where avoidance failed, so we can re-check them
             if (DateTime.Now.Subtract(lastClearedAvoidanceBlackspots).TotalSeconds > 15)
@@ -267,92 +286,98 @@ namespace GilesTrinity
 
         private static HashSet<string> ignoreNames = new HashSet<string>
         {
-            "MarkerLocation", "Generic_Proxy", "Hireling", "Barbarian","Barbarian", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint",
+            "MarkerLocation", "Generic_Proxy", "Hireling", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint",
         };
 
         private static void RefreshCacheMainLoop()
         {
-            var refreshSource =
+            using (new PerformanceLogger("CacheManagement.RefreshCacheMainLoop"))
+            {
+                ZetaDia.Actors.Update();
+
+                var refreshSource =
                 from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                where o.IsValid
-                orderby o.ActorType, o.Distance
+                //where o.IsValid
+                //orderby o.ActorType, o.Distance
                 select o;
 
-            Stopwatch t1 = new Stopwatch();
+                Stopwatch t1 = new Stopwatch();
 
 
-            foreach (DiaObject currentObject in refreshSource)
-            {
-                try
+                foreach (DiaObject currentObject in refreshSource)
                 {
-                    bool AddToCache = false;
-
-                    if (!Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
+                    try
                     {
-                        /*
-                         *  Main Cache Function
-                         */
-                        AddToCache = CacheDiaObject(currentObject);
+                        bool AddToCache = false;
+
+                        if (!Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
+                        {
+                            /*
+                             *  Main Cache Function
+                             */
+                            AddToCache = CacheDiaObject(currentObject);
+                        }
+                        else
+                        {
+                            // We're debugging, slightly slower, calculate performance metrics and dump debugging to log 
+                            t1.Reset();
+                            t1.Start();
+
+                            /*
+                             *  Main Cache Function
+                             */
+                            AddToCache = CacheDiaObject(currentObject);
+
+                            if (t1.IsRunning)
+                                t1.Stop();
+
+                            // Disabled, was missing some things on output... ServerProps maybe?
+                            // bool ignore = (from n in ignoreNames
+                            //               where c_Name.StartsWith(n)
+                            //               select true).FirstOrDefault();
+                            // if (!ignore)
+                            // {
+
+                            double duration = t1.Elapsed.TotalMilliseconds;
+
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement,
+                                "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12}",
+                                duration,
+                                (AddToCache ? "Added  " : " Ignored"),
+                                (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
+                                c_diaObject.ActorType,
+                                c_ObjectType,
+                                c_Name,
+                                c_ActorSNO,
+                                (c_unit_IsBoss ? " IsBoss" : ""),
+                                (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
+                                c_CentreDistance,
+                                c_RadiusDistance,
+                                c_ZDiff,
+                                c_Radius);
+                            // }
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        // We're debugging, slightly slower, calculate performance metrics and dump debugging to log 
-                        t1.Reset();
-                        t1.Start();
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
+                                currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
 
-                        /*
-                         *  Main Cache Function
-                         */
-                        AddToCache = CacheDiaObject(currentObject);
-
-                        if (t1.IsRunning)
-                            t1.Stop();
-
-                        // Disabled, was missing some things on output... ServerProps maybe?
-                        // bool ignore = (from n in ignoreNames
-                        //               where c_Name.StartsWith(n)
-                        //               select true).FirstOrDefault();
-                        // if (!ignore)
-                        // {
-
-                        double duration = t1.Elapsed.TotalMilliseconds;
-
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement,
-                            "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}){7} Dist2Mid: {8:0} Dist2Rad: {9:0} ZDiff: {10:0} Radius: {11}",
-                            duration,
-                            (AddToCache ? "Added  " : " Ignored"),
-                            (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
-                            (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
-                            c_ObjectType,
-                            c_diaObject.ActorType,
-                            c_Name,
-                            c_ActorSNO,
-                            (c_unit_IsBoss ? " IsBoss" : ""),
-                            c_CentreDistance,
-                            c_RadiusDistance,
-                            c_ZDiff,
-                            c_Radius);
-                        // }
                     }
                 }
-                catch (Exception ex)
-                {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
-                            currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance);
-                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
 
-                }
             }
         }
 
-        private static void RefreshItemStats(GBaseItemType tempbasetype)
+        private static void RefreshItemStats(GItemBaseType tempbasetype)
         {
             if (!_hashsetItemStatsLookedAt.Contains(c_RActorGuid))
             {
                 _hashsetItemStatsLookedAt.Add(c_RActorGuid);
-                if (tempbasetype == GBaseItemType.Armor || tempbasetype == GBaseItemType.WeaponOneHand || tempbasetype == GBaseItemType.WeaponTwoHand ||
-                    tempbasetype == GBaseItemType.WeaponRange || tempbasetype == GBaseItemType.Jewelry || tempbasetype == GBaseItemType.FollowerItem ||
-                    tempbasetype == GBaseItemType.Offhand)
+                if (tempbasetype == GItemBaseType.Armor || tempbasetype == GItemBaseType.WeaponOneHand || tempbasetype == GItemBaseType.WeaponTwoHand ||
+                    tempbasetype == GItemBaseType.WeaponRange || tempbasetype == GItemBaseType.Jewelry || tempbasetype == GItemBaseType.FollowerItem ||
+                    tempbasetype == GItemBaseType.Offhand)
                 {
                     int iThisQuality;
                     ItemsDroppedStats.Total++;
@@ -368,7 +393,7 @@ namespace GilesTrinity
                     ItemsDroppedStats.TotalPerLevel[c_ItemLevel]++;
                     ItemsDroppedStats.TotalPerQPerL[iThisQuality, c_ItemLevel]++;
                 }
-                else if (tempbasetype == GBaseItemType.Gem)
+                else if (tempbasetype == GItemBaseType.Gem)
                 {
                     int iThisGemType = 0;
                     ItemsDroppedStats.TotalGems++;
@@ -458,9 +483,9 @@ namespace GilesTrinity
                 }
             }
             // Safety for Giles own portal-back-to-town for full-backpack
-            else if (ForceVendorRunASAP)
+            if (ForceVendorRunASAP)
             {
-                if (dUseKillRadius <= 60) dUseKillRadius = 60;
+                if (dUseKillRadius <= 90) dUseKillRadius = 90;
                 //intell
             }
             return dUseKillRadius;
