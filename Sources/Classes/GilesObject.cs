@@ -26,7 +26,9 @@ namespace GilesTrinity
         public int Level { get; set; }
         public int GoldAmount { get; set; }
         public bool OneHanded { get; set; }
+        public bool TwoHanded { get; set; }
         public ItemQuality ItemQuality { get; set; }
+        public ItemBaseType DBItemBaseType { get; set; }
         public ItemType DBItemType { get; set; }
         public FollowerType FollowerType { get; set; }
         public GItemType GilesItemType { get; set; }
@@ -81,7 +83,9 @@ namespace GilesTrinity
                 Level = Level,
                 GoldAmount = GoldAmount,
                 OneHanded = OneHanded,
+                TwoHanded = TwoHanded,
                 ItemQuality = ItemQuality,
+                DBItemBaseType = DBItemBaseType,
                 DBItemType = DBItemType,
                 FollowerType = FollowerType,
                 GilesItemType = GilesItemType,

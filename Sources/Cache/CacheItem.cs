@@ -734,7 +734,7 @@ namespace GilesTrinity.Cache
             }
             else
             {
-                return GilesTrinity.GilesPickupItemValidation(item.ACDItem.InternalName, item.ACDItem.Level, item.ACDItem.ItemQualityLevel, item.ACDItem.GameBalanceId, item.ACDItem.ItemType, item.ACDItem.FollowerSpecialType, item.ACDItem.DynamicId);
+                return GilesTrinity.GilesPickupItemValidation(item.ACDItem.InternalName, item.ACDItem.Level, item.ACDItem.ItemQualityLevel, item.ACDItem.GameBalanceId, item.ACDItem.ItemBaseType, item.ACDItem.ItemType, item.ACDItem.IsOneHand, item.ACDItem.IsTwoHand, item.ACDItem.FollowerSpecialType, item.ACDItem.DynamicId);
             }
         }
 

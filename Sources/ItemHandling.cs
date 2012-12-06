@@ -24,22 +24,24 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        private static bool GilesPickupItemValidation(ACDItem item)
-        {
-            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
-            {
-                Interpreter.InterpreterAction action = StashRule.checkItem(item, true);
+        //private static bool GilesPickupItemValidation(ACDItem item)
+        //{
+        //    if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
+        //    {
+        //        Interpreter.InterpreterAction action = StashRule.checkItem(item, true);
 
-                switch (action)
-                {
-                    case Interpreter.InterpreterAction.IGNORE: return false;
-                    case Interpreter.InterpreterAction.PICKUP: return true;
-                    default: break;
-                }
-            }
+        //        switch (action)
+        //        {
+        //            case Interpreter.InterpreterAction.KEEP:
+        //                return true;
 
-            return GilesPickupItemValidation(item.InternalName, item.Level, item.ItemQualityLevel, item.GameBalanceId, item.ItemType, item.FollowerSpecialType, item.DynamicId);
-        }
+        //            case Interpreter.InterpreterAction.IGNORE:
+        //                return false;
+        //        }
+        //    }
+
+        //    return GilesPickupItemValidation(item.Name, item.Level, item.ItemQualityLevel, item.GameBalanceId, item.ItemType, item.FollowerSpecialType, item.DynamicId);
+        //}
 
         /// <summary>
         /// Pickup Validation - Determines what should or should not be picked up
@@ -52,8 +54,28 @@ namespace GilesTrinity
         /// <param name="followerType"></param>
         /// <param name="dynamicID"></param>
         /// <returns></returns>
-        internal static bool GilesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemType dbItemType, FollowerType followerType, int dynamicID = 0)
+        internal static bool GilesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
         {
+
+            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
+            {
+                // try updating fix#3 try for name bug -> doesn't work
+                //ACDItem item = ZetaDia.Actors.GetACDItemByGuid(acd.ACDGuid);
+                //Interpreter.InterpreterAction action = StashRule.checkItem(ZetaDia.Actors.GetACDItemByGuid(acd.ACDGuid), true);
+                
+                //Interpreter.InterpreterAction action = StashRule.checkItem(acd as ACDItem, true);
+
+                Interpreter.InterpreterAction action = StashRule.checkPickUpItem(name, level, quality, dbItemBaseType, dbItemType, isOneHand, isTwoHand, balanceId);
+                switch (action)
+                {
+                    case Interpreter.InterpreterAction.KEEP:
+                        return true;
+
+                    case Interpreter.InterpreterAction.IGNORE:
+                        return false;
+                }
+            }
+
             // If it's legendary, we always want it *IF* it's level is right
             if (quality >= ItemQuality.Legendary)
             {

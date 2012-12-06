@@ -126,7 +126,9 @@ namespace GilesTrinity
                         Level = c_ItemLevel,
                         GoldAmount = c_GoldStackSize,
                         OneHanded = c_IsOneHandedItem,
+                        TwoHanded = c_IsTwoHandedItem,
                         ItemQuality = c_ItemQuality,
+                        DBItemBaseType = c_DBItemBaseType,
                         DBItemType = c_DBItemType,
                         FollowerType = c_item_tFollowerType,
                         GilesItemType = c_item_GItemType,
@@ -199,6 +201,7 @@ namespace GilesTrinity
             c_GoldStackSize = -1;
             c_HitPoints = -1;
             c_IsOneHandedItem = false;
+            c_IsTwoHandedItem = false;
             c_unit_IsElite = false;
             c_unit_IsRare = false;
             c_unit_IsUnique = false;
@@ -210,6 +213,7 @@ namespace GilesTrinity
             c_ForceLeapAgainst = false;
             c_IsObstacle = false;
             c_ItemQuality = ItemQuality.Invalid;
+            c_DBItemBaseType = ItemBaseType.None;
             c_DBItemType = ItemType.Unknown;
             c_item_tFollowerType = FollowerType.None;
             c_item_GItemType = GItemType.Unknown;
@@ -930,12 +934,14 @@ namespace GilesTrinity
                     try
                     {
                         c_ItemLevel = item.CommonData.Level;
+                        c_DBItemBaseType = item.CommonData.ItemBaseType;
                         c_DBItemType = item.CommonData.ItemType;
                         c_IsOneHandedItem = item.CommonData.IsOneHand;
+                        c_IsTwoHandedItem = item.CommonData.IsTwoHand;
                         c_item_tFollowerType = item.CommonData.FollowerSpecialType;
 
                         // Add to session cache
-                        dictGilesGameBalanceDataCache.Add(c_BalanceID, new GilesGameBalanceDataCache(c_ItemLevel, c_DBItemType, c_IsOneHandedItem, c_item_tFollowerType));
+                        dictGilesGameBalanceDataCache.Add(c_BalanceID, new GilesGameBalanceDataCache(c_ItemLevel, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType));
                     }
                     catch (Exception ex)
                     {
@@ -957,8 +963,10 @@ namespace GilesTrinity
             {
                 // We pulled this data from the dictionary cache, so use it instead of trying to get new data from DB/D3 memory!
                 c_ItemLevel = balanceCachEntry.ItemLevel;
+                c_DBItemBaseType = balanceCachEntry.ItemBaseType;
                 c_DBItemType = balanceCachEntry.ItemType;
                 c_IsOneHandedItem = balanceCachEntry.OneHand;
+                c_IsTwoHandedItem = balanceCachEntry.TwoHand;
                 c_item_tFollowerType = balanceCachEntry.FollowerType;
             }
 
@@ -1059,16 +1067,9 @@ namespace GilesTrinity
                 {
                     AddToCache = ItemManager.EvaluateItem((ACDItem)c_CommonData, ItemManager.RuleType.PickUp);
                 }
-                else if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
-                {
-                    if (c_CommonData is ACDItem)
-                        AddToCache = GilesPickupItemValidation((ACDItem)c_CommonData);
-                    else
-                        AddToCache = false;
-                }
                 else
                 {
-                    AddToCache = GilesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemType, c_item_tFollowerType, c_GameDynamicID);
+                    AddToCache = GilesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem,c_item_tFollowerType, c_GameDynamicID);
                 }
                 dictGilesPickupItem.Add(c_RActorGuid, AddToCache);
             }
