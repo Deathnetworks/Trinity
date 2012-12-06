@@ -10,7 +10,7 @@ REM Clean Directory
 rd /S /Q "Sources\bin"
 rd /S /Q "Sources\obj"
 rd /S /Q "Sources\Logs"
-del /S /Q "Sources\ItemRules\Log\*"
+del /F /S /Q "Sources\ItemRules\Log\*"
 
 REM Clean Old Zip file
 del Latest-GilesTrinity.zip
@@ -20,6 +20,9 @@ md GilesTrinity
 xcopy /E /Y "Sources\*.cs" "GilesTrinity\"
 xcopy /E /Y "Sources\*.dis" "GilesTrinity\"
 xcopy /E /Y "Sources\*.xaml" "GilesTrinity\"
+xcopy /E /Y "Sources\*.xml" "GilesTrinity\"
+xcopy /E /Y "Sources\*.xsd" "GilesTrinity\"
+xcopy /E /Y "Sources\*.txt" "GilesTrinity\"
 
 REM Zip fresh directory
 7za.exe a Latest-GilesTrinity.zip GilesTrinity\ -mx9
