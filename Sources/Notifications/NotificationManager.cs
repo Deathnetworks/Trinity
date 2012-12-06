@@ -37,7 +37,7 @@ namespace GilesTrinity.Notifications
         }
         public static void SendNotification(ProwlNotification notification)
         {
-            if (GilesTrinity.Settings.Notification.IPhoneEnabled && GilesTrinity.Settings.Notification.IPhoneKey != "")
+            if (GilesTrinity.Settings.Notification.IPhoneEnabled && !string.IsNullOrWhiteSpace(GilesTrinity.Settings.Notification.IPhoneKey))
             {
                 var newNotification =
                         new ProwlNotification
@@ -54,7 +54,7 @@ namespace GilesTrinity.Notifications
                 {
                 }
             }
-            if (GilesTrinity.Settings.Notification.AndroidEnabled && GilesTrinity.Settings.Notification.AndroidKey != "")
+            if (GilesTrinity.Settings.Notification.AndroidEnabled && !string.IsNullOrWhiteSpace(GilesTrinity.Settings.Notification.AndroidKey))
             {
                 var newNotification =
                         new ProwlNotification
@@ -78,7 +78,7 @@ namespace GilesTrinity.Notifications
                                     @"https://prowl.weks.net/publicapi/add" :
                                     @"https://www.notifymyandroid.com/publicapi/notify";
             string sThisAPIKey = !android ? GilesTrinity.Settings.Notification.IPhoneKey : GilesTrinity.Settings.Notification.AndroidKey;
-            prowlUrlSb += "?apikey=" + HttpUtility.UrlEncode(sThisAPIKey) +
+            prowlUrlSb += "?apikey=" + HttpUtility.UrlEncode(sThisAPIKey.Trim()) +
                           "&application=" + HttpUtility.UrlEncode("GilesTrinity") +
                           "&description=" + HttpUtility.UrlEncode(notification_.Description) +
                           "&event=" + HttpUtility.UrlEncode(notification_.Event) +
