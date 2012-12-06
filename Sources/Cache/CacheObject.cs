@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace GilesTrinity.Cache
 {
+    [Flags]
     public enum CacheType
     {
         Object,
@@ -32,24 +33,23 @@ namespace GilesTrinity.Cache
         //    LastAccessDate = DateTime.UtcNow;
         //    LastRefreshDate = DateTime.Now;
         //}
-        public CacheObject(ACD acd)
+        public CacheObject(DiaObject dia)
         {
-            ACDGuid = acd.ACDGuid;
-            CommonData = acd;
+            ACDGuid = dia.ACDGuid;
+            CommonData = dia.CommonData;
 
             Type = GObjectType.Unknown;
             CacheType = Cache.CacheType.Other;
             LastAccessDate = DateTime.UtcNow;
             LastRefreshDate = DateTime.UtcNow;
-            Name = acd.Name;
-            ActorSNO = acd.ActorSNO;
-            DynamicID = acd.DynamicId;
-            DynamicID = acd.DynamicId;
-            Position = acd.Position;
-            CentreDistance = acd.Distance;
+            Name = dia.Name;
+            ActorSNO = dia.ActorSNO;
+            DynamicID = dia.CommonData.DynamicId;
+            Position = dia.Position;
+            CentreDistance = dia.Distance;
             CacheType = Cache.CacheType.Object;
 
-            InternalObject = acd.AsRActor;
+            InternalObject = dia;
 
             if (InternalObject != null)
             {
@@ -61,6 +61,12 @@ namespace GilesTrinity.Cache
         #endregion Constructors
 
         #region Properties
+
+        public bool Stale
+        {
+            get;
+            set;
+        }
         /// <summary>
         /// Gets the RActorGUID.
         /// </summary>
@@ -205,8 +211,8 @@ namespace GilesTrinity.Cache
 
     internal class CacheOther : CacheObject
     {
-        public CacheOther(ACD acd)
-            : base(acd)
+        public CacheOther(DiaObject dia)
+            : base(dia)
         {
             CacheType = CacheType.Other;
         }

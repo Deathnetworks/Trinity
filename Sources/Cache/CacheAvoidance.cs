@@ -10,8 +10,8 @@ namespace GilesTrinity.Cache
 {
     internal class CacheAvoidance : CacheObject
     {
-        public CacheAvoidance(ACD acd)
-            : base(acd)
+        public CacheAvoidance(DiaObject dia)
+            : base(dia)
         {
             CacheType = CacheType.Avoidance;
         }
@@ -21,7 +21,7 @@ namespace GilesTrinity.Cache
 
         public override CacheObject Clone()
         {
-            return new CacheAvoidance(this.CommonData);
+            return (CacheAvoidance)this.MemberwiseClone();
         }
 
 

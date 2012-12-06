@@ -24,11 +24,11 @@ namespace GilesTrinity.Cache
         /// </summary>
         /// <param name="rActorGuid">The RActorGUID.</param>
         /// <param name="item">The item.</param>
-        public CacheItem(ACD acd)
-            : base(acd)
+        public CacheItem(DiaObject dia)
+            : base(dia)
         {
             CacheType = CacheType.Item;
-            ACDItem = (ACDItem)acd;
+            ACDItem = (ACDItem)dia.CommonData;
             InternalName = CacheObject.NameNumberRemover.Replace(ACDItem.InternalName, string.Empty);
             try
             {
@@ -728,10 +728,9 @@ namespace GilesTrinity.Cache
             {
                 return ItemManager.EvaluateItem(item.ACDItem, ItemManager.RuleType.PickUp);
             }
-            else if (GilesTrinity.Settings.Loot.ItemFilterMode == Settings.Loot.ItemFilterMode.TrinityWithItemRules && item.BaseType != GItemBaseType.Misc && item.BaseType != GItemBaseType.Gem && item.BaseType != GItemBaseType.HealthGlobe)
-            {
-                return ScriptedRules.RulesManager.ShouldPickup(item);
-            }
+            /*
+             * Put Scripted Rules here 
+             */
             else
             {
                 return GilesTrinity.GilesPickupItemValidation(item.ACDItem.InternalName, item.ACDItem.Level, item.ACDItem.ItemQualityLevel, item.ACDItem.GameBalanceId, item.ACDItem.ItemBaseType, item.ACDItem.ItemType, item.ACDItem.IsOneHand, item.ACDItem.IsTwoHand, item.ACDItem.FollowerSpecialType, item.ACDItem.DynamicId);
