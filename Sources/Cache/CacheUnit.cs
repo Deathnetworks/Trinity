@@ -10,23 +10,23 @@ namespace GilesTrinity.Cache
 {
     internal class CacheUnit : CacheObject
     {
-        public CacheUnit(ACD acd)
-            : base(acd)
+        public CacheUnit(DiaObject dia)
+            : base(dia)
         {
-            ActorSNO = acd.ActorSNO;
+            ActorSNO = dia.ActorSNO;
             CacheType = CacheType.Unit;
             Type = GObjectType.Unit;
 
-            DynamicID = acd.DynamicId;
-            GameBalanceID = acd.GameBalanceId;
-            Name = acd.Name;
+            DynamicID = dia.CommonData.DynamicId;
+            GameBalanceID = dia.CommonData.GameBalanceId;
+            Name = dia.Name;
 
-            CurrentAnimation = acd.CurrentAnimation;
-            MonsterSize = acd.MonsterInfo.MonsterSize;
+            CurrentAnimation = dia.CommonData.CurrentAnimation;
+            MonsterSize = dia.MonsterInfo.MonsterSize;
 
-            IsElite = acd.IsElite;
-            IsRare = acd.IsRare;
-            IsUnique = acd.IsUnique;
+            IsElite = dia.CommonData.IsElite;
+            IsRare = dia.CommonData.IsRare;
+            IsUnique = dia.CommonData.IsUnique;
             IsEliteRareUnique = (IsElite || IsRare || IsUnique);
             IsBoss = CacheUtils.IsBossSNO(ActorSNO);
 
@@ -41,7 +41,7 @@ namespace GilesTrinity.Cache
                     HitpointsMaxTotal = InternalUnit.HitpointsMaxTotal;
                     HitpointsCurrentPct = HitpointsCurrent / HitpointsMaxTotal;
                     IsMinion = InternalUnit.SummonedByACDId > 0;
-                    MonsterType = acd.MonsterInfo.MonsterType;
+                    MonsterType = dia.MonsterInfo.MonsterType;
                     IsNPC = (InternalUnit.IsHelper || InternalUnit.IsNPC || InternalUnit.IsTownVendor);
                 }
             }

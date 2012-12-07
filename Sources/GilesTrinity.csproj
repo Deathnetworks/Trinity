@@ -82,19 +82,16 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotManager.cs" />
+    <Compile Include="ItemRules\Core\ExpressionCompiler.cs" />
     <Compile Include="ItemRules\Core\Formula.cs" />
     <Compile Include="ItemRules\Core\Parser.cs" />
     <Compile Include="ItemRules\Core\ParseTree.cs" />
     <Compile Include="ItemRules\Core\Scanner.cs" />
     <Compile Include="ItemRules\Core\TextHighlighter.cs" />
-    <Compile Include="ScriptedRules\Dynamic.cs" />
     <Compile Include="Technicals\Loader.cs" />
     <Compile Include="TownRun.cs" />
     <Compile Include="TrinityPowerManager.cs" />
     <Compile Include="ScheduledPower.cs" />
-    <Compile Include="ScriptedRules\RulesManager.cs" />
-    <Compile Include="ScriptedRules\ScriptedRuleAction.cs" />
-    <Compile Include="ScriptedRules\ScriptedRule.cs" />
     <Compile Include="Cache\CacheManager.cs" />
     <Compile Include="Cache\CacheObject.cs" />
     <Compile Include="Cache\CacheRefresher.cs" />
@@ -254,7 +251,6 @@
     <None Include="Dictionaries.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ItemRules\Loot.utr" />
     <None Include="ItemRules\Rules\config.dis" />
     <None Include="ItemRules\Rules\legendary.dis" />
     <None Include="ItemRules\Rules\magic.dis" />

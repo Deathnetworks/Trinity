@@ -121,9 +121,10 @@ namespace GilesTrinity.Cache
                     CacheManager.CacheObjectGetter = GetCache;
                     CacheManager.CacheObjectRefresher = RefreshCache;
                     CacheManager.MaxRefreshRate = 100;
+                    CacheManager.DefineStaleFlag();
                     foreach (DiaObject obj in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Where(o => o.IsACDBased && o.CommonData != null))
                     {
-                        CacheManager.GetObject(obj.CommonData);
+                        CacheManager.RefreshObject(obj);
                     }
                 }
                 catch (Exception ex) {
@@ -133,7 +134,7 @@ namespace GilesTrinity.Cache
             }
         }
 
-        private static void RefreshCache(int acdGuid, ACD acdObject, CacheObject cacheObject)
+        private static void RefreshCache(DiaObject diaObject, CacheObject cacheObject)
         {
             switch (cacheObject.CacheType)
             {
@@ -151,24 +152,24 @@ namespace GilesTrinity.Cache
                     break;
             }
         }
-        private static CacheObject GetCache(int acdGuid, ACD acdObject)
+        private static CacheObject GetCache(DiaObject diaObject)
         {
-            switch (acdObject.ActorType)
+            switch (diaObject.ActorType)
             {
                 case ActorType.Unit:
-                    return new CacheUnit(acdObject);
+                    return new CacheUnit(diaObject);
                 case ActorType.Gizmo:
-                    return new CacheGizmo(acdObject);
+                    return new CacheGizmo(diaObject);
                 case ActorType.Item:
-                    return new CacheItem(acdObject);
+                    return new CacheItem(diaObject);
                 default:
-                    if (CacheUtils.IsAvoidanceSNO(acdObject.ActorSNO))
+                    if (CacheUtils.IsAvoidanceSNO(diaObject.ActorSNO))
                     {
-                        return new CacheAvoidance(acdObject);
+                        return new CacheAvoidance(diaObject);
                     }
                     else
                     {
-                        return new CacheOther(acdObject);
+                        return new CacheOther(diaObject);
                     }
             }
         }
