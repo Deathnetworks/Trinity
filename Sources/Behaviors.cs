@@ -636,7 +636,7 @@ namespace GilesTrinity
                     {
                         bool bFoundSpecialMovement = UsedSpecialMovement();
 						
-						if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap)
+						if (playerStatus.ActorClass == ActorClass.Monk && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap)
 						{
 							if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind) 
 								&& (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))

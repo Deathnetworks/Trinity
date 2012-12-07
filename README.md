@@ -39,6 +39,16 @@ Future Planned Improvements:
 * Default Loot Settings options for Questing, Champion Farming
 
 
+Changelog 1.7.1.6:
+
+* Fixed legendary item attributes being blank
+
+* Fixed "Test Backpack" scoring button
+
+* Adjusted a few more log levels as appropriate
+
+* WeaponSwapper now only attempts to run Swap and SecurityCheck if you're a Monk
+
 
 Changelog 1.7.1.5:
 

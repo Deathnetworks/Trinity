@@ -12,8 +12,8 @@ namespace GilesTrinity.Cache
     /// </summary>
     internal class CacheGizmo : CacheObject
     {
-        public CacheGizmo(ACD acd)
-            : base(acd)
+        public CacheGizmo(DiaObject dia)
+            : base(dia)
         {
             CacheType = CacheType.Gizmo;
         }

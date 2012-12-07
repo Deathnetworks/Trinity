@@ -285,7 +285,7 @@ namespace GilesTrinity
                     if (!ItemManager.ItemIsProtected(thisitem) && !GilesTrinity.weaponSwap.SwapperUsing(thisitem))
                     {
                         // test
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DEBUG: {0},{1},{2}", thisitem.InternalName, thisitem.Name, thisitem.Level);
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "DEBUG: {0},{1},{2}", thisitem.InternalName, thisitem.Name, thisitem.Level);
                         GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
                             thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);

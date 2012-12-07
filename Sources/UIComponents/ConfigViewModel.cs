@@ -5,6 +5,7 @@ using GilesTrinity.Settings.Loot;
 using GilesTrinity.UI;
 using System.Diagnostics;
 using System.Windows.Input;
+using GilesTrinity.Technicals;
 
 namespace GilesTrinity.UIComponents
 {

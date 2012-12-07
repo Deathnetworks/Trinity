@@ -6,9 +6,6 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        internal static string ValueItemStatString = "";
-        internal static string junkItemStatString = "";
-        
         private static double[] ItemMaxStats = new double[TOTALSTATS];
         private static double[] ItemMaxPoints = new double[TOTALSTATS];
         private static bool IsInvalidItem = true;
@@ -836,12 +833,12 @@ namespace GilesTrinity
                     // For item logs
                     if (i != DEXTERITY && i != STRENGTH && i != INTELLIGENCE)
                     {
-                        if (ValueItemStatString != "")
-                            ValueItemStatString += ". ";
-                        ValueItemStatString += StatNames[i] + "=" + Math.Round(TempStatistic).ToString();
-                        if (junkItemStatString != "")
-                            junkItemStatString += ". ";
-                        junkItemStatString += StatNames[i] + "=" + Math.Round(TempStatistic).ToString();
+                        if (TownRun.ValueItemStatString != "")
+                            TownRun.ValueItemStatString += ". ";
+                        TownRun.ValueItemStatString += StatNames[i] + "=" + Math.Round(TempStatistic).ToString();
+                        if (TownRun.junkItemStatString != "")
+                            TownRun.junkItemStatString += ". ";
+                        TownRun.junkItemStatString += StatNames[i] + "=" + Math.Round(TempStatistic).ToString();
                     }
                 }
             }
@@ -859,8 +856,8 @@ namespace GilesTrinity
                     HighestScoringPrimary *= 0.8;
                 TotalItemPoints += HighestScoringPrimary;
 
-                ValueItemStatString = StatNames[WhichPrimaryIsHighest] + "=" + Math.Round(AmountHighestScoringPrimary).ToString() + ". " + ValueItemStatString;
-                junkItemStatString = StatNames[WhichPrimaryIsHighest] + "=" + Math.Round(AmountHighestScoringPrimary).ToString() + ". " + junkItemStatString;
+                TownRun.ValueItemStatString = StatNames[WhichPrimaryIsHighest] + "=" + Math.Round(AmountHighestScoringPrimary).ToString() + ". " + TownRun.ValueItemStatString;
+                TownRun.junkItemStatString = StatNames[WhichPrimaryIsHighest] + "=" + Math.Round(AmountHighestScoringPrimary).ToString() + ". " + TownRun.junkItemStatString;
 
             }
             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "--- +" + TotalItemPoints.ToString("0") + " total score pre-special reductions. (GlobalMultiplier=" + GlobalMultiplier.ToString("0.000") + ")", true);

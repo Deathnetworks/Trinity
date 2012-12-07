@@ -11,8 +11,8 @@ namespace GilesTrinity.Cache
     internal static class CacheManager
     {
         #region Delegates
-        public delegate CacheObject CacheObjectGetterDelegate(int acdGuid, ACD acdObject);
-        public delegate void CacheObjectRefresherDelegate(int acdGuid, ACD acdObject, CacheObject cacheObject);
+        public delegate CacheObject CacheObjectGetterDelegate(DiaObject acdObject);
+        public delegate void CacheObjectRefresherDelegate(DiaObject acdObject, CacheObject cacheObject);
         #endregion Delegates
 
         #region Fields
@@ -76,28 +76,13 @@ namespace GilesTrinity.Cache
             }
         }
 
-        public static IDictionary<int, CacheObject> Cache
+        public static void DefineStaleFlag()
         {
-            get
+            lock (_Synchronizer)
             {
-                return _Cache;
-            }
-            set
-            {
-                if (_Cache != null)
+                foreach (CacheObject obj in _Cache.Values)
                 {
-                    _Cache = value;
-                }
-            }
-        }
-
-        public static bool ContainsKey(int acdGuid)
-        {
-            using (new PerformanceLogger("CacheManager.PutObject"))
-            {
-                lock (_Synchronizer)
-                {
-                    return _Cache.ContainsKey(acdGuid);
+                    obj.Stale = true;
                 }
             }
         }
@@ -167,50 +152,18 @@ namespace GilesTrinity.Cache
             }
         }
 
-        /// <summary>Gets an object from cache.</summary>
-        /// <param name="acdObject">The acd object.</param>
-        /// <returns>
-        /// Cached object corresponding to the <paramref name="acdObject" />
-        /// </returns>
-        public static CacheObject GetObject(ACD acdObject)
-        {
-            if (acdObject == null)
-            {
-                return null;
-            }
-
-            return GetObject(acdObject.ACDGuid, acdObject);
-        }
-
-        /// <summary>Gets an object from cache.</summary>
-        /// <param name="acdObject">The acd object.</param>
-        /// <returns>
-        /// Cached object corresponding to the <paramref name="acdObject" />
-        /// </returns>
-        public static T GetObject<T>(ACD acdObject)
-            where T : CacheObject
-        {
-            if (acdObject == null)
-            {
-                return null;
-            }
-
-            return (T)GetObject(acdObject.ACDGuid, acdObject);
-        }
-
-        /// <summary>Gets the object from cache.</summary>
-        /// <param name="acdGuid">The ACDGuid.</param>
-        /// <returns>Cached object corresponding to the <paramref name="acdGuid" /></returns>
-        public static CacheObject GetObject(int acdGuid)
-        {
-            return GetObject(acdGuid, null);
-        }
-
-        private static CacheObject GetObject(int acdGuid, ACD acdObject)
+        /// <summary>
+        /// Put object to cache or refresh existing object.
+        /// </summary>
+        /// <param name="diaObject">The dia object.</param>
+        /// <exception cref="System.InvalidOperationException">You haven't defined CacheObjectRefresher before calling GetObject</exception>
+        /// <exception cref="System.InvalidOperationException">You must set CacheObjectGetter property before calling GetObject</exception>
+        public static void RefreshObject(DiaObject diaObject)
         {
             using (new PerformanceLogger("CacheManager.GetObject"))
             {
                 CacheObject cacheObject;
+                int acdGuid = diaObject.ACDGuid;
                 lock (_Synchronizer)
                 {
                     if (_Cache.ContainsKey(acdGuid))
@@ -224,8 +177,7 @@ namespace GilesTrinity.Cache
                         {
                             if (DateTime.UtcNow.Subtract(cacheObject.LastRefreshDate).TotalMilliseconds >= MaxRefreshRate)
                             {
-                                CacheObjectRefresher.Invoke(acdGuid, acdObject, cacheObject);
-                                cacheObject.LastRefreshDate = DateTime.UtcNow;
+                                CacheObjectRefresher.Invoke(diaObject, cacheObject);
                             }
                         }
                     }
@@ -235,20 +187,16 @@ namespace GilesTrinity.Cache
                         {
                             throw new InvalidOperationException("You must set CacheObjectGetter property before calling GetObject");
                         }
-                        cacheObject = _CacheObjectGetter.Invoke(acdGuid, acdObject);
+                        cacheObject = _CacheObjectGetter.Invoke(diaObject);
                         if (cacheObject != null)
                         {
                             _Cache.Add(acdGuid, cacheObject);
                         }
                     }
-                }
 
-                if (cacheObject != null)
-                {
-                    cacheObject.LastAccessDate = DateTime.UtcNow;
+                    cacheObject.LastRefreshDate = DateTime.UtcNow;
+                    cacheObject.Stale = false;
                 }
-                // Return clone of cached object (You can modify returned copy without impact on cache system) 
-                return cacheObject.Clone();
             }
         }
 
@@ -259,11 +207,14 @@ namespace GilesTrinity.Cache
         public static IEnumerable<T> GetAllObjectByType<T>(CacheType type)
             where T : CacheObject
         {
-            foreach (CacheObject obj in _Cache.Values.Where(o => o.CacheType == type).ToList())
+            lock (_Synchronizer)
             {
-                if (obj is T)
+                foreach (CacheObject obj in _Cache.Values.Where(o => o.CacheType == type && !o.Stale).ToList())
                 {
-                    yield return (T)obj.Clone();
+                    if (obj is T)
+                    {
+                        yield return (T)obj.Clone();
+                    }
                 }
             }
         }
