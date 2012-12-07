@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using System.Text.RegularExpressions;
+using Zeta.Internals.Actors;
 
 namespace GilesTrinity.ItemRules.Core
 {
@@ -28,14 +30,15 @@ namespace GilesTrinity.ItemRules.Core
             int counter = 0;
             foreach (ParseNode tree in expressionTrees)
             {
-                GenerateMethodForNode(tree, string.Format("Rule{0}",counter));
+                GenerateMethodForNode(tree, string.Format("Rule{0}", counter), typeBuilder);
                 counter++;
             }
         }
 
-        private static void GenerateMethodForNode(ParseNode tree, string methodName)
+        private static void GenerateMethodForNode(ParseNode tree, string methodName, TypeBuilder typeBuilder)
         {
-            throw new NotImplementedException();
+            typeBuilder.DefineMethod(methodName, MethodAttribut, typeof(bool), new Type[] { typeof(DiaItem) });
+
         }
 
         private static void GenerateBaseOperationFloatMethod(TypeBuilder typeBuilder)
@@ -103,6 +106,11 @@ namespace GilesTrinity.ItemRules.Core
             methIL.Emit(OpCodes.Ldarg_1);
             methIL.Emit(OpCodes.Add);
             methIL.Emit(OpCodes.Ret);
+        }
+
+        public static bool Like(this string toSearch, string toFind)
+        {
+            return new Regex(@"\A" + new Regex(@"\.|\$|\^|\{|\[|\(|\||\)|\*|\+|\?|\\").Replace(toFind, ch => @"\" + ch).Replace('_', '.').Replace("%", ".*") + @"\z", RegexOptions.Singleline).IsMatch(toSearch);
         }
     }
 }
