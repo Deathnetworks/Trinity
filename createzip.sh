@@ -4,7 +4,7 @@
 
 GILESVERSION=`cat /c/db/Plugins/GilesTrinity/Plugin.cs | grep "new Version" | sed -E 's/ +return new Version//g' | sed -E 's/[\(\);]//g' | sed -E 's/, /./g'`
 
-A="GilesTrinity-"
+A="TrinityPlugin-"
 B=$GILESVERSION
 D=".zip"
 
