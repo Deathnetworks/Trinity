@@ -692,7 +692,6 @@ namespace GilesTrinity
             }
             // Pull up the Monster Affix cached data
             MonsterAffixes theseaffixes = RefreshAffixes(c_CommonData);
-            //intell -- Other dangerous: Nightmarish, Mortar, Desecrator, Fire Chains, Knockback, Electrified
             /*
              * 
              * This should be moved to HandleTarget
@@ -787,44 +786,6 @@ namespace GilesTrinity
                     c_unit_IsAttackable = true;
                 }
             }
-
-
-            // rrrix disabled this because it can change at ANY TIME and caching is a bad idea for this!
-            // Inactive units like trees, withermoths etc. still underground
-            //if (c_HitPoints >= 1f || c_unit_bIsBoss)
-            //{
-            //    // Get the burrowing data for this unit
-            //    bool bBurrowed;
-            //    if (!dictGilesBurrowedCache.TryGetValue(c_RActorGuid, out bBurrowed) || c_unit_bIsBoss)
-            //    {
-            //        try
-            //        {
-            //            bBurrowed = thisUnit.IsBurrowed;
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            Logging.WriteDiagnostic("[Trinity] Safely handled exception getting is-untargetable or is-burrowed attribute for unit " + c_Name + " [" + c_ActorSNO.ToString() + "]");
-            //            Logging.WriteDiagnostic(ex.ToString());
-            //            bWantThis = false;
-            //            //return bWantThis;
-            //        }
-            //        // Only cache it if it's NOT burrowed (if it *IS* - then we need to keep re-checking until it comes out!)
-            //        if (!bBurrowed)
-            //        {
-            //            // Don't cache for bosses, as we have to check for bosses popping in and out of the game during a complex fight
-            //            if (!c_unit_bIsBoss)
-            //                dictGilesBurrowedCache.Add(c_RActorGuid, bBurrowed);
-            //        }
-            //        else
-            //        {
-            //            // Unit is burrowed, so we need to ignore it until it isn't!
-            //            c_IgnoreSubStep = "Burrowed";
-            //            bWantThis = false;
-            //            //return bWantThis;
-            //        }
-            //    }
-            //}
-
             // Only if at full health, else don't bother checking each loop
             // See if we already have this monster's size stored, if not get it and cache it
             if (!dictionaryStoredMonsterSizes.TryGetValue(c_ActorSNO, out c_unit_MonsterSize))
@@ -1112,6 +1073,7 @@ namespace GilesTrinity
                 dictGilesGoldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
             }
 
+            /* rrrix commenting this out until it works better... 
             // Ignore gold piles that are (currently) too small...
             rangedMinimumStackSize = Settings.Loot.Pickup.MinimumGoldStack;
             int min_cash = Settings.Loot.Pickup.MinimumGoldStack;	//absolute min cash to consider
@@ -1142,13 +1104,20 @@ namespace GilesTrinity
             {
                 AddToCache = false;
             }
+            */
 
+            // rrrix: keep it simple...
+            if (c_GoldStackSize >= Settings.Loot.Pickup.MinimumGoldStack)
+            {
+                AddToCache = true;
+            }
             // Blacklist gold piles already in pickup radius range
             if (c_CentreDistance <= ZetaDia.Me.GoldPickUpRadius)
             {
                 hashRGUIDBlacklist3.Add(c_RActorGuid);
                 hashRGUIDBlacklist60.Add(c_RActorGuid);
                 AddToCache = false;
+                c_IgnoreSubStep = "GoldOutOfRange";
             }
 
             //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Gold Stack {0} has iPercentage {1} with rangeMinimumStackSize: {2} Distance: {3} MininumGoldStack: {4} PickupRadius: {5} AddToCache: {6}",
@@ -1445,7 +1414,7 @@ namespace GilesTrinity
                             c_IgnoreSubStep = "NotStuck";
                         }
                         // If we're standing on it, usually right before above unstucker returns true
-                        if (c_RadiusDistance <= 2f)
+                        if (c_RadiusDistance <= 5f)
                         {
                             AddToCache = true;
                             c_IgnoreSubStep = "";
@@ -1675,12 +1644,16 @@ namespace GilesTrinity
                 // Everything except items (including gold)
                 if (c_ObjectType != GObjectType.Item)
                 {
-                    bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
 
-                    if (!isNavigable)
+                    if (c_ObjectType == GObjectType.Unit)
                     {
-                        AddToCache = false;
-                        c_IgnoreSubStep = "NotNavigable";
+                        bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
+
+                        if (!isNavigable)
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "NotNavigable";
+                        }
                     }
                     // Ignore units not in LoS except bosses, rares, champs
                     if (c_ObjectType == GObjectType.Unit && !c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
