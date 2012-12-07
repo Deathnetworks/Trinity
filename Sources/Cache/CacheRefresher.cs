@@ -121,6 +121,7 @@ namespace GilesTrinity.Cache
                     CacheManager.CacheObjectGetter = GetCache;
                     CacheManager.CacheObjectRefresher = RefreshCache;
                     CacheManager.MaxRefreshRate = 100;
+                    CacheManager.DefineStaleFlag();
                     foreach (DiaObject obj in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Where(o => o.IsACDBased && o.CommonData != null))
                     {
                         CacheManager.RefreshObject(obj);

@@ -76,6 +76,17 @@ namespace GilesTrinity.Cache
             }
         }
 
+        public static void DefineStaleFlag()
+        {
+            lock (_Synchronizer)
+            {
+                foreach (CacheObject obj in _Cache.Values)
+                {
+                    obj.Stale = true;
+                }
+            }
+        }
+
         /// <summary>
         /// Gets or sets the max refresh rate.
         /// </summary>
@@ -196,11 +207,14 @@ namespace GilesTrinity.Cache
         public static IEnumerable<T> GetAllObjectByType<T>(CacheType type)
             where T : CacheObject
         {
-            foreach (CacheObject obj in _Cache.Values.Where(o => o.CacheType == type && !o.Stale).ToList())
+            lock (_Synchronizer)
             {
-                if (obj is T)
+                foreach (CacheObject obj in _Cache.Values.Where(o => o.CacheType == type && !o.Stale).ToList())
                 {
-                    yield return (T)obj.Clone();
+                    if (obj is T)
+                    {
+                        yield return (T)obj.Clone();
+                    }
                 }
             }
         }
