@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
@@ -121,7 +121,7 @@ namespace GilesTrinity
                     weaponSwap.SwapGear();
                     WeaponSwapTime = DateTime.Now;
                 }
-                if (!Settings.Combat.Monk.SweepingWindWeaponSwap || !weaponSwap.CanSwap())
+                if (!Settings.Combat.Monk.SweepingWindWeaponSwap || !weaponSwap.CanSwap() || (weaponSwap.CanSwap() && CheckAbilityAndBuff(SNOPower.Monk_SweepingWind)))
                     return new GilesPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 11f -- 1, 2
             }
             // Blinding Flash as a DEFENSE
