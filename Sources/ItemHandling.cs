@@ -17,32 +17,6 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-
-
-        /// <summary>
-        /// Pickup Validation for scripted rulesets
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        //private static bool GilesPickupItemValidation(ACDItem item)
-        //{
-        //    if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
-        //    {
-        //        Interpreter.InterpreterAction action = StashRule.checkItem(item, true);
-
-        //        switch (action)
-        //        {
-        //            case Interpreter.InterpreterAction.KEEP:
-        //                return true;
-
-        //            case Interpreter.InterpreterAction.IGNORE:
-        //                return false;
-        //        }
-        //    }
-
-        //    return GilesPickupItemValidation(item.Name, item.Level, item.ItemQualityLevel, item.GameBalanceId, item.ItemType, item.FollowerSpecialType, item.DynamicId);
-        //}
-
         /// <summary>
         /// Pickup Validation - Determines what should or should not be picked up
         /// </summary>
@@ -522,62 +496,62 @@ namespace GilesTrinity
 
             if (TrueItemType == GItemType.StaffOfHerding)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep staff of herding)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.CraftingMaterial)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep craft materials)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
 
             if (TrueItemType == GItemType.Emerald)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.Amethyst)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.Topaz)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.Ruby)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.CraftTome)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep tomes)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.InfernalKey)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep infernal key)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.HealthPotion)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (ignoring potions)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return false;
             }
 
             // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
             if (thisitem.IsUnidentified)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] = (autokeep unidentified items)", thisitem.RealName, thisitem.InternalName);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] = (autokeep unidentified items)", thisitem.RealName, thisitem.InternalName);
                 return true;
             }
 
             if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
                 Interpreter.InterpreterAction action = StashRule.checkItem(thisitem.item, false);
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (" + action + ")", thisitem.item.Name, thisitem.item.InternalName, thisitem.item.ItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", thisitem.item.Name, thisitem.item.InternalName, thisitem.item.ItemType);
                 switch (action)
                 {
                     case Interpreter.InterpreterAction.KEEP:
@@ -598,13 +572,13 @@ namespace GilesTrinity
 
             if (thisitem.Quality >= ItemQuality.Legendary)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep legendaries)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
 
             if (TrueItemType == GItemType.CraftingPlan)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep plans)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
 
@@ -612,7 +586,7 @@ namespace GilesTrinity
             double iNeedScore = ScoreNeeded(TrueItemType);
             double iMyScore = ValueThisItem(thisitem, TrueItemType);
 
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", thisitem.RealName, thisitem.InternalName, TrueItemType, iMyScore);
+            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", thisitem.RealName, thisitem.InternalName, TrueItemType, iMyScore);
             if (iMyScore >= iNeedScore) return true;
 
             // If we reached this point, then we found no reason to keep the item!

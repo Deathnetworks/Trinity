@@ -40,8 +40,8 @@ namespace GilesTrinity.Swap
             /// Then we look at the array "items" -> if first item in rows is 0, first item in columns is 3 and first item in items is InventorySlot.PlayerLeftFinger -> 
             ///         It will be the location we put the left ring for swapping.
             /// </summary>
-        private static int[] rows = new int[] { 0, 0, 1, 0 };
-        private static int[] columns = new int[] { 3, 2, 1, 1 };
+        private static int[] rows = new int[] { };
+        private static int[] columns = new int[] {  };
 
             /// <summary>
             /// Possible Inventory Slots:
@@ -58,8 +58,7 @@ namespace GilesTrinity.Swap
             ///     InventorySlot.PlayerFeet
             /// </summary>
 
-        private static InventorySlot[] items = new InventorySlot[] { InventorySlot.PlayerHands, InventorySlot.PlayerLeftFinger, InventorySlot.PlayerRightFinger, 
-                                                                       InventorySlot.PlayerNeck };
+        private static InventorySlot[] items = new InventorySlot[] {};
             // Last slot is reserved for Offhand (if exists) and the slot before last for the main hand
         private static int[] mainID = new int[rows.Length + 3];
             // Last slot is reserved for the 2 Handed weapon we swap to.
@@ -74,7 +73,7 @@ namespace GilesTrinity.Swap
             // Returns if this item is protected by the swapper or not -> should make items safe from town run routine
         public bool SwapperUsing(ACDItem thisItem)
         {
-            if (!GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap)
+            if (!GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap && GilesTrinity.playerStatus.ActorClass != ActorClass.Monk)
             {
                 return false;
             }
@@ -134,6 +133,9 @@ namespace GilesTrinity.Swap
 
         private void SecurityCheck()
         {
+            if (GilesTrinity.playerStatus.ActorClass != ActorClass.Monk)
+                return;
+
             using (ZetaDia.Memory.AcquireFrame())
             {
                 ableToSwap = true;
@@ -283,6 +285,11 @@ namespace GilesTrinity.Swap
 
         public void SwapGear()
         {
+            if (GilesTrinity.playerStatus.ActorClass != ActorClass.Monk)
+            {
+                return;
+            }
+
             if (!hasChecked)
             {
                 SecurityCheck();
