@@ -102,6 +102,11 @@ namespace GilesTrinity
             {
                 try
                 {
+                    if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
+                    {
+                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
+                        return RunStatus.Failure;
+                    }
                     HandlerRunStatus runStatus = HandlerRunStatus.NotFinished;
 
                     // Make sure we reset unstucker stuff here
