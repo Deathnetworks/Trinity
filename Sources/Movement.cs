@@ -166,7 +166,7 @@ namespace GilesTrinity
                         PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
                     );
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
-                if (!bKitingSpot && iMyCachedActorClass == ActorClass.Wizard && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_WaveOfForce) && playerStatus.CurrentEnergy >= 25 &&
+                if (!bKitingSpot && playerStatus.ActorClass == ActorClass.Wizard && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_WaveOfForce) && playerStatus.CurrentEnergy >= 25 &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_WaveOfForce] &&
                     !playerStatus.IsIncapacitated && hashAvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(playerStatus.CurrentPosition) <= 15f) >= 2 &&
                     (Settings.Combat.Wizard.CriticalMass || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))

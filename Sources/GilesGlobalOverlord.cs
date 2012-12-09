@@ -16,12 +16,14 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
+        internal static int lastSceneId = -1;
+
         // Find fresh targets, start main BT if needed, cast any buffs needed etc.
         internal static bool GilesGlobalOverlord(object ret)
         {
             using (new PerformanceLogger("GilesTrinity.GilesGlobalOverlord"))
             {
-                // If we aren't in the game of a world is loading, don't do anything yet
+                // If we aren't in the game or a world is loading, don't do anything yet
                 if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
                 {
                     lastChangedZigZag = DateTime.Today;
@@ -34,43 +36,25 @@ namespace GilesTrinity
                     return true;
                 }
 
-                if (gp == null)
-                    gp = Navigator.SearchGridProvider;
-                gp.Update();
-                if (pf == null)
-                    pf = new PathFinder(gp);
-
-                // Refresh World Objects
-                //CacheRefresher.RefreshAll();
-
-                // Refresh Player, Backpack, Stash
-                using (ZetaDia.Memory.AcquireFrame())
+                if (lastSceneId != playerStatus.SceneId)
                 {
-
-                    ZetaDia.Actors.Update();
-
-                    // Update player-data cache
-                    UpdateCachedPlayerData();
-
-                    //foreach (ACDItem item in Me.Inventory.Backpack)
-                    //{
-                    //    CacheManager.GetObject(item);
-                    //}
-                    //try
-                    //{
-                    //    foreach (ACDItem item in Me.Inventory.StashItems)
-                    //    {
-                    //        CacheManager.GetObject(item);
-                    //    }
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    System.Diagnostics.Debug.WriteLine(ex);
-                    //}
+                    lastSceneId = ZetaDia.Me.CurrentScene.SceneInfo.SNOId;
+                    gp.Update();
                 }
 
-                // Refresh player buffs (to check for archon)
-                GilesRefreshBuffs();
+
+                // Refresh Cache if needed
+                bool CacheWasRefreshed = RefreshDiaObjectCache();
+
+                //if (CacheWasRefreshed)
+                //{
+                //    return true;
+                //}
+                
+                
+                // Refresh new Cache
+                //CacheRefresher.RefreshAll();
+
 
 
                 // Store all of the player's abilities every now and then, to keep it cached and handy, also check for critical-mass timer changes etc.
@@ -87,12 +71,11 @@ namespace GilesTrinity
                     {
                         DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.GlobalHandler, "Safely handled exception trying to get character class.");
                     }
-                    if (tempClass != ActorClass.Invalid)
-                        iMyCachedActorClass = ZetaDia.Actors.Me.ActorClass;
+
                     iCombatLoops = 0;
                     GilesRefreshHotbar(GilesHasBuff(SNOPower.Wizard_Archon));
                     dictAbilityRepeatDelay = new Dictionary<SNOPower, int>(dictAbilityRepeatDefaults);
-                    if (Settings.Combat.Wizard.CriticalMass && iMyCachedActorClass == ActorClass.Wizard)
+                    if (Settings.Combat.Wizard.CriticalMass && playerStatus.ActorClass == ActorClass.Wizard)
                     {
                         dictAbilityRepeatDelay[SNOPower.Wizard_FrostNova] = 25;
                         dictAbilityRepeatDelay[SNOPower.Wizard_ExplosiveBlast] = 25;
@@ -105,7 +88,7 @@ namespace GilesTrinity
                         dictAbilityRepeatDelay[SNOPower.Wizard_Archon_SlowTime] = 1500;
                         dictAbilityRepeatDelay[SNOPower.Wizard_Archon_Teleport] = 2700;
                     }
-                    if (Settings.Combat.WitchDoctor.GraveInjustice && iMyCachedActorClass == ActorClass.WitchDoctor)
+                    if (Settings.Combat.WitchDoctor.GraveInjustice && playerStatus.ActorClass == ActorClass.WitchDoctor)
                     {
                         dictAbilityRepeatDelay[SNOPower.Witchdoctor_SoulHarvest] = 1000;
                         dictAbilityRepeatDelay[SNOPower.Witchdoctor_SpiritWalk] = 1000;
@@ -121,14 +104,14 @@ namespace GilesTrinity
                         dictAbilityRepeatDelay[SNOPower.Witchdoctor_FetishArmy] = 20000;
                         dictAbilityRepeatDelay[SNOPower.Witchdoctor_BigBadVoodoo] = 20000;
                     }
-                    if (Settings.Combat.Barbarian.BoonBulKathosPassive && iMyCachedActorClass == ActorClass.Barbarian)
+                    if (Settings.Combat.Barbarian.BoonBulKathosPassive && playerStatus.ActorClass == ActorClass.Barbarian)
                     {
                         dictAbilityRepeatDelay[SNOPower.Barbarian_Earthquake] = 90500;
                         dictAbilityRepeatDelay[SNOPower.Barbarian_CallOfTheAncients] = 90500;
                         dictAbilityRepeatDelay[SNOPower.Barbarian_WrathOfTheBerserker] = 90500;
                     }
                     // Pick an appropriate health set etc. based on class
-                    switch (iMyCachedActorClass)
+                    switch (playerStatus.ActorClass)
                     {
                         case ActorClass.Barbarian:
                             // What health % should we use a potion, or look for a globe
@@ -178,29 +161,9 @@ namespace GilesTrinity
 
                 ClearBlacklists();
 
-                // Let's calculate whether or not we want a new target list... update at least once every 150 milliseconds in main decorator
-                bool bShouldRefreshDiaObjects = DateTime.Now.Subtract(lastRefreshedObjects).TotalMilliseconds >= 150;
-                // So, do we want a new target or not?
-                if (bShouldRefreshDiaObjects)
-                {
-                    //// Update player data
-                    //UpdateCachedPlayerData();
-                    // Check for death / player being dead
-                    if (playerStatus.CurrentHealthPct <= 0)
-                    {
-                        return false;
-                    }
-                    RefreshDiaObjectCache();
-
-                }
-                else
-                {
-                    // Return false here means we only do all of the below OOC stuff at max once every 150ms
-                    return false;
-                }
 
                 // For Monk SweepingWind WeaponSwap
-                if (weaponSwap.DpsGearOn())
+                if (playerStatus.ActorClass == ActorClass.Monk && GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap && weaponSwap.DpsGearOn())
                     weaponSwap.SwapGear();
 
                 // We have a target, start the target handler!

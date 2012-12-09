@@ -46,7 +46,7 @@ namespace GilesTrinity.Cache
                         unit.IsInvulnerable = unit.InternalUnit.IsInvulnerable;
                     }
                     unit.CurrentAnimation = acd.CurrentAnimation;
-                    
+
                     if (unit.IsBoss)
                     {
                         unit.MonsterType = acd.MonsterInfo.MonsterType;
@@ -68,7 +68,7 @@ namespace GilesTrinity.Cache
             {
                 ACDItem acd = (ACDItem)item.CommonData;
                 item.Distance = acd.Position.Distance(ZetaDia.Me.Position);
-                if (acd.IsUnidentified != item.IsUnidentified || item.Gold>0)
+                if (acd.IsUnidentified != item.IsUnidentified || item.Gold > 0)
                 {
                     CacheItem.ComputeItemProperty(item);
                 }
@@ -115,6 +115,7 @@ namespace GilesTrinity.Cache
         {
             using (ZetaDia.Memory.AcquireFrame())
             {
+                // World objects
                 try
                 {
                     ZetaDia.Actors.Update();
@@ -127,9 +128,35 @@ namespace GilesTrinity.Cache
                         CacheManager.RefreshObject(obj);
                     }
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Exception occured refreshing cache: {0}", ex.Message);
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex.StackTrace);
+                }
+
+                // Backpack
+                try
+                {
+                    foreach (ACDItem item in Me.Inventory.Backpack)
+                    {
+                        CacheManager.RefreshObject(item.AsRActor);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex);
+                } 
+                // Stash
+                try
+                {
+                    foreach (ACDItem item in Me.Inventory.StashItems)
+                    {
+                        CacheManager.RefreshObject(item.AsRActor);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex);
                 }
             }
         }

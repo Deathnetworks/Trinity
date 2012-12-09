@@ -71,7 +71,7 @@ namespace GilesTrinity
         /// <summary>
         /// Used to force-refresh dia objects at least once every XX milliseconds
         /// </summary>
-        public static DateTime lastRefreshedObjects = DateTime.Today;
+        public static DateTime LastRefreshedCache = DateTime.MinValue;
 
         /// <summary>
         /// This object is used for the main handling - the "current target" etc. as selected by the target-selecter, whether it be a unit, an item, a shrine, anything. 
@@ -360,7 +360,6 @@ namespace GilesTrinity
         public static bool bOnlyTarget = false;
 
         // Target provider and core routine variables
-        public static ActorClass iMyCachedActorClass = ActorClass.Invalid;
         private static bool bAnyChampionsPresent = false;
         private static bool bAnyTreasureGoblinsPresent = false;
         private static bool bAnyMobsInCloseRange = false;

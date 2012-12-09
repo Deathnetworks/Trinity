@@ -9,6 +9,7 @@ using Zeta;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Navigation;
+using Zeta.Pathfinding;
 
 namespace GilesTrinity
 {
@@ -72,7 +73,9 @@ namespace GilesTrinity
         /// Receive Pulse event from DemonBuddy.
         /// </summary>
         public void OnPulse()
-        { }
+        {
+            RefreshDiaObjectCache();
+        }
 
         /// <summary>
         /// Called when user Enable the plugin.
@@ -105,10 +108,14 @@ namespace GilesTrinity
                 bMappedPlayerAbilities = false;
                 bPluginEnabled = true;
 
+                // Settings are available after this... 
                 LoadConfiguration();
 
                 Navigator.PlayerMover = new GilesPlayerMover();
-                Navigator.StuckHandler = new GilesStuckHandler();
+                if (Settings.Advanced.UnstuckerEnabled)
+                {
+                    Navigator.StuckHandler = new GilesStuckHandler();
+                }
                 GameEvents.OnPlayerDied += GilesTrinityOnDeath;
                 GameEvents.OnGameJoined += GilesTrinityOnJoinGame;
                 GameEvents.OnGameLeft += GilesTrinityOnLeaveGame;
@@ -118,6 +125,12 @@ namespace GilesTrinity
                 LootTargeting.Instance.Provider = newLootTargetingProvider;
                 ITargetingProvider newObstacleTargetingProvider = new GilesObstacleTargetingProvider();
                 ObstacleTargeting.Instance.Provider = newObstacleTargetingProvider;
+
+                if (gp == null)
+                    gp = Navigator.SearchGridProvider;
+                if (pf == null)
+                    pf = new PathFinder(gp);
+
 
                 // Safety check incase DB "OnStart" event didn't fire properly
                 if (BotMain.IsRunning)
@@ -215,7 +228,7 @@ namespace GilesTrinity
         /// </summary>
         public void OnInitialize()
         {
-            AvoidanceManager.GetAvoidanceHealth(AvoidanceType.Arcane, 0);
+
         }
 
         /// <summary>
@@ -248,10 +261,7 @@ namespace GilesTrinity
 
         public GilesTrinity()
         {
-           // Instance = this;
+
         }
-
-        //public static GilesTrinity Instance { get; private set; }
-
     }
 }

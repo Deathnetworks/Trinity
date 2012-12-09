@@ -496,38 +496,38 @@ namespace GilesTrinity
 
             if (TrueItemType == GItemType.StaffOfHerding)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep staff of herding)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.CraftingMaterial)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep craft materials)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
 
             if (TrueItemType == GItemType.Emerald)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.Amethyst)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.Topaz)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.Ruby)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.CraftTome)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep tomes)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.InfernalKey)
@@ -537,7 +537,7 @@ namespace GilesTrinity
             }
             if (TrueItemType == GItemType.HealthPotion)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (ignoring potions)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", thisitem.RealName, thisitem.InternalName, TrueItemType);
                 return false;
             }
 

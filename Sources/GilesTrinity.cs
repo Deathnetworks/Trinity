@@ -11,16 +11,18 @@ using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
+using Zeta.Navigation;
+using Zeta.Pathfinding;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
         /// <summary>
-        /// Update the cached data on the player status - health, location etc. This must be called with a Framelock!
+        /// Update the cached data on the player information, including buffs if needed
         /// </summary>
         private static void UpdateCachedPlayerData()
         {
-            if (DateTime.Now.Subtract(playerStatus.LastUpdated).TotalMilliseconds <= 50)
+            if (DateTime.Now.Subtract(playerStatus.LastUpdated).TotalMilliseconds <= 100)
                 return;
             // If we aren't in the game of a world is loading, don't do anything yet
             if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
@@ -49,6 +51,7 @@ namespace GilesTrinity
                 playerStatus.Level = me.Level;
                 playerStatus.ActorClass = me.ActorClass;
                 playerStatus.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
+                playerStatus.SceneId = ZetaDia.Me.CurrentScene.SceneInfo.SNOId;
 
                 // World ID safety caching incase it's ever unavailable
                 if (ZetaDia.CurrentWorldDynamicId != -1)
@@ -56,6 +59,9 @@ namespace GilesTrinity
                 // Game difficulty, used really for vault on DH's
                 if (ZetaDia.Service.CurrentHero.CurrentDifficulty != GameDifficulty.Invalid)
                     iCurrentGameDifficulty = ZetaDia.Service.CurrentHero.CurrentDifficulty;
+
+                // Refresh player buffs (to check for archon)
+                GilesRefreshBuffs();
             }
             catch (Exception ex)
             {
@@ -203,6 +209,12 @@ namespace GilesTrinity
             listProfilesLoaded = new List<string>();
             sLastProfileSeen = "";
             sFirstProfileSeen = "";
+
+            if (gp == null)
+                gp = Navigator.SearchGridProvider;
+            if (pf == null)
+                pf = new PathFinder(gp);
+
         }
     }
 }

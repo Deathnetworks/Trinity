@@ -1073,44 +1073,12 @@ namespace GilesTrinity
                 dictGilesGoldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
             }
 
-            /* rrrix commenting this out until it works better... 
-            // Ignore gold piles that are (currently) too small...
-            rangedMinimumStackSize = Settings.Loot.Pickup.MinimumGoldStack;
-            int min_cash = Settings.Loot.Pickup.MinimumGoldStack;	//absolute min cash to consider
-            int max_distance = 80;
-            if (c_GoldStackSize < min_cash)
-            {
-                rangedMinimumStackSize = min_cash;
-            }
-            else if (c_CentreDistance >= max_distance)
-            {
-                rangedMinimumStackSize = 0;	//too far away
-            }
-            else
-            {
-                //scale the min stack size based on distance
-                //this will enable smaller, local cash values to be picked up
-                //while enroute, picking up items or larger amounts
-                //better for toons with low pickup range
-                int min_range = 6; //anything below this should be collected
-                int max_range = 30; //anything beyond this should be at the upper threshold
-                int max_cash = Math.Max(min_cash, rangedMinimumStackSize);
-                double cash_range = Math.Max(0, c_CentreDistance - min_range);
-                double rangedPerc = cash_range / (max_range - min_range); //no ceiling on this to capture distant, high values. twice distance=twice value
-                int newMinStack = (int)Math.Floor(rangedPerc * (max_cash - min_cash)) + min_cash;
-                rangedMinimumStackSize = newMinStack;
-            }
-            if (c_GoldStackSize < rangedMinimumStackSize)
-            {
-                AddToCache = false;
-            }
-            */
-
             // rrrix: keep it simple...
             if (c_GoldStackSize >= Settings.Loot.Pickup.MinimumGoldStack)
             {
                 AddToCache = true;
             }
+
             // Blacklist gold piles already in pickup radius range
             if (c_CentreDistance <= ZetaDia.Me.GoldPickUpRadius)
             {
@@ -1560,13 +1528,13 @@ namespace GilesTrinity
             bool bIgnoreThisAvoidance = false;
             double dThisHealthAvoid = GetAvoidanceHealth();
             // Monks with Serenity up ignore all AOE's
-            if (iMyCachedActorClass == ActorClass.Monk && hashPowerHotbarAbilities.Contains(SNOPower.Monk_Serenity) && GilesHasBuff(SNOPower.Monk_Serenity))
+            if (playerStatus.ActorClass == ActorClass.Monk && hashPowerHotbarAbilities.Contains(SNOPower.Monk_Serenity) && GilesHasBuff(SNOPower.Monk_Serenity))
             {
                 // Monks with serenity are immune
                 bIgnoreThisAvoidance = true;
             }
             // Witch doctors with spirit walk available and not currently Spirit Walking will subtly ignore ice balls, arcane, desecrator & plague cloud
-            if (iMyCachedActorClass == ActorClass.WitchDoctor && hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_SpiritWalk) &&
+            if (playerStatus.ActorClass == ActorClass.WitchDoctor && hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_SpiritWalk) &&
                 (!GilesHasBuff(SNOPower.Witchdoctor_SpiritWalk) && GilesUseTimer(SNOPower.Witchdoctor_SpiritWalk)) || GilesHasBuff(SNOPower.Witchdoctor_SpiritWalk))
             {
                 if (c_ActorSNO == 223675 || c_ActorSNO == 402 || c_ActorSNO == 219702 || c_ActorSNO == 221225 || c_ActorSNO == 84608 || c_ActorSNO == 108869)
@@ -1576,7 +1544,7 @@ namespace GilesTrinity
                 }
             }
             // Remove ice balls if the barbarian has wrath of the berserker up, and reduce health from most other SNO avoidances
-            if (iMyCachedActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+            if (playerStatus.ActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
             {
                 if (c_ActorSNO == 223675 || c_ActorSNO == 402)
                 {
@@ -1904,7 +1872,7 @@ namespace GilesTrinity
         private static bool RefreshStepCachedPlayerSummons(bool AddToCache)
         {
             // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
-            if (iMyCachedActorClass == ActorClass.Monk)
+            if (playerStatus.ActorClass == ActorClass.Monk)
             {
                 if (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MysticAlly) && hashMysticAlly.Contains(c_ActorSNO))
                 {
@@ -1913,7 +1881,7 @@ namespace GilesTrinity
                 }
             }
             // Count up Demon Hunter pets
-            if (iMyCachedActorClass == ActorClass.DemonHunter)
+            if (playerStatus.ActorClass == ActorClass.DemonHunter)
             {
                 if (hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Companion) && hashDHPets.Contains(c_ActorSNO))
                 {
@@ -1922,7 +1890,7 @@ namespace GilesTrinity
                 }
             }
             // Count up zombie dogs and gargantuans next
-            if (iMyCachedActorClass == ActorClass.WitchDoctor)
+            if (playerStatus.ActorClass == ActorClass.WitchDoctor)
             {
                 if (hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_Gargantuan) && hashGargantuan.Contains(c_ActorSNO))
                 {

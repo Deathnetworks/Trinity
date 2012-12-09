@@ -139,7 +139,7 @@ namespace GilesTrinity
                                         cacheObject.Weight += (1200 * (1 - (cacheObject.RadiusDistance / iCurrentMaxKillRadius)));
 
                                     // Give extra weight to ranged enemies
-                                    if ((iMyCachedActorClass == ActorClass.Barbarian || iMyCachedActorClass == ActorClass.Monk) &&
+                                    if ((playerStatus.ActorClass == ActorClass.Barbarian || playerStatus.ActorClass == ActorClass.Monk) &&
                                         (cacheObject.MonsterStyle == MonsterSize.Ranged || hashActorSNORanged.Contains(c_ActorSNO)))
                                     {
                                         cacheObject.Weight += 1100;
@@ -322,14 +322,6 @@ namespace GilesTrinity
                             if (CurrentTarget != null && bAnyMobsInCloseRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting)
                                 cacheObject.Weight = 1;
 
-                            // Calculate a spot reaching a little bit further out from the item, to help pickup-movements
-                            /*if (thisgilesobject.dThisWeight > 0)
-                            {
-                                if (thisgilesobject.iThisGoldAmount > 0)
-                                    thisgilesobject.vThisPosition = MathEx.CalculatePointFrom(thisgilesobject.vThisPosition, playerStatus.vCurrentPosition, thisgilesobject.fCentreDistance + 2f);
-                                else
-                                    thisgilesobject.vThisPosition = MathEx.CalculatePointFrom(thisgilesobject.vThisPosition, playerStatus.vCurrentPosition, thisgilesobject.fCentreDistance + 1f);
-                            }*/
                             break;
                         }
                     case GObjectType.Globe:
@@ -557,7 +549,13 @@ namespace GilesTrinity
                 //}
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5}",
                         cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance);
-                
+
+                // Prevent target dynamic weight flip-flop 
+                if (CurrentTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)
+                {
+                    cacheObject.Weight = 100;
+                }
+
                 // Is the weight of this one higher than the current-highest weight? Then make this the new primary target!
                 if (cacheObject.Weight > w_HighestWeightFound && cacheObject.Weight > 0)
                 {

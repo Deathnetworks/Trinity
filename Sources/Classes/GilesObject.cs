@@ -42,6 +42,9 @@ namespace GilesTrinity
         public bool IsBoss { get; set; }
         public bool IsBossOrEliteRareUnique { get { return (IsEliteRareUnique || IsBoss); } }
         public bool IsAttackable { get; set; }
+        /// <summary>
+        /// Percentage hit points
+        /// </summary>
         public double HitPoints { get; set; }
         public float Radius { get; set; }
         public bool ForceLeapAgainst { get; set; }
