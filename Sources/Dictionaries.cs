@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -260,6 +260,8 @@ namespace GilesTrinity
         /// </summary>
         internal static HashSet<int> hashSNOContainerResplendant = new HashSet<int> {
             62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866,
+            // Magi
+			112182,
          };
         /// <summary>
         /// Objects that should never be ignored due to no Line of Sight (LoS)
@@ -274,6 +276,8 @@ namespace GilesTrinity
         /// </summary>
         internal static HashSet<int> hashSNOContainerWhitelist = new HashSet<int> {
             62859, 62865, 62872, 78790, 79016, 94708, 96522, 130170, 108122, 111870, 111947, 213447, 213446, 51300, 179865, 109264, 212491, 210422, 211861,
+            // Magi
+			196945, 70534,
          };
         // IGNORE LIST / BLACKLIST - for world objects
         // World objects that should always be ignored - eg certain destructables, certain containers, etc. - anything handled as a "world object" rather than a monster
