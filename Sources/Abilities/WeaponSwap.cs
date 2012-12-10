@@ -22,7 +22,8 @@ using GilesTrinity.Technicals;
 namespace GilesTrinity.Swap
 {
     /// <summary>
-    /// Version: 1.0.1
+    /// Version: 1.0.1b
+    /// - Fixed an issue that would cause people that aren't monks using weapon swap to run the checks during town run.
     /// </summary>
     class WeaponSwap
     {
@@ -73,7 +74,7 @@ namespace GilesTrinity.Swap
         // Returns if this item is protected by the swapper or not -> should make items safe from town run routine
         public bool SwapperUsing(ACDItem thisItem)
         {
-            if (!GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap && GilesTrinity.playerStatus.ActorClass != ActorClass.Monk)
+            if (!GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap || GilesTrinity.playerStatus.ActorClass != ActorClass.Monk)
             {
                 return false;
             }
