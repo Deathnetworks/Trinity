@@ -1,4 +1,4 @@
-﻿using GilesTrinity.Settings.Combat;
+using GilesTrinity.Settings.Combat;
 using GilesTrinity.Technicals;
 using System;
 using System.Linq;
@@ -174,7 +174,16 @@ namespace GilesTrinity
                                     // Elites on low health get extra priority - up to 1500
                                     if ((cacheObject.IsEliteRareUnique || cacheObject.IsTreasureGoblin) && cacheObject.HitPoints < 0.20)
                                         cacheObject.Weight += (1500 * (1 - (cacheObject.HitPoints / 0.45)));
-
+									
+									// Magi - Elites/Bosses that are killed should have weight erased so we don't keep attacking
+                                    if ((cacheObject.IsEliteRareUnique || cacheObject.IsBoss) && cacheObject.HitPoints <= 0)
+									{
+                                        cacheObject.Weight = 0;
+										
+										// temporary blacklist for individual boss/uber so we don't repeadedly attack it (looks suspicious)
+										hashRGUIDBlacklist15.Add(cacheObject.RActorGuid);
+									}
+                                    
                                     // Goblins on low health get extra priority - up to 2500
                                     if (Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize && cacheObject.IsTreasureGoblin && cacheObject.HitPoints <= 0.98)
                                         cacheObject.Weight += (3000 * (1 - (cacheObject.HitPoints / 0.85)));
