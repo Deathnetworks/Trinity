@@ -1,4 +1,5 @@
 ﻿using System;
+using Zeta;
 using Zeta.Common;
 using Zeta.Internals.Actors;
 
@@ -23,7 +24,27 @@ namespace GilesTrinity
         public int Level { get; set; }
         public ActorClass ActorClass { get; set; }
         public string BattleTag { get; set; }
+        public int SceneId { get; set; }
 
+        public GilesPlayerCache()
+        {
+            LastUpdated = DateTime.MinValue;
+            IsIncapacitated = false;
+            IsRooted = false;
+            IsInTown = false;
+            CurrentHealthPct = 0;
+            CurrentEnergy = 0;
+            CurrentEnergyPct = 0;
+            Discipline = 0;
+            DisciplinePct = 0;
+            CurrentPosition = Vector3.Zero;
+            WaitingForReserveEnergy = false;
+            MyDynamicID = -1;
+            Level = -1;
+            ActorClass = Zeta.Internals.Actors.ActorClass.Invalid;
+            BattleTag = String.Empty;
+            SceneId = -1;
+        }
 
         public GilesPlayerCache(
             DateTime lastUpdated, bool incapacitated, bool isRooted, bool isInTown, double currentHealth, double currentEnergy, double currentEnergyPct,
@@ -44,6 +65,7 @@ namespace GilesTrinity
             Level = level;
             ActorClass = actorClass;
             BattleTag = battleTag;
+            SceneId = -1;
         }
     }
 }

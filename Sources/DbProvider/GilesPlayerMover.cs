@@ -520,8 +520,14 @@ namespace GilesTrinity.DbProvider
                 }
             }
 
-            ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
-            // ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
+            if (ZetaDia.Physics.Raycast(GilesTrinity.playerStatus.CurrentPosition, vMoveToTarget, NavCellFlags.AllowWalk))
+            {
+                ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID);
+            }
+            else
+            {
+                ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
+            }
         }
 
         private static void GetShiftedPosition(ref Vector3 vMoveToTarget, ref Vector3 point)
@@ -562,7 +568,7 @@ namespace GilesTrinity.DbProvider
                         if (!hashDoneThisVector.Contains(vMoveToTarget))
                         {
                             // Log it
-                            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath ,"LongPaths - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
+                            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "LongPaths - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                             using (StreamWriter LogWriter = new StreamWriter(LogStream))
                             {
                                 LogWriter.WriteLine(DateTime.Now.ToString() + ":");

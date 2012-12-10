@@ -96,7 +96,7 @@ namespace GilesTrinity
         {
             //TODO : Make mapping between Type and Config
             IAvoidanceHealth avoidanceHealth = null;
-            switch (GilesTrinity.iMyCachedActorClass)
+            switch (GilesTrinity.playerStatus.ActorClass)
             {
                 case ActorClass.Barbarian:
                     avoidanceHealth = GilesTrinity.Settings.Combat.Barbarian;

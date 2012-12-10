@@ -674,6 +674,8 @@ namespace GilesTrinity
                 NeedToClearBlacklist3 = true;
                 AddToCache = false;
                 c_IgnoreSubStep = "0HitPoints";
+                // return here immediately
+                return AddToCache;
             }
             // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
             c_unit_IsTreasureGoblin = false;
@@ -692,7 +694,6 @@ namespace GilesTrinity
             }
             // Pull up the Monster Affix cached data
             MonsterAffixes theseaffixes = RefreshAffixes(c_CommonData);
-            //intell -- Other dangerous: Nightmarish, Mortar, Desecrator, Fire Chains, Knockback, Electrified
             /*
              * 
              * This should be moved to HandleTarget
@@ -787,44 +788,6 @@ namespace GilesTrinity
                     c_unit_IsAttackable = true;
                 }
             }
-
-
-            // rrrix disabled this because it can change at ANY TIME and caching is a bad idea for this!
-            // Inactive units like trees, withermoths etc. still underground
-            //if (c_HitPoints >= 1f || c_unit_bIsBoss)
-            //{
-            //    // Get the burrowing data for this unit
-            //    bool bBurrowed;
-            //    if (!dictGilesBurrowedCache.TryGetValue(c_RActorGuid, out bBurrowed) || c_unit_bIsBoss)
-            //    {
-            //        try
-            //        {
-            //            bBurrowed = thisUnit.IsBurrowed;
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            Logging.WriteDiagnostic("[Trinity] Safely handled exception getting is-untargetable or is-burrowed attribute for unit " + c_Name + " [" + c_ActorSNO.ToString() + "]");
-            //            Logging.WriteDiagnostic(ex.ToString());
-            //            bWantThis = false;
-            //            //return bWantThis;
-            //        }
-            //        // Only cache it if it's NOT burrowed (if it *IS* - then we need to keep re-checking until it comes out!)
-            //        if (!bBurrowed)
-            //        {
-            //            // Don't cache for bosses, as we have to check for bosses popping in and out of the game during a complex fight
-            //            if (!c_unit_bIsBoss)
-            //                dictGilesBurrowedCache.Add(c_RActorGuid, bBurrowed);
-            //        }
-            //        else
-            //        {
-            //            // Unit is burrowed, so we need to ignore it until it isn't!
-            //            c_IgnoreSubStep = "Burrowed";
-            //            bWantThis = false;
-            //            //return bWantThis;
-            //        }
-            //    }
-            //}
-
             // Only if at full health, else don't bother checking each loop
             // See if we already have this monster's size stored, if not get it and cache it
             if (!dictionaryStoredMonsterSizes.TryGetValue(c_ActorSNO, out c_unit_MonsterSize))
@@ -1112,35 +1075,10 @@ namespace GilesTrinity
                 dictGilesGoldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
             }
 
-            // Ignore gold piles that are (currently) too small...
-            rangedMinimumStackSize = Settings.Loot.Pickup.MinimumGoldStack;
-            int min_cash = Settings.Loot.Pickup.MinimumGoldStack;	//absolute min cash to consider
-            int max_distance = 80;
-            if (c_GoldStackSize < min_cash)
+            // rrrix: keep it simple...
+            if (c_GoldStackSize >= Settings.Loot.Pickup.MinimumGoldStack)
             {
-                rangedMinimumStackSize = min_cash;
-            }
-            else if (c_CentreDistance >= max_distance)
-            {
-                rangedMinimumStackSize = 0;	//too far away
-            }
-            else
-            {
-                //scale the min stack size based on distance
-                //this will enable smaller, local cash values to be picked up
-                //while enroute, picking up items or larger amounts
-                //better for toons with low pickup range
-                int min_range = 6; //anything below this should be collected
-                int max_range = 30; //anything beyond this should be at the upper threshold
-                int max_cash = Math.Max(min_cash, rangedMinimumStackSize);
-                double cash_range = Math.Max(0, c_CentreDistance - min_range);
-                double rangedPerc = cash_range / (max_range - min_range); //no ceiling on this to capture distant, high values. twice distance=twice value
-                int newMinStack = (int)Math.Floor(rangedPerc * (max_cash - min_cash)) + min_cash;
-                rangedMinimumStackSize = newMinStack;
-            }
-            if (c_GoldStackSize < rangedMinimumStackSize)
-            {
-                AddToCache = false;
+                AddToCache = true;
             }
 
             // Blacklist gold piles already in pickup radius range
@@ -1149,6 +1087,7 @@ namespace GilesTrinity
                 hashRGUIDBlacklist3.Add(c_RActorGuid);
                 hashRGUIDBlacklist60.Add(c_RActorGuid);
                 AddToCache = false;
+                c_IgnoreSubStep = "GoldOutOfRange";
             }
 
             //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Gold Stack {0} has iPercentage {1} with rangeMinimumStackSize: {2} Distance: {3} MininumGoldStack: {4} PickupRadius: {5} AddToCache: {6}",
@@ -1445,7 +1384,7 @@ namespace GilesTrinity
                             c_IgnoreSubStep = "NotStuck";
                         }
                         // If we're standing on it, usually right before above unstucker returns true
-                        if (c_RadiusDistance <= 2f)
+                        if (c_RadiusDistance <= 5f)
                         {
                             AddToCache = true;
                             c_IgnoreSubStep = "";
@@ -1591,13 +1530,13 @@ namespace GilesTrinity
             bool bIgnoreThisAvoidance = false;
             double dThisHealthAvoid = GetAvoidanceHealth();
             // Monks with Serenity up ignore all AOE's
-            if (iMyCachedActorClass == ActorClass.Monk && hashPowerHotbarAbilities.Contains(SNOPower.Monk_Serenity) && GilesHasBuff(SNOPower.Monk_Serenity))
+            if (playerStatus.ActorClass == ActorClass.Monk && hashPowerHotbarAbilities.Contains(SNOPower.Monk_Serenity) && GilesHasBuff(SNOPower.Monk_Serenity))
             {
                 // Monks with serenity are immune
                 bIgnoreThisAvoidance = true;
             }
             // Witch doctors with spirit walk available and not currently Spirit Walking will subtly ignore ice balls, arcane, desecrator & plague cloud
-            if (iMyCachedActorClass == ActorClass.WitchDoctor && hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_SpiritWalk) &&
+            if (playerStatus.ActorClass == ActorClass.WitchDoctor && hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_SpiritWalk) &&
                 (!GilesHasBuff(SNOPower.Witchdoctor_SpiritWalk) && GilesUseTimer(SNOPower.Witchdoctor_SpiritWalk)) || GilesHasBuff(SNOPower.Witchdoctor_SpiritWalk))
             {
                 if (c_ActorSNO == 223675 || c_ActorSNO == 402 || c_ActorSNO == 219702 || c_ActorSNO == 221225 || c_ActorSNO == 84608 || c_ActorSNO == 108869)
@@ -1607,7 +1546,7 @@ namespace GilesTrinity
                 }
             }
             // Remove ice balls if the barbarian has wrath of the berserker up, and reduce health from most other SNO avoidances
-            if (iMyCachedActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+            if (playerStatus.ActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
             {
                 if (c_ActorSNO == 223675 || c_ActorSNO == 402)
                 {
@@ -1675,12 +1614,16 @@ namespace GilesTrinity
                 // Everything except items (including gold)
                 if (c_ObjectType != GObjectType.Item)
                 {
-                    bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
 
-                    if (!isNavigable)
+                    if (c_ObjectType == GObjectType.Unit)
                     {
-                        AddToCache = false;
-                        c_IgnoreSubStep = "NotNavigable";
+                        bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
+
+                        if (!isNavigable)
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "NotNavigable";
+                        }
                     }
                     // Ignore units not in LoS except bosses, rares, champs
                     if (c_ObjectType == GObjectType.Unit && !c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
@@ -1931,7 +1874,7 @@ namespace GilesTrinity
         private static bool RefreshStepCachedPlayerSummons(bool AddToCache)
         {
             // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
-            if (iMyCachedActorClass == ActorClass.Monk)
+            if (playerStatus.ActorClass == ActorClass.Monk)
             {
                 if (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MysticAlly) && hashMysticAlly.Contains(c_ActorSNO))
                 {
@@ -1940,7 +1883,7 @@ namespace GilesTrinity
                 }
             }
             // Count up Demon Hunter pets
-            if (iMyCachedActorClass == ActorClass.DemonHunter)
+            if (playerStatus.ActorClass == ActorClass.DemonHunter)
             {
                 if (hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Companion) && hashDHPets.Contains(c_ActorSNO))
                 {
@@ -1949,7 +1892,7 @@ namespace GilesTrinity
                 }
             }
             // Count up zombie dogs and gargantuans next
-            if (iMyCachedActorClass == ActorClass.WitchDoctor)
+            if (playerStatus.ActorClass == ActorClass.WitchDoctor)
             {
                 if (hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_Gargantuan) && hashGargantuan.Contains(c_ActorSNO))
                 {

@@ -18,25 +18,35 @@ Major new features:
 * Improved code Readability
 
 
-
-Code Cleanup TODO: 
-
-* More Refactoring, cleaning, optimization (does it ever end?)
-
-* Put XML Comment on all classes and members
-
-* Refactor AbilitySelector for readability, maybe we can even get to behavior trees someday
-
-* Refactor TargetHandler for readability / flow
-
-
 Future Planned Improvements: 
 
 * New cache system, trash the HashSet's and Dictionaries for an object based system
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
 
-* Default Loot Settings options for Questing, Champion Farming
+
+
+Changelog 1.7.1.7:
+
+* Monk performance issues should be resolved
+
+* Fix for monk blinding flash (by Magi)
+
+* Improved overall performance (removed potential duplicate actor update & frame locking)
+
+* Fixed attacking monsters/ubers with 0% health
+
+* Removed kiting when below 15% health (kiting still works if turned on in class config)
+
+* Fixed salvaging legendaries
+
+* Increased range that blocking destructables are destroyed at (from 2 to 5), may need further adjustment
+
+* Rolled back dynamic gold pickup logic to "simple" - (for a more advanced version, see thread 1.7.1.7 mods by SP). 
+
+* Added additional chest/resplendent chest SNO's
+
+* Fixed gold pickup flip-flop (stuck) while moving to pickup far away gold
 
 
 Changelog 1.7.1.6:

@@ -142,6 +142,9 @@ namespace GilesTrinity
             // Take Salvage Option corresponding to ItemLevel
             SalvageOption salvageOption = GetSalvageOption(thisquality);
 
+            if (thisquality >= ItemQuality.Legendary && salvageOption == SalvageOption.InfernoOnly && thislevel >= 60)
+                return true;
+
             switch (thisGilesBaseType)
             {
                 case GItemBaseType.WeaponRange:

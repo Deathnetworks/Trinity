@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -191,13 +191,13 @@ namespace GilesTrinity
             //bone pile
             218951,245838,
             // rrrix act 1
-            108882,
+            108882, 245919,
             // rrrix act 2
             213907, 92519, 61544, 105681, 113983, 114527, 114642, 139933, 144405, 156890, 164057, 164195, 180254, 180802, 180809, 181173, 181174, 181177, 181181,
             181182, 181185, 181290, 181292, 181306, 181309, 181313, 181326, 181563, 181857, 181858, 187265, 191433, 191462, 191641, 192880, 192881, 196413, 196435,
             197280, 199191, 199264, 199274, 199597, 199664, 200979, 200982, 201236, 201580, 201581, 201583, 204183, 205746, 205756, 210087, 213907, 218228, 219223,
             220114, 3011, 3205, 3539, 3582, 3584, 3595, 3600, 4580, 52693, 5466, 55005, 5509, 62522, 
-            205756, 5509, 200371,
+            205756, 5509, 200371, 167185,
             // rrrix act 3
             60108,
             // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
@@ -260,6 +260,8 @@ namespace GilesTrinity
         /// </summary>
         internal static HashSet<int> hashSNOContainerResplendant = new HashSet<int> {
             62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866,
+            // Magi
+			112182,
          };
         /// <summary>
         /// Objects that should never be ignored due to no Line of Sight (LoS)
@@ -274,6 +276,8 @@ namespace GilesTrinity
         /// </summary>
         internal static HashSet<int> hashSNOContainerWhitelist = new HashSet<int> {
             62859, 62865, 62872, 78790, 79016, 94708, 96522, 130170, 108122, 111870, 111947, 213447, 213446, 51300, 179865, 109264, 212491, 210422, 211861,
+            // Magi
+			196945, 70534,
          };
         // IGNORE LIST / BLACKLIST - for world objects
         // World objects that should always be ignored - eg certain destructables, certain containers, etc. - anything handled as a "world object" rather than a monster

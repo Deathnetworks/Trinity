@@ -1,4 +1,4 @@
-﻿using GilesTrinity.Settings.Combat;
+using GilesTrinity.Settings.Combat;
 using GilesTrinity.Technicals;
 using System;
 using System.Linq;
@@ -139,7 +139,7 @@ namespace GilesTrinity
                                         cacheObject.Weight += (1200 * (1 - (cacheObject.RadiusDistance / iCurrentMaxKillRadius)));
 
                                     // Give extra weight to ranged enemies
-                                    if ((iMyCachedActorClass == ActorClass.Barbarian || iMyCachedActorClass == ActorClass.Monk) &&
+                                    if ((playerStatus.ActorClass == ActorClass.Barbarian || playerStatus.ActorClass == ActorClass.Monk) &&
                                         (cacheObject.MonsterStyle == MonsterSize.Ranged || hashActorSNORanged.Contains(c_ActorSNO)))
                                     {
                                         cacheObject.Weight += 1100;
@@ -174,7 +174,16 @@ namespace GilesTrinity
                                     // Elites on low health get extra priority - up to 1500
                                     if ((cacheObject.IsEliteRareUnique || cacheObject.IsTreasureGoblin) && cacheObject.HitPoints < 0.20)
                                         cacheObject.Weight += (1500 * (1 - (cacheObject.HitPoints / 0.45)));
-
+									
+									// Magi - Elites/Bosses that are killed should have weight erased so we don't keep attacking
+                                    if ((cacheObject.IsEliteRareUnique || cacheObject.IsBoss) && cacheObject.HitPoints <= 0)
+									{
+                                        cacheObject.Weight = 0;
+										
+										// temporary blacklist for individual boss/uber so we don't repeadedly attack it (looks suspicious)
+										hashRGUIDBlacklist15.Add(cacheObject.RActorGuid);
+									}
+                                    
                                     // Goblins on low health get extra priority - up to 2500
                                     if (Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize && cacheObject.IsTreasureGoblin && cacheObject.HitPoints <= 0.98)
                                         cacheObject.Weight += (3000 * (1 - (cacheObject.HitPoints / 0.85)));
@@ -319,17 +328,9 @@ namespace GilesTrinity
                                 cacheObject.Weight = 1;
 
                             // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
-                            if (bAnyMobsInCloseRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting)
+                            if (CurrentTarget != null && bAnyMobsInCloseRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting)
                                 cacheObject.Weight = 1;
 
-                            // Calculate a spot reaching a little bit further out from the item, to help pickup-movements
-                            /*if (thisgilesobject.dThisWeight > 0)
-                            {
-                                if (thisgilesobject.iThisGoldAmount > 0)
-                                    thisgilesobject.vThisPosition = MathEx.CalculatePointFrom(thisgilesobject.vThisPosition, playerStatus.vCurrentPosition, thisgilesobject.fCentreDistance + 2f);
-                                else
-                                    thisgilesobject.vThisPosition = MathEx.CalculatePointFrom(thisgilesobject.vThisPosition, playerStatus.vCurrentPosition, thisgilesobject.fCentreDistance + 1f);
-                            }*/
                             break;
                         }
                     case GObjectType.Globe:
@@ -557,7 +558,13 @@ namespace GilesTrinity
                 //}
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5}",
                         cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance);
-                
+
+                // Prevent current target dynamic ranged weighting flip-flop 
+                if (CurrentTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)
+                {
+                    cacheObject.Weight = 100;
+                }
+
                 // Is the weight of this one higher than the current-highest weight? Then make this the new primary target!
                 if (cacheObject.Weight > w_HighestWeightFound && cacheObject.Weight > 0)
                 {

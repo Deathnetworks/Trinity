@@ -171,14 +171,18 @@ namespace GilesTrinity
         internal static GilesPower GilesAbilitySelector(bool bCurrentlyAvoiding = false, bool bOOCBuff = false, bool bDestructiblePower = false)
         {
             // Refresh buffs once to save buff-check-spam
-            GilesRefreshBuffs();
+            // rrrix: disabled this (it's called through other means)
+            //GilesRefreshBuffs();
+            
+            
             // See if archon just appeared/disappeared, so update the hotbar
             if (bRefreshHotbarAbilities)
                 GilesRefreshHotbar(GilesHasBuff(SNOPower.Wizard_Archon));
+
             // Extra height thingy, not REALLY used as it was originally going to be, will probably get phased out...
             float iThisHeight = iExtraHeight;
             // Switch based on the cached character class
-            switch (iMyCachedActorClass)
+            switch (playerStatus.ActorClass)
             {
                 // Barbs
                 case ActorClass.Barbarian: 

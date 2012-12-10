@@ -102,19 +102,17 @@ namespace GilesTrinity
             {
                 try
                 {
+                    if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
+                    {
+                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
+                        return RunStatus.Failure;
+                    }
                     HandlerRunStatus runStatus = HandlerRunStatus.NotFinished;
 
                     // Make sure we reset unstucker stuff here
                     GilesPlayerMover.iTimesReachedStuckPoint = 0;
                     GilesPlayerMover.vSafeMovementLocation = Vector3.Zero;
                     GilesPlayerMover.timeLastRecordedPosition = DateTime.Now;
-
-                    using (ZetaDia.Memory.AcquireFrame())
-                    {
-                        // Update player-data cache
-                        UpdateCachedPlayerData();
-                    }
-
 
                     // Whether we should refresh the target list or not
                     // See if we should update hotbar abilities
@@ -164,8 +162,7 @@ namespace GilesTrinity
                         {
                             // Now call the function that refreshes targets
                             RefreshDiaObjectCache();
-                            // Update when we last refreshed with current time
-                            lastRefreshedObjects = DateTime.Now;
+
                             // No target, return success
                             if (CurrentTarget == null)
                             {
@@ -290,7 +287,7 @@ namespace GilesTrinity
                         if (runStatus != HandlerRunStatus.NotFinished)
                             return GetTreeSharpRunStatus(runStatus);
 
-                        UpdateStatusTextTarget();
+                        UpdateStatusTextTarget(true);
 
                         // An integer to log total interact attempts on a particular object or item
                         int iInteractAttempts;
@@ -524,7 +521,7 @@ namespace GilesTrinity
                         return RunStatus.Running;
                     }
                     // Out-of-range, so move towards the target
-                    UpdateStatusTextTarget();
+                    UpdateStatusTextTarget(false);
                     // Are we currently incapacitated? If so then wait...
                     if (playerStatus.IsIncapacitated || playerStatus.IsRooted)
                     {
@@ -635,31 +632,33 @@ namespace GilesTrinity
                         )
                     {
                         bool bFoundSpecialMovement = UsedSpecialMovement();
-						
-						if (playerStatus.ActorClass == ActorClass.Monk && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap)
-						{
-							if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind) 
-								&& (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
-								{
-									ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
-									return RunStatus.Running;
-								}
-							else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800 
-									&& GilesHasBuff(SNOPower.Monk_SweepingWind))
-							{
-								weaponSwap.SwapGear();
-							}
-						}
-						// Spam sweeping winds
-						if ((playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
-							&& (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
-							|| !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
-						{
-							ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
-							SweepWindSpam = DateTime.Now;
-							return RunStatus.Running;
-						}	
-						
+
+                        if (playerStatus.ActorClass == ActorClass.Monk && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap)
+                        {
+                            if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind)
+                                && (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
+                            {
+                                ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
+                                return RunStatus.Running;
+                            }
+                            else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800
+                                    && GilesHasBuff(SNOPower.Monk_SweepingWind))
+                            {
+                                weaponSwap.SwapGear();
+                            }
+                        }
+                        // Spam sweeping winds
+                        if ((playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
+                            && (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 &&
+                            DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100 || !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() &&
+                            Settings.Combat.Monk.SweepingWindWeaponSwap && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400) &&
+                            hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
+                        {
+                            ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
+                            SweepWindSpam = DateTime.Now;
+                            return RunStatus.Running;
+                        }
+
                         if (CurrentTarget.Type != GObjectType.Backtrack)
                         {
                             // Whirlwind for a barb
@@ -890,7 +889,7 @@ namespace GilesTrinity
             if (!bWholeNewTarget && !bWaitingForPower && !bWaitingForPotion)
             {
                 // Update targets at least once every 80 milliseconds
-                if (bForceTargetUpdate || IsAvoidingProjectiles || DateTime.Now.Subtract(lastRefreshedObjects).TotalMilliseconds >= 80)
+                if (bForceTargetUpdate || IsAvoidingProjectiles)
                 {
                     StaleCache = true;
                 }
@@ -1086,7 +1085,7 @@ namespace GilesTrinity
         /// <summary>
         /// Updates bot status text with appropriate information if we are moving into range of our <see cref="CurrentTarget"/>
         /// </summary>
-        private static void UpdateStatusTextTarget()
+        private static void UpdateStatusTextTarget(bool targetIsInRange)
         {
             StringBuilder statusText = new StringBuilder();
             switch (CurrentTarget.Type)
@@ -1144,7 +1143,8 @@ namespace GilesTrinity
             }
             statusText.Append("Weight=");
             statusText.Append(CurrentTarget.Weight);
-            statusText.Append(" MOVING INTO RANGE");
+            if (!targetIsInRange)
+                statusText.Append(" MOVING INTO RANGE");
             if (Settings.Advanced.DebugInStatusBar)
             {
                 sStatusText = "[Trinity] " + statusText.ToString();

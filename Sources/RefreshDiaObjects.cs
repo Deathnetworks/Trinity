@@ -25,12 +25,26 @@ namespace GilesTrinity
 
         /// <summary>
         /// This method will add and update necessary information about all available actors. Determines GilesObjectType, sets ranges, updates blacklists, determines avoidance, kiting, target weighting
-        /// and the result is we will have a new target for the Target Handler
+        /// and the result is we will have a new target for the Target Handler. Returns true if the cache was refreshed.
         /// </summary>
-        public static void RefreshDiaObjectCache()
+        /// <returns>True if the cache was updated</returns>
+        public static bool RefreshDiaObjectCache()
         {
+            if (DateTime.Now.Subtract(LastRefreshedCache).TotalMilliseconds <= 100)
+                return false;
+
+            LastRefreshedCache = DateTime.Now;
+
             using (ZetaDia.Memory.AcquireFrame())
             {
+                // Update player-data cache, including buffs
+                UpdateCachedPlayerData();
+
+                if (playerStatus.CurrentHealthPct <= 0)
+                {
+                    return false;
+                }
+              
                 //RefreshInit(out vSafePointNear, out vKitePointAvoid, out iCurrentTargetRactorGUID, out iUnitsSurrounding, out iHighestWeightFound, out listGilesObjectCache, out hashDoneThisRactor);
                 RefreshCacheInit();
                 // Now pull up all the data and store anything we want to handle in the super special cache list
@@ -103,7 +117,7 @@ namespace GilesTrinity
             // Still no target, let's end it all!
             if (CurrentTarget == null)
             {
-                return;
+                return true;
             }
             // Ok record the time we last saw any unit at all
             if (CurrentTarget.Type == GObjectType.Unit)
@@ -113,10 +127,10 @@ namespace GilesTrinity
                 if (CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin)
                     lastHadEliteUnitInSights = DateTime.Now;
             }
-            // Record the last time our target changed etc.
+            // Record the last time our target changed
             if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
             {
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Setting dateSincePicked to {0} iCurrentTargetRactorGUID: {1} CurrentTarget.iRActorGuid: {2}",
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Setting dateSincePicked to {0} CurrentTargetRactorGUID: {1} CurrentTarget.RActorGuid: {2}",
                                 DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
                 dateSincePickedTarget = DateTime.Now;
                 iTargetLastHealth = 0f;
@@ -137,13 +151,15 @@ namespace GilesTrinity
                     iTargetLastHealth = CurrentTarget.HitPoints;
                 }
             }
+            // We have a target and the cached was refreshed
+            return true;
         }
         // Refresh object list from Diablo 3 memory RefreshDiaObjects()
         //private static void RefreshInit(out Vector3 vSafePointNear, out Vector3 vKitePointAvoid, out int iCurrentTargetRactorGUID, out int iUnitsSurrounding, out double iHighestWeightFound, out List<GilesObject> listGilesObjectCache, out HashSet<int> hashDoneThisRactor)
         private static void RefreshCacheInit()
         {
             // Update when we last refreshed with current time
-            lastRefreshedObjects = DateTime.Now;
+            LastRefreshedCache = DateTime.Now;
 
             // Blank current/last/next targets
             vSafePointNear = CurrentTarget != null ? CurrentTarget.Position : vNullLocation;
@@ -173,7 +189,7 @@ namespace GilesTrinity
             {
                 iCurrentMaxLootRadius /= 4;
             }
-            if (iMyCachedActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+            if (playerStatus.ActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
             { //!sp - keep looking for kills while WOTB is up
                 iKeepKillRadiusExtendedFor = Math.Max(3, iKeepKillRadiusExtendedFor);
                 timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
@@ -191,9 +207,6 @@ namespace GilesTrinity
             }
             if (iKeepLootRadiusExtendedFor > 0)
                 iKeepLootRadiusExtendedFor--;
-
-            // Refresh buffs (so we can check for wrath being up to ignore ice balls and anything else like that)
-            GilesRefreshBuffs();
 
             // Clear forcing close-range priority on mobs after XX period of time
             if (ForceCloseRangeTarget && DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds)
@@ -671,7 +684,7 @@ namespace GilesTrinity
 
             if (
                 ((hashMonsterObstacleCache.Any(m => m.Location.Distance(playerStatus.CurrentPosition) <= PlayerKiteDistance)) &&
-                (iMyCachedActorClass != ActorClass.Wizard || IsWizardShouldKite())) || playerStatus.CurrentHealthPct <= 0.15)
+                (playerStatus.ActorClass != ActorClass.Wizard || IsWizardShouldKite())) || playerStatus.CurrentHealthPct <= 0.15)
             {
                 TryToKite = true;
 
@@ -684,7 +697,7 @@ namespace GilesTrinity
                 (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= cancelledKiteMoveForMilliseconds ||
                 (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= 2500 && NeedToKite)))
             {
-                Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true, playerStatus.CurrentHealthPct <= 0.15);
+                Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true);
 
                 // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
                 if (vAnySafePoint != vNullLocation)
@@ -721,7 +734,7 @@ namespace GilesTrinity
         }
         private static bool IsWizardShouldKite()
         {
-            return (iMyCachedActorClass == ActorClass.Wizard && (!Settings.Combat.Wizard.OnlyKiteInArchon || GilesHasBuff(SNOPower.Wizard_Archon)));
+            return (playerStatus.ActorClass == ActorClass.Wizard && (!Settings.Combat.Wizard.OnlyKiteInArchon || GilesHasBuff(SNOPower.Wizard_Archon)));
         }
     }
 }
