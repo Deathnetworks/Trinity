@@ -697,7 +697,7 @@ namespace GilesTrinity
                 (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= cancelledKiteMoveForMilliseconds ||
                 (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= 2500 && NeedToKite)))
             {
-                Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true, playerStatus.CurrentHealthPct <= 0.15);
+                Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true);
 
                 // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
                 if (vAnySafePoint != vNullLocation)

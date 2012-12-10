@@ -114,9 +114,9 @@ namespace GilesTrinity.Swap
 
         public bool CanSwap()
         {
-            if (DateTime.Now.Subtract(LastCheckCanSwap).TotalMilliseconds <= 250)
-                return ableToSwap;
-            LastCheckCanSwap = DateTime.Now;
+            //if (DateTime.Now.Subtract(LastCheckCanSwap).TotalMilliseconds <= 250)
+            //    return ableToSwap;
+            //LastCheckCanSwap = DateTime.Now;
 
             if (sGamesCreated < GilesTrinity.iTotalJoinGames)
             {
@@ -146,9 +146,9 @@ namespace GilesTrinity.Swap
                 return;
 
             // Don't run if we've already checked within 250ms
-            if (DateTime.Now.Subtract(LastSecurityCheck).TotalMilliseconds <= 250)
-                return;
-            LastSecurityCheck = DateTime.Now;
+            //if (DateTime.Now.Subtract(LastSecurityCheck).TotalMilliseconds <= 250)
+            //    return;
+            //LastSecurityCheck = DateTime.Now;
 
             ableToSwap = true;
             //ZetaDia.Actors.Update();
@@ -303,10 +303,9 @@ namespace GilesTrinity.Swap
                 return;
             }
 
-            if (DateTime.Now.Subtract(LastCheckSwapGear).TotalMilliseconds <= 250)
-                return;
-
-            LastCheckSwapGear = DateTime.Now;
+            //if (DateTime.Now.Subtract(LastCheckSwapGear).TotalMilliseconds <= 250)
+            //    return;
+            //LastCheckSwapGear = DateTime.Now;
 
             if (!hasChecked)
             {
