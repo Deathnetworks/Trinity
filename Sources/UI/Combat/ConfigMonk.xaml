@@ -46,9 +46,10 @@
         </Grid>
         <!--CheckBox-->
         <Grid Grid.Row="1" Margin="2">
-            <UniformGrid Columns="2">
+            <UniformGrid Columns="3">
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.HasInnaSet}" ToolTip="sweeping wind 5 spirit">Inna's set</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.SweepingWindWeaponSwap}" ToolTip="Sweeping Wind Weapon Swap Exploit">Weapon Swap</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.DisableMantraSpam}" ToolTip="Disable Spamming Mantras for the 3-sec. buff.">Disable Mantra Spam</CheckBox>
             </UniformGrid>
         </Grid>
         <Grid Grid.Row="3" Margin="2">
