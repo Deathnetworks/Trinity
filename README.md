@@ -18,25 +18,12 @@ Major new features:
 * Improved code Readability
 
 
-
-Code Cleanup TODO: 
-
-* More Refactoring, cleaning, optimization (does it ever end?)
-
-* Put XML Comment on all classes and members
-
-* Refactor AbilitySelector for readability, maybe we can even get to behavior trees someday
-
-* Refactor TargetHandler for readability / flow
-
-
 Future Planned Improvements: 
 
 * New cache system, trash the HashSet's and Dictionaries for an object based system
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
 
-* Default Loot Settings options for Questing, Champion Farming
 
 
 Changelog 1.7.1.7:
