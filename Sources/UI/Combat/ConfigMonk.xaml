@@ -57,7 +57,7 @@
         <!--Options for TR-->
         <Grid Grid.Row="2" Margin="2">
             <UniformGrid Columns="3">
-                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.UseTRMovement}" ToolTip="Disable Tempest Rush for combat, and optimize it for movement">Tempest Rush Traversal</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.UseTRMovement}" ToolTip="Disable Tempest Rush for combat, and optimize it for movement.  This will also ignore frenzy shrines!">Tempest Rush Traversal</CheckBox>
             </UniformGrid>
         </Grid>
         
