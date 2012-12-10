@@ -37,6 +37,7 @@ namespace GilesTrinity.Settings.Combat
         private float _AvoidZoltTwisterHealth;
         private bool _HasInnaSet;
         private bool _SweepingWindWeaponSwap;
+        private bool _DisableMantraSpam;
         #endregion Fields
 
         #region Events
@@ -575,6 +576,24 @@ namespace GilesTrinity.Settings.Combat
                 {
                     _HasInnaSet = value;
                     OnPropertyChanged("HasInnaSet");
+                }
+            }
+        }
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool DisableMantraSpam
+        {
+            get
+            {
+                return _DisableMantraSpam;
+            }
+            set
+            {
+                if (_DisableMantraSpam != value)
+                {
+                    _DisableMantraSpam = value;
+                    OnPropertyChanged("DisableMantraSpam");
                 }
             }
         }
