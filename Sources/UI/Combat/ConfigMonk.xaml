@@ -18,6 +18,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -47,15 +48,47 @@
         <!--CheckBox-->
         <Grid Grid.Row="1" Margin="2">
             <UniformGrid Columns="3">
-                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.HasInnaSet}" ToolTip="sweeping wind 5 spirit">Inna's set</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.HasInnaSet}" ToolTip="Sweeping Wind for 5 Spirit">Inna's set</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.SweepingWindWeaponSwap}" ToolTip="Sweeping Wind Weapon Swap Exploit">Weapon Swap</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.DisableMantraSpam}" ToolTip="Disable Spamming Mantras for the 3-sec. buff.">Disable Mantra Spam</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.DisableMantraSpam}" ToolTip="Disable Spamming Mantras (for the 3-sec. buff)">Disable Mantra Spam</CheckBox>
             </UniformGrid>
         </Grid>
+        
+        <!--Options for TR-->
+        <Grid Grid.Row="2" Margin="2">
+            <UniformGrid Columns="3">
+                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.UseTRMovement}" ToolTip="Disable Tempest Rush for combat, and optimize it for movement">Tempest Rush Traversal</CheckBox>
+            </UniformGrid>
+        </Grid>
+        
         <Grid Grid.Row="3" Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Min Spirit" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+            <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                Interval="1" Maximum="150" Minimum="0"
+                SmallChange="1" LargeChange="10"
+                TickPlacement="None" 
+                IsEnabled="{Binding Path=Monk.UseTRMovement}"
+                Value="{Binding Path=Monk.TR_MinSpirit}" 
+                HorizontalAlignment="Stretch" Margin="2"/>
+            <TextBlock Grid.Column="2" Text="Min Dist." FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+            <Slider Grid.Column="3" Template="{DynamicResource Slider}" 
+                Interval="1" Maximum="50" Minimum="0"
+                SmallChange="1" LargeChange="5"
+                TickPlacement="None" 
+                IsEnabled="{Binding Path=Monk.UseTRMovement}"
+                Value="{Binding Path=Monk.TR_MinDist}" 
+                HorizontalAlignment="Stretch" Margin="2"/>
+        </Grid>
+        <Grid Grid.Row="4" Margin="2">
             <ScrollViewer Tag="Combat\Avoidance.xaml" DataContext="{Binding Path=Monk}"/>
         </Grid>
         <!--Reset Button-->
-        <Button Grid.Row="4" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetMonkCommand}">Reset</Button>
+        <Button Grid.Row="5" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetMonkCommand}">Reset</Button>
     </Grid>
 </UserControl>
