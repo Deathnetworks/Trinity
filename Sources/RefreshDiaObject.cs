@@ -674,6 +674,8 @@ namespace GilesTrinity
                 NeedToClearBlacklist3 = true;
                 AddToCache = false;
                 c_IgnoreSubStep = "0HitPoints";
+                // return here immediately
+                return AddToCache;
             }
             // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
             c_unit_IsTreasureGoblin = false;
