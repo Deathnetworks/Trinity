@@ -559,7 +559,7 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5}",
                         cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance);
 
-                // Prevent target dynamic weight flip-flop 
+                // Prevent current target dynamic ranged weighting flip-flop 
                 if (CurrentTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)
                 {
                     cacheObject.Weight = 100;

@@ -122,14 +122,14 @@ namespace GilesTrinity
                     WeaponSwapTime = DateTime.Now;
                 }
                 if (!Settings.Combat.Monk.SweepingWindWeaponSwap || !weaponSwap.CanSwap() || (weaponSwap.CanSwap() && CheckAbilityAndBuff(SNOPower.Monk_SweepingWind)))
-                    return new GilesPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 11f -- 1, 2
+                    return new GilesPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); 
             }
             // Blinding Flash as a DEFENSE
             if (!bOOCBuff && playerStatus.CurrentEnergy >= 10 && hashPowerHotbarAbilities.Contains(SNOPower.Monk_BlindingFlash) &&
                 playerStatus.CurrentHealthPct <= 0.25 && iAnythingWithinRange[RANGE_15] >= 1 &&
                 GilesUseTimer(SNOPower.Monk_BlindingFlash) && PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && (!Settings.Combat.Monk.SweepingWindWeaponSwap || !weaponSwap.CanSwap()))
             {
-                return new GilesPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 11f -- 1, 2
+                return new GilesPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); 
             }
 
 
