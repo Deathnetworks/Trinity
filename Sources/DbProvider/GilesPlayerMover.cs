@@ -45,12 +45,16 @@ namespace GilesTrinity.DbProvider
         public static DateTime timeLastReportedAnyStuck = DateTime.Today;
         public static int iCancelUnstuckerForSeconds = 60;
         public static DateTime timeLastRestartedGame = DateTime.Today;
+        
         // Store player current position
         public static Vector3 vMyCurrentPosition = Vector3.Zero;
 
         private static int lastKnowCoin;
         private static DateTime lastCheckBag;
         private static DateTime lastRefreshCoin;
+        
+        //For Tempest Rush Monks
+        private static bool bCanChannelTR = false;
 
         private static void ResetCheckGold()
         {
@@ -486,11 +490,19 @@ namespace GilesTrinity.DbProvider
                     return;
                 }
                 // Tempest rush for a monk
-                if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.Monk_TempestRush) && !bTooMuchZChange && ZetaDia.Me.CurrentPrimaryResource >= 20)
+                if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.Monk_TempestRush) && !bTooMuchZChange) 
                 {
-                    Vector3 vTargetAimPoint = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 10f);
-                    ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vTargetAimPoint, GilesTrinity.iCurrentWorldID, -1);
-                    return;
+			         		if (ZetaDia.Me.CurrentPrimaryResource >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit && fDistanceFromTarget > GilesTrinity.Settings.Combat.Monk.TR_MinDist)
+					            bCanChannelTR = true;
+			        		else if (bCanChannelTR && ZetaDia.Me.CurrentPrimaryResource <= 20)
+			          			bCanChannelTR = false;
+
+				        	if (bCanChannelTR) 
+				          {
+			 	        	    Vector3 vTargetAimPoint = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 10f);
+				        		  ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vTargetAimPoint, GilesTrinity.iCurrentWorldID, -1);
+				        		  return;
+			        		}
                 }
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Teleport) &&

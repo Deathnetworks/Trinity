@@ -602,5 +602,15 @@ namespace GilesTrinity
 
         // Darkfriend's Looting Rule
         public static Interpreter StashRule = new Interpreter();
+		
+        // Tesslerc - used for using combination strike
+            // ForesightFirstHit is used to track the 30 second buff from deadly reach.
+        private static DateTime ForeSightFirstHit = new DateTime(1996, 6, 3, 22, 15, 0);
+            // Foresight2 is used to track combination strike buff.
+        private static DateTime ForeSight2 = DateTime.Now;
+            // Otherthandeadlyreach is used for other spirit generators to track for combination strike buff.
+        private static DateTime OtherThanDeadlyReach = DateTime.Now;
+            // Set by sweeping winds or by blinding flash if the time is right for a swap.
+        private static bool WantToSwap = false;		
     }
 }
