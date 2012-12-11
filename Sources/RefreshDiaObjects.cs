@@ -241,7 +241,7 @@ namespace GilesTrinity
                 hashRGUIDBlacklist3 = new HashSet<int>();
             }
             // Clear certain cache dictionaries sequentially, spaced out over time, to force data updates
-            if (DateTime.Now.Subtract(lastClearedCacheDictionary).TotalMilliseconds >= 4000)
+            if (DateTime.Now.Subtract(lastClearedCacheDictionary).TotalMilliseconds >= 30000)
             {
                 lastClearedCacheDictionary = DateTime.Now;
                 iLastClearedCacheDictionary++;

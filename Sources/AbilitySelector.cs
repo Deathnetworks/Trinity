@@ -159,7 +159,7 @@ namespace GilesTrinity
         /// <summary>
         /// A default power in case we can't use anything else
         /// </summary>
-        private static GilesPower defaultPower = new GilesPower(SNOPower.None, 0, vNullLocation, -1, -1, 0, 0, false);
+        private static GilesPower defaultPower = new GilesPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
 
         /// <summary>
         /// Returns an appropriately selected GilesPower and related information

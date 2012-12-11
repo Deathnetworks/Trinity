@@ -1803,6 +1803,10 @@ namespace GilesTrinity
         }
         private static bool RefreshStepNewObjectTypeZDiff(bool AddToCache)
         {
+            // always take current target regardless if ZDiff changed
+            if (c_RActorGuid == CurrentTargetRactorGUID)
+                return true;
+
             // Ignore stuff which has a Z-height-difference too great, it's probably on a different level etc. - though not avoidance!
             if (c_ObjectType != GObjectType.Avoidance)
             {
@@ -1818,7 +1822,6 @@ namespace GilesTrinity
                         if (c_ZDiff >= 14f && !c_unit_IsBoss)
                         {
                             AddToCache = false;
-                            //return bWantThis;
                         }
                         break;
                     case GObjectType.Item:
@@ -1827,7 +1830,6 @@ namespace GilesTrinity
                         if (c_ZDiff >= 26f)
                         {
                             AddToCache = false;
-                            //return bWantThis;
                         }
                         break;
                     case GObjectType.Gold:
@@ -1836,7 +1838,6 @@ namespace GilesTrinity
                         if (c_ZDiff >= 11f)
                         {
                             AddToCache = false;
-                            //return bWantThis;
                         }
                         break;
                     case GObjectType.Destructible:
@@ -1846,7 +1847,6 @@ namespace GilesTrinity
                         if (c_ZDiff >= 7f)
                         {
                             AddToCache = false;
-                            //return bWantThis;
                         }
                         break;
                     case GObjectType.Interactable:
@@ -1854,7 +1854,6 @@ namespace GilesTrinity
                         if (c_ZDiff >= 9f)
                         {
                             AddToCache = false;
-                            //return bWantThis;
                         }
                         break;
                     case GObjectType.Unknown:

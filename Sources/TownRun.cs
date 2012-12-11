@@ -195,10 +195,10 @@ namespace GilesTrinity
         {
             GilesTrinity.bWantToTownRun = false;
 
-            bool CombatCheck = GilesTrinity.GilesGlobalOverlord(null);
+            //bool CombatCheck = GilesTrinity.GilesGlobalOverlord(null);
 
-            if (CombatCheck)
-                return false;
+            //if (CombatCheck)
+            //    return false;
 
 
             // Check if we should be forcing a town-run

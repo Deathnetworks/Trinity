@@ -556,8 +556,8 @@ namespace GilesTrinity
 
                 //    bStayPutDuringAvoidance = true;
                 //}
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5}",
-                        cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5} PrioritizeCloseRangeUnits: {6}",
+                        cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance, PrioritizeCloseRangeUnits);
 
                 // Prevent current target dynamic ranged weighting flip-flop 
                 if (CurrentTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)

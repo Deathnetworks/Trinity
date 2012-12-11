@@ -213,22 +213,28 @@ namespace GilesTrinity
                         fThisRange = 9f;
                     return new GilesPower(SNOPower.Wizard_ExplosiveBlast, fThisRange, vNullLocation, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
                 }
+
                 // Check to see if we have a signature spell on our hotbar, for energy twister check
                 bool bHasSignatureSpell = (hashPowerHotbarAbilities.Contains(SNOPower.Wizard_MagicMissile) || hashPowerHotbarAbilities.Contains(SNOPower.Wizard_ShockPulse) ||
                     hashPowerHotbarAbilities.Contains(SNOPower.Wizard_SpectralBlade) || hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Electrocute));
+
+
                 // Energy Twister SPAMS whenever 35 or more ap to generate Arcane Power
-                if (!bOOCBuff && !playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_EnergyTwister) &&
+                if (!bOOCBuff && !playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_EnergyTwister) && playerStatus.CurrentEnergy >= 35 &&
                     // If using storm chaser, then force a signature spell every 1 stack of the buff, if we have a signature spell
                     (!bHasSignatureSpell || GilesBuffStacks(SNOPower.Wizard_EnergyTwister) < 1) &&
                     (iElitesWithinRange[RANGE_30] >= 1 || iAnythingWithinRange[RANGE_25] >= 1 || CurrentTarget.RadiusDistance <= 12f) &&
                     (!hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Electrocute) || !hashActorSNOFastMobs.Contains(CurrentTarget.ActorSNO)) &&
-                    ((Settings.Combat.Wizard.CriticalMass && (!bHasSignatureSpell || playerStatus.CurrentEnergy >= 35)) || (!Settings.Combat.Wizard.CriticalMass && playerStatus.CurrentEnergy >= 35)))
+                    ((Settings.Combat.Wizard.CriticalMass && !bHasSignatureSpell) || !Settings.Combat.Wizard.CriticalMass))
                 {
                     float fThisRange = 28f;
-                    if (Settings.Combat.Wizard.CriticalMass)
-                        fThisRange = 9f;
+                    //if (Settings.Combat.Wizard.CriticalMass)
+                    //    fThisRange = 9f;
                     return new GilesPower(SNOPower.Wizard_EnergyTwister, fThisRange, CurrentTarget.Position, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
                 }
+
+
+
                 // Disintegrate
                 if (!bOOCBuff && !playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Disintegrate) &&
                     ((playerStatus.CurrentEnergy >= 20 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= iWaitingReservedAmount))
@@ -295,6 +301,7 @@ namespace GilesTrinity
                 {
                     return new GilesPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
                 }
+                return new GilesPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             }
             else
             {
@@ -325,18 +332,19 @@ namespace GilesTrinity
                     return new GilesPower(SNOPower.Wizard_Archon_ArcaneBlast, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
                 }
                 // Arcane Strike (Arcane Strike) Rapid Spam at close-range only
-                if (!bOOCBuff && !playerStatus.IsIncapacitated && CurrentTarget.RadiusDistance <= 13f &&
+                if (!bOOCBuff && !playerStatus.IsIncapacitated && CurrentTarget.RadiusDistance <= 7f &&
                     CurrentTarget.IsBossOrEliteRareUnique)
                 {
-                    return new GilesPower(SNOPower.Wizard_Archon_ArcaneStrike, 11f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
+                    return new GilesPower(SNOPower.Wizard_Archon_ArcaneStrike, 7f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
                 }
                 // Disintegrate
                 if (!bOOCBuff && !bCurrentlyAvoiding && !playerStatus.IsIncapacitated)
                 {
                     return new GilesPower(SNOPower.Wizard_Archon_DisintegrationWave, 49f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, SIGNATURE_SPAM);
                 }
+                return new GilesPower(SNOPower.Wizard_Archon_DisintegrationWave, 49f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, SIGNATURE_SPAM);
             }
-            return defaultPower;
+            return new GilesPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
         }
 
         private static GilesPower GetWizardDestructablePower()

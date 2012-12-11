@@ -142,8 +142,11 @@ namespace GilesTrinity
         {
             if (!bFindAntiStuckSpot)
             {
-                // Already searched & found a safe spot in last 800 milliseconds, stick to it
-                if (!IsAvoidingProjectiles && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 800 && vlastSafeSpot != vNullLocation)
+                if (bKitingSpot && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 1500 && vlastSafeSpot != vNullLocation)
+                {
+                    return vlastSafeSpot;
+                }
+                else if (!IsAvoidingProjectiles && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 800 && vlastSafeSpot != vNullLocation)
                 {
                     return vlastSafeSpot;
                 }
@@ -188,12 +191,12 @@ namespace GilesTrinity
             // Start off checking every 12 degrees (which is 30 loops for a full circle)
             const int iMaxRadiusChecks = 30;
             const int iRadiusMultiplier = 12;
-            for (int iStepDistance = 1; iStepDistance <= 12; iStepDistance++)
+            for (int iStepDistance = 0; iStepDistance <= 11; iStepDistance++)
             {
                 // Distance of 10 for each step loop at first
                 int iDistanceOut = 10;
 
-                int iKiteStepSize = 6;
+                int iKiteStepSize = 3;
                 if (avoidDeath)
                 {
                     // 90-(6*1), 90-(6*2), 90-(6*n)... 
@@ -234,7 +237,7 @@ namespace GilesTrinity
                             break;
                     }
                 }
-                int iRandomUse = 3 + ((iStepDistance - 1) * 4);
+                int iRandomUse = 3 + Math.Max(((iStepDistance - 1) * 4),1);
                 // Try to return "early", or as soon as possible, beyond step 4, except when unstucking, when the max steps is based on the unstuck attempt
                 if (fHighestWeight > 0 &&
                     ((!bFindAntiStuckSpot && iStepDistance > 5) || (bFindAntiStuckSpot && iStepDistance > iAntiStuckAttempts))
