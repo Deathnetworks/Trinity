@@ -20,7 +20,8 @@ namespace GilesTrinity
             // Do weapon swapping checks
             if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds > 1500 ||
                     DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds > 800 && GilesHasBuff(SNOPower.Monk_SweepingWind)) || WantToSwap &&
-                    (DateTime.Now.Subtract(ForeSightFirstHit).TotalMilliseconds >= 1400 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach)))
+                    (DateTime.Now.Subtract(ForeSightFirstHit).TotalMilliseconds >= 1400 && DateTime.Now.Subtract(ForeSightFirstHit).TotalMilliseconds <= 29000 && 
+                    DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds <= 2700 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach)))
             {
                 WantToSwap = false;
                 if (!weaponSwap.DpsGearOn())
@@ -29,14 +30,13 @@ namespace GilesTrinity
                 }
                 weaponSwap.SwapGear();
             }
-            // Foresight b4 swap
+            /*// Foresight b4 swap
             if ((hashPowerHotbarAbilities.Contains(SNOPower.Monk_FistsofThunder) || hashPowerHotbarAbilities.Contains(SNOPower.Monk_CripplingWave) ||
                 hashPowerHotbarAbilities.Contains(SNOPower.Monk_WayOfTheHundredFists)) && hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach) && !bOOCBuff && !playerStatus.IsIncapacitated
                 && DateTime.Now.Subtract(ForeSightFirstHit).TotalMilliseconds < 1400 && !GilesHasBuff(SNOPower.Monk_SweepingWind) && WantToSwap)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] ForeSighting b4 swap!");
                 return new GilesPower(SNOPower.Monk_DeadlyReach, 16f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
-            }
+            }*/
                 // Blinding flash after swap
             if (Settings.Combat.Monk.SweepingWindWeaponSwap && weaponSwap.DpsGearOn() && PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && 
                 !GilesHasBuff(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15))
@@ -156,7 +156,8 @@ namespace GilesTrinity
             if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && !GilesHasBuff(SNOPower.Monk_SweepingWind) &&
                 (iElitesWithinRange[RANGE_25] > 0 || iAnythingWithinRange[RANGE_20] >= 3 || (iAnythingWithinRange[RANGE_20] >= 1 && Settings.Combat.Monk.HasInnaSet) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 25f)) &&
                 // Check if either we don't have blinding flash, or we do and it's been cast in the last 6000ms
-                (DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 8000 || CheckAbilityAndBuff(SNOPower.Monk_BlindingFlash)) &&
+                (DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 8000 || CheckAbilityAndBuff(SNOPower.Monk_BlindingFlash) ||
+                iElitesWithinRange[RANGE_25] > 0 && DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 12500) &&
                 // Check our mantras, if we have them, are up first
 				(Settings.Combat.Monk.SweepingWindWeaponSwap || 
                 CheckAbilityAndBuff(SNOPower.Monk_MantraOfConviction) &&
@@ -294,7 +295,8 @@ namespace GilesTrinity
 
             // Fists of thunder as the primary, repeatable attack
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Monk_FistsofThunder)
-                && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach) || CurrentTarget.RadiusDistance > 12f))
+                && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach) || CurrentTarget.RadiusDistance > 12f ||
+                iAnythingWithinRange[RANGE_50] < 5 && iElitesWithinRange[RANGE_50] <= 0 && !WantToSwap))
             {
                 if (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700)
                     OtherThanDeadlyReach = DateTime.Now;
@@ -304,7 +306,8 @@ namespace GilesTrinity
             }
             // Crippling wave
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Monk_CripplingWave)
-                && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach)))
+                && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach)
+                || iAnythingWithinRange[RANGE_50] < 5 && iElitesWithinRange[RANGE_50] <= 0 && !WantToSwap))
             {
                 OtherThanDeadlyReach = DateTime.Now;
                 if (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
@@ -313,7 +316,8 @@ namespace GilesTrinity
             }
             // Way of hundred fists
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Monk_WayOfTheHundredFists)
-                && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach)))
+                && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach)
+                || iAnythingWithinRange[RANGE_50] < 5 && iElitesWithinRange[RANGE_50] <= 0 && !WantToSwap))
             {
                 OtherThanDeadlyReach = DateTime.Now;
                 if (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
@@ -323,7 +327,7 @@ namespace GilesTrinity
             // Deadly reach
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach))
             {
-                if (DateTime.Now.Subtract(ForeSightFirstHit).TotalMilliseconds > 30000)
+                if (DateTime.Now.Subtract(ForeSightFirstHit).TotalMilliseconds > 29000)
                 {
                     ForeSightFirstHit = DateTime.Now;
                 }

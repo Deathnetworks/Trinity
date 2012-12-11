@@ -368,12 +368,12 @@ namespace GilesTrinity.Swap
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Swapped back to normal gear.");
                     }
                 }
+				else if (crashedDuringSwap == true)
+				{
+					wearingDPSGear = true;
+				}
+				crashedDuringSwap = false;				
             }
-            else if (crashedDuringSwap == true)
-            {
-                wearingDPSGear = true;
-            }
-            crashedDuringSwap = false;
         }
 
     }
