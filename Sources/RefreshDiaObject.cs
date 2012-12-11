@@ -1267,6 +1267,15 @@ namespace GilesTrinity
                             AddToCache = false;
                             //return bWantThis;
                         }
+                        // Frenzy shrines are a huge time sink for monks using Tempest Rush to move, we should ignore them.
+                        if (Settings.Combat.Monk.UseTRMovement)
+                        {
+                            if (c_ActorSNO == 176077)
+                            {
+                              hashRGUIDBlacklist60.Add(c_RActorGuid);
+                              AddToCache = false;
+                            }
+                        }
                         // Already used, blacklist it and don't look at it again
                         try
                         {
