@@ -295,7 +295,7 @@ namespace GilesTrinity
 
             // Fists of thunder as the primary, repeatable attack
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Monk_FistsofThunder)
-                && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach) || CurrentTarget.RadiusDistance > 12f ||
+                && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 && DateTime.Now.Subtract(ForeSightFirstHit).TotalMilliseconds < 29000 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach) || CurrentTarget.RadiusDistance > 12f ||
                 iAnythingWithinRange[RANGE_50] < 5 && iElitesWithinRange[RANGE_50] <= 0 && !WantToSwap))
             {
                 if (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700)
@@ -306,7 +306,7 @@ namespace GilesTrinity
             }
             // Crippling wave
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Monk_CripplingWave)
-                && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach)
+                && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 && DateTime.Now.Subtract(ForeSightFirstHit).TotalMilliseconds < 29000 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach)
                 || iAnythingWithinRange[RANGE_50] < 5 && iElitesWithinRange[RANGE_50] <= 0 && !WantToSwap))
             {
                 OtherThanDeadlyReach = DateTime.Now;
@@ -316,7 +316,7 @@ namespace GilesTrinity
             }
             // Way of hundred fists
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Monk_WayOfTheHundredFists)
-                && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach)
+                && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 && DateTime.Now.Subtract(ForeSightFirstHit).TotalMilliseconds < 29000 || !hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach)
                 || iAnythingWithinRange[RANGE_50] < 5 && iElitesWithinRange[RANGE_50] <= 0 && !WantToSwap))
             {
                 OtherThanDeadlyReach = DateTime.Now;
