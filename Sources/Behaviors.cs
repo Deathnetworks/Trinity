@@ -191,6 +191,12 @@ namespace GilesTrinity
                         }
                     }
 
+                    if (CurrentTarget == null)
+                    {
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget set as null in refresh");
+                        runStatus = HandlerRunStatus.TreeSuccess;
+                    }
+
                     //check if we are returning to the tree
                     if (runStatus != HandlerRunStatus.NotFinished)
                         return GetTreeSharpRunStatus(runStatus);

@@ -1076,9 +1076,9 @@ namespace GilesTrinity
             }
 
             // rrrix: keep it simple...
-            if (c_GoldStackSize >= Settings.Loot.Pickup.MinimumGoldStack)
+            if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)
             {
-                AddToCache = true;
+                AddToCache = false;
             }
 
             // Blacklist gold piles already in pickup radius range

@@ -532,14 +532,17 @@ namespace GilesTrinity.DbProvider
                 }
             }
 
-            if (ZetaDia.Physics.Raycast(GilesTrinity.playerStatus.CurrentPosition, vMoveToTarget, NavCellFlags.AllowWalk))
-            {
-                ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID);
-            }
-            else
-            {
-                ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
-            }
+            ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
+
+
+            //if (ZetaDia.Physics.Raycast(GilesTrinity.playerStatus.CurrentPosition, vMoveToTarget, NavCellFlags.AllowWalk))
+            //{
+            //    ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID);
+            //}
+            //else
+            //{
+            //    ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
+            //}
         }
 
         private static void GetShiftedPosition(ref Vector3 vMoveToTarget, ref Vector3 point)
