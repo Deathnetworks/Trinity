@@ -697,6 +697,16 @@ namespace GilesTrinity.Settings.Combat
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+        /// <summary>
+        /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserializing()]
+        internal void OnDeserializingMethod(StreamingContext context)
+        {
+            this.TR_MinSpirit = 60;
+            this.TR_MinDist = 20;
+        }
         #endregion Methods
     }
 }
