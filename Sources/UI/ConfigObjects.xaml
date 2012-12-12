@@ -52,11 +52,23 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="Shrines :" FontWeight="Bold" TextAlignment="Center"/>
             <UniformGrid Grid.Row="1" Margin="50,0,50,0" Columns="2" HorizontalAlignment="Center">
                 <RadioButton GroupName="WorldObjectShrine" Content="Ignore shrine" IsChecked="{Binding Path=WorldObject.UseShrine, Converter={StaticResource boolInverterConverter}}" Margin="5"/>
                 <RadioButton GroupName="WorldObjectShrine" Content="Click shrine" IsChecked="{Binding Path=WorldObject.UseShrine}" Margin="5"/>
+            </UniformGrid>
+            <UniformGrid Grid.Row="2" Margin="50,0,50,0" Columns="3" HorizontalAlignment="Center">
+                 <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseEnlightenedShrine}" ToolTip="Enable collection of Enlightened Shrines">Use Enlightened</CheckBox>
+                 <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseFrenzyShrine}" ToolTip="Enable collection of Frenzy Shrines">Use Frenzy</CheckBox>
+                 <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseFortuneShrine}" ToolTip="Enable collection of Fortune Shrines">Use Fortune</CheckBox>
+            </UniformGrid>
+            <UniformGrid Grid.Row="3" Margin="50,0,50,0" Columns="3" HorizontalAlignment="Center">
+                 <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseProtectionShrine}" ToolTip="Enable collection of Protection Shrines">Use Protection</CheckBox>
+                 <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseEmpoweredShrine}" ToolTip="Enable collection of Empowered Shrines">Use Empowered</CheckBox>
+                 <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseFleetingShrine}" ToolTip="Enable collection of Fleeting Shrines">Use Fleeting</CheckBox>
             </UniformGrid>
         </Grid>
         <!--Corpses Settings-->
