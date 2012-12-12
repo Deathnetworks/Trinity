@@ -32,6 +32,8 @@ namespace GilesTrinity.UIComponents
                                     {
                                         _Model.CopyTo(_OriginalModel);
                                         _OriginalModel.Save();
+                                        GilesTrinity.SetBotTPS();
+                                        GilesTrinity.SetUnstuckProvider();
                                         UILoader.CloseWindow();
                                     });
             TestScoreCommand = new RelayCommand(

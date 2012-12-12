@@ -193,79 +193,76 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool GilesTownRunCheckOverlord(object ret)
         {
-            GilesTrinity.bWantToTownRun = false;
-
-            //bool CombatCheck = GilesTrinity.GilesGlobalOverlord(null);
-
-            //if (CombatCheck)
-            //    return false;
-
-
-            // Check if we should be forcing a town-run
-            if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+            using (new PerformanceLogger("TownRunOverlord"))
             {
-                if (!TownRun.bLastTownRunCheckResult)
-                {
-                    bPreStashPauseDone = false;
-                    if (Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
-                    {
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
-                    }
-                }
-                GilesTrinity.bWantToTownRun = true;
-            }
+                GilesTrinity.bWantToTownRun = false;
 
-            // Time safety switch for more advanced town-run checking to prevent CPU spam
-            else if (DateTime.Now.Subtract(timeLastAttemptedTownRun).TotalSeconds > 6)
-            {
-                timeLastAttemptedTownRun = DateTime.Now;
-
-                // Check for no space in backpack
-                Vector2 ValidLocation = GilesTrinity.FindValidBackpackLocation(true);
-                if (ValidLocation.X < 0 || ValidLocation.Y < 0)
+                // Check if we should be forcing a town-run
+                if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, now running town-run routine.");
-                    if (!bLastTownRunCheckResult)
+                    if (!TownRun.bLastTownRunCheckResult)
                     {
                         bPreStashPauseDone = false;
-                        bLastTownRunCheckResult = true;
+                        if (Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                        {
+                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
+                        }
                     }
                     GilesTrinity.bWantToTownRun = true;
-                    //return true;
                 }
 
-                // Check durability percentages
-                foreach (ACDItem tempitem in ZetaDia.Me.Inventory.Equipped)
+                // Time safety switch for more advanced town-run checking to prevent CPU spam
+                else if (DateTime.Now.Subtract(timeLastAttemptedTownRun).TotalSeconds > 6)
                 {
-                    if (tempitem.BaseAddress != IntPtr.Zero)
+                    timeLastAttemptedTownRun = DateTime.Now;
+
+                    // Check for no space in backpack
+                    Vector2 ValidLocation = GilesTrinity.FindValidBackpackLocation(true);
+                    if (ValidLocation.X < 0 || ValidLocation.Y < 0)
                     {
-                        if (tempitem.DurabilityPercent <= Zeta.CommonBot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow)
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, now running town-run routine.");
+                        if (!bLastTownRunCheckResult)
                         {
-                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Items may need repair, now running town-run routine.");
-                            if (!bLastTownRunCheckResult)
+                            bPreStashPauseDone = false;
+                            bLastTownRunCheckResult = true;
+                        }
+                        GilesTrinity.bWantToTownRun = true;
+                        //return true;
+                    }
+
+                    // Check durability percentages
+                    foreach (ACDItem tempitem in ZetaDia.Me.Inventory.Equipped)
+                    {
+                        if (tempitem.BaseAddress != IntPtr.Zero)
+                        {
+                            if (tempitem.DurabilityPercent <= Zeta.CommonBot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow)
                             {
-                                bPreStashPauseDone = false;
+                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Items may need repair, now running town-run routine.");
+                                if (!bLastTownRunCheckResult)
+                                {
+                                    bPreStashPauseDone = false;
+                                }
+                                GilesTrinity.bWantToTownRun = true;
                             }
-                            GilesTrinity.bWantToTownRun = true;
                         }
                     }
                 }
+
+                // hax for Town running in Act 2 Soulstone Chamber
+                if (ZetaDia.CurrentWorldId == 60193)
+                {
+                    GilesTrinity.bWantToTownRun = false;
+                }
+
+                if (Zeta.CommonBot.ErrorDialog.IsVisible)
+                {
+                    GilesTrinity.bWantToTownRun = false;
+                }
+
+                bLastTownRunCheckResult = GilesTrinity.bWantToTownRun;
+
+                return GilesTrinity.bWantToTownRun;
             }
-
-            // hax for Town running in Act 2 Soulstone Chamber
-            if (ZetaDia.CurrentWorldId == 60193)
-            {
-                GilesTrinity.bWantToTownRun = false;
-            }
-
-            if (Zeta.CommonBot.ErrorDialog.IsVisible)
-            {
-                GilesTrinity.bWantToTownRun = false;
-            }
-
-            bLastTownRunCheckResult = GilesTrinity.bWantToTownRun;
-
-            return GilesTrinity.bWantToTownRun;
         }
 
         /// <summary>

@@ -31,7 +31,7 @@ namespace GilesTrinity
         {
             get
             {
-                return new Version(1, 7, 1, 7);
+                return new Version(1, 7, 1, 8);
             }
         }
 
@@ -112,10 +112,7 @@ namespace GilesTrinity
                 LoadConfiguration();
 
                 Navigator.PlayerMover = new GilesPlayerMover();
-                if (Settings.Advanced.UnstuckerEnabled)
-                {
-                    Navigator.StuckHandler = new GilesStuckHandler();
-                }
+                SetUnstuckProvider();
                 GameEvents.OnPlayerDied += GilesTrinityOnDeath;
                 GameEvents.OnGameJoined += GilesTrinityOnJoinGame;
                 GameEvents.OnGameLeft += GilesTrinityOnLeaveGame;
@@ -139,15 +136,40 @@ namespace GilesTrinity
                     if (ZetaDia.IsInGame)
                         GilesTrinityOnJoinGame(null, null);
                 }
-                // Carguy's ticks-per-second feature
-                if (Settings.Advanced.TPSEnabled)
-                {
-                    BotMain.TicksPerSecond = (int)Settings.Advanced.TPSLimit;
-                }
+                SetBotTPS();
 
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
+            }
+        }
+
+        internal static void SetBotTPS()
+        {
+            // Carguy's ticks-per-second feature
+            if (Settings.Advanced.TPSEnabled)
+            {
+                BotMain.TicksPerSecond = (int)Settings.Advanced.TPSLimit;
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Bot TPS set to {0}", (int)Settings.Advanced.TPSLimit);
+            }
+            else
+            {
+                BotMain.TicksPerSecond = 10;
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Reset bot TPS to default", (int)Settings.Advanced.TPSLimit);
+            }
+        }
+
+        internal static void SetUnstuckProvider()
+        {
+            if (Settings.Advanced.UnstuckerEnabled)
+            {
+                Navigator.StuckHandler = new GilesStuckHandler();
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Trinity Unstucker", true);
+            }
+            else
+            {
+                Navigator.StuckHandler = new Zeta.Navigation.DefaultStuckHandler();
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Default Demonbuddy Unstucker", true);
             }
         }
 

@@ -98,7 +98,7 @@ namespace GilesTrinity
 
         private static RunStatus GilesHandleTarget(object ret)
         {
-            using (new PerformanceLogger("GilesTrinity.GilesGlobalOverlord"))
+            using (new PerformanceLogger("GilesTrinity.GilesHandleTarget"))
             {
                 try
                 {

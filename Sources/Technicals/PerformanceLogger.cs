@@ -33,8 +33,8 @@ namespace GilesTrinity.Technicals
                 if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
                 {
                     _Stopwatch.Stop();
-                    Logging.WriteVerbose("[Trinity][Performance] Execution of the block {0} took {1}ms.", _BlockName,
-                                        _Stopwatch.ElapsedMilliseconds);
+                    Logging.WriteVerbose("[Trinity][Performance] Execution of the block {0} took {1:00.00}ms.", _BlockName,
+                                        _Stopwatch.Elapsed.TotalMilliseconds);
                 }
                 GC.SuppressFinalize(this);
             }
