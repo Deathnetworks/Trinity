@@ -1267,15 +1267,68 @@ namespace GilesTrinity
                             AddToCache = false;
                             //return bWantThis;
                         }
-                        // Frenzy shrines are a huge time sink for monks using Tempest Rush to move, we should ignore them.
-                        if (playerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.UseTRMovement)
+                        
+                        // Determine what shrine type it is, and blacklist if the user has disabled it
+                        switch (c_ActorSNO)
                         {
-                            if (c_ActorSNO == 176077)
-                            {
-                              hashRGUIDBlacklist60.Add(c_RActorGuid);
-                              AddToCache = false;
-                            }
-                        }
+                          case 176077:  //Frenzy Shrine
+                              if (!Settings.WorldObject.UseFrenzyShrine)
+                              {
+                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                  AddToCache = false; 
+                              }
+                              if (playerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.UseTRMovement)
+                              {
+                                  // Frenzy shrines are a huge time sink for monks using Tempest Rush to move, we should ignore them.
+                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                  AddToCache = false; 
+                              }
+                              break;
+                          
+                          case 176076:  //Fortune Shrine
+                              if (!Settings.WorldObject.UseFortuneShrine)
+                              {
+                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                  AddToCache = false; 
+                              }
+                              break;
+                              
+                          case 176074:  //Protection Shrine
+                              if (!Settings.WorldObject.UseProtectionShrine)
+                              {
+                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                  AddToCache = false; 
+                              }       
+                              break;     
+                              
+                          case 260330:  //Empowered Shrine
+                              if (!Settings.WorldObject.UseEmpoweredShrine)
+                              {
+                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                  AddToCache = false; 
+                              }       
+                              break;      
+                              
+                          case 176075:  //Enlightened Shrine
+                              if (!Settings.WorldObject.UseEnlightenedShrine)
+                              {
+                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                  AddToCache = false; 
+                              }       
+                              break;   
+                              
+                          case 260331:  //Fleeting Shrine
+                              if (!Settings.WorldObject.UseFleetingShrine)
+                              {
+                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                  AddToCache = false; 
+                              }       
+                              break;     
+                          
+                          default:
+                              break;
+                        }  //end switch
+                        
                         // Already used, blacklist it and don't look at it again
                         try
                         {
