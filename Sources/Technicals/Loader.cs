@@ -178,7 +178,7 @@ namespace GilesTrinity.Technicals
         {
             get
             {
-                return Path.Combine(DemonBuddyPath, "ItemRules");
+                return Path.Combine(PluginPath, "ItemRules");
             }
         }
 

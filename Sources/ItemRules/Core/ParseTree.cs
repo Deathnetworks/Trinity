@@ -220,10 +220,10 @@ namespace GilesTrinity.ItemRules.Core
 
         protected virtual object EvalSepExpr(ParseTree tree, params object[] paramlist)
         {
-            //Console.WriteLine("Inside EvalSepExpr '" + this.GetValue(tree, TokenType.OrExpr, 0) + "'");
+
             object obj = this.GetValue(tree, TokenType.OrExpr, 0);
 
-            //// only do logical AND with bool values
+            // only do logical AND with bool values
             if (!(obj is bool)) return obj;
 
             bool value = (bool)obj;
@@ -236,7 +236,6 @@ namespace GilesTrinity.ItemRules.Core
 
         protected virtual object EvalOrExpr(ParseTree tree, params object[] paramlist)
         {
-            //Console.WriteLine("Inside EvalOrExpr '" + this.GetValue(tree, TokenType.AndExpr, 0) + "'");
             object obj = this.GetValue(tree, TokenType.AndExpr, 0);
 
             // only do logical OR with bool values
@@ -251,7 +250,6 @@ namespace GilesTrinity.ItemRules.Core
 
         protected virtual object EvalAndExpr(ParseTree tree, params object[] paramlist)
         {
-            //Console.WriteLine("Inside EvalAndExpr '" + this.GetValue(tree, TokenType.CompExpr, 0) + "'");
             object obj = this.GetValue(tree, TokenType.CompExpr, 0);
 
             // only do logical AND with bool values
@@ -266,7 +264,6 @@ namespace GilesTrinity.ItemRules.Core
 
         protected virtual object EvalCompExpr(ParseTree tree, params object[] paramlist)
         {
-            //Console.WriteLine("Inside EvalCompExpr '" + this.GetValue(tree, TokenType.AddExpr, 0) + "'");
             object obj = this.GetValue(tree, TokenType.AddExpr, 0);
 
             int i = 1;
@@ -317,7 +314,6 @@ namespace GilesTrinity.ItemRules.Core
 
         protected virtual object EvalAddExpr(ParseTree tree, params object[] paramlist)
         {
-            //Console.WriteLine("Inside EvalAddExpr '" + this.GetValue(tree, TokenType.MultExpr, 0) + "'");
             object obj = this.GetValue(tree, TokenType.MultExpr, 0);
 
             // only do addition and substraction for floating numbers
@@ -337,7 +333,6 @@ namespace GilesTrinity.ItemRules.Core
 
         protected virtual object EvalMultExpr(ParseTree tree, params object[] paramlist)
         {
-            //Console.WriteLine("Inside EvalMultExpr '" + this.GetValue(tree, TokenType.Atom, 0) + "'");
             object obj = this.GetValue(tree, TokenType.Atom, 0);
 
             // only do multiplication and divisions for floating numbers
@@ -357,8 +352,6 @@ namespace GilesTrinity.ItemRules.Core
 
         protected virtual object EvalAtom(ParseTree tree, params object[] paramlist)
         {
-            //Console.WriteLine("Inside EvalAtom");
-
             if (this.GetValue(tree, TokenType.VARIABLE, 0) != null)
                 return getAtomValue(tree, TokenType.VARIABLE, 0);
 
@@ -383,7 +376,9 @@ namespace GilesTrinity.ItemRules.Core
             {
                 case TokenType.VARIABLE:
                     object value;
-                    if (Interpreter.itemDic.TryGetValue(obj.ToString(), out value))
+                    //if (Interpreter.itemDic.TryGetValue(obj.ToString(), out value))
+                    //    return value;
+                    if (Interpreter.getVariableValue(obj.ToString(), out value))
                         return value;
                     break;
 
