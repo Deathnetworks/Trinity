@@ -619,7 +619,7 @@ namespace GilesTrinity
             // Now try to get the current health - using temporary and intelligent caching
             // Health calculations
             int iLastCheckedHealth;
-            double dThisCurrentHealth = 0d;
+            double HitpointsCur = 0d;
             bool bHasCachedHealth;
             // See if we already have a cached value for health or not for this monster
             if (dictGilesLastHealthChecked.TryGetValue(c_RActorGuid, out iLastCheckedHealth))
@@ -641,42 +641,47 @@ namespace GilesTrinity
             {
                 try
                 {
-                    dThisCurrentHealth = c_CommonData.GetAttribute<float>(ActorAttributeType.HitpointsCur);
+                    HitpointsCur = c_CommonData.GetAttribute<float>(ActorAttributeType.HitpointsCur);
                 }
                 catch
                 {
                     // This happens so frequently in DB/D3 that this fails, let's not even bother logging it anymore
                     //Logging.WriteDiagnostic("[Trinity] Safely handled exception getting current health for unit " + tmp_sThisInternalName + " [" + tmp_iThisActorSNO.ToString() + "]");
                     // Add this monster to our very short-term ignore list
-                    if (!c_unit_IsBoss)
-                    {
-                        hashRGUIDBlacklist3.Add(c_RActorGuid);
-                        dateSinceBlacklist3Clear = DateTime.Now;
-                        NeedToClearBlacklist3 = true;
-                    }
+                    //if (!c_unit_IsBoss)
+                    //{
+                    //    hashRGUIDBlacklist3.Add(c_RActorGuid);
+                    //    dateSinceBlacklist3Clear = DateTime.Now;
+                    //    NeedToClearBlacklist3 = true;
+                    //}
                     AddToCache = false;
                 }
-                RefreshCachedHealth(iLastCheckedHealth, dThisCurrentHealth, bHasCachedHealth);
+                RefreshCachedHealth(iLastCheckedHealth, HitpointsCur, bHasCachedHealth);
             }
             else
             {
-                dThisCurrentHealth = dictGilesLastHealthCache[c_RActorGuid];
+                HitpointsCur = dictGilesLastHealthCache[c_RActorGuid];
                 dictGilesLastHealthChecked[c_RActorGuid] = iLastCheckedHealth;
             }
             // And finally put the two together for a current health percentage
-            c_HitPoints = dThisCurrentHealth / dThisMaxHealth;
+            c_HitPoints = HitpointsCur / dThisMaxHealth;
+
             // Unit is already dead
             if (c_HitPoints <= 0d && !c_unit_IsBoss)
             {
                 // Add this monster to our very short-term ignore list
-                hashRGUIDBlacklist3.Add(c_RActorGuid);
-                dateSinceBlacklist3Clear = DateTime.Now;
-                NeedToClearBlacklist3 = true;
+                //hashRGUIDBlacklist3.Add(c_RActorGuid);
+                //dateSinceBlacklist3Clear = DateTime.Now;
+                //NeedToClearBlacklist3 = true;
+
                 AddToCache = false;
                 c_IgnoreSubStep = "0HitPoints";
+
                 // return here immediately
                 return AddToCache;
             }
+
+
             // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
             c_unit_IsTreasureGoblin = false;
             // Flag this as a treasure goblin *OR* ignore this object altogether if treasure goblins are set to ignore
@@ -1084,7 +1089,6 @@ namespace GilesTrinity
             // Blacklist gold piles already in pickup radius range
             if (c_CentreDistance <= ZetaDia.Me.GoldPickUpRadius)
             {
-                hashRGUIDBlacklist3.Add(c_RActorGuid);
                 hashRGUIDBlacklist60.Add(c_RActorGuid);
                 AddToCache = false;
                 c_IgnoreSubStep = "GoldOutOfRange";
@@ -1192,7 +1196,7 @@ namespace GilesTrinity
                         catch { }
                         if (GizmoUsed)
                         {
-                            hashRGUIDBlacklist90.Add(c_RActorGuid);
+                            hashRGUIDBlacklist3.Add(c_RActorGuid);
                             AddToCache = false;
                             c_IgnoreSubStep = "Door is Open or Opening";
                         }
@@ -1207,7 +1211,7 @@ namespace GilesTrinity
 
                                     if (door != null && door.IsGizmoDisabledByScript)
                                     {
-                                        hashRGUIDBlacklist90.Add(c_RActorGuid);
+                                        hashRGUIDBlacklist3.Add(c_RActorGuid);
                                         AddToCache = false;
                                         c_IgnoreSubStep = "DoorDisabledbyScript";
                                     }
@@ -2099,5 +2103,19 @@ namespace GilesTrinity
                 return 1;
             }
         }
+        private static void RefreshCachedHealth(int iLastCheckedHealth, double dThisCurrentHealth, bool bHasCachedHealth)
+        {
+            if (!bHasCachedHealth)
+            {
+                dictGilesLastHealthCache.Add(c_RActorGuid, dThisCurrentHealth);
+                dictGilesLastHealthChecked.Add(c_RActorGuid, iLastCheckedHealth);
+            }
+            else
+            {
+                dictGilesLastHealthCache[c_RActorGuid] = dThisCurrentHealth;
+                dictGilesLastHealthChecked[c_RActorGuid] = iLastCheckedHealth;
+            }
+        }
+
     }
 }
