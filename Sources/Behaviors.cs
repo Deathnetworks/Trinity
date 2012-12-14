@@ -982,7 +982,9 @@ namespace GilesTrinity
             // Vault for a Demon Hunter
             if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Vault) &&
                 DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.DemonHunter_Vault] &&
-                PowerManager.CanCast(SNOPower.DemonHunter_Vault))
+                PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
+                (PlayerKiteDistance <= 0 || (!hashMonsterObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance) && 
+                !hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance))))
             {
                 WaitWhileAnimating(3, true);
                 ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vCurrentDestination, iCurrentWorldID, -1);

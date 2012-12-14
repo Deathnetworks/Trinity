@@ -18,6 +18,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -76,9 +77,15 @@
                     ToolTip="Vault for movement re-use delay"/>
         </Grid>
         <Grid Grid.Row="3" Margin="2">
+            <UniformGrid Columns="2">
+                <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamSmokeScreen}" ToolTip="For use with Displacement rune">Spam Smoke Screen</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamPreparation}">Preperation Out of Combat</CheckBox>
+            </UniformGrid>
+        </Grid>
+        <Grid Grid.Row="4" Margin="2">
             <ScrollViewer Tag="Combat\Avoidance.xaml" DataContext="{Binding Path=DH}"/>
         </Grid>
         <!--Reset Button-->
-        <Button Grid.Row="4" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetDemonHunterCommand}">Reset</Button>
+        <Button Grid.Row="5" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetDemonHunterCommand}">Reset</Button>
     </Grid>
 </UserControl>

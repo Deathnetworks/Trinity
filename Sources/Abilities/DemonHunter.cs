@@ -25,26 +25,40 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.DemonHunter_ShadowPower, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
             }
             // Smoke Screen
-            if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_SmokeScreen) &&
+            if ((!bOOCBuff || Settings.Combat.DemonHunter.SpamSmokeScreen) && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_SmokeScreen) &&
                 !GilesHasBuff(SNOPower.DemonHunter_ShadowPower) && playerStatus.Discipline >= 14 &&
-                (playerStatus.CurrentHealthPct <= 0.90 || playerStatus.IsRooted || iElitesWithinRange[RANGE_20] >= 1 || iAnythingWithinRange[RANGE_15] >= 3 || playerStatus.IsIncapacitated) &&
+                (
+                 ( playerStatus.CurrentHealthPct <= 0.90 || playerStatus.IsRooted || iElitesWithinRange[RANGE_20] >= 1 || iAnythingWithinRange[RANGE_15] >= 3 || playerStatus.IsIncapacitated ) ||
+                 Settings.Combat.DemonHunter.SpamSmokeScreen 
+                ) &&
                 GilesUseTimer(SNOPower.DemonHunter_SmokeScreen))
             {
                 return new GilesPower(SNOPower.DemonHunter_SmokeScreen, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
             }
             // Preparation
-            if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Preparation) && !playerStatus.IsIncapacitated &&
-                playerStatus.Discipline <= 9 && iAnythingWithinRange[RANGE_40] >= 1 &&
-                GilesUseTimer(SNOPower.DemonHunter_Preparation) && PowerManager.CanCast(SNOPower.DemonHunter_Preparation))
+
+            if (
+                (
+                (( !bOOCBuff && !playerStatus.IsIncapacitated && iAnythingWithinRange[RANGE_40] >= 1 ) 
+                 || Settings.Combat.DemonHunter.SpamPreparation ) 
+                ) && 
+                hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Preparation) &&
+                playerStatus.Discipline <= 10 &&
+                //GilesUseTimer(SNOPower.DemonHunter_Preparation) && 
+                //PowerManager.CanCast(SNOPower.DemonHunter_Preparation) 
+                TrinityPowerManager.CanUse(SNOPower.DemonHunter_Preparation)
+                )
             {
                 return new GilesPower(SNOPower.DemonHunter_Preparation, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
             }
             // Evasive Fire
-            if (!bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_EvasiveFire) && !playerStatus.IsIncapacitated &&
-                (iAnythingWithinRange[RANGE_20] >= 1 || CurrentTarget.RadiusDistance <= 20f) &&
-                GilesUseTimer(SNOPower.DemonHunter_EvasiveFire))
+            if ( !bOOCBuff && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_EvasiveFire) && !playerStatus.IsIncapacitated &&
+                  (((iAnythingWithinRange[RANGE_20] >= 1 || CurrentTarget.RadiusDistance <= 20f) && GilesUseTimer(SNOPower.DemonHunter_EvasiveFire)) ||
+                DHHasNoPrimary()))
             {
-                return new GilesPower(SNOPower.DemonHunter_EvasiveFire, 0f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
+                float range = DHHasNoPrimary() ? 70f : 0f;
+
+                return new GilesPower(SNOPower.DemonHunter_EvasiveFire, range, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
             // Companion
             if (!playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Companion) && iPlayerOwnedDHPets == 0 &&
@@ -223,6 +237,14 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.Weapon_Ranged_Projectile, 40f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
             return defaultPower;
+        }
+
+        private static bool DHHasNoPrimary()
+        {
+            return !hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_BolaShot) ||
+                                !hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_EntanglingShot) ||
+                                !hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Grenades) ||
+                                !hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_HungeringArrow);
         }
 
         private static GilesPower GetDemonHunterDestroyPower()

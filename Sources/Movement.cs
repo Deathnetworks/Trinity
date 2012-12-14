@@ -100,10 +100,14 @@ namespace GilesTrinity
                         if (iMultiplier == 2)
                             fThisWeight -= 80f;
                         // Remove weight for each avoidance *IN* that location
+                        if (hashAvoidanceObstacleCache.Any(m => m.Location.Distance(vThisZigZag) <= m.Radius))
+                            continue;
+
                         foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => GilesIntersectsPath(cp.Location, cp.Radius * 1.2f, playerStatus.CurrentPosition, vThisZigZag)))
                         {
                             bAnyAvoidance = true;
-                            fThisWeight -= (float)tempobstacle.Weight;
+                            //fThisWeight -= (float)tempobstacle.Weight;
+                            fThisWeight = 0;
                         }
                         // Give extra weight to areas we've been inside before
                         bool bExtraSafetyWeight = hashSkipAheadAreaCache.Any(cp => cp.Location.Distance(vThisZigZag) <= cp.Radius);
@@ -401,7 +405,7 @@ namespace GilesTrinity
             #endregion
 
 
-            vBestLocation = newFindSafeZone(dangerPoint, shouldKite);
+            vBestLocation = newFindSafeZone(dangerPoint, shouldKite, isStuck);
             fHighestWeight = 1;
 
             // Loop through distance-range steps
@@ -413,7 +417,7 @@ namespace GilesTrinity
             return vBestLocation;
         }
 
-        internal static Vector3 newFindSafeZone(Vector3 origin, bool shouldKite = false)
+        internal static Vector3 newFindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false)
         {
             /*
             generate 25x25 grid of 5x5 squares within max 100 distance to edge of grid
@@ -432,18 +436,17 @@ namespace GilesTrinity
 
             float gridSquareSize = 5f;
             int maxDistance = 100;
-            int gridTotalSize = (int)(maxDistance / gridSquareSize);
+            int gridTotalSize = (int)(maxDistance / gridSquareSize) * 2;
             int maxWeight = 100;
-            int maxZDiff = 35;
+            int maxZDiff = 45;
 
             /* If maxDistance is the radius of a circle from the origin, then we want to get the hypotenuse of the radius (x) and tangent (y) as our search grid corner
              * anything outside of the circle will not be considered
              */
-            //int cornerDist = (int)Math.Sqrt((Math.Pow(maxDistance, 2) + Math.Pow(maxDistance, 2)));
+            Vector2 topleft = new Vector2(origin.X - maxDistance/2, origin.Y - maxDistance/2);
 
-            double gridSquareRadius = Math.Sqrt((Math.Pow(gridSquareSize, 2) + Math.Pow(gridSquareSize, 2)));
-
-            Vector2 topleft = new Vector2(origin.X - maxDistance, origin.Y - maxDistance);
+            //Make a circle on the corners of the square
+            double gridSquareRadius = Math.Sqrt((Math.Pow(gridSquareSize / 2, 2) + Math.Pow(gridSquareSize / 2, 2)));
 
             GridPoint bestPoint = new GridPoint(Vector3.Zero, 0, 0);
 
@@ -459,11 +462,6 @@ namespace GilesTrinity
 
                     if (gridPoint.Distance > maxDistance)
                         continue;
-
-                    if (shouldKite && gridPoint.Distance < PlayerKiteDistance)
-                    {
-                        continue;
-                    }
 
                     // If the point is navigable but ZDiff is way too different (up a cliff or wall)
                     if (Math.Abs(gridPoint.Position.Z - origin.Z) > maxZDiff && gridPoint.Weight != 0)
@@ -498,28 +496,35 @@ namespace GilesTrinity
                         continue;
                     }
 
-                    if (gridPoint.Weight > 0)
+                    // body blocking
+                    foreach (GilesObstacle monster in hashMonsterObstacleCache.Where(m => GilesIntersectsPath(m.Location, m.Radius * 2f, playerStatus.CurrentPosition, gridPoint.Position)))
                     {
-                        gridPoint.Weight = ((maxDistance - gridPoint.Distance) / maxDistance) * maxWeight;
-
-                        foreach (GilesObstacle monster in hashMonsterObstacleCache)
-                        {
-                            float distanceToMonster = origin.Distance(monster.Location);
-                            if (gridPoint.Distance <= distanceToMonster)
-                            {
-                                gridPoint.Weight -= distanceToMonster;
-                            }
-                        }
+                        continue;
                     }
 
+                    gridPoint.Weight = ((maxDistance - gridPoint.Distance) / maxDistance) * maxWeight;
+
+                    if (shouldKite && gridPoint.Distance < PlayerKiteDistance)
+                    {
+                        gridPoint.Weight = (int)gridPoint.Distance;
+                    }
+
+                    foreach (GilesObstacle monster in hashMonsterObstacleCache)
+                    {
+                        float distanceToMonster = origin.Distance(monster.Location);
+                        if (gridPoint.Distance <= distanceToMonster)
+                        {
+                            gridPoint.Weight -= distanceToMonster;
+                        }
+                    }
 
                     if (gridPoint.Weight > bestPoint.Weight && gridPoint.Distance > 1)
                     {
                         bestPoint = gridPoint;
                     }
 
-                    //if (gridPoint.Weight > 0)
-                    //    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting grid point {0}, distance: {1:0}, weight: {2:0}", gridPoint.Position, gridPoint.Distance, gridPoint.Weight);
+                    if (gridPoint.Weight > 0)
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting grid point {0}, distance: {1:0}, weight: {2:0}", gridPoint.Position, gridPoint.Distance, gridPoint.Weight);
                 }
             }
 
@@ -564,6 +569,10 @@ namespace GilesTrinity
         /// <returns></returns>
         public static bool GilesIntersectsPath(Vector3 obstacle, float radius, Vector3 start, Vector3 destination)
         {
+            // should fix height differences (basically makes this a 2D check)
+            start.Z = obstacle.Z;
+            destination.Z = obstacle.Z;
+
             float fDirectionToTarget = NormalizeRadian((float)Math.Atan2(destination.Y - start.Y, destination.X - start.X));
             float fDirectionToObstacle = NormalizeRadian((float)Math.Atan2(obstacle.Y - start.Y, obstacle.X - start.X));
             if (Math.Abs(RadianToDegree(fDirectionToTarget) - RadianToDegree(fDirectionToObstacle)) > 30)

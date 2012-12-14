@@ -46,16 +46,8 @@ namespace GilesTrinity
                 // Refresh Cache if needed
                 bool CacheWasRefreshed = RefreshDiaObjectCache();
 
-                //if (CacheWasRefreshed)
-                //{
-                //    return true;
-                //}
-                
-                
                 // Refresh new Cache
                 //CacheRefresher.RefreshAll();
-
-
 
                 // Store all of the player's abilities every now and then, to keep it cached and handy, also check for critical-mass timer changes etc.
                 iCombatLoops++;

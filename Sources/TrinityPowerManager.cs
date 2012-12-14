@@ -27,6 +27,17 @@ namespace GilesTrinity
             set;
         }
 
+        /// <summary>
+        /// Loads delays from GilesTrinity.dictAbilityRepeatDelay dictionary
+        /// </summary>
+        public static void LoadLegacyDelays()
+        {
+            foreach (KeyValuePair<SNOPower, int> kv in GilesTrinity.dictAbilityRepeatDelay)
+            {
+                DefineDelay(kv.Key, kv.Value);
+            }
+        }
+
         /// <summary>Defines the delay of power.</summary>
         /// <param name="power">The power.</param>
         /// <param name="delay">The delay.</param>

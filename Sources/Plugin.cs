@@ -138,6 +138,8 @@ namespace GilesTrinity
                 }
                 SetBotTPS();
 
+                TrinityPowerManager.LoadLegacyDelays();
+
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");

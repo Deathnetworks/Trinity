@@ -482,8 +482,14 @@ namespace GilesTrinity.DbProvider
                     if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Vault) && !bTooMuchZChange &&
                         DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= GilesTrinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                         fDistanceFromTarget >= 18f &&
-                        PowerManager.CanCast(SNOPower.DemonHunter_Vault) && !ShrinesInArea(vMoveToTarget))
+                        PowerManager.CanCast(SNOPower.DemonHunter_Vault) && !ShrinesInArea(vMoveToTarget) &&
+                        // Don't Vault into avoidance/monsters if we're kiting
+                        (GilesTrinity.PlayerKiteDistance <= 0 || (GilesTrinity.PlayerKiteDistance > 0 && 
+                         (!GilesTrinity.hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= GilesTrinity.PlayerKiteDistance) ||
+                         !GilesTrinity.hashMonsterObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= GilesTrinity.PlayerKiteDistance))))
+                        )
                     {
+
                         Vector3 vThisTarget = vMoveToTarget;
                         if (fDistanceFromTarget > 35f)
                             vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);

@@ -177,12 +177,12 @@ namespace GilesTrinity
         /// <summary>
         /// A list of all monsters and their positions, so we don't try to walk through them during avoidance
         /// </summary>
-        private static HashSet<GilesObstacle> hashMonsterObstacleCache = new HashSet<GilesObstacle>();
+        internal static HashSet<GilesObstacle> hashMonsterObstacleCache = new HashSet<GilesObstacle>();
 
         /// <summary>
         /// A list of all current obstacles, to help avoid running through them when picking targets
         /// </summary>
-        private static HashSet<GilesObstacle> hashAvoidanceObstacleCache = new HashSet<GilesObstacle>();
+        internal static HashSet<GilesObstacle> hashAvoidanceObstacleCache = new HashSet<GilesObstacle>();
 
         /// <summary>
         /// Blacklist avoidance spots we failed to reach in time, for a period of time
@@ -263,7 +263,7 @@ namespace GilesTrinity
         /// <summary>
         /// Distance to kite, read settings (class independant)
         /// </summary>
-        private static int PlayerKiteDistance = 0;
+        internal static int PlayerKiteDistance = 0;
 
         /*
          *  Blacklists
