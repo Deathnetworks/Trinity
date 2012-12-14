@@ -52,6 +52,7 @@ namespace GilesTrinity
                 playerStatus.ActorClass = me.ActorClass;
                 playerStatus.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
                 playerStatus.SceneId = ZetaDia.Me.CurrentScene.SceneInfo.SNOId;
+                playerStatus.LevelAreaId = ZetaDia.CurrentLevelAreaId;
 
                 // World ID safety caching incase it's ever unavailable
                 if (ZetaDia.CurrentWorldDynamicId != -1)
