@@ -13,11 +13,8 @@
 // | |_______|___|  |_______|______|_______|___|___|_______|
 // +---------------------------------------------------------------------------+                                               
 
-// TODO add crafting plans gems and the follower shizzle
-[QUALITY] == "Legendary" && [TYPE] == "CraftingPlan"
-[QUALITY] == "Rare6" && [TYPE] == "CraftingPlan"
-[QUALITY] == "Rare5" && [TYPE] == "CraftingPlan" -> [IGNORE]
-[QUALITY] == "Rare4" && [TYPE] == "CraftingPlan" -> [IGNORE]
+// craftingPlans on the ground have all quality normal cant decide here
+[QUALITY] == "Normal" && [TYPE] == "CraftingPlan"
 
 // +---------------------------------------------------------------------------+
 // |  _____   _______ _______ _______ _______ _____  _______ ______ ___ ___ 

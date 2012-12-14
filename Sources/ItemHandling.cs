@@ -550,7 +550,7 @@ namespace GilesTrinity
 
             if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
-                Interpreter.InterpreterAction action = StashRule.checkItem(thisitem.item, false);
+                Interpreter.InterpreterAction action = StashRule.checkItem(thisitem.item);
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", thisitem.item.Name, thisitem.item.InternalName, thisitem.item.ItemType);
                 switch (action)
                 {

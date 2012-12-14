@@ -144,6 +144,9 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
             }
+
+            // reseting stash rules
+            StashRule.reset();
         }
 
         internal static void SetBotTPS()
