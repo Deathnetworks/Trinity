@@ -1,4 +1,5 @@
 ﻿using System;
+using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
@@ -60,6 +61,9 @@ namespace GilesTrinity
                     (iElitesWithinRange[RANGE_25] > 0 || iAnythingWithinRange[RANGE_25] > 2 || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss || playerStatus.CurrentHealthPct <= 0.7) &&
                     playerStatus.CurrentEnergy >= 40 && GilesUseTimer(SNOPower.Wizard_Blizzard))
                 {
+                    Vector3 targetDirection = MathEx.CalculatePointFrom(playerStatus.CurrentPosition, CurrentTarget.Position, 1f);
+
+                    ZetaDia.Me.UsePower(SNOPower.Walk, targetDirection);
                     return new GilesPower(SNOPower.Wizard_Blizzard, 40f, new Vector3(CurrentTarget.Position.X, CurrentTarget.Position.Y, CurrentTarget.Position.Z), iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
                 }
                 // Meteor
@@ -227,6 +231,8 @@ namespace GilesTrinity
                     (!hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Electrocute) || !hashActorSNOFastMobs.Contains(CurrentTarget.ActorSNO)) &&
                     ((Settings.Combat.Wizard.CriticalMass && !bHasSignatureSpell) || !Settings.Combat.Wizard.CriticalMass))
                 {
+                    Vector3 targetDirection = MathEx.CalculatePointFrom(playerStatus.CurrentPosition, CurrentTarget.Position, 1f);
+                    ZetaDia.Me.UsePower(SNOPower.Walk, targetDirection);
                     float fThisRange = 28f;
                     //if (Settings.Combat.Wizard.CriticalMass)
                     //    fThisRange = 9f;
@@ -342,23 +348,27 @@ namespace GilesTrinity
                 {
                     return new GilesPower(SNOPower.Wizard_Archon_DisintegrationWave, 49f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, SIGNATURE_SPAM);
                 }
-                return new GilesPower(SNOPower.Wizard_Archon_DisintegrationWave, 49f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, SIGNATURE_SPAM);
+                return defaultPower;
             }
-            return new GilesPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
         }
 
         private static GilesPower GetWizardDestructablePower()
         {
             if (hashPowerHotbarAbilities.Contains(SNOPower.Wizard_EnergyTwister) && playerStatus.CurrentEnergy >= 35)
                 return new GilesPower(SNOPower.Wizard_EnergyTwister, 9f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+
             if (hashPowerHotbarAbilities.Contains(SNOPower.Wizard_MagicMissile))
                 return new GilesPower(SNOPower.Wizard_MagicMissile, 15f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+
             if (hashPowerHotbarAbilities.Contains(SNOPower.Wizard_ShockPulse))
                 return new GilesPower(SNOPower.Wizard_ShockPulse, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+
             if (hashPowerHotbarAbilities.Contains(SNOPower.Wizard_SpectralBlade))
                 return new GilesPower(SNOPower.Wizard_SpectralBlade, 9f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+
             if (hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Electrocute))
                 return new GilesPower(SNOPower.Wizard_Electrocute, 9f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+
             return new GilesPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
         }
 

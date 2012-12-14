@@ -106,6 +106,9 @@ namespace GilesTrinity
                 btnPauseBot.Content = "Unpause Bot";
                 bMainBotPaused = true;
             }
+
+            GilesPlayerMover.ResetCheckGold();
+
         }
 
         private static bool BotIsPaused()

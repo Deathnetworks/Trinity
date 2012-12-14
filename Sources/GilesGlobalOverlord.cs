@@ -267,12 +267,19 @@ namespace GilesTrinity
                 hashRGUIDBlacklist60 = new HashSet<int>();
                 RefreshProfileBlacklists();
             }
-            // Clear the temporary blacklist every 90 seconds (default was 90)
+            // Clear the temporary blacklist every 15 seconds (default was 15)
             if (DateTime.Now.Subtract(dateSinceBlacklist15Clear).TotalSeconds > 15)
             {
                 dateSinceBlacklist15Clear = DateTime.Now;
                 hashRGUIDBlacklist15 = new HashSet<int>();
             }
+            // Clear our very short-term ignore-monster blacklist (from not being able to raycast on them or already dead units)
+            if (NeedToClearBlacklist3 && DateTime.Now.Subtract(dateSinceBlacklist3Clear).TotalMilliseconds > 3000)
+            {
+                NeedToClearBlacklist3 = false;
+                hashRGUIDBlacklist3 = new HashSet<int>();
+            }
+
         }
         /// <summary>
         /// Adds profile blacklist entries to the Giles Blacklist

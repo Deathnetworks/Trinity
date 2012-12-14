@@ -264,12 +264,13 @@ namespace GilesTrinity
 			112182,
          };
         /// <summary>
-        /// Objects that should never be ignored due to no Line of Sight (LoS)
+        /// Objects that should never be ignored due to no Line of Sight (LoS) or ZDiff
         /// </summary>
         internal static HashSet<int> LineOfSightWhitelist = new HashSet<int>
         {
             116807, // Butcher Health Well
             180575, // Diablo arena Health Well
+            129031, // A3 Skycrown Catapults
         };
         /// <summary>
         /// Chests/average-level containers that deserve a bit of extra radius (ie - they are more worthwhile to loot than "random" misc/junk containers)

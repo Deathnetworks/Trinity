@@ -59,7 +59,7 @@ namespace GilesTrinity
         private static bool bAnyNonWWIgnoreMobsInRange = false;
 
         /// <summary>
-        /// A null location, may shave off the tiniest fraction of CPU time, but probably not. Still, I like using this variable! :D
+        /// A null location, may shave off the tiniest fraction of CPU time, but probably not. Still, Giles liked using this variable apparently.
         /// </summary>
         private static readonly Vector3 vNullLocation = Vector3.Zero;
 
@@ -261,35 +261,35 @@ namespace GilesTrinity
         private static double PlayerEmergencyHealthGlobeLimit = 0.6;
 
         /// <summary>
-        /// Distance to kite, set on BotStart from Settings
+        /// Distance to kite, read settings (class independant)
         /// </summary>
         private static int PlayerKiteDistance = 0;
 
         /*
          *  Blacklists
          */
-        private static bool NeedToClearBlacklist3 = false;
-        private static DateTime dateSinceBlacklist3Clear = DateTime.Today;
-        private static DateTime dateSinceBlacklist15Clear = DateTime.Today;
-        private static DateTime dateSinceBlacklist60Clear = DateTime.Today;
-        private static DateTime dateSinceBlacklist90Clear = DateTime.Today;
+        internal static bool NeedToClearBlacklist3 = false;
+        internal static DateTime dateSinceBlacklist3Clear = DateTime.Today;
+        internal static DateTime dateSinceBlacklist15Clear = DateTime.Today;
+        internal static DateTime dateSinceBlacklist60Clear = DateTime.Today;
+        internal static DateTime dateSinceBlacklist90Clear = DateTime.Today;
 
         /// <summary>
         /// Use RActorGUID to blacklist an object/monster for 3 seconds
         /// </summary>
-        private static HashSet<int> hashRGUIDBlacklist3 = new HashSet<int>();
+        internal static HashSet<int> hashRGUIDBlacklist3 = new HashSet<int>();
         /// <summary>
         /// Use RActorGUID to blacklist an object/monster for 15 seconds
         /// </summary>
-        private static HashSet<int> hashRGUIDBlacklist15 = new HashSet<int>();
+        internal static HashSet<int> hashRGUIDBlacklist15 = new HashSet<int>();
         /// <summary>
         /// Use RActorGUID to blacklist an object/monster for 60 seconds
         /// </summary>
-        private static HashSet<int> hashRGUIDBlacklist60 = new HashSet<int>();
+        internal static HashSet<int> hashRGUIDBlacklist60 = new HashSet<int>();
         /// <summary>
         /// Use RActorGUID to blacklist an object/monster for 90 seconds
         /// </summary>
-        private static HashSet<int> hashRGUIDBlacklist90 = new HashSet<int>();
+        internal static HashSet<int> hashRGUIDBlacklist90 = new HashSet<int>();
 
         // This is a blacklist that is cleared within 3 seconds of last attacking a destructible
         private static HashSet<int> hashRGUIDDestructible3SecBlacklist = new HashSet<int>();

@@ -227,7 +227,6 @@ namespace GilesTrinity
                             bLastTownRunCheckResult = true;
                         }
                         GilesTrinity.bWantToTownRun = true;
-                        //return true;
                     }
 
                     // Check durability percentages
@@ -260,6 +259,15 @@ namespace GilesTrinity
                 }
 
                 bLastTownRunCheckResult = GilesTrinity.bWantToTownRun;
+
+                // Clear blacklists to triple check any potential targets
+                if (GilesTrinity.bWantToTownRun)
+                {
+                    GilesTrinity.hashRGUIDBlacklist3 = new HashSet<int>();
+                    GilesTrinity.hashRGUIDBlacklist15 = new HashSet<int>();
+                    GilesTrinity.hashRGUIDBlacklist60 = new HashSet<int>();
+                    GilesTrinity.hashRGUIDBlacklist90 = new HashSet<int>();
+                }
 
                 return GilesTrinity.bWantToTownRun;
             }

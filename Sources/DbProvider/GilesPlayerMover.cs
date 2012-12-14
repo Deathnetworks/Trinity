@@ -56,14 +56,14 @@ namespace GilesTrinity.DbProvider
         //For Tempest Rush Monks
         private static bool bCanChannelTR = false;
 
-        private static void ResetCheckGold()
+        internal static void ResetCheckGold()
         {
             lastCheckBag = DateTime.Now;
             lastRefreshCoin = DateTime.Now;
             lastKnowCoin = 0;
         }
 
-        private static bool GoldInactive()
+        internal static bool GoldInactive()
         {
             if (!GilesTrinity.Settings.Advanced.GoldInactivityEnabled)
             {

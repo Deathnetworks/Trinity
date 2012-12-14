@@ -63,6 +63,9 @@ namespace GilesTrinity
 
             ReplaceTreeHooks();
 
+            GilesPlayerMover.timeLastRecordedPosition = DateTime.Now;
+            GilesPlayerMover.timeLastRestartedGame = DateTime.Now;
+
             try
             {
                 CacheManager.Initialize();

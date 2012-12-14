@@ -1867,8 +1867,17 @@ namespace GilesTrinity
         {
             // always take current target regardless if ZDiff changed
             if (c_RActorGuid == CurrentTargetRactorGUID)
-                return true;
+            {
+                AddToCache = true;
+                return AddToCache;
+            }
 
+            // Special whitelist for always getting stuff regardless of ZDiff or LoS
+            if (LineOfSightWhitelist.Contains(c_ActorSNO))
+            {
+                AddToCache = true;
+                return AddToCache;
+            }
             // Ignore stuff which has a Z-height-difference too great, it's probably on a different level etc. - though not avoidance!
             if (c_ObjectType != GObjectType.Avoidance)
             {
