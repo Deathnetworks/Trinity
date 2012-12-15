@@ -497,6 +497,9 @@ namespace GilesTrinity
         private static Vector3 c_Position = Vector3.Zero;
         private static GObjectType c_ObjectType = GObjectType.Unknown;
         private static double c_Weight = 0d;
+        /// <summary>
+        /// Percent of total health remaining on unit
+        /// </summary>
         private static double c_HitPoints = 0d;
         private static float c_CentreDistance = 0f;
         private static float c_RadiusDistance = 0f;

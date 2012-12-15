@@ -533,19 +533,6 @@ namespace GilesTrinity
             c_unit_IsMinion = theseaffixes.HasFlag(MonsterAffixes.Minion);
             return theseaffixes;
         }
-        private static void RefreshCachedHealth(int iLastCheckedHealth, double dThisCurrentHealth, bool bHasCachedHealth)
-        {
-            if (!bHasCachedHealth)
-            {
-                dictGilesLastHealthCache.Add(c_RActorGuid, dThisCurrentHealth);
-                dictGilesLastHealthChecked.Add(c_RActorGuid, iLastCheckedHealth);
-            }
-            else
-            {
-                dictGilesLastHealthCache[c_RActorGuid] = dThisCurrentHealth;
-                dictGilesLastHealthChecked[c_RActorGuid] = iLastCheckedHealth;
-            }
-        }
         private static MonsterType RefreshMonsterType(ACD tempCommonData, MonsterType monsterType, bool bAddToDictionary)
         {
             SNORecordMonster monsterInfo = tempCommonData.MonsterInfo;
