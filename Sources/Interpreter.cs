@@ -215,9 +215,9 @@ namespace GilesTrinity.ItemRules
         /// <param name="isTwoHand"></param>
         /// <param name="gameBalanceID"></param>
         /// <returns></returns>
-        public InterpreterAction checkPickUpItem(string name, int level, ItemQuality quality, ItemBaseType itemBaseType, ItemType itemType, bool isOneHand, bool isTwoHand, int gameBalanceID)
+        public InterpreterAction checkPickUpItem(string name, int level, ItemQuality quality, ItemBaseType itemBaseType, ItemType itemType, bool isOneHand, bool isTwoHand, int gameBalanceId, int dynamicId)
         {
-            fillPickupDic(name, level, quality, itemBaseType, itemType, isOneHand, isTwoHand, gameBalanceID);
+            fillPickupDic(name, level, quality, itemBaseType, itemType, isOneHand, isTwoHand, gameBalanceId, dynamicId);
 
             return checkItem(true);
         }
@@ -404,7 +404,7 @@ namespace GilesTrinity.ItemRules
                 Directory.CreateDirectory(logPath);
 
             log = new StreamWriter(Path.Combine(logPath, logFile), true);
-            log.WriteLine(DateTime.Now.ToString("dd MMM HH:mm:ss") + "[" + logType + "]:" + str);
+            log.WriteLine(DateTime.Now.ToString("yyyyMMddHHmmssffff") + SEP + logType + SEP + str);
             log.Close();
         }
 
@@ -441,6 +441,8 @@ namespace GilesTrinity.ItemRules
                     else if (value is string && (string)value != "")
                         result += key.ToUpper() + ":" + value.ToString() + SEP;
                     else if (value is bool)
+                        result += key.ToUpper() + ":" + value.ToString() + SEP;
+                    else if (value is int)
                         result += key.ToUpper() + ":" + value.ToString() + SEP;
                 }
             }
@@ -484,11 +486,14 @@ namespace GilesTrinity.ItemRules
         /// <param name="itemType"></param>
         /// <param name="isOneHand"></param>
         /// <param name="isTwoHand"></param>
-        /// <param name="balanceId"></param>
-        private void fillPickupDic(string name, int level, ItemQuality itemQuality, ItemBaseType itemBaseType, ItemType itemType, bool isOneHand, bool isTwoHand, int balanceId)
+        /// <param name="gameBalanceId"></param>
+        private void fillPickupDic(string name, int level, ItemQuality itemQuality, ItemBaseType itemBaseType, ItemType itemType, bool isOneHand, bool isTwoHand, int gameBalanceId, int dynamicId)
         {
             object result;
             itemDic = new Dictionary<string, object>();
+
+            // add log unique key
+            itemDic.Add("[KEY]", getHashKey(gameBalanceId, dynamicId));
 
             // - BASETYPE ---------------------------------------------------------//
             itemDic.Add("[BASETYPE]", itemBaseType.ToString());
@@ -551,6 +556,9 @@ namespace GilesTrinity.ItemRules
                 logOut("received an item with a null reference!", LogType.ERROR);
                 return;
             }
+
+            // add log unique key
+            itemDic.Add("[KEY]", getHashKey(item.GameBalanceId, item.DynamicId));
 
             // - BASETYPE ---------------------------------------------------------//
             itemDic.Add("[BASETYPE]", item.ItemBaseType.ToString());
@@ -690,6 +698,7 @@ namespace GilesTrinity.ItemRules
             //    defstats += 1;
             itemDic.Add("[DEFSTATS]", defstats);
             //itemDic.Add("[GAMEBALANCEID]", (float)item.GameBalanceId);
+            //itemDic.Add("[DYNAMICID]", item.DynamicId);
 
             // starting on macro implementation here
             foreach (string key in macroDic.Keys)
@@ -711,6 +720,11 @@ namespace GilesTrinity.ItemRules
             }
 
             // end macro implementation
+        }
+
+        private object getHashKey(int gameBalanceId, int dynamicId)
+        {
+            return dynamicId;
         }
 
     }

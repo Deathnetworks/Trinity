@@ -23,7 +23,7 @@ namespace GilesTrinity
         /// <param name="name"></param>
         /// <param name="level"></param>
         /// <param name="quality"></param>
-        /// <param name="balanceId"></param>
+        /// <param name="gameBalanceId"></param>
         /// <param name="dbItemType"></param>
         /// <param name="followerType"></param>
         /// <param name="dynamicID"></param>
@@ -39,7 +39,7 @@ namespace GilesTrinity
                 
                 //Interpreter.InterpreterAction action = StashRule.checkItem(acd as ACDItem, true);
 
-                Interpreter.InterpreterAction action = StashRule.checkPickUpItem(name, level, quality, dbItemBaseType, dbItemType, isOneHand, isTwoHand, balanceId);
+                Interpreter.InterpreterAction action = StashRule.checkPickUpItem(name, level, quality, dbItemBaseType, dbItemType, isOneHand, isTwoHand, balanceId, dynamicID);
                 switch (action)
                 {
                     case Interpreter.InterpreterAction.KEEP:
