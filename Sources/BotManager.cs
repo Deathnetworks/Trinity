@@ -138,9 +138,7 @@ namespace GilesTrinity
                 if (hook.Key.Contains("Loot"))
                 {
                     // Replace the loot behavior tree with a blank one, as we no longer need it
-                    hook.Value[0] = new Decorator(ret => GilesBlankDecorator(ret),
-                        new Action(ret => GilesBlankAction(ret))
-                        );
+                    hook.Value[0] = new Decorator(ret => false, new Action());
                 }
 
             }

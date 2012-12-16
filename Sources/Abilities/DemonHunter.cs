@@ -77,10 +77,11 @@ namespace GilesTrinity
             }
             // Marked for Death
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_MarkedForDeath) &&
-                playerStatus.Discipline >= 3 &&
+                playerStatus.Discipline >= 3 && 
                 (iElitesWithinRange[RANGE_40] >= 1 || iAnythingWithinRange[RANGE_40] >= 3 ||
+                
                 ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) &&
-                CurrentTarget.RadiusDistance <= 40f)) &&
+                CurrentTarget.Radius <= 40 && CurrentTarget.RadiusDistance <= 40f)) &&
                 GilesUseTimer(SNOPower.DemonHunter_MarkedForDeath))
             {
                 return new GilesPower(SNOPower.DemonHunter_MarkedForDeath, 40f, vNullLocation, iCurrentWorldID, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
@@ -263,6 +264,8 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.DemonHunter_RapidFire, 15f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Chakram) && playerStatus.CurrentEnergy >= 20)
                 return new GilesPower(SNOPower.DemonHunter_Chakram, 15f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+            if (hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_EvasiveFire) && playerStatus.CurrentEnergy >= 20)
+                return new GilesPower(SNOPower.DemonHunter_EvasiveFire, 15f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             return new GilesPower(SNOPower.Weapon_Ranged_Instant, 20f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
         }
     }

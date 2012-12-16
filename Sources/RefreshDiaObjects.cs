@@ -562,7 +562,7 @@ namespace GilesTrinity
         private static void RefreshDoBackTrack()
         {
             // See if we should wait for [playersetting] milliseconds for possible loot drops before continuing run
-            if (DateTime.Now.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill || DateTime.Now.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= 10000)
+            if (DateTime.Now.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill || DateTime.Now.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill)
             {
                 CurrentTarget = new GilesObject()
                                     {
@@ -573,6 +573,7 @@ namespace GilesTrinity
                                         RadiusDistance = 2f,
                                         InternalName = "GilesWaitForLootDrops"
                                     };
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Waiting for loot to drop, delay: {0}ms", Settings.Combat.Misc.DelayAfterKill);
             }
             // Now see if we need to do any backtracking
             if (CurrentTarget == null && iTotalBacktracks >= 2 && Settings.Combat.Misc.AllowBacktracking && !playerStatus.IsInTown)
@@ -680,21 +681,22 @@ namespace GilesTrinity
                 vKitePointAvoid = playerStatus.CurrentPosition;
             }
 
-            if (
-                ((monsterList.Count() > 0) && (playerStatus.ActorClass != ActorClass.Wizard || IsWizardShouldKite())))
+            if (monsterList.Count() > 0 && (playerStatus.ActorClass != ActorClass.Wizard || IsWizardShouldKite()))
             {
                 TryToKite = true;
-
                 vKitePointAvoid = playerStatus.CurrentPosition;
             }
 
+            double msCancelledEmergency = DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds;
+            double msCancelledKite = DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds;
 
+            bool shouldKamikazeTreasureGoblins = (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize);
+
+            bool shouldEmergencyMove = msCancelledEmergency >= cancelledEmergencyMoveForMilliseconds && NeedToKite;
+            bool shouldKite = msCancelledKite >= cancelledKiteMoveForMilliseconds && TryToKite;
 
             // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
-            if ((TryToKite || NeedToKite) && (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
-                DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds &&
-                (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= cancelledKiteMoveForMilliseconds ||
-                (DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds >= 2500 && NeedToKite)))
+            if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite))
             {
                 Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true);
 
@@ -717,8 +719,9 @@ namespace GilesTrinity
                                             RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
                                             InternalName = "GilesKiting"
                                         };
-                    timeCancelledKiteMove = DateTime.Today;
-                    cancelledKiteMoveForMilliseconds = 5000;
+
+                    timeCancelledKiteMove = DateTime.Now;
+                    cancelledKiteMoveForMilliseconds = 750;
 
                     // Try forcing a target update with each kiting
                     //bForceTargetUpdate = true;
@@ -727,7 +730,7 @@ namespace GilesTrinity
                 {
                     // Didn't find any kiting we could reach, so don't look for any more kite spots for at least 1.5 seconds
                     timeCancelledKiteMove = DateTime.Today;
-                    cancelledKiteMoveForMilliseconds = 2500;
+                    cancelledKiteMoveForMilliseconds = 1500;
                     DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Unable to find kite location, canceling kite movement for {0}ms", cancelledKiteMoveForMilliseconds);
                 }
             }

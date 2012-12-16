@@ -15,37 +15,24 @@ using Zeta.Internals.SNO;
 using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
 using Decorator = Zeta.TreeSharp.Decorator;
+using System.Diagnostics;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        /*
-         * Blank decorator and action to wipe some of DB's behavior trees
-         */
-        private static bool GilesBlankDecorator(object ret)
-        {
-            return false;
-        }
-        private static RunStatus GilesBlankAction(object ret)
-        {
-            return RunStatus.Success;
-        }
 
-        private static RunStatus ActionRunningDelegate(object ret)
-        {
-            return RunStatus.Running;
-        }
-
-
+        /// <summary>
+        /// Returns the current DiaPlayer
+        /// </summary>
         public static DiaActivePlayer Me
         {
             get { return ZetaDia.Me; }
         }
 
-        /*
-         * Start the process of moving to target object and dealing with it 
-         */
-
+        /// <summary>
+        /// Decorator for main Action delegate, also handles bot pausing
+        /// </summary>
+        /// <returns></returns>
         private static Composite HandleTargetAction()
         {
             return new PrioritySelector(
@@ -64,6 +51,9 @@ namespace GilesTrinity
             return bMainBotPaused ? RunStatus.Running : RunStatus.Success;
         }
 
+        /// <summary>
+        /// Help determine runstatus in the main action
+        /// </summary>
         private enum HandlerRunStatus
         {
             NotFinished,
@@ -96,6 +86,11 @@ namespace GilesTrinity
 
         }
 
+        /// <summary>
+        /// Handles all aspects of moving to and attacking the current target
+        /// </summary>
+        /// <param name="ret"></param>
+        /// <returns></returns>
         private static RunStatus GilesHandleTarget(object ret)
         {
             using (new PerformanceLogger("GilesTrinity.GilesHandleTarget"))
@@ -245,6 +240,8 @@ namespace GilesTrinity
                      */
 
                     SetRangeRequiredForTarget();
+
+
                     // Maintain an area list of all zones we pass through/near while moving, for our custom navigation handler
                     if (DateTime.Now.Subtract(lastAddedLocationCache).TotalMilliseconds >= 100)
                     {
@@ -278,8 +275,11 @@ namespace GilesTrinity
                     if (fDistanceFromTarget < 0f)
                         fDistanceFromTarget = 0f;
 
+                    bool currentTargetIsInLoS = GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk);
+
+
                     // Interact/use power on target if already in range
-                    if (fRangeRequired <= 0f || fDistanceFromTarget <= fRangeRequired)
+                    if (fRangeRequired <= 0f || fDistanceFromTarget <= fRangeRequired && currentTargetIsInLoS)
                     {
                         // If avoidance, instantly skip
                         if (CurrentTarget.Type == GObjectType.Avoidance)
@@ -640,31 +640,31 @@ namespace GilesTrinity
                         bool bFoundSpecialMovement = UsedSpecialMovement();
 
                         // Item Swap + Blinding flash cast
-						if (playerStatus.ActorClass == ActorClass.Monk && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && 
+                        if (playerStatus.ActorClass == ActorClass.Monk && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
                             hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
-						{
-							if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind) 
-								&& (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
-								{
-									ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
-									return RunStatus.Running;
-								}
-							else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800 
-									&& GilesHasBuff(SNOPower.Monk_SweepingWind))
-							{
-								weaponSwap.SwapGear();
-							}
-						}
-						// Spam sweeping winds
+                        {
+                            if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind)
+                                && (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
+                            {
+                                ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
+                                return RunStatus.Running;
+                            }
+                            else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800
+                                    && GilesHasBuff(SNOPower.Monk_SweepingWind))
+                            {
+                                weaponSwap.SwapGear();
+                            }
+                        }
+                        // Spam sweeping winds
                         if (hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
-							&& (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
-							|| !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && 
+                            && (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
+                            || !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
                             DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
-						{
-							ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
-							SweepWindSpam = DateTime.Now;
-							return RunStatus.Running;
-						}
+                        {
+                            ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
+                            SweepWindSpam = DateTime.Now;
+                            return RunStatus.Running;
+                        }
 
                         if (CurrentTarget.Type != GObjectType.Backtrack)
                         {
@@ -759,6 +759,8 @@ namespace GilesTrinity
             }
         }
 
+        private static Stack<KeyValuePair<int, DateTime>> BlackListStack = new Stack<KeyValuePair<int, DateTime>>(20);
+
         /// <summary>
         /// Handles target blacklist assignment if necessary, used for all targets (units/gold/items/interactables)
         /// </summary>
@@ -769,15 +771,18 @@ namespace GilesTrinity
             // Been trying to handle the same target for more than 30 seconds without damaging/reaching it? Blacklist it!
             // Note: The time since target picked updates every time the current target loses health, if it's a monster-target
             // Don't blacklist stuff if we're playing a cutscene
+
             if (!ZetaDia.IsPlayingCutscene && CurrentTargetIsNotAvoidance() && (
-                        (CurrentTargetIsNonUnit() && GetSecondsSinceTargetAssigned() > 6) ||
-                        (CurrentTargetIsUnit() && GetSecondsSinceTargetAssigned() > 15)))
+                        (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6) ||
+                        (CurrentTargetIsUnit() && GetSecondsSinceTargetUpdate() > 15)))
             {
                 // NOTE: This only blacklists if it's remained the PRIMARY TARGET that we are trying to actually directly attack!
                 // So it won't blacklist a monster "on the edge of the screen" who isn't even being targetted
                 // Don't blacklist monsters on <= 50% health though, as they can't be in a stuck location... can they!? Maybe give them some extra time!
+
                 bool isNavigable = pf.IsNavigable(gp.WorldToGrid(CurrentTarget.Position.ToVector2()));
                 bool bBlacklistThis = true;
+
                 // PREVENT blacklisting a monster on less than 90% health unless we haven't damaged it for more than 2 minutes
                 if (CurrentTarget.Type == GObjectType.Unit && isNavigable)
                 {
@@ -820,10 +825,9 @@ namespace GilesTrinity
                     else
                     {
                         hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
-                        //dateSinceBlacklist90Clear = DateTime.Now;
+
                         CurrentTarget = null;
                         runStatus = HandlerRunStatus.TreeSuccess;
-                        //return RunStatus.Success;
                     }
                 }
             }
@@ -983,7 +987,7 @@ namespace GilesTrinity
             if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Vault) &&
                 DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.DemonHunter_Vault] &&
                 PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
-                (PlayerKiteDistance <= 0 || (!hashMonsterObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance) && 
+                (PlayerKiteDistance <= 0 || (!hashMonsterObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
                 !hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance))))
             {
                 WaitWhileAnimating(3, true);
@@ -1019,15 +1023,22 @@ namespace GilesTrinity
         {
             return CurrentTarget.Type != GObjectType.Avoidance;
         }
+
         private static bool CurrentTargetIsNonUnit()
         {
             return CurrentTarget.Type != GObjectType.Unit;
         }
+
         private static bool CurrentTargetIsUnit()
         {
             return CurrentTarget.Type == GObjectType.Unit;
         }
-        private static double GetSecondsSinceTargetAssigned()
+
+        /// <summary>
+        /// Returns the number of seconds since our current target was updated
+        /// </summary>
+        /// <returns></returns>
+        private static double GetSecondsSinceTargetUpdate()
         {
             return DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds;
         }
@@ -1216,24 +1227,6 @@ namespace GilesTrinity
                     {
                         fRangeRequired = 6f;
 
-
-                        /*
-                         * rrrix disabled this. 6 yards to radius is 6 yards to radius, why make it so complicated? 
-                         * 
-                         */
-                        //// If we're having stuck issues, try forcing us to get closer to this item
-                        //if (ForceCloseRangeTarget)
-                        //    fRangeRequired -= 1f;
-                        //// Try and randomize the distances required if we have problems looting this
-                        //if (IgnoreRactorGUID == CurrentTarget.RActorGuid)
-                        //{
-                        //    Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
-                        //    fRangeRequired = (rndNum.Next(5)) + 2f;
-                        //}
-                        //// Treat the distance as closer if the X & Y distance are almost point-blank, for items
-                        //if (fDistanceToDestination <= 1.5f)
-                        //    fDistanceReduction += 1f;
-
                         break;
                     }
                 // * Gold - need to get within pickup radius only
@@ -1418,6 +1411,7 @@ namespace GilesTrinity
                 bWaitingAfterPower = true;
             }
         }
+
         private static int HandleItemInRange()
         {
             int iInteractAttempts;
