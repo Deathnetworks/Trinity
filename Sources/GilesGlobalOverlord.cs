@@ -155,7 +155,7 @@ namespace GilesTrinity
 
 
                 // For Monk SweepingWind WeaponSwap
-                if (playerStatus.ActorClass == ActorClass.Monk && GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap && weaponSwap.DpsGearOn())
+                if (playerStatus.ActorClass == ActorClass.Monk && GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap && weaponSwap.DpsGearOn() && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds > 1500)
                     weaponSwap.SwapGear();
 
                 // We have a target, start the target handler!
