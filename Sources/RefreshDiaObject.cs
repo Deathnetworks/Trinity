@@ -1677,7 +1677,7 @@ namespace GilesTrinity
             try
             {
 
-                // Everything except items (including gold)
+                // Everything except items
                 if (c_ObjectType != GObjectType.Item)
                 {
 
@@ -1697,6 +1697,12 @@ namespace GilesTrinity
                         AddToCache = false;
                         c_IgnoreSubStep = "UnitNotInLoS";
                     }
+                    if (!ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
+                    {
+                        AddToCache = false;
+                        c_IgnoreSubStep = "UnableToRayCast";
+                    }
+
                     // always set true for bosses nearby
                     if (c_unit_IsBoss && c_RadiusDistance < 100f)
                     {

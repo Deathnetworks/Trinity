@@ -197,6 +197,9 @@ namespace GilesTrinity
             {
                 GilesTrinity.bWantToTownRun = false;
 
+                if (GilesTrinity.BossLevelAreaIDs.Contains(GilesTrinity.playerStatus.LevelAreaId))
+                    return false;
+
                 // Check if we should be forcing a town-run
                 if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                 {
