@@ -188,7 +188,7 @@ namespace GilesTrinity
 
                     if (CurrentTarget == null)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget set as null in refresh");
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget set as null in refresh");
                         runStatus = HandlerRunStatus.TreeSuccess;
                     }
 
@@ -584,7 +584,7 @@ namespace GilesTrinity
                         Vector3 point = vCurrentDestination;
                         foreach (GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
                                         GilesTrinity.GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, point) &&
-                                        cp.Location.Distance(playerStatus.CurrentPosition) > GilesTrinity.dictSNONavigationSize[cp.ActorSNO]))
+                                        cp.Location.Distance(playerStatus.CurrentPosition) > GilesPlayerMover.GetObstacleNavigationSize(cp)))
                         {
                             if (vShiftedPosition == Vector3.Zero)
                             {
@@ -825,13 +825,13 @@ namespace GilesTrinity
                     {
                         hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
                         CurrentTarget = null;
-                        runStatus = HandlerRunStatus.TreeSuccess;
+                        runStatus = HandlerRunStatus.TreeRunning;
                     }
                     else
                     {
-                        hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
+                        hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
                         CurrentTarget = null;
-                        runStatus = HandlerRunStatus.TreeSuccess;
+                        runStatus = HandlerRunStatus.TreeRunning;
                     }
                 }
             }

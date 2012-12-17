@@ -729,7 +729,7 @@ namespace GilesTrinity
                                         };
 
                     timeCancelledKiteMove = DateTime.Now;
-                    cancelledKiteMoveForMilliseconds = 0;
+                    cancelledKiteMoveForMilliseconds = 750;
 
                     // Try forcing a target update with each kiting
                     //bForceTargetUpdate = true;

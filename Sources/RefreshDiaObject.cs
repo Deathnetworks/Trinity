@@ -106,7 +106,7 @@ namespace GilesTrinity
             if (!AddToCache) { c_IgnoreReason = "DoubleCheckBlacklists"; return AddToCache; }
             // If it's a unit, add it to the monster cache
             AddUnitToMonsterObstacleCache(AddToCache);
-            AddGizmoToNavigationObstacleCache();
+            //AddGizmoToNavigationObstacleCache();
 
             if (AddToCache)
             {
@@ -1714,22 +1714,23 @@ namespace GilesTrinity
                             AddToCache = false;
                             c_IgnoreSubStep = "NotNavigable";
                         }
-                    }
-                    // Ignore units not in LoS except bosses, rares, champs
-                    if (c_ObjectType == GObjectType.Unit && !c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
-                    {
-                        AddToCache = false;
-                        c_IgnoreSubStep = "UnitNotInLoS";
-                    }
-                    if (PlayerKiteDistance <= 5 && c_CentreDistance >= 5 && !ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
-                    {
-                        AddToCache = false;
-                        c_IgnoreSubStep = "UnableToRayCast";
-                    }
-                    else if (!ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowProjectile))
-                    {
-                        AddToCache = false;
-                        c_IgnoreSubStep = "UnableToRayCast";
+                        if (PlayerKiteDistance <= 5 && c_CentreDistance >= 5 && !ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "UnableToRayCast";
+                        }
+                        else if (!ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowProjectile))
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "UnableToRayCast";
+                        }
+                        // Ignore units not in LoS except bosses, rares, champs
+                        if (!c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
+                        {
+
+                            AddToCache = false;
+                            c_IgnoreSubStep = "UnitNotInLoS";
+                        }
                     }
 
                     // always set true for bosses nearby

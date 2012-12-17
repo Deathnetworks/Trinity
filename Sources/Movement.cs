@@ -173,7 +173,7 @@ namespace GilesTrinity
         {
             if (!isStuck)
             {
-                if (shouldKite && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 750 && vlastSafeSpot != vNullLocation)
+                if (shouldKite && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 1500 && vlastSafeSpot != vNullLocation)
                 {
                     return vlastSafeSpot;
                 }
@@ -418,6 +418,10 @@ namespace GilesTrinity
             //}
             #endregion
 
+
+            if (monsterList == null)
+                monsterList = new List<GilesObject>();
+
             vBestLocation = newFindSafeZone(dangerPoint, shouldKite, isStuck);
             fHighestWeight = 1;
 
@@ -519,10 +523,12 @@ namespace GilesTrinity
                             continue;
                         }
 
+                        int nearbyMonsters = (monsterList != null ? monsterList.Count() : 0);
+
                         /*
-                         * This little bit is insanely CPU intensive and causes lots of small game freezes
+                         * This little bit is insanely CPU intensive and causes lots of small game freezes, maybe needs GUI option..
                          */
-                        if (!hasEmergencyTeleportUp && monsterList.Count() > 3)
+                        if (!hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 45)
                         {
                             PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 5, true);
 
@@ -569,6 +575,7 @@ namespace GilesTrinity
                     {
                         gridPoint.Weight = ((maxDistance - gridPoint.Distance) / maxDistance) * maxWeight;
 
+                        // Low weight for close range grid points
                         if (shouldKite && gridPoint.Distance < PlayerKiteDistance)
                         {
                             gridPoint.Weight = (int)gridPoint.Distance;

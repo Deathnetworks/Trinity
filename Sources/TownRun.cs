@@ -201,7 +201,7 @@ namespace GilesTrinity
                 if (GilesTrinity.BossLevelAreaIDs.Contains(GilesTrinity.playerStatus.LevelAreaId))
                     return false;
 
-                if (GilesTrinity.CurrentTarget != null)
+                if (!GilesTrinity.bWantToTownRun && GilesTrinity.CurrentTarget != null)
                     return false;
 
                 // Check if we should be forcing a town-run
@@ -254,12 +254,6 @@ namespace GilesTrinity
                     }
                 }
 
-                // hax for Town running in Act 2 Soulstone Chamber
-                if (ZetaDia.CurrentWorldId == 60193)
-                {
-                    GilesTrinity.bWantToTownRun = false;
-                }
-
                 if (Zeta.CommonBot.ErrorDialog.IsVisible)
                 {
                     GilesTrinity.bWantToTownRun = false;
@@ -276,7 +270,7 @@ namespace GilesTrinity
                     GilesTrinity.hashRGUIDBlacklist90 = new HashSet<int>();
                 }
 
-                if (GilesTrinity.bWantToTownRun && townRunCheckTimer.IsRunning && townRunCheckTimer.ElapsedMilliseconds > 2000)
+                if ((GilesTrinity.bWantToTownRun && townRunCheckTimer.IsRunning && townRunCheckTimer.ElapsedMilliseconds > 2000) || ZetaDia.Me.IsInTown)
                     return true;
                 else if (GilesTrinity.bWantToTownRun && !townRunCheckTimer.IsRunning)
                     townRunCheckTimer.Start();

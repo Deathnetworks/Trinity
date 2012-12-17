@@ -424,7 +424,7 @@ namespace GilesTrinity.DbProvider
                 Vector3 point = vMoveToTarget;
                 foreach (GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
                                 GilesTrinity.GilesIntersectsPath(cp.Location, cp.Radius, vMyCurrentPosition, point) &&
-                                cp.Location.Distance(vMyCurrentPosition) > GilesTrinity.dictSNONavigationSize[cp.ActorSNO]))
+                                cp.Location.Distance(vMyCurrentPosition) > GetObstacleNavigationSize(cp)))
                 {
                     if (vShiftedPosition == Vector3.Zero)
                     {
@@ -484,7 +484,7 @@ namespace GilesTrinity.DbProvider
                         fDistanceFromTarget >= 18f &&
                         PowerManager.CanCast(SNOPower.DemonHunter_Vault) && !ShrinesInArea(vMoveToTarget) &&
                         // Don't Vault into avoidance/monsters if we're kiting
-                        (GilesTrinity.PlayerKiteDistance <= 0 || (GilesTrinity.PlayerKiteDistance > 0 && 
+                        (GilesTrinity.PlayerKiteDistance <= 0 || (GilesTrinity.PlayerKiteDistance > 0 &&
                          (!GilesTrinity.hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= GilesTrinity.PlayerKiteDistance) ||
                          !GilesTrinity.hashMonsterObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= GilesTrinity.PlayerKiteDistance))))
                         )
@@ -544,6 +544,14 @@ namespace GilesTrinity.DbProvider
                 ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
 
             }
+        }
+
+        internal static int GetObstacleNavigationSize(GilesObstacle obstacle)
+        {
+            if (GilesTrinity.dictSNONavigationSize.ContainsKey(obstacle.ActorSNO))
+                return GilesTrinity.dictSNONavigationSize[obstacle.ActorSNO];
+            else
+                return (int)Math.Ceiling(obstacle.Radius);
         }
 
         private static void GetShiftedPosition(ref Vector3 vMoveToTarget, ref Vector3 point)
