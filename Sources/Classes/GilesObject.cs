@@ -8,7 +8,7 @@ namespace GilesTrinity
     // Let's me create an object list with ONLY the data I need read from D3 memory, and then read from this while
     // Handling movement and interaction with the target - whether the target is a shrine, an item or a monster
     // Completely minimizing the D3 memory reads to the bare minimum
-    internal class GilesObject
+    public class GilesObject
     {
         // Generic stuff applicable to all objects
         public GObjectType Type { get; set; }

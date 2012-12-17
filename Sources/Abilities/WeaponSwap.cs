@@ -22,7 +22,8 @@ using GilesTrinity.Technicals;
 namespace GilesTrinity.Swap
 {
     /// <summary>
-    /// Version: 1.0.1b
+    /// Version: 1.0.1c
+    /// - Added check after death
     /// - Fixed an issue that would cause people that aren't monks using weapon swap to run the checks during town run.
     /// </summary>
     class WeaponSwap
@@ -41,8 +42,8 @@ namespace GilesTrinity.Swap
         /// Then we look at the array "items" -> if first item in rows is 0, first item in columns is 3 and first item in items is InventorySlot.PlayerLeftFinger -> 
         ///         It will be the location we put the left ring for swapping.
         /// </summary>
-        private static int[] rows = new int[] { };
-        private static int[] columns = new int[] { };
+        private static int[] rows = new int[] {  };
+        private static int[] columns = new int[] {  };
 
         /// <summary>
         /// Possible Inventory Slots:
@@ -59,7 +60,7 @@ namespace GilesTrinity.Swap
         ///     InventorySlot.PlayerFeet
         /// </summary>
 
-        private static InventorySlot[] items = new InventorySlot[] { };
+        private static InventorySlot[] items = new InventorySlot[] {  };
         // Last slot is reserved for Offhand (if exists) and the slot before last for the main hand
         private static int[] mainID = new int[rows.Length + 3];
         // Last slot is reserved for the 2 Handed weapon we swap to.
@@ -290,6 +291,20 @@ namespace GilesTrinity.Swap
             }
         }
 
+        public void CheckAfterDeath()
+        {
+            if (ZetaDia.Me.Inventory.Equipped.FirstOrDefault(j => j.InventorySlot == InventorySlot.PlayerLeftHand).DynamicId == mainID[rows.Length - 2])
+            {
+                wearingDPSGear = false;
+				DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Died wearing normal gear.");
+            }
+            else
+            {
+                wearingDPSGear = true;
+				DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Died wearning Dps gear - saving status for next fight.");
+            }
+        }
+
         public bool DpsGearOn()
         {
             return wearingDPSGear;
@@ -368,13 +383,12 @@ namespace GilesTrinity.Swap
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Swapped back to normal gear.");
                     }
                 }
-				else if (crashedDuringSwap == true)
-				{
-					wearingDPSGear = true;
-				}
-				crashedDuringSwap = false;				
+                else if (crashedDuringSwap == true)
+                {
+                    wearingDPSGear = true;
+                }
+                crashedDuringSwap = false;
             }
         }
-
     }
 }

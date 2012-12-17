@@ -33,6 +33,8 @@ namespace GilesTrinity
 
             try
             {
+                double attack = ZetaDia.Me.Attack;
+
                 playerStatus.LastUpdated = DateTime.Now;
                 playerStatus.IsInTown = me.IsInTown;
                 playerStatus.IsIncapacitated = (me.IsFeared || me.IsStunned || me.IsFrozen || me.IsBlind);
@@ -120,6 +122,9 @@ namespace GilesTrinity
         {
             if (DateTime.Now.Subtract(lastDied).TotalSeconds > 10)
             {
+                    // Reset status incase we died during swap.
+                weaponSwap.CheckAfterDeath();	
+				
                 lastDied = DateTime.Now;
                 iTotalDeaths++;
                 iDeathsThisRun++;

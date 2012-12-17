@@ -74,7 +74,7 @@ namespace GilesTrinity
         /// </summary>
         public void OnPulse()
         {
-            RefreshDiaObjectCache();
+            //RefreshDiaObjectCache();
         }
 
         /// <summary>

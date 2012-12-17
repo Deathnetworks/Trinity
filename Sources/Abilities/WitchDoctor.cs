@@ -212,6 +212,8 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.Witchdoctor_CorpseSpider, 12f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_PlagueOfToads))
                 return new GilesPower(SNOPower.Witchdoctor_PlagueOfToads, 12f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+            if (hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_AcidCloud) && playerStatus.CurrentEnergy >= 172)
+                return new GilesPower(SNOPower.Witchdoctor_AcidCloud, 12f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             return new GilesPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
         }
 

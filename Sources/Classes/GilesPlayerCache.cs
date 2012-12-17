@@ -26,9 +26,12 @@ namespace GilesTrinity
         public string BattleTag { get; set; }
         public int SceneId { get; set; }
         public int LevelAreaId { get; set; }
+        public double PlayerDamagePerSecond { get; set; }
 
         public GilesPlayerCache()
         {
+
+
             LastUpdated = DateTime.MinValue;
             IsIncapacitated = false;
             IsRooted = false;

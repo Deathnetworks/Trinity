@@ -24,7 +24,51 @@ Future Planned Improvements:
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
 
+Changelog 1.7.1.8:
 
+* Fixed reverse gold pickup bug
+
+* darkfriend77 ItemRules2 2.0.20
+
+* New Prototype Kiting logic, still getting refined but so far works better than before. Is now grid-based (instead of a set of circles) and also uses path-finding. (Tested with DemonHunter @ 20 yards)
+
+* Trinity unstucker and Bot TPS now take immediate effect (previously needed bot stop/start)
+
+* Bot TPS slider now goes to 30 for those of us with more horsepower
+
+* Kiting players will no longer attempt to rush head-first into monsters/avoidance for a health globe
+
+* Added some adjusments to help prevent town portalling while monsters are present
+
+* Fixed stucks A3 Skycrown Catapult barricade/destructables
+
+* Ranged players will no longer attempt to attack through navigation obstacles (like Signal Fires in Skycrown) 
+
+* Removed blacklisting for 0-hitpoint monsters (now they're simply just not added to cache), monsters were possibly ignored due to D3 memory exception on first read.
+
+* Added check for town-portalling in boss areas and non-town-portalable places like A2 caldeum bazaar
+
+* Now displays XP Per hour in the log file
+
+* Options to ignore Shrine types added
+
+* Monk now has Tempest Rush movement option
+
+* Monk WeaponSwap fixes/updates
+
+* DemonHunter: Added options for for Spam smoke screen and preparation OOC. 
+
+* DemonHunter: Evasive fire can now be used as a primary ability and will no longer case default attacks to be used.  
+
+* DemonHunter: Added avoidance and kiting safety checks for DemonHunter vault. 
+
+* WitchDoctor: Added  AcidCloud to destructable spells (Thanks Yadda).
+
+* Wizard: Energy twister is now only "used" if we have enough energy (default attacks are now used). 
+
+* Wizard: Archon Arcane strike is now used at 7 instead of 13 (should prevent chasing). 
+
+* Wizard: Timers on Wizard armors changed from 115sec to 60sec. 
 
 Changelog 1.7.1.7:
 

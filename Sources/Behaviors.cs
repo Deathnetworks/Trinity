@@ -188,7 +188,7 @@ namespace GilesTrinity
 
                     if (CurrentTarget == null)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget set as null in refresh");
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget set as null in refresh");
                         runStatus = HandlerRunStatus.TreeSuccess;
                     }
 
@@ -277,7 +277,36 @@ namespace GilesTrinity
 
                     bool currentTargetIsInLoS = GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk);
 
-
+					// Item Swap + Blinding flash cast
+					if (playerStatus.ActorClass == ActorClass.Monk)
+					{
+						if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && 
+							hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
+						{
+							if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind) 
+								&& (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
+								{
+									ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
+									return RunStatus.Running;
+								}
+							else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800 
+									&& GilesHasBuff(SNOPower.Monk_SweepingWind))
+							{
+								weaponSwap.SwapGear();
+							}
+						}
+						// Spam sweeping winds
+						if (hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
+							&& (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
+							|| !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && 
+							DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
+						{
+							ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
+							SweepWindSpam = DateTime.Now;
+							return RunStatus.Running;
+						}
+					}
+					
                     // Interact/use power on target if already in range
                     if (fRangeRequired <= 0f || fDistanceFromTarget <= fRangeRequired && currentTargetIsInLoS)
                     {
@@ -382,7 +411,7 @@ namespace GilesTrinity
                             case GObjectType.Shrine:
                             case GObjectType.Container:
                             case GObjectType.Interactable:
-                                {
+                                {		
                                     WaitWhileAnimating(5, true);
                                     ZetaDia.Me.UsePower(SNOPower.Axe_Operate_Gizmo, Vector3.Zero, 0, CurrentTarget.ACDGuid);
                                     //iIgnoreThisRactorGUID = CurrentTarget.iRActorGuid;
@@ -584,7 +613,7 @@ namespace GilesTrinity
                         Vector3 point = vCurrentDestination;
                         foreach (GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
                                         GilesTrinity.GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, point) &&
-                                        cp.Location.Distance(playerStatus.CurrentPosition) > GilesTrinity.dictSNONavigationSize[cp.ActorSNO]))
+                                        cp.Location.Distance(playerStatus.CurrentPosition) > GilesPlayerMover.GetObstacleNavigationSize(cp)))
                         {
                             if (vShiftedPosition == Vector3.Zero)
                             {
@@ -624,6 +653,10 @@ namespace GilesTrinity
                         }
                         // Position shifting code
                     }
+
+
+
+
                     // Only position-shift when not avoiding
                     // See if we want to ACTUALLY move, or are just waiting for the last move command...
                     if (!bForceNewMovement && bAlreadyMoving && vCurrentDestination == vLastMoveToTarget && DateTime.Now.Subtract(lastMovementCommand).TotalMilliseconds <= 100)
@@ -638,33 +671,6 @@ namespace GilesTrinity
                         )
                     {
                         bool bFoundSpecialMovement = UsedSpecialMovement();
-
-                        // Item Swap + Blinding flash cast
-                        if (playerStatus.ActorClass == ActorClass.Monk && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
-                            hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
-                        {
-                            if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind)
-                                && (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
-                            {
-                                ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
-                                return RunStatus.Running;
-                            }
-                            else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800
-                                    && GilesHasBuff(SNOPower.Monk_SweepingWind))
-                            {
-                                weaponSwap.SwapGear();
-                            }
-                        }
-                        // Spam sweeping winds
-                        if (hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
-                            && (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
-                            || !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
-                            DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
-                        {
-                            ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
-                            SweepWindSpam = DateTime.Now;
-                            return RunStatus.Running;
-                        }
 
                         if (CurrentTarget.Type != GObjectType.Backtrack)
                         {
@@ -820,14 +826,14 @@ namespace GilesTrinity
                     if (CurrentTarget.IsBoss)
                     {
                         hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
-                        dateSinceBlacklist15Clear = DateTime.Now;
+                        CurrentTarget = null;
+                        runStatus = HandlerRunStatus.TreeRunning;
                     }
                     else
                     {
                         hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
-
                         CurrentTarget = null;
-                        runStatus = HandlerRunStatus.TreeSuccess;
+                        runStatus = HandlerRunStatus.TreeRunning;
                     }
                 }
             }
@@ -961,7 +967,7 @@ namespace GilesTrinity
         /// <returns></returns>
         private static bool UsedSpecialMovement()
         {
-            // Log whether we used a special movement (for avoidance really)
+            // Log whether we used a  (for avoidance really)
             bool bFoundSpecialMovement = false;
             // Leap movement for a barb
             if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Leap) &&
@@ -1162,7 +1168,7 @@ namespace GilesTrinity
                 statusText.Append(") ");
             }
             statusText.Append("Weight=");
-            statusText.Append(CurrentTarget.Weight);
+            statusText.Append(CurrentTarget.Weight.ToString("0"));
             if (!targetIsInRange)
                 statusText.Append(" MOVING INTO RANGE");
             if (Settings.Advanced.DebugInStatusBar)

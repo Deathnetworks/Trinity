@@ -106,6 +106,8 @@ namespace GilesTrinity
             if (!AddToCache) { c_IgnoreReason = "DoubleCheckBlacklists"; return AddToCache; }
             // If it's a unit, add it to the monster cache
             AddUnitToMonsterObstacleCache(AddToCache);
+            //AddGizmoToNavigationObstacleCache();
+
             if (AddToCache)
             {
                 c_IgnoreReason = "None";
@@ -148,6 +150,29 @@ namespace GilesTrinity
             }
             return true;
         }
+
+        private static void AddGizmoToNavigationObstacleCache()
+        {
+            switch (c_ObjectType)
+            {
+                case GObjectType.Barricade:
+                case GObjectType.Container:
+                case GObjectType.Destructible:
+                case GObjectType.Door:
+                case GObjectType.HealthWell:
+                case GObjectType.Interactable:
+                case GObjectType.Shrine:
+                    hashNavigationObstacleCache.Add(new GilesObstacle()
+                    {
+                        ActorSNO = c_ActorSNO,
+                        Radius = c_Radius,
+                        Location = c_Position,
+                        Name = c_Name,
+                        Weight = c_Weight
+                    });
+                    break;
+            }
+        }
         /// <summary>
         /// Adds a unit to cache hashMonsterObstacleCache
         /// </summary>
@@ -161,12 +186,12 @@ namespace GilesTrinity
                 {
                     // Force to elite and add to the collision list
                     c_unit_IsElite = true;
-                    hashMonsterObstacleCache.Add(new GilesObstacle(c_Position, (c_Radius * 0.15f), c_ActorSNO));
+                    hashMonsterObstacleCache.Add(new GilesObstacle(c_Position, c_Radius, c_ActorSNO));
                 }
                 else
                 {
                     // Add to the collision-list
-                    hashMonsterObstacleCache.Add(new GilesObstacle(c_Position, (c_Radius * 0.10f), c_ActorSNO));
+                    hashMonsterObstacleCache.Add(new GilesObstacle(c_Position, c_Radius, c_ActorSNO));
                 }
             }
         }
@@ -745,7 +770,7 @@ namespace GilesTrinity
                 //    c_IgnoreSubStep += "IsHidden+";
                 // }
             }
-            catch { } 
+            catch { }
             try
             {
                 if (thisUnit.IsInvulnerable)
@@ -754,7 +779,7 @@ namespace GilesTrinity
                     c_IgnoreSubStep += "IsInvulnerable+";
                 }
             }
-            catch { } 
+            catch { }
             try
             {
                 if (thisUnit.IsBurrowed)
@@ -763,7 +788,7 @@ namespace GilesTrinity
                     c_IgnoreSubStep += "IsBurrowed+";
                 }
             }
-            catch { } 
+            catch { }
             try
             {
                 if (thisUnit.IsHelper || thisUnit.IsNPC || thisUnit.IsTownVendor)
@@ -1015,11 +1040,11 @@ namespace GilesTrinity
             }
             if (c_ItemQuality >= ItemQuality.Rare4)
             {
-                fExtraRange = iCurrentMaxLootRadius; 
+                fExtraRange = iCurrentMaxLootRadius;
             }
             if (c_ItemQuality >= ItemQuality.Legendary)
             {
-                fExtraRange = 10 * iCurrentMaxLootRadius; 
+                fExtraRange = 10 * iCurrentMaxLootRadius;
             }
 
             if (c_CentreDistance > (iCurrentMaxLootRadius + fExtraRange))
@@ -1037,7 +1062,7 @@ namespace GilesTrinity
                 }
                 else
                 {
-                    AddToCache = GilesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem,c_item_tFollowerType, c_GameDynamicID);
+                    AddToCache = GilesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType, c_GameDynamicID);
                 }
                 dictGilesPickupItem.Add(c_RActorGuid, AddToCache);
             }
@@ -1271,68 +1296,68 @@ namespace GilesTrinity
                             AddToCache = false;
                             //return bWantThis;
                         }
-                        
+
                         // Determine what shrine type it is, and blacklist if the user has disabled it
                         switch (c_ActorSNO)
                         {
-                          case 176077:  //Frenzy Shrine
-                              if (!Settings.WorldObject.UseFrenzyShrine)
-                              {
-                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
-                                  AddToCache = false; 
-                              }
-                              if (playerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.UseTRMovement)
-                              {
-                                  // Frenzy shrines are a huge time sink for monks using Tempest Rush to move, we should ignore them.
-                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
-                                  AddToCache = false; 
-                              }
-                              break;
-                          
-                          case 176076:  //Fortune Shrine
-                              if (!Settings.WorldObject.UseFortuneShrine)
-                              {
-                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
-                                  AddToCache = false; 
-                              }
-                              break;
-                              
-                          case 176074:  //Protection Shrine
-                              if (!Settings.WorldObject.UseProtectionShrine)
-                              {
-                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
-                                  AddToCache = false; 
-                              }       
-                              break;     
-                              
-                          case 260330:  //Empowered Shrine
-                              if (!Settings.WorldObject.UseEmpoweredShrine)
-                              {
-                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
-                                  AddToCache = false; 
-                              }       
-                              break;      
-                              
-                          case 176075:  //Enlightened Shrine
-                              if (!Settings.WorldObject.UseEnlightenedShrine)
-                              {
-                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
-                                  AddToCache = false; 
-                              }       
-                              break;   
-                              
-                          case 260331:  //Fleeting Shrine
-                              if (!Settings.WorldObject.UseFleetingShrine)
-                              {
-                                  hashRGUIDBlacklist60.Add(c_RActorGuid);
-                                  AddToCache = false; 
-                              }       
-                              break;     
-                          
-                          default:
-                              break;
+                            case 176077:  //Frenzy Shrine
+                                if (!Settings.WorldObject.UseFrenzyShrine)
+                                {
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                if (playerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.UseTRMovement)
+                                {
+                                    // Frenzy shrines are a huge time sink for monks using Tempest Rush to move, we should ignore them.
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                break;
+
+                            case 176076:  //Fortune Shrine
+                                if (!Settings.WorldObject.UseFortuneShrine)
+                                {
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                break;
+
+                            case 176074:  //Protection Shrine
+                                if (!Settings.WorldObject.UseProtectionShrine)
+                                {
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                break;
+
+                            case 260330:  //Empowered Shrine
+                                if (!Settings.WorldObject.UseEmpoweredShrine)
+                                {
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                break;
+
+                            case 176075:  //Enlightened Shrine
+                                if (!Settings.WorldObject.UseEnlightenedShrine)
+                                {
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                break;
+
+                            case 260331:  //Fleeting Shrine
+                                if (!Settings.WorldObject.UseFleetingShrine)
+                                {
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                break;
+
+                            default:
+                                break;
                         }  //end switch
-                        
+
                         // Already used, blacklist it and don't look at it again
                         try
                         {
@@ -1676,7 +1701,6 @@ namespace GilesTrinity
         {
             try
             {
-
                 // Everything except items
                 if (c_ObjectType != GObjectType.Item)
                 {
@@ -1690,17 +1714,23 @@ namespace GilesTrinity
                             AddToCache = false;
                             c_IgnoreSubStep = "NotNavigable";
                         }
-                    }
-                    // Ignore units not in LoS except bosses, rares, champs
-                    if (c_ObjectType == GObjectType.Unit && !c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
-                    {
-                        AddToCache = false;
-                        c_IgnoreSubStep = "UnitNotInLoS";
-                    }
-                    if (!ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
-                    {
-                        AddToCache = false;
-                        c_IgnoreSubStep = "UnableToRayCast";
+                        if (PlayerKiteDistance <= 5 && c_CentreDistance >= 5 && !ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "UnableToRayCast";
+                        }
+                        else if (!ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowProjectile))
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "UnableToRayCast";
+                        }
+                        // Ignore units not in LoS except bosses, rares, champs
+                        if (!c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
+                        {
+
+                            AddToCache = false;
+                            c_IgnoreSubStep = "UnitNotInLoS";
+                        }
                     }
 
                     // always set true for bosses nearby
@@ -1730,14 +1760,6 @@ namespace GilesTrinity
                     c_IgnoreSubStep = "";
                 }
 
-
-                //if (!thisobj.InLineOfSight && thisobj.ZDiff < 14f && !tmp_unit_bThisBoss)
-                //{
-                //    bWantThis = false;
-                //    tmp_cacheIgnoreSubStep = "IgnoreLoS";
-                //    
-                //return bWantThis;
-                //}
             }
             catch
             {
@@ -1900,10 +1922,10 @@ namespace GilesTrinity
                     case GObjectType.Barricade:
                         // Ignore monsters (units) who's Z-height is 14 foot or more than our own z-height
                         // rrrix: except bosses like Belial :)
-                        if (c_ZDiff >= 14f && !c_unit_IsBoss)
-                        {
-                            AddToCache = false;
-                        }
+                        //if (c_ZDiff >= 14f && !c_unit_IsBoss)
+                        //{
+                        //    AddToCache = false;
+                        //}
                         break;
                     case GObjectType.Item:
                     case GObjectType.HealthWell:
