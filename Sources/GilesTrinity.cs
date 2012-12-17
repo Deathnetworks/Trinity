@@ -122,9 +122,12 @@ namespace GilesTrinity
         {
             if (DateTime.Now.Subtract(lastDied).TotalSeconds > 10)
             {
+                if (playerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.SweepingWindWeaponSwap)
+                {
                     // Reset status incase we died during swap.
-                weaponSwap.CheckAfterDeath();	
-				
+                    weaponSwap.CheckAfterDeath();
+                }
+
                 lastDied = DateTime.Now;
                 iTotalDeaths++;
                 iDeathsThisRun++;

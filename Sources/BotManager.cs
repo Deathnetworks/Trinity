@@ -66,15 +66,15 @@ namespace GilesTrinity
             GilesPlayerMover.timeLastRecordedPosition = DateTime.Now;
             GilesPlayerMover.timeLastRestartedGame = DateTime.Now;
 
-            try
-            {
-                CacheManager.Initialize();
-            }
-            catch (Exception ex)
-            {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Error Initializing CacheManager");
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
-            }
+            //try
+            //{
+            //    CacheManager.Initialize();
+            //}
+            //catch (Exception ex)
+            //{
+            //    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Error Initializing CacheManager");
+            //    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
+            //}
         }
 
         // When the bot stops, output a final item-stats report so it is as up-to-date as can be
