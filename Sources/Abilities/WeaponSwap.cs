@@ -36,6 +36,7 @@ namespace GilesTrinity.Swap
         // Is able to swap or not??
         private static bool ableToSwap = true;
         private static int sGamesCreated = -1;
+        private static bool sCheckAfterDeath = false;
         /// <summary>
         /// Make sure rows and columns have the same amount of numbers inside (top left corner is row=0,column=0, bottom right corner is row=5,column=9). 
         /// Each combination of Row and Column is an item location, for instance Row 0, Column 3 -> Top row, 4th column from the left.
@@ -62,7 +63,7 @@ namespace GilesTrinity.Swap
 
         private static InventorySlot[] items = new InventorySlot[] {  };
         // Last slot is reserved for Offhand (if exists) and the slot before last for the main hand
-        private static int[] mainID = new int[rows.Length + 3];
+        private static int[] mainID = new int[rows.Length + 2];
         // Last slot is reserved for the 2 Handed weapon we swap to.
         private static int[] altID = new int[rows.Length + 1];
 
@@ -293,16 +294,7 @@ namespace GilesTrinity.Swap
 
         public void CheckAfterDeath()
         {
-            if (ZetaDia.Me.Inventory.Equipped.FirstOrDefault(j => j.InventorySlot == InventorySlot.PlayerLeftHand).DynamicId == mainID[rows.Length - 2])
-            {
-                wearingDPSGear = false;
-				DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Died wearing normal gear.");
-            }
-            else
-            {
-                wearingDPSGear = true;
-				DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Died wearning Dps gear - saving status for next fight.");
-            }
+            sCheckAfterDeath = true;
         }
 
         public bool DpsGearOn()
@@ -313,8 +305,8 @@ namespace GilesTrinity.Swap
         internal static DateTime LastCheckSwapGear = DateTime.Now;
 
         public void SwapGear()
-        {
-            if (GilesTrinity.playerStatus.ActorClass != ActorClass.Monk)
+        {	
+            if (GilesTrinity.playerStatus.ActorClass != ActorClass.Monk || ZetaDia.Me.CommonData.AnimationState == AnimationState.Dead)
             {
                 return;
             }
@@ -322,11 +314,33 @@ namespace GilesTrinity.Swap
             //if (DateTime.Now.Subtract(LastCheckSwapGear).TotalMilliseconds <= 250)
             //    return;
             //LastCheckSwapGear = DateTime.Now;
-
             if (!hasChecked)
             {
                 SecurityCheck();
+            }			
+            if (sCheckAfterDeath)
+            {
+                if (ZetaDia.Me.Inventory.Equipped.FirstOrDefault(j => j.InventorySlot == InventorySlot.PlayerLeftHand).DynamicId == mainID[mainID.Length - 2])
+                {
+					if (wearingDPSGear)
+					{
+						crashedDuringSwap = true;
+					}
+                    wearingDPSGear = false;
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Died wearing normal gear.");
+                }
+                else
+                {
+					if (!wearingDPSGear)
+					{
+						crashedDuringSwap = true;
+					}
+                    wearingDPSGear = true;
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Died wearning Dps gear - saving status for next fight.");
+                }
+                sCheckAfterDeath = false;
             }
+
             if (ableToSwap == true)
             {
                 if (crashedDuringSwap == false)
