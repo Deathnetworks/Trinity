@@ -277,7 +277,36 @@ namespace GilesTrinity
 
                     bool currentTargetIsInLoS = GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk);
 
-
+					// Item Swap + Blinding flash cast
+					if (playerStatus.ActorClass == ActorClass.Monk)
+					{
+						if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && 
+							hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
+						{
+							if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind) 
+								&& (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
+								{
+									ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
+									return RunStatus.Running;
+								}
+							else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800 
+									&& GilesHasBuff(SNOPower.Monk_SweepingWind))
+							{
+								weaponSwap.SwapGear();
+							}
+						}
+						// Spam sweeping winds
+						if (hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
+							&& (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
+							|| !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && 
+							DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
+						{
+							ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
+							SweepWindSpam = DateTime.Now;
+							return RunStatus.Running;
+						}
+					}
+					
                     // Interact/use power on target if already in range
                     if (fRangeRequired <= 0f || fDistanceFromTarget <= fRangeRequired && currentTargetIsInLoS)
                     {
@@ -382,7 +411,7 @@ namespace GilesTrinity
                             case GObjectType.Shrine:
                             case GObjectType.Container:
                             case GObjectType.Interactable:
-                                {
+                                {		
                                     WaitWhileAnimating(5, true);
                                     ZetaDia.Me.UsePower(SNOPower.Axe_Operate_Gizmo, Vector3.Zero, 0, CurrentTarget.ACDGuid);
                                     //iIgnoreThisRactorGUID = CurrentTarget.iRActorGuid;
@@ -638,33 +667,6 @@ namespace GilesTrinity
                         )
                     {
                         bool bFoundSpecialMovement = UsedSpecialMovement();
-
-                        // Item Swap + Blinding flash cast
-                        if (playerStatus.ActorClass == ActorClass.Monk && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
-                            hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
-                        {
-                            if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind)
-                                && (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
-                            {
-                                ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
-                                return RunStatus.Running;
-                            }
-                            else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800
-                                    && GilesHasBuff(SNOPower.Monk_SweepingWind))
-                            {
-                                weaponSwap.SwapGear();
-                            }
-                        }
-                        // Spam sweeping winds
-                        if (hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
-                            && (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
-                            || !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
-                            DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
-                        {
-                            ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
-                            SweepWindSpam = DateTime.Now;
-                            return RunStatus.Running;
-                        }
 
                         if (CurrentTarget.Type != GObjectType.Backtrack)
                         {

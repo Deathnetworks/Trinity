@@ -120,6 +120,9 @@ namespace GilesTrinity
         {
             if (DateTime.Now.Subtract(lastDied).TotalSeconds > 10)
             {
+                    // Reset status incase we died during swap.
+                weaponSwap.CheckAfterDeath();	
+				
                 lastDied = DateTime.Now;
                 iTotalDeaths++;
                 iDeathsThisRun++;
