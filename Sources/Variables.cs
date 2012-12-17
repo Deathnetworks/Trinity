@@ -614,6 +614,11 @@ namespace GilesTrinity
             // Otherthandeadlyreach is used for other spirit generators to track for combination strike buff.
         private static DateTime OtherThanDeadlyReach = DateTime.Now;
             // Set by sweeping winds or by blinding flash if the time is right for a swap.
-        private static bool WantToSwap = false;		
+        private static bool WantToSwap = false;
+
+        // Xp Counter
+        private static int iTotalXp = 0;
+        private static int iLastXp = 0;
+        private static int iNextLvXp = 0;			
     }
 }
