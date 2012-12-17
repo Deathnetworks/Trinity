@@ -270,7 +270,7 @@ namespace GilesTrinity
                     GilesTrinity.hashRGUIDBlacklist90 = new HashSet<int>();
                 }
 
-                if ((GilesTrinity.bWantToTownRun && townRunCheckTimer.IsRunning && townRunCheckTimer.ElapsedMilliseconds > 2000) || ZetaDia.Me.IsInTown)
+                if ((GilesTrinity.bWantToTownRun && townRunCheckTimer.IsRunning && townRunCheckTimer.ElapsedMilliseconds > 2000) || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                     return true;
                 else if (GilesTrinity.bWantToTownRun && !townRunCheckTimer.IsRunning)
                     townRunCheckTimer.Start();
