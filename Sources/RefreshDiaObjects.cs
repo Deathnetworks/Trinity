@@ -362,7 +362,7 @@ namespace GilesTrinity
 
                             double duration = t1.Elapsed.TotalMilliseconds;
 
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement,
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                 "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12}",
                                 duration,
                                 (AddToCache ? "Added  " : " Ignored"),
@@ -468,11 +468,14 @@ namespace GilesTrinity
                         dUseKillRadius = 200;
             }
             // Special short-range list to ignore weakling mobs
-            if (hashActorSNOShortRangeOnly.Contains(c_ActorSNO))
-                dUseKillRadius = 12;
+            if (PlayerKiteDistance <= 0)
+            {
+                if (hashActorSNOShortRangeOnly.Contains(c_ActorSNO))
+                    dUseKillRadius = 12;
+            }
             // Prevent long-range mobs beign ignored while they may be pounding on us
             if (dUseKillRadius <= 30 && hashActorSNORanged.Contains(c_ActorSNO))
-                dUseKillRadius = 30;
+                dUseKillRadius = 80;
             //intell
             //GoatMutant_Ranged_A_Unique_Uber-10955 ActorSNO:	255996 	(act 1)
             //DuneDervish_B_Unique_Uber-14252 ActorSNO: 		256000	(act 2)
@@ -508,7 +511,6 @@ namespace GilesTrinity
             if (ForceVendorRunASAP)
             {
                 if (dUseKillRadius <= 90) dUseKillRadius = 90;
-                //intell
             }
             return dUseKillRadius;
         }
@@ -673,7 +675,13 @@ namespace GilesTrinity
         {
             TryToKite = false;
 
-            var monsterList = hashMonsterObstacleCache.Where(m => m.Location.Distance(playerStatus.CurrentPosition) <= PlayerKiteDistance);
+            var monsterList = from m in GilesObjectCache
+                              where m.Type == GObjectType.Unit && 
+                              m.RadiusDistance <= PlayerKiteDistance &&
+                              (m.IsBossOrEliteRareUnique ||
+                               ((m.HitPoints >= .15 || m.MonsterStyle != MonsterSize.Swarm) && !m.IsBossOrEliteRareUnique)
+                               )
+                              select m;
 
             if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
             {
@@ -687,18 +695,18 @@ namespace GilesTrinity
                 vKitePointAvoid = playerStatus.CurrentPosition;
             }
 
-            double msCancelledEmergency = DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds;
-            double msCancelledKite = DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds;
-
+            // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
             bool shouldKamikazeTreasureGoblins = (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize);
 
+            double msCancelledEmergency = DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds;
             bool shouldEmergencyMove = msCancelledEmergency >= cancelledEmergencyMoveForMilliseconds && NeedToKite;
+
+            double msCancelledKite = DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds;
             bool shouldKite = msCancelledKite >= cancelledKiteMoveForMilliseconds && TryToKite;
 
-            // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
             if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite))
             {
-                Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true);
+                Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true, monsterList);
 
                 // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
                 if (vAnySafePoint != Vector3.Zero && vAnySafePoint.Distance(playerStatus.CurrentPosition) >= 1)
@@ -721,7 +729,7 @@ namespace GilesTrinity
                                         };
 
                     timeCancelledKiteMove = DateTime.Now;
-                    cancelledKiteMoveForMilliseconds = 750;
+                    cancelledKiteMoveForMilliseconds = 0;
 
                     // Try forcing a target update with each kiting
                     //bForceTargetUpdate = true;
@@ -729,11 +737,19 @@ namespace GilesTrinity
                 else
                 {
                     // Didn't find any kiting we could reach, so don't look for any more kite spots for at least 1.5 seconds
-                    timeCancelledKiteMove = DateTime.Today;
-                    cancelledKiteMoveForMilliseconds = 1500;
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Unable to find kite location, canceling kite movement for {0}ms", cancelledKiteMoveForMilliseconds);
+                    timeCancelledKiteMove = DateTime.Now;
+                    cancelledKiteMoveForMilliseconds = 500;
                 }
             }
+            else if (!shouldEmergencyMove && NeedToKite)
+            {
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Emergency movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds);
+            }
+            else if (!shouldKite && TryToKite)
+            {
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kite movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds);
+            }
+
         }
         public static string GetHeading(float heading)
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -9,6 +10,7 @@ using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
+using Zeta.Pathfinding;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -140,7 +142,12 @@ namespace GilesTrinity
         public static bool GilesCanRayCast(Vector3 vStartLocation, Vector3 vDestination, NavCellFlags NavType = NavCellFlags.AllowWalk)
         {
             if (ZetaDia.Physics.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + 3f), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + 3f), NavType))
-                return true;
+            {
+                if (hashNavigationObstacleCache.Any(o => MathEx.IntersectsPath(o.Location, o.Radius, vStartLocation, vDestination)))
+                    return false;
+                else
+                    return true;
+            }
             return false;
         }
         // Calculate direction of A to B
@@ -162,11 +169,11 @@ namespace GilesTrinity
         /// <param name="shouldKite"></param>
         /// <param name="avoidDeath"></param>
         /// <returns></returns>
-        public static Vector3 FindSafeZone(bool isStuck, int stuckAttempts, Vector3 dangerPoint, bool shouldKite = false)
+        public static Vector3 FindSafeZone(bool isStuck, int stuckAttempts, Vector3 dangerPoint, bool shouldKite = false, IEnumerable<GilesObject> monsterList = null)
         {
             if (!isStuck)
             {
-                if (shouldKite && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 1500 && vlastSafeSpot != vNullLocation)
+                if (shouldKite && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 750 && vlastSafeSpot != vNullLocation)
                 {
                     return vlastSafeSpot;
                 }
@@ -411,7 +418,6 @@ namespace GilesTrinity
             //}
             #endregion
 
-
             vBestLocation = newFindSafeZone(dangerPoint, shouldKite, isStuck);
             fHighestWeight = 1;
 
@@ -424,7 +430,7 @@ namespace GilesTrinity
             return vBestLocation;
         }
 
-        internal static Vector3 newFindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false)
+        internal static Vector3 newFindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<GilesObject> monsterList = null)
         {
             /*
             generate 50x50 grid of 5x5 squares within max 100 distance from origin to edge of grid
@@ -445,7 +451,7 @@ namespace GilesTrinity
             int maxDistance = 100;
             int gridTotalSize = (int)(maxDistance / gridSquareSize) * 2;
             int maxWeight = 100;
-            int maxZDiff = 45;
+            int maxZDiff = 14;
 
             /* If maxDistance is the radius of a circle from the origin, then we want to get the hypotenuse of the radius (x) and tangent (y) as our search grid corner
              * anything outside of the circle will not be considered
@@ -471,10 +477,10 @@ namespace GilesTrinity
                         continue;
 
                     // If the point is navigable but ZDiff is way too different (up a cliff or wall)
-                    if (Math.Abs(gridPoint.Position.Z - origin.Z) > maxZDiff)
-                    {
-                        continue;
-                    }
+                    //if (Math.Abs(gridPoint.Position.Z - origin.Z) > maxZDiff)
+                    //{
+                    //    continue;
+                    //}
 
                     if (!pf.IsNavigable(p_xy))
                     {
@@ -489,23 +495,74 @@ namespace GilesTrinity
                     {
                         continue;
                     }
-
-                    // Monsters
-                    if (hashMonsterObstacleCache.Any(a => a.Location.Distance(xyz) <= (shouldKite ? gridSquareRadius + a.Radius : gridSquareSize + a.Radius + PlayerKiteDistance)))
-                    {
-                        continue;
-                    }
-
-                    // body blocking... i don't think GilesIntersectsPath works.. ?
-                    //foreach (GilesObstacle monster in hashMonsterObstacleCache.Where(m => GilesIntersectsPath(m.Location, m.Radius, playerStatus.CurrentPosition, gridPoint.Position)))
-                    //{
-                    //    continue;
-                    //}
-
                     // Obstacles
                     if (hashNavigationObstacleCache.Any(a => a.Location.Distance(xyz) <= gridSquareRadius + a.Radius))
                     {
                         continue;
+                    }
+
+                    // Monsters
+                    if (shouldKite)
+                    {
+                        // Any monster standing in this GridPoint
+                        if (hashMonsterObstacleCache.Any(a => a.Location.Distance(xyz) <= (shouldKite ? gridSquareRadius + a.Radius : gridSquareSize + a.Radius + PlayerKiteDistance)))
+                        {
+                            continue;
+                        }
+
+                        // Any monsters blocking in a straight line between origin and this GridPoint
+                        foreach (GilesObstacle monster in hashMonsterObstacleCache.Where(m =>
+                            MathEx.IntersectsPath(new Vector3(m.Location.X, m.Location.Y, 0), m.Radius, new Vector3(origin.X, origin.Y, 0), new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
+                            ))
+                        {
+
+                            continue;
+                        }
+
+                        /*
+                         * This little bit is insanely CPU intensive and causes lots of small game freezes
+                         */
+                        if (!hasEmergencyTeleportUp && monsterList.Count() > 3)
+                        {
+                            PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 5, true);
+
+                            bool pathFailure = false;
+                            Point lastNode = gp.WorldToGrid(origin.ToVector2());
+
+                            // analyze pathing to a safe point
+                            foreach (Point node in pfr.PointsReversed)
+                            {
+                                Vector2 node_xy = gp.GridToWorld(node);
+                                Vector3 node_xyz = new Vector3(node_xy.X, node_xy.Y, gp.GetHeight(node_xy));
+
+                                // never skip first-step nodes
+                                if (node_xyz.Distance(origin) < 10)
+                                    continue;
+
+                                // ignore any path points where monsters are standing in it
+                                if (hashMonsterObstacleCache.Any(m => m.Location.Distance(node_xyz) <= m.Radius))
+                                {
+                                    pathFailure = true;
+                                    break;
+                                }
+                                // Any monsters blocking previous and this node
+                                foreach (GilesObstacle monster in hashMonsterObstacleCache.Where(m =>
+                                    MathEx.IntersectsPath(
+                                        new Vector3(m.Location.X, m.Location.Y, 0),
+                                        m.Radius,
+                                        new Vector3(lastNode.X, lastNode.Y, 0),
+                                        new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
+                                    ))
+                                {
+                                    pathFailure = true;
+                                    break;
+                                }
+                            }
+
+                            if (pathFailure)
+                                continue;
+                        }
+
                     }
 
                     if (!isStuck)
@@ -580,6 +637,10 @@ namespace GilesTrinity
             float fDirectionToObstacle = NormalizeRadian((float)Math.Atan2(destB.Y - origin.Y, destB.X - origin.X));
             return AbsAngularDiffernce(RadianToDegree(fDirectionToTarget), RadianToDegree(fDirectionToObstacle));
         }
+        public static double AbsAngularDiffernce(double angleA, double angleB)
+        {
+            return 180d - Math.Abs(180d - Math.Abs(angleA - angleB));
+        }
         // Check if an obstacle is blocking our path
         /// <summary>
         /// Checks if <see cref="obstacle"/> with <see cref="radius"/> is blocking the ray between <see cref="start"/> and <see cref="destination"/>
@@ -591,26 +652,26 @@ namespace GilesTrinity
         /// <returns></returns>
         public static bool GilesIntersectsPath(Vector3 obstacle, float radius, Vector3 start, Vector3 destination)
         {
-            // should fix height differences (basically makes this a 2D check)
-            start.Z = obstacle.Z;
-            destination.Z = obstacle.Z;
+            return MathEx.IntersectsPath(obstacle, radius, start, destination);
 
-            double dAngle = GetRelativeAngularVariance(start, obstacle, destination);
-            if (dAngle > 30)
-            {
-                return false;
-            }
-            if (radius <= 1f) radius = 1f;
-            if (radius >= 15f) radius = 15f;
-            Ray ray = new Ray(start, Vector3.NormalizedDirection(start, destination));
-            Sphere sphere = new Sphere(obstacle, radius);
-            float? nullable = ray.Intersects(sphere);
-            bool result = (nullable.HasValue && (nullable.Value < start.Distance(destination)));
-            return result;
-        }
-        public static double AbsAngularDiffernce(double angleA, double angleB)
-        {
-            return 180d - Math.Abs(180d - Math.Abs(angleA - angleB));
+            //// should fix height differences (basically makes this a 2D check)
+            //start.Z = obstacle.Z;
+            //destination.Z = obstacle.Z;
+
+            //double dAngle = GetRelativeAngularVariance(start, obstacle, destination);
+            ////if (dAngle > 30)
+            ////{
+            ////    return false;
+            ////}
+            ////if (radius <= 1f) radius = 1f;
+            ////if (radius >= 15f) radius = 15f;
+
+            //Ray ray = new Ray(start, Vector3.NormalizedDirection(start, destination));
+
+            //Sphere sphere = new Sphere(obstacle, radius);
+            //float? nullable = ray.Intersects(sphere);
+            //bool result = (nullable.HasValue && (nullable.Value < start.Distance(destination)));
+            //return result;
         }
         public static double Normalize180(double angleA, double angleB)
         {

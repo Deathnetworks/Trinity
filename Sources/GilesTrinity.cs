@@ -33,6 +33,8 @@ namespace GilesTrinity
 
             try
             {
+                double attack = ZetaDia.Me.Attack;
+
                 playerStatus.LastUpdated = DateTime.Now;
                 playerStatus.IsInTown = me.IsInTown;
                 playerStatus.IsIncapacitated = (me.IsFeared || me.IsStunned || me.IsFrozen || me.IsBlind);

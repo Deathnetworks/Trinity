@@ -331,13 +331,13 @@ namespace GilesTrinity
         /// <summary>
         /// This force-prevents avoidance for XX loops incase we get stuck trying to avoid stuff
         /// </summary>
-        private static DateTime timeCancelledEmergencyMove = DateTime.Today;
+        private static DateTime timeCancelledEmergencyMove = DateTime.Now;
         private static int cancelledEmergencyMoveForMilliseconds = 0;
 
         /// <summary>
         /// Prevent spam-kiting too much - allow fighting between each kite movement
         /// </summary>
-        private static DateTime timeCancelledKiteMove = DateTime.Today;
+        private static DateTime timeCancelledKiteMove = DateTime.Now;
         private static int cancelledKiteMoveForMilliseconds = 0;
 
         // For if we have emergency teleport abilities available right now or not

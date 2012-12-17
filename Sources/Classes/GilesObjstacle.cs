@@ -9,6 +9,14 @@ namespace GilesTrinity
         public int ActorSNO { get; set; }
         public double Weight { get; set; }
         public string Name { get; set; }
+        public int HitPointsCurPct { get; set; }
+        public int HitPointsCur { get; set; }
+
+        public GilesObstacle()
+        {
+
+        }
+
         public GilesObstacle(Vector3 location, float radius, int snoId, double weight = 0, string name = "")
         {
             Location = location;

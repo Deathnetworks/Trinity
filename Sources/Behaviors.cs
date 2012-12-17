@@ -624,6 +624,10 @@ namespace GilesTrinity
                         }
                         // Position shifting code
                     }
+
+
+
+
                     // Only position-shift when not avoiding
                     // See if we want to ACTUALLY move, or are just waiting for the last move command...
                     if (!bForceNewMovement && bAlreadyMoving && vCurrentDestination == vLastMoveToTarget && DateTime.Now.Subtract(lastMovementCommand).TotalMilliseconds <= 100)
@@ -820,12 +824,12 @@ namespace GilesTrinity
                     if (CurrentTarget.IsBoss)
                     {
                         hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
-                        dateSinceBlacklist15Clear = DateTime.Now;
+                        CurrentTarget = null;
+                        runStatus = HandlerRunStatus.TreeSuccess;
                     }
                     else
                     {
-                        hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
-
+                        hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
                         CurrentTarget = null;
                         runStatus = HandlerRunStatus.TreeSuccess;
                     }
@@ -961,7 +965,7 @@ namespace GilesTrinity
         /// <returns></returns>
         private static bool UsedSpecialMovement()
         {
-            // Log whether we used a special movement (for avoidance really)
+            // Log whether we used a  (for avoidance really)
             bool bFoundSpecialMovement = false;
             // Leap movement for a barb
             if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Leap) &&
@@ -1162,7 +1166,7 @@ namespace GilesTrinity
                 statusText.Append(") ");
             }
             statusText.Append("Weight=");
-            statusText.Append(CurrentTarget.Weight);
+            statusText.Append(CurrentTarget.Weight.ToString("0"));
             if (!targetIsInRange)
                 statusText.Append(" MOVING INTO RANGE");
             if (Settings.Advanced.DebugInStatusBar)

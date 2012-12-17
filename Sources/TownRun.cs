@@ -17,6 +17,7 @@ using Zeta.Internals.Actors.Gizmos;
 using Zeta.Internals;
 using Action = Zeta.TreeSharp.Action;
 using System.Threading;
+using System.Diagnostics;
 
 namespace GilesTrinity
 {
@@ -184,7 +185,7 @@ namespace GilesTrinity
             return SalvageOption.None;
         }
 
-        internal static DateTime lastTownRunAttempt = DateTime.Now;
+        internal static Stopwatch townRunCheckTimer = new Stopwatch();
 
         /// <summary>
         /// TownRunCheckOverlord - determine if we should do a town-run or not
@@ -198,6 +199,9 @@ namespace GilesTrinity
                 GilesTrinity.bWantToTownRun = false;
 
                 if (GilesTrinity.BossLevelAreaIDs.Contains(GilesTrinity.playerStatus.LevelAreaId))
+                    return false;
+
+                if (GilesTrinity.CurrentTarget != null)
                     return false;
 
                 // Check if we should be forcing a town-run
@@ -272,7 +276,12 @@ namespace GilesTrinity
                     GilesTrinity.hashRGUIDBlacklist90 = new HashSet<int>();
                 }
 
-                return GilesTrinity.bWantToTownRun;
+                if (GilesTrinity.bWantToTownRun && townRunCheckTimer.IsRunning && townRunCheckTimer.ElapsedMilliseconds > 2000)
+                    return true;
+                else if (GilesTrinity.bWantToTownRun && !townRunCheckTimer.IsRunning)
+                    townRunCheckTimer.Start();
+
+                return false;
             }
         }
 
@@ -287,6 +296,9 @@ namespace GilesTrinity
             bNeedsEquipmentRepairs = false;
             GilesTrinity.ForceVendorRunASAP = false;
             bool bShouldVisitStash = false;
+
+            townRunCheckTimer.Reset();
+
             foreach (ACDItem thisitem in ZetaDia.Me.Inventory.Backpack)
             {
                 if (thisitem.BaseAddress != IntPtr.Zero)
