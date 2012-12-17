@@ -550,7 +550,7 @@ namespace GilesTrinity
 
             if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
-                Interpreter.InterpreterAction action = StashRule.checkItem(thisitem.item, false);
+                Interpreter.InterpreterAction action = StashRule.checkItem(thisitem.item);
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", thisitem.item.Name, thisitem.item.InternalName, thisitem.item.ItemType);
                 switch (action)
                 {
@@ -684,6 +684,44 @@ namespace GilesTrinity
                         LogWriter.WriteLine("Total games joined: " + iTotalJoinGames.ToString() + " [" + Math.Round(iTotalJoinGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
                     }
                 }
+                /*
+                  Check is Lv 60 or not
+                 * If lv 60 use Paragon
+                 * If not lv 60 use normal xp/hr
+                 */
+                if (ZetaDia.Actors.Me.Level < 60)
+                {
+                    if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
+                    {
+                        if (iLastXp > ZetaDia.Actors.Me.CurrentExperience)
+                        {
+                            iTotalXp += iNextLvXp;
+                        }
+                        else
+                        {
+                            iTotalXp += ZetaDia.Actors.Me.CurrentExperience - iLastXp;
+                        }
+                    }
+                    iLastXp = ZetaDia.Actors.Me.CurrentExperience;
+                    iNextLvXp = ZetaDia.Actors.Me.ExperienceNextLevel;
+                }
+                else
+                {
+                    if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
+                    {
+                        if (iLastXp > ZetaDia.Actors.Me.ParagonCurrentExperience)
+                        {
+                            iTotalXp += iNextLvXp;
+                        }
+                        else
+                        {
+                            iTotalXp += ZetaDia.Actors.Me.ParagonCurrentExperience - iLastXp;
+                        }
+                    }
+                    iLastXp = ZetaDia.Actors.Me.ParagonCurrentExperience;
+                    iNextLvXp = ZetaDia.Actors.Me.ParagonExperienceNextLevel;
+                }
+                LogWriter.WriteLine("Total XP gained: " + Math.Round(iTotalXp / (float)1000000, 2).ToString() + " million [" + Math.Round(iTotalXp / TotalRunningTime.TotalHours / 1000000, 2).ToString() + " million per hour]");
                 LogWriter.WriteLine("");
                 LogWriter.WriteLine("===== Item DROP Statistics =====");
 
@@ -863,7 +901,11 @@ namespace GilesTrinity
             {
                 BackpackSlotBlocked[square.Column, square.Row] = true;
             }
-
+            if (playerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.SweepingWindWeaponSwap)
+            {
+                BackpackSlotBlocked[9, 4] = true;
+                BackpackSlotBlocked[9, 5] = true;
+            }
             // Map out all the items already in the backpack
             foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {

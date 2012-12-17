@@ -27,3 +27,5 @@ GilesBlankCombatRoutine/TrinityCombatRoutine/obj
 *.orig
 Latest-GilesTrinity.zip
 Sources/GilesTrinity.csproj.user
+
+pub.bat

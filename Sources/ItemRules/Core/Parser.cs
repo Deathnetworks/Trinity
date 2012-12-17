@@ -67,6 +67,8 @@ namespace GilesTrinity.ItemRules.Core
 
         private void ParseExpr(ParseNode parent)
         {
+            //Token tok;
+            //ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Expr), "Expr");
             parent.Nodes.Add(node);
 
@@ -82,16 +84,11 @@ namespace GilesTrinity.ItemRules.Core
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.SepExpr), "SepExpr");
             parent.Nodes.Add(node);
 
-
-            
             ParseOrExpr(node);
 
-            
             tok = scanner.LookAhead(TokenType.SEPARATOR);
             while (tok.Type == TokenType.SEPARATOR)
             {
-
-                
                 tok = scanner.Scan(TokenType.SEPARATOR);
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
@@ -101,7 +98,6 @@ namespace GilesTrinity.ItemRules.Core
                     return;
                 }
 
-                
                 ParseOrExpr(node);
             tok = scanner.LookAhead(TokenType.SEPARATOR);
             }
@@ -116,16 +112,11 @@ namespace GilesTrinity.ItemRules.Core
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.OrExpr), "OrExpr");
             parent.Nodes.Add(node);
 
-
-            
             ParseAndExpr(node);
 
-            
             tok = scanner.LookAhead(TokenType.OR);
             while (tok.Type == TokenType.OR)
             {
-
-                
                 tok = scanner.Scan(TokenType.OR);
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
@@ -135,7 +126,6 @@ namespace GilesTrinity.ItemRules.Core
                     return;
                 }
 
-                
                 ParseAndExpr(node);
             tok = scanner.LookAhead(TokenType.OR);
             }
@@ -150,16 +140,11 @@ namespace GilesTrinity.ItemRules.Core
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.AndExpr), "AndExpr");
             parent.Nodes.Add(node);
 
-
-            
             ParseCompExpr(node);
 
-            
             tok = scanner.LookAhead(TokenType.AND);
             while (tok.Type == TokenType.AND)
             {
-
-                
                 tok = scanner.Scan(TokenType.AND);
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
@@ -168,7 +153,6 @@ namespace GilesTrinity.ItemRules.Core
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.AND.ToString(), 0x1001, 0, tok.StartPos, tok.StartPos, tok.Length));
                     return;
                 }
-
                 
                 ParseCompExpr(node);
             tok = scanner.LookAhead(TokenType.AND);
@@ -184,11 +168,8 @@ namespace GilesTrinity.ItemRules.Core
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CompExpr), "CompExpr");
             parent.Nodes.Add(node);
 
-
-            
             ParseAddExpr(node);
 
-            
             tok = scanner.LookAhead(TokenType.EQUAL, TokenType.NOTEQUAL, TokenType.SMALLEQ, TokenType.GREATEQ, TokenType.SMALLTH, TokenType.GREATTH);
             if (tok.Type == TokenType.EQUAL
                 || tok.Type == TokenType.NOTEQUAL
@@ -266,8 +247,7 @@ namespace GilesTrinity.ItemRules.Core
                         tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", 0x0002, 0, tok.StartPos, tok.StartPos, tok.Length));
                         break;
                 }
-
-                
+               
                 ParseAddExpr(node);
             }
 
@@ -281,17 +261,13 @@ namespace GilesTrinity.ItemRules.Core
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.AddExpr), "AddExpr");
             parent.Nodes.Add(node);
 
-
-            
             ParseMultExpr(node);
 
-            
             tok = scanner.LookAhead(TokenType.PLUS, TokenType.MINUS);
             while (tok.Type == TokenType.PLUS
                 || tok.Type == TokenType.MINUS)
             {
 
-                
                 tok = scanner.LookAhead(TokenType.PLUS, TokenType.MINUS);
                 switch (tok.Type)
                 {

@@ -59,7 +59,7 @@ namespace GilesTrinity
         private static bool bAnyNonWWIgnoreMobsInRange = false;
 
         /// <summary>
-        /// A null location, may shave off the tiniest fraction of CPU time, but probably not. Still, I like using this variable! :D
+        /// A null location, may shave off the tiniest fraction of CPU time, but probably not. Still, Giles liked using this variable apparently.
         /// </summary>
         private static readonly Vector3 vNullLocation = Vector3.Zero;
 
@@ -177,12 +177,12 @@ namespace GilesTrinity
         /// <summary>
         /// A list of all monsters and their positions, so we don't try to walk through them during avoidance
         /// </summary>
-        private static HashSet<GilesObstacle> hashMonsterObstacleCache = new HashSet<GilesObstacle>();
+        internal static HashSet<GilesObstacle> hashMonsterObstacleCache = new HashSet<GilesObstacle>();
 
         /// <summary>
         /// A list of all current obstacles, to help avoid running through them when picking targets
         /// </summary>
-        private static HashSet<GilesObstacle> hashAvoidanceObstacleCache = new HashSet<GilesObstacle>();
+        internal static HashSet<GilesObstacle> hashAvoidanceObstacleCache = new HashSet<GilesObstacle>();
 
         /// <summary>
         /// Blacklist avoidance spots we failed to reach in time, for a period of time
@@ -261,35 +261,35 @@ namespace GilesTrinity
         private static double PlayerEmergencyHealthGlobeLimit = 0.6;
 
         /// <summary>
-        /// Distance to kite, set on BotStart from Settings
+        /// Distance to kite, read settings (class independant)
         /// </summary>
-        private static int PlayerKiteDistance = 0;
+        internal static int PlayerKiteDistance = 0;
 
         /*
          *  Blacklists
          */
-        private static bool NeedToClearBlacklist3 = false;
-        private static DateTime dateSinceBlacklist3Clear = DateTime.Today;
-        private static DateTime dateSinceBlacklist15Clear = DateTime.Today;
-        private static DateTime dateSinceBlacklist60Clear = DateTime.Today;
-        private static DateTime dateSinceBlacklist90Clear = DateTime.Today;
+        internal static bool NeedToClearBlacklist3 = false;
+        internal static DateTime dateSinceBlacklist3Clear = DateTime.Today;
+        internal static DateTime dateSinceBlacklist15Clear = DateTime.Today;
+        internal static DateTime dateSinceBlacklist60Clear = DateTime.Today;
+        internal static DateTime dateSinceBlacklist90Clear = DateTime.Today;
 
         /// <summary>
         /// Use RActorGUID to blacklist an object/monster for 3 seconds
         /// </summary>
-        private static HashSet<int> hashRGUIDBlacklist3 = new HashSet<int>();
+        internal static HashSet<int> hashRGUIDBlacklist3 = new HashSet<int>();
         /// <summary>
         /// Use RActorGUID to blacklist an object/monster for 15 seconds
         /// </summary>
-        private static HashSet<int> hashRGUIDBlacklist15 = new HashSet<int>();
+        internal static HashSet<int> hashRGUIDBlacklist15 = new HashSet<int>();
         /// <summary>
         /// Use RActorGUID to blacklist an object/monster for 60 seconds
         /// </summary>
-        private static HashSet<int> hashRGUIDBlacklist60 = new HashSet<int>();
+        internal static HashSet<int> hashRGUIDBlacklist60 = new HashSet<int>();
         /// <summary>
         /// Use RActorGUID to blacklist an object/monster for 90 seconds
         /// </summary>
-        private static HashSet<int> hashRGUIDBlacklist90 = new HashSet<int>();
+        internal static HashSet<int> hashRGUIDBlacklist90 = new HashSet<int>();
 
         // This is a blacklist that is cleared within 3 seconds of last attacking a destructible
         private static HashSet<int> hashRGUIDDestructible3SecBlacklist = new HashSet<int>();
@@ -331,13 +331,13 @@ namespace GilesTrinity
         /// <summary>
         /// This force-prevents avoidance for XX loops incase we get stuck trying to avoid stuff
         /// </summary>
-        private static DateTime timeCancelledEmergencyMove = DateTime.Today;
+        private static DateTime timeCancelledEmergencyMove = DateTime.Now;
         private static int cancelledEmergencyMoveForMilliseconds = 0;
 
         /// <summary>
         /// Prevent spam-kiting too much - allow fighting between each kite movement
         /// </summary>
-        private static DateTime timeCancelledKiteMove = DateTime.Today;
+        private static DateTime timeCancelledKiteMove = DateTime.Now;
         private static int cancelledKiteMoveForMilliseconds = 0;
 
         // For if we have emergency teleport abilities available right now or not
@@ -497,6 +497,9 @@ namespace GilesTrinity
         private static Vector3 c_Position = Vector3.Zero;
         private static GObjectType c_ObjectType = GObjectType.Unknown;
         private static double c_Weight = 0d;
+        /// <summary>
+        /// Percent of total health remaining on unit
+        /// </summary>
         private static double c_HitPoints = 0d;
         private static float c_CentreDistance = 0f;
         private static float c_RadiusDistance = 0f;
@@ -602,5 +605,20 @@ namespace GilesTrinity
 
         // Darkfriend's Looting Rule
         public static Interpreter StashRule = new Interpreter();
+		
+        // Tesslerc - used for using combination strike
+            // ForesightFirstHit is used to track the 30 second buff from deadly reach.
+        private static DateTime ForeSightFirstHit = new DateTime(1996, 6, 3, 22, 15, 0);
+            // Foresight2 is used to track combination strike buff.
+        private static DateTime ForeSight2 = DateTime.Now;
+            // Otherthandeadlyreach is used for other spirit generators to track for combination strike buff.
+        private static DateTime OtherThanDeadlyReach = DateTime.Now;
+            // Set by sweeping winds or by blinding flash if the time is right for a swap.
+        private static bool WantToSwap = false;
+
+        // Xp Counter
+        private static int iTotalXp = 0;
+        private static int iLastXp = 0;
+        private static int iNextLvXp = 0;			
     }
 }

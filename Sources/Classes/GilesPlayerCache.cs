@@ -25,9 +25,13 @@ namespace GilesTrinity
         public ActorClass ActorClass { get; set; }
         public string BattleTag { get; set; }
         public int SceneId { get; set; }
+        public int LevelAreaId { get; set; }
+        public double PlayerDamagePerSecond { get; set; }
 
         public GilesPlayerCache()
         {
+
+
             LastUpdated = DateTime.MinValue;
             IsIncapacitated = false;
             IsRooted = false;
@@ -44,6 +48,7 @@ namespace GilesTrinity
             ActorClass = Zeta.Internals.Actors.ActorClass.Invalid;
             BattleTag = String.Empty;
             SceneId = -1;
+            LevelAreaId = -1;
         }
 
         public GilesPlayerCache(
@@ -66,6 +71,7 @@ namespace GilesTrinity
             ActorClass = actorClass;
             BattleTag = battleTag;
             SceneId = -1;
+            LevelAreaId = -1;
         }
     }
 }

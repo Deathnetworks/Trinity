@@ -7,7 +7,7 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        public static readonly HashSet<int> BossLevelAreaIDs = new HashSet<int> { 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235 };
+        public static readonly HashSet<int> BossLevelAreaIDs = new HashSet<int> { 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, };
 
         /// <summary>
         /// This list is used when an actor has an attribute BuffVisualEffect=1, e.g. fire floors in The Butcher arena
@@ -233,13 +233,13 @@ namespace GilesTrinity
         /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
         /// </summary>
         internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
-            174900, 191459, 104632
+            174900, 191459, 104632, 196211,
         };
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 10}, {191459, 13}, {104632, 20},
+            {174900, 10}, {191459, 13}, {104632, 20}, {196211, 25},
          };
         /// <summary>
         /// Destructible things that are very large and need breaking at a bigger distance - eg logstacks, large crates, carts, etc.
@@ -264,12 +264,13 @@ namespace GilesTrinity
 			112182,
          };
         /// <summary>
-        /// Objects that should never be ignored due to no Line of Sight (LoS)
+        /// Objects that should never be ignored due to no Line of Sight (LoS) or ZDiff
         /// </summary>
         internal static HashSet<int> LineOfSightWhitelist = new HashSet<int>
         {
             116807, // Butcher Health Well
             180575, // Diablo arena Health Well
+            129031, // A3 Skycrown Catapults
         };
         /// <summary>
         /// Chests/average-level containers that deserve a bit of extra radius (ie - they are more worthwhile to loot than "random" misc/junk containers)
@@ -288,7 +289,7 @@ namespace GilesTrinity
             163449, 78030, 2909, 58283, 58299, 58309, 58321, 87809, 88005, 90150, 91600, 97023, 97350, 97381, 72689, 121327, 54515, 3340, 122076, 123640,
             60665, 60844, 78554, 86400, 86428, 81699, 86266, 86400, 110769, 192466, 211456, 6190, 80002, 104596, 58836, 104827, 74909, 6155, 6156, 6158, 6159, 75132,
             181504, 91688, 3016, 3007, 3011, 3014, 130858, 131573, 214396, 182730, 226087, 141639, 206569, 15119, 54413, 54926, 2979, 5776, 3949,
-            108490, 52833, 200371,
+            108490, 52833, 200371, 153752 ,
             //a3dun_crater_st_Demo_ChainPylon_Fire_Azmodan
             198977,
             //a3dun_crater_st_Demon_ChainPylon_Fire_MistressOfPain
@@ -378,11 +379,11 @@ namespace GilesTrinity
                 {SNOPower.Wizard_Meteor, 1000},
                 {SNOPower.Wizard_Blizzard, 6000},
                 // Effect lasts for 6 seconds, actual cooldown is 0...
-                {SNOPower.Wizard_IceArmor, 115000},
-                {SNOPower.Wizard_StormArmor, 115000},
+                {SNOPower.Wizard_IceArmor, 60000},
+                {SNOPower.Wizard_StormArmor, 60000},
+                {SNOPower.Wizard_EnergyArmor, 60000},
                 {SNOPower.Wizard_MagicWeapon, 60000},
                 {SNOPower.Wizard_Familiar, 60000},
-                {SNOPower.Wizard_EnergyArmor, 115000},
                 {SNOPower.Wizard_ExplosiveBlast, 6000},
                 {SNOPower.Wizard_MirrorImage, 5000},
                 {SNOPower.Wizard_Archon, 100000},

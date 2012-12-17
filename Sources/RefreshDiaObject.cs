@@ -106,6 +106,8 @@ namespace GilesTrinity
             if (!AddToCache) { c_IgnoreReason = "DoubleCheckBlacklists"; return AddToCache; }
             // If it's a unit, add it to the monster cache
             AddUnitToMonsterObstacleCache(AddToCache);
+            //AddGizmoToNavigationObstacleCache();
+
             if (AddToCache)
             {
                 c_IgnoreReason = "None";
@@ -148,6 +150,29 @@ namespace GilesTrinity
             }
             return true;
         }
+
+        private static void AddGizmoToNavigationObstacleCache()
+        {
+            switch (c_ObjectType)
+            {
+                case GObjectType.Barricade:
+                case GObjectType.Container:
+                case GObjectType.Destructible:
+                case GObjectType.Door:
+                case GObjectType.HealthWell:
+                case GObjectType.Interactable:
+                case GObjectType.Shrine:
+                    hashNavigationObstacleCache.Add(new GilesObstacle()
+                    {
+                        ActorSNO = c_ActorSNO,
+                        Radius = c_Radius,
+                        Location = c_Position,
+                        Name = c_Name,
+                        Weight = c_Weight
+                    });
+                    break;
+            }
+        }
         /// <summary>
         /// Adds a unit to cache hashMonsterObstacleCache
         /// </summary>
@@ -161,12 +186,12 @@ namespace GilesTrinity
                 {
                     // Force to elite and add to the collision list
                     c_unit_IsElite = true;
-                    hashMonsterObstacleCache.Add(new GilesObstacle(c_Position, (c_Radius * 0.15f), c_ActorSNO));
+                    hashMonsterObstacleCache.Add(new GilesObstacle(c_Position, c_Radius, c_ActorSNO));
                 }
                 else
                 {
                     // Add to the collision-list
-                    hashMonsterObstacleCache.Add(new GilesObstacle(c_Position, (c_Radius * 0.10f), c_ActorSNO));
+                    hashMonsterObstacleCache.Add(new GilesObstacle(c_Position, c_Radius, c_ActorSNO));
                 }
             }
         }
@@ -619,7 +644,7 @@ namespace GilesTrinity
             // Now try to get the current health - using temporary and intelligent caching
             // Health calculations
             int iLastCheckedHealth;
-            double dThisCurrentHealth = 0d;
+            double HitpointsCur = 0d;
             bool bHasCachedHealth;
             // See if we already have a cached value for health or not for this monster
             if (dictGilesLastHealthChecked.TryGetValue(c_RActorGuid, out iLastCheckedHealth))
@@ -641,42 +666,47 @@ namespace GilesTrinity
             {
                 try
                 {
-                    dThisCurrentHealth = c_CommonData.GetAttribute<float>(ActorAttributeType.HitpointsCur);
+                    HitpointsCur = c_CommonData.GetAttribute<float>(ActorAttributeType.HitpointsCur);
                 }
                 catch
                 {
                     // This happens so frequently in DB/D3 that this fails, let's not even bother logging it anymore
                     //Logging.WriteDiagnostic("[Trinity] Safely handled exception getting current health for unit " + tmp_sThisInternalName + " [" + tmp_iThisActorSNO.ToString() + "]");
                     // Add this monster to our very short-term ignore list
-                    if (!c_unit_IsBoss)
-                    {
-                        hashRGUIDBlacklist3.Add(c_RActorGuid);
-                        dateSinceBlacklist3Clear = DateTime.Now;
-                        NeedToClearBlacklist3 = true;
-                    }
+                    //if (!c_unit_IsBoss)
+                    //{
+                    //    hashRGUIDBlacklist3.Add(c_RActorGuid);
+                    //    dateSinceBlacklist3Clear = DateTime.Now;
+                    //    NeedToClearBlacklist3 = true;
+                    //}
                     AddToCache = false;
                 }
-                RefreshCachedHealth(iLastCheckedHealth, dThisCurrentHealth, bHasCachedHealth);
+                RefreshCachedHealth(iLastCheckedHealth, HitpointsCur, bHasCachedHealth);
             }
             else
             {
-                dThisCurrentHealth = dictGilesLastHealthCache[c_RActorGuid];
+                HitpointsCur = dictGilesLastHealthCache[c_RActorGuid];
                 dictGilesLastHealthChecked[c_RActorGuid] = iLastCheckedHealth;
             }
             // And finally put the two together for a current health percentage
-            c_HitPoints = dThisCurrentHealth / dThisMaxHealth;
+            c_HitPoints = HitpointsCur / dThisMaxHealth;
+
             // Unit is already dead
             if (c_HitPoints <= 0d && !c_unit_IsBoss)
             {
                 // Add this monster to our very short-term ignore list
-                hashRGUIDBlacklist3.Add(c_RActorGuid);
-                dateSinceBlacklist3Clear = DateTime.Now;
-                NeedToClearBlacklist3 = true;
+                //hashRGUIDBlacklist3.Add(c_RActorGuid);
+                //dateSinceBlacklist3Clear = DateTime.Now;
+                //NeedToClearBlacklist3 = true;
+
                 AddToCache = false;
                 c_IgnoreSubStep = "0HitPoints";
+
                 // return here immediately
                 return AddToCache;
             }
+
+
             // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
             c_unit_IsTreasureGoblin = false;
             // Flag this as a treasure goblin *OR* ignore this object altogether if treasure goblins are set to ignore
@@ -740,7 +770,7 @@ namespace GilesTrinity
                 //    c_IgnoreSubStep += "IsHidden+";
                 // }
             }
-            catch { } 
+            catch { }
             try
             {
                 if (thisUnit.IsInvulnerable)
@@ -749,7 +779,7 @@ namespace GilesTrinity
                     c_IgnoreSubStep += "IsInvulnerable+";
                 }
             }
-            catch { } 
+            catch { }
             try
             {
                 if (thisUnit.IsBurrowed)
@@ -758,7 +788,7 @@ namespace GilesTrinity
                     c_IgnoreSubStep += "IsBurrowed+";
                 }
             }
-            catch { } 
+            catch { }
             try
             {
                 if (thisUnit.IsHelper || thisUnit.IsNPC || thisUnit.IsTownVendor)
@@ -1010,11 +1040,11 @@ namespace GilesTrinity
             }
             if (c_ItemQuality >= ItemQuality.Rare4)
             {
-                fExtraRange = iCurrentMaxLootRadius; 
+                fExtraRange = iCurrentMaxLootRadius;
             }
             if (c_ItemQuality >= ItemQuality.Legendary)
             {
-                fExtraRange = 10 * iCurrentMaxLootRadius; 
+                fExtraRange = 10 * iCurrentMaxLootRadius;
             }
 
             if (c_CentreDistance > (iCurrentMaxLootRadius + fExtraRange))
@@ -1032,7 +1062,7 @@ namespace GilesTrinity
                 }
                 else
                 {
-                    AddToCache = GilesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem,c_item_tFollowerType, c_GameDynamicID);
+                    AddToCache = GilesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType, c_GameDynamicID);
                 }
                 dictGilesPickupItem.Add(c_RActorGuid, AddToCache);
             }
@@ -1076,15 +1106,14 @@ namespace GilesTrinity
             }
 
             // rrrix: keep it simple...
-            if (c_GoldStackSize >= Settings.Loot.Pickup.MinimumGoldStack)
+            if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)
             {
-                AddToCache = true;
+                AddToCache = false;
             }
 
             // Blacklist gold piles already in pickup radius range
             if (c_CentreDistance <= ZetaDia.Me.GoldPickUpRadius)
             {
-                hashRGUIDBlacklist3.Add(c_RActorGuid);
                 hashRGUIDBlacklist60.Add(c_RActorGuid);
                 AddToCache = false;
                 c_IgnoreSubStep = "GoldOutOfRange";
@@ -1192,7 +1221,7 @@ namespace GilesTrinity
                         catch { }
                         if (GizmoUsed)
                         {
-                            hashRGUIDBlacklist90.Add(c_RActorGuid);
+                            hashRGUIDBlacklist3.Add(c_RActorGuid);
                             AddToCache = false;
                             c_IgnoreSubStep = "Door is Open or Opening";
                         }
@@ -1207,7 +1236,7 @@ namespace GilesTrinity
 
                                     if (door != null && door.IsGizmoDisabledByScript)
                                     {
-                                        hashRGUIDBlacklist90.Add(c_RActorGuid);
+                                        hashRGUIDBlacklist3.Add(c_RActorGuid);
                                         AddToCache = false;
                                         c_IgnoreSubStep = "DoorDisabledbyScript";
                                     }
@@ -1267,6 +1296,68 @@ namespace GilesTrinity
                             AddToCache = false;
                             //return bWantThis;
                         }
+
+                        // Determine what shrine type it is, and blacklist if the user has disabled it
+                        switch (c_ActorSNO)
+                        {
+                            case 176077:  //Frenzy Shrine
+                                if (!Settings.WorldObject.UseFrenzyShrine)
+                                {
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                if (playerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.UseTRMovement)
+                                {
+                                    // Frenzy shrines are a huge time sink for monks using Tempest Rush to move, we should ignore them.
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                break;
+
+                            case 176076:  //Fortune Shrine
+                                if (!Settings.WorldObject.UseFortuneShrine)
+                                {
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                break;
+
+                            case 176074:  //Protection Shrine
+                                if (!Settings.WorldObject.UseProtectionShrine)
+                                {
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                break;
+
+                            case 260330:  //Empowered Shrine
+                                if (!Settings.WorldObject.UseEmpoweredShrine)
+                                {
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                break;
+
+                            case 176075:  //Enlightened Shrine
+                                if (!Settings.WorldObject.UseEnlightenedShrine)
+                                {
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                break;
+
+                            case 260331:  //Fleeting Shrine
+                                if (!Settings.WorldObject.UseFleetingShrine)
+                                {
+                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    AddToCache = false;
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }  //end switch
+
                         // Already used, blacklist it and don't look at it again
                         try
                         {
@@ -1610,8 +1701,7 @@ namespace GilesTrinity
         {
             try
             {
-
-                // Everything except items (including gold)
+                // Everything except items
                 if (c_ObjectType != GObjectType.Item)
                 {
 
@@ -1624,13 +1714,25 @@ namespace GilesTrinity
                             AddToCache = false;
                             c_IgnoreSubStep = "NotNavigable";
                         }
+                        if (PlayerKiteDistance <= 5 && c_CentreDistance >= 5 && !ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "UnableToRayCast";
+                        }
+                        else if (!ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowProjectile))
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "UnableToRayCast";
+                        }
+                        // Ignore units not in LoS except bosses, rares, champs
+                        if (!c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
+                        {
+
+                            AddToCache = false;
+                            c_IgnoreSubStep = "UnitNotInLoS";
+                        }
                     }
-                    // Ignore units not in LoS except bosses, rares, champs
-                    if (c_ObjectType == GObjectType.Unit && !c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
-                    {
-                        AddToCache = false;
-                        c_IgnoreSubStep = "UnitNotInLoS";
-                    }
+
                     // always set true for bosses nearby
                     if (c_unit_IsBoss && c_RadiusDistance < 100f)
                     {
@@ -1658,14 +1760,6 @@ namespace GilesTrinity
                     c_IgnoreSubStep = "";
                 }
 
-
-                //if (!thisobj.InLineOfSight && thisobj.ZDiff < 14f && !tmp_unit_bThisBoss)
-                //{
-                //    bWantThis = false;
-                //    tmp_cacheIgnoreSubStep = "IgnoreLoS";
-                //    
-                //return bWantThis;
-                //}
             }
             catch
             {
@@ -1803,6 +1897,19 @@ namespace GilesTrinity
         }
         private static bool RefreshStepNewObjectTypeZDiff(bool AddToCache)
         {
+            // always take current target regardless if ZDiff changed
+            if (c_RActorGuid == CurrentTargetRactorGUID)
+            {
+                AddToCache = true;
+                return AddToCache;
+            }
+
+            // Special whitelist for always getting stuff regardless of ZDiff or LoS
+            if (LineOfSightWhitelist.Contains(c_ActorSNO))
+            {
+                AddToCache = true;
+                return AddToCache;
+            }
             // Ignore stuff which has a Z-height-difference too great, it's probably on a different level etc. - though not avoidance!
             if (c_ObjectType != GObjectType.Avoidance)
             {
@@ -1815,11 +1922,10 @@ namespace GilesTrinity
                     case GObjectType.Barricade:
                         // Ignore monsters (units) who's Z-height is 14 foot or more than our own z-height
                         // rrrix: except bosses like Belial :)
-                        if (c_ZDiff >= 14f && !c_unit_IsBoss)
-                        {
-                            AddToCache = false;
-                            //return bWantThis;
-                        }
+                        //if (c_ZDiff >= 14f && !c_unit_IsBoss)
+                        //{
+                        //    AddToCache = false;
+                        //}
                         break;
                     case GObjectType.Item:
                     case GObjectType.HealthWell:
@@ -1827,7 +1933,6 @@ namespace GilesTrinity
                         if (c_ZDiff >= 26f)
                         {
                             AddToCache = false;
-                            //return bWantThis;
                         }
                         break;
                     case GObjectType.Gold:
@@ -1836,7 +1941,6 @@ namespace GilesTrinity
                         if (c_ZDiff >= 11f)
                         {
                             AddToCache = false;
-                            //return bWantThis;
                         }
                         break;
                     case GObjectType.Destructible:
@@ -1846,7 +1950,6 @@ namespace GilesTrinity
                         if (c_ZDiff >= 7f)
                         {
                             AddToCache = false;
-                            //return bWantThis;
                         }
                         break;
                     case GObjectType.Interactable:
@@ -1854,7 +1957,6 @@ namespace GilesTrinity
                         if (c_ZDiff >= 9f)
                         {
                             AddToCache = false;
-                            //return bWantThis;
                         }
                         break;
                     case GObjectType.Unknown:
@@ -2029,5 +2131,19 @@ namespace GilesTrinity
                 return 1;
             }
         }
+        private static void RefreshCachedHealth(int iLastCheckedHealth, double dThisCurrentHealth, bool bHasCachedHealth)
+        {
+            if (!bHasCachedHealth)
+            {
+                dictGilesLastHealthCache.Add(c_RActorGuid, dThisCurrentHealth);
+                dictGilesLastHealthChecked.Add(c_RActorGuid, iLastCheckedHealth);
+            }
+            else
+            {
+                dictGilesLastHealthCache[c_RActorGuid] = dThisCurrentHealth;
+                dictGilesLastHealthChecked[c_RActorGuid] = iLastCheckedHealth;
+            }
+        }
+
     }
 }

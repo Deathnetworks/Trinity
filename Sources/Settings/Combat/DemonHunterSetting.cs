@@ -11,6 +11,8 @@ namespace GilesTrinity.Settings.Combat
         private float _HealthGlobeLevel;
         private int _KiteLimit;
         private int _VaultMovementDelay;
+        private bool _SpamSmokeScreen;
+        private bool _SpamPreparation;
         private float _AvoidArcaneHealth;
         private float _AvoidDesecratorHealth;
         private float _AvoidMoltenCoreHealth;
@@ -107,6 +109,42 @@ namespace GilesTrinity.Settings.Combat
                 {
                     _KiteLimit = value;
                     OnPropertyChanged("KiteLimit");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SpamSmokeScreen
+        {
+            get
+            {
+                return _SpamSmokeScreen;
+            }
+            set
+            {
+                if (_SpamSmokeScreen != value)
+                {
+                    _SpamSmokeScreen = value;
+                    OnPropertyChanged("SpamSmokeScreen");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SpamPreparation
+        {
+            get
+            {
+                return _SpamPreparation;
+            }
+            set
+            {
+                if (_SpamPreparation != value)
+                {
+                    _SpamPreparation = value;
+                    OnPropertyChanged("SpamPreparation");
                 }
             }
         }

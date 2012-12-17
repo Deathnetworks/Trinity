@@ -174,16 +174,16 @@ namespace GilesTrinity
                                     // Elites on low health get extra priority - up to 1500
                                     if ((cacheObject.IsEliteRareUnique || cacheObject.IsTreasureGoblin) && cacheObject.HitPoints < 0.20)
                                         cacheObject.Weight += (1500 * (1 - (cacheObject.HitPoints / 0.45)));
-									
-									// Magi - Elites/Bosses that are killed should have weight erased so we don't keep attacking
+
+                                    // Magi - Elites/Bosses that are killed should have weight erased so we don't keep attacking
                                     if ((cacheObject.IsEliteRareUnique || cacheObject.IsBoss) && cacheObject.HitPoints <= 0)
-									{
+                                    {
                                         cacheObject.Weight = 0;
-										
-										// temporary blacklist for individual boss/uber so we don't repeadedly attack it (looks suspicious)
-										hashRGUIDBlacklist15.Add(cacheObject.RActorGuid);
-									}
-                                    
+
+                                        // temporary blacklist for individual boss/uber so we don't repeadedly attack it (looks suspicious)
+                                        hashRGUIDBlacklist15.Add(cacheObject.RActorGuid);
+                                    }
+
                                     // Goblins on low health get extra priority - up to 2500
                                     if (Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize && cacheObject.IsTreasureGoblin && cacheObject.HitPoints <= 0.98)
                                         cacheObject.Weight += (3000 * (1 - (cacheObject.HitPoints / 0.85)));
@@ -320,7 +320,7 @@ namespace GilesTrinity
                                 cacheObject.Weight = 18000 - (Math.Floor(cacheObject.CentreDistance) * 200);
 
                             // If there's a monster in the path-line to the item, reduce the weight to 1
-                            if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius*1.2f, playerStatus.CurrentPosition, cacheObject.Position)))
+                            if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius * 1.2f, playerStatus.CurrentPosition, cacheObject.Position)))
                                 cacheObject.Weight = 1;
 
                             // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
@@ -380,6 +380,16 @@ namespace GilesTrinity
                                 // Calculate a spot reaching a little bit further out from the globe, to help globe-movements
                                 if (cacheObject.Weight > 0)
                                     cacheObject.Position = MathEx.CalculatePointFrom(cacheObject.Position, playerStatus.CurrentPosition, cacheObject.CentreDistance + 3f);
+
+                                // do not collect health globes if we are kiting and health globe is too close to monster
+                                if (PlayerKiteDistance > 0)
+                                {
+                                    if (hashMonsterObstacleCache.Any(m => m.Location.Distance(cacheObject.Position) < PlayerKiteDistance))
+                                        cacheObject.Weight = 0;
+                                    if (hashAvoidanceObstacleCache.Any(m => m.Location.Distance(cacheObject.Position) < PlayerKiteDistance))
+                                        cacheObject.Weight = 0;
+                                }
+
                             }
                             break;
                         }
@@ -556,8 +566,8 @@ namespace GilesTrinity
 
                 //    bStayPutDuringAvoidance = true;
                 //}
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5}",
-                        cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5} PrioritizeCloseRangeUnits: {6}",
+                        cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance, PrioritizeCloseRangeUnits);
 
                 // Prevent current target dynamic ranged weighting flip-flop 
                 if (CurrentTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)
@@ -594,7 +604,7 @@ namespace GilesTrinity
                             {
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Avoidance: Id={0} Weight={1} Loc={2} Radius={3} Name={4}", o.ActorSNO, o.Weight, o.Location, o.Radius, o.Name);
                             }
-                            
+
                             vKitePointAvoid = CurrentTarget.Position;
                             NeedToKite = true;
                         }
@@ -605,11 +615,11 @@ namespace GilesTrinity
             // Loop through all the objects and give them a weight
             if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.RActorGuid != CurrentTargetRactorGUID)
             {
-                DbHelper.Log(TrinityLogLevel.Verbose, 
-                                LogCategory.Targetting, 
+                DbHelper.Log(TrinityLogLevel.Verbose,
+                                LogCategory.Targetting,
                                 "Target changed to {2} {0} ({1})",
-                                CurrentTarget.InternalName, 
-                                CurrentTarget.ActorSNO, 
+                                CurrentTarget.InternalName,
+                                CurrentTarget.ActorSNO,
                                 CurrentTarget.Type);
             }
         }

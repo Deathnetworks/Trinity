@@ -33,6 +33,8 @@ namespace GilesTrinity
 
             try
             {
+                double attack = ZetaDia.Me.Attack;
+
                 playerStatus.LastUpdated = DateTime.Now;
                 playerStatus.IsInTown = me.IsInTown;
                 playerStatus.IsIncapacitated = (me.IsFeared || me.IsStunned || me.IsFrozen || me.IsBlind);
@@ -52,6 +54,7 @@ namespace GilesTrinity
                 playerStatus.ActorClass = me.ActorClass;
                 playerStatus.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
                 playerStatus.SceneId = ZetaDia.Me.CurrentScene.SceneInfo.SNOId;
+                playerStatus.LevelAreaId = ZetaDia.CurrentLevelAreaId;
 
                 // World ID safety caching incase it's ever unavailable
                 if (ZetaDia.CurrentWorldDynamicId != -1)
@@ -106,6 +109,9 @@ namespace GilesTrinity
                 btnPauseBot.Content = "Unpause Bot";
                 bMainBotPaused = true;
             }
+
+            GilesPlayerMover.ResetCheckGold();
+
         }
 
         private static bool BotIsPaused()
@@ -116,6 +122,12 @@ namespace GilesTrinity
         {
             if (DateTime.Now.Subtract(lastDied).TotalSeconds > 10)
             {
+                if (playerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.SweepingWindWeaponSwap)
+                {
+                    // Reset status incase we died during swap.
+                    weaponSwap.CheckAfterDeath();
+                }
+
                 lastDied = DateTime.Now;
                 iTotalDeaths++;
                 iDeathsThisRun++;

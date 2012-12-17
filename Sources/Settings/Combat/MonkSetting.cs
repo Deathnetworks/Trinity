@@ -35,8 +35,12 @@ namespace GilesTrinity.Settings.Combat
         private float _AvoidWallOfFireHealth;
         private float _AvoidZoltBubbleHealth;
         private float _AvoidZoltTwisterHealth;
+        private int _TR_MinSpirit;
+        private int _TR_MinDist;
         private bool _HasInnaSet;
         private bool _SweepingWindWeaponSwap;
+        private bool _DisableMantraSpam;
+        private bool _UseTRMovement;
         #endregion Fields
 
         #region Events
@@ -560,6 +564,42 @@ namespace GilesTrinity.Settings.Combat
                 }
             }
         }
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(60)]
+        public float TR_MinSpirit
+        {
+            get
+            {
+                return _TR_MinSpirit;
+            }
+            set
+            {
+                if (_TR_MinSpirit != value)
+                {
+                    _TR_MinSpirit = (int)value;
+                    OnPropertyChanged("TR_MinSpirit");
+                }
+            }
+        }
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(20)]
+        public float TR_MinDist
+        {
+            get
+            {
+                return _TR_MinDist;
+            }
+            set
+            {
+                if (_TR_MinDist != value)
+                {
+                    _TR_MinDist = (int)value;
+                    OnPropertyChanged("TR_MinDist");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
@@ -575,6 +615,42 @@ namespace GilesTrinity.Settings.Combat
                 {
                     _HasInnaSet = value;
                     OnPropertyChanged("HasInnaSet");
+                }
+            }
+        }
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool DisableMantraSpam
+        {
+            get
+            {
+                return _DisableMantraSpam;
+            }
+            set
+            {
+                if (_DisableMantraSpam != value)
+                {
+                    _DisableMantraSpam = value;
+                    OnPropertyChanged("DisableMantraSpam");
+                }
+            }
+        }
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool UseTRMovement
+        {
+            get
+            {
+                return _UseTRMovement;
+            }
+            set
+            {
+                if (_UseTRMovement != value)
+                {
+                    _UseTRMovement = value;
+                    OnPropertyChanged("UseTRMovement");
                 }
             }
         }
@@ -595,7 +671,7 @@ namespace GilesTrinity.Settings.Combat
                     OnPropertyChanged("SweepingWindWeaponSwap");
                 }
             }
-        }
+        }    
         #endregion Properties
 
         #region Methods
@@ -620,6 +696,16 @@ namespace GilesTrinity.Settings.Combat
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+        /// <summary>
+        /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserializing()]
+        internal void OnDeserializingMethod(StreamingContext context)
+        {
+            this.TR_MinSpirit = 60;
+            this.TR_MinDist = 20;
         }
         #endregion Methods
     }

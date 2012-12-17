@@ -1,0 +1,227 @@
+// +--------------------------------------------------------------------------------------+
+// |  ______ _______ ______ _______ 
+// | |   __ \   _   |   __ \    ___|
+// | |      <       |      <    ___|
+// | |___|__|___|___|___|__|_______|                     
+// | +++++++++++++++++++++++++++++++
+// +--------------------------------------------------------------------------------------+
+
+
+// keep all "Rare" items
+// this is a saftey line ... as long it isn't removed it will keep all items
+// specifyed by the rule ... the action of commenting it out
+// will apply all following rules ... this set of rules is no where of complete
+//[QUALITY] == "Rare" # True -> [KEEP]
+
+// keep all "Weapon" for now
+//[QUALITY] == "Rare" && [BASETYPE] == "Weapon" # True -> [KEEP]
+
+// keep all "Armor" for now
+//[QUALITY] == "Rare" && [BASETYPE] == "Armor" # True -> [KEEP]
+
+// keep all jewelerys for now
+//[QUALITY] == "Rare" && [BASETYPE] == "Jewelry" # True -> [KEEP]
+
+// +---------------------------------------------------------------------------+ 
+// |  _ _ _ _____ _____ _____ _____ _____ 
+// | | | | |   __|  _  |  _  |     |   | |
+// | | | | |   __|     |   __|  |  | | | |
+// | |_____|_____|__|__|__|  |_____|_|___|
+// | +++++++++++++++++++++++++++++++++++++                                   
+// +---------------------------------------------------------------------------+
+
+// +---------------------------------------------------------------------------+ 
+// +---------- One-Handed
+// +---------------------------------------------------------------------------+
+
+[QUALITY] == "Rare" && [BASETYPE] == "Weapon" && [ONEHAND] == true # [DPS] < 900 && [SOCKETS] == 0  -> [TRASH]
+[QUALITY] == "Rare" && [BASETYPE] == "Weapon" && [ONEHAND] == true # [CRITDMG%] >= 70 && [SOCKETS] > 0 && [LOH] >= 700 && [LS%] > 0 -> [KEEP]
+[QUALITY] == "Rare" && [BASETYPE] == "Weapon" && [ONEHAND] == true # [DPS] > 1000 && ([CRITDMG%] >= 50 || [LOH] > 700) && [SOCKETS] > 0 -> [KEEP]
+//[QUALITY] == "Rare" && [BASETYPE] == "Weapon" && [ONEHAND] == true # [DPS] > 700 && [MAXSTATVIT] > 200 && ([CRITDMG%] > 50 || [LOH] > 300) && [SOCKETS] > 0 -> [SCORE]
+[QUALITY] == "Rare" && [BASETYPE] == "Weapon" && [ONEHAND] == true # [DPS] > 900 && [SOCKETS] > 0 && [CRITDMG%] > 50 && (([LOH] >= 700 && [LS%] > 0) || ([LOH] >= 900)) -> [KEEP]
+[QUALITY] == "Rare" && [BASETYPE] == "Weapon" && [ONEHAND] == true # [DPS] > 1100 && [SOCKETS] > 0  -> [KEEP]
+
+// +---------------------------------------------------------------------------+ 
+// +---------- Two-Handed
+// +---------------------------------------------------------------------------+ 
+
+[QUALITY] == "Rare" && [TYPE] == "Crossbow" && [TWOHAND] == true # [DPS] < 1250 || [SOCKETS] == 0 || [CRITDMG%] < 100 -> [TRASH]
+[QUALITY] == "Rare" && [BASETYPE] == "Weapon" && [TWOHAND] == true # [DPS] >= 1400 && [CRITDMG%] >= 100 && [SOCKETS] > 0 -> [KEEP]
+[QUALITY] == "Rare" && [BASETYPE] == "Weapon" && [TWOHAND] == true # [DPS] >= 1200 && [CRITDMG%] >= 100 && [SOCKETS] > 0 && ([LOH] >= 1000 || [LS%] > 4) -> [KEEP]
+[QUALITY] == "Rare" && ([TYPE] == "Axe" || [TYPE] == "Daibo" || [TYPE] == "Staff" || [TYPE] == "Mace" || [TYPE] == "MightyWeapon" || [TYPE] == "Polearm") && [TWOHAND] == true # True -> [TRASH]
+
+// +---------------------------------------------------------------------------+ 
+// |  _____ _____ _____ _____ _____ 
+// | |  _  | __  |     |     | __  |
+// | |     |    -| | | |  |  |    -|
+// | |__|__|__|__|_|_|_|_____|__|__|
+// | +++++++++++++++++++++++++++++++                               
+// +---------------------------------------------------------------------------+
+
+// +---------------------------------------------------------------------------+
+// +---------- Head
+// +---------------------------------------------------------------------------+
+[QUALITY] == "Rare" && [TYPE] == "Helm" # ([DEX] >= 150 || [STR] >= 150 || [INT] >= 160) && [SOCKETS] >= 1 && (([VIT] >= 80 || [LIFE%] >= 8) || ([VIT] > 0 && [LIFE%] > 0)) && [ALLRES] >= 50 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Helm" # ([DEX] >= 100 || [STR] >= 100 || [INT] >= 100) && [SOCKETS] >= 1 && [CRIT%] > 0 && ([VIT] >= 50 || [LIFE%] >= 6 || [ALLRES] >= 40) -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Helm" # [INT] >= 100 && [SOCKETS] >= 1 && [CRIT%] > 0 && ([VIT] >= 50 || [LIFE%] >= 6) && [ALLRES] >= 40 && [ARCONCRIT] >= 5 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "SpiritStone" # [DEX] >= 140 && [SOCKETS] >= 1 && ([VIT] >= 80 || [LIFE%] >= 8) && [TOTRES] > 50 && [SPIRITREG] > 2 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "WizardHat" # [INT] >= 180 && [SOCKETS] >= 1 && ([VIT] >= 60 || [LIFE%] >= 7) && [ALLRES] >= 60 -> [SCORE]
+[QUALITY] == "Rare" && [TYPE] == "WizardHat" # [INT] >= 150 && [SOCKETS] >= 1 && ([CRIT%] > 0 || [VIT] >= 60 || [LIFE%] >= 6 || [ARCONCRIT] >= 5) && [ALLRES] >= 40 -> [SCORE]
+[QUALITY] == "Rare" && [TYPE] == "VoodooMask" # [INT] >= 180 && [SOCKETS] >= 1 && ([VIT] >= 60 || [LIFE%] >= 7) && [ALLRES] >= 60 -> [SCORE]
+[QUALITY] == "Rare" && [TYPE] == "VoodooMask" # [INT] >= 150 && [SOCKETS] >= 1 && [CRIT%] > 0 -> [SCORE]
+
+// +---------------------------------------------------------------------------+
+// +--- Shoulders
+// +---------------------------------------------------------------------------+
+[QUALITY] == "Rare" && [TYPE] == "Shoulder" # ([DEX] >= 150 || [STR] >= 180 || [INT] >= 150) && (([VIT] >= 80 || [LIFE%] >= 8) || ([VIT] > 0 && [LIFE%] > 0)) && [ALLRES] >= 60 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Shoulder" # [DEX] <= 140 && [STR] <= 160 && [INT] <= 140 -> [TRASH]
+[QUALITY] == "Rare" && [TYPE] == "Shoulder" # ([DEX] >= 150 || [STR] >= 180 || [INT] >= 150) && ([VIT] >= 80 || [LIFE%] >= 8) -> [SCORE]
+
+// +---------------------------------------------------------------------------+
+// +--- Torso
+// +---------------------------------------------------------------------------+
+
+[QUALITY] == "Rare" && [TYPE] == "Chest" # [DEX] >= 100 && [SOCKETS] >= 2 && ([VIT] >= 50 || [LIFE%] >= 6) && [TOTRES] >= 70 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Chest" # [MAXSTAT] >= 120 && [SOCKETS] >= 2 && ([VIT] >= 50 || [LIFE%] >= 6) && [ALLRES] >= 50 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Chest" # [MAXSTAT] >= 100 && ([VIT] >= 70 || [LIFE%] >= 8) && [ALLRES] >= 50 && [SOCKETS] > 2 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Chest" # [MAXSTATVIT] >= 160 && [ALLRES] >= 40 && [SOCKETS] >= 2 -> [SCORE]
+
+// +---------------------------------------------------------------------------+
+// +--- Wrists
+// +---------------------------------------------------------------------------+
+[QUALITY] == "Rare" && [TYPE] == "Bracer" # [MAXSTAT] >= 130 && [CRIT%] >= 4 && [VIT] >= 80 && [ALLRES] >= 50 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Bracer" # [DEX] <= 120 && [STR] <= 120 && [INT] <= 120 -> [TRASH]
+[QUALITY] == "Rare" && [TYPE] == "Bracer" # [DEX] >= 140 && [CRIT%] >= 4 && [VIT] >= 70 && [TOTRES] >= 70 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Bracer" # [MAXSTATVIT] >= 180 && [CRIT%] >= 3 && [ALLRES] >= 50 -> [SCORE]
+
+
+// +---------------------------------------------------------------------------+
+// +--- Hands
+// +---------------------------------------------------------------------------+
+
+[QUALITY] == "Rare" && [TYPE] == "Gloves" # [DMGFACTOR] <= 21 -> [TRASH]
+[QUALITY] == "Rare" && [TYPE] == "Gloves" # [DMGFACTOR] >= 22 && [MAXSTATVIT] > 150 && [ALLRES] > 40 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Gloves" # [DMGFACTOR] > 25 && ([MAXSTAT] > 100 || [ALLRES] > 30) -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Gloves" # [DMGFACTOR] > 28 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Gloves" # [DMGFACTOR] > 22 && (([MAXSTATVIT] > 200 || [ALLRES] > 50) || ([MAXSTATVIT] > 100 && [ALLRES] > 30)) -> [SCORE]
+[QUALITY] == "Rare" && [TYPE] == "Gloves" # [DMGFACTOR] > 24 && ([MAXSTATVIT] > 0 || [ALLRES] > 0) -> [SCORE]
+
+// +---------------------------------------------------------------------------+
+// +--- Waist
+// +---------------------------------------------------------------------------+
+[QUALITY] == "Rare" && [TYPE] == "Belt" # ([DEX] >= 150 || [STR] >= 200 || [INT] >= 150) && (([VIT] >= 80 || [LIFE%] >= 8) || ([VIT] > 0 && [LIFE%] > 0)) && [ALLRES] >= 50 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Belt" # ([DEX] >= 120 || [STR] >= 160 || [INT] >= 120) && (([VIT] >= 70 || [LIFE%] >= 8) || ([VIT] > 0 && [LIFE%] > 0)) && [ALLRES] >= 40 -> [SCORE]
+[QUALITY] == "Rare" && [TYPE] == "MightyBelt" # [STR] >= 220 && [VIT] >= 80 && [LIFE%] >= 8 && [ALLRES] >= 60 -> [SCORE]
+
+// +---------------------------------------------------------------------------+
+// +--- Legs
+// +---------------------------------------------------------------------------+
+
+[QUALITY] == "Rare" && [TYPE] == "Legs" # [MAXSTAT] >= 150 && [SOCKETS] > 1 && [VIT] >= 100 && [ALLRES] >= 50 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Legs" # [DEX] >= 150 && [SOCKETS] > 1 && [VIT] >= 100 && [TOTRES] >= 70 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Legs" # [MAXSTATVIT] >= 200 && [ALLRES] >= 50 && [SOCKETS] >= 1 -> [SCORE]
+
+// +---------------------------------------------------------------------------+
+// +--- Feet
+// +---------------------------------------------------------------------------+
+
+[QUALITY] == "Rare" && [TYPE] == "Boots" # ([STR] <= 150 && [INT] <= 150 && [DEX] <= 150) && [VIT] <= 60 && [ALLRES] <= 40 -> [TRASH]
+[QUALITY] == "Rare" && [TYPE] == "Boots" # [DEX] >= 200 && [MS%] >= 10 && [VIT] >= 60 && [ALLRES] >= 50 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Boots" # ([STR] >= 170 || [INT] >= 150 || [DEX] >= 150) && [MS%] >= 8 && [VIT] >= 60 && [ALLRES] >= 40 -> [SCORE]
+[QUALITY] == "Rare" && [TYPE] == "Boots" # ([STR] >= 150 || [INT] >= 150 || [DEX] >= 150) && [MS%] >= 8 && [VIT] >= 60 && [ALLRES] >= 40 -> [SCORE]
+[QUALITY] == "Rare" && [TYPE] == "Boots" # ([STR] >= 180 || [INT] >= 180 || [DEX] >= 180) && [VIT] >= 100 && [ALLRES] >= 60 -> [SCORE]
+
+// +---------------------------------------------------------------------------+ 
+// |  _____ _____ _____     _____ _____ _____ ____  
+// | |     |   __|   __|___|  |  |  _  |   | |    \ 
+// | |  |  |   __|   __|___|     |     | | | |  |  |
+// | |_____|__|  |__|      |__|__|__|__|_|___|____/ 
+// | +++++++++++++++++++++++++++++++++++++++++++++++                                               
+// +---------------------------------------------------------------------------+
+
+// +---------------------------------------------------------------------------+
+// +--- Shields
+//[QUALITY] == "Rare" && [TYPE] == "Quiver" # [DEX] >= 150 && [AS%] >= 15 && [CRIT%] >= 8 && [MAXDISCIP] >= 9 -> [KEEP]
+
+// +---------------------------------------------------------------------------+
+// +--- Mojos
+[QUALITY] == "Rare" && [TYPE] == "Mojo" # [INT] >= 100 && [CRIT%] >= 7 && [MANAREG] >= 8 && [AVGDMG] >= 200 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Mojo" # True -> [TRASH]
+
+// +---------------------------------------------------------------------------+
+// +--- Orbs
+[QUALITY] == "Rare" && [TYPE] == "Orb" # [INT] >= 100 && [CRIT%] >= 7 && [ARCONCRIT] >= 6 && [AVGDMG] >= 200 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Orb" # True -> [TRASH]
+
+// +---------------------------------------------------------------------------+
+// +--- Quivers
+
+[QUALITY] == "Rare" && [TYPE] == "Shield" # [MAXSTATVIT] >= 200 && [CRIT%] >= 7 && [ALLRES] >= 50 && [BLOCK%] >= 25 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Shield" # True -> [TRASH]
+
+// +---------------------------------------------------------------------------+ 
+// |     __ _____ _ _ _ _____ __    _____ __ __ 
+// |  __|  |   __| | | |   __|  |  | __  |  |  |
+// | |  |  |   __| | | |   __|  |__|    -|_   _|
+// | |_____|_____|_____|_____|_____|__|__| |_|  
+// | +++++++++++++++++++++++++++++++++++++++++++                                           
+// +---------------------------------------------------------------------------+
+
+// +---------------------------------------------------------------------------+
+// +--- Amulet
+// +---------------------------------------------------------------------------+
+[QUALITY] == "Rare" && [TYPE] == "Amulet" # [MAXSTAT] >= 150 && ([CRITDMG%] > 80 || [AS%] > 8 || [CRIT%] > 8) && ([VIT]  >= 100 || [LOH] >= 400 || [LIFE%] >= 8 || [AVGDMG] >= 40) && [ALLRES] >= 50 -> [KEEP]
+//[QUALITY] == "Rare" && [TYPE] == "Amulet" # [MAXSTAT] >= 200 && ([VIT]  >= 100 || [LIFE%] >= 6) && [ALLRES] >= 40 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Amulet" # [CRITDMG%] > 45 && [AS%] > 5 && [CRIT%] > 5 -> [KEEP]
+
+[QUALITY] == "Rare" && [TYPE] == "Amulet" # (([CRITDMG%] >= 50 && [CRIT%] >= 6) || ([AS%] >= 7 && [CRIT%] >= 6) || ([AS%] >= 7 && [CRITDMG%] >= 50)) && [MAXSTAT] >= 100 && [ALLRES] >= 40 && ([VIT]  >= 50 || [LIFE%] >= 6 || [SOCKETS] >= 1 || [MAXONERES] > 40 || [LOH] > 400 || [AVGDMG] >= 40) -> [KEEP]
+
+
+[QUALITY] == "Rare" && [TYPE] == "Amulet" # [DMGFACTOR] > 22 && [MAXSTAT] > 150 && [ALLRES] > 50 -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Amulet" # [DMGFACTOR] > 20 && [MAXSTATVIT] > 200 && [ALLRES] > 50 && ([LOH] > 400 || [LIFE%] >= 8) -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Amulet" # [DMGFACTOR] > 30 -> [KEEP]
+
+[QUALITY] == "Rare" && [TYPE] == "Amulet" # [DMGFACTOR] > 23 && ([MAXSTATVIT] > 100 || [ALLRES] > 40 || [LOH] > 300 || [LIFE%] >= 6) -> [SCORE]
+[QUALITY] == "Rare" && [TYPE] == "Amulet" # [DMGFACTOR] > 25 && ([MAXSTATVIT] > 0 || [ALLRES] > 0 || [LIFE%] >= 0) -> [SCORE]
+
+// +---------------------------------------------------------------------------+
+// +--- Ring
+// +---------------------------------------------------------------------------+
+//[QUALITY] == "Rare" && [TYPE] == "Ring" # [MAXSTAT] >= 60 && ([VIT] >= 60 || [LIFE%] >= 6) && [ALLRES] >= 40 -> [KEEP]
+
+[QUALITY] == "Rare" && [TYPE] == "Ring" # [MAXSTAT] >= 100 && ([CRITDMG%] > 40 || [AS%] > 8 || [CRIT%] > 5) && (([VIT]  >= 60 || [LIFE%] >= 6) && ([LOH] >= 200 || [ALLRES] >= 40 || [AVGDMG] >= 30)) -> [KEEP]
+
+[QUALITY] == "Rare" && [TYPE] == "Ring" # [CRITDMG%] > 20 && [AS%] > 5 && [CRIT%] > 3 -> [KEEP]
+
+[QUALITY] == "Rare" && [TYPE] == "Ring" # (([CRITDMG%] >= 25 && [CRIT%] >= 3) || ([AS%] >= 7 && [CRIT%] >= 3) || ([AS%] >= 7 && [CRITDMG%] >= 25)) && [MAXSTAT] >= 60 && [ALLRES] >= 40 && ([VIT]  >= 50 || [LIFE%] >= 6 || [SOCKETS] >= 1 || [MAXONERES] > 30 || [LOH] > 200 || [AVGDMG] >= 30) -> [KEEP]
+
+[QUALITY] == "Rare" && [TYPE] == "Ring" # (([CRITDMG%] >= 25 && [CRIT%] >= 3) || ([AS%] >= 7 && [CRIT%] >= 3) || ([AS%] >= 7 && [CRITDMG%] >= 25)) && [MAXSTAT] >= 100 && ([VIT]  >= 80 || [LIFE%] >= 8 || [ALLRES] >= 50 || [SOCKETS] >= 1 || [MAXONERES] > 44 || [LOH] > 200 || [AVGDMG] >= 30) -> [KEEP]
+
+[QUALITY] == "Rare" && [TYPE] == "Ring" # [DMGFACTOR] > 11 && [MAXSTAT] > 100 && [ALLRES] > 50 && ([VIT]  >= 60 || [LIFE%] >= 6 || [LOH] > 200) -> [KEEP]
+[QUALITY] == "Rare" && [TYPE] == "Ring" # [DMGFACTOR] > 20 -> [KEEP]
+
+[QUALITY] == "Rare" && [TYPE] == "Ring" # [DMGFACTOR] > 14 && [MAXSTATVIT] > 100 && [ALLRES] > 40 && ([LOH] > 200 || [LIFE%] >= 5) -> [SCORE]
+[QUALITY] == "Rare" && [TYPE] == "Ring" # [DMGFACTOR] > 14 && [MAXSTATVIT] > 70 && [ALLRES] > 30 && [MAXONERES] > 30 && [LOH] > 200 -> [SCORE]
+[QUALITY] == "Rare" && [TYPE] == "Ring" # [DMGFACTOR] > 16 && ([MAXSTATVIT] > 0 || [ALLRES] > 0) -> [SCORE]
+// +---------------------------------------------------------------------------+ 
+// | _____ _____ _____ _____ _____ 
+// ||_   _| __  |  _  |   __|  |  |
+// |  | | |    -|     |__   |     |
+// |  |_| |__|__|__|__|_____|__|__|
+// | ++++++++++++++++++++++++++++++                                           
+// +---------------------------------------------------------------------------+
+
+// safety rule
+//[QUALITY] == "Rare" && [BASETYPE] == "Weapon" && [ONEHAND] == true # [DPS] > 900 && [SOCKETS] > 0 && ([CRITDMG%] > 50 || [LOH] > 400 || [LS%] > 3 || [MAXSTATVIT] > 200)
+//[QUALITY] == "Rare" && [BASETYPE] == "Weapon" && [TWOHAND] == true # [DPS] > 1200 && [SOCKETS] > 0 && ([CRITDMG%] > 100 || [LOH] > 800 || [LS%] > 6 || [MAXSTATVIT] > 400) 
+//[QUALITY] == "Rare" && [BASETYPE] == "Armor" # [MAXSTATVIT] > 300 || [DMGFACTOR] > 17
+//[QUALITY] == "Rare" && [BASETYPE] == "Armor" # [MAXSTATVIT] > 150 && ([DMGFACTOR] > 14 && [ALLRES] > 50)
+//[QUALITY] == "Rare" && [BASETYPE] == "Armor" # [MAXSTATVIT] > 100 && [DMGFACTOR] > 11 && [ALLRES] > 50
+//[QUALITY] == "Rare" && [BASETYPE] == "Jewelry" # [MAXSTATVIT] > 200 || [DMGFACTOR] > 11
+//[QUALITY] == "Rare" && [BASETYPE] == "Jewelry" # [MAXSTATVIT] > 200 && ([DMGFACTOR] > 6 || [ALLRES] > 60)
+//[QUALITY] == "Rare" && [BASETYPE] == "Jewelry" # [MAXSTATVIT] > 150 && [DMGFACTOR] > 6 && [ALLRES] > 50
+
+// cleanup rule trashing all other "Weapon" legendarys
+[QUALITY] == "Rare" && [BASETYPE] == "Weapon" # True -> [TRASH]
+[QUALITY] == "Rare" && [BASETYPE] == "Armor" # True -> [TRASH]
+[QUALITY] == "Rare" && [BASETYPE] == "Jewelry" # True -> [TRASH]

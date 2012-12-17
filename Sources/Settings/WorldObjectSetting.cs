@@ -11,6 +11,12 @@ namespace GilesTrinity.Settings
         private int _ContainerOpenRange;
         private int _DestructibleRange;
         private bool _UseShrine;
+        private bool _UseFrenzyShrine;
+        private bool _UseFortuneShrine;
+        private bool _UseProtectionShrine;
+        private bool _UseEmpoweredShrine;
+        private bool _UseEnlightenedShrine;
+        private bool _UseFleetingShrine;
         private bool _IgnoreNonBlocking;
         #endregion Fields
 
@@ -85,6 +91,114 @@ namespace GilesTrinity.Settings
                 }
             }
         }
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseEnlightenedShrine
+        {
+            get
+            {
+                return _UseEnlightenedShrine;
+            }
+            set
+            {
+                if (_UseEnlightenedShrine != value)
+                {
+                    _UseEnlightenedShrine = value;
+                    OnPropertyChanged("UseEnlightenedShrine");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseFrenzyShrine
+        {
+            get
+            {
+                return _UseFrenzyShrine;
+            }
+            set
+            {
+                if (_UseFrenzyShrine != value)
+                {
+                    _UseFrenzyShrine = value;
+                    OnPropertyChanged("UseFrenzyShrine");
+                }
+            }
+        }
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseFortuneShrine
+        {
+            get
+            {
+                return _UseFortuneShrine;
+            }
+            set
+            {
+                if (_UseFortuneShrine != value)
+                {
+                    _UseFortuneShrine = value;
+                    OnPropertyChanged("UseFortuneShrine");
+                }
+            }
+        }
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseProtectionShrine
+        {
+            get
+            {
+                return _UseProtectionShrine;
+            }
+            set
+            {
+                if (_UseProtectionShrine != value)
+                {
+                    _UseProtectionShrine = value;
+                    OnPropertyChanged("UseProtectionShrine");
+                }
+            }
+        }
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseEmpoweredShrine
+        {
+            get
+            {
+                return _UseEmpoweredShrine;
+            }
+            set
+            {
+                if (_UseEmpoweredShrine != value)
+                {
+                    _UseEmpoweredShrine = value;
+                    OnPropertyChanged("UseEmpoweredShrine");
+                }
+            }
+        }
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseFleetingShrine
+        {
+            get
+            {
+                return _UseFleetingShrine;
+            }
+            set
+            {
+                if (_UseFleetingShrine != value)
+                {
+                    _UseFleetingShrine = value;
+                    OnPropertyChanged("UseFleetingShrine");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
@@ -131,6 +245,20 @@ namespace GilesTrinity.Settings
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+        /// <summary>
+        /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserializing()]
+        internal void OnDeserializingMethod(StreamingContext context)
+        {
+            this.UseEmpoweredShrine = true;
+            this.UseEnlightenedShrine = true;
+            this.UseFleetingShrine = true;
+            this.UseFortuneShrine = true;
+            this.UseFrenzyShrine = true;
+            this.UseProtectionShrine = true;
         }
         #endregion Methods
     }

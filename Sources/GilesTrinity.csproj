@@ -82,7 +82,6 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotManager.cs" />
-    <Compile Include="ItemRules\Core\ExpressionCompiler.cs" />
     <Compile Include="ItemRules\Core\Formula.cs" />
     <Compile Include="ItemRules\Core\Parser.cs" />
     <Compile Include="ItemRules\Core\ParseTree.cs" />
@@ -242,7 +241,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="ItemRules\Rules\custom\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Dictionaries.xml" />
     <Content Include="ItemRules\ItemRules2.txt" />
@@ -252,12 +253,19 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="ItemRules\Rules\config.dis" />
-    <None Include="ItemRules\Rules\legendary.dis" />
-    <None Include="ItemRules\Rules\magic.dis" />
+    <None Include="ItemRules\Rules\hard\legendary.dis" />
+    <None Include="ItemRules\Rules\hard\magic.dis" />
+    <None Include="ItemRules\Rules\hard\rare.dis" />
+    <None Include="ItemRules\Rules\hard\special.dis" />
+    <None Include="ItemRules\Rules\medium\legendary.dis" />
+    <None Include="ItemRules\Rules\medium\magic.dis" />
+    <None Include="ItemRules\Rules\medium\rare.dis" />
+    <None Include="ItemRules\Rules\medium\special.dis" />
     <None Include="ItemRules\Rules\pickup.dis" />
-    <None Include="ItemRules\Rules\rare.dis" />
-    <None Include="ItemRules\Rules\special.dis" />
-    <None Include="ItemRules\Rules\test.dis" />
+    <None Include="ItemRules\Rules\soft\legendary.dis" />
+    <None Include="ItemRules\Rules\soft\magic.dis" />
+    <None Include="ItemRules\Rules\soft\rare.dis" />
+    <None Include="ItemRules\Rules\soft\special.dis" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
