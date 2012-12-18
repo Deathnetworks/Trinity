@@ -449,7 +449,7 @@ namespace GilesTrinity
         {
             if (TownRun.testingBackpack) return;
             TownRun.testingBackpack = true;
-            ZetaDia.Actors.Update();
+            //ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error testing scores - not in game world?");

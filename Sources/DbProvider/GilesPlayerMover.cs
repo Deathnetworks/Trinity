@@ -24,7 +24,8 @@ namespace GilesTrinity.DbProvider
 
         private static bool ShrinesInArea(Vector3 targetpos)
         {
-            return ZetaDia.Actors.GetActorsOfType<DiaObject>(true).Any(u => hashAvoidLeapingToSNO.Contains(u.ActorSNO) && Vector3.Distance(u.Position, targetpos) <= 10f);
+            return GilesTrinity.GilesObjectCache.Any(o => hashAvoidLeapingToSNO.Contains(o.ActorSNO) && Vector3.Distance(o.Position, targetpos) <= 10f);
+            //return ZetaDia.Actors.GetActorsOfType<DiaObject>(true).Any(u => hashAvoidLeapingToSNO.Contains(u.ActorSNO) && Vector3.Distance(u.Position, targetpos) <= 10f);
         }
 
         public void MoveStop()
@@ -223,7 +224,7 @@ namespace GilesTrinity.DbProvider
                 // Temporarily log stuff
                 if (iTotalAntiStuckAttempts == 1 && GilesTrinity.Settings.Advanced.LogStuckLocation)
                 {
-                    FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "Stucks - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
+                    FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "Stucks - " + GilesTrinity.playerStatus.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
                     {
                         LogWriter.WriteLine(DateTime.Now.ToString() + ": Original Destination=" + vOldMoveToTarget.ToString() + ". Current player position when stuck=" + vMyCurrentPosition.ToString());
@@ -486,6 +487,7 @@ namespace GilesTrinity.DbProvider
                         // Don't Vault into avoidance/monsters if we're kiting
                         (GilesTrinity.PlayerKiteDistance <= 0 || (GilesTrinity.PlayerKiteDistance > 0 &&
                          (!GilesTrinity.hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= GilesTrinity.PlayerKiteDistance) ||
+                         (!GilesTrinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, GilesTrinity.playerStatus.CurrentPosition, vMoveToTarget))) || 
                          !GilesTrinity.hashMonsterObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= GilesTrinity.PlayerKiteDistance))))
                         )
                     {

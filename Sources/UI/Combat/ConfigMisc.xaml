@@ -58,7 +58,7 @@
             <TextBlock Text="Wait for loot drop - Delay after kill :" FontWeight="Bold" TextAlignment="Center"/>
             <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
                     Interval="100" 
-                    Maximum="1500" Minimum="200" SmallChange="100" TickFrequency="100" TickPlacement="BottomRight" 
+                    Maximum="1500" Minimum="0" SmallChange="100" TickFrequency="100" TickPlacement="BottomRight" 
                     Value="{Binding Path=Misc.DelayAfterKill}" 
                     HorizontalAlignment="Stretch" Margin="25,0,25,0"/>
         </Grid>

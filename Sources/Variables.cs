@@ -487,7 +487,7 @@ namespace GilesTrinity
         /// <summary>
         /// This contains the active cache of DiaObjects
         /// </summary>
-        private static List<GilesObject> GilesObjectCache;
+        internal static List<GilesObject> GilesObjectCache;
 
         /// <summary>
         /// This will eventually be come our single source of truth and we can get rid of most/all of the below "c_" variables

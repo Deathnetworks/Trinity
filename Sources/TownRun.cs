@@ -201,8 +201,11 @@ namespace GilesTrinity
                 if (GilesTrinity.BossLevelAreaIDs.Contains(GilesTrinity.playerStatus.LevelAreaId))
                     return false;
 
-                if (!GilesTrinity.bWantToTownRun && GilesTrinity.CurrentTarget != null)
+                if (GilesTrinity.bWantToTownRun && GilesTrinity.CurrentTarget != null)
+                {
+                    townRunCheckTimer.Reset();
                     return false;
+                }
 
                 // Check if we should be forcing a town-run
                 if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
@@ -351,10 +354,10 @@ namespace GilesTrinity
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Stash routine ending sequence...");
 
             // Lock memory (probably not actually necessary anymore, since we handle all item stuff ourselves!?)
-            using (ZetaDia.Memory.AcquireFrame())
-            {
-                ZetaDia.Actors.Update();
-            }
+            //using (ZetaDia.Memory.AcquireFrame())
+            //{
+            //    ZetaDia.Actors.Update();
+            //}
             if (loggedAnythingThisStash)
             {
                 FileStream LogStream = null;
@@ -402,7 +405,7 @@ namespace GilesTrinity
             /*
              *  Move to Stash
              */
-            ZetaDia.Actors.Update();
+            //ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [CoreStash-1]");
@@ -611,7 +614,7 @@ namespace GilesTrinity
             if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Sell routine started";
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Sell routine started.");
-            ZetaDia.Actors.Update();
+            //ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [PreSell-1]");
@@ -835,10 +838,10 @@ namespace GilesTrinity
         internal static RunStatus GilesOptimisedPostSell(object ret)
         {
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Sell routine ending sequence...");
-            using (ZetaDia.Memory.AcquireFrame())
-            {
-                ZetaDia.Actors.Update();
-            }
+            //using (ZetaDia.Memory.AcquireFrame())
+            //{
+            //    ZetaDia.Actors.Update();
+            //}
 
             // Always repair, but only if we have enough money
             if (bNeedsEquipmentRepairs && iLowestDurabilityFound < 20 && iLowestDurabilityFound > -1 && ZetaDia.Me.Inventory.Coinage < 40000)
@@ -974,7 +977,7 @@ namespace GilesTrinity
             if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Salvage routine started";
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Salvage routine started.");
-            ZetaDia.Actors.Update();
+            //ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [PreSalvage-1]");
@@ -1180,10 +1183,10 @@ namespace GilesTrinity
         internal static RunStatus GilesOptimisedPostSalvage(object ret)
         {
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Salvage routine ending sequence...");
-            using (ZetaDia.Memory.AcquireFrame())
-            {
-                ZetaDia.Actors.Update();
-            }
+            //using (ZetaDia.Memory.AcquireFrame())
+            //{
+            //    ZetaDia.Actors.Update();
+            //}
             if (loggedJunkThisStash)
             {
                 FileStream LogStream = null;
@@ -1713,7 +1716,7 @@ namespace GilesTrinity
         {
 
             // Try and update the player-data
-            ZetaDia.Actors.Update();
+            //ZetaDia.Actors.Update();
 
             // Check we can get the player dynamic ID
             int iPlayerDynamicID = -1;

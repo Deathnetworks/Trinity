@@ -91,7 +91,11 @@ namespace GilesTrinity
                 // Only use vault to retreat if < level 60, or if in inferno difficulty for level 60's
                 (playerStatus.Level < 60 || iCurrentGameDifficulty == GameDifficulty.Inferno) &&
                 (CurrentTarget.RadiusDistance <= 10f || iAnythingWithinRange[RANGE_6] >= 1) &&
-                playerStatus.Discipline >= 8 && GilesUseTimer(SNOPower.DemonHunter_Vault) && PowerManager.CanCast(SNOPower.DemonHunter_Vault))
+                ((!hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_ShadowPower) && playerStatus.Discipline >= 16) ||
+                 (hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_ShadowPower) && playerStatus.Discipline >= 22)) && 
+                    //GilesUseTimer(SNOPower.DemonHunter_Vault) && 
+                    DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= GilesTrinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
+                    PowerManager.CanCast(SNOPower.DemonHunter_Vault))
             {
                 Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, playerStatus.CurrentPosition, -15f);
                 return new GilesPower(SNOPower.DemonHunter_Vault, 20f, vNewTarget, iCurrentWorldID, -1, 1, 2, USE_SLOWLY);
