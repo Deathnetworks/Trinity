@@ -1705,7 +1705,7 @@ namespace GilesTrinity
                 if (c_ObjectType != GObjectType.Item)
                 {
 
-                    if (c_ObjectType == GObjectType.Unit)
+                    if ((c_ObjectType == GObjectType.Unit && !bWantToTownRun) || c_ObjectType == GObjectType.Shrine)
                     {
                         bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
 

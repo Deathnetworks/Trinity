@@ -315,7 +315,7 @@ namespace GilesTrinity
         {
             using (new PerformanceLogger("CacheManagement.RefreshCacheMainLoop"))
             {
-                ZetaDia.Actors.Update();
+                //ZetaDia.Actors.Update();
 
                 var refreshSource =
                 from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
@@ -508,7 +508,7 @@ namespace GilesTrinity
                 }
             }
             // Safety for Giles own portal-back-to-town for full-backpack
-            if (ForceVendorRunASAP)
+            if (ForceVendorRunASAP || bWantToTownRun)
             {
                 if (dUseKillRadius <= 90) dUseKillRadius = 90;
             }

@@ -826,14 +826,16 @@ namespace GilesTrinity
                     if (CurrentTarget.IsBoss)
                     {
                         hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
+                        dateSinceBlacklist15Clear = DateTime.Now;
                         CurrentTarget = null;
-                        runStatus = HandlerRunStatus.TreeRunning;
+                        runStatus = HandlerRunStatus.TreeSuccess;
                     }
                     else
                     {
                         hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
+                        dateSinceBlacklist90Clear = DateTime.Now;
                         CurrentTarget = null;
-                        runStatus = HandlerRunStatus.TreeRunning;
+                        runStatus = HandlerRunStatus.TreeSuccess;
                     }
                 }
             }
