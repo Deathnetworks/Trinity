@@ -487,6 +487,7 @@ namespace GilesTrinity.DbProvider
                         // Don't Vault into avoidance/monsters if we're kiting
                         (GilesTrinity.PlayerKiteDistance <= 0 || (GilesTrinity.PlayerKiteDistance > 0 &&
                          (!GilesTrinity.hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= GilesTrinity.PlayerKiteDistance) ||
+                         (!GilesTrinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, GilesTrinity.playerStatus.CurrentPosition, vMoveToTarget))) || 
                          !GilesTrinity.hashMonsterObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= GilesTrinity.PlayerKiteDistance))))
                         )
                     {

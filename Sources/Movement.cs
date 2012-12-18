@@ -535,7 +535,7 @@ namespace GilesTrinity
                          */
                         if (!hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 45)
                         {
-                            PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 5, true);
+                            PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 25, true);
 
                             bool pathFailure = false;
                             Point lastNode = gp.WorldToGrid(origin.ToVector2());

@@ -993,10 +993,13 @@ namespace GilesTrinity
             }
             // Vault for a Demon Hunter
             if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Vault) &&
-                DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.DemonHunter_Vault] &&
+                //DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.DemonHunter_Vault] &&
+                DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= GilesTrinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                 PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
                 (PlayerKiteDistance <= 0 || (!hashMonsterObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
-                !hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance))))
+                !hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance))) &&
+                (!GilesTrinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, GilesTrinity.playerStatus.CurrentPosition, vCurrentDestination)))
+                )
             {
                 WaitWhileAnimating(3, true);
                 ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vCurrentDestination, iCurrentWorldID, -1);
@@ -1197,7 +1200,8 @@ namespace GilesTrinity
                 //Navigator.MoveTo(vCurrentDestination, null, true);
                 //Navigator.PlayerMover.MoveTowards(vCurrentDestination);
 
-                ZetaDia.Me.Movement.MoveActor(vCurrentDestination);
+                //ZetaDia.Me.Movement.MoveActor(vCurrentDestination);
+                Zeta.Navigation.Navigator.MoveTo(vCurrentDestination, CurrentTarget.InternalName, true);
                 lastSentMovePower = DateTime.Now;
 
                 // Store the current destination for comparison incase of changes next loop
