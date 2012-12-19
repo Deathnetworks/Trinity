@@ -533,7 +533,7 @@ namespace GilesTrinity
                         /*
                          * This little bit is insanely CPU intensive and causes lots of small game freezes, maybe needs GUI option..
                          */
-                        if (!hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 45)
+                        if (!hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 75)
                         {
                             PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 25, true);
 

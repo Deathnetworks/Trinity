@@ -54,7 +54,7 @@ namespace GilesTrinity
         /// <returns>
         /// Returns whether or not we can use a skill, or if it's on our own internal Trinity cooldown timer
         /// </returns>
-        private static bool GilesUseTimer(SNOPower power, bool recheck = false)
+        internal static bool GilesUseTimer(SNOPower power, bool recheck = false)
         {
             if (DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds >= dictAbilityRepeatDelay[power])
                 return true;
