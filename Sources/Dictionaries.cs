@@ -341,7 +341,7 @@ namespace GilesTrinity
                 {SNOPower.Monk_CripplingWave, 5},
                 {SNOPower.Monk_WayOfTheHundredFists, 5},
                 {SNOPower.Monk_LashingTailKick, 250},
-                {SNOPower.Monk_TempestRush, 250},
+                {SNOPower.Monk_TempestRush, 50},
                 {SNOPower.Monk_WaveOfLight, 250},
                 {SNOPower.Monk_BlindingFlash, 15200},
                 {SNOPower.Monk_BreathOfHeaven, 15200},
