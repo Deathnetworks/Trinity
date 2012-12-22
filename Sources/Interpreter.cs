@@ -8,6 +8,7 @@ using Zeta.Internals.Actors;
 using Zeta.Common;
 using GilesTrinity.ItemRules.Core;
 using GilesTrinity.Technicals;
+using Zeta;
 
 namespace GilesTrinity.ItemRules
 {
@@ -33,6 +34,7 @@ namespace GilesTrinity.ItemRules
             DEBUG,
             ERROR
         };
+
         public enum InterpreterAction
         {
             PICKUP,
@@ -44,7 +46,7 @@ namespace GilesTrinity.ItemRules
         };
 
         // final variables
-        readonly string version = "2.0.2.00";
+        readonly string version = "2.0.2.34";
         readonly string rulesPath = Path.Combine(FileManager.ItemRulePath, "Rules");
         readonly string logPath = Path.Combine(FileManager.ItemRulePath, "Log");
         readonly string configFile = "config.dis";
@@ -54,8 +56,10 @@ namespace GilesTrinity.ItemRules
         readonly Regex filePattern = new Regex(@"\[FILE\][ ]*==[ ]*([A-Za-z]+.dis)", RegexOptions.Compiled);
         readonly Regex flagPattern = new Regex(@"\[([A-Z]+)\][ ]*==[ ]*([A-Za-z]+)", RegexOptions.Compiled);
         readonly Regex macroPattern = new Regex(@"(@[A-Z]+)[ ]*:=[ ]*(.+)", RegexOptions.Compiled);
-       
+
         string ruleType = "soft";
+        int notPickLog = 4;
+        int notKeepLog = 4;
 
         // objects
         ArrayList ruleSet, pickUpRuleSet;
@@ -118,9 +122,9 @@ namespace GilesTrinity.ItemRules
             // initialize or reset ruleSet array
             ruleSet = new ArrayList();
             pickUpRuleSet = new ArrayList();
-            
+
             // instantiating our macro dictonary
-            macroDic = new Dictionary<string,string>();
+            macroDic = new Dictionary<string, string>();
 
             // instantiating our itemfilename array
             List<string> itemFileNames = new List<string>();
@@ -148,10 +152,18 @@ namespace GilesTrinity.ItemRules
 
                     if (match2.Groups[1].Value.Contains("RULE"))
                         ruleType = match2.Groups[2].Value.ToLower();
+
+                    if (match2.Groups[1].Value.Contains("NOTPICKLOG"))
+                        notPickLog = getQualityValueFromQuality(match2.Groups[2].Value);
+
+                    if (match2.Groups[1].Value.Contains("NOTKEEPLOG"))
+                        notKeepLog = getQualityValueFromQuality(match2.Groups[2].Value);
                 }
 
             }
 
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "NOTPICKLOG {0} ", notPickLog);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "NOTKEEPLOG {0} ", notKeepLog);
             // parse pickup file
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "reading ... {0} ", pickupFile);
             pickUpRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, pickupFile)), pickUpRuleSet);
@@ -308,13 +320,16 @@ namespace GilesTrinity.ItemRules
                     logOut(logString, action, LogType.DEBUG);
                     break;
                 case InterpreterAction.IGNORE:
-                    logOut(logString, action, LogType.DEBUG);
+                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= notPickLog)
+                        logOut(logString, action, LogType.LOG);
+                    else
+                        logOut(logString, action, LogType.DEBUG);
                     break;
                 case InterpreterAction.KEEP:
                     logOut(logString, action, LogType.LOG);
                     break;
                 case InterpreterAction.TRASH:
-                    if (itemDic["[QUALITY]"].ToString() == "Legendary")
+                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= notKeepLog)
                         logOut(logString, action, LogType.LOG);
                     else
                         logOut(logString, action, LogType.DEBUG);
@@ -328,6 +343,23 @@ namespace GilesTrinity.ItemRules
                     else
                         logOut(logString, action, LogType.DEBUG);
                     break;
+            }
+        }
+
+        private int getQualityValueFromQuality(object quality)
+        {
+            switch (quality.ToString().ToLower())
+            {
+                case "legendary":
+                    return 4;
+                case "rare":
+                    return 3;
+                case "magic":
+                    return 2;
+                case "normal":
+                    return 1;
+                default:
+                    return 0;
             }
         }
 
@@ -404,7 +436,7 @@ namespace GilesTrinity.ItemRules
                 Directory.CreateDirectory(logPath);
 
             log = new StreamWriter(Path.Combine(logPath, logFile), true);
-            log.WriteLine(DateTime.Now.ToString("yyyyMMddHHmmssffff") + SEP + logType + SEP + str);
+            log.WriteLine(DateTime.Now.ToString("yyyyMMddHHmmssffff") + "." + ZetaDia.Service.CurrentHero.Name + SEP + logType + SEP + str);
             log.Close();
         }
 
@@ -437,7 +469,7 @@ namespace GilesTrinity.ItemRules
                 if (itemDic.TryGetValue(key, out value))
                 {
                     if (value is float && (float)value > 0)
-                        result += key.ToUpper() + ":" + ((float)value).ToString("0.00").Replace(".00","") + SEP;
+                        result += key.ToUpper() + ":" + ((float)value).ToString("0.00").Replace(".00", "") + SEP;
                     else if (value is string && (string)value != "")
                         result += key.ToUpper() + ":" + value.ToString() + SEP;
                     else if (value is bool)
@@ -454,23 +486,24 @@ namespace GilesTrinity.ItemRules
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static bool getVariableValue(string key, out object obj) {
+        public static bool getVariableValue(string key, out object obj)
+        {
 
             string[] strArray = key.Split('.');
 
             if (Interpreter.itemDic.TryGetValue(strArray[0], out obj) && strArray.Count() > 1)
             {
-                   switch (strArray[1])
-                    {
-                        case "dual":
-                            if (obj is float && (float)obj > 0)
-                                obj = (float)1;
-                            break;
-                        case "max":
-                            if (obj is float)
-                                obj = (float)1;
-                            break;
-                    }
+                switch (strArray[1])
+                {
+                    case "dual":
+                        if (obj is float && (float)obj > 0)
+                            obj = (float)1;
+                        break;
+                    case "max":
+                        if (obj is float)
+                            obj = (float)1;
+                        break;
+                }
             }
 
             return (obj != null);
