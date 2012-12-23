@@ -241,6 +241,13 @@ namespace GilesTrinity
                                     }
                                     cacheObject.Weight -= fWeightRemoval;
 
+                                    if (PlayerKiteDistance > 0)
+                                    {
+                                        if (hashMonsterObstacleCache.Any(m => GilesIntersectsPath(cacheObject.Position, cacheObject.Radius, playerStatus.CurrentPosition, m.Location)))
+                                            cacheObject.Weight = 0;
+                                    }
+
+
                                     // Prevent going less than 300 yet to prevent annoyances (should only lose this much weight from priority reductions in priority list?)
                                     if (cacheObject.Weight < 300)
                                         cacheObject.Weight = 300;

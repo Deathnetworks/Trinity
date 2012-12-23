@@ -671,6 +671,16 @@ namespace GilesTrinity
                                     };
             }
         }
+
+        internal sealed class KitePosition
+        {
+            public DateTime PositionFoundTime { get; set; }
+            public Vector3 Position { get; set; }
+            public float Distance { get; set; }
+            public KitePosition() { }
+        }
+        internal static KitePosition LastKitePosition = null;
+
         private static void RefreshSetKiting(ref Vector3 vKitePointAvoid, bool NeedToKite, ref bool TryToKite)
         {
             TryToKite = false;
@@ -707,14 +717,42 @@ namespace GilesTrinity
             if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite))
             {
                 Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true, monsterList);
+                
+                if (LastKitePosition == null)
+                {
+                    LastKitePosition = new KitePosition()
+                    {
+                        PositionFoundTime = DateTime.Now,
+                        Position = vAnySafePoint,
+                        Distance = vAnySafePoint.Distance(playerStatus.CurrentPosition)
+                    };
+                }
 
-                // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
                 if (vAnySafePoint != Vector3.Zero && vAnySafePoint.Distance(playerStatus.CurrentPosition) >= 1)
                 {
+
+                    if ((DateTime.Now.Subtract(LastKitePosition.PositionFoundTime).TotalMilliseconds > 3000 && LastKitePosition.Position == vAnySafePoint) ||
+                        ( CurrentTarget != null && DateTime.Now.Subtract(lastGlobalCooldownUse).TotalMilliseconds > 1500))
+                    {
+                        timeCancelledKiteMove = DateTime.Now;
+                        cancelledKiteMoveForMilliseconds = 3000;
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kite movement failed, cancelling for {0:0}ms", cancelledKiteMoveForMilliseconds);
+                        return;
+                    } 
+                    else
+                    {
+                        LastKitePosition = new KitePosition()
+                        {
+                            PositionFoundTime = DateTime.Now,
+                            Position = vAnySafePoint,
+                            Distance = vAnySafePoint.Distance(playerStatus.CurrentPosition)
+                        };
+                    }
+
                     if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Moving))
                     {
                         DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
-                            vAnySafePoint, vAnySafePoint.Distance(Me.Position), GetHeading(FindDirectionDegree(Me.Position, vAnySafePoint)),
+                            vAnySafePoint, vAnySafePoint.Distance(playerStatus.CurrentPosition), GetHeading(FindDirectionDegree(Me.Position, vAnySafePoint)),
                             playerStatus.CurrentHealthPct, PlayerKiteDistance, monsterList.Count(),
                             NeedToKite, TryToKite);
                     }
