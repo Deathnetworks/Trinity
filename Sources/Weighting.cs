@@ -179,9 +179,6 @@ namespace GilesTrinity
                                     if ((cacheObject.IsEliteRareUnique || cacheObject.IsBoss) && cacheObject.HitPoints <= 0)
                                     {
                                         cacheObject.Weight = 0;
-
-                                        // temporary blacklist for individual boss/uber so we don't repeadedly attack it (looks suspicious)
-                                        hashRGUIDBlacklist15.Add(cacheObject.RActorGuid);
                                     }
 
                                     // Goblins on low health get extra priority - up to 2500

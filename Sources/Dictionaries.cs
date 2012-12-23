@@ -156,8 +156,12 @@ namespace GilesTrinity
         /// </summary>
         internal static HashSet<int> hashBossSNO = new HashSet<int>
         {
-            // Siegebreaker (96192), Azmodan (89690), Cydea (95250), Heart-thing (193077), Kulle (80509), Small Belial (220160), Big Belial (3349), Diablo 1 (114917), terror Diablo (133562)
-            96192, 89690, 95250, 193077, 80509, 220160, 3349, 114917, 133562, 255929, 256711, 256508, 256187, 256189, 256709,
+            // Siegebreaker (96192), Azmodan (89690), Cydea (95250), Heart-thing (193077), 
+            96192,                   89690,           95250,         193077, 
+            //Kulle (80509), Small Belial (220160), Big Belial (3349), Diablo 1 (114917), terror Diablo (133562)
+            80509,           220160,                3349,              114917,            133562, 
+            
+            255929, 256711, 256508, 256187, 256189, 256709,
             // Another Cydaea
             137139,
             // Diablo shadow clones (needs all of them, there is a male & female version of each class!)
@@ -271,6 +275,9 @@ namespace GilesTrinity
             116807, // Butcher Health Well
             180575, // Diablo arena Health Well
             129031, // A3 Skycrown Catapults
+            //Small Belial (220160), Big Belial (3349),
+            220160,                3349,             
+
         };
         /// <summary>
         /// Chests/average-level containers that deserve a bit of extra radius (ie - they are more worthwhile to loot than "random" misc/junk containers)

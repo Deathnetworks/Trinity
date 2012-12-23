@@ -275,7 +275,7 @@ namespace GilesTrinity
                     if (fDistanceFromTarget < 0f)
                         fDistanceFromTarget = 0f;
 
-                    bool currentTargetIsInLoS = GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk);
+                    bool currentTargetIsInLoS = (GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
 
 					// Item Swap + Blinding flash cast
 					if (playerStatus.ActorClass == ActorClass.Monk)
