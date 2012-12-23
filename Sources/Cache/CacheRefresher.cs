@@ -118,7 +118,7 @@ namespace GilesTrinity.Cache
                 // World objects
                 try
                 {
-                    ZetaDia.Actors.Update();
+                    //ZetaDia.Actors.Update();
                     CacheManager.CacheObjectGetter = GetCache;
                     CacheManager.CacheObjectRefresher = RefreshCache;
                     CacheManager.MaxRefreshRate = 100;

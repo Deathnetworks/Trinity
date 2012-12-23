@@ -491,6 +491,11 @@ namespace GilesTrinity
                         continue;
                     }
 
+                    if (gridPoint.Distance > 45 && !ZetaDia.Physics.Raycast(origin, xyz, NavCellFlags.AllowWalk))
+                    {
+                        continue;
+                    }
+
                     /*
                      * Check if a square is occupied already
                      */
@@ -528,9 +533,9 @@ namespace GilesTrinity
                         /*
                          * This little bit is insanely CPU intensive and causes lots of small game freezes, maybe needs GUI option..
                          */
-                        if (!hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 45)
+                        if (!hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 75)
                         {
-                            PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 5, true);
+                            PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 25, true);
 
                             bool pathFailure = false;
                             Point lastNode = gp.WorldToGrid(origin.ToVector2());
@@ -586,16 +591,36 @@ namespace GilesTrinity
                         gridPoint.Weight = gridPoint.Distance;
                     }
 
-                    /*
-                     * We want to down-weight any grid points where monsters are closer to it than we are
-                     */
-                    foreach (GilesObstacle monster in hashMonsterObstacleCache)
+                    if (shouldKite)
                     {
-                        float distFromMonster = gridPoint.Position.Distance(monster.Location);
+                        /*
+                        * We want to down-weight any grid points where monsters are closer to it than we are
+                        */
+                        foreach (GilesObstacle monster in hashMonsterObstacleCache)
+                        {
+                            float distFromMonster = gridPoint.Position.Distance(monster.Location);
+                            float distFromOrigin = gridPoint.Position.Distance(origin);
+                            if (distFromMonster < distFromOrigin)
+                            {
+                                gridPoint.Weight -= distFromOrigin;
+                            }
+                            else if (distFromMonster > distFromOrigin)
+                            {
+                                gridPoint.Weight += distFromMonster;
+                            }
+                        }
+                    }
+                    foreach (GilesObstacle avoidance in hashAvoidanceObstacleCache)
+                    {
+                        float distFromAvoidance = gridPoint.Position.Distance(avoidance.Location);
                         float distFromOrigin = gridPoint.Position.Distance(origin);
-                        if (distFromMonster < distFromOrigin)
+                        if (distFromAvoidance < distFromOrigin)
                         {
                             gridPoint.Weight -= distFromOrigin;
+                        }
+                        else if (distFromAvoidance > distFromOrigin)
+                        {
+                            gridPoint.Weight += distFromAvoidance;
                         }
                     }
 

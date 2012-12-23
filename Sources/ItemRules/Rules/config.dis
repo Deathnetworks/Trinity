@@ -16,6 +16,8 @@
 // |                             |_____|   
 // +---------------------------------------------------------------------------+   
 [DEBUG]	== false
+[NOTPICKLOG] == rare         // [magic,rare,legendary] logs selected and higher
+[NOTKEEPLOG] == rare         // [magic,rare,legendary] logs selected and higher
 
 // +- Rule strength -----------------------------------------------------------+
 [RULE]	== hard                                     // [custom,hard,medium,soft] 

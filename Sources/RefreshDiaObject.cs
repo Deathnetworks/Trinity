@@ -619,10 +619,13 @@ namespace GilesTrinity
                     {
                         AddToCache = false;
                         c_IgnoreSubStep = "AllySceneryHelperTeam";
-                        //return bWantThis;
                     }
                     break;
             }
+            // Force return here for un-attackable allies
+            if (!AddToCache)
+                return AddToCache;
+
             // health calculations
             double dThisMaxHealth;
             // Get the max health of this unit, a cached version if available, if not cache it
@@ -1705,7 +1708,7 @@ namespace GilesTrinity
                 if (c_ObjectType != GObjectType.Item)
                 {
 
-                    if (c_ObjectType == GObjectType.Unit)
+                    if ((c_ObjectType == GObjectType.Unit && !bWantToTownRun) || c_ObjectType == GObjectType.Shrine)
                     {
                         bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
 

@@ -201,8 +201,11 @@ namespace GilesTrinity
                 if (GilesTrinity.BossLevelAreaIDs.Contains(GilesTrinity.playerStatus.LevelAreaId))
                     return false;
 
-                if (!GilesTrinity.bWantToTownRun && GilesTrinity.CurrentTarget != null)
+                if (GilesTrinity.bWantToTownRun && GilesTrinity.CurrentTarget != null)
+                {
+                    townRunCheckTimer.Reset();
                     return false;
+                }
 
                 // Check if we should be forcing a town-run
                 if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
@@ -351,10 +354,10 @@ namespace GilesTrinity
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Stash routine ending sequence...");
 
             // Lock memory (probably not actually necessary anymore, since we handle all item stuff ourselves!?)
-            using (ZetaDia.Memory.AcquireFrame())
-            {
-                ZetaDia.Actors.Update();
-            }
+            //using (ZetaDia.Memory.AcquireFrame())
+            //{
+            //    ZetaDia.Actors.Update();
+            //}
             if (loggedAnythingThisStash)
             {
                 FileStream LogStream = null;
@@ -402,7 +405,7 @@ namespace GilesTrinity
             /*
              *  Move to Stash
              */
-            ZetaDia.Actors.Update();
+            //ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [CoreStash-1]");
@@ -524,7 +527,9 @@ namespace GilesTrinity
                 currentItemLoops = 0;
                 RandomizeTheTimer();
                 GilesCachedACDItem thisitem = hashGilesCachedKeepItems.FirstOrDefault();
+
                 bool bDidStashSucceed = GilesStashAttempt(thisitem);
+
                 if (!bDidStashSucceed)
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "There was an unknown error stashing an item.");
                 if (thisitem != null)
@@ -611,7 +616,7 @@ namespace GilesTrinity
             if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Sell routine started";
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Sell routine started.");
-            ZetaDia.Actors.Update();
+            //ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [PreSell-1]");
@@ -634,18 +639,7 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static RunStatus GilesOptimisedSell(object ret)
         {
-            string sVendorName = "";
-            switch (ZetaDia.CurrentAct)
-            {
-                case Act.A1:
-                    sVendorName = "a1_uniquevendor_miner"; break;
-                case Act.A2:
-                    sVendorName = "a2_uniquevendor_peddler"; break;
-                case Act.A3:
-                    sVendorName = "a3_uniquevendor_collector"; break;
-                case Act.A4:
-                    sVendorName = "a4_uniquevendor_collector"; break;
-            }
+            string VendorName = GetTownVendorName();
             if (bGoToSafetyPointFirst)
             {
                 Vector3 vectorPlayerPosition = ZetaDia.Me.Position;
@@ -687,58 +681,11 @@ namespace GilesTrinity
                 }
                 bCurrentlyMoving = false;
                 bGoToSafetyPointFirst = false;
-                /*if (ZetaDia.CurrentAct == Act.A2)
-                    bGoToSafetyPointSecond = true;*/
+
                 return RunStatus.Running;
             }
-            /*if (bGoToSafetyPointSecond)
-            {
-                Vector3 vectorPlayerPosition = ZetaDia.Me.Position;
-                Vector3 vectorSellLocation = new Vector3(0f, 0f, 0f);
-                switch (ZetaDia.CurrentAct)
-                {
-                    case Act.A1:
-                        vectorSellLocation = new Vector3(2941.904f, 2812.825f, 24.04533f); break;
-                    case Act.A2:
-                        vectorSellLocation = new Vector3(295.0274f, 156.2243f, -1.834799f); break;
-                    case Act.A3:
-                    case Act.A4:
-                        vectorSellLocation = new Vector3(410.6073f, 355.8762f, 0.1000005f); break;
-                }
-                float iDistanceFromSell = Vector3.Distance(vectorPlayerPosition, vectorSellLocation);
-                if (bCurrentlyMoving)
-                {
-                    if (iDistanceFromSell <= 8f)
-                    {
-                        bGoToSafetyPointSecond = false;
-                        bCurrentlyMoving = false;
-                    }
-                    else if (iLastDistance == iDistanceFromSell)
-                    {
-                        try
-                        {
-                            ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
-                        }
-                        catch
-                        {
-                            Log("GSError: Diablo 3 move command error [CoreSell-1: " + thisGilesDiaItem.ThisInternalName + "]", true);
-                        }
-                    }
-                    return RunStatus.Running;
-                }
-                iLastDistance = iDistanceFromSell;
-                if (iDistanceFromSell > 120f)
-                    return RunStatus.Failure;
-                if (iDistanceFromSell > 8f)
-                {
-                    ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
-                    bCurrentlyMoving = true;
-                    return RunStatus.Running;
-                }
-                bCurrentlyMoving = false;
-                bGoToSafetyPointSecond = false;
-                return RunStatus.Running;
-            }*/
+
+
             if (!bReachedDestination)
             {
                 Vector3 vectorPlayerPosition = ZetaDia.Me.Position;
@@ -753,18 +700,18 @@ namespace GilesTrinity
                     case Act.A4:
                         vectorSellLocation = new Vector3(447.8373f, 324.1446f, 0.1000005f); break;
                 }
-                DiaUnit objSellNavigation = ZetaDia.Actors.GetActorsOfType<DiaUnit>(true).FirstOrDefault<DiaUnit>(u => u.Name.ToLower().StartsWith(sVendorName));
-                if (objSellNavigation != null)
-                    vectorSellLocation = objSellNavigation.Position;
+                DiaUnit townVendor = ZetaDia.Actors.GetActorsOfType<DiaUnit>(true).FirstOrDefault<DiaUnit>(u => u.Name.ToLower().StartsWith(VendorName));
+                if (townVendor != null)
+                    vectorSellLocation = townVendor.Position;
                 float iDistanceFromSell = Vector3.Distance(vectorPlayerPosition, vectorSellLocation);
                 if (bCurrentlyMoving)
                 {
                     if (iDistanceFromSell <= 9.5f)
                     {
                         bReachedDestination = true;
-                        if (objSellNavigation == null)
+                        if (townVendor == null)
                             return RunStatus.Failure;
-                        objSellNavigation.Interact();
+                        townVendor.Interact();
                     }
                     else if (lastDistance == iDistanceFromSell)
                     {
@@ -782,16 +729,16 @@ namespace GilesTrinity
                     return RunStatus.Running;
                 }
                 bReachedDestination = true;
-                if (objSellNavigation == null)
+                if (townVendor == null)
                     return RunStatus.Failure;
-                objSellNavigation.Interact();
+                townVendor.Interact();
             }
             if (!Zeta.Internals.UIElement.IsValidElement(12123456831356216535L) || !Zeta.Internals.UIElement.FromHash(12123456831356216535L).IsVisible)
             {
-                DiaUnit objSellNavigation = ZetaDia.Actors.GetActorsOfType<DiaUnit>(true).FirstOrDefault<DiaUnit>(u => u.Name.ToLower().StartsWith(sVendorName));
-                if (objSellNavigation == null)
+                DiaUnit townVendor = ZetaDia.Actors.GetActorsOfType<DiaUnit>(true).FirstOrDefault<DiaUnit>(u => u.Name.ToLower().StartsWith(VendorName));
+                if (townVendor == null)
                     return RunStatus.Failure;
-                objSellNavigation.Interact();
+                townVendor.Interact();
                 return RunStatus.Running;
             }
             if (hashGilesCachedSellItems.Count > 0)
@@ -815,7 +762,7 @@ namespace GilesTrinity
                         double iThisItemValue = GilesTrinity.ValueThisItem(thisitem, OriginalGilesItemType);
                         LogJunkItems(thisitem, thisGilesBaseType, OriginalGilesItemType, iThisItemValue);
                     }
-                    ZetaDia.Me.Inventory.SellItem(thisitem.DynamicID);
+                    ZetaDia.Me.Inventory.SellItem(thisitem.item);
                 }
                 if (thisitem != null)
                     hashGilesCachedSellItems.Remove(thisitem);
@@ -827,6 +774,23 @@ namespace GilesTrinity
             return RunStatus.Success;
         }
 
+        private static string GetTownVendorName()
+        {
+            string sVendorName = "";
+            switch (ZetaDia.CurrentAct)
+            {
+                case Act.A1:
+                    sVendorName = "a1_uniquevendor_miner"; break;
+                case Act.A2:
+                    sVendorName = "a2_uniquevendor_peddler"; break;
+                case Act.A3:
+                    sVendorName = "a3_uniquevendor_collector"; break;
+                case Act.A4:
+                    sVendorName = "a4_uniquevendor_collector"; break;
+            }
+            return sVendorName;
+        }
+
         /// <summary>
         /// Post Sell tidies everything up and signs off junk log after selling
         /// </summary>
@@ -835,20 +799,30 @@ namespace GilesTrinity
         internal static RunStatus GilesOptimisedPostSell(object ret)
         {
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Sell routine ending sequence...");
-            using (ZetaDia.Memory.AcquireFrame())
-            {
-                ZetaDia.Actors.Update();
-            }
+            //using (ZetaDia.Memory.AcquireFrame())
+            //{
+            //    ZetaDia.Actors.Update();
+            //}
 
             // Always repair, but only if we have enough money
-            if (bNeedsEquipmentRepairs && iLowestDurabilityFound < 20 && iLowestDurabilityFound > -1 && ZetaDia.Me.Inventory.Coinage < 40000)
+            if (bNeedsEquipmentRepairs && iLowestDurabilityFound < 20 && iLowestDurabilityFound > -1 && ZetaDia.Me.Inventory.Coinage < 5000)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "*");
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Emergency Stop: You need repairs but don't have enough money. Stopping the bot to prevent infinite death loop.");
                 BotMain.Stop();
             }
+            string VendorName = GetTownVendorName();
 
-            //ZetaDia.Me.Inventory.RepairEquippedItems();
+            if (!Zeta.Internals.UIElement.IsValidElement(12123456831356216535L) || !Zeta.Internals.UIElement.FromHash(12123456831356216535L).IsVisible)
+            {
+                DiaUnit townVendor = ZetaDia.Actors.GetActorsOfType<DiaUnit>(true).FirstOrDefault<DiaUnit>(u => u.Name.ToLower().StartsWith(VendorName));
+                if (townVendor == null)
+                    return RunStatus.Failure;
+                townVendor.Interact();
+                return RunStatus.Running;
+            }
+
+            // TODO: Open repair tab and Click UIElement to Repair All
             ZetaDia.Me.Inventory.RepairAllItems();
 
             bNeedsEquipmentRepairs = false;
@@ -886,43 +860,7 @@ namespace GilesTrinity
                     // Do nothing if it fails, just catching to prevent any big errors/plugin crashes from this
                 }
             }
-            /*if (!bReachedSafety && ZetaDia.CurrentAct == Act.A2)
-            {
-                Vector3 vectorPlayerPosition = ZetaDia.Me.Position;
-                Vector3 vectorSafeLocation = new Vector3(284.3047f, 212.2945f, 0.1f);
-                float iDistanceFromSafety = Vector3.Distance(vectorPlayerPosition, vectorSafeLocation);
-                if (bCurrentlyMoving)
-                {
-                    if (iDistanceFromSafety <= 8f)
-                    {
-                        bReachedSafety = true;
-                        bCurrentlyMoving = false;
-                    }
-                    else if (iLastDistance == iDistanceFromSafety)
-                    {
-                        try
-                        {
-                            ZetaDia.Me.UsePower(SNOPower.Walk, vectorSafeLocation, ZetaDia.Me.WorldDynamicId);
-                        }
-                        catch
-                        {
-                            Log("GSError: Diablo 3 move command error [PostSell-1: " + thisGilesDiaItem.ThisInternalName + "]", true);
-                        }
-                    }
-                    return RunStatus.Running;
-                }
-                iLastDistance = iDistanceFromSafety;
-                if (iDistanceFromSafety > 120f)
-                    return RunStatus.Failure;
-                if (iDistanceFromSafety > 8f)
-                {
-                    ZetaDia.Me.UsePower(SNOPower.Walk, vectorSafeLocation, ZetaDia.Me.WorldDynamicId);
-                    bCurrentlyMoving = true;
-                    return RunStatus.Running;
-                }
-                bCurrentlyMoving = false;
-                bReachedSafety = true;
-            }*/
+
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Sell routine finished.");
             return RunStatus.Success;
         }
@@ -974,7 +912,7 @@ namespace GilesTrinity
             if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Salvage routine started";
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Salvage routine started.");
-            ZetaDia.Actors.Update();
+            //ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [PreSalvage-1]");
@@ -1180,10 +1118,10 @@ namespace GilesTrinity
         internal static RunStatus GilesOptimisedPostSalvage(object ret)
         {
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Salvage routine ending sequence...");
-            using (ZetaDia.Memory.AcquireFrame())
-            {
-                ZetaDia.Actors.Update();
-            }
+            //using (ZetaDia.Memory.AcquireFrame())
+            //{
+            //    ZetaDia.Actors.Update();
+            //}
             if (loggedJunkThisStash)
             {
                 FileStream LogStream = null;
@@ -1713,7 +1651,7 @@ namespace GilesTrinity
         {
 
             // Try and update the player-data
-            ZetaDia.Actors.Update();
+            //ZetaDia.Actors.Update();
 
             // Check we can get the player dynamic ID
             int iPlayerDynamicID = -1;

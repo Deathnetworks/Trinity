@@ -1,9 +1,9 @@
-// +---------------------------------------------------------------------------+
-// | _____ _______ _______ _______ _______ _____ _______ ______ ___ ___ 
-// | |  |_| ___|  __| ___| | |  \| _ | __ \ | |
-// | |  | ___| | | ___|  | -- |  |  <\  / 
-// | |_______|_______|_______|_______|__|____|_____/|___|___|___|__| |___| 
-// | +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                  
+﻿// +---------------------------------------------------------------------------+
+// |  _____   _______ _______ _______ _______ _____  _______ ______ ___ ___ 
+// | |     |_|    ___|     __|    ___|    |  |     \|   _   |   __ \   |   |
+// | |       |    ___|    |  |    ___|       |  --  |       |      <\     / 
+// | |_______|_______|_______|_______|__|____|_____/|___|___|___|__| |___|  
+// | +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                                       
 // +---------------------------------------------------------------------------+
 
 // keep all legendarys items
@@ -23,10 +23,10 @@
 
 // +---------------------------------------------------------------------------+ 
 // |  _ _ _ _____ _____ _____ _____ _____ 
-// | | | | | __| _ | _ |  | | |
-// | | | | | __|  | __| | | | | |
-// | |_____|_____|__|__|__| |_____|_|___|
-// | +++++++++++++++++++++++++++++++++++++         
+// | | | | |   __|  _  |  _  |     |   | |
+// | | | | |   __|     |   __|  |  | | | |
+// | |_____|_____|__|__|__|  |_____|_|___|
+// | +++++++++++++++++++++++++++++++++++++                                   
 // +---------------------------------------------------------------------------+
 
 // +---------------------------------------------------------------------------+ 
@@ -621,8 +621,9 @@
 // Item Level: 60
 //[QUALITY] == "Legendary" && [NAME] == "Heart Slaughter" # [DPS] > 800 && [SOCKETS] > 0 //soft
 //[QUALITY] == "Legendary" && [NAME] == "Heart Slaughter" # [DPS] > 900 && ([SOCKETS] > 0 || [LOH] > 0 || [LS%] > 0 || [MAXSTATVIT] > 100) //soft
-//[QUALITY] == "Legendary" && [NAME] == "Heart Slaughter" # [DPS] > 1000 //soft
-
+[QUALITY] == "Legendary" && [NAME] == "Heart Slaughter" # [DPS] > 1000 && [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "Heart Slaughter" -> [TRASH] // baseType misc bug
+ 
 // - Vigilance ----------------------------------------------------------------+
 // "Legendary" Polearm
 // 1164.2–1484.7 Damage Per Second
@@ -648,6 +649,7 @@
 //[QUALITY] == "Legendary" && [NAME] == "Vigilance" # [DPS] > 1300 && ([SOCKETS] > 0 || [LOH] > 0 || [MAXSTATVIT] > 100) //soft 
 //[QUALITY] == "Legendary" && [NAME] == "Vigilance" # [DPS] > 1400 //soft
 [QUALITY] == "Legendary" && [NAME] == "Vigilance" # [DPS] > 1450 && [SOCKETS] > 0
+[QUALITY] == "Legendary" && [NAME] == "Vigilance" -> [TRASH] // baseType misc bug
 
 // +---------------------------------------------------------------------------+ 
 // +--- Staves
@@ -1113,11 +1115,11 @@
 [QUALITY] == "Legendary" && [NAME] == "Chantodo's Will" # [DPS] > 1100
 
 // +---------------------------------------------------------------------------+ 
-// | _____ _____ _____  _____ _____ _____ ____ 
-// | |  | __| __|___| | | _ | | | \ 
-// | | | | __| __|___|  |  | | | | | |
-// | |_____|__| |__|  |__|__|__|__|_|___|____/ 
-// | +++++++++++++++++++++++++++++++++++++++++++++++            
+// |  _____ _____ _____     _____ _____ _____ ____  
+// | |     |   __|   __|___|  |  |  _  |   | |    \ 
+// | |  |  |   __|   __|___|     |     | | | |  |  |
+// | |_____|__|  |__|      |__|__|__|__|_|___|____/ 
+// | +++++++++++++++++++++++++++++++++++++++++++++++                                               
 // +---------------------------------------------------------------------------+
 
 // +---------------------------------------------------------------------------+
@@ -1166,7 +1168,7 @@
 // Increases Gold and Health Pickup by 20 Yards.
 // +2 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Thing of the Deep" # [DMGFACTOR] > 12 || ([DMGFACTOR] > 11 && [INTVIT] > 200)
+[QUALITY] == "Legendary" && [NAME] == "Thing of the Deep" # [AVGDMG] > 200 && [INTVIT] > 200
 
 // - Uhkapian Serpent ---------------------------------------------------------+
 // "Legendary" Mojo
@@ -1314,11 +1316,11 @@
 [QUALITY] == "Legendary" && [NAME] == "Dead Man's Legacy" # [AS%] > 15 && [DEXVIT] > 400 || [AS%] > 17
 
 // +---------------------------------------------------------------------------+ 
-// | _____ _____ _____ _____ _____ 
-// | | _ | __ |  |  | __ |
-// | |  | -| | | | | | -|
+// |  _____ _____ _____ _____ _____ 
+// | |  _  | __  |     |     | __  |
+// | |     |    -| | | |  |  |    -|
 // | |__|__|__|__|_|_|_|_____|__|__|
-// | +++++++++++++++++++++++++++++++        
+// | +++++++++++++++++++++++++++++++                               
 // +---------------------------------------------------------------------------+
 
 // +---------------------------------------------------------------------------+
@@ -1343,7 +1345,8 @@
 // +150-169 Strength
 // +1 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Andariel's Visage" # [SOCKETS] > 0 || [ALLRES] > 0 || [MAXSTATVIT] > 200 || [LIFE%] > 0
+[QUALITY] == "Legendary" && [NAME] == "Andariel's Visage" # [SOCKETS] > 0 || [ALLRES] > 50 || [MAXSTATVIT] > 250 || [LIFE%] > 5
+[QUALITY] == "Legendary" && [NAME] == "Andariel's Visage" -> [TRASH] // baseType misc bug
 
 // - Mempo of Twilight --------------------------------------------------------+
 // "Legendary" Helm
@@ -1391,6 +1394,7 @@
 // Natalya's Solace
 // Item Level: 63
 [QUALITY] == "Legendary" && [NAME] == "Natalya's Sight" # [DEXVIT] > 100 || [ALLRES] > 0 || [CRIT%] > 0 || [LIFE%] > 0
+[QUALITY] == "Legendary" && [NAME] == "Natalya's Sight" -> [TRASH] // baseType misc bug
 
 // - Tal Rasha's Guise of Wisdom ----------------------------------------------+
 // Set Helm
@@ -1419,7 +1423,7 @@
 // Gain 15.1-29.8 Life per Spirit Spent (Monk Only)
 // +1 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "Tzo Krin's Gaze" # [DEXVIT] > 200 || [SOCKETS] > 0 || [TOTRES] > 0 || [CRIT%] > 0
+[QUALITY] == "Legendary" && [NAME] == "Tzo Krin's Gaze" # [CRIT%] > 0
 
 // - Madstone -----------------------------------------------------------------+
 // "Legendary" Spirit Stone
@@ -1438,7 +1442,7 @@
 // Increases Fists of Thunder Damage by 5-14% (Monk Only)
 // +1 Random Magic Properties
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Madstone" # [DEXVIT] > 150 || [SOCKETS] > 0 || [LIFE%] > 0 || [CRIT%] > 0 || [MAXONERES] > 0
+[QUALITY] == "Legendary" && [NAME] == "Madstone" # [SOCKETS] > 0 || [CRIT%] > 3
 
 // - Inna's Radiance ----------------------------------------------------------+
 // Set Spirit Stone
@@ -1852,6 +1856,7 @@
 // Blackthorne's Armor
 // Item Level: 63
 [QUALITY] == "Legendary" && [NAME] == "Blackthorne's Notched Belt" # [MAXSTATVIT] > 195 && ([ALLRES] > 0 || [LIFE%] > 0 || [LS%] > 0)
+[QUALITY] == "Legendary" && [NAME] == "Blackthorne's Notched Belt" -> [TRASH] // baseType misc bug
 
 // - Inna's Favor -------------------------------------------------------------+
 // Set Belt
@@ -1891,7 +1896,7 @@
 // Melee attackers take 812-1242 damage per hit.
 // +2 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "Ageless Might" # [STR] > 50 || [LIFE%] > 0 || [LS%] > 0
+[QUALITY] == "Legendary" && [NAME] == "Ageless Might" # [STRVIT] > 150 && ([LIFE%] > 0 || [LS%] > 0)
 
 // - Lamentation --------------------------------------------------------------+
 // "Legendary" Mighty Belt
@@ -2003,7 +2008,7 @@
 // +150-169 Strength
 // +2 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Fire Walkers" # [MAXSTATVIT] > 200 || [ALLRES] > 0
+[QUALITY] == "Legendary" && [NAME] == "Fire Walkers" # ([MAXSTATVIT] > 200 && [ALLRES] > 0) || [ALLRES] > 60
 
 // - Ice Climbers -------------------------------------------------------------+
 // "Legendary" Boots
@@ -2070,14 +2075,15 @@
 // +2 Random Magic Properties
 // Zunimassa's Whispers
 // Item Level: 63
-[QUALITY] == "Legendary" && [NAME] == "Zunimassa's Trail" 
-
+[QUALITY] == "Legendary" && [NAME] == "Zunimassa's Trail" # [MAXSTATVIT] > 275 || [ALLRES] > 50 
+[QUALITY] == "Legendary" && [NAME] == "Zunimassa's Trail" # [MAXSTATVIT] > 200 && [ALLRES] > 0 && [ARMORBONUS] > 0
+ 
 // +---------------------------------------------------------------------------+ 
-// |  __ _____ _ _ _ _____ __ _____ __ __ 
-// | __| | __| | | | __| | | __ | | |
-// | | | | __| | | | __| |__| -|_ _|
-// | |_____|_____|_____|_____|_____|__|__| |_| 
-// | +++++++++++++++++++++++++++++++++++++++++++           
+// |     __ _____ _ _ _ _____ __    _____ __ __ 
+// |  __|  |   __| | | |   __|  |  | __  |  |  |
+// | |  |  |   __| | | |   __|  |__|    -|_   _|
+// | |_____|_____|_____|_____|_____|__|__| |_|  
+// | +++++++++++++++++++++++++++++++++++++++++++                                           
 // +---------------------------------------------------------------------------+
 
 // +---------------------------------------------------------------------------+
@@ -2209,7 +2215,7 @@
 // Reduces resource cost of Hammer of the Ancients by 1-5 Fury. (Barbarian Only)
 // +3 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Mara's Kaleidoscope" # [DMGFACTOR] > 0
+[QUALITY] == "Legendary" && [NAME] == "Mara's Kaleidoscope" # ([AS%].dual + [CRIT%].dual + [CRITDMG%].dual) > 1 || [DMGFACTOR] > 18 || [MAXSTATVIT] > 250
  
 // - Xephirian Amulet ---------------------------------------------------------+
 // "Legendary" Amulet
@@ -2301,7 +2307,7 @@
 // This ring occasionally haunts nearby enemies.
 // +1 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "Band of Hollow Whispers" # [DMGFACTOR] > 3 || [MAXSTATVIT] > 100 || [MAXSTATVIT] > 200
+[QUALITY] == "Legendary" && [NAME] == "Band of Hollow Whispers" # [DMGFACTOR] > 6 || [MAXSTATVIT] > 200
 
 // - Hierophant's Seal --------------------------------------------------------+
 // "Legendary" Ring
@@ -2313,7 +2319,7 @@
 // Regenerates 116-160 Life per Second
 // +1 Random Magic Properties
 // Item Level: 61
-[QUALITY] == "Legendary" && [NAME] == "Hierophant's Seal" # [DMGFACTOR] > 7 || [MAXSTATVIT] > 50 || [ALLRES] > 40
+[QUALITY] == "Legendary" && [NAME] == "Hierophant's Seal" # [DMGFACTOR] > 12 || [MAXSTATVIT] > 100 || [ALLRES] > 50
 
 // - Skull Grasp --------------------------------------------------------------+
 // "Legendary" Ring
@@ -2493,7 +2499,7 @@
 // +150-169 Strength
 // +1 Random Magic Properties
 // Item Level: 62
-[QUALITY] == "Legendary" && [NAME] == "Unity" # [ALLRES] > 0 || [CRITDMG%] > 0 || [AS%] > 0 || [ALLRES] > 60
+[QUALITY] == "Legendary" && [NAME] == "Unity" # [MAXSTATVIT] > 200 || [ALLRES] > 0 || [CRITDMG%] > 0 || [AS%] > 0
 
 // - Litany of the Undaunted --------------------------------------------------+
 // Set Ring
@@ -2557,23 +2563,24 @@
 
 // +---------------------------------------------------------------------------+ 
 // | _____ _____ _____ _____ _____ 
-// || _ _| __ | _ | __| | |
-// | | | | -|  |__ |  |
-// | |_| |__|__|__|__|_____|__|__|
-// | ++++++++++++++++++++++++++++++           
+// ||_   _| __  |  _  |   __|  |  |
+// |  | | |    -|     |__   |     |
+// |  |_| |__|__|__|__|_____|__|__|
+// | ++++++++++++++++++++++++++++++                                           
 // +---------------------------------------------------------------------------+
 
 // safety rule
-[QUALITY] == "Legendary" && [BASETYPE] == "Weapon" && [ONEHAND] == true # [DPS] > 900 && [SOCKETS] > 0 && ([CRITDMG%] > 50 || [LOH] > 400 || [LS%] > 3 || [MAXSTATVIT] > 200)
-[QUALITY] == "Legendary" && [BASETYPE] == "Weapon" && [TWOHAND] == true # [DPS] > 1200 && [SOCKETS] > 0 && ([CRITDMG%] > 100 || [LOH] > 800 || [LS%] > 6 || [MAXSTATVIT] > 400) 
-[QUALITY] == "Legendary" && [BASETYPE] == "Armor" # [MAXSTATVIT] > 400 || [DMGFACTOR] > 15
-[QUALITY] == "Legendary" && [BASETYPE] == "Armor" # [MAXSTATVIT] > 300 && ([DMGFACTOR] > 12 || [ALLRES] > 60)
-[QUALITY] == "Legendary" && [BASETYPE] == "Armor" # [MAXSTATVIT] > 200 && [DMGFACTOR] > 9 && [ALLRES] > 60
-[QUALITY] == "Legendary" && [BASETYPE] == "Jewelry" # [MAXSTATVIT] > 300 || [DMGFACTOR] > 6
-[QUALITY] == "Legendary" && [BASETYPE] == "Jewelry" # [MAXSTATVIT] > 200 && ([DMGFACTOR] > 4 || [ALLRES] > 60)
-[QUALITY] == "Legendary" && [BASETYPE] == "Jewelry" # [MAXSTATVIT] > 100 && [DMGFACTOR] > 3 && [ALLRES] > 60
+//[QUALITY] == "Legendary" && [BASETYPE] == "Weapon" && [ONEHAND] == true # [DPS] > 900 && [SOCKETS] > 0 && ([CRITDMG%] > 50 || [LOH] > 400 || [LS%] > 3 || [MAXSTATVIT] > 200)
+//[QUALITY] == "Legendary" && [BASETYPE] == "Weapon" && [TWOHAND] == true # [DPS] > 1200 && [SOCKETS] > 0 && ([CRITDMG%] > 100 || [LOH] > 800 || [LS%] > 6 || [MAXSTATVIT] > 400) 
+//[QUALITY] == "Legendary" && [BASETYPE] == "Armor" # [MAXSTATVIT] > 400 || [DMGFACTOR] > 15
+//[QUALITY] == "Legendary" && [BASETYPE] == "Armor" # [MAXSTATVIT] > 300 && ([DMGFACTOR] > 12 || [ALLRES] > 60)
+//[QUALITY] == "Legendary" && [BASETYPE] == "Armor" # [MAXSTATVIT] > 200 && [DMGFACTOR] > 9 && [ALLRES] > 60
+//[QUALITY] == "Legendary" && [BASETYPE] == "Jewelry" # [MAXSTATVIT] > 300 || [DMGFACTOR] > 6
+//[QUALITY] == "Legendary" && [BASETYPE] == "Jewelry" # [MAXSTATVIT] > 200 && ([DMGFACTOR] > 4 || [ALLRES] > 60)
+//[QUALITY] == "Legendary" && [BASETYPE] == "Jewelry" # [MAXSTATVIT] > 100 && [DMGFACTOR] > 3 && [ALLRES] > 60
 
 // cleanup rule trashing all other stuff
 [QUALITY] == "Legendary" && [BASETYPE] == "Weapon" -> [TRASH]
 [QUALITY] == "Legendary" && [BASETYPE] == "Armor" -> [TRASH]
 [QUALITY] == "Legendary" && [BASETYPE] == "Jewelry" -> [TRASH]
+//[QUALITY] == "Legendary" && [BASETYPE] == "Misc" -> [TRASH] // baseType misc bug

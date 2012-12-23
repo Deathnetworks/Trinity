@@ -24,6 +24,20 @@ Future Planned Improvements:
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
 
+Changelog 1.7.1.9:
+
+* Now opens vendor window before repairing
+
+* Performance fixes (no longer calling ActorManager.Update(), since DB does this itself)
+
+* Fixed Demonhunter Vault Delay slider
+
+* Fixed localization issues for some countries in ItemRules2
+
+* Additional debug logging for special movement
+
+* changed logging and added some more options for config.dis
+
 Changelog 1.7.1.8:
 
 * Fixed reverse gold pickup bug
