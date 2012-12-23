@@ -12,4 +12,4 @@ ZIPFILE=$A$B$D
 
 ./CreateZip.cmd
 
-mv Latest-GilesTrinity.zip $ZIPFILE
+mv Latest-GilesTrinity.zip ../Releases/$ZIPFILE
