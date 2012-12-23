@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
+using System.Globalization;
 
 namespace GilesTrinity.ItemRules.Core
 {
@@ -387,7 +388,7 @@ namespace GilesTrinity.ItemRules.Core
 
                 case TokenType.NUMBER:
                     float resultFloat;
-                    if (Single.TryParse(obj.ToString(), out resultFloat))
+                    if (Single.TryParse(obj.ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out resultFloat))
                         return resultFloat;
                     break;
 

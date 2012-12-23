@@ -13,7 +13,7 @@
 
 // crafting plans setting
 [QUALITY] == "Legendary" && [TYPE] == "CraftingPlan"
-[QUALITY] == "Rare6" && [TYPE] == "CraftingPlan"
+[QUALITY] == "Rare6" && [TYPE] == "CraftingPlan" -> [TRASH]
 [QUALITY] == "Rare5" && [TYPE] == "CraftingPlan" -> [TRASH]
 [QUALITY] == "Rare4" && [TYPE] == "CraftingPlan" -> [TRASH]
 

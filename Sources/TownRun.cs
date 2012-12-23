@@ -762,7 +762,7 @@ namespace GilesTrinity
                         double iThisItemValue = GilesTrinity.ValueThisItem(thisitem, OriginalGilesItemType);
                         LogJunkItems(thisitem, thisGilesBaseType, OriginalGilesItemType, iThisItemValue);
                     }
-                    ZetaDia.Me.Inventory.SellItem(thisitem.DynamicID);
+                    ZetaDia.Me.Inventory.SellItem(thisitem.item);
                 }
                 if (thisitem != null)
                     hashGilesCachedSellItems.Remove(thisitem);

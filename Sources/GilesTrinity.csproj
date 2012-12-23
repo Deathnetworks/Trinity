@@ -37,8 +37,10 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Demonbuddy">
-      <HintPath>..\..\Demonbuddy.exe</HintPath>
+    <Reference Include="Demonbuddy, Version=1.0.1234.293, Culture=neutral, PublicKeyToken=eff32ccf253d66d4, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <ExecutableExtension>.exe</ExecutableExtension>
+      <HintPath>..\..\..\Demonbuddy I\Demonbuddy.exe</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
