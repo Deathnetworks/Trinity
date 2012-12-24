@@ -16,6 +16,7 @@ using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
 using Decorator = Zeta.TreeSharp.Decorator;
 using System.Diagnostics;
+using Zeta.Navigation;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -1197,11 +1198,10 @@ namespace GilesTrinity
             if (DateTime.Now.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(vLastMoveToTarget, vCurrentDestination) >= 2f || bForceNewMovement)
             {
                 //ZetaDia.Me.UsePower(SNOPower.Walk, vCurrentDestination, iCurrentWorldID, -1);
-                //Navigator.MoveTo(vCurrentDestination, null, true);
-                //Navigator.PlayerMover.MoveTowards(vCurrentDestination);
 
+                Navigator.PlayerMover.MoveTowards(vCurrentDestination);
                 //ZetaDia.Me.Movement.MoveActor(vCurrentDestination);
-                Zeta.Navigation.Navigator.MoveTo(vCurrentDestination, CurrentTarget.InternalName, true);
+                //Navigator.MoveTo(vCurrentDestination, CurrentTarget.InternalName, true);
                 lastSentMovePower = DateTime.Now;
 
                 // Store the current destination for comparison incase of changes next loop

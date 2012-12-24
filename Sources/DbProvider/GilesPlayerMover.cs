@@ -550,7 +550,8 @@ namespace GilesTrinity.DbProvider
                 }
 
                 // Default movement
-                ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
+                ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
+                //ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
 
             }
         }
