@@ -33,18 +33,11 @@ namespace GilesTrinity
 
             if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
-                // try updating fix#3 try for name bug -> doesn't work
-                //ACDItem item = ZetaDia.Actors.GetACDItemByGuid(acd.ACDGuid);
-                //Interpreter.InterpreterAction action = StashRule.checkItem(ZetaDia.Actors.GetACDItemByGuid(acd.ACDGuid), true);
-                
-                //Interpreter.InterpreterAction action = StashRule.checkItem(acd as ACDItem, true);
-
                 Interpreter.InterpreterAction action = StashRule.checkPickUpItem(name, level, quality, dbItemBaseType, dbItemType, isOneHand, isTwoHand, balanceId, dynamicID);
                 switch (action)
                 {
-                    case Interpreter.InterpreterAction.KEEP:
+                    case Interpreter.InterpreterAction.PICKUP:
                         return true;
-
                     case Interpreter.InterpreterAction.IGNORE:
                         return false;
                 }
