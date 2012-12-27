@@ -305,7 +305,7 @@ namespace GilesTrinity.DbProvider
 
 
         public void MoveTowards(Vector3 vMoveToTarget)
-        {
+        {            
             using (new PerformanceLogger("GilesPlayerMover.MoveTowards"))
             {
                 // rrrix-note: This really shouldn't be here... 
@@ -552,13 +552,14 @@ namespace GilesTrinity.DbProvider
                 if (fDistanceFromTarget > 1f)
                 {
                     // Default movement
-                    ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
-                    //ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
+                    ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Used basic movement to {0}", vMoveToTarget);
                 }
                 else
                 {
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Reached MoveTowards Destination {0}", vMoveToTarget); 
                 }
+
             }
         }
 

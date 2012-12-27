@@ -24,6 +24,24 @@ Future Planned Improvements:
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
 
+Changelog 1.7.1.10:
+
+Simplified gold and item weighting forumulas.
+
+* Adjustments for Kiting targeting.
+
+* Gold inactivity timer reset on bot start.
+
+* Should no longer attack through 'dummy' signal fires.
+
+* Picks up all health potions again (was missing Greater health potions).
+
+* Fixed forced vendor run (will no longer continue moving).
+
+* Fixed item rules pickup validation, should now correctly pickup items again when using Item Rules
+
+* Trinity now attacks Belial again
+
 Changelog 1.7.1.9:
 
 * Now opens vendor window before repairing
