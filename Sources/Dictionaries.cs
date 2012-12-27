@@ -170,6 +170,8 @@ namespace GilesTrinity
             86624, 156353, 51341, 5350, 3526,
             // Corrupt Growths, Act 4, Istaku
             210120, 215103,
+            // Rakanoth
+            4630, 
          };
         // IGNORE LIST / BLACKLIST - for units / monsters / npcs
         // Special blacklist for things like ravens, templar/scoundrel/enchantress in town, witch-doctor summons, tornado-animations etc. etc. that should never be attacked
@@ -237,13 +239,13 @@ namespace GilesTrinity
         /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
         /// </summary>
         internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
-            174900, 191459, 104632, 196211,
+            174900, 191459, 104632, 196211, 200872, 
         };
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 10}, {191459, 13}, {104632, 20}, {196211, 25},
+            {174900, 10}, {191459, 13}, {104632, 20}, {196211, 25}, {200872, 25},
          };
         /// <summary>
         /// Destructible things that are very large and need breaking at a bigger distance - eg logstacks, large crates, carts, etc.

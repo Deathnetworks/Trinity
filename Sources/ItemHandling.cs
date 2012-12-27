@@ -227,7 +227,7 @@ namespace GilesTrinity
             if (name.StartsWith("emerald_")) return GItemType.Emerald;
             if (name.StartsWith("topaz_")) return GItemType.Topaz;
             if (name.StartsWith("amethyst")) return GItemType.Amethyst;
-            if (name.StartsWith("healthpotion_")) return GItemType.HealthPotion;
+            if (name.StartsWith("healthpotion")) return GItemType.HealthPotion;
             if (name.StartsWith("followeritem_enchantress_")) return GItemType.FollowerEnchantress;
             if (name.StartsWith("followeritem_scoundrel_")) return GItemType.FollowerScoundrel;
             if (name.StartsWith("followeritem_templar_")) return GItemType.FollowerTemplar;

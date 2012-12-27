@@ -118,6 +118,13 @@ namespace GilesTrinity
                                     };
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Staying Put During Avoidance");
             }
+
+            // force to stay put if we want to town run and there's no target
+            if (CurrentTarget == null && ForceVendorRunASAP)
+            {
+                bDontMoveMeIAmDoingShit = true;
+            }
+
             // Still no target, let's see if we should backtrack or wait for wrath to come off cooldown...
             if (CurrentTarget == null)
             {

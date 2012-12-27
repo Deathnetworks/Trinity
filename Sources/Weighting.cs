@@ -238,16 +238,20 @@ namespace GilesTrinity
                                     }
                                     cacheObject.Weight -= fWeightRemoval;
 
-                                    if (PlayerKiteDistance > 0)
-                                    {
-                                        if (hashMonsterObstacleCache.Any(m => GilesIntersectsPath(cacheObject.Position, cacheObject.Radius, playerStatus.CurrentPosition, m.Location)))
-                                            cacheObject.Weight = 0;
-                                    }
-
-
                                     // Prevent going less than 300 yet to prevent annoyances (should only lose this much weight from priority reductions in priority list?)
                                     if (cacheObject.Weight < 300)
                                         cacheObject.Weight = 300;
+
+                                    if (PlayerKiteDistance > 0)
+                                    {
+                                        if (GilesObjectCache.Any(m => m.Type == GObjectType.Unit &&
+                                            GilesIntersectsPath(cacheObject.Position, cacheObject.Radius, playerStatus.CurrentPosition, m.Position) &&
+                                            m.RActorGuid != cacheObject.RActorGuid))
+                                        {
+                                            cacheObject.Weight = 0;
+                                        }
+                                    }
+
 
                                     // Deal with treasure goblins - note, of priority is set to "0", then the is-a-goblin flag isn't even set for use here - the monster is ignored
                                     if (cacheObject.IsTreasureGoblin)
@@ -298,17 +302,23 @@ namespace GilesTrinity
                             // Weight Items
 
                             // We'll weight them based on distance, giving gold less weight and close objects more
+                            //if (cacheObject.GoldAmount > 0)
+                            //    cacheObject.Weight = 5000d - (Math.Floor(cacheObject.CentreDistance) * 2000d);
+                            //else
+                            //    cacheObject.Weight = 8000d - (Math.Floor(cacheObject.CentreDistance) * 1900d);
+
                             if (cacheObject.GoldAmount > 0)
-                                cacheObject.Weight = 5000d - (Math.Floor(cacheObject.CentreDistance) * 200d);
+                                cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 5000d;
                             else
-                                cacheObject.Weight = 8000d - (Math.Floor(cacheObject.CentreDistance) * 190d);
+                                cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 8000d;
+
 
                             // Point-blank items get a weight increase 
                             if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 8f)
                                 cacheObject.Weight += 600d;
 
                             // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                            if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                            if (cacheObject.RActorGuid == CurrentTargetRactorGUID)
                                 cacheObject.Weight += 800;
 
                             // Give yellows more weight
@@ -570,7 +580,7 @@ namespace GilesTrinity
 
                 //    bStayPutDuringAvoidance = true;
                 //}
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2} type: {3} mobsInCloseRange: {4} requireAvoidance: {5} PrioritizeCloseRangeUnits: {6}",
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2:0} type: {3} mobsInCloseRange: {4} requireAvoidance: {5} PrioritizeCloseRangeUnits: {6}",
                         cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance, PrioritizeCloseRangeUnits);
 
                 // Prevent current target dynamic ranged weighting flip-flop 
@@ -582,7 +592,6 @@ namespace GilesTrinity
                 // Is the weight of this one higher than the current-highest weight? Then make this the new primary target!
                 if (cacheObject.Weight > w_HighestWeightFound && cacheObject.Weight > 0)
                 {
-
                     // Clone the current Giles-cache object
                     CurrentTarget = cacheObject.Clone();
                     w_HighestWeightFound = cacheObject.Weight;

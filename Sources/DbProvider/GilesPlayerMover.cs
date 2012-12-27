@@ -549,10 +549,16 @@ namespace GilesTrinity.DbProvider
                     }
                 }
 
-                // Default movement
-                ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
-                //ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
-
+                if (fDistanceFromTarget > 1f)
+                {
+                    // Default movement
+                    ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
+                    //ZetaDia.Me.Movement.MoveActor(vMoveToTarget);
+                }
+                else
+                {
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Reached MoveTowards Destination {0}", vMoveToTarget); 
+                }
             }
         }
 

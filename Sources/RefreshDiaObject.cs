@@ -1083,7 +1083,7 @@ namespace GilesTrinity
             AddToCache = MosterObstacleInPathCacheObject(AddToCache);
 
             // Didn't pass giles pickup rules/DB internal rule match, so ignore it
-            if (!AddToCache)
+            if (!AddToCache && c_IgnoreSubStep == String.Empty)
                 c_IgnoreSubStep = "NoMatchingRule";
 
             return AddToCache;
@@ -2086,6 +2086,7 @@ namespace GilesTrinity
             if (hashMonsterObstacleCache.Any(o => GilesIntersectsPath(o.Location, o.Radius, playerStatus.CurrentPosition, c_Position)))
             {
                 AddToCache = false;
+                c_IgnoreSubStep = "MonsterInPath";
             }
             return AddToCache;
         }
