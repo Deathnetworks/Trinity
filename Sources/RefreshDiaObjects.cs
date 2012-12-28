@@ -213,19 +213,23 @@ namespace GilesTrinity
                 bStayPutDuringAvoidance = false;
                 // Set up the fake object for the target handler
                 FakeObject = null;
-                // Not allowed to kill monsters due to profile/routine/combat targeting settings - just set the kill range to a third
-                if (!ProfileManager.CurrentProfile.KillMonsters || !CombatTargeting.Instance.AllowedToKillMonsters)
-                {
-                    iCurrentMaxKillRadius /= 3;
-                }
+
                 // Always have a minimum kill radius, so we're never getting whacked without retaliating
                 if (iCurrentMaxKillRadius < 10)
                     iCurrentMaxKillRadius = 10;
+
+                // Not allowed to kill monsters due to profile/routine/combat targeting settings - just set the kill range to a third
+                if (!ProfileManager.CurrentProfile.KillMonsters || !CombatTargeting.Instance.AllowedToKillMonsters)
+                {
+                    iCurrentMaxKillRadius = 0;
+                }
+
                 // Not allowed to loots due to profile/routine/loot targeting settings - just set range to a quarter
                 if (!ProfileManager.CurrentProfile.PickupLoot || !LootTargeting.Instance.AllowedToLoot)
                 {
-                    iCurrentMaxLootRadius /= 4;
+                    iCurrentMaxLootRadius = 0;
                 }
+
                 if (playerStatus.ActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
                 { //!sp - keep looking for kills while WOTB is up
                     iKeepKillRadiusExtendedFor = Math.Max(3, iKeepKillRadiusExtendedFor);

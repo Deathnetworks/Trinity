@@ -550,13 +550,30 @@ namespace GilesTrinity
                 // Handle Unit-type Objects
                 case GObjectType.Unit:
                     {
-                        AddToCache = RefreshGilesUnit(AddToCache);
+                        // Not allowed to kill monsters due to profile settings
+                        if (!ProfileManager.CurrentProfile.KillMonsters || !CombatTargeting.Instance.AllowedToKillMonsters)
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "CombatDisabled";
+                            break;
+                        }
+                        else
+                        {
+                            AddToCache = RefreshGilesUnit(AddToCache);
+                        }
                         break;
                     }
                 // Handle Item-type Objects
                 case GObjectType.Item:
                     {
-                        if (!ForceVendorRunASAP)
+                        // Not allowed to loot due to profile settings
+                        if (!ProfileManager.CurrentProfile.PickupLoot || !LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "LootingDisabled";
+                            break;
+                        }
+                        else if (!ForceVendorRunASAP)
                         {
                             AddToCache = RefreshGilesItem(AddToCache);
                             c_IgnoreReason = "RefreshGilesItem";
@@ -573,9 +590,19 @@ namespace GilesTrinity
                 // NOTE: Only identified as gold after *FIRST* loop as an "item" by above code
                 case GObjectType.Gold:
                     {
-                        AddToCache = RefreshGilesGold(AddToCache);
-                        c_IgnoreSubStep = "RefreshGilesGold";
-                        break;
+                        // Not allowed to loot due to profile settings
+                        if (!ProfileManager.CurrentProfile.PickupLoot || !LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "LootingDisabled";
+                            break;
+                        }
+                        else
+                        {
+                            AddToCache = RefreshGilesGold(AddToCache);
+                            c_IgnoreSubStep = "RefreshGilesGold";
+                            break;
+                        }
                     }
                 // Handle Globes
                 // NOTE: Only identified as globe after *FIRST* loop as an "item" by above code
@@ -1851,7 +1878,7 @@ namespace GilesTrinity
 
                     if (((c_ObjectType == GObjectType.Unit && !bWantToTownRun) || c_ObjectType == GObjectType.Shrine) && (c_CentreDistance > 10 && c_CentreDistance < 75))
                     {
-using (new PerformanceLogger("RefreshLoS.1"))
+                        using (new PerformanceLogger("RefreshLoS.1"))
                         {
                             bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
 
