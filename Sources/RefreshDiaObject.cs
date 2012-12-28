@@ -898,64 +898,89 @@ namespace GilesTrinity
             {
                 try
                 {
-                    bool isUntargetable = c_CommonData.GetAttribute<bool>(ActorAttributeType.Untargetable);
+                    int isUntargetable = c_CommonData.GetAttribute<int>(ActorAttributeType.Untargetable);
 
-                    if (isUntargetable)
+                    if (isUntargetable > 0)
                     {
                         AddToCache = false;
                         c_IgnoreSubStep += "Untargettable+";
                         return AddToCache;
                     }
                 }
-                catch { }
+                catch
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep += "Untargettable-";
+                    return AddToCache;
+                }
                 try
                 {
-                    bool isInvulnerable = c_CommonData.GetAttribute<bool>(ActorAttributeType.Invulnerable);
+                    int isInvulnerable = c_CommonData.GetAttribute<int>(ActorAttributeType.Invulnerable);
 
-                    if (isInvulnerable)
+                    if (isInvulnerable > 0)
                     {
                         AddToCache = false;
                         c_IgnoreSubStep += "IsInvulnerable+";
                         return AddToCache;
                     }
                 }
-                catch { }
+                catch
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep += "IsInvulnerable-";
+                    return AddToCache;
+                }
 
                 try
                 {
-                    bool isBurrowed = c_CommonData.GetAttribute<bool>(ActorAttributeType.Burrowed);
-                    if (isBurrowed)
+                    int isBurrowed = c_CommonData.GetAttribute<int>(ActorAttributeType.Burrowed);
+                    if (isBurrowed > 0)
                     {
                         AddToCache = false;
                         c_IgnoreSubStep += "IsBurrowed+";
                         return AddToCache;
                     }
                 }
-                catch { }
+                catch
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep += "IsBurrowed-";
+                    return AddToCache;
+                }
 
                 try
                 {
-                    bool isHelper = c_CommonData.GetAttribute<bool>(ActorAttributeType.IsHelper);
-                    if (isHelper)
+                    int isHelper = c_CommonData.GetAttribute<int>(ActorAttributeType.IsHelper);
+                    if (isHelper > 0)
                     {
                         AddToCache = false;
                         c_IgnoreSubStep += "IsHelper+";
                         return AddToCache;
                     }
                 }
-                catch { }
+                catch
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep += "IsHelper-";
+                    return AddToCache;
+                }
 
                 try
                 {
-                    bool isNPC = c_CommonData.GetAttribute<bool>(ActorAttributeType.IsNPC);
-                    if (isNPC)
+                    int isNPC = c_CommonData.GetAttribute<int>(ActorAttributeType.IsNPC);
+                    if (isNPC > 0)
                     {
                         AddToCache = false;
                         c_IgnoreSubStep += "IsNPC+";
                         return AddToCache;
                     }
                 }
-                catch { }
+                catch
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep += "IsNPC-";
+                    return AddToCache;
+                }
 
             }
             using (new PerformanceLogger("RefreshUnit.11"))
@@ -1627,7 +1652,7 @@ namespace GilesTrinity
                         //return bWantThis;
                         //}
                         // Set min distance to user-defined setting
-                        iMinDistance = Settings.WorldObject.DestructibleRange + (c_Radius * 0.30);
+                        iMinDistance = Settings.WorldObject.DestructibleRange + c_Radius;
                         if (ForceCloseRangeTarget)
                             iMinDistance += 6f;
                         // Large objects, like logs - Give an extra xx feet of distance
@@ -1640,18 +1665,11 @@ namespace GilesTrinity
                             c_IgnoreSubStep = "NotInDestructableRange";
                         }
                         // Only break destructables if we're stuck
-                        if (!GilesPlayerMover.UnstuckChecker())
+                        if (!GilesPlayerMover.UnstuckChecker() && !AddToCache)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "NotStuck";
                         }
-                        // If we're standing on it, usually right before above unstucker returns true
-                        if (c_RadiusDistance <= 5f)
-                        {
-                            AddToCache = true;
-                            c_IgnoreSubStep = "";
-                        }
-
                         // special mojo for whitelists
                         if (hashSNOInteractWhitelist.Contains(c_ActorSNO))
                             AddToCache = true;
