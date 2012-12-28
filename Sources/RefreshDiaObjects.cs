@@ -30,287 +30,303 @@ namespace GilesTrinity
         /// <returns>True if the cache was updated</returns>
         public static bool RefreshDiaObjectCache()
         {
-            if (DateTime.Now.Subtract(LastRefreshedCache).TotalMilliseconds <= 100)
-                return false;
-
-            LastRefreshedCache = DateTime.Now;
-
-            using (ZetaDia.Memory.AcquireFrame())
+            using (new PerformanceLogger("RefreshDiaObjectCache"))
             {
-                // Update player-data cache, including buffs
-                UpdateCachedPlayerData();
-
-                if (playerStatus.CurrentHealthPct <= 0)
-                {
+                if (DateTime.Now.Subtract(LastRefreshedCache).TotalMilliseconds <= 100)
                     return false;
-                }
 
-                //RefreshInit(out vSafePointNear, out vKitePointAvoid, out iCurrentTargetRactorGUID, out iUnitsSurrounding, out iHighestWeightFound, out listGilesObjectCache, out hashDoneThisRactor);
-                RefreshCacheInit();
-                // Now pull up all the data and store anything we want to handle in the super special cache list
-                // Also use many cache dictionaries to minimize DB<->D3 memory hits, and speed everything up a lot
-                RefreshCacheMainLoop();
-            }
-            // Reduce ignore-for-loops counter
-            if (IgnoreTargetForLoops > 0)
-                IgnoreTargetForLoops--;
-            // If we have an avoidance under our feet, then create a new object which contains a safety point to move to
-            // But only if we aren't force-cancelling avoidance for XX time
-            bool bFoundSafeSpot = false;
+                LastRefreshedCache = DateTime.Now;
 
-            // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
-            if (StandingInAvoidance && (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
-                DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
-            {
-                Vector3 vAnySafePoint = FindSafeZone(false, 1, vSafePointNear);
-                // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
-                if (vAnySafePoint != vNullLocation)
+                using (new PerformanceLogger("RefreshDiaObjectCache.UpdateBlock"))
                 {
-                    if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Moving))
+                    using (ZetaDia.Memory.AcquireFrame())
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting Avoidance: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}",
-                            vAnySafePoint, vAnySafePoint.Distance(Me.Position), GetHeading(FindDirectionDegree(Me.Position, vAnySafePoint)),
-                            playerStatus.CurrentHealthPct, PlayerKiteDistance);
+                        // Update player-data cache, including buffs
+                        UpdateCachedPlayerData();
+
+                        if (playerStatus.CurrentHealthPct <= 0)
+                        {
+                            return false;
+                        }
+
+                        //RefreshInit(out vSafePointNear, out vKitePointAvoid, out iCurrentTargetRactorGUID, out iUnitsSurrounding, out iHighestWeightFound, out listGilesObjectCache, out hashDoneThisRactor);
+                        RefreshCacheInit();
+                        // Now pull up all the data and store anything we want to handle in the super special cache list
+                        // Also use many cache dictionaries to minimize DB<->D3 memory hits, and speed everything up a lot
+                        RefreshCacheMainLoop();
+                    }
+                }
+                // Reduce ignore-for-loops counter
+                if (IgnoreTargetForLoops > 0)
+                    IgnoreTargetForLoops--;
+                // If we have an avoidance under our feet, then create a new object which contains a safety point to move to
+                // But only if we aren't force-cancelling avoidance for XX time
+                bool bFoundSafeSpot = false;
+
+                using (new PerformanceLogger("RefreshDiaObjectCache.AvoidanceCheck"))
+                {
+                    // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
+                    if (StandingInAvoidance && (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
+                        DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
+                    {
+                        Vector3 vAnySafePoint = FindSafeZone(false, 1, vSafePointNear);
+                        // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
+                        if (vAnySafePoint != vNullLocation)
+                        {
+                            if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Moving))
+                            {
+                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting Avoidance: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}",
+                                    vAnySafePoint, vAnySafePoint.Distance(Me.Position), GetHeading(FindDirectionDegree(Me.Position, vAnySafePoint)),
+                                    playerStatus.CurrentHealthPct, PlayerKiteDistance);
+                            }
+
+                            bFoundSafeSpot = true;
+                            CurrentTarget = new GilesObject()
+                                {
+                                    Position = vAnySafePoint,
+                                    Type = GObjectType.Avoidance,
+                                    Weight = 20000,
+                                    CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
+                                    RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
+                                    InternalName = "GilesSafePoint"
+                                }; ;
+                        }
+                        else
+                        {
+                            // Didn't find any safe spot we could reach, so don't look for any more safe spots for at least 2.8 seconds
+                            cancelledEmergencyMoveForMilliseconds = 2800;
+                            timeCancelledEmergencyMove = DateTime.Now;
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Unable to find kite location, canceling kite movement for {0}ms", cancelledKiteMoveForMilliseconds);
+                        }
+                    }
+                }
+                /*
+                 * Give weights to objects
+                 */
+                // Special flag for special whirlwind circumstances
+                bAnyNonWWIgnoreMobsInRange = false;
+                // Now give each object a weight *IF* we aren't skipping direcly to a safe-spot
+                if (!bFoundSafeSpot)
+                {
+                    RefreshDiaGetWeights();
+                    RefreshSetKiting(ref vKitePointAvoid, NeedToKite, ref TryToKite);
+                }
+                // Not heading straight for a safe-spot?
+                // No valid targets but we were told to stay put?
+                if (CurrentTarget == null && bStayPutDuringAvoidance && !StandingInAvoidance)
+                {
+                    CurrentTarget = new GilesObject()
+                                        {
+                                            Position = playerStatus.CurrentPosition,
+                                            Type = GObjectType.Avoidance,
+                                            Weight = 20000,
+                                            CentreDistance = 2f,
+                                            RadiusDistance = 2f,
+                                            InternalName = "GilesStayPutPoint"
+                                        };
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Staying Put During Avoidance");
+                }
+                using (new PerformanceLogger("RefreshDiaObjectCache.FinalChecks"))
+                {
+
+                    // force to stay put if we want to town run and there's no target
+                    if (CurrentTarget == null && ForceVendorRunASAP)
+                    {
+                        bDontMoveMeIAmDoingShit = true;
                     }
 
-                    bFoundSafeSpot = true;
-                    CurrentTarget = new GilesObject()
+                    // Still no target, let's see if we should backtrack or wait for wrath to come off cooldown...
+                    if (CurrentTarget == null)
+                    {
+                        RefreshDoBackTrack();
+                    }
+                    // Still no target, let's end it all!
+                    if (CurrentTarget == null)
+                    {
+                        return true;
+                    }
+                    // Ok record the time we last saw any unit at all
+                    if (CurrentTarget.Type == GObjectType.Unit)
+                    {
+                        lastHadUnitInSights = DateTime.Now;
+                        // And record when we last saw any form of elite
+                        if (CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin)
+                            lastHadEliteUnitInSights = DateTime.Now;
+                    }
+                    // Record the last time our target changed
+                    if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
+                    {
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Setting dateSincePicked to {0} CurrentTargetRactorGUID: {1} CurrentTarget.RActorGuid: {2}",
+                                        DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
+                        dateSincePickedTarget = DateTime.Now;
+                        iTargetLastHealth = 0f;
+                    }
+                    else
+                    {
+                        // We're sticking to the same target, so update the target's health cache to check for stucks
+                        if (CurrentTarget.Type == GObjectType.Unit)
                         {
-                            Position = vAnySafePoint,
-                            Type = GObjectType.Avoidance,
-                            Weight = 20000,
-                            CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
-                            RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
-                            InternalName = "GilesSafePoint"
-                        }; ;
+                            // Check if the health has changed, if so update the target-pick time before we blacklist them again
+                            if (CurrentTarget.HitPoints != iTargetLastHealth)
+                            {
+                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Setting dateSincePicked to {0} CurrentTarget.iHitPoints: {1}  iTargetLastHealth: {2} ",
+                                                DateTime.Now, CurrentTarget.HitPoints, iTargetLastHealth);
+                                dateSincePickedTarget = DateTime.Now;
+                            }
+                            // Now store the target's last-known health
+                            iTargetLastHealth = CurrentTarget.HitPoints;
+                        }
+                    }
                 }
-                else
-                {
-                    // Didn't find any safe spot we could reach, so don't look for any more safe spots for at least 2.8 seconds
-                    cancelledEmergencyMoveForMilliseconds = 2800;
-                    timeCancelledEmergencyMove = DateTime.Now;
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Unable to find kite location, canceling kite movement for {0}ms", cancelledKiteMoveForMilliseconds);
-                }
-            }
-            /*
-             * Give weights to objects
-             */
-            // Special flag for special whirlwind circumstances
-            bAnyNonWWIgnoreMobsInRange = false;
-            // Now give each object a weight *IF* we aren't skipping direcly to a safe-spot
-            if (!bFoundSafeSpot)
-            {
-                RefreshDiaGetWeights();
-                RefreshSetKiting(ref vKitePointAvoid, NeedToKite, ref TryToKite);
-            }
-            // Not heading straight for a safe-spot?
-            // No valid targets but we were told to stay put?
-            if (CurrentTarget == null && bStayPutDuringAvoidance && !StandingInAvoidance)
-            {
-                CurrentTarget = new GilesObject()
-                                    {
-                                        Position = playerStatus.CurrentPosition,
-                                        Type = GObjectType.Avoidance,
-                                        Weight = 20000,
-                                        CentreDistance = 2f,
-                                        RadiusDistance = 2f,
-                                        InternalName = "GilesStayPutPoint"
-                                    };
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Staying Put During Avoidance");
-            }
-
-            // force to stay put if we want to town run and there's no target
-            if (CurrentTarget == null && ForceVendorRunASAP)
-            {
-                bDontMoveMeIAmDoingShit = true;
-            }
-
-            // Still no target, let's see if we should backtrack or wait for wrath to come off cooldown...
-            if (CurrentTarget == null)
-            {
-                RefreshDoBackTrack();
-            }
-            // Still no target, let's end it all!
-            if (CurrentTarget == null)
-            {
+                // We have a target and the cached was refreshed
                 return true;
             }
-            // Ok record the time we last saw any unit at all
-            if (CurrentTarget.Type == GObjectType.Unit)
-            {
-                lastHadUnitInSights = DateTime.Now;
-                // And record when we last saw any form of elite
-                if (CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin)
-                    lastHadEliteUnitInSights = DateTime.Now;
-            }
-            // Record the last time our target changed
-            if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
-            {
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Setting dateSincePicked to {0} CurrentTargetRactorGUID: {1} CurrentTarget.RActorGuid: {2}",
-                                DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
-                dateSincePickedTarget = DateTime.Now;
-                iTargetLastHealth = 0f;
-            }
-            else
-            {
-                // We're sticking to the same target, so update the target's health cache to check for stucks
-                if (CurrentTarget.Type == GObjectType.Unit)
-                {
-                    // Check if the health has changed, if so update the target-pick time before we blacklist them again
-                    if (CurrentTarget.HitPoints != iTargetLastHealth)
-                    {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Setting dateSincePicked to {0} CurrentTarget.iHitPoints: {1}  iTargetLastHealth: {2} ",
-                                        DateTime.Now, CurrentTarget.HitPoints, iTargetLastHealth);
-                        dateSincePickedTarget = DateTime.Now;
-                    }
-                    // Now store the target's last-known health
-                    iTargetLastHealth = CurrentTarget.HitPoints;
-                }
-            }
-            // We have a target and the cached was refreshed
-            return true;
         }
         // Refresh object list from Diablo 3 memory RefreshDiaObjects()
         //private static void RefreshInit(out Vector3 vSafePointNear, out Vector3 vKitePointAvoid, out int iCurrentTargetRactorGUID, out int iUnitsSurrounding, out double iHighestWeightFound, out List<GilesObject> listGilesObjectCache, out HashSet<int> hashDoneThisRactor)
         private static void RefreshCacheInit()
         {
-            // Update when we last refreshed with current time
-            LastRefreshedCache = DateTime.Now;
+            using (new PerformanceLogger("RefreshDiaObjectCache.CacheInit"))
+            {
 
-            // Blank current/last/next targets
-            vSafePointNear = CurrentTarget != null ? CurrentTarget.Position : vNullLocation;
-            vKitePointAvoid = vNullLocation;
-            // store current target GUID
-            CurrentTargetRactorGUID = CurrentTarget != null ? CurrentTarget.RActorGuid : -1;
-            //reset current target
-            CurrentTarget = null;
-            // Reset all variables for target-weight finding
-            bAnyTreasureGoblinsPresent = false;
-            iCurrentMaxKillRadius = (float)(Settings.Combat.Misc.NonEliteRange);
-            //intell
-            iCurrentMaxLootRadius = Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius;
-            bStayPutDuringAvoidance = false;
-            // Set up the fake object for the target handler
-            FakeObject = null;
-            // Not allowed to kill monsters due to profile/routine/combat targeting settings - just set the kill range to a third
-            if (!ProfileManager.CurrentProfile.KillMonsters || !CombatTargeting.Instance.AllowedToKillMonsters)
-            {
-                iCurrentMaxKillRadius /= 3;
-            }
-            // Always have a minimum kill radius, so we're never getting whacked without retaliating
-            if (iCurrentMaxKillRadius < 10)
-                iCurrentMaxKillRadius = 10;
-            // Not allowed to loots due to profile/routine/loot targeting settings - just set range to a quarter
-            if (!ProfileManager.CurrentProfile.PickupLoot || !LootTargeting.Instance.AllowedToLoot)
-            {
-                iCurrentMaxLootRadius /= 4;
-            }
-            if (playerStatus.ActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
-            { //!sp - keep looking for kills while WOTB is up
-                iKeepKillRadiusExtendedFor = Math.Max(3, iKeepKillRadiusExtendedFor);
-                timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
-            }
-            // Counter for how many cycles we extend or reduce our attack/kill radius, and our loot radius, after a last kill
-            if (iKeepKillRadiusExtendedFor > 0)
-            {
-                TimeSpan diffResult = DateTime.Now.Subtract(timeKeepKillRadiusExtendedUntil);
-                iKeepKillRadiusExtendedFor = (int)diffResult.Seconds;
-                //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kill Radius remaining " + diffResult.Seconds + "s");
-                if (timeKeepKillRadiusExtendedUntil <= DateTime.Now)
-                {
-                    iKeepKillRadiusExtendedFor = 0;
-                }
-            }
-            if (iKeepLootRadiusExtendedFor > 0)
-                iKeepLootRadiusExtendedFor--;
+                // Update when we last refreshed with current time
+                LastRefreshedCache = DateTime.Now;
 
-            // Clear forcing close-range priority on mobs after XX period of time
-            if (ForceCloseRangeTarget && DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds)
-            {
-                ForceCloseRangeTarget = false;
-            }
-            // Bunch of variables used throughout
-            iUnitsSurrounding = 0;
-            hashMonsterObstacleCache = new HashSet<GilesObstacle>();
-            hashAvoidanceObstacleCache = new HashSet<GilesObstacle>();
-            hashNavigationObstacleCache = new HashSet<GilesObstacle>();
-            bAnyChampionsPresent = false;
-            bAnyMobsInCloseRange = false;
-            TownRun.lastDistance = 0f;
-            IsAvoidingProjectiles = false;
-            // Every 15 seconds, clear the "blackspots" where avoidance failed, so we can re-check them
-            if (DateTime.Now.Subtract(lastClearedAvoidanceBlackspots).TotalSeconds > 15)
-            {
-                lastClearedAvoidanceBlackspots = DateTime.Now;
-                hashAvoidanceBlackspot = new HashSet<GilesObstacle>();
-            }
-            // Clear our very short-term destructible blacklist within 3 seconds of last attacking a destructible
-            if (bNeedClearDestructibles && DateTime.Now.Subtract(lastDestroyedDestructible).TotalMilliseconds > 2500)
-            {
-                bNeedClearDestructibles = false;
-                hashRGUIDDestructible3SecBlacklist = new HashSet<int>();
-            }
-            // Clear our very short-term ignore-monster blacklist (from not being able to raycast on them or already dead units)
-            if (NeedToClearBlacklist3 && DateTime.Now.Subtract(dateSinceBlacklist3Clear).TotalMilliseconds > 3000)
-            {
-                NeedToClearBlacklist3 = false;
-                hashRGUIDBlacklist3 = new HashSet<int>();
-            }
-            // Clear certain cache dictionaries sequentially, spaced out over time, to force data updates
-            if (DateTime.Now.Subtract(lastClearedCacheDictionary).TotalMilliseconds >= 30000)
-            {
-                lastClearedCacheDictionary = DateTime.Now;
-                iLastClearedCacheDictionary++;
-                if (iLastClearedCacheDictionary > 5)
-                    iLastClearedCacheDictionary = 1;
-                switch (iLastClearedCacheDictionary)
+                // Blank current/last/next targets
+                vSafePointNear = CurrentTarget != null ? CurrentTarget.Position : vNullLocation;
+                vKitePointAvoid = vNullLocation;
+                // store current target GUID
+                CurrentTargetRactorGUID = CurrentTarget != null ? CurrentTarget.RActorGuid : -1;
+                //reset current target
+                CurrentTarget = null;
+                // Reset all variables for target-weight finding
+                bAnyTreasureGoblinsPresent = false;
+                iCurrentMaxKillRadius = (float)(Settings.Combat.Misc.NonEliteRange);
+                //intell
+                iCurrentMaxLootRadius = Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius;
+                bStayPutDuringAvoidance = false;
+                // Set up the fake object for the target handler
+                FakeObject = null;
+                // Not allowed to kill monsters due to profile/routine/combat targeting settings - just set the kill range to a third
+                if (!ProfileManager.CurrentProfile.KillMonsters || !CombatTargeting.Instance.AllowedToKillMonsters)
                 {
-                    case 1:
-                        dictGilesVectorCache = new Dictionary<int, Vector3>();
-                        dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
-                        dictGilesActorSNOCache = new Dictionary<int, int>();
-                        dictGilesACDGUIDCache = new Dictionary<int, int>();
-                        dictGilesLastHealthCache = new Dictionary<int, double>();
-                        dictGilesLastHealthChecked = new Dictionary<int, int>();
-                        break;
-                    case 2:
-                        dictGilesMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
-                        dictGilesMaxHealthCache = new Dictionary<int, double>();
-                        dictionaryStoredMonsterTypes = new Dictionary<int, MonsterType>();
-                        dictionaryStoredMonsterSizes = new Dictionary<int, MonsterSize>();
-                        dictGilesBurrowedCache = new Dictionary<int, bool>();
-                        dictSummonedByID = new Dictionary<int, int>();
-                        break;
-                    case 3:
-                        dictGilesInternalNameCache = new Dictionary<int, string>();
-                        dictGilesGoldAmountCache = new Dictionary<int, int>();
-                        break;
-                    case 4:
-                    case 5:
-                        dictGilesGameBalanceIDCache = new Dictionary<int, int>();
-                        dictGilesDynamicIDCache = new Dictionary<int, int>();
-                        dictGilesQualityCache = new Dictionary<int, ItemQuality>();
-                        dictGilesQualityRechecked = new Dictionary<int, bool>();
-                        dictGilesPickupItem = new Dictionary<int, bool>();
-                        break;
+                    iCurrentMaxKillRadius /= 3;
                 }
+                // Always have a minimum kill radius, so we're never getting whacked without retaliating
+                if (iCurrentMaxKillRadius < 10)
+                    iCurrentMaxKillRadius = 10;
+                // Not allowed to loots due to profile/routine/loot targeting settings - just set range to a quarter
+                if (!ProfileManager.CurrentProfile.PickupLoot || !LootTargeting.Instance.AllowedToLoot)
+                {
+                    iCurrentMaxLootRadius /= 4;
+                }
+                if (playerStatus.ActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+                { //!sp - keep looking for kills while WOTB is up
+                    iKeepKillRadiusExtendedFor = Math.Max(3, iKeepKillRadiusExtendedFor);
+                    timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
+                }
+                // Counter for how many cycles we extend or reduce our attack/kill radius, and our loot radius, after a last kill
+                if (iKeepKillRadiusExtendedFor > 0)
+                {
+                    TimeSpan diffResult = DateTime.Now.Subtract(timeKeepKillRadiusExtendedUntil);
+                    iKeepKillRadiusExtendedFor = (int)diffResult.Seconds;
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kill Radius remaining " + diffResult.Seconds + "s");
+                    if (timeKeepKillRadiusExtendedUntil <= DateTime.Now)
+                    {
+                        iKeepKillRadiusExtendedFor = 0;
+                    }
+                }
+                if (iKeepLootRadiusExtendedFor > 0)
+                    iKeepLootRadiusExtendedFor--;
+
+                // Clear forcing close-range priority on mobs after XX period of time
+                if (ForceCloseRangeTarget && DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds)
+                {
+                    ForceCloseRangeTarget = false;
+                }
+                // Bunch of variables used throughout
+                iUnitsSurrounding = 0;
+                hashMonsterObstacleCache = new HashSet<GilesObstacle>();
+                hashAvoidanceObstacleCache = new HashSet<GilesObstacle>();
+                hashNavigationObstacleCache = new HashSet<GilesObstacle>();
+                bAnyChampionsPresent = false;
+                bAnyMobsInCloseRange = false;
+                TownRun.lastDistance = 0f;
+                IsAvoidingProjectiles = false;
+                // Every 15 seconds, clear the "blackspots" where avoidance failed, so we can re-check them
+                if (DateTime.Now.Subtract(lastClearedAvoidanceBlackspots).TotalSeconds > 15)
+                {
+                    lastClearedAvoidanceBlackspots = DateTime.Now;
+                    hashAvoidanceBlackspot = new HashSet<GilesObstacle>();
+                }
+                // Clear our very short-term destructible blacklist within 3 seconds of last attacking a destructible
+                if (bNeedClearDestructibles && DateTime.Now.Subtract(lastDestroyedDestructible).TotalMilliseconds > 2500)
+                {
+                    bNeedClearDestructibles = false;
+                    hashRGUIDDestructible3SecBlacklist = new HashSet<int>();
+                }
+                // Clear our very short-term ignore-monster blacklist (from not being able to raycast on them or already dead units)
+                if (NeedToClearBlacklist3 && DateTime.Now.Subtract(dateSinceBlacklist3Clear).TotalMilliseconds > 3000)
+                {
+                    NeedToClearBlacklist3 = false;
+                    hashRGUIDBlacklist3 = new HashSet<int>();
+                }
+                // Clear certain cache dictionaries sequentially, spaced out over time, to force data updates
+                if (DateTime.Now.Subtract(lastClearedCacheDictionary).TotalMilliseconds >= 30000)
+                {
+                    lastClearedCacheDictionary = DateTime.Now;
+                    iLastClearedCacheDictionary++;
+                    if (iLastClearedCacheDictionary > 5)
+                        iLastClearedCacheDictionary = 1;
+                    switch (iLastClearedCacheDictionary)
+                    {
+                        case 1:
+                            dictGilesVectorCache = new Dictionary<int, Vector3>();
+                            dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
+                            dictGilesActorSNOCache = new Dictionary<int, int>();
+                            dictGilesACDGUIDCache = new Dictionary<int, int>();
+                            dictGilesLastHealthCache = new Dictionary<int, double>();
+                            dictGilesLastHealthChecked = new Dictionary<int, int>();
+                            break;
+                        case 2:
+                            dictGilesMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
+                            dictGilesMaxHealthCache = new Dictionary<int, double>();
+                            dictionaryStoredMonsterTypes = new Dictionary<int, MonsterType>();
+                            dictionaryStoredMonsterSizes = new Dictionary<int, MonsterSize>();
+                            dictGilesBurrowedCache = new Dictionary<int, bool>();
+                            dictSummonedByID = new Dictionary<int, int>();
+                            break;
+                        case 3:
+                            dictGilesInternalNameCache = new Dictionary<int, string>();
+                            dictGilesGoldAmountCache = new Dictionary<int, int>();
+                            break;
+                        case 4:
+                        case 5:
+                            dictGilesGameBalanceIDCache = new Dictionary<int, int>();
+                            dictGilesDynamicIDCache = new Dictionary<int, int>();
+                            dictGilesQualityCache = new Dictionary<int, ItemQuality>();
+                            dictGilesQualityRechecked = new Dictionary<int, bool>();
+                            dictGilesPickupItem = new Dictionary<int, bool>();
+                            break;
+                    }
+                }
+                // Reset the counters for player-owned things
+                iPlayerOwnedMysticAlly = 0;
+                iPlayerOwnedGargantuan = 0;
+                iPlayerOwnedZombieDog = 0;
+                iPlayerOwnedDHPets = 0;
+                // Reset the counters for monsters at various ranges
+                iElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+                iAnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+                bAnyBossesInRange = false;
+                // Flag for if we should search for an avoidance spot or not
+                StandingInAvoidance = false;
+                // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
+                w_HighestWeightFound = 0;
+                // Here's the list we'll use to store each object
+                GilesObjectCache = new List<GilesObject>();
+                hashDoneThisRactor = new HashSet<int>();
             }
-            // Reset the counters for player-owned things
-            iPlayerOwnedMysticAlly = 0;
-            iPlayerOwnedGargantuan = 0;
-            iPlayerOwnedZombieDog = 0;
-            iPlayerOwnedDHPets = 0;
-            // Reset the counters for monsters at various ranges
-            iElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
-            iAnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
-            bAnyBossesInRange = false;
-            // Flag for if we should search for an avoidance spot or not
-            StandingInAvoidance = false;
-            // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
-            w_HighestWeightFound = 0;
-            // Here's the list we'll use to store each object
-            GilesObjectCache = new List<GilesObject>();
-            hashDoneThisRactor = new HashSet<int>();
         }
 
         private static HashSet<string> ignoreNames = new HashSet<string>
@@ -690,63 +706,45 @@ namespace GilesTrinity
 
         private static void RefreshSetKiting(ref Vector3 vKitePointAvoid, bool NeedToKite, ref bool TryToKite)
         {
-            TryToKite = false;
-
-            var monsterList = from m in GilesObjectCache
-                              where m.Type == GObjectType.Unit && 
-                              m.RadiusDistance <= PlayerKiteDistance &&
-                              (m.IsBossOrEliteRareUnique ||
-                               ((m.HitPoints >= .15 || m.MonsterStyle != MonsterSize.Swarm) && !m.IsBossOrEliteRareUnique)
-                               )
-                              select m;
-
-            if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
+            using (new PerformanceLogger("RefreshDiaObjectCache.Kiting"))
             {
-                TryToKite = true;
-                vKitePointAvoid = playerStatus.CurrentPosition;
-            }
 
-            if (monsterList.Count() > 0 && (playerStatus.ActorClass != ActorClass.Wizard || IsWizardShouldKite()))
-            {
-                TryToKite = true;
-                vKitePointAvoid = playerStatus.CurrentPosition;
-            }
+                TryToKite = false;
 
-            // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
-            bool shouldKamikazeTreasureGoblins = (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize);
+                var monsterList = from m in GilesObjectCache
+                                  where m.Type == GObjectType.Unit &&
+                                  m.RadiusDistance <= PlayerKiteDistance &&
+                                  (m.IsBossOrEliteRareUnique ||
+                                   ((m.HitPoints >= .15 || m.MonsterStyle != MonsterSize.Swarm) && !m.IsBossOrEliteRareUnique)
+                                   )
+                                  select m;
 
-            double msCancelledEmergency = DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds;
-            bool shouldEmergencyMove = msCancelledEmergency >= cancelledEmergencyMoveForMilliseconds && NeedToKite;
-
-            double msCancelledKite = DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds;
-            bool shouldKite = msCancelledKite >= cancelledKiteMoveForMilliseconds && TryToKite;
-
-            if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite))
-            {
-                Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true, monsterList);
-                
-                if (LastKitePosition == null)
+                if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
                 {
-                    LastKitePosition = new KitePosition()
-                    {
-                        PositionFoundTime = DateTime.Now,
-                        Position = vAnySafePoint,
-                        Distance = vAnySafePoint.Distance(playerStatus.CurrentPosition)
-                    };
+                    TryToKite = true;
+                    vKitePointAvoid = playerStatus.CurrentPosition;
                 }
 
-                if (vAnySafePoint != Vector3.Zero && vAnySafePoint.Distance(playerStatus.CurrentPosition) >= 1)
+                if (monsterList.Count() > 0 && (playerStatus.ActorClass != ActorClass.Wizard || IsWizardShouldKite()))
                 {
+                    TryToKite = true;
+                    vKitePointAvoid = playerStatus.CurrentPosition;
+                }
 
-                    if ((DateTime.Now.Subtract(LastKitePosition.PositionFoundTime).TotalMilliseconds > 3000 && LastKitePosition.Position == vAnySafePoint) ||
-                        ( CurrentTarget != null && DateTime.Now.Subtract(lastGlobalCooldownUse).TotalMilliseconds > 1500))
-                    {
-                        timeCancelledKiteMove = DateTime.Now;
-                        cancelledKiteMoveForMilliseconds = 3000;
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kite movement failed, cancelling for {0:0}ms", cancelledKiteMoveForMilliseconds);
-                        return;
-                    } 
-                    else
+                // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
+                bool shouldKamikazeTreasureGoblins = (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize);
+
+                double msCancelledEmergency = DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds;
+                bool shouldEmergencyMove = msCancelledEmergency >= cancelledEmergencyMoveForMilliseconds && NeedToKite;
+
+                double msCancelledKite = DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds;
+                bool shouldKite = msCancelledKite >= cancelledKiteMoveForMilliseconds && TryToKite;
+
+                if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite))
+                {
+                    Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true, monsterList);
+
+                    if (LastKitePosition == null)
                     {
                         LastKitePosition = new KitePosition()
                         {
@@ -756,45 +754,66 @@ namespace GilesTrinity
                         };
                     }
 
-                    if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Moving))
+                    if (vAnySafePoint != Vector3.Zero && vAnySafePoint.Distance(playerStatus.CurrentPosition) >= 1)
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
-                            vAnySafePoint, vAnySafePoint.Distance(playerStatus.CurrentPosition), GetHeading(FindDirectionDegree(Me.Position, vAnySafePoint)),
-                            playerStatus.CurrentHealthPct, PlayerKiteDistance, monsterList.Count(),
-                            NeedToKite, TryToKite);
+
+                        if ((DateTime.Now.Subtract(LastKitePosition.PositionFoundTime).TotalMilliseconds > 3000 && LastKitePosition.Position == vAnySafePoint) ||
+                            (CurrentTarget != null && DateTime.Now.Subtract(lastGlobalCooldownUse).TotalMilliseconds > 1500))
+                        {
+                            timeCancelledKiteMove = DateTime.Now;
+                            cancelledKiteMoveForMilliseconds = 3000;
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kite movement failed, cancelling for {0:0}ms", cancelledKiteMoveForMilliseconds);
+                            return;
+                        }
+                        else
+                        {
+                            LastKitePosition = new KitePosition()
+                            {
+                                PositionFoundTime = DateTime.Now,
+                                Position = vAnySafePoint,
+                                Distance = vAnySafePoint.Distance(playerStatus.CurrentPosition)
+                            };
+                        }
+
+                        if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Moving))
+                        {
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
+                                vAnySafePoint, vAnySafePoint.Distance(playerStatus.CurrentPosition), GetHeading(FindDirectionDegree(Me.Position, vAnySafePoint)),
+                                playerStatus.CurrentHealthPct, PlayerKiteDistance, monsterList.Count(),
+                                NeedToKite, TryToKite);
+                        }
+                        CurrentTarget = new GilesObject()
+                                            {
+                                                Position = vAnySafePoint,
+                                                Type = GObjectType.Avoidance,
+                                                Weight = 20000,
+                                                CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
+                                                RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
+                                                InternalName = "GilesKiting"
+                                            };
+
+                        timeCancelledKiteMove = DateTime.Now;
+                        cancelledKiteMoveForMilliseconds = 100;
+
+                        // Try forcing a target update with each kiting
+                        //bForceTargetUpdate = true;
                     }
-                    CurrentTarget = new GilesObject()
-                                        {
-                                            Position = vAnySafePoint,
-                                            Type = GObjectType.Avoidance,
-                                            Weight = 20000,
-                                            CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
-                                            RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
-                                            InternalName = "GilesKiting"
-                                        };
-
-                    timeCancelledKiteMove = DateTime.Now;
-                    cancelledKiteMoveForMilliseconds = 100;
-
-                    // Try forcing a target update with each kiting
-                    //bForceTargetUpdate = true;
+                    else
+                    {
+                        // Didn't find any kiting we could reach, so don't look for any more kite spots for at least 1.5 seconds
+                        timeCancelledKiteMove = DateTime.Now;
+                        cancelledKiteMoveForMilliseconds = 500;
+                    }
                 }
-                else
+                else if (!shouldEmergencyMove && NeedToKite)
                 {
-                    // Didn't find any kiting we could reach, so don't look for any more kite spots for at least 1.5 seconds
-                    timeCancelledKiteMove = DateTime.Now;
-                    cancelledKiteMoveForMilliseconds = 500;
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Emergency movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds);
+                }
+                else if (!shouldKite && TryToKite)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kite movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds);
                 }
             }
-            else if (!shouldEmergencyMove && NeedToKite)
-            {
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Emergency movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds);
-            }
-            else if (!shouldKite && TryToKite)
-            {
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kite movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds);
-            }
-
         }
         public static string GetHeading(float heading)
         {

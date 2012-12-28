@@ -27,11 +27,10 @@ namespace GilesTrinity
         public int SceneId { get; set; }
         public int LevelAreaId { get; set; }
         public double PlayerDamagePerSecond { get; set; }
+        public SceneInfo Scene { get; set; }
 
         public GilesPlayerCache()
         {
-
-
             LastUpdated = DateTime.MinValue;
             IsIncapacitated = false;
             IsRooted = false;
@@ -72,6 +71,17 @@ namespace GilesTrinity
             BattleTag = battleTag;
             SceneId = -1;
             LevelAreaId = -1;
+            Scene = new SceneInfo()
+            {
+                SceneId = -1,
+                LastUpdate = DateTime.Now
+            };
+        }
+
+        public class SceneInfo
+        {
+            public DateTime LastUpdate { get; set; }
+            public int SceneId { get; set; }
         }
     }
 }

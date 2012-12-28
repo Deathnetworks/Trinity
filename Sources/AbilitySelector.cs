@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GilesTrinity.Technicals;
 using Zeta;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
@@ -13,13 +14,16 @@ namespace GilesTrinity
         // Also caches the values after - but ONLY if we aren't in archon mode (or if this function is told NOT to cache this)
         public static void GilesRefreshHotbar(bool dontCacheThis = false)
         {
-            bMappedPlayerAbilities = true;
-            hashPowerHotbarAbilities = new HashSet<SNOPower>();
-            for (int i = 0; i <= 5; i++)
-                hashPowerHotbarAbilities.Add(ZetaDia.Me.GetHotbarPowerId((HotbarSlot)i));
-            bRefreshHotbarAbilities = false;
-            if (!dontCacheThis)
-                hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(hashPowerHotbarAbilities);
+            using (new PerformanceLogger("RefreshHotbar"))
+            {
+                bMappedPlayerAbilities = true;
+                hashPowerHotbarAbilities = new HashSet<SNOPower>();
+                for (int i = 0; i <= 5; i++)
+                    hashPowerHotbarAbilities.Add(ZetaDia.Me.GetHotbarPowerId((HotbarSlot)i));
+                bRefreshHotbarAbilities = false;
+                if (!dontCacheThis)
+                    hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(hashPowerHotbarAbilities);
+            }
         }
         /// <summary>
         /// Check if a particular buff is present
@@ -122,38 +126,42 @@ namespace GilesTrinity
         // Cache all current buffs on character
         public static void GilesRefreshBuffs()
         {
-            listCachedBuffs = new List<Buff>();
-            dictCachedBuffs = new Dictionary<int, int>();
-            listCachedBuffs = ZetaDia.Me.GetAllBuffs().ToList();
-            // Special flag for detecting the activation and de-activation of archon
-            bool bThisArchonBuff = false;
-            int iTempStackCount;
-            // Store how many stacks of each buff we have
-            foreach (Buff thisbuff in listCachedBuffs)
+            using (new PerformanceLogger("GilesRefreshBuffs"))
             {
-                // Store the stack count of this buff
-                if (!dictCachedBuffs.TryGetValue(thisbuff.SNOId, out iTempStackCount))
-                    dictCachedBuffs.Add(thisbuff.SNOId, thisbuff.StackCount);
-                // Check for archon stuff
-                if (thisbuff.SNOId == (int)SNOPower.Wizard_Archon)
-                    bThisArchonBuff = true;
-            }
-            // Archon stuff
-            if (bThisArchonBuff)
-            {
-                if (!bHasHadArchonbuff)
-                    bRefreshHotbarAbilities = true;
-                bHasHadArchonbuff = true;
-            }
-            else
-            {
-                if (bHasHadArchonbuff)
+
+                listCachedBuffs = new List<Buff>();
+                dictCachedBuffs = new Dictionary<int, int>();
+                listCachedBuffs = ZetaDia.Me.GetAllBuffs().ToList();
+                // Special flag for detecting the activation and de-activation of archon
+                bool bThisArchonBuff = false;
+                int iTempStackCount;
+                // Store how many stacks of each buff we have
+                foreach (Buff thisbuff in listCachedBuffs)
                 {
-                    hashPowerHotbarAbilities = new HashSet<SNOPower>(hashCachedPowerHotbarAbilities);
+                    // Store the stack count of this buff
+                    if (!dictCachedBuffs.TryGetValue(thisbuff.SNOId, out iTempStackCount))
+                        dictCachedBuffs.Add(thisbuff.SNOId, thisbuff.StackCount);
+                    // Check for archon stuff
+                    if (thisbuff.SNOId == (int)SNOPower.Wizard_Archon)
+                        bThisArchonBuff = true;
                 }
-                bHasHadArchonbuff = false;
+                // Archon stuff
+                if (bThisArchonBuff)
+                {
+                    if (!bHasHadArchonbuff)
+                        bRefreshHotbarAbilities = true;
+                    bHasHadArchonbuff = true;
+                }
+                else
+                {
+                    if (bHasHadArchonbuff)
+                    {
+                        hashPowerHotbarAbilities = new HashSet<SNOPower>(hashCachedPowerHotbarAbilities);
+                    }
+                    bHasHadArchonbuff = false;
+                }
+                //"g_killElitePack : 1, snoid=230745" <- Noting this here incase I ever want to monitor NV stacks, this is the SNO ID code for it!
             }
-            //"g_killElitePack : 1, snoid=230745" <- Noting this here incase I ever want to monitor NV stacks, this is the SNO ID code for it!
         }
 
         /// <summary>
@@ -170,41 +178,47 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static GilesPower GilesAbilitySelector(bool bCurrentlyAvoiding = false, bool bOOCBuff = false, bool bDestructiblePower = false)
         {
-            // Refresh buffs once to save buff-check-spam
-            // rrrix: disabled this (it's called through other means)
-            //GilesRefreshBuffs();
-            
-            
-            // See if archon just appeared/disappeared, so update the hotbar
-            if (bRefreshHotbarAbilities)
-                GilesRefreshHotbar(GilesHasBuff(SNOPower.Wizard_Archon));
-
-            // Extra height thingy, not REALLY used as it was originally going to be, will probably get phased out...
-            float iThisHeight = iExtraHeight;
-            // Switch based on the cached character class
-            switch (playerStatus.ActorClass)
+            using (new PerformanceLogger("GilesAbilitySelector"))
             {
-                // Barbs
-                case ActorClass.Barbarian: 
-                    return GetBarbarianPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
+                // Refresh buffs once to save buff-check-spam
+                // rrrix: disabled this (it's called through other means)
+                //GilesRefreshBuffs();
 
-                // Monks
-                case ActorClass.Monk: 
-                    return GetMonkPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
 
-                // Wizards
-                case ActorClass.Wizard: 
-                    return GetWizardPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
+                // See if archon just appeared/disappeared, so update the hotbar
+                if (bRefreshHotbarAbilities)
+                    GilesRefreshHotbar(GilesHasBuff(SNOPower.Wizard_Archon));
 
-                // Witch Doctors
-                case ActorClass.WitchDoctor:
-                    return GetWitchDoctorPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower, iThisHeight);
+                // Extra height thingy, not REALLY used as it was originally going to be, will probably get phased out...
+                float iThisHeight = iExtraHeight;
+                // Switch based on the cached character class
+                using (new PerformanceLogger("AbilitySelector.ClassAbility"))
+                {
+                    switch (playerStatus.ActorClass)
+                    {
+                        // Barbs
+                        case ActorClass.Barbarian:
+                            return GetBarbarianPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
 
-                // Demon Hunters
-                case ActorClass.DemonHunter:
-                    return GetDemonHunterPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
+                        // Monks
+                        case ActorClass.Monk:
+                            return GetMonkPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
+
+                        // Wizards
+                        case ActorClass.Wizard:
+                            return GetWizardPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
+
+                        // Witch Doctors
+                        case ActorClass.WitchDoctor:
+                            return GetWitchDoctorPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower, iThisHeight);
+
+                        // Demon Hunters
+                        case ActorClass.DemonHunter:
+                            return GetDemonHunterPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
+                    }
+                }
+                return defaultPower;
             }
-            return defaultPower;
         }
 
         /// <summary>

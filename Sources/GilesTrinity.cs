@@ -22,63 +22,99 @@ namespace GilesTrinity
         /// </summary>
         private static void UpdateCachedPlayerData()
         {
-            if (DateTime.Now.Subtract(playerStatus.LastUpdated).TotalMilliseconds <= 100)
-                return;
-            // If we aren't in the game of a world is loading, don't do anything yet
-            if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
-                return;
-            var me = ZetaDia.Me;
-            if (me == null)
-                return;
-
-            try
+            using (new PerformanceLogger("UpdateCachedPlayerData"))
             {
-                double attack = ZetaDia.Me.Attack;
+                if (DateTime.Now.Subtract(playerStatus.LastUpdated).TotalMilliseconds <= 100)
+                    return;
+                // If we aren't in the game of a world is loading, don't do anything yet
+                if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
+                    return;
+                var me = ZetaDia.Me;
+                if (me == null)
+                    return;
 
-                playerStatus.LastUpdated = DateTime.Now;
-                playerStatus.IsInTown = me.IsInTown;
-                playerStatus.IsIncapacitated = (me.IsFeared || me.IsStunned || me.IsFrozen || me.IsBlind);
-                playerStatus.IsRooted = me.IsRooted;
-                playerStatus.CurrentHealthPct = me.HitpointsCurrentPct;
-                playerStatus.CurrentEnergy = me.CurrentPrimaryResource;
-                playerStatus.CurrentEnergyPct = playerStatus.CurrentEnergy / me.MaxPrimaryResource;
-                playerStatus.Discipline = me.CurrentSecondaryResource;
-                playerStatus.DisciplinePct = playerStatus.Discipline / me.MaxSecondaryResource;
-                playerStatus.CurrentPosition = me.Position;
-                if (playerStatus.CurrentEnergy >= iWaitingReservedAmount)
-                    playerStatus.WaitingForReserveEnergy = false;
-                if (playerStatus.CurrentEnergy < 20)
-                    playerStatus.WaitingForReserveEnergy = true;
-                playerStatus.MyDynamicID = me.CommonData.DynamicId;
-                playerStatus.Level = me.Level;
-                playerStatus.ActorClass = me.ActorClass;
-                playerStatus.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
-                playerStatus.SceneId = ZetaDia.Me.CurrentScene.SceneInfo.SNOId;
-                playerStatus.LevelAreaId = ZetaDia.CurrentLevelAreaId;
+                try
+                {
+                    double attack = ZetaDia.Me.Attack;
+                    using (new PerformanceLogger("UpdateCachedPlayerData.1"))
+                    {
 
-                // World ID safety caching incase it's ever unavailable
-                if (ZetaDia.CurrentWorldDynamicId != -1)
-                    iCurrentWorldID = ZetaDia.CurrentWorldDynamicId;
-                // Game difficulty, used really for vault on DH's
-                if (ZetaDia.Service.CurrentHero.CurrentDifficulty != GameDifficulty.Invalid)
-                    iCurrentGameDifficulty = ZetaDia.Service.CurrentHero.CurrentDifficulty;
+                        playerStatus.LastUpdated = DateTime.Now;
+                        playerStatus.IsInTown = me.IsInTown;
+                        playerStatus.IsIncapacitated = (me.IsFeared || me.IsStunned || me.IsFrozen || me.IsBlind);
+                        playerStatus.IsRooted = me.IsRooted;
 
-                // Refresh player buffs (to check for archon)
-                GilesRefreshBuffs();
-            }
-            catch (Exception ex)
-            {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception for grabbing player data.{0}{1}", Environment.NewLine, ex);
+                    }
+                    using (new PerformanceLogger("UpdateCachedPlayerData.2"))
+                    {
+
+                        playerStatus.CurrentHealthPct = me.HitpointsCurrentPct;
+                        playerStatus.CurrentEnergy = me.CurrentPrimaryResource;
+                        playerStatus.CurrentEnergyPct = playerStatus.CurrentEnergy / me.MaxPrimaryResource;
+                        playerStatus.Discipline = me.CurrentSecondaryResource;
+                        playerStatus.DisciplinePct = playerStatus.Discipline / me.MaxSecondaryResource;
+                        playerStatus.CurrentPosition = me.Position;
+                    }
+                    using (new PerformanceLogger("UpdateCachedPlayerData.3"))
+                    {
+
+                        if (playerStatus.CurrentEnergy >= iWaitingReservedAmount)
+                            playerStatus.WaitingForReserveEnergy = false;
+                        if (playerStatus.CurrentEnergy < 20)
+                            playerStatus.WaitingForReserveEnergy = true;
+                        playerStatus.MyDynamicID = me.CommonData.DynamicId;
+                        playerStatus.Level = me.Level;
+                        playerStatus.ActorClass = me.ActorClass;
+                        playerStatus.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
+                        playerStatus.LevelAreaId = ZetaDia.CurrentLevelAreaId;
+                    }
+                    using (new PerformanceLogger("UpdateCachedPlayerData.4"))
+                    {
+                        if (DateTime.Now.Subtract(playerStatus.Scene.LastUpdate).TotalMilliseconds > 1000)
+                        {
+                            int CurrentSceneSNO = -1;
+                            using (new PerformanceLogger("UpdateCachedPlayerData.4.1"))
+                            {
+                                CurrentSceneSNO = (int)ZetaDia.Me.Movement.SceneId;
+                            }
+                            using (new PerformanceLogger("UpdateCachedPlayerData.4.2"))
+                            {
+                                if (playerStatus.SceneId != CurrentSceneSNO)
+                                {
+                                    playerStatus.SceneId = CurrentSceneSNO;
+                                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Updating Grid Provider", true);
+                                    gp.Update();
+                                }
+                            }
+                        }
+                    }
+                    using (new PerformanceLogger("UpdateCachedPlayerData.5"))
+                    {
+
+                        // World ID safety caching incase it's ever unavailable
+                        if (ZetaDia.CurrentWorldDynamicId != -1)
+                            iCurrentWorldID = ZetaDia.CurrentWorldDynamicId;
+                        // Game difficulty, used really for vault on DH's
+                        if (ZetaDia.Service.CurrentHero.CurrentDifficulty != GameDifficulty.Invalid)
+                            iCurrentGameDifficulty = ZetaDia.Service.CurrentHero.CurrentDifficulty;
+                    }
+
+
+                    // Refresh player buffs (to check for archon)
+                    GilesRefreshBuffs();
+                }
+                catch (Exception ex)
+                {
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception for grabbing player data.{0}{1}", Environment.NewLine, ex);
+                }
             }
         }
-
 
         // How many total leave games, for stat-tracking?
         public static int iTotalJoinGames = 0;
         // How many total leave games, for stat-tracking?
         public static int TotalLeaveGames = 0;
         public static int TotalProfileRecycles = 0;
-
 
         // Force town-run button
         private static void buttonTownRun_Click(object sender, RoutedEventArgs e)
