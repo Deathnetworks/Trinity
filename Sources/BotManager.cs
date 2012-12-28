@@ -65,6 +65,7 @@ namespace GilesTrinity
 
             GilesPlayerMover.timeLastRecordedPosition = DateTime.Now;
             GilesPlayerMover.timeLastRestartedGame = DateTime.Now;
+            GilesPlayerMover.ResetCheckGold();
 
             //try
             //{

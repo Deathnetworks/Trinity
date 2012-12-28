@@ -434,6 +434,26 @@ namespace GilesTrinity
             return vBestLocation;
         }
 
+        internal class UnSafeZone
+        {
+            public int WorldId { get; set; }
+            public Vector3 Position { get; set; }
+            public float Radius { get; set; }
+            public string Name { get; set; }
+        }
+
+        internal static HashSet<UnSafeZone> UnsafeKiteAreas = new HashSet<UnSafeZone>()
+        {
+            { 
+                new UnSafeZone() {
+                    WorldId = 182976, 
+                    Position = (new Vector3(281.0147f,361.5885f,20.86533f)),
+                    Name = "Chamber of Queen Araneae",
+                    Radius = 90f
+                }
+            }
+        };
+
         internal static Vector3 newFindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<GilesObject> monsterList = null)
         {
             /*
@@ -589,6 +609,12 @@ namespace GilesTrinity
                     else
                     {
                         gridPoint.Weight = gridPoint.Distance;
+                    }
+
+                    // Boss Areas
+                    if (UnsafeKiteAreas.Any(a => a.WorldId == iCurrentWorldID && Vector3.Distance(a.Position, gridPoint.Position) <= a.Radius))
+                    {
+                        continue;
                     }
 
                     if (shouldKite)

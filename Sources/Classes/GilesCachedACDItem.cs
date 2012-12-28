@@ -1,11 +1,12 @@
-﻿using Zeta.Internals;
+﻿using System;
+using Zeta.Internals;
 using Zeta.Internals.Actors;
 namespace GilesTrinity
 {
     // GilesCachedACDItem - Special caching class to help with backpack-item handling
     // So we can make an object, read all item stats from a backpack item *ONCE*, then store it here while my behavior trees process everything
     // Preventing any need for calling D3 memory again after the initial read (every D3 memory read is a chance for a DB crash/item mis-read/stuck!)
-    public class GilesCachedACDItem
+    public class GilesCachedACDItem : IComparable
     {
         public string InternalName { get; set; }
         public string RealName { get; set; }
@@ -78,6 +79,8 @@ namespace GilesTrinity
         public float WeaponMaxDamage { get; set; }
         public float WeaponMinDamage { get; set; }
         public ACDItem item { get; set; }
+        public int Row { get; set; }
+        public int Column { get; set; }
 
         public GilesCachedACDItem(
             ACDItem acdItem,
@@ -173,5 +176,19 @@ namespace GilesTrinity
 
         }
 
+
+        public int CompareTo(object obj)
+        {
+            GilesCachedACDItem item = (GilesCachedACDItem)obj;
+
+            if (this.Row < item.Row)
+                return -1;
+            else if (this.Column < item.Column)
+                return -1;
+            else if (this.Column == item.Column && this.Row == item.Row)
+                return 0;
+            else
+                return 1;
+        }
     }
 }

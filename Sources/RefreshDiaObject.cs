@@ -39,19 +39,25 @@ namespace GilesTrinity
 
             AddToCache = RefreshStepSkipDoubleCheckGuid(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "SkipDoubleCheckGuid"; return AddToCache; }
+
             // ActorSNO
             AddToCache = RefreshStepCachedActorSNO(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
 
             // Have ActorSNO Check for SNO based navigation obstacle hashlist
             c_IsObstacle = hashSNONavigationObstacles.Contains(c_ActorSNO);
 
-            if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
             // Get Internal Name
             AddToCache = RefreshInternalName(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "InternalName"; return AddToCache; }
+
             // Get ACDGuid
             AddToCache = RefreshStepCachedACDGuid(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
+
+            // Check Blacklists
+            AddToCache = RefreshStepCheckBlacklists(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "CheckBlacklists"; return AddToCache; }
 
 
             /*
@@ -64,10 +70,6 @@ namespace GilesTrinity
             // Summons by the player 
             AddToCache = RefreshStepCachedPlayerSummons(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
-
-            // Check Blacklists
-            AddToCache = RefreshStepCheckBlacklists(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "CheckBlacklists"; return AddToCache; }
 
             // Get Cached Position
             AddToCache = RefreshStepCachedPosition(AddToCache);
@@ -758,13 +760,17 @@ namespace GilesTrinity
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "OutsideofKillRadius";
+                // Return here
+                return AddToCache;
             }
+
             try
             {
                 if (thisUnit.IsUntargetable)
                 {
                     AddToCache = false;
                     c_IgnoreSubStep += "Untargettable+";
+                    return AddToCache;
                 }
                 // Disabled because of chickens
                 // if (thisUnit.IsHidden)
@@ -780,6 +786,7 @@ namespace GilesTrinity
                 {
                     AddToCache = false;
                     c_IgnoreSubStep += "IsInvulnerable+";
+                    return AddToCache;
                 }
             }
             catch { }
@@ -789,6 +796,7 @@ namespace GilesTrinity
                 {
                     AddToCache = false;
                     c_IgnoreSubStep += "IsBurrowed+";
+                    return AddToCache;
                 }
             }
             catch { }
@@ -798,6 +806,7 @@ namespace GilesTrinity
                 {
                     AddToCache = false;
                     c_IgnoreSubStep += "IsNPCOrHelper+";
+                    return AddToCache;
                 }
             }
             catch { }
@@ -1083,14 +1092,14 @@ namespace GilesTrinity
             AddToCache = MosterObstacleInPathCacheObject(AddToCache);
 
             // Didn't pass giles pickup rules/DB internal rule match, so ignore it
-            if (!AddToCache)
+            if (!AddToCache && c_IgnoreSubStep == String.Empty)
                 c_IgnoreSubStep = "NoMatchingRule";
 
             return AddToCache;
         }
         private static bool RefreshGilesGold(bool AddToCache)
         {
-            int rangedMinimumStackSize = 0;
+            //int rangedMinimumStackSize = 0;
             AddToCache = true;
 
             // Get the gold amount of this pile, cached if possible
@@ -2086,6 +2095,7 @@ namespace GilesTrinity
             if (hashMonsterObstacleCache.Any(o => GilesIntersectsPath(o.Location, o.Radius, playerStatus.CurrentPosition, c_Position)))
             {
                 AddToCache = false;
+                c_IgnoreSubStep = "MonsterInPath";
             }
             return AddToCache;
         }

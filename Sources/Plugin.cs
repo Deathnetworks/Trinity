@@ -31,7 +31,7 @@ namespace GilesTrinity
         {
             get
             {
-                return new Version(1, 7, 1, 9);
+                return new Version(1, 7, 1, 10);
             }
         }
 
@@ -93,9 +93,7 @@ namespace GilesTrinity
             BotMain.OnStop += TrinityBotStop;
 
             // Set up the pause button
-            Application.Current.Dispatcher.Invoke(
-
-            PaintMainWindowButtons(battleTagName));
+            Application.Current.Dispatcher.Invoke(PaintMainWindowButtons(battleTagName));
 
             if (!Directory.Exists(FileManager.PluginPath))
             {
@@ -116,12 +114,9 @@ namespace GilesTrinity
                 GameEvents.OnPlayerDied += GilesTrinityOnDeath;
                 GameEvents.OnGameJoined += GilesTrinityOnJoinGame;
                 GameEvents.OnGameLeft += GilesTrinityOnLeaveGame;
-                ITargetingProvider newCombatTargetingProvider = new GilesCombatTargetingReplacer();
-                CombatTargeting.Instance.Provider = newCombatTargetingProvider;
-                ITargetingProvider newLootTargetingProvider = new GilesLootTargetingProvider();
-                LootTargeting.Instance.Provider = newLootTargetingProvider;
-                ITargetingProvider newObstacleTargetingProvider = new GilesObstacleTargetingProvider();
-                ObstacleTargeting.Instance.Provider = newObstacleTargetingProvider;
+                CombatTargeting.Instance.Provider = new GilesCombatTargetingReplacer();
+                LootTargeting.Instance.Provider = new GilesLootTargetingProvider();
+                ObstacleTargeting.Instance.Provider = new GilesObstacleTargetingProvider();
 
                 if (gp == null)
                     gp = Navigator.SearchGridProvider;
@@ -136,6 +131,7 @@ namespace GilesTrinity
                     if (ZetaDia.IsInGame)
                         GilesTrinityOnJoinGame(null, null);
                 }
+
                 SetBotTPS();
 
                 TrinityPowerManager.LoadLegacyDelays();

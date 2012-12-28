@@ -118,7 +118,8 @@ namespace GilesTrinity
             // Multi Shot
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Multishot) && !playerStatus.IsIncapacitated &&
                 playerStatus.CurrentEnergy >= 30 &&
-                (iElitesWithinRange[RANGE_40] >= 1 || iAnythingWithinRange[RANGE_40] >= 2 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 40f)))
+                (iElitesWithinRange[RANGE_40] >= 1 || iAnythingWithinRange[RANGE_40] >= 2 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && 
+                CurrentTarget.RadiusDistance <= 30f)))
             {
                 return new GilesPower(SNOPower.DemonHunter_Multishot, 40f, CurrentTarget.Position, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
             }

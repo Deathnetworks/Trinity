@@ -33,18 +33,11 @@ namespace GilesTrinity
 
             if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
-                // try updating fix#3 try for name bug -> doesn't work
-                //ACDItem item = ZetaDia.Actors.GetACDItemByGuid(acd.ACDGuid);
-                //Interpreter.InterpreterAction action = StashRule.checkItem(ZetaDia.Actors.GetACDItemByGuid(acd.ACDGuid), true);
-                
-                //Interpreter.InterpreterAction action = StashRule.checkItem(acd as ACDItem, true);
-
                 Interpreter.InterpreterAction action = StashRule.checkPickUpItem(name, level, quality, dbItemBaseType, dbItemType, isOneHand, isTwoHand, balanceId, dynamicID);
                 switch (action)
                 {
-                    case Interpreter.InterpreterAction.KEEP:
+                    case Interpreter.InterpreterAction.PICKUP:
                         return true;
-
                     case Interpreter.InterpreterAction.IGNORE:
                         return false;
                 }
@@ -234,7 +227,7 @@ namespace GilesTrinity
             if (name.StartsWith("emerald_")) return GItemType.Emerald;
             if (name.StartsWith("topaz_")) return GItemType.Topaz;
             if (name.StartsWith("amethyst")) return GItemType.Amethyst;
-            if (name.StartsWith("healthpotion_")) return GItemType.HealthPotion;
+            if (name.StartsWith("healthpotion")) return GItemType.HealthPotion;
             if (name.StartsWith("followeritem_enchantress_")) return GItemType.FollowerEnchantress;
             if (name.StartsWith("followeritem_scoundrel_")) return GItemType.FollowerScoundrel;
             if (name.StartsWith("followeritem_templar_")) return GItemType.FollowerTemplar;
