@@ -26,7 +26,19 @@ Future Planned Improvements:
 
 Changelog 1.7.1.10:
 
-Simplified gold and item weighting forumulas.
+* Fixed performance problem accessing SceneId.
+
+* Fixed monk tempest rush movement and other channeling spells.
+
+* Fixed bot stuck when manually clicking on D3 ground position.
+
+* Bot now sells items from backpack sorted ascending first by row then by column (left to right, top to bottom).
+
+* Added more in-depth performance logging & Reduced logging noise for very fast performance logging sections.
+
+* Can now specify Unsafe Kite zones for boss area kiting.
+
+* Simplified gold and item weighting forumulas, should now always pickup items and gold if in range.
 
 * Adjustments for Kiting targeting.
 
