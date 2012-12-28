@@ -1099,7 +1099,7 @@ namespace GilesTrinity
         }
         private static bool RefreshGilesGold(bool AddToCache)
         {
-            int rangedMinimumStackSize = 0;
+            //int rangedMinimumStackSize = 0;
             AddToCache = true;
 
             // Get the gold amount of this pile, cached if possible

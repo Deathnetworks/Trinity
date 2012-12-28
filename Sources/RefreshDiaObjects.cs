@@ -49,6 +49,12 @@ namespace GilesTrinity
                             return false;
                         }
 
+                        if (!pf.IsNavigable(gp.WorldToGrid(playerStatus.CurrentPosition.ToVector2())))
+                        {
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "Updating Grid Provider", true);
+                            gp.Update();
+                        }
+
                         //RefreshInit(out vSafePointNear, out vKitePointAvoid, out iCurrentTargetRactorGUID, out iUnitsSurrounding, out iHighestWeightFound, out listGilesObjectCache, out hashDoneThisRactor);
                         RefreshCacheInit();
                         // Now pull up all the data and store anything we want to handle in the super special cache list

@@ -576,6 +576,8 @@ namespace GilesTrinity
                         GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                             thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
                             thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
+                        thiscacheditem.Row = thisitem.InventoryRow;
+                        thiscacheditem.Column = thisitem.InventoryColumn;
                         bool bShouldSellThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy
                             ? GilesSellValidation(thiscacheditem.InternalName, thiscacheditem.Level, thiscacheditem.Quality, thiscacheditem.DBItemType, thiscacheditem.FollowerType)
                             : ItemManager.ShouldSellItem(thisitem);
@@ -748,7 +750,7 @@ namespace GilesTrinity
                     return RunStatus.Running;
                 currentItemLoops = 0;
                 RandomizeTheTimer();
-                GilesCachedACDItem thisitem = hashGilesCachedSellItems.FirstOrDefault();
+                GilesCachedACDItem thisitem = hashGilesCachedSellItems.OrderBy( i => i.Row ).ThenBy( i => i.Column ).FirstOrDefault();
 
                 // Item log for cool stuff sold
                 if (thisitem != null)
