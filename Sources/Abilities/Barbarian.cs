@@ -387,7 +387,7 @@ namespace GilesTrinity
             }
             // Weapon throw
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WeaponThrow)
-                && (playerStatus.CurrentEnergy >= 10 && CurrentTarget.RadiusDistance >= 5f))
+                && (playerStatus.CurrentEnergy >= 10 && ( CurrentTarget.RadiusDistance >= 5f || BarbHasNoPrimary())))
             {
                 return new GilesPower(SNOPower.Barbarian_WeaponThrow, 80f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, SIGNATURE_SPAM);
             }
@@ -414,14 +414,21 @@ namespace GilesTrinity
             return defaultPower;
         }
 
+        private static bool BarbHasNoPrimary()
+        {
+            return !(hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Frenzy) ||
+                hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Bash) ||
+                hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Cleave));
+        }
+
         private static GilesPower GetBarbarianDestroyPower()
         {
             if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Frenzy))
                 return new GilesPower(SNOPower.Barbarian_Frenzy, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Bash))
-                return new GilesPower(SNOPower.Barbarian_Bash, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+                return new GilesPower(SNOPower.Barbarian_Bash, 6f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Cleave))
-                return new GilesPower(SNOPower.Barbarian_Cleave, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+                return new GilesPower(SNOPower.Barbarian_Cleave, 6f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Rend) && playerStatus.CurrentEnergyPct >= 0.65)
                 return new GilesPower(SNOPower.Barbarian_Rend, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WeaponThrow) && playerStatus.CurrentEnergy >= 20)

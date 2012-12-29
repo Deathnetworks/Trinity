@@ -282,11 +282,25 @@ namespace GilesTrinity
 
 
                     // Calculate the player's current distance from destination
-                    float fDistanceFromTarget = Vector3.Distance(playerStatus.CurrentPosition, vCurrentDestination) - fDistanceReduction;
-                    if (fDistanceFromTarget < 0f)
-                        fDistanceFromTarget = 0f;
+                    float fDistanceFromTarget;
+                    bool currentTargetIsInLoS;
 
-                    bool currentTargetIsInLoS = (GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
+                    using (new PerformanceLogger("HandleTarget.LoSCheck"))
+                    {
+                        fDistanceFromTarget = Vector3.Distance(playerStatus.CurrentPosition, vCurrentDestination) - fDistanceReduction;
+                        if (fDistanceFromTarget < 0f)
+                            fDistanceFromTarget = 0f;
+
+                        if (Settings.Combat.Misc.UseNavMeshTargeting)
+                        {
+                            currentTargetIsInLoS = (GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
+                        }
+                        else
+                        {
+                            currentTargetIsInLoS = true;
+                        }
+                    }
+
                     using (new PerformanceLogger("HandleTarget.MonkWeaponSwap"))
                     {
                         // Item Swap + Blinding flash cast
@@ -571,56 +585,63 @@ namespace GilesTrinity
                             return RunStatus.Running;
                         }
                     }
-                    // Out-of-range, so move towards the target
-                    UpdateStatusTextTarget(false);
+                    using (new PerformanceLogger("HandleTarget.UpdateStatusText"))
+                    {
+                        // Out-of-range, so move towards the target
+                        UpdateStatusTextTarget(false);
+                    }
+
                     // Are we currently incapacitated? If so then wait...
                     if (playerStatus.IsIncapacitated || playerStatus.IsRooted)
                     {
                         return RunStatus.Running;
                     }
 
-                    // Some stuff to avoid spamming usepower EVERY loop, and also to detect stucks/staying in one place for too long
-                    // Count how long we have failed to move - body block stuff etc.
-                    if (fDistanceFromTarget == fLastDistanceFromTarget)
+                    using (new PerformanceLogger("HandleTarget.DistanceEqualCheck"))
                     {
-                        bForceNewMovement = true;
-                        if (DateTime.Now.Subtract(lastMovedDuringCombat).TotalMilliseconds >= 250)
+                        // Some stuff to avoid spamming usepower EVERY loop, and also to detect stucks/staying in one place for too long
+                        // Count how long we have failed to move - body block stuff etc.
+                        if (fDistanceFromTarget == fLastDistanceFromTarget)
                         {
-                            lastMovedDuringCombat = DateTime.Now;
-                            // We've been stuck at least 250 ms, let's go and pick new targets etc.
-                            TimesBlockedMoving++;
-                            ForceCloseRangeTarget = true;
-                            lastForcedKeepCloseRange = DateTime.Now;
-                            // And tell Trinity to get a new target
-                            bForceTargetUpdate = true;
-                            // Blacklist an 80 degree direction for avoidance
-                            if (CurrentTarget.Type == GObjectType.Avoidance)
+                            bForceNewMovement = true;
+                            if (DateTime.Now.Subtract(lastMovedDuringCombat).TotalMilliseconds >= 250)
                             {
-                                bAvoidDirectionBlacklisting = true;
-                                fAvoidBlacklistDirection = FindDirectionDegree(playerStatus.CurrentPosition, CurrentTarget.Position);
-                            }
-                            // Handle body blocking by blacklisting
-                            GilesHandleBodyBlocking();
-                            // If we were backtracking and failed, remove the current backtrack and try and move to the next
-                            if (CurrentTarget.Type == GObjectType.Backtrack && TimesBlockedMoving >= 2)
-                            {
-                                vBacktrackList.Remove(iTotalBacktracks);
-                                iTotalBacktracks--;
-                                if (iTotalBacktracks <= 1)
+                                lastMovedDuringCombat = DateTime.Now;
+                                // We've been stuck at least 250 ms, let's go and pick new targets etc.
+                                TimesBlockedMoving++;
+                                ForceCloseRangeTarget = true;
+                                lastForcedKeepCloseRange = DateTime.Now;
+                                // And tell Trinity to get a new target
+                                bForceTargetUpdate = true;
+                                // Blacklist an 80 degree direction for avoidance
+                                if (CurrentTarget.Type == GObjectType.Avoidance)
                                 {
-                                    iTotalBacktracks = 0;
-                                    vBacktrackList = new SortedList<int, Vector3>();
+                                    bAvoidDirectionBlacklisting = true;
+                                    fAvoidBlacklistDirection = FindDirectionDegree(playerStatus.CurrentPosition, CurrentTarget.Position);
                                 }
+                                // Handle body blocking by blacklisting
+                                GilesHandleBodyBlocking();
+                                // If we were backtracking and failed, remove the current backtrack and try and move to the next
+                                if (CurrentTarget.Type == GObjectType.Backtrack && TimesBlockedMoving >= 2)
+                                {
+                                    vBacktrackList.Remove(iTotalBacktracks);
+                                    iTotalBacktracks--;
+                                    if (iTotalBacktracks <= 1)
+                                    {
+                                        iTotalBacktracks = 0;
+                                        vBacktrackList = new SortedList<int, Vector3>();
+                                    }
+                                }
+                                // Reset the emergency loop counter and return success
+                                return RunStatus.Running;
                             }
-                            // Reset the emergency loop counter and return success
-                            return RunStatus.Running;
+                            // Been 250 milliseconds of non-movement?
                         }
-                        // Been 250 milliseconds of non-movement?
-                    }
-                    else
-                    {
-                        // Movement has been made, so count the time last moved!
-                        lastMovedDuringCombat = DateTime.Now;
+                        else
+                        {
+                            // Movement has been made, so count the time last moved!
+                            lastMovedDuringCombat = DateTime.Now;
+                        }
                     }
 
                     // Update the last distance stored
@@ -814,7 +835,12 @@ namespace GilesTrinity
                     // So it won't blacklist a monster "on the edge of the screen" who isn't even being targetted
                     // Don't blacklist monsters on <= 50% health though, as they can't be in a stuck location... can they!? Maybe give them some extra time!
 
-                    bool isNavigable = pf.IsNavigable(gp.WorldToGrid(CurrentTarget.Position.ToVector2()));
+                    bool isNavigable;
+
+                    if (Settings.Combat.Misc.UseNavMeshTargeting)
+                        isNavigable = pf.IsNavigable(gp.WorldToGrid(CurrentTarget.Position.ToVector2()));
+                    else
+                        isNavigable = true;
                     bool bBlacklistThis = true;
 
                     // PREVENT blacklisting a monster on less than 90% health unless we haven't damaged it for more than 2 minutes

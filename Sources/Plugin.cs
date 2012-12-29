@@ -31,7 +31,7 @@ namespace GilesTrinity
         {
             get
             {
-                return new Version(1, 7, 1, 10);
+                return new Version(1, 7, 1, 11);
             }
         }
 
@@ -118,11 +118,7 @@ namespace GilesTrinity
                 LootTargeting.Instance.Provider = new GilesLootTargetingProvider();
                 ObstacleTargeting.Instance.Provider = new GilesObstacleTargetingProvider();
 
-                if (gp == null)
-                    gp = Navigator.SearchGridProvider;
-                if (pf == null)
-                    pf = new PathFinder(gp);
-
+                UpdateSearchGridProvider();
 
                 // Safety check incase DB "OnStart" event didn't fire properly
                 if (BotMain.IsRunning)

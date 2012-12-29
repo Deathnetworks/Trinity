@@ -81,7 +81,7 @@ namespace GilesTrinity
         {
             Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
             int rnd = rndNum.Next(7);
-            itemDelayLoopLimit = 4 + rnd;
+            itemDelayLoopLimit = 4 + rnd + ((int)Math.Floor(((double)(BotMain.TicksPerSecond / 2))));
         }
 
         /// <summary>

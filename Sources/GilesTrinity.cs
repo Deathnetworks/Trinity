@@ -70,7 +70,7 @@ namespace GilesTrinity
                     }
                     using (new PerformanceLogger("UpdateCachedPlayerData.4"))
                     {
-                        if (DateTime.Now.Subtract(playerStatus.Scene.LastUpdate).TotalMilliseconds > 1000)
+                        if (DateTime.Now.Subtract(playerStatus.Scene.LastUpdate).TotalMilliseconds > 1000 && Settings.Combat.Misc.UseNavMeshTargeting)
                         {
                             int CurrentSceneSNO = -1;
                             using (new PerformanceLogger("UpdateCachedPlayerData.4.1"))
@@ -83,7 +83,7 @@ namespace GilesTrinity
                                 {
                                     playerStatus.SceneId = CurrentSceneSNO;
                                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Updating Grid Provider", true);
-                                    gp.Update();
+                                    UpdateSearchGridProvider();
                                 }
                             }
                         }
@@ -258,10 +258,8 @@ namespace GilesTrinity
             sLastProfileSeen = "";
             sFirstProfileSeen = "";
 
-            if (gp == null)
-                gp = Navigator.SearchGridProvider;
-            if (pf == null)
-                pf = new PathFinder(gp);
+
+            UpdateSearchGridProvider();
 
         }
     }

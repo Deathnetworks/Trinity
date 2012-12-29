@@ -49,10 +49,9 @@ namespace GilesTrinity
                             return false;
                         }
 
-                        if (!pf.IsNavigable(gp.WorldToGrid(playerStatus.CurrentPosition.ToVector2())))
+                        if (Settings.Combat.Misc.UseNavMeshTargeting && !pf.IsNavigable(gp.WorldToGrid(playerStatus.CurrentPosition.ToVector2())))
                         {
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "Updating Grid Provider", true);
-                            gp.Update();
+                            UpdateSearchGridProvider();
                         }
 
                         //RefreshInit(out vSafePointNear, out vKitePointAvoid, out iCurrentTargetRactorGUID, out iUnitsSurrounding, out iHighestWeightFound, out listGilesObjectCache, out hashDoneThisRactor);
@@ -213,19 +212,23 @@ namespace GilesTrinity
                 bStayPutDuringAvoidance = false;
                 // Set up the fake object for the target handler
                 FakeObject = null;
-                // Not allowed to kill monsters due to profile/routine/combat targeting settings - just set the kill range to a third
-                if (!ProfileManager.CurrentProfile.KillMonsters || !CombatTargeting.Instance.AllowedToKillMonsters)
-                {
-                    iCurrentMaxKillRadius /= 3;
-                }
+
                 // Always have a minimum kill radius, so we're never getting whacked without retaliating
                 if (iCurrentMaxKillRadius < 10)
                     iCurrentMaxKillRadius = 10;
+
+                // Not allowed to kill monsters due to profile/routine/combat targeting settings - just set the kill range to a third
+                if (!ProfileManager.CurrentProfile.KillMonsters || !CombatTargeting.Instance.AllowedToKillMonsters)
+                {
+                    iCurrentMaxKillRadius = 0;
+                }
+
                 // Not allowed to loots due to profile/routine/loot targeting settings - just set range to a quarter
                 if (!ProfileManager.CurrentProfile.PickupLoot || !LootTargeting.Instance.AllowedToLoot)
                 {
-                    iCurrentMaxLootRadius /= 4;
+                    iCurrentMaxLootRadius = 0;
                 }
+
                 if (playerStatus.ActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
                 { //!sp - keep looking for kills while WOTB is up
                     iKeepKillRadiusExtendedFor = Math.Max(3, iKeepKillRadiusExtendedFor);
@@ -382,31 +385,26 @@ namespace GilesTrinity
                             if (t1.IsRunning)
                                 t1.Stop();
 
-                            // Disabled, was missing some things on output... ServerProps maybe?
-                            // bool ignore = (from n in ignoreNames
-                            //               where c_Name.StartsWith(n)
-                            //               select true).FirstOrDefault();
-                            // if (!ignore)
-                            // {
-
                             double duration = t1.Elapsed.TotalMilliseconds;
 
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                                "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12}",
-                                duration,
-                                (AddToCache ? "Added  " : " Ignored"),
-                                (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
-                                c_diaObject.ActorType,
-                                c_ObjectType,
-                                c_Name,
-                                c_ActorSNO,
-                                (c_unit_IsBoss ? " IsBoss" : ""),
-                                (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
-                                c_CentreDistance,
-                                c_RadiusDistance,
-                                c_ZDiff,
-                                c_Radius);
-                            // }
+                            if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && duration > 1 || !Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
+                            {
+                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                                    "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0}",
+                                    duration,
+                                    (AddToCache ? "Added  " : " Ignored"),
+                                    (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
+                                    c_diaObject.ActorType,
+                                    c_ObjectType,
+                                    c_Name,
+                                    c_ActorSNO,
+                                    (c_unit_IsBoss ? " IsBoss" : ""),
+                                    (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
+                                    c_CentreDistance,
+                                    c_RadiusDistance,
+                                    c_ZDiff,
+                                    c_Radius);
+                            }
                         }
                     }
                     catch (Exception ex)

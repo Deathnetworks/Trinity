@@ -84,6 +84,13 @@ namespace GilesTrinity.DbProvider
                 if ((DateTime.Now.Subtract(lastCheckBag).TotalSeconds < 5))
                     return false;
 
+                // sometimes bosses take a LONG time
+                if (GilesTrinity.CurrentTarget.IsBoss)
+                {
+                    ResetCheckGold();
+                    return false;
+                }
+
                 lastCheckBag = DateTime.Now;
                 int currentcoin = ZetaDia.Me.Inventory.Coinage;
 

@@ -24,6 +24,22 @@ Future Planned Improvements:
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
 
+Changelog 1.7.1.11:
+
+* New GUI option: "Use NavMesh to prevent stucks" on the Combat>Misc tab. Default and recommendation is to enable this option. Disabling this may lead to stucks for bot attempting to target monsters/shines through walls and floor gaps. If you experience severe performance problems, try disabling this option. 
+
+* Barbarian Weapon Throw can now be used as "primary" if no other primary ability is present.
+
+* Reduced barbarian bash destructable attack range.
+
+* Changed Targetable/Invulnerable/Burrowed/NPC checks (should be faster now)
+
+* Profile toggle targetting / toggle loot tags now work as expected
+
+* TrinityLogs moved to Demonbuddy directory.
+
+* Added more performance logging.
+
 Changelog 1.7.1.10:
 
 * Fixed performance problem accessing SceneId.

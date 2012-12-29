@@ -7,7 +7,7 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        public static readonly HashSet<int> BossLevelAreaIDs = new HashSet<int> {60194, 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, };
+        public static readonly HashSet<int> BossLevelAreaIDs = new HashSet<int> { 60194, 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, };
 
         /// <summary>
         /// This list is used when an actor has an attribute BuffVisualEffect=1, e.g. fire floors in The Butcher arena
@@ -225,7 +225,7 @@ namespace GilesTrinity
          };
         // Interactable whitelist - things that need interacting with like special wheels, levers - they will be blacklisted for 30 seconds after one-use
         internal static HashSet<int> hashSNOInteractWhitelist = new HashSet<int> {
-            56686, 211999, 52685, 54882,  180575,
+            56686, 211999, 52685, 54882, 180575, 105478, 
          };
         /// <summary>
         /// NOTE: you don't NEED interactable SNO's listed here. But if they are listed here, *THIS* is the range at which your character will try to walk to within the object
@@ -245,13 +245,13 @@ namespace GilesTrinity
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 10}, {191459, 13}, {104632, 20}, {196211, 25}, {200872, 25},
+            {174900, 20}, {191459, 13}, {104632, 20}, {196211, 25}, {200872, 25},
          };
         /// <summary>
         /// Destructible things that are very large and need breaking at a bigger distance - eg logstacks, large crates, carts, etc.
         /// </summary>
         internal static Dictionary<int, int> dictSNOExtendedDestructRange = new Dictionary<int, int> {
-            {2972, 10}, {80357, 16}, {116508, 10}, {113932, 8}, {197514, 18}, {108587, 8}, {108618, 8}, {108612, 8}, {116409, 18}, {121586, 18},
+            {2972, 10}, {80357, 16}, {116508, 10}, {113932, 8}, {197514, 18}, {108587, 8}, {108618, 8}, {108612, 8}, {116409, 18}, {121586, 22},
             {195101, 10}, {195108, 25}, {170657, 8}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 8}, {193963, 10}, {159066, 12}, {160570, 12},
             {55325, 14}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 25}, {192867, 8}, {155255, 8}
          };
@@ -279,7 +279,7 @@ namespace GilesTrinity
             129031, // A3 Skycrown Catapults
             //Small Belial (220160), Big Belial (3349),
             220160,                3349,             
-
+            210268, // Corrupt Growths 2nd Tier
         };
         /// <summary>
         /// Chests/average-level containers that deserve a bit of extra radius (ie - they are more worthwhile to loot than "random" misc/junk containers)
@@ -298,7 +298,7 @@ namespace GilesTrinity
             163449, 78030, 2909, 58283, 58309, 58321, 87809, 90150, 91600, 97023, 97350, 97381, 72689, 121327, 54515, 3340, 122076, 123640,
             60665, 60844, 78554, 86400, 86428, 81699, 86266, 86400, 110769, 192466, 211456, 6190, 80002, 104596, 58836, 104827, 74909, 6155, 6156, 6158, 6159, 75132,
             181504, 91688, 3016, 3007, 3011, 3014, 130858, 131573, 214396, 182730, 226087, 141639, 206569, 15119, 54413, 54926, 2979, 5776, 3949,
-            108490, 52833, 200371, 153752, 2972, 
+            108490, 52833, 200371, 153752, 2972, 206527,
             //a3dun_crater_st_Demo_ChainPylon_Fire_Azmodan, a3dun_crater_st_Demon_ChainPylon_Fire_MistressOfPain
             198977, 201680,
             //trOut_Leor_painting

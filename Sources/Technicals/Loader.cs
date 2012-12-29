@@ -164,7 +164,7 @@ namespace GilesTrinity.Technicals
         {
             get
             {
-                string path = Path.Combine(PluginPath, "Logs", ZetaDia.Service.CurrentHero.BattleTagName);
+                string path = Path.Combine(DemonBuddyPath, "TrinityLogs", ZetaDia.Service.CurrentHero.BattleTagName);
                 CreateDirectory(path);
                 return path;
             }
