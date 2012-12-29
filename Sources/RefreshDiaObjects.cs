@@ -51,8 +51,7 @@ namespace GilesTrinity
 
                         if (Settings.Combat.Misc.UseNavMeshTargeting && !pf.IsNavigable(gp.WorldToGrid(playerStatus.CurrentPosition.ToVector2())))
                         {
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "Updating Grid Provider", true);
-                            gp.Update();
+                            UpdateSearchGridProvider();
                         }
 
                         //RefreshInit(out vSafePointNear, out vKitePointAvoid, out iCurrentTargetRactorGUID, out iUnitsSurrounding, out iHighestWeightFound, out listGilesObjectCache, out hashDoneThisRactor);

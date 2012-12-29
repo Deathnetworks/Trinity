@@ -68,7 +68,6 @@ namespace GilesTrinity
             }
             // Sentry Turret
             if (!bOOCBuff && !playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Sentry) &&
-                powerLastSnoPowerUsed != SNOPower.DemonHunter_Sentry &&
                 (iElitesWithinRange[RANGE_50] >= 1 || iAnythingWithinRange[RANGE_50] >= 2 ||
                 (CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss)) && CurrentTarget.RadiusDistance <= 50f &&
                 playerStatus.CurrentEnergy >= 30 && GilesUseTimer(SNOPower.DemonHunter_Sentry))

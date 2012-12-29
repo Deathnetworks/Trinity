@@ -10,6 +10,7 @@ using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
+using Zeta.Navigation;
 using Zeta.Pathfinding;
 namespace GilesTrinity
 {
@@ -787,6 +788,24 @@ namespace GilesTrinity
         public static double RadianToDegree(double angle)
         {
             return angle * (180.0 / Math.PI);
+        }
+
+        private static void UpdateSearchGridProvider()
+        {
+            if (Settings.Combat.Misc.UseNavMeshTargeting)
+            {
+                if (gp == null)
+                    gp = Navigator.SearchGridProvider;
+                if (pf == null)
+                    pf = new PathFinder(gp);
+
+                if (ZetaDia.IsInGame)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "Updating Grid Provider", true);
+                    gp.Update();
+                }
+            }
+
         }
     }
 }

@@ -118,13 +118,7 @@ namespace GilesTrinity
                 LootTargeting.Instance.Provider = new GilesLootTargetingProvider();
                 ObstacleTargeting.Instance.Provider = new GilesObstacleTargetingProvider();
 
-                if (Settings.Combat.Misc.UseNavMeshTargeting)
-                {
-                    if (gp == null)
-                        gp = Navigator.SearchGridProvider;
-                    if (pf == null)
-                        pf = new PathFinder(gp);
-                }
+                UpdateSearchGridProvider();
 
                 // Safety check incase DB "OnStart" event didn't fire properly
                 if (BotMain.IsRunning)

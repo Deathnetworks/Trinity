@@ -64,12 +64,12 @@
         </Grid>
         <!--All CheckBox-->
         <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Center" Margin="5">
-            <CheckBox Margin="5" IsChecked="{Binding Path=Misc.ExtendedTrashKill}" ToolTip="Extended range for ~ 2 seconds">Extend trash-kill range after combat</CheckBox>
-            <CheckBox Margin="5" IsChecked="{Binding Path=Misc.AvoidAOE}">Attempt to avoid AOE</CheckBox>
-            <CheckBox Margin="5" IsChecked="{Binding Path=Misc.CollectHealthGlobe}">Attempt to collect health globes</CheckBox>
-            <CheckBox Margin="5" IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Allow out-of-combat movement powers</CheckBox>
-            <CheckBox Margin="5" IsChecked="{Binding Path=Misc.AllowBacktracking}" ToolTip="currently experimental and buggy">Allow Backtracking path after combat</CheckBox>
-            <CheckBox Margin="5" IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="May cause performance problems">Use NavMesh for Targeting</CheckBox>
+            <CheckBox Margin="3" IsChecked="{Binding Path=Misc.ExtendedTrashKill}" ToolTip="Extended range for ~ 2 seconds">Extend trash-kill range after combat</CheckBox>
+            <CheckBox Margin="3" IsChecked="{Binding Path=Misc.AvoidAOE}">Attempt to avoid AOE</CheckBox>
+            <CheckBox Margin="3" IsChecked="{Binding Path=Misc.CollectHealthGlobe}">Attempt to collect health globes</CheckBox>
+            <CheckBox Margin="3" IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Allow out-of-combat movement powers</CheckBox>
+            <CheckBox Margin="3" IsChecked="{Binding Path=Misc.AllowBacktracking}" ToolTip="currently experimental and buggy">Allow Backtracking path after combat</CheckBox>
+            <CheckBox Margin="3" IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>
         </StackPanel>
         <!--Reset Button-->
         <Button Grid.Row="4" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetMiscCommand}">Reset</Button>

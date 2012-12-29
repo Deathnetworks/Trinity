@@ -387,7 +387,7 @@ namespace GilesTrinity
             }
             // Weapon throw
             if (!bOOCBuff && !bCurrentlyAvoiding && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WeaponThrow)
-                && (playerStatus.CurrentEnergy >= 10 && CurrentTarget.RadiusDistance >= 5f))
+                && (playerStatus.CurrentEnergy >= 10 && ( CurrentTarget.RadiusDistance >= 5f || BarbHasNoPrimary())))
             {
                 return new GilesPower(SNOPower.Barbarian_WeaponThrow, 80f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, SIGNATURE_SPAM);
             }
@@ -412,6 +412,13 @@ namespace GilesTrinity
                 return new GilesPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
             return defaultPower;
+        }
+
+        private static bool BarbHasNoPrimary()
+        {
+            return !(hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Frenzy) ||
+                hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Bash) ||
+                hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Cleave));
         }
 
         private static GilesPower GetBarbarianDestroyPower()
