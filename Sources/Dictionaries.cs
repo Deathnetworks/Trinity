@@ -245,7 +245,7 @@ namespace GilesTrinity
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 10}, {191459, 13}, {104632, 20}, {196211, 25}, {200872, 25},
+            {174900, 20}, {191459, 13}, {104632, 20}, {196211, 25}, {200872, 25},
          };
         /// <summary>
         /// Destructible things that are very large and need breaking at a bigger distance - eg logstacks, large crates, carts, etc.
@@ -279,7 +279,7 @@ namespace GilesTrinity
             129031, // A3 Skycrown Catapults
             //Small Belial (220160), Big Belial (3349),
             220160,                3349,             
-
+            210268, // Corrupt Growths 2nd Tier
         };
         /// <summary>
         /// Chests/average-level containers that deserve a bit of extra radius (ie - they are more worthwhile to loot than "random" misc/junk containers)
@@ -298,7 +298,7 @@ namespace GilesTrinity
             163449, 78030, 2909, 58283, 58309, 58321, 87809, 90150, 91600, 97023, 97350, 97381, 72689, 121327, 54515, 3340, 122076, 123640,
             60665, 60844, 78554, 86400, 86428, 81699, 86266, 86400, 110769, 192466, 211456, 6190, 80002, 104596, 58836, 104827, 74909, 6155, 6156, 6158, 6159, 75132,
             181504, 91688, 3016, 3007, 3011, 3014, 130858, 131573, 214396, 182730, 226087, 141639, 206569, 15119, 54413, 54926, 2979, 5776, 3949,
-            108490, 52833, 200371, 153752, 2972, 
+            108490, 52833, 200371, 153752, 2972, 206527,
             //a3dun_crater_st_Demo_ChainPylon_Fire_Azmodan, a3dun_crater_st_Demon_ChainPylon_Fire_MistressOfPain
             198977, 201680,
             //trOut_Leor_painting

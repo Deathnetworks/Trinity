@@ -419,9 +419,9 @@ namespace GilesTrinity
             if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Frenzy))
                 return new GilesPower(SNOPower.Barbarian_Frenzy, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Bash))
-                return new GilesPower(SNOPower.Barbarian_Bash, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+                return new GilesPower(SNOPower.Barbarian_Bash, 6f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Cleave))
-                return new GilesPower(SNOPower.Barbarian_Cleave, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+                return new GilesPower(SNOPower.Barbarian_Cleave, 6f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Rend) && playerStatus.CurrentEnergyPct >= 0.65)
                 return new GilesPower(SNOPower.Barbarian_Rend, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WeaponThrow) && playerStatus.CurrentEnergy >= 20)

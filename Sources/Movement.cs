@@ -475,7 +475,7 @@ namespace GilesTrinity
             int maxDistance = 100;
             int gridTotalSize = (int)(maxDistance / gridSquareSize) * 2;
             int maxWeight = 100;
-            int maxZDiff = 14;
+            //int maxZDiff = 14;
 
             /* If maxDistance is the radius of a circle from the origin, then we want to get the hypotenuse of the radius (x) and tangent (y) as our search grid corner
              * anything outside of the circle will not be considered
@@ -553,7 +553,7 @@ namespace GilesTrinity
                         /*
                          * This little bit is insanely CPU intensive and causes lots of small game freezes, maybe needs GUI option..
                          */
-                        if (!hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 75)
+                        if (!hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 75 && Settings.Combat.Misc.UseNavMeshTargeting)
                         {
                             PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 25, true);
 

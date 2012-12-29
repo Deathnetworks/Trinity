@@ -424,51 +424,59 @@ namespace GilesTrinity
             // Set the object type
             // begin with default... 
             c_ObjectType = GObjectType.Unknown;
+
+            if (ignoreNames.Any(n => c_Name.ToLower().Contains(n.ToLower())))
+            {
+                AddToCache = false;
+                c_IgnoreSubStep = "IgnoreNames";
+                return AddToCache;
+            }
             // Either get the cached Giles object type, or calculate it fresh
             if (!c_IsObstacle && !dictGilesObjectTypeCache.TryGetValue(c_RActorGuid, out c_ObjectType))
             {
                 // See if it's an avoidance first from the SNO
                 if (Settings.Combat.Misc.AvoidAOE && (hashAvoidanceSNOList.Contains(c_ActorSNO) || hashAvoidanceBuffSNOList.Contains(c_ActorSNO) || hashAvoidanceSNOProjectiles.Contains(c_ActorSNO)))
                 {
-                    // Checking for BuffVisualEffect - for Butcher, maybe useful other places?
-                    if (hashAvoidanceBuffSNOList.Contains(c_ActorSNO))
+                    using (new PerformanceLogger("RefreshCachedType.0"))
                     {
-                        bool hasBuff = false;
-                        try
+                        // Checking for BuffVisualEffect - for Butcher, maybe useful other places?
+                        if (hashAvoidanceBuffSNOList.Contains(c_ActorSNO))
                         {
-                            hasBuff = c_CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) > 0;
-                        }
-                        catch
-                        {
-                            // Remove on exception, otherwise it may get stuck in the cache
-                            dictGilesObjectTypeCache.Remove(c_RActorGuid);
-                        }
-                        if (hasBuff)
-                        {
-                            AddToCache = true;
-                            c_ObjectType = GObjectType.Avoidance;
+                            bool hasBuff = false;
+                            try
+                            {
+                                hasBuff = c_CommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) > 0;
+                            }
+                            catch
+                            {
+                                // Remove on exception, otherwise it may get stuck in the cache
+                                dictGilesObjectTypeCache.Remove(c_RActorGuid);
+                            }
+                            if (hasBuff)
+                            {
+                                AddToCache = true;
+                                c_ObjectType = GObjectType.Avoidance;
+                            }
+                            else
+                            {
+                                dictGilesObjectTypeCache.Remove(c_RActorGuid);
+                                AddToCache = false;
+                                c_IgnoreSubStep = "NoBuffVisualEffect";
+                            }
                         }
                         else
                         {
-                            dictGilesObjectTypeCache.Remove(c_RActorGuid);
-                            AddToCache = false;
-                            c_IgnoreSubStep = "NoBuffVisualEffect";
+                            // Avoidance isn't disabled, so set this object type to avoidance
+                            c_ObjectType = GObjectType.Avoidance;
                         }
-                    }
-                    else
-                    {
-                        // Avoidance isn't disabled, so set this object type to avoidance
-                        c_ObjectType = GObjectType.Avoidance;
                     }
                 }
                 // It's not an avoidance, so let's calculate it's object type "properly"
                 else
                 {
                     // Calculate the object type of this object
-                    //if (thisobj is DiaUnit && thisobj.ActorType == ActorType.Unit)                    
-                    if (c_diaObject.ActorType == ActorType.Unit)
+                    if (c_diaObject is DiaUnit)
                     {
-
                         using (new PerformanceLogger("RefreshCachedType.1"))
                         {
 
@@ -486,7 +494,7 @@ namespace GilesTrinity
                             }
                         }
                     }
-                    else if (hashForceSNOToItemList.Contains(c_ActorSNO) || c_diaObject.ActorType == ActorType.Item)
+                    else if (hashForceSNOToItemList.Contains(c_ActorSNO) || (c_diaObject is DiaItem))
                     {
                         using (new PerformanceLogger("RefreshCachedType.2"))
                         {
@@ -508,26 +516,32 @@ namespace GilesTrinity
                             }
                         }
                     }
-                    else if (c_diaObject.ActorType == ActorType.Gizmo)
+                    else if (c_diaObject is DiaGizmo)
                     {
+                        DiaGizmo c_diaGizmo;
                         using (new PerformanceLogger("RefreshCachedType.3"))
                         {
-                            if (c_diaObject.ActorInfo.GizmoType == GizmoType.Shrine)
+                            c_diaGizmo = (DiaGizmo)c_diaObject;
+                        }
+                        using (new PerformanceLogger("RefreshCachedType.4"))
+                        {
+
+                            if (c_diaObject is GizmoShrine)
                                 c_ObjectType = GObjectType.Shrine;
-                            else if (c_diaObject.ActorInfo.GizmoType == GizmoType.Healthwell)
+                            else if (c_diaObject is GizmoHealthwell)
                                 c_ObjectType = GObjectType.HealthWell;
-                            else if (c_diaObject.ActorInfo.GizmoType == GizmoType.DestructibleLootContainer)
+                            else if (c_diaObject is GizmoDestructibleLootContainer)
                                 c_ObjectType = GObjectType.Destructible;
-                            else if (c_diaObject.ActorInfo.GizmoType == GizmoType.Destructible)
+                            else if (c_diaObject is GizmoDestructible)
                                 c_ObjectType = GObjectType.Destructible;
-                            else if (c_diaObject.ActorInfo.GizmoType == GizmoType.Barricade)
-                                c_ObjectType = GObjectType.Barricade;
-                            else if (c_diaObject.ActorInfo.GizmoType == GizmoType.LootContainer)
+                            else if (c_diaObject is GizmoLootContainer)
                                 c_ObjectType = GObjectType.Container;
+                            else if (c_diaObject is GizmoDoor)
+                                c_ObjectType = GObjectType.Door;
                             else if (hashSNOInteractWhitelist.Contains(c_ActorSNO))
                                 c_ObjectType = GObjectType.Interactable;
-                            else if (c_diaObject.ActorInfo.GizmoType == GizmoType.Door)
-                                c_ObjectType = GObjectType.Door;
+                            else if (c_diaGizmo.IsBarricade)
+                                c_ObjectType = GObjectType.Barricade;
                             else if (c_diaObject.ActorInfo.GizmoType == GizmoType.WeirdGroup57)
                                 c_ObjectType = GObjectType.Interactable;
                             else
@@ -742,7 +756,7 @@ namespace GilesTrinity
                             c_IgnoreSubStep = "AllySceneryHelperTeam";
                             return AddToCache;
                         }
-                        break;
+                    //break;
                 }
             }
             // Force return here for un-attackable allies
@@ -1898,38 +1912,54 @@ namespace GilesTrinity
                     {
                         using (new PerformanceLogger("RefreshLoS.1"))
                         {
-                            bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
-
-                            if (!isNavigable)
+                            if (Settings.Combat.Misc.UseNavMeshTargeting)
                             {
-                                AddToCache = false;
-                                c_IgnoreSubStep = "NotNavigable";
+                                bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
+
+                                if (!isNavigable)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "NotNavigable";
+                                }
                             }
                         }
                         using (new PerformanceLogger("RefreshLoS.2"))
                         {
-                            // For Melee
-                            if (PlayerKiteDistance <= 5 && c_CentreDistance >= 5 && !ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
+                            if (Settings.Combat.Misc.UseNavMeshTargeting)
                             {
-                                AddToCache = false;
-                                c_IgnoreSubStep = "UnableToRayCast";
+                                // For Melee
+                                if (PlayerKiteDistance <= 5 && c_CentreDistance >= 5 && !ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "UnableToRayCast";
+                                }
+                                // For Kiting
+                                else if (!ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowProjectile))
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "UnableToRayCast";
+                                }
                             }
-                            // For Kiting
-                            else if (!ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowProjectile))
+                            else
                             {
-                                AddToCache = false;
-                                c_IgnoreSubStep = "UnableToRayCast";
+                                if (c_ZDiff > 14f)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "LoS.ZDiff";
+                                }
                             }
                         }
                         using (new PerformanceLogger("RefreshLoS.3"))
                         {
-
-                            // Ignore units not in LoS except bosses, rares, champs
-                            if (!c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
+                            if (Settings.Combat.Misc.UseNavMeshTargeting)
                             {
+                                // Ignore units not in LoS except bosses, rares, champs
+                                if (!c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
+                                {
 
-                                AddToCache = false;
-                                c_IgnoreSubStep = "UnitNotInLoS";
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "UnitNotInLoS";
+                                }
                             }
                         }
                     }

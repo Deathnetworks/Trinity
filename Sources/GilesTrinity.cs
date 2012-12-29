@@ -70,7 +70,7 @@ namespace GilesTrinity
                     }
                     using (new PerformanceLogger("UpdateCachedPlayerData.4"))
                     {
-                        if (DateTime.Now.Subtract(playerStatus.Scene.LastUpdate).TotalMilliseconds > 1000)
+                        if (DateTime.Now.Subtract(playerStatus.Scene.LastUpdate).TotalMilliseconds > 1000 && Settings.Combat.Misc.UseNavMeshTargeting)
                         {
                             int CurrentSceneSNO = -1;
                             using (new PerformanceLogger("UpdateCachedPlayerData.4.1"))

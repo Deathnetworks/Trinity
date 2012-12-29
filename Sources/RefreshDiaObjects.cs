@@ -386,31 +386,26 @@ namespace GilesTrinity
                             if (t1.IsRunning)
                                 t1.Stop();
 
-                            // Disabled, was missing some things on output... ServerProps maybe?
-                            // bool ignore = (from n in ignoreNames
-                            //               where c_Name.StartsWith(n)
-                            //               select true).FirstOrDefault();
-                            // if (!ignore)
-                            // {
-
                             double duration = t1.Elapsed.TotalMilliseconds;
 
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                                "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12}",
-                                duration,
-                                (AddToCache ? "Added  " : " Ignored"),
-                                (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
-                                c_diaObject.ActorType,
-                                c_ObjectType,
-                                c_Name,
-                                c_ActorSNO,
-                                (c_unit_IsBoss ? " IsBoss" : ""),
-                                (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
-                                c_CentreDistance,
-                                c_RadiusDistance,
-                                c_ZDiff,
-                                c_Radius);
-                            // }
+                            if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && duration > 1 || !Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
+                            {
+                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                                    "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0}",
+                                    duration,
+                                    (AddToCache ? "Added  " : " Ignored"),
+                                    (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
+                                    c_diaObject.ActorType,
+                                    c_ObjectType,
+                                    c_Name,
+                                    c_ActorSNO,
+                                    (c_unit_IsBoss ? " IsBoss" : ""),
+                                    (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
+                                    c_CentreDistance,
+                                    c_RadiusDistance,
+                                    c_ZDiff,
+                                    c_Radius);
+                            }
                         }
                     }
                     catch (Exception ex)
