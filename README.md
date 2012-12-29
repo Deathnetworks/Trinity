@@ -26,7 +26,7 @@ Future Planned Improvements:
 
 Changelog 1.7.1.11:
 
-* New experimental option: "Use NavMesh to prevent stucks" on the Combat>Misc tab. Default and recommended is to enable this option. Disabling this may lead to stucks for bot attempting to target monsters/shines through walls and floor gaps. If you experience severe performance problems, try disabling this option. 
+* New GUI option: "Use NavMesh to prevent stucks" on the Combat>Misc tab. Default and recommendation is to enable this option. Disabling this may lead to stucks for bot attempting to target monsters/shines through walls and floor gaps. If you experience severe performance problems, try disabling this option. 
 
 * Barbarian Weapon Throw can now be used as "primary" if no other primary ability is present.
 
