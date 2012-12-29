@@ -22,9 +22,12 @@ using GilesTrinity.Technicals;
 namespace GilesTrinity.Swap
 {
     /// <summary>
-    /// Version: 1.0.1c
-    /// - Added check after death
-    /// - Fixed an issue that would cause people that aren't monks using weapon swap to run the checks during town run.
+	/// Quick Fix: A
+	/// - Fixed a permanent stuck issue when an unidentified item is placed in the bottom right corner (but Trinity doesn't want to town run yet).	
+    /// Version: 1.0.2
+    /// - Attempt to move misplaced items from the bottom right corner
+    /// - Fixed rare issue where DB mis-reads an item and it continues for ever
+    /// - Checks and places all items in their rightful location
     /// </summary>
     class WeaponSwap
     {
@@ -37,6 +40,7 @@ namespace GilesTrinity.Swap
         private static bool ableToSwap = true;
         private static int sGamesCreated = -1;
         private static bool sCheckAfterDeath = false;
+        private static bool sPlacementCheck = true;
         /// <summary>
         /// Make sure rows and columns have the same amount of numbers inside (top left corner is row=0,column=0, bottom right corner is row=5,column=9). 
         /// Each combination of Row and Column is an item location, for instance Row 0, Column 3 -> Top row, 4th column from the left.
@@ -62,6 +66,7 @@ namespace GilesTrinity.Swap
         /// </summary>
 
         private static InventorySlot[] items = new InventorySlot[] {  };
+        private static InventorySlot[] tempItems = items;
         // Last slot is reserved for Offhand (if exists) and the slot before last for the main hand
         private static int[] mainID = new int[rows.Length + 2];
         // Last slot is reserved for the 2 Handed weapon we swap to.
@@ -147,7 +152,7 @@ namespace GilesTrinity.Swap
             // Don't run if we're not a monk
             if (GilesTrinity.playerStatus.ActorClass != ActorClass.Monk)
                 return;
-
+            tempItems = items;
             // Don't run if we've already checked within 250ms
             //if (DateTime.Now.Subtract(LastSecurityCheck).TotalMilliseconds <= 250)
             //    return;
@@ -238,48 +243,48 @@ namespace GilesTrinity.Swap
                 if (crashedDuringSwap == true)
                 {
                     // If crashed during swapped, the currently equipped items are the alternative items and the items in the inventory are the MAIN items.
-                    for (int i = 0; i < items.Length; i++)
+                    for (int i = 0; i < tempItems.Length; i++)
                     {
                         try
                         {
-                            altID[i] = ZetaDia.Me.Inventory.Equipped.FirstOrDefault(j => j.InventorySlot == items[i]).DynamicId;
+                            altID[i] = ZetaDia.Me.Inventory.Equipped.FirstOrDefault(j => j.InventorySlot == tempItems[i]).DynamicId;
 
                             ACDItem item = ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == columns[i] && j.InventoryRow == rows[i]).FirstOrDefault();
                             mainID[i] = item.DynamicId;
-                            if (!item.ValidInventorySlots.Contains(items[i]))
+                            if (!item.ValidInventorySlots.Contains(tempItems[i]))
                             {
-                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "[Swapper] Item at location: Row = " + rows[i] + ", Column = " + columns[i] + " can't be placed in " + items[i].ToString());
-                                items[i] = InventorySlot.Gold;
+                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "[Swapper] Item at location: Row = " + rows[i] + ", Column = " + columns[i] + " can't be placed in " + tempItems[i].ToString());
+                                tempItems[i] = InventorySlot.Gold;
                             }
 
                         }
                         catch
                         {
                             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "[Swapper] Problem with item at location: Row = " + rows[i] + ", Column = " + columns[i] + ".");
-                            items[i] = InventorySlot.Gold;
+                            tempItems[i] = InventorySlot.Gold;
                         }
                     }
                 }
                 else
                 {
-                    for (int i = 0; i < items.Length; i++)
+                    for (int i = 0; i < tempItems.Length; i++)
                     {
                         try
                         {
-                            mainID[i] = ZetaDia.Me.Inventory.Equipped.FirstOrDefault(j => j.InventorySlot == items[i]).DynamicId;
+                            mainID[i] = ZetaDia.Me.Inventory.Equipped.FirstOrDefault(j => j.InventorySlot == tempItems[i]).DynamicId;
 
                             ACDItem item = ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == columns[i] && j.InventoryRow == rows[i]).FirstOrDefault();
                             altID[i] = item.DynamicId;
-                            if (!item.ValidInventorySlots.Contains(items[i]))
+                            if (!item.ValidInventorySlots.Contains(tempItems[i]))
                             {
                                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "[Swapper] Problem with item at location: Row = " + rows[i] + ", Column = " + columns[i]);
-                                items[i] = InventorySlot.Gold;
+                                tempItems[i] = InventorySlot.Gold;
                             }
                         }
                         catch
                         {
                             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "[Swapper] Problem with item at location: Row = " + rows[i] + ", Column = " + columns[i]);
-                            items[i] = InventorySlot.Gold;
+                            tempItems[i] = InventorySlot.Gold;
                         }
                     }
                 }
@@ -302,11 +307,164 @@ namespace GilesTrinity.Swap
             return wearingDPSGear;
         }
 
+        public void ItemsInPlace()
+        {
+			if (GilesTrinity.playerStatus.ActorClass != ActorClass.Monk || ZetaDia.Me.CommonData.AnimationState == AnimationState.Dead ||
+				!GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap)
+			{
+				return;
+			}
+            if (sPlacementCheck == false && !wearingDPSGear)
+            {
+                    // Make sure all items are in place
+                for (int i = 0; i < rows.Length; i++)
+                {
+                        // Check equipped items are in place
+                    if (!ZetaDia.Me.Inventory.ItemInLocation(items[i], 0, 0) || ZetaDia.Me.Inventory.Equipped.FirstOrDefault(j => j.InventorySlot == items[i]).DynamicId != mainID[i])
+                    {
+                        ZetaDia.Me.Inventory.EquipItem(mainID[i], items[i]);
+                    }
+                        // Check alternative items are in place
+                    if (!ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, columns[i], rows[i]))
+                    {
+                        if (ZetaDia.Me.Inventory.Backpack.Where(j => j.DynamicId == altID[i]).FirstOrDefault().IsTwoSquareItem)
+                        {
+                            if (ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, columns[i], rows[i]+1))
+                            {
+                                MoveSpot(ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == columns[i] && j.InventoryRow == rows[i] + 1).FirstOrDefault().DynamicId, ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == columns[i] && j.InventoryRow == rows[i] + 1).FirstOrDefault().IsTwoSquareItem);
+                            }
+                        }
+                        ZetaDia.Me.Inventory.MoveItem(altID[i],
+                                    ZetaDia.Me.CommonData.DynamicId, InventorySlot.PlayerBackpack, columns[i], rows[i]);
+                    }
+                        // Another variational check for alternative items
+                    else if (ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, columns[i], rows[i]) &&
+                        ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == columns[i] && j.InventoryRow == rows[i]).FirstOrDefault().DynamicId != altID[i])
+                    {
+                        if (ZetaDia.Me.Inventory.Backpack.Where(j => j.DynamicId == altID[i]).FirstOrDefault().IsTwoSquareItem)
+                        {
+                            if (ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, columns[i], rows[i] + 1))
+                            {
+                                MoveSpot(ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == columns[i] && j.InventoryRow == rows[i] + 1).FirstOrDefault().DynamicId, ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == columns[i] && j.InventoryRow == rows[i] + 1).FirstOrDefault().IsTwoSquareItem);
+                            }
+                        }
+                        if (ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, columns[i], rows[i]))
+                        {
+                            MoveSpot(ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == columns[i] && j.InventoryRow == rows[i]).FirstOrDefault().DynamicId, ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == columns[i] && j.InventoryRow == rows[i] + 1).FirstOrDefault().IsTwoSquareItem);
+                        }
+                        ZetaDia.Me.Inventory.MoveItem(altID[i],
+                                    ZetaDia.Me.CommonData.DynamicId, InventorySlot.PlayerBackpack, columns[i], rows[i]);
+                    }
+                }
+                    // Make sure mainhand is in place
+                if (!ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerLeftHand, 0, 0) || ZetaDia.Me.Inventory.Equipped.FirstOrDefault(j => j.InventorySlot == InventorySlot.PlayerLeftHand).DynamicId != mainID[mainID.Length - 2])
+                {
+                    ZetaDia.Me.Inventory.EquipItem(mainID[mainID.Length - 2], InventorySlot.PlayerLeftHand);
+                }
+                    // Make sure offhand is in place
+                if (MainIsTwoHander && (!ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerRightHand, 0, 0) || ZetaDia.Me.Inventory.Equipped.FirstOrDefault(j => j.InventorySlot == InventorySlot.PlayerRightHand).DynamicId != mainID[mainID.Length - 1]))
+                {
+                    ZetaDia.Me.Inventory.EquipItem(mainID[mainID.Length - 1], InventorySlot.PlayerRightHand);
+                }
+                if (ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 0, 0) 
+                    && ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 0 && j.InventoryRow == 0).FirstOrDefault().DynamicId != altID[altID.Length - 1]
+                    || !ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 0, 0))
+                {
+                    if (ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 0, 0))
+                    {
+                        MoveSpot(ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 0 && j.InventoryRow == 0).FirstOrDefault().DynamicId, ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 0 && j.InventoryRow == 0).FirstOrDefault().IsTwoSquareItem);
+                    }
+                    if (ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 0, 1))
+                    {
+                        MoveSpot(ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 0 && j.InventoryRow == 1).FirstOrDefault().DynamicId, ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 0 && j.InventoryRow == 1).FirstOrDefault().IsTwoSquareItem);
+                    }
+                    ZetaDia.Me.Inventory.MoveItem(altID[altID.Length - 1],
+                                    ZetaDia.Me.CommonData.DynamicId, InventorySlot.PlayerBackpack, 0, 0);
+                }
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Items placed in their rightful locations.");
+            }
+            sPlacementCheck = true;
+        }
+
+        private bool MoveSpot(int DynID, bool mIsTwoSpot)
+        {
+            bool moved = false;
+
+            for (int j = 5; j >= 0; j--)
+            {
+                for (int i = 9; i >= 0; i--)
+                {
+                    if (i == 9 && (j == 4 || j == 5))
+                    { }
+                    else
+                    {
+                        if (!ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, i, j) && !mIsTwoSpot ||
+                            !ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, i, j) && !ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, i, j - 1) && j >= 1)
+                        {
+                            if (mIsTwoSpot)
+                            {
+                                ZetaDia.Me.Inventory.MoveItem(DynID,
+                                            ZetaDia.Me.CommonData.DynamicId, InventorySlot.PlayerBackpack, i, j-1);
+								return true;
+                            }
+                            else
+                            {
+                                ZetaDia.Me.Inventory.MoveItem(DynID,
+                                            ZetaDia.Me.CommonData.DynamicId, InventorySlot.PlayerBackpack, i, j);
+								return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return moved;
+        }
+
+        private bool TryClearCorner()
+        {
+            bool success = true;
+            if (ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 9, 5) && ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 9, 4))
+            {
+                if (ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 9 && j.InventoryRow == 5).FirstOrDefault().DynamicId == ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 9 && j.InventoryRow == 4).FirstOrDefault().DynamicId)
+                {
+                    if (!MoveSpot(ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 9 && j.InventoryRow == 5).FirstOrDefault().DynamicId, true))
+                    {
+                        success = false;
+                    }
+                }
+                else
+                {
+                    if (!MoveSpot(ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 9 && j.InventoryRow == 5).FirstOrDefault().DynamicId, false)
+                        || MoveSpot(ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 9 && j.InventoryRow == 4).FirstOrDefault().DynamicId, false))
+                    {
+                        success = false;
+                    }
+                }
+            }
+            else if (ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 9, 5))
+            {
+                if (!MoveSpot(ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 9 && j.InventoryRow == 5).FirstOrDefault().DynamicId, false))
+                    {
+                        success = false;
+                    }
+            }
+            else
+            {
+                if (!MoveSpot(ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 9 && j.InventoryRow == 4).FirstOrDefault().DynamicId, false))
+                    {
+                        success = false;
+                    }
+            }
+            return success;
+        }
+
         internal static DateTime LastCheckSwapGear = DateTime.Now;
+        internal static DateTime LastSwapTime = DateTime.Now;
 
         public void SwapGear()
         {	
-            if (GilesTrinity.playerStatus.ActorClass != ActorClass.Monk || ZetaDia.Me.CommonData.AnimationState == AnimationState.Dead)
+            if (GilesTrinity.playerStatus.ActorClass != ActorClass.Monk || ZetaDia.Me.CommonData.AnimationState == AnimationState.Dead || DateTime.Now.Subtract(LastSwapTime).TotalMilliseconds <= 700
+                || GilesTrinity.GilesHasBuff(SNOPower.Monk_SweepingWind) && !wearingDPSGear)
             {
                 return;
             }
@@ -314,7 +472,8 @@ namespace GilesTrinity.Swap
             //if (DateTime.Now.Subtract(LastCheckSwapGear).TotalMilliseconds <= 250)
             //    return;
             //LastCheckSwapGear = DateTime.Now;
-            if (!hasChecked)
+            if (!hasChecked || mainID[mainID.Length - 2] != ZetaDia.Me.Inventory.Equipped.FirstOrDefault(j => j.InventorySlot == InventorySlot.PlayerLeftHand).DynamicId 
+                && altID[altID.Length - 1] != ZetaDia.Me.Inventory.Equipped.FirstOrDefault(j => j.InventorySlot == InventorySlot.PlayerLeftHand).DynamicId)
             {
                 SecurityCheck();
             }			
@@ -336,7 +495,7 @@ namespace GilesTrinity.Swap
 						crashedDuringSwap = true;
 					}
                     wearingDPSGear = true;
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Died wearning Dps gear - saving status for next fight.");
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Died wearing Dps gear - saving status for next fight.");
                 }
                 sCheckAfterDeath = false;
             }
@@ -359,9 +518,9 @@ namespace GilesTrinity.Swap
                             // Swap other shiz
                             for (int i = 0; i < rows.Length; i++)
                             {
-                                if (items[i] != InventorySlot.Gold)
+                                if (tempItems[i] != InventorySlot.Gold)
                                 {
-                                    ZetaDia.Me.Inventory.EquipItem(altID[i], items[i]);
+                                    ZetaDia.Me.Inventory.EquipItem(altID[i], tempItems[i]);
                                 }
                             }
                             // Equip the 2 handed weapon
@@ -371,9 +530,24 @@ namespace GilesTrinity.Swap
                         }
                         else
                         {
-                            // Force town run due to last spot taken!
-                            GilesTrinity.bWantToTownRun = true;
-                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] For some reason bottom right corner isn't protected, initializing town run to clear it up.");
+                                // Try clearing bottom right corner
+                            if (ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 9 && j.InventoryRow == 5).FirstOrDefault().IsUnidentified ||
+                                ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 9 && j.InventoryRow == 4).FirstOrDefault().IsUnidentified)
+                            {
+                                    // Unid items don't have DynamicId - we initialize town run to move it away.
+                                GilesTrinity.bWantToTownRun = true;
+                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Forcing town run to clear bottom right corner.");
+                            }
+                            else if (!ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 9, 5)
+                                || ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 9 && j.InventoryRow == 5).FirstOrDefault().DynamicId != mainID[mainID.Length - 1])
+                            {
+                                if (!TryClearCorner())
+                                {
+                                    // Force town run due to last spot taken!
+                                    GilesTrinity.bWantToTownRun = true;
+                                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Forcing town run to clear bottom right corner.");
+                                }
+                            }
                         }
                     }
                     else
@@ -381,9 +555,9 @@ namespace GilesTrinity.Swap
                         // Equip non weapon items
                         for (int i = 0; i < rows.Length; i++)
                         {
-                            if (items[i] != InventorySlot.Gold)
+                            if (tempItems[i] != InventorySlot.Gold)
                             {
-                                ZetaDia.Me.Inventory.EquipItem(mainID[i], items[i]);
+                                ZetaDia.Me.Inventory.EquipItem(mainID[i], tempItems[i]);
                             }
                         }
                         // Equip main hand
@@ -395,6 +569,7 @@ namespace GilesTrinity.Swap
                         }
                         wearingDPSGear = false;
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Swapped back to normal gear.");
+                        sPlacementCheck = false;
                     }
                 }
                 else if (crashedDuringSwap == true)
@@ -403,6 +578,7 @@ namespace GilesTrinity.Swap
                 }
                 crashedDuringSwap = false;
             }
+            LastSwapTime = DateTime.Now;
         }
     }
 }
