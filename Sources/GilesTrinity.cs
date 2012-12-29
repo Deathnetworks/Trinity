@@ -258,11 +258,13 @@ namespace GilesTrinity
             sLastProfileSeen = "";
             sFirstProfileSeen = "";
 
-            if (gp == null)
-                gp = Navigator.SearchGridProvider;
-            if (pf == null)
-                pf = new PathFinder(gp);
-
+            if (Settings.Combat.Misc.UseNavMeshTargeting)
+            {
+                if (gp == null)
+                    gp = Navigator.SearchGridProvider;
+                if (pf == null)
+                    pf = new PathFinder(gp);
+            }
         }
     }
 }

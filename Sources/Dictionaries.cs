@@ -225,7 +225,7 @@ namespace GilesTrinity
          };
         // Interactable whitelist - things that need interacting with like special wheels, levers - they will be blacklisted for 30 seconds after one-use
         internal static HashSet<int> hashSNOInteractWhitelist = new HashSet<int> {
-            56686, 211999, 52685, 54882,  180575,
+            56686, 211999, 52685, 54882, 180575, 105478, 
          };
         /// <summary>
         /// NOTE: you don't NEED interactable SNO's listed here. But if they are listed here, *THIS* is the range at which your character will try to walk to within the object

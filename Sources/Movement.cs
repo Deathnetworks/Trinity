@@ -68,7 +68,9 @@ namespace GilesTrinity
                         iPosition = 360f + iPosition;
                     if (iPosition >= 360f)
                         iPosition = iPosition - 360f;
+
                     vThisZigZag = MathEx.GetPointAt(playerStatus.CurrentPosition, fRunDistance, MathEx.ToRadians(iPosition));
+
                     if (fPointToTarget <= 30f || fPointToTarget >= 330f)
                     {
                         vThisZigZag.Z = vTargetLocation.Z;
@@ -87,13 +89,21 @@ namespace GilesTrinity
                         fRunDistance = 8f;
                     }
 
-                    if (bCheckGround)
+                    if (Settings.Combat.Misc.UseNavMeshTargeting)
                     {
-                        vThisZigZag.Z = gp.GetHeight(vThisZigZag.ToVector2());
-                        bCanRayCast = ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
+                        if (bCheckGround)
+                        {
+                            vThisZigZag.Z = gp.GetHeight(vThisZigZag.ToVector2());
+                            bCanRayCast = ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
+                        }
+                        else
+                            bCanRayCast = pf.IsNavigable(gp.WorldToGrid(vThisZigZag.ToVector2()));
                     }
                     else
-                        bCanRayCast = pf.IsNavigable(gp.WorldToGrid(vThisZigZag.ToVector2()));
+                    {
+                        bCanRayCast = ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
+                    }
+
                     // Give weight to each zigzag point, so we can find the best one to aim for
                     if (bCanRayCast)
                     {
@@ -126,7 +136,15 @@ namespace GilesTrinity
                         if (fThisWeight > fHighestWeight)
                         {
                             fHighestWeight = fThisWeight;
-                            vBestLocation = new Vector3(vThisZigZag.X, vThisZigZag.Y, gp.GetHeight(vThisZigZag.ToVector2()));
+
+                            if (Settings.Combat.Misc.UseNavMeshTargeting)
+                            {
+                                vBestLocation = new Vector3(vThisZigZag.X, vThisZigZag.Y, gp.GetHeight(vThisZigZag.ToVector2()));
+                            }
+                            else
+                            {
+                                vBestLocation = new Vector3(vThisZigZag.X, vThisZigZag.Y, vThisZigZag.Z + 4);
+                            }
                             if (!bAnyAvoidance)
                                 bFoundSafeSpotsFirstLoop = true;
                         }
@@ -475,7 +493,7 @@ namespace GilesTrinity
             int maxDistance = 100;
             int gridTotalSize = (int)(maxDistance / gridSquareSize) * 2;
             int maxWeight = 100;
-            //int maxZDiff = 14;
+            int maxZDiff = 14;
 
             /* If maxDistance is the radius of a circle from the origin, then we want to get the hypotenuse of the radius (x) and tangent (y) as our search grid corner
              * anything outside of the circle will not be considered
@@ -492,25 +510,38 @@ namespace GilesTrinity
                 for (int y = 0; y < gridTotalSize; y++)
                 {
                     Vector2 xy = new Vector2(topleft.X + (x * gridSquareSize), topleft.Y + (y * gridSquareSize));
-                    Vector3 xyz = new Vector3(xy.X, xy.Y, gp.GetHeight(xy));
-                    Point p_xy = gp.WorldToGrid(xy);
+                    Vector3 xyz = Vector3.Zero;
+                    Point p_xy = Point.Empty;
+
+                    if (Settings.Combat.Misc.UseNavMeshTargeting)
+                    {
+                        xyz = new Vector3(xy.X, xy.Y, gp.GetHeight(xy));
+                    }
+                    else
+                    {
+                        xyz = new Vector3(xy.X, xy.Y, origin.Z + 4);
+                    }
 
                     GridPoint gridPoint = new GridPoint(xyz, 0, origin.Distance(xyz));
 
                     if (gridPoint.Distance > maxDistance + gridSquareRadius)
                         continue;
-
-                    // If the point is navigable but ZDiff is way too different (up a cliff or wall)
-                    //if (Math.Abs(gridPoint.Position.Z - origin.Z) > maxZDiff)
-                    //{
-                    //    continue;
-                    //}
-
-                    if (!pf.IsNavigable(p_xy))
+                    if (Settings.Combat.Misc.UseNavMeshTargeting)
                     {
-                        continue;
+                        p_xy = gp.WorldToGrid(xy);
+                        if (!pf.IsNavigable(p_xy))
+                        {
+                            continue;
+                        }
                     }
-
+                    else
+                    {
+                        // If ZDiff is way too different (up a cliff or wall)
+                        if (Math.Abs(gridPoint.Position.Z - origin.Z) > maxZDiff)
+                        {
+                            continue;
+                        }
+                    }
                     if (gridPoint.Distance > 45 && !ZetaDia.Physics.Raycast(origin, xyz, NavCellFlags.AllowWalk))
                     {
                         continue;
@@ -553,8 +584,11 @@ namespace GilesTrinity
                         /*
                          * This little bit is insanely CPU intensive and causes lots of small game freezes, maybe needs GUI option..
                          */
-                        if (!hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 75 && Settings.Combat.Misc.UseNavMeshTargeting)
+                        if (Settings.Combat.Misc.UseNavMeshTargeting && !hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 75)
                         {
+                            if (p_xy == Point.Empty)
+                                p_xy = gp.WorldToGrid(xy);
+
                             PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 25, true);
 
                             bool pathFailure = false;

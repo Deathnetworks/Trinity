@@ -835,7 +835,12 @@ namespace GilesTrinity
                     // So it won't blacklist a monster "on the edge of the screen" who isn't even being targetted
                     // Don't blacklist monsters on <= 50% health though, as they can't be in a stuck location... can they!? Maybe give them some extra time!
 
-                    bool isNavigable = pf.IsNavigable(gp.WorldToGrid(CurrentTarget.Position.ToVector2()));
+                    bool isNavigable;
+
+                    if (Settings.Combat.Misc.UseNavMeshTargeting)
+                        isNavigable = pf.IsNavigable(gp.WorldToGrid(CurrentTarget.Position.ToVector2()));
+                    else
+                        isNavigable = true;
                     bool bBlacklistThis = true;
 
                     // PREVENT blacklisting a monster on less than 90% health unless we haven't damaged it for more than 2 minutes

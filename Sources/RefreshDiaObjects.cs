@@ -49,7 +49,7 @@ namespace GilesTrinity
                             return false;
                         }
 
-                        if (!pf.IsNavigable(gp.WorldToGrid(playerStatus.CurrentPosition.ToVector2())))
+                        if (Settings.Combat.Misc.UseNavMeshTargeting && !pf.IsNavigable(gp.WorldToGrid(playerStatus.CurrentPosition.ToVector2())))
                         {
                             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "Updating Grid Provider", true);
                             gp.Update();

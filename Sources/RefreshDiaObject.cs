@@ -532,16 +532,16 @@ namespace GilesTrinity
                                 c_ObjectType = GObjectType.HealthWell;
                             else if (c_diaObject is GizmoDestructibleLootContainer)
                                 c_ObjectType = GObjectType.Destructible;
-                            else if (c_diaObject is GizmoDestructible)
-                                c_ObjectType = GObjectType.Destructible;
                             else if (c_diaObject is GizmoLootContainer)
                                 c_ObjectType = GObjectType.Container;
                             else if (c_diaObject is GizmoDoor)
                                 c_ObjectType = GObjectType.Door;
-                            else if (hashSNOInteractWhitelist.Contains(c_ActorSNO))
-                                c_ObjectType = GObjectType.Interactable;
                             else if (c_diaGizmo.IsBarricade)
                                 c_ObjectType = GObjectType.Barricade;
+                            else if (c_diaObject is GizmoDestructible)
+                                c_ObjectType = GObjectType.Destructible;
+                            else if (hashSNOInteractWhitelist.Contains(c_ActorSNO))
+                                c_ObjectType = GObjectType.Interactable;
                             else if (c_diaObject.ActorInfo.GizmoType == GizmoType.WeirdGroup57)
                                 c_ObjectType = GObjectType.Interactable;
                             else
@@ -2053,8 +2053,14 @@ namespace GilesTrinity
                         //c_vPosition = thisobj.Position;
                         Vector3 pos = c_diaObject.Position;
 
-                        // always get Height of wherever the nav says it is (for flying things..)
-                        c_Position = new Vector3(pos.X, pos.Y, gp.GetHeight(pos.ToVector2()));
+                        if (Settings.Combat.Misc.UseNavMeshTargeting)
+                        {
+                            // always get Height of wherever the nav says it is (for flying things..)
+                            c_Position = new Vector3(pos.X, pos.Y, gp.GetHeight(pos.ToVector2()));
+                        }
+                        else
+                            c_Position = pos;
+
                     }
                     catch (Exception ex)
                     {
