@@ -281,17 +281,13 @@ namespace GilesTrinity
                     }
 
 
-                    // Calculate the player's current distance from destination
-                    float fDistanceFromTarget;
-                    bool currentTargetIsInLoS;
-
                     using (new PerformanceLogger("HandleTarget.LoSCheck"))
                     {
                         fDistanceFromTarget = Vector3.Distance(playerStatus.CurrentPosition, vCurrentDestination) - fDistanceReduction;
                         if (fDistanceFromTarget < 0f)
                             fDistanceFromTarget = 0f;
 
-                        if (Settings.Combat.Misc.UseNavMeshTargeting)
+                        if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade || CurrentTarget.Type != GObjectType.Destructible)
                         {
                             currentTargetIsInLoS = (GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
                         }
@@ -1230,10 +1226,11 @@ namespace GilesTrinity
             statusText.Append(" C-Dist=");
             statusText.Append(CurrentTarget.CentreDistance.ToString("0"));
             statusText.Append(". R-Dist=");
-            statusText.Append(Math.Round(CurrentTarget.RadiusDistance, 2));
+            statusText.Append(Math.Round(CurrentTarget.RadiusDistance, 0));
             statusText.Append(". RangeReq'd: ");
             statusText.Append(fRangeRequired.ToString("0"));
-            statusText.Append(". ");
+            statusText.Append(". DistfromT: ");
+            statusText.Append(fDistanceFromTarget.ToString("0"));
             if (CurrentTarget.Type == GObjectType.Unit && currentPower.SNOPower != SNOPower.None)
             {
                 statusText.Append("Power=");
@@ -1289,6 +1286,8 @@ namespace GilesTrinity
             using (new PerformanceLogger("HandleTarget.SetRequiredRange"))
             {
                 fRangeRequired = 1f;
+                fDistanceFromTarget = 0;
+                currentTargetIsInLoS = false;
                 fDistanceReduction = 0f;
                 // Set current destination to our current target's destination
                 vCurrentDestination = CurrentTarget.Position;
@@ -1388,6 +1387,7 @@ namespace GilesTrinity
                             // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
                             fRangeRequired = currentPower.SNOPower == SNOPower.None ? 9f : currentPower.iMinimumRange;
                             fDistanceReduction = CurrentTarget.Radius;
+
                             if (ForceCloseRangeTarget)
                                 fDistanceReduction -= 3f;
                             if (fDistanceReduction <= 0f)
