@@ -510,9 +510,9 @@ namespace GilesTrinity.DbProvider
                 // Tempest rush for a monk
                 if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.Monk_TempestRush) && !bTooMuchZChange)
                 {
-                    if (!bCanChannelTR && ZetaDia.Me.CurrentPrimaryResource >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit && fDistanceFromTarget > GilesTrinity.Settings.Combat.Monk.TR_MinDist)
+                    if (!bCanChannelTR && GilesTrinity.playerStatus.CurrentEnergy >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit && fDistanceFromTarget > GilesTrinity.Settings.Combat.Monk.TR_MinDist)
                         bCanChannelTR = true;
-                    else if (bCanChannelTR && ZetaDia.Me.CurrentPrimaryResource <= 20)
+                    else if (bCanChannelTR && (GilesTrinity.playerStatus.CurrentEnergy <= 20 || fDistanceFromTarget < 10f))
                         bCanChannelTR = false;
 
                     if (bCanChannelTR)

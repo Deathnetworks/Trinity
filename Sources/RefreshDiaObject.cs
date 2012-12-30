@@ -1908,7 +1908,8 @@ namespace GilesTrinity
                 if (c_ObjectType != GObjectType.Item)
                 {
 
-                    if (((c_ObjectType == GObjectType.Unit && !bWantToTownRun) || c_ObjectType == GObjectType.Shrine) && (c_CentreDistance > 10 && c_CentreDistance < 75))
+                    //if (((c_ObjectType == GObjectType.Unit && !bWantToTownRun) || c_ObjectType == GObjectType.Shrine) && (c_CentreDistance > 10 && c_CentreDistance < 75))
+                    if ((c_ObjectType == GObjectType.Unit || c_ObjectType == GObjectType.Shrine) && (c_CentreDistance > 10 && c_CentreDistance < 125))
                     {
                         using (new PerformanceLogger("RefreshLoS.1"))
                         {
