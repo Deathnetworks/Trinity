@@ -287,7 +287,7 @@ namespace GilesTrinity
                         if (fDistanceFromTarget < 0f)
                             fDistanceFromTarget = 0f;
 
-                        if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade || CurrentTarget.Type != GObjectType.Destructible)
+                        if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade && CurrentTarget.Type != GObjectType.Destructible)
                         {
                             currentTargetIsInLoS = (GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
                         }
@@ -1224,13 +1224,16 @@ namespace GilesTrinity
             statusText.Append("Type=");
             statusText.Append(CurrentTarget.Type);
             statusText.Append(" C-Dist=");
-            statusText.Append(CurrentTarget.CentreDistance.ToString("0"));
+            statusText.Append(CurrentTarget.CentreDistance.ToString("0.0"));
             statusText.Append(". R-Dist=");
-            statusText.Append(Math.Round(CurrentTarget.RadiusDistance, 0));
+            statusText.Append(CurrentTarget.RadiusDistance.ToString("0.0"));
             statusText.Append(". RangeReq'd: ");
-            statusText.Append(fRangeRequired.ToString("0"));
-            statusText.Append(". DistfromT: ");
-            statusText.Append(fDistanceFromTarget.ToString("0"));
+            statusText.Append(fRangeRequired.ToString("0.0"));
+            statusText.Append(". DistfromTrgt: ");
+            statusText.Append(fDistanceFromTarget.ToString("0.0"));
+            statusText.Append(". InLoS: ");
+            statusText.Append(currentTargetIsInLoS);
+            statusText.Append(". ");
             if (CurrentTarget.Type == GObjectType.Unit && currentPower.SNOPower != SNOPower.None)
             {
                 statusText.Append("Power=");
