@@ -1927,8 +1927,11 @@ namespace GilesTrinity
                         {
                             if (Settings.Combat.Misc.UseNavMeshTargeting)
                             {
+                                Vector3 myPos = new Vector3(playerStatus.CurrentPosition.X, playerStatus.CurrentPosition.Y, playerStatus.CurrentPosition.Z + 4);
+                                Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 4f);
+
                                 // For Melee
-                                if (PlayerKiteDistance <= 5 && c_CentreDistance >= 5 && !ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
+                                if (PlayerKiteDistance <= 5 && c_CentreDistance >= 5 && !ZetaDia.Physics.Raycast(myPos, cPos, NavCellFlags.AllowWalk))
                                 {
                                     AddToCache = false;
                                     c_IgnoreSubStep = "UnableToRayCast";

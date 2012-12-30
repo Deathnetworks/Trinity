@@ -11,6 +11,12 @@ namespace GilesTrinity
     {
         private static GilesPower GetMonkPower(bool bCurrentlyAvoiding, bool bOOCBuff, bool bDestructiblePower)
         {
+			if (!weaponSwap.DpsGearOn() && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds > 3000 && !WantToSwap)
+            {
+                weaponSwap.ItemsInPlace();
+				if (Zeta.Internals.UIElements.InventoryWindow.IsVisible)
+					Zeta.Internals.UIElements.BackgroundScreenPCButtonInventory.Click();
+            }
             if (!bOOCBuff && !bCurrentlyAvoiding && GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds <= 4000 && !playerStatus.IsIncapacitated &&
                 iAnythingWithinRange[RANGE_15] >= 1 && CurrentTarget.RadiusDistance <= 15f)
             {
@@ -30,13 +36,6 @@ namespace GilesTrinity
                 }
                 weaponSwap.SwapGear();
             }
-            /*// Foresight b4 swap
-            if ((hashPowerHotbarAbilities.Contains(SNOPower.Monk_FistsofThunder) || hashPowerHotbarAbilities.Contains(SNOPower.Monk_CripplingWave) ||
-                hashPowerHotbarAbilities.Contains(SNOPower.Monk_WayOfTheHundredFists)) && hashPowerHotbarAbilities.Contains(SNOPower.Monk_DeadlyReach) && !bOOCBuff && !playerStatus.IsIncapacitated
-                && DateTime.Now.Subtract(ForeSightFirstHit).TotalMilliseconds < 1400 && !GilesHasBuff(SNOPower.Monk_SweepingWind) && WantToSwap)
-            {
-                return new GilesPower(SNOPower.Monk_DeadlyReach, 16f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
-            }*/
                 // Blinding flash after swap
             if (Settings.Combat.Monk.SweepingWindWeaponSwap && weaponSwap.DpsGearOn() && PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && 
                 !GilesHasBuff(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15))
@@ -133,9 +132,6 @@ namespace GilesTrinity
             {
                 if (!weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.CanSwap())
                 {
-                    /*weaponSwap.SwapGear();
-                    WeaponSwapTime = DateTime.Now;*/
-                    //ForeSightFirstHit = DateTime.Now;
                     WantToSwap = true;
                 }
                 if (!Settings.Combat.Monk.SweepingWindWeaponSwap || !weaponSwap.CanSwap() || (weaponSwap.CanSwap() && CheckAbilityAndBuff(SNOPower.Monk_SweepingWind)))
@@ -168,9 +164,6 @@ namespace GilesTrinity
             {
                 if (!weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && weaponSwap.CanSwap())
                 {
-                    /*weaponSwap.SwapGear();
-                    WeaponSwapTime = DateTime.Now;*/
-                    //ForeSightFirstHit = DateTime.Now;
                     WantToSwap = true;
                 }
                 if (!Settings.Combat.Monk.SweepingWindWeaponSwap || !weaponSwap.CanSwap())

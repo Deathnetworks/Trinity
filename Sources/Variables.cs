@@ -593,6 +593,17 @@ namespace GilesTrinity
         /// Behaviors: How close we need to get to the target before we consider it "reached"
         /// </summary>
         private static float fRangeRequired = 1f;
+
+        /// <summary>
+        /// Modified distance from target used in Behavior handling
+        /// </summary>
+        private static float fDistanceFromTarget;
+
+        /// <summary>
+        /// If our current target is in LoS for use in Behavior handling
+        /// </summary>
+        private static bool currentTargetIsInLoS;
+
         /// <summary>
         /// Behaviors: How close we need to get to the target before we consider it "reached"
         /// </summary>

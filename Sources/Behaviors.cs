@@ -281,17 +281,13 @@ namespace GilesTrinity
                     }
 
 
-                    // Calculate the player's current distance from destination
-                    float fDistanceFromTarget;
-                    bool currentTargetIsInLoS;
-
                     using (new PerformanceLogger("HandleTarget.LoSCheck"))
                     {
                         fDistanceFromTarget = Vector3.Distance(playerStatus.CurrentPosition, vCurrentDestination) - fDistanceReduction;
                         if (fDistanceFromTarget < 0f)
                             fDistanceFromTarget = 0f;
 
-                        if (Settings.Combat.Misc.UseNavMeshTargeting)
+                        if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade && CurrentTarget.Type != GObjectType.Destructible)
                         {
                             currentTargetIsInLoS = (GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
                         }
@@ -303,35 +299,35 @@ namespace GilesTrinity
 
                     using (new PerformanceLogger("HandleTarget.MonkWeaponSwap"))
                     {
-                        // Item Swap + Blinding flash cast
-                        if (playerStatus.ActorClass == ActorClass.Monk)
-                        {
-                            if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
-                                hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
-                            {
-                                if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind)
-                                    && (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
-                                {
-                                    ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
-                                    return RunStatus.Running;
-                                }
-                                else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800
-                                        && GilesHasBuff(SNOPower.Monk_SweepingWind))
-                                {
-                                    weaponSwap.SwapGear();
-                                }
-                            }
-                            // Spam sweeping winds
-                            if (hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
-                                && (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
-                                || !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
-                                DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
-                            {
-                                ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
-                                SweepWindSpam = DateTime.Now;
-                                return RunStatus.Running;
-                            }
-                        }
+							// Item Swap + Blinding flash cast
+						if (playerStatus.ActorClass == ActorClass.Monk)
+						{
+							if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && 
+								hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
+							{
+								if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind) 
+									&& (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
+									{
+										ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
+										return RunStatus.Running;
+									}
+								else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800 
+										&& GilesHasBuff(SNOPower.Monk_SweepingWind))
+								{
+									weaponSwap.SwapGear();
+								}
+							}
+							// Spam sweeping winds
+							if (hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
+								&& (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
+								|| !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && 
+								DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
+							{
+								ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
+								SweepWindSpam = DateTime.Now;
+								return RunStatus.Running;
+							}
+						}
                     }
 
                     using (new PerformanceLogger("HandleTarget.InRange"))
@@ -1228,11 +1224,15 @@ namespace GilesTrinity
             statusText.Append("Type=");
             statusText.Append(CurrentTarget.Type);
             statusText.Append(" C-Dist=");
-            statusText.Append(CurrentTarget.CentreDistance.ToString("0"));
+            statusText.Append(CurrentTarget.CentreDistance.ToString("0.0"));
             statusText.Append(". R-Dist=");
-            statusText.Append(Math.Round(CurrentTarget.RadiusDistance, 2));
+            statusText.Append(CurrentTarget.RadiusDistance.ToString("0.0"));
             statusText.Append(". RangeReq'd: ");
-            statusText.Append(fRangeRequired.ToString("0"));
+            statusText.Append(fRangeRequired.ToString("0.0"));
+            statusText.Append(". DistfromTrgt: ");
+            statusText.Append(fDistanceFromTarget.ToString("0.0"));
+            statusText.Append(". InLoS: ");
+            statusText.Append(currentTargetIsInLoS);
             statusText.Append(". ");
             if (CurrentTarget.Type == GObjectType.Unit && currentPower.SNOPower != SNOPower.None)
             {
@@ -1289,6 +1289,8 @@ namespace GilesTrinity
             using (new PerformanceLogger("HandleTarget.SetRequiredRange"))
             {
                 fRangeRequired = 1f;
+                fDistanceFromTarget = 0;
+                currentTargetIsInLoS = false;
                 fDistanceReduction = 0f;
                 // Set current destination to our current target's destination
                 vCurrentDestination = CurrentTarget.Position;
@@ -1388,6 +1390,7 @@ namespace GilesTrinity
                             // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
                             fRangeRequired = currentPower.SNOPower == SNOPower.None ? 9f : currentPower.iMinimumRange;
                             fDistanceReduction = CurrentTarget.Radius;
+
                             if (ForceCloseRangeTarget)
                                 fDistanceReduction -= 3f;
                             if (fDistanceReduction <= 0f)

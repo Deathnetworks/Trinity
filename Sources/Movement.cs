@@ -160,7 +160,7 @@ namespace GilesTrinity
         // Quick Easy Raycast Function for quick changes
         public static bool GilesCanRayCast(Vector3 vStartLocation, Vector3 vDestination, NavCellFlags NavType = NavCellFlags.AllowWalk)
         {
-            if (ZetaDia.Physics.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + 3f), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + 3f), NavType))
+            if (ZetaDia.Physics.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + 4f), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + 4f), NavType))
             {
                 if (hashNavigationObstacleCache.Any(o => MathEx.IntersectsPath(o.Location, o.Radius, vStartLocation, vDestination)))
                     return false;
@@ -468,6 +468,15 @@ namespace GilesTrinity
                     WorldId = 182976, 
                     Position = (new Vector3(281.0147f,361.5885f,20.86533f)),
                     Name = "Chamber of Queen Araneae",
+                    Radius = 90f
+                }
+            },
+            {
+                new UnSafeZone()
+                {
+                    WorldId = 78839,
+                    Position = (new Vector3(59.50927f,60.12386f,0.100002f)),
+                    Name = "Chamber of Suffering (Butcher)",
                     Radius = 90f
                 }
             }
