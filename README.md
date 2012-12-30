@@ -24,6 +24,12 @@ Future Planned Improvements:
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
 
+Changelog 1.7.1.12:
+
+* Fixed A3 Skycrown/Stonefort barricade problem
+
+* Latest WeaponSwap 1.0.2a
+
 Changelog 1.7.1.11:
 
 * New GUI option: "Use NavMesh to prevent stucks" on the Combat>Misc tab. Default and recommendation is to enable this option. Disabling this may lead to stucks for bot attempting to target monsters/shines through walls and floor gaps. If you experience severe performance problems, try disabling this option. 
