@@ -114,8 +114,8 @@ namespace GilesTrinity
                             // Map out all the items already in the backpack
                             int iTotalPotions =
                                 (from tempitem in ZetaDia.Me.Inventory.Backpack
-                                 where tempitem.BaseAddress != IntPtr.Zero
-                                 where tempitem.GameBalanceId == balanceId
+                                 where tempitem.BaseAddress != IntPtr.Zero &&
+                                 tempitem.GameBalanceId == balanceId 
                                  select tempitem.ItemStackQuantity).Sum();
                             if (iTotalPotions > 98)
                             {
@@ -228,9 +228,9 @@ namespace GilesTrinity
             if (name.StartsWith("topaz_")) return GItemType.Topaz;
             if (name.StartsWith("amethyst")) return GItemType.Amethyst;
             if (name.StartsWith("healthpotion")) return GItemType.HealthPotion;
-            if (name.StartsWith("followeritem_enchantress_")) return GItemType.FollowerEnchantress;
-            if (name.StartsWith("followeritem_scoundrel_")) return GItemType.FollowerScoundrel;
-            if (name.StartsWith("followeritem_templar_")) return GItemType.FollowerTemplar;
+            if (name.StartsWith("followeritem_enchantress_") || dbFollowerType == FollowerType.Enchantress) return GItemType.FollowerEnchantress;
+            if (name.StartsWith("followeritem_scoundrel_") || dbFollowerType == FollowerType.Scoundrel) return GItemType.FollowerScoundrel;
+            if (name.StartsWith("followeritem_templar_") || dbFollowerType == FollowerType.Templar) return GItemType.FollowerTemplar;
             if (name.StartsWith("craftingplan_")) return GItemType.CraftingPlan;
             if (name.StartsWith("dye_")) return GItemType.Dye;
             if (name.StartsWith("a1_")) return GItemType.SpecialItem;

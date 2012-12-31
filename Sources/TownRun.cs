@@ -566,6 +566,7 @@ namespace GilesTrinity
                 }
             }
 
+            ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).FirstOrDefault();
             // Check for anything to sell
             foreach (ACDItem thisitem in ZetaDia.Me.Inventory.Backpack)
             {
@@ -593,6 +594,13 @@ namespace GilesTrinity
                         {
                             bShouldSellThis = false;
                         }
+
+                        // Sell potions that aren't best quality
+                        if (thisitem.IsPotion && thisitem.GameBalanceId != thisBestPotion.GameBalanceId)
+                        {
+                            bShouldSellThis = true;
+                        }
+
                         if (bShouldSellThis)
                         {
                             hashGilesCachedSellItems.Add(thiscacheditem);

@@ -160,6 +160,7 @@ namespace GilesTrinity.DbProvider
                     ResetCheckGold();
                     return false;
                 }
+
                 // We're not stuck if we're doing stuff!
                 if (aState == AnimationState.Attacking ||
                     aState == AnimationState.Casting ||
@@ -169,10 +170,12 @@ namespace GilesTrinity.DbProvider
                     ResetCheckGold();
                     return false;
                 }
+
                 if (vOldPosition != Vector3.Zero && vOldPosition.Distance(vMyCurrentPosition) <= 4f)
                 {
                     return true;
                 }
+
                 vOldPosition = vMyCurrentPosition;
             }
             return false;
@@ -188,6 +191,12 @@ namespace GilesTrinity.DbProvider
         // Actually deal with a stuck - find an unstuck point etc.
         public static Vector3 UnstuckHandler(Vector3 vMyCurrentPosition, Vector3 vOriginalDestination)
         {
+            if (GoldInactive())
+            {
+                GoldInactiveLeaveGame();
+                return vOriginalDestination;
+            }
+
             // Update the last time we generated a path
             timeStartedUnstuckMeasure = DateTime.Now;
             // If we got stuck on a 2nd/3rd/4th "chained" anti-stuck route, then return the old move to target to keep movement of some kind going
@@ -336,22 +345,7 @@ namespace GilesTrinity.DbProvider
             {
                 if (GoldInactive())
                 {
-                    // Exit the game and reload the profile
-                    timeLastRestartedGame = DateTime.Now;
-                    string sUseProfile = GilesTrinity.sFirstProfileSeen;
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck measures exiting current game.");
-                    // Load the first profile seen last run
-                    ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
-                                            ? sUseProfile
-                                            : Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
-                    Thread.Sleep(1000);
-                    GilesTrinity.GilesResetEverythingNewGame();
-                    ZetaDia.Service.Games.LeaveGame();
-                    // Wait for 10 second log out timer if not in town
-                    if (!ZetaDia.Me.IsInTown)
-                    {
-                        Thread.Sleep(10000);
-                    }
+                    GoldInactiveLeaveGame();
                     return;
                 }
                 // Store the "real" (not anti-stuck) destination
@@ -578,6 +572,27 @@ namespace GilesTrinity.DbProvider
             }
 
 
+        }
+
+        private static void GoldInactiveLeaveGame()
+        {
+            // Exit the game and reload the profile
+            timeLastRestartedGame = DateTime.Now;
+            string sUseProfile = GilesTrinity.sFirstProfileSeen;
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck measures exiting current game.");
+            // Load the first profile seen last run
+            ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
+                                    ? sUseProfile
+                                    : Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
+            Thread.Sleep(1000);
+            GilesTrinity.GilesResetEverythingNewGame();
+            ZetaDia.Service.Games.LeaveGame();
+            // Wait for 10 second log out timer if not in town
+            if (!ZetaDia.Me.IsInTown)
+            {
+                Thread.Sleep(10000);
+            }
+            return;
         }
 
         internal static int GetObstacleNavigationSize(GilesObstacle obstacle)

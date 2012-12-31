@@ -996,6 +996,25 @@ namespace GilesTrinity
                     return AddToCache;
                 }
 
+                try
+                {
+                    int isNPC = c_CommonData.GetAttribute<int>(ActorAttributeType.TeamID);
+                    if (isNPC == 1)
+                    {
+                        AddToCache = false;
+                        c_IgnoreSubStep += "IsTeam1+";
+                        return AddToCache;
+                    }
+                }
+                catch
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep += "IsTeam1-";
+                    return AddToCache;
+                }
+
+
+
             }
             using (new PerformanceLogger("RefreshUnit.11"))
             {
@@ -1369,12 +1388,12 @@ namespace GilesTrinity
 
                     //// Take 8 from the radius
                     //c_fRadius -= 10f;
-                    //// Minimum range clamp
-                    //if (c_fRadius <= 1f)
-                    //    c_fRadius = 1f;
-                    //// Maximum range clamp
-                    //if (c_fRadius >= 16f)
-                    //    c_fRadius = 16f;
+                    // Minimum range clamp
+                    if (c_Radius <= 1f)
+                        c_Radius = 1f;
+                    // Maximum range clamp
+                    if (c_Radius >= 16f)
+                        c_Radius = 16f;
                 }
                 catch
                 {
