@@ -68,10 +68,19 @@ namespace GilesTrinity.XmlTags
             }
 
             // Now use Trinity movement to try a direct movement towards that location
+
+            Vector3 NavTarget = Position;
+            Vector3 MyPos = GilesTrinity.playerStatus.CurrentPosition;
+            if (Vector3.Distance(MyPos, NavTarget) > 250)
+            {
+                NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
+            }
+
             if (sUseNavigation == null || sUseNavigation.ToLower() != "true")
-                Navigator.PlayerMover.MoveTowards(Position);
+                Navigator.PlayerMover.MoveTowards(NavTarget);
             else
-                Navigator.MoveTo(Position);
+                Navigator.MoveTo(NavTarget);
+
             return RunStatus.Success;
         }
 
@@ -236,6 +245,6 @@ namespace GilesTrinity.XmlTags
             }
         }
 
-        
+
     }
 }

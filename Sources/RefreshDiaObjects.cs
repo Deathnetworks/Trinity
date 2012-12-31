@@ -762,10 +762,10 @@ namespace GilesTrinity
                     {
 
                         if ((DateTime.Now.Subtract(LastKitePosition.PositionFoundTime).TotalMilliseconds > 3000 && LastKitePosition.Position == vAnySafePoint) ||
-                            (CurrentTarget != null && DateTime.Now.Subtract(lastGlobalCooldownUse).TotalMilliseconds > 1500))
+                            (CurrentTarget != null && DateTime.Now.Subtract(lastGlobalCooldownUse).TotalMilliseconds > 1500 && TryToKite))
                         {
                             timeCancelledKiteMove = DateTime.Now;
-                            cancelledKiteMoveForMilliseconds = 3000;
+                            cancelledKiteMoveForMilliseconds = 1500;
                             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kite movement failed, cancelling for {0:0}ms", cancelledKiteMoveForMilliseconds);
                             return;
                         }

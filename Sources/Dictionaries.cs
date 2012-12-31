@@ -7,7 +7,7 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        public static readonly HashSet<int> BossLevelAreaIDs = new HashSet<int> { 60194, 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, };
+        public static readonly HashSet<int> BossLevelAreaIDs = new HashSet<int> {185228, 60194, 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, };
 
         /// <summary>
         /// This list is used when an actor has an attribute BuffVisualEffect=1, e.g. fire floors in The Butcher arena
@@ -168,8 +168,8 @@ namespace GilesTrinity
             144001, 144003, 143996, 143994, 
             // Jondar, Chancellor, Queen Araneae (act 1 dungeons), Skeleton King, Butcher
             86624, 156353, 51341, 5350, 3526,
-            // Corrupt Growths, Act 4, Istaku
-            210120, 215103,
+            215103, // Istaku            
+            //210120, // A4 Corrupt Growths            
             // Rakanoth
             4630, 
          };
@@ -259,7 +259,7 @@ namespace GilesTrinity
         /// Destructible things that need targeting by a location instead of an ACDGUID (stuff you can't "click on" to destroy in-game)
         /// </summary>
         internal static HashSet<int> hashDestructableLocationTarget = new HashSet<int> {
-            170657, 116409, 121586,
+            170657, 116409, 121586, 155255, 
          };
         /// <summary>
         /// Resplendent chest SNO list
