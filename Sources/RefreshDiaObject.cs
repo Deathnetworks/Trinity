@@ -1388,6 +1388,12 @@ namespace GilesTrinity
 
                     //// Take 8 from the radius
                     //c_fRadius -= 10f;
+
+                    if (c_ObjectType == GObjectType.Destructible && c_Radius >= 5f)
+                    {
+                        c_Radius = c_Radius * 0.70f;
+                    }
+
                     // Minimum range clamp
                     if (c_Radius <= 1f)
                         c_Radius = 1f;
@@ -1684,6 +1690,8 @@ namespace GilesTrinity
                         //    
                         //return bWantThis;
                         //}
+
+
                         // Set min distance to user-defined setting
                         iMinDistance = Settings.WorldObject.DestructibleRange + c_Radius;
                         if (ForceCloseRangeTarget)
@@ -2180,12 +2188,11 @@ namespace GilesTrinity
                     case GObjectType.Door:
                     case GObjectType.Unit:
                     case GObjectType.Barricade:
-                        // Ignore monsters (units) who's Z-height is 14 foot or more than our own z-height
-                        // rrrix: except bosses like Belial :)
-                        //if (c_ZDiff >= 14f && !c_unit_IsBoss)
-                        //{
-                        //    AddToCache = false;
-                        //}
+                        // Ignore monsters (units) who's Z-height is 14 foot or more than our own z-height except bosses
+                        if (c_ZDiff >= 14f && !c_unit_IsBoss)
+                        {
+                            AddToCache = false;
+                        }
                         break;
                     case GObjectType.Item:
                     case GObjectType.HealthWell:

@@ -349,12 +349,19 @@ namespace GilesTrinity
             {
                 //ZetaDia.Actors.Update();
 
-                var refreshSource =
-                from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                //where o.IsValid
-                //orderby o.ActorType, o.Distance
-                select o;
+                IEnumerable<DiaObject> refreshSource;
 
+                if (Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
+                {
+                    refreshSource = from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                    orderby o.Distance
+                    select o;
+                }
+                else
+                {
+                    refreshSource = from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                    select o;
+                }
                 Stopwatch t1 = new Stopwatch();
 
 
@@ -387,7 +394,7 @@ namespace GilesTrinity
 
                             double duration = t1.Elapsed.TotalMilliseconds;
 
-                            if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && duration > 1 || !Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
+                            if ((Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && duration > 1 || !Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance)))
                             {
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                     "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0}",

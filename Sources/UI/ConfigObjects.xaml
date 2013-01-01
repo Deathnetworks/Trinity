@@ -42,7 +42,7 @@
             </Grid.RowDefinitions>
             <TextBlock Text="Destructible attack range :" FontWeight="Bold" TextAlignment="Center"/>
             <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
-                    Interval="500" Maximum="30" Minimum="6" 
+                    Interval="500" Maximum="30" Minimum="1" 
                     SmallChange="1" LargeChange="5" TickFrequency="5" 
                     TickPlacement="BottomRight" Value="{Binding Path=WorldObject.DestructibleRange}" 
                     HorizontalAlignment="Stretch" Margin="25,0,25,0"/>

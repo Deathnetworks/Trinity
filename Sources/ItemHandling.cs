@@ -899,6 +899,8 @@ namespace GilesTrinity
                 BackpackSlotBlocked[9, 4] = true;
                 BackpackSlotBlocked[9, 5] = true;
             }
+
+            int cellsFilled = 0;
             // Map out all the items already in the backpack
             foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
@@ -916,13 +918,23 @@ namespace GilesTrinity
                 GItemType tempItemType = DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType);
                 if (DetermineIsTwoSlot(tempItemType) && inventoryRow < 5)
                 {
+                    cellsFilled += 2;
                     BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                 }
+                else
+                    cellsFilled++;
             }
             int iPointX = -1;
             int iPointY = -1;
+
+            // return "true" if we're already in town and backpack is 1/2 full
+            if ((cellsFilled / 60) > .5 && ZetaDia.Me.IsInTown)
+                return new Vector2(iPointX, iPointY);
+
+            // 6 rows
             for (int iRow = 0; iRow <= 5; iRow++)
             {
+                // 10 columns
                 for (int iColumn = 0; iColumn <= 9; iColumn++)
                 {
                     if (!BackpackSlotBlocked[iColumn, iRow])

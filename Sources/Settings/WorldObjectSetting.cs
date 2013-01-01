@@ -57,7 +57,7 @@ namespace GilesTrinity.Settings
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(12)]
+        [DefaultValue(1)]
         public int DestructibleRange
         {
             get

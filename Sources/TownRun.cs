@@ -678,6 +678,7 @@ namespace GilesTrinity
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
                     }
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Moving to vendor.");
                     return RunStatus.Running;
                 }
                 lastDistance = iDistanceFromSell;
@@ -687,6 +688,7 @@ namespace GilesTrinity
                 {
                     ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
                     bCurrentlyMoving = true;
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Moving to vendor.");
                     return RunStatus.Running;
                 }
                 bCurrentlyMoving = false;

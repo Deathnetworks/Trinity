@@ -592,7 +592,7 @@ namespace GilesTrinity
                         int nearbyMonsters = (monsterList != null ? monsterList.Count() : 0);
 
                         /*
-                         * This little bit is insanely CPU intensive and causes lots of small game freezes, maybe needs GUI option..
+                         * This little bit is insanely CPU intensive and causes lots of small game freezes.
                          */
                         if (Settings.Combat.Misc.UseNavMeshTargeting && !hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 75)
                         {
@@ -640,6 +640,11 @@ namespace GilesTrinity
 
                     }
 
+                    if (isStuck && UsedStuckSpots.Any(p => Vector3.Distance(p.Position, gridPoint.Position) <= gridSquareRadius))
+                    {
+                        continue;
+                    }
+
                     if (!isStuck)
                     {
                         gridPoint.Weight = ((maxDistance - gridPoint.Distance) / maxDistance) * maxWeight;
@@ -679,18 +684,18 @@ namespace GilesTrinity
                                 gridPoint.Weight += distFromMonster;
                             }
                         }
-                    }
-                    foreach (GilesObstacle avoidance in hashAvoidanceObstacleCache)
-                    {
-                        float distFromAvoidance = gridPoint.Position.Distance(avoidance.Location);
-                        float distFromOrigin = gridPoint.Position.Distance(origin);
-                        if (distFromAvoidance < distFromOrigin)
+                        foreach (GilesObstacle avoidance in hashAvoidanceObstacleCache)
                         {
-                            gridPoint.Weight -= distFromOrigin;
-                        }
-                        else if (distFromAvoidance > distFromOrigin)
-                        {
-                            gridPoint.Weight += distFromAvoidance;
+                            float distFromAvoidance = gridPoint.Position.Distance(avoidance.Location);
+                            float distFromOrigin = gridPoint.Position.Distance(origin);
+                            if (distFromAvoidance < distFromOrigin)
+                            {
+                                gridPoint.Weight -= distFromOrigin;
+                            }
+                            else if (distFromAvoidance > distFromOrigin)
+                            {
+                                gridPoint.Weight += distFromAvoidance;
+                            }
                         }
                     }
 
@@ -704,10 +709,17 @@ namespace GilesTrinity
                 }
             }
 
+            if (isStuck)
+            {
+                UsedStuckSpots.Add(bestPoint);
+            }
+
             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting grid found {0}, distance: {1:0}, weight: {2:0}", bestPoint.Position, bestPoint.Distance, bestPoint.Weight);
             return bestPoint.Position;
 
         }
+
+        internal static List<GridPoint> UsedStuckSpots = new List<GridPoint>();
 
         internal class GridPoint : IEquatable<GridPoint>
         {

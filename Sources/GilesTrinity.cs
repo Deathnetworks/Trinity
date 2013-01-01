@@ -75,7 +75,7 @@ namespace GilesTrinity
                             int CurrentSceneSNO = -1;
                             using (new PerformanceLogger("UpdateCachedPlayerData.4.1"))
                             {
-                                CurrentSceneSNO = (int)ZetaDia.Me.Movement.SceneId;
+                                CurrentSceneSNO = (int)ZetaDia.Me.SceneId;
                             }
                             using (new PerformanceLogger("UpdateCachedPlayerData.4.2"))
                             {
@@ -235,6 +235,7 @@ namespace GilesTrinity
             GilesPlayerMover.iTimesReachedMaxUnstucks = 0;
             GilesPlayerMover.iCancelUnstuckerForSeconds = 0;
             GilesPlayerMover.timeCancelledUnstuckerFor = DateTime.Today;
+            GilesTrinity.UsedStuckSpots = new List<GilesTrinity.GridPoint>();
             // Reset all the caches
             dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
             dictGilesMonsterAffixCache = new Dictionary<int, MonsterAffixes>();

@@ -85,7 +85,7 @@ namespace GilesTrinity.DbProvider
                     return false;
 
                 // sometimes bosses take a LONG time
-                if (GilesTrinity.CurrentTarget.IsBoss)
+                if (GilesTrinity.CurrentTarget != null && GilesTrinity.CurrentTarget.IsBoss)
                 {
                     ResetCheckGold();
                     return false;
@@ -236,7 +236,7 @@ namespace GilesTrinity.DbProvider
 
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
                 GilesTrinity.playerStatus.CurrentPosition = vMyCurrentPosition;
-                vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, Vector3.Zero);
+                vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
                 // Temporarily log stuff
                 if (iTotalAntiStuckAttempts == 1 && GilesTrinity.Settings.Advanced.LogStuckLocation)
                 {
@@ -319,7 +319,6 @@ namespace GilesTrinity.DbProvider
         private static DateTime lastShiftedPosition = DateTime.Today;
         private static int iShiftPositionFor = 0;
 
-
         public void MoveTowards(Vector3 vMoveToTarget)
         {
             // rrrix-note: This really shouldn't be here... 
@@ -356,6 +355,7 @@ namespace GilesTrinity.DbProvider
                     iTotalAntiStuckAttempts = 1;
                     iTimesReachedStuckPoint = 0;
                     vSafeMovementLocation = Vector3.Zero;
+                    GilesTrinity.UsedStuckSpots = new List<GilesTrinity.GridPoint>();
                 }
                 // See if we need to, and can, generate unstuck actions
                 if (DateTime.Now.Subtract(timeCancelledUnstuckerFor).TotalSeconds > iCancelUnstuckerForSeconds && UnstuckChecker(vMyCurrentPosition))
@@ -389,7 +389,7 @@ namespace GilesTrinity.DbProvider
                     if (iTimesReachedStuckPoint <= iTotalAntiStuckAttempts)
                     {
                         GilesTrinity.playerStatus.CurrentPosition = vMyCurrentPosition;
-                        vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, Vector3.Zero);
+                        vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
                         vMoveToTarget = vSafeMovementLocation;
                     }
                     else
@@ -448,7 +448,7 @@ namespace GilesTrinity.DbProvider
             }
 
             // See if we can use abilities like leap etc. for movement out of combat, but not in town
-            if (GilesTrinity.Settings.Combat.Misc.AllowOOCMovement && !ZetaDia.Me.IsInTown)
+            if (GilesTrinity.Settings.Combat.Misc.AllowOOCMovement && !ZetaDia.Me.IsInTown && !GilesTrinity.bDontMoveMeIAmDoingShit)
             {
                 bool bTooMuchZChange = (Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z) >= 4f);
 

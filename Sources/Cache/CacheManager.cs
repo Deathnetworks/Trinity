@@ -142,8 +142,11 @@ namespace GilesTrinity.Cache
         {
             using (new PerformanceLogger("CacheManager.Destroy"))
             {
-                _CacheCleaner.Abort();
-                _CacheCleaner = null;
+                if (_CacheCleaner != null)
+                {
+                    _CacheCleaner.Abort();
+                    _CacheCleaner = null;
+                } 
                 lock (_Synchronizer)
                 {
                     _Cache.Clear();

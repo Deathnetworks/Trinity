@@ -592,22 +592,22 @@ namespace GilesTrinity
         /// <summary>
         /// Behaviors: How close we need to get to the target before we consider it "reached"
         /// </summary>
-        private static float fRangeRequired = 1f;
+        private static float TargetRangeRequired = 1f;
 
         /// <summary>
-        /// Modified distance from target used in Behavior handling
+        /// An adjusted distance from the current target, <seealso cref="GilesTrinity.TargetDistanceReduction"/>
         /// </summary>
-        private static float fDistanceFromTarget;
+        private static float TargetCurrentDistance;
 
         /// <summary>
         /// If our current target is in LoS for use in Behavior handling
         /// </summary>
-        private static bool currentTargetIsInLoS;
+        private static bool CurrentTargetIsInLoS;
 
         /// <summary>
-        /// Behaviors: How close we need to get to the target before we consider it "reached"
+        /// This value is subtracted from the distance to the target to get the modified <see cref="GilesTrinity.TargetCurrentDistance"/>
         /// </summary>
-        private static float fDistanceReduction = 0f;
+        private static float TargetDistanceReduction = 0f;
 
         /// <summary>
         /// Special check to force re-buffing before castign archon
