@@ -58,8 +58,8 @@ namespace GilesTrinity.ItemRules
         readonly Regex macroPattern = new Regex(@"(@[A-Z]+)[ ]*:=[ ]*(.+)", RegexOptions.Compiled);
 
         string ruleType = "soft";
-        int notPickLog = 4;
-        int notKeepLog = 4;
+        int logPickQuality = 4;
+        int logKeepQuality = 4;
 
         // objects
         ArrayList ruleSet, pickUpRuleSet;
@@ -153,17 +153,17 @@ namespace GilesTrinity.ItemRules
                     if (match2.Groups[1].Value.Contains("RULE"))
                         ruleType = match2.Groups[2].Value.ToLower();
 
-                    if (match2.Groups[1].Value.Contains("NOTPICKLOG"))
-                        notPickLog = getQualityValueFromQuality(match2.Groups[2].Value);
+                    if (match2.Groups[1].Value.Contains("PICKLOG"))
+                        logPickQuality = getQualityValueFromQuality(match2.Groups[2].Value);
 
-                    if (match2.Groups[1].Value.Contains("NOTKEEPLOG"))
-                        notKeepLog = getQualityValueFromQuality(match2.Groups[2].Value);
+                    if (match2.Groups[1].Value.Contains("KEEPLOG"))
+                        logKeepQuality = getQualityValueFromQuality(match2.Groups[2].Value);
                 }
 
             }
 
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "NOTPICKLOG {0} ", notPickLog);
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "NOTKEEPLOG {0} ", notKeepLog);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "PICKLOG {0} ", logPickQuality);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "KEEPLOG {0} ", logKeepQuality);
             // parse pickup file
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "reading ... {0} ", pickupFile);
             pickUpRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, pickupFile)), pickUpRuleSet);
@@ -317,35 +317,40 @@ namespace GilesTrinity.ItemRules
             switch (action)
             {
                 case InterpreterAction.PICKUP:
-                    logOut(logString, action, LogType.DEBUG);
+                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= logPickQuality)
+                        logOut(logString, action, LogType.LOG);
                     break;
                 case InterpreterAction.IGNORE:
-                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= notPickLog)
+                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= logPickQuality)
                         logOut(logString, action, LogType.LOG);
-                    else
-                        logOut(logString, action, LogType.DEBUG);
                     break;
                 case InterpreterAction.KEEP:
-                    logOut(logString, action, LogType.LOG);
+                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= logKeepQuality)
+                        logOut(logString, action, LogType.LOG);
                     break;
                 case InterpreterAction.TRASH:
-                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= notKeepLog)
+                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= logKeepQuality)
                         logOut(logString, action, LogType.LOG);
-                    else
-                        logOut(logString, action, LogType.DEBUG);
                     break;
                 case InterpreterAction.SCORE:
-                    logOut(logString, action, LogType.DEBUG);
+                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= logKeepQuality)
+                        logOut(logString, action, LogType.LOG);
                     break;
                 case InterpreterAction.NULL:
-                    if (pickUp)
+                    if (pickUp || getQualityValueFromQuality(itemDic["[QUALITY]"]) >= logPickQuality)
                         logOut(logString, action, LogType.DEBUG);
                     else
-                        logOut(logString, action, LogType.DEBUG);
+                        logOut(logString, action, LogType.LOG);
                     break;
             }
         }
 
+        // todo use an enumeration value
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="quality"></param>
+        /// <returns></returns>
         private int getQualityValueFromQuality(object quality)
         {
             switch (quality.ToString().ToLower())
@@ -571,6 +576,7 @@ namespace GilesTrinity.ItemRules
             itemDic.Add("[ONEHAND]", isOneHand);
             itemDic.Add("[TWOHAND]", isTwoHand);
             itemDic.Add("[UNIDENT]", (bool)true);
+            itemDic.Add("[INTNAME]", name);
             //itemDic.Add("[GAMEBALANCEID]", (float)item.GameBalanceId);
         }
 
@@ -636,6 +642,7 @@ namespace GilesTrinity.ItemRules
             itemDic.Add("[ONEHAND]", item.IsOneHand);
             itemDic.Add("[TWOHAND]", item.IsTwoHand);
             itemDic.Add("[UNIDENT]", item.IsUnidentified);
+            itemDic.Add("[INTNAME]", item.InternalName);
 
             // if there are no stats return
             //if (item.Stats == null) return;
