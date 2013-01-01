@@ -46,7 +46,7 @@ namespace GilesTrinity.ItemRules
         };
 
         // final variables
-        readonly string version = "2.0.2.34";
+        readonly string version = "2.0.2.35";
         readonly string rulesPath = Path.Combine(FileManager.ItemRulePath, "Rules");
         readonly string logPath = Path.Combine(FileManager.ItemRulePath, "Log");
         readonly string configFile = "config.dis";
