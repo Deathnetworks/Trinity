@@ -200,7 +200,7 @@ namespace GilesTrinity
                     if (runStatus != HandlerRunStatus.NotFinished)
                         return GetTreeSharpRunStatus(runStatus);
 
-                    // Blacklist the current target
+                    // Handle Target stuck / timeout
                     runStatus = HandleTargetTimeout(runStatus);
 
                     //check if we are returning to the tree
@@ -824,9 +824,22 @@ namespace GilesTrinity
                 // Note: The time since target picked updates every time the current target loses health, if it's a monster-target
                 // Don't blacklist stuff if we're playing a cutscene
 
-                if (!ZetaDia.IsPlayingCutscene && CurrentTargetIsNotAvoidance() && (
-                            (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6) ||
-                            (CurrentTargetIsUnit() && GetSecondsSinceTargetUpdate() > 15)))
+                bool shouldTryBlacklist = false;
+
+                if (!CurrentTargetIsNotAvoidance())
+                    return HandlerRunStatus.NotFinished;
+
+                if (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6)
+                    shouldTryBlacklist = true;
+
+                if ((CurrentTargetIsUnit() && GetSecondsSinceTargetUpdate() > 15))
+                    shouldTryBlacklist = true;
+
+                // special raycast check for current target after 5 sec
+                if ((CurrentTargetIsUnit() && GetSecondsSinceTargetUpdate() > 5))
+                    shouldTryBlacklist = true;
+
+                if (shouldTryBlacklist)
                 {
                     // NOTE: This only blacklists if it's remained the PRIMARY TARGET that we are trying to actually directly attack!
                     // So it won't blacklist a monster "on the edge of the screen" who isn't even being targetted
@@ -838,19 +851,29 @@ namespace GilesTrinity
                         isNavigable = pf.IsNavigable(gp.WorldToGrid(CurrentTarget.Position.ToVector2()));
                     else
                         isNavigable = true;
-                    bool bBlacklistThis = true;
+
+                    bool addTargetToBlacklist = true;
+
 
                     // PREVENT blacklisting a monster on less than 90% health unless we haven't damaged it for more than 2 minutes
                     if (CurrentTarget.Type == GObjectType.Unit && isNavigable)
                     {
                         if (CurrentTarget.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Kamikaze)
-                            bBlacklistThis = false;
-                        //if (CurrentTarget.iHitPoints <= 0.90 && DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds <= 30)
-                        //    bBlacklistThis = false;
-                        //if (CurrentTarget.bIsBoss)
-                        //    bBlacklistThis = false;
+                            addTargetToBlacklist = false;
                     }
-                    if (bBlacklistThis)
+
+                    // Check if we can Raycast to a trash mob
+                    if (CurrentTarget.IsTrashMob && 
+                        GetSecondsSinceTargetUpdate() > 4 && 
+                        CurrentTarget.HitPoints > 0.90)
+                    {
+                        if (GilesCanRayCast(playerStatus.CurrentPosition, CurrentTarget.Position, NavCellFlags.AllowWalk))
+                        {
+                            addTargetToBlacklist = false;
+                        }
+                    }
+
+                    if (addTargetToBlacklist)
                     {
                         if (CurrentTarget.Type == GObjectType.Unit)
                         {

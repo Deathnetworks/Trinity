@@ -913,16 +913,15 @@ namespace GilesTrinity
 
                 // Mark this slot as not-free
                 BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
+                cellsFilled++;
 
                 // Try and reliably find out if this is a two slot item or not
                 GItemType tempItemType = DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType);
                 if (DetermineIsTwoSlot(tempItemType) && inventoryRow < 5)
                 {
-                    cellsFilled += 2;
+                    cellsFilled++;
                     BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                 }
-                else
-                    cellsFilled++;
             }
             int iPointX = -1;
             int iPointY = -1;

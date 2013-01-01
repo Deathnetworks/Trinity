@@ -1391,7 +1391,7 @@ namespace GilesTrinity
 
                     if (c_ObjectType == GObjectType.Destructible && c_Radius >= 5f)
                     {
-                        c_Radius = c_Radius * 0.70f;
+                        c_Radius = c_Radius / 2;
                     }
 
                     // Minimum range clamp

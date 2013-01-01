@@ -102,7 +102,7 @@ namespace GilesTrinity.DbProvider
                 int notpickupgoldsec = Convert.ToInt32(DateTime.Now.Subtract(lastRefreshCoin).TotalSeconds);
                 if (notpickupgoldsec >= GilesTrinity.Settings.Advanced.GoldInactivityTimer)
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Gold inactivity after {0}s. Sending abort.", notpickupgoldsec);
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Gold inactivity after {0}s. Sending abort.", notpickupgoldsec);
                     lastRefreshCoin = DateTime.Now;
                     lastKnowCoin = currentcoin;
                     notpickupgoldsec = 0;
@@ -579,7 +579,7 @@ namespace GilesTrinity.DbProvider
             // Exit the game and reload the profile
             timeLastRestartedGame = DateTime.Now;
             string sUseProfile = GilesTrinity.sFirstProfileSeen;
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck measures exiting current game.");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Gold Inactivity timer tripped - Anti-stuck measures exiting current game.");
             // Load the first profile seen last run
             ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
                                     ? sUseProfile
