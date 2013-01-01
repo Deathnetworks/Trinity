@@ -161,7 +161,7 @@ namespace GilesTrinity
                     // Record the last time our target changed
                     if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Setting dateSincePicked to {0} CurrentTargetRactorGUID: {1} CurrentTarget.RActorGuid: {2}",
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Found New Target - {0} CurrentTargetRactorGUID: {1} CurrentTarget.RActorGuid: {2}",
                                         DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
                         dateSincePickedTarget = DateTime.Now;
                         iTargetLastHealth = 0f;
@@ -174,7 +174,7 @@ namespace GilesTrinity
                             // Check if the health has changed, if so update the target-pick time before we blacklist them again
                             if (CurrentTarget.HitPoints != iTargetLastHealth)
                             {
-                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Setting dateSincePicked to {0} CurrentTarget.iHitPoints: {1}  iTargetLastHealth: {2} ",
+                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Keeping Target - CurrentTarget.iHitPoints: {1:0.00}  iTargetLastHealth: {2:0.00} ",
                                                 DateTime.Now, CurrentTarget.HitPoints, iTargetLastHealth);
                                 dateSincePickedTarget = DateTime.Now;
                             }
@@ -399,7 +399,7 @@ namespace GilesTrinity
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                     "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0}",
                                     duration,
-                                    (AddToCache ? "Added  " : " Ignored"),
+                                    (AddToCache ? "Added " : "Ignored"),
                                     (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
                                     c_diaObject.ActorType,
                                     c_ObjectType,
