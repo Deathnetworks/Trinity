@@ -273,6 +273,12 @@ namespace GilesTrinity
                     GilesTrinity.hashRGUIDBlacklist90 = new HashSet<int>();
                 }
 
+                // Fix for A1 new game with bags full
+                if (GilesTrinity.playerStatus.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700 && (ZetaDia.CurrentQuest.StepId == -1 || ZetaDia.CurrentQuest.StepId == 42))
+                {
+                        return false;
+                }
+
                 if ((GilesTrinity.bWantToTownRun && townRunCheckTimer.IsRunning && townRunCheckTimer.ElapsedMilliseconds > 2000) || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                     return true;
                 else if (GilesTrinity.bWantToTownRun && !townRunCheckTimer.IsRunning)

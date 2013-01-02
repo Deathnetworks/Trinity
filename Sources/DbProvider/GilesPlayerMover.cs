@@ -422,16 +422,15 @@ namespace GilesTrinity.DbProvider
             // }
             // See if there's an obstacle in our way, if so try to navigate around it
             Vector3 point = vMoveToTarget;
-            foreach (GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
-                            GilesTrinity.GilesIntersectsPath(cp.Location, cp.Radius, vMyCurrentPosition, point) &&
-                            cp.Location.Distance(vMyCurrentPosition) > GetObstacleNavigationSize(cp)))
+            foreach (GilesObstacle obstacle in GilesTrinity.hashNavigationObstacleCache.Where(o =>
+                            GilesTrinity.GilesIntersectsPath(o.Location, o.Radius, vMyCurrentPosition, point)))
             {
                 if (vShiftedPosition == Vector3.Zero)
                 {
-                    // Make sure we only shift max once every 10 seconds
-                    if (DateTime.Now.Subtract(lastShiftedPosition).TotalSeconds >= 10)
+                    // Make sure we only shift max once every 1 second
+                    if (DateTime.Now.Subtract(lastShiftedPosition).TotalSeconds >= 1)
                     {
-                        GetShiftedPosition(ref vMoveToTarget, ref point);
+                        GetShiftedPosition(ref vMoveToTarget, ref point, obstacle.Radius + 15f);
                     }
                 }
                 else
@@ -603,13 +602,13 @@ namespace GilesTrinity.DbProvider
                 return (int)Math.Ceiling(obstacle.Radius);
         }
 
-        private static void GetShiftedPosition(ref Vector3 vMoveToTarget, ref Vector3 point)
+        private static void GetShiftedPosition(ref Vector3 vMoveToTarget, ref Vector3 point, float radius = 15f)
         {
             float fDirectionToTarget = GilesTrinity.FindDirectionDegree(vMyCurrentPosition, vMoveToTarget);
-            vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget - 50));
+            vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, radius, MathEx.ToRadians(fDirectionToTarget - 65));
             if (!GilesTrinity.GilesCanRayCast(vMyCurrentPosition, vMoveToTarget, NavCellFlags.AllowWalk))
             {
-                vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget + 50));
+                vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, radius, MathEx.ToRadians(fDirectionToTarget + 65));
                 if (!GilesTrinity.GilesCanRayCast(vMyCurrentPosition, vMoveToTarget, NavCellFlags.AllowWalk))
                 {
                     vMoveToTarget = point;

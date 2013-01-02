@@ -7,7 +7,7 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        public static readonly HashSet<int> BossLevelAreaIDs = new HashSet<int> {185228, 60194, 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, };
+        public static readonly HashSet<int> BossLevelAreaIDs = new HashSet<int> { 109457, 185228, 60194, 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, };
 
         /// <summary>
         /// This list is used when an actor has an attribute BuffVisualEffect=1, e.g. fire floors in The Butcher arena
@@ -252,7 +252,7 @@ namespace GilesTrinity
         /// </summary>
         internal static Dictionary<int, int> dictSNOExtendedDestructRange = new Dictionary<int, int> {
             {2972, 10}, {80357, 16}, {116508, 10}, {113932, 8}, {197514, 18}, {108587, 8}, {108618, 8}, {108612, 8}, {116409, 18}, {121586, 22},
-            {195101, 10}, {195108, 25}, {170657, 8}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 8}, {193963, 10}, {159066, 12}, {160570, 12},
+            {195101, 10}, {195108, 25}, {170657, 1}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 8}, {193963, 10}, {159066, 12}, {160570, 12},
             {55325, 14}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 25}, {192867, 8}, {155255, 8}
          };
         /// <summary>

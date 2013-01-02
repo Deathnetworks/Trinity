@@ -593,52 +593,13 @@ namespace GilesTrinity
                         return RunStatus.Running;
                     }
 
-                    using (new PerformanceLogger("HandleTarget.DistanceEqualCheck"))
-                    {
-                        // Some stuff to avoid spamming usepower EVERY loop, and also to detect stucks/staying in one place for too long
-                        // Count how long we have failed to move - body block stuff etc.
-                        if (Math.Abs(TargetCurrentDistance - fLastDistanceFromTarget) < 2f)
-                        {
-                            bForceNewMovement = true;
-                            if (DateTime.Now.Subtract(lastMovedDuringCombat).TotalMilliseconds >= 250)
-                            {
-                                lastMovedDuringCombat = DateTime.Now;
-                                // We've been stuck at least 250 ms, let's go and pick new targets etc.
-                                TimesBlockedMoving++;
-                                ForceCloseRangeTarget = true;
-                                lastForcedKeepCloseRange = DateTime.Now;
-                                // And tell Trinity to get a new target
-                                bForceTargetUpdate = true;
-                                // Blacklist an 80 degree direction for avoidance
-                                if (CurrentTarget.Type == GObjectType.Avoidance)
-                                {
-                                    bAvoidDirectionBlacklisting = true;
-                                    fAvoidBlacklistDirection = FindDirectionDegree(playerStatus.CurrentPosition, CurrentTarget.Position);
-                                }
-                                // Handle body blocking by blacklisting
-                                GilesHandleBodyBlocking();
-                                // If we were backtracking and failed, remove the current backtrack and try and move to the next
-                                if (CurrentTarget.Type == GObjectType.Backtrack && TimesBlockedMoving >= 2)
-                                {
-                                    vBacktrackList.Remove(iTotalBacktracks);
-                                    iTotalBacktracks--;
-                                    if (iTotalBacktracks <= 1)
-                                    {
-                                        iTotalBacktracks = 0;
-                                        vBacktrackList = new SortedList<int, Vector3>();
-                                    }
-                                }
-                                // Reset the emergency loop counter and return success
-                                return RunStatus.Running;
-                            }
-                            // Been 250 milliseconds of non-movement?
-                        }
-                        else
-                        {
-                            // Movement has been made, so count the time last moved!
-                            lastMovedDuringCombat = DateTime.Now;
-                        }
-                    }
+                    // Check to see if we're stuck in moving to the target
+                    runStatus = HandleTargetDistanceCheck(runStatus);
+
+                    //check if we are returning to the tree
+                    if (runStatus != HandlerRunStatus.NotFinished)
+                        return GetTreeSharpRunStatus(runStatus);
+
 
                     // Update the last distance stored
                     fLastDistanceFromTarget = TargetCurrentDistance;
@@ -807,6 +768,56 @@ namespace GilesTrinity
 
                 return RunStatus.Running;
             }
+        }
+
+        private static HandlerRunStatus HandleTargetDistanceCheck(HandlerRunStatus runStatus)
+        {
+            using (new PerformanceLogger("HandleTarget.DistanceEqualCheck"))
+            {
+                // Count how long we have failed to move - body block stuff etc.
+                if (Math.Abs(TargetCurrentDistance - fLastDistanceFromTarget) < 2f)
+                {
+                    bForceNewMovement = true;
+                    if (DateTime.Now.Subtract(lastMovedDuringCombat).TotalMilliseconds >= 250)
+                    {
+                        lastMovedDuringCombat = DateTime.Now;
+                        // We've been stuck at least 250 ms, let's go and pick new targets etc.
+                        TimesBlockedMoving++;
+                        ForceCloseRangeTarget = true;
+                        lastForcedKeepCloseRange = DateTime.Now;
+                        // And tell Trinity to get a new target
+                        bForceTargetUpdate = true;
+                        // Blacklist an 80 degree direction for avoidance
+                        if (CurrentTarget.Type == GObjectType.Avoidance)
+                        {
+                            bAvoidDirectionBlacklisting = true;
+                            fAvoidBlacklistDirection = FindDirectionDegree(playerStatus.CurrentPosition, CurrentTarget.Position);
+                        }
+                        // Handle body blocking by blacklisting
+                        GilesHandleBodyBlocking();
+                        // If we were backtracking and failed, remove the current backtrack and try and move to the next
+                        if (CurrentTarget.Type == GObjectType.Backtrack && TimesBlockedMoving >= 2)
+                        {
+                            vBacktrackList.Remove(iTotalBacktracks);
+                            iTotalBacktracks--;
+                            if (iTotalBacktracks <= 1)
+                            {
+                                iTotalBacktracks = 0;
+                                vBacktrackList = new SortedList<int, Vector3>();
+                            }
+                        }
+                        // Reset the emergency loop counter and return success
+                        runStatus = HandlerRunStatus.TreeRunning;
+                    }
+                    // Been 250 milliseconds of non-movement?
+                }
+                else
+                {
+                    // Movement has been made, so count the time last moved!
+                    lastMovedDuringCombat = DateTime.Now;
+                }
+            }
+            return runStatus;
         }
 
         private static Stack<KeyValuePair<int, DateTime>> BlackListStack = new Stack<KeyValuePair<int, DateTime>>(20);
@@ -1409,6 +1420,21 @@ namespace GilesTrinity
                         }
                     // * Destructible - need to pick an ability and attack it
                     case GObjectType.Destructible:
+                        {
+                            // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
+                            TargetRangeRequired = currentPower.SNOPower == SNOPower.None ? 9f : currentPower.iMinimumRange;
+                            TargetDistanceReduction = CurrentTarget.Radius;
+
+                            if (ForceCloseRangeTarget)
+                                TargetDistanceReduction += TimesBlockedMoving * 2.5f;
+
+                            if (TargetDistanceReduction <= 0f)
+                                TargetDistanceReduction = 0f;
+                            // Treat the distance as closer if the X & Y distance are almost point-blank, for destructibles
+                            if (fDistanceToDestination <= 1.5f)
+                                TargetDistanceReduction += 1f;
+                            break;
+                        }
                     case GObjectType.Barricade:
                         {
                             // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
@@ -1416,12 +1442,11 @@ namespace GilesTrinity
                             TargetDistanceReduction = CurrentTarget.Radius;
 
                             if (ForceCloseRangeTarget)
-                                TargetDistanceReduction -= 3f;
+                                TargetDistanceReduction += TimesBlockedMoving * 3f;
+
                             if (TargetDistanceReduction <= 0f)
                                 TargetDistanceReduction = 0f;
-                            // Treat the distance as closer if the X & Y distance are almost point-blank, for destructibles
-                            if (fDistanceToDestination <= 1.5f)
-                                TargetDistanceReduction += 1f;
+
                             break;
                         }
                     // * Avoidance - need to pick an avoid location and move there
