@@ -17,8 +17,43 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
+
         /// <summary>
-        /// Pickup Validation - Determines what should or should not be picked up
+        /// Pickup Validation - Determines what should or should not be picked up (Item Rules)
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="level"></param>
+        /// <param name="quality"></param>
+        /// <param name="balanceId"></param>
+        /// <param name="dbItemBaseType"></param>
+        /// <param name="dbItemType"></param>
+        /// <param name="isOneHand"></param>
+        /// <param name="isTwoHand"></param>
+        /// <param name="followerType"></param>
+        /// <param name="dynamicID"></param>
+        /// <returns></returns>
+        internal static bool ItemRulesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
+        {
+
+            Interpreter.InterpreterAction action = StashRule.checkPickUpItem(name, level, quality, dbItemBaseType, dbItemType, isOneHand, isTwoHand, balanceId, dynamicID);
+            
+            switch (action)
+            {
+                case Interpreter.InterpreterAction.PICKUP:
+                    return true;
+
+                case Interpreter.InterpreterAction.IGNORE:
+                    return false;
+            }
+
+            // TODO: remove if tested
+            if (quality > ItemQuality.Superior)
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Item Rules doesn't handle {0} of type {1} and quality {2}!", name, dbItemType, quality);
+            
+            return GilesPickupItemValidation(name, level, quality, balanceId, dbItemBaseType, dbItemType, isOneHand, isTwoHand, followerType, dynamicID);
+        }
+        /// <summary>
+        /// Pickup Validation - Determines what should or should not be picked up (Scoring)
         /// </summary>
         /// <param name="name"></param>
         /// <param name="level"></param>
@@ -30,18 +65,6 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool GilesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
         {
-
-            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
-            {
-                Interpreter.InterpreterAction action = StashRule.checkPickUpItem(name, level, quality, dbItemBaseType, dbItemType, isOneHand, isTwoHand, balanceId, dynamicID);
-                switch (action)
-                {
-                    case Interpreter.InterpreterAction.PICKUP:
-                        return true;
-                    case Interpreter.InterpreterAction.IGNORE:
-                        return false;
-                }
-            }
 
             // If it's legendary, we always want it *IF* it's level is right
             if (quality >= ItemQuality.Legendary)
@@ -115,7 +138,7 @@ namespace GilesTrinity
                             int iTotalPotions =
                                 (from tempitem in ZetaDia.Me.Inventory.Backpack
                                  where tempitem.BaseAddress != IntPtr.Zero &&
-                                 tempitem.GameBalanceId == balanceId 
+                                 tempitem.GameBalanceId == balanceId
                                  select tempitem.ItemStackQuantity).Sum();
                             if (iTotalPotions > 98)
                             {
