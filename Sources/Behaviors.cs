@@ -200,7 +200,7 @@ namespace GilesTrinity
                     if (runStatus != HandlerRunStatus.NotFinished)
                         return GetTreeSharpRunStatus(runStatus);
 
-                    // Blacklist the current target
+                    // Handle Target stuck / timeout
                     runStatus = HandleTargetTimeout(runStatus);
 
                     //check if we are returning to the tree
@@ -283,57 +283,57 @@ namespace GilesTrinity
 
                     using (new PerformanceLogger("HandleTarget.LoSCheck"))
                     {
-                        fDistanceFromTarget = Vector3.Distance(playerStatus.CurrentPosition, vCurrentDestination) - fDistanceReduction;
-                        if (fDistanceFromTarget < 0f)
-                            fDistanceFromTarget = 0f;
+                        TargetCurrentDistance = Vector3.Distance(playerStatus.CurrentPosition, vCurrentDestination) - TargetDistanceReduction;
+                        if (TargetCurrentDistance < 0f)
+                            TargetCurrentDistance = 0f;
 
                         if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade && CurrentTarget.Type != GObjectType.Destructible)
                         {
-                            currentTargetIsInLoS = (GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
+                            CurrentTargetIsInLoS = (GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
                         }
                         else
                         {
-                            currentTargetIsInLoS = true;
+                            CurrentTargetIsInLoS = true;
                         }
                     }
 
                     using (new PerformanceLogger("HandleTarget.MonkWeaponSwap"))
                     {
-							// Item Swap + Blinding flash cast
-						if (playerStatus.ActorClass == ActorClass.Monk)
-						{
-							if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && 
-								hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
-							{
-								if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind) 
-									&& (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
-									{
-										ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
-										return RunStatus.Running;
-									}
-								else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800 
-										&& GilesHasBuff(SNOPower.Monk_SweepingWind))
-								{
-									weaponSwap.SwapGear();
-								}
-							}
-							// Spam sweeping winds
-							if (hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
-								&& (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
-								|| !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap && 
-								DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
-							{
-								ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
-								SweepWindSpam = DateTime.Now;
-								return RunStatus.Running;
-							}
-						}
+                        // Item Swap + Blinding flash cast
+                        if (playerStatus.ActorClass == ActorClass.Monk)
+                        {
+                            if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
+                                hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
+                            {
+                                if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind)
+                                    && (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
+                                {
+                                    ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
+                                    return RunStatus.Running;
+                                }
+                                else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800
+                                        && GilesHasBuff(SNOPower.Monk_SweepingWind))
+                                {
+                                    weaponSwap.SwapGear();
+                                }
+                            }
+                            // Spam sweeping winds
+                            if (hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
+                                && (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
+                                || !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
+                                DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
+                            {
+                                ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
+                                SweepWindSpam = DateTime.Now;
+                                return RunStatus.Running;
+                            }
+                        }
                     }
 
                     using (new PerformanceLogger("HandleTarget.InRange"))
                     {
                         // Interact/use power on target if already in range
-                        if (fRangeRequired <= 0f || fDistanceFromTarget <= fRangeRequired && currentTargetIsInLoS)
+                        if (TargetRangeRequired <= 0f || TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS)
                         {
                             // If avoidance, instantly skip
                             if (CurrentTarget.Type == GObjectType.Avoidance)
@@ -492,7 +492,7 @@ namespace GilesTrinity
                                                     CurrentTarget.InternalName,     // 0
                                                     CurrentTarget.ActorSNO,         // 1
                                                     CurrentTarget.CentreDistance,   // 2
-                                                    fRangeRequired,                 // 3
+                                                    TargetRangeRequired,                 // 3
                                                     CurrentTarget.Radius,           // 4
                                                     CurrentTarget.Type,             // 5
                                                     currentPower.SNOPower           // 6
@@ -505,7 +505,7 @@ namespace GilesTrinity
                                                     CurrentTarget.InternalName,     // 0
                                                     CurrentTarget.ActorSNO,         // 1
                                                     CurrentTarget.CentreDistance,   // 2
-                                                    fRangeRequired,                 // 3 
+                                                    TargetRangeRequired,                 // 3 
                                                     CurrentTarget.Radius,           // 4
                                                     CurrentTarget.Type,             // 5
                                                     currentPower.SNOPower           // 6
@@ -593,55 +593,16 @@ namespace GilesTrinity
                         return RunStatus.Running;
                     }
 
-                    using (new PerformanceLogger("HandleTarget.DistanceEqualCheck"))
-                    {
-                        // Some stuff to avoid spamming usepower EVERY loop, and also to detect stucks/staying in one place for too long
-                        // Count how long we have failed to move - body block stuff etc.
-                        if (fDistanceFromTarget == fLastDistanceFromTarget)
-                        {
-                            bForceNewMovement = true;
-                            if (DateTime.Now.Subtract(lastMovedDuringCombat).TotalMilliseconds >= 250)
-                            {
-                                lastMovedDuringCombat = DateTime.Now;
-                                // We've been stuck at least 250 ms, let's go and pick new targets etc.
-                                TimesBlockedMoving++;
-                                ForceCloseRangeTarget = true;
-                                lastForcedKeepCloseRange = DateTime.Now;
-                                // And tell Trinity to get a new target
-                                bForceTargetUpdate = true;
-                                // Blacklist an 80 degree direction for avoidance
-                                if (CurrentTarget.Type == GObjectType.Avoidance)
-                                {
-                                    bAvoidDirectionBlacklisting = true;
-                                    fAvoidBlacklistDirection = FindDirectionDegree(playerStatus.CurrentPosition, CurrentTarget.Position);
-                                }
-                                // Handle body blocking by blacklisting
-                                GilesHandleBodyBlocking();
-                                // If we were backtracking and failed, remove the current backtrack and try and move to the next
-                                if (CurrentTarget.Type == GObjectType.Backtrack && TimesBlockedMoving >= 2)
-                                {
-                                    vBacktrackList.Remove(iTotalBacktracks);
-                                    iTotalBacktracks--;
-                                    if (iTotalBacktracks <= 1)
-                                    {
-                                        iTotalBacktracks = 0;
-                                        vBacktrackList = new SortedList<int, Vector3>();
-                                    }
-                                }
-                                // Reset the emergency loop counter and return success
-                                return RunStatus.Running;
-                            }
-                            // Been 250 milliseconds of non-movement?
-                        }
-                        else
-                        {
-                            // Movement has been made, so count the time last moved!
-                            lastMovedDuringCombat = DateTime.Now;
-                        }
-                    }
+                    // Check to see if we're stuck in moving to the target
+                    runStatus = HandleTargetDistanceCheck(runStatus);
+
+                    //check if we are returning to the tree
+                    if (runStatus != HandlerRunStatus.NotFinished)
+                        return GetTreeSharpRunStatus(runStatus);
+
 
                     // Update the last distance stored
-                    fLastDistanceFromTarget = fDistanceFromTarget;
+                    fLastDistanceFromTarget = TargetCurrentDistance;
                     using (new PerformanceLogger("HandleTarget.PositionShift"))
                     {
 
@@ -728,7 +689,8 @@ namespace GilesTrinity
                                     return RunStatus.Running;
                                 }
                                 // Tempest rush for a monk
-                                if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.Monk_TempestRush) && playerStatus.CurrentEnergy >= 20)
+                                if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.Monk_TempestRush) && playerStatus.CurrentEnergy >= 20 &&
+                                    ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.CentreDistance > 20f) || CurrentTarget.Type != GObjectType.Item))
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, iCurrentWorldID, -1);
                                     // Store the current destination for comparison incase of changes next loop
@@ -765,10 +727,10 @@ namespace GilesTrinity
 
                     // Whirlwind against everything within range (except backtrack points)
                     //intell
-                    if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) && playerStatus.CurrentEnergy >= 10 && iAnythingWithinRange[RANGE_20] >= 1 && !bWaitingForSpecial && currentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && fDistanceFromTarget <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
+                    if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) && playerStatus.CurrentEnergy >= 10 && iAnythingWithinRange[RANGE_20] >= 1 && !bWaitingForSpecial && currentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
                         (!hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Sprint) || GilesHasBuff(SNOPower.Barbarian_Sprint)) &&
                         CurrentTarget.Type != GObjectType.Backtrack &&
-                        (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && fDistanceFromTarget >= 6f) &&
+                        (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && TargetCurrentDistance >= 6f) &&
                         (CurrentTarget.Type != GObjectType.Unit ||
                         (CurrentTarget.Type == GObjectType.Unit && !CurrentTarget.IsTreasureGoblin &&
                             (!Settings.Combat.Barbarian.SelectiveWhirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)))))
@@ -808,6 +770,56 @@ namespace GilesTrinity
             }
         }
 
+        private static HandlerRunStatus HandleTargetDistanceCheck(HandlerRunStatus runStatus)
+        {
+            using (new PerformanceLogger("HandleTarget.DistanceEqualCheck"))
+            {
+                // Count how long we have failed to move - body block stuff etc.
+                if (Math.Abs(TargetCurrentDistance - fLastDistanceFromTarget) < 2f)
+                {
+                    bForceNewMovement = true;
+                    if (DateTime.Now.Subtract(lastMovedDuringCombat).TotalMilliseconds >= 250)
+                    {
+                        lastMovedDuringCombat = DateTime.Now;
+                        // We've been stuck at least 250 ms, let's go and pick new targets etc.
+                        TimesBlockedMoving++;
+                        ForceCloseRangeTarget = true;
+                        lastForcedKeepCloseRange = DateTime.Now;
+                        // And tell Trinity to get a new target
+                        bForceTargetUpdate = true;
+                        // Blacklist an 80 degree direction for avoidance
+                        if (CurrentTarget.Type == GObjectType.Avoidance)
+                        {
+                            bAvoidDirectionBlacklisting = true;
+                            fAvoidBlacklistDirection = FindDirectionDegree(playerStatus.CurrentPosition, CurrentTarget.Position);
+                        }
+                        // Handle body blocking by blacklisting
+                        GilesHandleBodyBlocking();
+                        // If we were backtracking and failed, remove the current backtrack and try and move to the next
+                        if (CurrentTarget.Type == GObjectType.Backtrack && TimesBlockedMoving >= 2)
+                        {
+                            vBacktrackList.Remove(iTotalBacktracks);
+                            iTotalBacktracks--;
+                            if (iTotalBacktracks <= 1)
+                            {
+                                iTotalBacktracks = 0;
+                                vBacktrackList = new SortedList<int, Vector3>();
+                            }
+                        }
+                        // Reset the emergency loop counter and return success
+                        runStatus = HandlerRunStatus.TreeRunning;
+                    }
+                    // Been 250 milliseconds of non-movement?
+                }
+                else
+                {
+                    // Movement has been made, so count the time last moved!
+                    lastMovedDuringCombat = DateTime.Now;
+                }
+            }
+            return runStatus;
+        }
+
         private static Stack<KeyValuePair<int, DateTime>> BlackListStack = new Stack<KeyValuePair<int, DateTime>>(20);
 
         /// <summary>
@@ -823,9 +835,22 @@ namespace GilesTrinity
                 // Note: The time since target picked updates every time the current target loses health, if it's a monster-target
                 // Don't blacklist stuff if we're playing a cutscene
 
-                if (!ZetaDia.IsPlayingCutscene && CurrentTargetIsNotAvoidance() && (
-                            (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6) ||
-                            (CurrentTargetIsUnit() && GetSecondsSinceTargetUpdate() > 15)))
+                bool shouldTryBlacklist = false;
+
+                if (!CurrentTargetIsNotAvoidance())
+                    return HandlerRunStatus.NotFinished;
+
+                if (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6)
+                    shouldTryBlacklist = true;
+
+                if ((CurrentTargetIsUnit() && GetSecondsSinceTargetUpdate() > 15))
+                    shouldTryBlacklist = true;
+
+                // special raycast check for current target after 5 sec
+                if ((CurrentTargetIsUnit() && GetSecondsSinceTargetUpdate() > 5))
+                    shouldTryBlacklist = true;
+
+                if (shouldTryBlacklist)
                 {
                     // NOTE: This only blacklists if it's remained the PRIMARY TARGET that we are trying to actually directly attack!
                     // So it won't blacklist a monster "on the edge of the screen" who isn't even being targetted
@@ -837,19 +862,29 @@ namespace GilesTrinity
                         isNavigable = pf.IsNavigable(gp.WorldToGrid(CurrentTarget.Position.ToVector2()));
                     else
                         isNavigable = true;
-                    bool bBlacklistThis = true;
+
+                    bool addTargetToBlacklist = true;
+
 
                     // PREVENT blacklisting a monster on less than 90% health unless we haven't damaged it for more than 2 minutes
                     if (CurrentTarget.Type == GObjectType.Unit && isNavigable)
                     {
                         if (CurrentTarget.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Kamikaze)
-                            bBlacklistThis = false;
-                        //if (CurrentTarget.iHitPoints <= 0.90 && DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds <= 30)
-                        //    bBlacklistThis = false;
-                        //if (CurrentTarget.bIsBoss)
-                        //    bBlacklistThis = false;
+                            addTargetToBlacklist = false;
                     }
-                    if (bBlacklistThis)
+
+                    // Check if we can Raycast to a trash mob
+                    if (CurrentTarget.IsTrashMob && 
+                        GetSecondsSinceTargetUpdate() > 4 && 
+                        CurrentTarget.HitPoints > 0.90)
+                    {
+                        if (GilesCanRayCast(playerStatus.CurrentPosition, CurrentTarget.Position, NavCellFlags.AllowWalk))
+                        {
+                            addTargetToBlacklist = false;
+                        }
+                    }
+
+                    if (addTargetToBlacklist)
                     {
                         if (CurrentTarget.Type == GObjectType.Unit)
                         {
@@ -943,7 +978,7 @@ namespace GilesTrinity
                     bWaitingForPotion = false;
                     if (!playerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
                     {
-                        ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).FirstOrDefault();
+                        ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).ThenBy(p => p.ItemStackQuantity).FirstOrDefault();
                         if (thisBestPotion != null)
                         {
                             WaitWhileAnimating(3, true);
@@ -1228,18 +1263,18 @@ namespace GilesTrinity
             statusText.Append(". R-Dist=");
             statusText.Append(CurrentTarget.RadiusDistance.ToString("0.0"));
             statusText.Append(". RangeReq'd: ");
-            statusText.Append(fRangeRequired.ToString("0.0"));
+            statusText.Append(TargetRangeRequired.ToString("0.0"));
             statusText.Append(". DistfromTrgt: ");
-            statusText.Append(fDistanceFromTarget.ToString("0.0"));
+            statusText.Append(TargetCurrentDistance.ToString("0.0"));
             statusText.Append(". InLoS: ");
-            statusText.Append(currentTargetIsInLoS);
+            statusText.Append(CurrentTargetIsInLoS);
             statusText.Append(". ");
             if (CurrentTarget.Type == GObjectType.Unit && currentPower.SNOPower != SNOPower.None)
             {
                 statusText.Append("Power=");
                 statusText.Append(currentPower.SNOPower);
                 statusText.Append(" (range ");
-                statusText.Append(fRangeRequired);
+                statusText.Append(TargetRangeRequired);
                 statusText.Append(") ");
             }
             statusText.Append("Weight=");
@@ -1288,10 +1323,10 @@ namespace GilesTrinity
         {
             using (new PerformanceLogger("HandleTarget.SetRequiredRange"))
             {
-                fRangeRequired = 1f;
-                fDistanceFromTarget = 0;
-                currentTargetIsInLoS = false;
-                fDistanceReduction = 0f;
+                TargetRangeRequired = 1f;
+                TargetCurrentDistance = 0;
+                CurrentTargetIsInLoS = false;
+                TargetDistanceReduction = 0f;
                 // Set current destination to our current target's destination
                 vCurrentDestination = CurrentTarget.Position;
                 float fDistanceToDestination = playerStatus.CurrentPosition.Distance(vCurrentDestination);
@@ -1301,49 +1336,49 @@ namespace GilesTrinity
                     case GObjectType.Unit:
                         {
                             // Treat the distance as closer based on the radius of monsters
-                            fDistanceReduction = CurrentTarget.Radius;
+                            TargetDistanceReduction = CurrentTarget.Radius;
                             if (ForceCloseRangeTarget)
-                                fDistanceReduction -= 3f;
-                            if (fDistanceReduction <= 0f)
-                                fDistanceReduction = 0f;
+                                TargetDistanceReduction -= 3f;
+                            if (TargetDistanceReduction <= 0f)
+                                TargetDistanceReduction = 0f;
                             // Pick a range to try to reach
-                            fRangeRequired = currentPower.SNOPower == SNOPower.None ? 9f : currentPower.iMinimumRange;
+                            TargetRangeRequired = currentPower.SNOPower == SNOPower.None ? 9f : currentPower.iMinimumRange;
                             break;
                         }
                     // * Item - need to get within 6 feet and then interact with it
                     case GObjectType.Item:
                         {
-                            fRangeRequired = 6f;
+                            TargetRangeRequired = 6f;
 
                             break;
                         }
                     // * Gold - need to get within pickup radius only
                     case GObjectType.Gold:
                         {
-                            fRangeRequired = (float)ZetaDia.Me.GoldPickUpRadius;
-                            if (fRangeRequired < 2f)
-                                fRangeRequired = 2f;
+                            TargetRangeRequired = (float)ZetaDia.Me.GoldPickUpRadius;
+                            if (TargetRangeRequired < 2f)
+                                TargetRangeRequired = 2f;
                             break;
                         }
                     // * Globes - need to get within pickup radius only
                     case GObjectType.Globe:
                         {
-                            fRangeRequired = (float)ZetaDia.Me.GoldPickUpRadius;
-                            if (fRangeRequired < 2f)
-                                fRangeRequired = 2f;
-                            if (fRangeRequired > 5f)
-                                fRangeRequired = 5f;
+                            TargetRangeRequired = (float)ZetaDia.Me.GoldPickUpRadius;
+                            if (TargetRangeRequired < 2f)
+                                TargetRangeRequired = 2f;
+                            if (TargetRangeRequired > 5f)
+                                TargetRangeRequired = 5f;
                             break;
                         }
                     // * Shrine & Container - need to get within 8 feet and interact
                     case GObjectType.HealthWell:
                         {
-                            fRangeRequired = CurrentTarget.Radius + 5f;
-                            fRangeRequired = 5f;
+                            TargetRangeRequired = CurrentTarget.Radius + 5f;
+                            TargetRangeRequired = 5f;
                             int _range;
                             if (dictInteractableRange.TryGetValue(CurrentTarget.ActorSNO, out _range))
                             {
-                                fRangeRequired = (float)_range;
+                                TargetRangeRequired = (float)_range;
                             }
                             break;
                         }
@@ -1351,77 +1386,91 @@ namespace GilesTrinity
                     case GObjectType.Container:
                         {
                             // Treat the distance as closer based on the radius of the object
-                            fDistanceReduction = CurrentTarget.Radius;
-                            fRangeRequired = 8f;
+                            TargetDistanceReduction = CurrentTarget.Radius;
+                            TargetRangeRequired = 8f;
                             if (ForceCloseRangeTarget)
-                                fRangeRequired -= 2f;
+                                TargetRangeRequired -= 2f;
                             // Treat the distance as closer if the X & Y distance are almost point-blank, for objects
                             if (fDistanceToDestination <= 1.5f)
-                                fDistanceReduction += 1f;
+                                TargetDistanceReduction += 1f;
                             int iTempRange;
                             if (dictInteractableRange.TryGetValue(CurrentTarget.ActorSNO, out iTempRange))
                             {
-                                fRangeRequired = (float)iTempRange;
+                                TargetRangeRequired = (float)iTempRange;
                             }
                             break;
                         }
                     case GObjectType.Interactable:
                         {
                             // Treat the distance as closer based on the radius of the object
-                            fDistanceReduction = CurrentTarget.Radius;
-                            fRangeRequired = 12f;
+                            TargetDistanceReduction = CurrentTarget.Radius;
+                            TargetRangeRequired = 12f;
                             if (ForceCloseRangeTarget)
-                                fRangeRequired -= 2f;
+                                TargetRangeRequired -= 2f;
                             // Check if it's in our interactable range dictionary or not
                             int iTempRange;
                             if (dictInteractableRange.TryGetValue(CurrentTarget.ActorSNO, out iTempRange))
                             {
-                                fRangeRequired = (float)iTempRange;
+                                TargetRangeRequired = (float)iTempRange;
                             }
                             // Treat the distance as closer if the X & Y distance are almost point-blank, for objects
                             if (fDistanceToDestination <= 1.5f)
-                                fDistanceReduction += 1f;
+                                TargetDistanceReduction += 1f;
                             break;
                         }
                     // * Destructible - need to pick an ability and attack it
                     case GObjectType.Destructible:
+                        {
+                            // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
+                            TargetRangeRequired = currentPower.SNOPower == SNOPower.None ? 9f : currentPower.iMinimumRange;
+                            TargetDistanceReduction = CurrentTarget.Radius;
+
+                            if (ForceCloseRangeTarget)
+                                TargetDistanceReduction += TimesBlockedMoving * 2.5f;
+
+                            if (TargetDistanceReduction <= 0f)
+                                TargetDistanceReduction = 0f;
+                            // Treat the distance as closer if the X & Y distance are almost point-blank, for destructibles
+                            if (fDistanceToDestination <= 1.5f)
+                                TargetDistanceReduction += 1f;
+                            break;
+                        }
                     case GObjectType.Barricade:
                         {
                             // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
-                            fRangeRequired = currentPower.SNOPower == SNOPower.None ? 9f : currentPower.iMinimumRange;
-                            fDistanceReduction = CurrentTarget.Radius;
+                            TargetRangeRequired = currentPower.SNOPower == SNOPower.None ? 9f : currentPower.iMinimumRange;
+                            TargetDistanceReduction = CurrentTarget.Radius;
 
                             if (ForceCloseRangeTarget)
-                                fDistanceReduction -= 3f;
-                            if (fDistanceReduction <= 0f)
-                                fDistanceReduction = 0f;
-                            // Treat the distance as closer if the X & Y distance are almost point-blank, for destructibles
-                            if (fDistanceToDestination <= 1.5f)
-                                fDistanceReduction += 1f;
+                                TargetDistanceReduction += TimesBlockedMoving * 3f;
+
+                            if (TargetDistanceReduction <= 0f)
+                                TargetDistanceReduction = 0f;
+
                             break;
                         }
                     // * Avoidance - need to pick an avoid location and move there
                     case GObjectType.Avoidance:
                         {
-                            fRangeRequired = 2f;
+                            TargetRangeRequired = 2f;
                             // Treat the distance as closer if the X & Y distance are almost point-blank, for avoidance spots
                             if (fDistanceToDestination <= 1.5f)
-                                fDistanceReduction += 2f;
+                                TargetDistanceReduction += 2f;
                             break;
                         }
                     // * Backtrack Destination
                     case GObjectType.Backtrack:
                         {
-                            fRangeRequired = 5f;
+                            TargetRangeRequired = 5f;
                             if (ForceCloseRangeTarget)
-                                fRangeRequired -= 2f;
+                                TargetRangeRequired -= 2f;
                             break;
                         }
                     case GObjectType.Door:
-                        fRangeRequired = CurrentTarget.Radius + 2f;
+                        TargetRangeRequired = CurrentTarget.Radius + 2f;
                         break;
                     default:
-                        fRangeRequired = CurrentTarget.Radius;
+                        TargetRangeRequired = CurrentTarget.Radius;
                         break;
                 }
             }

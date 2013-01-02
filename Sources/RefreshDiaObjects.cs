@@ -161,7 +161,7 @@ namespace GilesTrinity
                     // Record the last time our target changed
                     if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Setting dateSincePicked to {0} CurrentTargetRactorGUID: {1} CurrentTarget.RActorGuid: {2}",
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Found New Target - {0} CurrentTargetRactorGUID: {1} CurrentTarget.RActorGuid: {2}",
                                         DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
                         dateSincePickedTarget = DateTime.Now;
                         iTargetLastHealth = 0f;
@@ -174,7 +174,7 @@ namespace GilesTrinity
                             // Check if the health has changed, if so update the target-pick time before we blacklist them again
                             if (CurrentTarget.HitPoints != iTargetLastHealth)
                             {
-                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Setting dateSincePicked to {0} CurrentTarget.iHitPoints: {1}  iTargetLastHealth: {2} ",
+                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Keeping Target - CurrentTarget.iHitPoints: {1:0.00}  iTargetLastHealth: {2:0.00} ",
                                                 DateTime.Now, CurrentTarget.HitPoints, iTargetLastHealth);
                                 dateSincePickedTarget = DateTime.Now;
                             }
@@ -349,12 +349,19 @@ namespace GilesTrinity
             {
                 //ZetaDia.Actors.Update();
 
-                var refreshSource =
-                from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                //where o.IsValid
-                //orderby o.ActorType, o.Distance
-                select o;
+                IEnumerable<DiaObject> refreshSource;
 
+                if (Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
+                {
+                    refreshSource = from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                    orderby o.Distance
+                    select o;
+                }
+                else
+                {
+                    refreshSource = from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                    select o;
+                }
                 Stopwatch t1 = new Stopwatch();
 
 
@@ -387,12 +394,12 @@ namespace GilesTrinity
 
                             double duration = t1.Elapsed.TotalMilliseconds;
 
-                            if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && duration > 1 || !Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
+                            if ((Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && duration > 1 || !Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance)))
                             {
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                     "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0}",
                                     duration,
-                                    (AddToCache ? "Added  " : " Ignored"),
+                                    (AddToCache ? "Added " : "Ignored"),
                                     (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
                                     c_diaObject.ActorType,
                                     c_ObjectType,
@@ -762,10 +769,10 @@ namespace GilesTrinity
                     {
 
                         if ((DateTime.Now.Subtract(LastKitePosition.PositionFoundTime).TotalMilliseconds > 3000 && LastKitePosition.Position == vAnySafePoint) ||
-                            (CurrentTarget != null && DateTime.Now.Subtract(lastGlobalCooldownUse).TotalMilliseconds > 1500))
+                            (CurrentTarget != null && DateTime.Now.Subtract(lastGlobalCooldownUse).TotalMilliseconds > 1500 && TryToKite))
                         {
                             timeCancelledKiteMove = DateTime.Now;
-                            cancelledKiteMoveForMilliseconds = 3000;
+                            cancelledKiteMoveForMilliseconds = 1500;
                             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kite movement failed, cancelling for {0:0}ms", cancelledKiteMoveForMilliseconds);
                             return;
                         }

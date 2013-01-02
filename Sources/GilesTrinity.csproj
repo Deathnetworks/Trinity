@@ -39,7 +39,7 @@
   <ItemGroup>
     <Reference Include="Demonbuddy, Version=1.0.1204.101, Culture=neutral, PublicKeyToken=eff32ccf253d66d4, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Demonbuddy.exe</HintPath>
+      <HintPath>..\..\..\Demonbuddy.exe</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
@@ -157,6 +157,7 @@
     <Compile Include="GilesTrinity.cs" />
     <Compile Include="RefreshDiaObjects.cs" />
     <Compile Include="XmlTags\BaseComplexNodeTag.cs" />
+    <Compile Include="XmlTags\TrinityCastSweepingWinds.cs" />
     <Compile Include="XmlTags\TrinityIfRandom.cs" />
     <Compile Include="XmlTags\TrinityIfSNOInRange.cs" />
     <Compile Include="XmlTags\TrinityIf.cs" />
@@ -167,6 +168,7 @@
     <Compile Include="XmlTags\TrinityMoveToSNO.cs" />
     <Compile Include="XmlTags\TrinityMoveTo.cs" />
     <Compile Include="XmlTags\TrinityRandomRoll.cs" />
+    <Compile Include="XmlTags\TrinityRandomWait.cs" />
     <Compile Include="XmlTags\TrinityTownRun.cs" />
     <Compile Include="XmlTags\TrinityUseOnce.cs" />
     <Compile Include="XmlTags\TrinityUseReset.cs" />

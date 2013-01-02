@@ -41,7 +41,9 @@ namespace GilesTrinity.ItemRules.Core
             Patterns.Add(TokenType.VARIABLE, regex);
             Tokens.Add(TokenType.VARIABLE);
 
-            regex = new Regex(@"\""[0-9A-Za-z' :\-]*\""", RegexOptions.Compiled);
+            //regex = new Regex(@"\""[0-9A-Za-z' :\-]*\""", RegexOptions.Compiled);
+            // fix for all language (chinese,russian, etc.)
+            regex = new Regex(@"\""([^\""]*)\""", RegexOptions.Compiled);
             Patterns.Add(TokenType.STRING, regex);
             Tokens.Add(TokenType.STRING);
 

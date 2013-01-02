@@ -395,6 +395,7 @@ namespace GilesTrinity
             {
                 hashNavigationObstacleCache.Add(new GilesObstacle(c_Position, dictSNONavigationSize[c_ActorSNO], c_ActorSNO));
                 AddToCache = false;
+
             }
             return AddToCache;
         }
@@ -996,6 +997,25 @@ namespace GilesTrinity
                     return AddToCache;
                 }
 
+                try
+                {
+                    int isNPC = c_CommonData.GetAttribute<int>(ActorAttributeType.TeamID);
+                    if (isNPC == 1)
+                    {
+                        AddToCache = false;
+                        c_IgnoreSubStep += "IsTeam1+";
+                        return AddToCache;
+                    }
+                }
+                catch
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep += "IsTeam1-";
+                    return AddToCache;
+                }
+
+
+
             }
             using (new PerformanceLogger("RefreshUnit.11"))
             {
@@ -1270,6 +1290,10 @@ namespace GilesTrinity
                 {
                     AddToCache = ItemManager.EvaluateItem((ACDItem)c_CommonData, ItemManager.RuleType.PickUp);
                 }
+                if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
+                {
+                    AddToCache = ItemRulesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType, c_GameDynamicID);
+                }
                 else
                 {
                     AddToCache = GilesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType, c_GameDynamicID);
@@ -1343,6 +1367,7 @@ namespace GilesTrinity
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "hashSNOIgnoreBlacklist";
+                return AddToCache;
                 //return bWantThis;
             }
             // Ignore it if it's not in range yet, except health wells
@@ -1350,7 +1375,7 @@ namespace GilesTrinity
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotInRange";
-                //return bWantThis;
+                return AddToCache;
             }
             if (c_Name.ToLower().StartsWith("minimapicon"))
             {
@@ -1358,7 +1383,7 @@ namespace GilesTrinity
                 hashRGUIDBlacklist60.Add(c_RActorGuid);
                 c_IgnoreSubStep = "minimapicon";
                 AddToCache = false;
-                //return bWantThis;
+                return AddToCache;
             }
             // Retrieve collision sphere radius, cached if possible
             if (!dictGilesCollisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
@@ -1369,12 +1394,18 @@ namespace GilesTrinity
 
                     //// Take 8 from the radius
                     //c_fRadius -= 10f;
-                    //// Minimum range clamp
-                    //if (c_fRadius <= 1f)
-                    //    c_fRadius = 1f;
-                    //// Maximum range clamp
-                    //if (c_fRadius >= 16f)
-                    //    c_fRadius = 16f;
+
+                    if (c_ObjectType == GObjectType.Destructible && c_Radius >= 5f)
+                    {
+                        c_Radius = c_Radius / 2;
+                    }
+
+                    // Minimum range clamp
+                    if (c_Radius <= 1f)
+                        c_Radius = 1f;
+                    // Maximum range clamp
+                    if (c_Radius >= 16f)
+                        c_Radius = 16f;
                 }
                 catch
                 {
@@ -1406,6 +1437,7 @@ namespace GilesTrinity
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "GizmoDisabledByScript";
+                return AddToCache;
             }
             // Now for the specifics
             int iThisPhysicsSNO;
@@ -1449,6 +1481,7 @@ namespace GilesTrinity
                                         hashRGUIDBlacklist3.Add(c_RActorGuid);
                                         AddToCache = false;
                                         c_IgnoreSubStep = "DoorDisabledbyScript";
+                                        return AddToCache;
                                     }
                                 }
                                 else
@@ -1468,7 +1501,7 @@ namespace GilesTrinity
                     if (c_CentreDistance > 30f)
                     {
                         AddToCache = false;
-                        //return bWantThis;
+                        return AddToCache;
                     }
                     c_Radius = 4f;
                     break;
@@ -1489,7 +1522,7 @@ namespace GilesTrinity
                         {
                             c_IgnoreSubStep = "GizmoCharges";
                             AddToCache = false;
-                            //return bWantThis;
+                            return AddToCache;
                         }
                         bWaitingAfterPower = true;
                     }
@@ -1502,9 +1535,9 @@ namespace GilesTrinity
                         if (!Settings.WorldObject.UseShrine)
                         {
                             // We're ignoring all shrines, so blacklist this one
-                            hashRGUIDBlacklist60.Add(c_RActorGuid);
+                            c_IgnoreSubStep = "IgnoreAllShrinesSet";
                             AddToCache = false;
-                            //return bWantThis;
+                            return AddToCache;
                         }
 
                         // Determine what shrine type it is, and blacklist if the user has disabled it
@@ -1519,48 +1552,54 @@ namespace GilesTrinity
                                 if (playerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.UseTRMovement)
                                 {
                                     // Frenzy shrines are a huge time sink for monks using Tempest Rush to move, we should ignore them.
-                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
                                     AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
                                 }
                                 break;
 
                             case 176076:  //Fortune Shrine
                                 if (!Settings.WorldObject.UseFortuneShrine)
                                 {
-                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
                                     AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
                                 }
                                 break;
 
                             case 176074:  //Protection Shrine
                                 if (!Settings.WorldObject.UseProtectionShrine)
                                 {
-                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
                                     AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
                                 }
                                 break;
 
                             case 260330:  //Empowered Shrine
                                 if (!Settings.WorldObject.UseEmpoweredShrine)
                                 {
-                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
                                     AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
                                 }
                                 break;
 
                             case 176075:  //Enlightened Shrine
                                 if (!Settings.WorldObject.UseEnlightenedShrine)
                                 {
-                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
                                     AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
                                 }
                                 break;
 
                             case 260331:  //Fleeting Shrine
                                 if (!Settings.WorldObject.UseFleetingShrine)
                                 {
-                                    hashRGUIDBlacklist60.Add(c_RActorGuid);
                                     AddToCache = false;
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
+                                    return AddToCache;
                                 }
                                 break;
 
@@ -1582,10 +1621,9 @@ namespace GilesTrinity
                         if (GizmoUsed)
                         {
                             // It's already open!
-                            hashRGUIDBlacklist60.Add(c_RActorGuid);
                             c_IgnoreSubStep = "GizmoHasBeenOperated";
                             AddToCache = false;
-                            //return bWantThis;
+                            return AddToCache;
                         }
                         // Bag it!
                         c_Radius = 4f;
@@ -1621,18 +1659,20 @@ namespace GilesTrinity
                         //return bWantThis;
                         //}
                         // Set min distance to user-defined setting
-                        iMinDistance = Settings.WorldObject.DestructibleRange + (c_Radius * 0.70);
+                        iMinDistance = Settings.WorldObject.DestructibleRange;
                         if (ForceCloseRangeTarget)
                             iMinDistance += 6f;
+
                         // Large objects, like logs - Give an extra xx feet of distance
                         if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out iExtendedRange))
                             iMinDistance = Settings.WorldObject.DestructibleRange + iExtendedRange;
+
                         // This object isn't yet in our destructible desire range
-                        if (iMinDistance <= 0 || c_CentreDistance > iMinDistance)
+                        if (iMinDistance <= 0 || c_RadiusDistance > iMinDistance)
                         {
                             c_IgnoreSubStep = "NotInBarricadeRange";
                             AddToCache = false;
-                            //return bWantThis;
+                            return AddToCache;
                         }
                         break;
                     }
@@ -1665,13 +1705,17 @@ namespace GilesTrinity
                         //    
                         //return bWantThis;
                         //}
+
+
                         // Set min distance to user-defined setting
-                        iMinDistance = Settings.WorldObject.DestructibleRange + c_Radius;
+                        iMinDistance = Settings.WorldObject.DestructibleRange;
                         if (ForceCloseRangeTarget)
                             iMinDistance += 6f;
+
                         // Large objects, like logs - Give an extra xx feet of distance
                         if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out iExtendedRange))
                             iMinDistance = Settings.WorldObject.DestructibleRange + iExtendedRange;
+
                         // This object isn't yet in our destructible desire range
                         if (iMinDistance <= 0 || c_RadiusDistance > iMinDistance)
                         {
@@ -1690,7 +1734,6 @@ namespace GilesTrinity
 
                         if (hashSNOContainerResplendant.Contains(c_ActorSNO))
                             AddToCache = true;
-
                         break;
                     }
                 case GObjectType.Container:
@@ -1711,14 +1754,12 @@ namespace GilesTrinity
                         {
                             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting container-been-opened attribute for object {0} [{1}]", c_Name, c_ActorSNO);
                             AddToCache = false;
-                            //return bWantThis;
                         }
                         if (bThisOpen)
                         {
                             // It's already open!
-                            hashRGUIDBlacklist60.Add(c_RActorGuid);
                             AddToCache = false;
-                            //return bWantThis;
+                            return AddToCache;
                         }
                         else if (!bThisOpen && c_Name.ToLower().Contains("chest") && !c_Name.ToLower().Contains("chest_rare"))
                         {
@@ -1739,7 +1780,6 @@ namespace GilesTrinity
                             {
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_Name, c_ActorSNO);
                                 AddToCache = false;
-                                //return bWantThis;
                             }
                             dictPhysicsSNO.Add(c_ActorSNO, iThisPhysicsSNO);
                         }
@@ -1908,64 +1948,97 @@ namespace GilesTrinity
                 if (c_ObjectType != GObjectType.Item)
                 {
 
-                    if (((c_ObjectType == GObjectType.Unit && !bWantToTownRun) || c_ObjectType == GObjectType.Shrine) && (c_CentreDistance > 10 && c_CentreDistance < 75))
+                    //if (((c_ObjectType == GObjectType.Unit && !bWantToTownRun) || c_ObjectType == GObjectType.Shrine) && (c_CentreDistance > 10 && c_CentreDistance < 75))
+
+                    if (c_CentreDistance < 125)
                     {
-                        using (new PerformanceLogger("RefreshLoS.1"))
+                        switch (c_ObjectType)
                         {
-                            if (Settings.Combat.Misc.UseNavMeshTargeting)
-                            {
-                                bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
-
-                                if (!isNavigable)
+                            case GObjectType.Destructible:
+                            case GObjectType.Unit:
+                            case GObjectType.Shrine:
+                            case GObjectType.Barricade:
                                 {
-                                    AddToCache = false;
-                                    c_IgnoreSubStep = "NotNavigable";
-                                }
-                            }
+                                    using (new PerformanceLogger("RefreshLoS.1"))
+                                    {
+                                        if (Settings.Combat.Misc.UseNavMeshTargeting)
+                                        {
+                                            bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
+
+                                            if (!isNavigable)
+                                            {
+                                                AddToCache = false;
+                                                c_IgnoreSubStep = "NotNavigable";
+                                            }
+                                        }
+                                    }
+                                } 
+                                break;
+
                         }
-                        using (new PerformanceLogger("RefreshLoS.2"))
+                        switch (c_ObjectType)
                         {
-                            if (Settings.Combat.Misc.UseNavMeshTargeting)
-                            {
-                                Vector3 myPos = new Vector3(playerStatus.CurrentPosition.X, playerStatus.CurrentPosition.Y, playerStatus.CurrentPosition.Z + 4);
-                                Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 4f);
+                            case GObjectType.Destructible:
+                            case GObjectType.Unit:
+                            case GObjectType.Shrine:
+                                {
+                                    using (new PerformanceLogger("RefreshLoS.2"))
+                                    {
+                                        if (Settings.Combat.Misc.UseNavMeshTargeting)
+                                        {
+                                            Vector3 myPos = new Vector3(playerStatus.CurrentPosition.X, playerStatus.CurrentPosition.Y, playerStatus.CurrentPosition.Z + 4);
+                                            Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 4f);
 
-                                // For Melee
-                                if (PlayerKiteDistance <= 5 && c_CentreDistance >= 5 && !ZetaDia.Physics.Raycast(myPos, cPos, NavCellFlags.AllowWalk))
-                                {
-                                    AddToCache = false;
-                                    c_IgnoreSubStep = "UnableToRayCast";
-                                }
-                                // For Kiting
-                                else if (!ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowProjectile))
-                                {
-                                    AddToCache = false;
-                                    c_IgnoreSubStep = "UnableToRayCast";
-                                }
-                            }
-                            else
-                            {
-                                if (c_ZDiff > 14f)
-                                {
-                                    AddToCache = false;
-                                    c_IgnoreSubStep = "LoS.ZDiff";
-                                }
-                            }
+                                            // For Melee
+                                            if (PlayerKiteDistance <= 5 && c_CentreDistance >= 5 && !ZetaDia.Physics.Raycast(myPos, cPos, NavCellFlags.AllowWalk))
+                                            {
+                                                AddToCache = false;
+                                                c_IgnoreSubStep = "UnableToRayCast";
+                                            }
+                                            // For Kiting
+                                            else if (!ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowProjectile))
+                                            {
+                                                AddToCache = false;
+                                                c_IgnoreSubStep = "UnableToRayCast";
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (c_ZDiff > 14f)
+                                            {
+                                                AddToCache = false;
+                                                c_IgnoreSubStep = "LoS.ZDiff";
+                                            }
+                                        }
+                                    }
+                                } 
+                                break;
+
                         }
-                        using (new PerformanceLogger("RefreshLoS.3"))
+                        switch (c_ObjectType)
                         {
-                            if (Settings.Combat.Misc.UseNavMeshTargeting)
-                            {
-                                // Ignore units not in LoS except bosses, rares, champs
-                                if (!c_diaObject.InLineOfSight && !(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare))
+                            case GObjectType.Destructible:
+                            case GObjectType.Unit:
+                            case GObjectType.Shrine:
                                 {
+                                    using (new PerformanceLogger("RefreshLoS.3"))
+                                    {
+                                        if (Settings.Combat.Misc.UseNavMeshTargeting)
+                                        {
+                                            // Ignore units not in LoS except bosses, rares, champs
+                                            if (!(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare) && !c_diaObject.InLineOfSight)
+                                            {
 
-                                    AddToCache = false;
-                                    c_IgnoreSubStep = "UnitNotInLoS";
+                                                AddToCache = false;
+                                                c_IgnoreSubStep = "UnitNotInLoS";
+                                            }
+                                        }
+                                    }
+                                    break;
                                 }
-                            }
                         }
                     }
+
 
                     // always set true for bosses nearby
                     if (c_unit_IsBoss && c_RadiusDistance < 100f)
@@ -2160,12 +2233,11 @@ namespace GilesTrinity
                     case GObjectType.Door:
                     case GObjectType.Unit:
                     case GObjectType.Barricade:
-                        // Ignore monsters (units) who's Z-height is 14 foot or more than our own z-height
-                        // rrrix: except bosses like Belial :)
-                        //if (c_ZDiff >= 14f && !c_unit_IsBoss)
-                        //{
-                        //    AddToCache = false;
-                        //}
+                        // Ignore monsters (units) who's Z-height is 14 foot or more than our own z-height except bosses
+                        if (c_ZDiff >= 14f && !c_unit_IsBoss)
+                        {
+                            AddToCache = false;
+                        }
                         break;
                     case GObjectType.Item:
                     case GObjectType.HealthWell:

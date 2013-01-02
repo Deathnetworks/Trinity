@@ -273,6 +273,12 @@ namespace GilesTrinity
                     GilesTrinity.hashRGUIDBlacklist90 = new HashSet<int>();
                 }
 
+                // Fix for A1 new game with bags full
+                if (GilesTrinity.playerStatus.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700 && (ZetaDia.CurrentQuest.StepId == -1 || ZetaDia.CurrentQuest.StepId == 42))
+                {
+                        return false;
+                }
+
                 if ((GilesTrinity.bWantToTownRun && townRunCheckTimer.IsRunning && townRunCheckTimer.ElapsedMilliseconds > 2000) || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                     return true;
                 else if (GilesTrinity.bWantToTownRun && !townRunCheckTimer.IsRunning)
@@ -566,6 +572,7 @@ namespace GilesTrinity
                 }
             }
 
+            ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).FirstOrDefault();
             // Check for anything to sell
             foreach (ACDItem thisitem in ZetaDia.Me.Inventory.Backpack)
             {
@@ -593,6 +600,13 @@ namespace GilesTrinity
                         {
                             bShouldSellThis = false;
                         }
+
+                        // Sell potions that aren't best quality
+                        if (thisitem.IsPotion && thisitem.GameBalanceId != thisBestPotion.GameBalanceId)
+                        {
+                            bShouldSellThis = true;
+                        }
+
                         if (bShouldSellThis)
                         {
                             hashGilesCachedSellItems.Add(thiscacheditem);
@@ -670,6 +684,7 @@ namespace GilesTrinity
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
                     }
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Moving to vendor.");
                     return RunStatus.Running;
                 }
                 lastDistance = iDistanceFromSell;
@@ -679,6 +694,7 @@ namespace GilesTrinity
                 {
                     ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
                     bCurrentlyMoving = true;
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Moving to vendor.");
                     return RunStatus.Running;
                 }
                 bCurrentlyMoving = false;

@@ -2,6 +2,7 @@
 =================================
 
 Major new features: 
+-------------------
 
 * Source control :)
 
@@ -17,20 +18,60 @@ Major new features:
 
 * Improved code Readability
 
-
 Future Planned Improvements: 
+----------------------------
 
 * New cache system, trash the HashSet's and Dictionaries for an object based system
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
 
-Changelog 1.7.1.12:
+### Changelog 1.7.1.13:
+
+* New XML Tags: TrinityRandomWait and TrinityCastSweepingWinds
+
+* Fixed UnStucker.
+
+* Improved destructible and barricade logic
+
+* Adjustment for destructible object radius's and weighting. Destructible object minimum and default on slider is now 1 (was 6).
+
+* Improved navigation obstacle handling (should now correctly avoid Demonic Forges in Arreat Crater)
+
+* Bot will no longer attempt to town portal on A1 Quest 1 Step 1
+
+* New *trash mob* blacklisting logic - if > 90% health, hasn't been attacked in 4 seconds, and not raycastable, it's blacklisted.
+
+* Bot will now town-run if it happens to be in town and bags are more than half full.
+
+* Re-added 14yd ZDiff check for non-boss units.
+
+* TrinityMoveTo now always uses local navigation.
+
+* Bot will now sell non-optimal potions (if higher level potions are found).
+
+* Now uses potions from the smallest stack first
+
+* Added TeamID check for Units (should help with un-attackable units like Sin Heart before it's attackable)
+
+* Fixed monk ability selector always closing inventory window
+
+* Fixed monk tempest rush not picking up items.
+
+* LoS/NavMesh Raycast is used again when needing to town run.
+
+* ItemRules2: Additional logging added.
+
+* ItemRules2: Default rules changed to soft;
+
+* ItemRules2: Now accepts any language as string (russian, chinese, etc.)
+
+### Changelog 1.7.1.12:
 
 * Fixed A3 Skycrown/Stonefort barricade problem
 
 * Latest WeaponSwap 1.0.2a
 
-Changelog 1.7.1.11:
+### Changelog 1.7.1.11:
 
 * New GUI option: "Use NavMesh to prevent stucks" on the Combat>Misc tab. Default and recommendation is to enable this option. Disabling this may lead to stucks for bot attempting to target monsters/shines through walls and floor gaps. If you experience severe performance problems, try disabling this option. 
 
@@ -46,7 +87,7 @@ Changelog 1.7.1.11:
 
 * Added more performance logging.
 
-Changelog 1.7.1.10:
+### Changelog 1.7.1.10:
 
 * Fixed performance problem accessing SceneId.
 
@@ -76,7 +117,7 @@ Changelog 1.7.1.10:
 
 * Trinity now attacks Belial again
 
-Changelog 1.7.1.9:
+### Changelog 1.7.1.9:
 
 * Now opens vendor window before repairing
 
@@ -90,7 +131,7 @@ Changelog 1.7.1.9:
 
 * changed logging and added some more options for config.dis
 
-Changelog 1.7.1.8:
+### Changelog 1.7.1.8:
 
 * Fixed reverse gold pickup bug
 
@@ -136,7 +177,7 @@ Changelog 1.7.1.8:
 
 * Wizard: Timers on Wizard armors changed from 115sec to 60sec. 
 
-Changelog 1.7.1.7:
+### Changelog 1.7.1.7:
 
 * Monk performance issues should be resolved
 
@@ -159,7 +200,7 @@ Changelog 1.7.1.7:
 * Fixed gold pickup flip-flop (stuck) while moving to pickup far away gold
 
 
-Changelog 1.7.1.6:
+### Changelog 1.7.1.6:
 
 * Fixed legendary item attributes being blank
 
@@ -170,7 +211,7 @@ Changelog 1.7.1.6:
 * WeaponSwapper now only attempts to run Swap and SecurityCheck if you're a Monk
 
 
-Changelog 1.7.1.5:
+### Changelog 1.7.1.5:
 
 * Fixed memory read errors
 
@@ -202,7 +243,7 @@ Changelog 1.7.1.5:
   
 
 
-Changelog 1.7.1.4:
+### Changelog 1.7.1.4:
 
 * Fixes gold pickup radius
 
@@ -211,7 +252,7 @@ Changelog 1.7.1.4:
 * Can now reload script rules from GUI
 
 
-Changelog 1.7.1.3:
+### Changelog 1.7.1.3:
 
 * Tooltips describe each new UI option for managing Selling and Salvaging of Magic, Rare, and Legendary items. Note: Legendaries are never salvaged/sold when using only Trinity Scoring.
 
@@ -246,13 +287,13 @@ Changelog 1.7.1.3:
 
 
 
-Changelog 1.7.1.2
+### Changelog 1.7.1.2
 
 * UI Works in all regions now
 
 
 
-Changelog 1.7.1.1
+### Changelog 1.7.1.1
 
 * Fix for darkfriend77 item rulesets not being used
 
@@ -260,7 +301,7 @@ Changelog 1.7.1.1
 
 
 
-Changelog 1.7.1.0
+### Changelog 1.7.1.0
 
 * Entire new UI system using XAML/WPF instead of WinForms
 

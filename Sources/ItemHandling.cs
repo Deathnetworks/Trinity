@@ -17,8 +17,43 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
+
         /// <summary>
-        /// Pickup Validation - Determines what should or should not be picked up
+        /// Pickup Validation - Determines what should or should not be picked up (Item Rules)
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="level"></param>
+        /// <param name="quality"></param>
+        /// <param name="balanceId"></param>
+        /// <param name="dbItemBaseType"></param>
+        /// <param name="dbItemType"></param>
+        /// <param name="isOneHand"></param>
+        /// <param name="isTwoHand"></param>
+        /// <param name="followerType"></param>
+        /// <param name="dynamicID"></param>
+        /// <returns></returns>
+        internal static bool ItemRulesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
+        {
+
+            Interpreter.InterpreterAction action = StashRule.checkPickUpItem(name, level, quality, dbItemBaseType, dbItemType, isOneHand, isTwoHand, balanceId, dynamicID);
+            
+            switch (action)
+            {
+                case Interpreter.InterpreterAction.PICKUP:
+                    return true;
+
+                case Interpreter.InterpreterAction.IGNORE:
+                    return false;
+            }
+
+            // TODO: remove if tested
+            if (quality > ItemQuality.Superior)
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Item Rules doesn't handle {0} of type {1} and quality {2}!", name, dbItemType, quality);
+            
+            return GilesPickupItemValidation(name, level, quality, balanceId, dbItemBaseType, dbItemType, isOneHand, isTwoHand, followerType, dynamicID);
+        }
+        /// <summary>
+        /// Pickup Validation - Determines what should or should not be picked up (Scoring)
         /// </summary>
         /// <param name="name"></param>
         /// <param name="level"></param>
@@ -30,18 +65,6 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool GilesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
         {
-
-            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
-            {
-                Interpreter.InterpreterAction action = StashRule.checkPickUpItem(name, level, quality, dbItemBaseType, dbItemType, isOneHand, isTwoHand, balanceId, dynamicID);
-                switch (action)
-                {
-                    case Interpreter.InterpreterAction.PICKUP:
-                        return true;
-                    case Interpreter.InterpreterAction.IGNORE:
-                        return false;
-                }
-            }
 
             // If it's legendary, we always want it *IF* it's level is right
             if (quality >= ItemQuality.Legendary)
@@ -114,8 +137,8 @@ namespace GilesTrinity
                             // Map out all the items already in the backpack
                             int iTotalPotions =
                                 (from tempitem in ZetaDia.Me.Inventory.Backpack
-                                 where tempitem.BaseAddress != IntPtr.Zero
-                                 where tempitem.GameBalanceId == balanceId
+                                 where tempitem.BaseAddress != IntPtr.Zero &&
+                                 tempitem.GameBalanceId == balanceId
                                  select tempitem.ItemStackQuantity).Sum();
                             if (iTotalPotions > 98)
                             {
@@ -228,9 +251,9 @@ namespace GilesTrinity
             if (name.StartsWith("topaz_")) return GItemType.Topaz;
             if (name.StartsWith("amethyst")) return GItemType.Amethyst;
             if (name.StartsWith("healthpotion")) return GItemType.HealthPotion;
-            if (name.StartsWith("followeritem_enchantress_")) return GItemType.FollowerEnchantress;
-            if (name.StartsWith("followeritem_scoundrel_")) return GItemType.FollowerScoundrel;
-            if (name.StartsWith("followeritem_templar_")) return GItemType.FollowerTemplar;
+            if (name.StartsWith("followeritem_enchantress_") || dbFollowerType == FollowerType.Enchantress) return GItemType.FollowerEnchantress;
+            if (name.StartsWith("followeritem_scoundrel_") || dbFollowerType == FollowerType.Scoundrel) return GItemType.FollowerScoundrel;
+            if (name.StartsWith("followeritem_templar_") || dbFollowerType == FollowerType.Templar) return GItemType.FollowerTemplar;
             if (name.StartsWith("craftingplan_")) return GItemType.CraftingPlan;
             if (name.StartsWith("dye_")) return GItemType.Dye;
             if (name.StartsWith("a1_")) return GItemType.SpecialItem;
@@ -899,6 +922,8 @@ namespace GilesTrinity
                 BackpackSlotBlocked[9, 4] = true;
                 BackpackSlotBlocked[9, 5] = true;
             }
+
+            int cellsFilled = 0;
             // Map out all the items already in the backpack
             foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
@@ -911,18 +936,27 @@ namespace GilesTrinity
 
                 // Mark this slot as not-free
                 BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
+                cellsFilled++;
 
                 // Try and reliably find out if this is a two slot item or not
                 GItemType tempItemType = DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType);
                 if (DetermineIsTwoSlot(tempItemType) && inventoryRow < 5)
                 {
+                    cellsFilled++;
                     BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                 }
             }
             int iPointX = -1;
             int iPointY = -1;
+
+            // return "true" if we're already in town and backpack is 1/2 full
+            if ((cellsFilled / 60) > .5 && ZetaDia.Me.IsInTown)
+                return new Vector2(iPointX, iPointY);
+
+            // 6 rows
             for (int iRow = 0; iRow <= 5; iRow++)
             {
+                // 10 columns
                 for (int iColumn = 0; iColumn <= 9; iColumn++)
                 {
                     if (!BackpackSlotBlocked[iColumn, iRow])

@@ -179,7 +179,7 @@ namespace GilesTrinity.Settings.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(800)]
+        [DefaultValue(0)]
         public int DelayAfterKill
         {
             get

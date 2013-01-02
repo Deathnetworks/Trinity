@@ -85,7 +85,7 @@ namespace GilesTrinity.DbProvider
                     return false;
 
                 // sometimes bosses take a LONG time
-                if (GilesTrinity.CurrentTarget.IsBoss)
+                if (GilesTrinity.CurrentTarget != null && GilesTrinity.CurrentTarget.IsBoss)
                 {
                     ResetCheckGold();
                     return false;
@@ -102,7 +102,7 @@ namespace GilesTrinity.DbProvider
                 int notpickupgoldsec = Convert.ToInt32(DateTime.Now.Subtract(lastRefreshCoin).TotalSeconds);
                 if (notpickupgoldsec >= GilesTrinity.Settings.Advanced.GoldInactivityTimer)
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Gold inactivity after {0}s. Sending abort.", notpickupgoldsec);
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Gold inactivity after {0}s. Sending abort.", notpickupgoldsec);
                     lastRefreshCoin = DateTime.Now;
                     lastKnowCoin = currentcoin;
                     notpickupgoldsec = 0;
@@ -160,6 +160,7 @@ namespace GilesTrinity.DbProvider
                     ResetCheckGold();
                     return false;
                 }
+
                 // We're not stuck if we're doing stuff!
                 if (aState == AnimationState.Attacking ||
                     aState == AnimationState.Casting ||
@@ -169,10 +170,12 @@ namespace GilesTrinity.DbProvider
                     ResetCheckGold();
                     return false;
                 }
+
                 if (vOldPosition != Vector3.Zero && vOldPosition.Distance(vMyCurrentPosition) <= 4f)
                 {
                     return true;
                 }
+
                 vOldPosition = vMyCurrentPosition;
             }
             return false;
@@ -188,6 +191,12 @@ namespace GilesTrinity.DbProvider
         // Actually deal with a stuck - find an unstuck point etc.
         public static Vector3 UnstuckHandler(Vector3 vMyCurrentPosition, Vector3 vOriginalDestination)
         {
+            if (GoldInactive())
+            {
+                GoldInactiveLeaveGame();
+                return vOriginalDestination;
+            }
+
             // Update the last time we generated a path
             timeStartedUnstuckMeasure = DateTime.Now;
             // If we got stuck on a 2nd/3rd/4th "chained" anti-stuck route, then return the old move to target to keep movement of some kind going
@@ -227,7 +236,7 @@ namespace GilesTrinity.DbProvider
 
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
                 GilesTrinity.playerStatus.CurrentPosition = vMyCurrentPosition;
-                vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, Vector3.Zero);
+                vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
                 // Temporarily log stuff
                 if (iTotalAntiStuckAttempts == 1 && GilesTrinity.Settings.Advanced.LogStuckLocation)
                 {
@@ -310,7 +319,6 @@ namespace GilesTrinity.DbProvider
         private static DateTime lastShiftedPosition = DateTime.Today;
         private static int iShiftPositionFor = 0;
 
-
         public void MoveTowards(Vector3 vMoveToTarget)
         {
             // rrrix-note: This really shouldn't be here... 
@@ -336,22 +344,7 @@ namespace GilesTrinity.DbProvider
             {
                 if (GoldInactive())
                 {
-                    // Exit the game and reload the profile
-                    timeLastRestartedGame = DateTime.Now;
-                    string sUseProfile = GilesTrinity.sFirstProfileSeen;
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck measures exiting current game.");
-                    // Load the first profile seen last run
-                    ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
-                                            ? sUseProfile
-                                            : Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
-                    Thread.Sleep(1000);
-                    GilesTrinity.GilesResetEverythingNewGame();
-                    ZetaDia.Service.Games.LeaveGame();
-                    // Wait for 10 second log out timer if not in town
-                    if (!ZetaDia.Me.IsInTown)
-                    {
-                        Thread.Sleep(10000);
-                    }
+                    GoldInactiveLeaveGame();
                     return;
                 }
                 // Store the "real" (not anti-stuck) destination
@@ -362,6 +355,7 @@ namespace GilesTrinity.DbProvider
                     iTotalAntiStuckAttempts = 1;
                     iTimesReachedStuckPoint = 0;
                     vSafeMovementLocation = Vector3.Zero;
+                    GilesTrinity.UsedStuckSpots = new List<GilesTrinity.GridPoint>();
                 }
                 // See if we need to, and can, generate unstuck actions
                 if (DateTime.Now.Subtract(timeCancelledUnstuckerFor).TotalSeconds > iCancelUnstuckerForSeconds && UnstuckChecker(vMyCurrentPosition))
@@ -395,7 +389,7 @@ namespace GilesTrinity.DbProvider
                     if (iTimesReachedStuckPoint <= iTotalAntiStuckAttempts)
                     {
                         GilesTrinity.playerStatus.CurrentPosition = vMyCurrentPosition;
-                        vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, Vector3.Zero);
+                        vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
                         vMoveToTarget = vSafeMovementLocation;
                     }
                     else
@@ -428,16 +422,15 @@ namespace GilesTrinity.DbProvider
             // }
             // See if there's an obstacle in our way, if so try to navigate around it
             Vector3 point = vMoveToTarget;
-            foreach (GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
-                            GilesTrinity.GilesIntersectsPath(cp.Location, cp.Radius, vMyCurrentPosition, point) &&
-                            cp.Location.Distance(vMyCurrentPosition) > GetObstacleNavigationSize(cp)))
+            foreach (GilesObstacle obstacle in GilesTrinity.hashNavigationObstacleCache.Where(o =>
+                            GilesTrinity.GilesIntersectsPath(o.Location, o.Radius, vMyCurrentPosition, point)))
             {
                 if (vShiftedPosition == Vector3.Zero)
                 {
-                    // Make sure we only shift max once every 10 seconds
-                    if (DateTime.Now.Subtract(lastShiftedPosition).TotalSeconds >= 10)
+                    // Make sure we only shift max once every 1 second
+                    if (DateTime.Now.Subtract(lastShiftedPosition).TotalSeconds >= 1)
                     {
-                        GetShiftedPosition(ref vMoveToTarget, ref point);
+                        GetShiftedPosition(ref vMoveToTarget, ref point, obstacle.Radius + 15f);
                     }
                 }
                 else
@@ -454,7 +447,7 @@ namespace GilesTrinity.DbProvider
             }
 
             // See if we can use abilities like leap etc. for movement out of combat, but not in town
-            if (GilesTrinity.Settings.Combat.Misc.AllowOOCMovement && !ZetaDia.Me.IsInTown)
+            if (GilesTrinity.Settings.Combat.Misc.AllowOOCMovement && !ZetaDia.Me.IsInTown && !GilesTrinity.bDontMoveMeIAmDoingShit)
             {
                 bool bTooMuchZChange = (Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z) >= 4f);
 
@@ -510,9 +503,9 @@ namespace GilesTrinity.DbProvider
                 // Tempest rush for a monk
                 if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.Monk_TempestRush) && !bTooMuchZChange)
                 {
-                    if (!bCanChannelTR && ZetaDia.Me.CurrentPrimaryResource >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit && fDistanceFromTarget > GilesTrinity.Settings.Combat.Monk.TR_MinDist)
+                    if (!bCanChannelTR && GilesTrinity.playerStatus.CurrentEnergy >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit && fDistanceFromTarget > GilesTrinity.Settings.Combat.Monk.TR_MinDist)
                         bCanChannelTR = true;
-                    else if (bCanChannelTR && ZetaDia.Me.CurrentPrimaryResource <= 20)
+                    else if (bCanChannelTR && (GilesTrinity.playerStatus.CurrentEnergy <= 20 || fDistanceFromTarget < 10f))
                         bCanChannelTR = false;
 
                     if (bCanChannelTR)
@@ -580,6 +573,27 @@ namespace GilesTrinity.DbProvider
 
         }
 
+        private static void GoldInactiveLeaveGame()
+        {
+            // Exit the game and reload the profile
+            timeLastRestartedGame = DateTime.Now;
+            string sUseProfile = GilesTrinity.sFirstProfileSeen;
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Gold Inactivity timer tripped - Anti-stuck measures exiting current game.");
+            // Load the first profile seen last run
+            ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
+                                    ? sUseProfile
+                                    : Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
+            Thread.Sleep(1000);
+            GilesTrinity.GilesResetEverythingNewGame();
+            ZetaDia.Service.Games.LeaveGame();
+            // Wait for 10 second log out timer if not in town
+            if (!ZetaDia.Me.IsInTown)
+            {
+                Thread.Sleep(10000);
+            }
+            return;
+        }
+
         internal static int GetObstacleNavigationSize(GilesObstacle obstacle)
         {
             if (GilesTrinity.dictSNONavigationSize.ContainsKey(obstacle.ActorSNO))
@@ -588,13 +602,13 @@ namespace GilesTrinity.DbProvider
                 return (int)Math.Ceiling(obstacle.Radius);
         }
 
-        private static void GetShiftedPosition(ref Vector3 vMoveToTarget, ref Vector3 point)
+        private static void GetShiftedPosition(ref Vector3 vMoveToTarget, ref Vector3 point, float radius = 15f)
         {
             float fDirectionToTarget = GilesTrinity.FindDirectionDegree(vMyCurrentPosition, vMoveToTarget);
-            vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget - 50));
+            vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, radius, MathEx.ToRadians(fDirectionToTarget - 65));
             if (!GilesTrinity.GilesCanRayCast(vMyCurrentPosition, vMoveToTarget, NavCellFlags.AllowWalk))
             {
-                vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget + 50));
+                vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, radius, MathEx.ToRadians(fDirectionToTarget + 65));
                 if (!GilesTrinity.GilesCanRayCast(vMyCurrentPosition, vMoveToTarget, NavCellFlags.AllowWalk))
                 {
                     vMoveToTarget = point;
