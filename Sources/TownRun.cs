@@ -84,6 +84,34 @@ namespace GilesTrinity
             itemDelayLoopLimit = 4 + rnd + ((int)Math.Floor(((double)(BotMain.TicksPerSecond / 2))));
         }
 
+        internal static Stopwatch randomTimer = new Stopwatch();
+        internal static Random timerRandomizer = new Random();
+        internal static int randomTimerVal = -1;
+
+        internal static void SetStartRandomTimer()
+        {
+            if (!randomTimer.IsRunning)
+            {
+                randomTimerVal = timerRandomizer.Next(500, 1500);
+                randomTimer.Start();
+            }
+        }
+
+        internal static void StopRandomTimer()
+        {
+            randomTimer.Reset();
+        }
+
+        internal static bool RandomTimerIsDone()
+        {
+            return (randomTimer.IsRunning && randomTimer.ElapsedMilliseconds >= randomTimerVal);
+        }
+
+        internal static bool RandomTimerIsNotDone()
+        {
+            return (randomTimer.IsRunning && randomTimer.ElapsedMilliseconds < randomTimerVal);
+        }
+
         /// <summary>
         /// Sell Validation - Determines what should or should not be sold to vendor
         /// </summary>
@@ -276,7 +304,7 @@ namespace GilesTrinity
                 // Fix for A1 new game with bags full
                 if (GilesTrinity.playerStatus.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700 && (ZetaDia.CurrentQuest.StepId == -1 || ZetaDia.CurrentQuest.StepId == 42))
                 {
-                        return false;
+                    return false;
                 }
 
                 if ((GilesTrinity.bWantToTownRun && townRunCheckTimer.IsRunning && townRunCheckTimer.ElapsedMilliseconds > 2000) || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
@@ -684,7 +712,7 @@ namespace GilesTrinity
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
                     }
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Moving to vendor.");
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Moving to vendor pt1.");
                     return RunStatus.Running;
                 }
                 lastDistance = iDistanceFromSell;
@@ -694,12 +722,13 @@ namespace GilesTrinity
                 {
                     ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
                     bCurrentlyMoving = true;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Moving to vendor.");
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Moving to vendor pt2.");
                     return RunStatus.Running;
                 }
                 bCurrentlyMoving = false;
                 bGoToSafetyPointFirst = false;
 
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Moving to vendor pt3.");
                 return RunStatus.Running;
             }
 
@@ -735,6 +764,7 @@ namespace GilesTrinity
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
                     }
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Moving to vendor pt4.");
                     return RunStatus.Running;
                 }
                 lastDistance = iDistanceFromSell;
@@ -744,6 +774,7 @@ namespace GilesTrinity
                 {
                     bCurrentlyMoving = true;
                     ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Moving to vendor pt5.");
                     return RunStatus.Running;
                 }
                 bReachedDestination = true;
@@ -757,6 +788,7 @@ namespace GilesTrinity
                 if (townVendor == null)
                     return RunStatus.Failure;
                 townVendor.Interact();
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Vendor interact pt1.");
                 return RunStatus.Running;
             }
             if (hashGilesCachedSellItems.Count > 0)
@@ -766,7 +798,7 @@ namespace GilesTrinity
                     return RunStatus.Running;
                 currentItemLoops = 0;
                 RandomizeTheTimer();
-                GilesCachedACDItem thisitem = hashGilesCachedSellItems.OrderBy( i => i.Row ).ThenBy( i => i.Column ).FirstOrDefault();
+                GilesCachedACDItem thisitem = hashGilesCachedSellItems.OrderBy(i => i.Row).ThenBy(i => i.Column).FirstOrDefault();
 
                 // Item log for cool stuff sold
                 if (thisitem != null)
@@ -817,10 +849,6 @@ namespace GilesTrinity
         internal static RunStatus GilesOptimisedPostSell(object ret)
         {
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Sell routine ending sequence...");
-            //using (ZetaDia.Memory.AcquireFrame())
-            //{
-            //    ZetaDia.Actors.Update();
-            //}
 
             // Always repair, but only if we have enough money
             if (bNeedsEquipmentRepairs && iLowestDurabilityFound < 20 && iLowestDurabilityFound > -1 && ZetaDia.Me.Inventory.Coinage < 5000)
@@ -837,11 +865,48 @@ namespace GilesTrinity
                 if (townVendor == null)
                     return RunStatus.Failure;
                 townVendor.Interact();
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Vendor interact pt2.");
                 return RunStatus.Running;
             }
 
-            // TODO: Open repair tab and Click UIElement to Repair All
             ZetaDia.Me.Inventory.RepairAllItems();
+
+            /*
+             * Per Nesox, 2013 jan 02, clicking repair tab doesn't activate (same issue as stash tabs)
+             */
+            //UIElement repairTab = UIElement.FromHash(0x95EFA3BFC7BD25BC);
+            //UIElement repairAllButton = UIElement.FromHash(0x80F5D06A035848A5);
+
+            //SetStartRandomTimer();
+            //if (RandomTimerIsNotDone())
+            //{
+            //    return RunStatus.Running;
+            //}
+            //else
+            //{
+            //    StopRandomTimer();
+            //}
+
+            //Logging.Write("Repair tab isValid: {0} isVisible: {1}", repairTab.IsValid, repairTab.IsVisible);
+            //Logging.Write("Repair all button isValid: {0} isVisible: {1}", repairAllButton.IsValid, repairAllButton.IsVisible);
+
+            //if (repairTab.IsValid && repairTab.IsVisible && !(repairAllButton.IsValid && repairAllButton.IsVisible) )
+            //{
+            //    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Clicking Repair tab");
+            //    repairTab.Click();
+            //    return RunStatus.Running;
+            //}
+
+            //if (repairAllButton.IsValid && repairAllButton.IsVisible)
+            //{
+            //    UITextObject repairButtonText = null;
+            //    if (repairAllButton.HasText)
+            //        repairButtonText = repairAllButton.TextObject;
+
+            //    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Clicking Repair All button. Text: {0}", repairButtonText.Text);
+            //    repairAllButton.Click();
+            //}
+
 
             bNeedsEquipmentRepairs = false;
             if (loggedJunkThisStash)

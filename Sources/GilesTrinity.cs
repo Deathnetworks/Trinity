@@ -261,6 +261,7 @@ namespace GilesTrinity
 
 
             UpdateSearchGridProvider();
+            GilesPlayerMover.ResetCheckGold();
 
         }
     }

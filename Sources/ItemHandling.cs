@@ -923,7 +923,7 @@ namespace GilesTrinity
                 BackpackSlotBlocked[9, 5] = true;
             }
 
-            int cellsFilled = 0;
+            double cellsFilled = 0;
             // Map out all the items already in the backpack
             foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
@@ -949,8 +949,11 @@ namespace GilesTrinity
             int iPointX = -1;
             int iPointY = -1;
 
+            double maxCells = 60;
+            double ratioCellsFilled = cellsFilled / maxCells;
+
             // return "true" if we're already in town and backpack is 1/2 full
-            if ((cellsFilled / 60) > .5 && ZetaDia.Me.IsInTown)
+            if (ratioCellsFilled > .5 && ZetaDia.Me.IsInTown)
                 return new Vector2(iPointX, iPointY);
 
             // 6 rows
