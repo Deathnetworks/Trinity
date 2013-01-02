@@ -25,6 +25,46 @@ Future Planned Improvements:
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
 
+### Changelog 1.7.1.13:
+
+* New XML Tags: TrinityRandomWait and TrinityCastSweepingWinds
+
+* Fixed UnStucker.
+
+* Improved destructible and barricade logic
+
+* Adjustment for destructible object radius's and weighting. Destructible object minimum and default on slider is now 1 (was 6).
+
+* Improved navigation obstacle handling (should now correctly avoid Demonic Forges in Arreat Crater)
+
+* Bot will no longer attempt to town portal on A1 Quest 1 Step 1
+
+* New *trash mob* blacklisting logic - if > 90% health, hasn't been attacked in 4 seconds, and not raycastable, it's blacklisted.
+
+* Bot will now town-run if it happens to be in town and bags are more than half full.
+
+* Re-added 14yd ZDiff check for non-boss units.
+
+* TrinityMoveTo now always uses local navigation.
+
+* Bot will now sell non-optimal potions (if higher level potions are found).
+
+* Now uses potions from the smallest stack first
+
+* Added TeamID check for Units (should help with un-attackable units like Sin Heart before it's attackable)
+
+* Fixed monk ability selector always closing inventory window
+
+* Fixed monk tempest rush not picking up items.
+
+* LoS/NavMesh Raycast is used again when needing to town run.
+
+* ItemRules2: Additional logging added.
+
+* ItemRules2: Default rules changed to soft;
+
+* ItemRules2: Now accepts any language as string (russian, chinese, etc.)
+
 ### Changelog 1.7.1.12:
 
 * Fixed A3 Skycrown/Stonefort barricade problem
