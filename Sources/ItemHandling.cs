@@ -182,7 +182,7 @@ namespace GilesTrinity
             {
                 if (requiredBlueLevel == 0 || (requiredBlueLevel != 0 && level < requiredBlueLevel))
                 {
-                    // Between magic and rare, and either we want no blues, or this level is higher than the blue level we want
+                    // Between magic and rare, and either we want no blues, or this level is lower than the blue level we want
                     return false;
                 }
             }
@@ -190,7 +190,7 @@ namespace GilesTrinity
             {
                 if (requiredYellowLevel == 0 || (requiredYellowLevel != 0 && level < requiredYellowLevel))
                 {
-                    // Between magic and rare, and either we want no blues, or this level is higher than the blue level we want
+                    // Either we want no rares or the item is below the level we want
                     return false;
                 }
             }
@@ -705,7 +705,7 @@ namespace GilesTrinity
                  * If lv 60 use Paragon
                  * If not lv 60 use normal xp/hr
                  */
-                if (ZetaDia.Actors.Me.Level < 60)
+                if (ZetaDia.Me.Level < 60)
                 {
                     if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
                     {

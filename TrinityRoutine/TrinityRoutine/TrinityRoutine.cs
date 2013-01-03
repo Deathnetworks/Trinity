@@ -15,7 +15,7 @@ namespace GilesTrinity
         {
             foreach (PluginContainer plugin in PluginManager.Plugins)
             {
-                if (plugin.Plugin.Name == "GilesTrinity" && !plugin.Enabled)
+                if (plugin.Plugin.Name == "Trinity" && !plugin.Enabled)
                 {
                     plugin.Enabled = true;
                 }
@@ -26,7 +26,7 @@ namespace GilesTrinity
         { 
         }
 
-        public override string Name { get { return "GilesPlugin"; } }
+        public override string Name { get { return "Trinity"; } }
 
         public override Window ConfigWindow 
         { 
@@ -34,7 +34,7 @@ namespace GilesTrinity
             {
                 foreach (PluginContainer plugin in PluginManager.Plugins)
                 {
-                    if (plugin.Plugin.Name == "GilesTrinity")
+                    if (plugin.Plugin.Name == "Trinity")
                     {
                         return plugin.Plugin.DisplayWindow;
                     }

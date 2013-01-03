@@ -160,7 +160,8 @@ namespace GilesTrinity
             96192,                   89690,           95250,         193077, 
             //Kulle (80509), Small Belial (220160), Big Belial (3349), Diablo 1 (114917), terror Diablo (133562)
             80509,           220160,                3349,              114917,            133562, 
-            
+            //Maghda
+            6031,
             255929, 256711, 256508, 256187, 256189, 256709,
             // Another Cydaea
             137139,
@@ -239,21 +240,21 @@ namespace GilesTrinity
         /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
         /// </summary>
         internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
-            174900, 191459, 104632, 196211, 200872, 
+            174900, 191459, 104632, 196211, 200872, 194682,
         };
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 20}, {191459, 13}, {104632, 20}, {196211, 25}, {200872, 25},
+            {174900, 25}, {191459, 13}, {104632, 20}, {196211, 25}, {200872, 25}, {194682, 20},
          };
         /// <summary>
-        /// Destructible things that are very large and need breaking at a bigger distance - eg logstacks, large crates, carts, etc.
+        /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache
         /// </summary>
         internal static Dictionary<int, int> dictSNOExtendedDestructRange = new Dictionary<int, int> {
             {2972, 10}, {80357, 16}, {116508, 10}, {113932, 8}, {197514, 18}, {108587, 8}, {108618, 8}, {108612, 8}, {116409, 18}, {121586, 22},
-            {195101, 10}, {195108, 25}, {170657, 1}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 8}, {193963, 10}, {159066, 12}, {160570, 12},
-            {55325, 14}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 25}, {192867, 8}, {155255, 8}
+            {195101, 10}, {195108, 25}, {170657, 1}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 8}, {193963, 1}, {159066, 12}, {160570, 12},
+            {55325, 1}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 25}, {192867, 8}, {155255, 8}
          };
         /// <summary>
         /// Destructible things that need targeting by a location instead of an ACDGUID (stuff you can't "click on" to destroy in-game)
@@ -432,7 +433,7 @@ namespace GilesTrinity
                 {SNOPower.DemonHunter_RapidFire, 5},
                 {SNOPower.DemonHunter_Chakram, 5},
                 {SNOPower.DemonHunter_ElementalArrow, 5},
-                {SNOPower.DemonHunter_Caltrops, 6000},
+                {SNOPower.DemonHunter_Caltrops, 3000},
                 {SNOPower.DemonHunter_SmokeScreen, 3000},
                 {SNOPower.DemonHunter_ShadowPower, 5000},
                 {SNOPower.DemonHunter_Vault, 400},

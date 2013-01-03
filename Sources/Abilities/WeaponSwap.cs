@@ -464,7 +464,7 @@ namespace GilesTrinity.Swap
         public void SwapGear()
         {	
             if (GilesTrinity.playerStatus.ActorClass != ActorClass.Monk || ZetaDia.Me.CommonData.AnimationState == AnimationState.Dead || DateTime.Now.Subtract(LastSwapTime).TotalMilliseconds <= 700
-                || GilesTrinity.GilesHasBuff(SNOPower.Monk_SweepingWind) && !wearingDPSGear)
+                || GilesTrinity.GetHasBuff(SNOPower.Monk_SweepingWind) && !wearingDPSGear)
             {
                 return;
             }

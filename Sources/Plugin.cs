@@ -14,7 +14,7 @@ using Zeta.Pathfinding;
 namespace GilesTrinity
 {
     /// <summary>
-    /// Giles Trinity DemonBuddy Plugin 
+    /// Trinity DemonBuddy Plugin 
     /// </summary>
     public partial class GilesTrinity : IPlugin
     {
@@ -31,7 +31,7 @@ namespace GilesTrinity
         {
             get
             {
-                return new Version(1, 7, 1, 13);
+                return new Version(1, 7, 1, 14);
             }
         }
 
@@ -65,7 +65,7 @@ namespace GilesTrinity
         {
             get
             {
-                return string.Format("GilesTrinity Community Edition (version {0})", Version);
+                return string.Format("Trinity v{0}", Version);
             }
         }
 
@@ -99,24 +99,24 @@ namespace GilesTrinity
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error - cannot enable plugin. Invalid path: {0}", FileManager.PluginPath);
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Please check you have installed the plugin to the correct location, and then restart DemonBuddy and re-enable the plugin.");
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, @"Plugin should be installed to \<DemonBuddyFolder>\Plugins\GilesTrinity\");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, @"Plugin should be installed to \<DemonBuddyFolder>\Plugins\Trinity\");
             }
             else
             {
-                bMappedPlayerAbilities = false;
-                bPluginEnabled = true;
+                HasMappedPlayerAbilities = false;
+                IsPluginEnabled = true;
 
                 // Settings are available after this... 
                 LoadConfiguration();
 
-                Navigator.PlayerMover = new GilesPlayerMover();
+                Navigator.PlayerMover = new PlayerMover();
                 SetUnstuckProvider();
-                GameEvents.OnPlayerDied += GilesTrinityOnDeath;
-                GameEvents.OnGameJoined += GilesTrinityOnJoinGame;
-                GameEvents.OnGameLeft += GilesTrinityOnLeaveGame;
-                CombatTargeting.Instance.Provider = new GilesCombatTargetingReplacer();
-                LootTargeting.Instance.Provider = new GilesLootTargetingProvider();
-                ObstacleTargeting.Instance.Provider = new GilesObstacleTargetingProvider();
+                GameEvents.OnPlayerDied += TrinityOnDeath;
+                GameEvents.OnGameJoined += TrinityOnJoinGame;
+                GameEvents.OnGameLeft += TrinityOnLeaveGame;
+                CombatTargeting.Instance.Provider = new BlankCombatProvider();
+                LootTargeting.Instance.Provider = new BlankLootProvider();
+                ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
 
                 UpdateSearchGridProvider();
 
@@ -125,16 +125,14 @@ namespace GilesTrinity
                 {
                     TrinityBotStart(null);
                     if (ZetaDia.IsInGame)
-                        GilesTrinityOnJoinGame(null, null);
+                        TrinityOnJoinGame(null, null);
                 }
 
                 SetBotTPS();
 
                 TrinityPowerManager.LoadLegacyDelays();
 
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
             }
 
             // reseting stash rules
@@ -160,7 +158,7 @@ namespace GilesTrinity
         {
             if (Settings.Advanced.UnstuckerEnabled)
             {
-                Navigator.StuckHandler = new GilesStuckHandler();
+                Navigator.StuckHandler = new StuckHandler();
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Trinity Unstucker", true);
             }
             else
@@ -220,18 +218,19 @@ namespace GilesTrinity
         /// </summary>
         public void OnDisabled()
         {
-            bPluginEnabled = false;
+            IsPluginEnabled = false;
             Navigator.PlayerMover = new DefaultPlayerMover();
             Navigator.StuckHandler = new DefaultStuckHandler();
             CombatTargeting.Instance.Provider = new DefaultCombatTargetingProvider();
             LootTargeting.Instance.Provider = new DefaultLootTargetingProvider();
             ObstacleTargeting.Instance.Provider = new DefaultObstacleTargetingProvider();
-            GameEvents.OnPlayerDied -= GilesTrinityOnDeath;
+            GameEvents.OnPlayerDied -= TrinityOnDeath;
             BotMain.OnStop -= TrinityBotStop;
-            GameEvents.OnGameJoined -= GilesTrinityOnJoinGame;
-            GameEvents.OnGameLeft -= GilesTrinityOnLeaveGame;
+            BotMain.OnStop -= PluginCheck;
+            GameEvents.OnGameJoined -= TrinityOnJoinGame;
+            GameEvents.OnGameLeft -= TrinityOnLeaveGame;
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DISABLED: Giles Trinity is now shut down...");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DISABLED: Trinity is now shut down...");
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
         }
 
@@ -247,8 +246,20 @@ namespace GilesTrinity
         /// </summary>
         public void OnInitialize()
         {
-
+            Zeta.CommonBot.BotMain.OnStart += PluginCheck;
         }
+
+        void PluginCheck(IBot bot)
+        {
+            if (!IsPluginEnabled && bot != null)
+            {
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "\tWARNING: Trinity Plugin is NOT YET ENABLED. Bot start detected");
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "\tIgnore this message if you are not currently using Trinity.");
+                return;
+            }
+        }
+
+
 
         /// <summary>
         /// Gets the displayed name of plugin.
@@ -261,7 +272,7 @@ namespace GilesTrinity
         {
             get
             {
-                return "GilesTrinity";
+                return "Trinity";
             }
         }
 

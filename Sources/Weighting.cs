@@ -28,7 +28,7 @@ namespace GilesTrinity
 
                 bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || playerStatus.IsRooted);
 
-                bool bIsBerserked = GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
+                bool bIsBerserked = GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
                 foreach (GilesObject cacheObject in GilesObjectCache)
                 {
 
@@ -62,25 +62,25 @@ namespace GilesTrinity
                                     {
                                         iAnythingWithinRange[RANGE_6]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_6]++;
+                                            ElitesWithinRange[RANGE_6]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 12f)
                                     {
                                         iAnythingWithinRange[RANGE_12]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_12]++;
+                                            ElitesWithinRange[RANGE_12]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 15f)
                                     {
                                         iAnythingWithinRange[RANGE_15]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_15]++;
+                                            ElitesWithinRange[RANGE_15]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 20f)
                                     {
                                         iAnythingWithinRange[RANGE_20]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_20]++;
+                                            ElitesWithinRange[RANGE_20]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 25f)
                                     {
@@ -88,25 +88,25 @@ namespace GilesTrinity
                                             bAnyNonWWIgnoreMobsInRange = true;
                                         iAnythingWithinRange[RANGE_25]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_25]++;
+                                            ElitesWithinRange[RANGE_25]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 30f)
                                     {
                                         iAnythingWithinRange[RANGE_30]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_30]++;
+                                            ElitesWithinRange[RANGE_30]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 40f)
                                     {
                                         iAnythingWithinRange[RANGE_40]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_40]++;
+                                            ElitesWithinRange[RANGE_40]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 50f)
                                     {
                                         iAnythingWithinRange[RANGE_50]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_50]++;
+                                            ElitesWithinRange[RANGE_50]++;
                                     }
                                 }
 

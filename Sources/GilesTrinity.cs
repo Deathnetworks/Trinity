@@ -58,7 +58,7 @@ namespace GilesTrinity
                     using (new PerformanceLogger("UpdateCachedPlayerData.3"))
                     {
 
-                        if (playerStatus.CurrentEnergy >= iWaitingReservedAmount)
+                        if (playerStatus.CurrentEnergy >= MinEnergyReserve)
                             playerStatus.WaitingForReserveEnergy = false;
                         if (playerStatus.CurrentEnergy < 20)
                             playerStatus.WaitingForReserveEnergy = true;
@@ -134,9 +134,9 @@ namespace GilesTrinity
             {
                 btnPauseBot.Content = "Pause Bot";
                 bMainBotPaused = false;
-                bMappedPlayerAbilities = false;
+                HasMappedPlayerAbilities = false;
                 lastChangedZigZag = DateTime.Today;
-                bAlreadyMoving = false;
+                IsAlreadyMoving = false;
                 lastMovementCommand = DateTime.Today;
             }
             else
@@ -146,7 +146,7 @@ namespace GilesTrinity
                 bMainBotPaused = true;
             }
 
-            GilesPlayerMover.ResetCheckGold();
+            PlayerMover.ResetCheckGold();
 
         }
 
@@ -154,7 +154,7 @@ namespace GilesTrinity
         {
             return bMainBotPaused;
         }
-        private void GilesTrinityOnDeath(object src, EventArgs mea)
+        private void TrinityOnDeath(object src, EventArgs mea)
         {
             if (DateTime.Now.Subtract(lastDied).TotalSeconds > 10)
             {
@@ -170,8 +170,8 @@ namespace GilesTrinity
                 dictAbilityLastUse = new Dictionary<SNOPower, DateTime>(dictAbilityLastUseDefaults);
                 vBacktrackList = new SortedList<int, Vector3>();
                 iTotalBacktracks = 0;
-                GilesPlayerMover.iTotalAntiStuckAttempts = 1;
-                GilesPlayerMover.vSafeMovementLocation = Vector3.Zero;
+                PlayerMover.iTotalAntiStuckAttempts = 1;
+                PlayerMover.vSafeMovementLocation = Vector3.Zero;
                 // Does Trinity need to handle deaths?
                 if (iMaxDeathsAllowed > 0)
                 {
@@ -199,13 +199,13 @@ namespace GilesTrinity
 
 
         // Each time we join & leave a game, might as well clear the hashset of looked-at dropped items - just to keep it smaller
-        private static void GilesTrinityOnJoinGame(object src, EventArgs mea)
+        private static void TrinityOnJoinGame(object src, EventArgs mea)
         {
             iTotalJoinGames++;
             GilesResetEverythingNewGame();
         }
         // Each time we join & leave a game, might as well clear the hashset of looked-at dropped items - just to keep it smaller
-        private static void GilesTrinityOnLeaveGame(object src, EventArgs mea)
+        private static void TrinityOnLeaveGame(object src, EventArgs mea)
         {
             TotalLeaveGames++;
             GilesResetEverythingNewGame();
@@ -225,16 +225,16 @@ namespace GilesTrinity
             hashRGUIDBlacklist15 = new HashSet<int>();
             vBacktrackList = new SortedList<int, Vector3>();
             iTotalBacktracks = 0;
-            bMappedPlayerAbilities = false;
-            GilesPlayerMover.iTotalAntiStuckAttempts = 1;
-            GilesPlayerMover.vSafeMovementLocation = Vector3.Zero;
-            GilesPlayerMover.vOldPosition = Vector3.Zero;
-            GilesPlayerMover.iTimesReachedStuckPoint = 0;
-            GilesPlayerMover.timeLastRecordedPosition = DateTime.Today;
-            GilesPlayerMover.timeStartedUnstuckMeasure = DateTime.Today;
-            GilesPlayerMover.iTimesReachedMaxUnstucks = 0;
-            GilesPlayerMover.iCancelUnstuckerForSeconds = 0;
-            GilesPlayerMover.timeCancelledUnstuckerFor = DateTime.Today;
+            HasMappedPlayerAbilities = false;
+            PlayerMover.iTotalAntiStuckAttempts = 1;
+            PlayerMover.vSafeMovementLocation = Vector3.Zero;
+            PlayerMover.vOldPosition = Vector3.Zero;
+            PlayerMover.iTimesReachedStuckPoint = 0;
+            PlayerMover.TimeLastRecordedPosition = DateTime.Today;
+            PlayerMover.timeStartedUnstuckMeasure = DateTime.Today;
+            PlayerMover.iTimesReachedMaxUnstucks = 0;
+            PlayerMover.iCancelUnstuckerForSeconds = 0;
+            PlayerMover.timeCancelledUnstuckerFor = DateTime.Today;
             GilesTrinity.UsedStuckSpots = new List<GilesTrinity.GridPoint>();
             // Reset all the caches
             dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
@@ -261,7 +261,7 @@ namespace GilesTrinity
 
 
             UpdateSearchGridProvider();
-            GilesPlayerMover.ResetCheckGold();
+            PlayerMover.ResetCheckGold();
 
         }
     }

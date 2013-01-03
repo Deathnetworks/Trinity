@@ -10,7 +10,7 @@ namespace GilesTrinity.DbProvider
     /// <remarks>
     /// This class is injected to DemonBuddy
     /// </remarks>
-    public class GilesCombatTargetingReplacer : ITargetingProvider
+    public class BlankCombatProvider : ITargetingProvider
     {
         private static readonly List<DiaObject> listEmptyList = new List<DiaObject>();
 

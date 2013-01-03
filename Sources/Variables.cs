@@ -51,7 +51,7 @@ namespace GilesTrinity
         /// <summary>
         /// Used for letting noobs know they started the bot without Trinity enabled in the plugins tab.
         /// </summary>
-        private static bool bPluginEnabled = false;
+        private static bool IsPluginEnabled = false;
 
         /// <summary>
         /// A flag to say whether any NON-hashActorSNOWhirlwindIgnore things are around
@@ -82,27 +82,27 @@ namespace GilesTrinity
         /// <summary>
         /// A flag to indicate whether we have a new target from the overlord (decorator) or not, in which case don't refresh targets again this first loop
         /// </summary>
-        private static bool bWholeNewTarget = false;
+        private static bool IsWholeNewTarget = false;
 
         /// <summary>
         /// A flag to indicate if we should pick a new power/ability to use or not
         /// </summary>
-        private static bool bPickNewAbilities = false;
+        private static bool ShouldPickNewAbilities = false;
 
         /// <summary>
         /// Flag used to indicate if we are simply waiting for a power to go off - so don't do any new target checking or anything
         /// </summary>
-        private static bool bWaitingForPower = false;
+        private static bool IsWaitingForPower = false;
 
         /// <summary>
         /// A special post power use pause, causes targetHandler to wait on any new decisions
         /// </summary>
-        private static bool bWaitingAfterPower = false;
+        private static bool IsWaitingAfterPower = false;
 
         /// <summary>
         /// If TargetHandle is waiting waiting before popping a potion - we won't refresh cache/change targets/unstuck/etc
         /// </summary>
-        private static bool bWaitingForPotion = false;
+        private static bool IsWaitingForPotion = false;
 
         /// <summary>
         /// Status text for DB main window status
@@ -244,7 +244,7 @@ namespace GilesTrinity
         private static double iTargetLastHealth = 0f;
 
         // This is used so we don't use certain skills until we "top up" our primary resource by enough
-        private static double iWaitingReservedAmount = 0d;
+        private static double MinEnergyReserve = 0d;
 
         /// <summary>
         /// Store the date-time when we *FIRST* picked this target, so we can blacklist after X period of time targeting
@@ -350,8 +350,8 @@ namespace GilesTrinity
         private static bool wasRootedLastTick = false;
 
         // Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
-        private static GilesPower powerBuff;
-        private static GilesPower currentPower;
+        private static TrinityPower powerBuff;
+        private static TrinityPower CurrentPower;
         private static SNOPower powerLastSnoPowerUsed = SNOPower.None;
 
         // Two variables to stop DB from attempting any navigator movement mid-combat/mid-backtrack
@@ -373,7 +373,7 @@ namespace GilesTrinity
         /// <summary>
         /// Are we waiting for a special? Don't waste mana/rage/disc/hate etc.
         /// </summary>
-        private static bool bWaitingForSpecial = false;
+        private static bool IsWaitingForSpecial = false;
 
         /// <summary>
         /// Check LoS if waller avoidance detected
@@ -393,7 +393,7 @@ namespace GilesTrinity
         internal static DateTime SweepWindSpam = DateTime.Today; //intell -- inna
 
         // Variables relating to quick-reference of monsters within sepcific ranges (if anyone has suggestion for similar functionality with reduced CPU use, lemme know, but this is fast atm!)
-        private static int[] iElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+        private static int[] ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
         private static int[] iAnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
         private static bool bAnyBossesInRange = false;
         private const int RANGE_50 = 0;
@@ -411,16 +411,16 @@ namespace GilesTrinity
 
         // Unique ID of mob last targetting when using whirlwind
         private static int iACDGUIDLastWhirlwind = 0;
-        private static bool bAlreadyMoving = false;
+        private static bool IsAlreadyMoving = false;
         private static Vector3 vLastMoveToTarget;
         private static float fLastDistanceFromTarget;
         private static DateTime lastMovementCommand = DateTime.Today;
 
         // Actual combat function variables
-        private static bool bMappedPlayerAbilities = false;
+        private static bool HasMappedPlayerAbilities = false;
 
         // Contains our apparent *CURRENT* hotbar abilities, cached in a fast hash
-        public static HashSet<SNOPower> hashPowerHotbarAbilities = new HashSet<SNOPower>();
+        public static HashSet<SNOPower> Hotbar = new HashSet<SNOPower>();
 
         // Contains a hash of our LAST hotbar abilities before we transformed into archon (for quick and safe hotbar restoration)
         public static HashSet<SNOPower> hashCachedPowerHotbarAbilities = new HashSet<SNOPower>();

@@ -229,7 +229,7 @@ namespace GilesTrinity
                     iCurrentMaxLootRadius = 0;
                 }
 
-                if (playerStatus.ActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+                if (playerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
                 { //!sp - keep looking for kills while WOTB is up
                     iKeepKillRadiusExtendedFor = Math.Max(3, iKeepKillRadiusExtendedFor);
                     timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
@@ -325,7 +325,7 @@ namespace GilesTrinity
                 iPlayerOwnedZombieDog = 0;
                 iPlayerOwnedDHPets = 0;
                 // Reset the counters for monsters at various ranges
-                iElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+                ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
                 iAnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
                 bAnyBossesInRange = false;
                 // Flag for if we should search for an avoidance spot or not
@@ -675,7 +675,7 @@ namespace GilesTrinity
             //                        };
             //}
             // And a special check for wizard archon
-            if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Archon) && !GilesUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && ZetaDia.CurrentWorldId == 121214 &&
+            if (CurrentTarget == null && Hotbar.Contains(SNOPower.Wizard_Archon) && !GilesUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && ZetaDia.CurrentWorldId == 121214 &&
                 (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for Wizard Archon cooldown before continuing to Azmodan.");
@@ -690,7 +690,7 @@ namespace GilesTrinity
                                     };
             }
             // And a very sexy special check for WD BigBadVoodoo
-            if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_BigBadVoodoo) && !PowerManager.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && ZetaDia.CurrentWorldId == 121214 &&
+            if (CurrentTarget == null && Hotbar.Contains(SNOPower.Witchdoctor_BigBadVoodoo) && !PowerManager.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && ZetaDia.CurrentWorldId == 121214 &&
                 (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for WD BigBadVoodoo cooldown before continuing to Azmodan.");
@@ -837,7 +837,7 @@ namespace GilesTrinity
         }
         private static bool IsWizardShouldKite()
         {
-            return (playerStatus.ActorClass == ActorClass.Wizard && (!Settings.Combat.Wizard.OnlyKiteInArchon || GilesHasBuff(SNOPower.Wizard_Archon)));
+            return (playerStatus.ActorClass == ActorClass.Wizard && (!Settings.Combat.Wizard.OnlyKiteInArchon || GetHasBuff(SNOPower.Wizard_Archon)));
         }
     }
 }

@@ -30,12 +30,12 @@ namespace GilesTrinity.XmlTags
         {
             return new Zeta.TreeSharp.Action(ret =>
             {
-                if (ZetaDia.Me.ActorClass == Zeta.Internals.Actors.ActorClass.Monk && GilesTrinity.hashPowerHotbarAbilities.Contains(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind)
+                if (ZetaDia.Me.ActorClass == Zeta.Internals.Actors.ActorClass.Monk && GilesTrinity.Hotbar.Contains(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind)
                     && GilesTrinity.Settings.Combat.Monk.HasInnaSet && GilesTrinity.playerStatus.CurrentEnergy > 10)
                 {
                     if (DateTime.Now.Subtract(GilesTrinity.SweepWindSpam).TotalMilliseconds >= 1500)
                     {
-                        if (GilesTrinity.GilesHasBuff(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind))
+                        if (GilesTrinity.GetHasBuff(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind))
                         {
                             ZetaDia.Me.UsePower(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind, GilesTrinity.playerStatus.CurrentPosition, GilesTrinity.iCurrentWorldID, -1);
                             GilesTrinity.SweepWindSpam = DateTime.Now;

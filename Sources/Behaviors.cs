@@ -39,7 +39,7 @@ namespace GilesTrinity
             return new PrioritySelector(
                 new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && !bMainBotPaused,
 
-                    new Action(ctx => GilesHandleTarget(ctx))
+                    new Action(ctx => HandleTarget(ctx))
                 ),
                 new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && bMainBotPaused,
                     new Action(ret => PausedAction(ret))
@@ -92,7 +92,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        private static RunStatus GilesHandleTarget(object ret)
+        private static RunStatus HandleTarget(object ret)
         {
             using (new PerformanceLogger("GilesTrinity.GilesHandleTarget"))
             {
@@ -106,25 +106,25 @@ namespace GilesTrinity
                     HandlerRunStatus runStatus = HandlerRunStatus.NotFinished;
 
                     // Make sure we reset unstucker stuff here
-                    GilesPlayerMover.iTimesReachedStuckPoint = 0;
-                    GilesPlayerMover.vSafeMovementLocation = Vector3.Zero;
-                    GilesPlayerMover.timeLastRecordedPosition = DateTime.Now;
+                    PlayerMover.iTimesReachedStuckPoint = 0;
+                    PlayerMover.vSafeMovementLocation = Vector3.Zero;
+                    PlayerMover.TimeLastRecordedPosition = DateTime.Now;
 
                     // Whether we should refresh the target list or not
                     // See if we should update hotbar abilities
                     if (bRefreshHotbarAbilities)
                     {
-                        GilesRefreshHotbar(GilesHasBuff(SNOPower.Wizard_Archon));
+                        RefreshHotbar(GetHasBuff(SNOPower.Wizard_Archon));
                     }
-                    if (currentPower == null)
-                        currentPower = GilesAbilitySelector();
+                    if (CurrentPower == null)
+                        CurrentPower = AbilitySelector();
                     // Special pausing *AFTER* using certain powers
-                    if (bWaitingAfterPower && currentPower.iForceWaitLoopsAfter >= 1)
+                    if (IsWaitingAfterPower && CurrentPower.ForceWaitLoopsAfter >= 1)
                     {
-                        if (currentPower.iForceWaitLoopsAfter >= 1)
-                            currentPower.iForceWaitLoopsAfter--;
-                        if (currentPower.iForceWaitLoopsAfter <= 0)
-                            bWaitingAfterPower = false;
+                        if (CurrentPower.ForceWaitLoopsAfter >= 1)
+                            CurrentPower.ForceWaitLoopsAfter--;
+                        if (CurrentPower.ForceWaitLoopsAfter <= 0)
+                            IsWaitingAfterPower = false;
                         return RunStatus.Running;
                     }
 
@@ -153,7 +153,7 @@ namespace GilesTrinity
                     using (new PerformanceLogger("HandleTarget.CheckForNewTarget"))
                     {
                         // So, after all that, do we actually want a new target list?
-                        if (!bWholeNewTarget && !bWaitingForPower && !bWaitingForPotion)
+                        if (!IsWholeNewTarget && !IsWaitingForPower && !IsWaitingForPotion)
                         {
                             // If we *DO* want a new target list, do this... 
                             if (StaleCache)
@@ -169,9 +169,9 @@ namespace GilesTrinity
                                 else
                                 {
                                     // Make sure we start trying to move again should we need to!
-                                    bAlreadyMoving = false;
+                                    IsAlreadyMoving = false;
                                     lastMovementCommand = DateTime.Today;
-                                    bPickNewAbilities = true;
+                                    ShouldPickNewAbilities = true;
                                 }
                             }
                             // Ok we didn't want a new target list, should we at least update the position of the current target, if it's a monster?
@@ -208,14 +208,14 @@ namespace GilesTrinity
                         return GetTreeSharpRunStatus(runStatus);
 
                     // This variable just prevents an instant 2-target update after coming here from the main decorator function above
-                    bWholeNewTarget = false;
+                    IsWholeNewTarget = false;
                     AssignMonsterTargetPower();
 
                     // Pop a potion when necessary
                     // Note that we force a single-loop pause first, to help potion popping "go off"
-                    if (playerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !bWaitingForPower && !bWaitingForPotion && !playerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
+                    if (playerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !IsWaitingForPower && !IsWaitingForPotion && !playerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
                     {
-                        bWaitingForPotion = true;
+                        IsWaitingForPotion = true;
                         runStatus = HandlerRunStatus.TreeRunning;
                     }
 
@@ -231,7 +231,7 @@ namespace GilesTrinity
                         // See if we can use any special buffs etc. while in avoidance
                         if (CurrentTarget.Type == GObjectType.Avoidance)
                         {
-                            powerBuff = GilesAbilitySelector(true, false, false);
+                            powerBuff = AbilitySelector(true, false, false);
                             if (powerBuff.SNOPower != SNOPower.None)
                             {
                                 ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.vTargetLocation, powerBuff.iTargetWorldID, powerBuff.iTargetGUID);
@@ -305,22 +305,22 @@ namespace GilesTrinity
                             if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
                                 hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
                             {
-                                if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GilesHasBuff(SNOPower.Monk_SweepingWind)
+                                if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GetHasBuff(SNOPower.Monk_SweepingWind)
                                     && (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
                                     return RunStatus.Running;
                                 }
                                 else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800
-                                        && GilesHasBuff(SNOPower.Monk_SweepingWind))
+                                        && GetHasBuff(SNOPower.Monk_SweepingWind))
                                 {
                                     weaponSwap.SwapGear();
                                 }
                             }
                             // Spam sweeping winds
                             if (hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
-                                && (GilesHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
-                                || !GilesHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
+                                && (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
+                                || !GetHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
                                 DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
                             {
                                 ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
@@ -356,14 +356,14 @@ namespace GilesTrinity
                                 // Unit, use our primary power to attack
                                 case GObjectType.Unit:
                                     {
-                                        if (currentPower.SNOPower != SNOPower.None)
+                                        if (CurrentPower.SNOPower != SNOPower.None)
                                         {
                                             // Force waiting for global cooldown timer or long-animation abilities
-                                            if (currentPower.iForceWaitLoopsBefore >= 1 || (currentPower.bWaitWhileAnimating != SIGNATURE_SPAM && DateTime.Now.Subtract(lastGlobalCooldownUse).TotalMilliseconds <= 50))
+                                            if (CurrentPower.iForceWaitLoopsBefore >= 1 || (CurrentPower.bWaitWhileAnimating != SIGNATURE_SPAM && DateTime.Now.Subtract(lastGlobalCooldownUse).TotalMilliseconds <= 50))
                                             {
-                                                bWaitingForPower = true;
-                                                if (currentPower.iForceWaitLoopsBefore >= 1)
-                                                    currentPower.iForceWaitLoopsBefore--;
+                                                IsWaitingForPower = true;
+                                                if (CurrentPower.iForceWaitLoopsBefore >= 1)
+                                                    CurrentPower.iForceWaitLoopsBefore--;
                                                 runStatus = HandlerRunStatus.TreeRunning;
                                             }
                                             else
@@ -483,7 +483,7 @@ namespace GilesTrinity
                                 case GObjectType.Destructible:
                                 case GObjectType.Barricade:
                                     {
-                                        if (currentPower.SNOPower != SNOPower.None)
+                                        if (CurrentPower.SNOPower != SNOPower.None)
                                         {
                                             if (CurrentTarget.Type == GObjectType.Barricade)
                                             {
@@ -495,7 +495,7 @@ namespace GilesTrinity
                                                     TargetRangeRequired,                 // 3
                                                     CurrentTarget.Radius,           // 4
                                                     CurrentTarget.Type,             // 5
-                                                    currentPower.SNOPower           // 6
+                                                    CurrentPower.SNOPower           // 6
                                                     );
                                             }
                                             else
@@ -508,7 +508,7 @@ namespace GilesTrinity
                                                     TargetRangeRequired,                 // 3 
                                                     CurrentTarget.Radius,           // 4
                                                     CurrentTarget.Type,             // 5
-                                                    currentPower.SNOPower           // 6
+                                                    CurrentPower.SNOPower           // 6
                                                     );
                                             }
 
@@ -525,12 +525,12 @@ namespace GilesTrinity
 
                                                 vAttackPoint.Z += 1.5f;
                                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "(NB: Attacking location of destructable)");
-                                                ZetaDia.Me.UsePower(currentPower.SNOPower, vAttackPoint, iCurrentWorldID, -1);
+                                                ZetaDia.Me.UsePower(CurrentPower.SNOPower, vAttackPoint, iCurrentWorldID, -1);
                                             }
                                             else
                                             {
                                                 // Standard attack - attack the ACDGUID (equivalent of left-clicking the object in-game)
-                                                ZetaDia.Me.UsePower(currentPower.SNOPower, vNullLocation, -1, CurrentTarget.ACDGuid);
+                                                ZetaDia.Me.UsePower(CurrentPower.SNOPower, vNullLocation, -1, CurrentTarget.ACDGuid);
                                             }
                                             // Count how many times we've tried interacting
                                             if (!dictTotalInteractionAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
@@ -547,8 +547,8 @@ namespace GilesTrinity
                                                 hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
                                                 //dateSinceBlacklist90Clear = DateTime.Now;
                                             }
-                                            dictAbilityLastUse[currentPower.SNOPower] = DateTime.Now;
-                                            currentPower.SNOPower = SNOPower.None;
+                                            dictAbilityLastUse[CurrentPower.SNOPower] = DateTime.Now;
+                                            CurrentPower.SNOPower = SNOPower.None;
                                             WaitWhileAnimating(6, true);
                                             // Prevent this EXACT object being targetted again for a short while, just incase
                                             IgnoreRactorGUID = CurrentTarget.RActorGuid;
@@ -612,7 +612,7 @@ namespace GilesTrinity
                             Vector3 point = vCurrentDestination;
                             foreach (GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
                                             GilesTrinity.GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, point) &&
-                                            cp.Location.Distance(playerStatus.CurrentPosition) > GilesPlayerMover.GetObstacleNavigationSize(cp)))
+                                            cp.Location.Distance(playerStatus.CurrentPosition) > PlayerMover.GetObstacleNavigationSize(cp)))
                             {
                                 if (vShiftedPosition == Vector3.Zero)
                                 {
@@ -658,7 +658,7 @@ namespace GilesTrinity
 
                     // Only position-shift when not avoiding
                     // See if we want to ACTUALLY move, or are just waiting for the last move command...
-                    if (!bForceNewMovement && bAlreadyMoving && vCurrentDestination == vLastMoveToTarget && DateTime.Now.Subtract(lastMovementCommand).TotalMilliseconds <= 100)
+                    if (!bForceNewMovement && IsAlreadyMoving && vCurrentDestination == vLastMoveToTarget && DateTime.Now.Subtract(lastMovementCommand).TotalMilliseconds <= 100)
                     {
                         return RunStatus.Running;
                     }
@@ -678,7 +678,7 @@ namespace GilesTrinity
                             {
                                 // Whirlwind for a barb
                                 //intell
-                                if (!bWaitingForSpecial && currentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) && playerStatus.CurrentEnergy >= 10)
+                                if (!IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && playerStatus.CurrentEnergy >= 10)
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, iCurrentWorldID, -1);
                                     // Store the current destination for comparison incase of changes next loop
@@ -689,7 +689,7 @@ namespace GilesTrinity
                                     return RunStatus.Running;
                                 }
                                 // Tempest rush for a monk
-                                if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.Monk_TempestRush) && playerStatus.CurrentEnergy >= 20 &&
+                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && playerStatus.CurrentEnergy >= 20 &&
                                     ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.CentreDistance > 20f) || CurrentTarget.Type != GObjectType.Item))
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, iCurrentWorldID, -1);
@@ -701,7 +701,7 @@ namespace GilesTrinity
                                     return RunStatus.Running;
                                 }
                                 // Strafe for a Demon Hunter
-                                if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Strafe) && playerStatus.CurrentEnergy >= 15)
+                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && playerStatus.CurrentEnergy >= 15)
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Strafe, vCurrentDestination, iCurrentWorldID, -1);
                                     // Store the current destination for comparison incase of changes next loop
@@ -727,8 +727,8 @@ namespace GilesTrinity
 
                     // Whirlwind against everything within range (except backtrack points)
                     //intell
-                    if (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) && playerStatus.CurrentEnergy >= 10 && iAnythingWithinRange[RANGE_20] >= 1 && !bWaitingForSpecial && currentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
-                        (!hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Sprint) || GilesHasBuff(SNOPower.Barbarian_Sprint)) &&
+                    if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && playerStatus.CurrentEnergy >= 10 && iAnythingWithinRange[RANGE_20] >= 1 && !IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
+                        (!Hotbar.Contains(SNOPower.Barbarian_Sprint) || GetHasBuff(SNOPower.Barbarian_Sprint)) &&
                         CurrentTarget.Type != GObjectType.Backtrack &&
                         (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && TargetCurrentDistance >= 6f) &&
                         (CurrentTarget.Type != GObjectType.Unit ||
@@ -929,21 +929,21 @@ namespace GilesTrinity
         }
 
         /// <summary>
-        /// Checks to see if we need a new monster power and will assign it to <see cref="currentPower"/>, distinguishes destructables/barricades from units
+        /// Checks to see if we need a new monster power and will assign it to <see cref="CurrentPower"/>, distinguishes destructables/barricades from units
         /// </summary>
         private static void AssignMonsterTargetPower()
         {
             using (new PerformanceLogger("HandleTarget.AssignMonsterTargetPower"))
             {
                 // Find a valid ability if the target is a monster
-                if (bPickNewAbilities && !bWaitingForPower && !bWaitingForPotion)
+                if (ShouldPickNewAbilities && !IsWaitingForPower && !IsWaitingForPotion)
                 {
-                    bPickNewAbilities = false;
+                    ShouldPickNewAbilities = false;
                     if (CurrentTarget.Type == GObjectType.Unit)
                     {
                         // Pick a suitable ability
-                        currentPower = GilesAbilitySelector(false, false, false);
-                        if (currentPower.SNOPower == SNOPower.None && !playerStatus.IsIncapacitated)
+                        CurrentPower = AbilitySelector(false, false, false);
+                        if (CurrentPower.SNOPower == SNOPower.None && !playerStatus.IsIncapacitated)
                         {
                             iNoAbilitiesAvailableInARow++;
                             if (DateTime.Now.Subtract(lastRemindedAboutAbilities).TotalSeconds > 60 && iNoAbilitiesAvailableInARow >= 4)
@@ -961,21 +961,21 @@ namespace GilesTrinity
                     }
                     // Select an ability for destroying a destructible with in advance
                     if (CurrentTarget.Type == GObjectType.Destructible || CurrentTarget.Type == GObjectType.Barricade)
-                        currentPower = GilesAbilitySelector(false, false, true);
+                        CurrentPower = AbilitySelector(false, false, true);
                 }
             }
         }
 
         /// <summary>
-        /// Will check <see cref=" bWaitingForPotion"/> and Use a Potion if needed
+        /// Will check <see cref=" IsWaitingForPotion"/> and Use a Potion if needed
         /// </summary>
         private static void UseHealthPotionIfNeeded()
         {
             using (new PerformanceLogger("HandleTarget.UseHealthPotionIfNeeded"))
             {
-                if (bWaitingForPotion)
+                if (IsWaitingForPotion)
                 {
-                    bWaitingForPotion = false;
+                    IsWaitingForPotion = false;
                     if (!playerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).ThenBy(p => p.ItemStackQuantity).FirstOrDefault();
@@ -999,7 +999,7 @@ namespace GilesTrinity
             using (new PerformanceLogger("HandleTarget.CheckStaleCache"))
             {
                 // Let's calculate whether or not we want a new target list...
-                if (!bWholeNewTarget && !bWaitingForPower && !bWaitingForPotion)
+                if (!IsWholeNewTarget && !IsWaitingForPower && !IsWaitingForPotion)
                 {
                     // Update targets at least once every 80 milliseconds
                     if (bForceTargetUpdate || IsAvoidingProjectiles)
@@ -1069,7 +1069,7 @@ namespace GilesTrinity
                 // Log whether we used a  (for avoidance really)
                 bool bFoundSpecialMovement = false;
                 // Leap movement for a barb
-                if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Leap) &&
+                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Leap) &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Leap]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Barbarian_Leap] &&
                     PowerManager.CanCast(SNOPower.Barbarian_Leap))
                 {
@@ -1079,7 +1079,7 @@ namespace GilesTrinity
                     bFoundSpecialMovement = true;
                 }
                 // Furious Charge movement for a barb
-                if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_FuriousCharge) &&
+                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_FuriousCharge]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Barbarian_FuriousCharge] &&
                     PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge))
                 {
@@ -1089,7 +1089,7 @@ namespace GilesTrinity
                     bFoundSpecialMovement = true;
                 }
                 // Vault for a Demon Hunter
-                if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Vault) &&
+                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Vault) &&
                     //DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.DemonHunter_Vault] &&
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= GilesTrinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
@@ -1104,7 +1104,7 @@ namespace GilesTrinity
                     bFoundSpecialMovement = true;
                 }
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
-                if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Teleport) &&
+                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Wizard_Teleport) &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_Teleport] &&
                     playerStatus.CurrentEnergy >= 15 &&
                     PowerManager.CanCast(SNOPower.Wizard_Teleport))
@@ -1115,7 +1115,7 @@ namespace GilesTrinity
                     bFoundSpecialMovement = true;
                 }
                 // Archon Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
-                if (!bFoundSpecialMovement && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Archon_Teleport) &&
+                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_Archon_Teleport]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_Archon_Teleport] &&
                     PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
                 {
@@ -1269,10 +1269,10 @@ namespace GilesTrinity
             statusText.Append(". InLoS: ");
             statusText.Append(CurrentTargetIsInLoS);
             statusText.Append(". ");
-            if (CurrentTarget.Type == GObjectType.Unit && currentPower.SNOPower != SNOPower.None)
+            if (CurrentTarget.Type == GObjectType.Unit && CurrentPower.SNOPower != SNOPower.None)
             {
                 statusText.Append("Power=");
-                statusText.Append(currentPower.SNOPower);
+                statusText.Append(CurrentPower.SNOPower);
                 statusText.Append(" (range ");
                 statusText.Append(TargetRangeRequired);
                 statusText.Append(") ");
@@ -1299,7 +1299,7 @@ namespace GilesTrinity
             using (new PerformanceLogger("HandleTarget.HandleBasicMovement"))
             {
                 // Now for the actual movement request stuff
-                bAlreadyMoving = true;
+                IsAlreadyMoving = true;
                 lastMovementCommand = DateTime.Now;
                 if (DateTime.Now.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(vLastMoveToTarget, vCurrentDestination) >= 2f || bForceNewMovement)
                 {
@@ -1342,7 +1342,7 @@ namespace GilesTrinity
                             if (TargetDistanceReduction <= 0f)
                                 TargetDistanceReduction = 0f;
                             // Pick a range to try to reach
-                            TargetRangeRequired = currentPower.SNOPower == SNOPower.None ? 9f : currentPower.iMinimumRange;
+                            TargetRangeRequired = CurrentPower.SNOPower == SNOPower.None ? 9f : CurrentPower.iMinimumRange;
                             break;
                         }
                     // * Item - need to get within 6 feet and then interact with it
@@ -1422,7 +1422,7 @@ namespace GilesTrinity
                     case GObjectType.Destructible:
                         {
                             // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
-                            TargetRangeRequired = currentPower.SNOPower == SNOPower.None ? 9f : currentPower.iMinimumRange;
+                            TargetRangeRequired = CurrentPower.SNOPower == SNOPower.None ? 9f : CurrentPower.iMinimumRange;
                             TargetDistanceReduction = CurrentTarget.Radius;
 
                             if (ForceCloseRangeTarget)
@@ -1438,7 +1438,7 @@ namespace GilesTrinity
                     case GObjectType.Barricade:
                         {
                             // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
-                            TargetRangeRequired = currentPower.SNOPower == SNOPower.None ? 9f : currentPower.iMinimumRange;
+                            TargetRangeRequired = CurrentPower.SNOPower == SNOPower.None ? 9f : CurrentPower.iMinimumRange;
                             TargetDistanceReduction = CurrentTarget.Radius;
 
                             if (ForceCloseRangeTarget)
@@ -1480,16 +1480,16 @@ namespace GilesTrinity
         {
             using (new PerformanceLogger("HandleTarget.HandleUnitInRange"))
             {
-                bWaitingForPower = false;
+                IsWaitingForPower = false;
                 // Wait while animating before an attack
-                if (currentPower.bWaitWhileAnimating)
+                if (CurrentPower.bWaitWhileAnimating)
                     WaitWhileAnimating(5, false);
                 // Use the power
                 bool bUsePowerSuccess = false;
                 // Note that whirlwinds use an off-on-off-on to avoid spam
-                if (currentPower.SNOPower != SNOPower.Barbarian_Whirlwind && currentPower.SNOPower != SNOPower.DemonHunter_Strafe)
+                if (CurrentPower.SNOPower != SNOPower.Barbarian_Whirlwind && CurrentPower.SNOPower != SNOPower.DemonHunter_Strafe)
                 {
-                    ZetaDia.Me.UsePower(currentPower.SNOPower, currentPower.vTargetLocation, currentPower.iTargetWorldID, currentPower.iTargetGUID);
+                    ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.vTargetLocation, CurrentPower.iTargetWorldID, CurrentPower.iTargetGUID);
                     bUsePowerSuccess = true;
                     lastChangedZigZag = DateTime.Today;
                     vPositionLastZigZagCheck = Vector3.Zero;
@@ -1497,33 +1497,33 @@ namespace GilesTrinity
                 else
                 {
                     // Special code to prevent whirlwind double-spam, this helps save fury
-                    bool bUseThisLoop = currentPower.SNOPower != powerLastSnoPowerUsed;
+                    bool bUseThisLoop = CurrentPower.SNOPower != powerLastSnoPowerUsed;
                     if (!bUseThisLoop)
                     {
                         //powerLastSnoPowerUsed = SNOPower.None;
-                        if (DateTime.Now.Subtract(dictAbilityLastUse[currentPower.SNOPower]).TotalMilliseconds >= 200)
+                        if (DateTime.Now.Subtract(dictAbilityLastUse[CurrentPower.SNOPower]).TotalMilliseconds >= 200)
                             bUseThisLoop = true;
                     }
                     if (bUseThisLoop)
                     {
-                        ZetaDia.Me.UsePower(currentPower.SNOPower, currentPower.vTargetLocation, currentPower.iTargetWorldID, currentPower.iTargetGUID);
+                        ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.vTargetLocation, CurrentPower.iTargetWorldID, CurrentPower.iTargetGUID);
                         bUsePowerSuccess = true;
                     }
                 }
                 if (bUsePowerSuccess)
                 {
-                    dictAbilityLastUse[currentPower.SNOPower] = DateTime.Now;
+                    dictAbilityLastUse[CurrentPower.SNOPower] = DateTime.Now;
                     lastGlobalCooldownUse = DateTime.Now;
-                    powerLastSnoPowerUsed = currentPower.SNOPower;
-                    currentPower.SNOPower = SNOPower.None;
+                    powerLastSnoPowerUsed = CurrentPower.SNOPower;
+                    CurrentPower.SNOPower = SNOPower.None;
                     // Wait for animating AFTER the attack
-                    if (currentPower.bWaitWhileAnimating)
+                    if (CurrentPower.bWaitWhileAnimating)
                         WaitWhileAnimating(3, false);
                 }
                 // Wait for animating AFTER the attack
-                if (currentPower.bWaitWhileAnimating)
+                if (CurrentPower.bWaitWhileAnimating)
                     WaitWhileAnimating(3, false);
-                bPickNewAbilities = true;
+                ShouldPickNewAbilities = true;
                 // Keep looking for monsters at "normal kill range" a few moments after we successfully attack a monster incase we can pull them into range
                 iKeepKillRadiusExtendedFor = 8;
                 timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
@@ -1546,10 +1546,10 @@ namespace GilesTrinity
                 }
                 // See if we should force a long wait AFTERWARDS, too
                 // Force waiting AFTER power use for certain abilities
-                bWaitingAfterPower = false;
-                if (currentPower.iForceWaitLoopsAfter >= 1)
+                IsWaitingAfterPower = false;
+                if (CurrentPower.ForceWaitLoopsAfter >= 1)
                 {
-                    bWaitingAfterPower = true;
+                    IsWaitingAfterPower = true;
                 }
             }
         }

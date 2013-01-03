@@ -77,10 +77,10 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Non blocking container :" FontWeight="Bold" TextAlignment="Center"/>
+            <TextBlock Text="Non blocking containers and destructables:" FontWeight="Bold" TextAlignment="Center"/>
             <UniformGrid Grid.Row="1" Margin="50,0,50,0" Columns="2" HorizontalAlignment="Center">
-                <RadioButton GroupName="WorldObjectCorpses" Content="Skip corpses" IsChecked="{Binding Path=WorldObject.IgnoreNonBlocking}" Margin="5"/>
-                <RadioButton GroupName="WorldObjectCorpses" Content="Open it" IsChecked="{Binding Path=WorldObject.IgnoreNonBlocking, Converter={StaticResource boolInverterConverter}}" Margin="5"/>
+                <RadioButton GroupName="WorldObjectCorpses" Content="Skip Destructibles" IsChecked="{Binding Path=WorldObject.IgnoreNonBlocking}" Margin="5"/>
+                <RadioButton GroupName="WorldObjectCorpses" Content="Destroy Destructibles" IsChecked="{Binding Path=WorldObject.IgnoreNonBlocking, Converter={StaticResource boolInverterConverter}}" Margin="5"/>
             </UniformGrid>
         </Grid>
         <!--Reset Button-->

@@ -18,8 +18,12 @@ namespace GilesTrinity
     {
         internal static int lastSceneId = -1;
 
-        // Find fresh targets, start main BT if needed, cast any buffs needed etc.
-        internal static bool GilesGlobalOverlord(object ret)
+        /// <summary>
+        /// Find fresh targets, start main BehaviorTree if needed, cast any buffs needed etc.
+        /// </summary>
+        /// <param name="ret"></param>
+        /// <returns></returns>
+        internal static bool CheckHasTarget(object ret)
         {
             using (new PerformanceLogger("GilesTrinity.GilesGlobalOverlord"))
             {
@@ -44,7 +48,7 @@ namespace GilesTrinity
 
                     // Store all of the player's abilities every now and then, to keep it cached and handy, also check for critical-mass timer changes etc.
                     iCombatLoops++;
-                    if (!bMappedPlayerAbilities || iCombatLoops >= 50 || bRefreshHotbarAbilities)
+                    if (!HasMappedPlayerAbilities || iCombatLoops >= 50 || bRefreshHotbarAbilities)
                     {
                         // Update the cached player's cache
                         ActorClass tempClass = ActorClass.Invalid;
@@ -58,7 +62,7 @@ namespace GilesTrinity
                         }
 
                         iCombatLoops = 0;
-                        GilesRefreshHotbar(GilesHasBuff(SNOPower.Wizard_Archon));
+                        RefreshHotbar(GetHasBuff(SNOPower.Wizard_Archon));
                         dictAbilityRepeatDelay = new Dictionary<SNOPower, int>(dictAbilityRepeatDefaults);
                         if (Settings.Combat.Wizard.CriticalMass && playerStatus.ActorClass == ActorClass.Wizard)
                         {
@@ -139,12 +143,12 @@ namespace GilesTrinity
                     //CurrentTarget = null;
                     bDontMoveMeIAmDoingShit = false;
                     TimesBlockedMoving = 0;
-                    bAlreadyMoving = false;
+                    IsAlreadyMoving = false;
                     lastMovementCommand = DateTime.Today;
                     bAvoidDirectionBlacklisting = false;
-                    bWaitingForPower = false;
-                    bWaitingAfterPower = false;
-                    bWaitingForPotion = false;
+                    IsWaitingForPower = false;
+                    IsWaitingAfterPower = false;
+                    IsWaitingForPotion = false;
                     wasRootedLastTick = false;
 
                     ClearBlacklists();
@@ -166,9 +170,9 @@ namespace GilesTrinity
                 // We have a target, start the target handler!
                 if (CurrentTarget != null)
                 {
-                    bWholeNewTarget = true;
+                    IsWholeNewTarget = true;
                     bDontMoveMeIAmDoingShit = true;
-                    bPickNewAbilities = true;
+                    ShouldPickNewAbilities = true;
                     return true;
                 }
                 using (new PerformanceLogger("GilesGlobalOverlord.UsePotion"))
@@ -221,7 +225,7 @@ namespace GilesTrinity
 
                             bDontSpamOutofCombat = false;
 
-                            powerBuff = GilesAbilitySelector(false, true, false);
+                            powerBuff = AbilitySelector(false, true, false);
 
                             if (powerBuff.SNOPower != SNOPower.None && powerBuff.SNOPower != SNOPower.Weapon_Melee_Instant)
                             {
@@ -257,6 +261,12 @@ namespace GilesTrinity
                     }
                 }
                 CurrentTarget = null;
+
+                if (GilesTrinity.bWantToTownRun && TownRun.TownRunCheckTimer.IsRunning && TownRun.TownRunCheckTimer.ElapsedMilliseconds < 2000)
+                {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for town run timer", true);
+                    return true;
+                }
 
                 // Ok let DemonBuddy do stuff this loop, since we're done for the moment
                 //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.GlobalHandler, sStatusText);

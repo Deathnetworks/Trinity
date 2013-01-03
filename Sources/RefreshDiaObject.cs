@@ -883,7 +883,7 @@ namespace GilesTrinity
                         //Bosses and uber elites
                         c_unit_IsBoss || c_ActorSNO == 256015 || c_ActorSNO == 256000 || c_ActorSNO == 255996 ||
                         //...or more than 4 elite mobs in range (only elites/rares/uniques, not minions!)
-                        iElitesWithinRange[RANGE_50] > 4)
+                        ElitesWithinRange[RANGE_50] > 4)
                         bUseBerserker = true;
                 }
                 else
@@ -1524,7 +1524,7 @@ namespace GilesTrinity
                             AddToCache = false;
                             return AddToCache;
                         }
-                        bWaitingAfterPower = true;
+                        IsWaitingAfterPower = true;
                     }
                     break;
                 case GObjectType.Shrine:
@@ -1647,17 +1647,7 @@ namespace GilesTrinity
                             }
                             dictPhysicsSNO.Add(c_ActorSNO, iThisPhysicsSNO);
                         }
-                        // No physics mesh? Ignore this destructible altogether
-                        //if (iThisPhysicsSNO <= 0)
-                        //{
-                        //    
-                        // No physics mesh on a destructible, probably bugged
-                        //    hashRGUIDIgnoreBlacklist60.Add(tmp_iThisRActorGuid);
-                        //    tmp_cacheIgnoreSubStep = "NoPhysicsSNO";
-                        //    bWantThis = false;
-                        //    
-                        //return bWantThis;
-                        //}
+
                         // Set min distance to user-defined setting
                         iMinDistance = Settings.WorldObject.DestructibleRange;
                         if (ForceCloseRangeTarget)
@@ -1674,6 +1664,7 @@ namespace GilesTrinity
                             AddToCache = false;
                             return AddToCache;
                         }
+
                         break;
                     }
                 case GObjectType.Destructible:
@@ -1694,18 +1685,6 @@ namespace GilesTrinity
                             }
                             dictPhysicsSNO.Add(c_ActorSNO, iThisPhysicsSNO);
                         }
-                        // No physics mesh? Ignore this destructible altogether
-                        //if (iThisPhysicsSNO <= 0)
-                        //{
-                        //    
-                        // No physics mesh on a destructible, probably bugged
-                        //    hashRGUIDIgnoreBlacklist60.Add(tmp_iThisRActorGuid);
-                        //    tmp_cacheIgnoreSubStep = "NoPhysicsMesh";
-                        //    bWantThis = false;
-                        //    
-                        //return bWantThis;
-                        //}
-
 
                         // Set min distance to user-defined setting
                         iMinDistance = Settings.WorldObject.DestructibleRange;
@@ -1716,18 +1695,37 @@ namespace GilesTrinity
                         if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out iExtendedRange))
                             iMinDistance = Settings.WorldObject.DestructibleRange + iExtendedRange;
 
+                        if (Settings.WorldObject.IgnoreNonBlocking)
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "IgnoringDestructables";
+                        }
+
+                        // Only break destructables if we're stuck and using IgnoreNonBlocking
+                        if (!PlayerMover.UnstuckChecker(playerStatus.CurrentPosition, 500) && !AddToCache && Settings.WorldObject.IgnoreNonBlocking)
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "NotStuck";
+                        }
+                        else
+                        {
+                            iMinDistance += 6f;
+                            AddToCache = true;
+                        }
+
                         // This object isn't yet in our destructible desire range
                         if (iMinDistance <= 0 || c_RadiusDistance > iMinDistance)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "NotInDestructableRange";
                         }
-                        // Only break destructables if we're stuck
-                        if (!GilesPlayerMover.UnstuckChecker() && !AddToCache)
+
+                        if (c_RActorGuid == CurrentTargetRactorGUID)
                         {
-                            AddToCache = false;
-                            c_IgnoreSubStep = "NotStuck";
+                            AddToCache = true;
+                            c_IgnoreSubStep = "";
                         }
+
                         // special mojo for whitelists
                         if (hashSNOInteractWhitelist.Contains(c_ActorSNO))
                             AddToCache = true;
@@ -1864,14 +1862,14 @@ namespace GilesTrinity
             bool bIgnoreThisAvoidance = false;
             double dThisHealthAvoid = GetAvoidanceHealth();
             // Monks with Serenity up ignore all AOE's
-            if (playerStatus.ActorClass == ActorClass.Monk && hashPowerHotbarAbilities.Contains(SNOPower.Monk_Serenity) && GilesHasBuff(SNOPower.Monk_Serenity))
+            if (playerStatus.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_Serenity) && GetHasBuff(SNOPower.Monk_Serenity))
             {
                 // Monks with serenity are immune
                 bIgnoreThisAvoidance = true;
             }
             // Witch doctors with spirit walk available and not currently Spirit Walking will subtly ignore ice balls, arcane, desecrator & plague cloud
-            if (playerStatus.ActorClass == ActorClass.WitchDoctor && hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_SpiritWalk) &&
-                (!GilesHasBuff(SNOPower.Witchdoctor_SpiritWalk) && GilesUseTimer(SNOPower.Witchdoctor_SpiritWalk)) || GilesHasBuff(SNOPower.Witchdoctor_SpiritWalk))
+            if (playerStatus.ActorClass == ActorClass.WitchDoctor && Hotbar.Contains(SNOPower.Witchdoctor_SpiritWalk) &&
+                (!GetHasBuff(SNOPower.Witchdoctor_SpiritWalk) && GilesUseTimer(SNOPower.Witchdoctor_SpiritWalk)) || GetHasBuff(SNOPower.Witchdoctor_SpiritWalk))
             {
                 if (c_ActorSNO == 223675 || c_ActorSNO == 402 || c_ActorSNO == 219702 || c_ActorSNO == 221225 || c_ActorSNO == 84608 || c_ActorSNO == 108869)
                 {
@@ -1880,7 +1878,7 @@ namespace GilesTrinity
                 }
             }
             // Remove ice balls if the barbarian has wrath of the berserker up, and reduce health from most other SNO avoidances
-            if (playerStatus.ActorClass == ActorClass.Barbarian && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+            if (playerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
             {
                 if (c_ActorSNO == 223675 || c_ActorSNO == 402)
                 {
@@ -1944,8 +1942,8 @@ namespace GilesTrinity
         {
             try
             {
-                // Everything except items
-                if (c_ObjectType != GObjectType.Item)
+                // Everything except items and the current target
+                if (c_ObjectType != GObjectType.Item && c_RActorGuid != CurrentTargetRactorGUID)
                 {
 
                     //if (((c_ObjectType == GObjectType.Unit && !bWantToTownRun) || c_ObjectType == GObjectType.Shrine) && (c_CentreDistance > 10 && c_CentreDistance < 75))
@@ -1958,6 +1956,7 @@ namespace GilesTrinity
                             case GObjectType.Unit:
                             case GObjectType.Shrine:
                             case GObjectType.Barricade:
+                            case GObjectType.Gold:
                                 {
                                     using (new PerformanceLogger("RefreshLoS.1"))
                                     {
@@ -1972,7 +1971,7 @@ namespace GilesTrinity
                                             }
                                         }
                                     }
-                                } 
+                                }
                                 break;
 
                         }
@@ -1981,6 +1980,7 @@ namespace GilesTrinity
                             case GObjectType.Destructible:
                             case GObjectType.Unit:
                             case GObjectType.Shrine:
+                            case GObjectType.Gold:
                                 {
                                     using (new PerformanceLogger("RefreshLoS.2"))
                                     {
@@ -2011,7 +2011,7 @@ namespace GilesTrinity
                                             }
                                         }
                                     }
-                                } 
+                                }
                                 break;
 
                         }
@@ -2020,15 +2020,15 @@ namespace GilesTrinity
                             case GObjectType.Destructible:
                             case GObjectType.Unit:
                             case GObjectType.Shrine:
+                            case GObjectType.Gold:
                                 {
                                     using (new PerformanceLogger("RefreshLoS.3"))
                                     {
                                         if (Settings.Combat.Misc.UseNavMeshTargeting)
                                         {
                                             // Ignore units not in LoS except bosses, rares, champs
-                                            if (!(c_unit_IsBoss && c_unit_IsElite || c_unit_IsRare) && !c_diaObject.InLineOfSight)
+                                            if (!(c_unit_IsBoss) && !c_diaObject.InLineOfSight)
                                             {
-
                                                 AddToCache = false;
                                                 c_IgnoreSubStep = "UnitNotInLoS";
                                             }
@@ -2290,7 +2290,7 @@ namespace GilesTrinity
             // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
             if (playerStatus.ActorClass == ActorClass.Monk)
             {
-                if (hashPowerHotbarAbilities.Contains(SNOPower.Monk_MysticAlly) && hashMysticAlly.Contains(c_ActorSNO))
+                if (Hotbar.Contains(SNOPower.Monk_MysticAlly) && hashMysticAlly.Contains(c_ActorSNO))
                 {
                     iPlayerOwnedMysticAlly++;
                     AddToCache = false;
@@ -2299,7 +2299,7 @@ namespace GilesTrinity
             // Count up Demon Hunter pets
             if (playerStatus.ActorClass == ActorClass.DemonHunter)
             {
-                if (hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Companion) && hashDHPets.Contains(c_ActorSNO))
+                if (Hotbar.Contains(SNOPower.DemonHunter_Companion) && hashDHPets.Contains(c_ActorSNO))
                 {
                     iPlayerOwnedDHPets++;
                     AddToCache = false;
@@ -2308,12 +2308,12 @@ namespace GilesTrinity
             // Count up zombie dogs and gargantuans next
             if (playerStatus.ActorClass == ActorClass.WitchDoctor)
             {
-                if (hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_Gargantuan) && hashGargantuan.Contains(c_ActorSNO))
+                if (Hotbar.Contains(SNOPower.Witchdoctor_Gargantuan) && hashGargantuan.Contains(c_ActorSNO))
                 {
                     iPlayerOwnedGargantuan++;
                     AddToCache = false;
                 }
-                if (hashPowerHotbarAbilities.Contains(SNOPower.Witchdoctor_SummonZombieDog) && hashZombie.Contains(c_ActorSNO))
+                if (Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && hashZombie.Contains(c_ActorSNO))
                 {
                     iPlayerOwnedZombieDog++;
                     AddToCache = false;
@@ -2432,11 +2432,14 @@ namespace GilesTrinity
             }
 
         }
-        private static double GetAvoidanceHealth()
+        private static double GetAvoidanceHealth(int actorSno = -1)
         {
             try
             {
-                return AvoidanceManager.GetAvoidanceHealthBySNO(c_ActorSNO, 1);
+                if (actorSno != -1)
+                    return AvoidanceManager.GetAvoidanceHealthBySNO(c_ActorSNO, 1);
+                else
+                    return AvoidanceManager.GetAvoidanceHealthBySNO(actorSno, 1);
             }
             catch
             {

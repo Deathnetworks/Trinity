@@ -20,142 +20,173 @@ namespace GilesTrinity
         public static Vector3 FindZigZagTargetLocation(Vector3 vTargetLocation, float fDistanceOutreach, bool bRandomizeDistance = false, bool bRandomizeStart = false, bool bCheckGround = false)
         {
             Vector3 vThisZigZag = vNullLocation;
-            Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
-            bool bCanRayCast;
-            float iFakeStart = 0;
-            //K: bRandomizeStart is for boss and elite, they usually jump around, make obstacles, let you Incapacitated. 
-            //   you usually have to move back and forth to hit them
-            if (bRandomizeStart)
-                iFakeStart = rndNum.Next(18) * 5;
-            if (bRandomizeDistance)
-                fDistanceOutreach += rndNum.Next(18);
-            float fDirectionToTarget = FindDirectionDegree(playerStatus.CurrentPosition, vTargetLocation);
-
-            float fPointToTarget;
-
-            float fHighestWeight = float.NegativeInfinity;
-            Vector3 vBestLocation = vNullLocation;
-
-            bool bFoundSafeSpotsFirstLoop = false;
-            float fAdditionalRange = 0f;
-            //K: Direction is more important than distance
-            for (int iMultiplier = 1; iMultiplier <= 2; iMultiplier++)
+            using (new PerformanceLogger("FindZigZagTargetLocation"))
             {
-                if (iMultiplier == 2)
+                using (new PerformanceLogger("FindZigZagTargetLocation.CheckObjectCache"))
                 {
-                    if (bFoundSafeSpotsFirstLoop)
-                        break;
-                    fAdditionalRange = 150f;
-                    if (bRandomizeStart)
-                        iFakeStart = 30f + (rndNum.Next(16) * 5);
-                    else
-                        iFakeStart = (rndNum.Next(17) * 5);
+                    float minDistance = 2f;
+                    float maxDistance = 20f;
+                    int minTargets = 3;
+
+                    if (GilesObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
+                    {
+                        IEnumerable<GilesObject> zigZagTargets =
+                            from u in GilesObjectCache
+                            where u.Type == GObjectType.Unit && u.RadiusDistance > minDistance && u.RadiusDistance < maxDistance && u.RActorGuid != CurrentTarget.RActorGuid &&
+                            !hashAvoidanceObstacleCache.Any(a => Vector3.Distance(u.Position, a.Location) < GetAvoidanceRadius(a.ActorSNO) && playerStatus.CurrentHealthPct <= GetAvoidanceHealth(a.ActorSNO))
+                            select u;
+                        if (zigZagTargets.Count() >= minTargets)
+                        {
+                            vThisZigZag = zigZagTargets.OrderByDescending(u => u.CentreDistance).FirstOrDefault().Position;
+                            return vThisZigZag;
+                        }
+                    }
                 }
-                float fRunDistance = fDistanceOutreach;
-                for (float iDegreeChange = iFakeStart; iDegreeChange <= 30f + fAdditionalRange; iDegreeChange += 5)
+                using (new PerformanceLogger("FindZigZagTargetLocation.RandomZigZagPoint"))
                 {
-                    float iPosition = iDegreeChange;
-                    //point to target is better, otherwise we have to avoid obstacle first 
-                    if (iPosition > 105f)
-                        iPosition = 90f - iPosition;
-                    else if (iPosition > 30f)
-                        iPosition -= 15f;
-                    else
-                        iPosition = 15f - iPosition;
-                    fPointToTarget = iPosition;
 
-                    iPosition += fDirectionToTarget;
-                    if (iPosition < 0)
-                        iPosition = 360f + iPosition;
-                    if (iPosition >= 360f)
-                        iPosition = iPosition - 360f;
+                    Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
+                    bool bCanRayCast;
+                    float iFakeStart = 0;
+                    //K: bRandomizeStart is for boss and elite, they usually jump around, make obstacles, let you Incapacitated. 
+                    //   you usually have to move back and forth to hit them
+                    if (bRandomizeStart)
+                        iFakeStart = rndNum.Next(18) * 5;
+                    if (bRandomizeDistance)
+                        fDistanceOutreach += rndNum.Next(18);
+                    float fDirectionToTarget = FindDirectionDegree(playerStatus.CurrentPosition, vTargetLocation);
 
-                    vThisZigZag = MathEx.GetPointAt(playerStatus.CurrentPosition, fRunDistance, MathEx.ToRadians(iPosition));
+                    float fPointToTarget;
 
-                    if (fPointToTarget <= 30f || fPointToTarget >= 330f)
-                    {
-                        vThisZigZag.Z = vTargetLocation.Z;
-                    }
-                    else if (fPointToTarget <= 60f || fPointToTarget >= 300f)
-                    {
-                        //K: we are trying to find position that we can circle around the target
-                        //   but we shouldn't run too far away from target
-                        vThisZigZag.Z = (vTargetLocation.Z + playerStatus.CurrentPosition.Z) / 2;
-                        fRunDistance = fDistanceOutreach - 5f;
-                    }
-                    else
-                    {
-                        //K: don't move too far if we are not point to target, we just try to move
-                        //   this can help a lot when we are near stairs
-                        fRunDistance = 8f;
-                    }
+                    float fHighestWeight = float.NegativeInfinity;
+                    Vector3 vBestLocation = vNullLocation;
 
-                    if (Settings.Combat.Misc.UseNavMeshTargeting)
+                    bool bFoundSafeSpotsFirstLoop = false;
+                    float fAdditionalRange = 0f;
+                    //K: Direction is more important than distance
+                    for (int iMultiplier = 1; iMultiplier <= 2; iMultiplier++)
                     {
-                        if (bCheckGround)
-                        {
-                            vThisZigZag.Z = gp.GetHeight(vThisZigZag.ToVector2());
-                            bCanRayCast = ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
-                        }
-                        else
-                            bCanRayCast = pf.IsNavigable(gp.WorldToGrid(vThisZigZag.ToVector2()));
-                    }
-                    else
-                    {
-                        bCanRayCast = ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
-                    }
-
-                    // Give weight to each zigzag point, so we can find the best one to aim for
-                    if (bCanRayCast)
-                    {
-                        bool bAnyAvoidance = false;
-                        float fThisWeight = 1000f;
                         if (iMultiplier == 2)
-                            fThisWeight -= 80f;
-
-                        if (PlayerKiteDistance > 0)
                         {
-                            if (hashMonsterObstacleCache.Any(m => m.Location.Distance(vThisZigZag) <= PlayerKiteDistance))
-                                continue;
+                            if (bFoundSafeSpotsFirstLoop)
+                                break;
+                            fAdditionalRange = 150f;
+                            if (bRandomizeStart)
+                                iFakeStart = 30f + (rndNum.Next(16) * 5);
+                            else
+                                iFakeStart = (rndNum.Next(17) * 5);
                         }
-
-                        // Remove weight for each avoidance *IN* that location
-                        if (hashAvoidanceObstacleCache.Any(m => m.Location.Distance(vThisZigZag) <= m.Radius))
-                            continue;
-
-                        foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => GilesIntersectsPath(cp.Location, cp.Radius * 1.2f, playerStatus.CurrentPosition, vThisZigZag)))
+                        float fRunDistance = fDistanceOutreach;
+                        for (float iDegreeChange = iFakeStart; iDegreeChange <= 30f + fAdditionalRange; iDegreeChange += 5)
                         {
-                            bAnyAvoidance = true;
-                            //fThisWeight -= (float)tempobstacle.Weight;
-                            fThisWeight = 0;
-                        }
-                        // Give extra weight to areas we've been inside before
-                        bool bExtraSafetyWeight = hashSkipAheadAreaCache.Any(cp => cp.Location.Distance(vThisZigZag) <= cp.Radius);
-                        if (bExtraSafetyWeight)
-                            fThisWeight += 100f;
-                        // Use this one if it's more weight, or we haven't even found one yet, or if same weight as another with a random chance
-                        if (fThisWeight > fHighestWeight)
-                        {
-                            fHighestWeight = fThisWeight;
+                            float iPosition = iDegreeChange;
+                            //point to target is better, otherwise we have to avoid obstacle first 
+                            if (iPosition > 105f)
+                                iPosition = 90f - iPosition;
+                            else if (iPosition > 30f)
+                                iPosition -= 15f;
+                            else
+                                iPosition = 15f - iPosition;
+                            fPointToTarget = iPosition;
 
-                            if (Settings.Combat.Misc.UseNavMeshTargeting)
+                            iPosition += fDirectionToTarget;
+                            if (iPosition < 0)
+                                iPosition = 360f + iPosition;
+                            if (iPosition >= 360f)
+                                iPosition = iPosition - 360f;
+
+                            vThisZigZag = MathEx.GetPointAt(playerStatus.CurrentPosition, fRunDistance, MathEx.ToRadians(iPosition));
+
+                            if (fPointToTarget <= 30f || fPointToTarget >= 330f)
                             {
-                                vBestLocation = new Vector3(vThisZigZag.X, vThisZigZag.Y, gp.GetHeight(vThisZigZag.ToVector2()));
+                                vThisZigZag.Z = vTargetLocation.Z;
+                            }
+                            else if (fPointToTarget <= 60f || fPointToTarget >= 300f)
+                            {
+                                //K: we are trying to find position that we can circle around the target
+                                //   but we shouldn't run too far away from target
+                                vThisZigZag.Z = (vTargetLocation.Z + playerStatus.CurrentPosition.Z) / 2;
+                                fRunDistance = fDistanceOutreach - 5f;
                             }
                             else
                             {
-                                vBestLocation = new Vector3(vThisZigZag.X, vThisZigZag.Y, vThisZigZag.Z + 4);
+                                //K: don't move too far if we are not point to target, we just try to move
+                                //   this can help a lot when we are near stairs
+                                fRunDistance = 8f;
                             }
-                            if (!bAnyAvoidance)
-                                bFoundSafeSpotsFirstLoop = true;
+
+                            if (Settings.Combat.Misc.UseNavMeshTargeting)
+                            {
+                                if (bCheckGround)
+                                {
+                                    vThisZigZag.Z = gp.GetHeight(vThisZigZag.ToVector2());
+                                    bCanRayCast = ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
+                                }
+                                else
+                                    bCanRayCast = pf.IsNavigable(gp.WorldToGrid(vThisZigZag.ToVector2()));
+                            }
+                            else
+                            {
+                                bCanRayCast = ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
+                            }
+
+                            // Give weight to each zigzag point, so we can find the best one to aim for
+                            if (bCanRayCast)
+                            {
+                                bool bAnyAvoidance = false;
+                                float fThisWeight = 1000f;
+                                if (iMultiplier == 2)
+                                    fThisWeight -= 80f;
+
+                                if (PlayerKiteDistance > 0)
+                                {
+                                    if (hashMonsterObstacleCache.Any(m => m.Location.Distance(vThisZigZag) <= PlayerKiteDistance))
+                                        continue;
+                                }
+
+                                // Remove weight for each avoidance *IN* that location
+                                if (hashAvoidanceObstacleCache.Any(m => m.Location.Distance(vThisZigZag) <= m.Radius && playerStatus.CurrentHealthPct <= GetAvoidanceHealth(m.ActorSNO)))
+                                    continue;
+
+                                foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => GilesIntersectsPath(cp.Location, cp.Radius * 1.2f, playerStatus.CurrentPosition, vThisZigZag)))
+                                {
+                                    bAnyAvoidance = true;
+                                    //fThisWeight -= (float)tempobstacle.Weight;
+                                    fThisWeight = 0;
+                                }
+                                if (bAnyAvoidance && fThisWeight <= 0)
+                                    continue;
+
+                                // Give extra weight to areas we've been inside before
+                                bool bExtraSafetyWeight = hashSkipAheadAreaCache.Any(cp => cp.Location.Distance(vThisZigZag) <= cp.Radius);
+                                if (bExtraSafetyWeight)
+                                    fThisWeight += 100f;
+
+                                // Use this one if it's more weight, or we haven't even found one yet, or if same weight as another with a random chance
+                                if (fThisWeight > fHighestWeight)
+                                {
+                                    fHighestWeight = fThisWeight;
+
+                                    if (Settings.Combat.Misc.UseNavMeshTargeting)
+                                    {
+                                        vBestLocation = new Vector3(vThisZigZag.X, vThisZigZag.Y, gp.GetHeight(vThisZigZag.ToVector2()));
+                                    }
+                                    else
+                                    {
+                                        vBestLocation = new Vector3(vThisZigZag.X, vThisZigZag.Y, vThisZigZag.Z + 4);
+                                    }
+                                    if (!bAnyAvoidance)
+                                        bFoundSafeSpotsFirstLoop = true;
+                                }
+                            }
+                            // Can we raycast to the point at minimum?
                         }
+                        // Loop through degrees
                     }
-                    // Can we raycast to the point at minimum?
+                    // Loop through multiplier
+                    return vBestLocation;
                 }
-                // Loop through degrees
             }
-            // Loop through multiplier
-            return vBestLocation;
         }
         // Quick Easy Raycast Function for quick changes
         public static bool GilesCanRayCast(Vector3 vStartLocation, Vector3 vDestination, NavCellFlags NavType = NavCellFlags.AllowWalk)
@@ -202,24 +233,24 @@ namespace GilesTrinity
                 }
                 hasEmergencyTeleportUp = (
                     // Leap is available
-                    (!playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Leap) &&
+                    (!playerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Leap) &&
                         DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Leap]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Barbarian_Leap]) ||
                     // Whirlwind is available
-                    (!playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Whirlwind) &&
-                        ((playerStatus.CurrentEnergy >= 10 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= iWaitingReservedAmount)) ||
+                    (!playerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
+                        ((playerStatus.CurrentEnergy >= 10 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= MinEnergyReserve)) ||
                     // Tempest rush is available
-                    (!playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Monk_TempestRush) &&
-                        ((playerStatus.CurrentEnergy >= 20 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= iWaitingReservedAmount)) ||
+                    (!playerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_TempestRush) &&
+                        ((playerStatus.CurrentEnergy >= 20 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= MinEnergyReserve)) ||
                     // Teleport is available
-                    (!playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Teleport) &&
+                    (!playerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Teleport) &&
                         playerStatus.CurrentEnergy >= 15 &&
                         PowerManager.CanCast(SNOPower.Wizard_Teleport)) ||
                     // Archon Teleport is available
-                    (!playerStatus.IsIncapacitated && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Archon_Teleport) &&
+                    (!playerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
                         PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
                     );
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
-                if (!shouldKite && playerStatus.ActorClass == ActorClass.Wizard && hashPowerHotbarAbilities.Contains(SNOPower.Wizard_WaveOfForce) && playerStatus.CurrentEnergy >= 25 &&
+                if (!shouldKite && playerStatus.ActorClass == ActorClass.Wizard && Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && playerStatus.CurrentEnergy >= 25 &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_WaveOfForce] &&
                     !playerStatus.IsIncapacitated && hashAvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(playerStatus.CurrentPosition) <= 15f) >= 2 &&
                     (Settings.Combat.Wizard.CriticalMass || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))

@@ -73,6 +73,113 @@ namespace GilesTrinity
         // This dictionary stores attempted stash counts on items, to help detect any stash stucks on the same item etc.
         internal static Dictionary<int, int> _dictItemStashAttempted = new Dictionary<int, int>();
 
+        /// <summary>
+        /// TownRunCheckOverlord - determine if we should do a town-run or not
+        /// </summary>
+        /// <param name="ret"></param>
+        /// <returns></returns>
+        internal static bool TownRunCanRun(object ret)
+        {
+            using (new PerformanceLogger("TownRunOverlord"))
+            {
+                GilesTrinity.bWantToTownRun = false;
+
+                if (GilesTrinity.BossLevelAreaIDs.Contains(GilesTrinity.playerStatus.LevelAreaId))
+                    return false;
+
+                if (GilesTrinity.bWantToTownRun && GilesTrinity.CurrentTarget != null)
+                {
+                    TownRunCheckTimer.Reset();
+                    return false;
+                }
+
+                // Check if we should be forcing a town-run
+                if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                {
+                    if (!TownRun.bLastTownRunCheckResult)
+                    {
+                        bPreStashPauseDone = false;
+                        if (Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                        {
+                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
+                        }
+                    }
+                    GilesTrinity.bWantToTownRun = true;
+                }
+
+                // Time safety switch for more advanced town-run checking to prevent CPU spam
+                else if (DateTime.Now.Subtract(timeLastAttemptedTownRun).TotalSeconds > 6)
+                {
+                    timeLastAttemptedTownRun = DateTime.Now;
+
+                    // Check for no space in backpack
+                    Vector2 ValidLocation = GilesTrinity.FindValidBackpackLocation(true);
+                    if (ValidLocation.X < 0 || ValidLocation.Y < 0)
+                    {
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, now running town-run routine.");
+                        if (!bLastTownRunCheckResult)
+                        {
+                            bPreStashPauseDone = false;
+                            bLastTownRunCheckResult = true;
+                        }
+                        GilesTrinity.bWantToTownRun = true;
+                    }
+
+                    // Check durability percentages
+                    foreach (ACDItem tempitem in ZetaDia.Me.Inventory.Equipped)
+                    {
+                        if (tempitem.BaseAddress != IntPtr.Zero)
+                        {
+                            if (tempitem.DurabilityPercent <= Zeta.CommonBot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow)
+                            {
+                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Items may need repair, now running town-run routine.");
+                                if (!bLastTownRunCheckResult)
+                                {
+                                    bPreStashPauseDone = false;
+                                }
+                                GilesTrinity.bWantToTownRun = true;
+                            }
+                        }
+                    }
+                }
+
+                if (Zeta.CommonBot.ErrorDialog.IsVisible)
+                {
+                    GilesTrinity.bWantToTownRun = false;
+                }
+
+                bLastTownRunCheckResult = GilesTrinity.bWantToTownRun;
+
+                // Clear blacklists to triple check any potential targets
+                if (GilesTrinity.bWantToTownRun)
+                {
+                    GilesTrinity.hashRGUIDBlacklist3 = new HashSet<int>();
+                    GilesTrinity.hashRGUIDBlacklist15 = new HashSet<int>();
+                    GilesTrinity.hashRGUIDBlacklist60 = new HashSet<int>();
+                    GilesTrinity.hashRGUIDBlacklist90 = new HashSet<int>();
+                }
+
+                // Fix for A1 new game with bags full
+                if (GilesTrinity.playerStatus.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700 && (ZetaDia.CurrentQuest.StepId == -1 || ZetaDia.CurrentQuest.StepId == 42))
+                {
+                    GilesTrinity.bWantToTownRun = false;
+                }
+
+                // check for navigation obstacles (never TP near demonic forges, etc)
+                if (GilesTrinity.hashNavigationObstacleCache.Any(o => Vector3.Distance(o.Location, GilesTrinity.playerStatus.CurrentPosition) < 40f))
+                {
+                    GilesTrinity.bWantToTownRun = false;
+                }
+
+                if ((GilesTrinity.bWantToTownRun && TownRunCheckTimer.IsRunning && TownRunCheckTimer.ElapsedMilliseconds > 2000) || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                    return true;
+                else if (GilesTrinity.bWantToTownRun && !TownRunCheckTimer.IsRunning)
+                    TownRunCheckTimer.Start();
+
+                return false;
+            }
+        }
+
 
         /// <summary>
         /// Randomize the timer between stashing/salvaging etc.
@@ -213,108 +320,7 @@ namespace GilesTrinity
             return SalvageOption.None;
         }
 
-        internal static Stopwatch townRunCheckTimer = new Stopwatch();
-
-        /// <summary>
-        /// TownRunCheckOverlord - determine if we should do a town-run or not
-        /// </summary>
-        /// <param name="ret"></param>
-        /// <returns></returns>
-        internal static bool GilesTownRunCheckOverlord(object ret)
-        {
-            using (new PerformanceLogger("TownRunOverlord"))
-            {
-                GilesTrinity.bWantToTownRun = false;
-
-                if (GilesTrinity.BossLevelAreaIDs.Contains(GilesTrinity.playerStatus.LevelAreaId))
-                    return false;
-
-                if (GilesTrinity.bWantToTownRun && GilesTrinity.CurrentTarget != null)
-                {
-                    townRunCheckTimer.Reset();
-                    return false;
-                }
-
-                // Check if we should be forcing a town-run
-                if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
-                {
-                    if (!TownRun.bLastTownRunCheckResult)
-                    {
-                        bPreStashPauseDone = false;
-                        if (Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
-                        {
-                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
-                        }
-                    }
-                    GilesTrinity.bWantToTownRun = true;
-                }
-
-                // Time safety switch for more advanced town-run checking to prevent CPU spam
-                else if (DateTime.Now.Subtract(timeLastAttemptedTownRun).TotalSeconds > 6)
-                {
-                    timeLastAttemptedTownRun = DateTime.Now;
-
-                    // Check for no space in backpack
-                    Vector2 ValidLocation = GilesTrinity.FindValidBackpackLocation(true);
-                    if (ValidLocation.X < 0 || ValidLocation.Y < 0)
-                    {
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, now running town-run routine.");
-                        if (!bLastTownRunCheckResult)
-                        {
-                            bPreStashPauseDone = false;
-                            bLastTownRunCheckResult = true;
-                        }
-                        GilesTrinity.bWantToTownRun = true;
-                    }
-
-                    // Check durability percentages
-                    foreach (ACDItem tempitem in ZetaDia.Me.Inventory.Equipped)
-                    {
-                        if (tempitem.BaseAddress != IntPtr.Zero)
-                        {
-                            if (tempitem.DurabilityPercent <= Zeta.CommonBot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow)
-                            {
-                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Items may need repair, now running town-run routine.");
-                                if (!bLastTownRunCheckResult)
-                                {
-                                    bPreStashPauseDone = false;
-                                }
-                                GilesTrinity.bWantToTownRun = true;
-                            }
-                        }
-                    }
-                }
-
-                if (Zeta.CommonBot.ErrorDialog.IsVisible)
-                {
-                    GilesTrinity.bWantToTownRun = false;
-                }
-
-                bLastTownRunCheckResult = GilesTrinity.bWantToTownRun;
-
-                // Clear blacklists to triple check any potential targets
-                if (GilesTrinity.bWantToTownRun)
-                {
-                    GilesTrinity.hashRGUIDBlacklist3 = new HashSet<int>();
-                    GilesTrinity.hashRGUIDBlacklist15 = new HashSet<int>();
-                    GilesTrinity.hashRGUIDBlacklist60 = new HashSet<int>();
-                    GilesTrinity.hashRGUIDBlacklist90 = new HashSet<int>();
-                }
-
-                // Fix for A1 new game with bags full
-                if (GilesTrinity.playerStatus.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700 && (ZetaDia.CurrentQuest.StepId == -1 || ZetaDia.CurrentQuest.StepId == 42))
-                {
-                    return false;
-                }
-
-                if ((GilesTrinity.bWantToTownRun && townRunCheckTimer.IsRunning && townRunCheckTimer.ElapsedMilliseconds > 2000) || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
-                    return true;
-                else if (GilesTrinity.bWantToTownRun && !townRunCheckTimer.IsRunning)
-                    townRunCheckTimer.Start();
-
-                return false;
-            }
-        }
+        internal static Stopwatch TownRunCheckTimer = new Stopwatch();
 
         /// <summary>
         /// Stash Overlord values all items and checks if we have anything to stash
@@ -328,7 +334,7 @@ namespace GilesTrinity
             GilesTrinity.ForceVendorRunASAP = false;
             bool bShouldVisitStash = false;
 
-            townRunCheckTimer.Reset();
+            TownRunCheckTimer.Reset();
 
             foreach (ACDItem thisitem in ZetaDia.Me.Inventory.Backpack)
             {

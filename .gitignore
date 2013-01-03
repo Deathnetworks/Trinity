@@ -1,5 +1,6 @@
 DemonBuddy.exe
-
+/TrinityRoutine/TrinityRoutine/bin
+/TrinityRoutine/TrinityRoutine/obj
 /Sources/bin
 
 /Sources/obj
@@ -26,6 +27,5 @@ GilesBlankCombatRoutine/TrinityCombatRoutine/obj
 *.bak
 *.orig
 Latest-GilesTrinity.zip
-Sources/GilesTrinity.csproj.user
-
+*.csproj.user
 pub.bat

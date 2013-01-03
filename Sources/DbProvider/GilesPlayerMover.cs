@@ -16,7 +16,7 @@ using Zeta.TreeSharp;
 namespace GilesTrinity.DbProvider
 {
     // Player Mover Class
-    public class GilesPlayerMover : IPlayerMover
+    public class PlayerMover : IPlayerMover
     {
         private static readonly HashSet<int> hashAvoidLeapingToSNO = new HashSet<int> { 138989, 176074, 176076, 176077, 176536, 260330 };
         // 138989 = health pool, 176074 = protection, 176076 = fortune, 176077 = frenzied, 176536 = portal in leorics, 260330 = cooldown shrine
@@ -34,18 +34,19 @@ namespace GilesTrinity.DbProvider
         }
 
         // Anti-stuck variables
-        public static Vector3 vOldMoveToTarget = Vector3.Zero;
-        public static int iTimesReachedStuckPoint = 0;
-        public static int iTotalAntiStuckAttempts = 1;
-        public static Vector3 vSafeMovementLocation = Vector3.Zero;
-        public static DateTime timeLastRecordedPosition = DateTime.Today;
-        public static Vector3 vOldPosition = Vector3.Zero;
-        public static DateTime timeStartedUnstuckMeasure = DateTime.Today;
-        public static int iTimesReachedMaxUnstucks = 0;
-        public static DateTime timeCancelledUnstuckerFor = DateTime.Today;
-        public static DateTime timeLastReportedAnyStuck = DateTime.Today;
-        public static int iCancelUnstuckerForSeconds = 60;
-        public static DateTime timeLastRestartedGame = DateTime.Today;
+        internal static Vector3 vOldMoveToTarget = Vector3.Zero;
+        internal static int iTimesReachedStuckPoint = 0;
+        internal static int iTotalAntiStuckAttempts = 1;
+        internal static Vector3 vSafeMovementLocation = Vector3.Zero;
+        internal static DateTime TimeLastRecordedPosition = DateTime.Today;
+        internal static Vector3 vOldPosition = Vector3.Zero;
+        internal static DateTime timeStartedUnstuckMeasure = DateTime.Today;
+        internal static int iTimesReachedMaxUnstucks = 0;
+        internal static DateTime timeCancelledUnstuckerFor = DateTime.Today;
+        internal static DateTime timeLastReportedAnyStuck = DateTime.Today;
+        internal static int iCancelUnstuckerForSeconds = 60;
+        internal static DateTime timeLastRestartedGame = DateTime.Today;
+        internal static bool UnStuckCheckerLastResult = false;
 
         // Store player current position
         public static Vector3 vMyCurrentPosition = Vector3.Zero;
@@ -55,8 +56,11 @@ namespace GilesTrinity.DbProvider
         private static DateTime lastRefreshCoin;
 
         //For Tempest Rush Monks
-        private static bool bCanChannelTR = false;
+        private static bool CanChannelTempestRush = false;
 
+        /// <summary>
+        /// Resets the gold inactivity timer
+        /// </summary>
         internal static void ResetCheckGold()
         {
             lastCheckBag = DateTime.Now;
@@ -64,6 +68,10 @@ namespace GilesTrinity.DbProvider
             lastKnowCoin = 0;
         }
 
+        /// <summary>
+        /// Determines whether or not to leave the game based on the gold inactivity timer
+        /// </summary>
+        /// <returns></returns>
         internal static bool GoldInactive()
         {
             if (!GilesTrinity.Settings.Advanced.GoldInactivityEnabled)
@@ -120,47 +128,55 @@ namespace GilesTrinity.DbProvider
             return false;
         }
 
-
-
-
-        // Check if we are stuck or not
-        // Simply checks for position changing max once every 3 seconds, to decide on stuck
-        public static bool UnstuckChecker(Vector3 vMyCurrentPosition)
+        /// <summary>
+        /// Check if we are stuck or not by simply checking for position changing max once every 3 seconds
+        /// </summary>
+        /// <param name="vMyCurrentPosition"></param>
+        /// <param name="checkDuration"></param>
+        /// <returns></returns>
+        public static bool UnstuckChecker(Vector3 vMyCurrentPosition, int checkDuration = 3000)
         {
             // Keep checking distance changes every 3 seconds
-            if (DateTime.Now.Subtract(timeLastRecordedPosition).TotalMilliseconds >= 3000)
+            if (DateTime.Now.Subtract(TimeLastRecordedPosition).TotalMilliseconds >= checkDuration)
             {
                 // We're not stuck if we're vendoring!
                 if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                 {
-                    return false;
+                    UnStuckCheckerLastResult = false;
+                    return UnStuckCheckerLastResult;
                 }
 
 
-                timeLastRecordedPosition = DateTime.Now;
+                TimeLastRecordedPosition = DateTime.Now;
                 Composite c = null;
+
                 try
                 {
                     if (Zeta.CommonBot.ProfileManager.CurrentProfileBehavior != null)
                         c = Zeta.CommonBot.ProfileManager.CurrentProfileBehavior.Behavior;
                 }
                 catch { }
-                Zeta.Internals.UIElement vendorWindow = Zeta.Internals.UIElements.VendorWindow;
-                AnimationState aState = ZetaDia.Me.CommonData.AnimationState;
+
                 if (c != null && c.GetType() == typeof(WaitTimerTag))
                 {
                     vOldPosition = Vector3.Zero;
                     ResetCheckGold();
-                    return false;
+                    UnStuckCheckerLastResult = false;
+                    return UnStuckCheckerLastResult;
                 }
+
+                Zeta.Internals.UIElement vendorWindow = Zeta.Internals.UIElements.VendorWindow;
+
                 // We're not stuck if we're doing stuff!
                 if (ZetaDia.Me.IsInConversation || ZetaDia.IsPlayingCutscene || ZetaDia.IsLoadingWorld || (vendorWindow.IsValid && vendorWindow.IsVisible))
                 {
                     vOldPosition = Vector3.Zero;
                     ResetCheckGold();
-                    return false;
+                    UnStuckCheckerLastResult = false;
+                    return UnStuckCheckerLastResult;
                 }
 
+                AnimationState aState = ZetaDia.Me.CommonData.AnimationState;
                 // We're not stuck if we're doing stuff!
                 if (aState == AnimationState.Attacking ||
                     aState == AnimationState.Casting ||
@@ -168,16 +184,20 @@ namespace GilesTrinity.DbProvider
                 {
                     vOldPosition = Vector3.Zero;
                     ResetCheckGold();
-                    return false;
+                    UnStuckCheckerLastResult = false;
+                    return UnStuckCheckerLastResult;
                 }
 
                 if (vOldPosition != Vector3.Zero && vOldPosition.Distance(vMyCurrentPosition) <= 4f)
                 {
-                    return true;
+                    UnStuckCheckerLastResult = true;
+                    return UnStuckCheckerLastResult;
                 }
 
                 vOldPosition = vMyCurrentPosition;
             }
+
+            // Return last result if within the specified timeframe
             return false;
         }
         public static bool UnstuckChecker()
@@ -257,7 +277,7 @@ namespace GilesTrinity.DbProvider
             vSafeMovementLocation = Vector3.Zero;
             vOldPosition = Vector3.Zero;
             iTimesReachedStuckPoint = 0;
-            timeLastRecordedPosition = DateTime.Today;
+            TimeLastRecordedPosition = DateTime.Today;
             timeStartedUnstuckMeasure = DateTime.Today;
             // int iSafetyLoops = 0;
             if (iTimesReachedMaxUnstucks == 1)
@@ -452,7 +472,7 @@ namespace GilesTrinity.DbProvider
                 bool bTooMuchZChange = (Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z) >= 4f);
 
                 // Leap movement for a barb
-                if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Leap) &&
+                if (GilesTrinity.Hotbar.Contains(SNOPower.Barbarian_Leap) &&
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Barbarian_Leap]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Barbarian_Leap] &&
                     fDistanceFromTarget >= 20f &&
                     PowerManager.CanCast(SNOPower.Barbarian_Leap) && !ShrinesInArea(vMoveToTarget))
@@ -466,7 +486,7 @@ namespace GilesTrinity.DbProvider
                     return;
                 }
                 // Furious Charge movement for a barb
-                if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_FuriousCharge) && !bTooMuchZChange &&
+                if (GilesTrinity.Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) && !bTooMuchZChange &&
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Barbarian_FuriousCharge]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Barbarian_FuriousCharge] &&
                     fDistanceFromTarget >= 20f &&
                     PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge) && !ShrinesInArea(vMoveToTarget))
@@ -480,7 +500,7 @@ namespace GilesTrinity.DbProvider
                     return;
                 }
                 // Vault for a DH - maximum set by user-defined setting
-                if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.DemonHunter_Vault) && !bTooMuchZChange &&
+                if (GilesTrinity.Hotbar.Contains(SNOPower.DemonHunter_Vault) && !bTooMuchZChange &&
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= GilesTrinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     fDistanceFromTarget >= 18f &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) && !ShrinesInArea(vMoveToTarget) &&
@@ -501,14 +521,14 @@ namespace GilesTrinity.DbProvider
                     return;
                 }
                 // Tempest rush for a monk
-                if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.Monk_TempestRush) && !bTooMuchZChange)
+                if (GilesTrinity.Hotbar.Contains(SNOPower.Monk_TempestRush) && !bTooMuchZChange)
                 {
-                    if (!bCanChannelTR && GilesTrinity.playerStatus.CurrentEnergy >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit && fDistanceFromTarget > GilesTrinity.Settings.Combat.Monk.TR_MinDist)
-                        bCanChannelTR = true;
-                    else if (bCanChannelTR && (GilesTrinity.playerStatus.CurrentEnergy <= 20 || fDistanceFromTarget < 10f))
-                        bCanChannelTR = false;
+                    if (!CanChannelTempestRush && GilesTrinity.playerStatus.CurrentEnergy >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit && fDistanceFromTarget > GilesTrinity.Settings.Combat.Monk.TR_MinDist)
+                        CanChannelTempestRush = true;
+                    else if (CanChannelTempestRush && (GilesTrinity.playerStatus.CurrentEnergy <= 20 || fDistanceFromTarget < 10f))
+                        CanChannelTempestRush = false;
 
-                    if (bCanChannelTR)
+                    if (CanChannelTempestRush)
                     {
                         float aimPointDistance = 20f;
                         Vector3 vTargetAimPoint = vMoveToTarget;
@@ -527,7 +547,7 @@ namespace GilesTrinity.DbProvider
                     }
                 }
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
-                if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Teleport) &&
+                if (GilesTrinity.Hotbar.Contains(SNOPower.Wizard_Teleport) &&
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Wizard_Teleport] &&
                     fDistanceFromTarget >= 20f &&
                     PowerManager.CanCast(SNOPower.Wizard_Teleport) && !ShrinesInArea(vMoveToTarget))
@@ -541,7 +561,7 @@ namespace GilesTrinity.DbProvider
                     return;
                 }
                 // Archon Teleport for a wizard 
-                if (GilesTrinity.hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Archon_Teleport) &&
+                if (GilesTrinity.Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Archon_Teleport]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Wizard_Archon_Teleport] &&
                     fDistanceFromTarget >= 20f &&
                     PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport) && !ShrinesInArea(vMoveToTarget))

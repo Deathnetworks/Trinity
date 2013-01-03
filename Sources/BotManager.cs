@@ -20,12 +20,7 @@ namespace GilesTrinity
         /// <param name="bot"></param>
         private static void TrinityBotStart(IBot bot)
         {
-            if (!bPluginEnabled && bot != null)
-            {
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "WARNING: Giles Trinity is NOT YET ENABLED. Bot start detected");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Ignore this message if you are not currently using Giles Trinity.");
-                return;
-            }
+
             // Recording of all the XML's in use this run
             try
             {
@@ -46,7 +41,7 @@ namespace GilesTrinity
             {
                 ZetaDia.Actors.Update();
             }
-            bMappedPlayerAbilities = false;
+            HasMappedPlayerAbilities = false;
             if (!bMaintainStatTracking)
             {
                 ItemStatsWhenStartedBot = DateTime.Now;
@@ -63,9 +58,9 @@ namespace GilesTrinity
 
             ReplaceTreeHooks();
 
-            GilesPlayerMover.timeLastRecordedPosition = DateTime.Now;
-            GilesPlayerMover.timeLastRestartedGame = DateTime.Now;
-            GilesPlayerMover.ResetCheckGold();
+            PlayerMover.TimeLastRecordedPosition = DateTime.Now;
+            PlayerMover.timeLastRestartedGame = DateTime.Now;
+            PlayerMover.ResetCheckGold();
 
             //try
             //{
@@ -85,12 +80,12 @@ namespace GilesTrinity
             OutputReport();
             vBacktrackList = new SortedList<int, Vector3>();
             iTotalBacktracks = 0;
-            GilesPlayerMover.iTotalAntiStuckAttempts = 1;
-            GilesPlayerMover.vSafeMovementLocation = Vector3.Zero;
-            GilesPlayerMover.vOldPosition = Vector3.Zero;
-            GilesPlayerMover.iTimesReachedStuckPoint = 0;
-            GilesPlayerMover.timeLastRecordedPosition = DateTime.Today;
-            GilesPlayerMover.timeStartedUnstuckMeasure = DateTime.Today;
+            PlayerMover.iTotalAntiStuckAttempts = 1;
+            PlayerMover.vSafeMovementLocation = Vector3.Zero;
+            PlayerMover.vOldPosition = Vector3.Zero;
+            PlayerMover.iTimesReachedStuckPoint = 0;
+            PlayerMover.TimeLastRecordedPosition = DateTime.Today;
+            PlayerMover.timeStartedUnstuckMeasure = DateTime.Today;
             hashUseOnceID = new HashSet<int>();
             dictUseOnceID = new Dictionary<int, int>();
             dictRandomID = new Dictionary<int, int>();
@@ -117,7 +112,7 @@ namespace GilesTrinity
                 // Replace the combat behavior tree, as that happens first and so gets done quicker!
                 if (hook.Key.Contains("Combat"))
                 {
-                    hook.Value[0] = new Zeta.TreeSharp.Decorator(ctx => GilesGlobalOverlord(ctx), HandleTargetAction());
+                    hook.Value[0] = new Zeta.TreeSharp.Decorator(ctx => CheckHasTarget(ctx), HandleTargetAction());
                 }
 
                 // Vendor run hook
@@ -132,7 +127,7 @@ namespace GilesTrinity
                     VendorRunPrioritySelector.Children[5] = TownRun.Decorators.GetSellDecorator();
                     VendorRunPrioritySelector.Children[6] = TownRun.Decorators.GetSalvageDecorator();
 
-                    hook.Value[0] = new Decorator(ret => TownRun.GilesTownRunCheckOverlord(ret), VendorRunPrioritySelector);
+                    hook.Value[0] = new Decorator(ret => TownRun.TownRunCanRun(ret), VendorRunPrioritySelector);
 
                 }
 
