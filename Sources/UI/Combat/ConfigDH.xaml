@@ -70,7 +70,7 @@
             <TextBlock Text="Vault movement delay" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
             <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                     Interval="500" Maximum="4000" Minimum="400" 
-                    SmallChange="1" LargeChange="5" 
+                    SmallChange="10" LargeChange="5" 
                     TickPlacement="BottomRight" TickFrequency="1"
                     Value="{Binding Path=DH.VaultMovementDelay}" 
                     HorizontalAlignment="Stretch" Margin="2"

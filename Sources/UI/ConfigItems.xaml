@@ -42,7 +42,7 @@
                 <ComboBoxItem Content="Demonbuddy Loot Rules" Tag="DemonBuddy" ToolTip="Use the Built-in Demonbuddy loot rule logic (see Demonbuddy Settings tab)" />
             </ComboBox>
             <TextBlock Grid.Row="1" 
-                       Text="WARNING : This mode can sell or salvage your legendaries items" 
+                       Text="WARNING : This mode can sell or salvage your legendary items" 
                        HorizontalAlignment="Center" 
                        FontWeight="Bold" 
                        FontSize="12" 
@@ -313,9 +313,9 @@
                 <ComboBoxItem Content="Runic+" Tag="55" />
                 <ComboBoxItem Content="Mythic+" IsSelected="True" Tag="60" />
             </ComboBox>
-            <TextBlock Grid.Row="0" Grid.Column="2" FontWeight="Bold" Text="Minimum Gold Pile :"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" FontWeight="Bold" Text="Minimum Gold Pile:"/>
             <Slider Grid.Row="1" Grid.Column="2" Template="{DynamicResource Slider}"
-                    Interval="500" Maximum="4000" Minimum="0" SmallChange="1" LargeChange="100"
+                    Interval="500" Maximum="4000" Minimum="0" SmallChange="10" LargeChange="100"
                     TickFrequency="100" TickPlacement="BottomRight" 
                     Value="{Binding Path=Pickup.MinimumGoldStack}" />
         </Grid>

@@ -31,7 +31,7 @@ namespace GilesTrinity.Cache
                     ACD acd = unit.CommonData;
 
                     unit.Position = acd.Position;
-                    unit.CentreDistance = Vector3.Distance(GilesTrinity.playerStatus.CurrentPosition, acd.Position);
+                    unit.CentreDistance = Vector3.Distance(GilesTrinity.PlayerStatus.CurrentPosition, acd.Position);
 
                     if (unit.InternalUnit != null)
                     {

@@ -129,7 +129,7 @@ namespace GilesTrinity
                     }
 
                     // Check for death / player being dead
-                    if (playerStatus.CurrentHealthPct <= 0)
+                    if (PlayerStatus.CurrentHealthPct <= 0)
                     {
                         runStatus = HandlerRunStatus.TreeSuccess;
                     }
@@ -138,12 +138,12 @@ namespace GilesTrinity
                         return GetTreeSharpRunStatus(runStatus);
 
                     // See if we have been "newly rooted", to force target updates
-                    if (playerStatus.IsRooted && !wasRootedLastTick)
+                    if (PlayerStatus.IsRooted && !wasRootedLastTick)
                     {
                         wasRootedLastTick = true;
                         bForceTargetUpdate = true;
                     }
-                    if (!playerStatus.IsRooted)
+                    if (!PlayerStatus.IsRooted)
                         wasRootedLastTick = false;
                     if (CurrentTarget == null)
                     {
@@ -213,7 +213,7 @@ namespace GilesTrinity
 
                     // Pop a potion when necessary
                     // Note that we force a single-loop pause first, to help potion popping "go off"
-                    if (playerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !IsWaitingForPower && !IsWaitingForPotion && !playerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
+                    if (PlayerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !IsWaitingForPower && !IsWaitingForPotion && !PlayerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         IsWaitingForPotion = true;
                         runStatus = HandlerRunStatus.TreeRunning;
@@ -255,27 +255,27 @@ namespace GilesTrinity
                         if (DateTime.Now.Subtract(lastAddedLocationCache).TotalMilliseconds >= 100)
                         {
                             lastAddedLocationCache = DateTime.Now;
-                            if (Vector3.Distance(playerStatus.CurrentPosition, vLastRecordedLocationCache) >= 5f)
+                            if (Vector3.Distance(PlayerStatus.CurrentPosition, vLastRecordedLocationCache) >= 5f)
                             {
-                                hashSkipAheadAreaCache.Add(new GilesObstacle(playerStatus.CurrentPosition, 20f, 0));
-                                vLastRecordedLocationCache = playerStatus.CurrentPosition;
+                                hashSkipAheadAreaCache.Add(new GilesObstacle(PlayerStatus.CurrentPosition, 20f, 0));
+                                vLastRecordedLocationCache = PlayerStatus.CurrentPosition;
                             }
                         }
                         // Maintain a backtrack list only while fighting monsters
                         if (CurrentTarget.Type == GObjectType.Unit && Settings.Combat.Misc.AllowBacktracking &&
-                            (iTotalBacktracks == 0 || Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]) >= 10f))
+                            (iTotalBacktracks == 0 || Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]) >= 10f))
                         {
                             bool bAddThisBacktrack = true;
                             // Check we aren't within 12 feet of 2 backtracks again (eg darting back & forth)
                             if (iTotalBacktracks >= 2)
                             {
-                                if (Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks - 1]) < 12f)
+                                if (Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks - 1]) < 12f)
                                     bAddThisBacktrack = false;
                             }
                             if (bAddThisBacktrack)
                             {
                                 iTotalBacktracks++;
-                                vBacktrackList.Add(iTotalBacktracks, playerStatus.CurrentPosition);
+                                vBacktrackList.Add(iTotalBacktracks, PlayerStatus.CurrentPosition);
                             }
                         }
                     }
@@ -283,13 +283,13 @@ namespace GilesTrinity
 
                     using (new PerformanceLogger("HandleTarget.LoSCheck"))
                     {
-                        TargetCurrentDistance = Vector3.Distance(playerStatus.CurrentPosition, vCurrentDestination) - TargetDistanceReduction;
+                        TargetCurrentDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vCurrentDestination) - TargetDistanceReduction;
                         if (TargetCurrentDistance < 0f)
                             TargetCurrentDistance = 0f;
 
                         if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade && CurrentTarget.Type != GObjectType.Destructible)
                         {
-                            CurrentTargetIsInLoS = (GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
+                            CurrentTargetIsInLoS = (GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
                         }
                         else
                         {
@@ -300,13 +300,13 @@ namespace GilesTrinity
                     using (new PerformanceLogger("HandleTarget.MonkWeaponSwap"))
                     {
                         // Item Swap + Blinding flash cast
-                        if (playerStatus.ActorClass == ActorClass.Monk)
+                        if (PlayerStatus.ActorClass == ActorClass.Monk)
                         {
                             if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
                                 hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
                             {
                                 if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GetHasBuff(SNOPower.Monk_SweepingWind)
-                                    && (playerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 15)))
+                                    && (PlayerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && PlayerStatus.CurrentEnergy >= 15)))
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
                                     return RunStatus.Running;
@@ -318,7 +318,7 @@ namespace GilesTrinity
                                 }
                             }
                             // Spam sweeping winds
-                            if (hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (playerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && playerStatus.CurrentEnergy >= 5))
+                            if (hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (PlayerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && PlayerStatus.CurrentEnergy >= 5))
                                 && (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
                                 || !GetHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
                                 DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
@@ -519,7 +519,7 @@ namespace GilesTrinity
                                                 // Location attack - attack the Vector3/map-area (equivalent of holding shift and left-clicking the object in-game to "force-attack")
                                                 Vector3 vAttackPoint;
                                                 if (CurrentTarget.CentreDistance >= 6f)
-                                                    vAttackPoint = MathEx.CalculatePointFrom(CurrentTarget.Position, playerStatus.CurrentPosition, 6f);
+                                                    vAttackPoint = MathEx.CalculatePointFrom(CurrentTarget.Position, PlayerStatus.CurrentPosition, 6f);
                                                 else
                                                     vAttackPoint = CurrentTarget.Position;
 
@@ -588,7 +588,7 @@ namespace GilesTrinity
                     }
 
                     // Are we currently incapacitated? If so then wait...
-                    if (playerStatus.IsIncapacitated || playerStatus.IsRooted)
+                    if (PlayerStatus.IsIncapacitated || PlayerStatus.IsRooted)
                     {
                         return RunStatus.Running;
                     }
@@ -611,19 +611,19 @@ namespace GilesTrinity
                         {
                             Vector3 point = vCurrentDestination;
                             foreach (GilesObstacle tempobstacle in GilesTrinity.hashNavigationObstacleCache.Where(cp =>
-                                            GilesTrinity.GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, point) &&
-                                            cp.Location.Distance(playerStatus.CurrentPosition) > PlayerMover.GetObstacleNavigationSize(cp)))
+                                            GilesTrinity.GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, point) &&
+                                            cp.Location.Distance(PlayerStatus.CurrentPosition) > PlayerMover.GetObstacleNavigationSize(cp)))
                             {
                                 if (vShiftedPosition == Vector3.Zero)
                                 {
                                     if (DateTime.Now.Subtract(lastShiftedPosition).TotalSeconds >= 10)
                                     {
-                                        float fDirectionToTarget = GilesTrinity.FindDirectionDegree(playerStatus.CurrentPosition, vCurrentDestination);
-                                        vCurrentDestination = MathEx.GetPointAt(playerStatus.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget - 50));
-                                        if (!GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk))
+                                        float fDirectionToTarget = GilesTrinity.FindDirectionDegree(PlayerStatus.CurrentPosition, vCurrentDestination);
+                                        vCurrentDestination = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget - 50));
+                                        if (!GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk))
                                         {
-                                            vCurrentDestination = MathEx.GetPointAt(playerStatus.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget + 50));
-                                            if (!GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk))
+                                            vCurrentDestination = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget + 50));
+                                            if (!GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk))
                                             {
                                                 vCurrentDestination = point;
                                             }
@@ -669,7 +669,7 @@ namespace GilesTrinity
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||
                             CurrentTarget.Type == GObjectType.Globe ||
                             (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
-                            && GilesCanRayCast(playerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk)
+                            && GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk)
                             )
                         {
                             bool bFoundSpecialMovement = UsedSpecialMovement();
@@ -678,7 +678,7 @@ namespace GilesTrinity
                             {
                                 // Whirlwind for a barb
                                 //intell
-                                if (!IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && playerStatus.CurrentEnergy >= 10)
+                                if (!IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.CurrentEnergy >= 10)
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, iCurrentWorldID, -1);
                                     // Store the current destination for comparison incase of changes next loop
@@ -689,7 +689,7 @@ namespace GilesTrinity
                                     return RunStatus.Running;
                                 }
                                 // Tempest rush for a monk
-                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && playerStatus.CurrentEnergy >= 20 &&
+                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && PlayerStatus.CurrentEnergy >= 20 &&
                                     ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.CentreDistance > 20f) || CurrentTarget.Type != GObjectType.Item))
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, iCurrentWorldID, -1);
@@ -701,7 +701,7 @@ namespace GilesTrinity
                                     return RunStatus.Running;
                                 }
                                 // Strafe for a Demon Hunter
-                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && playerStatus.CurrentEnergy >= 15)
+                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && PlayerStatus.CurrentEnergy >= 15)
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Strafe, vCurrentDestination, iCurrentWorldID, -1);
                                     // Store the current destination for comparison incase of changes next loop
@@ -727,7 +727,7 @@ namespace GilesTrinity
 
                     // Whirlwind against everything within range (except backtrack points)
                     //intell
-                    if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && playerStatus.CurrentEnergy >= 10 && iAnythingWithinRange[RANGE_20] >= 1 && !IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
+                    if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.CurrentEnergy >= 10 && AnythingWithinRange[RANGE_20] >= 1 && !IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
                         (!Hotbar.Contains(SNOPower.Barbarian_Sprint) || GetHasBuff(SNOPower.Barbarian_Sprint)) &&
                         CurrentTarget.Type != GObjectType.Backtrack &&
                         (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && TargetCurrentDistance >= 6f) &&
@@ -791,7 +791,7 @@ namespace GilesTrinity
                         if (CurrentTarget.Type == GObjectType.Avoidance)
                         {
                             bAvoidDirectionBlacklisting = true;
-                            fAvoidBlacklistDirection = FindDirectionDegree(playerStatus.CurrentPosition, CurrentTarget.Position);
+                            fAvoidBlacklistDirection = FindDirectionDegree(PlayerStatus.CurrentPosition, CurrentTarget.Position);
                         }
                         // Handle body blocking by blacklisting
                         GilesHandleBodyBlocking();
@@ -878,7 +878,7 @@ namespace GilesTrinity
                         GetSecondsSinceTargetUpdate() > 4 && 
                         CurrentTarget.HitPoints > 0.90)
                     {
-                        if (GilesCanRayCast(playerStatus.CurrentPosition, CurrentTarget.Position, NavCellFlags.AllowWalk))
+                        if (GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position, NavCellFlags.AllowWalk))
                         {
                             addTargetToBlacklist = false;
                         }
@@ -943,7 +943,7 @@ namespace GilesTrinity
                     {
                         // Pick a suitable ability
                         CurrentPower = AbilitySelector(false, false, false);
-                        if (CurrentPower.SNOPower == SNOPower.None && !playerStatus.IsIncapacitated)
+                        if (CurrentPower.SNOPower == SNOPower.None && !PlayerStatus.IsIncapacitated)
                         {
                             iNoAbilitiesAvailableInARow++;
                             if (DateTime.Now.Subtract(lastRemindedAboutAbilities).TotalSeconds > 60 && iNoAbilitiesAvailableInARow >= 4)
@@ -976,7 +976,7 @@ namespace GilesTrinity
                 if (IsWaitingForPotion)
                 {
                     IsWaitingForPotion = false;
-                    if (!playerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
+                    if (!PlayerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).ThenBy(p => p.ItemStackQuantity).FirstOrDefault();
                         if (thisBestPotion != null)
@@ -1095,7 +1095,7 @@ namespace GilesTrinity
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
                     (PlayerKiteDistance <= 0 || (!hashMonsterObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
                     !hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance))) &&
-                    (!GilesTrinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, GilesTrinity.playerStatus.CurrentPosition, vCurrentDestination)))
+                    (!GilesTrinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, GilesTrinity.PlayerStatus.CurrentPosition, vCurrentDestination)))
                     )
                 {
                     WaitWhileAnimating(3, true);
@@ -1106,7 +1106,7 @@ namespace GilesTrinity
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Wizard_Teleport) &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_Teleport] &&
-                    playerStatus.CurrentEnergy >= 15 &&
+                    PlayerStatus.CurrentEnergy >= 15 &&
                     PowerManager.CanCast(SNOPower.Wizard_Teleport))
                 {
                     WaitWhileAnimating(3, true);
@@ -1180,7 +1180,7 @@ namespace GilesTrinity
                             case GObjectType.Gold:
                             case GObjectType.Item:
                                 // No raycast available, try and force-ignore this for a little while, and blacklist for a few seconds
-                                if (!GilesCanRayCast(playerStatus.CurrentPosition, CurrentTarget.Position, NavCellFlags.AllowWalk))
+                                if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position, NavCellFlags.AllowWalk))
                                 {
                                     IgnoreRactorGUID = CurrentTarget.RActorGuid;
                                     IgnoreTargetForLoops = 6;
@@ -1329,7 +1329,7 @@ namespace GilesTrinity
                 TargetDistanceReduction = 0f;
                 // Set current destination to our current target's destination
                 vCurrentDestination = CurrentTarget.Position;
-                float fDistanceToDestination = playerStatus.CurrentPosition.Distance(vCurrentDestination);
+                float fDistanceToDestination = PlayerStatus.CurrentPosition.Distance(vCurrentDestination);
                 switch (CurrentTarget.Type)
                 {
                     // * Unit, we need to pick an ability to use and get within range
@@ -1529,9 +1529,9 @@ namespace GilesTrinity
                 timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
                 iKeepLootRadiusExtendedFor = 8;
                 // if at full or nearly full health, see if we can raycast to it, if not, ignore it for 2000 ms
-                if (CurrentTarget.HitPoints >= 0.9d && iAnythingWithinRange[RANGE_50] > 3)
+                if (CurrentTarget.HitPoints >= 0.9d && AnythingWithinRange[RANGE_50] > 3)
                 {
-                    if (!GilesCanRayCast(playerStatus.CurrentPosition, CurrentTarget.Position, NavCellFlags.AllowWalk))
+                    if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position, NavCellFlags.AllowWalk))
                     {
                         IgnoreRactorGUID = CurrentTarget.RActorGuid;
                         IgnoreTargetForLoops = 6;

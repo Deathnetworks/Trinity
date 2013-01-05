@@ -44,12 +44,12 @@ namespace GilesTrinity
                         // Update player-data cache, including buffs
                         UpdateCachedPlayerData();
 
-                        if (playerStatus.CurrentHealthPct <= 0)
+                        if (PlayerStatus.CurrentHealthPct <= 0)
                         {
                             return false;
                         }
 
-                        if (Settings.Combat.Misc.UseNavMeshTargeting && !pf.IsNavigable(gp.WorldToGrid(playerStatus.CurrentPosition.ToVector2())))
+                        if (Settings.Combat.Misc.UseNavMeshTargeting && !pf.IsNavigable(gp.WorldToGrid(PlayerStatus.CurrentPosition.ToVector2())))
                         {
                             UpdateSearchGridProvider();
                         }
@@ -82,7 +82,7 @@ namespace GilesTrinity
                             {
                                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting Avoidance: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}",
                                     vAnySafePoint, vAnySafePoint.Distance(Me.Position), GetHeading(FindDirectionDegree(Me.Position, vAnySafePoint)),
-                                    playerStatus.CurrentHealthPct, PlayerKiteDistance);
+                                    PlayerStatus.CurrentHealthPct, PlayerKiteDistance);
                             }
 
                             bFoundSafeSpot = true;
@@ -91,8 +91,8 @@ namespace GilesTrinity
                                     Position = vAnySafePoint,
                                     Type = GObjectType.Avoidance,
                                     Weight = 20000,
-                                    CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
-                                    RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
+                                    CentreDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vAnySafePoint),
+                                    RadiusDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vAnySafePoint),
                                     InternalName = "GilesSafePoint"
                                 }; ;
                         }
@@ -122,7 +122,7 @@ namespace GilesTrinity
                 {
                     CurrentTarget = new GilesObject()
                                         {
-                                            Position = playerStatus.CurrentPosition,
+                                            Position = PlayerStatus.CurrentPosition,
                                             Type = GObjectType.Avoidance,
                                             Weight = 20000,
                                             CentreDistance = 2f,
@@ -206,7 +206,7 @@ namespace GilesTrinity
                 CurrentTarget = null;
                 // Reset all variables for target-weight finding
                 bAnyTreasureGoblinsPresent = false;
-                iCurrentMaxKillRadius = (float)(Settings.Combat.Misc.NonEliteRange);
+                iCurrentMaxKillRadius = Math.Min((float)(Settings.Combat.Misc.NonEliteRange), Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius);
                 //intell
                 iCurrentMaxLootRadius = Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius;
                 bStayPutDuringAvoidance = false;
@@ -229,7 +229,7 @@ namespace GilesTrinity
                     iCurrentMaxLootRadius = 0;
                 }
 
-                if (playerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+                if (PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
                 { //!sp - keep looking for kills while WOTB is up
                     iKeepKillRadiusExtendedFor = Math.Max(3, iKeepKillRadiusExtendedFor);
                     timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
@@ -326,7 +326,7 @@ namespace GilesTrinity
                 iPlayerOwnedDHPets = 0;
                 // Reset the counters for monsters at various ranges
                 ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
-                iAnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+                AnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
                 bAnyBossesInRange = false;
                 // Flag for if we should search for an avoidance spot or not
                 StandingInAvoidance = false;
@@ -354,13 +354,13 @@ namespace GilesTrinity
                 if (Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
                 {
                     refreshSource = from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                    orderby o.Distance
-                    select o;
+                                    orderby o.Distance
+                                    select o;
                 }
                 else
                 {
                     refreshSource = from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                    select o;
+                                    select o;
                 }
                 Stopwatch t1 = new Stopwatch();
 
@@ -542,7 +542,7 @@ namespace GilesTrinity
                 }
             }
             // Safety for Giles own portal-back-to-town for full-backpack
-            if (ForceVendorRunASAP || bWantToTownRun)
+            if (ForceVendorRunASAP || IsReadyToTownRun)
             {
                 if (dUseKillRadius <= 90) dUseKillRadius = 90;
             }
@@ -602,7 +602,7 @@ namespace GilesTrinity
             {
                 CurrentTarget = new GilesObject()
                                     {
-                                        Position = playerStatus.CurrentPosition,
+                                        Position = PlayerStatus.CurrentPosition,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
@@ -612,18 +612,18 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Waiting for loot to drop, delay: {0}ms", Settings.Combat.Misc.DelayAfterKill);
             }
             // Now see if we need to do any backtracking
-            if (CurrentTarget == null && iTotalBacktracks >= 2 && Settings.Combat.Misc.AllowBacktracking && !playerStatus.IsInTown)
+            if (CurrentTarget == null && iTotalBacktracks >= 2 && Settings.Combat.Misc.AllowBacktracking && !PlayerStatus.IsInTown)
             // Never bother with the 1st backtrack position nor if we are in town
             {
                 // See if we're already within 18 feet of our start position first
-                if (Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[1]) <= 18f)
+                if (Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[1]) <= 18f)
                 {
                     vBacktrackList = new SortedList<int, Vector3>();
                     iTotalBacktracks = 0;
                 }
                 // See if we can raytrace to the final location and it's within 25 feet
-                if (iTotalBacktracks >= 2 && Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[1]) <= 25f &&
-                    GilesCanRayCast(playerStatus.CurrentPosition, vBacktrackList[1], NavCellFlags.AllowWalk))
+                if (iTotalBacktracks >= 2 && Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[1]) <= 25f &&
+                    GilesCanRayCast(PlayerStatus.CurrentPosition, vBacktrackList[1], NavCellFlags.AllowWalk))
                 {
                     vBacktrackList = new SortedList<int, Vector3>();
                     iTotalBacktracks = 0;
@@ -633,7 +633,7 @@ namespace GilesTrinity
                     // See if we can skip to the next backtracker location first
                     if (iTotalBacktracks >= 3)
                     {
-                        if (Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks - 1]) <= 10f)
+                        if (Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks - 1]) <= 10f)
                         {
                             vBacktrackList.Remove(iTotalBacktracks);
                             iTotalBacktracks--;
@@ -644,8 +644,8 @@ namespace GilesTrinity
                                             Position = vBacktrackList[iTotalBacktracks],
                                             Type = GObjectType.Backtrack,
                                             Weight = 20000,
-                                            CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
-                                            RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
+                                            CentreDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
+                                            RadiusDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
                                             InternalName = "GilesBacktrack"
                                         };
                 }
@@ -676,12 +676,12 @@ namespace GilesTrinity
             //}
             // And a special check for wizard archon
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Wizard_Archon) && !GilesUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && ZetaDia.CurrentWorldId == 121214 &&
-                (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+                (Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for Wizard Archon cooldown before continuing to Azmodan.");
                 CurrentTarget = new GilesObject()
                                     {
-                                        Position = playerStatus.CurrentPosition,
+                                        Position = PlayerStatus.CurrentPosition,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
@@ -691,12 +691,12 @@ namespace GilesTrinity
             }
             // And a very sexy special check for WD BigBadVoodoo
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Witchdoctor_BigBadVoodoo) && !PowerManager.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && ZetaDia.CurrentWorldId == 121214 &&
-                (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+                (Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for WD BigBadVoodoo cooldown before continuing to Azmodan.");
                 CurrentTarget = new GilesObject()
                                     {
-                                        Position = playerStatus.CurrentPosition,
+                                        Position = PlayerStatus.CurrentPosition,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
@@ -733,13 +733,13 @@ namespace GilesTrinity
                 if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
                 {
                     TryToKite = true;
-                    vKitePointAvoid = playerStatus.CurrentPosition;
+                    vKitePointAvoid = PlayerStatus.CurrentPosition;
                 }
 
-                if (monsterList.Count() > 0 && (playerStatus.ActorClass != ActorClass.Wizard || IsWizardShouldKite()))
+                if (monsterList.Count() > 0 && (PlayerStatus.ActorClass != ActorClass.Wizard || IsWizardShouldKite()))
                 {
                     TryToKite = true;
-                    vKitePointAvoid = playerStatus.CurrentPosition;
+                    vKitePointAvoid = PlayerStatus.CurrentPosition;
                 }
 
                 // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
@@ -761,11 +761,11 @@ namespace GilesTrinity
                         {
                             PositionFoundTime = DateTime.Now,
                             Position = vAnySafePoint,
-                            Distance = vAnySafePoint.Distance(playerStatus.CurrentPosition)
+                            Distance = vAnySafePoint.Distance(PlayerStatus.CurrentPosition)
                         };
                     }
 
-                    if (vAnySafePoint != Vector3.Zero && vAnySafePoint.Distance(playerStatus.CurrentPosition) >= 1)
+                    if (vAnySafePoint != Vector3.Zero && vAnySafePoint.Distance(PlayerStatus.CurrentPosition) >= 1)
                     {
 
                         if ((DateTime.Now.Subtract(LastKitePosition.PositionFoundTime).TotalMilliseconds > 3000 && LastKitePosition.Position == vAnySafePoint) ||
@@ -782,15 +782,15 @@ namespace GilesTrinity
                             {
                                 PositionFoundTime = DateTime.Now,
                                 Position = vAnySafePoint,
-                                Distance = vAnySafePoint.Distance(playerStatus.CurrentPosition)
+                                Distance = vAnySafePoint.Distance(PlayerStatus.CurrentPosition)
                             };
                         }
 
                         if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Moving))
                         {
                             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
-                                vAnySafePoint, vAnySafePoint.Distance(playerStatus.CurrentPosition), GetHeading(FindDirectionDegree(Me.Position, vAnySafePoint)),
-                                playerStatus.CurrentHealthPct, PlayerKiteDistance, monsterList.Count(),
+                                vAnySafePoint, vAnySafePoint.Distance(PlayerStatus.CurrentPosition), GetHeading(FindDirectionDegree(Me.Position, vAnySafePoint)),
+                                PlayerStatus.CurrentHealthPct, PlayerKiteDistance, monsterList.Count(),
                                 NeedToKite, TryToKite);
                         }
                         CurrentTarget = new GilesObject()
@@ -798,9 +798,9 @@ namespace GilesTrinity
                                                 Position = vAnySafePoint,
                                                 Type = GObjectType.Avoidance,
                                                 Weight = 20000,
-                                                CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
-                                                RadiusDistance = Vector3.Distance(playerStatus.CurrentPosition, vAnySafePoint),
-                                                InternalName = "GilesKiting"
+                                                CentreDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vAnySafePoint),
+                                                RadiusDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vAnySafePoint),
+                                                InternalName = "KitePoint"
                                             };
 
                         timeCancelledKiteMove = DateTime.Now;
@@ -818,26 +818,18 @@ namespace GilesTrinity
                 }
                 else if (!shouldEmergencyMove && NeedToKite)
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Emergency movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Emergency movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
                 }
                 else if (!shouldKite && TryToKite)
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kite movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kite movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
                 }
             }
         }
-        public static string GetHeading(float heading)
-        {
-            var directions = new string[] {
-                "n", "ne", "e", "se", "s", "sw", "w", "nw", "n"
-            };
 
-            var index = (((int)heading) + 23) / 45;
-            return directions[index];
-        }
         private static bool IsWizardShouldKite()
         {
-            return (playerStatus.ActorClass == ActorClass.Wizard && (!Settings.Combat.Wizard.OnlyKiteInArchon || GetHasBuff(SNOPower.Wizard_Archon)));
+            return (PlayerStatus.ActorClass == ActorClass.Wizard && (!Settings.Combat.Wizard.OnlyKiteInArchon || GetHasBuff(SNOPower.Wizard_Archon)));
         }
     }
 }

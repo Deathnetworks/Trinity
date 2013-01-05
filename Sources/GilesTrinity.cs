@@ -24,7 +24,7 @@ namespace GilesTrinity
         {
             using (new PerformanceLogger("UpdateCachedPlayerData"))
             {
-                if (DateTime.Now.Subtract(playerStatus.LastUpdated).TotalMilliseconds <= 100)
+                if (DateTime.Now.Subtract(PlayerStatus.LastUpdated).TotalMilliseconds <= 100)
                     return;
                 // If we aren't in the game of a world is loading, don't do anything yet
                 if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
@@ -39,38 +39,38 @@ namespace GilesTrinity
                     using (new PerformanceLogger("UpdateCachedPlayerData.1"))
                     {
 
-                        playerStatus.LastUpdated = DateTime.Now;
-                        playerStatus.IsInTown = me.IsInTown;
-                        playerStatus.IsIncapacitated = (me.IsFeared || me.IsStunned || me.IsFrozen || me.IsBlind);
-                        playerStatus.IsRooted = me.IsRooted;
+                        PlayerStatus.LastUpdated = DateTime.Now;
+                        PlayerStatus.IsInTown = me.IsInTown;
+                        PlayerStatus.IsIncapacitated = (me.IsFeared || me.IsStunned || me.IsFrozen || me.IsBlind);
+                        PlayerStatus.IsRooted = me.IsRooted;
 
                     }
                     using (new PerformanceLogger("UpdateCachedPlayerData.2"))
                     {
 
-                        playerStatus.CurrentHealthPct = me.HitpointsCurrentPct;
-                        playerStatus.CurrentEnergy = me.CurrentPrimaryResource;
-                        playerStatus.CurrentEnergyPct = playerStatus.CurrentEnergy / me.MaxPrimaryResource;
-                        playerStatus.Discipline = me.CurrentSecondaryResource;
-                        playerStatus.DisciplinePct = playerStatus.Discipline / me.MaxSecondaryResource;
-                        playerStatus.CurrentPosition = me.Position;
+                        PlayerStatus.CurrentHealthPct = me.HitpointsCurrentPct;
+                        PlayerStatus.CurrentEnergy = me.CurrentPrimaryResource;
+                        PlayerStatus.CurrentEnergyPct = PlayerStatus.CurrentEnergy / me.MaxPrimaryResource;
+                        PlayerStatus.Discipline = me.CurrentSecondaryResource;
+                        PlayerStatus.DisciplinePct = PlayerStatus.Discipline / me.MaxSecondaryResource;
+                        PlayerStatus.CurrentPosition = me.Position;
                     }
                     using (new PerformanceLogger("UpdateCachedPlayerData.3"))
                     {
 
-                        if (playerStatus.CurrentEnergy >= MinEnergyReserve)
-                            playerStatus.WaitingForReserveEnergy = false;
-                        if (playerStatus.CurrentEnergy < 20)
-                            playerStatus.WaitingForReserveEnergy = true;
-                        playerStatus.MyDynamicID = me.CommonData.DynamicId;
-                        playerStatus.Level = me.Level;
-                        playerStatus.ActorClass = me.ActorClass;
-                        playerStatus.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
-                        playerStatus.LevelAreaId = ZetaDia.CurrentLevelAreaId;
+                        if (PlayerStatus.CurrentEnergy >= MinEnergyReserve)
+                            PlayerStatus.WaitingForReserveEnergy = false;
+                        if (PlayerStatus.CurrentEnergy < 20)
+                            PlayerStatus.WaitingForReserveEnergy = true;
+                        PlayerStatus.MyDynamicID = me.CommonData.DynamicId;
+                        PlayerStatus.Level = me.Level;
+                        PlayerStatus.ActorClass = me.ActorClass;
+                        PlayerStatus.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
+                        PlayerStatus.LevelAreaId = ZetaDia.CurrentLevelAreaId;
                     }
                     using (new PerformanceLogger("UpdateCachedPlayerData.4"))
                     {
-                        if (DateTime.Now.Subtract(playerStatus.Scene.LastUpdate).TotalMilliseconds > 1000 && Settings.Combat.Misc.UseNavMeshTargeting)
+                        if (DateTime.Now.Subtract(PlayerStatus.Scene.LastUpdate).TotalMilliseconds > 1000 && Settings.Combat.Misc.UseNavMeshTargeting)
                         {
                             int CurrentSceneSNO = -1;
                             using (new PerformanceLogger("UpdateCachedPlayerData.4.1"))
@@ -79,9 +79,9 @@ namespace GilesTrinity
                             }
                             using (new PerformanceLogger("UpdateCachedPlayerData.4.2"))
                             {
-                                if (playerStatus.SceneId != CurrentSceneSNO)
+                                if (PlayerStatus.SceneId != CurrentSceneSNO)
                                 {
-                                    playerStatus.SceneId = CurrentSceneSNO;
+                                    PlayerStatus.SceneId = CurrentSceneSNO;
                                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Updating Grid Provider", true);
                                     UpdateSearchGridProvider();
                                 }
@@ -158,7 +158,7 @@ namespace GilesTrinity
         {
             if (DateTime.Now.Subtract(lastDied).TotalSeconds > 10)
             {
-                if (playerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.SweepingWindWeaponSwap)
+                if (PlayerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.SweepingWindWeaponSwap)
                 {
                     // Reset status incase we died during swap.
                     weaponSwap.CheckAfterDeath();
@@ -262,6 +262,8 @@ namespace GilesTrinity
 
             UpdateSearchGridProvider();
             PlayerMover.ResetCheckGold();
+
+            global::GilesTrinity.XmlTags.TrinityLoadOnce.UsedProfiles = new List<string>();
 
         }
     }

@@ -1,15 +1,7 @@
-﻿using Zeta.CommonBot.Profile;
-using Zeta.TreeSharp;
-using Zeta.XmlEngine;
-
+﻿using System;
 using GilesTrinity.Technicals;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Zeta;
-using Zeta.Common;
 using Zeta.CommonBot.Profile;
-using Zeta.Navigation;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
@@ -31,13 +23,13 @@ namespace GilesTrinity.XmlTags
             return new Zeta.TreeSharp.Action(ret =>
             {
                 if (ZetaDia.Me.ActorClass == Zeta.Internals.Actors.ActorClass.Monk && GilesTrinity.Hotbar.Contains(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind)
-                    && GilesTrinity.Settings.Combat.Monk.HasInnaSet && GilesTrinity.playerStatus.CurrentEnergy > 10)
+                    && GilesTrinity.Settings.Combat.Monk.HasInnaSet && GilesTrinity.PlayerStatus.CurrentEnergy > 10)
                 {
                     if (DateTime.Now.Subtract(GilesTrinity.SweepWindSpam).TotalMilliseconds >= 1500)
                     {
                         if (GilesTrinity.GetHasBuff(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind))
                         {
-                            ZetaDia.Me.UsePower(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind, GilesTrinity.playerStatus.CurrentPosition, GilesTrinity.iCurrentWorldID, -1);
+                            ZetaDia.Me.UsePower(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind, GilesTrinity.PlayerStatus.CurrentPosition, GilesTrinity.iCurrentWorldID, -1);
                             GilesTrinity.SweepWindSpam = DateTime.Now;
                             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Cast Sweeping Winds.");
                         }

@@ -679,7 +679,7 @@ namespace GilesTrinity
             TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
 
             // Create whole new file
-            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("Stats - {0}.log", playerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read);
+            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("Stats - {0}.log", PlayerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read);
             using (StreamWriter LogWriter = new StreamWriter(LogStream))
             {
                 LogWriter.WriteLine("===== Misc Statistics =====");
@@ -903,6 +903,26 @@ namespace GilesTrinity
             LogStream.Close();
         }
 
+        internal static bool TownVisitShouldTownRun()
+        {
+            double cellsFilled = 0;
+            foreach (ACDItem i in ZetaDia.Me.Inventory.Backpack)
+            {
+                cellsFilled++;
+                if (i.IsTwoSquareItem)
+                    cellsFilled++;
+            }
+
+            double maxCells = 60;
+            double ratioCellsFilled = cellsFilled / maxCells;
+
+            // return true if we're already in town and backpack is 1/2 full
+            if (ratioCellsFilled > .5 && ZetaDia.Me.IsInTown)
+                return true;
+
+            return false;
+        }
+
         /// <summary>
         /// Search backpack to see if we have room for a 2-slot item anywhere
         /// </summary>
@@ -917,13 +937,12 @@ namespace GilesTrinity
             {
                 BackpackSlotBlocked[square.Column, square.Row] = true;
             }
-            if (playerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.SweepingWindWeaponSwap)
+            if (PlayerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.SweepingWindWeaponSwap)
             {
                 BackpackSlotBlocked[9, 4] = true;
                 BackpackSlotBlocked[9, 5] = true;
             }
 
-            double cellsFilled = 0;
             // Map out all the items already in the backpack
             foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
@@ -936,25 +955,17 @@ namespace GilesTrinity
 
                 // Mark this slot as not-free
                 BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
-                cellsFilled++;
 
                 // Try and reliably find out if this is a two slot item or not
                 GItemType tempItemType = DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType);
                 if (DetermineIsTwoSlot(tempItemType) && inventoryRow < 5)
                 {
-                    cellsFilled++;
                     BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                 }
             }
+
             int iPointX = -1;
             int iPointY = -1;
-
-            double maxCells = 60;
-            double ratioCellsFilled = cellsFilled / maxCells;
-
-            // return "true" if we're already in town and backpack is 1/2 full
-            if (ratioCellsFilled > .5 && ZetaDia.Me.IsInTown)
-                return new Vector2(iPointX, iPointY);
 
             // 6 rows
             for (int iRow = 0; iRow <= 5; iRow++)

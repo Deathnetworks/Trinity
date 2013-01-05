@@ -21,7 +21,7 @@ namespace GilesTrinity.Cache
         internal static float GetZDiff(Vector3 Position)
         {
             if (Position != Vector3.Zero)
-                return Math.Abs(GilesTrinity.playerStatus.CurrentPosition.Z - Position.Z);
+                return Math.Abs(GilesTrinity.PlayerStatus.CurrentPosition.Z - Position.Z);
             else
                 return 0f;
         }

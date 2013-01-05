@@ -47,17 +47,18 @@
         </Grid>
         <!--CheckBox-->
         <Grid Grid.Row="1" Margin="2">
-            <UniformGrid Columns="3">
+            <UniformGrid Columns="2">
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.HasInnaSet}" ToolTip="Sweeping Wind for 5 Spirit">Inna's set</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.SweepingWindWeaponSwap}" ToolTip="Sweeping Wind Weapon Swap Exploit">Weapon Swap</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.DisableMantraSpam}" ToolTip="Disable Spamming Mantras (for the 3-sec. buff)">Disable Mantra Spam</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.UseTRMovement}" ToolTip="Disable Tempest Rush for combat, and optimize it for movement.  This will also ignore frenzy shrines!">Tempest Rush Traversal</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.TargetBasedZigZag}" ToolTip="Used Monster positions for Tempest Rush instead of random XYZ">Multi-Target Based ZigZag</CheckBox>
             </UniformGrid>
         </Grid>
         
         <!--Options for TR-->
         <Grid Grid.Row="2" Margin="2">
             <UniformGrid Columns="3">
-                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.UseTRMovement}" ToolTip="Disable Tempest Rush for combat, and optimize it for movement.  This will also ignore frenzy shrines!">Tempest Rush Traversal</CheckBox>
             </UniformGrid>
         </Grid>
         

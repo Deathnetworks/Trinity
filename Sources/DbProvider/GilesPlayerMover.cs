@@ -146,8 +146,11 @@ namespace GilesTrinity.DbProvider
                     return UnStuckCheckerLastResult;
                 }
 
+                if (checkDuration >= 3000)
+                {
+                    TimeLastRecordedPosition = DateTime.Now;
+                }
 
-                TimeLastRecordedPosition = DateTime.Now;
                 Composite c = null;
 
                 try
@@ -194,7 +197,10 @@ namespace GilesTrinity.DbProvider
                     return UnStuckCheckerLastResult;
                 }
 
-                vOldPosition = vMyCurrentPosition;
+                if (checkDuration >= 3000)
+                {
+                    vOldPosition = vMyCurrentPosition;
+                }
             }
 
             // Return last result if within the specified timeframe
@@ -255,12 +261,12 @@ namespace GilesTrinity.DbProvider
                 );
 
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
-                GilesTrinity.playerStatus.CurrentPosition = vMyCurrentPosition;
+                GilesTrinity.PlayerStatus.CurrentPosition = vMyCurrentPosition;
                 vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
                 // Temporarily log stuff
                 if (iTotalAntiStuckAttempts == 1 && GilesTrinity.Settings.Advanced.LogStuckLocation)
                 {
-                    FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "Stucks - " + GilesTrinity.playerStatus.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
+                    FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "Stucks - " + GilesTrinity.PlayerStatus.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
                     {
                         LogWriter.WriteLine(DateTime.Now.ToString() + ": Original Destination=" + vOldMoveToTarget.ToString() + ". Current player position when stuck=" + vMyCurrentPosition.ToString());
@@ -408,7 +414,7 @@ namespace GilesTrinity.DbProvider
                     // Do we want to immediately generate a 2nd waypoint to "chain" anti-stucks in an ever-increasing path-length?
                     if (iTimesReachedStuckPoint <= iTotalAntiStuckAttempts)
                     {
-                        GilesTrinity.playerStatus.CurrentPosition = vMyCurrentPosition;
+                        GilesTrinity.PlayerStatus.CurrentPosition = vMyCurrentPosition;
                         vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
                         vMoveToTarget = vSafeMovementLocation;
                     }
@@ -450,7 +456,7 @@ namespace GilesTrinity.DbProvider
                     // Make sure we only shift max once every 1 second
                     if (DateTime.Now.Subtract(lastShiftedPosition).TotalSeconds >= 1)
                     {
-                        GetShiftedPosition(ref vMoveToTarget, ref point, obstacle.Radius + 15f);
+                        GetShiftedPosition(ref vMoveToTarget, ref point, obstacle.Radius + 5f);
                     }
                 }
                 else
@@ -507,7 +513,7 @@ namespace GilesTrinity.DbProvider
                     // Don't Vault into avoidance/monsters if we're kiting
                     (GilesTrinity.PlayerKiteDistance <= 0 || (GilesTrinity.PlayerKiteDistance > 0 &&
                      (!GilesTrinity.hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= GilesTrinity.PlayerKiteDistance) ||
-                     (!GilesTrinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, GilesTrinity.playerStatus.CurrentPosition, vMoveToTarget))) ||
+                     (!GilesTrinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, GilesTrinity.PlayerStatus.CurrentPosition, vMoveToTarget))) ||
                      !GilesTrinity.hashMonsterObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= GilesTrinity.PlayerKiteDistance))))
                     )
                 {
@@ -523,9 +529,9 @@ namespace GilesTrinity.DbProvider
                 // Tempest rush for a monk
                 if (GilesTrinity.Hotbar.Contains(SNOPower.Monk_TempestRush) && !bTooMuchZChange)
                 {
-                    if (!CanChannelTempestRush && GilesTrinity.playerStatus.CurrentEnergy >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit && fDistanceFromTarget > GilesTrinity.Settings.Combat.Monk.TR_MinDist)
+                    if (!CanChannelTempestRush && GilesTrinity.PlayerStatus.CurrentEnergy >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit && fDistanceFromTarget > GilesTrinity.Settings.Combat.Monk.TR_MinDist)
                         CanChannelTempestRush = true;
-                    else if (CanChannelTempestRush && (GilesTrinity.playerStatus.CurrentEnergy <= 20 || fDistanceFromTarget < 10f))
+                    else if (CanChannelTempestRush && (GilesTrinity.PlayerStatus.CurrentEnergy <= 20 || fDistanceFromTarget < 10f))
                         CanChannelTempestRush = false;
 
                     if (CanChannelTempestRush)
@@ -583,7 +589,7 @@ namespace GilesTrinity.DbProvider
                 ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
                 //ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget);
 
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Used basic movement to {0}", vMoveToTarget);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Used basic movement to {0}, direction: {1}", vMoveToTarget, GilesTrinity.GetHeadingToPoint(vMoveToTarget));
             }
             else
             {

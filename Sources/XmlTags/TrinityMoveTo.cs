@@ -70,7 +70,7 @@ namespace GilesTrinity.XmlTags
             // Now use Trinity movement to try a direct movement towards that location
 
             Vector3 NavTarget = Position;
-            Vector3 MyPos = GilesTrinity.playerStatus.CurrentPosition;
+            Vector3 MyPos = GilesTrinity.PlayerStatus.CurrentPosition;
             if (Vector3.Distance(MyPos, NavTarget) > 250)
             {
                 NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);

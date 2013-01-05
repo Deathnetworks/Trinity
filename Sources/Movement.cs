@@ -24,16 +24,22 @@ namespace GilesTrinity
             {
                 using (new PerformanceLogger("FindZigZagTargetLocation.CheckObjectCache"))
                 {
+                    bool useTargetBasedZigZag = false;
+                    if (PlayerStatus.ActorClass == ActorClass.Monk)
+                        useTargetBasedZigZag = (Settings.Combat.Monk.TargetBasedZigZag);
+                    if (PlayerStatus.ActorClass == ActorClass.Barbarian)
+                        useTargetBasedZigZag = (Settings.Combat.Barbarian.TargetBasedZigZag);
+
                     float minDistance = 2f;
                     float maxDistance = 20f;
                     int minTargets = 3;
 
-                    if (GilesObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
+                    if (useTargetBasedZigZag && GilesObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
                     {
                         IEnumerable<GilesObject> zigZagTargets =
                             from u in GilesObjectCache
                             where u.Type == GObjectType.Unit && u.RadiusDistance > minDistance && u.RadiusDistance < maxDistance && u.RActorGuid != CurrentTarget.RActorGuid &&
-                            !hashAvoidanceObstacleCache.Any(a => Vector3.Distance(u.Position, a.Location) < GetAvoidanceRadius(a.ActorSNO) && playerStatus.CurrentHealthPct <= GetAvoidanceHealth(a.ActorSNO))
+                            !hashAvoidanceObstacleCache.Any(a => Vector3.Distance(u.Position, a.Location) < GetAvoidanceRadius(a.ActorSNO) && PlayerStatus.CurrentHealthPct <= GetAvoidanceHealth(a.ActorSNO))
                             select u;
                         if (zigZagTargets.Count() >= minTargets)
                         {
@@ -54,7 +60,7 @@ namespace GilesTrinity
                         iFakeStart = rndNum.Next(18) * 5;
                     if (bRandomizeDistance)
                         fDistanceOutreach += rndNum.Next(18);
-                    float fDirectionToTarget = FindDirectionDegree(playerStatus.CurrentPosition, vTargetLocation);
+                    float fDirectionToTarget = FindDirectionDegree(PlayerStatus.CurrentPosition, vTargetLocation);
 
                     float fPointToTarget;
 
@@ -95,7 +101,7 @@ namespace GilesTrinity
                             if (iPosition >= 360f)
                                 iPosition = iPosition - 360f;
 
-                            vThisZigZag = MathEx.GetPointAt(playerStatus.CurrentPosition, fRunDistance, MathEx.ToRadians(iPosition));
+                            vThisZigZag = MathEx.GetPointAt(PlayerStatus.CurrentPosition, fRunDistance, MathEx.ToRadians(iPosition));
 
                             if (fPointToTarget <= 30f || fPointToTarget >= 330f)
                             {
@@ -105,7 +111,7 @@ namespace GilesTrinity
                             {
                                 //K: we are trying to find position that we can circle around the target
                                 //   but we shouldn't run too far away from target
-                                vThisZigZag.Z = (vTargetLocation.Z + playerStatus.CurrentPosition.Z) / 2;
+                                vThisZigZag.Z = (vTargetLocation.Z + PlayerStatus.CurrentPosition.Z) / 2;
                                 fRunDistance = fDistanceOutreach - 5f;
                             }
                             else
@@ -120,14 +126,14 @@ namespace GilesTrinity
                                 if (bCheckGround)
                                 {
                                     vThisZigZag.Z = gp.GetHeight(vThisZigZag.ToVector2());
-                                    bCanRayCast = ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
+                                    bCanRayCast = ZetaDia.Physics.Raycast(PlayerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
                                 }
                                 else
                                     bCanRayCast = pf.IsNavigable(gp.WorldToGrid(vThisZigZag.ToVector2()));
                             }
                             else
                             {
-                                bCanRayCast = ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
+                                bCanRayCast = ZetaDia.Physics.Raycast(PlayerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
                             }
 
                             // Give weight to each zigzag point, so we can find the best one to aim for
@@ -145,10 +151,10 @@ namespace GilesTrinity
                                 }
 
                                 // Remove weight for each avoidance *IN* that location
-                                if (hashAvoidanceObstacleCache.Any(m => m.Location.Distance(vThisZigZag) <= m.Radius && playerStatus.CurrentHealthPct <= GetAvoidanceHealth(m.ActorSNO)))
+                                if (hashAvoidanceObstacleCache.Any(m => m.Location.Distance(vThisZigZag) <= m.Radius && PlayerStatus.CurrentHealthPct <= GetAvoidanceHealth(m.ActorSNO)))
                                     continue;
 
-                                foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => GilesIntersectsPath(cp.Location, cp.Radius * 1.2f, playerStatus.CurrentPosition, vThisZigZag)))
+                                foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => GilesIntersectsPath(cp.Location, cp.Radius * 1.2f, PlayerStatus.CurrentPosition, vThisZigZag)))
                                 {
                                     bAnyAvoidance = true;
                                     //fThisWeight -= (float)tempobstacle.Weight;
@@ -233,26 +239,26 @@ namespace GilesTrinity
                 }
                 hasEmergencyTeleportUp = (
                     // Leap is available
-                    (!playerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Leap) &&
+                    (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Leap) &&
                         DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Leap]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Barbarian_Leap]) ||
                     // Whirlwind is available
-                    (!playerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
-                        ((playerStatus.CurrentEnergy >= 10 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= MinEnergyReserve)) ||
+                    (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
+                        ((PlayerStatus.CurrentEnergy >= 10 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.CurrentEnergy >= MinEnergyReserve)) ||
                     // Tempest rush is available
-                    (!playerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_TempestRush) &&
-                        ((playerStatus.CurrentEnergy >= 20 && !playerStatus.WaitingForReserveEnergy) || playerStatus.CurrentEnergy >= MinEnergyReserve)) ||
+                    (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_TempestRush) &&
+                        ((PlayerStatus.CurrentEnergy >= 20 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.CurrentEnergy >= MinEnergyReserve)) ||
                     // Teleport is available
-                    (!playerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Teleport) &&
-                        playerStatus.CurrentEnergy >= 15 &&
+                    (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Teleport) &&
+                        PlayerStatus.CurrentEnergy >= 15 &&
                         PowerManager.CanCast(SNOPower.Wizard_Teleport)) ||
                     // Archon Teleport is available
-                    (!playerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
+                    (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
                         PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
                     );
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
-                if (!shouldKite && playerStatus.ActorClass == ActorClass.Wizard && Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && playerStatus.CurrentEnergy >= 25 &&
+                if (!shouldKite && PlayerStatus.ActorClass == ActorClass.Wizard && Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && PlayerStatus.CurrentEnergy >= 25 &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_WaveOfForce] &&
-                    !playerStatus.IsIncapacitated && hashAvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(playerStatus.CurrentPosition) <= 15f) >= 2 &&
+                    !PlayerStatus.IsIncapacitated && hashAvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(PlayerStatus.CurrentPosition) <= 15f) >= 2 &&
                     (Settings.Combat.Wizard.CriticalMass || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, vNullLocation, iCurrentWorldID, -1);
@@ -508,7 +514,7 @@ namespace GilesTrinity
                     WorldId = 78839,
                     Position = (new Vector3(59.50927f,60.12386f,0.100002f)),
                     Name = "Chamber of Suffering (Butcher)",
-                    Radius = 90f
+                    Radius = 120f
                 }
             }
         };
@@ -858,6 +864,19 @@ namespace GilesTrinity
                 }
             }
 
+        }
+        public static string GetHeadingToPoint(Vector3 TargetPoint)
+        {
+            return GetHeading(FindDirectionDegree(PlayerStatus.CurrentPosition, TargetPoint));
+        }
+        public static string GetHeading(float heading)
+        {
+            var directions = new string[] {
+                "n", "ne", "e", "se", "s", "sw", "w", "nw", "n"
+            };
+
+            var index = (((int)heading) + 23) / 45;
+            return directions[index].ToUpper();
         }
     }
 }

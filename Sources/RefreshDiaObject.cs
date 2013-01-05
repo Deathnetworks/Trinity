@@ -173,7 +173,6 @@ namespace GilesTrinity
                 AddUnitToMonsterObstacleCache(AddToCache);
             }
 
-
             if (AddToCache)
             {
                 c_IgnoreReason = "None";
@@ -402,7 +401,7 @@ namespace GilesTrinity
         private static void RefreshStepCalculateDistance()
         {
             // Calculate distance, don't rely on DB's internal method as this may hit Diablo 3 memory again
-            c_CentreDistance = Vector3.Distance(playerStatus.CurrentPosition, c_Position);
+            c_CentreDistance = Vector3.Distance(PlayerStatus.CurrentPosition, c_Position);
             // Set radius-distance to centre distance at first
             c_RadiusDistance = c_CentreDistance;
         }
@@ -1362,21 +1361,21 @@ namespace GilesTrinity
         {
             // start as true, then set as false as we go. If nothing matches below, it will return true.
             AddToCache = true;
-            // Check the primary object blacklist
-            if (hashSNOIgnoreBlacklist.Contains(c_ActorSNO))
-            {
-                AddToCache = false;
-                c_IgnoreSubStep = "hashSNOIgnoreBlacklist";
-                return AddToCache;
-                //return bWantThis;
-            }
-            // Ignore it if it's not in range yet, except health wells
-            if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell)
+
+            // Ignore it if it's not in range yet, except health wells and resplendent chests if we're opening chests
+            if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell && !(Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_Name.ToLower().Contains("chest_rare")))
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotInRange";
                 return AddToCache;
             }
+
+            if (!(Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_Name.ToLower().Contains("chest_rare")))
+            {
+                AddToCache = true;
+                c_IgnoreSubStep = "NotInRange";
+            }
+
             if (c_Name.ToLower().StartsWith("minimapicon"))
             {
                 // Minimap icons caused a few problems in the past, so this force-blacklists them
@@ -1549,7 +1548,7 @@ namespace GilesTrinity
                                     hashRGUIDBlacklist60.Add(c_RActorGuid);
                                     AddToCache = false;
                                 }
-                                if (playerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.UseTRMovement)
+                                if (PlayerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.UseTRMovement)
                                 {
                                     // Frenzy shrines are a huge time sink for monks using Tempest Rush to move, we should ignore them.
                                     AddToCache = false;
@@ -1702,7 +1701,7 @@ namespace GilesTrinity
                         }
 
                         // Only break destructables if we're stuck and using IgnoreNonBlocking
-                        if (!PlayerMover.UnstuckChecker(playerStatus.CurrentPosition, 500) && !AddToCache && Settings.WorldObject.IgnoreNonBlocking)
+                        if (!PlayerMover.UnstuckChecker(PlayerStatus.CurrentPosition, 500) && !AddToCache && Settings.WorldObject.IgnoreNonBlocking)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "NotStuck";
@@ -1862,13 +1861,13 @@ namespace GilesTrinity
             bool bIgnoreThisAvoidance = false;
             double dThisHealthAvoid = GetAvoidanceHealth();
             // Monks with Serenity up ignore all AOE's
-            if (playerStatus.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_Serenity) && GetHasBuff(SNOPower.Monk_Serenity))
+            if (PlayerStatus.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_Serenity) && GetHasBuff(SNOPower.Monk_Serenity))
             {
                 // Monks with serenity are immune
                 bIgnoreThisAvoidance = true;
             }
             // Witch doctors with spirit walk available and not currently Spirit Walking will subtly ignore ice balls, arcane, desecrator & plague cloud
-            if (playerStatus.ActorClass == ActorClass.WitchDoctor && Hotbar.Contains(SNOPower.Witchdoctor_SpiritWalk) &&
+            if (PlayerStatus.ActorClass == ActorClass.WitchDoctor && Hotbar.Contains(SNOPower.Witchdoctor_SpiritWalk) &&
                 (!GetHasBuff(SNOPower.Witchdoctor_SpiritWalk) && GilesUseTimer(SNOPower.Witchdoctor_SpiritWalk)) || GetHasBuff(SNOPower.Witchdoctor_SpiritWalk))
             {
                 if (c_ActorSNO == 223675 || c_ActorSNO == 402 || c_ActorSNO == 219702 || c_ActorSNO == 221225 || c_ActorSNO == 84608 || c_ActorSNO == 108869)
@@ -1878,7 +1877,7 @@ namespace GilesTrinity
                 }
             }
             // Remove ice balls if the barbarian has wrath of the berserker up, and reduce health from most other SNO avoidances
-            if (playerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+            if (PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
             {
                 if (c_ActorSNO == 223675 || c_ActorSNO == 402)
                 {
@@ -1903,7 +1902,7 @@ namespace GilesTrinity
                 }
             }
             // Add it to the list of known avoidance objects, *IF* our health is lower than this avoidance health limit
-            if (!bIgnoreThisAvoidance && dThisHealthAvoid >= playerStatus.CurrentHealthPct)
+            if (!bIgnoreThisAvoidance && dThisHealthAvoid >= PlayerStatus.CurrentHealthPct)
             {
                 // Generate a "weight" for how badly we want to avoid this obstacle, based on a percentage of 100% the avoidance health is, multiplied into a max of 200 weight
                 double dThisWeight = (200 * dThisHealthAvoid);
@@ -1986,21 +1985,27 @@ namespace GilesTrinity
                                     {
                                         if (Settings.Combat.Misc.UseNavMeshTargeting)
                                         {
-                                            Vector3 myPos = new Vector3(playerStatus.CurrentPosition.X, playerStatus.CurrentPosition.Y, playerStatus.CurrentPosition.Z + 4);
+                                            Vector3 myPos = new Vector3(PlayerStatus.CurrentPosition.X, PlayerStatus.CurrentPosition.Y, PlayerStatus.CurrentPosition.Z + 4);
                                             Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 4f);
 
                                             // For Melee
-                                            if (PlayerKiteDistance <= 5 && c_CentreDistance >= 5 && !ZetaDia.Physics.Raycast(myPos, cPos, NavCellFlags.AllowWalk))
+                                            //if (PlayerKiteDistance <= 5 && c_CentreDistance >= 5 && !ZetaDia.Physics.Raycast(myPos, cPos, NavCellFlags.AllowWalk))
+                                            //{
+                                            //    AddToCache = false;
+                                            //    c_IgnoreSubStep = "UnableToRayCast";
+                                            //}
+                                            //// For Kiting
+                                            //else if (!ZetaDia.Physics.Raycast(PlayerStatus.CurrentPosition, c_Position, NavCellFlags.AllowProjectile))
+                                            //{
+                                            //    AddToCache = false;
+                                            //    c_IgnoreSubStep = "UnableToRayCast";
+                                            //}
+                                            if (!ZetaDia.Physics.Raycast(PlayerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
                                             {
                                                 AddToCache = false;
                                                 c_IgnoreSubStep = "UnableToRayCast";
                                             }
-                                            // For Kiting
-                                            else if (!ZetaDia.Physics.Raycast(playerStatus.CurrentPosition, c_Position, NavCellFlags.AllowProjectile))
-                                            {
-                                                AddToCache = false;
-                                                c_IgnoreSubStep = "UnableToRayCast";
-                                            }
+
                                         }
                                         else
                                         {
@@ -2227,7 +2232,7 @@ namespace GilesTrinity
             if (c_ObjectType != GObjectType.Avoidance)
             {
                 // Calculate the z-height difference between our current position, and this object's position
-                c_ZDiff = Math.Abs(playerStatus.CurrentPosition.Z - c_Position.Z);
+                c_ZDiff = Math.Abs(PlayerStatus.CurrentPosition.Z - c_Position.Z);
                 switch (c_ObjectType)
                 {
                     case GObjectType.Door:
@@ -2288,7 +2293,7 @@ namespace GilesTrinity
         private static bool RefreshStepCachedPlayerSummons(bool AddToCache)
         {
             // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
-            if (playerStatus.ActorClass == ActorClass.Monk)
+            if (PlayerStatus.ActorClass == ActorClass.Monk)
             {
                 if (Hotbar.Contains(SNOPower.Monk_MysticAlly) && hashMysticAlly.Contains(c_ActorSNO))
                 {
@@ -2297,7 +2302,7 @@ namespace GilesTrinity
                 }
             }
             // Count up Demon Hunter pets
-            if (playerStatus.ActorClass == ActorClass.DemonHunter)
+            if (PlayerStatus.ActorClass == ActorClass.DemonHunter)
             {
                 if (Hotbar.Contains(SNOPower.DemonHunter_Companion) && hashDHPets.Contains(c_ActorSNO))
                 {
@@ -2306,7 +2311,7 @@ namespace GilesTrinity
                 }
             }
             // Count up zombie dogs and gargantuans next
-            if (playerStatus.ActorClass == ActorClass.WitchDoctor)
+            if (PlayerStatus.ActorClass == ActorClass.WitchDoctor)
             {
                 if (Hotbar.Contains(SNOPower.Witchdoctor_Gargantuan) && hashGargantuan.Contains(c_ActorSNO))
                 {
@@ -2392,7 +2397,7 @@ namespace GilesTrinity
         private static bool MosterObstacleInPathCacheObject(bool AddToCache)
         {
             // Don't add an item if a monster is blocking our path
-            if (hashMonsterObstacleCache.Any(o => GilesIntersectsPath(o.Location, o.Radius, playerStatus.CurrentPosition, c_Position)))
+            if (hashMonsterObstacleCache.Any(o => GilesIntersectsPath(o.Location, o.Radius, PlayerStatus.CurrentPosition, c_Position)))
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "MonsterInPath";

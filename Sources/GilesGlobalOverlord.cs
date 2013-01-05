@@ -54,7 +54,7 @@ namespace GilesTrinity
                         ActorClass tempClass = ActorClass.Invalid;
                         try
                         {
-                            tempClass = playerStatus.ActorClass;
+                            tempClass = PlayerStatus.ActorClass;
                         }
                         catch
                         {
@@ -64,7 +64,7 @@ namespace GilesTrinity
                         iCombatLoops = 0;
                         RefreshHotbar(GetHasBuff(SNOPower.Wizard_Archon));
                         dictAbilityRepeatDelay = new Dictionary<SNOPower, int>(dictAbilityRepeatDefaults);
-                        if (Settings.Combat.Wizard.CriticalMass && playerStatus.ActorClass == ActorClass.Wizard)
+                        if (Settings.Combat.Wizard.CriticalMass && PlayerStatus.ActorClass == ActorClass.Wizard)
                         {
                             dictAbilityRepeatDelay[SNOPower.Wizard_FrostNova] = 25;
                             dictAbilityRepeatDelay[SNOPower.Wizard_ExplosiveBlast] = 25;
@@ -77,7 +77,7 @@ namespace GilesTrinity
                             dictAbilityRepeatDelay[SNOPower.Wizard_Archon_SlowTime] = 1500;
                             dictAbilityRepeatDelay[SNOPower.Wizard_Archon_Teleport] = 2700;
                         }
-                        if (Settings.Combat.WitchDoctor.GraveInjustice && playerStatus.ActorClass == ActorClass.WitchDoctor)
+                        if (Settings.Combat.WitchDoctor.GraveInjustice && PlayerStatus.ActorClass == ActorClass.WitchDoctor)
                         {
                             dictAbilityRepeatDelay[SNOPower.Witchdoctor_SoulHarvest] = 1000;
                             dictAbilityRepeatDelay[SNOPower.Witchdoctor_SpiritWalk] = 1000;
@@ -93,14 +93,14 @@ namespace GilesTrinity
                             dictAbilityRepeatDelay[SNOPower.Witchdoctor_FetishArmy] = 20000;
                             dictAbilityRepeatDelay[SNOPower.Witchdoctor_BigBadVoodoo] = 20000;
                         }
-                        if (Settings.Combat.Barbarian.BoonBulKathosPassive && playerStatus.ActorClass == ActorClass.Barbarian)
+                        if (Settings.Combat.Barbarian.BoonBulKathosPassive && PlayerStatus.ActorClass == ActorClass.Barbarian)
                         {
                             dictAbilityRepeatDelay[SNOPower.Barbarian_Earthquake] = 90500;
                             dictAbilityRepeatDelay[SNOPower.Barbarian_CallOfTheAncients] = 90500;
                             dictAbilityRepeatDelay[SNOPower.Barbarian_WrathOfTheBerserker] = 90500;
                         }
                         // Pick an appropriate health set etc. based on class
-                        switch (playerStatus.ActorClass)
+                        switch (PlayerStatus.ActorClass)
                         {
                             case ActorClass.Barbarian:
                                 // What health % should we use a potion, or look for a globe
@@ -164,7 +164,7 @@ namespace GilesTrinity
                 using (new PerformanceLogger("GilesGlobalOverlord.WeaponSwapCheck"))
                 {
                     // For Monk SweepingWind WeaponSwap
-                    if (playerStatus.ActorClass == ActorClass.Monk && GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap && weaponSwap.DpsGearOn() && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds > 1500)
+                    if (PlayerStatus.ActorClass == ActorClass.Monk && GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap && weaponSwap.DpsGearOn() && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds > 1500)
                         weaponSwap.SwapGear();
                 }
                 // We have a target, start the target handler!
@@ -179,9 +179,9 @@ namespace GilesTrinity
                 {
 
                     // Pop a potion when necessary
-                    if (playerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
+                    if (PlayerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
                     {
-                        if (!playerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
+                        if (!PlayerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
                         {
                             ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).ThenBy(p => p.ItemStackQuantity).FirstOrDefault();
                             if (thisBestPotion != null)
@@ -217,7 +217,7 @@ namespace GilesTrinity
                         // Out of combat buffing etc. but only if we don't want to return to town etc.
                         ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
 
-                        if (!playerStatus.IsInTown && !bWantToTownRun && !ForceVendorRunASAP && myAnimationState != null
+                        if (!PlayerStatus.IsInTown && !IsReadyToTownRun && !ForceVendorRunASAP && myAnimationState != null
                             && myAnimationState.State != AnimationState.Attacking
                             && myAnimationState.State != AnimationState.Casting
                             && myAnimationState.State != AnimationState.Channeling)
@@ -262,7 +262,7 @@ namespace GilesTrinity
                 }
                 CurrentTarget = null;
 
-                if (GilesTrinity.bWantToTownRun && TownRun.TownRunCheckTimer.IsRunning && TownRun.TownRunCheckTimer.ElapsedMilliseconds < 2000)
+                if (GilesTrinity.IsReadyToTownRun && TownRun.TownRunCheckTimer.IsRunning && TownRun.TownRunCheckTimer.ElapsedMilliseconds < 2000)
                 {
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for town run timer", true);
                     return true;

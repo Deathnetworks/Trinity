@@ -161,6 +161,9 @@
     <Compile Include="XmlTags\TrinityIfSNOInRange.cs" />
     <Compile Include="XmlTags\TrinityIf.cs" />
     <Compile Include="XmlTags\TrinityInteract.cs" />
+    <Compile Include="XmlTags\TrinityLoadOnce.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="XmlTags\TrinityLoadProfile.cs" />
     <Compile Include="XmlTags\TrinityLog.cs" />
     <Compile Include="XmlTags\TrinityMaxDeaths.cs" />

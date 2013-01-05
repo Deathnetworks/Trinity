@@ -154,7 +154,10 @@ namespace GilesTrinity
         /// <summary>
         /// Holds all of the player's current info handily cached, updated once per loop with a minimum timer on updates to save D3 memory hits
         /// </summary>
-        public static GilesPlayerCache playerStatus = new GilesPlayerCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, vNullLocation, false, 0, 1, ActorClass.Invalid, String.Empty);
+        public static GilesPlayerCache PlayerStatus = new GilesPlayerCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, vNullLocation, false, 0, 1, ActorClass.Invalid, String.Empty);
+
+        [Obsolete("This property is obsolete; use PlayerStatus instead")]
+        public static GilesPlayerCache playerStatus { get { return PlayerStatus; } }
 
         /// <summary>
         /// Obstacle cache, things we can't or shouldn't move through
@@ -394,7 +397,7 @@ namespace GilesTrinity
 
         // Variables relating to quick-reference of monsters within sepcific ranges (if anyone has suggestion for similar functionality with reduced CPU use, lemme know, but this is fast atm!)
         private static int[] ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
-        private static int[] iAnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+        private static int[] AnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
         private static bool bAnyBossesInRange = false;
         private const int RANGE_50 = 0;
         private const int RANGE_40 = 1;
@@ -468,11 +471,13 @@ namespace GilesTrinity
         // These objects are instances of my stats class above, holding identical types of data for two different things - one holds item DROP stats, one holds item PICKUP stats
         internal static GItemStats ItemsDroppedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
         internal static GItemStats ItemsPickedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
-        
-        
+
+
         // Whether to try forcing a vendor-run for custom reasons
         public static bool ForceVendorRunASAP = false;
-        public static bool bWantToTownRun = false;
+        public static bool IsReadyToTownRun = false;
+        [Obsolete("Property bWantToTownRun is obsolete and will eventually be removed. Use IsReadyToTownRun instead.")]
+        public static bool bWantToTownRun { get { return IsReadyToTownRun; } set { IsReadyToTownRun = value; } }
 
         // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
         private static bool[,] StashSlotBlocked = new bool[7, 30];
@@ -616,20 +621,20 @@ namespace GilesTrinity
 
         // Darkfriend's Looting Rule
         public static Interpreter StashRule = new Interpreter();
-		
+
         // Tesslerc - used for using combination strike
-            // ForesightFirstHit is used to track the 30 second buff from deadly reach.
+        // ForesightFirstHit is used to track the 30 second buff from deadly reach.
         private static DateTime ForeSightFirstHit = new DateTime(1996, 6, 3, 22, 15, 0);
-            // Foresight2 is used to track combination strike buff.
+        // Foresight2 is used to track combination strike buff.
         private static DateTime ForeSight2 = DateTime.Now;
-            // Otherthandeadlyreach is used for other spirit generators to track for combination strike buff.
+        // Otherthandeadlyreach is used for other spirit generators to track for combination strike buff.
         private static DateTime OtherThanDeadlyReach = DateTime.Now;
-            // Set by sweeping winds or by blinding flash if the time is right for a swap.
+        // Set by sweeping winds or by blinding flash if the time is right for a swap.
         private static bool WantToSwap = false;
 
         // Xp Counter
         private static int iTotalXp = 0;
         private static int iLastXp = 0;
-        private static int iNextLvXp = 0;			
+        private static int iNextLvXp = 0;
     }
 }

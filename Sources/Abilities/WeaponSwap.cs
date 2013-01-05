@@ -81,7 +81,7 @@ namespace GilesTrinity.Swap
         // Returns if this item is protected by the swapper or not -> should make items safe from town run routine
         public bool SwapperUsing(ACDItem thisItem)
         {
-            if (!GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap || GilesTrinity.playerStatus.ActorClass != ActorClass.Monk)
+            if (!GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap || GilesTrinity.PlayerStatus.ActorClass != ActorClass.Monk)
             {
                 return false;
             }
@@ -98,7 +98,7 @@ namespace GilesTrinity.Swap
 
         public void SwapCastBlindingFlash(bool sHasInnaSet)
         {
-            if (GilesTrinity.playerStatus.CurrentEnergy >= 85 || (sHasInnaSet && GilesTrinity.playerStatus.CurrentEnergy >= 15))
+            if (GilesTrinity.PlayerStatus.CurrentEnergy >= 85 || (sHasInnaSet && GilesTrinity.PlayerStatus.CurrentEnergy >= 15))
             {
                 ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, ZetaDia.Me.Position, ZetaDia.Me.WorldDynamicId, -1);
             }
@@ -106,7 +106,7 @@ namespace GilesTrinity.Swap
 
         public void SwapCastSweepingWinds(bool sHasInnaSet)
         {
-            if (GilesTrinity.playerStatus.CurrentEnergy >= 75 || (sHasInnaSet && GilesTrinity.playerStatus.CurrentEnergy >= 5))
+            if (GilesTrinity.PlayerStatus.CurrentEnergy >= 75 || (sHasInnaSet && GilesTrinity.PlayerStatus.CurrentEnergy >= 5))
             {
                 ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, ZetaDia.Me.Position, ZetaDia.Me.WorldDynamicId, -1);
                 GilesTrinity.SweepWindSpam = DateTime.Now;
@@ -150,7 +150,7 @@ namespace GilesTrinity.Swap
         private void SecurityCheck()
         {
             // Don't run if we're not a monk
-            if (GilesTrinity.playerStatus.ActorClass != ActorClass.Monk)
+            if (GilesTrinity.PlayerStatus.ActorClass != ActorClass.Monk)
                 return;
             tempItems = items;
             // Don't run if we've already checked within 250ms
@@ -309,7 +309,7 @@ namespace GilesTrinity.Swap
 
         public void ItemsInPlace()
         {
-			if (GilesTrinity.playerStatus.ActorClass != ActorClass.Monk || ZetaDia.Me.CommonData.AnimationState == AnimationState.Dead ||
+			if (GilesTrinity.PlayerStatus.ActorClass != ActorClass.Monk || ZetaDia.Me.CommonData.AnimationState == AnimationState.Dead ||
 				!GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap)
 			{
 				return;
@@ -463,7 +463,7 @@ namespace GilesTrinity.Swap
 
         public void SwapGear()
         {	
-            if (GilesTrinity.playerStatus.ActorClass != ActorClass.Monk || ZetaDia.Me.CommonData.AnimationState == AnimationState.Dead || DateTime.Now.Subtract(LastSwapTime).TotalMilliseconds <= 700
+            if (GilesTrinity.PlayerStatus.ActorClass != ActorClass.Monk || ZetaDia.Me.CommonData.AnimationState == AnimationState.Dead || DateTime.Now.Subtract(LastSwapTime).TotalMilliseconds <= 700
                 || GilesTrinity.GetHasBuff(SNOPower.Monk_SweepingWind) && !wearingDPSGear)
             {
                 return;
@@ -535,7 +535,7 @@ namespace GilesTrinity.Swap
                                 ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == 9 && j.InventoryRow == 4).FirstOrDefault().IsUnidentified)
                             {
                                     // Unid items don't have DynamicId - we initialize town run to move it away.
-                                GilesTrinity.bWantToTownRun = true;
+                                GilesTrinity.IsReadyToTownRun = true;
                                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Forcing town run to clear bottom right corner.");
                             }
                             else if (!ZetaDia.Me.Inventory.ItemInLocation(InventorySlot.PlayerBackpack, 9, 5)
@@ -544,7 +544,7 @@ namespace GilesTrinity.Swap
                                 if (!TryClearCorner())
                                 {
                                     // Force town run due to last spot taken!
-                                    GilesTrinity.bWantToTownRun = true;
+                                    GilesTrinity.IsReadyToTownRun = true;
                                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Forcing town run to clear bottom right corner.");
                                 }
                             }

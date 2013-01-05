@@ -198,7 +198,7 @@ namespace GilesTrinity
             //bone pile
             218951,245838,
             // rrrix act 1
-            108882, 245919,
+            108882, 245919, 5944,
             // rrrix act 2
             213907, 92519, 61544, 105681, 113983, 114527, 114642, 139933, 144405, 156890, 164057, 164195, 180254, 180802, 180809, 181173, 181174, 181177, 181181,
             181182, 181185, 181290, 181292, 181306, 181309, 181313, 181326, 181563, 181857, 181858, 187265, 191433, 191462, 191641, 192880, 192881, 196413, 196435,
@@ -240,13 +240,13 @@ namespace GilesTrinity
         /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
         /// </summary>
         internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
-            174900, 191459, 104632, 196211, 200872, 194682,
+            174900, 191459, 104632, 196211, 194682, 81699, 3340,
         };
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 25}, {191459, 13}, {104632, 20}, {196211, 25}, {200872, 25}, {194682, 20},
+            {174900, 25}, {191459, 13}, {104632, 20}, {196211, 25},  {194682, 20}, {81699, 20}, {3340, 14},
          };
         /// <summary>
         /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache
@@ -254,7 +254,7 @@ namespace GilesTrinity
         internal static Dictionary<int, int> dictSNOExtendedDestructRange = new Dictionary<int, int> {
             {2972, 10}, {80357, 16}, {116508, 10}, {113932, 8}, {197514, 18}, {108587, 8}, {108618, 8}, {108612, 8}, {116409, 18}, {121586, 22},
             {195101, 10}, {195108, 25}, {170657, 1}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 8}, {193963, 1}, {159066, 12}, {160570, 12},
-            {55325, 1}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 25}, {192867, 8}, {155255, 8}
+            {55325, 1}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 25}, {192867, 8}, {155255, 8}, {54530, 6}
          };
         /// <summary>
         /// Destructible things that need targeting by a location instead of an ACDGUID (stuff you can't "click on" to destroy in-game)

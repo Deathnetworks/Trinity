@@ -43,6 +43,7 @@ namespace GilesTrinity.Settings.Combat
         private bool _FuryDumpWOTB;
         private bool _FuryDumpAlways;
         private bool _WOTBHardOnly;
+        private bool _TargetBasedZigZag;
         #endregion Fields
 
         #region Events
@@ -710,6 +711,24 @@ namespace GilesTrinity.Settings.Combat
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool TargetBasedZigZag
+        {
+            get
+            {
+                return _TargetBasedZigZag;
+            }
+            set
+            {
+                if (_TargetBasedZigZag != value)
+                {
+                    _TargetBasedZigZag = value;
+                    OnPropertyChanged("TargetBasedZigZag");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -739,6 +758,17 @@ namespace GilesTrinity.Settings.Combat
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        /// <summary>
+        /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserializing()]
+        internal void OnDeserializingMethod(StreamingContext context)
+        {
+            this._TargetBasedZigZag = true;
+        }
+
         #endregion Methods
     }
 }

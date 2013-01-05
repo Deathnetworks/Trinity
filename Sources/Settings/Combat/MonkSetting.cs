@@ -41,6 +41,7 @@ namespace GilesTrinity.Settings.Combat
         private bool _SweepingWindWeaponSwap;
         private bool _DisableMantraSpam;
         private bool _UseTRMovement;
+        private bool _TargetBasedZigZag;
         #endregion Fields
 
         #region Events
@@ -564,7 +565,7 @@ namespace GilesTrinity.Settings.Combat
                 }
             }
         }
-        
+
         [DataMember(IsRequired = false)]
         [DefaultValue(60)]
         public float TR_MinSpirit
@@ -582,7 +583,7 @@ namespace GilesTrinity.Settings.Combat
                 }
             }
         }
-        
+
         [DataMember(IsRequired = false)]
         [DefaultValue(20)]
         public float TR_MinDist
@@ -618,7 +619,7 @@ namespace GilesTrinity.Settings.Combat
                 }
             }
         }
-        
+
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool DisableMantraSpam
@@ -636,7 +637,7 @@ namespace GilesTrinity.Settings.Combat
                 }
             }
         }
-        
+
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool UseTRMovement
@@ -671,7 +672,25 @@ namespace GilesTrinity.Settings.Combat
                     OnPropertyChanged("SweepingWindWeaponSwap");
                 }
             }
-        }    
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool TargetBasedZigZag
+        {
+            get
+            {
+                return _TargetBasedZigZag;
+            }
+            set
+            {
+                if (_TargetBasedZigZag != value)
+                {
+                    _TargetBasedZigZag = value;
+                    OnPropertyChanged("TargetBasedZigZag");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -706,6 +725,7 @@ namespace GilesTrinity.Settings.Combat
         {
             this.TR_MinSpirit = 60;
             this.TR_MinDist = 20;
+            this._TargetBasedZigZag = true;
         }
         #endregion Methods
     }

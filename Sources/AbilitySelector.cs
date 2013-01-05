@@ -194,7 +194,7 @@ namespace GilesTrinity
                 // Switch based on the cached character class
                 using (new PerformanceLogger("AbilitySelector.ClassAbility"))
                 {
-                    switch (playerStatus.ActorClass)
+                    switch (PlayerStatus.ActorClass)
                     {
                         // Barbs
                         case ActorClass.Barbarian:

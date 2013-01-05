@@ -1,17 +1,11 @@
-﻿using Zeta.CommonBot.Profile;
-using Zeta.TreeSharp;
-using Zeta.XmlEngine;
-
+﻿using System;
+using System.Diagnostics;
 using GilesTrinity.Technicals;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Zeta;
-using Zeta.Common;
+using Zeta.CommonBot;
 using Zeta.CommonBot.Profile;
-using Zeta.Navigation;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
+using Action = Zeta.TreeSharp.Action;
 
 namespace GilesTrinity.XmlTags
 {
@@ -19,37 +13,60 @@ namespace GilesTrinity.XmlTags
     [XmlElement("TrinityRandomWait")]
     public class TrinityRandomWait : ProfileBehavior
     {
-        private bool m_IsDone = false;
-        private int iMinDelay;
-        private int iMaxDelay;
+        private bool isDone = false;
+        private int minDelay;
+        private int maxDelay;
         private int delay;
+        private string statusText;
+        private Stopwatch timer = new Stopwatch();
 
         public override bool IsDone
         {
-            get { return m_IsDone; }
+            get { return isDone; }
         }
 
         protected override Composite CreateBehavior()
         {
-            return new Zeta.TreeSharp.Action(ret =>
-            {
-                delay = new System.Random().Next(iMinDelay, iMaxDelay);
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "[XML Tag] Trinity Random Wait - Taking a break for " + Math.Round(delay / (float)1000, 2).ToString() + " seconds.");
-                System.Threading.Thread.Sleep(delay);
-                m_IsDone = true;
-            });
+            Sequence RandomWaitSequence = new Sequence(
+                new Action(ret => delay = new Random().Next(minDelay, maxDelay)),
+                new Action(ret => statusText = String.Format("[XML Tag] Trinity Random Wait - Taking a break for {0:3} seconds.", delay)),
+                new Action(ret => DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, statusText)),
+                new Action(ctx => DoRandomWait(ctx)),
+                new Action(ret => isDone = true)
+            );
+
+            return RandomWaitSequence;
         }
+
+        private RunStatus DoRandomWait(object ctx)
+        {
+            if (!timer.IsRunning)
+            {
+                timer.Start();
+                return RunStatus.Running;
+            }
+            else if (timer.IsRunning && timer.ElapsedMilliseconds < delay)
+            {
+                return RunStatus.Running;
+            }
+            else
+            {
+                timer.Reset();
+                return RunStatus.Success;
+            }
+        }
+
 
         [XmlAttribute("min")]
         public int min
         {
             get
             {
-                return iMinDelay;
+                return minDelay;
             }
             set
             {
-                iMinDelay = value;
+                minDelay = value;
             }
         }
         [XmlAttribute("max")]
@@ -57,17 +74,17 @@ namespace GilesTrinity.XmlTags
         {
             get
             {
-                return iMaxDelay;
+                return maxDelay;
             }
             set
             {
-                iMaxDelay = value;
+                maxDelay = value;
             }
         }
 
         public override void ResetCachedDone()
         {
-            m_IsDone = false;
+            isDone = false;
             base.ResetCachedDone();
         }
     }

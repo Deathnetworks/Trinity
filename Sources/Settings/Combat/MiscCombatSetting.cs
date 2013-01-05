@@ -16,6 +16,7 @@ namespace GilesTrinity.Settings.Combat
         private bool _AllowBacktracking;
         private int _DelayAfterKill;
         private bool _UseNavMeshTargeting;
+        private bool _IgnoreSolitaryTrash;
         #endregion Fields
 
         #region Events
@@ -33,6 +34,24 @@ namespace GilesTrinity.Settings.Combat
         #endregion Constructors
 
         #region Properties
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool IgnoreSolitaryTrash
+        {
+            get
+            {
+                return _IgnoreSolitaryTrash;
+            }
+            set
+            {
+                if (_IgnoreSolitaryTrash != value)
+                {
+                    _IgnoreSolitaryTrash = value;
+                    OnPropertyChanged("IgnoreSolitaryTrash");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
