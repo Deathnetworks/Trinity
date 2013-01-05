@@ -25,6 +25,34 @@ Future Planned Improvements:
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
 
+### Changelog 1.7.1.14:
+
+* New XML Tag: TrinityLoadOnce - will load a set of profiles in random order within a single game session
+
+* New Barbarian multi-target Whirlwind and monk tempest rush logic, with GUI option to disable if you don't like it.
+
+* Added GUI option to ignore solitary trash mobs.
+
+* Bot will now stand in place until pre-TownRun timer finishes.
+
+* Supports new DB CanTownRun() logic, fixed town run with bags 1/2 full.
+
+* Improved TrinityRandomWait tag (no longer using Thread.Sleep())
+
+* More improvements to destructibles/barricades.
+
+* TownRun with bags 1/2 full actually works now.
+
+* Increased DemonHunter destructible power range.
+
+* Decreased DemonHunter Caltrops timer from 6 sec to 3 sec.
+
+* Fixed reset gold counter on new game.
+
+* Fixed derp math error on town run logic for bags 1/2 full (it works now).
+
+* Added additional logging for vendor movement logic during town run (to help determine stucks).
+
 ### Changelog 1.7.1.13:
 
 * New XML Tags: TrinityRandomWait and TrinityCastSweepingWinds

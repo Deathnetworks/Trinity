@@ -76,7 +76,7 @@ namespace GilesTrinity.XmlTags
             return new Sequence(
                 new Action(ret => Initialize()),
                 new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: Found {0} Total Profiles, {1} Used Profiles, {2} Unused Profiles",
-                    Profiles.Count(), UsedProfiles.Count(), Profiles.Where(p => UsedProfiles.Contains(p.FileName)).Count())),
+                    Profiles.Count(), UsedProfiles.Count(), Profiles.Where(p => !UsedProfiles.Contains(p.FileName)).Count())),
                 new Action(ret => AvailableProfiles = (from p in Profiles where !UsedProfiles.Contains(p.FileName) && p.FileName != CurrentProfileName select p.FileName).ToArray()),
                 new PrioritySelector(
                     new Decorator(ret => AvailableProfiles.Length == 0,

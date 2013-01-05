@@ -20,7 +20,6 @@ namespace GilesTrinity
         /// <param name="bot"></param>
         private static void TrinityBotStart(IBot bot)
         {
-
             // Recording of all the XML's in use this run
             try
             {
@@ -33,9 +32,7 @@ namespace GilesTrinity
                         sFirstProfileSeen = sThisProfile;
                 }
             }
-            catch
-            {
-            }
+            catch { }
             // Update actors if possible (if already in-game)
             if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && ZetaDia.Actors != null)
             {
@@ -51,7 +48,7 @@ namespace GilesTrinity
             else
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: Maintaining item stats from previous run. To reset stats fully, please restart DB.");
-				weaponSwap.Reset();
+                weaponSwap.Reset();
             }
 
             RefreshProfileBlacklists();
@@ -61,6 +58,18 @@ namespace GilesTrinity
             PlayerMover.TimeLastRecordedPosition = DateTime.Now;
             PlayerMover.timeLastRestartedGame = DateTime.Now;
             PlayerMover.ResetCheckGold();
+
+            if (Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius < 20)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: Low Kill Radius detected, currently set to: {0} (Update through Demonbuddy bot settings)",
+                    Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius);
+            }
+
+            if (Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius < 40)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: Low Loot Radius detected, currently set to: {0} (Update through Demonbuddy bot settings)",
+                    Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius);
+            }
 
             //try
             //{

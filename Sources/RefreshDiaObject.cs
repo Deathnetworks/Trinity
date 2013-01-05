@@ -2022,10 +2022,7 @@ namespace GilesTrinity
                         }
                         switch (c_ObjectType)
                         {
-                            case GObjectType.Destructible:
                             case GObjectType.Unit:
-                            case GObjectType.Shrine:
-                            case GObjectType.Gold:
                                 {
                                     using (new PerformanceLogger("RefreshLoS.3"))
                                     {
@@ -2035,7 +2032,7 @@ namespace GilesTrinity
                                             if (!(c_unit_IsBoss) && !c_diaObject.InLineOfSight)
                                             {
                                                 AddToCache = false;
-                                                c_IgnoreSubStep = "UnitNotInLoS";
+                                                c_IgnoreSubStep = "NotInLoS";
                                             }
                                         }
                                     }

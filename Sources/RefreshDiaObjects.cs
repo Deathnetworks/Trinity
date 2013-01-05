@@ -188,7 +188,6 @@ namespace GilesTrinity
             }
         }
         // Refresh object list from Diablo 3 memory RefreshDiaObjects()
-        //private static void RefreshInit(out Vector3 vSafePointNear, out Vector3 vKitePointAvoid, out int iCurrentTargetRactorGUID, out int iUnitsSurrounding, out double iHighestWeightFound, out List<GilesObject> listGilesObjectCache, out HashSet<int> hashDoneThisRactor)
         private static void RefreshCacheInit()
         {
             using (new PerformanceLogger("RefreshDiaObjectCache.CacheInit"))
@@ -658,22 +657,22 @@ namespace GilesTrinity
             // End of backtracking check
             //TODO : If this code is obselete remove it (Check that) 
             // Finally, a special check for waiting for wrath of the berserker cooldown before engaging Azmodan
-            //if (CurrentTarget == null && hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Barbarian.WaitWOTB && !GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
-            //    ZetaDia.CurrentWorldId == 121214 &&
-            //    (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(playerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
-            //{
-            //    bDontSpamOutofCombat = true;
-            //    Logging.Write("[Trinity] Waiting for Wrath Of The Berserker cooldown before continuing to Azmodan.");
-            //    CurrentTarget = new GilesObject()
-            //                        {
-            //                            Position = playerStatus.CurrentPosition,
-            //                            Type = GObjectType.Avoidance,
-            //                            Weight = 20000,
-            //                            CentreDistance = 2f,
-            //                            RadiusDistance = 2f,
-            //                            InternalName = "GilesWaitForWrath"
-            //                        };
-            //}
+            if (CurrentTarget == null && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Barbarian.WaitWOTB && !GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                ZetaDia.CurrentWorldId == 121214 &&
+                (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+            {
+                bDontSpamOutofCombat = true;
+                Logging.Write("[Trinity] Waiting for Wrath Of The Berserker cooldown before continuing to Azmodan.");
+                CurrentTarget = new GilesObject()
+                                    {
+                                        Position = playerStatus.CurrentPosition,
+                                        Type = GObjectType.Avoidance,
+                                        Weight = 20000,
+                                        CentreDistance = 2f,
+                                        RadiusDistance = 2f,
+                                        InternalName = "GilesWaitForWrath"
+                                    };
+            }
             // And a special check for wizard archon
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Wizard_Archon) && !GilesUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && ZetaDia.CurrentWorldId == 121214 &&
                 (Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))

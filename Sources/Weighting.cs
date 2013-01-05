@@ -6,6 +6,9 @@ using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
+using Zeta.TreeSharp;
+using Zeta.CommonBot;
+using Zeta.CommonBot.Profile.Common;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -38,7 +41,22 @@ namespace GilesTrinity
                 int TrashMobCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsTrashMob);
                 int EliteCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
 
-                bool ShouldIgnoreTrashMobs = (!IsReadyToTownRun && Settings.Combat.Misc.IgnoreSolitaryTrash && EliteCount == 0);
+                Composite c = null;
+
+                try
+                {
+                    if (ProfileManager.CurrentProfileBehavior != null)
+                        c = ProfileManager.CurrentProfileBehavior.Behavior;
+                }
+                catch { }
+
+                bool tryingToTownPortal = false;
+                
+                if (c != null && c.GetType() == typeof(UseTownPortalTag))
+                {
+                    tryingToTownPortal = true;
+                }
+                bool ShouldIgnoreTrashMobs = (!tryingToTownPortal && !IsReadyToTownRun && Settings.Combat.Misc.IgnoreSolitaryTrash && EliteCount == 0);
 
                 foreach (GilesObject cacheObject in GilesObjectCache)
                 {
@@ -592,13 +610,11 @@ namespace GilesTrinity
                     // Switch on object type
 
                     // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
-                    //if (thisgilesobject.dWeight == 1 && !bRequireAvoidance)
-                    //{
-
-                    //    thisgilesobject.dWeight = 0;
-
-                    //    bStayPutDuringAvoidance = true;
-                    //}
+                    if (cacheObject.Weight == 1 && !StandingInAvoidance)
+                    {
+                        cacheObject.Weight = 0;
+                        bStayPutDuringAvoidance = true;
+                    }
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2:0} type: {3} mobsInCloseRange: {4} requireAvoidance: {5} PrioritizeCloseRangeUnits: {6}",
                             cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance, PrioritizeCloseRangeUnits);
 

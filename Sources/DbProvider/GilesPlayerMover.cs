@@ -12,6 +12,7 @@ using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
 using Zeta.Navigation;
 using Zeta.TreeSharp;
+using GilesTrinity.XmlTags;
 
 namespace GilesTrinity.DbProvider
 {
@@ -155,8 +156,8 @@ namespace GilesTrinity.DbProvider
 
                 try
                 {
-                    if (Zeta.CommonBot.ProfileManager.CurrentProfileBehavior != null)
-                        c = Zeta.CommonBot.ProfileManager.CurrentProfileBehavior.Behavior;
+                    if (ProfileManager.CurrentProfileBehavior != null)
+                        c = ProfileManager.CurrentProfileBehavior.Behavior;
                 }
                 catch { }
 
@@ -349,8 +350,7 @@ namespace GilesTrinity.DbProvider
         {
             // rrrix-note: This really shouldn't be here... 
             // Recording of all the XML's in use this run
-            string sThisProfile = Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile;
-            RecordLastProfile(sThisProfile);
+            RecordLastProfile();
 
 
             vMoveToTarget = WarnAndLogLongPath(vMoveToTarget);
@@ -686,8 +686,16 @@ namespace GilesTrinity.DbProvider
             return vMoveToTarget;
         }
 
-        private static void RecordLastProfile(string sThisProfile)
+        private static void RecordLastProfile()
         {
+            string currentProfileFileName = Path.GetFileName(ProfileManager.CurrentProfile.Path);
+            if (TrinityLoadOnce.UsedProfiles.Contains(currentProfileFileName))
+            {
+                TrinityLoadOnce.UsedProfiles.Add(currentProfileFileName);
+            }
+
+
+            string sThisProfile = Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile;
             if (sThisProfile != GilesTrinity.sLastProfileSeen)
             {
                 // See if we appear to have started a new game
