@@ -537,7 +537,7 @@ namespace GilesTrinity
             */
 
             float gridSquareSize = 5f;
-            int maxDistance = 100;
+            int maxDistance = 200;
             int gridTotalSize = (int)(maxDistance / gridSquareSize) * 2;
             int maxWeight = 100;
             int maxZDiff = 14;
@@ -571,8 +571,8 @@ namespace GilesTrinity
 
                     GridPoint gridPoint = new GridPoint(xyz, 0, origin.Distance(xyz));
 
-                    if (gridPoint.Distance > maxDistance + gridSquareRadius)
-                        continue;
+                    //if (gridPoint.Distance > maxDistance + gridSquareRadius)
+                    //    continue;
                     if (Settings.Combat.Misc.UseNavMeshTargeting)
                     {
                         p_xy = gp.WorldToGrid(xy);
@@ -598,12 +598,12 @@ namespace GilesTrinity
                      * Check if a square is occupied already
                      */
                     // Avoidance
-                    if (hashAvoidanceObstacleCache.Any(a => a.Location.Distance(xyz) <= gridSquareRadius + a.Radius))
+                    if (hashAvoidanceObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= gridSquareRadius))
                     {
                         continue;
                     }
                     // Obstacles
-                    if (hashNavigationObstacleCache.Any(a => a.Location.Distance(xyz) <= gridSquareRadius + a.Radius))
+                    if (hashNavigationObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= gridSquareRadius))
                     {
                         continue;
                     }
@@ -612,18 +612,21 @@ namespace GilesTrinity
                     if (shouldKite)
                     {
                         // Any monster standing in this GridPoint
-                        if (hashMonsterObstacleCache.Any(a => a.Location.Distance(xyz) <= (shouldKite ? gridSquareRadius + a.Radius : gridSquareSize + a.Radius + PlayerKiteDistance)))
+                        if (hashMonsterObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= (shouldKite ? gridSquareRadius : gridSquareSize + PlayerKiteDistance)))
                         {
                             continue;
                         }
 
-                        // Any monsters blocking in a straight line between origin and this GridPoint
-                        foreach (GilesObstacle monster in hashMonsterObstacleCache.Where(m =>
-                            MathEx.IntersectsPath(new Vector3(m.Location.X, m.Location.Y, 0), m.Radius, new Vector3(origin.X, origin.Y, 0), new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
-                            ))
+                        if (!hasEmergencyTeleportUp)
                         {
+                            // Any monsters blocking in a straight line between origin and this GridPoint
+                            foreach (GilesObstacle monster in hashMonsterObstacleCache.Where(m =>
+                                MathEx.IntersectsPath(new Vector3(m.Location.X, m.Location.Y, 0), m.Radius, new Vector3(origin.X, origin.Y, 0), new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
+                                ))
+                            {
 
-                            continue;
+                                continue;
+                            }
                         }
 
                         int nearbyMonsters = (monsterList != null ? monsterList.Count() : 0);
@@ -636,10 +639,13 @@ namespace GilesTrinity
                             if (p_xy == Point.Empty)
                                 p_xy = gp.WorldToGrid(xy);
 
-                            PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 25, true);
+                            PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 50, true);
 
                             bool pathFailure = false;
                             Point lastNode = gp.WorldToGrid(origin.ToVector2());
+
+                            if (pfr.IsPartialPath)
+                                continue;
 
                             // analyze pathing to a safe point
                             foreach (Point node in pfr.PointsReversed)

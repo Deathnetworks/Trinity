@@ -51,7 +51,7 @@ namespace GilesTrinity
                 catch { }
 
                 bool tryingToTownPortal = false;
-                
+
                 if (c != null && c.GetType() == typeof(UseTownPortalTag))
                 {
                     tryingToTownPortal = true;
@@ -610,7 +610,7 @@ namespace GilesTrinity
                     // Switch on object type
 
                     // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
-                    if (cacheObject.Weight == 1 && !StandingInAvoidance)
+                    if (cacheObject.Weight == 1 && !StandingInAvoidance && GilesObjectCache.Any(o => o.Type == GObjectType.Avoidance))
                     {
                         cacheObject.Weight = 0;
                         bStayPutDuringAvoidance = true;

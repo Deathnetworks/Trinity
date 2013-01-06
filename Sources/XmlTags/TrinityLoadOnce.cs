@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using GilesTrinity.Technicals;
-using Zeta;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
-using Zeta.CommonBot;
 using Action = Zeta.TreeSharp.Action;
 
 namespace GilesTrinity.XmlTags
@@ -54,6 +52,8 @@ namespace GilesTrinity.XmlTags
         void TrinityLoadOnce_OnGameJoined(object sender, EventArgs e)
         {
             UsedProfiles = new List<string>();
+
+
         }
 
 

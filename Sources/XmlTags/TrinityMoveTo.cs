@@ -23,7 +23,7 @@ namespace GilesTrinity.XmlTags
         private float fRandomizedDistance;
         private string sDestinationName;
         private string sNoSkip;
-        private string sUseNavigation;
+        private string UseNavigator;
         private Vector3? vMainVector;
 
         protected override Composite CreateBehavior()
@@ -76,7 +76,7 @@ namespace GilesTrinity.XmlTags
                 NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
             }
 
-            if (sUseNavigation == null || sUseNavigation.ToLower() != "true")
+            if (UseNavigator.ToLower() != "true")
                 Navigator.PlayerMover.MoveTowards(NavTarget);
             else
                 Navigator.MoveTo(NavTarget);
@@ -126,11 +126,11 @@ namespace GilesTrinity.XmlTags
         {
             get
             {
-                return sUseNavigation;
+                return UseNavigator;
             }
             set
             {
-                sUseNavigation = value;
+                UseNavigator = value;
             }
         }
 

@@ -191,7 +191,7 @@ namespace GilesTrinity
                         DynamicID = c_GameDynamicID,
                         BalanceID = c_BalanceID,
                         ActorSNO = c_ActorSNO,
-                        Level = c_ItemLevel,
+                        ItemLevel = c_ItemLevel,
                         GoldAmount = c_GoldStackSize,
                         OneHanded = c_IsOneHandedItem,
                         TwoHanded = c_IsTwoHandedItem,
@@ -303,6 +303,10 @@ namespace GilesTrinity
             c_IsEliteRareUnique = false;
             c_ForceLeapAgainst = false;
             c_IsObstacle = false;
+            c_HasBeenNavigable = false;
+            c_HasBeenRaycastable = false;
+            c_HasBeenInLoS = false;
+            c_ItemSha1Hash = string.Empty;
             c_ItemQuality = ItemQuality.Invalid;
             c_DBItemBaseType = ItemBaseType.None;
             c_DBItemType = ItemType.Unknown;
@@ -1267,17 +1271,33 @@ namespace GilesTrinity
             // Get whether or not we want this item, cached if possible
             if (!dictGilesPickupItem.TryGetValue(c_RActorGuid, out AddToCache))
             {
+                PickupItem pickupItem = new PickupItem()
+                {
+                    Name = c_Name,
+                    Level = c_ItemLevel,
+                    Quality = c_ItemQuality,
+                    BalanceID = c_BalanceID,
+                    DBBaseType = c_DBItemBaseType,
+                    DBItemType = c_DBItemType,
+                    IsOneHand = c_IsOneHandedItem,
+                    IsTwoHand = c_IsTwoHandedItem,
+                    ItemFollowerType = c_item_tFollowerType,
+                    DynamicID = c_GameDynamicID,
+                    Position = c_Position,
+                    ActorSNO = c_ActorSNO
+                };
+
                 if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
                 {
                     AddToCache = ItemManager.EvaluateItem((ACDItem)c_CommonData, ItemManager.RuleType.PickUp);
                 }
                 if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
                 {
-                    AddToCache = ItemRulesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType, c_GameDynamicID);
+                    AddToCache = ItemRulesPickupValidation(pickupItem);
                 }
                 else
                 {
-                    AddToCache = GilesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType, c_GameDynamicID);
+                    AddToCache = GilesPickupItemValidation(pickupItem);
                 }
                 dictGilesPickupItem.Add(c_RActorGuid, AddToCache);
             }
@@ -1323,22 +1343,25 @@ namespace GilesTrinity
             if (!AddToCache && c_IgnoreSubStep == String.Empty)
                 c_IgnoreSubStep = "NoMatchingRule";
 
-            if (logNewItem && !AddToCache && c_DBItemType != ItemType.Unknown)
-                LogSkippedItem();
+            if (logNewItem && c_DBItemType != ItemType.Unknown)
+                LogDroppedItem();
 
             return AddToCache;
         }
 
-        private static void LogSkippedItem()
+        private static void LogDroppedItem()
         {
-            string skippedItemsPath = Path.Combine(FileManager.LoggingPath, String.Format("SkippedItems_{0}_{1}.csv", PlayerStatus.ActorClass, DateTime.Now.ToString("yyyy-MM-dd")));
+            string droppedItemLogPath = Path.Combine(FileManager.LoggingPath, String.Format("ItemsDropped_{0}_{1}.csv", PlayerStatus.ActorClass, DateTime.Now.ToString("yyyy-MM-dd")));
 
-            bool writeHeader = !File.Exists(skippedItemsPath);
-            using (StreamWriter LogWriter = new StreamWriter(skippedItemsPath, true))
+            bool pickupItem = false;
+            dictGilesPickupItem.TryGetValue(c_RActorGuid, out pickupItem);
+
+            bool writeHeader = !File.Exists(droppedItemLogPath);
+            using (StreamWriter LogWriter = new StreamWriter(droppedItemLogPath, true))
             {
                 if (writeHeader)
                 {
-                    LogWriter.WriteLine("ActorSNO,RActorGUID,DyanmicID,ACDGuid,Name,DBBaseType,TBaseType,DBItemType,TItemType,Quality,Level,IgnoreItemSubStep,Distance");
+                    LogWriter.WriteLine("ActorSNO,RActorGUID,DyanmicID,ACDGuid,Name,DBBaseType,TBaseType,DBItemType,TItemType,Quality,Level,IgnoreItemSubStep,Distance,Pickup,SHA1Hash");
                 }
                 LogWriter.Write(FormatCSVField(c_ActorSNO));
                 LogWriter.Write(FormatCSVField(c_RActorGuid));
@@ -1353,6 +1376,8 @@ namespace GilesTrinity
                 LogWriter.Write(FormatCSVField(c_ItemLevel));
                 LogWriter.Write(FormatCSVField(c_IgnoreSubStep));
                 LogWriter.Write(FormatCSVField(c_CentreDistance));
+                LogWriter.Write(FormatCSVField(pickupItem));
+                LogWriter.Write(FormatCSVField(c_ItemSha1Hash));
                 LogWriter.Write("\n");
             }
 
@@ -1369,6 +1394,10 @@ namespace GilesTrinity
         private static string FormatCSVField(double number)
         {
             return String.Format("\"{0:0}\",", number);
+        }
+        private static string FormatCSVField(bool value)
+        {
+            return String.Format("\"{0}\",", value);
         }
 
         private static bool RefreshGilesGold(bool AddToCache)
@@ -2024,9 +2053,6 @@ namespace GilesTrinity
                 // Everything except items and the current target
                 if (c_ObjectType != GObjectType.Item && c_RActorGuid != CurrentTargetRactorGUID)
                 {
-
-                    //if (((c_ObjectType == GObjectType.Unit && !bWantToTownRun) || c_ObjectType == GObjectType.Shrine) && (c_CentreDistance > 10 && c_CentreDistance < 75))
-
                     if (c_CentreDistance < 125)
                     {
                         switch (c_ObjectType)
@@ -2039,14 +2065,28 @@ namespace GilesTrinity
                                 {
                                     using (new PerformanceLogger("RefreshLoS.1"))
                                     {
-                                        if (Settings.Combat.Misc.UseNavMeshTargeting)
+                                        // Get whether or not this RActor has ever been navigable. If it hasn't, don't add to cache and keep rechecking
+                                        if (!dictHasBeenNavigableCache.TryGetValue(c_RActorGuid, out c_HasBeenNavigable))
                                         {
-                                            bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
-
-                                            if (!isNavigable)
+                                            if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
-                                                AddToCache = false;
-                                                c_IgnoreSubStep = "NotNavigable";
+                                                bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
+
+                                                if (!isNavigable)
+                                                {
+                                                    AddToCache = false;
+                                                    c_IgnoreSubStep = "NotNavigable";
+                                                }
+                                                else
+                                                {
+                                                    c_HasBeenNavigable = true;
+                                                    dictHasBeenNavigableCache.Add(c_RActorGuid, c_HasBeenNavigable);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                c_HasBeenNavigable = true;
+                                                dictHasBeenNavigableCache.Add(c_RActorGuid, c_HasBeenNavigable);
                                             }
                                         }
                                     }
@@ -2063,36 +2103,45 @@ namespace GilesTrinity
                                 {
                                     using (new PerformanceLogger("RefreshLoS.2"))
                                     {
-                                        if (Settings.Combat.Misc.UseNavMeshTargeting && c_RadiusDistance > 5f)
+                                        // Get whether or not this RActor has ever been in a path line with AllowWalk. If it hasn't, don't add to cache and keep rechecking
+                                        if (!dictHasBeenRayCastedCache.TryGetValue(c_RActorGuid, out c_HasBeenRaycastable))
                                         {
-                                            Vector3 myPos = new Vector3(PlayerStatus.CurrentPosition.X, PlayerStatus.CurrentPosition.Y, PlayerStatus.CurrentPosition.Z + 4);
-                                            Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 4f);
-
-                                            // For Melee
-                                            //if (PlayerKiteDistance <= 5 && c_CentreDistance >= 5 && !ZetaDia.Physics.Raycast(myPos, cPos, NavCellFlags.AllowWalk))
-                                            //{
-                                            //    AddToCache = false;
-                                            //    c_IgnoreSubStep = "UnableToRayCast";
-                                            //}
-                                            //// For Kiting
-                                            //else if (!ZetaDia.Physics.Raycast(PlayerStatus.CurrentPosition, c_Position, NavCellFlags.AllowProjectile))
-                                            //{
-                                            //    AddToCache = false;
-                                            //    c_IgnoreSubStep = "UnableToRayCast";
-                                            //}
-                                            if (!ZetaDia.Physics.Raycast(PlayerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
+                                            if (c_RadiusDistance <= 5f)
                                             {
-                                                AddToCache = false;
-                                                c_IgnoreSubStep = "UnableToRayCast";
+                                                c_HasBeenRaycastable = true;
+                                                dictHasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);
                                             }
 
-                                        }
-                                        else
-                                        {
-                                            if (c_ZDiff > 14f)
+                                            if (Settings.Combat.Misc.UseNavMeshTargeting && c_RadiusDistance > 5f)
                                             {
-                                                AddToCache = false;
-                                                c_IgnoreSubStep = "LoS.ZDiff";
+                                                Vector3 myPos = new Vector3(PlayerStatus.CurrentPosition.X, PlayerStatus.CurrentPosition.Y, PlayerStatus.CurrentPosition.Z + 4);
+                                                Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 4f);
+
+                                                if (!ZetaDia.Physics.Raycast(PlayerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
+                                                {
+                                                    AddToCache = false;
+                                                    c_IgnoreSubStep = "UnableToRayCast";
+                                                }
+                                                else
+                                                {
+                                                    c_HasBeenRaycastable = true;
+                                                    dictHasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                }
+
+                                            }
+                                            else
+                                            {
+                                                if (c_ZDiff > 14f)
+                                                {
+                                                    AddToCache = false;
+                                                    c_IgnoreSubStep = "LoS.ZDiff";
+                                                }
+                                                else
+                                                {
+                                                    c_HasBeenRaycastable = true;
+                                                    dictHasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                }
+
                                             }
                                         }
                                     }
@@ -2106,13 +2155,27 @@ namespace GilesTrinity
                                 {
                                     using (new PerformanceLogger("RefreshLoS.3"))
                                     {
-                                        if (Settings.Combat.Misc.UseNavMeshTargeting)
+                                        // Get whether or not this RActor has ever been in "Line of Sight" (as determined by Demonbuddy). If it hasn't, don't add to cache and keep rechecking
+                                        if (!dictHasBeenInLoSCache.TryGetValue(c_RActorGuid, out c_HasBeenInLoS))
                                         {
-                                            // Ignore units not in LoS except bosses, rares, champs
-                                            if (!(c_unit_IsBoss) && !c_diaObject.InLineOfSight)
+                                            if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
-                                                AddToCache = false;
-                                                c_IgnoreSubStep = "NotInLoS";
+                                                // Ignore units not in LoS except bosses, rares, champs
+                                                if (!(c_unit_IsBoss) && !c_diaObject.InLineOfSight)
+                                                {
+                                                    AddToCache = false;
+                                                    c_IgnoreSubStep = "NotInLoS";
+                                                }
+                                                else
+                                                {
+                                                    c_HasBeenInLoS = true;
+                                                    dictHasBeenInLoSCache.Add(c_RActorGuid, c_HasBeenInLoS);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                c_HasBeenInLoS = true;
+                                                dictHasBeenInLoSCache.Add(c_RActorGuid, c_HasBeenInLoS);
                                             }
                                         }
                                     }

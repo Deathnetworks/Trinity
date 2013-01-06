@@ -23,7 +23,7 @@ namespace GilesTrinity
         public int BalanceID { get; set; }
         public int ActorSNO { get; set; }
         // Item/gold/other stuff
-        public int Level { get; set; }
+        public int ItemLevel { get; set; }
         public int GoldAmount { get; set; }
         public bool OneHanded { get; set; }
         public bool TwoHanded { get; set; }
@@ -49,6 +49,20 @@ namespace GilesTrinity
         public double HitPoints { get; set; }
         public float Radius { get; set; }
         public bool ForceLeapAgainst { get; set; }
+
+        /// <summary>
+        /// If the object has ever been navigable
+        /// </summary>
+        public bool HasBeenNavigable { get; set; }
+        /// <summary>
+        /// If the object has ever had RayCast AllowWalk
+        /// </summary>
+        public bool HasBeenRaycastable { get; set; }
+        /// <summary>
+        /// If the object has ever been in Line of Sight
+        /// </summary>
+        public bool HasBeenInLoS { get; set; }
+
         public MonsterSize MonsterStyle { get; set; }
         // A reference to the original object for fast updates
         public DiaUnit Unit
@@ -84,7 +98,7 @@ namespace GilesTrinity
                 DynamicID = DynamicID,
                 BalanceID = BalanceID,
                 ActorSNO = ActorSNO,
-                Level = Level,
+                ItemLevel = ItemLevel,
                 GoldAmount = GoldAmount,
                 OneHanded = OneHanded,
                 TwoHanded = TwoHanded,

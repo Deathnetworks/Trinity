@@ -18,6 +18,39 @@ namespace GilesTrinity
     public partial class GilesTrinity : IPlugin
     {
 
+        internal class PickupItem
+        {
+            public string Name { get; set; }
+            public int Level { get; set; }
+            public ItemQuality Quality { get; set; }
+            public int BalanceID { get; set; }
+            public ItemBaseType DBBaseType { get; set; }
+            public ItemType DBItemType { get; set; }
+            public bool IsOneHand { get; set; }
+            public bool IsTwoHand { get; set; }
+            public FollowerType ItemFollowerType { get; set; }
+            public int DynamicID { get; set; }
+            public Vector3 Position { get; set; }
+            public int ActorSNO { get; set; }
+
+            public PickupItem() { }
+
+            public PickupItem(string name, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
+            {
+                this.Name = name;
+                this.Level = level;
+                this.Quality = quality;
+                this.BalanceID = balanceId;
+                this.DBBaseType = dbItemBaseType;
+                this.DBItemType = dbItemType;
+                this.IsOneHand = IsOneHand;
+                this.IsTwoHand = IsTwoHand;
+                this.ItemFollowerType = followerType;
+                this.DynamicID = dynamicID;
+            }
+
+        }
+
         /// <summary>
         /// Pickup Validation - Determines what should or should not be picked up (Item Rules)
         /// </summary>
@@ -32,11 +65,11 @@ namespace GilesTrinity
         /// <param name="followerType"></param>
         /// <param name="dynamicID"></param>
         /// <returns></returns>
-        internal static bool ItemRulesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
+        internal static bool ItemRulesPickupValidation(PickupItem item)
         {
 
-            Interpreter.InterpreterAction action = StashRule.checkPickUpItem(name, level, quality, dbItemBaseType, dbItemType, isOneHand, isTwoHand, balanceId, dynamicID);
-            
+            Interpreter.InterpreterAction action = StashRule.checkPickUpItem(item.Name, item.Level, item.Quality, item.DBBaseType, item.DBItemType, item.IsOneHand, item.IsTwoHand, item.BalanceID, item.DynamicID);
+
             switch (action)
             {
                 case Interpreter.InterpreterAction.PICKUP:
@@ -47,10 +80,10 @@ namespace GilesTrinity
             }
 
             // TODO: remove if tested
-            if (quality > ItemQuality.Superior)
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Item Rules doesn't handle {0} of type {1} and quality {2}!", name, dbItemType, quality);
-            
-            return GilesPickupItemValidation(name, level, quality, balanceId, dbItemBaseType, dbItemType, isOneHand, isTwoHand, followerType, dynamicID);
+            if (item.Quality > ItemQuality.Superior)
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Item Rules doesn't handle {0} of type {1} and quality {2}!", item.Name, item.DBItemType, item.Quality);
+
+            return GilesPickupItemValidation(item);
         }
         /// <summary>
         /// Pickup Validation - Determines what should or should not be picked up (Scoring)
@@ -63,43 +96,45 @@ namespace GilesTrinity
         /// <param name="followerType"></param>
         /// <param name="dynamicID"></param>
         /// <returns></returns>
-        internal static bool GilesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
+        internal static bool GilesPickupItemValidation(PickupItem item)
         {
 
             // If it's legendary, we always want it *IF* it's level is right
-            if (quality >= ItemQuality.Legendary)
+            if (item.Quality >= ItemQuality.Legendary)
             {
-                return (Settings.Loot.Pickup.LegendaryLevel > 0 && (level >= Settings.Loot.Pickup.LegendaryLevel || Settings.Loot.Pickup.LegendaryLevel == 1));
+                return (Settings.Loot.Pickup.LegendaryLevel > 0 && (item.Level >= Settings.Loot.Pickup.LegendaryLevel || Settings.Loot.Pickup.LegendaryLevel == 1));
             }
 
             // Calculate giles item types and base types etc.
-            GItemType itemType = DetermineItemType(name, dbItemType, followerType);
+            GItemType itemType = DetermineItemType(item.Name, item.DBItemType, item.ItemFollowerType);
             GItemBaseType baseType = DetermineBaseType(itemType);
+
+            string itemSha1Hash = ItemHash.GenerateItemHash(item.Position, item.ActorSNO, item.Name, iCurrentWorldID, item.Quality, item.Level);
 
             switch (baseType)
             {
                 case GItemBaseType.WeaponTwoHand:
                 case GItemBaseType.WeaponOneHand:
                 case GItemBaseType.WeaponRange:
-                    return CheckLevelRequirements(level, quality, Settings.Loot.Pickup.WeaponBlueLevel, Settings.Loot.Pickup.WeaponYellowLevel);
+                    return CheckLevelRequirements(item.Level, item.Quality, Settings.Loot.Pickup.WeaponBlueLevel, Settings.Loot.Pickup.WeaponYellowLevel);
                 case GItemBaseType.Armor:
                 case GItemBaseType.Offhand:
-                    return CheckLevelRequirements(level, quality, Settings.Loot.Pickup.ArmorBlueLevel, Settings.Loot.Pickup.ArmorYellowLevel);
+                    return CheckLevelRequirements(item.Level, item.Quality, Settings.Loot.Pickup.ArmorBlueLevel, Settings.Loot.Pickup.ArmorYellowLevel);
                 case GItemBaseType.Jewelry:
-                    return CheckLevelRequirements(level, quality, Settings.Loot.Pickup.JewelryBlueLevel, Settings.Loot.Pickup.JewelryYellowLevel);
+                    return CheckLevelRequirements(item.Level, item.Quality, Settings.Loot.Pickup.JewelryBlueLevel, Settings.Loot.Pickup.JewelryYellowLevel);
                 case GItemBaseType.FollowerItem:
-                    if (level < 60 || !Settings.Loot.Pickup.FollowerItem || quality < ItemQuality.Rare4)
+                    if (item.Level < 60 || !Settings.Loot.Pickup.FollowerItem || item.Quality < ItemQuality.Rare4)
                     {
-                        if (!_hashsetItemFollowersIgnored.Contains(dynamicID))
+                        if (!_hashsetItemFollowersIgnored.Contains(itemSha1Hash))
                         {
-                            _hashsetItemFollowersIgnored.Add(dynamicID);
+                            _hashsetItemFollowersIgnored.Add(itemSha1Hash);
                             totalFollowerItemsIgnored++;
                         }
                         return false;
                     }
                     break;
                 case GItemBaseType.Gem:
-                    if (level < Settings.Loot.Pickup.GemLevel ||
+                    if (item.Level < Settings.Loot.Pickup.GemLevel ||
                         (itemType == GItemType.Ruby && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Ruby)) ||
                         (itemType == GItemType.Emerald && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Emerald)) ||
                         (itemType == GItemType.Amethyst && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Amethyst)) ||
@@ -111,11 +146,11 @@ namespace GilesTrinity
                 case GItemBaseType.Misc:
 
                     // Note; Infernal keys are misc, so should be picked up here - we aren't filtering them out, so should default to true at the end of this function
-                    if (itemType == GItemType.CraftingMaterial && level < Settings.Loot.Pickup.MiscItemLevel)
+                    if (itemType == GItemType.CraftingMaterial && item.Level < Settings.Loot.Pickup.MiscItemLevel)
                     {
                         return false;
                     }
-                    if (itemType == GItemType.CraftTome && (level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.CraftTomes))
+                    if (itemType == GItemType.CraftTome && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.CraftTomes))
                     {
                         return false;
                     }
@@ -127,7 +162,7 @@ namespace GilesTrinity
                     // Potion filtering
                     if (itemType == GItemType.HealthPotion)
                     {
-                        if (Settings.Loot.Pickup.PotionMode == PotionMode.Ignore || level < Settings.Loot.Pickup.PotionLevel)
+                        if (Settings.Loot.Pickup.PotionMode == PotionMode.Ignore || item.Level < Settings.Loot.Pickup.PotionLevel)
                         {
                             return false;
                         }
@@ -138,7 +173,7 @@ namespace GilesTrinity
                             int iTotalPotions =
                                 (from tempitem in ZetaDia.Me.Inventory.Backpack
                                  where tempitem.BaseAddress != IntPtr.Zero &&
-                                 tempitem.GameBalanceId == balanceId
+                                 tempitem.GameBalanceId == item.BalanceID
                                  select tempitem.ItemStackQuantity).Sum();
                             if (iTotalPotions > 98)
                             {

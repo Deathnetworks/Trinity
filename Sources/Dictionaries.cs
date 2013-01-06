@@ -296,7 +296,7 @@ namespace GilesTrinity
             163449, 78030, 2909, 58283, 58309, 58321, 87809, 90150, 91600, 97023, 97350, 97381, 72689, 121327, 54515, 3340, 122076, 123640,
             60665, 60844, 78554, 86400, 86428, 81699, 86266, 86400, 110769, 192466, 211456, 6190, 80002, 104596, 58836, 104827, 74909, 6155, 6156, 6158, 6159, 75132,
             181504, 91688, 3016, 3007, 3011, 3014, 130858, 131573, 214396, 182730, 226087, 141639, 206569, 15119, 54413, 54926, 2979, 5776, 3949,
-            108490, 52833, 200371, 153752, 2972, 206527, 
+            108490, 52833, 200371, 153752, 2972, 206527, 3628,
             //a3dun_crater_st_Demo_ChainPylon_Fire_Azmodan, a3dun_crater_st_Demon_ChainPylon_Fire_MistressOfPain
             198977, 201680,
             //trOut_Leor_painting
@@ -610,6 +610,11 @@ namespace GilesTrinity
         /// Summoned-by ID for units (RactorGUID based)
         /// </summary>
         private static Dictionary<int, int> dictSummonedByID = new Dictionary<int, int>();
+
+
+        private static Dictionary<int, bool> dictHasBeenNavigableCache = new Dictionary<int, bool>();
+        private static Dictionary<int, bool> dictHasBeenRayCastedCache = new Dictionary<int, bool>();
+        private static Dictionary<int, bool> dictHasBeenInLoSCache = new Dictionary<int, bool>();
 
         /// <summary>
         /// Do we actually need this?

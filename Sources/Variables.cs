@@ -463,10 +463,9 @@ namespace GilesTrinity
         private static bool bMaintainStatTracking = false;
 
         // Store items already logged by item-stats, to make sure no stats get doubled up by accident
-        private static HashSet<int> _hashsetItemStatsLookedAt = new HashSet<int>();
-        private static HashSet<int> _hashsetItemPicksLookedAt = new HashSet<int>();
-        private static HashSet<int> _hashsetItemFollowersIgnored = new HashSet<int>();
-
+        private static HashSet<string> _hashsetItemStatsLookedAt = new HashSet<string>();
+        private static HashSet<string> _hashsetItemPicksLookedAt = new HashSet<string>();
+        private static HashSet<string> _hashsetItemFollowersIgnored = new HashSet<string>();
 
         // These objects are instances of my stats class above, holding identical types of data for two different things - one holds item DROP stats, one holds item PICKUP stats
         internal static GItemStats ItemsDroppedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
@@ -541,6 +540,11 @@ namespace GilesTrinity
         private static bool c_unit_IsAttackable = false;
         private static bool c_ForceLeapAgainst = false;
         private static bool c_IsObstacle = false;
+        private static bool c_HasBeenNavigable = false;
+        private static bool c_HasBeenRaycastable = false;
+        private static bool c_HasBeenInLoS = false;
+        private static string c_ItemSha1Hash = string.Empty;
+
 
         // From main RefreshDiaobjects
         private static Vector3 vSafePointNear;

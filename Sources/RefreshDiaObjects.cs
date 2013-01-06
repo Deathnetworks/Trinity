@@ -280,15 +280,15 @@ namespace GilesTrinity
                     hashRGUIDBlacklist3 = new HashSet<int>();
                 }
                 // Clear certain cache dictionaries sequentially, spaced out over time, to force data updates
-                if (DateTime.Now.Subtract(lastClearedCacheDictionary).TotalMilliseconds >= 30000)
+                if (DateTime.Now.Subtract(lastClearedCacheDictionary).TotalMilliseconds >= 3000)
                 {
                     lastClearedCacheDictionary = DateTime.Now;
                     iLastClearedCacheDictionary++;
-                    if (iLastClearedCacheDictionary > 5)
+                    if (iLastClearedCacheDictionary > 50)
                         iLastClearedCacheDictionary = 1;
                     switch (iLastClearedCacheDictionary)
                     {
-                        case 1:
+                        case 10: // every 30 seconds
                             dictGilesVectorCache = new Dictionary<int, Vector3>();
                             dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
                             dictGilesActorSNOCache = new Dictionary<int, int>();
@@ -296,7 +296,7 @@ namespace GilesTrinity
                             dictGilesLastHealthCache = new Dictionary<int, double>();
                             dictGilesLastHealthChecked = new Dictionary<int, int>();
                             break;
-                        case 2:
+                        case 20: // every 60 seconds
                             dictGilesMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
                             dictGilesMaxHealthCache = new Dictionary<int, double>();
                             dictionaryStoredMonsterTypes = new Dictionary<int, MonsterType>();
@@ -304,17 +304,19 @@ namespace GilesTrinity
                             dictGilesBurrowedCache = new Dictionary<int, bool>();
                             dictSummonedByID = new Dictionary<int, int>();
                             break;
-                        case 3:
+                        case 30: // every 90 seconds
                             dictGilesInternalNameCache = new Dictionary<int, string>();
                             dictGilesGoldAmountCache = new Dictionary<int, int>();
                             break;
-                        case 4:
-                        case 5:
+                        case 50: // every 150 seconds
                             dictGilesGameBalanceIDCache = new Dictionary<int, int>();
                             dictGilesDynamicIDCache = new Dictionary<int, int>();
                             dictGilesQualityCache = new Dictionary<int, ItemQuality>();
                             dictGilesQualityRechecked = new Dictionary<int, bool>();
                             dictGilesPickupItem = new Dictionary<int, bool>();
+                            dictHasBeenRayCastedCache = new Dictionary<int, bool>();
+                            dictHasBeenNavigableCache = new Dictionary<int, bool>();
+                            dictHasBeenInLoSCache = new Dictionary<int, bool>();
                             break;
                     }
                 }
@@ -428,9 +430,12 @@ namespace GilesTrinity
         private static bool RefreshItemStats(GItemBaseType tempbasetype)
         {
             bool isNewLogItem = false;
-            if (!_hashsetItemStatsLookedAt.Contains(c_RActorGuid))
+
+            c_ItemSha1Hash = ItemHash.GenerateItemHash(c_Position, c_ActorSNO, c_Name, iCurrentWorldID, c_ItemQuality, c_ItemLevel);
+
+            if (!_hashsetItemStatsLookedAt.Contains(c_ItemSha1Hash))
             {
-                _hashsetItemStatsLookedAt.Add(c_RActorGuid);
+                _hashsetItemStatsLookedAt.Add(c_ItemSha1Hash);
                 isNewLogItem = true;
                 if (tempbasetype == GItemBaseType.Armor || tempbasetype == GItemBaseType.WeaponOneHand || tempbasetype == GItemBaseType.WeaponTwoHand ||
                     tempbasetype == GItemBaseType.WeaponRange || tempbasetype == GItemBaseType.Jewelry || tempbasetype == GItemBaseType.FollowerItem ||
@@ -662,13 +667,13 @@ namespace GilesTrinity
             // Finally, a special check for waiting for wrath of the berserker cooldown before engaging Azmodan
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Barbarian.WaitWOTB && !GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
                 ZetaDia.CurrentWorldId == 121214 &&
-                (Vector3.Distance(playerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+                (Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 bDontSpamOutofCombat = true;
                 Logging.Write("[Trinity] Waiting for Wrath Of The Berserker cooldown before continuing to Azmodan.");
                 CurrentTarget = new GilesObject()
                                     {
-                                        Position = playerStatus.CurrentPosition,
+                                        Position = PlayerStatus.CurrentPosition,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,

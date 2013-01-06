@@ -216,9 +216,9 @@ namespace GilesTrinity
             dictUseOnceID = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;
             iDeathsThisRun = 0;
-            _hashsetItemStatsLookedAt = new HashSet<int>();
-            _hashsetItemPicksLookedAt = new HashSet<int>();
-            _hashsetItemFollowersIgnored = new HashSet<int>();
+            _hashsetItemStatsLookedAt = new HashSet<string>();
+            _hashsetItemPicksLookedAt = new HashSet<string>();
+            _hashsetItemFollowersIgnored = new HashSet<string>();
             TownRun._dictItemStashAttempted = new Dictionary<int, int>();
             hashRGUIDBlacklist60 = new HashSet<int>();
             hashRGUIDBlacklist90 = new HashSet<int>();
