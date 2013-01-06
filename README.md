@@ -31,27 +31,24 @@
 * New XML Tag: TrinityLoadOnce - will load a set of profiles in random order within a single game session.   
 This XML tag will load a random profile from the list, but only once during this game session 
 
-* New Barbarian multi-target Whirlwind and monk tempest rush logic, with GUI option to disable if you don't like it.
+* New Barbarian multi-target Whirlwind and monk tempest rush logic, with GUI option to disable if you don't like it.   
+This helps with "chaining" large packs of trash mobs, rather than X/criss-cross only a single target in a pack.
 
-* Added GUI option to ignore solitary trash mobs.
+* Added GUI option to ignore solitary trash mobs. This will cause bot to ignore a trash mob when no other trash mob is within 40yds of it. Automatically disabled if elites are present. 
 
-* Bot will now stand in place until pre-TownRun timer finishes.
+* Bot will no longer continue on profile behaviors while waiting for pre-TownRun timer.
 
-* Supports new DB CanTownRun() logic, fixed town run with bags 1/2 full.
+* Supports new DB BETA CanTownRun() logic, also fixed town run with bags 1/2 full.
 
-* Improved TrinityRandomWait tag (no longer using Thread.Sleep())
+* Improved TrinityRandomWait tag (no longer using Thread.Sleep()), does not lock Demonbuddy - allows combat/looting to continue while waiting.
 
-* More improvements to destructibles/barricades.
-
-* TownRun with bags 1/2 full actually works now.
+* More improvements to destructibles/barricades logic.
 
 * Increased DemonHunter destructible power range.
 
 * Decreased DemonHunter Caltrops timer from 6 sec to 3 sec.
 
 * Fixed reset gold counter on new game.
-
-* Fixed derp math error on town run logic for bags 1/2 full (it works now).
 
 * Added additional logging for vendor movement logic during town run (to help determine stucks).
 
