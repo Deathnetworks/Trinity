@@ -223,7 +223,7 @@ namespace GilesTrinity
             if (name.StartsWith("xbow_")) return GItemType.TwoHandCrossbow;
             if (name.StartsWith("twohandedmace_")) return GItemType.TwoHandMace;
             if (name.StartsWith("mightyweapon_2h_")) return GItemType.TwoHandMighty;
-            if (name.StartsWith("polearm_")) return GItemType.TwoHandPolearm;
+            if (name.StartsWith("polearm_") || dbItemType == ItemType.Polearm) return GItemType.TwoHandPolearm;
             if (name.StartsWith("staff_")) return GItemType.TwoHandStaff;
             if (name.StartsWith("twohandedsword_")) return GItemType.TwoHandSword;
             if (name.StartsWith("staffofcow")) return GItemType.StaffOfHerding;

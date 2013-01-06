@@ -1,8 +1,6 @@
-﻿Unified Trinity Community Edition
-=================================
+﻿# Unified Trinity Community Edition
 
-Major new features: 
--------------------
+## Major new features: 
 
 * Source control :)
 
@@ -18,8 +16,7 @@ Major new features:
 
 * Improved code Readability
 
-Future Planned Improvements: 
-----------------------------
+## Future Planned Improvements: 
 
 * New cache system, trash the HashSet's and Dictionaries for an object based system
 
@@ -27,7 +24,12 @@ Future Planned Improvements:
 
 ### Changelog 1.7.1.14:
 
-* New XML Tag: TrinityLoadOnce - will load a set of profiles in random order within a single game session
+###### REQUIRES DemonbuddyBETA 1.0.1240.115 OR HIGHER  
+
+###### WILL NOT WORK WITH .294!  
+
+* New XML Tag: TrinityLoadOnce - will load a set of profiles in random order within a single game session.   
+This XML tag will load a random profile from the list, but only once during this game session 
 
 * New Barbarian multi-target Whirlwind and monk tempest rush logic, with GUI option to disable if you don't like it.
 
@@ -312,22 +314,15 @@ Future Planned Improvements:
 
 * Lots of refactoring for Logging, many new advanced options for logging selection
 
-
-
-
 ### Changelog 1.7.1.2
 
 * UI Works in all regions now
-
-
 
 ### Changelog 1.7.1.1
 
 * Fix for darkfriend77 item rulesets not being used
 
 * Fixed WD grave injustice checkbox not being saved or used correctly
-
-
 
 ### Changelog 1.7.1.0
 

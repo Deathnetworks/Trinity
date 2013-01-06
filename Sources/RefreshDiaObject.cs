@@ -1265,7 +1265,7 @@ namespace GilesTrinity
             // !sp - loot range extension range for legendaries
             if (iKeepLootRadiusExtendedFor > 0)
             {
-                fExtraRange = 30f;
+                fExtraRange = 90f;
             }
             if (c_ItemQuality >= ItemQuality.Rare4)
             {
@@ -1983,7 +1983,7 @@ namespace GilesTrinity
                                 {
                                     using (new PerformanceLogger("RefreshLoS.2"))
                                     {
-                                        if (Settings.Combat.Misc.UseNavMeshTargeting)
+                                        if (Settings.Combat.Misc.UseNavMeshTargeting && c_RadiusDistance > 5f)
                                         {
                                             Vector3 myPos = new Vector3(PlayerStatus.CurrentPosition.X, PlayerStatus.CurrentPosition.Y, PlayerStatus.CurrentPosition.Z + 4);
                                             Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 4f);
