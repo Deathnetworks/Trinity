@@ -16,9 +16,6 @@ namespace GilesTrinity
         {
             // Butcher Floor Panels
             201454, 201464, 201426, 201438, 200969, 201423, 201242,
-            // A1 Halls of Agony Fire walls
-            89578, 89579,
-
         };
 
         /// <summary>

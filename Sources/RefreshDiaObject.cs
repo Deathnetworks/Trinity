@@ -10,6 +10,7 @@ using Zeta.CommonBot;
 using Zeta.Internals.Actors;
 using Zeta.Internals.Actors.Gizmos;
 using Zeta.Internals.SNO;
+using System.Text;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -1140,6 +1141,7 @@ namespace GilesTrinity
         }
         private static bool RefreshGilesItem(bool AddToCache)
         {
+            bool logNewItem = false;
             AddToCache = false;
             if (c_BalanceID == -1)
             {
@@ -1258,8 +1260,28 @@ namespace GilesTrinity
                     }
                 }
             }
+
             // Item stats
-            RefreshItemStats(itemBaseType);
+            logNewItem = RefreshItemStats(itemBaseType);
+
+            // Get whether or not we want this item, cached if possible
+            if (!dictGilesPickupItem.TryGetValue(c_RActorGuid, out AddToCache))
+            {
+                if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+                {
+                    AddToCache = ItemManager.EvaluateItem((ACDItem)c_CommonData, ItemManager.RuleType.PickUp);
+                }
+                if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
+                {
+                    AddToCache = ItemRulesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType, c_GameDynamicID);
+                }
+                else
+                {
+                    AddToCache = GilesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType, c_GameDynamicID);
+                }
+                dictGilesPickupItem.Add(c_RActorGuid, AddToCache);
+            }
+
             // Ignore it if it's not in range yet - allow legendary items to have 15 feet extra beyond our profile max loot radius
             float fExtraRange = 0f;
             // !sp - loot range extension range for legendaries
@@ -1282,23 +1304,7 @@ namespace GilesTrinity
                 c_IgnoreSubStep = "OutOfRange";
             }
 
-            // Get whether or not we want this item, cached if possible
-            if (!dictGilesPickupItem.TryGetValue(c_RActorGuid, out AddToCache))
-            {
-                if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
-                {
-                    AddToCache = ItemManager.EvaluateItem((ACDItem)c_CommonData, ItemManager.RuleType.PickUp);
-                }
-                if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
-                {
-                    AddToCache = ItemRulesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType, c_GameDynamicID);
-                }
-                else
-                {
-                    AddToCache = GilesPickupItemValidation(c_Name, c_ItemLevel, c_ItemQuality, c_BalanceID, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType, c_GameDynamicID);
-                }
-                dictGilesPickupItem.Add(c_RActorGuid, AddToCache);
-            }
+
             // Using DB built-in item rules
             if (AddToCache)
             {
@@ -1310,14 +1316,61 @@ namespace GilesTrinity
                 AddToCache = true;
             }
 
+            // Check if there's a monster intersecting the path-line to this item
             AddToCache = MosterObstacleInPathCacheObject(AddToCache);
 
-            // Didn't pass giles pickup rules/DB internal rule match, so ignore it
+            // Didn't pass pickup rules, so ignore it
             if (!AddToCache && c_IgnoreSubStep == String.Empty)
                 c_IgnoreSubStep = "NoMatchingRule";
 
+            if (logNewItem && !AddToCache && c_DBItemType != ItemType.Unknown)
+                LogSkippedItem();
+
             return AddToCache;
         }
+
+        private static void LogSkippedItem()
+        {
+            string skippedItemsPath = Path.Combine(FileManager.LoggingPath, String.Format("SkippedItems_{0}_{1}.csv", PlayerStatus.ActorClass, DateTime.Now.ToString("yyyy-MM-dd")));
+
+            bool writeHeader = !File.Exists(skippedItemsPath);
+            using (StreamWriter LogWriter = new StreamWriter(skippedItemsPath, true))
+            {
+                if (writeHeader)
+                {
+                    LogWriter.WriteLine("ActorSNO,RActorGUID,DyanmicID,ACDGuid,Name,DBBaseType,TBaseType,DBItemType,TItemType,Quality,Level,IgnoreItemSubStep,Distance");
+                }
+                LogWriter.Write(FormatCSVField(c_ActorSNO));
+                LogWriter.Write(FormatCSVField(c_RActorGuid));
+                LogWriter.Write(FormatCSVField(c_GameDynamicID));
+                LogWriter.Write(FormatCSVField(c_ACDGUID));
+                LogWriter.Write(FormatCSVField(c_Name));
+                LogWriter.Write(FormatCSVField(c_DBItemBaseType.ToString()));
+                LogWriter.Write(FormatCSVField(DetermineBaseType(c_item_GItemType).ToString()));
+                LogWriter.Write(FormatCSVField(c_DBItemType.ToString()));
+                LogWriter.Write(FormatCSVField(c_item_GItemType.ToString()));
+                LogWriter.Write(FormatCSVField(c_ItemQuality.ToString()));
+                LogWriter.Write(FormatCSVField(c_ItemLevel));
+                LogWriter.Write(FormatCSVField(c_IgnoreSubStep));
+                LogWriter.Write(FormatCSVField(c_CentreDistance));
+                LogWriter.Write("\n");
+            }
+
+        }
+
+        private static string FormatCSVField(string text)
+        {
+            return String.Format("\"{0}\",", text);
+        }
+        private static string FormatCSVField(int number)
+        {
+            return String.Format("\"{0}\",", number);
+        }
+        private static string FormatCSVField(double number)
+        {
+            return String.Format("\"{0:0}\",", number);
+        }
+
         private static bool RefreshGilesGold(bool AddToCache)
         {
             //int rangedMinimumStackSize = 0;
@@ -1334,6 +1387,7 @@ namespace GilesTrinity
                 {
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", c_Name, c_ActorSNO);
                     AddToCache = false;
+                    c_IgnoreSubStep = "GetAttributeException";
                 }
                 dictGilesGoldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
             }
@@ -1342,20 +1396,46 @@ namespace GilesTrinity
             if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)
             {
                 AddToCache = false;
+                c_IgnoreSubStep = "NotEnoughGold";
             }
 
-            // Blacklist gold piles already in pickup radius range
-            if (c_CentreDistance <= ZetaDia.Me.GoldPickUpRadius)
-            {
-                hashRGUIDBlacklist60.Add(c_RActorGuid);
-                AddToCache = false;
-                c_IgnoreSubStep = "GoldOutOfRange";
-            }
+            if (!AddToCache)
+                LogSkippedGold();
+
+            // gold piles already in pickup radius range
+            //if (c_CentreDistance <= ZetaDia.Me.GoldPickUpRadius)
+            //{
+            //    AddToCache = false;
+            //    c_IgnoreSubStep = "GoldAlreadyInPickupRadius";
+            //}
 
             //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Gold Stack {0} has iPercentage {1} with rangeMinimumStackSize: {2} Distance: {3} MininumGoldStack: {4} PickupRadius: {5} AddToCache: {6}",
             //    c_GoldStackSize, iPercentage, rangedMinimumStackSize, c_CentreDistance, Settings.Loot.Pickup.MinimumGoldStack, ZetaDia.Me.GoldPickUpRadius, AddToCache);
 
             return AddToCache;
+        }
+        private static void LogSkippedGold()
+        {
+            string skippedItemsPath = Path.Combine(FileManager.LoggingPath, String.Format("SkippedGoldStacks_{0}_{1}.csv", PlayerStatus.ActorClass, DateTime.Now.ToString("yyyy-MM-dd")));
+
+            bool writeHeader = !File.Exists(skippedItemsPath);
+            using (StreamWriter LogWriter = new StreamWriter(skippedItemsPath, true))
+            {
+                if (writeHeader)
+                {
+                    LogWriter.WriteLine("ActorSNO,RActorGUID,DyanmicID,ACDGuid,Name,GoldStackSize,IgnoreItemSubStep,Distance");
+                }
+                LogWriter.Write(FormatCSVField(c_ActorSNO));
+                LogWriter.Write(FormatCSVField(c_RActorGuid));
+                LogWriter.Write(FormatCSVField(c_GameDynamicID));
+                LogWriter.Write(FormatCSVField(c_ACDGUID));
+                LogWriter.Write(FormatCSVField(c_Name));
+                LogWriter.Write(FormatCSVField(c_GoldStackSize));
+                LogWriter.Write(FormatCSVField(c_IgnoreSubStep));
+                LogWriter.Write(FormatCSVField(c_CentreDistance));
+                LogWriter.Write("\n");
+            }
+
         }
         private static bool RefreshGilesGizmo(bool AddToCache)
         {
@@ -1859,7 +1939,7 @@ namespace GilesTrinity
             catch { }
 
             bool bIgnoreThisAvoidance = false;
-            double dThisHealthAvoid = GetAvoidanceHealth();
+            double dThisHealthAvoid = GetAvoidanceHealth(c_ActorSNO);
             // Monks with Serenity up ignore all AOE's
             if (PlayerStatus.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_Serenity) && GetHasBuff(SNOPower.Monk_Serenity))
             {
@@ -2436,6 +2516,9 @@ namespace GilesTrinity
         }
         private static double GetAvoidanceHealth(int actorSno = -1)
         {
+            // snag our SNO from cache variable if not provided
+            if (actorSno == -1)
+                actorSno = c_ActorSNO;
             try
             {
                 if (actorSno != -1)

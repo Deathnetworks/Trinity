@@ -349,8 +349,8 @@ namespace GilesTrinity
 
 
                                 // Point-blank items get a weight increase 
-                                if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 8f)
-                                    cacheObject.Weight += 600d;
+                                if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 12f)
+                                    cacheObject.Weight += 1000d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == CurrentTargetRactorGUID)

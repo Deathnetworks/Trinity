@@ -425,11 +425,13 @@ namespace GilesTrinity
             }
         }
 
-        private static void RefreshItemStats(GItemBaseType tempbasetype)
+        private static bool RefreshItemStats(GItemBaseType tempbasetype)
         {
+            bool isNewLogItem = false;
             if (!_hashsetItemStatsLookedAt.Contains(c_RActorGuid))
             {
                 _hashsetItemStatsLookedAt.Add(c_RActorGuid);
+                isNewLogItem = true;
                 if (tempbasetype == GItemBaseType.Armor || tempbasetype == GItemBaseType.WeaponOneHand || tempbasetype == GItemBaseType.WeaponTwoHand ||
                     tempbasetype == GItemBaseType.WeaponRange || tempbasetype == GItemBaseType.Jewelry || tempbasetype == GItemBaseType.FollowerItem ||
                     tempbasetype == GItemBaseType.Offhand)
@@ -480,6 +482,7 @@ namespace GilesTrinity
                     OutputReport();
                 }
             }
+            return isNewLogItem;
         }
         private static double RefreshKillRadius()
         {

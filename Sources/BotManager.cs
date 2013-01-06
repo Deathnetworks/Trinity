@@ -68,7 +68,7 @@ namespace GilesTrinity
             if (Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius < 50)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: Low Gold Loot Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
-                    Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius);
+                    Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius);
             }
 
             //try
