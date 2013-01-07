@@ -70,6 +70,7 @@
     <Compile Include="Cache\CacheItem.cs" />
     <Compile Include="Cache\CacheUnit.cs" />
     <Compile Include="Cache\CacheUtils.cs" />
+    <Compile Include="Cache\GenericCache.cs" />
     <Compile Include="Cache\TrinityItemQuality.cs" />
     <Compile Include="Classes\GilesObjstacle.cs" />
     <Compile Include="Classes\GilesPower.cs" />

@@ -34,7 +34,7 @@ namespace GilesTrinity
                     float maxDistance = 20f;
                     int minTargets = 3;
 
-                    if (useTargetBasedZigZag && GilesObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
+                    if (useTargetBasedZigZag && !bAnyTreasureGoblinsPresent && GilesObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
                     {
                         IEnumerable<GilesObject> zigZagTargets =
                             from u in GilesObjectCache
@@ -497,27 +497,6 @@ namespace GilesTrinity
             public float Radius { get; set; }
             public string Name { get; set; }
         }
-
-        internal static HashSet<UnSafeZone> UnsafeKiteAreas = new HashSet<UnSafeZone>()
-        {
-            { 
-                new UnSafeZone() {
-                    WorldId = 182976, 
-                    Position = (new Vector3(281.0147f,361.5885f,20.86533f)),
-                    Name = "Chamber of Queen Araneae",
-                    Radius = 90f
-                }
-            },
-            {
-                new UnSafeZone()
-                {
-                    WorldId = 78839,
-                    Position = (new Vector3(59.50927f,60.12386f,0.100002f)),
-                    Name = "Chamber of Suffering (Butcher)",
-                    Radius = 120f
-                }
-            }
-        };
 
         internal static Vector3 newFindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<GilesObject> monsterList = null)
         {

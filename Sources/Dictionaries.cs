@@ -620,5 +620,39 @@ namespace GilesTrinity
         /// Do we actually need this?
         /// </summary>
         private static Dictionary<int, GilesGameBalanceDataCache> dictGilesGameBalanceDataCache = new Dictionary<int, GilesGameBalanceDataCache>();
+
+        /// <summary>
+        /// Spots where we should not kite to (used during boss fights)
+        /// </summary>
+        internal static HashSet<UnSafeZone> UnsafeKiteAreas = new HashSet<UnSafeZone>()
+        {
+            { 
+                new UnSafeZone() {
+                    WorldId = 182976, 
+                    Position = (new Vector3(281.0147f,361.5885f,20.86533f)),
+                    Name = "Chamber of Queen Araneae",
+                    Radius = 90f
+                }
+            },
+            {
+                new UnSafeZone()
+                {
+                    WorldId = 78839,
+                    Position = (new Vector3(59.50927f,60.12386f,0.100002f)),
+                    Name = "Chamber of Suffering (Butcher)",
+                    Radius = 120f
+                }
+            },
+            {
+                new UnSafeZone()
+                {
+                    WorldId = 109143,
+                    Position = (new Vector3(355.8749f,424.0184f,-14.9f)),
+                    Name = "Izual",
+                    Radius = 120f
+                }
+            }
+        };
+
     }
 }

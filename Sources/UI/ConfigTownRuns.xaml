@@ -27,7 +27,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Savlvage options :" FontWeight="Bold" TextAlignment="Center"/>
+            <TextBlock Text="Salvage options:" FontWeight="Bold" TextAlignment="Center"/>
             <UniformGrid Grid.Row="1" Columns="4" Margin="25,2">
                 <TextBlock Margin="2" Text="Magics" FontWeight="Bold" VerticalAlignment="Center"/>
                 <RadioButton GroupName="BlueSalvage" Content="None" ToolTip="Sell all items"

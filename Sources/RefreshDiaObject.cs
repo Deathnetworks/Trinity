@@ -2119,8 +2119,8 @@ namespace GilesTrinity
 
                                             if (Settings.Combat.Misc.UseNavMeshTargeting && c_RadiusDistance > 5f)
                                             {
-                                                Vector3 myPos = new Vector3(PlayerStatus.CurrentPosition.X, PlayerStatus.CurrentPosition.Y, PlayerStatus.CurrentPosition.Z + 4);
-                                                Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 4f);
+                                                Vector3 myPos = new Vector3(PlayerStatus.CurrentPosition.X, PlayerStatus.CurrentPosition.Y, PlayerStatus.CurrentPosition.Z + 8f);
+                                                Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 8f);
 
                                                 if (!ZetaDia.Physics.Raycast(PlayerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
                                                 {

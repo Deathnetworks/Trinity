@@ -39,6 +39,8 @@ namespace GilesTrinity
 
                 using (new PerformanceLogger("RefreshDiaObjectCache.UpdateBlock"))
                 {
+                    GenericCache.MaintainCache();
+                    
                     using (ZetaDia.Memory.AcquireFrame())
                     {
                         // Update player-data cache, including buffs
@@ -280,6 +282,8 @@ namespace GilesTrinity
                     hashRGUIDBlacklist3 = new HashSet<int>();
                 }
                 // Clear certain cache dictionaries sequentially, spaced out over time, to force data updates
+                // keep data for up to 60 minutes
+                // run refresh every 3 seconds
                 if (DateTime.Now.Subtract(lastClearedCacheDictionary).TotalMilliseconds >= 3000)
                 {
                     lastClearedCacheDictionary = DateTime.Now;
@@ -320,6 +324,7 @@ namespace GilesTrinity
                             break;
                     }
                 }
+
                 // Reset the counters for player-owned things
                 iPlayerOwnedMysticAlly = 0;
                 iPlayerOwnedGargantuan = 0;
@@ -433,9 +438,10 @@ namespace GilesTrinity
 
             c_ItemSha1Hash = ItemHash.GenerateItemHash(c_Position, c_ActorSNO, c_Name, iCurrentWorldID, c_ItemQuality, c_ItemLevel);
 
-            if (!_hashsetItemStatsLookedAt.Contains(c_ItemSha1Hash))
+            if (!GenericCache.ContainsKey(c_ItemSha1Hash))
             {
-                _hashsetItemStatsLookedAt.Add(c_ItemSha1Hash);
+                GenericCache.AddToCache(new GenericCacheObject(c_ItemSha1Hash, null, new TimeSpan(1, 0, 0)));
+
                 isNewLogItem = true;
                 if (tempbasetype == GItemBaseType.Armor || tempbasetype == GItemBaseType.WeaponOneHand || tempbasetype == GItemBaseType.WeaponTwoHand ||
                     tempbasetype == GItemBaseType.WeaponRange || tempbasetype == GItemBaseType.Jewelry || tempbasetype == GItemBaseType.FollowerItem ||
