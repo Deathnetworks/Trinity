@@ -1361,8 +1361,9 @@ namespace GilesTrinity
             {
                 if (writeHeader)
                 {
-                    LogWriter.WriteLine("ActorSNO,RActorGUID,DyanmicID,ACDGuid,Name,DBBaseType,TBaseType,DBItemType,TItemType,Quality,Level,IgnoreItemSubStep,Distance,Pickup,SHA1Hash");
+                    LogWriter.WriteLine("Timestamp,ActorSNO,RActorGUID,DyanmicID,ACDGuid,Name,DBBaseType,TBaseType,DBItemType,TItemType,Quality,Level,IgnoreItemSubStep,Distance,Pickup,SHA1Hash");
                 }
+                LogWriter.Write(FormatCSVField(DateTime.Now));
                 LogWriter.Write(FormatCSVField(c_ActorSNO));
                 LogWriter.Write(FormatCSVField(c_RActorGuid));
                 LogWriter.Write(FormatCSVField(c_GameDynamicID));
@@ -1381,6 +1382,10 @@ namespace GilesTrinity
                 LogWriter.Write("\n");
             }
 
+        }
+        private static string FormatCSVField(DateTime time)
+        {
+            return String.Format("\"{0:yyyy-MM-ddTHH:mm:ss.ffffzzz}\",", time);
         }
 
         private static string FormatCSVField(string text)
