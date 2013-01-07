@@ -7,13 +7,18 @@ namespace GilesTrinity
 {
     internal class GenericCache
     {
-        private static List<GenericCacheObject> CacheList = new List<GenericCacheObject>();
+        private static HashSet<GenericCacheObject> CacheList = new HashSet<GenericCacheObject>();
+
+        private static readonly object _Synchronizer = new object();
 
         public static bool AddToCache(GenericCacheObject obj)
         {
             if (!ContainsKey(obj.Key))
             {
-                CacheList.Add(obj);
+                lock (_Synchronizer)
+                {
+                    CacheList.Add(obj);
+                }
                 return true;
             }
             return false;
@@ -21,23 +26,41 @@ namespace GilesTrinity
 
         public static bool ContainsKey(string key)
         {
-            return CacheList.Any(o => o.Key == key);
+            lock (_Synchronizer)
+            {
+                return CacheList.Any(o => o.Key == key);
+            }
         }
 
         public static GenericCacheObject GetObject(string key)
         {
-            if (ContainsKey(key))
-                return CacheList.FirstOrDefault(o => o.Key == key);
-            else
-                return new GenericCacheObject();
+            lock (_Synchronizer)
+            {
+                if (ContainsKey(key))
+                    return CacheList.FirstOrDefault(o => o.Key == key);
+                else
+                    return new GenericCacheObject();
+            }
         }
 
         public static void MaintainCache()
         {
-            foreach (GenericCacheObject obj in CacheList)
+            lock (_Synchronizer)
             {
-                if (obj.IsExpired())
-                    CacheList.Remove(obj);
+
+                foreach (GenericCacheObject obj in CacheList)
+                {
+                    if (obj.IsExpired())
+                        CacheList.Remove(obj);
+                }
+            }
+        }
+
+        public static void ClearCache()
+        {
+            lock (_Synchronizer)
+            {
+                CacheList.Clear();
             }
         }
     }

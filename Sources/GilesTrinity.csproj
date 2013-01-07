@@ -153,12 +153,14 @@
     <Compile Include="Dictionaries.cs" />
     <Compile Include="StuckHandler.cs" />
     <Compile Include="DbProvider\GilesPlayerMover.cs" />
-    <Compile Include="!Template.cs" />
     <Compile Include="RefreshDiaObject.cs" />
     <Compile Include="GilesTrinity.cs" />
     <Compile Include="RefreshDiaObjects.cs" />
     <Compile Include="XmlTags\BaseComplexNodeTag.cs" />
     <Compile Include="XmlTags\TrinityCastSweepingWinds.cs" />
+    <Compile Include="XmlTags\TrinityExploreDungeon.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="XmlTags\TrinityIfRandom.cs" />
     <Compile Include="XmlTags\TrinityIfSNOInRange.cs" />
     <Compile Include="XmlTags\TrinityIf.cs" />

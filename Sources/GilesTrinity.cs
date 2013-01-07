@@ -265,6 +265,8 @@ namespace GilesTrinity
 
             global::GilesTrinity.XmlTags.TrinityLoadOnce.UsedProfiles = new List<string>();
 
+            GenericCache.ClearCache();
+
         }
     }
 }

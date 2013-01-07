@@ -2033,16 +2033,7 @@ namespace GilesTrinity
                         IsAvoidingProjectiles = true;
                 }
             }
-            // Butcher WIP
-            //bool tmp_bHasBuff = false;
-            //try
-            //{
-            //    tmp_bHasBuff = tempCommonData.GetAttribute<int>(ActorAttributeType.BuffVisualEffect) > 0;
-            //}
-            //catch
-            //{
-            //}
-            // continue because we aren't actually treating this as a TARGET - avoidance has special handling after all targets are found
+
             return AddToCache;
         }
         /// <summary>
@@ -2111,13 +2102,12 @@ namespace GilesTrinity
                                         // Get whether or not this RActor has ever been in a path line with AllowWalk. If it hasn't, don't add to cache and keep rechecking
                                         if (!dictHasBeenRayCastedCache.TryGetValue(c_RActorGuid, out c_HasBeenRaycastable))
                                         {
-                                            if (c_RadiusDistance <= 5f)
+                                            if (c_RadiusDistance <= 12f)
                                             {
                                                 c_HasBeenRaycastable = true;
                                                 dictHasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);
                                             }
-
-                                            if (Settings.Combat.Misc.UseNavMeshTargeting && c_RadiusDistance > 5f)
+                                            else if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
                                                 Vector3 myPos = new Vector3(PlayerStatus.CurrentPosition.X, PlayerStatus.CurrentPosition.Y, PlayerStatus.CurrentPosition.Z + 8f);
                                                 Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 8f);
