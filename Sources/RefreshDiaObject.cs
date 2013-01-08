@@ -1477,14 +1477,15 @@ namespace GilesTrinity
             AddToCache = true;
 
             // Ignore it if it's not in range yet, except health wells and resplendent chests if we're opening chests
-            if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell && !(Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_Name.ToLower().Contains("chest_rare")))
+            if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell && 
+                !(Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_Name.ToLower().Contains("chest_rare")) && c_RActorGuid != CurrentTargetRactorGUID)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotInRange";
                 return AddToCache;
             }
 
-            if (!(Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_Name.ToLower().Contains("chest_rare")))
+            if (!(Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_Name.ToLower().Contains("chest_rare")) && c_RActorGuid != CurrentTargetRactorGUID)
             {
                 AddToCache = true;
                 c_IgnoreSubStep = "NotInRange";
@@ -1503,14 +1504,14 @@ namespace GilesTrinity
             {
                 try
                 {
-                    c_Radius = c_diaObject.CollisionSphere.Radius;
-
-                    //// Take 8 from the radius
-                    //c_fRadius -= 10f;
-
-                    if (c_ObjectType == GObjectType.Destructible && c_Radius >= 5f)
+                    if (!dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out c_Radius))
                     {
-                        c_Radius = c_Radius / 2;
+                        c_Radius = c_diaObject.CollisionSphere.Radius;
+
+                        if (c_ObjectType == GObjectType.Destructible && c_Radius >= 5f)
+                        {
+                            c_Radius = c_Radius / 2;
+                        }
                     }
 
                     // Minimum range clamp
@@ -1767,8 +1768,8 @@ namespace GilesTrinity
                             iMinDistance += 6f;
 
                         // Large objects, like logs - Give an extra xx feet of distance
-                        if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out iExtendedRange))
-                            iMinDistance = Settings.WorldObject.DestructibleRange + iExtendedRange;
+                        //if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out iExtendedRange))
+                        //    iMinDistance = Settings.WorldObject.DestructibleRange + iExtendedRange;
 
                         // This object isn't yet in our destructible desire range
                         if (iMinDistance <= 0 || c_RadiusDistance > iMinDistance)
@@ -1805,8 +1806,8 @@ namespace GilesTrinity
                             iMinDistance += 6f;
 
                         // Large objects, like logs - Give an extra xx feet of distance
-                        if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out iExtendedRange))
-                            iMinDistance = Settings.WorldObject.DestructibleRange + iExtendedRange;
+                        //if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out iExtendedRange))
+                        //    iMinDistance = Settings.WorldObject.DestructibleRange + iExtendedRange;
 
                         if (Settings.WorldObject.IgnoreNonBlocking)
                         {
@@ -2112,7 +2113,9 @@ namespace GilesTrinity
                                                 Vector3 myPos = new Vector3(PlayerStatus.CurrentPosition.X, PlayerStatus.CurrentPosition.Y, PlayerStatus.CurrentPosition.Z + 8f);
                                                 Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 8f);
 
-                                                if (!ZetaDia.Physics.Raycast(PlayerStatus.CurrentPosition, c_Position, NavCellFlags.AllowWalk))
+                                                cPos = MathEx.CalculatePointFrom(myPos, cPos, c_CentreDistance - ZetaDia.Me.GoldPickupRadius);
+
+                                                if (!ZetaDia.Physics.Raycast(myPos, cPos, NavCellFlags.AllowWalk))
                                                 {
                                                     AddToCache = false;
                                                     c_IgnoreSubStep = "UnableToRayCast";

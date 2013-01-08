@@ -237,18 +237,18 @@ namespace GilesTrinity
         /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
         /// </summary>
         internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
-            174900, 191459, 104632, 196211, 194682, 81699, 3340,
+            174900, 191459, 104632, 196211, 194682, 81699, 3340, 122558,
         };
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 25}, {191459, 13}, {104632, 20}, {196211, 25},  {194682, 20}, {81699, 20}, {3340, 14},
+            {174900, 25}, {191459, 13}, {104632, 20}, {196211, 25},  {194682, 20}, {81699, 20}, {3340, 14}, {122558, 5}
          };
         /// <summary>
         /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache
         /// </summary>
-        internal static Dictionary<int, int> dictSNOExtendedDestructRange = new Dictionary<int, int> {
+        internal static Dictionary<int, float> dictSNOExtendedDestructRange = new Dictionary<int, float> {
             {2972, 10}, {80357, 16}, {116508, 10}, {113932, 8}, {197514, 18}, {108587, 8}, {108618, 8}, {108612, 8}, {116409, 18}, {121586, 22},
             {195101, 10}, {195108, 25}, {170657, 1}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 8}, {193963, 1}, {159066, 12}, {160570, 12},
             {55325, 1}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 25}, {192867, 8}, {155255, 8}, {54530, 6}

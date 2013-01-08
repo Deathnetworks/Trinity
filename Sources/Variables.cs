@@ -592,11 +592,11 @@ namespace GilesTrinity
         /// <summary>
         /// The Grid Provider for Navigation checks
         /// </summary>
-        private static ISearchAreaProvider gp;
+        internal static ISearchAreaProvider gp;
         /// <summary>
         /// The PathFinder for Navigation checks
         /// </summary>
-        private static PathFinder pf;
+        internal static PathFinder pf;
 
         /// <summary>
         /// Behaviors: How close we need to get to the target before we consider it "reached"

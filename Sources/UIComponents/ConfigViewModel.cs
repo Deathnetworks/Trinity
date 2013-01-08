@@ -524,12 +524,12 @@ namespace GilesTrinity.UIComponents
         private void ConfigHuntingLoot()
         {
             _Model.Loot.Pickup.ArmorBlueLevel = 0;
-            _Model.Loot.Pickup.ArmorYellowLevel = 62;
+            _Model.Loot.Pickup.ArmorYellowLevel = 63;
             _Model.Loot.Pickup.WeaponBlueLevel = 0;
-            _Model.Loot.Pickup.WeaponYellowLevel = 62;
+            _Model.Loot.Pickup.WeaponYellowLevel = 63;
             _Model.Loot.Pickup.JewelryBlueLevel = 0;
-            _Model.Loot.Pickup.JewelryYellowLevel = 62;
-            _Model.Loot.Pickup.LegendaryLevel = 60;
+            _Model.Loot.Pickup.JewelryYellowLevel = 58;
+            _Model.Loot.Pickup.LegendaryLevel = 55;
             _Model.Loot.Pickup.GemLevel = 60;
             _Model.Loot.Pickup.GemType = TrinityGemType.All;
             _Model.Loot.Pickup.FollowerItem = true;

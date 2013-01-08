@@ -833,7 +833,7 @@ namespace GilesTrinity
             return angle * (180.0 / Math.PI);
         }
 
-        private static void UpdateSearchGridProvider()
+        internal static void UpdateSearchGridProvider()
         {
             if (Settings.Combat.Misc.UseNavMeshTargeting)
             {
@@ -857,7 +857,8 @@ namespace GilesTrinity
         public static string GetHeading(float heading)
         {
             var directions = new string[] {
-                "n", "ne", "e", "se", "s", "sw", "w", "nw", "n"
+              //"n", "ne", "e", "se", "s", "sw", "w", "nw", "n"
+                "s", "se", "e", "ne", "n", "nw", "w", "sw", "s"
             };
 
             var index = (((int)heading) + 23) / 45;
