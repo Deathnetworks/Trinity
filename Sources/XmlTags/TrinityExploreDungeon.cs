@@ -71,46 +71,6 @@ namespace GilesTrinity.XmlTags
         private MoveResult lastMoveResult = MoveResult.PathGenerating;
         private bool InitDone = false;
         private DungeonNode NextNode;
-        private DateTime lastUpdatedPOS = DateTime.MinValue;
-
-        private class ExploreBox
-        {
-            public float Min_X { get; set; }
-            public float Max_X { get; set; }
-            public float Min_Y { get; set; }
-            public float Max_Y { get; set; }
-            public Vector3 NavigableCenter { get; set; }
-            public float BoxSize { get; set; }
-
-            public ExploreBox(Vector3 center, float boxSize)
-            {
-                this.NavigableCenter = center;
-                this.BoxSize = boxSize;
-                float halfBoxSize = (boxSize / 2);
-                Min_X = center.X - halfBoxSize;
-                Max_X = center.X + halfBoxSize;
-                Min_Y = center.Y - halfBoxSize;
-                Max_Y = center.Y + halfBoxSize;
-            }
-
-            public bool PointIsInBox(Vector3 position)
-            {
-                if (position.X > Min_X &&
-                    position.X < Max_X &&
-                    position.Y > Min_Y &&
-                    position.Y < Max_Y)
-                    return true;
-                else
-                    return false;
-            }
-        }
-
-        private HashSet<ExploreBox> VisistedBoxes = new HashSet<ExploreBox>();
-
-        private bool HasVisistedNode(Vector3 center)
-        {
-            return VisistedBoxes.Any(b => b.PointIsInBox(center));
-        }
 
         private void Init()
         {
@@ -201,13 +161,6 @@ namespace GilesTrinity.XmlTags
                 new Action(ret => GetNodeCounts()),
                 new PrioritySelector(
                     CheckIsFinished(),
-                    //new Decorator(ret => lastMoveResult != MoveResult.Moved && (lastMoveResult == MoveResult.Failed || lastMoveResult == MoveResult.PathGenerationFailed),
-                    //    new Sequence(
-                    //        new Action(ret => UpdateRoute()),
-                    //        new Action(ret => VisistedBoxes.Clear()),
-                    //        new Action(ret => GilesTrinity.hashSkipAheadAreaCache.Clear())
-                    //    )
-                    //),
                     new Decorator(ret => BrainBehavior.DungeonExplorer.CurrentNode != null,
                         new Sequence(
                             new Decorator(ret => BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition) <= PathPrecision || lastMoveResult == MoveResult.ReachedDestination,
@@ -217,18 +170,6 @@ namespace GilesTrinity.XmlTags
                                 )
                             ),
                             new Action(ret => MoveToNextNode())
-                            //new Decorator(ret => HasVisistedNode(CurrentNavTarget),
-                            //    new Sequence(
-                            //        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Dequeing previously visited node {0}", CurrentNavTarget)),
-                            //        new Action(ret => BrainBehavior.DungeonExplorer.CurrentRoute.Dequeue())
-                            //    )
-                            //),
-                            //new Decorator(ret => GilesTrinity.hashSkipAheadAreaCache.Any(p => Vector3.Distance(p.Location, CurrentNavTarget) <= PathPrecision),
-                            //    new Sequence(
-                            //        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Dequeing previously visited area {0}", CurrentNavTarget)),
-                            //        new Action(ret => SetNodeVisited())
-                            //    )
-                            //),
                         )
                     )
                 )
