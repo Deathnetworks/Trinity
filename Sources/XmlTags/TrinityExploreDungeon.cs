@@ -178,8 +178,7 @@ namespace GilesTrinity.XmlTags
         private Decorator CheckNodeFinished()
         {
             return
-            new Decorator(ret => BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition) <= PathPrecision
-                || lastMoveResult == MoveResult.ReachedDestination,
+            new Decorator(ret => BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition) <= PathPrecision,
                 new Sequence(
                     new Action(ret => SetNodeVisited()),
                     new Action(ret => UpdateRoute())
@@ -305,12 +304,16 @@ namespace GilesTrinity.XmlTags
 
             Vector3 moveTarget = NextNode.NavigableCenter;
 
-            if (PathStack.Any())
+            if (!PathStack.Any())
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Using alternative path", true);
-                moveTarget = PathStack.Peek();
+                // Generate nodes for the PathStack
+                GeneratePathTo(NextNode.NavigableCenter);
             }
-            if (PathStack.Any() && Vector3.Distance(moveTarget, GilesTrinity.PlayerStatus.CurrentPosition) <= PathPrecision)
+
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Using Generated Path", true);
+            moveTarget = PathStack.Peek();
+
+            if (Vector3.Distance(moveTarget, GilesTrinity.PlayerStatus.CurrentPosition) <= PathPrecision)
             {
                 PathStack.Pop();
                 moveTarget = PathStack.Peek();
@@ -375,7 +378,7 @@ namespace GilesTrinity.XmlTags
             {
                 Vector3 v3 = gp.GridToWorld(p).ToVector3();
                 PathStack.Push(v3);
-                Logging.Write("Pushing path point to stack {0}, order {1}, distance {2}", v3, PathStack.Count(), v3.Distance(myPos));
+                //Logging.Write("Pushing path point to stack {0}, order {1}, distance {2}", v3, PathStack.Count(), v3.Distance(myPos));
             }
         }
 

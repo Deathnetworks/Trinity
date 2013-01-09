@@ -243,7 +243,7 @@ namespace GilesTrinity
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 25}, {191459, 13}, {104632, 20}, {196211, 25},  {194682, 20}, {81699, 20}, {3340, 14}, {122558, 5}
+            {174900, 25}, {191459, 13}, {104632, 20}, {196211, 25},  {194682, 20}, {81699, 20}, {3340, 12}, {122558, 5}
          };
         /// <summary>
         /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache

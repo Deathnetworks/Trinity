@@ -35,7 +35,6 @@ namespace GilesTrinity
 
                 try
                 {
-                    double attack = ZetaDia.Me.Attack;
                     using (new PerformanceLogger("UpdateCachedPlayerData.1"))
                     {
 
