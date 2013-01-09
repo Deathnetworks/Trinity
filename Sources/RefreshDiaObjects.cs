@@ -554,8 +554,8 @@ namespace GilesTrinity
                     if (dUseKillRadius <= 60) dUseKillRadius = 60;
                 }
             }
-            // Safety for Giles own portal-back-to-town for full-backpack
-            if (ForceVendorRunASAP || IsReadyToTownRun)
+            // Safety for TownRun and UseTownPortalTag
+            if (TownRun.IsTryingToTownPortal())
             {
                 if (dUseKillRadius <= 90) dUseKillRadius = 90;
             }

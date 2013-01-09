@@ -41,22 +41,7 @@ namespace GilesTrinity
                 int TrashMobCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsTrashMob);
                 int EliteCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
 
-                Composite c = null;
-
-                try
-                {
-                    if (ProfileManager.CurrentProfileBehavior != null)
-                        c = ProfileManager.CurrentProfileBehavior.Behavior;
-                }
-                catch { }
-
-                bool tryingToTownPortal = false;
-
-                if (c != null && c.GetType() == typeof(UseTownPortalTag))
-                {
-                    tryingToTownPortal = true;
-                }
-                bool ShouldIgnoreTrashMobs = (!tryingToTownPortal && !IsReadyToTownRun && Settings.Combat.Misc.IgnoreSolitaryTrash && EliteCount == 0);
+                bool ShouldIgnoreTrashMobs = (!TownRun.IsTryingToTownPortal() && !PrioritizeCloseRangeUnits && Settings.Combat.Misc.IgnoreSolitaryTrash && EliteCount == 0);
 
                 foreach (GilesObject cacheObject in GilesObjectCache)
                 {

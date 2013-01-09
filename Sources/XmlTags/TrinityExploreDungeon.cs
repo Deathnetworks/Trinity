@@ -25,13 +25,13 @@ namespace GilesTrinity.XmlTags
 
         [XmlAttribute("actorId", true)]
         public int ActorId { get; set; }
-        
+
         [XmlAttribute("boxSize", true)]
         public int BoxSize { get; set; }
-        
+
         [XmlAttribute("boxTolerance", true)]
         public float BoxTolerance { get; set; }
-        
+
         [XmlAttribute("exitNameHash", true)]
         public int ExitNameHash { get; set; }
 
@@ -40,11 +40,10 @@ namespace GilesTrinity.XmlTags
 
         [XmlAttribute("leaveWhenFinished", true)]
         public bool LeaveWhenExplored { get; set; }
-        
+
         [XmlAttribute("objectDistance", true)]
         public float ObjectDistance { get; set; }
 
-        
         public enum TrinityExploreEndType
         {
             FullyExplored = 0,
@@ -82,11 +81,11 @@ namespace GilesTrinity.XmlTags
         private bool InitDone = false;
         private DungeonNode NextNode;
         private Vector3 CurrentNavTarget { get { return BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter; } }
-        private Vector3 myPos { get { return GilesTrinity.PlayerStatus.CurrentPosition; } }
+        private Vector3 myPos { get { return ZetaDia.Me.Position; } }
         private static ISearchAreaProvider gp { get { return GilesTrinity.gp; } }
         private static PathFinder pf { get { return GilesTrinity.pf; } }
         private Stack<Vector3> PathStack = new Stack<Vector3>();
-        
+
         public override void OnStart()
         {
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "TrinityExploreDungeon OnStart() called");
@@ -134,9 +133,9 @@ namespace GilesTrinity.XmlTags
 
         private PrioritySelector CheckIsFinished()
         {
-            return 
+            return
             new PrioritySelector(
-                new Decorator(ret => EndType == TrinityExploreEndType.FullyExplored && GetRouteUnvisitedNodeCount() == 0,
+                new Decorator(ret => EndType == TrinityExploreEndType.FullyExplored && GetRouteUnvisitedNodeCount() == 0, // When fully Explored, just finish!
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Visited all nodes, TrinityExploreDungeon finished")),
                         new Action(ret => isDone = true)
@@ -164,30 +163,33 @@ namespace GilesTrinity.XmlTags
             );
         }
 
-        //private PrioritySelector CheckUpdateRoute()
-        //{
-        //    return
-        //    new PrioritySelector(
-        //        new Decorator(ret => BrainBehavior.DungeonExplorer.CurrentRoute == null,
-        //            new Action(ret => UpdateRoute())
-        //        ),
-                
-        //    );
-        //}
-
-        private Decorator CheckNodeFinished()
+        private PrioritySelector CheckNodeFinished()
         {
+            Vector3 center = BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter;
+            float centerDistance = center.Distance(ZetaDia.Me.Position);
+            bool centerIsNavigable = centerDistance <= 40f ? pf.IsNavigable(gp.WorldToGrid(center.ToVector2())) : true;
+
             return
-            new Decorator(ret => BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition) <= PathPrecision,
-                new Sequence(
-                    new Action(ret => SetNodeVisited()),
-                    new Action(ret => UpdateRoute())
+            new PrioritySelector(
+                new Decorator(ret => BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter.Distance(ZetaDia.Me.Position) <= PathPrecision,
+                    new Sequence(
+                        new Action(ret => SetNodeVisited(String.Format("Node {0} is within PathPrecision ({1:0}/{2:0})", BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter,
+                            BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter.Distance(ZetaDia.Me.Position), PathPrecision))),
+                        new Action(ret => UpdateRoute())
+                    )
+                ),
+                new Decorator(ret => BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter.Distance(ZetaDia.Me.Position) <= 40f ? pf.IsNavigable(gp.WorldToGrid(BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter.ToVector2())) : true,
+                    new Sequence(
+                        new Action(ret => SetNodeVisited("Center Not Navigable")),
+                        new Action(ret => UpdateRoute())
+                    )
                 )
             );
         }
 
         private void UpdateRoute()
         {
+            GilesTrinity.UpdateSearchGridProvider();
 
             CheckResetDungeonExplorer();
 
@@ -200,13 +202,14 @@ namespace GilesTrinity.XmlTags
             lastMoveResult = MoveResult.PathGenerated;
         }
 
-        private void SetNodeVisited()
+        private void SetNodeVisited(string reason = "")
         {
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Dequeueing current node {0}", BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Dequeueing current node {0} - {1}", BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter, reason);
             BrainBehavior.DungeonExplorer.CurrentNode.Visited = true;
             BrainBehavior.DungeonExplorer.CurrentRoute.Dequeue();
             PrintNodeCounts("SetNodeVisited");
         }
+
         private void Init()
         {
             if (gp == null)
@@ -214,8 +217,19 @@ namespace GilesTrinity.XmlTags
                 GilesTrinity.UpdateSearchGridProvider();
             }
 
-            if (PathPrecision == 0)
+            if (BoxSize == 0)
+                BoxSize = 35;
+
+            if (BoxTolerance == 0)
+                BoxTolerance = 0.10f;
+
+            if (PathPrecision == 0 && BoxSize > 40)
+                PathPrecision = BoxSize / 2f;
+            else
                 PathPrecision = 20f;
+
+            if (ObjectDistance == 0)
+                ObjectDistance = 50f;
 
             GilesTrinity.hashSkipAheadAreaCache = new HashSet<GilesObstacle>();
 
@@ -236,8 +250,23 @@ namespace GilesTrinity.XmlTags
 
         private void PrintNodeCounts(string step = "")
         {
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Nodes [ Route-Unvisited: {1} Grid-Visited: {2} Grid-Unvisited: {3} ] Box: {4}/{5} Step: {6}",
-                GetRouteVisistedNodeCount(), GetRouteUnvisitedNodeCount(), GetGridSegmentationVisistedNodeCount(), GetGridSegmentationUnvisitedNodeCount(), GridSegmentation.BoxSize, GridSegmentation.BoxTolerance, step);
+            string nodeDistance = String.Empty;
+            if (GetRouteUnvisitedNodeCount() > 0)
+            {
+                try
+                {
+                    float distance = BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter.Distance(myPos);
+
+                    if (distance > 0)
+                        nodeDistance = String.Format(" Distance: {0:0} ", Math.Round(distance / 10f, 2) * 10f);
+                }
+                catch { }
+            }
+
+
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Nodes [ Route-Unvisited: {1} Grid-Visited: {2} Grid-Unvisited: {3} ] Box: {4}/{5}{7}Step: {6} ",
+                GetRouteVisistedNodeCount(), GetRouteUnvisitedNodeCount(), GetGridSegmentationVisistedNodeCount(), GetGridSegmentationUnvisitedNodeCount(),
+                GridSegmentation.BoxSize, GridSegmentation.BoxTolerance, step, nodeDistance);
         }
 
         /*
@@ -293,58 +322,60 @@ namespace GilesTrinity.XmlTags
                 return 0;
         }
 
-        
+
 
         private void MoveToNextNode()
         {
             NextNode = BrainBehavior.DungeonExplorer.CurrentRoute.Peek();
+            Vector3 moveTarget = NextNode.NavigableCenter;
 
             string nodeName = String.Format("{0} Distance: {1:0} Direction: {2}",
                 NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition), GilesTrinity.GetHeadingToPoint(NextNode.NavigableCenter));
 
-            Vector3 moveTarget = NextNode.NavigableCenter;
-
-            if (!PathStack.Any())
-            {
-                // Generate nodes for the PathStack
-                GeneratePathTo(NextNode.NavigableCenter);
-            }
-
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Using Generated Path", true);
-            moveTarget = PathStack.Peek();
-
-            if (Vector3.Distance(moveTarget, GilesTrinity.PlayerStatus.CurrentPosition) <= PathPrecision)
-            {
-                PathStack.Pop();
-                moveTarget = PathStack.Peek();
-            }
-
-            if (!GilesTrinity.hashSkipAheadAreaCache.Any(p => Vector3.Distance(p.Location, ZetaDia.Me.Position) <= PathPrecision))
-            {
-                GilesTrinity.hashSkipAheadAreaCache.Add(new GilesObstacle() { Location = ZetaDia.Me.Position, Radius = PathPrecision });
-            }
-
             lastMoveResult = Navigator.MoveTo(moveTarget, nodeName, true);
 
-            switch (lastMoveResult)
-            {
 
-                case MoveResult.ReachedDestination:
-                    break;
-                case MoveResult.Moved:
-                    //Logging.Write("Movement return is successful.");
-                    break;
-                case MoveResult.PathGenerated:
-                case MoveResult.PathGenerating:
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Movement pending", true);
-                    break;
-                case MoveResult.Failed:
-                case MoveResult.PathGenerationFailed:
-                    {
-                        GeneratePathTo(NextNode.NavigableCenter);
-                        break;
-                    }
-            }
+
+            //if (!PathStack.Any())
+            //{
+            //    // Generate nodes for the PathStack
+            //    GeneratePathTo(NextNode.NavigableCenter);
+            //}
+
+            //moveTarget = PathStack.Peek();
+
+            //if (Vector3.Distance(moveTarget, GilesTrinity.PlayerStatus.CurrentPosition) <= PathPrecision)
+            //{
+            //    PathStack.Pop();
+            //    moveTarget = PathStack.Peek();
+            //}
+
+            //if (!GilesTrinity.hashSkipAheadAreaCache.Any(p => Vector3.Distance(p.Location, ZetaDia.Me.Position) <= PathPrecision))
+            //{
+            //    GilesTrinity.hashSkipAheadAreaCache.Add(new GilesObstacle() { Location = ZetaDia.Me.Position, Radius = PathPrecision });
+            //}
+
+            //lastMoveResult = Navigator.MoveTo(moveTarget, nodeName, true);
+
+            //switch (lastMoveResult)
+            //{
+
+            //    case MoveResult.ReachedDestination:
+            //        break;
+            //    case MoveResult.Moved:
+            //        //Logging.Write("Movement return is successful.");
+            //        break;
+            //    case MoveResult.PathGenerated:
+            //    case MoveResult.PathGenerating:
+            //        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Movement pending", true);
+            //        break;
+            //    case MoveResult.Failed:
+            //    case MoveResult.PathGenerationFailed:
+            //        {
+            //            GeneratePathTo(NextNode.NavigableCenter);
+            //            break;
+            //        }
+            //}
 
         }
 

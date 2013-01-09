@@ -18,6 +18,7 @@ using Zeta.Internals;
 using Action = Zeta.TreeSharp.Action;
 using System.Threading;
 using System.Diagnostics;
+using Zeta.CommonBot.Profile.Common;
 
 namespace GilesTrinity
 {
@@ -191,6 +192,42 @@ namespace GilesTrinity
             }
         }
 
+        /// <summary>
+        /// Returns if we're trying to TownRun or if profile tag is UseTownPortalTag
+        /// </summary>
+        /// <returns></returns>
+        internal static bool IsTryingToTownPortal()
+        {
+            bool result = false;
+
+            if (GilesTrinity.IsReadyToTownRun)
+                result = true;
+
+            if (TownRunCheckTimer.IsRunning)
+                result = true;
+
+            Composite CurrentProfileBehavior = null;
+
+            try
+            {
+                if (ProfileManager.CurrentProfileBehavior != null)
+                    CurrentProfileBehavior = ProfileManager.CurrentProfileBehavior.Behavior;
+            }
+            catch { }
+
+            if (CurrentProfileBehavior != null && CurrentProfileBehavior.GetType() == typeof(UseTownPortalTag))
+            {
+                result = true;
+            }
+
+            if (GilesTrinity.ForceVendorRunASAP)
+                result = true;
+
+            if (Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                result = true;
+
+            return result;
+        }
 
         /// <summary>
         /// Randomize the timer between stashing/salvaging etc.

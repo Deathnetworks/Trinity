@@ -1279,7 +1279,7 @@ namespace GilesTrinity
             {
                 PickupItem pickupItem = new PickupItem()
                 {
-                    Name = c_Name,
+                    Name = item.CommonData.Name,
                     Level = c_ItemLevel,
                     Quality = c_ItemQuality,
                     BalanceID = c_BalanceID,
@@ -1764,7 +1764,6 @@ namespace GilesTrinity
                             {
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_Name, c_ActorSNO);
                                 AddToCache = false;
-                                //return bWantThis;
                             }
                             dictPhysicsSNO.Add(c_ActorSNO, iThisPhysicsSNO);
                         }
