@@ -1770,7 +1770,7 @@ namespace GilesTrinity
                         }
 
                         // Set min distance to user-defined setting
-                        iMinDistance = Settings.WorldObject.DestructibleRange;
+                        iMinDistance = Settings.WorldObject.DestructibleRange + c_Radius;
                         if (ForceCloseRangeTarget)
                             iMinDistance += 6f;
 
