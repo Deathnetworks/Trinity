@@ -239,14 +239,13 @@ namespace GilesTrinity
         /// <param name="thisdbitemtype"></param>
         /// <param name="thisfollowertype"></param>
         /// <returns></returns>
-        internal static bool GilesSellValidation(string thisinternalname, int thislevel, ItemQuality thisquality, ItemType thisdbitemtype, FollowerType thisfollowertype)
+        internal static bool GilesSellValidation(GilesCachedACDItem cItem)
         {
-
             // Check this isn't something we want to salvage
-            if (GilesSalvageValidation(thisinternalname, thislevel, thisquality, thisdbitemtype, thisfollowertype))
+            if (GilesSalvageValidation(cItem))
                 return false;
 
-            GItemType thisGilesItemType = GilesTrinity.DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
+            GItemType thisGilesItemType = GilesTrinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
             GItemBaseType thisGilesBaseType = GilesTrinity.DetermineBaseType(thisGilesItemType);
             switch (thisGilesBaseType)
             {
@@ -281,15 +280,15 @@ namespace GilesTrinity
         /// <param name="thisdbitemtype"></param>
         /// <param name="thisfollowertype"></param>
         /// <returns></returns>
-        internal static bool GilesSalvageValidation(string thisinternalname, int thislevel, ItemQuality thisquality, ItemType thisdbitemtype, FollowerType thisfollowertype)
+        internal static bool GilesSalvageValidation(GilesCachedACDItem cItem)
         {
-            GItemType thisGilesItemType = GilesTrinity.DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
+            GItemType thisGilesItemType = GilesTrinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
             GItemBaseType thisGilesBaseType = GilesTrinity.DetermineBaseType(thisGilesItemType);
 
             // Take Salvage Option corresponding to ItemLevel
-            SalvageOption salvageOption = GetSalvageOption(thisquality);
+            SalvageOption salvageOption = GetSalvageOption(cItem.Quality);
 
-            if (thisquality >= ItemQuality.Legendary && salvageOption == SalvageOption.InfernoOnly && thislevel >= 60)
+            if (cItem.Quality >= ItemQuality.Legendary && salvageOption == SalvageOption.InfernoOnly && cItem.Level >= 60)
                 return true;
 
             switch (thisGilesBaseType)
@@ -299,11 +298,11 @@ namespace GilesTrinity
                 case GItemBaseType.WeaponTwoHand:
                 case GItemBaseType.Armor:
                 case GItemBaseType.Offhand:
-                    return ((thislevel >= 61 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
+                    return ((cItem.Level >= 61 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
                 case GItemBaseType.Jewelry:
-                    return ((thislevel >= 59 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
+                    return ((cItem.Level >= 59 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
                 case GItemBaseType.FollowerItem:
-                    return ((thislevel >= 60 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
+                    return ((cItem.Level >= 60 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
                 case GItemBaseType.Gem:
                 case GItemBaseType.Misc:
                 case GItemBaseType.Unknown:
@@ -347,25 +346,44 @@ namespace GilesTrinity
 
             TownRunCheckTimer.Reset();
 
-            foreach (ACDItem thisitem in ZetaDia.Me.Inventory.Backpack)
+            foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
-                if (thisitem.BaseAddress != IntPtr.Zero)
+                if (item.BaseAddress != IntPtr.Zero)
                 {
-
                     // Find out if this item's in a protected bag slot
-                    if (!ItemManager.ItemIsProtected(thisitem) && !GilesTrinity.weaponSwap.SwapperUsing(thisitem))
+                    if (!ItemManager.ItemIsProtected(item) && !GilesTrinity.weaponSwap.SwapperUsing(item))
                     {
                         // test
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "DEBUG: {0},{1},{2}", thisitem.InternalName, thisitem.Name, thisitem.Level);
-                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
-                            thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
-                            thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "DEBUG: {0},{1},{2}", item.InternalName, item.Name, item.Level);
 
-                        bool bShouldStashThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesTrinity.ShouldWeStashThis(thiscacheditem) : ItemManager.ShouldStashItem(thisitem);
+                        GilesCachedACDItem cItem = new GilesCachedACDItem(item.Stats)
+                        {
+                            AcdItem = item,
+                            InternalName = item.InternalName,
+                            RealName = item.Name,
+                            Level = item.Level,
+                            Quality = item.ItemQualityLevel,
+                            GoldAmount = item.Gold,
+                            BalanceID = item.GameBalanceId,
+                            DynamicID = item.DynamicId,
+                            OneHanded = item.IsOneHand,
+                            TwoHanded = item.IsTwoHand,
+                            DyeType = item.DyeType,
+                            DBItemType = item.ItemType,
+                            DBBaseType = item.ItemBaseType,
+                            FollowerType = item.FollowerSpecialType,
+                            IsUnidentified = item.IsUnidentified,
+                            ItemStackQuantity = item.ItemStackQuantity,
+                            Row = item.InventoryRow,
+                            Column = item.InventoryColumn,
+                            ItemLink = item.ItemLink
+                        };
+
+                        bool bShouldStashThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesTrinity.ShouldWeStashThis(cItem) : ItemManager.ShouldStashItem(item);
 
                         if (bShouldStashThis)
                         {
-                            hashGilesCachedKeepItems.Add(thiscacheditem);
+                            hashGilesCachedKeepItems.Add(cItem);
                             bShouldVisitStash = true;
                         }
                     }
@@ -604,57 +622,80 @@ namespace GilesTrinity
 
             // Check durability percentages
             iLowestDurabilityFound = -1;
-            foreach (ACDItem tempitem in ZetaDia.Me.Inventory.Equipped)
+            foreach (ACDItem equippedItem in ZetaDia.Me.Inventory.Equipped)
             {
-                if (tempitem.BaseAddress != IntPtr.Zero)
+                if (equippedItem.BaseAddress != IntPtr.Zero)
                 {
-                    if (tempitem.DurabilityPercent <= Zeta.CommonBot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow)
+                    if (equippedItem.DurabilityPercent <= Zeta.CommonBot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow)
                     {
-                        iLowestDurabilityFound = tempitem.DurabilityPercent;
+                        iLowestDurabilityFound = equippedItem.DurabilityPercent;
                         bNeedsEquipmentRepairs = true;
                         bShouldVisitVendor = true;
                     }
                 }
             }
 
-            ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).FirstOrDefault();
+            ACDItem bestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).FirstOrDefault();
             // Check for anything to sell
-            foreach (ACDItem thisitem in ZetaDia.Me.Inventory.Backpack)
+            foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
-                if (thisitem.BaseAddress != IntPtr.Zero)
+                if (item.BaseAddress != IntPtr.Zero)
                 {
-                    if (!ItemManager.ItemIsProtected(thisitem) && !GilesTrinity.weaponSwap.SwapperUsing(thisitem))
+                    if (!ItemManager.ItemIsProtected(item) && !GilesTrinity.weaponSwap.SwapperUsing(item))
                     {
-                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
-                            thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
-                            thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
-                        thiscacheditem.Row = thisitem.InventoryRow;
-                        thiscacheditem.Column = thisitem.InventoryColumn;
-                        bool bShouldSellThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy
-                            ? GilesSellValidation(thiscacheditem.InternalName, thiscacheditem.Level, thiscacheditem.Quality, thiscacheditem.DBItemType, thiscacheditem.FollowerType)
-                            : ItemManager.ShouldSellItem(thisitem);
+                        //GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
+                        //    thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
+                        //    thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
+
+                        GilesCachedACDItem cItem = new GilesCachedACDItem(item.Stats)
+                        {
+                            AcdItem = item,
+                            InternalName = item.InternalName,
+                            RealName = item.Name,
+                            Level = item.Level,
+                            Quality = item.ItemQualityLevel,
+                            GoldAmount = item.Gold,
+                            BalanceID = item.GameBalanceId,
+                            DynamicID = item.DynamicId,
+                            OneHanded = item.IsOneHand,
+                            TwoHanded = item.IsTwoHand,
+                            DyeType = item.DyeType,
+                            DBItemType = item.ItemType,
+                            DBBaseType = item.ItemBaseType,
+                            FollowerType = item.FollowerSpecialType,
+                            IsUnidentified = item.IsUnidentified,
+                            ItemStackQuantity = item.ItemStackQuantity,
+                            Row = item.InventoryRow,
+                            Column = item.InventoryColumn,
+                            ItemLink = item.ItemLink
+                        };
+
+
+                        bool bShouldSellThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy 
+                            ? GilesSellValidation(cItem)
+                            : ItemManager.ShouldSellItem(item);
 
                         // if it has gems, always salvage
-                        if (thisitem.NumSocketsFilled > 0)
+                        if (item.NumSocketsFilled > 0)
                         {
                             bShouldSellThis = false;
                         }
 
                         // Don't sell stuff that we want to salvage, if using custom loot-rules
-                        if (GilesTrinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy && ItemManager.ShouldSalvageItem(thisitem))
+                        if (GilesTrinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy && ItemManager.ShouldSalvageItem(item))
                         {
                             bShouldSellThis = false;
                         }
 
                         // Sell potions that aren't best quality
-                        if (thisitem.IsPotion && thisitem.GameBalanceId != thisBestPotion.GameBalanceId)
+                        if (item.IsPotion && item.GameBalanceId != bestPotion.GameBalanceId)
                         {
                             bShouldSellThis = true;
                         }
 
                         if (bShouldSellThis)
                         {
-                            hashGilesCachedSellItems.Add(thiscacheditem);
+                            hashGilesCachedSellItems.Add(cItem);
                             bShouldVisitVendor = true;
                         }
                     }
@@ -827,7 +868,7 @@ namespace GilesTrinity
                         double iThisItemValue = GilesTrinity.ValueThisItem(thisitem, OriginalGilesItemType);
                         LogJunkItems(thisitem, thisGilesBaseType, OriginalGilesItemType, iThisItemValue);
                     }
-                    ZetaDia.Me.Inventory.SellItem(thisitem.item);
+                    ZetaDia.Me.Inventory.SellItem(thisitem.AcdItem);
                 }
                 if (thisitem != null)
                     hashGilesCachedSellItems.Remove(thisitem);
@@ -975,19 +1016,43 @@ namespace GilesTrinity
             bool bShouldVisitSmith = false;
 
             // Check for anything to salvage
-            foreach (ACDItem thisitem in ZetaDia.Me.Inventory.Backpack)
+            foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
-                if (thisitem.BaseAddress != IntPtr.Zero)
+                if (item.BaseAddress != IntPtr.Zero)
                 {
-                    if (!ItemManager.ItemIsProtected(thisitem) && !GilesTrinity.weaponSwap.SwapperUsing(thisitem))
+                    if (!ItemManager.ItemIsProtected(item) && !GilesTrinity.weaponSwap.SwapperUsing(item))
                     {
-                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
-                            thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
-                            thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
-                        bool bShouldSalvageThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesSalvageValidation(thiscacheditem.InternalName, thiscacheditem.Level, thiscacheditem.Quality, thiscacheditem.DBItemType, thiscacheditem.FollowerType) : ItemManager.ShouldSalvageItem(thisitem);
+                        GilesCachedACDItem cItem = new GilesCachedACDItem(item.Stats)
+                        {
+                            AcdItem = item,
+                            InternalName = item.InternalName,
+                            RealName = item.Name,
+                            Level = item.Level,
+                            Quality = item.ItemQualityLevel,
+                            GoldAmount = item.Gold,
+                            BalanceID = item.GameBalanceId,
+                            DynamicID = item.DynamicId,
+                            OneHanded = item.IsOneHand,
+                            TwoHanded = item.IsTwoHand,
+                            DyeType = item.DyeType,
+                            DBItemType = item.ItemType,
+                            DBBaseType = item.ItemBaseType,
+                            FollowerType = item.FollowerSpecialType,
+                            IsUnidentified = item.IsUnidentified,
+                            ItemStackQuantity = item.ItemStackQuantity,
+                            Row = item.InventoryRow,
+                            Column = item.InventoryColumn,
+                            ItemLink = item.ItemLink
+                        };
+
+
+
+                        bool bShouldSalvageThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesSalvageValidation(cItem) : ItemManager.ShouldSalvageItem(item);
+                        
+                        
                         if (bShouldSalvageThis)
                         {
-                            hashGilesCachedSalvageItems.Add(thiscacheditem);
+                            hashGilesCachedSalvageItems.Add(cItem);
                             bShouldVisitSmith = true;
                         }
                     }

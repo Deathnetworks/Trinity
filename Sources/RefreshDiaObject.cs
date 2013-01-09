@@ -1147,16 +1147,21 @@ namespace GilesTrinity
         {
             bool logNewItem = false;
             AddToCache = false;
+
             if (c_BalanceID == -1)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "InvalidBalanceID";
             }
+
+            DiaItem item = c_diaObject as DiaItem;
+
+            c_ItemLink = item.CommonData.ItemLink;
+
             // Try and pull up cached item data on this item, if not, add to our local memory cache
             GilesGameBalanceDataCache balanceCachEntry;
             if (!dictGilesGameBalanceDataCache.TryGetValue(c_BalanceID, out balanceCachEntry))
             {
-                DiaItem item = c_diaObject as DiaItem;
                 if (item != null)
                 {
                     try
@@ -1284,7 +1289,8 @@ namespace GilesTrinity
                     ItemFollowerType = c_item_tFollowerType,
                     DynamicID = c_GameDynamicID,
                     Position = c_Position,
-                    ActorSNO = c_ActorSNO
+                    ActorSNO = c_ActorSNO,
+                    ItemLink = c_ItemLink
                 };
 
                 if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)

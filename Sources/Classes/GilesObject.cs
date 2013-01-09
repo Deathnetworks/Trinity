@@ -24,6 +24,7 @@ namespace GilesTrinity
         public int ActorSNO { get; set; }
         // Item/gold/other stuff
         public int ItemLevel { get; set; }
+        public string ItemLink { get; set; }
         public int GoldAmount { get; set; }
         public bool OneHanded { get; set; }
         public bool TwoHanded { get; set; }

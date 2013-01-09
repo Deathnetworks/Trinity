@@ -32,6 +32,7 @@ namespace GilesTrinity
             public int DynamicID { get; set; }
             public Vector3 Position { get; set; }
             public int ActorSNO { get; set; }
+            public string ItemLink { get; set; }
 
             public PickupItem() { }
 
@@ -601,8 +602,8 @@ namespace GilesTrinity
 
             if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
-                Interpreter.InterpreterAction action = StashRule.checkItem(thisitem.item);
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", thisitem.item.Name, thisitem.item.InternalName, thisitem.item.ItemType);
+                Interpreter.InterpreterAction action = StashRule.checkItem(thisitem.AcdItem);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", thisitem.AcdItem.Name, thisitem.AcdItem.InternalName, thisitem.AcdItem.ItemType);
                 switch (action)
                 {
                     case Interpreter.InterpreterAction.KEEP:

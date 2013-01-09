@@ -518,6 +518,7 @@ namespace GilesTrinity
         private static int c_BalanceID = 0;
         private static int c_ActorSNO = 0;
         private static int c_ItemLevel = 0;
+        private static string c_ItemLink = String.Empty;
         private static int c_GoldStackSize = 0;
         private static bool c_IsOneHandedItem = false;
         private static bool c_IsTwoHandedItem = false;
