@@ -22,6 +22,8 @@ using GilesTrinity.Technicals;
 namespace GilesTrinity.Swap
 {
     /// <summary>
+	/// Version: 1.0.3
+	/// - Added check inna set function: will check if the gear you are wearing and the gear you swap to is 4 piece inna set
 	/// Quick Fix: A
 	/// - Fixed a permanent stuck issue when an unidentified item is placed in the bottom right corner (but Trinity doesn't want to town run yet).	
     /// Version: 1.0.2
@@ -71,13 +73,64 @@ namespace GilesTrinity.Swap
         private static int[] mainID = new int[rows.Length + 2];
         // Last slot is reserved for the 2 Handed weapon we swap to.
         private static int[] altID = new int[rows.Length + 1];
-
+		private static bool sCheckedInna = false;
+		private static bool InnaDpsOn = GilesTrinity.Settings.Combat.Monk.HasInnaSet;
+		private static bool InnaDpsOff = GilesTrinity.Settings.Combat.Monk.HasInnaSet;
+		
+		
         static void Main()
         {
             WeaponSwap weaponSwap = new WeaponSwap();
             wearingDPSGear = false;
         }
-
+        public bool CheckedInna()
+        {
+            return sCheckedInna;
+        }		
+        public bool InnaBonusDpsOn()
+        {
+            if (sCheckedInna)
+                return InnaDpsOn;
+            if (!hasChecked)
+                return InnaDpsOn;
+            foreach (InventorySlot item in items)
+            {
+                Logging.Write(ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == columns[items.IndexOf(item)] && j.InventoryRow == rows[items.IndexOf(item)]).FirstOrDefault().Name.ToLower());
+                switch (item)
+                {
+                    case InventorySlot.PlayerTorso:
+                    case InventorySlot.PlayerWaist:
+                    case InventorySlot.PlayerLegs:
+                    case InventorySlot.PlayerHead:
+                        if (!ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == columns[items.IndexOf(item)] && j.InventoryRow == rows[items.IndexOf(item)]).FirstOrDefault().Name.ToLower().Contains("inna"))
+                            return false;
+                        break;
+                }
+            }
+            return true;
+        }
+        public bool InnaBonusDpsOff()
+        {
+            if (sCheckedInna)
+                return InnaDpsOff;
+            if (!hasChecked)
+                return InnaDpsOff;
+            foreach (InventorySlot item in items)
+            {
+                Logging.Write(ZetaDia.Me.Inventory.Equipped.Where(j => j.InventorySlot == item).FirstOrDefault().Name.ToLower());
+                switch (item)
+                {
+                    case InventorySlot.PlayerTorso:
+                    case InventorySlot.PlayerWaist:
+                    case InventorySlot.PlayerLegs:
+                    case InventorySlot.PlayerHead:
+                        if (!ZetaDia.Me.Inventory.Equipped.Where(j => j.InventorySlot == item).FirstOrDefault().Name.ToLower().Contains("inna"))
+                            return false;
+                        break;
+                }
+            }
+            return true;
+        }
         // Returns if this item is protected by the swapper or not -> should make items safe from town run routine
         public bool SwapperUsing(ACDItem thisItem)
         {
@@ -289,6 +342,19 @@ namespace GilesTrinity.Swap
                     }
                 }
                 hasChecked = true;
+				if (crashedDuringSwap)
+				{
+                    InnaDpsOff = InnaBonusDpsOn();
+                    InnaDpsOn = InnaBonusDpsOff();
+				}
+				else
+				{
+                    InnaDpsOn = InnaBonusDpsOn();
+                    InnaDpsOff = InnaBonusDpsOff();
+				}
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Dps Gear has innaset: " + InnaDpsOn);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Non-Dps Gear has innaset: " + InnaDpsOff);
+                GilesTrinity.Settings.Combat.Monk.HasInnaSet = InnaDpsOn;
             }
             else
             {

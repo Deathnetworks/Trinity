@@ -36,6 +36,23 @@ namespace GilesTrinity
                 }
                 weaponSwap.SwapGear();
             }
+            if (GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap)
+            {
+                if (GetHasBuff(SNOPower.Monk_SweepingWind))
+                {
+                    if (GilesTrinity.Settings.Combat.Monk.HasInnaSet != weaponSwap.InnaBonusDpsOff())
+                    {
+                        GilesTrinity.Settings.Combat.Monk.HasInnaSet = weaponSwap.InnaBonusDpsOff();
+                    }
+                }
+                else
+                {
+                    if (GilesTrinity.Settings.Combat.Monk.HasInnaSet != weaponSwap.InnaBonusDpsOn())
+                    {
+                        GilesTrinity.Settings.Combat.Monk.HasInnaSet = weaponSwap.InnaBonusDpsOn();
+                    }
+                }
+            }
             // Blinding flash after swap
             if (Settings.Combat.Monk.SweepingWindWeaponSwap && weaponSwap.DpsGearOn() && PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 &&
                 !GetHasBuff(SNOPower.Monk_SweepingWind) && (PlayerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && PlayerStatus.CurrentEnergy >= 15))
