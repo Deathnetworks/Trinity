@@ -379,7 +379,7 @@ namespace GilesTrinity
                             ItemLink = item.ItemLink
                         };
 
-                        bool bShouldStashThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesTrinity.ShouldWeStashThis(cItem) : ItemManager.ShouldStashItem(item);
+                        bool bShouldStashThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesTrinity.ShouldWeStashThis(cItem, item) : ItemManager.ShouldStashItem(item);
 
                         if (bShouldStashThis)
                         {
