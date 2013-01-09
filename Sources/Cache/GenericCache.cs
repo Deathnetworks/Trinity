@@ -13,15 +13,15 @@ namespace GilesTrinity
 
         public static bool AddToCache(GenericCacheObject obj)
         {
-            if (!ContainsKey(obj.Key))
+            lock (_Synchronizer)
             {
-                lock (_Synchronizer)
+                if (!ContainsKey(obj.Key))
                 {
                     CacheList.Add(obj);
+                    return true;
                 }
-                return true;
+                return false;
             }
-            return false;
         }
 
         public static bool ContainsKey(string key)
@@ -47,7 +47,6 @@ namespace GilesTrinity
         {
             lock (_Synchronizer)
             {
-
                 foreach (GenericCacheObject obj in CacheList)
                 {
                     if (obj.IsExpired())
@@ -83,6 +82,6 @@ namespace GilesTrinity
         public bool IsExpired()
         {
             return DateTime.Now.Subtract(Expires).TotalMilliseconds > 0;
-        }      
+        }
     }
 }

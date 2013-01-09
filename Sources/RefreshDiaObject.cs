@@ -11,6 +11,7 @@ using Zeta.Internals.Actors;
 using Zeta.Internals.Actors.Gizmos;
 using Zeta.Internals.SNO;
 using System.Text;
+using GilesTrinity.Cache;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
