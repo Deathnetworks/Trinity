@@ -640,5 +640,8 @@ namespace GilesTrinity
         private static int iTotalXp = 0;
         private static int iLastXp = 0;
         private static int iNextLvXp = 0;
+		// Gold counter
+        private static int iTotalGold = 0;
+        private static int iLastGold = 0;
     }
 }
