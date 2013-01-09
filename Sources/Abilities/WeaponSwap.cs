@@ -76,7 +76,7 @@ namespace GilesTrinity.Swap
 		private static bool sCheckedInna = false;
 		private static bool InnaDpsOn = GilesTrinity.Settings.Combat.Monk.HasInnaSet;
 		private static bool InnaDpsOff = GilesTrinity.Settings.Combat.Monk.HasInnaSet;
-		
+		private static InventorySlot[] InnaItems = new InventorySlot[] { InventorySlot.PlayerHead, InventorySlot.PlayerLegs, InventorySlot.PlayerTorso, InventorySlot.PlayerWaist };
 		
         static void Main()
         {
@@ -107,6 +107,14 @@ namespace GilesTrinity.Swap
                         break;
                 }
             }
+            foreach (InventorySlot item in InnaItems)
+            {
+                if (!items.Contains(item))
+                {
+                    if (!ZetaDia.Me.Inventory.Equipped.Where(j => j.InventorySlot == item).FirstOrDefault().Name.ToLower().Contains("inna"))
+                        return false;
+                }
+            }			
             return true;
         }
         public bool InnaBonusDpsOff()
@@ -129,6 +137,14 @@ namespace GilesTrinity.Swap
                         break;
                 }
             }
+            foreach (InventorySlot item in InnaItems)
+            {
+                if (!items.Contains(item))
+                {
+                    if (!ZetaDia.Me.Inventory.Equipped.Where(j => j.InventorySlot == item).FirstOrDefault().Name.ToLower().Contains("inna"))
+                        return false;
+                }
+            }			
             return true;
         }
         // Returns if this item is protected by the swapper or not -> should make items safe from town run routine
