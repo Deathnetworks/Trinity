@@ -374,7 +374,8 @@ namespace GilesTrinity
                 (GetHasBuff(SNOPower.Monk_MantraOfConviction) ||
                 GetHasBuff(SNOPower.Monk_MantraOfEvasion) ||
                 GetHasBuff(SNOPower.Monk_MantraOfHealing) ||
-                GetHasBuff(SNOPower.Monk_MantraOfRetribution));
+                GetHasBuff(SNOPower.Monk_MantraOfRetribution)) ||
+                DoesNotHaveMonkMantraAbility();
         }
         private static bool DoesNotHaveMonkMantraAbility()
         {
