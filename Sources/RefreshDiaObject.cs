@@ -1156,6 +1156,7 @@ namespace GilesTrinity
             }
 
             DiaItem item = c_diaObject as DiaItem;
+            ACDItem acdItem = item.CommonData;
 
             c_ItemLink = item.CommonData.ItemLink;
 
@@ -1300,7 +1301,7 @@ namespace GilesTrinity
                 }
                 if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
                 {
-                    AddToCache = ItemRulesPickupValidation(pickupItem);
+                    AddToCache = ItemRulesPickupValidation(pickupItem, ref acdItem);
                 }
                 else
                 {

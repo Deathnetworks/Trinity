@@ -18,8 +18,6 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-
-
         /// <summary>
         /// Pickup Validation - Determines what should or should not be picked up (Item Rules)
         /// </summary>
@@ -34,10 +32,10 @@ namespace GilesTrinity
         /// <param name="followerType"></param>
         /// <param name="dynamicID"></param>
         /// <returns></returns>
-        internal static bool ItemRulesPickupValidation(PickupItem item)
+        internal static bool ItemRulesPickupValidation(PickupItem item, ref ACDItem acdItem)
         {
 
-            Interpreter.InterpreterAction action = StashRule.checkPickUpItem(item.Name, item.Level, item.Quality, item.DBBaseType, item.DBItemType, item.IsOneHand, item.IsTwoHand, item.BalanceID, item.DynamicID);
+            Interpreter.InterpreterAction action = StashRule.checkPickUpItem(acdItem.Name, item.Level, item.Quality, item.DBBaseType, item.DBItemType, item.IsOneHand, item.IsTwoHand, item.BalanceID, item.DynamicID);
 
             switch (action)
             {
