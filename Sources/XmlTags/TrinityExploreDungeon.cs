@@ -129,7 +129,7 @@ namespace GilesTrinity.XmlTags
 
         private void AddMarkersToList()
         {
-            foreach (Zeta.Internals.MinimapMarker marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers)
+            foreach (Zeta.Internals.MinimapMarker marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.NameHash == 0))
             {
                 MiniMapMarkers.Add(new MiniMapMarker()
                 {
@@ -146,6 +146,7 @@ namespace GilesTrinity.XmlTags
 
             return
             new Sequence(
+                new Action(ret => PrintNodeCounts("MainBehavior")),
                 new DecoratorContinue(ret => ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.NameHash == 0 && !MiniMapMarkers.Any(m2 => m2.MarkerNameHash != m.NameHash)),
                     new Sequence(
                         new Action(ret => AddMarkersToList())
@@ -158,14 +159,17 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => GilesTrinity.UpdateSearchGridProvider())
                     )
                 ),
-                new Action(ret => PrintNodeCounts("MainBehavior")),
                 new PrioritySelector(
                     new Decorator(ret => MiniMapMarkers.Any(m => !m.Visited),
                         new Sequence(
                             new WhileLoop(ret => MiniMapMarkers.Any(m => Vector3.Distance(myPos, m.Location) <= PathPrecision),
-                                new Action(ret => MiniMapMarkers.FirstOrDefault(m => Vector3.Distance(myPos, m.Location) <= PathPrecision).Visited = true)
+                                new Sequence(
+                                    new Action(ret => targetmarker = MiniMapMarkers.OrderBy(m => Vector3.Distance(myPos, m.Location)).FirstOrDefault(m => Vector3.Distance(myPos, m.Location) <= PathPrecision)),
+                                    new Action(ret => DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "Setting MiniMapMarker {0} as Visited", targetmarker.MarkerNameHash)),
+                                    new Action(ret => MiniMapMarkers.FirstOrDefault(m => Vector3.Distance(myPos, m.Location) <= PathPrecision).Visited = true)
+                                )
                             ),
-                            new Action(ret => targetmarker = MiniMapMarkers.OrderBy(m => Vector3.Distance(myPos, m.Location)).FirstOrDefault(m => m.Visited)),
+                            new Action(ret => targetmarker = MiniMapMarkers.OrderBy(m => Vector3.Distance(myPos, m.Location)).FirstOrDefault(m => !m.Visited)),
                             new Decorator(ret => targetmarker != null,
                                 new Sequence(
                                     new Action(ret => DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "Moving to inspect nameHash 0 at {0} distance {1:0}",
@@ -188,7 +192,8 @@ namespace GilesTrinity.XmlTags
                                 new Action(ret => MoveToNextNode())
                             )
                         )
-                    )
+                    ),
+                    new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Error 1: Unknown error occured!"))
                 )
             );
         }
@@ -250,6 +255,13 @@ namespace GilesTrinity.XmlTags
                             new Action(ret => UpdateRoute())
                         )
                     )
+                ),
+                new Decorator(ret => lastMoveResult == MoveResult.PathGenerationFailed || lastMoveResult == MoveResult.Failed,
+                    new Sequence(
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Dequeueing current node {0} - leaving unvisited - Navigation failed",
+                            BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter)),
+                        new Action(ret => BrainBehavior.DungeonExplorer.CurrentRoute.Dequeue())
+                    )
                 )
             );
         }
@@ -293,8 +305,10 @@ namespace GilesTrinity.XmlTags
             if (PathPrecision == 0)
                 PathPrecision = BoxSize / 2f;
 
-            if (PathPrecision < 40f)
-                PathPrecision = 40f;
+            float minPathPrecision = 10f;
+
+            if (PathPrecision < 10f)
+                PathPrecision = 10f;
 
             if (ObjectDistance == 0)
                 ObjectDistance = 50f;
@@ -400,11 +414,12 @@ namespace GilesTrinity.XmlTags
             }
 
 
-            NextNode = BrainBehavior.DungeonExplorer.CurrentRoute.Peek();
+            NextNode = BrainBehavior.DungeonExplorer.CurrentNode;
             Vector3 moveTarget = NextNode.NavigableCenter;
 
-            string nodeName = String.Format("{0} Distance: {1:0} Direction: {2}",
-                NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition), GilesTrinity.GetHeadingToPoint(NextNode.NavigableCenter));
+            string nodeName = String.Format("{0} Distance: {1:0} Direction: {2} PathStack: {3}",
+                NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition), GilesTrinity.GetHeadingToPoint(NextNode.NavigableCenter),
+                PathStack.Count);
 
             //lastMoveResult = Navigator.MoveTo(moveTarget, nodeName, true);
 
@@ -417,6 +432,13 @@ namespace GilesTrinity.XmlTags
             if (PathStack.Any())
             {
                 moveTarget = PathStack.Peek();
+
+                if (Vector3.Distance(moveTarget, myPos) > 90f)
+                {
+                    GeneratePathTo(CurrentNavTarget);
+                    moveTarget = PathStack.Peek();
+                }
+
             }
 
             if (Vector3.Distance(moveTarget, GilesTrinity.PlayerStatus.CurrentPosition) <= PathPrecision || lastMoveResult == MoveResult.ReachedDestination)

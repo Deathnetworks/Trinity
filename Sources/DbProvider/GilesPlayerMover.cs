@@ -756,7 +756,7 @@ namespace GilesTrinity.DbProvider
         private static void RecordLastProfile()
         {
             string currentProfileFileName = Path.GetFileName(ProfileManager.CurrentProfile.Path);
-            if (TrinityLoadOnce.UsedProfiles.Contains(currentProfileFileName))
+            if (!TrinityLoadOnce.UsedProfiles.Contains(currentProfileFileName))
             {
                 TrinityLoadOnce.UsedProfiles.Add(currentProfileFileName);
             }
@@ -776,6 +776,11 @@ namespace GilesTrinity.DbProvider
                 }
                 GilesTrinity.listProfilesLoaded.Add(sThisProfile);
                 GilesTrinity.sLastProfileSeen = sThisProfile;
+
+                if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.Name != null)
+                {
+                    GilesTrinity.SetWindowTitle(ProfileManager.CurrentProfile.Name);
+                }
                 if (GilesTrinity.sFirstProfileSeen == "")
                     GilesTrinity.sFirstProfileSeen = sThisProfile;
             }

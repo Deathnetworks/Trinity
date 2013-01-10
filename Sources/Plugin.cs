@@ -82,18 +82,13 @@ namespace GilesTrinity
         /// </summary>
         public void OnEnabled()
         {
-            string battleTagName = "";
-            try
-            {
-                battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
-            }
-            catch { }
-
             BotMain.OnStart += TrinityBotStart;
             BotMain.OnStop += TrinityBotStop;
 
             // Set up the pause button
-            Application.Current.Dispatcher.Invoke(PaintMainWindowButtons(battleTagName));
+            Application.Current.Dispatcher.Invoke(PaintMainWindowButtons());
+
+            SetWindowTitle();
 
             if (!Directory.Exists(FileManager.PluginPath))
             {
@@ -168,22 +163,39 @@ namespace GilesTrinity
             }
         }
 
+        internal static void SetWindowTitle(string profileName = "")
+        {
+            Application.Current.Dispatcher.Invoke(new Action( () => {
+            string battleTagName = "";
+            try
+            {
+                battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
+            }
+            catch { }
+            Window mainWindow = Application.Current.MainWindow;
+ 
+            string windowTitle = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
+
+            if (profileName.Trim() != String.Empty)
+            {
+                windowTitle += " - " + profileName;
+            }
+
+            mainWindow.Title = windowTitle;
+                }));
+        }
+
         /// <summary>
         /// Adds the Pause and Town Run buttons to Demonbuddy's main window. Sets Window Title.
         /// </summary>
         /// <param name="battleTagName"></param>
         /// <returns></returns>
-        private static Action PaintMainWindowButtons(string battleTagName)
+        private static Action PaintMainWindowButtons()
         {
             return new System.Action(
                         () =>
                         {
                             Window mainWindow = Application.Current.MainWindow;
-                            try
-                            {
-                                mainWindow.Title = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
-                            }
-                            catch { }
                             var tab = mainWindow.FindName("tabControlMain") as TabControl;
                             if (tab == null) return;
                             var infoDumpTab = tab.Items[0] as TabItem;

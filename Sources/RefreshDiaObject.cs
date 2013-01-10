@@ -1169,6 +1169,7 @@ namespace GilesTrinity
                 {
                     try
                     {
+                        var c_ItemName = ((ACDItem)c_diaObject.CommonData).Name;
                         c_ItemLevel = ((ACDItem)c_diaObject.CommonData).Level;
                         c_DBItemBaseType = ((ACDItem)c_diaObject.CommonData).ItemBaseType;
                         c_DBItemType = ((ACDItem)c_diaObject.CommonData).ItemType;
@@ -1823,7 +1824,7 @@ namespace GilesTrinity
                         }
 
                         // Only break destructables if we're stuck and using IgnoreNonBlocking
-                        if (PlayerMover.GetMovementSpeed() > 0 && !AddToCache && Settings.WorldObject.IgnoreNonBlocking)
+                        if (PlayerMover.GetMovementSpeed() > 0.1 && !AddToCache && Settings.WorldObject.IgnoreNonBlocking)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "NotStuck";
