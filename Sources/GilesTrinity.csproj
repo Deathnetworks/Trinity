@@ -37,7 +37,7 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Demonbuddy, Version=1.0.1240.115, Culture=neutral, PublicKeyToken=eff32ccf253d66d4, processorArchitecture=x86">
+    <Reference Include="Demonbuddy, Version=1.0.1252.119, Culture=neutral, PublicKeyToken=eff32ccf253d66d4, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\db\Demonbuddy.exe</HintPath>
     </Reference>
@@ -81,6 +81,7 @@
     <Compile Include="Classes\GilesItemStats.cs" />
     <Compile Include="Classes\GilesStashSort.cs" />
     <Compile Include="Classes\ItemHash.cs" />
+    <Compile Include="Classes\SpeedSensor.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Behaviors.cs" />

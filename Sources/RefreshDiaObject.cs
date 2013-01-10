@@ -1485,7 +1485,7 @@ namespace GilesTrinity
             AddToCache = true;
 
             // Ignore it if it's not in range yet, except health wells and resplendent chests if we're opening chests
-            if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell && 
+            if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell &&
                 !(Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_Name.ToLower().Contains("chest_rare")) && c_RActorGuid != CurrentTargetRactorGUID)
             {
                 AddToCache = false;
@@ -1823,7 +1823,7 @@ namespace GilesTrinity
                         }
 
                         // Only break destructables if we're stuck and using IgnoreNonBlocking
-                        if (!PlayerMover.UnstuckChecker(PlayerStatus.CurrentPosition, 500) && !AddToCache && Settings.WorldObject.IgnoreNonBlocking)
+                        if (PlayerMover.GetMovementSpeed() > 0 && !AddToCache && Settings.WorldObject.IgnoreNonBlocking)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "NotStuck";

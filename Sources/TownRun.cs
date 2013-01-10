@@ -383,6 +383,9 @@ namespace GilesTrinity
 
             TownRunCheckTimer.Reset();
 
+            // Force update actors, maybe this will fix item name bug
+            ZetaDia.Actors.Update();
+
             foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
                 if (item.BaseAddress != IntPtr.Zero)

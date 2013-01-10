@@ -346,8 +346,77 @@ namespace GilesTrinity.DbProvider
         private static DateTime lastShiftedPosition = DateTime.Today;
         private static int iShiftPositionFor = 0;
 
+        private static Vector3 lastMovementPosition = Vector3.Zero;
+        private static DateTime lastRecordedPosition = DateTime.Now;
+        internal static double MovementSpeed { get; private set; }
+
+        private static List<SpeedSensor> SpeedSensors = new List<SpeedSensor>();
+        private static int MaxSpeedSensors = 15;
+
+
+        public static double GetMovementSpeed()
+        {
+            // If we just used a spell, we "moved"
+            if (DateTime.Now.Subtract(GilesTrinity.lastGlobalCooldownUse).TotalMilliseconds <= 1000)
+                return 1d;
+
+            // Minimum of 3 records to calculate speed
+            if (!SpeedSensors.Any() || SpeedSensors.Count <= 2)
+                return 0d;
+
+            double AverageRecordingTime = SpeedSensors.Average(s => s.TimeSinceLastMove.TotalHours); ;
+            double averageMovementSpeed = SpeedSensors.Average(s => Vector3.Distance(s.Location, vMyCurrentPosition) * 1000000);
+
+            return averageMovementSpeed / AverageRecordingTime;
+        }
+
         public void MoveTowards(Vector3 vMoveToTarget)
         {
+            vMyCurrentPosition = ZetaDia.Me.Position;
+
+            // record speed once per second
+            if (DateTime.Now.Subtract(lastRecordedPosition).TotalMilliseconds >= 1000)
+            {
+                // Check if we have enough recorded positions, remove one if so
+                while (SpeedSensors.Count > MaxSpeedSensors - 1)
+                {
+                    // first sensors
+                    SpeedSensors.Remove(SpeedSensors.OrderBy(s => s.Timestamp).FirstOrDefault());
+                }
+                // Clean up the stack
+                if (SpeedSensors.Any(s => s.WorldID != GilesTrinity.iCurrentWorldID))
+                {
+                    SpeedSensors.Clear();
+                }
+
+                // Record our current location and time
+                if (!SpeedSensors.Any())
+                {
+                    SpeedSensors.Add(new SpeedSensor()
+                    {
+                        Location = vMyCurrentPosition,
+                        TimeSinceLastMove = new TimeSpan(0),
+                        Distance = 0f,
+                        WorldID = GilesTrinity.iCurrentWorldID
+                    });
+                }
+                else
+                {
+                    SpeedSensor lastSensor = SpeedSensors.OrderByDescending(s => s.Timestamp).FirstOrDefault();
+                    SpeedSensors.Add(new SpeedSensor()
+                     {
+                         Location = vMyCurrentPosition,
+                         TimeSinceLastMove = new TimeSpan(DateTime.Now.Subtract(lastSensor.TimeSinceLastMove).Ticks),
+                         Distance = Vector3.Distance(vMyCurrentPosition, lastSensor.Location),
+                         WorldID = GilesTrinity.iCurrentWorldID
+                     });
+                }
+
+                lastRecordedPosition = DateTime.Now;
+                // Set the public variable
+                MovementSpeed = GetMovementSpeed();
+            }
+
             // rrrix-note: This really shouldn't be here... 
             // Recording of all the XML's in use this run
             RecordLastProfile();
@@ -359,8 +428,6 @@ namespace GilesTrinity.DbProvider
             //if (GilesTrinity.bDontMoveMeIAmDoingShit)
             //    return;
             // Store player current position
-
-            vMyCurrentPosition = ZetaDia.Me.Position;
 
             // Store distance to current moveto target
             float fDistanceFromTarget;
@@ -589,11 +656,11 @@ namespace GilesTrinity.DbProvider
                 ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
                 //ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget);
 
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Used basic movement to {0}, direction: {1}", vMoveToTarget, GilesTrinity.GetHeadingToPoint(vMoveToTarget));
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Used basic movement to {0}, direction: {1} Speed: {2:0.00}", vMoveToTarget, GilesTrinity.GetHeadingToPoint(vMoveToTarget), MovementSpeed);
             }
             else
             {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Reached MoveTowards Destination {0}", vMoveToTarget);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Reached MoveTowards Destination {0} Current Speed: {0}", vMoveToTarget, MovementSpeed);
             }
 
 

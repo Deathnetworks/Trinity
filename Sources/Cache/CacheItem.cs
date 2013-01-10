@@ -733,7 +733,10 @@ namespace GilesTrinity.Cache
                 PickupItem pickupItem = new PickupItem(
                     item.ACDItem.InternalName, item.ACDItem.Level, item.ACDItem.ItemQualityLevel, item.ACDItem.GameBalanceId, item.ACDItem.ItemBaseType, item.ACDItem.ItemType, item.ACDItem.IsOneHand, item.ACDItem.IsTwoHand, item.ACDItem.FollowerSpecialType, item.ACDItem.DynamicId
                     );
-                return GilesTrinity.ItemRulesPickupValidation(pickupItem);
+
+                ACDItem acdItem = item.ACDItem;
+
+                return GilesTrinity.ItemRulesPickupValidation(pickupItem, ref acdItem);
             }
             else
             {

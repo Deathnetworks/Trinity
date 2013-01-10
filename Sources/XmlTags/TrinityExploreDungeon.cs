@@ -86,8 +86,17 @@ namespace GilesTrinity.XmlTags
         private static ISearchAreaProvider gp { get { return GilesTrinity.gp; } }
         private static PathFinder pf { get { return GilesTrinity.pf; } }
         private Stack<Vector3> PathStack = new Stack<Vector3>();
-        private int myLevelAreaId = -1;
+        private int mySceneId = -1;
         private Vector3 GPUpdatePosition = Vector3.Zero;
+        private List<MiniMapMarker> MiniMapMarkers = new List<MiniMapMarker>();
+
+        private class MiniMapMarker
+        {
+            public int MarkerNameHash { get; set; }
+            public Vector3 Location { get; set; }
+            public bool Visited { get; set; }
+            public MiniMapMarker() { }
+        }
 
         public override void OnStart()
         {
@@ -105,7 +114,7 @@ namespace GilesTrinity.XmlTags
 
         private void CheckResetDungeonExplorer()
         {
-            if ((BoxSize != 0 && BoxTolerance != 0) && (GridSegmentation.BoxSize != BoxSize || GridSegmentation.BoxTolerance != BoxTolerance))
+            if ((BoxSize != 0 && BoxTolerance != 0) && (GridSegmentation.BoxSize != BoxSize || GridSegmentation.BoxTolerance != BoxTolerance) || (GetGridSegmentationNodeCount() == 0))
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Box Size or Tolerance has been changed! {0}/{1}", GridSegmentation.BoxSize, GridSegmentation.BoxTolerance);
                 BrainBehavior.DungeonExplorer.Reset();
@@ -118,26 +127,68 @@ namespace GilesTrinity.XmlTags
             }
         }
 
+        private void AddMarkersToList()
+        {
+            foreach (Zeta.Internals.MinimapMarker marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers)
+            {
+                MiniMapMarkers.Add(new MiniMapMarker()
+                {
+                    MarkerNameHash = marker.NameHash,
+                    Location = marker.Position,
+                    Visited = false
+                });
+            }
+        }
 
         protected override Composite CreateBehavior()
         {
+            MiniMapMarker targetmarker = null;
+
             return
             new Sequence(
-                new DecoratorContinue(ret => myLevelAreaId != ZetaDia.CurrentLevelAreaId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
+                new DecoratorContinue(ret => ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.NameHash == 0 && !MiniMapMarkers.Any(m2 => m2.MarkerNameHash != m.NameHash)),
                     new Sequence(
-                        new Action(ret => myLevelAreaId = ZetaDia.CurrentLevelAreaId),
+                        new Action(ret => AddMarkersToList())
+                    )
+                ),
+                new DecoratorContinue(ret => mySceneId != ZetaDia.Me.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
+                    new Sequence(
+                        new Action(ret => mySceneId = ZetaDia.Me.SceneId),
                         new Action(ret => GPUpdatePosition = myPos),
                         new Action(ret => GilesTrinity.UpdateSearchGridProvider())
                     )
                 ),
                 new Action(ret => PrintNodeCounts("MainBehavior")),
-                new DecoratorContinue(ret => !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
-                    new Action(ret => UpdateRoute())
-                ),
                 new PrioritySelector(
-                    CheckIsFinished(),
-                    CheckNodeFinished(),
-                    new Action(ret => MoveToNextNode())
+                    new Decorator(ret => MiniMapMarkers.Any(m => !m.Visited),
+                        new Sequence(
+                            new WhileLoop(ret => MiniMapMarkers.Any(m => Vector3.Distance(myPos, m.Location) <= PathPrecision),
+                                new Action(ret => MiniMapMarkers.FirstOrDefault(m => Vector3.Distance(myPos, m.Location) <= PathPrecision).Visited = true)
+                            ),
+                            new Action(ret => targetmarker = MiniMapMarkers.OrderBy(m => Vector3.Distance(myPos, m.Location)).FirstOrDefault(m => m.Visited)),
+                            new Decorator(ret => targetmarker != null,
+                                new Sequence(
+                                    new Action(ret => DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "Moving to inspect nameHash 0 at {0} distance {1:0}",
+                                        targetmarker.Location, Vector3.Distance(myPos, targetmarker.Location))),
+                                    new Action(ret => Navigator.MoveTo(targetmarker.Location))
+                                )
+                            )
+                        )
+                    ),
+                    new PrioritySelector(
+                        new Sequence(
+                            new DecoratorContinue(ret => !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
+                                new Action(ret => UpdateRoute())
+                            ),
+                            CheckIsFinished()
+                        ),
+                        new DecoratorContinue(ret => BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
+                            new PrioritySelector(
+                                CheckNodeFinished(),
+                                new Action(ret => MoveToNextNode())
+                            )
+                        )
+                    )
                 )
             );
         }
@@ -179,8 +230,11 @@ namespace GilesTrinity.XmlTags
         {
             return
             new PrioritySelector(
-                new Decorator(ret => GetRouteUnvisitedNodeCount() == 0,
-                    new Action()
+                new Decorator(ret => GetRouteUnvisitedNodeCount() == 0 || !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
+                    new Sequence(
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Error - CheckIsNodeFinished() called while Route is empty!")),
+                        new Action(ret => UpdateRoute())
+                    )
                 ),
                 new Decorator(ret => CurrentNavTarget.Distance(ZetaDia.Me.Position) <= PathPrecision,
                     new Sequence(
@@ -447,6 +501,7 @@ namespace GilesTrinity.XmlTags
             isDone = false;
             InitDone = false;
             BrainBehavior.DungeonExplorer.Reset();
+            MiniMapMarkers = new List<MiniMapMarker>();
         }
     }
 }
