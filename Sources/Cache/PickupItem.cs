@@ -21,7 +21,6 @@ namespace GilesTrinity.Cache
         public int DynamicID { get; set; }
         public Vector3 Position { get; set; }
         public int ActorSNO { get; set; }
-        public string ItemLink { get; set; }
 
         public PickupItem() { }
 

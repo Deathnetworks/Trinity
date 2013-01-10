@@ -736,7 +736,7 @@ namespace GilesTrinity.Cache
 
                 ACDItem acdItem = item.ACDItem;
 
-                return GilesTrinity.ItemRulesPickupValidation(pickupItem, ref acdItem);
+                return GilesTrinity.ItemRulesPickupValidation(pickupItem);
             }
             else
             {

@@ -1146,6 +1146,12 @@ namespace GilesTrinity
         }
         private static bool RefreshGilesItem(bool AddToCache)
         {
+            /*
+             * rrrix note: avoid casting the DiaObject into a DiaItem, and accessing the ACDItem.Name property before the item is identified.
+             * Demonbuddy will cache the item name pre-identification and will cause problems post-identification during Stash/Sell/Salvage routines, which rely on item names for
+             * processing keep/sell logic.
+             */
+
             bool logNewItem = false;
             AddToCache = false;
 
@@ -1155,25 +1161,20 @@ namespace GilesTrinity
                 c_IgnoreSubStep = "InvalidBalanceID";
             }
 
-            DiaItem item = c_diaObject as DiaItem;
-            ACDItem acdItem = item.CommonData;
-
-            c_ItemLink = item.CommonData.ItemLink;
-
             // Try and pull up cached item data on this item, if not, add to our local memory cache
             GilesGameBalanceDataCache balanceCachEntry;
             if (!dictGilesGameBalanceDataCache.TryGetValue(c_BalanceID, out balanceCachEntry))
             {
-                if (item != null)
+                if (c_diaObject.CommonData != null)
                 {
                     try
                     {
-                        c_ItemLevel = item.CommonData.Level;
-                        c_DBItemBaseType = item.CommonData.ItemBaseType;
-                        c_DBItemType = item.CommonData.ItemType;
-                        c_IsOneHandedItem = item.CommonData.IsOneHand;
-                        c_IsTwoHandedItem = item.CommonData.IsTwoHand;
-                        c_item_tFollowerType = item.CommonData.FollowerSpecialType;
+                        c_ItemLevel = ((ACDItem)c_diaObject.CommonData).Level;
+                        c_DBItemBaseType = ((ACDItem)c_diaObject.CommonData).ItemBaseType;
+                        c_DBItemType = ((ACDItem)c_diaObject.CommonData).ItemType;
+                        c_IsOneHandedItem = ((ACDItem)c_diaObject.CommonData).IsOneHand;
+                        c_IsTwoHandedItem = ((ACDItem)c_diaObject.CommonData).IsTwoHand;
+                        c_item_tFollowerType = ((ACDItem)c_diaObject.CommonData).FollowerSpecialType;
 
                         // Add to session cache
                         dictGilesGameBalanceDataCache.Add(c_BalanceID, new GilesGameBalanceDataCache(c_ItemLevel, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType));
@@ -1280,7 +1281,7 @@ namespace GilesTrinity
             {
                 PickupItem pickupItem = new PickupItem()
                 {
-                    Name = item.CommonData.Name,
+                    Name = c_Name,
                     Level = c_ItemLevel,
                     Quality = c_ItemQuality,
                     BalanceID = c_BalanceID,
@@ -1291,8 +1292,7 @@ namespace GilesTrinity
                     ItemFollowerType = c_item_tFollowerType,
                     DynamicID = c_GameDynamicID,
                     Position = c_Position,
-                    ActorSNO = c_ActorSNO,
-                    ItemLink = c_ItemLink
+                    ActorSNO = c_ActorSNO
                 };
 
                 if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
@@ -1301,7 +1301,7 @@ namespace GilesTrinity
                 }
                 if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
                 {
-                    AddToCache = ItemRulesPickupValidation(pickupItem, ref acdItem);
+                    AddToCache = ItemRulesPickupValidation(pickupItem);
                 }
                 else
                 {
