@@ -46,15 +46,13 @@ namespace GilesTrinity.ItemRules
         };
 
         // final variables
-        readonly string version = "2.0.2.35";
-        readonly string rulesPath = Path.Combine(FileManager.ItemRulePath, "Rules");
-        readonly string logPath = Path.Combine(FileManager.ItemRulePath, "Log");
+        readonly string version = "2.0.4.0";
         readonly string configFile = "config.dis";
         readonly string pickupFile = "pickup.dis";
-        readonly string logFile = "actualLog.txt";
+        readonly string logFile = "ItemRules.log";
         readonly string assign = "->", SEP = ";";
         readonly Regex filePattern = new Regex(@"\[FILE\][ ]*==[ ]*([A-Za-z]+.dis)", RegexOptions.Compiled);
-        readonly Regex flagPattern = new Regex(@"\[([A-Z]+)\][ ]*==[ ]*([A-Za-z]+)", RegexOptions.Compiled);
+        readonly Regex flagPattern = new Regex(@"\[([A-Z]+)\][ ]*==[ ]*(.+)", RegexOptions.Compiled);
         readonly Regex macroPattern = new Regex(@"(@[A-Z]+)[ ]*:=[ ]*(.+)", RegexOptions.Compiled);
 
         string ruleType = "soft";
@@ -95,8 +93,8 @@ namespace GilesTrinity.ItemRules
 
         public void reset()
         {
-            string actualLog = Path.Combine(logPath, logFile);
-            string archivePath = Path.Combine(logPath, "Archive");
+            string actualLog = Path.Combine(FileManager.LoggingPath, logFile);
+            string archivePath = Path.Combine(FileManager.LoggingPath, "Archive");
             string archiveLog = Path.Combine(archivePath, DateTime.Now.ToString("ddMMyyyyHHmmss") + "_log.txt");
 
             if (!File.Exists(actualLog))
@@ -117,7 +115,7 @@ namespace GilesTrinity.ItemRules
         {
             reset();
 
-            StreamReader streamReader = new StreamReader(Path.Combine(rulesPath, configFile));
+            StreamReader streamReader = new StreamReader(Path.Combine(FileManager.ItemRulePath, configFile));
 
             // initialize or reset ruleSet array
             ruleSet = new ArrayList();
@@ -128,6 +126,9 @@ namespace GilesTrinity.ItemRules
 
             // instantiating our itemfilename array
             List<string> itemFileNames = new List<string>();
+
+            // set default rules path
+            string rulesPath = Path.Combine(FileManager.ItemRulePath, "Rules");
 
             string str;
             Match match1, match2;
@@ -147,26 +148,35 @@ namespace GilesTrinity.ItemRules
                 }
                 else if (match2.Success)
                 {
-                    if (match2.Groups[1].Value.Contains("DEBUG"))
-                        debugFlag = Boolean.Parse(match2.Groups[2].Value);
 
-                    if (match2.Groups[1].Value.Contains("RULE"))
-                        ruleType = match2.Groups[2].Value.ToLower();
-
-                    if (match2.Groups[1].Value.Contains("PICKLOG"))
-                        logPickQuality = getQualityValueFromQuality(match2.Groups[2].Value);
-
-                    if (match2.Groups[1].Value.Contains("KEEPLOG"))
-                        logKeepQuality = getQualityValueFromQuality(match2.Groups[2].Value);
+                    switch (match2.Groups[1].Value)
+                    {
+                        case "DEBUG":
+                            debugFlag = Boolean.Parse(match2.Groups[2].Value);
+                            break;
+                        case "RULE":
+                            ruleType = match2.Groups[2].Value.ToLower();
+                            break;
+                        case "PICKLOG":
+                            logPickQuality = getQualityValueFromQuality(match2.Groups[2].Value);
+                            break;
+                        case "KEEPLOG":
+                            logKeepQuality = getQualityValueFromQuality(match2.Groups[2].Value);
+                            break;
+                        case "RULEPATH":
+                            rulesPath = @match2.Groups[2].Value;
+                            break;
+                    }
                 }
 
             }
 
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "PICKLOG {0} ", logPickQuality);
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "KEEPLOG {0} ", logKeepQuality);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "RULEPATH {0} ", rulesPath);
             // parse pickup file
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "reading ... {0} ", pickupFile);
-            pickUpRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, pickupFile)), pickUpRuleSet);
+            pickUpRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, ruleType, pickupFile)), pickUpRuleSet);
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... loaded: {0} pickup rules", pickUpRuleSet.Count);
 
             // parse all item files
@@ -436,12 +446,8 @@ namespace GilesTrinity.ItemRules
             if (logType == LogType.DEBUG && !debugFlag)
                 return;
 
-            // create directory if it doesn't exists
-            if (!Directory.Exists(logPath))
-                Directory.CreateDirectory(logPath);
-
-            log = new StreamWriter(Path.Combine(logPath, logFile), true);
-            log.WriteLine(DateTime.Now.ToString("yyyyMMddHHmmssffff") + "." + ZetaDia.Service.CurrentHero.Name + SEP + logType + SEP + str);
+            log = new StreamWriter(Path.Combine(FileManager.LoggingPath, logFile), true);
+            log.WriteLine(DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".Hero" + SEP + logType + SEP + str);
             log.Close();
         }
 
@@ -505,8 +511,16 @@ namespace GilesTrinity.ItemRules
                             obj = (float)1;
                         break;
                     case "max":
-                        if (obj is float)
-                            obj = (float)1;
+                        object itemType, twoHand;
+                        double result;
+                        if (obj is float
+                            && Interpreter.itemDic.TryGetValue("[TYPE]", out itemType)
+                            && Interpreter.itemDic.TryGetValue("[TWOHAND]", out twoHand)
+                            && MaxStats.maxItemStats.TryGetValue(itemType.ToString() + twoHand.ToString() + strArray[0], out result)
+                            && result > 0)
+                            obj = (float)obj/(float)result;
+                        else
+                            obj = (float)0;
                         break;
                 }
             }
@@ -630,10 +644,8 @@ namespace GilesTrinity.ItemRules
 
             // - NAME -------------------------------------------------------------//
             if ((item.ItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.ItemType == ItemType.CraftingPlan)
-            {
                 //{c:ffffff00}Plan: Exalted Fine Doomcaster{/c}
                 itemDic.Add("[NAME]", Regex.Replace(item.Name, @"{[/:a-zA-Z0-9 ]*}", string.Empty).Replace(" ", ""));
-            }
             else
                 itemDic.Add("[NAME]", item.Name.ToString().Replace(" ", ""));
 
@@ -660,6 +672,7 @@ namespace GilesTrinity.ItemRules
             itemDic.Add("[GLOBEBONUS]", item.Stats.HealthGlobeBonus);
             itemDic.Add("[DPS]", item.Stats.WeaponDamagePerSecond);
             itemDic.Add("[WEAPAS]", item.Stats.WeaponAttacksPerSecond);
+            itemDic.Add("[WEAPDMGTYPE]", item.Stats.WeaponDamageType.ToString());
             itemDic.Add("[WEAPMAXDMG]", item.Stats.WeaponMaxDamage);
             itemDic.Add("[WEAPMINDMG]", item.Stats.WeaponMinDamage);
             itemDic.Add("[CRIT%]", item.Stats.CritPercent);
@@ -672,7 +685,7 @@ namespace GilesTrinity.ItemRules
             itemDic.Add("[RESFIRE]", item.Stats.ResistFire);
             itemDic.Add("[RESLIGHTNING]", item.Stats.ResistLightning);
             itemDic.Add("[RESHOLY]", item.Stats.ResistHoly);
-            itemDic.Add("[RESARCAN]", item.Stats.ResistArcane);
+            itemDic.Add("[RESARCANE]", item.Stats.ResistArcane);
             itemDic.Add("[RESCOLD]", item.Stats.ResistCold);
             itemDic.Add("[RESPOISON]", item.Stats.ResistPoison);
             itemDic.Add("[FIREDMG%]", item.Stats.FireDamagePercent);
@@ -700,6 +713,15 @@ namespace GilesTrinity.ItemRules
             itemDic.Add("[HATREDREG]", item.Stats.HatredRegen);
             itemDic.Add("[MAXMANA]", item.Stats.MaxMana);
             itemDic.Add("[MANAREG]", item.Stats.ManaRegen);
+
+            //// - REDUCED LEVEL REQUIRMENT -----------------------------------------//
+            //// TODO: this an ugly but it works maybee ...
+            //result = 0;
+            //if (item.Level <= 60)
+            //    result = item.Stats.Level - item.Stats.RequiredLevel;
+            //else result = 60 - item.Stats.RequiredLevel;
+            //itemDic.Add("[RLR]", result);
+
             itemDic.Add("[MAXSTAT]", new float[] { item.Stats.Strength, item.Stats.Intelligence, item.Stats.Dexterity }.Max());
             itemDic.Add("[MAXSTATVIT]", new float[] { item.Stats.Strength, item.Stats.Intelligence, item.Stats.Dexterity }.Max() + item.Stats.Vitality);
             itemDic.Add("[STRVIT]", item.Stats.Strength + item.Stats.Vitality);
