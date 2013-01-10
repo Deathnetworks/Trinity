@@ -20,7 +20,7 @@
 [KEEPLOG] == rare         // [magic,rare,legendary] logs selected and higher
 
 // +- Rule path ---------------------------------------------------------------+
-[RULEPATH] == D:\Bot\DBItemRules\                   // optional path
+//[RULEPATH] == D:\Bot\DBItemRules\                   // optional path
 
 // +- Rule strength -----------------------------------------------------------+
 [RULE]	== hard                                     // [custom,hard,medium,soft] 
