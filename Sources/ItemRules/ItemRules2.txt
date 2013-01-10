@@ -273,7 +273,8 @@
 // |  [DPS]                           | WeaponDamagePerSecond       | 1100				 
 // |  [WEAPAS]                        | WeaponAttacksPerSecond      | 1.5			
 // |  [WEAPMAXDMG]                    | WeaponMaxDamage             | 560					 
-// |  [WEAPMINDMG]                    | WeaponMinDamage             | 255					 
+// |  [WEAPMINDMG]                    | WeaponMinDamage             | 255
+// |  [WEAPDMGTYPE]                   | WeaponDamageType            | Fire					 
 // |  [MINDMG]                        | MinDamage                   | 100							 
 // |  [MAXDMG]                        | MaxDamage                   | 200							 
 // +----------------------------------+-----------------------------+----------+
@@ -457,5 +458,5 @@
 // |                                                        |_____|      
 // +---------------------------------------------------------------------------+
 // | - [AS%] not working on weapons ... use [WEAPAS] to check for speed
-// | - [BLOCK%] not working on shields (untested) 
+// | - [BLOCK%] not working on shields ... shows total blockChance 
 // +---------------------------------------------------------------------------+

@@ -87,7 +87,7 @@
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotManager.cs" />
-    <Compile Include="ItemRules\Core\Formula.cs" />
+    <Compile Include="ItemRules\Core\MaxStats.cs" />
     <Compile Include="ItemRules\Core\Parser.cs" />
     <Compile Include="ItemRules\Core\ParseTree.cs" />
     <Compile Include="ItemRules\Core\Scanner.cs" />
@@ -264,18 +264,20 @@
     <None Include="Dictionaries.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ItemRules\Rules\config.dis" />
+    <None Include="ItemRules\config.dis" />
     <None Include="ItemRules\Rules\hard\legendary.dis" />
     <None Include="ItemRules\Rules\hard\magic.dis" />
+    <None Include="ItemRules\Rules\hard\pickup.dis" />
     <None Include="ItemRules\Rules\hard\rare.dis" />
     <None Include="ItemRules\Rules\hard\special.dis" />
     <None Include="ItemRules\Rules\medium\legendary.dis" />
     <None Include="ItemRules\Rules\medium\magic.dis" />
+    <None Include="ItemRules\Rules\medium\pickup.dis" />
     <None Include="ItemRules\Rules\medium\rare.dis" />
     <None Include="ItemRules\Rules\medium\special.dis" />
-    <None Include="ItemRules\Rules\pickup.dis" />
     <None Include="ItemRules\Rules\soft\legendary.dis" />
     <None Include="ItemRules\Rules\soft\magic.dis" />
+    <None Include="ItemRules\Rules\soft\pickup.dis" />
     <None Include="ItemRules\Rules\soft\rare.dis" />
     <None Include="ItemRules\Rules\soft\special.dis" />
   </ItemGroup>
