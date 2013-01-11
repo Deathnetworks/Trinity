@@ -739,6 +739,20 @@ namespace GilesTrinity
                     iNextLvXp = ZetaDia.Actors.Me.ParagonExperienceNextLevel;
                 }
                 LogWriter.WriteLine("Total XP gained: " + Math.Round(iTotalXp / (float)1000000, 2).ToString() + " million [" + Math.Round(iTotalXp / TotalRunningTime.TotalHours / 1000000, 2).ToString() + " million per hour]");
+				if (iLastGold == 0)
+                {
+                    iLastGold = ZetaDia.Me.Inventory.Coinage;
+                }
+                if (ZetaDia.Me.Inventory.Coinage - iLastGold >= 500000)
+                {
+                    iLastGold = ZetaDia.Me.Inventory.Coinage;
+                }
+                else
+                {
+                    iTotalGold += ZetaDia.Me.Inventory.Coinage - iLastGold;
+                    iLastGold = ZetaDia.Me.Inventory.Coinage;
+                }
+                LogWriter.WriteLine("Total Gold gained: " + Math.Round(iTotalGold / (float)1000, 2).ToString() + " Thousand [" + Math.Round(iTotalGold / TotalRunningTime.TotalHours / 1000, 2).ToString() + " Thousand per hour]");
                 LogWriter.WriteLine("");
                 LogWriter.WriteLine("===== Item DROP Statistics =====");
 
