@@ -731,8 +731,17 @@ namespace GilesTrinity.Cache
             else if (GilesTrinity.Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
             {
                 PickupItem pickupItem = new PickupItem(
-                    item.ACDItem.InternalName, item.ACDItem.Level, item.ACDItem.ItemQualityLevel, item.ACDItem.GameBalanceId, item.ACDItem.ItemBaseType, item.ACDItem.ItemType, item.ACDItem.IsOneHand, item.ACDItem.IsTwoHand, item.ACDItem.FollowerSpecialType, item.ACDItem.DynamicId
-                    );
+                    item.ACDItem.Name,
+                    item.ACDItem.InternalName,
+                    item.ACDItem.Level,
+                    item.ACDItem.ItemQualityLevel,
+                    item.ACDItem.GameBalanceId,
+                    item.ACDItem.ItemBaseType,
+                    item.ACDItem.ItemType,
+                    item.ACDItem.IsOneHand,
+                    item.ACDItem.IsTwoHand,
+                    item.ACDItem.FollowerSpecialType,
+                    item.ACDItem.DynamicId);
 
                 ACDItem acdItem = item.ACDItem;
 
@@ -741,8 +750,18 @@ namespace GilesTrinity.Cache
             else
             {
                 PickupItem pickupItem = new PickupItem(
-                  item.ACDItem.InternalName, item.ACDItem.Level, item.ACDItem.ItemQualityLevel, item.ACDItem.GameBalanceId, item.ACDItem.ItemBaseType, item.ACDItem.ItemType, item.ACDItem.IsOneHand, item.ACDItem.IsTwoHand, item.ACDItem.FollowerSpecialType, item.ACDItem.DynamicId
-                  );
+                  item.ACDItem.Name,
+                  item.ACDItem.InternalName,
+                  item.ACDItem.Level,
+                  item.ACDItem.ItemQualityLevel,
+                  item.ACDItem.GameBalanceId,
+                  item.ACDItem.ItemBaseType,
+                  item.ACDItem.ItemType,
+                  item.ACDItem.IsOneHand,
+                  item.ACDItem.IsTwoHand,
+                  item.ACDItem.FollowerSpecialType,
+                  item.ACDItem.DynamicId);
+
                 return GilesTrinity.GilesPickupItemValidation(pickupItem);
             }
         }

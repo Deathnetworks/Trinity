@@ -34,7 +34,7 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool ItemRulesPickupValidation(PickupItem item)
         {
-            Interpreter.InterpreterAction action = StashRule.checkPickUpItem(item.Name, item.Level, item.Quality, item.DBBaseType, item.DBItemType, item.IsOneHand, item.IsTwoHand, item.BalanceID, item.DynamicID);
+            Interpreter.InterpreterAction action = StashRule.checkPickUpItem(item);
 
             switch (action)
             {

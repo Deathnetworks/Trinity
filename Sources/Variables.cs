@@ -510,6 +510,7 @@ namespace GilesTrinity
         private static float c_Radius = 0f;
         private static float c_ZDiff = 0f;
         private static string c_Name = "";
+        private static string c_InternalName = "";
         private static string c_IgnoreReason = "";
         private static string c_IgnoreSubStep = "";
         private static int c_ACDGUID = 0;

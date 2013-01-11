@@ -409,7 +409,7 @@ namespace GilesTrinity
                                     (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
                                     c_diaObject.ActorType,
                                     c_ObjectType,
-                                    c_Name,
+                                    c_InternalName,
                                     c_ActorSNO,
                                     (c_unit_IsBoss ? " IsBoss" : ""),
                                     (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
@@ -436,7 +436,7 @@ namespace GilesTrinity
         {
             bool isNewLogItem = false;
 
-            c_ItemSha1Hash = ItemHash.GenerateItemHash(c_Position, c_ActorSNO, c_Name, iCurrentWorldID, c_ItemQuality, c_ItemLevel);
+            c_ItemSha1Hash = ItemHash.GenerateItemHash(c_Position, c_ActorSNO, c_InternalName, iCurrentWorldID, c_ItemQuality, c_ItemLevel);
 
             if (!GenericCache.ContainsKey(c_ItemSha1Hash))
             {
