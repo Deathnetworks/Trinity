@@ -546,9 +546,9 @@ namespace GilesTrinity
                                 // Weight Interactable Specials
 
                                 // Very close interactables get a weight increase
-                                cacheObject.Weight = 15000d - (Math.Floor(cacheObject.CentreDistance) * 170d);
+                                cacheObject.Weight = 15000d - (Math.Floor(cacheObject.CentreDistance) * 90d);
                                 if (cacheObject.CentreDistance <= 12f)
-                                    cacheObject.Weight += 800d;
+                                    cacheObject.Weight += 1000d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
@@ -562,8 +562,8 @@ namespace GilesTrinity
                                 if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
-                                if (bAnyMobsInCloseRange || (CurrentTarget != null && CurrentTarget.IsBossOrEliteRareUnique))
-                                    cacheObject.Weight = 1;
+                                //if (bAnyMobsInCloseRange || (CurrentTarget != null && CurrentTarget.IsBossOrEliteRareUnique))
+                                //    cacheObject.Weight = 1;
 
                                 break;
                             }

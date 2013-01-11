@@ -541,12 +541,7 @@ namespace GilesTrinity
                                             {
                                                 dictTotalInteractionAttempts[CurrentTarget.RActorGuid]++;
                                             }
-                                            // If we've tried interacting too many times, blacklist this for a while
-                                            if (iInteractAttempts > 3)
-                                            {
-                                                hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
-                                                //dateSinceBlacklist90Clear = DateTime.Now;
-                                            }
+
                                             dictAbilityLastUse[CurrentPower.SNOPower] = DateTime.Now;
                                             CurrentPower.SNOPower = SNOPower.None;
                                             WaitWhileAnimating(6, true);

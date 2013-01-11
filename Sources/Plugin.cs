@@ -86,7 +86,9 @@ namespace GilesTrinity
             BotMain.OnStop += TrinityBotStop;
 
             // Set up the pause button
-            Application.Current.Dispatcher.Invoke(PaintMainWindowButtons());
+
+            // rrrix: removing for next DB beta... 
+            //Application.Current.Dispatcher.Invoke(PaintMainWindowButtons());
 
             SetWindowTitle();
 
@@ -190,6 +192,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="battleTagName"></param>
         /// <returns></returns>
+        [Obsolete("This has been removed in the latest DemonbuddyBETA")]
         private static Action PaintMainWindowButtons()
         {
             return new System.Action(

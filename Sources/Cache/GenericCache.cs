@@ -47,7 +47,7 @@ namespace GilesTrinity
         {
             lock (_Synchronizer)
             {
-                foreach (GenericCacheObject obj in CacheList)
+                foreach (GenericCacheObject obj in CacheList.ToList())
                 {
                     if (obj.IsExpired())
                         CacheList.Remove(obj);
