@@ -315,8 +315,8 @@ namespace GilesTrinity
                         case 50: // every 150 seconds
                             dictGilesGameBalanceIDCache = new Dictionary<int, int>();
                             dictGilesDynamicIDCache = new Dictionary<int, int>();
-                            dictGilesQualityCache = new Dictionary<int, ItemQuality>();
-                            dictGilesQualityRechecked = new Dictionary<int, bool>();
+                            //dictGilesQualityCache = new Dictionary<int, ItemQuality>();
+                            //dictGilesQualityRechecked = new Dictionary<int, bool>();
                             dictGilesPickupItem = new Dictionary<int, bool>();
                             dictHasBeenRayCastedCache = new Dictionary<int, bool>();
                             dictHasBeenNavigableCache = new Dictionary<int, bool>();

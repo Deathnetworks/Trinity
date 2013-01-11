@@ -47,7 +47,7 @@ namespace GilesTrinity.ItemRules
         };
 
         // final variables
-        readonly string version = "2.0.4.0";
+        readonly string version = "2.0.4.5";
         readonly string configFile = "config.dis";
         readonly string pickupFile = "pickup.dis";
         readonly string logFile = "ItemRules.log";
