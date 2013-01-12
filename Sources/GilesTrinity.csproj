@@ -271,11 +271,6 @@
     <None Include="ItemRules\Rules\hard\pickup.dis" />
     <None Include="ItemRules\Rules\hard\rare.dis" />
     <None Include="ItemRules\Rules\hard\special.dis" />
-    <None Include="ItemRules\Rules\medium\legendary.dis" />
-    <None Include="ItemRules\Rules\medium\magic.dis" />
-    <None Include="ItemRules\Rules\medium\pickup.dis" />
-    <None Include="ItemRules\Rules\medium\rare.dis" />
-    <None Include="ItemRules\Rules\medium\special.dis" />
     <None Include="ItemRules\Rules\soft\legendary.dis" />
     <None Include="ItemRules\Rules\soft\magic.dis" />
     <None Include="ItemRules\Rules\soft\pickup.dis" />
