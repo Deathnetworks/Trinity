@@ -76,7 +76,7 @@ namespace GilesTrinity.XmlTags
                 NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
             }
 
-            if (UseNavigator.ToLower() != "true")
+            if (UseNavigator.ToLower() == "false")
                 Navigator.PlayerMover.MoveTowards(NavTarget);
             else
                 Navigator.MoveTo(NavTarget);

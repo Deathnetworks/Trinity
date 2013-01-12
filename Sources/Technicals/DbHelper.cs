@@ -29,13 +29,43 @@ namespace GilesTrinity.Technicals
             }
         }
 
-        /// <summary>Logs the specified level.</summary>
+        /// <summary>Logs the message to Normal log level</summary>
         /// <param name="category">The category.</param>
         /// <param name="formatMessage">The format message.</param>
         /// <param name="args">The parameters used when format message.</param>
         public static void Log(LogCategory category, string formatMessage, params object[] args)
         {
-            Log(TrinityLogLevel.Debug, category, formatMessage, args);
+            Log(TrinityLogLevel.Normal, category, formatMessage, args);
+        }
+
+        /// <summary>
+        /// Logs a message with Normal/UserInformation
+        /// </summary>
+        /// <param name="formatMessage"></param>
+        /// <param name="args"></param>
+        public static void LogNormal(string formatMessage, params object[] args)
+        {
+            Log(TrinityLogLevel.Normal, LogCategory.UserInformation, formatMessage, args);
+        }
+
+        /// <summary>
+        /// Logs a message with Normal/UserInformation
+        /// </summary>
+        /// <param name="formatMessage"></param>
+        /// <param name="args"></param>
+        public static void LogVerbose(string formatMessage, params object[] args)
+        {
+            Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, formatMessage, args);
+        }
+
+        /// <summary>
+        /// Logs a message with Normal/UserInformation
+        /// </summary>
+        /// <param name="formatMessage"></param>
+        /// <param name="args"></param>
+        public static void LogDebug(string formatMessage, params object[] args)
+        {
+            Log(TrinityLogLevel.Debug, LogCategory.UserInformation, formatMessage, args);
         }
 
         /// <summary>Converts <see cref="TrinityLogLevel"/> to <see cref="LogLevel"/>.</summary>

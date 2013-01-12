@@ -19,7 +19,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <!--Unstucker-->
@@ -29,10 +30,10 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <TextBlock Text="Trinity Unstucker :" FontWeight="Bold" TextAlignment="Center" Margin="5"/>
-            <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Stretch">
+            <UniformGrid Grid.Row="1" Columns="2">
                 <CheckBox Margin="5" IsChecked="{Binding Advanced.UnstuckerEnabled}" Content="Enable Trinity unstucker"/>
-                <CheckBox Margin="5" IsChecked="{Binding Advanced.AllowRestartGame}" Content="Allow game restarting for long stuck"/>
-            </StackPanel>
+                <CheckBox Margin="5" IsChecked="{Binding Advanced.AllowRestartGame}" Content="Allow game restarts"/>
+            </UniformGrid>
         </Grid>
         <Grid Grid.Row="1" Margin="2">
             <Grid.RowDefinitions>
@@ -53,9 +54,9 @@
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Ticks Per Second " FontWeight="Bold" TextAlignment="Center" Margin="5"/>
+            <TextBlock Text="Ticks Per Second " FontWeight="Bold" TextAlignment="Center" Margin="2"/>
             <UniformGrid Grid.Row="1" Columns="2" HorizontalAlignment="Stretch">
-                <CheckBox Margin="5,5" IsChecked="{Binding Path=Advanced.TPSEnabled}">Enable TPS modification</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.TPSEnabled}">Enable TPS modification</CheckBox>
                 <Slider Grid.Row="1" Template="{DynamicResource Slider}" IsEnabled="{Binding Path=Advanced.TPSEnabled}"
                     Interval="500" Maximum="30" Minimum="1" SmallChange="1" TickFrequency="3" TickPlacement="BottomRight"
                     Value="{Binding Path=Advanced.TPSLimit}" 
@@ -63,13 +64,35 @@
                         ToolTip="Set below 10 to reduce CPU use (but dumb the bot down). You can experiment above 10 (Db Default), but this will eat CPU)"/>
             </UniformGrid>
         </Grid>
-        <!--Debug Statusbar-->
+        <!--Cache Refresh Rate-->
         <Grid Grid.Row="3" Margin="2">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock Text="Cache Refresh Rate (Default 100) - use with caution!" FontWeight="Bold" TextAlignment="Center" Margin="2"/>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="10*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Fast" TextAlignment="Right" Margin="2" />
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" IsEnabled="True"
+                    Interval="500" Maximum="500" Minimum="0" SmallChange="5" TickFrequency="5"  TickPlacement="BottomRight"
+                    Value="{Binding Path=Advanced.CacheRefreshRate}" IsSnapToTickEnabled="True"
+                    HorizontalAlignment="Stretch" Margin="5,0,5,0"
+                        ToolTip="Default 100. Increase value to decrease CPU usage, and may help alleviate some crashes."/>
+                <TextBlock Grid.Column="3" Text="Slow" TextAlignment="Left" Margin="2" />
+            </Grid>
+        </Grid>
+        <!--Debug Statusbar-->
+        <Grid Grid.Row="4" Margin="2">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Debug Informations :" FontWeight="Bold" TextAlignment="Center" Margin="5"/>
+            <TextBlock Text="Debug Informations :" FontWeight="Bold" TextAlignment="Center" Margin="2"/>
             <UniformGrid Grid.Row="1" Columns="2" HorizontalAlignment="Stretch">
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogStuckLocation}" ToolTip="Create a separated file for stuck locations">Log stuck locations</CheckBox>
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.DebugInStatusBar}" ToolTip="Useful for tracking down problem, but can be CPU intensive">Debug info in status bar</CheckBox>
@@ -89,6 +112,6 @@
             </UniformGrid>
         </Grid>
         <!--Reset Button-->
-        <Button Grid.Row="4" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetAdvancedCommand}">Reset</Button>
+        <Button Grid.Row="5" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetAdvancedCommand}">Reset</Button>
     </Grid>
 </UserControl>

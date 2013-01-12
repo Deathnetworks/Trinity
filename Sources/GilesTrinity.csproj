@@ -81,6 +81,7 @@
     <Compile Include="Classes\GilesItemStats.cs" />
     <Compile Include="Classes\GilesStashSort.cs" />
     <Compile Include="Classes\ItemHash.cs" />
+    <Compile Include="Classes\MiniMapMarker.cs" />
     <Compile Include="Classes\SpeedSensor.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Configuration.cs" />

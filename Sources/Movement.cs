@@ -833,9 +833,9 @@ namespace GilesTrinity
             return angle * (180.0 / Math.PI);
         }
 
-        internal static void UpdateSearchGridProvider()
+        internal static void UpdateSearchGridProvider(bool force = false)
         {
-            if (Settings.Combat.Misc.UseNavMeshTargeting)
+            if (Settings.Combat.Misc.UseNavMeshTargeting || force)
             {
                 if (gp == null)
                     gp = Navigator.SearchGridProvider;

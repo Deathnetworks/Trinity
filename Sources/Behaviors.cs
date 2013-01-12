@@ -1300,9 +1300,9 @@ namespace GilesTrinity
                 {
                     //ZetaDia.Me.UsePower(SNOPower.Walk, vCurrentDestination, iCurrentWorldID, -1);
 
-                    Navigator.PlayerMover.MoveTowards(vCurrentDestination);
+                    //Navigator.PlayerMover.MoveTowards(vCurrentDestination);
                     //ZetaDia.Me.Movement.MoveActor(vCurrentDestination);
-                    //Navigator.MoveTo(vCurrentDestination, CurrentTarget.InternalName, true);
+                    Navigator.MoveTo(vCurrentDestination, CurrentTarget.InternalName, true);
                     lastSentMovePower = DateTime.Now;
 
                     // Store the current destination for comparison incase of changes next loop

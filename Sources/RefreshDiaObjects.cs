@@ -32,7 +32,7 @@ namespace GilesTrinity
         {
             using (new PerformanceLogger("RefreshDiaObjectCache"))
             {
-                if (DateTime.Now.Subtract(LastRefreshedCache).TotalMilliseconds <= 100)
+                if (DateTime.Now.Subtract(LastRefreshedCache).TotalMilliseconds < Settings.Advanced.CacheRefreshRate)
                     return false;
 
                 LastRefreshedCache = DateTime.Now;
