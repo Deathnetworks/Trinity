@@ -589,11 +589,11 @@ namespace GilesTrinity
         /// Same as above but for gold-amount of pile (RactorGUID based)
         /// </summary>
         private static Dictionary<int, int> dictGilesGoldAmountCache = new Dictionary<int, int>();
-        /// <summary>
-        /// Same as above but for quality of item, we check this twice to make bloody sure we don't miss a legendary from a mis-read though (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, ItemQuality> dictGilesQualityCache = new Dictionary<int, ItemQuality>();
-        private static Dictionary<int, bool> dictGilesQualityRechecked = new Dictionary<int, bool>();
+        ///// <summary>
+        ///// Same as above but for quality of item, we check this twice to make bloody sure we don't miss a legendary from a mis-read though (RactorGUID based)
+        ///// </summary>
+        //private static Dictionary<int, ItemQuality> dictGilesQualityCache = new Dictionary<int, ItemQuality>();
+        //private static Dictionary<int, bool> dictGilesQualityRechecked = new Dictionary<int, bool>();
         /// <summary>
         /// Same as above but for whether we want to pick it up or not (RactorGUID based)
         /// </summary>
@@ -616,10 +616,10 @@ namespace GilesTrinity
         private static Dictionary<int, bool> dictHasBeenRayCastedCache = new Dictionary<int, bool>();
         private static Dictionary<int, bool> dictHasBeenInLoSCache = new Dictionary<int, bool>();
 
-        /// <summary>
-        /// Do we actually need this?
-        /// </summary>
-        private static Dictionary<int, GilesGameBalanceDataCache> dictGilesGameBalanceDataCache = new Dictionary<int, GilesGameBalanceDataCache>();
+        ///// <summary>
+        ///// Do we actually need this?
+        ///// </summary>
+        //private static Dictionary<int, GilesGameBalanceDataCache> dictGilesGameBalanceDataCache = new Dictionary<int, GilesGameBalanceDataCache>();
 
         /// <summary>
         /// Spots where we should not kite to (used during boss fights)

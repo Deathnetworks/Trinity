@@ -10,6 +10,7 @@ namespace GilesTrinity.Cache
     internal class PickupItem
     {
         public string Name { get; set; }
+        public string InternalName { get; set; }
         public int Level { get; set; }
         public ItemQuality Quality { get; set; }
         public int BalanceID { get; set; }
@@ -24,9 +25,10 @@ namespace GilesTrinity.Cache
 
         public PickupItem() { }
 
-        public PickupItem(string name, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
+        public PickupItem(string Name, string internalName, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
         {
-            this.Name = name;
+            this.Name = Name;
+            this.InternalName = internalName;
             this.Level = level;
             this.Quality = quality;
             this.BalanceID = balanceId;

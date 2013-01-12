@@ -9,6 +9,7 @@ using Zeta.Common;
 using GilesTrinity.ItemRules.Core;
 using GilesTrinity.Technicals;
 using Zeta;
+using GilesTrinity.Cache;
 
 namespace GilesTrinity.ItemRules
 {
@@ -46,7 +47,7 @@ namespace GilesTrinity.ItemRules
         };
 
         // final variables
-        readonly string version = "2.0.4.0";
+        readonly string version = "2.0.4.5";
         readonly string configFile = "config.dis";
         readonly string pickupFile = "pickup.dis";
         readonly string logFile = "ItemRules.log";
@@ -237,9 +238,9 @@ namespace GilesTrinity.ItemRules
         /// <param name="isTwoHand"></param>
         /// <param name="gameBalanceID"></param>
         /// <returns></returns>
-        public InterpreterAction checkPickUpItem(string name, int level, ItemQuality quality, ItemBaseType itemBaseType, ItemType itemType, bool isOneHand, bool isTwoHand, int gameBalanceId, int dynamicId)
+        internal InterpreterAction checkPickUpItem(PickupItem item)
         {
-            fillPickupDic(name, level, quality, itemBaseType, itemType, isOneHand, isTwoHand, gameBalanceId, dynamicId);
+            fillPickupDic(item);
 
             return checkItem(true);
         }
@@ -539,58 +540,58 @@ namespace GilesTrinity.ItemRules
         /// <param name="isOneHand"></param>
         /// <param name="isTwoHand"></param>
         /// <param name="gameBalanceId"></param>
-        private void fillPickupDic(string name, int level, ItemQuality itemQuality, ItemBaseType itemBaseType, ItemType itemType, bool isOneHand, bool isTwoHand, int gameBalanceId, int dynamicId)
+        private void fillPickupDic(PickupItem item)
         {
             object result;
             itemDic = new Dictionary<string, object>();
 
             // add log unique key
-            itemDic.Add("[KEY]", getHashKey(gameBalanceId, dynamicId));
+            itemDic.Add("[KEY]", getHashKey(item.BalanceID, item.DynamicID));
 
             // - BASETYPE ---------------------------------------------------------//
-            itemDic.Add("[BASETYPE]", itemBaseType.ToString());
+            itemDic.Add("[BASETYPE]", item.DBBaseType.ToString());
 
             // - TYPE -------------------------------------------------------------//
             // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
-            if (itemType == ItemType.Unknown && name.Contains("Plan"))
+            if (item.DBItemType == ItemType.Unknown && item.Name.Contains("Plan"))
                 result = ItemType.CraftingPlan.ToString();
-            else result = itemType.ToString();
+            else result = item.DBItemType.ToString();
             itemDic.Add("[TYPE]", result);
 
             // - QUALITY -------------------------------------------------------//
             // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
-            if ((itemType == ItemType.Unknown && name.Contains("Plan")) || itemType == ItemType.CraftingPlan)
+            if ((item.DBItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.DBItemType == ItemType.CraftingPlan)
             {
-                if (name.Contains("ffbf642f"))
+                if (item.Name.Contains("ffbf642f"))
                     result = ItemQuality.Legendary.ToString();
-                else if (name.Contains("Exalted Grand"))
+                else if (item.Name.Contains("Exalted Grand"))
                     result = ItemQuality.Rare6.ToString();
-                else if (name.Contains("Exalted Fine"))
+                else if (item.Name.Contains("Exalted Fine"))
                     result = ItemQuality.Rare5.ToString();
-                else if (name.Contains("Exalted"))
+                else if (item.Name.Contains("Exalted"))
                     result = ItemQuality.Rare4.ToString();
                 else
                     result = ItemQuality.Normal.ToString();
             }
             else
-                result = Regex.Replace(itemQuality.ToString(), @"[\d-]", string.Empty);
+                result = Regex.Replace(item.Quality.ToString(), @"[\d-]", string.Empty);
             itemDic.Add("[QUALITY]", result);
 
             // - NAME -------------------------------------------------------------//
-            if ((itemType == ItemType.Unknown && name.Contains("Plan")) || itemType == ItemType.CraftingPlan)
+            if ((item.DBItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.DBItemType == ItemType.CraftingPlan)
             {
                 //{c:ffffff00}Plan: Exalted Fine Doomcaster{/c}
-                itemDic.Add("[NAME]", Regex.Replace(name, @"{[/:a-zA-Z0-9 ]*}", string.Empty).Replace(" ", ""));
+                itemDic.Add("[NAME]", Regex.Replace(item.Name, @"{[/:a-zA-Z0-9 ]*}", string.Empty).Replace(" ", ""));
             }
             else
-                itemDic.Add("[NAME]", name.ToString().Replace(" ", ""));
+                itemDic.Add("[NAME]", item.Name.ToString().Replace(" ", ""));
 
             // - LEVEL ------------------------------------------------------------//
-            itemDic.Add("[LEVEL]", (float)level);
-            itemDic.Add("[ONEHAND]", isOneHand);
-            itemDic.Add("[TWOHAND]", isTwoHand);
+            itemDic.Add("[LEVEL]", (float)item.Level);
+            itemDic.Add("[ONEHAND]", item.IsOneHand);
+            itemDic.Add("[TWOHAND]", item.IsTwoHand);
             itemDic.Add("[UNIDENT]", (bool)true);
-            itemDic.Add("[INTNAME]", name);
+            itemDic.Add("[INTNAME]", item.InternalName);
             //itemDic.Add("[GAMEBALANCEID]", (float)item.GameBalanceId);
         }
 

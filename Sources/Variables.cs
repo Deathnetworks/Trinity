@@ -510,6 +510,7 @@ namespace GilesTrinity
         private static float c_Radius = 0f;
         private static float c_ZDiff = 0f;
         private static string c_Name = "";
+        private static string c_InternalName = "";
         private static string c_IgnoreReason = "";
         private static string c_IgnoreSubStep = "";
         private static int c_ACDGUID = 0;
@@ -641,5 +642,8 @@ namespace GilesTrinity
         private static int iTotalXp = 0;
         private static int iLastXp = 0;
         private static int iNextLvXp = 0;
+		// Gold counter
+        private static int iTotalGold = 0;
+        private static int iLastGold = 0;
     }
 }

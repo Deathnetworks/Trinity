@@ -1022,7 +1022,7 @@ namespace GilesTrinity
                                 }
                                 catch
                                 {
-                                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit {0} [{1}]", c_Name, c_ActorSNO);
+                                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit {0} [{1}]", c_InternalName, c_ActorSNO);
                                     StaleCache = true;
                                 }
                             }

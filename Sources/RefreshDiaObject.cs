@@ -186,7 +186,7 @@ namespace GilesTrinity
                         Weight = c_Weight,
                         CentreDistance = c_CentreDistance,
                         RadiusDistance = c_RadiusDistance,
-                        InternalName = c_Name,
+                        InternalName = c_InternalName,
                         ACDGuid = c_ACDGUID,
                         RActorGuid = c_RActorGuid,
                         DynamicID = c_GameDynamicID,
@@ -234,7 +234,7 @@ namespace GilesTrinity
                         ActorSNO = c_ActorSNO,
                         Radius = c_Radius,
                         Location = c_Position,
-                        Name = c_Name,
+                        Name = c_InternalName,
                         Weight = c_Weight
                     });
                     break;
@@ -281,7 +281,7 @@ namespace GilesTrinity
             c_RadiusDistance = 0f;
             c_Radius = 0f;
             c_ZDiff = 0f;
-            c_Name = "";
+            c_InternalName = "";
             c_IgnoreReason = "";
             c_IgnoreSubStep = "";
             c_ACDGUID = -1;
@@ -345,11 +345,11 @@ namespace GilesTrinity
         private static bool RefreshInternalName(bool AddToCache)
         {
             // This is "internalname" for items, and just a "generic" name for objects and units - cached if possible
-            if (!dictGilesInternalNameCache.TryGetValue(c_RActorGuid, out c_Name))
+            if (!dictGilesInternalNameCache.TryGetValue(c_RActorGuid, out c_InternalName))
             {
                 try
                 {
-                    c_Name = nameNumberTrimRegex.Replace(c_diaObject.Name, "");
+                    c_InternalName = nameNumberTrimRegex.Replace(c_diaObject.Name, "");
                 }
                 catch (Exception ex)
                 {
@@ -357,7 +357,7 @@ namespace GilesTrinity
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                 }
-                dictGilesInternalNameCache.Add(c_RActorGuid, c_Name);
+                dictGilesInternalNameCache.Add(c_RActorGuid, c_InternalName);
             }
             return AddToCache;
         }
@@ -431,7 +431,7 @@ namespace GilesTrinity
             // begin with default... 
             c_ObjectType = GObjectType.Unknown;
 
-            if (ignoreNames.Any(n => c_Name.ToLower().Contains(n.ToLower())))
+            if (ignoreNames.Any(n => c_InternalName.ToLower().Contains(n.ToLower())))
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "IgnoreNames";
@@ -512,7 +512,7 @@ namespace GilesTrinity
                             {
                                 AddToCache = false;
                             }
-                            if (c_Name.ToLower().StartsWith("gold"))
+                            if (c_InternalName.ToLower().StartsWith("gold"))
                             {
                                 c_ObjectType = GObjectType.Gold;
                             }
@@ -595,7 +595,7 @@ namespace GilesTrinity
                         }
                         else if (!ForceVendorRunASAP)
                         {
-                            AddToCache = RefreshGilesItem(AddToCache);
+                            AddToCache = RefreshGilesItem();
                             c_IgnoreReason = "RefreshGilesItem";
                         }
                         else
@@ -687,7 +687,7 @@ namespace GilesTrinity
             using (new PerformanceLogger("RefreshUnit.3"))
             {
                 // hax for Diablo_shadowClone
-                c_unit_IsAttackable = c_Name.StartsWith("Diablo_shadowClone");
+                c_unit_IsAttackable = c_InternalName.StartsWith("Diablo_shadowClone");
                 try
                 {
                     // Prepare the fake object for target handler
@@ -743,7 +743,7 @@ namespace GilesTrinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monsterinfo and monstertype for unit {0} [{1}]", c_Name, c_ActorSNO);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monsterinfo and monstertype for unit {0} [{1}]", c_InternalName, c_ActorSNO);
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "ActorTypeAttempt={0}", thisUnit.ActorType);
                         AddToCache = false;
@@ -782,7 +782,7 @@ namespace GilesTrinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting attribute max health for unit {0} [{1}]", c_Name, c_ActorSNO);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting attribute max health for unit {0} [{1}]", c_InternalName, c_ActorSNO);
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                         return AddToCache;
@@ -1038,7 +1038,7 @@ namespace GilesTrinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting is-invulnerable attribute for unit {0} [{1}]", c_Name, c_ActorSNO);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting is-invulnerable attribute for unit {0} [{1}]", c_InternalName, c_ActorSNO);
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         c_unit_IsAttackable = true;
                     }
@@ -1065,7 +1065,7 @@ namespace GilesTrinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monstersize info for unit {0} [{1}]", c_Name, c_ActorSNO);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monstersize info for unit {0} [{1}]", c_InternalName, c_ActorSNO);
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                         return AddToCache;
@@ -1092,7 +1092,7 @@ namespace GilesTrinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for unit {0} [{1}]", c_Name, c_ActorSNO);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for unit {0} [{1}]", c_InternalName, c_ActorSNO);
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                         return AddToCache;
@@ -1144,7 +1144,7 @@ namespace GilesTrinity
             }
             return AddToCache;
         }
-        private static bool RefreshGilesItem(bool AddToCache)
+        private static bool RefreshGilesItem()
         {
             /*
              * rrrix note: avoid casting the DiaObject into a DiaItem, and accessing the ACDItem.Name property before the item is identified.
@@ -1153,7 +1153,7 @@ namespace GilesTrinity
              */
 
             bool logNewItem = false;
-            AddToCache = false;
+            bool AddToCache = false;
 
             if (c_BalanceID == -1)
             {
@@ -1161,118 +1161,145 @@ namespace GilesTrinity
                 c_IgnoreSubStep = "InvalidBalanceID";
             }
 
-            // Try and pull up cached item data on this item, if not, add to our local memory cache
-            GilesGameBalanceDataCache balanceCachEntry;
-            if (!dictGilesGameBalanceDataCache.TryGetValue(c_BalanceID, out balanceCachEntry))
-            {
-                if (c_diaObject.CommonData != null)
-                {
-                    try
-                    {
-                        var c_ItemName = ((ACDItem)c_diaObject.CommonData).Name;
-                        c_ItemLevel = ((ACDItem)c_diaObject.CommonData).Level;
-                        c_DBItemBaseType = ((ACDItem)c_diaObject.CommonData).ItemBaseType;
-                        c_DBItemType = ((ACDItem)c_diaObject.CommonData).ItemType;
-                        c_IsOneHandedItem = ((ACDItem)c_diaObject.CommonData).IsOneHand;
-                        c_IsTwoHandedItem = ((ACDItem)c_diaObject.CommonData).IsTwoHand;
-                        c_item_tFollowerType = ((ACDItem)c_diaObject.CommonData).FollowerSpecialType;
+            DiaItem item = c_diaObject as DiaItem;
+            c_Name = item.CommonData.Name;
+            c_ItemQuality = item.CommonData.ItemQualityLevel;
+            c_ItemLevel = item.CommonData.Level;
+            c_DBItemBaseType = item.CommonData.ItemBaseType;
+            c_DBItemType = item.CommonData.ItemType;
+            c_IsOneHandedItem = item.CommonData.IsOneHand;
+            c_IsTwoHandedItem = item.CommonData.IsTwoHand;
+            c_item_tFollowerType = item.CommonData.FollowerSpecialType;
 
-                        // Add to session cache
-                        dictGilesGameBalanceDataCache.Add(c_BalanceID, new GilesGameBalanceDataCache(c_ItemLevel, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType));
-                    }
-                    catch (Exception ex)
-                    {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                            "Safely handled exception getting un-cached ACD Item data (level/item type etc.) for item {0} [{1}]", c_Name, c_ActorSNO);
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                        AddToCache = false;
-                        c_IgnoreSubStep = "CommonDataException";
-                    }
-                }
-                else
-                {
-                    // Couldn't get the game balance data for this item, so ignore it for now
-                    AddToCache = false;
-                    c_IgnoreSubStep = "NoBalanceData";
-                }
-            }
-            else
+            PickupItem pickupItem = new PickupItem()
             {
-                // We pulled this data from the dictionary cache, so use it instead of trying to get new data from DB/D3 memory!
-                c_ItemLevel = balanceCachEntry.ItemLevel;
-                c_DBItemBaseType = balanceCachEntry.ItemBaseType;
-                c_DBItemType = balanceCachEntry.ItemType;
-                c_IsOneHandedItem = balanceCachEntry.OneHand;
-                c_IsTwoHandedItem = balanceCachEntry.TwoHand;
-                c_item_tFollowerType = balanceCachEntry.FollowerType;
-            }
+                Name = c_Name,
+                InternalName = c_InternalName,
+                Level = c_ItemLevel,
+                Quality = c_ItemQuality,
+                BalanceID = c_BalanceID,
+                DBBaseType = c_DBItemBaseType,
+                DBItemType = c_DBItemType,
+                IsOneHand = c_IsOneHandedItem,
+                IsTwoHand = c_IsTwoHandedItem,
+                ItemFollowerType = c_item_tFollowerType,
+                DynamicID = c_GameDynamicID,
+                Position = c_Position,
+                ActorSNO = c_ActorSNO
+            };
+
+            //// Try and pull up cached item data on this item, if not, add to our local memory cache
+            //GilesGameBalanceDataCache balanceCachEntry;
+            //if (!dictGilesGameBalanceDataCache.TryGetValue(c_BalanceID, out balanceCachEntry))
+            //{
+            //    if (c_diaObject.CommonData != null)
+            //    {
+            //        try
+            //        {
+            //            DiaItem item = c_diaObject as DiaItem;
+            //            c_Name = item.CommonData.Name;
+            //            c_ItemLevel = item.CommonData.Level;
+            //            c_DBItemBaseType = item.CommonData.ItemBaseType;
+            //            c_DBItemType = item.CommonData.ItemType;
+            //            c_IsOneHandedItem = item.CommonData.IsOneHand;
+            //            c_IsTwoHandedItem = item.CommonData.IsTwoHand;
+            //            c_item_tFollowerType = item.CommonData.FollowerSpecialType;
+
+            //            // Add to session cache
+            //            dictGilesGameBalanceDataCache.Add(c_BalanceID, new GilesGameBalanceDataCache(c_Name, c_ItemLevel, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType));
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+            //                "Safely handled exception getting un-cached ACD Item data (level/item type etc.) for item {0} [{1}]", c_InternalName, c_ActorSNO);
+            //            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+            //            AddToCache = false;
+            //            c_IgnoreSubStep = "CommonDataException";
+            //        }
+            //    }
+            //    else
+            //    {
+            //        // Couldn't get the game balance data for this item, so ignore it for now
+            //        AddToCache = false;
+            //        c_IgnoreSubStep = "NoBalanceData";
+            //    }
+            //}
+            //else
+            //{
+            //    // We pulled this data from the dictionary cache, so use it instead of trying to get new data from DB/D3 memory!
+            //    c_Name = balanceCachEntry.Name;
+            //    c_ItemLevel = balanceCachEntry.ItemLevel;
+            //    c_DBItemBaseType = balanceCachEntry.ItemBaseType;
+            //    c_DBItemType = balanceCachEntry.ItemType;
+            //    c_IsOneHandedItem = balanceCachEntry.OneHand;
+            //    c_IsTwoHandedItem = balanceCachEntry.TwoHand;
+            //    c_item_tFollowerType = balanceCachEntry.FollowerType;
+            //}
 
             // Calculate custom Giles item type
-            c_item_GItemType = DetermineItemType(c_Name, c_DBItemType, c_item_tFollowerType);
+            c_item_GItemType = DetermineItemType(c_InternalName, c_DBItemType, c_item_tFollowerType);
+
             // And temporarily store the base type
             GItemBaseType itemBaseType = DetermineBaseType(c_item_GItemType);
+
             // Treat all globes as a yes
             if (c_item_GItemType == GItemType.HealthGlobe)
             {
                 c_ObjectType = GObjectType.Globe;
                 // Create or alter this cached object type
-                GObjectType objectType;
-                if (!dictGilesObjectTypeCache.TryGetValue(c_RActorGuid, out objectType))
-                    dictGilesObjectTypeCache.Add(c_RActorGuid, c_ObjectType);
-                else
-                    dictGilesObjectTypeCache[c_RActorGuid] = c_ObjectType;
+                dictGilesObjectTypeCache[c_RActorGuid] = c_ObjectType;
                 AddToCache = true;
             }
 
-            // Quality of item for "genuine" items
-            c_ItemQuality = ItemQuality.Invalid;
-            if (itemBaseType != GItemBaseType.Unknown && itemBaseType != GItemBaseType.HealthGlobe && itemBaseType != GItemBaseType.Gem && itemBaseType != GItemBaseType.Misc &&
-                !hashForceSNOToItemList.Contains(c_ActorSNO))
-            {
-                // Get the quality of this item, cached if possible
-                if (!dictGilesQualityCache.TryGetValue(c_RActorGuid, out c_ItemQuality))
-                {
-                    try
-                    {
-                        c_ItemQuality = (ItemQuality)c_CommonData.GetAttribute<int>(ActorAttributeType.ItemQualityLevel);
-                    }
-                    catch
-                    {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting item-quality for item {0} [{1}]", c_Name, c_ActorSNO);
-                        AddToCache = false;
-                        c_IgnoreSubStep = "ItemQualityLevelException";
-                    }
-                    dictGilesQualityCache.Add(c_RActorGuid, c_ItemQuality);
-                    dictGilesQualityRechecked.Add(c_RActorGuid, false);
-                }
-                else
-                {
-                    // Because item-quality is such a sensitive thing, we don't want to risk losing items
-                    // So we check a cached item quality a 2nd time - as long as it's the same, we won't check again
-                    // However, if there's any inconsistencies, we keep checking, and keep the highest-read quality as the real value
-                    if (!dictGilesQualityRechecked[c_RActorGuid])
-                    {
-                        ItemQuality temporaryItemQualityCheck = ItemQuality.Invalid;
-                        try
-                        {
-                            temporaryItemQualityCheck = (ItemQuality)c_CommonData.GetAttribute<int>(ActorAttributeType.ItemQualityLevel);
-                            // If the newly-received quality is higher, then store the new quality
-                            if (temporaryItemQualityCheck > c_ItemQuality)
-                            {
-                                dictGilesQualityCache[c_RActorGuid] = temporaryItemQualityCheck;
-                                c_ItemQuality = temporaryItemQualityCheck;
-                            }
-                            // And now flag it so we don't check this item again
-                            dictGilesQualityRechecked[c_RActorGuid] = true;
-                        }
-                        catch
-                        {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                                "Safely handled exception double-checking item-quality for item {0} [{1}]", c_Name, c_ActorSNO);
-                        }
-                    }
-                }
-            }
+            //// Quality of item for "genuine" items
+            //c_ItemQuality = ItemQuality.Invalid;
+            //if (itemBaseType != GItemBaseType.Unknown && itemBaseType != GItemBaseType.HealthGlobe && itemBaseType != GItemBaseType.Gem && itemBaseType != GItemBaseType.Misc &&
+            //    !hashForceSNOToItemList.Contains(c_ActorSNO))
+            //{
+            //    // Get the quality of this item, cached if possible
+            //    if (!dictGilesQualityCache.TryGetValue(c_RActorGuid, out c_ItemQuality))
+            //    {
+            //        try
+            //        {
+            //            c_ItemQuality = (ItemQuality)c_CommonData.GetAttribute<int>(ActorAttributeType.ItemQualityLevel);
+            //        }
+            //        catch
+            //        {
+            //            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting item-quality for item {0} [{1}]", c_InternalName, c_ActorSNO);
+            //            AddToCache = false;
+            //            c_IgnoreSubStep = "ItemQualityLevelException";
+            //        }
+            //        dictGilesQualityCache.Add(c_RActorGuid, c_ItemQuality);
+            //        dictGilesQualityRechecked.Add(c_RActorGuid, false);
+            //    }
+            //    else
+            //    {
+            //        // Because item-quality is such a sensitive thing, we don't want to risk losing items
+            //        // So we check a cached item quality a 2nd time - as long as it's the same, we won't check again
+            //        // However, if there's any inconsistencies, we keep checking, and keep the highest-read quality as the real value
+            //        if (!dictGilesQualityRechecked[c_RActorGuid])
+            //        {
+            //            ItemQuality temporaryItemQualityCheck = ItemQuality.Invalid;
+            //            try
+            //            {
+            //                temporaryItemQualityCheck = (ItemQuality)c_CommonData.GetAttribute<int>(ActorAttributeType.ItemQualityLevel);
+            //                // If the newly-received quality is higher, then store the new quality
+            //                if (temporaryItemQualityCheck > c_ItemQuality)
+            //                {
+            //                    dictGilesQualityCache[c_RActorGuid] = temporaryItemQualityCheck;
+            //                    c_ItemQuality = temporaryItemQualityCheck;
+            //                }
+            //                // And now flag it so we don't check this item again
+            //                dictGilesQualityRechecked[c_RActorGuid] = true;
+            //            }
+            //            catch
+            //            {
+            //                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+            //                    "Safely handled exception double-checking item-quality for item {0} [{1}]", c_InternalName, c_ActorSNO);
+            //            }
+            //        }
+            //    }
+            //}
 
             // Item stats
             logNewItem = RefreshItemStats(itemBaseType);
@@ -1280,27 +1307,11 @@ namespace GilesTrinity
             // Get whether or not we want this item, cached if possible
             if (!dictGilesPickupItem.TryGetValue(c_RActorGuid, out AddToCache))
             {
-                PickupItem pickupItem = new PickupItem()
-                {
-                    Name = c_Name,
-                    Level = c_ItemLevel,
-                    Quality = c_ItemQuality,
-                    BalanceID = c_BalanceID,
-                    DBBaseType = c_DBItemBaseType,
-                    DBItemType = c_DBItemType,
-                    IsOneHand = c_IsOneHandedItem,
-                    IsTwoHand = c_IsTwoHandedItem,
-                    ItemFollowerType = c_item_tFollowerType,
-                    DynamicID = c_GameDynamicID,
-                    Position = c_Position,
-                    ActorSNO = c_ActorSNO
-                };
-
                 if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
                 {
                     AddToCache = ItemManager.EvaluateItem((ACDItem)c_CommonData, ItemManager.RuleType.PickUp);
                 }
-                if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
+                else if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
                 {
                     AddToCache = ItemRulesPickupValidation(pickupItem);
                 }
@@ -1308,42 +1319,32 @@ namespace GilesTrinity
                 {
                     AddToCache = GilesPickupItemValidation(pickupItem);
                 }
+
                 dictGilesPickupItem.Add(c_RActorGuid, AddToCache);
             }
 
             // Ignore it if it's not in range yet - allow legendary items to have 15 feet extra beyond our profile max loot radius
             float fExtraRange = 0f;
+
             // !sp - loot range extension range for legendaries
             if (iKeepLootRadiusExtendedFor > 0)
-            {
                 fExtraRange = 90f;
-            }
+
             if (c_ItemQuality >= ItemQuality.Rare4)
-            {
                 fExtraRange = iCurrentMaxLootRadius;
-            }
+
             if (c_ItemQuality >= ItemQuality.Legendary)
-            {
                 fExtraRange = 10 * iCurrentMaxLootRadius;
-            }
 
             if (c_CentreDistance > (iCurrentMaxLootRadius + fExtraRange))
             {
-                AddToCache = false;
                 c_IgnoreSubStep = "OutOfRange";
+                AddToCache = false;
             }
-
 
             // Using DB built-in item rules
-            if (AddToCache)
-            {
-                if (ForceVendorRunASAP)
-                {
-                    AddToCache = false;
-                    c_IgnoreSubStep = "ForcedVendoring";
-                }
-                AddToCache = true;
-            }
+            if (AddToCache && ForceVendorRunASAP)
+                c_IgnoreSubStep = "ForcedVendoring";
 
             // Check if there's a monster intersecting the path-line to this item
             AddToCache = MosterObstacleInPathCacheObject(AddToCache);
@@ -1377,7 +1378,7 @@ namespace GilesTrinity
                 LogWriter.Write(FormatCSVField(c_RActorGuid));
                 LogWriter.Write(FormatCSVField(c_GameDynamicID));
                 LogWriter.Write(FormatCSVField(c_ACDGUID));
-                LogWriter.Write(FormatCSVField(c_Name));
+                LogWriter.Write(FormatCSVField(c_InternalName));
                 LogWriter.Write(FormatCSVField(c_DBItemBaseType.ToString()));
                 LogWriter.Write(FormatCSVField(DetermineBaseType(c_item_GItemType).ToString()));
                 LogWriter.Write(FormatCSVField(c_DBItemType.ToString()));
@@ -1428,7 +1429,7 @@ namespace GilesTrinity
                 }
                 catch
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", c_Name, c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", c_InternalName, c_ActorSNO);
                     AddToCache = false;
                     c_IgnoreSubStep = "GetAttributeException";
                 }
@@ -1472,7 +1473,7 @@ namespace GilesTrinity
                 LogWriter.Write(FormatCSVField(c_RActorGuid));
                 LogWriter.Write(FormatCSVField(c_GameDynamicID));
                 LogWriter.Write(FormatCSVField(c_ACDGUID));
-                LogWriter.Write(FormatCSVField(c_Name));
+                LogWriter.Write(FormatCSVField(c_InternalName));
                 LogWriter.Write(FormatCSVField(c_GoldStackSize));
                 LogWriter.Write(FormatCSVField(c_IgnoreSubStep));
                 LogWriter.Write(FormatCSVField(c_CentreDistance));
@@ -1487,20 +1488,20 @@ namespace GilesTrinity
 
             // Ignore it if it's not in range yet, except health wells and resplendent chests if we're opening chests
             if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell &&
-                !(Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_Name.ToLower().Contains("chest_rare")) && c_RActorGuid != CurrentTargetRactorGUID)
+                !(Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_InternalName.ToLower().Contains("chest_rare")) && c_RActorGuid != CurrentTargetRactorGUID)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotInRange";
                 return AddToCache;
             }
 
-            if (!(Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_Name.ToLower().Contains("chest_rare")) && c_RActorGuid != CurrentTargetRactorGUID)
+            if (!(Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_InternalName.ToLower().Contains("chest_rare")) && c_RActorGuid != CurrentTargetRactorGUID)
             {
                 AddToCache = true;
                 c_IgnoreSubStep = "NotInRange";
             }
 
-            if (c_Name.ToLower().StartsWith("minimapicon"))
+            if (c_InternalName.ToLower().StartsWith("minimapicon"))
             {
                 // Minimap icons caused a few problems in the past, so this force-blacklists them
                 hashRGUIDBlacklist60.Add(c_RActorGuid);
@@ -1532,7 +1533,7 @@ namespace GilesTrinity
                 }
                 catch
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for object {0} [{1}]", c_Name, c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for object {0} [{1}]", c_InternalName, c_ActorSNO);
                     AddToCache = false;
                     //return bWantThis;
                 }
@@ -1553,7 +1554,7 @@ namespace GilesTrinity
             catch
             {
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                    "Safely handled exception getting Gizmo-Disabled-By-Script attribute for object {0} [{1}]", c_Name, c_ActorSNO);
+                    "Safely handled exception getting Gizmo-Disabled-By-Script attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
                 AddToCache = false;
             }
             if (bDisabledByScript)
@@ -1637,7 +1638,7 @@ namespace GilesTrinity
                         }
                         catch
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_Name, c_ActorSNO);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
                             AddToCache = true;
                             //return bWantThis;
                         }
@@ -1737,7 +1738,7 @@ namespace GilesTrinity
                         }
                         catch
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_Name, c_ActorSNO);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
                             AddToCache = false;
                             //return bWantThis;
                         }
@@ -1764,7 +1765,7 @@ namespace GilesTrinity
                             }
                             catch
                             {
-                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_Name, c_ActorSNO);
+                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
                                 AddToCache = false;
                             }
                             dictPhysicsSNO.Add(c_ActorSNO, iThisPhysicsSNO);
@@ -1801,7 +1802,7 @@ namespace GilesTrinity
                             }
                             catch
                             {
-                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_Name, c_ActorSNO);
+                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
                                 AddToCache = false;
                                 //return bWantThis;
                             }
@@ -1872,7 +1873,7 @@ namespace GilesTrinity
                         }
                         catch
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting container-been-opened attribute for object {0} [{1}]", c_Name, c_ActorSNO);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting container-been-opened attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
                             AddToCache = false;
                         }
                         if (bThisOpen)
@@ -1881,7 +1882,7 @@ namespace GilesTrinity
                             AddToCache = false;
                             return AddToCache;
                         }
-                        else if (!bThisOpen && c_Name.ToLower().Contains("chest") && !c_Name.ToLower().Contains("chest_rare"))
+                        else if (!bThisOpen && c_InternalName.ToLower().Contains("chest") && !c_InternalName.ToLower().Contains("chest_rare"))
                         {
                             // This should make the magic happen with Chests we actually want :)
                             AddToCache = true;
@@ -1898,13 +1899,13 @@ namespace GilesTrinity
                             }
                             catch
                             {
-                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_Name, c_ActorSNO);
+                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
                                 AddToCache = false;
                             }
                             dictPhysicsSNO.Add(c_ActorSNO, iThisPhysicsSNO);
                         }
                         // Any physics mesh? Give a minimum distance of 5 feet
-                        if (c_Name.ToLower().Contains("corpse") && Settings.WorldObject.IgnoreNonBlocking)
+                        if (c_InternalName.ToLower().Contains("corpse") && Settings.WorldObject.IgnoreNonBlocking)
                         {
                             bBlacklistThis = true;
                         }
@@ -1925,9 +1926,9 @@ namespace GilesTrinity
                             if (Settings.WorldObject.ContainerOpenRange > 0)
                                 iMinDistance = Settings.WorldObject.ContainerOpenRange + 5;
                         }
-                        else if (c_Name.ToLower().Contains("chest") && !c_Name.ToLower().Contains("chest_rare"))
+                        else if (c_InternalName.ToLower().Contains("chest") && !c_InternalName.ToLower().Contains("chest_rare"))
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "GSDebug: Possible Chest SNO: {0}, SNO={1}", c_Name, c_ActorSNO);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "GSDebug: Possible Chest SNO: {0}, SNO={1}", c_InternalName, c_ActorSNO);
                         }
                         // Superlist for rare chests etc.
                         if (hashSNOContainerResplendant.Contains(c_ActorSNO))
@@ -1938,9 +1939,9 @@ namespace GilesTrinity
                             else
                                 iMinDistance = 10;
                         }
-                        else if (c_Name.Contains("chest_rare"))
+                        else if (c_InternalName.Contains("chest_rare"))
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "GSDebug: Possible Resplendant Chest SNO: {0}, SNO={1}", c_Name, c_ActorSNO);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "GSDebug: Possible Resplendant Chest SNO: {0}, SNO={1}", c_InternalName, c_ActorSNO);
                         }
                         // Blacklist this if it's something we should never bother looking at again
                         if (bBlacklistThis)
@@ -2030,7 +2031,7 @@ namespace GilesTrinity
                 // Generate a "weight" for how badly we want to avoid this obstacle, based on a percentage of 100% the avoidance health is, multiplied into a max of 200 weight
                 double dThisWeight = (200 * dThisHealthAvoid);
 
-                hashAvoidanceObstacleCache.Add(new GilesObstacle(c_Position, (float)GetAvoidanceRadius(), c_ActorSNO, dThisWeight, c_Name));
+                hashAvoidanceObstacleCache.Add(new GilesObstacle(c_Position, (float)GetAvoidanceRadius(), c_ActorSNO, dThisWeight, c_InternalName));
 
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
                 if (c_CentreDistance <= GetAvoidanceRadius())
@@ -2328,7 +2329,7 @@ namespace GilesTrinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting DynamicID for item {0} [{1}]", c_Name, c_ActorSNO);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting DynamicID for item {0} [{1}]", c_InternalName, c_ActorSNO);
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                         //return bWantThis;
@@ -2344,7 +2345,7 @@ namespace GilesTrinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting GameBalanceID for item {0} [{1}]", c_Name, c_ActorSNO);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting GameBalanceID for item {0} [{1}]", c_InternalName, c_ActorSNO);
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                         //return bWantThis;
