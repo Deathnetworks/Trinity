@@ -432,7 +432,7 @@ namespace GilesTrinity.XmlTags
 
         private void MoveToNextNode()
         {
-            if (!GilesTrinity.hashSkipAheadAreaCache.Any(p => Vector3.Distance(p.Location, ZetaDia.Me.Position) <= PathPrecision))
+            if (!GilesTrinity.hashSkipAheadAreaCache.Any(p => p.Location.Distance2D(ZetaDia.Me.Position) <= PathPrecision))
             {
                 GilesTrinity.hashSkipAheadAreaCache.Add(new GilesObstacle() { Location = myPos, Radius = PathPrecision });
             }

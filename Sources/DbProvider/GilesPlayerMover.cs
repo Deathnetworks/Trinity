@@ -650,15 +650,16 @@ namespace GilesTrinity.DbProvider
                 }
             }
 
-            if (fDistanceFromTarget > 1f)
+            if (vMyCurrentPosition.Distance2D(vMoveToTarget) > 1f)
             {
                 // Default movement
                 ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
 
                 if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Moving))
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Moved to:{0} dir: {1} Speed:{2:0.00} Dist:{3:0} Nav:{4} LoS:{5}",
-                        vMoveToTarget, GilesTrinity.GetHeadingToPoint(vMoveToTarget), MovementSpeed, fDistanceFromTarget,
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Moved to:{0} dir: {1} Speed:{2:0.00} Dist:{3:0} ZDiff:{4:0} Nav:{5} LoS:{6}",
+                        vMoveToTarget, GilesTrinity.GetHeadingToPoint(vMoveToTarget), MovementSpeed, vMyCurrentPosition.Distance2D(vMoveToTarget),
+                        Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z),
                         GilesTrinity.pf.IsNavigable(GilesTrinity.gp.WorldToGrid(vMoveToTarget.ToVector2())),
                         ZetaDia.Physics.Raycast(vMyCurrentPosition, vMoveToTarget, Zeta.Internals.SNO.NavCellFlags.AllowWalk));
                 }
@@ -847,7 +848,7 @@ namespace GilesTrinity.DbProvider
 
             if (PathStack.Any())
             {
-                if (Vector3.Distance(PathStack.Peek(), ZetaDia.Me.Position) <= 20f)
+                if (PathStack.Peek().Distance2D(ZetaDia.Me.Position) <= 20f)
                     PathStack.Pop();
             }
 

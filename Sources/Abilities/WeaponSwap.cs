@@ -95,7 +95,7 @@ namespace GilesTrinity.Swap
                 return InnaDpsOn;
             foreach (InventorySlot item in items)
             {
-                Logging.Write(ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == columns[items.IndexOf(item)] && j.InventoryRow == rows[items.IndexOf(item)]).FirstOrDefault().Name.ToLower());
+                //Logging.Write(ZetaDia.Me.Inventory.Backpack.Where(j => j.InventoryColumn == columns[items.IndexOf(item)] && j.InventoryRow == rows[items.IndexOf(item)]).FirstOrDefault().Name.ToLower());
                 switch (item)
                 {
                     case InventorySlot.PlayerTorso:
@@ -125,7 +125,7 @@ namespace GilesTrinity.Swap
                 return InnaDpsOff;
             foreach (InventorySlot item in items)
             {
-                Logging.Write(ZetaDia.Me.Inventory.Equipped.Where(j => j.InventorySlot == item).FirstOrDefault().Name.ToLower());
+                //Logging.Write(ZetaDia.Me.Inventory.Equipped.Where(j => j.InventorySlot == item).FirstOrDefault().Name.ToLower());
                 switch (item)
                 {
                     case InventorySlot.PlayerTorso:
