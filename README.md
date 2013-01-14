@@ -22,6 +22,42 @@
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
 
+### Changelog 1.7.1.15:
+
+* Fixed inflated Item Dropped per hour statistics. Your IPH in stats logs will probably decrease considerably.
+
+* Fixed gold pickup derp bug, increased weight for very close gold piles
+
+* Fixed townrun ignoring mobs + extended kill radius logic now includes UseTownPortal profile tag
+
+* Added configurable cache refresh rate in Trinity Advanced tab to optionaly help reduce CPU utilization and diagnose crashes. May cause bot to act strangely, use with caution.
+
+* Added Gold gained to stats log (thanks Tesslerc!)
+
+* Removed Pause/Townrun buttons from GUI (now included natively in latest DemonbuddyBETA).
+
+* Current Profile is now displayed in the DB window title
+
+* Fix for flip/flopping current target if gizmo (shrine/door) changes into and out of range.
+
+* Slightly Modified Champ Hunting Items tab configuration defaults.
+
+* Now logs all items dropped into CSV file in Trinitylogs
+
+* Now logs all skipped gold piles into CSV file in TrinityLogs (or, "ScroogeMcDuck mode" as darkfriend puts it)
+
+* Added caching for if a unit/item/gold/shrine is ever in LoS/Navigable/RayCast (should help with flip flopping and missed targets)
+
+* TrinityMoveTo profile tag now uses Navigator by default (disable with useNavigation="false")
+
+* ItemRules2: Removed Medium Rules (no longer maintaned)
+
+* ItemRules2: Fixes for cached item name bug
+
+* ItemRules2: Added [WeaponDamageType] (Arcane, Holy, etc)
+
+* TrinityExploreDungeon prototype profile tag included. Don't use it, it doesn't work. You will get stuck, and rrrix won't answer questions or help you with it. For educational purposes only.
+
 ### Changelog 1.7.1.14:
 
 ###### REQUIRES DemonbuddyBETA 1.0.1240.115 OR HIGHER  

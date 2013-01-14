@@ -316,7 +316,7 @@
             <TextBlock Grid.Row="0" Grid.Column="2" FontWeight="Bold" Text="Minimum Gold Pile:"/>
             <Slider Grid.Row="1" Grid.Column="2" Template="{DynamicResource Slider}"
                     Interval="500" Maximum="4000" Minimum="0" SmallChange="10" LargeChange="100"
-                    TickFrequency="100" TickPlacement="BottomRight" 
+                    TickFrequency="100" TickPlacement="BottomRight" IsSnapToTickEnabled="True"
                     Value="{Binding Path=Pickup.MinimumGoldStack}" />
         </Grid>
         <Grid Grid.Row="5">
