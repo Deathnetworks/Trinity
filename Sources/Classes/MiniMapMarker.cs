@@ -37,12 +37,12 @@ namespace GilesTrinity
 
         internal static MiniMapMarker GetNearestUnvisitedMarker(Vector3 near)
         {
-            return KnownMarkers.OrderBy(m => Vector3.Distance(near, m.Position)).FirstOrDefault(m => !m.Visited);
+            return KnownMarkers.OrderBy(m => m.MarkerNameHash != 0).ThenBy(m => Vector3.Distance(near, m.Position)).FirstOrDefault(m => !m.Visited);
         }
 
-        internal static void AddMarkersToList()
+        internal static void AddMarkersToList(int includeMarker = 0)
         {
-            foreach (Zeta.Internals.MinimapMarker marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => m.NameHash == 0 && !KnownMarkers.Any(ml => ml.Position == m.Position)))
+            foreach (Zeta.Internals.MinimapMarker marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => (m.NameHash == 0 || m.NameHash == includeMarker) && !KnownMarkers.Any(ml => ml.Position == m.Position)))
             {
                 KnownMarkers.Add(new MiniMapMarker()
                 {
@@ -53,12 +53,12 @@ namespace GilesTrinity
             }
         }
 
-        internal static DecoratorContinue DetectMiniMapMarkers()
+        internal static DecoratorContinue DetectMiniMapMarkers(int includeMarker = 0)
         {
             return
-            new DecoratorContinue(ret => ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.NameHash == 0 && !MiniMapMarker.KnownMarkers.Any(m2 => m2.Position != m.Position)),
+            new DecoratorContinue(ret => ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => (m.NameHash == 0 || m.NameHash == includeMarker) && !MiniMapMarker.KnownMarkers.Any(m2 => m2.Position != m.Position)),
                 new Sequence(
-                    new Action(ret => MiniMapMarker.AddMarkersToList())
+                    new Action(ret => MiniMapMarker.AddMarkersToList(includeMarker))
                 )
             );
         }

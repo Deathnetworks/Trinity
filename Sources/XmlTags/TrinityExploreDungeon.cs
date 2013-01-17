@@ -165,7 +165,7 @@ namespace GilesTrinity.XmlTags
             return
             new Sequence(
                 new Action(ret => PrintNodeCounts("MainBehavior")),
-                MiniMapMarker.DetectMiniMapMarkers(),
+                MiniMapMarker.DetectMiniMapMarkers(ExitNameHash),
                 UpdateSearchGridProvider(),
                 new PrioritySelector(
                     MiniMapMarker.VisitMiniMapMarkers(myPos, MarkerDistance),
