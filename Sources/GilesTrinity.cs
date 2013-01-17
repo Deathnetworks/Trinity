@@ -93,6 +93,8 @@ namespace GilesTrinity
                         // World ID safety caching incase it's ever unavailable
                         if (ZetaDia.CurrentWorldDynamicId != -1)
                             iCurrentWorldID = ZetaDia.CurrentWorldDynamicId;
+                        if (ZetaDia.CurrentWorldId != -1)
+                            cachedStaticWorldId = ZetaDia.CurrentWorldId;
                         // Game difficulty, used really for vault on DH's
                         if (ZetaDia.Service.CurrentHero.CurrentDifficulty != GameDifficulty.Invalid)
                             iCurrentGameDifficulty = ZetaDia.Service.CurrentHero.CurrentDifficulty;

@@ -677,36 +677,12 @@ namespace GilesTrinity
         /// </summary>
         internal static void OutputReport()
         {
-            TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
-
-            // Create whole new file
-            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("Stats - {0}.log", PlayerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read);
-            using (StreamWriter LogWriter = new StreamWriter(LogStream))
-            {
-                LogWriter.WriteLine("===== Misc Statistics =====");
-                LogWriter.WriteLine("Total tracking time: " + TotalRunningTime.Hours.ToString() + "h " + TotalRunningTime.Minutes.ToString() +
-                    "m " + TotalRunningTime.Seconds.ToString() + "s");
-                LogWriter.WriteLine("Total deaths: " + iTotalDeaths.ToString() + " [" + Math.Round(iTotalDeaths / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                LogWriter.WriteLine("Total games (approx): " + TotalLeaveGames.ToString() + " [" + Math.Round(TotalLeaveGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                if (TotalLeaveGames == 0 && iTotalJoinGames > 0)
-                {
-                    if (iTotalJoinGames == 1 && TotalProfileRecycles > 1)
-                    {
-                        LogWriter.WriteLine("(a profile manager/death handler is interfering with join/leave game events, attempting to guess total runs based on profile-loops)");
-                        LogWriter.WriteLine("Total full profile cycles: " + TotalProfileRecycles.ToString() + " [" + Math.Round(TotalProfileRecycles / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                    }
-                    else
-                    {
-                        LogWriter.WriteLine("(your games left value may be bugged @ 0 due to profile managers/routines etc., now showing games joined instead:)");
-                        LogWriter.WriteLine("Total games joined: " + iTotalJoinGames.ToString() + " [" + Math.Round(iTotalJoinGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                    }
-                }
                 /*
                   Check is Lv 60 or not
                  * If lv 60 use Paragon
                  * If not lv 60 use normal xp/hr
                  */
-                if (ZetaDia.Me.Level < 60)
+            if (ZetaDia.Actors.Me.Level < 60)
                 {
                     if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
                     {
@@ -738,6 +714,34 @@ namespace GilesTrinity
                     iLastXp = ZetaDia.Actors.Me.ParagonCurrentExperience;
                     iNextLvXp = ZetaDia.Actors.Me.ParagonExperienceNextLevel;
                 }
+
+
+            PersistentOutputReport();
+            TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
+
+            // Create whole new file
+            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("RunStats - {0}.log", PlayerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read);
+            using (StreamWriter LogWriter = new StreamWriter(LogStream))
+            {
+                LogWriter.WriteLine("===== Misc Statistics =====");
+                LogWriter.WriteLine("Total tracking time: " + ((int)TotalRunningTime.TotalHours).ToString() + "h " + TotalRunningTime.Minutes.ToString() +
+                    "m " + TotalRunningTime.Seconds.ToString() + "s");
+                LogWriter.WriteLine("Total deaths: " + iTotalDeaths.ToString() + " [" + Math.Round(iTotalDeaths / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
+                LogWriter.WriteLine("Total games (approx): " + TotalLeaveGames.ToString() + " [" + Math.Round(TotalLeaveGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
+                if (TotalLeaveGames == 0 && iTotalJoinGames > 0)
+                {
+                    if (iTotalJoinGames == 1 && TotalProfileRecycles > 1)
+                    {
+                        LogWriter.WriteLine("(a profile manager/death handler is interfering with join/leave game events, attempting to guess total runs based on profile-loops)");
+                        LogWriter.WriteLine("Total full profile cycles: " + TotalProfileRecycles.ToString() + " [" + Math.Round(TotalProfileRecycles / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
+                    }
+                    else
+                    {
+                        LogWriter.WriteLine("(your games left value may be bugged @ 0 due to profile managers/routines etc., now showing games joined instead:)");
+                        LogWriter.WriteLine("Total games joined: " + iTotalJoinGames.ToString() + " [" + Math.Round(iTotalJoinGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
+                    }
+                }
+
                 LogWriter.WriteLine("Total XP gained: " + Math.Round(iTotalXp / (float)1000000, 2).ToString() + " million [" + Math.Round(iTotalXp / TotalRunningTime.TotalHours / 1000000, 2).ToString() + " million per hour]");
 				if (iLastGold == 0)
                 {

@@ -441,6 +441,7 @@ namespace GilesTrinity
         private static DateTime lastChangedZigZag = DateTime.Today;
         private static Vector3 vPositionLastZigZagCheck = Vector3.Zero;
         public static int iCurrentWorldID = -1;
+        public static int cachedStaticWorldId = -1; // worldId from profiles, used in persistent stats
         public static GameDifficulty iCurrentGameDifficulty = GameDifficulty.Invalid;
         private const bool USE_COMBAT_ONLY = false;
         private const bool USE_ANY_TIME = true;
