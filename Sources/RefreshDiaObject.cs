@@ -1443,8 +1443,8 @@ namespace GilesTrinity
                 c_IgnoreSubStep = "NotEnoughGold";
             }
 
-            if (!AddToCache)
-                LogSkippedGold();
+            //if (!AddToCache)
+            //    LogSkippedGold();
 
             // gold piles already in pickup radius range
             //if (c_CentreDistance <= ZetaDia.Me.GoldPickUpRadius)
@@ -1486,19 +1486,20 @@ namespace GilesTrinity
             // start as true, then set as false as we go. If nothing matches below, it will return true.
             AddToCache = true;
 
+            bool openResplendentChests = Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_InternalName.ToLower().Contains("chest_rare");
+
             // Ignore it if it's not in range yet, except health wells and resplendent chests if we're opening chests
-            if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell &&
-                !(Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_InternalName.ToLower().Contains("chest_rare")) && c_RActorGuid != CurrentTargetRactorGUID)
+            if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell && c_RActorGuid != CurrentTargetRactorGUID)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotInRange";
                 return AddToCache;
             }
 
-            if (!(Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_InternalName.ToLower().Contains("chest_rare")) && c_RActorGuid != CurrentTargetRactorGUID)
+            // re-add resplendent chests
+            if (openResplendentChests)
             {
                 AddToCache = true;
-                c_IgnoreSubStep = "NotInRange";
             }
 
             if (c_InternalName.ToLower().StartsWith("minimapicon"))
