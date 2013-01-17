@@ -1353,8 +1353,8 @@ namespace GilesTrinity
             if (!AddToCache && c_IgnoreSubStep == String.Empty)
                 c_IgnoreSubStep = "NoMatchingRule";
 
-            if (logNewItem && c_DBItemType != ItemType.Unknown)
-                LogDroppedItem();
+            //if (logNewItem && c_DBItemType != ItemType.Unknown)
+            //    LogDroppedItem();
 
             return AddToCache;
         }
