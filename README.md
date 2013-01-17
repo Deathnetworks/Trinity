@@ -22,6 +22,14 @@
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
 
+### Changelog 1.7.1.16:
+
+* Fixed TrinityMoveTo 
+
+* Disabled dropped items log, and skipped gold log (were really only intended for dev purpose only)
+
+* Fixed not destroying some barricades / operating some gizmos
+
 ### Changelog 1.7.1.15:
 
 * Fixed inflated Item Dropped per hour statistics. Your IPH in stats logs will probably decrease considerably.
