@@ -370,7 +370,6 @@ namespace GilesTrinity.Swap
 				}
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Dps Gear has innaset: " + InnaDpsOn);
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.WeaponSwap, "[Swapper] Non-Dps Gear has innaset: " + InnaDpsOff);
-                GilesTrinity.Settings.Combat.Monk.HasInnaSet = InnaDpsOn;
             }
             else
             {

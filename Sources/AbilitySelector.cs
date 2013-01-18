@@ -19,8 +19,9 @@ namespace GilesTrinity
                 HasMappedPlayerAbilities = true;
                 Hotbar = new HashSet<SNOPower>();
                 for (int i = 0; i <= 5; i++)
-                    Hotbar.Add(ZetaDia.Me.GetHotbarPowerId((HotbarSlot)i));
-                bRefreshHotbarAbilities = false;
+                {
+                    Hotbar.Add(ZetaDia.CPlayer.GetPowerForSlot((HotbarSlot)i));
+                } bRefreshHotbarAbilities = false;
                 if (!dontCacheThis)
                     hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(Hotbar);
             }

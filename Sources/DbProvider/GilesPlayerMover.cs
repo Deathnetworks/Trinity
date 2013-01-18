@@ -220,6 +220,8 @@ namespace GilesTrinity.DbProvider
         // Actually deal with a stuck - find an unstuck point etc.
         public static Vector3 UnstuckHandler(Vector3 vMyCurrentPosition, Vector3 vOriginalDestination)
         {
+            PathStack.Clear();
+
             if (GoldInactive())
             {
                 GoldInactiveLeaveGame();
@@ -689,7 +691,7 @@ namespace GilesTrinity.DbProvider
             // Wait for 10 second log out timer if not in town
             if (!ZetaDia.Me.IsInTown)
             {
-                Thread.Sleep(10000);
+                Thread.Sleep(12000);
             }
             return;
         }
@@ -839,11 +841,19 @@ namespace GilesTrinity.DbProvider
 
         private static Stack<Vector3> PathStack = new Stack<Vector3>();
 
-        internal static void NavigateTo(Vector3 moveTarget)
+        internal static MoveResult NavigateTo(Vector3 moveTarget)
         {
+            bool newPath = false;
+
             if (!PathStack.Any())
             {
                 PathStack = PlayerMover.GeneratePath(ZetaDia.Me.Position, moveTarget);
+                newPath = true;
+            }
+
+            if (PathStack.Any() && PathStack.Count == 1 && moveTarget.Distance2D(PathStack.Peek()) >= 20f && newPath)
+            {
+                return MoveResult.PathGenerationFailed;
             }
 
             if (PathStack.Any())
@@ -855,7 +865,10 @@ namespace GilesTrinity.DbProvider
             if (PathStack.Any())
             {
                 Navigator.PlayerMover.MoveTowards(PathStack.Peek());
+                return MoveResult.Moved;
             }
+
+            return MoveResult.ReachedDestination;
         }
 
 

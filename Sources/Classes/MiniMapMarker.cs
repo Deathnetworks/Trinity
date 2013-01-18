@@ -21,6 +21,8 @@ namespace GilesTrinity
         public MiniMapMarker() { }
         internal static List<MiniMapMarker> KnownMarkers = new List<MiniMapMarker>();
 
+        internal static MoveResult lastMoveResult = MoveResult.ReachedDestination;
+
         internal static bool AnyUnvisitedMarkers()
         {
             return MiniMapMarker.KnownMarkers.Any(m => !m.Visited);
@@ -33,6 +35,16 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "Setting MiniMapMarker {0} as Visited", marker.MarkerNameHash);
                 marker.Visited = true;
             }
+
+            if (lastMoveResult == MoveResult.PathGenerationFailed)
+            {
+                foreach (MiniMapMarker marker in KnownMarkers.Where(m => m.Position == GetNearestUnvisitedMarker(near).Position))
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "Unable to navigate to marker, setting MiniMapMarker {0} at {1} as Visited", marker.MarkerNameHash, marker.Position);
+                    marker.Visited = true;
+                }
+            }
+
         }
 
         internal static MiniMapMarker GetNearestUnvisitedMarker(Vector3 near)
@@ -42,15 +54,24 @@ namespace GilesTrinity
 
         internal static void AddMarkersToList(int includeMarker = 0)
         {
-            foreach (Zeta.Internals.MinimapMarker marker in ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => (m.NameHash == 0 || m.NameHash == includeMarker) && !KnownMarkers.Any(ml => ml.Position == m.Position)))
+            foreach (Zeta.Internals.MinimapMarker marker in GetMarkerList(includeMarker))
             {
-                KnownMarkers.Add(new MiniMapMarker()
+                MiniMapMarker mmm = new MiniMapMarker()
                 {
                     MarkerNameHash = marker.NameHash,
                     Position = marker.Position,
                     Visited = false
-                });
+                };
+
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Adding MiniMapMarker {0} at {1} to KnownMarkers", mmm.MarkerNameHash, mmm.Position);
+
+                KnownMarkers.Add(mmm);
             }
+        }
+
+        private static IEnumerable<Zeta.Internals.MinimapMarker> GetMarkerList(int includeMarker)
+        {
+            return ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => (m.NameHash == 0 || m.NameHash == includeMarker) && !KnownMarkers.Any(ml => ml.Position == m.Position)).OrderBy(m => m.NameHash != 0);
         }
 
         internal static DecoratorContinue DetectMiniMapMarkers(int includeMarker = 0)
@@ -71,10 +92,11 @@ namespace GilesTrinity
                     new Action(ret => MiniMapMarker.SetNearbyMarkersVisited(ZetaDia.Me.Position, markerDistance)),
                     new Decorator(ret => MiniMapMarker.GetNearestUnvisitedMarker(ZetaDia.Me.Position) != null,
                         new Sequence(
-                            new Action(ret => DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "Moving to inspect nameHash 0 at {0} distance {1:0}",
+                            new Action(ret => DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "Moving to inspect nameHash {0} at {1} distance {2:0}",
+                                MiniMapMarker.GetNearestUnvisitedMarker(ZetaDia.Me.Position).MarkerNameHash,
                                 MiniMapMarker.GetNearestUnvisitedMarker(ZetaDia.Me.Position).Position,
                                 Vector3.Distance(ZetaDia.Me.Position, MiniMapMarker.GetNearestUnvisitedMarker(ZetaDia.Me.Position).Position))),
-                            new Action(ret => PlayerMover.NavigateTo(MiniMapMarker.GetNearestUnvisitedMarker(near).Position))
+                            new Action(ret => lastMoveResult = PlayerMover.NavigateTo(MiniMapMarker.GetNearestUnvisitedMarker(near).Position))
                         )
                     )
                 )

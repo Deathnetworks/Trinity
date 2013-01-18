@@ -906,7 +906,7 @@ namespace GilesTrinity
 
                 dUseKillRadius = RefreshKillRadius();
                 // Now ignore any unit not within our kill or extended kill radius
-                if (c_RadiusDistance > dUseKillRadius)
+                if (c_RadiusDistance > dUseKillRadius && c_RActorGuid != CurrentTargetRactorGUID)
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "OutsideofKillRadius";

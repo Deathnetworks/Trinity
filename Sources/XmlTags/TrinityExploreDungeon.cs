@@ -270,6 +270,12 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => SetNodeVisited("Stuck moving to node point, marking done (in LoS and nearby!)")),
                         new Action(ret => UpdateRoute())
                     )
+                ),
+                new Decorator(ret => GilesTrinity.hashSkipAheadAreaCache.Any( p => p.Location.Distance2D(CurrentNavTarget) <= PathPrecision),
+                    new Sequence(
+                        new Action(ret => SetNodeVisited("Found node to be in skip ahead cache, marking done")),
+                        new Action(ret => UpdateRoute())
+                    )
                 )
             );
         }
@@ -325,8 +331,8 @@ namespace GilesTrinity.XmlTags
             GilesTrinity.hashSkipAheadAreaCache = new HashSet<GilesObstacle>();
 
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag,
-                "Initialized TrinityExploreDungeon: boxSize={0} boxTolerance={1:0.00} endType={2} timeoutType={3} timeoutValue={4} pathPrecision={5:0} sceneId={6} actorId={7} objectDistance={8} markerDistance={9}",
-                GridSegmentation.BoxSize, GridSegmentation.BoxTolerance, EndType, ExploreTimeoutType, TimeoutValue, PathPrecision, SceneId, ActorId, ObjectDistance, MarkerDistance);
+                "Initialized TrinityExploreDungeon: boxSize={0} boxTolerance={1:0.00} endType={2} timeoutType={3} timeoutValue={4} pathPrecision={5:0} sceneId={6} actorId={7} objectDistance={8} markerDistance={9} exitNameHash={10}",
+                GridSegmentation.BoxSize, GridSegmentation.BoxTolerance, EndType, ExploreTimeoutType, TimeoutValue, PathPrecision, SceneId, ActorId, ObjectDistance, MarkerDistance, ExitNameHash);
 
             InitDone = true;
         }
@@ -432,6 +438,8 @@ namespace GilesTrinity.XmlTags
 
         private void MoveToNextNode()
         {
+            bool newPath = false;
+
             if (!GilesTrinity.hashSkipAheadAreaCache.Any(p => p.Location.Distance2D(ZetaDia.Me.Position) <= PathPrecision))
             {
                 GilesTrinity.hashSkipAheadAreaCache.Add(new GilesObstacle() { Location = myPos, Radius = PathPrecision });
@@ -449,6 +457,13 @@ namespace GilesTrinity.XmlTags
             {
                 // Generate nodes for the PathStack
                 PathStack = PlayerMover.GeneratePath(myPos, NextNode.NavigableCenter);
+                newPath = true;
+            }
+
+            if (!newPath && PlayerMover.GetMovementSpeed() < 1)
+            {
+                PathStack.Clear();
+                return;
             }
 
             if (PathStack.Any())
@@ -488,6 +503,7 @@ namespace GilesTrinity.XmlTags
         {
             isDone = false;
             InitDone = false;
+            GridSegmentation.Reset();
             BrainBehavior.DungeonExplorer.Reset();
             MiniMapMarker.KnownMarkers.Clear();
         }
