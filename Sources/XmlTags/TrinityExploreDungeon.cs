@@ -621,7 +621,10 @@ namespace GilesTrinity.XmlTags
         /// <returns></returns>
         private bool PositionInsideIgnoredScene(Vector3 position)
         {
-            foreach (Scene scene in ZetaDia.Scenes.GetScenes().Where(scn => IgnoreScenes.Any(igscn => scn.Name.ToLower().Contains(igscn.SceneName.ToLower())) || IgnoreScenes.Any(igscn => scn.SceneInfo.SNOId == igscn.SceneId)))
+            List<Scene> ignoredScenes = ZetaDia.Scenes.GetScenes()
+                .Where(scn => IgnoreScenes.Any(igscn => igscn.SceneName != String.Empty && scn.Name.ToLower().Contains(igscn.SceneName.ToLower())) || 
+                IgnoreScenes.Any(igscn => scn.SceneInfo.SNOId == igscn.SceneId)).ToList();
+            foreach (Scene scene in ignoredScenes)
             {
                 Vector2 pos = position.ToVector2();
                 Vector2 min = scene.Mesh.Zone.ZoneMin;
