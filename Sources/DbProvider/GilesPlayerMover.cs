@@ -853,12 +853,7 @@ namespace GilesTrinity.DbProvider
                 newPath = true;
             }
 
-            if (PathStack[PathStack.Count - 1].Distance2D(moveTarget) >= 20f && newPath)
-            {
-                return MoveResult.PathGenerationFailed;
-            }
-
-            if (PathStack.Any() && PathStack.Count <= 2 && moveTarget.Distance2D(PathStack.Current) >= 20f && newPath)
+            if (PathStack.Any() && PathStack.Count <= 2 && moveTarget.Distance2D(PathStack[PathStack.Count - 1]) >= 20f && newPath)
             {
                 return MoveResult.PathGenerationFailed;
             }

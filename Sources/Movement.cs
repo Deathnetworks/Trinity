@@ -835,6 +835,9 @@ namespace GilesTrinity
 
         internal static void UpdateSearchGridProvider(bool force = false)
         {
+            if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
+                return;
+
             if (Settings.Combat.Misc.UseNavMeshTargeting || force)
             {
                 if (gp == null)
