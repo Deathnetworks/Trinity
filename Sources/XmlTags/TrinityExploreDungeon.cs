@@ -1,51 +1,77 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using GilesTrinity.DbProvider;
+using GilesTrinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot.Dungeons;
-using Zeta.CommonBot.Profile;
 using Zeta.CommonBot.Logic;
-using Zeta.CommonBot.Profile.Common;
+using Zeta.CommonBot.Profile;
+using Zeta.Internals;
+using Zeta.Internals.Actors;
+using Zeta.Internals.SNO;
 using Zeta.Navigation;
+using Zeta.Pathfinding;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
-using Zeta.Pathfinding;
 using Action = Zeta.TreeSharp.Action;
-using System.Collections.Generic;
-using GilesTrinity.Technicals;
-using Zeta.Internals.Actors;
-using System.Drawing;
-using Zeta.CommonBot;
-using GilesTrinity.DbProvider;
-using Zeta.Internals;
-using Zeta.Internals.SNO;
 
 namespace GilesTrinity.XmlTags
 {
+    /// <summary>
+    /// TrinityExploreDungeon is fuly backwards compatible with the built-in Demonbuddy ExploreArea tag. It provides additional features such as:
+    /// Moving to investigate MiniMapMarker pings and the current ExitNameHash if provided and visible
+    /// Moving to investigate Priority Scenes if provided
+    /// Ignoring DungeonExplorer nodes in certain scenes if provided
+    /// Reduced backtracking 
+    /// </summary>
     [XmlElement("TrinityExploreDungeon")]
     public class TrinityExploreDungeon : ProfileBehavior
     {
+        /// <summary>
+        /// The SNOId of the Actor that we're looking for, used with until="ObjectFound"
+        /// </summary>
         [XmlAttribute("actorId", true)]
         public int ActorId { get; set; }
 
+        /// <summary>
+        /// Sets a custom grid segmentation Box Size (default 15)
+        /// </summary>
         [XmlAttribute("boxSize", true)]
         public int BoxSize { get; set; }
 
+        /// <summary>
+        /// Sets a custom grid segmentation Box Tolerance (default 0.55)
+        /// </summary>
         [XmlAttribute("boxTolerance", true)]
         public float BoxTolerance { get; set; }
 
+        /// <summary>
+        /// The nameHash of the exit the bot will move to and finish the tag when found
+        /// </summary>
         [XmlAttribute("exitNameHash", true)]
         public int ExitNameHash { get; set; }
 
         [XmlAttribute("ignoreGridReset", true)]
         public bool IgnoreGridReset { get; set; }
 
+        /// <summary>
+        /// Not currently implimented
+        /// </summary>
         [XmlAttribute("leaveWhenFinished", true)]
         public bool LeaveWhenExplored { get; set; }
 
+        /// <summary>
+        /// The distance the bot must be from an actor before marking the tag as complete, when used with until="ObjectFound"
+        /// </summary>
         [XmlAttribute("objectDistance", true)]
         public float ObjectDistance { get; set; }
 
+        /// <summary>
+        /// The until="" atribute must match one of these
+        /// </summary>
         public enum TrinityExploreEndType
         {
             FullyExplored = 0,
@@ -58,12 +84,21 @@ namespace GilesTrinity.XmlTags
         [XmlAttribute("until", true)]
         public TrinityExploreEndType EndType { get; set; }
 
+        /// <summary>
+        /// The list of Scene SNOId's or Scene Names that the bot will ignore dungeon nodes in
+        /// </summary>
         [XmlElement("IgnoreScenes")]
         public List<IgnoreScene> IgnoreScenes { get; set; }
 
+        /// <summary>
+        /// The list of Scene SNOId's or Scene Names that the bot will prioritize (only works when the scene is "loaded")
+        /// </summary>
         [XmlElement("PrioritizeScenes")]
         public List<PrioritizeScene> PriorityScenes { get; set; }
 
+        /// <summary>
+        /// The Ignore Scene class, used as IgnoreScenes child elements
+        /// </summary>
         [XmlElement("IgnoreScene")]
         public class IgnoreScene
         {
@@ -72,7 +107,8 @@ namespace GilesTrinity.XmlTags
             [XmlAttribute("sceneId")]
             public int SceneId { get; set; }
 
-            public IgnoreScene() {
+            public IgnoreScene()
+            {
                 SceneId = -1;
                 SceneName = String.Empty;
             }
@@ -87,6 +123,9 @@ namespace GilesTrinity.XmlTags
             }
         }
 
+        /// <summary>
+        /// The Priority Scene class, used as PrioritizeScenes child elements
+        /// </summary>
         [XmlElement("PrioritizeScene")]
         public class PrioritizeScene
         {
@@ -114,12 +153,21 @@ namespace GilesTrinity.XmlTags
             }
         }
 
+        /// <summary>
+        /// The Scene SNOId, used with ExploreUntil="SceneFound"
+        /// </summary>
         [XmlAttribute("sceneId")]
         public int SceneId { get; set; }
 
+        /// <summary>
+        /// The distance the bot will mark dungeon nodes as "visited" (default is 1/2 of box size, minimum 10)
+        /// </summary>
         [XmlAttribute("pathPrecision")]
         public float PathPrecision { get; set; }
 
+        /// <summary>
+        /// The distance before reaching a MiniMapMarker before marking it as visited
+        /// </summary>
         [XmlAttribute("markerDistance")]
         public float MarkerDistance { get; set; }
 
@@ -130,34 +178,18 @@ namespace GilesTrinity.XmlTags
             GoldInactivity
         }
 
+        /// <summary>
+        /// The TimeoutType to use (default None, no timeout)
+        /// </summary>
         [XmlAttribute("timeoutType")]
         public TimeoutType ExploreTimeoutType { get; set; }
 
+        /// <summary>
+        /// Value in Seconds. 
+        /// The timeout value to use, when used with Timer will force-end the tag after a certain time. When used with GoldInactivity will end the tag after coinages doesn't change for the given period
+        /// </summary>
         [XmlAttribute("timeoutValue")]
         public int TimeoutValue { get; set; }
-
-
-        /* TODO:
-         * Add timeout handling for GoldInactivity and Timer
-         * 
-         * Add IgnoreScenes XmlElements, with either sceneId or scene Name
-         * Add PriorityScenes XmlElements, with either sceneId or scene Name
-         */
-
-        /*
-         * Scene Prioritizer:
-         * Iterate through loaded scenes
-         * if scene found
-         * Iterate through nav cells, find nav cell nearest to center that is walkable
-         * Test if can fully client path to nav cell
-         */
-
-        /*
-         * Scene Ignore:
-         * check if destination XY is in loaded scene
-         * if scene is loaded and sceneSnoID or name is in ignoreScenes list, mark node as visited
-         */
-
 
         /// <summary>
         /// The Position of the CurrentNode NavigableCenter
@@ -189,7 +221,13 @@ namespace GilesTrinity.XmlTags
         /// Contains the current navigation path
         /// </summary>
         private IndexedList<Vector3> PathStack = new IndexedList<Vector3>();
+        /// <summary>
+        /// The last scene SNOId we entered
+        /// </summary>
         private int mySceneId = -1;
+        /// <summary>
+        /// The last position we updated the ISearchGridProvider at
+        /// </summary>
         private Vector3 GPUpdatePosition = Vector3.Zero;
 
         /// <summary>
@@ -205,15 +243,6 @@ namespace GilesTrinity.XmlTags
             {
                 Init();
             }
-
-            SceneManager sMgr = ZetaDia.Scenes;
-            List<Scene> LoadedScenes = sMgr.GetScenes().ToList();
-            foreach (Scene scene in LoadedScenes)
-            {
-                var si = scene.SceneInfo;
-            }
-
-
 
             PrintNodeCounts("PostInit");
         }
@@ -241,9 +270,9 @@ namespace GilesTrinity.XmlTags
         }
 
         /// <summary>
-        /// Adds any visibile 
+        /// The main profile behavior
         /// </summary>
-
+        /// <returns></returns>
         protected override Composite CreateBehavior()
         {
             return
@@ -251,6 +280,7 @@ namespace GilesTrinity.XmlTags
                 MiniMapMarker.DetectMiniMapMarkers(ExitNameHash),
                 UpdateSearchGridProvider(),
                 new PrioritySelector(
+                    TimeoutCheck(),
                     PrioritySceneCheck(),
                     MiniMapMarker.VisitMiniMapMarkers(myPos, MarkerDistance),
                     new Sequence(
@@ -274,6 +304,10 @@ namespace GilesTrinity.XmlTags
         }
 
 
+        /// <summary>
+        /// Updates the search grid provider as needed
+        /// </summary>
+        /// <returns></returns>
         private Composite UpdateSearchGridProvider()
         {
             return
@@ -286,6 +320,78 @@ namespace GilesTrinity.XmlTags
             );
         }
 
+        /// <summary>
+        /// Checks if we are using a timeout and will end the tag if the timer has breached the given value
+        /// </summary>
+        /// <returns></returns>
+        private Composite TimeoutCheck()
+        {
+            return
+            new PrioritySelector(
+                new Decorator(ret => ExploreTimeoutType == TimeoutType.Timer,
+                    new Action(ret => CheckSetTimer(ret))
+                ),
+                new Decorator(ret => ExploreTimeoutType == TimeoutType.GoldInactivity,
+                    new Action(ret => CheckSetGoldInactive(ret))
+                )
+            );
+        }
+
+        Stopwatch TagTimer = new Stopwatch();
+        /// <summary>
+        /// Will start the timer if needed, and end the tag if the timer has exceeded the TimeoutValue
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        private RunStatus CheckSetTimer(object ctx)
+        {
+            if (!TagTimer.IsRunning)
+            {
+                TagTimer.Start();
+                return RunStatus.Failure;
+            }
+            if (TagTimer.Elapsed.TotalSeconds > TimeoutValue)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityExploreDungeon timer ended ({0}), tag finished!", TimeoutValue);
+                isDone = true;
+                return RunStatus.Success;
+            }
+            return RunStatus.Failure;
+        }
+        
+        private int lastCoinage = -1;
+        /// <summary>
+        /// Will check if the bot has not picked up any gold within the allocated TimeoutValue
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        private RunStatus CheckSetGoldInactive(object ctx)
+        {
+            CheckSetTimer(ctx);
+            if (lastCoinage == -1)
+            {
+                lastCoinage = ZetaDia.Me.Inventory.Coinage;
+                return RunStatus.Failure;
+            }
+            else if (lastCoinage != ZetaDia.Me.Inventory.Coinage)
+            {
+                TagTimer.Restart();
+                return RunStatus.Failure;
+            }
+            else if (lastCoinage == ZetaDia.Me.Inventory.Coinage && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityExploreDungeon gold inactivity timer tripped ({0}), tag finished!", TimeoutValue);
+                isDone = true;
+                return RunStatus.Success;
+            }
+
+            return RunStatus.Failure;
+        }
+
+        /// <summary>
+        /// Checks to see if the tag is finished as needed
+        /// </summary>
+        /// <returns></returns>
         private Composite CheckIsFinished()
         {
             return
@@ -318,6 +424,10 @@ namespace GilesTrinity.XmlTags
            );
         }
 
+        /// <summary>
+        /// Determine if the tag ExitNameHash is visible in the list of Current World Markers
+        /// </summary>
+        /// <returns></returns>
         private bool IsExitNameHashVisible()
         {
             return ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.NameHash == ExitNameHash && Vector3.Distance(m.Position, myPos) <= MarkerDistance);
@@ -325,33 +435,45 @@ namespace GilesTrinity.XmlTags
 
         private Vector3 PrioritySceneTarget = Vector3.Zero;
         private int PrioritySceneId = -1;
+        /// <summary>
+        /// A list of Scene SNOId's that have already been investigated
+        /// </summary>
         private List<int> PriorityScenesInvestigated = new List<int>();
 
         private DateTime lastCheckedScenes = DateTime.MinValue;
+        /// <summary>
+        /// Will find and move to Prioritized Scene's based on Scene SNOId or Name
+        /// </summary>
+        /// <returns></returns>
         private Composite PrioritySceneCheck()
         {
             return
-            new Sequence(
-                new DecoratorContinue(ret => DateTime.Now.Subtract(lastCheckedScenes).TotalMilliseconds > 1000,
-                    new Sequence(
-                        new Action(ret => lastCheckedScenes = DateTime.Now),
-                        new Action(ret => FindPrioritySceneTarget())
-                    )
-                ),
-                new Decorator(ret => PrioritySceneTarget != Vector3.Zero,
-                    new PrioritySelector(
-                        new Decorator(ret => PrioritySceneTarget.Distance2D(myPos) <= PathPrecision,
-                            new Sequence(
-                                new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Successfully navigated to priority scene {0} center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos))),
-                                new Action(ret => PrioritySceneMoveToFinished())
-                            )
-                        ),
-                        new Action(ret => MoveToPriorityScene())
+            new Decorator(ret => PriorityScenes != null && PriorityScenes.Any(),
+                new Sequence(
+                    new DecoratorContinue(ret => DateTime.Now.Subtract(lastCheckedScenes).TotalMilliseconds > 1000,
+                        new Sequence(
+                            new Action(ret => lastCheckedScenes = DateTime.Now),
+                            new Action(ret => FindPrioritySceneTarget())
+                        )
+                    ),
+                    new Decorator(ret => PrioritySceneTarget != Vector3.Zero,
+                        new PrioritySelector(
+                            new Decorator(ret => PrioritySceneTarget.Distance2D(myPos) <= PathPrecision,
+                                new Sequence(
+                                    new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Successfully navigated to priority scene {0} center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos))),
+                                    new Action(ret => PrioritySceneMoveToFinished())
+                                )
+                            ),
+                            new Action(ret => MoveToPriorityScene())
+                        )
                     )
                 )
             );
         }
 
+        /// <summary>
+        /// Handles actual movement to the Priority Scene
+        /// </summary>
         private void MoveToPriorityScene()
         {
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Moving to Priority Scene {0} Center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
@@ -365,6 +487,9 @@ namespace GilesTrinity.XmlTags
             }
         }
 
+        /// <summary>
+        /// Sets a priority scene as finished
+        /// </summary>
         private void PrioritySceneMoveToFinished()
         {
             PriorityScenesInvestigated.Add(PrioritySceneId);
@@ -373,7 +498,9 @@ namespace GilesTrinity.XmlTags
             UpdateRoute();
         }
 
-
+        /// <summary>
+        /// Finds a navigable point in a priority scene
+        /// </summary>
         private void FindPrioritySceneTarget()
         {
             if (!PriorityScenes.Any())
@@ -429,6 +556,11 @@ namespace GilesTrinity.XmlTags
             }
         }
 
+        /// <summary>
+        /// Gets the center of a given Navigation Zone
+        /// </summary>
+        /// <param name="zone"></param>
+        /// <returns></returns>
         private Vector3 GetNavZoneCenter(NavZone zone)
         {
             float X = zone.ZoneMin.X + ((zone.ZoneMax.X - zone.ZoneMin.X) / 2);
@@ -437,11 +569,24 @@ namespace GilesTrinity.XmlTags
             return new Vector3(X, Y, 0);
         }
 
+        /// <summary>
+        /// Gets the center of a given Navigation Cell
+        /// </summary>
+        /// <param name="cell"></param>
+        /// <param name="zone"></param>
+        /// <returns></returns>
         private Vector3 GetNavCellCenter(NavCell cell, NavZone zone)
         {
             return GetNavCellCenter(cell.Min, cell.Max, zone);
         }
 
+        /// <summary>
+        /// Gets the center of a given box with min/max, adjusted for the Navigation Zone
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <param name="zone"></param>
+        /// <returns></returns>
         private Vector3 GetNavCellCenter(Vector3 min, Vector3 max, NavZone zone)
         {
             float X = zone.ZoneMin.X + min.X + ((max.X - min.X) / 2);
@@ -451,40 +596,47 @@ namespace GilesTrinity.XmlTags
             return new Vector3(X, Y, Z);
         }
 
+        /// <summary>
+        /// Checks to see if the current DungeonExplorer node is in an Ignored scene, and marks the node immediately visited if so
+        /// </summary>
+        /// <returns></returns>
         private Composite CheckIgnoredScenes()
         {
             return
-            new PrioritySelector(
-                new Decorator(ret => PositionInsideIgnoredScene(CurrentNavTarget),
-                    new Sequence(
-                        new Action(ret => SetNodeVisited("Node is in Ignored Scene"))
+            new Decorator(ret => IgnoreScenes != null && IgnoreScenes.Any(),
+                new PrioritySelector(
+                    new Decorator(ret => PositionInsideIgnoredScene(CurrentNavTarget),
+                        new Sequence(
+                            new Action(ret => SetNodeVisited("Node is in Ignored Scene"))
+                        )
                     )
                 )
             );
         }
 
+        /// <summary>
+        /// Determines if a given Vector3 is in a provided IgnoreScene (if the scene is loaded)
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         private bool PositionInsideIgnoredScene(Vector3 position)
         {
             foreach (Scene scene in ZetaDia.Scenes.GetScenes().Where(s => IgnoreScenes.Any(sp => s.Name.ToLower().Contains(sp.SceneName.ToLower())) || IgnoreScenes.Any(sp => s.SceneInfo.SNOId == sp.SceneId)))
             {
-                if (PositionInsideScene(position, scene))
+                Vector2 v2 = position.ToVector2();
+                Vector2 min = scene.Mesh.Zone.ZoneMin;
+                Vector2 max = scene.Mesh.Zone.ZoneMax;
+
+                if (v2.X > min.X && v2.X < max.X && v2.Y > min.Y && v2.Y < max.Y)
                     return true;
             }
             return false;
         }
 
-        private bool PositionInsideScene(Vector3 position, Scene scene)
-        {
-            Vector2 v2 = position.ToVector2();
-            Vector2 min = scene.Mesh.Zone.ZoneMin;
-            Vector2 max = scene.Mesh.Zone.ZoneMax;
-
-            if (v2.X > min.X && v2.X < max.X && v2.Y > min.Y && v2.Y < max.Y)
-                return true;
-            else
-                return false;            
-        }
-
+        /// <summary>
+        /// Determines if the current node can be marked as Visited, and does so if needed
+        /// </summary>
+        /// <returns></returns>
         private Composite CheckNodeFinished()
         {
             return
@@ -529,6 +681,9 @@ namespace GilesTrinity.XmlTags
             );
         }
 
+        /// <summary>
+        /// Updates the DungeonExplorer Route
+        /// </summary>
         private void UpdateRoute()
         {
             GilesTrinity.UpdateSearchGridProvider();
@@ -542,6 +697,10 @@ namespace GilesTrinity.XmlTags
             ValidateCurrentRoute();
         }
 
+        /// <summary>
+        /// Marks the current dungeon Explorer as Visited and dequeues it from the route
+        /// </summary>
+        /// <param name="reason"></param>
         private void SetNodeVisited(string reason = "")
         {
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Dequeueing current node {0} - {1}", BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter, reason);
@@ -550,43 +709,9 @@ namespace GilesTrinity.XmlTags
             PrintNodeCounts("SetNodeVisited");
         }
 
-        private void Init()
-        {
-            if (gp == null)
-            {
-                GilesTrinity.UpdateSearchGridProvider();
-            }
-
-            if (BoxSize == 0)
-                BoxSize = 15;
-
-            if (BoxTolerance == 0)
-                BoxTolerance = 0.55f;
-
-            if (PathPrecision == 0)
-                PathPrecision = BoxSize / 2f;
-
-            float minPathPrecision = 10f;
-
-            if (PathPrecision < minPathPrecision)
-                PathPrecision = minPathPrecision;
-
-            if (ObjectDistance == 0)
-                ObjectDistance = 75f;
-
-            if (MarkerDistance == 0)
-                MarkerDistance = 50f;
-
-            GilesTrinity.hashSkipAheadAreaCache.Clear();
-            PriorityScenesInvestigated.Clear();
-
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag,
-                "Initialized TrinityExploreDungeon: boxSize={0} boxTolerance={1:0.00} endType={2} timeoutType={3} timeoutValue={4} pathPrecision={5:0} sceneId={6} actorId={7} objectDistance={8} markerDistance={9} exitNameHash={10}",
-                GridSegmentation.BoxSize, GridSegmentation.BoxTolerance, EndType, ExploreTimeoutType, TimeoutValue, PathPrecision, SceneId, ActorId, ObjectDistance, MarkerDistance, ExitNameHash);
-
-            InitDone = true;
-        }
-
+        /// <summary>
+        /// Makes sure the current route is not null! Bad stuff happens if it's null...
+        /// </summary>
         private static void ValidateCurrentRoute()
         {
             if (BrainBehavior.DungeonExplorer.CurrentRoute == null)
@@ -595,6 +720,10 @@ namespace GilesTrinity.XmlTags
             }
         }
 
+        /// <summary>
+        /// Prints a plethora of useful information about the Dungeon Exploration process
+        /// </summary>
+        /// <param name="step"></param>
         private void PrintNodeCounts(string step = "")
         {
             if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.XmlTag))
@@ -636,6 +765,10 @@ namespace GilesTrinity.XmlTags
         /*
          * Dungeon Explorer Nodes
          */
+        /// <summary>
+        /// Gets the number of unvisited nodes in the DungeonExplorer Route
+        /// </summary>
+        /// <returns></returns>
         private int GetRouteUnvisitedNodeCount()
         {
             if (GetCurrentRouteNodeCount() > 0)
@@ -644,6 +777,10 @@ namespace GilesTrinity.XmlTags
                 return 0;
         }
 
+        /// <summary>
+        /// Gets the number of visisted nodes in the DungeonExplorer Route
+        /// </summary>
+        /// <returns></returns>
         private int GetRouteVisistedNodeCount()
         {
             if (GetCurrentRouteNodeCount() > 0)
@@ -652,6 +789,10 @@ namespace GilesTrinity.XmlTags
                 return 0;
         }
 
+        /// <summary>
+        /// Gets the number of nodes in the DungeonExplorer Route
+        /// </summary>
+        /// <returns></returns>
         private int GetCurrentRouteNodeCount()
         {
             if (BrainBehavior.DungeonExplorer.CurrentRoute != null)
@@ -662,6 +803,10 @@ namespace GilesTrinity.XmlTags
         /*
          *  Grid Segmentation Nodes
          */
+        /// <summary>
+        /// Gets the number of Unvisited nodes as reported by the Grid Segmentation provider
+        /// </summary>
+        /// <returns></returns>
         private int GetGridSegmentationUnvisitedNodeCount()
         {
             if (GetGridSegmentationNodeCount() > 0)
@@ -670,6 +815,10 @@ namespace GilesTrinity.XmlTags
                 return 0;
         }
 
+        /// <summary>
+        /// Gets the number of Visited nodes as reported by the Grid Segmentation provider
+        /// </summary>
+        /// <returns></returns>
         private int GetGridSegmentationVisistedNodeCount()
         {
             if (GetCurrentRouteNodeCount() > 0)
@@ -678,6 +827,10 @@ namespace GilesTrinity.XmlTags
                 return 0;
         }
 
+        /// <summary>
+        /// Gets the total number of nodes with the current BoxSize/Tolerance as reported by the Grid Segmentation Provider
+        /// </summary>
+        /// <returns></returns>
         private int GetGridSegmentationNodeCount()
         {
             if (GridSegmentation.Nodes != null)
@@ -688,15 +841,14 @@ namespace GilesTrinity.XmlTags
 
 
         private DateTime lastGeneratedPath = DateTime.MinValue;
+        /// <summary>
+        /// Moves the bot to the next DungeonExplorer node
+        /// </summary>
         private void MoveToNextNode()
         {
             bool newPath = false;
 
-            if (!GilesTrinity.hashSkipAheadAreaCache.Any(p => p.Location.Distance2D(ZetaDia.Me.Position) <= PathPrecision))
-            {
-                GilesTrinity.hashSkipAheadAreaCache.Add(new GilesObstacle() { Location = myPos, Radius = PathPrecision });
-            }
-
+            PlayerMover.RecordSkipAheadCachePoint();
 
             NextNode = BrainBehavior.DungeonExplorer.CurrentNode;
             Vector3 moveTarget = NextNode.NavigableCenter;
@@ -746,13 +898,65 @@ namespace GilesTrinity.XmlTags
 
             Navigator.PlayerMover.MoveTowards(moveTarget);
         }
+        /// <summary>
+        /// Initizializes the profile tag and sets defaults as needed
+        /// </summary>
+        private void Init()
+        {
+            if (gp == null)
+            {
+                GilesTrinity.UpdateSearchGridProvider();
+            }
+
+            if (BoxSize == 0)
+                BoxSize = 15;
+
+            if (BoxTolerance == 0)
+                BoxTolerance = 0.55f;
+
+            if (PathPrecision == 0)
+                PathPrecision = BoxSize / 2f;
+
+            float minPathPrecision = 10f;
+
+            if (PathPrecision < minPathPrecision)
+                PathPrecision = minPathPrecision;
+
+            if (ObjectDistance == 0)
+                ObjectDistance = 75f;
+
+            if (MarkerDistance == 0)
+                MarkerDistance = 50f;
+
+            GilesTrinity.hashSkipAheadAreaCache.Clear();
+            PriorityScenesInvestigated.Clear();
+            MiniMapMarker.KnownMarkers.Clear();
+            if (PriorityScenes == null)
+                PriorityScenes = new List<PrioritizeScene>();
+
+            if (IgnoreScenes == null)
+                IgnoreScenes = new List<IgnoreScene>();
+
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag,
+                "Initialized TrinityExploreDungeon: boxSize={0} boxTolerance={1:0.00} endType={2} timeoutType={3} timeoutValue={4} pathPrecision={5:0} sceneId={6} actorId={7} objectDistance={8} markerDistance={9} exitNameHash={10}",
+                GridSegmentation.BoxSize, GridSegmentation.BoxTolerance, EndType, ExploreTimeoutType, TimeoutValue, PathPrecision, SceneId, ActorId, ObjectDistance, MarkerDistance, ExitNameHash);
+
+            InitDone = true;
+        }
+
 
         private bool isDone = false;
+        /// <summary>
+        /// When true, the next profile tag is used
+        /// </summary>
         public override bool IsDone
         {
             get { return !IsActiveQuestStep || isDone; }
         }
 
+        /// <summary>
+        /// Resets this profile tag to defaults
+        /// </summary>
         public override void ResetCachedDone()
         {
             isDone = false;

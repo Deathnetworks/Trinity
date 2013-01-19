@@ -842,7 +842,7 @@ namespace GilesTrinity.DbProvider
         private static IndexedList<Vector3> PathStack = new IndexedList<Vector3>();
 
         private static DateTime lastGeneratedPath = DateTime.MinValue;
-        internal static MoveResult NavigateTo(Vector3 moveTarget)
+        internal static MoveResult NavigateTo(Vector3 moveTarget, string destinationName = "")
         {
             bool newPath = false;
 
@@ -875,6 +875,20 @@ namespace GilesTrinity.DbProvider
             }
 
             return MoveResult.ReachedDestination;
+        }
+
+        private static DateTime lastRecordedSkipAheadCache = DateTime.MinValue;
+        internal static void RecordSkipAheadCachePoint()
+        {
+            if (DateTime.Now.Subtract(lastRecordedSkipAheadCache).TotalMilliseconds < 100)
+                return;
+
+            lastRecordedSkipAheadCache = DateTime.Now;
+
+            if (!GilesTrinity.hashSkipAheadAreaCache.Any(p => p.Location.Distance2D(ZetaDia.Me.Position) <= 5f))
+            {
+                GilesTrinity.hashSkipAheadAreaCache.Add(new GilesObstacle() { Location = ZetaDia.Me.Position, Radius = 20f });
+            }
         }
 
 

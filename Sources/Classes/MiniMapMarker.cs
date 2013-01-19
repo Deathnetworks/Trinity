@@ -100,7 +100,7 @@ namespace GilesTrinity
         internal static RunStatus MoveToNearestMarker(Vector3 near)
         {
             MiniMapMarker m = MiniMapMarker.GetNearestUnvisitedMarker(near);
-
+            PlayerMover.RecordSkipAheadCachePoint();
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Moving to inspect nameHash {0} at {1} distance {2:0}", 
                 m.MarkerNameHash, m.Position, ZetaDia.Me.Position.Distance2D(m.Position));
 

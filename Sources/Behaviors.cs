@@ -38,7 +38,6 @@ namespace GilesTrinity
         {
             return new PrioritySelector(
                 new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && !bMainBotPaused,
-
                     new Action(ctx => HandleTarget(ctx))
                 ),
                 new Decorator(ret => ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && bMainBotPaused,
@@ -1302,7 +1301,8 @@ namespace GilesTrinity
 
                     //Navigator.PlayerMover.MoveTowards(vCurrentDestination);
                     //ZetaDia.Me.Movement.MoveActor(vCurrentDestination);
-                    Navigator.MoveTo(vCurrentDestination, CurrentTarget.InternalName, true);
+                    //Navigator.MoveTo(vCurrentDestination, CurrentTarget.InternalName, true);
+                    PlayerMover.NavigateTo(vCurrentDestination, CurrentTarget.InternalName);
                     lastSentMovePower = DateTime.Now;
 
                     // Store the current destination for comparison incase of changes next loop
