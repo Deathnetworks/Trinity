@@ -358,7 +358,7 @@ namespace GilesTrinity.XmlTags
             }
             return RunStatus.Failure;
         }
-        
+
         private int lastCoinage = -1;
         /// <summary>
         /// Will check if the bot has not picked up any gold within the allocated TimeoutValue
@@ -621,13 +621,13 @@ namespace GilesTrinity.XmlTags
         /// <returns></returns>
         private bool PositionInsideIgnoredScene(Vector3 position)
         {
-            foreach (Scene scene in ZetaDia.Scenes.GetScenes().Where(s => IgnoreScenes.Any(sp => s.Name.ToLower().Contains(sp.SceneName.ToLower())) || IgnoreScenes.Any(sp => s.SceneInfo.SNOId == sp.SceneId)))
+            foreach (Scene scene in ZetaDia.Scenes.GetScenes().Where(scn => IgnoreScenes.Any(igscn => scn.Name.ToLower().Contains(igscn.SceneName.ToLower())) || IgnoreScenes.Any(igscn => scn.SceneInfo.SNOId == igscn.SceneId)))
             {
-                Vector2 v2 = position.ToVector2();
+                Vector2 pos = position.ToVector2();
                 Vector2 min = scene.Mesh.Zone.ZoneMin;
                 Vector2 max = scene.Mesh.Zone.ZoneMax;
 
-                if (v2.X > min.X && v2.X < max.X && v2.Y > min.Y && v2.Y < max.Y)
+                if (pos.X >= min.X && pos.X <= max.X && pos.Y >= min.Y && pos.Y <= max.Y)
                     return true;
             }
             return false;
@@ -677,7 +677,8 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => SetNodeVisited("Found node to be in skip ahead cache, marking done")),
                         new Action(ret => UpdateRoute())
                     )
-                )
+                ),
+                CheckIgnoredScenes()
             );
         }
 
