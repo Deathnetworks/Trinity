@@ -65,20 +65,20 @@
                 <TextBlock Text="Weapon Score : (70 000+ recommended)" Margin="5"/>
                 <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
                     Interval="500" 
-                    Maximum="100000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="2000" TickPlacement="BottomRight" 
-                    Value="{Binding Path=TownRun.WeaponScore}" 
+                    Maximum="110000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="2000" TickPlacement="BottomRight" 
+                    Value="{Binding Path=TownRun.WeaponScore}" IsSnapToTickEnabled="True"
                     HorizontalAlignment="Stretch" Margin="2"/>
                 <TextBlock Text="Armor Score : (16 000+ recommended)" Margin="5"/>
                 <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
                     Interval="500" 
-                    Maximum="50000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" 
-                    Value="{Binding Path=TownRun.ArmorScore}" 
+                    Maximum="60000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" 
+                    Value="{Binding Path=TownRun.ArmorScore}"  IsSnapToTickEnabled="True"
                     HorizontalAlignment="Stretch" Margin="2"/>
                 <TextBlock Text="Jewelry Score : (15 000+ recommended)" Margin="5"/>
                 <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
                     Interval="500" 
-                    Maximum="50000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" 
-                    Value="{Binding Path=TownRun.JewelryScore}" 
+                    Maximum="60000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" 
+                    Value="{Binding Path=TownRun.JewelryScore}"  IsSnapToTickEnabled="True"
                     HorizontalAlignment="Stretch" Margin="2"/>
             </StackPanel>
         </Grid>

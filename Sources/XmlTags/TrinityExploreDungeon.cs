@@ -17,6 +17,8 @@ using Zeta.Internals.Actors;
 using System.Drawing;
 using Zeta.CommonBot;
 using GilesTrinity.DbProvider;
+using Zeta.Internals;
+using Zeta.Internals.SNO;
 
 namespace GilesTrinity.XmlTags
 {
@@ -56,8 +58,61 @@ namespace GilesTrinity.XmlTags
         [XmlAttribute("until", true)]
         public TrinityExploreEndType EndType { get; set; }
 
-        [XmlAttribute("ignoreScenes")]
-        public string IgnoreScenes { get; set; }
+        [XmlElement("IgnoreScenes")]
+        public List<IgnoreScene> IgnoreScenes { get; set; }
+
+        [XmlElement("PrioritizeScenes")]
+        public List<PrioritizeScene> PriorityScenes { get; set; }
+
+        [XmlElement("IgnoreScene")]
+        public class IgnoreScene
+        {
+            [XmlAttribute("sceneName")]
+            public string SceneName { get; set; }
+            [XmlAttribute("sceneId")]
+            public int SceneId { get; set; }
+
+            public IgnoreScene() {
+                SceneId = -1;
+                SceneName = String.Empty;
+            }
+
+            public IgnoreScene(string name)
+            {
+                this.SceneName = name;
+            }
+            public IgnoreScene(int id)
+            {
+                this.SceneId = id;
+            }
+        }
+
+        [XmlElement("PrioritizeScene")]
+        public class PrioritizeScene
+        {
+            [XmlAttribute("sceneName")]
+            public string SceneName { get; set; }
+            [XmlAttribute("sceneId")]
+            public int SceneId { get; set; }
+            [XmlAttribute("pathPrecision")]
+            public float PathPrecision { get; set; }
+
+            public PrioritizeScene()
+            {
+                PathPrecision = 10f;
+                SceneName = String.Empty;
+                SceneId = -1;
+            }
+
+            public PrioritizeScene(string name)
+            {
+                this.SceneName = name;
+            }
+            public PrioritizeScene(int id)
+            {
+                this.SceneId = id;
+            }
+        }
 
         [XmlAttribute("sceneId")]
         public int SceneId { get; set; }
@@ -81,8 +136,29 @@ namespace GilesTrinity.XmlTags
         [XmlAttribute("timeoutValue")]
         public int TimeoutValue { get; set; }
 
-        private bool InitDone = false;
-        private DungeonNode NextNode;
+
+        /* TODO:
+         * Add timeout handling for GoldInactivity and Timer
+         * 
+         * Add IgnoreScenes XmlElements, with either sceneId or scene Name
+         * Add PriorityScenes XmlElements, with either sceneId or scene Name
+         */
+
+        /*
+         * Scene Prioritizer:
+         * Iterate through loaded scenes
+         * if scene found
+         * Iterate through nav cells, find nav cell nearest to center that is walkable
+         * Test if can fully client path to nav cell
+         */
+
+        /*
+         * Scene Ignore:
+         * check if destination XY is in loaded scene
+         * if scene is loaded and sceneSnoID or name is in ignoreScenes list, mark node as visited
+         */
+
+
         /// <summary>
         /// The Position of the CurrentNode NavigableCenter
         /// </summary>
@@ -100,6 +176,8 @@ namespace GilesTrinity.XmlTags
                 }
             }
         }
+        private bool InitDone = false;
+        private DungeonNode NextNode;
 
         /// <summary>
         /// The current player position
@@ -110,12 +188,9 @@ namespace GilesTrinity.XmlTags
         /// <summary>
         /// Contains the current navigation path
         /// </summary>
-        private Stack<Vector3> PathStack = new Stack<Vector3>();
+        private IndexedList<Vector3> PathStack = new IndexedList<Vector3>();
         private int mySceneId = -1;
         private Vector3 GPUpdatePosition = Vector3.Zero;
-        /// <summary>
-        /// Contains known MiniMapMarkers
-        /// </summary>
 
         /// <summary>
         /// Called when the profile behavior starts
@@ -130,6 +205,15 @@ namespace GilesTrinity.XmlTags
             {
                 Init();
             }
+
+            SceneManager sMgr = ZetaDia.Scenes;
+            List<Scene> LoadedScenes = sMgr.GetScenes().ToList();
+            foreach (Scene scene in LoadedScenes)
+            {
+                var si = scene.SceneInfo;
+            }
+
+
 
             PrintNodeCounts("PostInit");
         }
@@ -164,10 +248,10 @@ namespace GilesTrinity.XmlTags
         {
             return
             new Sequence(
-                new Action(ret => PrintNodeCounts("MainBehavior")),
                 MiniMapMarker.DetectMiniMapMarkers(ExitNameHash),
                 UpdateSearchGridProvider(),
                 new PrioritySelector(
+                    PrioritySceneCheck(),
                     MiniMapMarker.VisitMiniMapMarkers(myPos, MarkerDistance),
                     new Sequence(
                         new DecoratorContinue(ret => !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
@@ -178,7 +262,10 @@ namespace GilesTrinity.XmlTags
                     new DecoratorContinue(ret => BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
                         new PrioritySelector(
                             CheckNodeFinished(),
-                            new Action(ret => MoveToNextNode())
+                            new Sequence(
+                                new Action(ret => PrintNodeCounts("MainBehavior")),
+                                new Action(ret => MoveToNextNode())
+                            )
                         )
                     ),
                     new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Error 1: Unknown error occured!"))
@@ -187,7 +274,7 @@ namespace GilesTrinity.XmlTags
         }
 
 
-        private DecoratorContinue UpdateSearchGridProvider()
+        private Composite UpdateSearchGridProvider()
         {
             return
             new DecoratorContinue(ret => mySceneId != ZetaDia.Me.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
@@ -199,7 +286,7 @@ namespace GilesTrinity.XmlTags
             );
         }
 
-        private PrioritySelector CheckIsFinished()
+        private Composite CheckIsFinished()
         {
             return
             new PrioritySelector(
@@ -236,7 +323,169 @@ namespace GilesTrinity.XmlTags
             return ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.NameHash == ExitNameHash && Vector3.Distance(m.Position, myPos) <= MarkerDistance);
         }
 
-        private PrioritySelector CheckNodeFinished()
+        private Vector3 PrioritySceneTarget = Vector3.Zero;
+        private int PrioritySceneId = -1;
+        private List<int> PriorityScenesInvestigated = new List<int>();
+
+        private DateTime lastCheckedScenes = DateTime.MinValue;
+        private Composite PrioritySceneCheck()
+        {
+            return
+            new Sequence(
+                new DecoratorContinue(ret => DateTime.Now.Subtract(lastCheckedScenes).TotalMilliseconds > 1000,
+                    new Sequence(
+                        new Action(ret => lastCheckedScenes = DateTime.Now),
+                        new Action(ret => FindPrioritySceneTarget())
+                    )
+                ),
+                new Decorator(ret => PrioritySceneTarget != Vector3.Zero,
+                    new PrioritySelector(
+                        new Decorator(ret => PrioritySceneTarget.Distance2D(myPos) <= PathPrecision,
+                            new Sequence(
+                                new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Successfully navigated to priority scene {0} center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos))),
+                                new Action(ret => PrioritySceneMoveToFinished())
+                            )
+                        ),
+                        new Action(ret => MoveToPriorityScene())
+                    )
+                )
+            );
+        }
+
+        private void MoveToPriorityScene()
+        {
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Moving to Priority Scene {0} Center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
+
+            MoveResult moveResult = PlayerMover.NavigateTo(PrioritySceneTarget);
+
+            if (moveResult == MoveResult.PathGenerationFailed)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Unable to navigate to Scene {0} Center {1} Distance {2:0}, cancelling!", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
+                PrioritySceneMoveToFinished();
+            }
+        }
+
+        private void PrioritySceneMoveToFinished()
+        {
+            PriorityScenesInvestigated.Add(PrioritySceneId);
+            PrioritySceneId = -1;
+            PrioritySceneTarget = Vector3.Zero;
+            UpdateRoute();
+        }
+
+
+        private void FindPrioritySceneTarget()
+        {
+            if (!PriorityScenes.Any())
+                return;
+
+            gp.Update();
+
+            if (PrioritySceneTarget != Vector3.Zero)
+                return;
+
+            bool foundPriorityScene = false;
+
+            // find any matching priority scenes in scene manager - match by name or SNOId
+            foreach (Scene scene in ZetaDia.Scenes.GetScenes().Where(s => PriorityScenes.Any(ps => s.Name.ToLower().Contains(ps.SceneName.ToLower()) || s.SceneInfo.SNOId == ps.SceneId)))
+            {
+                if (PriorityScenesInvestigated.Contains(scene.SceneInfo.SNOId))
+                    continue;
+
+                foundPriorityScene = true;
+
+                NavZone navZone = scene.Mesh.Zone;
+                NavZoneDef zoneDef = navZone.NavZoneDef;
+
+                Vector2 zoneMin = navZone.ZoneMin;
+                Vector2 zoneMax = navZone.ZoneMax;
+
+                Vector3 zoneCenter = GetNavZoneCenter(navZone);
+
+                List<NavCell> NavCells = zoneDef.NavCells.Where(c => c.Flags.HasFlag(NavCellFlags.AllowWalk)).ToList();
+
+                if (!NavCells.Any())
+                    continue;
+
+                NavCell bestCell = NavCells.OrderBy(c => GetNavCellCenter(c.Min, c.Max, navZone).Distance2D(zoneCenter)).FirstOrDefault();
+
+                if (bestCell != null)
+                {
+                    PrioritySceneTarget = GetNavCellCenter(bestCell, navZone);
+
+                    PrioritySceneId = scene.SceneInfo.SNOId;
+
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Found Priority Scene {0} Center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
+                }
+                else
+                {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Found Priority Scene but could not find a navigable point!", PrioritySceneId, PrioritySceneTarget);
+                }
+            }
+
+            if (!foundPriorityScene)
+            {
+                PrioritySceneTarget = Vector3.Zero;
+            }
+        }
+
+        private Vector3 GetNavZoneCenter(NavZone zone)
+        {
+            float X = zone.ZoneMin.X + ((zone.ZoneMax.X - zone.ZoneMin.X) / 2);
+            float Y = zone.ZoneMin.Y + ((zone.ZoneMax.Y - zone.ZoneMin.Y) / 2);
+
+            return new Vector3(X, Y, 0);
+        }
+
+        private Vector3 GetNavCellCenter(NavCell cell, NavZone zone)
+        {
+            return GetNavCellCenter(cell.Min, cell.Max, zone);
+        }
+
+        private Vector3 GetNavCellCenter(Vector3 min, Vector3 max, NavZone zone)
+        {
+            float X = zone.ZoneMin.X + min.X + ((max.X - min.X) / 2);
+            float Y = zone.ZoneMin.Y + min.Y + ((max.Y - min.Y) / 2);
+            float Z = min.Z + ((max.Z - min.Z) / 2);
+
+            return new Vector3(X, Y, Z);
+        }
+
+        private Composite CheckIgnoredScenes()
+        {
+            return
+            new PrioritySelector(
+                new Decorator(ret => PositionInsideIgnoredScene(CurrentNavTarget),
+                    new Sequence(
+                        new Action(ret => SetNodeVisited("Node is in Ignored Scene"))
+                    )
+                )
+            );
+        }
+
+        private bool PositionInsideIgnoredScene(Vector3 position)
+        {
+            foreach (Scene scene in ZetaDia.Scenes.GetScenes().Where(s => IgnoreScenes.Any(sp => s.Name.ToLower().Contains(sp.SceneName.ToLower())) || IgnoreScenes.Any(sp => s.SceneInfo.SNOId == sp.SceneId)))
+            {
+                if (PositionInsideScene(position, scene))
+                    return true;
+            }
+            return false;
+        }
+
+        private bool PositionInsideScene(Vector3 position, Scene scene)
+        {
+            Vector2 v2 = position.ToVector2();
+            Vector2 min = scene.Mesh.Zone.ZoneMin;
+            Vector2 max = scene.Mesh.Zone.ZoneMax;
+
+            if (v2.X > min.X && v2.X < max.X && v2.Y > min.Y && v2.Y < max.Y)
+                return true;
+            else
+                return false;            
+        }
+
+        private Composite CheckNodeFinished()
         {
             return
             new PrioritySelector(
@@ -271,7 +520,7 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => UpdateRoute())
                     )
                 ),
-                new Decorator(ret => GilesTrinity.hashSkipAheadAreaCache.Any( p => p.Location.Distance2D(CurrentNavTarget) <= PathPrecision),
+                new Decorator(ret => GilesTrinity.hashSkipAheadAreaCache.Any(p => p.Location.Distance2D(CurrentNavTarget) <= PathPrecision),
                     new Sequence(
                         new Action(ret => SetNodeVisited("Found node to be in skip ahead cache, marking done")),
                         new Action(ret => UpdateRoute())
@@ -328,7 +577,8 @@ namespace GilesTrinity.XmlTags
             if (MarkerDistance == 0)
                 MarkerDistance = 50f;
 
-            GilesTrinity.hashSkipAheadAreaCache = new HashSet<GilesObstacle>();
+            GilesTrinity.hashSkipAheadAreaCache.Clear();
+            PriorityScenesInvestigated.Clear();
 
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag,
                 "Initialized TrinityExploreDungeon: boxSize={0} boxTolerance={1:0.00} endType={2} timeoutType={3} timeoutValue={4} pathPrecision={5:0} sceneId={6} actorId={7} objectDistance={8} markerDistance={9} exitNameHash={10}",
@@ -436,6 +686,8 @@ namespace GilesTrinity.XmlTags
                 return 0;
         }
 
+
+        private DateTime lastGeneratedPath = DateTime.MinValue;
         private void MoveToNextNode()
         {
             bool newPath = false;
@@ -453,10 +705,11 @@ namespace GilesTrinity.XmlTags
                 NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition), GilesTrinity.GetHeadingToPoint(NextNode.NavigableCenter),
                 PathStack.Count);
 
-            if (!PathStack.Any())
+            if (!PathStack.Any() || DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000)
             {
                 // Generate nodes for the PathStack
                 PathStack = PlayerMover.GeneratePath(myPos, NextNode.NavigableCenter);
+                lastGeneratedPath = DateTime.Now;
                 newPath = true;
             }
 
@@ -468,18 +721,19 @@ namespace GilesTrinity.XmlTags
 
             if (PathStack.Any())
             {
-                moveTarget = PathStack.Peek();
+                moveTarget = PathStack.Current;
             }
 
             var playerPosition = ZetaDia.Me.Position;
             var distToTarget = Vector3.Distance2D(ref moveTarget, ref playerPosition);
             if (distToTarget <= PathPrecision || (PlayerMover.GetMovementSpeed() < 1 && distToTarget <= 50f && ZetaDia.Physics.Raycast(moveTarget, myPos, Zeta.Internals.SNO.NavCellFlags.AllowWalk)))
             {
-                Vector3 lastStep = PathStack.Peek();
-                PathStack.Pop();
+                Vector3 lastStep = PathStack.Current;
+                PathStack.Next();
+                PathStack.RemoveAt(0);
                 if (PathStack.Any())
                 {
-                    moveTarget = PathStack.Peek();
+                    moveTarget = PathStack.Current;
                     DbHelper.Log(LogCategory.Moving, "[Path] removed:{0} next:{1} dist:{2} dir:{3}",
                         lastStep, moveTarget, Vector3.Distance(lastStep, moveTarget), GilesTrinity.GetHeadingToPoint(moveTarget));
                 }

@@ -804,7 +804,7 @@ namespace GilesTrinity.DbProvider
             }
         }
 
-        internal static Stack<Vector3> GeneratePath(Vector3 start, Vector3 destination)
+        internal static IndexedList<Vector3> GeneratePath(Vector3 start, Vector3 destination)
         {
             Stack<Vector3> pathStack = new Stack<Vector3>();
             GilesTrinity.UpdateSearchGridProvider();
@@ -815,17 +815,17 @@ namespace GilesTrinity.DbProvider
                 true, 50, true
                 );
 
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Generated path with {0} points", pfr.PointsReversed.Count());
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Generated path with {0} points", pfr.PointsReversed.Count());
 
             if (pfr.Error)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Error in generating path: {0}", pfr.ErrorMessage);
-                return pathStack;
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Error in generating path: {0}", pfr.ErrorMessage);
+                return new IndexedList<Vector3>(pathStack, false);
             }
 
             if (pfr.IsPartialPath)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Partial Path Generated!", true);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Partial Path Generated!", true);
             }
 
             pathStack.Clear();
@@ -836,35 +836,46 @@ namespace GilesTrinity.DbProvider
                 pathStack.Push(v3);
                 //Logging.Write("Pushing path point to stack {0}, order {1}, distance {2}", v3, PathStack.Count(), v3.Distance(myPos));
             }
-            return pathStack;
+            return new IndexedList<Vector3>(pathStack, false);
         }
 
-        private static Stack<Vector3> PathStack = new Stack<Vector3>();
+        private static IndexedList<Vector3> PathStack = new IndexedList<Vector3>();
 
+        private static DateTime lastGeneratedPath = DateTime.MinValue;
         internal static MoveResult NavigateTo(Vector3 moveTarget)
         {
             bool newPath = false;
 
-            if (!PathStack.Any())
+            if (!PathStack.Any() || DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000)
             {
                 PathStack = PlayerMover.GeneratePath(ZetaDia.Me.Position, moveTarget);
+                lastGeneratedPath = DateTime.Now;
                 newPath = true;
             }
 
-            if (PathStack.Any() && PathStack.Count == 1 && moveTarget.Distance2D(PathStack.Peek()) >= 20f && newPath)
+            if (PathStack[PathStack.Count - 1].Distance2D(moveTarget) >= 20f && newPath)
+            {
+                return MoveResult.PathGenerationFailed;
+            }
+
+            if (PathStack.Any() && PathStack.Count <= 2 && moveTarget.Distance2D(PathStack.Current) >= 20f && newPath)
             {
                 return MoveResult.PathGenerationFailed;
             }
 
             if (PathStack.Any())
             {
-                if (PathStack.Peek().Distance2D(ZetaDia.Me.Position) <= 20f)
-                    PathStack.Pop();
+
+                if (PathStack.Current.Distance2D(ZetaDia.Me.Position) <= 20f)
+                {
+                    PathStack.Next();
+                    PathStack.RemoveAt(0);
+                }
             }
 
             if (PathStack.Any())
             {
-                Navigator.PlayerMover.MoveTowards(PathStack.Peek());
+                Navigator.PlayerMover.MoveTowards(PathStack.Current);
                 return MoveResult.Moved;
             }
 
