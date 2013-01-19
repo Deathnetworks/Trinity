@@ -502,10 +502,8 @@ namespace GilesTrinity
                             {
 
                                 // rrrix added this as a single "weight" source based on the DestructableRange.
-                                // Calculate the weight based on distance, where a distance = 1 is 5000
-                                //5000*(1+((B2-A2)/B2))
-                                float minRange = Settings.WorldObject.DestructibleRange >= 1 ? Settings.WorldObject.DestructibleRange : 1;
-                                cacheObject.Weight = 5000 * (1 + ((cacheObject.RadiusDistance - minRange) / minRange));
+                                // Calculate the weight based on distance, where a distance = 1 is 5000, 90 = 0
+                                cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 5000f;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)

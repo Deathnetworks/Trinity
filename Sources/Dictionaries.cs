@@ -257,7 +257,7 @@ namespace GilesTrinity
         /// Destructible things that need targeting by a location instead of an ACDGUID (stuff you can't "click on" to destroy in-game)
         /// </summary>
         internal static HashSet<int> hashDestructableLocationTarget = new HashSet<int> {
-            170657, 116409, 121586, 155255, 
+            170657, 116409, 121586, 155255, 104596,
          };
         /// <summary>
         /// Resplendent chest SNO list

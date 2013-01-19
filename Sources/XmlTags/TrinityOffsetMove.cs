@@ -12,7 +12,11 @@ using Action = Zeta.TreeSharp.Action;
 namespace GilesTrinity.XmlTags
 {
     /// <summary>
-    /// This profile tag will move the player a a direction given by the offsets x, y
+    /// This profile tag will move the player a a direction given by the offsets x, y. Examples:
+    ///       <TrinityOffsetMove questId="101758" stepId="1" offsetX="-1000" offsetY="1000" />
+    ///       <TrinityOffsetMove questId="101758" stepId="1" offsetX="1000" offsetY="-1000" />
+    ///       <TrinityOffsetMove questId="101758" stepId="1" offsetX="-1000" offsetY="-1000" />
+    ///       <TrinityOffsetMove questId="101758" stepId="1" offsetX="1000" offsetY="1000" />
     /// </summary>
     [XmlElement("TrinityOffsetMove")]
     public class TrinityOffsetMove : ProfileBehavior
