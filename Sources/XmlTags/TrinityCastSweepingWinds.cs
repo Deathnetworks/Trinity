@@ -31,16 +31,16 @@ namespace GilesTrinity.XmlTags
                         {
                             ZetaDia.Me.UsePower(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind, GilesTrinity.PlayerStatus.CurrentPosition, GilesTrinity.iCurrentWorldID, -1);
                             GilesTrinity.SweepWindSpam = DateTime.Now;
-                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Cast Sweeping Winds.");
+                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Cast Sweeping Winds.");
                         }
                         else
                         {
-                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Sweeping winds buff is down - not casting.");
+                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Sweeping winds buff is down - not casting.");
                         }
                     }
                     else
                     {
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, " Too soon to cast SW again, avoiding spam.");
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, " Too soon to cast SW again, avoiding spam.");
                     }
                 }
                 m_IsDone = true;

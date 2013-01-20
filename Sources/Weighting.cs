@@ -646,6 +646,8 @@ namespace GilesTrinity
                 // Loop through all the objects and give them a weight
                 if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.RActorGuid != CurrentTargetRactorGUID)
                 {
+                    RecordTargetHistory();
+
                     DbHelper.Log(TrinityLogLevel.Verbose,
                                     LogCategory.Targetting,
                                     "Target changed to {2} {0} ({1})",
@@ -653,6 +655,35 @@ namespace GilesTrinity
                                     CurrentTarget.ActorSNO,
                                     CurrentTarget.Type);
                 }
+            }
+        }
+
+        private static void RecordTargetHistory()
+        {
+            string targetSha1Hash = HashGenerator.GenerateGilesObjecthash(CurrentTarget);
+
+            // clean up past targets
+            if (!GenericCache.ContainsKey(targetSha1Hash))
+            {
+                CurrentTarget.HasBeenPrimaryTarget = true;
+                CurrentTarget.TimesBeenPrimaryTarget = 1;
+                CurrentTarget.FirstTargetAssignmentTime = DateTime.Now;
+                GenericCache.AddToCache(new GenericCacheObject(targetSha1Hash, CurrentTarget, new TimeSpan(0, 10, 0)));
+            }
+            else if (GenericCache.ContainsKey(targetSha1Hash))
+            {
+                GilesObject cTarget = (GilesObject)GenericCache.GetObject(targetSha1Hash).Value;
+                if (!cTarget.IsBoss && cTarget.TimesBeenPrimaryTarget > 15)
+                {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Blacklisting target {0} due to possible stuck/flipflop!", CurrentTarget.InternalName);
+                    hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
+                }
+                else
+                {
+                    cTarget.TimesBeenPrimaryTarget++;
+                    GenericCache.UpdateObject(new GenericCacheObject(targetSha1Hash, cTarget, new TimeSpan(0, 10, 0)));
+                }
+                
             }
         }
     }

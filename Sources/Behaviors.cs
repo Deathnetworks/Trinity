@@ -148,6 +148,7 @@ namespace GilesTrinity
                     {
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget was passed as null!");
                     }
+
                     CheckStaleCache();
                     using (new PerformanceLogger("HandleTarget.CheckForNewTarget"))
                     {
@@ -1273,6 +1274,9 @@ namespace GilesTrinity
             }
             statusText.Append("Weight=");
             statusText.Append(CurrentTarget.Weight.ToString("0"));
+
+            statusText.Append(String.Format(" Duration={0:0}", DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds));
+
             if (!targetIsInRange)
                 statusText.Append(" MOVING INTO RANGE");
             if (Settings.Advanced.DebugInStatusBar)
@@ -1563,7 +1567,7 @@ namespace GilesTrinity
                 IgnoreTargetForLoops = 3;
                 // Store item pickup stats
 
-                string itemSha1Hash = ItemHash.GenerateItemHash(CurrentTarget.Position, CurrentTarget.ActorSNO, CurrentTarget.InternalName, iCurrentWorldID, CurrentTarget.ItemQuality, CurrentTarget.ItemLevel);
+                string itemSha1Hash = HashGenerator.GenerateItemHash(CurrentTarget.Position, CurrentTarget.ActorSNO, CurrentTarget.InternalName, iCurrentWorldID, CurrentTarget.ItemQuality, CurrentTarget.ItemLevel);
                 if (!_hashsetItemPicksLookedAt.Contains(itemSha1Hash))
                 {
                     _hashsetItemPicksLookedAt.Add(itemSha1Hash);

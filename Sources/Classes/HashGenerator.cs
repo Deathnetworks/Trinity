@@ -8,7 +8,7 @@ using Zeta.Internals.Actors;
 
 namespace GilesTrinity
 {
-    public static class ItemHash
+    public static class HashGenerator
     {
         /*
          * Reference implimentation: http://msdn.microsoft.com/en-us/library/s02tk69a.aspx
@@ -30,6 +30,21 @@ namespace GilesTrinity
                 string itemHashBase = String.Format("{0}{1}{2}{3}{4}{5}", position, actorSNO, name, worldID, itemQuality, itemLevel);
                 string itemHash = GetSha1Hash(sha1, itemHashBase);
                 return itemHash;
+            }
+        }
+
+        /// <summary>
+        /// Generates an SHA1 hash of a particular GilesObject
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static string GenerateGilesObjecthash(GilesObject obj)
+        {
+            using (SHA1 sha1 = SHA1.Create())
+            {
+                string objHashBase = String.Format("{0}{1}{2}{3}", obj.ActorSNO, obj.Position, obj.Type, GilesTrinity.iCurrentWorldID);
+                string objHash = GetSha1Hash(sha1, objHashBase);
+                return objHash;
             }
         }
         static string GetSha1Hash(SHA1 sha1Hash, string input)

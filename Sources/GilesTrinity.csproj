@@ -80,7 +80,7 @@
     <Compile Include="Classes\GilesGameBalanceDataCache.cs" />
     <Compile Include="Classes\GilesItemStats.cs" />
     <Compile Include="Classes\GilesStashSort.cs" />
-    <Compile Include="Classes\ItemHash.cs" />
+    <Compile Include="Classes\HashGenerator.cs" />
     <Compile Include="Classes\MiniMapMarker.cs" />
     <Compile Include="Classes\SpeedSensor.cs" />
     <Compile Include="Constants.cs" />
@@ -118,7 +118,7 @@
     <Compile Include="Settings\Combat\BarbarianSetting.cs" />
     <Compile Include="Settings\Combat\CombatSetting.cs" />
     <Compile Include="Settings\Combat\DemonHunterSetting.cs" />
-    <Compile Include="Settings\Combat\GoblinPriority.cs" />
+    <Compile Include="Settings\Combat\EnumOptions.cs" />
     <Compile Include="Settings\Combat\IAvoidanceHealth.cs" />
     <Compile Include="Settings\Combat\MiscCombatSetting.cs" />
     <Compile Include="Settings\Combat\MonkSetting.cs" />
@@ -136,7 +136,6 @@
     <Compile Include="Settings\NotificationSetting.cs" />
     <Compile Include="Settings\TrinitySetting.cs" />
     <Compile Include="Settings\WorldObjectSetting.cs" />
-    <Compile Include="StashSellSalvage.cs" />
     <Compile Include="Technicals\PerformanceLogger.cs" />
     <Compile Include="UIComponents\BoolInverterConverter.cs" />
     <Compile Include="UIComponents\ConfigViewModel.cs" />

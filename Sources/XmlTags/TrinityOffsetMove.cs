@@ -30,6 +30,7 @@ namespace GilesTrinity.XmlTags
         /// <summary>
         /// The distance on the X axis to move
         /// </summary>
+        [XmlAttribute("x")]
         [XmlAttribute("offsetX")]
         [XmlAttribute("offsetx")]
         public float OffsetX { get; set; }
@@ -37,6 +38,7 @@ namespace GilesTrinity.XmlTags
         /// <summary>
         /// The distance on the Y axis to move
         /// </summary>
+        [XmlAttribute("y")]
         [XmlAttribute("offsetY")]
         [XmlAttribute("offsety")]
         public float OffsetY { get; set; }
@@ -93,7 +95,7 @@ namespace GilesTrinity.XmlTags
 
             if (PathPrecision == 0)
                 PathPrecision = 10f;
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "OffsetMove Initialized offset x={0} y={1} distance={2:0} position={3}",
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "OffsetMove Initialized offset x={0} y={1} distance={2:0} position={3}",
                        OffsetX, OffsetY, Position.Distance2D(MyPos), Position);
 
         }

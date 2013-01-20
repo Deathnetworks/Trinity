@@ -44,7 +44,7 @@ namespace GilesTrinity.XmlTags
                     }
                     catch
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "There was a memory/DB failure trying to follow the TrinityInteract XML tag on SNO {0}", SNOID);
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, "There was a memory/DB failure trying to follow the TrinityInteract XML tag on SNO {0}", SNOID);
                     }
                 }
                 m_IsDone = true;

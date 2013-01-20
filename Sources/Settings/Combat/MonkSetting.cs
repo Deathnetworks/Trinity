@@ -7,6 +7,7 @@ namespace GilesTrinity.Settings.Combat
     public class MonkSetting : ITrinitySetting<MonkSetting>, IAvoidanceHealth, INotifyPropertyChanged
     {
         #region Fields
+        private TempestRushOption _TROption;
         private float _PotionLevel;
         private float _HealthGlobeLevel;
         private float _AvoidArcaneHealth;
@@ -37,10 +38,10 @@ namespace GilesTrinity.Settings.Combat
         private float _AvoidZoltTwisterHealth;
         private int _TR_MinSpirit;
         private int _TR_MinDist;
+        private bool _UseTRMovement;
         private bool _HasInnaSet;
         private bool _SweepingWindWeaponSwap;
         private bool _DisableMantraSpam;
-        private bool _UseTRMovement;
         private bool _TargetBasedZigZag;
         #endregion Fields
 

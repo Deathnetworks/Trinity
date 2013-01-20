@@ -54,7 +54,7 @@ namespace GilesTrinity.XmlTags
                     {
                         if (thisObject.Location.Distance(Position) <= thisObject.Radius)
                         {
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "Skipping ahead from moveto {0} to next moveto.", Position);
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, "Skipping ahead from moveto {0} to next moveto.", Position);
                             GilesTrinity.bSkipAheadAGo = true;
                             return RunStatus.Success;
                         }

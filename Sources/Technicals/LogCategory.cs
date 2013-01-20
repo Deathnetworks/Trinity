@@ -22,7 +22,7 @@ namespace GilesTrinity.Technicals
         Performance = 128,
         Targetting = 256,       
         Weight = 512,           
-        XmlTag = 1024,          
+        ProfileTag = 1024,          
         Moving = 2048,          
         GlobalHandler = 4096    
     }

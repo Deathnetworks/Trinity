@@ -1,4 +1,5 @@
-﻿using Zeta.Common;
+﻿using System;
+using Zeta.Common;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
 
@@ -50,6 +51,10 @@ namespace GilesTrinity
         public double HitPoints { get; set; }
         public float Radius { get; set; }
         public bool ForceLeapAgainst { get; set; }
+
+        public bool HasBeenPrimaryTarget { get; set; }
+        public int TimesBeenPrimaryTarget { get; set; }
+        public DateTime FirstTargetAssignmentTime { get; set; }
 
         /// <summary>
         /// If the object has ever been navigable

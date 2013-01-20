@@ -163,6 +163,7 @@ namespace GilesTrinity
                     // Record the last time our target changed
                     if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
                     {
+                        RecordTargetHistory();
                         DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Found New Target - {0} CurrentTargetRactorGUID: {1} CurrentTarget.RActorGuid: {2}",
                                         DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
                         dateSincePickedTarget = DateTime.Now;
@@ -353,8 +354,6 @@ namespace GilesTrinity
         {
             using (new PerformanceLogger("CacheManagement.RefreshCacheMainLoop"))
             {
-                //ZetaDia.Actors.Update();
-
                 IEnumerable<DiaObject> refreshSource;
 
                 if (Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
@@ -436,7 +435,7 @@ namespace GilesTrinity
         {
             bool isNewLogItem = false;
 
-            c_ItemSha1Hash = ItemHash.GenerateItemHash(c_Position, c_ActorSNO, c_InternalName, iCurrentWorldID, c_ItemQuality, c_ItemLevel);
+            c_ItemSha1Hash = HashGenerator.GenerateItemHash(c_Position, c_ActorSNO, c_InternalName, iCurrentWorldID, c_ItemQuality, c_ItemLevel);
 
             if (!GenericCache.ContainsKey(c_ItemSha1Hash))
             {

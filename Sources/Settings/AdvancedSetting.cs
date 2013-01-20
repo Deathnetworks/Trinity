@@ -39,7 +39,7 @@ namespace GilesTrinity.Settings
 
         #region Properties
         [DataMember(IsRequired = false)]
-        [DefaultValue(LogCategory.UserInformation)]
+        [DefaultValue(LogCategory.UserInformation | LogCategory.ProfileTag)]
         public LogCategory LogCategories
         {
             get
@@ -183,7 +183,7 @@ namespace GilesTrinity.Settings
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
+        [DefaultValue(true)]
         public bool DebugInStatusBar
         {
             get

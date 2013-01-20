@@ -93,6 +93,7 @@ namespace GilesTrinity.XmlTags
         /// <summary>
         /// The list of Scene SNOId's or Scene Names that the bot will prioritize (only works when the scene is "loaded")
         /// </summary>
+        [XmlElement("PriorityScenes")]
         [XmlElement("PrioritizeScenes")]
         public List<PrioritizeScene> PriorityScenes { get; set; }
 
@@ -150,6 +151,24 @@ namespace GilesTrinity.XmlTags
             public PrioritizeScene(int id)
             {
                 this.SceneId = id;
+            }
+        }
+
+        [XmlElement("AlternateActors")]
+        public List<AlternateActor> AlternateActors { get; set; }
+
+        [XmlElement("AlternateActor")]
+        public class AlternateActor
+        {
+            [XmlAttribute("actorId")]
+            public int ActorId { get; set; }
+            [XmlAttribute("objectDistance")]
+            public float ObjectDistance { get; set; }
+
+            public AlternateActor()
+            {
+                ActorId = -1;
+                ObjectDistance = 10f;
             }
         }
 
@@ -235,7 +254,7 @@ namespace GilesTrinity.XmlTags
         /// </summary>
         public override void OnStart()
         {
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "TrinityExploreDungeon OnStart() called");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "TrinityExploreDungeon OnStart() called");
 
             CheckResetDungeonExplorer();
 
@@ -255,7 +274,7 @@ namespace GilesTrinity.XmlTags
             // I added this because GridSegmentation may (rarely) reset itself without us doing it to 15/.55.
             if ((BoxSize != 0 && BoxTolerance != 0) && (GridSegmentation.BoxSize != BoxSize || GridSegmentation.BoxTolerance != BoxTolerance) || (GetGridSegmentationNodeCount() == 0))
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Box Size or Tolerance has been changed! {0}/{1}", GridSegmentation.BoxSize, GridSegmentation.BoxTolerance);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Box Size or Tolerance has been changed! {0}/{1}", GridSegmentation.BoxSize, GridSegmentation.BoxTolerance);
 
                 BrainBehavior.DungeonExplorer.Reset();
                 PrintNodeCounts("BrainBehavior.DungeonExplorer.Reset");
@@ -280,14 +299,14 @@ namespace GilesTrinity.XmlTags
                 MiniMapMarker.DetectMiniMapMarkers(ExitNameHash),
                 UpdateSearchGridProvider(),
                 new PrioritySelector(
-                    TimeoutCheck(),
+                    CheckIsObjectiveFinished(),
                     PrioritySceneCheck(),
                     MiniMapMarker.VisitMiniMapMarkers(myPos, MarkerDistance),
                     new Sequence(
                         new DecoratorContinue(ret => !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
                             new Action(ret => UpdateRoute())
                         ),
-                        CheckIsFinished()
+                        CheckIsExplorerFinished()
                     ),
                     new DecoratorContinue(ret => BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
                         new PrioritySelector(
@@ -298,7 +317,7 @@ namespace GilesTrinity.XmlTags
                             )
                         )
                     ),
-                    new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Error 1: Unknown error occured!"))
+                    new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Error 1: Unknown error occured!"))
                 )
             );
         }
@@ -315,7 +334,8 @@ namespace GilesTrinity.XmlTags
                 new Sequence(
                     new Action(ret => mySceneId = ZetaDia.Me.SceneId),
                     new Action(ret => GPUpdatePosition = myPos),
-                    new Action(ret => GilesTrinity.UpdateSearchGridProvider(true))
+                    new Action(ret => GilesTrinity.UpdateSearchGridProvider(true)),
+                    new Action(ret => MiniMapMarker.UpdateFailedMarkers())
                 )
             );
         }
@@ -392,36 +412,71 @@ namespace GilesTrinity.XmlTags
         /// Checks to see if the tag is finished as needed
         /// </summary>
         /// <returns></returns>
-        private Composite CheckIsFinished()
+        private Composite CheckIsExplorerFinished()
         {
             return
             new PrioritySelector(
+                CheckIsObjectiveFinished(),
+                new Decorator(ret => GetRouteUnvisitedNodeCount() == 0, // When fully Explored, just finish
+                    new Sequence(
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Visited all nodes but objective not complete, forcing grid reset!")),
+                        new Action(ret => GilesTrinity.hashSkipAheadAreaCache.Clear()),
+                        new Action(ret => MiniMapMarker.KnownMarkers.Clear()),
+                        new Action(ret => GridSegmentation.Reset()),
+                        new Action(ret => BrainBehavior.DungeonExplorer.Reset()),
+                        new Action(ret => UpdateRoute())
+                    )
+                )
+           );
+        }
+
+        /// <summary>
+        /// Checks to see if the tag is finished as needed
+        /// </summary>
+        /// <returns></returns>
+        private Composite CheckIsObjectiveFinished()
+        {
+            return
+            new PrioritySelector(
+                TimeoutCheck(),
                 new Decorator(ret => EndType == TrinityExploreEndType.ExitFound && ExitNameHash != 0 && IsExitNameHashVisible(),
                     new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Found exitNameHash {0}!", ExitNameHash)),
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found exitNameHash {0}!", ExitNameHash)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.ObjectFound && ActorId != 0 && ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
                     .Any(a => a.ActorSNO == ActorId && a.Distance <= ObjectDistance),
                     new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Found Object {0}!", ActorId)),
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Object {0}!", ActorId)),
+                        new Action(ret => isDone = true)
+                    )
+                ),
+                new Decorator(ret => EndType == TrinityExploreEndType.ObjectFound && AlternateActorsFound(),
+                    new Sequence(
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Alternate Object {0}!", GetAlternateActor().ActorSNO)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && ZetaDia.Me.SceneId == SceneId,
                     new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Found SceneId {0}!", SceneId)),
-                        new Action(ret => isDone = true)
-                    )
-                ),
-                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0, // When fully Explored, just finish!
-                    new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Visited all nodes, TrinityExploreDungeon finished")),
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found SceneId {0}!", SceneId)),
                         new Action(ret => isDone = true)
                     )
                 )
-           );
+            );
+        }
+
+        private bool AlternateActorsFound()
+        {
+            return AlternateActors.Any() && ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                    .Where(o => AlternateActors.Any(a => a.ActorId == o.ActorSNO && o.Distance <= a.ObjectDistance)).Any();
+        }
+
+        private DiaObject GetAlternateActor()
+        {
+            return ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                    .Where(o => AlternateActors.Any(a => a.ActorId == o.ActorSNO && o.Distance <= a.ObjectDistance)).OrderBy(o => o.Distance).FirstOrDefault();
         }
 
         /// <summary>
@@ -430,7 +485,7 @@ namespace GilesTrinity.XmlTags
         /// <returns></returns>
         private bool IsExitNameHashVisible()
         {
-            return ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.NameHash == ExitNameHash && Vector3.Distance(m.Position, myPos) <= MarkerDistance);
+            return ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.NameHash == ExitNameHash && m.Position.Distance2D(myPos) <= MarkerDistance + 10f);
         }
 
         private Vector3 PrioritySceneTarget = Vector3.Zero;
@@ -460,7 +515,7 @@ namespace GilesTrinity.XmlTags
                         new PrioritySelector(
                             new Decorator(ret => PrioritySceneTarget.Distance2D(myPos) <= PathPrecision,
                                 new Sequence(
-                                    new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Successfully navigated to priority scene {0} center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos))),
+                                    new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Successfully navigated to priority scene {0} center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos))),
                                     new Action(ret => PrioritySceneMoveToFinished())
                                 )
                             ),
@@ -476,13 +531,13 @@ namespace GilesTrinity.XmlTags
         /// </summary>
         private void MoveToPriorityScene()
         {
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Moving to Priority Scene {0} Center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Moving to Priority Scene {0} Center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
 
             MoveResult moveResult = PlayerMover.NavigateTo(PrioritySceneTarget);
 
             if (moveResult == MoveResult.PathGenerationFailed)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Unable to navigate to Scene {0} Center {1} Distance {2:0}, cancelling!", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Unable to navigate to Scene {0} Center {1} Distance {2:0}, cancelling!", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
                 PrioritySceneMoveToFinished();
             }
         }
@@ -542,11 +597,11 @@ namespace GilesTrinity.XmlTags
 
                     PrioritySceneId = scene.SceneInfo.SNOId;
 
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Found Priority Scene {0} Center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene {0} Center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
                 }
                 else
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Found Priority Scene but could not find a navigable point!", PrioritySceneId, PrioritySceneTarget);
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene but could not find a navigable point!", PrioritySceneId, PrioritySceneTarget);
                 }
             }
 
@@ -622,8 +677,9 @@ namespace GilesTrinity.XmlTags
         private bool PositionInsideIgnoredScene(Vector3 position)
         {
             List<Scene> ignoredScenes = ZetaDia.Scenes.GetScenes()
-                .Where(scn => IgnoreScenes.Any(igscn => igscn.SceneName != String.Empty && scn.Name.ToLower().Contains(igscn.SceneName.ToLower())) || 
-                IgnoreScenes.Any(igscn => scn.SceneInfo.SNOId == igscn.SceneId)).ToList();
+                .Where(scn => IgnoreScenes.Any(igscn => igscn.SceneName != String.Empty && scn.Name.ToLower().Contains(igscn.SceneName.ToLower())) ||
+                    IgnoreScenes.Any(igscn => scn.SceneInfo.SNOId == igscn.SceneId) &&
+                    !PriorityScenes.Any(psc => scn.Name.ToLower().Contains(psc.SceneName))).ToList();
             foreach (Scene scene in ignoredScenes)
             {
                 Vector2 pos = position.ToVector2();
@@ -646,7 +702,7 @@ namespace GilesTrinity.XmlTags
             new PrioritySelector(
                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0 || !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
                     new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Error - CheckIsNodeFinished() called while Route is empty!")),
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Error - CheckIsNodeFinished() called while Route is empty!")),
                         new Action(ret => UpdateRoute())
                     )
                 ),
@@ -707,7 +763,7 @@ namespace GilesTrinity.XmlTags
         /// <param name="reason"></param>
         private void SetNodeVisited(string reason = "")
         {
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Dequeueing current node {0} - {1}", BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter, reason);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Dequeueing current node {0} - {1}", BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter, reason);
             BrainBehavior.DungeonExplorer.CurrentNode.Visited = true;
             BrainBehavior.DungeonExplorer.CurrentRoute.Dequeue();
             PrintNodeCounts("SetNodeVisited");
@@ -730,7 +786,7 @@ namespace GilesTrinity.XmlTags
         /// <param name="step"></param>
         private void PrintNodeCounts(string step = "")
         {
-            if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.XmlTag))
+            if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.ProfileTag))
             {
                 string nodeDistance = String.Empty;
                 if (GetRouteUnvisitedNodeCount() > 0)
@@ -762,7 +818,7 @@ namespace GilesTrinity.XmlTags
                     PathStack.Count
                     );
 
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, log);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, log);
             }
         }
 
@@ -927,10 +983,10 @@ namespace GilesTrinity.XmlTags
                 PathPrecision = minPathPrecision;
 
             if (ObjectDistance == 0)
-                ObjectDistance = 75f;
+                ObjectDistance = 40f;
 
             if (MarkerDistance == 0)
-                MarkerDistance = 50f;
+                MarkerDistance = 25f;
 
             GilesTrinity.hashSkipAheadAreaCache.Clear();
             PriorityScenesInvestigated.Clear();
@@ -941,7 +997,10 @@ namespace GilesTrinity.XmlTags
             if (IgnoreScenes == null)
                 IgnoreScenes = new List<IgnoreScene>();
 
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag,
+            if (AlternateActors == null)
+                AlternateActors = new List<AlternateActor>();
+
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag,
                 "Initialized TrinityExploreDungeon: boxSize={0} boxTolerance={1:0.00} endType={2} timeoutType={3} timeoutValue={4} pathPrecision={5:0} sceneId={6} actorId={7} objectDistance={8} markerDistance={9} exitNameHash={10}",
                 GridSegmentation.BoxSize, GridSegmentation.BoxTolerance, EndType, ExploreTimeoutType, TimeoutValue, PathPrecision, SceneId, ActorId, ObjectDistance, MarkerDistance, ExitNameHash);
 

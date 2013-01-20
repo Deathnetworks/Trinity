@@ -24,6 +24,19 @@ namespace GilesTrinity
             }
         }
 
+        public static bool UpdateObject(GenericCacheObject obj)
+        {
+            lock (_Synchronizer)
+            {
+                if (ContainsKey(obj.Key))
+                {
+                    CacheList.RemoveWhere(o => o.Key == obj.Key);
+                }
+                CacheList.Add(obj);
+                return true;
+            }
+        }
+
         public static bool ContainsKey(string key)
         {
             lock (_Synchronizer)
@@ -47,11 +60,7 @@ namespace GilesTrinity
         {
             lock (_Synchronizer)
             {
-                foreach (GenericCacheObject obj in CacheList.ToList())
-                {
-                    if (obj.IsExpired())
-                        CacheList.Remove(obj);
-                }
+                CacheList.RemoveWhere(o => o.IsExpired());
             }
         }
 

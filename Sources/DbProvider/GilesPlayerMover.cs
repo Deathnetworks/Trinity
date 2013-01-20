@@ -804,6 +804,23 @@ namespace GilesTrinity.DbProvider
             }
         }
 
+        internal static bool CanFullyPathTo(Vector3 point, float withinDistance = 10f)
+        {
+            IndexedList<Vector3> PathStack = GeneratePath(GilesTrinity.PlayerStatus.CurrentPosition, point);
+
+            if (!PathStack.Any())
+                return false;
+
+            for (int i = PathStack.Count - 1; i >= 0; i--)
+            {
+                if (PathStack[i].Distance2D(point) <= withinDistance)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         internal static IndexedList<Vector3> GeneratePath(Vector3 start, Vector3 destination)
         {
             Stack<Vector3> pathStack = new Stack<Vector3>();
@@ -815,17 +832,17 @@ namespace GilesTrinity.DbProvider
                 true, 50, true
                 );
 
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Generated path with {0} points", pfr.PointsReversed.Count());
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Generated path with {0} points", pfr.PointsReversed.Count());
 
             if (pfr.Error)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Error in generating path: {0}", pfr.ErrorMessage);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Error in generating path: {0}", pfr.ErrorMessage);
                 return new IndexedList<Vector3>(pathStack, false);
             }
 
             if (pfr.IsPartialPath)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.XmlTag, "Partial Path Generated!", true);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Partial Path Generated!", true);
             }
 
             pathStack.Clear();
@@ -849,6 +866,10 @@ namespace GilesTrinity.DbProvider
             if (!PathStack.Any() || DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000)
             {
                 PathStack = PlayerMover.GeneratePath(ZetaDia.Me.Position, moveTarget);
+
+                if (!PathStack.Any())
+                    return MoveResult.PathGenerationFailed;
+
                 lastGeneratedPath = DateTime.Now;
                 newPath = true;
             }
