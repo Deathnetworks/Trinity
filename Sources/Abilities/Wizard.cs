@@ -57,7 +57,7 @@ namespace GilesTrinity
                 }
                 // Blizzard
                 if (!bOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Blizzard) &&
-                    powerLastSnoPowerUsed != SNOPower.Wizard_Blizzard &&
+                    LastPowerUsed != SNOPower.Wizard_Blizzard &&
                     (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2 || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss || PlayerStatus.CurrentHealthPct <= 0.7) &&
                     PlayerStatus.CurrentEnergy >= 40 && GilesUseTimer(SNOPower.Wizard_Blizzard))
                 {
@@ -75,7 +75,7 @@ namespace GilesTrinity
                 }
                 // Teleport in combat for critical-mass wizards
                 if (!bOOCBuff && !bCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Teleport) && Settings.Combat.Wizard.CriticalMass &&
-                    powerLastSnoPowerUsed != SNOPower.Wizard_Teleport &&
+                    LastPowerUsed != SNOPower.Wizard_Teleport &&
                     PlayerStatus.CurrentEnergy >= 15 && CurrentTarget.CentreDistance <= 35f &&
                     PowerManager.CanCast(SNOPower.Wizard_Teleport))
                 {
@@ -83,7 +83,7 @@ namespace GilesTrinity
                     return new TrinityPower(SNOPower.Wizard_Teleport, 35f, vSideToSideTarget, iCurrentWorldID, -1, 1, 2, USE_SLOWLY);
                 }
                 // Diamond Skin SPAM
-                if (Hotbar.Contains(SNOPower.Wizard_DiamondSkin) && powerLastSnoPowerUsed != SNOPower.Wizard_DiamondSkin &&
+                if (Hotbar.Contains(SNOPower.Wizard_DiamondSkin) && LastPowerUsed != SNOPower.Wizard_DiamondSkin &&
                     (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 0 || PlayerStatus.CurrentHealthPct <= 0.90 || PlayerStatus.IsIncapacitated || PlayerStatus.IsRooted || (!bOOCBuff && CurrentTarget.RadiusDistance <= 40f)) &&
                     ((Settings.Combat.Wizard.CriticalMass && !bOOCBuff) || !GetHasBuff(SNOPower.Wizard_DiamondSkin)) &&
                     PowerManager.CanCast(SNOPower.Wizard_DiamondSkin))
@@ -139,7 +139,7 @@ namespace GilesTrinity
                 }
                 // Hydra
                 if (!bOOCBuff && !PlayerStatus.IsIncapacitated &&
-                    powerLastSnoPowerUsed != SNOPower.Wizard_Hydra &&
+                    LastPowerUsed != SNOPower.Wizard_Hydra &&
                     (ElitesWithinRange[RANGE_15] > 0 || AnythingWithinRange[RANGE_15] > 4 || PlayerStatus.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 15f)) &&
                     Hotbar.Contains(SNOPower.Wizard_Hydra) &&
                     PlayerStatus.CurrentEnergy >= 15 && GilesUseTimer(SNOPower.Wizard_Hydra))

@@ -1,6 +1,5 @@
 ﻿using GilesTrinity.ItemRules;
 using GilesTrinity.Settings;
-using GilesTrinity.Swap;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -355,7 +354,7 @@ namespace GilesTrinity
         // Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
         private static TrinityPower powerBuff;
         private static TrinityPower CurrentPower;
-        private static SNOPower powerLastSnoPowerUsed = SNOPower.None;
+        internal static SNOPower LastPowerUsed = SNOPower.None;
 
         // Two variables to stop DB from attempting any navigator movement mid-combat/mid-backtrack
         public static bool bDontMoveMeIAmDoingShit = false;
@@ -382,12 +381,6 @@ namespace GilesTrinity
         /// Check LoS if waller avoidance detected
         /// </summary>
         private static bool bCheckGround = false;
-
-        /// <summary>
-        /// Weapon swapping (Monk Sweeping Wind for higher DPS)
-        /// </summary>
-        internal static WeaponSwap weaponSwap = new WeaponSwap();
-        internal static DateTime WeaponSwapTime = DateTime.Today;
 
         // Goblinney things
         private static int iTotalNumberGoblins = 0;

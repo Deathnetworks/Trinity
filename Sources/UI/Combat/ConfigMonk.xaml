@@ -55,17 +55,15 @@
             </Grid.RowDefinitions>
             <UniformGrid Grid.Row="0" Columns="2">
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.HasInnaSet}" ToolTip="Sweeping Wind for 5 Spirit">Inna's set</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.SweepingWindWeaponSwap}" ToolTip="Sweeping Wind Weapon Swap Exploit">Weapon Swap</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.DisableMantraSpam}" ToolTip="Disable Spamming Mantras (for the 3-sec. buff)">Disable Mantra Spam</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.UseTRMovement}" ToolTip="Disable Tempest Rush for combat, and optimize it for movement.  This will also ignore frenzy shrines!">Tempest Rush Traversal</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.TargetBasedZigZag}" ToolTip="Used Monster positions for Tempest Rush instead of random XYZ">Multi-Target Based ZigZag</CheckBox>
             </UniformGrid>
             <TextBlock Grid.Row="1" Text="Tempest Rush Options:" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center" />
-            <UniformGrid Grid.Row="2" Margin="30,0,30,0" Columns="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <RadioButton Margin="20,0" GroupName="TempestRushOption" Content="Movement Only" IsChecked="{Binding Path=Monk.TempestRushOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=MovementOnly}" />
-                <RadioButton Margin="20,0" GroupName="TempestRushOption" Content="Elites Only" IsChecked="{Binding Path=Monk.TempestRushOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=ElitesOnly}" />
-                <RadioButton Margin="20,0" GroupName="TempestRushOption" Content="Combat Only" IsChecked="{Binding Path=v, Converter={StaticResource enumBooleanConverter}, ConverterParameter=CombatOnly}" />
-                <RadioButton Margin="20,0" GroupName="TempestRushOption" Content="Always" IsChecked="{Binding Path=Monk.TempestRushOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Always}" />
+            <UniformGrid Grid.Row="2" Margin="0,0,0,0" Columns="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <RadioButton Margin="20,0" GroupName="TempestRushOption" Content="Always" IsChecked="{Binding Path=Monk.TROption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Always}" />
+                <RadioButton Margin="20,0" GroupName="TempestRushOption" Content="Movement Only" IsChecked="{Binding Path=Monk.TROption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=MovementOnly}" />
+                <RadioButton Margin="20,0" GroupName="TempestRushOption" Content="Elites and Groups Only" IsChecked="{Binding Path=Monk.TROption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=ElitesGroupsOnly}" />
+                <RadioButton Margin="20,0" GroupName="TempestRushOption" Content="Combat Only" IsChecked="{Binding Path=Monk.TROption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=CombatOnly}" />
             </UniformGrid>
        </Grid>
         
@@ -86,7 +84,6 @@
                 Interval="1" Maximum="150" Minimum="0"
                 SmallChange="1" LargeChange="10"
                 TickPlacement="None" 
-                IsEnabled="{Binding Path=Monk.UseTRMovement}"
                 Value="{Binding Path=Monk.TR_MinSpirit}" 
                 HorizontalAlignment="Stretch" Margin="2"/>
             <TextBlock Grid.Column="2" Text="Min Dist." FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
@@ -94,7 +91,6 @@
                 Interval="1" Maximum="50" Minimum="0"
                 SmallChange="1" LargeChange="5"
                 TickPlacement="None" 
-                IsEnabled="{Binding Path=Monk.UseTRMovement}"
                 Value="{Binding Path=Monk.TR_MinDist}" 
                 HorizontalAlignment="Stretch" Margin="2"/>
         </Grid>

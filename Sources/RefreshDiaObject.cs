@@ -12,6 +12,7 @@ using Zeta.Internals.Actors.Gizmos;
 using Zeta.Internals.SNO;
 using System.Text;
 using GilesTrinity.Cache;
+using GilesTrinity.Settings.Combat;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -1674,7 +1675,7 @@ namespace GilesTrinity
                                     hashRGUIDBlacklist60.Add(c_RActorGuid);
                                     AddToCache = false;
                                 }
-                                if (PlayerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.UseTRMovement)
+                                if (PlayerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.TROption.HasFlag(TempestRushOption.MovementOnly))
                                 {
                                     // Frenzy shrines are a huge time sink for monks using Tempest Rush to move, we should ignore them.
                                     AddToCache = false;

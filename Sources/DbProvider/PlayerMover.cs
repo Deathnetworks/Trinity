@@ -15,6 +15,7 @@ using Zeta.TreeSharp;
 using GilesTrinity.XmlTags;
 using Zeta.Pathfinding;
 using System.Drawing;
+using GilesTrinity.Settings.Combat;
 
 namespace GilesTrinity.DbProvider
 {
@@ -28,7 +29,6 @@ namespace GilesTrinity.DbProvider
         private static bool ShrinesInArea(Vector3 targetpos)
         {
             return GilesTrinity.GilesObjectCache.Any(o => hashAvoidLeapingToSNO.Contains(o.ActorSNO) && Vector3.Distance(o.Position, targetpos) <= 10f);
-            //return ZetaDia.Actors.GetActorsOfType<DiaObject>(true).Any(u => hashAvoidLeapingToSNO.Contains(u.ActorSNO) && Vector3.Distance(u.Position, targetpos) <= 10f);
         }
 
         public void MoveStop()
@@ -121,12 +121,12 @@ namespace GilesTrinity.DbProvider
                 }
                 else if (notpickupgoldsec > 0)
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Gold unchanged for {0}s", notpickupgoldsec);
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Gold unchanged for {0}s", notpickupgoldsec);
                 }
             }
             catch (Exception e)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, e.Message);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, e.Message);
             }
             return false;
         }
@@ -243,21 +243,21 @@ namespace GilesTrinity.DbProvider
                     iCancelUnstuckerForSeconds = 20;
                 timeCancelledUnstuckerFor = DateTime.Now;
                 Navigator.Clear();
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Clearing old route and trying new path find to: " + vOldMoveToTarget.ToString());
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Clearing old route and trying new path find to: " + vOldMoveToTarget.ToString());
                 Navigator.MoveTo(vOldMoveToTarget, "original destination", false);
                 return vSafeMovementLocation;
             }
             // Only try an unstuck 10 times maximum in XXX period of time
             if (Vector3.Distance(vOriginalDestination, vMyCurrentPosition) >= 700f)
             {
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "You are " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away from your destination.");
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "This is too far for the unstucker, and is likely a sign of ending up in the wrong map zone.");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "You are " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away from your destination.");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "This is too far for the unstucker, and is likely a sign of ending up in the wrong map zone.");
                 iTotalAntiStuckAttempts = 20;
             }
             // intell
             if (iTotalAntiStuckAttempts <= 15)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Your bot got stuck! Trying to unstuck (attempt #{0} of 15 attempts) {1} {2} {3} {4}",
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Your bot got stuck! Trying to unstuck (attempt #{0} of 15 attempts) {1} {2} {3} {4}",
                     iTotalAntiStuckAttempts.ToString(),
                     "Act=\"" + ZetaDia.CurrentAct + "\"",
                     "questId=\"" + ZetaDia.CurrentQuest.QuestSNO + "\"",
@@ -265,7 +265,7 @@ namespace GilesTrinity.DbProvider
                     "worldId=\"" + ZetaDia.CurrentWorldId + "\""
                 );
 
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
                 GilesTrinity.PlayerStatus.CurrentPosition = vMyCurrentPosition;
                 vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
                 // Temporarily log stuff
@@ -294,7 +294,7 @@ namespace GilesTrinity.DbProvider
             if (iTimesReachedMaxUnstucks == 1)
             {
                 Navigator.Clear();
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Anti-stuck measures now attempting to kickstart DB's path-finder into action.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Anti-stuck measures now attempting to kickstart DB's path-finder into action.");
                 Navigator.MoveTo(vOriginalDestination, "original destination", false);
                 iCancelUnstuckerForSeconds = 40;
                 timeCancelledUnstuckerFor = DateTime.Now;
@@ -302,7 +302,7 @@ namespace GilesTrinity.DbProvider
             }
             if (iTimesReachedMaxUnstucks == 2)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Moving, "Anti-stuck measures failed. Now attempting to reload current profile.");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Anti-stuck measures failed. Now attempting to reload current profile.");
 
                 Navigator.Clear();
 
@@ -490,7 +490,7 @@ namespace GilesTrinity.DbProvider
                     }
                     else
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Clearing old route and trying new path find to: " + vOldMoveToTarget.ToString());
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Clearing old route and trying new path find to: " + vOldMoveToTarget.ToString());
                         // Reset the path and allow a whole "New" unstuck generation next cycle
                         iTimesReachedStuckPoint = 0;
                         // And cancel unstucking for 9 seconds so DB can try to navigate
@@ -558,7 +558,7 @@ namespace GilesTrinity.DbProvider
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.Barbarian_Leap] = DateTime.Now;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Using Leap for OOC movement, distance={0}", fDistanceFromTarget);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Leap for OOC movement, distance={0}", fDistanceFromTarget);
                     return;
                 }
                 // Furious Charge movement for a barb
@@ -572,7 +572,7 @@ namespace GilesTrinity.DbProvider
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.Barbarian_FuriousCharge] = DateTime.Now;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Using Furious Charge for OOC movement, distance={0}", fDistanceFromTarget);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Furious Charge for OOC movement, distance={0}", fDistanceFromTarget);
                     return;
                 }
                 // Vault for a DH - maximum set by user-defined setting
@@ -593,32 +593,39 @@ namespace GilesTrinity.DbProvider
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault] = DateTime.Now;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Using Vault for OOC movement, distance={0}", fDistanceFromTarget);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Vault for OOC movement, distance={0}", fDistanceFromTarget);
                     return;
                 }
                 // Tempest rush for a monk
-                if (GilesTrinity.Hotbar.Contains(SNOPower.Monk_TempestRush) && !bTooMuchZChange)
+                //if (GilesTrinity.Hotbar.Contains(SNOPower.Monk_TempestRush) && !bTooMuchZChange)
+                if (GilesTrinity.Hotbar.Contains(SNOPower.Monk_TempestRush) && 
+                    (GilesTrinity.Settings.Combat.Monk.TROption == TempestRushOption.MovementOnly || GilesTrinity.Settings.Combat.Monk.TROption == TempestRushOption.Always))
                 {
-                    if (!CanChannelTempestRush && GilesTrinity.PlayerStatus.CurrentEnergy >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit && fDistanceFromTarget > GilesTrinity.Settings.Combat.Monk.TR_MinDist)
-                        CanChannelTempestRush = true;
-                    else if (CanChannelTempestRush && (GilesTrinity.PlayerStatus.CurrentEnergy <= 20 || fDistanceFromTarget < 10f))
-                        CanChannelTempestRush = false;
-
-                    if (CanChannelTempestRush)
-                    {
-                        float aimPointDistance = 20f;
+                        float aimPointDistance = 10f;
                         Vector3 vTargetAimPoint = vMoveToTarget;
                         if (fDistanceFromTarget > aimPointDistance)
                         {
                             vTargetAimPoint = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, aimPointDistance);
                         }
 
+                        if (!CanChannelTempestRush &&
+                            GilesTrinity.PlayerStatus.CurrentEnergy >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit &&
+                            fDistanceFromTarget >= GilesTrinity.Settings.Combat.Monk.TR_MinDist &&
+                            GilesTrinity.GilesCanRayCast(vMyCurrentPosition, vTargetAimPoint, NavCellFlags.AllowWalk))
+                        {
+                            CanChannelTempestRush = true;
+                        }
+                        else if (CanChannelTempestRush && (GilesTrinity.PlayerStatus.CurrentEnergy <= 20 || fDistanceFromTarget < 5f))
+                        {
+                            CanChannelTempestRush = false;
+                        }
+                    if (CanChannelTempestRush)
+                    {
                         ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vTargetAimPoint, GilesTrinity.iCurrentWorldID, -1);
 
-                        //ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vMoveToTarget);
-
                         GilesTrinity.dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Using Tempest Rush for OOC movement, distance={0:0}", fDistanceFromTarget);
+                        GilesTrinity.LastPowerUsed = SNOPower.Monk_TempestRush;
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Tempest Rush for OOC movement, distance={0:0}", fDistanceFromTarget);
                         return;
                     }
                 }
@@ -633,7 +640,7 @@ namespace GilesTrinity.DbProvider
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Teleport] = DateTime.Now;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Using Teleport for OOC movement, distance={0}", fDistanceFromTarget);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Teleport for OOC movement, distance={0}", fDistanceFromTarget);
                     return;
                 }
                 // Archon Teleport for a wizard 
@@ -647,7 +654,7 @@ namespace GilesTrinity.DbProvider
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Archon_Teleport] = DateTime.Now;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Using Archon Teleport for OOC movement, distance={0}", fDistanceFromTarget);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Archon Teleport for OOC movement, distance={0}", fDistanceFromTarget);
                     return;
                 }
             }
@@ -657,9 +664,9 @@ namespace GilesTrinity.DbProvider
                 // Default movement
                 ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
 
-                if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Moving))
+                if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Moved to:{0} dir: {1} Speed:{2:0.00} Dist:{3:0} ZDiff:{4:0} Nav:{5} LoS:{6}",
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Moved to:{0} dir: {1} Speed:{2:0.00} Dist:{3:0} ZDiff:{4:0} Nav:{5} LoS:{6}",
                         vMoveToTarget, GilesTrinity.GetHeadingToPoint(vMoveToTarget), MovementSpeed, vMyCurrentPosition.Distance2D(vMoveToTarget),
                         Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z),
                         GilesTrinity.pf.IsNavigable(GilesTrinity.gp.WorldToGrid(vMoveToTarget.ToVector2())),
@@ -669,7 +676,7 @@ namespace GilesTrinity.DbProvider
             }
             else
             {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Moving, "Reached MoveTowards Destination {0} Current Speed: {0}", vMoveToTarget, MovementSpeed);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Reached MoveTowards Destination {0} Current Speed: {0}", vMoveToTarget, MovementSpeed);
             }
 
 
@@ -730,7 +737,7 @@ namespace GilesTrinity.DbProvider
                 vShiftedPosition = vMoveToTarget;
                 iShiftPositionFor = 900;
                 lastShiftedPosition = DateTime.Now;
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Navigation handler position shift to: " + vMoveToTarget.ToString() + " (was " + point.ToString() + ")");
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Navigation handler position shift to: " + vMoveToTarget.ToString() + " (was " + point.ToString() + ")");
             }
         }
 
@@ -832,17 +839,17 @@ namespace GilesTrinity.DbProvider
                 true, 50, true
                 );
 
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Generated path with {0} points", pfr.PointsReversed.Count());
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Generated path with {0} points", pfr.PointsReversed.Count());
 
             if (pfr.Error)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Error in generating path: {0}", pfr.ErrorMessage);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Error in generating path: {0}", pfr.ErrorMessage);
                 return new IndexedList<Vector3>(pathStack, false);
             }
 
             if (pfr.IsPartialPath)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Partial Path Generated!", true);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Partial Path Generated!", true);
             }
 
             pathStack.Clear();
@@ -851,7 +858,6 @@ namespace GilesTrinity.DbProvider
             {
                 Vector3 v3 = GilesTrinity.gp.GridToWorld(p).ToVector3();
                 pathStack.Push(v3);
-                //Logging.Write("Pushing path point to stack {0}, order {1}, distance {2}", v3, PathStack.Count(), v3.Distance(myPos));
             }
             return new IndexedList<Vector3>(pathStack, false);
         }

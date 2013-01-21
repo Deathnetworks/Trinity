@@ -159,7 +159,7 @@ namespace GilesTrinity
                 int iPostDelay = 0;
                 if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind))
                 {
-                    if (powerLastSnoPowerUsed == SNOPower.Barbarian_Whirlwind)
+                    if (LastPowerUsed == SNOPower.Barbarian_Whirlwind)
                     {
                         iPreDelay = 3;
                         iPostDelay = 3;
@@ -254,7 +254,7 @@ namespace GilesTrinity
                 int iPostDelay = 1;
                 if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind))
                 {
-                    if (powerLastSnoPowerUsed == SNOPower.Barbarian_Whirlwind || powerLastSnoPowerUsed == SNOPower.None)
+                    if (LastPowerUsed == SNOPower.Barbarian_Whirlwind || LastPowerUsed == SNOPower.None)
                     {
                         iPreDelay = 5;
                         iPostDelay = 5;
@@ -362,7 +362,7 @@ namespace GilesTrinity
                         vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f, false, true);
                     else
                         vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f);
-                    powerLastSnoPowerUsed = SNOPower.None;
+                    LastPowerUsed = SNOPower.None;
                     iACDGUIDLastWhirlwind = CurrentTarget.ACDGuid;
                     lastChangedZigZag = DateTime.Now;
                 }

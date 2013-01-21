@@ -60,7 +60,6 @@
   <ItemGroup>
     <Compile Include="Abilities\Barbarian.cs" />
     <Compile Include="Abilities\Monk.cs" />
-    <Compile Include="Abilities\WeaponSwap.cs" />
     <Compile Include="Abilities\Wizard.cs" />
     <Compile Include="Abilities\DemonHunter.cs" />
     <Compile Include="Abilities\WitchDoctor.cs" />
@@ -156,7 +155,7 @@
     <Compile Include="Classes\GilesPlayerCache.cs" />
     <Compile Include="Dictionaries.cs" />
     <Compile Include="StuckHandler.cs" />
-    <Compile Include="DbProvider\GilesPlayerMover.cs" />
+    <Compile Include="DbProvider\PlayerMover.cs" />
     <Compile Include="RefreshDiaObject.cs" />
     <Compile Include="GilesTrinity.cs" />
     <Compile Include="RefreshDiaObjects.cs" />

@@ -38,9 +38,7 @@ namespace GilesTrinity.Settings.Combat
         private float _AvoidZoltTwisterHealth;
         private int _TR_MinSpirit;
         private int _TR_MinDist;
-        private bool _UseTRMovement;
         private bool _HasInnaSet;
-        private bool _SweepingWindWeaponSwap;
         private bool _DisableMantraSpam;
         private bool _TargetBasedZigZag;
         #endregion Fields
@@ -586,7 +584,7 @@ namespace GilesTrinity.Settings.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(20)]
+        [DefaultValue(10f)]
         public float TR_MinDist
         {
             get
@@ -599,6 +597,24 @@ namespace GilesTrinity.Settings.Combat
                 {
                     _TR_MinDist = (int)value;
                     OnPropertyChanged("TR_MinDist");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(TempestRushOption.Always)]
+        public TempestRushOption TROption
+        {
+            get
+            {
+                return _TROption;
+            }
+            set
+            {
+                if (_TROption != value)
+                {
+                    _TROption = value;
+                    OnPropertyChanged("TROption");
                 }
             }
         }
@@ -635,42 +651,6 @@ namespace GilesTrinity.Settings.Combat
                 {
                     _DisableMantraSpam = value;
                     OnPropertyChanged("DisableMantraSpam");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool UseTRMovement
-        {
-            get
-            {
-                return _UseTRMovement;
-            }
-            set
-            {
-                if (_UseTRMovement != value)
-                {
-                    _UseTRMovement = value;
-                    OnPropertyChanged("UseTRMovement");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool SweepingWindWeaponSwap
-        {
-            get
-            {
-                return _SweepingWindWeaponSwap;
-            }
-            set
-            {
-                if (_SweepingWindWeaponSwap != value)
-                {
-                    _SweepingWindWeaponSwap = value;
-                    OnPropertyChanged("SweepingWindWeaponSwap");
                 }
             }
         }
@@ -724,9 +704,10 @@ namespace GilesTrinity.Settings.Combat
         [OnDeserializing()]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this.TR_MinSpirit = 60;
-            this.TR_MinDist = 20;
+            this._TR_MinSpirit = 60;
+            this._TR_MinDist = 10;
             this._TargetBasedZigZag = true;
+            this._TROption = TempestRushOption.Always;
         }
         #endregion Methods
     }

@@ -8,6 +8,7 @@ using Zeta.CommonBot.Profile;
 using Zeta.Navigation;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
+using GilesTrinity.DbProvider;
 
 namespace GilesTrinity.XmlTags
 {
@@ -68,19 +69,30 @@ namespace GilesTrinity.XmlTags
             }
 
             // Now use Trinity movement to try a direct movement towards that location
-
-            Vector3 NavTarget = Position;
-            Vector3 MyPos = GilesTrinity.PlayerStatus.CurrentPosition;
-            if (Vector3.Distance(MyPos, NavTarget) > 250)
+            if (!ZetaDia.WorldInfo.IsGenerated)
             {
-                NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
+                // Use DefaultNavigationProvider for static worlds
+                Vector3 NavTarget = Position;
+                Vector3 MyPos = GilesTrinity.PlayerStatus.CurrentPosition;
+                if (Vector3.Distance(MyPos, NavTarget) > 250)
+                {
+                    NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
+                }
+
+                if (useNavigator != null && useNavigator.ToLower() == "false")
+                {
+                    Navigator.PlayerMover.MoveTowards(NavTarget);
+                }
+                else
+                {
+                    Navigator.MoveTo(NavTarget);
+                }
             }
-
-            if (useNavigator != null && useNavigator.ToLower() == "false")
-                Navigator.PlayerMover.MoveTowards(NavTarget);
             else
-                Navigator.MoveTo(NavTarget);
-
+            {
+                // Use PathFinder for generated worlds
+                PlayerMover.NavigateTo(Position);
+            }
             return RunStatus.Success;
         }
 

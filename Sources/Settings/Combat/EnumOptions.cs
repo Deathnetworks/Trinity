@@ -1,4 +1,5 @@
-﻿
+﻿using System;
+
 namespace GilesTrinity.Settings.Combat
 {
     public enum GoblinPriority
@@ -8,11 +9,10 @@ namespace GilesTrinity.Settings.Combat
         Prioritize = 2,
         Kamikaze = 3
     }
-
     public enum TempestRushOption
     {
         MovementOnly = 0,
-        ElitesOnly = 1,
+        ElitesGroupsOnly = 1,
         CombatOnly = 2,
         Always = 3
     }

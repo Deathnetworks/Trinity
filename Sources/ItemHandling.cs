@@ -956,11 +956,6 @@ namespace GilesTrinity
             {
                 BackpackSlotBlocked[square.Column, square.Row] = true;
             }
-            if (PlayerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.SweepingWindWeaponSwap)
-            {
-                BackpackSlotBlocked[9, 4] = true;
-                BackpackSlotBlocked[9, 5] = true;
-            }
 
             // Map out all the items already in the backpack
             foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)

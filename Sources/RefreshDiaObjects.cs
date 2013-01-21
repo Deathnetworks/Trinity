@@ -80,9 +80,9 @@ namespace GilesTrinity
                         // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
                         if (vAnySafePoint != vNullLocation)
                         {
-                            if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Moving))
+                            if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                             {
-                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting Avoidance: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}",
+                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting Avoidance: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}",
                                     vAnySafePoint, vAnySafePoint.Distance(Me.Position), GetHeading(FindDirectionDegree(Me.Position, vAnySafePoint)),
                                     PlayerStatus.CurrentHealthPct, PlayerKiteDistance);
                             }
@@ -103,7 +103,7 @@ namespace GilesTrinity
                             // Didn't find any safe spot we could reach, so don't look for any more safe spots for at least 2.8 seconds
                             cancelledEmergencyMoveForMilliseconds = 2800;
                             timeCancelledEmergencyMove = DateTime.Now;
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Unable to find kite location, canceling kite movement for {0}ms", cancelledKiteMoveForMilliseconds);
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Unable to find kite location, canceling kite movement for {0}ms", cancelledKiteMoveForMilliseconds);
                         }
                     }
                 }
@@ -785,7 +785,7 @@ namespace GilesTrinity
                         {
                             timeCancelledKiteMove = DateTime.Now;
                             cancelledKiteMoveForMilliseconds = 1500;
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kite movement failed, cancelling for {0:0}ms", cancelledKiteMoveForMilliseconds);
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kite movement failed, cancelling for {0:0}ms", cancelledKiteMoveForMilliseconds);
                             return;
                         }
                         else
@@ -798,9 +798,9 @@ namespace GilesTrinity
                             };
                         }
 
-                        if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Moving))
+                        if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         {
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
                                 vAnySafePoint, vAnySafePoint.Distance(PlayerStatus.CurrentPosition), GetHeading(FindDirectionDegree(Me.Position, vAnySafePoint)),
                                 PlayerStatus.CurrentHealthPct, PlayerKiteDistance, monsterList.Count(),
                                 NeedToKite, TryToKite);
@@ -830,11 +830,11 @@ namespace GilesTrinity
                 }
                 else if (!shouldEmergencyMove && NeedToKite)
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Emergency movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Emergency movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
                 }
                 else if (!shouldKite && TryToKite)
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kite movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kite movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
                 }
             }
         }

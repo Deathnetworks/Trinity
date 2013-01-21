@@ -235,7 +235,7 @@ namespace GilesTrinity
                             if (powerBuff.SNOPower != SNOPower.None)
                             {
                                 ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.vTargetLocation, powerBuff.iTargetWorldID, powerBuff.iTargetGUID);
-                                powerLastSnoPowerUsed = powerBuff.SNOPower;
+                                LastPowerUsed = powerBuff.SNOPower;
                                 dictAbilityLastUse[powerBuff.SNOPower] = DateTime.Now;
                             }
                         }
@@ -294,39 +294,6 @@ namespace GilesTrinity
                         else
                         {
                             CurrentTargetIsInLoS = true;
-                        }
-                    }
-
-                    using (new PerformanceLogger("HandleTarget.MonkWeaponSwap"))
-                    {
-                        // Item Swap + Blinding flash cast
-                        if (PlayerStatus.ActorClass == ActorClass.Monk)
-                        {
-                            if (weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
-                                hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind))
-                            {
-                                if (PowerManager.CanCast(SNOPower.Monk_BlindingFlash) && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 200 && !GetHasBuff(SNOPower.Monk_SweepingWind)
-                                    && (PlayerStatus.CurrentEnergy >= 85 || (Settings.Combat.Monk.HasInnaSet && PlayerStatus.CurrentEnergy >= 15)))
-                                {
-                                    ZetaDia.Me.UsePower(SNOPower.Monk_BlindingFlash, vCurrentDestination, iCurrentWorldID, -1);
-                                    return RunStatus.Running;
-                                }
-                                else if (DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 1500 || DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 800
-                                        && GetHasBuff(SNOPower.Monk_SweepingWind))
-                                {
-                                    weaponSwap.SwapGear();
-                                }
-                            }
-                            // Spam sweeping winds
-                            if (hashCachedPowerHotbarAbilities.Contains(SNOPower.Monk_SweepingWind) && (PlayerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && PlayerStatus.CurrentEnergy >= 5))
-                                && (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 3700 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5100
-                                || !GetHasBuff(SNOPower.Monk_SweepingWind) && weaponSwap.DpsGearOn() && Settings.Combat.Monk.SweepingWindWeaponSwap &&
-                                DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds >= 400))
-                            {
-                                ZetaDia.Me.UsePower(SNOPower.Monk_SweepingWind, vCurrentDestination, iCurrentWorldID, -1);
-                                SweepWindSpam = DateTime.Now;
-                                return RunStatus.Running;
-                            }
                         }
                     }
 
@@ -685,9 +652,12 @@ namespace GilesTrinity
                                 }
                                 // Tempest rush for a monk
                                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && PlayerStatus.CurrentEnergy >= 20 &&
-                                    ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.CentreDistance > 20f) || CurrentTarget.Type != GObjectType.Item))
+                                    ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.CentreDistance > 20f) || CurrentTarget.Type != GObjectType.Item) &&
+                                    Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly)
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, iCurrentWorldID, -1);
+                                    dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
+                                    LastPowerUsed = SNOPower.Monk_TempestRush;
                                     // Store the current destination for comparison incase of changes next loop
                                     vLastMoveToTarget = vCurrentDestination;
                                     // Reset total body-block count, since we should have moved
@@ -731,17 +701,17 @@ namespace GilesTrinity
                             (!Settings.Combat.Barbarian.SelectiveWhirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)))))
                     {
                         // Special code to prevent whirlwind double-spam, this helps save fury
-                        bool bUseThisLoop = SNOPower.Barbarian_Whirlwind != powerLastSnoPowerUsed;
+                        bool bUseThisLoop = SNOPower.Barbarian_Whirlwind != LastPowerUsed;
                         if (!bUseThisLoop)
                         {
-                            powerLastSnoPowerUsed = SNOPower.None;
+                            LastPowerUsed = SNOPower.None;
                             if (DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Whirlwind]).TotalMilliseconds >= 200)
                                 bUseThisLoop = true;
                         }
                         if (bUseThisLoop)
                         {
                             ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, iCurrentWorldID, -1);
-                            powerLastSnoPowerUsed = SNOPower.Barbarian_Whirlwind;
+                            LastPowerUsed = SNOPower.Barbarian_Whirlwind;
                             dictAbilityLastUse[SNOPower.Barbarian_Whirlwind] = DateTime.Now;
                         }
                         // Store the current destination for comparison incase of changes next loop
@@ -1486,7 +1456,7 @@ namespace GilesTrinity
                 // Use the power
                 bool bUsePowerSuccess = false;
                 // Note that whirlwinds use an off-on-off-on to avoid spam
-                if (CurrentPower.SNOPower != SNOPower.Barbarian_Whirlwind && CurrentPower.SNOPower != SNOPower.DemonHunter_Strafe)
+                if (CurrentPower.SNOPower != SNOPower.Barbarian_Whirlwind && CurrentPower.SNOPower != SNOPower.DemonHunter_Strafe && CurrentPower.SNOPower != SNOPower.Monk_TempestRush)
                 {
                     ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.vTargetLocation, CurrentPower.iTargetWorldID, CurrentPower.iTargetGUID);
                     bUsePowerSuccess = true;
@@ -1496,7 +1466,7 @@ namespace GilesTrinity
                 else
                 {
                     // Special code to prevent whirlwind double-spam, this helps save fury
-                    bool bUseThisLoop = CurrentPower.SNOPower != powerLastSnoPowerUsed;
+                    bool bUseThisLoop = CurrentPower.SNOPower != LastPowerUsed;
                     if (!bUseThisLoop)
                     {
                         //powerLastSnoPowerUsed = SNOPower.None;
@@ -1513,7 +1483,7 @@ namespace GilesTrinity
                 {
                     dictAbilityLastUse[CurrentPower.SNOPower] = DateTime.Now;
                     lastGlobalCooldownUse = DateTime.Now;
-                    powerLastSnoPowerUsed = CurrentPower.SNOPower;
+                    LastPowerUsed = CurrentPower.SNOPower;
                     CurrentPower.SNOPower = SNOPower.None;
                     // Wait for animating AFTER the attack
                     if (CurrentPower.bWaitWhileAnimating)

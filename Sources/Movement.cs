@@ -736,7 +736,7 @@ namespace GilesTrinity
                 UsedStuckSpots.Add(bestPoint);
             }
 
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kiting grid found {0}, distance: {1:0}, weight: {2:0}", bestPoint.Position, bestPoint.Distance, bestPoint.Weight);
+            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid found {0}, distance: {1:0}, weight: {2:0}", bestPoint.Position, bestPoint.Distance, bestPoint.Weight);
             return bestPoint.Position;
 
         }

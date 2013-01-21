@@ -22,10 +22,11 @@ namespace GilesTrinity.XmlTags
 {
     /// <summary>
     /// TrinityExploreDungeon is fuly backwards compatible with the built-in Demonbuddy ExploreArea tag. It provides additional features such as:
-    /// Moving to investigate MiniMapMarker pings and the current ExitNameHash if provided and visible
-    /// Moving to investigate Priority Scenes if provided
-    /// Ignoring DungeonExplorer nodes in certain scenes if provided
-    /// Reduced backtracking 
+    /// Moving to investigate MiniMapMarker pings and the current ExitNameHash if provided and visible (mini map marker 0 and the current exitNameHash)
+    /// Moving to investigate Priority Scenes if provided (PrioritizeScenes subtags)
+    /// Ignoring DungeonExplorer nodes in certain scenes if provided (IgnoreScenes subtags)
+    /// Reduced backtracking (via pathPrecision attribute and combat skip ahead cache)
+    /// Multiple ActorId's for the ObjectFound end type (AlternateActors sub-tags)
     /// </summary>
     [XmlElement("TrinityExploreDungeon")]
     public class TrinityExploreDungeon : ProfileBehavior
@@ -370,7 +371,7 @@ namespace GilesTrinity.XmlTags
                 TagTimer.Start();
                 return RunStatus.Failure;
             }
-            if (TagTimer.Elapsed.TotalSeconds > TimeoutValue)
+            if (ExploreTimeoutType == TimeoutType.Timer && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityExploreDungeon timer ended ({0}), tag finished!", TimeoutValue);
                 isDone = true;
@@ -424,6 +425,7 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => MiniMapMarker.KnownMarkers.Clear()),
                         new Action(ret => GridSegmentation.Reset()),
                         new Action(ret => BrainBehavior.DungeonExplorer.Reset()),
+                        new Action(ret => PriorityScenesInvestigated.Clear()),
                         new Action(ret => UpdateRoute())
                     )
                 )
@@ -489,7 +491,8 @@ namespace GilesTrinity.XmlTags
         }
 
         private Vector3 PrioritySceneTarget = Vector3.Zero;
-        private int PrioritySceneId = -1;
+        private int PrioritySceneGuid = -1;
+        private Scene CurrentPriorityScene = null;
         /// <summary>
         /// A list of Scene SNOId's that have already been investigated
         /// </summary>
@@ -515,7 +518,8 @@ namespace GilesTrinity.XmlTags
                         new PrioritySelector(
                             new Decorator(ret => PrioritySceneTarget.Distance2D(myPos) <= PathPrecision,
                                 new Sequence(
-                                    new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Successfully navigated to priority scene {0} center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos))),
+                                    new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Successfully navigated to priority scene {0} {1} center {2} Distance {3:0}", 
+                                        CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos))),
                                     new Action(ret => PrioritySceneMoveToFinished())
                                 )
                             ),
@@ -531,13 +535,15 @@ namespace GilesTrinity.XmlTags
         /// </summary>
         private void MoveToPriorityScene()
         {
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Moving to Priority Scene {0} Center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Moving to Priority Scene {0} - {1} Center {2} Distance {3:0}", 
+                CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
 
             MoveResult moveResult = PlayerMover.NavigateTo(PrioritySceneTarget);
 
             if (moveResult == MoveResult.PathGenerationFailed)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Unable to navigate to Scene {0} Center {1} Distance {2:0}, cancelling!", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Unable to navigate to Scene {0} - {1} Center {2} Distance {3:0}, cancelling!",
+                    CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
                 PrioritySceneMoveToFinished();
             }
         }
@@ -547,8 +553,8 @@ namespace GilesTrinity.XmlTags
         /// </summary>
         private void PrioritySceneMoveToFinished()
         {
-            PriorityScenesInvestigated.Add(PrioritySceneId);
-            PrioritySceneId = -1;
+            PriorityScenesInvestigated.Add(PrioritySceneGuid);
+            PrioritySceneGuid = -1;
             PrioritySceneTarget = Vector3.Zero;
             UpdateRoute();
         }
@@ -569,9 +575,15 @@ namespace GilesTrinity.XmlTags
             bool foundPriorityScene = false;
 
             // find any matching priority scenes in scene manager - match by name or SNOId
-            foreach (Scene scene in ZetaDia.Scenes.GetScenes().Where(s => PriorityScenes.Any(ps => s.Name.ToLower().Contains(ps.SceneName.ToLower()) || s.SceneInfo.SNOId == ps.SceneId)))
+
+            List<Scene> PScenes = ZetaDia.Scenes.GetScenes()
+                .Where(s => PriorityScenes.Any(ps => 
+                    (ps.SceneName.Trim() != String.Empty && ps.SceneId == -1 && s.Name.ToLower().Contains(ps.SceneName.ToLower())) ||
+                ps.SceneId != -1 && s.SceneInfo.SNOId == ps.SceneId)).ToList();
+
+            foreach (Scene scene in PScenes)
             {
-                if (PriorityScenesInvestigated.Contains(scene.SceneInfo.SNOId))
+                if (PriorityScenesInvestigated.Contains(scene.SceneGuid))
                     continue;
 
                 foundPriorityScene = true;
@@ -595,13 +607,15 @@ namespace GilesTrinity.XmlTags
                 {
                     PrioritySceneTarget = GetNavCellCenter(bestCell, navZone);
 
-                    PrioritySceneId = scene.SceneInfo.SNOId;
+                    PrioritySceneGuid = scene.SceneGuid;
 
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene {0} Center {1} Distance {2:0}", PrioritySceneId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
+                    CurrentPriorityScene = scene;
+
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene {0}-{1} Center {2} Distance {3:0}", scene.Name, scene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
                 }
                 else
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene but could not find a navigable point!", PrioritySceneId, PrioritySceneTarget);
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene but could not find a navigable point!", true);
                 }
             }
 
@@ -946,7 +960,7 @@ namespace GilesTrinity.XmlTags
                 if (PathStack.Any())
                 {
                     moveTarget = PathStack.Current;
-                    DbHelper.Log(LogCategory.Moving, "[Path] removed:{0} next:{1} dist:{2} dir:{3}",
+                    DbHelper.Log(LogCategory.Movement, "[Path] removed:{0} next:{1} dist:{2} dir:{3}",
                         lastStep, moveTarget, Vector3.Distance(lastStep, moveTarget), GilesTrinity.GetHeadingToPoint(moveTarget));
                 }
                 else
@@ -961,7 +975,7 @@ namespace GilesTrinity.XmlTags
         /// <summary>
         /// Initizializes the profile tag and sets defaults as needed
         /// </summary>
-        private void Init()
+        private void Init(bool forced = false)
         {
             if (gp == null)
             {
@@ -1000,10 +1014,12 @@ namespace GilesTrinity.XmlTags
             if (AlternateActors == null)
                 AlternateActors = new List<AlternateActor>();
 
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag,
-                "Initialized TrinityExploreDungeon: boxSize={0} boxTolerance={1:0.00} endType={2} timeoutType={3} timeoutValue={4} pathPrecision={5:0} sceneId={6} actorId={7} objectDistance={8} markerDistance={9} exitNameHash={10}",
-                GridSegmentation.BoxSize, GridSegmentation.BoxTolerance, EndType, ExploreTimeoutType, TimeoutValue, PathPrecision, SceneId, ActorId, ObjectDistance, MarkerDistance, ExitNameHash);
-
+            if (!forced)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag,
+                    "Initialized TrinityExploreDungeon: boxSize={0} boxTolerance={1:0.00} endType={2} timeoutType={3} timeoutValue={4} pathPrecision={5:0} sceneId={6} actorId={7} objectDistance={8} markerDistance={9} exitNameHash={10}",
+                    GridSegmentation.BoxSize, GridSegmentation.BoxTolerance, EndType, ExploreTimeoutType, TimeoutValue, PathPrecision, SceneId, ActorId, ObjectDistance, MarkerDistance, ExitNameHash);
+            }
             InitDone = true;
         }
 

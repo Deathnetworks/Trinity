@@ -148,7 +148,7 @@ namespace GilesTrinity
                     //vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.vPosition, CurrentTarget.fCentreDist + fExtraDistance);
                     vSideToSideTarget = FindSafeZone(false, 1, CurrentTarget.Position, false);
                     // Resetting this to ensure the "no-spam" is reset since we changed our target location
-                    powerLastSnoPowerUsed = SNOPower.None;
+                    LastPowerUsed = SNOPower.None;
                     iACDGUIDLastWhirlwind = CurrentTarget.ACDGuid;
                     lastChangedZigZag = DateTime.Now;
                 }
@@ -156,7 +156,7 @@ namespace GilesTrinity
             }
             // Spike Trap
             if (!bOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_SpikeTrap) &&
-                powerLastSnoPowerUsed != SNOPower.DemonHunter_SpikeTrap &&
+                LastPowerUsed != SNOPower.DemonHunter_SpikeTrap &&
                 (ElitesWithinRange[RANGE_30] >= 1 || AnythingWithinRange[RANGE_25] > 4 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 35f)) &&
                 PlayerStatus.CurrentEnergy >= 30 && GilesUseTimer(SNOPower.DemonHunter_SpikeTrap))
             {

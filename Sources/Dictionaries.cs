@@ -157,8 +157,9 @@ namespace GilesTrinity
             96192,                   89690,           95250,         193077, 
             //Kulle (80509), Small Belial (220160), Big Belial (3349), Diablo 1 (114917), terror Diablo (133562)
             80509,           220160,                3349,              114917,            133562, 
-            //Maghda
-            6031,
+            //Maghda, Kamyr (MiniBoss before Belial)
+            6031, 51298,
+
             255929, 256711, 256508, 256187, 256189, 256709,
             // Another Cydaea
             137139,
@@ -346,7 +347,7 @@ namespace GilesTrinity
                 {SNOPower.Monk_CripplingWave, 5},
                 {SNOPower.Monk_WayOfTheHundredFists, 5},
                 {SNOPower.Monk_LashingTailKick, 250},
-                {SNOPower.Monk_TempestRush, 50},
+                {SNOPower.Monk_TempestRush, 5},
                 {SNOPower.Monk_WaveOfLight, 250},
                 {SNOPower.Monk_BlindingFlash, 15200},
                 {SNOPower.Monk_BreathOfHeaven, 15200},

@@ -161,12 +161,6 @@ namespace GilesTrinity
                 // Refresh new Cache
                 //CacheRefresher.RefreshAll();
 
-                using (new PerformanceLogger("GilesGlobalOverlord.WeaponSwapCheck"))
-                {
-                    // For Monk SweepingWind WeaponSwap
-                    if (PlayerStatus.ActorClass == ActorClass.Monk && GilesTrinity.Settings.Combat.Monk.SweepingWindWeaponSwap && weaponSwap.DpsGearOn() && DateTime.Now.Subtract(WeaponSwapTime).TotalMilliseconds > 1500)
-                        weaponSwap.SwapGear();
-                }
                 // We have a target, start the target handler!
                 if (CurrentTarget != null)
                 {
@@ -232,7 +226,7 @@ namespace GilesTrinity
                                 WaitWhileAnimating(4, true);
                                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", powerBuff.SNOPower.ToString());
                                 ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.vTargetLocation, powerBuff.iTargetWorldID, powerBuff.iTargetGUID);
-                                powerLastSnoPowerUsed = powerBuff.SNOPower;
+                                LastPowerUsed = powerBuff.SNOPower;
                                 dictAbilityLastUse[powerBuff.SNOPower] = DateTime.Now;
                                 WaitWhileAnimating(3, true);
                             }

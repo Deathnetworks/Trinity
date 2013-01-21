@@ -66,6 +66,7 @@ namespace GilesTrinity
                 {
                     DbHelper.LogNormal("Was able to generate full path to failed MiniMapMarker {0} at {1}, marking as good", marker.MarkerNameHash, marker.Position); 
                     marker.Failed = false;
+                    lastMoveResult = MoveResult.PathGenerated;
                 }
             }
         }
