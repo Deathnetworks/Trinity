@@ -37,6 +37,7 @@ namespace GilesTrinity
             if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && ZetaDia.Actors != null)
             {
                 ZetaDia.Actors.Update();
+                UpdateSearchGridProvider(true);
             }
             HasMappedPlayerAbilities = false;
             if (!bMaintainStatTracking)

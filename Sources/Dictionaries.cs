@@ -196,7 +196,7 @@ namespace GilesTrinity
             //bone pile
             218951,245838,
             // rrrix act 1
-            108882, 245919, 5944, 165475, 
+            108882, 245919, 5944, 165475, 199998,
             // rrrix act 2
             213907, 92519, 61544, 105681, 113983, 114527, 114642, 139933, 144405, 156890, 164057, 164195, 180254, 180802, 180809, 181173, 181174, 181177, 181181,
             181182, 181185, 181290, 181292, 181306, 181309, 181313, 181326, 181563, 181857, 181858, 187265, 191433, 191462, 191641, 192880, 192881, 196413, 196435,
@@ -238,13 +238,13 @@ namespace GilesTrinity
         /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
         /// </summary>
         internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
-            174900, 191459, 104632, 196211, 194682, 81699, 3340, 122558,
+            174900, 191459, 104632, 196211, 194682, 81699, 3340, 122558, 123325, 
         };
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 25}, {191459, 13}, {104632, 20}, {196211, 25},  {194682, 20}, {81699, 20}, {3340, 12}, {122558, 15}
+            {174900, 25}, {191459, 13}, {104632, 20}, {196211, 25},  {194682, 20}, {81699, 20}, {3340, 12}, {122558, 15}, {123325, 25},
          };
         /// <summary>
         /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache

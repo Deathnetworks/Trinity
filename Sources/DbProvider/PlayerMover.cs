@@ -813,19 +813,27 @@ namespace GilesTrinity.DbProvider
 
         internal static bool CanFullyPathTo(Vector3 point, float withinDistance = 10f)
         {
-            IndexedList<Vector3> PathStack = GeneratePath(GilesTrinity.PlayerStatus.CurrentPosition, point);
-
-            if (!PathStack.Any())
-                return false;
-
-            for (int i = PathStack.Count - 1; i >= 0; i--)
+            if (ZetaDia.WorldInfo.IsGenerated)
             {
-                if (PathStack[i].Distance2D(point) <= withinDistance)
+                IndexedList<Vector3> PathStack = GeneratePath(GilesTrinity.PlayerStatus.CurrentPosition, point);
+
+                if (!PathStack.Any())
+                    return false;
+
+                for (int i = PathStack.Count - 1; i >= 0; i--)
                 {
-                    return true;
+                    if (PathStack[i].Distance2D(point) <= withinDistance)
+                    {
+                        return true;
+                    }
                 }
+
+                return false;
             }
-            return false;
+            else {
+                var nav = new Zeta.Navigation.DefaultNavigationProvider();
+                return nav.CanPathWithinDistance(point, withinDistance);
+            }
         }
 
         internal static IndexedList<Vector3> GeneratePath(Vector3 start, Vector3 destination)

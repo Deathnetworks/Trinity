@@ -191,6 +191,12 @@ namespace GilesTrinity.XmlTags
         [XmlAttribute("markerDistance")]
         public float MarkerDistance { get; set; }
 
+        /// <summary>
+        /// Disable Mini Map Marker Scouting
+        /// </summary>
+        [XmlAttribute("ignoreMarkers")]
+        public bool IgnoreMarkers { get; set; }
+
         public enum TimeoutType
         {
             None,
@@ -257,6 +263,8 @@ namespace GilesTrinity.XmlTags
         {
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "TrinityExploreDungeon OnStart() called");
 
+            UpdateSearchGridProvider();
+
             CheckResetDungeonExplorer();
 
             if (!InitDone)
@@ -297,12 +305,16 @@ namespace GilesTrinity.XmlTags
         {
             return
             new Sequence(
-                MiniMapMarker.DetectMiniMapMarkers(ExitNameHash),
+                new DecoratorContinue(ret => !IgnoreMarkers,
+                    MiniMapMarker.DetectMiniMapMarkers(ExitNameHash)
+                ),
                 UpdateSearchGridProvider(),
                 new PrioritySelector(
                     CheckIsObjectiveFinished(),
                     PrioritySceneCheck(),
-                    MiniMapMarker.VisitMiniMapMarkers(myPos, MarkerDistance),
+                    new Decorator(ret => !IgnoreMarkers,
+                        MiniMapMarker.VisitMiniMapMarkers(myPos, MarkerDistance)
+                    ),
                     new Sequence(
                         new DecoratorContinue(ret => !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
                             new Action(ret => UpdateRoute())
@@ -418,7 +430,7 @@ namespace GilesTrinity.XmlTags
             return
             new PrioritySelector(
                 CheckIsObjectiveFinished(),
-                new Decorator(ret => GetRouteUnvisitedNodeCount() == 0, // When fully Explored, just finish
+                new Decorator(ret => GetRouteUnvisitedNodeCount() == 0, 
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Visited all nodes but objective not complete, forcing grid reset!")),
                         new Action(ret => GilesTrinity.hashSkipAheadAreaCache.Clear()),
@@ -441,6 +453,12 @@ namespace GilesTrinity.XmlTags
             return
             new PrioritySelector(
                 TimeoutCheck(),
+                new Decorator(ret => EndType == TrinityExploreEndType.FullyExplored && GetRouteUnvisitedNodeCount() == 0,
+                    new Sequence(
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Fully explored area! Tag Finished.", ExitNameHash)),
+                        new Action(ret => isDone = true)
+                    )
+                ),
                 new Decorator(ret => EndType == TrinityExploreEndType.ExitFound && ExitNameHash != 0 && IsExitNameHashVisible(),
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found exitNameHash {0}!", ExitNameHash)),
@@ -491,7 +509,7 @@ namespace GilesTrinity.XmlTags
         }
 
         private Vector3 PrioritySceneTarget = Vector3.Zero;
-        private int PrioritySceneGuid = -1;
+        private int PrioritySceneSNOId = -1;
         private Scene CurrentPriorityScene = null;
         /// <summary>
         /// A list of Scene SNOId's that have already been investigated
@@ -518,7 +536,7 @@ namespace GilesTrinity.XmlTags
                         new PrioritySelector(
                             new Decorator(ret => PrioritySceneTarget.Distance2D(myPos) <= PathPrecision,
                                 new Sequence(
-                                    new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Successfully navigated to priority scene {0} {1} center {2} Distance {3:0}", 
+                                    new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Successfully navigated to priority scene {0} {1} center {2} Distance {3:0}",
                                         CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos))),
                                     new Action(ret => PrioritySceneMoveToFinished())
                                 )
@@ -535,7 +553,7 @@ namespace GilesTrinity.XmlTags
         /// </summary>
         private void MoveToPriorityScene()
         {
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Moving to Priority Scene {0} - {1} Center {2} Distance {3:0}", 
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Moving to Priority Scene {0} - {1} Center {2} Distance {3:0}",
                 CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
 
             MoveResult moveResult = PlayerMover.NavigateTo(PrioritySceneTarget);
@@ -553,8 +571,8 @@ namespace GilesTrinity.XmlTags
         /// </summary>
         private void PrioritySceneMoveToFinished()
         {
-            PriorityScenesInvestigated.Add(PrioritySceneGuid);
-            PrioritySceneGuid = -1;
+            PriorityScenesInvestigated.Add(PrioritySceneSNOId);
+            PrioritySceneSNOId = -1;
             PrioritySceneTarget = Vector3.Zero;
             UpdateRoute();
         }
@@ -577,13 +595,17 @@ namespace GilesTrinity.XmlTags
             // find any matching priority scenes in scene manager - match by name or SNOId
 
             List<Scene> PScenes = ZetaDia.Scenes.GetScenes()
-                .Where(s => PriorityScenes.Any(ps => 
-                    (ps.SceneName.Trim() != String.Empty && ps.SceneId == -1 && s.Name.ToLower().Contains(ps.SceneName.ToLower())) ||
-                ps.SceneId != -1 && s.SceneInfo.SNOId == ps.SceneId)).ToList();
+                .Where(s => PriorityScenes.Any(ps => ps.SceneId != -1 && s.SceneInfo.SNOId == ps.SceneId)).ToList();
+
+            PScenes.AddRange(ZetaDia.Scenes.GetScenes()
+                 .Where(s => PriorityScenes.Any(ps => ps.SceneName.Trim() != String.Empty && ps.SceneId == -1 && s.Name.ToLower().Contains(ps.SceneName.ToLower()))).ToList());
+
+            List<Scene> foundPriorityScenes = new List<Scene>();
+            Dictionary<int, Vector3> foundPrioritySceneIndex = new Dictionary<int, Vector3>();
 
             foreach (Scene scene in PScenes)
             {
-                if (PriorityScenesInvestigated.Contains(scene.SceneGuid))
+                if (PriorityScenesInvestigated.Contains(scene.SceneInfo.SNOId))
                     continue;
 
                 foundPriorityScene = true;
@@ -605,18 +627,25 @@ namespace GilesTrinity.XmlTags
 
                 if (bestCell != null)
                 {
-                    PrioritySceneTarget = GetNavCellCenter(bestCell, navZone);
-
-                    PrioritySceneGuid = scene.SceneGuid;
-
-                    CurrentPriorityScene = scene;
-
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene {0}-{1} Center {2} Distance {3:0}", scene.Name, scene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
+                    foundPrioritySceneIndex.Add(scene.SceneInfo.SNOId, GetNavCellCenter(bestCell, navZone));
+                    foundPriorityScenes.Add(scene);
                 }
                 else
                 {
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene but could not find a navigable point!", true);
                 }
+            }
+
+            if (foundPrioritySceneIndex.Any())
+            {
+                KeyValuePair<int, Vector3> nearestPriorityScene = foundPrioritySceneIndex.OrderBy(s => s.Value.Distance2D(myPos)).FirstOrDefault();
+
+                PrioritySceneSNOId = nearestPriorityScene.Key;
+                PrioritySceneTarget = nearestPriorityScene.Value;
+                CurrentPriorityScene = foundPriorityScenes.FirstOrDefault(s => s.SceneInfo.SNOId == PrioritySceneSNOId);
+
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene {0} - {1} Center {2} Distance {3:0}",
+                    CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
             }
 
             if (!foundPriorityScene)
@@ -693,9 +722,14 @@ namespace GilesTrinity.XmlTags
             List<Scene> ignoredScenes = ZetaDia.Scenes.GetScenes()
                 .Where(scn => IgnoreScenes.Any(igscn => igscn.SceneName != String.Empty && scn.Name.ToLower().Contains(igscn.SceneName.ToLower())) ||
                     IgnoreScenes.Any(igscn => scn.SceneInfo.SNOId == igscn.SceneId) &&
-                    !PriorityScenes.Any(psc => scn.Name.ToLower().Contains(psc.SceneName))).ToList();
+                    !PriorityScenes.Any(psc => psc.SceneName.Trim() != String.Empty && scn.Name.ToLower().Contains(psc.SceneName)) &&
+                    !PriorityScenes.Any(psc => psc.SceneId != -1 && scn.SceneInfo.SNOId != psc.SceneId)).ToList();
+
             foreach (Scene scene in ignoredScenes)
             {
+                if (scene.Mesh.Zone == null)
+                    return true;
+
                 Vector2 pos = position.ToVector2();
                 Vector2 min = scene.Mesh.Zone.ZoneMin;
                 Vector2 max = scene.Mesh.Zone.ZoneMax;
@@ -824,7 +858,7 @@ namespace GilesTrinity.XmlTags
                     GridSegmentation.BoxTolerance,                               // 5
                     step,                                                        // 6
                     nodeDistance,                                                // 7
-                    pf.IsNavigable(gp.WorldToGrid(CurrentNavTarget.ToVector2())), // 8
+                    (pf != null ? pf.IsNavigable(gp.WorldToGrid(CurrentNavTarget.ToVector2())) : false), // 8
                     ZetaDia.Physics.Raycast(myPos, CurrentNavTarget, Zeta.Internals.SNO.NavCellFlags.AllowWalk),
                     PathPrecision,
                     GilesTrinity.GetHeadingToPoint(CurrentNavTarget),
