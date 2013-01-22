@@ -266,7 +266,7 @@ namespace GilesTrinity.DbProvider
                 );
 
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
-                GilesTrinity.PlayerStatus.CurrentPosition = vMyCurrentPosition;
+                //GilesTrinity.PlayerStatus.CurrentPosition = vMyCurrentPosition;
                 vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
                 // Temporarily log stuff
                 if (iTotalAntiStuckAttempts == 1 && GilesTrinity.Settings.Advanced.LogStuckLocation)
@@ -484,7 +484,7 @@ namespace GilesTrinity.DbProvider
                     // Do we want to immediately generate a 2nd waypoint to "chain" anti-stucks in an ever-increasing path-length?
                     if (iTimesReachedStuckPoint <= iTotalAntiStuckAttempts)
                     {
-                        GilesTrinity.PlayerStatus.CurrentPosition = vMyCurrentPosition;
+                        //GilesTrinity.PlayerStatus.CurrentPosition = vMyCurrentPosition;
                         vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
                         vMoveToTarget = vSafeMovementLocation;
                     }
@@ -609,14 +609,15 @@ namespace GilesTrinity.DbProvider
                         }
 
                         if (!CanChannelTempestRush &&
-                            GilesTrinity.PlayerStatus.CurrentEnergy >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit &&
+                            GilesTrinity.PlayerStatus.PrimaryResource >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit &&
                             fDistanceFromTarget >= GilesTrinity.Settings.Combat.Monk.TR_MinDist &&
                             GilesTrinity.GilesCanRayCast(vMyCurrentPosition, vTargetAimPoint, NavCellFlags.AllowWalk))
                         {
                             CanChannelTempestRush = true;
                         }
-                        else if (CanChannelTempestRush && (GilesTrinity.PlayerStatus.CurrentEnergy <= 20 || fDistanceFromTarget < 5f))
+                        else if (CanChannelTempestRush && (GilesTrinity.PlayerStatus.PrimaryResource <= 8 || fDistanceFromTarget < GilesTrinity.Settings.Combat.Monk.TR_MinDist))
                         {
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Tempest rush cancelled Spirit: {0:0.0} distance: {1:0.0}", GilesTrinity.PlayerStatus.PrimaryResource, fDistanceFromTarget);
                             CanChannelTempestRush = false;
                         }
                     if (CanChannelTempestRush)

@@ -81,7 +81,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="Min Spirit" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
             <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="150" Minimum="0"
+                Interval="1" Maximum="150" Minimum="25"
                 SmallChange="1" LargeChange="10"
                 TickPlacement="None" 
                 Value="{Binding Path=Monk.TR_MinSpirit}" 

@@ -17,27 +17,27 @@ namespace GilesTrinity
 
             // 4 Mantras for the initial buff (slow-use)
             if (Hotbar.Contains(SNOPower.Monk_MantraOfEvasion) && !GetHasBuff(SNOPower.Monk_MantraOfEvasion) &&
-                PlayerStatus.CurrentEnergy >= 50 && GilesUseTimer(SNOPower.Monk_MantraOfEvasion, true))
+                PlayerStatus.PrimaryResource >= 50 && GilesUseTimer(SNOPower.Monk_MantraOfEvasion, true))
             {
                 return new TrinityPower(SNOPower.Monk_MantraOfEvasion, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
             }
             if (Hotbar.Contains(SNOPower.Monk_MantraOfConviction) && !GetHasBuff(SNOPower.Monk_MantraOfConviction) &&
-                (PlayerStatus.CurrentEnergy >= 50 && PlayerStatus.CurrentEnergy >= 85) && GilesUseTimer(SNOPower.Monk_MantraOfConviction, true))
+                (PlayerStatus.PrimaryResource >= 50 && PlayerStatus.PrimaryResource >= 85) && GilesUseTimer(SNOPower.Monk_MantraOfConviction, true))
             {
                 return new TrinityPower(SNOPower.Monk_MantraOfConviction, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
             }
             if (Hotbar.Contains(SNOPower.Monk_MantraOfHealing) && !GetHasBuff(SNOPower.Monk_MantraOfHealing) &&
-                PlayerStatus.CurrentEnergy >= 50 && GilesUseTimer(SNOPower.Monk_MantraOfHealing, true))
+                PlayerStatus.PrimaryResource >= 50 && GilesUseTimer(SNOPower.Monk_MantraOfHealing, true))
             {
                 return new TrinityPower(SNOPower.Monk_MantraOfHealing, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
             }
             if (Hotbar.Contains(SNOPower.Monk_MantraOfRetribution) && !GetHasBuff(SNOPower.Monk_MantraOfRetribution) &&
-                PlayerStatus.CurrentEnergy >= 50 && GilesUseTimer(SNOPower.Monk_MantraOfRetribution, true))
+                PlayerStatus.PrimaryResource >= 50 && GilesUseTimer(SNOPower.Monk_MantraOfRetribution, true))
             {
                 return new TrinityPower(SNOPower.Monk_MantraOfRetribution, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
             }
             // Mystic ally
-            if (Hotbar.Contains(SNOPower.Monk_MysticAlly) && PlayerStatus.CurrentEnergy >= 90 && iPlayerOwnedMysticAlly == 0 &&
+            if (Hotbar.Contains(SNOPower.Monk_MysticAlly) && PlayerStatus.PrimaryResource >= 90 && iPlayerOwnedMysticAlly == 0 &&
                 GilesUseTimer(SNOPower.Monk_MysticAlly) && PowerManager.CanCast(SNOPower.Monk_MysticAlly))
             {
                 return new TrinityPower(SNOPower.Monk_MysticAlly, 0f, vNullLocation, iCurrentWorldID, -1, 2, 2, USE_SLOWLY);
@@ -45,26 +45,26 @@ namespace GilesTrinity
             // InnerSanctuary
             if (!bOOCBuff && PlayerStatus.CurrentHealthPct <= 0.45 && Hotbar.Contains(SNOPower.Monk_InnerSanctuary) &&
                 GilesUseTimer(SNOPower.Monk_InnerSanctuary, true) &&
-                PlayerStatus.CurrentEnergy >= 30 && PowerManager.CanCast(SNOPower.Monk_InnerSanctuary))
+                PlayerStatus.PrimaryResource >= 30 && PowerManager.CanCast(SNOPower.Monk_InnerSanctuary))
             {
                 return new TrinityPower(SNOPower.Monk_InnerSanctuary, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
             }
             // Serenity if health is low
             if ((PlayerStatus.CurrentHealthPct <= 0.50 || (PlayerStatus.IsIncapacitated && PlayerStatus.CurrentHealthPct <= 0.90)) && Hotbar.Contains(SNOPower.Monk_Serenity) &&
                 GilesUseTimer(SNOPower.Monk_Serenity, true) &&
-                PlayerStatus.CurrentEnergy >= 10 && PowerManager.CanCast(SNOPower.Monk_Serenity))
+                PlayerStatus.PrimaryResource >= 10 && PowerManager.CanCast(SNOPower.Monk_Serenity))
             {
                 return new TrinityPower(SNOPower.Monk_Serenity, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
             }
             // Breath of heaven when needing healing or the buff
             if (!bOOCBuff && (PlayerStatus.CurrentHealthPct <= 0.6 || !GetHasBuff(SNOPower.Monk_BreathOfHeaven)) && Hotbar.Contains(SNOPower.Monk_BreathOfHeaven) &&
-                (PlayerStatus.CurrentEnergy >= 35 || (!Hotbar.Contains(SNOPower.Monk_Serenity) && PlayerStatus.CurrentEnergy >= 25)) &&
+                (PlayerStatus.PrimaryResource >= 35 || (!Hotbar.Contains(SNOPower.Monk_Serenity) && PlayerStatus.PrimaryResource >= 25)) &&
                 GilesUseTimer(SNOPower.Monk_BreathOfHeaven) && PowerManager.CanCast(SNOPower.Monk_BreathOfHeaven))
             {
                 return new TrinityPower(SNOPower.Monk_BreathOfHeaven, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
             }
             // Blinding Flash
-            if (!bOOCBuff && PlayerStatus.CurrentEnergy >= 20 && Hotbar.Contains(SNOPower.Monk_BlindingFlash) &&
+            if (!bOOCBuff && PlayerStatus.PrimaryResource >= 20 && Hotbar.Contains(SNOPower.Monk_BlindingFlash) &&
                 (
                     ElitesWithinRange[RANGE_15] >= 1 ||
                     PlayerStatus.CurrentHealthPct <= 0.4 ||
@@ -76,18 +76,18 @@ namespace GilesTrinity
                 // Check if either we don't have sweeping winds, or we do and it's ready to cast in a moment
                 (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) ||
                  (Hotbar.Contains(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) &&
-                 (Settings.Combat.Monk.HasInnaSet ? PlayerStatus.CurrentEnergy >= 15 : PlayerStatus.CurrentEnergy >= 85)) ||
+                 (Settings.Combat.Monk.HasInnaSet ? PlayerStatus.PrimaryResource >= 15 : PlayerStatus.PrimaryResource >= 85)) ||
                  PlayerStatus.CurrentHealthPct <= 0.25) &&
                 GilesUseTimer(SNOPower.Monk_BlindingFlash) && PowerManager.CanCast(SNOPower.Monk_BlindingFlash))
             {
-                return new TrinityPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 11f -- 1, 2
+                return new TrinityPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); 
             }
             // Blinding Flash as a DEFENSE
-            if (!bOOCBuff && PlayerStatus.CurrentEnergy >= 10 && Hotbar.Contains(SNOPower.Monk_BlindingFlash) &&
+            if (!bOOCBuff && PlayerStatus.PrimaryResource >= 10 && Hotbar.Contains(SNOPower.Monk_BlindingFlash) &&
                 PlayerStatus.CurrentHealthPct <= 0.25 && AnythingWithinRange[RANGE_15] >= 1 &&
                 GilesUseTimer(SNOPower.Monk_BlindingFlash) && PowerManager.CanCast(SNOPower.Monk_BlindingFlash))
             {
-                return new TrinityPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 11f -- 1, 2
+                return new TrinityPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); 
             }
 
 
@@ -101,17 +101,17 @@ namespace GilesTrinity
                 // Check our mantras, if we have them, are up first
                 HasMonkMantraAbilityAndBuff() &&
                 // Check the re-use timer and energy costs
-                (PlayerStatus.CurrentEnergy >= 75 || (Settings.Combat.Monk.HasInnaSet && PlayerStatus.CurrentEnergy >= 5)))
+                (PlayerStatus.PrimaryResource >= 75 || (Settings.Combat.Monk.HasInnaSet && PlayerStatus.PrimaryResource >= 5)))
             {
                 SweepWindSpam = DateTime.Now;
-                return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); //intell -- 2,2
+                return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY); 
             }
 
 
             // Seven Sided Strike
             if (!bOOCBuff && !bCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
                 (ElitesWithinRange[RANGE_15] >= 1 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) || PlayerStatus.CurrentHealthPct <= 0.55) &&
-                Hotbar.Contains(SNOPower.Monk_SevenSidedStrike) && ((PlayerStatus.CurrentEnergy >= 50 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.CurrentEnergy >= MinEnergyReserve) &&
+                Hotbar.Contains(SNOPower.Monk_SevenSidedStrike) && ((PlayerStatus.PrimaryResource >= 50 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                 GilesUseTimer(SNOPower.Monk_SevenSidedStrike, true) && PowerManager.CanCast(SNOPower.Monk_SevenSidedStrike))
             {
                 return new TrinityPower(SNOPower.Monk_SevenSidedStrike, 16f, CurrentTarget.Position, iCurrentWorldID, -1, 2, 3, USE_SLOWLY);
@@ -120,7 +120,7 @@ namespace GilesTrinity
             if (!bOOCBuff && !bCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
                 (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_15] >= 3 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 14f)) &&
                 Hotbar.Contains(SNOPower.Monk_ExplodingPalm) &&
-                ((PlayerStatus.CurrentEnergy >= 40 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.CurrentEnergy >= MinEnergyReserve) &&
+                ((PlayerStatus.PrimaryResource >= 40 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                 GilesUseTimer(SNOPower.Monk_ExplodingPalm) && PowerManager.CanCast(SNOPower.Monk_ExplodingPalm))
             {
                 return new TrinityPower(SNOPower.Monk_ExplodingPalm, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
@@ -130,14 +130,14 @@ namespace GilesTrinity
                 (ElitesWithinRange[RANGE_20] >= 1 || AnythingWithinRange[RANGE_20] >= 2 ||
                 (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 18f)) &&
                 Hotbar.Contains(SNOPower.Monk_CycloneStrike) &&
-                ((PlayerStatus.CurrentEnergy >= 50 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.CurrentEnergy >= MinEnergyReserve) &&
+                ((PlayerStatus.PrimaryResource >= 50 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                 GilesUseTimer(SNOPower.Monk_CycloneStrike) && PowerManager.CanCast(SNOPower.Monk_CycloneStrike))
             {
                 return new TrinityPower(SNOPower.Monk_CycloneStrike, 0f, vNullLocation, iCurrentWorldID, -1, 2, 2, USE_SLOWLY);
             }
 
             // For tempest rush re-use
-            if (!bOOCBuff && LastPowerUsed == SNOPower.Monk_TempestRush && GilesUseTimer(SNOPower.Monk_TempestRush, true) && PlayerStatus.CurrentEnergy >= 15 &&
+            if (!bOOCBuff && LastPowerUsed == SNOPower.Monk_TempestRush && PlayerStatus.PrimaryResource >= 10 &&
                 (Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly))
             {
                 GenerateMonkZigZag();
@@ -145,28 +145,28 @@ namespace GilesTrinity
             }
 
             // Tempest rush at elites or groups of mobs
-            if (!bOOCBuff && !bCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && !PlayerStatus.IsRooted && Hotbar.Contains(SNOPower.Monk_TempestRush) && //PowerManager.CanCast(SNOPower.Monk_TempestRush) &&
-                ((PlayerStatus.CurrentEnergy >= 20 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.CurrentEnergy >= MinEnergyReserve) &&
+            if (!bOOCBuff && !bCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && !PlayerStatus.IsRooted && Hotbar.Contains(SNOPower.Monk_TempestRush) &&
+                ((PlayerStatus.PrimaryResource >= 15 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                 (Settings.Combat.Monk.TROption == TempestRushOption.Always ||
                 Settings.Combat.Monk.TROption == TempestRushOption.CombatOnly ||
-                (Settings.Combat.Monk.TROption.HasFlag(TempestRushOption.ElitesGroupsOnly) && (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_15] > 2))))
+                (Settings.Combat.Monk.TROption == TempestRushOption.ElitesGroupsOnly && (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_15] > 2))))
             {
                 GenerateMonkZigZag();
-                return new TrinityPower(SNOPower.Monk_TempestRush, 23f, vSideToSideTarget, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Monk_TempestRush, 60f, vSideToSideTarget, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
             }
             // 4 Mantra spam for the 4 second buff
-            if (!bOOCBuff && !Settings.Combat.Monk.DisableMantraSpam && (!Hotbar.Contains(SNOPower.Monk_TempestRush) || PlayerStatus.CurrentEnergy >= 98 ||
-                (PlayerStatus.CurrentHealthPct <= 0.55 && PlayerStatus.CurrentEnergy >= 75) || CurrentTarget.IsBoss) &&
-                    (PlayerStatus.CurrentEnergy >= 135 ||
-                    (GetHasBuff(SNOPower.Monk_SweepingWind) && (PlayerStatus.CurrentEnergy >= 60 &&
-                    PlayerStatus.CurrentEnergy >= 110 || (PlayerStatus.CurrentEnergy >= 100 && PlayerStatus.CurrentHealthPct >= 0.6) ||
-                    (PlayerStatus.CurrentEnergy >= 50 && PlayerStatus.CurrentHealthPct >= 0.6)) &&
+            if (!bOOCBuff && !Settings.Combat.Monk.DisableMantraSpam && (!Hotbar.Contains(SNOPower.Monk_TempestRush) || PlayerStatus.PrimaryResource >= 98 ||
+                (PlayerStatus.CurrentHealthPct <= 0.55 && PlayerStatus.PrimaryResource >= 75) || CurrentTarget.IsBoss) &&
+                    (PlayerStatus.PrimaryResource >= 135 ||
+                    (GetHasBuff(SNOPower.Monk_SweepingWind) && (PlayerStatus.PrimaryResource >= 60 &&
+                    PlayerStatus.PrimaryResource >= 110 || (PlayerStatus.PrimaryResource >= 100 && PlayerStatus.CurrentHealthPct >= 0.6) ||
+                    (PlayerStatus.PrimaryResource >= 50 && PlayerStatus.CurrentHealthPct >= 0.6)) &&
                 // Checking we have no expensive finishers
                     !Hotbar.Contains(SNOPower.Monk_SevenSidedStrike) && !Hotbar.Contains(SNOPower.Monk_LashingTailKick) &&
                     !Hotbar.Contains(SNOPower.Monk_WaveOfLight) && !Hotbar.Contains(SNOPower.Monk_CycloneStrike) &&
                     !Hotbar.Contains(SNOPower.Monk_ExplodingPalm))) &&
                 (ElitesWithinRange[RANGE_15] >= 1 || AnythingWithinRange[RANGE_15] >= 3 ||
-                (AnythingWithinRange[RANGE_15] >= 1 && (Settings.Combat.Monk.HasInnaSet && PlayerStatus.CurrentEnergy >= 70)))) //intell -- inna
+                (AnythingWithinRange[RANGE_15] >= 1 && (Settings.Combat.Monk.HasInnaSet && PlayerStatus.PrimaryResource >= 70)))) 
             {
                 if (Hotbar.Contains(SNOPower.Monk_MantraOfEvasion) && GilesUseTimer(SNOPower.Monk_MantraOfEvasion))
                 {
@@ -191,7 +191,7 @@ namespace GilesTrinity
                 // Either doesn't have sweeping wind, or does but the buff is already up
                 (!Hotbar.Contains(SNOPower.Monk_SweepingWind) || (Hotbar.Contains(SNOPower.Monk_SweepingWind) && GetHasBuff(SNOPower.Monk_SweepingWind))) &&
                 GilesUseTimer(SNOPower.Monk_LashingTailKick) &&
-                ((PlayerStatus.CurrentEnergy >= 65 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.CurrentEnergy >= MinEnergyReserve))
+                ((PlayerStatus.PrimaryResource >= 65 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
@@ -202,14 +202,14 @@ namespace GilesTrinity
                 AnythingWithinRange[RANGE_15] > 2) &&
                 Hotbar.Contains(SNOPower.Monk_WaveOfLight) &&
                 GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
-                (PlayerStatus.CurrentEnergy >= 90 || PlayerStatus.CurrentEnergyPct >= 0.85) && HasMonkMantraAbilityAndBuff())
+                (PlayerStatus.PrimaryResource >= 90 || PlayerStatus.PrimaryResourcePct >= 0.85) && HasMonkMantraAbilityAndBuff())
             {
                 return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
             // Dashing Strike
             if (!bOOCBuff && !bCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
                 (ElitesWithinRange[RANGE_25] > 0 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 14f) || AnythingWithinRange[RANGE_15] > 2) &&
-                Hotbar.Contains(SNOPower.Monk_DashingStrike) && ((PlayerStatus.CurrentEnergy >= 30 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.CurrentEnergy >= MinEnergyReserve))
+                Hotbar.Contains(SNOPower.Monk_DashingStrike) && ((PlayerStatus.PrimaryResource >= 30 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.Monk_DashingStrike, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
             }
@@ -294,6 +294,8 @@ namespace GilesTrinity
 
         private static TrinityPower GetMonkDestroyPower()
         {
+            if (Hotbar.Contains(SNOPower.Monk_TempestRush) && LastPowerUsed == SNOPower.Monk_TempestRush && PlayerStatus.PrimaryResource > 10f)
+                return new TrinityPower(SNOPower.Monk_TempestRush, 40f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (Hotbar.Contains(SNOPower.Monk_FistsofThunder))
                 return new TrinityPower(SNOPower.Monk_FistsofThunder, 15f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (Hotbar.Contains(SNOPower.Monk_DeadlyReach))

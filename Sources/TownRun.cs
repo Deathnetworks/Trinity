@@ -19,6 +19,7 @@ using Action = Zeta.TreeSharp.Action;
 using System.Threading;
 using System.Diagnostics;
 using Zeta.CommonBot.Profile.Common;
+using GilesTrinity.DbProvider;
 
 namespace GilesTrinity
 {
@@ -711,7 +712,7 @@ namespace GilesTrinity
                         };
 
 
-                        bool bShouldSellThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy 
+                        bool bShouldSellThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy
                             ? GilesSellValidation(cItem)
                             : ItemManager.ShouldSellItem(item);
 
@@ -1088,8 +1089,8 @@ namespace GilesTrinity
 
 
                         bool bShouldSalvageThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesSalvageValidation(cItem) : ItemManager.ShouldSalvageItem(item);
-                        
-                        
+
+
                         if (bShouldSalvageThis)
                         {
                             hashGilesCachedSalvageItems.Add(cItem);
@@ -1845,7 +1846,65 @@ namespace GilesTrinity
                     )
                 );
             }
+
+            internal static Composite GetPostTownRunDecorator()
+            {
+                return
+                new Decorator(ret => !Zeta.CommonBot.Logic.BrainBehavior.IsVendoring,
+                    new PrioritySelector(
+                        new Decorator(ret => GetPortalReturnPosition(ZetaDia.CurrentAct).Distance2D(ZetaDia.Me.Position) > 10f,
+                            new Sequence(
+                                new Action(ret => DbHelper.Log(LogCategory.UserInformation, "Moving to portal position", true)),
+                                new Action(ret => PlayerMover.NavigateTo(GetPortalReturnPosition(ZetaDia.CurrentAct)))
+                            )
+                        ),
+                        new Decorator(ret => PostTownRunStayInTown,
+                            new Sequence(
+                                new Action(ret => UseHearthPortal(ret))
+                            )
+                        )
+                    )
+                );
+            }
         }
+
+        internal static RunStatus UseHearthPortal(object ctx)
+        {
+            DiaGizmo portal = ZetaDia.Actors.GetActorsOfType<DiaGizmo>(true, false).Where(o => o.ActorInfo.GizmoType == Zeta.Internals.SNO.GizmoType.HearthPortal).FirstOrDefault();
+            if (portal == null)
+            {
+                DbHelper.Log(LogCategory.UserInformation, "Error: could not find hearth portal!");
+                return RunStatus.Failure;
+            }
+            else if (portal.Distance > 10f)
+            {
+                DbHelper.Log(LogCategory.UserInformation, "Error: Hearth portal is too far away!");
+                return RunStatus.Failure;
+            }
+            else
+            {
+                portal.Interact();
+                return RunStatus.Success;
+            }
+        }
+
+        internal static Vector3 GetPortalReturnPosition(Act act)
+        {
+            switch (act)
+            {
+                case Act.A1:
+                    return (new Vector3(2990.895f, 2800.335f, 24.04532f));
+                case Act.A2:
+                    return (new Vector3(313.1483f, 278.3289f, 0.1000038f));
+                case Act.A3:
+                case Act.A4:
+                    return (new Vector3(379.007f, 421.9408f, 0.3321455f));
+                default:
+                    return Vector3.Zero;
+            }
+        }
+
+        internal static bool PostTownRunStayInTown = false;
 
         /// <summary>
         /// Sorts the stash

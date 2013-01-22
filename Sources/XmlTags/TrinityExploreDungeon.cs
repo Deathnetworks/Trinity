@@ -986,7 +986,7 @@ namespace GilesTrinity.XmlTags
 
             var playerPosition = ZetaDia.Me.Position;
             var distToTarget = Vector3.Distance2D(ref moveTarget, ref playerPosition);
-            if (distToTarget <= PathPrecision || (PlayerMover.GetMovementSpeed() < 1 && distToTarget <= 50f && ZetaDia.Physics.Raycast(moveTarget, myPos, Zeta.Internals.SNO.NavCellFlags.AllowWalk)))
+            if (distToTarget <= 5f || (PlayerMover.GetMovementSpeed() < 1 && distToTarget <= 50f && ZetaDia.Physics.Raycast(moveTarget, myPos, Zeta.Internals.SNO.NavCellFlags.AllowWalk)))
             {
                 Vector3 lastStep = PathStack.Current;
                 PathStack.Next();

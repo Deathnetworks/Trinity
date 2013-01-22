@@ -146,7 +146,7 @@ namespace GilesTrinity
                         wasRootedLastTick = false;
                     if (CurrentTarget == null)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget was passed as null!");
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget was passed as null! Continuing...");
                     }
 
                     CheckStaleCache();
@@ -192,9 +192,17 @@ namespace GilesTrinity
 
                     if (CurrentTarget == null)
                     {
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget set as null in refresh");
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2");
                         runStatus = HandlerRunStatus.TreeSuccess;
+
+                        if (LastPowerUsed == SNOPower.Monk_TempestRush && PlayerStatus.PrimaryResource > 15f && Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly)
+                        {
+                            vSideToSideTarget = FindZigZagTargetLocation(PlayerMover.vOldPosition, 15f);
+                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Using Tempest Rush to maintain channeling");
+                            ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vSideToSideTarget, iCurrentWorldID, -1);
+                        }
                     }
+
 
                     //check if we are returning to the tree
                     if (runStatus != HandlerRunStatus.NotFinished)
@@ -213,7 +221,8 @@ namespace GilesTrinity
 
                     // Pop a potion when necessary
                     // Note that we force a single-loop pause first, to help potion popping "go off"
-                    if (PlayerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !IsWaitingForPower && !IsWaitingForPotion && !PlayerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
+                    if (PlayerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !IsWaitingForPower && !IsWaitingForPotion
+                        && !PlayerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         IsWaitingForPotion = true;
                         runStatus = HandlerRunStatus.TreeRunning;
@@ -640,7 +649,7 @@ namespace GilesTrinity
                             {
                                 // Whirlwind for a barb
                                 //intell
-                                if (!IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.CurrentEnergy >= 10)
+                                if (!IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource >= 10)
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, iCurrentWorldID, -1);
                                     // Store the current destination for comparison incase of changes next loop
@@ -651,7 +660,8 @@ namespace GilesTrinity
                                     return RunStatus.Running;
                                 }
                                 // Tempest rush for a monk
-                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && PlayerStatus.CurrentEnergy >= 20 &&
+                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) &&
+                                    (PlayerStatus.PrimaryResource >= 20 || (PlayerStatus.PrimaryResource > 10 && LastPowerUsed == SNOPower.Monk_TempestRush)) &&
                                     ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.CentreDistance > 20f) || CurrentTarget.Type != GObjectType.Item) &&
                                     Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly)
                                 {
@@ -666,7 +676,7 @@ namespace GilesTrinity
                                     return RunStatus.Running;
                                 }
                                 // Strafe for a Demon Hunter
-                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && PlayerStatus.CurrentEnergy >= 15)
+                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && PlayerStatus.PrimaryResource >= 15)
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Strafe, vCurrentDestination, iCurrentWorldID, -1);
                                     // Store the current destination for comparison incase of changes next loop
@@ -692,7 +702,7 @@ namespace GilesTrinity
 
                     // Whirlwind against everything within range (except backtrack points)
                     //intell
-                    if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.CurrentEnergy >= 10 && AnythingWithinRange[RANGE_20] >= 1 && !IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
+                    if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource >= 10 && AnythingWithinRange[RANGE_20] >= 1 && !IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
                         (!Hotbar.Contains(SNOPower.Barbarian_Sprint) || GetHasBuff(SNOPower.Barbarian_Sprint)) &&
                         CurrentTarget.Type != GObjectType.Backtrack &&
                         (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && TargetCurrentDistance >= 6f) &&
@@ -839,8 +849,8 @@ namespace GilesTrinity
                     }
 
                     // Check if we can Raycast to a trash mob
-                    if (CurrentTarget.IsTrashMob && 
-                        GetSecondsSinceTargetUpdate() > 4 && 
+                    if (CurrentTarget.IsTrashMob &&
+                        GetSecondsSinceTargetUpdate() > 4 &&
                         CurrentTarget.HitPoints > 0.90)
                     {
                         if (GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position, NavCellFlags.AllowWalk))
@@ -1071,7 +1081,7 @@ namespace GilesTrinity
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Wizard_Teleport) &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_Teleport] &&
-                    PlayerStatus.CurrentEnergy >= 15 &&
+                    PlayerStatus.PrimaryResource >= 15 &&
                     PowerManager.CanCast(SNOPower.Wizard_Teleport))
                 {
                     WaitWhileAnimating(3, true);
@@ -1456,7 +1466,7 @@ namespace GilesTrinity
                 // Use the power
                 bool bUsePowerSuccess = false;
                 // Note that whirlwinds use an off-on-off-on to avoid spam
-                if (CurrentPower.SNOPower != SNOPower.Barbarian_Whirlwind && CurrentPower.SNOPower != SNOPower.DemonHunter_Strafe && CurrentPower.SNOPower != SNOPower.Monk_TempestRush)
+                if (CurrentPower.SNOPower != SNOPower.Barbarian_Whirlwind && CurrentPower.SNOPower != SNOPower.DemonHunter_Strafe)
                 {
                     ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.vTargetLocation, CurrentPower.iTargetWorldID, CurrentPower.iTargetGUID);
                     bUsePowerSuccess = true;

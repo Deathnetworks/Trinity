@@ -48,7 +48,7 @@ namespace GilesTrinity
                 GilesUseTimer(SNOPower.Barbarian_Earthquake, true) &&
                 PowerManager.CanCast(SNOPower.Barbarian_Earthquake))
             {
-                if (PlayerStatus.CurrentEnergy >= 50)
+                if (PlayerStatus.PrimaryResource >= 50)
                     return new TrinityPower(SNOPower.Barbarian_Earthquake, 13f, vNullLocation, iCurrentWorldID, -1, 4, 4, USE_SLOWLY);
                 IsWaitingForSpecial = true;
             }
@@ -72,7 +72,7 @@ namespace GilesTrinity
                 // Don't still have the buff
                 !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) && PowerManager.CanCast(SNOPower.Barbarian_WrathOfTheBerserker))
             {
-                if (PlayerStatus.CurrentEnergy >= 50)
+                if (PlayerStatus.PrimaryResource >= 50)
                 {
                     DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Berserk being used!({0})", CurrentTarget.InternalName);
                     bUseBerserker = false;
@@ -90,14 +90,14 @@ namespace GilesTrinity
                 GilesUseTimer(SNOPower.Barbarian_CallOfTheAncients, true) &&
                 PowerManager.CanCast(SNOPower.Barbarian_CallOfTheAncients))
             {
-                if (PlayerStatus.CurrentEnergy >= 50)
+                if (PlayerStatus.PrimaryResource >= 50)
                     return new TrinityPower(SNOPower.Barbarian_CallOfTheAncients, 0f, vNullLocation, iCurrentWorldID, -1, 4, 4, USE_SLOWLY);
                 IsWaitingForSpecial = true;
             }
             // Battle rage, for if being followed and before we do sprint
             if (UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_BattleRage) &&
                 (GilesUseTimer(SNOPower.Barbarian_BattleRage) || !GetHasBuff(SNOPower.Barbarian_BattleRage)) &&
-                PlayerStatus.CurrentEnergy >= 20 && PowerManager.CanCast(SNOPower.Barbarian_BattleRage))
+                PlayerStatus.PrimaryResource >= 20 && PowerManager.CanCast(SNOPower.Barbarian_BattleRage))
             {
                 return new TrinityPower(SNOPower.Barbarian_BattleRage, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
             }
@@ -106,13 +106,13 @@ namespace GilesTrinity
                 (Settings.Combat.Misc.AllowOOCMovement || GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) &&
                 !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Sprint) &&
                 !GetHasBuff(SNOPower.Barbarian_Sprint) &&
-                PlayerStatus.CurrentEnergy >= 20 && GilesUseTimer(SNOPower.Barbarian_Sprint) && PowerManager.CanCast(SNOPower.Barbarian_Sprint))
+                PlayerStatus.PrimaryResource >= 20 && GilesUseTimer(SNOPower.Barbarian_Sprint) && PowerManager.CanCast(SNOPower.Barbarian_Sprint))
             {
                 return new TrinityPower(SNOPower.Barbarian_Sprint, 0f, vNullLocation, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
             }
             // War cry, constantly maintain
             if (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_WarCry) &&
-                (PlayerStatus.CurrentEnergy <= 60 || !GetHasBuff(SNOPower.Barbarian_WarCry)) &&
+                (PlayerStatus.PrimaryResource <= 60 || !GetHasBuff(SNOPower.Barbarian_WarCry)) &&
                 GilesUseTimer(SNOPower.Barbarian_WarCry, true) && (!GetHasBuff(SNOPower.Barbarian_WarCry) || PowerManager.CanCast(SNOPower.Barbarian_WarCry)))
             {
                 return new TrinityPower(SNOPower.Barbarian_WarCry, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
@@ -122,8 +122,8 @@ namespace GilesTrinity
               (
                   ElitesWithinRange[RANGE_20] >= 2 || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 20) ||
                   (AnythingWithinRange[RANGE_20] >= 3 && !bAnyBossesInRange && (ElitesWithinRange[RANGE_50] == 0 || Hotbar.Contains(SNOPower.Barbarian_SeismicSlam))) ||
-                  PlayerStatus.CurrentHealthPct <= 0.75 || (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.CurrentEnergy <= 10) ||
-                  (IsWaitingForSpecial && PlayerStatus.CurrentEnergy <= 50)
+                  PlayerStatus.CurrentHealthPct <= 0.75 || (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource <= 10) ||
+                  (IsWaitingForSpecial && PlayerStatus.PrimaryResource <= 50)
                   ) &&
               GilesUseTimer(SNOPower.Barbarian_ThreateningShout, true) && PowerManager.CanCast(SNOPower.Barbarian_ThreateningShout))
             {
@@ -132,7 +132,7 @@ namespace GilesTrinity
             // Threatening shout out-of-combat: helps battle rage and sprint (5+15=20)
             if (UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_ThreateningShout) &&
                 (Hotbar.Contains(SNOPower.Barbarian_Sprint) || Hotbar.Contains(SNOPower.Barbarian_BattleRage)) &&
-                !PlayerStatus.IsIncapacitated && PlayerStatus.CurrentEnergy >= 5 && PlayerStatus.CurrentEnergy < 20 &&
+                !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 5 && PlayerStatus.PrimaryResource < 20 &&
                 GilesUseTimer(SNOPower.Barbarian_ThreateningShout, true) && PowerManager.CanCast(SNOPower.Barbarian_ThreateningShout))
             {
                 return new TrinityPower(SNOPower.Barbarian_ThreateningShout, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
@@ -209,7 +209,7 @@ namespace GilesTrinity
                      (!Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
                         (
                 // *DON'T* use rend if we currently have wrath/earthquake/call available & needed but need to save up energy energy
-                        (!IsWaitingForSpecial || PlayerStatus.CurrentEnergy >= 75) &&
+                        (!IsWaitingForSpecial || PlayerStatus.PrimaryResource >= 75) &&
                 // Bunch of optionals now that go hand in hand with all of the above...
                             (
                 // Either off full 4 second or so cooldown...
@@ -219,17 +219,17 @@ namespace GilesTrinity
                 // ... or ability to spam rend every 1.1 seconds if current primary target changes...
                              (CurrentTarget.ACDGuid != iACDGUIDLastRend && DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Rend]).TotalMilliseconds >= 1800) ||
                 // ... or ability to spam rend every 1.5 seconds with almost full fury
-                             (PlayerStatus.CurrentEnergyPct >= 0.85 && DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Rend]).TotalMilliseconds >= 2500) ||
+                             (PlayerStatus.PrimaryResourcePct >= 0.85 && DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Rend]).TotalMilliseconds >= 2500) ||
                 // ... or ability to spam rend every 2 seconds with a lot of fury
-                             (PlayerStatus.CurrentEnergyPct >= 0.65 && DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Rend]).TotalMilliseconds >= 3500)
+                             (PlayerStatus.PrimaryResourcePct >= 0.65 && DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Rend]).TotalMilliseconds >= 3500)
                             )
                         )) ||
                 // This segment is for people who *DO* have whirlwind
                      (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
                 // See if it's off-cooldown and at least 40 fury, or use as a fury dump
                          (
-                            (Settings.Combat.Barbarian.FuryDumpWOTB && PlayerStatus.CurrentEnergyPct >= 0.92 && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
-                            (Settings.Combat.Barbarian.FuryDumpAlways && PlayerStatus.CurrentEnergyPct >= 0.92) ||
+                            (Settings.Combat.Barbarian.FuryDumpWOTB && PlayerStatus.PrimaryResourcePct >= 0.92 && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                            (Settings.Combat.Barbarian.FuryDumpAlways && PlayerStatus.PrimaryResourcePct >= 0.92) ||
                             (DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Rend]).TotalMilliseconds >= 2800)
                          ) &&
                 // Max once every 1.2 seconds even if fury dumping, so sprint can be fury dumped too
@@ -244,7 +244,7 @@ namespace GilesTrinity
                      )
                 ) &&
                 // And finally, got at least 20 energy
-                PlayerStatus.CurrentEnergy >= 20)
+                PlayerStatus.PrimaryResource >= 20)
             {
                 iWithinRangeLastRend = AnythingWithinRange[RANGE_6];
                 iACDGUIDLastRend = CurrentTarget.ACDGuid;
@@ -290,8 +290,8 @@ namespace GilesTrinity
             // Seismic slam enemies within close range
             if (!UseOOCBuff && !IsWaitingForSpecial && Hotbar.Contains(SNOPower.Barbarian_SeismicSlam) && !PlayerStatus.IsIncapacitated &&
                 (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage))) &&
-                PlayerStatus.CurrentEnergy >= 15 && CurrentTarget.CentreDistance <= 40f && (AnythingWithinRange[RANGE_50] > 1 ||
-                (AnythingWithinRange[RANGE_50] > 0 && PlayerStatus.CurrentEnergyPct >= 0.85 && CurrentTarget.HitPoints >= 0.30) ||
+                PlayerStatus.PrimaryResource >= 15 && CurrentTarget.CentreDistance <= 40f && (AnythingWithinRange[RANGE_50] > 1 ||
+                (AnythingWithinRange[RANGE_50] > 0 && PlayerStatus.PrimaryResourcePct >= 0.85 && CurrentTarget.HitPoints >= 0.30) ||
                 (CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || (CurrentTarget.IsTreasureGoblin && CurrentTarget.CentreDistance <= 20f))))
             {
                 return new TrinityPower(SNOPower.Barbarian_SeismicSlam, 40f, vNullLocation, -1, CurrentTarget.ACDGuid, 2, 2, USE_SLOWLY);
@@ -318,16 +318,16 @@ namespace GilesTrinity
                 DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Sprint]).TotalMilliseconds >= 200 &&
                 // Fury Dump Options for sprint: use at max energy constantly, or on a timer
                 (
-                    (Settings.Combat.Barbarian.FuryDumpWOTB && PlayerStatus.CurrentEnergyPct >= 0.95 && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
-                    (Settings.Combat.Barbarian.FuryDumpAlways && PlayerStatus.CurrentEnergyPct >= 0.95) ||
+                    (Settings.Combat.Barbarian.FuryDumpWOTB && PlayerStatus.PrimaryResourcePct >= 0.95 && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                    (Settings.Combat.Barbarian.FuryDumpAlways && PlayerStatus.PrimaryResourcePct >= 0.95) ||
                     ((GilesUseTimer(SNOPower.Barbarian_Sprint) && !GetHasBuff(SNOPower.Barbarian_Sprint)) &&
                 // Always keep up if we are whirlwinding, if the target is a goblin, or if we are 16 feet away from the target
-                    (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) || CurrentTarget.IsTreasureGoblin || (CurrentTarget.CentreDistance >= 16f && PlayerStatus.CurrentEnergy >= 40)))
+                    (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) || CurrentTarget.IsTreasureGoblin || (CurrentTarget.CentreDistance >= 16f && PlayerStatus.PrimaryResource >= 40)))
                 ) &&
                 // If they have battle-rage, make sure it's up
                 (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage))) &&
                 // Check for minimum energy
-                PlayerStatus.CurrentEnergy >= 20)
+                PlayerStatus.PrimaryResource >= 20)
             {
                 return new TrinityPower(SNOPower.Barbarian_Sprint, 0f, vNullLocation, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
             }
@@ -340,7 +340,7 @@ namespace GilesTrinity
                 (AnythingWithinRange[RANGE_50] >= 2 || CurrentTarget.HitPoints >= 0.30 || CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || PlayerStatus.CurrentHealthPct <= 0.60) &&
                 // Check for energy reservation amounts
                 //((playerStatus.dCurrentEnergy >= 20 && !playerStatus.bWaitingForReserveEnergy) || playerStatus.dCurrentEnergy >= iWaitingReservedAmount) &&
-                PlayerStatus.CurrentEnergy >= 10 &&
+                PlayerStatus.PrimaryResource >= 10 &&
                 // If they have battle-rage, make sure it's up
                 (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage))))
             // If they have sprint, make sure it's up
@@ -372,22 +372,22 @@ namespace GilesTrinity
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_BattleRage) && !PlayerStatus.IsIncapacitated &&
                 // Fury Dump Options for battle rage IF they don't have sprint 
                 (
-                 (Settings.Combat.Barbarian.FuryDumpWOTB && PlayerStatus.CurrentEnergyPct >= 0.99 && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
-                 (Settings.Combat.Barbarian.FuryDumpAlways && PlayerStatus.CurrentEnergyPct >= 0.99) || !GetHasBuff(SNOPower.Barbarian_BattleRage)
+                 (Settings.Combat.Barbarian.FuryDumpWOTB && PlayerStatus.PrimaryResourcePct >= 0.99 && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                 (Settings.Combat.Barbarian.FuryDumpAlways && PlayerStatus.PrimaryResourcePct >= 0.99) || !GetHasBuff(SNOPower.Barbarian_BattleRage)
                 ) &&
-                PlayerStatus.CurrentEnergy >= 20 && PowerManager.CanCast(SNOPower.Barbarian_BattleRage))
+                PlayerStatus.PrimaryResource >= 20 && PowerManager.CanCast(SNOPower.Barbarian_BattleRage))
             {
                 return new TrinityPower(SNOPower.Barbarian_BattleRage, 0f, vNullLocation, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
             }
             // Hammer of the ancients spam-attacks - never use if waiting for special
-            if (PlayerStatus.CurrentEnergy >= 20 && !UseOOCBuff && !IsCurrentlyAvoiding && !IsWaitingForSpecial && Hotbar.Contains(SNOPower.Barbarian_HammerOfTheAncients) &&
+            if (PlayerStatus.PrimaryResource >= 20 && !UseOOCBuff && !IsCurrentlyAvoiding && !IsWaitingForSpecial && Hotbar.Contains(SNOPower.Barbarian_HammerOfTheAncients) &&
                 !PlayerStatus.IsIncapacitated)
             {
                 return new TrinityPower(SNOPower.Barbarian_HammerOfTheAncients, 12f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
             // Weapon throw
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WeaponThrow)
-                && (PlayerStatus.CurrentEnergy >= 10 && ( CurrentTarget.RadiusDistance >= 5f || BarbHasNoPrimary())))
+                && (PlayerStatus.PrimaryResource >= 10 && ( CurrentTarget.RadiusDistance >= 5f || BarbHasNoPrimary())))
             {
                 return new TrinityPower(SNOPower.Barbarian_WeaponThrow, 80f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, SIGNATURE_SPAM);
             }
@@ -423,7 +423,7 @@ namespace GilesTrinity
 
         private static TrinityPower GetBarbarianDestroyPower()
         {
-            if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.CurrentEnergy > MinEnergyReserve)
+            if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource > MinEnergyReserve)
                 return new TrinityPower(SNOPower.Barbarian_Whirlwind, 10f, vSideToSideTarget, iCurrentWorldID, -1, 0, 0, USE_SLOWLY);
             if (Hotbar.Contains(SNOPower.Barbarian_Frenzy))
                 return new TrinityPower(SNOPower.Barbarian_Frenzy, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
@@ -431,9 +431,9 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.Barbarian_Bash, 6f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (Hotbar.Contains(SNOPower.Barbarian_Cleave))
                 return new TrinityPower(SNOPower.Barbarian_Cleave, 6f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
-            if (Hotbar.Contains(SNOPower.Barbarian_Rend) && PlayerStatus.CurrentEnergyPct >= 0.65)
+            if (Hotbar.Contains(SNOPower.Barbarian_Rend) && PlayerStatus.PrimaryResourcePct >= 0.65)
                 return new TrinityPower(SNOPower.Barbarian_Rend, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
-            if (Hotbar.Contains(SNOPower.Barbarian_WeaponThrow) && PlayerStatus.CurrentEnergy >= 20)
+            if (Hotbar.Contains(SNOPower.Barbarian_WeaponThrow) && PlayerStatus.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.Barbarian_WeaponThrow, 15f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             return new TrinityPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
         }

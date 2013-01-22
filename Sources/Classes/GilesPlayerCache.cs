@@ -13,12 +13,24 @@ namespace GilesTrinity
         public bool IsIncapacitated { get; set; }
         public bool IsRooted { get; set; }
         public bool IsInTown { get; set; }
-        public double CurrentHealthPct { get; set; }
-        public double CurrentEnergy { get; set; }
-        public double CurrentEnergyPct { get; set; }
-        public double Discipline { get; set; }
-        public double DisciplinePct { get; set; }
-        public Vector3 CurrentPosition { get; set; }
+        public double CurrentHealthPct { get { return ZetaDia.Me.HitpointsCurrentPct; } }
+        public double PrimaryResource
+        {
+            get
+            {
+                return ZetaDia.Me.CurrentPrimaryResource;
+            }
+        }
+        public double PrimaryResourcePct
+        {
+            get
+            {
+                return ZetaDia.Me.CurrentPrimaryResource / ZetaDia.Me.MaxPrimaryResource;
+            }
+        }
+        public double SecondaryResource { get { return ZetaDia.Me.CurrentSecondaryResource; } }
+        public double SecondaryResourcePct { get { return ZetaDia.Me.CurrentSecondaryResource / ZetaDia.Me.MaxSecondaryResource; } }
+        public Vector3 CurrentPosition { get { return ZetaDia.Me.Position; } }
         public bool WaitingForReserveEnergy { get; set; }
         public int MyDynamicID { get; set; }
         public int Level { get; set; }
@@ -35,12 +47,12 @@ namespace GilesTrinity
             IsIncapacitated = false;
             IsRooted = false;
             IsInTown = false;
-            CurrentHealthPct = 0;
-            CurrentEnergy = 0;
-            CurrentEnergyPct = 0;
-            Discipline = 0;
-            DisciplinePct = 0;
-            CurrentPosition = Vector3.Zero;
+            //CurrentHealthPct = 0;
+            //PrimaryResource = 0;
+            //PrimaryResourcePct = 0;
+            //SecondaryResource = 0;
+            //SecondaryResourcePct = 0;
+            //CurrentPosition = Vector3.Zero;
             WaitingForReserveEnergy = false;
             MyDynamicID = -1;
             Level = -1;
@@ -58,12 +70,12 @@ namespace GilesTrinity
             IsIncapacitated = incapacitated;
             IsRooted = isRooted;
             IsInTown = isInTown;
-            CurrentHealthPct = currentHealth;
-            CurrentEnergy = currentEnergy;
-            CurrentEnergyPct = currentEnergyPct;
-            Discipline = discipline;
-            DisciplinePct = disciplinePct;
-            CurrentPosition = currentPosition;
+            //CurrentHealthPct = currentHealth;
+            //PrimaryResource = currentEnergy;
+            //PrimaryResourcePct = currentEnergyPct;
+            //SecondaryResource = discipline;
+            //SecondaryResourcePct = disciplinePct;
+            //CurrentPosition = currentPosition;
             WaitingForReserveEnergy = waitingReserve;
             MyDynamicID = dynamicId;
             Level = level;

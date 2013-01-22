@@ -47,19 +47,19 @@ namespace GilesTrinity
                     using (new PerformanceLogger("UpdateCachedPlayerData.2"))
                     {
 
-                        PlayerStatus.CurrentHealthPct = me.HitpointsCurrentPct;
-                        PlayerStatus.CurrentEnergy = me.CurrentPrimaryResource;
-                        PlayerStatus.CurrentEnergyPct = PlayerStatus.CurrentEnergy / me.MaxPrimaryResource;
-                        PlayerStatus.Discipline = me.CurrentSecondaryResource;
-                        PlayerStatus.DisciplinePct = PlayerStatus.Discipline / me.MaxSecondaryResource;
-                        PlayerStatus.CurrentPosition = me.Position;
+                        //PlayerStatus.CurrentHealthPct = me.HitpointsCurrentPct;
+                        //PlayerStatus.PrimaryResource = me.CurrentPrimaryResource;
+                        //PlayerStatus.PrimaryResourcePct = PlayerStatus.PrimaryResource / me.MaxPrimaryResource;
+                        //PlayerStatus.SecondaryResource = me.CurrentSecondaryResource;
+                        //PlayerStatus.SecondaryResourcePct = PlayerStatus.SecondaryResource / me.MaxSecondaryResource;
+                        //PlayerStatus.CurrentPosition = me.Position;
                     }
                     using (new PerformanceLogger("UpdateCachedPlayerData.3"))
                     {
 
-                        if (PlayerStatus.CurrentEnergy >= MinEnergyReserve)
+                        if (PlayerStatus.PrimaryResource >= MinEnergyReserve)
                             PlayerStatus.WaitingForReserveEnergy = false;
-                        if (PlayerStatus.CurrentEnergy < 20)
+                        if (PlayerStatus.PrimaryResource < 20)
                             PlayerStatus.WaitingForReserveEnergy = true;
                         PlayerStatus.MyDynamicID = me.CommonData.DynamicId;
                         PlayerStatus.Level = me.Level;

@@ -18,7 +18,7 @@ namespace GilesTrinity
             MinEnergyReserve = 25;
             // Shadow Power
             if (!bOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && !PlayerStatus.IsIncapacitated &&
-                PlayerStatus.Discipline >= 14 &&
+                PlayerStatus.SecondaryResource >= 14 &&
                 (PlayerStatus.CurrentHealthPct <= 0.99 || PlayerStatus.IsRooted || ElitesWithinRange[RANGE_25] >= 1 || AnythingWithinRange[RANGE_15] >= 3) &&
                 GilesUseTimer(SNOPower.DemonHunter_ShadowPower))
             {
@@ -26,7 +26,7 @@ namespace GilesTrinity
             }
             // Smoke Screen
             if ((!bOOCBuff || Settings.Combat.DemonHunter.SpamSmokeScreen) && Hotbar.Contains(SNOPower.DemonHunter_SmokeScreen) &&
-                !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && PlayerStatus.Discipline >= 14 &&
+                !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && PlayerStatus.SecondaryResource >= 14 &&
                 (
                  ( PlayerStatus.CurrentHealthPct <= 0.90 || PlayerStatus.IsRooted || ElitesWithinRange[RANGE_20] >= 1 || AnythingWithinRange[RANGE_15] >= 3 || PlayerStatus.IsIncapacitated ) ||
                  Settings.Combat.DemonHunter.SpamSmokeScreen 
@@ -43,7 +43,7 @@ namespace GilesTrinity
                  || Settings.Combat.DemonHunter.SpamPreparation ) 
                 ) && 
                 Hotbar.Contains(SNOPower.DemonHunter_Preparation) &&
-                PlayerStatus.Discipline <= 10 &&
+                PlayerStatus.SecondaryResource <= 10 &&
                 //GilesUseTimer(SNOPower.DemonHunter_Preparation) && 
                 //PowerManager.CanCast(SNOPower.DemonHunter_Preparation) 
                 TrinityPowerManager.CanUse(SNOPower.DemonHunter_Preparation)
@@ -62,7 +62,7 @@ namespace GilesTrinity
             }
             // Companion
             if (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_Companion) && iPlayerOwnedDHPets == 0 &&
-                PlayerStatus.Discipline >= 10 && GilesUseTimer(SNOPower.DemonHunter_Companion))
+                PlayerStatus.SecondaryResource >= 10 && GilesUseTimer(SNOPower.DemonHunter_Companion))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Companion, 0f, vNullLocation, iCurrentWorldID, -1, 2, 1, USE_SLOWLY);
             }
@@ -70,13 +70,13 @@ namespace GilesTrinity
             if (!bOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_Sentry) &&
                 (ElitesWithinRange[RANGE_50] >= 1 || AnythingWithinRange[RANGE_50] >= 2 ||
                 (CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss)) && CurrentTarget.RadiusDistance <= 50f &&
-                PlayerStatus.CurrentEnergy >= 30 && GilesUseTimer(SNOPower.DemonHunter_Sentry))
+                PlayerStatus.PrimaryResource >= 30 && GilesUseTimer(SNOPower.DemonHunter_Sentry))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Sentry, 0f, vNullLocation, iCurrentWorldID, -1, 0, 0, SIGNATURE_SPAM);
             }
             // Marked for Death
             if (!bOOCBuff && !bCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_MarkedForDeath) &&
-                PlayerStatus.Discipline >= 3 && 
+                PlayerStatus.SecondaryResource >= 3 && 
                 (ElitesWithinRange[RANGE_40] >= 1 || AnythingWithinRange[RANGE_40] >= 3 ||
                 
                 ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) &&
@@ -90,8 +90,8 @@ namespace GilesTrinity
                 // Only use vault to retreat if < level 60, or if in inferno difficulty for level 60's
                 (PlayerStatus.Level < 60 || iCurrentGameDifficulty == GameDifficulty.Inferno) &&
                 (CurrentTarget.RadiusDistance <= 10f || AnythingWithinRange[RANGE_6] >= 1) &&
-                ((!Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && PlayerStatus.Discipline >= 16) ||
-                 (Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && PlayerStatus.Discipline >= 22)) && 
+                ((!Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && PlayerStatus.SecondaryResource >= 16) ||
+                 (Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && PlayerStatus.SecondaryResource >= 22)) && 
                     //GilesUseTimer(SNOPower.DemonHunter_Vault) && 
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= GilesTrinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault))
@@ -108,7 +108,7 @@ namespace GilesTrinity
             }
             // Cluster Arrow
             if (!bOOCBuff && !bCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_ClusterArrow) && !PlayerStatus.IsIncapacitated &&
-                PlayerStatus.CurrentEnergy >= 50 &&
+                PlayerStatus.PrimaryResource >= 50 &&
                (ElitesWithinRange[RANGE_50] >= 1 || AnythingWithinRange[RANGE_50] >= 5 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 69f)) &&
                 GilesUseTimer(SNOPower.DemonHunter_ClusterArrow))
             {
@@ -116,7 +116,7 @@ namespace GilesTrinity
             }
             // Multi Shot
             if (!bOOCBuff && !bCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Multishot) && !PlayerStatus.IsIncapacitated &&
-                PlayerStatus.CurrentEnergy >= 30 &&
+                PlayerStatus.PrimaryResource >= 30 &&
                 (ElitesWithinRange[RANGE_40] >= 1 || AnythingWithinRange[RANGE_40] >= 2 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && 
                 CurrentTarget.RadiusDistance <= 30f)))
             {
@@ -124,7 +124,7 @@ namespace GilesTrinity
             }
             // Fan of Knives
             if (!bOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_FanOfKnives) && !PlayerStatus.IsIncapacitated &&
-                PlayerStatus.CurrentEnergy >= 20 &&
+                PlayerStatus.PrimaryResource >= 20 &&
                 (AnythingWithinRange[RANGE_15] >= 4 || ElitesWithinRange[RANGE_15] >= 1) &&
                 GilesUseTimer(SNOPower.DemonHunter_FanOfKnives))
             {
@@ -135,7 +135,7 @@ namespace GilesTrinity
                 // Only if there's 3 guys in 25 yds
                 AnythingWithinRange[RANGE_25] >= 3 &&
                 // Check for energy reservation amounts
-                ((PlayerStatus.CurrentEnergy >= 15 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.CurrentEnergy >= MinEnergyReserve))
+                ((PlayerStatus.PrimaryResource >= 15 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
                 bool bGenerateNewZigZag = (DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 1500 ||
                     (vPositionLastZigZagCheck != vNullLocation && PlayerStatus.CurrentPosition == vPositionLastZigZagCheck && DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 200) ||
@@ -158,7 +158,7 @@ namespace GilesTrinity
             if (!bOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_SpikeTrap) &&
                 LastPowerUsed != SNOPower.DemonHunter_SpikeTrap &&
                 (ElitesWithinRange[RANGE_30] >= 1 || AnythingWithinRange[RANGE_25] > 4 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 35f)) &&
-                PlayerStatus.CurrentEnergy >= 30 && GilesUseTimer(SNOPower.DemonHunter_SpikeTrap))
+                PlayerStatus.PrimaryResource >= 30 && GilesUseTimer(SNOPower.DemonHunter_SpikeTrap))
             {
                 // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
                 float fExtraDistance = 0f;
@@ -175,14 +175,14 @@ namespace GilesTrinity
             }
             // Caltrops
             if (!bOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_Caltrops) && !PlayerStatus.IsIncapacitated &&
-                PlayerStatus.Discipline >= 6 && (AnythingWithinRange[RANGE_30] >= 2 || ElitesWithinRange[RANGE_40] >= 1) &&
+                PlayerStatus.SecondaryResource >= 6 && (AnythingWithinRange[RANGE_30] >= 2 || ElitesWithinRange[RANGE_40] >= 1) &&
                 GilesUseTimer(SNOPower.DemonHunter_Caltrops))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Caltrops, 0f, vNullLocation, iCurrentWorldID, -1, 1, 1, USE_SLOWLY);
             }
             // Elemental Arrow
             if (!bOOCBuff && !bCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && !PlayerStatus.IsIncapacitated &&
-                ((PlayerStatus.CurrentEnergy >= 10 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.CurrentEnergy >= MinEnergyReserve))
+                ((PlayerStatus.PrimaryResource >= 10 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
                 // Players with grenades *AND* elemental arrow should spam grenades at close-range instead
                 if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)
@@ -195,13 +195,13 @@ namespace GilesTrinity
                 // If we have elemental arrow or rapid fire, then use chakram as a 110 second buff, instead
                 ((!Hotbar.Contains(SNOPower.DemonHunter_ClusterArrow)) ||
                 DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.DemonHunter_Chakram]).TotalMilliseconds >= 110000) &&
-                ((PlayerStatus.CurrentEnergy >= 10 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.CurrentEnergy >= MinEnergyReserve))
+                ((PlayerStatus.PrimaryResource >= 10 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 50f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
             }
             // Rapid Fire
             if (!bOOCBuff && !bCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && !PlayerStatus.IsIncapacitated &&
-                ((PlayerStatus.CurrentEnergy >= 20 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.CurrentEnergy >= MinEnergyReserve))
+                ((PlayerStatus.PrimaryResource >= 20 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
                 // Players with grenades *AND* rapid fire should spam grenades at close-range instead
                 if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)
@@ -212,7 +212,7 @@ namespace GilesTrinity
             // Impale
             if (!bOOCBuff && !bCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Impale) && !PlayerStatus.IsIncapacitated &&
                 (AnythingWithinRange[RANGE_12] <= 3) &&
-                ((PlayerStatus.CurrentEnergy >= 25 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.CurrentEnergy >= MinEnergyReserve) &&
+                ((PlayerStatus.PrimaryResource >= 25 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                 CurrentTarget.RadiusDistance <= 50f)
             {
                 return new TrinityPower(SNOPower.DemonHunter_Impale, 50f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
@@ -263,13 +263,13 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.DemonHunter_BolaShot, 40f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (Hotbar.Contains(SNOPower.DemonHunter_Grenades))
                 return new TrinityPower(SNOPower.DemonHunter_Grenades, 15f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
-            if (Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && PlayerStatus.CurrentEnergy >= 10)
+            if (Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && PlayerStatus.PrimaryResource >= 10)
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 40f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
-            if (Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && PlayerStatus.CurrentEnergy >= 10)
+            if (Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && PlayerStatus.PrimaryResource >= 10)
                 return new TrinityPower(SNOPower.DemonHunter_RapidFire, 40f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
-            if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && PlayerStatus.CurrentEnergy >= 20)
+            if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && PlayerStatus.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 15f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
-            if (Hotbar.Contains(SNOPower.DemonHunter_EvasiveFire) && PlayerStatus.CurrentEnergy >= 20)
+            if (Hotbar.Contains(SNOPower.DemonHunter_EvasiveFire) && PlayerStatus.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.DemonHunter_EvasiveFire, 40f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             return new TrinityPower(SNOPower.Weapon_Ranged_Instant, 40f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
         }

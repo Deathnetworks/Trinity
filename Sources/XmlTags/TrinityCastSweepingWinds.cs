@@ -23,7 +23,7 @@ namespace GilesTrinity.XmlTags
             return new Zeta.TreeSharp.Action(ret =>
             {
                 if (ZetaDia.Me.ActorClass == Zeta.Internals.Actors.ActorClass.Monk && GilesTrinity.Hotbar.Contains(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind)
-                    && GilesTrinity.Settings.Combat.Monk.HasInnaSet && GilesTrinity.PlayerStatus.CurrentEnergy > 10)
+                    && GilesTrinity.Settings.Combat.Monk.HasInnaSet && GilesTrinity.PlayerStatus.PrimaryResource > 10)
                 {
                     if (DateTime.Now.Subtract(GilesTrinity.SweepWindSpam).TotalMilliseconds >= 1500)
                     {
