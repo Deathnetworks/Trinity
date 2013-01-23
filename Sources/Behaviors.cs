@@ -362,6 +362,7 @@ namespace GilesTrinity
                                         {
                                             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, town-run requested at next free moment.");
                                             ForceVendorRunASAP = true;
+                                            //runStatus = HandlerRunStatus.TreeRunning;
                                             runStatus = HandlerRunStatus.TreeSuccess;
                                         }
                                         else
@@ -660,8 +661,7 @@ namespace GilesTrinity
                                     return RunStatus.Running;
                                 }
                                 // Tempest rush for a monk
-                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) &&
-                                    (PlayerStatus.PrimaryResource >= 20 || (PlayerStatus.PrimaryResource > 10 && LastPowerUsed == SNOPower.Monk_TempestRush)) &&
+                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && PlayerStatus.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
                                     ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.CentreDistance > 20f) || CurrentTarget.Type != GObjectType.Item) &&
                                     Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly)
                                 {

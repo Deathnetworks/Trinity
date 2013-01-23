@@ -433,7 +433,8 @@ namespace GilesTrinity.DbProvider
             // Store player current position
 
             // Store distance to current moveto target
-            float fDistanceFromTarget;
+            float DestinationDistance;
+            DestinationDistance = vMyCurrentPosition.Distance2D(vMoveToTarget);
 
             // Do unstuckery things
             if (GilesTrinity.Settings.Advanced.UnstuckerEnabled)
@@ -475,9 +476,8 @@ namespace GilesTrinity.DbProvider
                     vMoveToTarget = vSafeMovementLocation;
                 }
                 // Get distance to current destination
-                fDistanceFromTarget = Vector3.Distance(vMyCurrentPosition, vMoveToTarget);
                 // Remove the stuck position if it's been reached, this bit of code also creates multiple stuck-patterns in an ever increasing amount
-                if (vSafeMovementLocation != Vector3.Zero && fDistanceFromTarget <= 3f)
+                if (vSafeMovementLocation != Vector3.Zero && DestinationDistance <= 3f)
                 {
                     vSafeMovementLocation = Vector3.Zero;
                     iTimesReachedStuckPoint++;
@@ -505,11 +505,6 @@ namespace GilesTrinity.DbProvider
                         return;
                     }
                 }
-            }
-            else
-            {
-                // Get distance to current destination
-                fDistanceFromTarget = Vector3.Distance(vMyCurrentPosition, vMoveToTarget);
             }
             // Is the built-in unstucker enabled or not?
             // if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
@@ -550,35 +545,35 @@ namespace GilesTrinity.DbProvider
                 // Leap movement for a barb
                 if (GilesTrinity.Hotbar.Contains(SNOPower.Barbarian_Leap) &&
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Barbarian_Leap]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Barbarian_Leap] &&
-                    fDistanceFromTarget >= 20f &&
+                    DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Barbarian_Leap) && !ShrinesInArea(vMoveToTarget))
                 {
                     Vector3 vThisTarget = vMoveToTarget;
-                    if (fDistanceFromTarget > 35f)
+                    if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.Barbarian_Leap] = DateTime.Now;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Leap for OOC movement, distance={0}", fDistanceFromTarget);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Leap for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
                 // Furious Charge movement for a barb
                 if (GilesTrinity.Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) && !bTooMuchZChange &&
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Barbarian_FuriousCharge]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Barbarian_FuriousCharge] &&
-                    fDistanceFromTarget >= 20f &&
+                    DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge) && !ShrinesInArea(vMoveToTarget))
                 {
                     Vector3 vThisTarget = vMoveToTarget;
-                    if (fDistanceFromTarget > 35f)
+                    if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.Barbarian_FuriousCharge] = DateTime.Now;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Furious Charge for OOC movement, distance={0}", fDistanceFromTarget);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Furious Charge for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
                 // Vault for a DH - maximum set by user-defined setting
                 if (GilesTrinity.Hotbar.Contains(SNOPower.DemonHunter_Vault) && !bTooMuchZChange &&
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= GilesTrinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
-                    fDistanceFromTarget >= 18f &&
+                    DestinationDistance >= 18f &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) && !ShrinesInArea(vMoveToTarget) &&
                     // Don't Vault into avoidance/monsters if we're kiting
                     (GilesTrinity.PlayerKiteDistance <= 0 || (GilesTrinity.PlayerKiteDistance > 0 &&
@@ -589,11 +584,11 @@ namespace GilesTrinity.DbProvider
                 {
 
                     Vector3 vThisTarget = vMoveToTarget;
-                    if (fDistanceFromTarget > 35f)
+                    if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault] = DateTime.Now;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Vault for OOC movement, distance={0}", fDistanceFromTarget);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Vault for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
                 // Tempest rush for a monk
@@ -603,21 +598,21 @@ namespace GilesTrinity.DbProvider
                 {
                         float aimPointDistance = 10f;
                         Vector3 vTargetAimPoint = vMoveToTarget;
-                        if (fDistanceFromTarget > aimPointDistance)
+                        if (DestinationDistance > aimPointDistance)
                         {
                             vTargetAimPoint = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, aimPointDistance);
                         }
 
                         if (!CanChannelTempestRush &&
                             GilesTrinity.PlayerStatus.PrimaryResource >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit &&
-                            fDistanceFromTarget >= GilesTrinity.Settings.Combat.Monk.TR_MinDist &&
+                            DestinationDistance >= GilesTrinity.Settings.Combat.Monk.TR_MinDist &&
                             GilesTrinity.GilesCanRayCast(vMyCurrentPosition, vTargetAimPoint, NavCellFlags.AllowWalk))
                         {
                             CanChannelTempestRush = true;
                         }
-                        else if (CanChannelTempestRush && (GilesTrinity.PlayerStatus.PrimaryResource <= 8 || fDistanceFromTarget < GilesTrinity.Settings.Combat.Monk.TR_MinDist))
+                        else if (CanChannelTempestRush && (GilesTrinity.PlayerStatus.PrimaryResource <= 15 || DestinationDistance < GilesTrinity.Settings.Combat.Monk.TR_MinDist))
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Tempest rush cancelled Spirit: {0:0.0} distance: {1:0.0}", GilesTrinity.PlayerStatus.PrimaryResource, fDistanceFromTarget);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Tempest rush cancelled Spirit: {0:0.0} distance: {1:0.0}", GilesTrinity.PlayerStatus.PrimaryResource, DestinationDistance);
                             CanChannelTempestRush = false;
                         }
                     if (CanChannelTempestRush)
@@ -626,36 +621,36 @@ namespace GilesTrinity.DbProvider
 
                         GilesTrinity.dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
                         GilesTrinity.LastPowerUsed = SNOPower.Monk_TempestRush;
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Tempest Rush for OOC movement, distance={0:0}", fDistanceFromTarget);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Tempest Rush for OOC movement, distance={0:0}", DestinationDistance);
                         return;
                     }
                 }
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (GilesTrinity.Hotbar.Contains(SNOPower.Wizard_Teleport) &&
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Wizard_Teleport] &&
-                    fDistanceFromTarget >= 20f &&
+                    DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Wizard_Teleport) && !ShrinesInArea(vMoveToTarget))
                 {
                     Vector3 vThisTarget = vMoveToTarget;
-                    if (fDistanceFromTarget > 35f)
+                    if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Teleport] = DateTime.Now;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Teleport for OOC movement, distance={0}", fDistanceFromTarget);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Teleport for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
                 // Archon Teleport for a wizard 
                 if (GilesTrinity.Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Archon_Teleport]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Wizard_Archon_Teleport] &&
-                    fDistanceFromTarget >= 20f &&
+                    DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport) && !ShrinesInArea(vMoveToTarget))
                 {
                     Vector3 vThisTarget = vMoveToTarget;
-                    if (fDistanceFromTarget > 35f)
+                    if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Archon_Teleport] = DateTime.Now;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Archon Teleport for OOC movement, distance={0}", fDistanceFromTarget);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Archon Teleport for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
             }

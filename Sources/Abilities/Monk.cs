@@ -137,7 +137,7 @@ namespace GilesTrinity
             }
 
             // For tempest rush re-use
-            if (!bOOCBuff && LastPowerUsed == SNOPower.Monk_TempestRush && PlayerStatus.PrimaryResource >= 10 &&
+            if (!bOOCBuff && LastPowerUsed == SNOPower.Monk_TempestRush && PlayerStatus.PrimaryResource >= 15 &&
                 (Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly))
             {
                 GenerateMonkZigZag();
