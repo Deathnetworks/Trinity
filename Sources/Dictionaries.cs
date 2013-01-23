@@ -202,7 +202,7 @@ namespace GilesTrinity
             181182, 181185, 181290, 181292, 181306, 181309, 181313, 181326, 181563, 181857, 181858, 187265, 191433, 191462, 191641, 192880, 192881, 196413, 196435,
             197280, 199191, 199264, 199274, 199597, 199664, 200979, 200982, 201236, 201580, 201581, 201583, 204183, 205746, 205756, 210087, 213907, 218228, 219223,
             220114, 3011, 3205, 3539, 3582, 3584, 3595, 3600, 4580, 52693, 5466, 55005, 5509, 62522, 
-            205756, 5509, 200371, 167185,
+            205756, 5509, 200371, 167185, 181195,
             // rrrix act 3
             60108,
             // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
@@ -252,7 +252,7 @@ namespace GilesTrinity
         internal static Dictionary<int, float> dictSNOExtendedDestructRange = new Dictionary<int, float> {
             {2972, 10}, {80357, 16}, {116508, 10}, {113932, 8}, {197514, 18}, {108587, 8}, {108618, 8}, {108612, 8}, {116409, 18}, {121586, 22},
             {195101, 10}, {195108, 25}, {170657, 5}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 8}, {193963, 5}, {159066, 12}, {160570, 12},
-            {55325, 5}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 30}, {192867, 3.5f}, {155255, 8}, {54530, 6}
+            {55325, 5}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 30}, {192867, 3.5f}, {155255, 8}, {54530, 6}, {157541, 6},
          };
         /// <summary>
         /// Destructible things that need targeting by a location instead of an ACDGUID (stuff you can't "click on" to destroy in-game)
@@ -347,7 +347,7 @@ namespace GilesTrinity
                 {SNOPower.Monk_CripplingWave, 5},
                 {SNOPower.Monk_WayOfTheHundredFists, 5},
                 {SNOPower.Monk_LashingTailKick, 250},
-                {SNOPower.Monk_TempestRush, 5},
+                {SNOPower.Monk_TempestRush, 50},
                 {SNOPower.Monk_WaveOfLight, 250},
                 {SNOPower.Monk_BlindingFlash, 15200},
                 {SNOPower.Monk_BreathOfHeaven, 15200},

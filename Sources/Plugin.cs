@@ -74,7 +74,9 @@ namespace GilesTrinity
         /// </summary>
         public void OnPulse()
         {
-            //RefreshDiaObjectCache();
+            if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld || !ZetaDia.CPlayer.IsValid)
+                return;
+
         }
 
         /// <summary>

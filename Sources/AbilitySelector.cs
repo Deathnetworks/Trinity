@@ -234,5 +234,46 @@ namespace GilesTrinity
 
         }
 
+        private static SNOPower GetDefaultWeaponPower()
+        {
+            ACDItem rhItem = ZetaDia.Me.Inventory.Equipped.Where(i => i.InventorySlot == InventorySlot.PlayerLeftHand).FirstOrDefault();
+            if (rhItem == null)
+                return SNOPower.None;
+
+            switch (rhItem.ItemType)
+            {
+                default:
+                    return SNOPower.Weapon_Melee_Instant;
+                case ItemType.Axe:
+                case ItemType.CeremonialDagger:
+                case ItemType.Dagger:
+                case ItemType.Daibo:
+                case ItemType.FistWeapon:
+                case ItemType.Mace:
+                case ItemType.Polearm:
+                case ItemType.Spear:
+                case ItemType.Staff:
+                case ItemType.Sword:
+                    return SNOPower.Weapon_Melee_Instant;
+                case ItemType.Wand:
+                    return SNOPower.Weapon_Ranged_Wand;
+                case ItemType.Bow:
+                case ItemType.Crossbow:
+                case ItemType.HandCrossbow:
+                    return SNOPower.Weapon_Ranged_Instant;
+            }
+        }
+        private static float GetDefaultWeaponDistance()
+        {
+            switch (GetDefaultWeaponPower())
+            {
+                case SNOPower.Weapon_Ranged_Instant:
+                case SNOPower.Weapon_Ranged_Wand:
+                    return 40f;
+                case SNOPower.Weapon_Melee_Instant:
+                default:
+                    return 10f;
+            }
+        }
     }
 }

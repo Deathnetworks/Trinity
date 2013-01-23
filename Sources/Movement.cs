@@ -229,11 +229,11 @@ namespace GilesTrinity
         {
             if (!isStuck)
             {
-                if (shouldKite && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 1500 && vlastSafeSpot != vNullLocation)
+                if (shouldKite && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 1500 && vlastSafeSpot != Vector3.Zero)
                 {
                     return vlastSafeSpot;
                 }
-                else if (!IsAvoidingProjectiles && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 800 && vlastSafeSpot != vNullLocation)
+                else if (!IsAvoidingProjectiles && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 800 && vlastSafeSpot != Vector3.Zero)
                 {
                     return vlastSafeSpot;
                 }
@@ -517,19 +517,45 @@ namespace GilesTrinity
 
             float gridSquareSize = 5f;
             int maxDistance = 200;
-            int gridTotalSize = (int)(maxDistance / gridSquareSize) * 2;
             int maxWeight = 100;
             int maxZDiff = 14;
+
+            // special settings for Azmodan
+            if (ZetaDia.CurrentWorldId == 121214)
+            {
+                List<Vector3> AzmoKitePositions = new List<Vector3>()
+                {
+                    new Vector3(364f, 550f, 0f), // right
+                    new Vector3(533f, 536f, 0f), // bottom
+                    new Vector3(540f, 353f, 0f), // left
+                    new Vector3(368f, 369f, 0f), // top
+                };
+
+                return AzmoKitePositions.OrderByDescending(p => p.Distance2D(origin)).FirstOrDefault();
+            }
+
+
+            int gridTotalSize = (int)(maxDistance / gridSquareSize) * 2;
 
             /* If maxDistance is the radius of a circle from the origin, then we want to get the hypotenuse of the radius (x) and tangent (y) as our search grid corner
              * anything outside of the circle will not be considered
              */
             Vector2 topleft = new Vector2(origin.X - maxDistance, origin.Y - maxDistance);
 
+
+
+
             //Make a circle on the corners of the square
             double gridSquareRadius = Math.Sqrt((Math.Pow(gridSquareSize / 2, 2) + Math.Pow(gridSquareSize / 2, 2)));
 
             GridPoint bestPoint = new GridPoint(Vector3.Zero, 0, 0);
+
+            int nodesNotNavigable = 0;
+            int nodesZDiff = 0;
+            int nodesGT45Raycast = 0;
+            int nodesAvoidance = 0;
+            int nodesMonsters = 0;
+            int pathFailures = 0;
 
             for (int x = 0; x < gridTotalSize; x++)
             {
@@ -557,6 +583,7 @@ namespace GilesTrinity
                         p_xy = gp.WorldToGrid(xy);
                         if (!pf.IsNavigable(p_xy))
                         {
+                            nodesNotNavigable++;
                             continue;
                         }
                     }
@@ -565,11 +592,13 @@ namespace GilesTrinity
                         // If ZDiff is way too different (up a cliff or wall)
                         if (Math.Abs(gridPoint.Position.Z - origin.Z) > maxZDiff)
                         {
+                            nodesZDiff++;
                             continue;
                         }
                     }
                     if (gridPoint.Distance > 45 && !ZetaDia.Physics.Raycast(origin, xyz, NavCellFlags.AllowWalk))
                     {
+                        nodesGT45Raycast++;
                         continue;
                     }
 
@@ -579,11 +608,13 @@ namespace GilesTrinity
                     // Avoidance
                     if (hashAvoidanceObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= gridSquareRadius))
                     {
+                        nodesAvoidance++;
                         continue;
                     }
                     // Obstacles
                     if (hashNavigationObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= gridSquareRadius))
                     {
+                        nodesMonsters++;
                         continue;
                     }
 
@@ -593,6 +624,7 @@ namespace GilesTrinity
                         // Any monster standing in this GridPoint
                         if (hashMonsterObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= (shouldKite ? gridSquareRadius : gridSquareSize + PlayerKiteDistance)))
                         {
+                            nodesMonsters++;
                             continue;
                         }
 
@@ -604,6 +636,7 @@ namespace GilesTrinity
                                 ))
                             {
 
+                                nodesMonsters++;
                                 continue;
                             }
                         }
@@ -624,8 +657,10 @@ namespace GilesTrinity
                             Point lastNode = gp.WorldToGrid(origin.ToVector2());
 
                             if (pfr.IsPartialPath)
+                            {
+                                pathFailures++;
                                 continue;
-
+                            }
                             // analyze pathing to a safe point
                             foreach (Point node in pfr.PointsReversed)
                             {
@@ -634,7 +669,9 @@ namespace GilesTrinity
 
                                 // never skip first-step nodes
                                 if (node_xyz.Distance(origin) < 10)
+                                {
                                     continue;
+                                }
 
                                 // ignore any path points where monsters are standing in it
                                 if (hashMonsterObstacleCache.Any(m => m.Location.Distance(node_xyz) <= m.Radius))
@@ -657,7 +694,10 @@ namespace GilesTrinity
                             }
 
                             if (pathFailure)
+                            {
+                                pathFailures++;
                                 continue;
+                            }
                         }
 
                     }
@@ -683,7 +723,7 @@ namespace GilesTrinity
                     }
 
                     // Boss Areas
-                    if (UnsafeKiteAreas.Any(a => a.WorldId == iCurrentWorldID && Vector3.Distance(a.Position, gridPoint.Position) <= a.Radius))
+                    if (UnsafeKiteAreas.Any(a => a.WorldId == ZetaDia.CurrentWorldId && Vector3.Distance(a.Position, gridPoint.Position) <= a.Radius))
                     {
                         continue;
                     }
@@ -737,6 +777,13 @@ namespace GilesTrinity
             }
 
             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid found {0}, distance: {1:0}, weight: {2:0}", bestPoint.Position, bestPoint.Distance, bestPoint.Weight);
+            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid stats NotNavigable {0} ZDiff {1} GT45Raycast {2} Avoidance {3} Monsters {4} pathFailures {5}",
+                nodesNotNavigable,
+                nodesZDiff,
+                nodesGT45Raycast,
+                nodesAvoidance,
+                nodesMonsters,
+                pathFailures);
             return bestPoint.Position;
 
         }

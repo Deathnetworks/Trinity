@@ -322,7 +322,7 @@ namespace GilesTrinity
         private static bool IsAvoidingProjectiles = false;
 
         // When we last FOUND a safe spot
-        private static DateTime lastFoundSafeSpot = DateTime.Today;
+        private static DateTime lastFoundSafeSpot = DateTime.MinValue;
         private static Vector3 vlastSafeSpot = Vector3.Zero;
 
         /// <summary>
@@ -367,6 +367,7 @@ namespace GilesTrinity
         private static bool bAnyMobsInCloseRange = false;
         private static float iCurrentMaxKillRadius = 0f;
         private static float iCurrentMaxLootRadius = 0f;
+        internal static bool MaintainTempestRush = false;
 
         /// <summary>
         /// Use Beserker Only with "Hard" elites (specific affixes)
@@ -386,7 +387,7 @@ namespace GilesTrinity
         private static int iTotalNumberGoblins = 0;
         private static DateTime lastGoblinTime = DateTime.Today;
 
-        internal static DateTime SweepWindSpam = DateTime.Today; //intell -- inna
+        internal static DateTime SweepWindSpam = DateTime.Today; 
 
         // Variables relating to quick-reference of monsters within sepcific ranges (if anyone has suggestion for similar functionality with reduced CPU use, lemme know, but this is fast atm!)
         private static int[] ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };

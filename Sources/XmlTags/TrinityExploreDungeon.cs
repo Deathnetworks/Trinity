@@ -321,7 +321,7 @@ namespace GilesTrinity.XmlTags
                         ),
                         CheckIsExplorerFinished()
                     ),
-                    new DecoratorContinue(ret => BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
+                    new DecoratorContinue(ret => BrainBehavior.DungeonExplorer != null && BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
                         new PrioritySelector(
                             CheckNodeFinished(),
                             new Sequence(
@@ -435,6 +435,7 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Visited all nodes but objective not complete, forcing grid reset!")),
                         new Action(ret => GilesTrinity.hashSkipAheadAreaCache.Clear()),
                         new Action(ret => MiniMapMarker.KnownMarkers.Clear()),
+                        new Action(ret => ForceUpdateScenes()),
                         new Action(ret => GridSegmentation.Reset()),
                         new Action(ret => BrainBehavior.DungeonExplorer.Reset()),
                         new Action(ret => PriorityScenesInvestigated.Clear()),
@@ -442,6 +443,14 @@ namespace GilesTrinity.XmlTags
                     )
                 )
            );
+        }
+
+        private void ForceUpdateScenes()
+        {
+            foreach (Scene scene in ZetaDia.Scenes.GetScenes().ToList())
+            {
+                scene.UpdatePointer(scene.BaseAddress);
+            }
         }
 
         /// <summary>
@@ -1025,7 +1034,7 @@ namespace GilesTrinity.XmlTags
             if (PathPrecision == 0)
                 PathPrecision = BoxSize / 2f;
 
-            float minPathPrecision = 10f;
+            float minPathPrecision = 15f;
 
             if (PathPrecision < minPathPrecision)
                 PathPrecision = minPathPrecision;

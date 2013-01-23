@@ -11,6 +11,7 @@ using Zeta.Internals.Actors;
 using Zeta.Navigation;
 using Zeta.Pathfinding;
 using GilesTrinity.Cache;
+using Zeta.Internals;
 
 namespace GilesTrinity
 {
@@ -31,7 +32,7 @@ namespace GilesTrinity
                 {
 
                     // If we aren't in the game or a world is loading, don't do anything yet
-                    if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
+                    if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || !ZetaDia.CPlayer.IsValid || ZetaDia.IsLoadingWorld)
                     {
                         lastChangedZigZag = DateTime.Today;
                         vPositionLastZigZagCheck = Vector3.Zero;
@@ -42,6 +43,7 @@ namespace GilesTrinity
                     {
                         return true;
                     }
+
                 }
                 using (new PerformanceLogger("GilesGlobalOverlord.RefreshHotBar"))
                 {
@@ -158,8 +160,6 @@ namespace GilesTrinity
                     // Refresh Cache if needed
                     bool CacheWasRefreshed = RefreshDiaObjectCache();
                 }
-                // Refresh new Cache
-                //CacheRefresher.RefreshAll();
 
                 // We have a target, start the target handler!
                 if (CurrentTarget != null)
@@ -169,6 +169,9 @@ namespace GilesTrinity
                     ShouldPickNewAbilities = true;
                     return true;
                 }
+
+                //Monk_MaintainTempestRush();
+
                 using (new PerformanceLogger("GilesGlobalOverlord.UsePotion"))
                 {
 

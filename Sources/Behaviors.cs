@@ -71,6 +71,8 @@ namespace GilesTrinity
         /// <returns></returns>
         private static Zeta.TreeSharp.RunStatus GetTreeSharpRunStatus(HandlerRunStatus rs)
         {
+            Monk_MaintainTempestRush();
+
             switch (rs)
             {
                 case HandlerRunStatus.TreeFailure:
@@ -97,7 +99,7 @@ namespace GilesTrinity
             {
                 try
                 {
-                    if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
+                    if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || !ZetaDia.CPlayer.IsValid || ZetaDia.IsLoadingWorld)
                     {
                         DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
                         return RunStatus.Failure;
@@ -194,15 +196,9 @@ namespace GilesTrinity
                     {
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2");
                         runStatus = HandlerRunStatus.TreeSuccess;
-
-                        if (LastPowerUsed == SNOPower.Monk_TempestRush && PlayerStatus.PrimaryResource > 15f && Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly)
-                        {
-                            vSideToSideTarget = FindZigZagTargetLocation(PlayerMover.vOldPosition, 15f);
-                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Using Tempest Rush to maintain channeling");
-                            ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vSideToSideTarget, iCurrentWorldID, -1);
-                        }
                     }
 
+                    Monk_MaintainTempestRush();
 
                     //check if we are returning to the tree
                     if (runStatus != HandlerRunStatus.NotFinished)
@@ -441,7 +437,7 @@ namespace GilesTrinity
                                         if ((iInteractAttempts > 5 || (CurrentTarget.Type == GObjectType.Interactable && iInteractAttempts > 3)) &&
                                             !(CurrentTarget.Type != GObjectType.HealthWell))
                                         {
-                                            hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
+                                            hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
                                             //dateSinceBlacklist90Clear = DateTime.Now;
                                         }
                                         // Now tell Trinity to get a new target!
@@ -663,7 +659,8 @@ namespace GilesTrinity
                                 // Tempest rush for a monk
                                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && PlayerStatus.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
                                     ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.CentreDistance > 20f) || CurrentTarget.Type != GObjectType.Item) &&
-                                    Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly)
+                                    Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly &&
+                                    Monk_TempestRushReady())
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, iCurrentWorldID, -1);
                                     dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
@@ -1491,6 +1488,9 @@ namespace GilesTrinity
                 }
                 if (bUsePowerSuccess)
                 {
+
+                    Monk_MaintainTempestRush();
+
                     dictAbilityLastUse[CurrentPower.SNOPower] = DateTime.Now;
                     lastGlobalCooldownUse = DateTime.Now;
                     LastPowerUsed = CurrentPower.SNOPower;

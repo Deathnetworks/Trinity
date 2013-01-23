@@ -164,7 +164,7 @@ namespace GilesTrinity
                     if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
                     {
                         RecordTargetHistory();
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Found New Target - {0} CurrentTargetRactorGUID: {1} CurrentTarget.RActorGuid: {2}",
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Found New Target - {0} CurrentTargetRactorGUID: {1} CurrentTarget.RActorGuid: {2}",
                                         DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
                         dateSincePickedTarget = DateTime.Now;
                         iTargetLastHealth = 0f;
@@ -177,7 +177,7 @@ namespace GilesTrinity
                             // Check if the health has changed, if so update the target-pick time before we blacklist them again
                             if (CurrentTarget.HitPoints != iTargetLastHealth)
                             {
-                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "Keeping Target - CurrentTarget.iHitPoints: {1:0.00}  iTargetLastHealth: {2:0.00} ",
+                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Keeping Target - CurrentTarget.iHitPoints: {1:0.00}  iTargetLastHealth: {2:0.00} ",
                                                 DateTime.Now, CurrentTarget.HitPoints, iTargetLastHealth);
                                 dateSincePickedTarget = DateTime.Now;
                             }

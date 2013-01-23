@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -305,9 +307,9 @@ namespace GilesTrinity
                 // Default attacks
                 if (!bOOCBuff && !bCurrentlyAvoiding && !PlayerStatus.IsIncapacitated)
                 {
-                    return new TrinityPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
+                    return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
                 }
-                return new TrinityPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             }
             else
             {
@@ -369,8 +371,10 @@ namespace GilesTrinity
             if (Hotbar.Contains(SNOPower.Wizard_Electrocute))
                 return new TrinityPower(SNOPower.Wizard_Electrocute, 9f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
 
-            return new TrinityPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+            return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
         }
+
+
 
     }
 }
