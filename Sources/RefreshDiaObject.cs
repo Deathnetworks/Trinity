@@ -572,7 +572,7 @@ namespace GilesTrinity
                 case GObjectType.Unit:
                     {
                         // Not allowed to kill monsters due to profile settings
-                        if (!ProfileManager.CurrentProfile.KillMonsters || !CombatTargeting.Instance.AllowedToKillMonsters)
+                        if (!CombatTargeting.Instance.AllowedToKillMonsters)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "CombatDisabled";
@@ -588,13 +588,14 @@ namespace GilesTrinity
                 case GObjectType.Item:
                     {
                         // Not allowed to loot due to profile settings
-                        if (!ProfileManager.CurrentProfile.PickupLoot || !LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
-                        {
-                            AddToCache = false;
-                            c_IgnoreSubStep = "LootingDisabled";
-                            break;
-                        }
-                        else if (!ForceVendorRunASAP)
+                        // rrrix disabled this since noobs can't figure out their profile is broken... looting is always enabled now
+                        //if (!ProfileManager.CurrentProfile.PickupLoot || !LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
+                        //{
+                        //    AddToCache = false;
+                        //    c_IgnoreSubStep = "LootingDisabled";
+                        //    break;
+                        //}
+                        if (!ForceVendorRunASAP)
                         {
                             AddToCache = RefreshGilesItem();
                             c_IgnoreReason = "RefreshGilesItem";

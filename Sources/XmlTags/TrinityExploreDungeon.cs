@@ -450,6 +450,7 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => MiniMapMarker.KnownMarkers.Clear()),
                         new Action(ret => ForceUpdateScenes()),
                         new Action(ret => GridSegmentation.Reset()),
+                        new Action(ret => GridSegmentation.Update()),
                         new Action(ret => BrainBehavior.DungeonExplorer.Reset()),
                         new Action(ret => PriorityScenesInvestigated.Clear()),
                         new Action(ret => UpdateRoute())

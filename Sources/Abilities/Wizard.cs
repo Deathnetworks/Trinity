@@ -350,7 +350,7 @@ namespace GilesTrinity
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_DisintegrationWave, 49f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, SIGNATURE_SPAM);
                 }
-                return defaultPower;
+                return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             }
         }
 

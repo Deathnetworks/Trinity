@@ -288,7 +288,7 @@ namespace GilesTrinity
                     SweepWindSpam = DateTime.Now; //intell -- inna
                 return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
             }
-            return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+            return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
         }
 
         private static void GenerateMonkZigZag()

@@ -603,7 +603,7 @@ namespace GilesTrinity
                         continue;
                     }
 
-                    if (isStuck && gridPoint.Distance > PlayerMover.iTotalAntiStuckAttempts + 1 * 10)
+                    if (isStuck && gridPoint.Distance > (PlayerMover.iTotalAntiStuckAttempts + 2) * 10)
                     {
                         continue;
                     }
