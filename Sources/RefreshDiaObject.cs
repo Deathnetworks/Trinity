@@ -1494,7 +1494,6 @@ namespace GilesTrinity
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotInRange";
-                return AddToCache;
             }
 
             // re-add resplendent chests
@@ -1834,7 +1833,7 @@ namespace GilesTrinity
                         }
                         else
                         {
-                            iMinDistance += 6f;
+                            iMinDistance += 12f;
                             AddToCache = true;
                         }
 

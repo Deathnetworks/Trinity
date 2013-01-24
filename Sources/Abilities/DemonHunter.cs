@@ -238,11 +238,11 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.DemonHunter_Grenades, 40f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
             }
             // Default attacks
-            if (!bOOCBuff && !bCurrentlyAvoiding && !PlayerStatus.IsIncapacitated)
+            if (!bOOCBuff && !bCurrentlyAvoiding)
             {
-                return new TrinityPower(SNOPower.Weapon_Ranged_Projectile, 40f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
+                return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
             }
-            return defaultPower;
+            return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
         }
 
         private static bool DHHasNoPrimary()

@@ -1019,7 +1019,7 @@ namespace GilesTrinity.XmlTags
             }
 
             var distToTarget = moveTarget.Distance2D(myPos);
-            while (distToTarget <= 5f || (PlayerMover.GetMovementSpeed() < 1 && distToTarget <= 50f && ZetaDia.Physics.Raycast(moveTarget, myPos, Zeta.Internals.SNO.NavCellFlags.AllowWalk)))
+            if (distToTarget <= 5f || (PlayerMover.GetMovementSpeed() < 1 && distToTarget <= 50f && ZetaDia.Physics.Raycast(moveTarget, myPos, NavCellFlags.AllowWalk)))
             {
                 Vector3 lastStep = PathStack.Current;
                 PathStack.Next();
@@ -1035,7 +1035,6 @@ namespace GilesTrinity.XmlTags
                 {
                     SetNodeVisited("Current movement stack is empty!");
                     UpdateRoute();
-                    break;
                 }
             }
 

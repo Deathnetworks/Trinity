@@ -235,7 +235,7 @@ namespace GilesTrinity.DbProvider
             if (iTimesReachedStuckPoint > 0)
             {
                 vSafeMovementLocation = Vector3.Zero;
-                iTimesReachedStuckPoint++;
+
                 // Reset the path and allow a whole "New" unstuck generation next cycle
                 iTimesReachedStuckPoint = 0;
                 // And cancel unstucking for 9 seconds so DB can try to navigate
@@ -267,8 +267,9 @@ namespace GilesTrinity.DbProvider
                 );
 
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
-                //GilesTrinity.PlayerStatus.CurrentPosition = vMyCurrentPosition;
+
                 vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
+
                 // Temporarily log stuff
                 if (iTotalAntiStuckAttempts == 1 && GilesTrinity.Settings.Advanced.LogStuckLocation)
                 {

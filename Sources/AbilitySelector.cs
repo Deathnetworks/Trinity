@@ -243,6 +243,8 @@ namespace GilesTrinity
             switch (rhItem.ItemType)
             {
                 default:
+                    if (rhItem.IsTwoHand)
+                        return SNOPower.Weapon_Melee_Instant_BothHand;
                     return SNOPower.Weapon_Melee_Instant;
                 case ItemType.Axe:
                 case ItemType.CeremonialDagger:
@@ -254,13 +256,15 @@ namespace GilesTrinity
                 case ItemType.Spear:
                 case ItemType.Staff:
                 case ItemType.Sword:
-                    return SNOPower.Weapon_Melee_Instant;
+                     if (rhItem.IsTwoHand)
+                        return SNOPower.Weapon_Melee_Instant_BothHand;
+                   return SNOPower.Weapon_Melee_Instant;
                 case ItemType.Wand:
                     return SNOPower.Weapon_Ranged_Wand;
                 case ItemType.Bow:
                 case ItemType.Crossbow:
                 case ItemType.HandCrossbow:
-                    return SNOPower.Weapon_Ranged_Instant;
+                  return SNOPower.Weapon_Ranged_Instant;
             }
         }
         private static float GetDefaultWeaponDistance()

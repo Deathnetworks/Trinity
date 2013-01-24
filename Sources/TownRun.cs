@@ -1850,7 +1850,7 @@ namespace GilesTrinity
             internal static Composite GetPostTownRunDecorator()
             {
                 return
-                new Decorator(ret => !Zeta.CommonBot.Logic.BrainBehavior.IsVendoring,
+                new Decorator(ret => Zeta.CommonBot.Logic.BrainBehavior.IsVendoring,
                     new PrioritySelector(
                         new Decorator(ret => GetPortalReturnPosition(ZetaDia.CurrentAct).Distance2D(ZetaDia.Me.Position) > 10f,
                             new Sequence(

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using GilesTrinity.DbProvider;
 using GilesTrinity.Technicals;
 using Zeta;
 using Zeta.Common;
@@ -599,6 +600,11 @@ namespace GilesTrinity
                     if (gridPoint.Distance > 45 && !ZetaDia.Physics.Raycast(origin, xyz, NavCellFlags.AllowWalk))
                     {
                         nodesGT45Raycast++;
+                        continue;
+                    }
+
+                    if (isStuck && gridPoint.Distance > PlayerMover.iTotalAntiStuckAttempts + 1 * 10)
+                    {
                         continue;
                     }
 

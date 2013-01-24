@@ -191,11 +191,11 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.Witchdoctor_Firebomb, fUseThisRange, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
             }
             // Default attacks
-            if (!bOOCBuff && !bCurrentlyAvoiding && !PlayerStatus.IsIncapacitated)
+            if (!bOOCBuff && !bCurrentlyAvoiding)
             {
-                return new TrinityPower(SNOPower.Weapon_Melee_Instant, 11f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
+                return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
             }
-            return defaultPower;
+            return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
         }
 
         private static TrinityPower GetWitchDoctorDestroyPower()

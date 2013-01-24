@@ -407,11 +407,11 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.Barbarian_Cleave, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 2, USE_SLOWLY);
             }
             // Default attacks
-            if (!UseOOCBuff && !IsCurrentlyAvoiding)
+            if (!bOOCBuff && !bCurrentlyAvoiding)
             {
-                return new TrinityPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
+                return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
             }
-            return defaultPower;
+            return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
         }
 
         private static bool BarbHasNoPrimary()
