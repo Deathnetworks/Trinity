@@ -39,7 +39,7 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.Monk_MantraOfRetribution, 0f, vNullLocation, iCurrentWorldID, -1, 0, 1, USE_SLOWLY);
             }
             // Mystic ally
-            if (Hotbar.Contains(SNOPower.Monk_MysticAlly) && PlayerStatus.PrimaryResource >= 90 && iPlayerOwnedMysticAlly == 0 &&
+            if (Hotbar.Contains(SNOPower.Monk_MysticAlly) && PlayerStatus.PrimaryResource >= 25 && iPlayerOwnedMysticAlly == 0 &&
                 GilesUseTimer(SNOPower.Monk_MysticAlly) && PowerManager.CanCast(SNOPower.Monk_MysticAlly))
             {
                 return new TrinityPower(SNOPower.Monk_MysticAlly, 0f, vNullLocation, iCurrentWorldID, -1, 2, 2, USE_SLOWLY);
@@ -101,7 +101,7 @@ namespace GilesTrinity
                 (DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 8000 || CheckAbilityAndBuff(SNOPower.Monk_BlindingFlash) ||
                 ElitesWithinRange[RANGE_25] > 0 && DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 12500) &&
                 // Check our mantras, if we have them, are up first
-                HasMonkMantraAbilityAndBuff() &&
+                Monk_HasMantraAbilityAndBuff() &&
                 // Check the re-use timer and energy costs
                 (PlayerStatus.PrimaryResource >= 75 || (Settings.Combat.Monk.HasInnaSet && PlayerStatus.PrimaryResource >= 5)))
             {
@@ -219,7 +219,7 @@ namespace GilesTrinity
                 AnythingWithinRange[RANGE_15] > 2) &&
                 Hotbar.Contains(SNOPower.Monk_WaveOfLight) &&
                 GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
-                (PlayerStatus.PrimaryResource >= 90 || PlayerStatus.PrimaryResourcePct >= 0.85) && HasMonkMantraAbilityAndBuff())
+                (PlayerStatus.PrimaryResource >= 90 || PlayerStatus.PrimaryResourcePct >= 0.85) && Monk_HasMantraAbilityAndBuff())
             {
                 return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
@@ -327,7 +327,7 @@ namespace GilesTrinity
         /// Returns true if we have a mantra and it's up, or if we don't have a Mantra at all
         /// </summary>
         /// <returns></returns>
-        private static bool HasMonkMantraAbilityAndBuff()
+        private static bool Monk_HasMantraAbilityAndBuff()
         {
             return
                 (CheckAbilityAndBuff(SNOPower.Monk_MantraOfConviction) ||
@@ -352,10 +352,13 @@ namespace GilesTrinity
             if (!Hotbar.Contains(SNOPower.Monk_TempestRush))
                 return false;
 
+            if (!Monk_HasMantraAbilityAndBuff())
+                return false;
+
             float currentSpirit = ZetaDia.Me.CurrentPrimaryResource;
 
             // Minimum 10 spirit to continue channeling tempest rush
-            if (DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_TempestRush]).TotalMilliseconds < 300 && currentSpirit > 10f)
+            if (DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_TempestRush]).TotalMilliseconds < 150 && currentSpirit > 10f)
                 return true;
 
             // Minimum 25 Spirit to start Tempest Rush
@@ -388,9 +391,9 @@ namespace GilesTrinity
             }
 
 
-            if (MaintainTempestRush && Monk_TempestRushReady() && Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly && GilesUseTimer(SNOPower.Monk_TempestRush) && shouldMaintain)
+            if (Monk_TempestRushReady() && Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly && GilesUseTimer(SNOPower.Monk_TempestRush) && shouldMaintain)
             {
-                Vector3 target = vCurrentDestination != Vector3.Zero ? FindZigZagTargetLocation(vCurrentDestination, 15f) : FindZigZagTargetLocation(ZetaDia.Me.Position, 15f);
+                Vector3 target = CurrentTarget != null ? FindZigZagTargetLocation(CurrentTarget.Position, 15f) : MathEx.GetPointAt(ZetaDia.Me.Position, 25f, ZetaDia.Me.Rotation);
 
                 Monk_TempestRushStatus("Using Tempest Rush to maintain channeling");
                 ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, iCurrentWorldID, -1);

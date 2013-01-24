@@ -195,9 +195,9 @@ namespace GilesTrinity
             }
         }
         // Quick Easy Raycast Function for quick changes
-        public static bool GilesCanRayCast(Vector3 vStartLocation, Vector3 vDestination, NavCellFlags NavType = NavCellFlags.AllowWalk)
+        public static bool GilesCanRayCast(Vector3 vStartLocation, Vector3 vDestination, NavCellFlags NavType = NavCellFlags.AllowWalk, float ZDiff = 4f)
         {
-            if (ZetaDia.Physics.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + 4f), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + 4f), NavType))
+            if (ZetaDia.Physics.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + ZDiff), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + ZDiff), NavType))
             {
                 if (hashNavigationObstacleCache.Any(o => MathEx.IntersectsPath(o.Location, o.Radius, vStartLocation, vDestination)))
                     return false;

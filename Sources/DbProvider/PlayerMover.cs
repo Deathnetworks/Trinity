@@ -613,6 +613,7 @@ namespace GilesTrinity.DbProvider
                         vTargetAimPoint = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, aimPointDistance);
                     }
                     bool canRayCastTarget = GilesTrinity.GilesCanRayCast(vMyCurrentPosition, vTargetAimPoint, NavCellFlags.AllowWalk);
+
                     if (!CanChannelTempestRush &&
                         GilesTrinity.PlayerStatus.PrimaryResource >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit &&
                         DestinationDistance >= GilesTrinity.Settings.Combat.Monk.TR_MinDist &&
@@ -620,32 +621,34 @@ namespace GilesTrinity.DbProvider
                     {
                         CanChannelTempestRush = true;
                     }
-                    else if (CanChannelTempestRush && (GilesTrinity.PlayerStatus.PrimaryResource < 10f || DestinationDistance < 5f || GetMovementSpeed() == 0))
+                    else if (CanChannelTempestRush && (GilesTrinity.PlayerStatus.PrimaryResource < 10f))
                     {
                         CanChannelTempestRush = false;
                     }
                     if (CanChannelTempestRush)
                     {
-                        ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vTargetAimPoint, GilesTrinity.iCurrentWorldID, -1);
-
-                        // simulate movement speed of 30
-                        SpeedSensor lastSensor = SpeedSensors.OrderByDescending(s => s.Timestamp).FirstOrDefault();
-                        SpeedSensors.Add(new SpeedSensor()
+                        if (GilesTrinity.GilesUseTimer(SNOPower.Monk_TempestRush))
                         {
-                            Location = vMyCurrentPosition,
-                            TimeSinceLastMove = new TimeSpan(0, 0, 0, 0, 500),
-                            Distance = 30f,
-                            WorldID = GilesTrinity.iCurrentWorldID
-                        });
+                            ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vTargetAimPoint, GilesTrinity.iCurrentWorldID, -1);
 
-                        GilesTrinity.MaintainTempestRush = true;
-                        GilesTrinity.dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
-                        GilesTrinity.LastPowerUsed = SNOPower.Monk_TempestRush;
+                            // simulate movement speed of 30
+                            SpeedSensor lastSensor = SpeedSensors.OrderByDescending(s => s.Timestamp).FirstOrDefault();
+                            SpeedSensors.Add(new SpeedSensor()
+                            {
+                                Location = vMyCurrentPosition,
+                                TimeSinceLastMove = new TimeSpan(0, 0, 0, 0, 500),
+                                Distance = 30f,
+                                WorldID = GilesTrinity.iCurrentWorldID
+                            });
 
-                        if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Tempest Rush for OOC movement, distance={0:0}",
-                                DestinationDistance);
+                            GilesTrinity.MaintainTempestRush = true;
+                            GilesTrinity.dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
+                            GilesTrinity.LastPowerUsed = SNOPower.Monk_TempestRush;
 
+                            if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
+                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Tempest Rush for OOC movement, distance={0:0}",
+                                    DestinationDistance);
+                        }
                         return;
                     }
                     else

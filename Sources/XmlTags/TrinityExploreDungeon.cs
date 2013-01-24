@@ -271,6 +271,8 @@ namespace GilesTrinity.XmlTags
             {
                 Init();
             }
+            TagTimer.Reset();
+            timesForcedReset = 0;
 
             PrintNodeCounts("PostInit");
         }
@@ -421,6 +423,9 @@ namespace GilesTrinity.XmlTags
             return RunStatus.Failure;
         }
 
+        private int timesForcedReset = 0;
+        private int timesForceResetMax = 5;
+
         /// <summary>
         /// Checks to see if the tag is finished as needed
         /// </summary>
@@ -430,9 +435,17 @@ namespace GilesTrinity.XmlTags
             return
             new PrioritySelector(
                 CheckIsObjectiveFinished(),
+                new Decorator(ret => GetRouteUnvisitedNodeCount() == 0 && timesForcedReset > timesForceResetMax,
+                    new Sequence(
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, 
+                            "Visited all nodes but objective not complete, forced reset more than {0} times, finished!", timesForceResetMax)),
+                        new Action(ret => isDone = true)
+                    )
+                ),
                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0, 
                     new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Visited all nodes but objective not complete, forcing grid reset!")),
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Visited all nodes but objective not complete, forcing grid reset!")),
+                        new Action(ret => timesForcedReset++),
                         new Action(ret => GilesTrinity.hashSkipAheadAreaCache.Clear()),
                         new Action(ret => MiniMapMarker.KnownMarkers.Clear()),
                         new Action(ret => ForceUpdateScenes()),
@@ -464,32 +477,32 @@ namespace GilesTrinity.XmlTags
                 TimeoutCheck(),
                 new Decorator(ret => EndType == TrinityExploreEndType.FullyExplored && GetRouteUnvisitedNodeCount() == 0,
                     new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Fully explored area! Tag Finished.", ExitNameHash)),
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fully explored area! Tag Finished.", ExitNameHash)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.ExitFound && ExitNameHash != 0 && IsExitNameHashVisible(),
                     new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found exitNameHash {0}!", ExitNameHash)),
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found exitNameHash {0}!", ExitNameHash)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.ObjectFound && ActorId != 0 && ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
                     .Any(a => a.ActorSNO == ActorId && a.Distance <= ObjectDistance),
                     new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Object {0}!", ActorId)),
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found Object {0}!", ActorId)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.ObjectFound && AlternateActorsFound(),
                     new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Alternate Object {0}!", GetAlternateActor().ActorSNO)),
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found Alternate Object {0}!", GetAlternateActor().ActorSNO)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && ZetaDia.Me.SceneId == SceneId,
                     new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found SceneId {0}!", SceneId)),
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found SceneId {0}!", SceneId)),
                         new Action(ret => isDone = true)
                     )
                 )
@@ -974,7 +987,18 @@ namespace GilesTrinity.XmlTags
                 NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition), GilesTrinity.GetHeadingToPoint(NextNode.NavigableCenter),
                 PathStack.Count);
 
-            if (!PathStack.Any() || DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000)
+            if (DateTime.Now.Subtract(GilesTrinity.lastAddedLocationCache).TotalMilliseconds >= 100)
+            {
+                GilesTrinity.lastAddedLocationCache = DateTime.Now;
+                if (Vector3.Distance(myPos, GilesTrinity.vLastRecordedLocationCache) >= 5f)
+                {
+                    GilesTrinity.hashSkipAheadAreaCache.Add(new GilesObstacle(myPos, 20f, 0));
+                    GilesTrinity.vLastRecordedLocationCache = myPos;
+                }
+            }
+
+            if (!PathStack.Any() || DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000 || 
+                (DateTime.Now.Subtract(GilesTrinity.lastHadUnitInSights).TotalMilliseconds < 250 || DateTime.Now.Subtract(GilesTrinity.lastHadEliteUnitInSights).TotalMilliseconds < 250))
             {
                 // Generate nodes for the PathStack
                 PathStack = PlayerMover.GeneratePath(myPos, NextNode.NavigableCenter);
@@ -982,10 +1006,11 @@ namespace GilesTrinity.XmlTags
                 newPath = true;
             }
 
-            if (!newPath && PlayerMover.GetMovementSpeed() < 1)
+            if (DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000 && PlayerMover.GetMovementSpeed() < 1)
             {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Clearing current dungeon path newPath={0}, MS={1}, PathSize={2} LastGeneratedPath={3}",
+                    newPath, PlayerMover.GetMovementSpeed(), PathStack.Count, DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds);
                 PathStack.Clear();
-                return;
             }
 
             if (PathStack.Any())
@@ -993,9 +1018,8 @@ namespace GilesTrinity.XmlTags
                 moveTarget = PathStack.Current;
             }
 
-            var playerPosition = ZetaDia.Me.Position;
-            var distToTarget = Vector3.Distance2D(ref moveTarget, ref playerPosition);
-            if (distToTarget <= 5f || (PlayerMover.GetMovementSpeed() < 1 && distToTarget <= 50f && ZetaDia.Physics.Raycast(moveTarget, myPos, Zeta.Internals.SNO.NavCellFlags.AllowWalk)))
+            var distToTarget = moveTarget.Distance2D(myPos);
+            while (distToTarget <= 5f || (PlayerMover.GetMovementSpeed() < 1 && distToTarget <= 50f && ZetaDia.Physics.Raycast(moveTarget, myPos, Zeta.Internals.SNO.NavCellFlags.AllowWalk)))
             {
                 Vector3 lastStep = PathStack.Current;
                 PathStack.Next();
@@ -1003,6 +1027,7 @@ namespace GilesTrinity.XmlTags
                 if (PathStack.Any())
                 {
                     moveTarget = PathStack.Current;
+                    distToTarget = moveTarget.Distance2D(myPos);
                     DbHelper.Log(LogCategory.Movement, "[Path] removed:{0} next:{1} dist:{2} dir:{3}",
                         lastStep, moveTarget, Vector3.Distance(lastStep, moveTarget), GilesTrinity.GetHeadingToPoint(moveTarget));
                 }
@@ -1010,6 +1035,7 @@ namespace GilesTrinity.XmlTags
                 {
                     SetNodeVisited("Current movement stack is empty!");
                     UpdateRoute();
+                    break;
                 }
             }
 

@@ -956,7 +956,7 @@ namespace GilesTrinity
             }
             string VendorName = GetTownVendorName();
 
-            if (!Zeta.Internals.UIElement.IsValidElement(12123456831356216535L) || !Zeta.Internals.UIElement.FromHash(12123456831356216535L).IsVisible)
+            if (!Zeta.Internals.UIElements.VendorWindow.IsVisible)
             {
                 DiaUnit townVendor = ZetaDia.Actors.GetActorsOfType<DiaUnit>(true).FirstOrDefault<DiaUnit>(u => u.Name.ToLower().StartsWith(VendorName));
                 if (townVendor == null)
@@ -1026,20 +1026,20 @@ namespace GilesTrinity
             }
 
             // See if we can close the inventory window
-            if (Zeta.Internals.UIElement.IsValidElement(0x368FF8C552241695))
-            {
-                try
-                {
-                    var el = Zeta.Internals.UIElement.FromHash(0x368FF8C552241695);
-                    if (el != null && el.IsValid && el.IsVisible && el.IsEnabled)
-                        el.Click();
-                }
-                catch
-                {
+            //if (Zeta.Internals.UIElements.InventoryWindow.IsVisible)
+            //{
+            //    try
+            //    {
+            //        var el = Zeta.Internals.UIElement.FromHash(0x368FF8C552241695);
+            //        if (el != null && el.IsValid && el.IsVisible && el.IsEnabled)
+            //            el.Click();
+            //    }
+            //    catch
+            //    {
 
-                    // Do nothing if it fails, just catching to prevent any big errors/plugin crashes from this
-                }
-            }
+            //        // Do nothing if it fails, just catching to prevent any big errors/plugin crashes from this
+            //    }
+            //}
 
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Sell routine finished.");
             return RunStatus.Success;

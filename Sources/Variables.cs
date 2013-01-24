@@ -205,10 +205,10 @@ namespace GilesTrinity
         private static DateTime lastRemindedAboutAbilities = DateTime.Today;
 
         // Last had any mob in range, for loot-waiting
-        private static DateTime lastHadUnitInSights = DateTime.Today;
+        internal static DateTime lastHadUnitInSights = DateTime.Today;
 
         // When we last saw a boss/elite etc.
-        private static DateTime lastHadEliteUnitInSights = DateTime.Today;
+        internal static DateTime lastHadEliteUnitInSights = DateTime.Today;
 
         // Do we need to reset the debug bar after combat handling?
         private static bool bResetStatusText = false;

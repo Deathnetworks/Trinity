@@ -77,6 +77,7 @@ namespace GilesTrinity
             if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld || !ZetaDia.CPlayer.IsValid)
                 return;
 
+
         }
 
         /// <summary>
