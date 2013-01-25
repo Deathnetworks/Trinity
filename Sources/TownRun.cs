@@ -18,6 +18,8 @@ using Zeta.Internals;
 using Action = Zeta.TreeSharp.Action;
 using System.Threading;
 using System.Diagnostics;
+using Zeta.CommonBot.Profile.Common;
+using GilesTrinity.DbProvider;
 
 namespace GilesTrinity
 {
@@ -66,13 +68,167 @@ namespace GilesTrinity
         internal static bool bNeedsEquipmentRepairs = false;
         // DateTime check to prevent inventory-check spam when looking for repairs being needed
         internal static DateTime timeLastAttemptedTownRun = DateTime.Now;
-        internal static bool bCurrentlyMoving = false;
+        internal static bool ShouldUseWalk = false;
         internal static bool bReachedDestination = false;
         // The distance last loop, so we can compare to current distance to work out if we moved
         internal static float lastDistance = 0f;
         // This dictionary stores attempted stash counts on items, to help detect any stash stucks on the same item etc.
         internal static Dictionary<int, int> _dictItemStashAttempted = new Dictionary<int, int>();
 
+        /// <summary>
+        /// TownRunCheckOverlord - determine if we should do a town-run or not
+        /// </summary>
+        /// <param name="ret"></param>
+        /// <returns></returns>
+        internal static bool TownRunCanRun(object ret)
+        {
+            using (new PerformanceLogger("TownRunOverlord"))
+            {
+                GilesTrinity.IsReadyToTownRun = false;
+
+                if (GilesTrinity.BossLevelAreaIDs.Contains(GilesTrinity.PlayerStatus.LevelAreaId))
+                    return false;
+
+                if (GilesTrinity.IsReadyToTownRun && GilesTrinity.CurrentTarget != null)
+                {
+                    TownRunCheckTimer.Reset();
+                    return false;
+                }
+
+                // Check if we should be forcing a town-run
+                if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                {
+                    if (!TownRun.bLastTownRunCheckResult)
+                    {
+                        bPreStashPauseDone = false;
+                        if (Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                        {
+                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
+                        }
+                    }
+                    GilesTrinity.IsReadyToTownRun = true;
+                }
+
+                // Time safety switch for more advanced town-run checking to prevent CPU spam
+                else if (DateTime.Now.Subtract(timeLastAttemptedTownRun).TotalSeconds > 6)
+                {
+                    timeLastAttemptedTownRun = DateTime.Now;
+
+                    // Check for no space in backpack
+                    Vector2 ValidLocation = GilesTrinity.FindValidBackpackLocation(true);
+                    if (ValidLocation.X < 0 || ValidLocation.Y < 0)
+                    {
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, now running town-run routine.");
+                        if (!bLastTownRunCheckResult)
+                        {
+                            bPreStashPauseDone = false;
+                            bLastTownRunCheckResult = true;
+                        }
+                        GilesTrinity.IsReadyToTownRun = true;
+                    }
+
+                    // Check durability percentages
+                    foreach (ACDItem tempitem in ZetaDia.Me.Inventory.Equipped)
+                    {
+                        if (tempitem.BaseAddress != IntPtr.Zero)
+                        {
+                            if (tempitem.DurabilityPercent <= Zeta.CommonBot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow)
+                            {
+                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Items may need repair, now running town-run routine.");
+                                if (!bLastTownRunCheckResult)
+                                {
+                                    bPreStashPauseDone = false;
+                                }
+                                GilesTrinity.IsReadyToTownRun = true;
+                            }
+                        }
+                    }
+                }
+
+                if (Zeta.CommonBot.ErrorDialog.IsVisible)
+                {
+                    GilesTrinity.IsReadyToTownRun = false;
+                }
+
+                bLastTownRunCheckResult = GilesTrinity.IsReadyToTownRun;
+
+                // Clear blacklists to triple check any potential targets
+                if (GilesTrinity.IsReadyToTownRun)
+                {
+                    GilesTrinity.hashRGUIDBlacklist3 = new HashSet<int>();
+                    GilesTrinity.hashRGUIDBlacklist15 = new HashSet<int>();
+                    GilesTrinity.hashRGUIDBlacklist60 = new HashSet<int>();
+                    GilesTrinity.hashRGUIDBlacklist90 = new HashSet<int>();
+                }
+
+                // Fix for A1 new game with bags full
+                if (GilesTrinity.PlayerStatus.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700 && (ZetaDia.CurrentQuest.StepId == -1 || ZetaDia.CurrentQuest.StepId == 42))
+                {
+                    GilesTrinity.IsReadyToTownRun = false;
+                }
+
+                // check for navigation obstacles (never TP near demonic forges, etc)
+                if (GilesTrinity.hashNavigationObstacleCache.Any(o => Vector3.Distance(o.Location, GilesTrinity.PlayerStatus.CurrentPosition) < 40f))
+                {
+                    GilesTrinity.IsReadyToTownRun = false;
+                }
+
+                if (GilesTrinity.IsReadyToTownRun && !(Zeta.CommonBot.Logic.BrainBehavior.IsVendoring || ZetaDia.Me.IsInTown))
+                {
+                    string cantUseTPreason = String.Empty;
+                    if (!ZetaDia.Me.CanUseTownPortal(out cantUseTPreason))
+                    {
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "It appears we need to town run but can't: {0}", cantUseTPreason);
+                        GilesTrinity.IsReadyToTownRun = false;
+                    }
+                }
+
+
+                if ((GilesTrinity.IsReadyToTownRun && TownRunCheckTimer.IsRunning && TownRunCheckTimer.ElapsedMilliseconds > 2000) || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                    return true;
+                else if (GilesTrinity.IsReadyToTownRun && !TownRunCheckTimer.IsRunning)
+                    TownRunCheckTimer.Start();
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns if we're trying to TownRun or if profile tag is UseTownPortalTag
+        /// </summary>
+        /// <returns></returns>
+        internal static bool IsTryingToTownPortal()
+        {
+            bool result = false;
+
+            if (GilesTrinity.IsReadyToTownRun)
+                result = true;
+
+            if (TownRunCheckTimer.IsRunning)
+                result = true;
+
+            Composite CurrentProfileBehavior = null;
+
+            try
+            {
+                if (ProfileManager.CurrentProfileBehavior != null)
+                    CurrentProfileBehavior = ProfileManager.CurrentProfileBehavior.Behavior;
+            }
+            catch { }
+
+            if (CurrentProfileBehavior != null && CurrentProfileBehavior.GetType() == typeof(UseTownPortalTag))
+            {
+                result = true;
+            }
+
+            if (GilesTrinity.ForceVendorRunASAP)
+                result = true;
+
+            if (Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                result = true;
+
+            return result;
+        }
 
         /// <summary>
         /// Randomize the timer between stashing/salvaging etc.
@@ -84,6 +240,34 @@ namespace GilesTrinity
             itemDelayLoopLimit = 4 + rnd + ((int)Math.Floor(((double)(BotMain.TicksPerSecond / 2))));
         }
 
+        internal static Stopwatch randomTimer = new Stopwatch();
+        internal static Random timerRandomizer = new Random();
+        internal static int randomTimerVal = -1;
+
+        internal static void SetStartRandomTimer()
+        {
+            if (!randomTimer.IsRunning)
+            {
+                randomTimerVal = timerRandomizer.Next(500, 1500);
+                randomTimer.Start();
+            }
+        }
+
+        internal static void StopRandomTimer()
+        {
+            randomTimer.Reset();
+        }
+
+        internal static bool RandomTimerIsDone()
+        {
+            return (randomTimer.IsRunning && randomTimer.ElapsedMilliseconds >= randomTimerVal);
+        }
+
+        internal static bool RandomTimerIsNotDone()
+        {
+            return (randomTimer.IsRunning && randomTimer.ElapsedMilliseconds < randomTimerVal);
+        }
+
         /// <summary>
         /// Sell Validation - Determines what should or should not be sold to vendor
         /// </summary>
@@ -93,14 +277,13 @@ namespace GilesTrinity
         /// <param name="thisdbitemtype"></param>
         /// <param name="thisfollowertype"></param>
         /// <returns></returns>
-        internal static bool GilesSellValidation(string thisinternalname, int thislevel, ItemQuality thisquality, ItemType thisdbitemtype, FollowerType thisfollowertype)
+        internal static bool GilesSellValidation(GilesCachedACDItem cItem)
         {
-
             // Check this isn't something we want to salvage
-            if (GilesSalvageValidation(thisinternalname, thislevel, thisquality, thisdbitemtype, thisfollowertype))
+            if (GilesSalvageValidation(cItem))
                 return false;
 
-            GItemType thisGilesItemType = GilesTrinity.DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
+            GItemType thisGilesItemType = GilesTrinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
             GItemBaseType thisGilesBaseType = GilesTrinity.DetermineBaseType(thisGilesItemType);
             switch (thisGilesBaseType)
             {
@@ -135,15 +318,15 @@ namespace GilesTrinity
         /// <param name="thisdbitemtype"></param>
         /// <param name="thisfollowertype"></param>
         /// <returns></returns>
-        internal static bool GilesSalvageValidation(string thisinternalname, int thislevel, ItemQuality thisquality, ItemType thisdbitemtype, FollowerType thisfollowertype)
+        internal static bool GilesSalvageValidation(GilesCachedACDItem cItem)
         {
-            GItemType thisGilesItemType = GilesTrinity.DetermineItemType(thisinternalname, thisdbitemtype, thisfollowertype);
+            GItemType thisGilesItemType = GilesTrinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
             GItemBaseType thisGilesBaseType = GilesTrinity.DetermineBaseType(thisGilesItemType);
 
             // Take Salvage Option corresponding to ItemLevel
-            SalvageOption salvageOption = GetSalvageOption(thisquality);
+            SalvageOption salvageOption = GetSalvageOption(cItem.Quality);
 
-            if (thisquality >= ItemQuality.Legendary && salvageOption == SalvageOption.InfernoOnly && thislevel >= 60)
+            if (cItem.Quality >= ItemQuality.Legendary && salvageOption == SalvageOption.InfernoOnly && cItem.Level >= 60)
                 return true;
 
             switch (thisGilesBaseType)
@@ -153,11 +336,11 @@ namespace GilesTrinity
                 case GItemBaseType.WeaponTwoHand:
                 case GItemBaseType.Armor:
                 case GItemBaseType.Offhand:
-                    return ((thislevel >= 61 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
+                    return ((cItem.Level >= 61 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
                 case GItemBaseType.Jewelry:
-                    return ((thislevel >= 59 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
+                    return ((cItem.Level >= 59 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
                 case GItemBaseType.FollowerItem:
-                    return ((thislevel >= 60 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
+                    return ((cItem.Level >= 60 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
                 case GItemBaseType.Gem:
                 case GItemBaseType.Misc:
                 case GItemBaseType.Unknown:
@@ -185,108 +368,7 @@ namespace GilesTrinity
             return SalvageOption.None;
         }
 
-        internal static Stopwatch townRunCheckTimer = new Stopwatch();
-
-        /// <summary>
-        /// TownRunCheckOverlord - determine if we should do a town-run or not
-        /// </summary>
-        /// <param name="ret"></param>
-        /// <returns></returns>
-        internal static bool GilesTownRunCheckOverlord(object ret)
-        {
-            using (new PerformanceLogger("TownRunOverlord"))
-            {
-                GilesTrinity.bWantToTownRun = false;
-
-                if (GilesTrinity.BossLevelAreaIDs.Contains(GilesTrinity.playerStatus.LevelAreaId))
-                    return false;
-
-                if (GilesTrinity.bWantToTownRun && GilesTrinity.CurrentTarget != null)
-                {
-                    townRunCheckTimer.Reset();
-                    return false;
-                }
-
-                // Check if we should be forcing a town-run
-                if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
-                {
-                    if (!TownRun.bLastTownRunCheckResult)
-                    {
-                        bPreStashPauseDone = false;
-                        if (Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
-                        {
-                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
-                        }
-                    }
-                    GilesTrinity.bWantToTownRun = true;
-                }
-
-                // Time safety switch for more advanced town-run checking to prevent CPU spam
-                else if (DateTime.Now.Subtract(timeLastAttemptedTownRun).TotalSeconds > 6)
-                {
-                    timeLastAttemptedTownRun = DateTime.Now;
-
-                    // Check for no space in backpack
-                    Vector2 ValidLocation = GilesTrinity.FindValidBackpackLocation(true);
-                    if (ValidLocation.X < 0 || ValidLocation.Y < 0)
-                    {
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, now running town-run routine.");
-                        if (!bLastTownRunCheckResult)
-                        {
-                            bPreStashPauseDone = false;
-                            bLastTownRunCheckResult = true;
-                        }
-                        GilesTrinity.bWantToTownRun = true;
-                    }
-
-                    // Check durability percentages
-                    foreach (ACDItem tempitem in ZetaDia.Me.Inventory.Equipped)
-                    {
-                        if (tempitem.BaseAddress != IntPtr.Zero)
-                        {
-                            if (tempitem.DurabilityPercent <= Zeta.CommonBot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow)
-                            {
-                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Items may need repair, now running town-run routine.");
-                                if (!bLastTownRunCheckResult)
-                                {
-                                    bPreStashPauseDone = false;
-                                }
-                                GilesTrinity.bWantToTownRun = true;
-                            }
-                        }
-                    }
-                }
-
-                if (Zeta.CommonBot.ErrorDialog.IsVisible)
-                {
-                    GilesTrinity.bWantToTownRun = false;
-                }
-
-                bLastTownRunCheckResult = GilesTrinity.bWantToTownRun;
-
-                // Clear blacklists to triple check any potential targets
-                if (GilesTrinity.bWantToTownRun)
-                {
-                    GilesTrinity.hashRGUIDBlacklist3 = new HashSet<int>();
-                    GilesTrinity.hashRGUIDBlacklist15 = new HashSet<int>();
-                    GilesTrinity.hashRGUIDBlacklist60 = new HashSet<int>();
-                    GilesTrinity.hashRGUIDBlacklist90 = new HashSet<int>();
-                }
-
-                // Fix for A1 new game with bags full
-                if (GilesTrinity.playerStatus.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700 && (ZetaDia.CurrentQuest.StepId == -1 || ZetaDia.CurrentQuest.StepId == 42))
-                {
-                        return false;
-                }
-
-                if ((GilesTrinity.bWantToTownRun && townRunCheckTimer.IsRunning && townRunCheckTimer.ElapsedMilliseconds > 2000) || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
-                    return true;
-                else if (GilesTrinity.bWantToTownRun && !townRunCheckTimer.IsRunning)
-                    townRunCheckTimer.Start();
-
-                return false;
-            }
-        }
+        internal static Stopwatch TownRunCheckTimer = new Stopwatch();
 
         /// <summary>
         /// Stash Overlord values all items and checks if we have anything to stash
@@ -300,27 +382,49 @@ namespace GilesTrinity
             GilesTrinity.ForceVendorRunASAP = false;
             bool bShouldVisitStash = false;
 
-            townRunCheckTimer.Reset();
+            TownRunCheckTimer.Reset();
 
-            foreach (ACDItem thisitem in ZetaDia.Me.Inventory.Backpack)
+            // Force update actors, maybe this will fix item name bug
+            ZetaDia.Actors.Update();
+
+            foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
-                if (thisitem.BaseAddress != IntPtr.Zero)
+                if (item.BaseAddress != IntPtr.Zero)
                 {
-
                     // Find out if this item's in a protected bag slot
-                    if (!ItemManager.ItemIsProtected(thisitem) && !GilesTrinity.weaponSwap.SwapperUsing(thisitem))
+                    if (!ItemManager.ItemIsProtected(item))
                     {
                         // test
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "DEBUG: {0},{1},{2}", thisitem.InternalName, thisitem.Name, thisitem.Level);
-                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
-                            thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
-                            thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "DEBUG: {0},{1},{2}", item.InternalName, item.Name, item.Level);
 
-                        bool bShouldStashThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesTrinity.ShouldWeStashThis(thiscacheditem) : ItemManager.ShouldStashItem(thisitem);
+                        GilesCachedACDItem cItem = new GilesCachedACDItem(item.Stats)
+                        {
+                            AcdItem = item,
+                            InternalName = item.InternalName,
+                            RealName = item.Name,
+                            Level = item.Level,
+                            Quality = item.ItemQualityLevel,
+                            GoldAmount = item.Gold,
+                            BalanceID = item.GameBalanceId,
+                            DynamicID = item.DynamicId,
+                            OneHanded = item.IsOneHand,
+                            TwoHanded = item.IsTwoHand,
+                            DyeType = item.DyeType,
+                            DBItemType = item.ItemType,
+                            DBBaseType = item.ItemBaseType,
+                            FollowerType = item.FollowerSpecialType,
+                            IsUnidentified = item.IsUnidentified,
+                            ItemStackQuantity = item.ItemStackQuantity,
+                            Row = item.InventoryRow,
+                            Column = item.InventoryColumn,
+                            ItemLink = item.ItemLink
+                        };
+
+                        bool bShouldStashThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesTrinity.ShouldWeStashThis(cItem, item) : ItemManager.ShouldStashItem(item);
 
                         if (bShouldStashThis)
                         {
-                            hashGilesCachedKeepItems.Add(thiscacheditem);
+                            hashGilesCachedKeepItems.Add(cItem);
                             bShouldVisitStash = true;
                         }
                     }
@@ -342,7 +446,7 @@ namespace GilesTrinity
         {
             if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Stash routine started";
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Stash routine started.");
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Stash routine started.");
             loggedAnythingThisStash = false;
             updatedStashMap = false;
             currentItemLoops = 0;
@@ -357,7 +461,7 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static RunStatus GilesOptimisedPostStash(object ret)
         {
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Stash routine ending sequence...");
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Stash routine ending sequence...");
 
             // Lock memory (probably not actually necessary anymore, since we handle all item stuff ourselves!?)
             //using (ZetaDia.Memory.AcquireFrame())
@@ -397,7 +501,7 @@ namespace GilesTrinity
                 }
                 loggedAnythingThisStash = false;
             }
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Stash routine finished.");
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Stash routine finished.");
             return RunStatus.Success;
         }
 
@@ -559,57 +663,80 @@ namespace GilesTrinity
 
             // Check durability percentages
             iLowestDurabilityFound = -1;
-            foreach (ACDItem tempitem in ZetaDia.Me.Inventory.Equipped)
+            foreach (ACDItem equippedItem in ZetaDia.Me.Inventory.Equipped)
             {
-                if (tempitem.BaseAddress != IntPtr.Zero)
+                if (equippedItem.BaseAddress != IntPtr.Zero)
                 {
-                    if (tempitem.DurabilityPercent <= Zeta.CommonBot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow)
+                    if (equippedItem.DurabilityPercent <= Zeta.CommonBot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow)
                     {
-                        iLowestDurabilityFound = tempitem.DurabilityPercent;
+                        iLowestDurabilityFound = equippedItem.DurabilityPercent;
                         bNeedsEquipmentRepairs = true;
                         bShouldVisitVendor = true;
                     }
                 }
             }
 
-            ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).FirstOrDefault();
+            ACDItem bestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).FirstOrDefault();
             // Check for anything to sell
-            foreach (ACDItem thisitem in ZetaDia.Me.Inventory.Backpack)
+            foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
-                if (thisitem.BaseAddress != IntPtr.Zero)
+                if (item.BaseAddress != IntPtr.Zero)
                 {
-                    if (!ItemManager.ItemIsProtected(thisitem) && !GilesTrinity.weaponSwap.SwapperUsing(thisitem))
+                    if (!ItemManager.ItemIsProtected(item))
                     {
-                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
-                            thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
-                            thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
-                        thiscacheditem.Row = thisitem.InventoryRow;
-                        thiscacheditem.Column = thisitem.InventoryColumn;
+                        //GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
+                        //    thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
+                        //    thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
+
+                        GilesCachedACDItem cItem = new GilesCachedACDItem(item.Stats)
+                        {
+                            AcdItem = item,
+                            InternalName = item.InternalName,
+                            RealName = item.Name,
+                            Level = item.Level,
+                            Quality = item.ItemQualityLevel,
+                            GoldAmount = item.Gold,
+                            BalanceID = item.GameBalanceId,
+                            DynamicID = item.DynamicId,
+                            OneHanded = item.IsOneHand,
+                            TwoHanded = item.IsTwoHand,
+                            DyeType = item.DyeType,
+                            DBItemType = item.ItemType,
+                            DBBaseType = item.ItemBaseType,
+                            FollowerType = item.FollowerSpecialType,
+                            IsUnidentified = item.IsUnidentified,
+                            ItemStackQuantity = item.ItemStackQuantity,
+                            Row = item.InventoryRow,
+                            Column = item.InventoryColumn,
+                            ItemLink = item.ItemLink
+                        };
+
+
                         bool bShouldSellThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy
-                            ? GilesSellValidation(thiscacheditem.InternalName, thiscacheditem.Level, thiscacheditem.Quality, thiscacheditem.DBItemType, thiscacheditem.FollowerType)
-                            : ItemManager.ShouldSellItem(thisitem);
+                            ? GilesSellValidation(cItem)
+                            : ItemManager.ShouldSellItem(item);
 
                         // if it has gems, always salvage
-                        if (thisitem.NumSocketsFilled > 0)
+                        if (item.NumSocketsFilled > 0)
                         {
                             bShouldSellThis = false;
                         }
 
                         // Don't sell stuff that we want to salvage, if using custom loot-rules
-                        if (GilesTrinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy && ItemManager.ShouldSalvageItem(thisitem))
+                        if (GilesTrinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy && ItemManager.ShouldSalvageItem(item))
                         {
                             bShouldSellThis = false;
                         }
 
                         // Sell potions that aren't best quality
-                        if (thisitem.IsPotion && thisitem.GameBalanceId != thisBestPotion.GameBalanceId)
+                        if (item.IsPotion && item.GameBalanceId != bestPotion.GameBalanceId)
                         {
                             bShouldSellThis = true;
                         }
 
                         if (bShouldSellThis)
                         {
-                            hashGilesCachedSellItems.Add(thiscacheditem);
+                            hashGilesCachedSellItems.Add(cItem);
                             bShouldVisitVendor = true;
                         }
                     }
@@ -631,7 +758,7 @@ namespace GilesTrinity
         {
             if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Sell routine started";
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Sell routine started.");
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Sell routine started.");
             //ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
@@ -641,7 +768,7 @@ namespace GilesTrinity
             bGoToSafetyPointFirst = true;
             bGoToSafetyPointSecond = false;
             loggedJunkThisStash = false;
-            bCurrentlyMoving = false;
+            ShouldUseWalk = false;
             bReachedDestination = false;
             currentItemLoops = 0;
             RandomizeTheTimer();
@@ -658,48 +785,47 @@ namespace GilesTrinity
             string VendorName = GetTownVendorName();
             if (bGoToSafetyPointFirst)
             {
-                Vector3 vectorPlayerPosition = ZetaDia.Me.Position;
-                Vector3 vectorSellLocation = new Vector3(0f, 0f, 0f);
+                Vector3 PlayerPosition = ZetaDia.Me.Position;
+                Vector3 VendorPosition = new Vector3(0f, 0f, 0f);
                 switch (ZetaDia.CurrentAct)
                 {
                     case Act.A1:
-                        vectorSellLocation = new Vector3(2941.904f, 2812.825f, 24.04533f); break;
+                        VendorPosition = new Vector3(2941.904f, 2812.825f, 24.04533f); break;
                     case Act.A2:
-                        vectorSellLocation = new Vector3(295.2101f, 265.1436f, 0.1000002f); break;
+                        VendorPosition = new Vector3(295.2101f, 265.1436f, 0.1000002f); break;
                     case Act.A3:
                     case Act.A4:
-                        vectorSellLocation = new Vector3(410.6073f, 355.8762f, 0.1000005f); break;
+                        VendorPosition = new Vector3(410.6073f, 355.8762f, 0.1000005f); break;
                 }
-                float iDistanceFromSell = Vector3.Distance(vectorPlayerPosition, vectorSellLocation);
-                if (bCurrentlyMoving)
+                float DistanceToVendor = Vector3.Distance(PlayerPosition, VendorPosition);
+                if (ShouldUseWalk)
                 {
-                    if (iDistanceFromSell <= 8f)
+                    if (DistanceToVendor <= 8f)
                     {
                         bGoToSafetyPointFirst = false;
-                        /*if (ZetaDia.CurrentAct == Act.A2)
-                            bGoToSafetyPointSecond = true;*/
-                        bCurrentlyMoving = false;
+                        ShouldUseWalk = false;
                     }
-                    else if (lastDistance == iDistanceFromSell)
+                    else if (lastDistance == DistanceToVendor)
                     {
-                        ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
+                        ZetaDia.Me.UsePower(SNOPower.Walk, VendorPosition, ZetaDia.Me.WorldDynamicId);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Moving to vendor pt1. LastDistance: {0:0} DistanceToVendor: {1:0}", lastDistance, DistanceToVendor);
+                        return RunStatus.Running;
                     }
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Moving to vendor.");
-                    return RunStatus.Running;
                 }
-                lastDistance = iDistanceFromSell;
-                if (iDistanceFromSell > 120f)
+                lastDistance = DistanceToVendor;
+                if (DistanceToVendor > 120f)
                     return RunStatus.Failure;
-                if (iDistanceFromSell > 8f)
+                if (DistanceToVendor > 8f)
                 {
-                    ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
-                    bCurrentlyMoving = true;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Moving to vendor.");
+                    ZetaDia.Me.UsePower(SNOPower.Walk, VendorPosition, ZetaDia.Me.WorldDynamicId);
+                    ShouldUseWalk = true;
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Moving to vendor pt2. LastDistance: {0:0} DistanceToVendor: {1:0}", lastDistance, DistanceToVendor);
                     return RunStatus.Running;
                 }
-                bCurrentlyMoving = false;
+                ShouldUseWalk = false;
                 bGoToSafetyPointFirst = false;
 
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Moving to vendor pt3. LastDistance: {0:0} DistanceToVendor: {1:0}", lastDistance, DistanceToVendor);
                 return RunStatus.Running;
             }
 
@@ -722,7 +848,7 @@ namespace GilesTrinity
                 if (townVendor != null)
                     vectorSellLocation = townVendor.Position;
                 float iDistanceFromSell = Vector3.Distance(vectorPlayerPosition, vectorSellLocation);
-                if (bCurrentlyMoving)
+                if (ShouldUseWalk)
                 {
                     if (iDistanceFromSell <= 9.5f)
                     {
@@ -735,6 +861,7 @@ namespace GilesTrinity
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
                     }
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Moving to vendor pt4.");
                     return RunStatus.Running;
                 }
                 lastDistance = iDistanceFromSell;
@@ -742,8 +869,9 @@ namespace GilesTrinity
                     return RunStatus.Failure;
                 if (iDistanceFromSell > 9.5f)
                 {
-                    bCurrentlyMoving = true;
+                    ShouldUseWalk = true;
                     ZetaDia.Me.UsePower(SNOPower.Walk, vectorSellLocation, ZetaDia.Me.WorldDynamicId);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Moving to vendor pt5.");
                     return RunStatus.Running;
                 }
                 bReachedDestination = true;
@@ -757,6 +885,7 @@ namespace GilesTrinity
                 if (townVendor == null)
                     return RunStatus.Failure;
                 townVendor.Interact();
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Vendor interact pt1.");
                 return RunStatus.Running;
             }
             if (hashGilesCachedSellItems.Count > 0)
@@ -766,7 +895,7 @@ namespace GilesTrinity
                     return RunStatus.Running;
                 currentItemLoops = 0;
                 RandomizeTheTimer();
-                GilesCachedACDItem thisitem = hashGilesCachedSellItems.OrderBy( i => i.Row ).ThenBy( i => i.Column ).FirstOrDefault();
+                GilesCachedACDItem thisitem = hashGilesCachedSellItems.OrderBy(i => i.Row).ThenBy(i => i.Column).FirstOrDefault();
 
                 // Item log for cool stuff sold
                 if (thisitem != null)
@@ -780,14 +909,14 @@ namespace GilesTrinity
                         double iThisItemValue = GilesTrinity.ValueThisItem(thisitem, OriginalGilesItemType);
                         LogJunkItems(thisitem, thisGilesBaseType, OriginalGilesItemType, iThisItemValue);
                     }
-                    ZetaDia.Me.Inventory.SellItem(thisitem.item);
+                    ZetaDia.Me.Inventory.SellItem(thisitem.AcdItem);
                 }
                 if (thisitem != null)
                     hashGilesCachedSellItems.Remove(thisitem);
                 if (hashGilesCachedSellItems.Count > 0)
                     return RunStatus.Running;
             }
-            bCurrentlyMoving = false;
+            ShouldUseWalk = false;
             bReachedSafety = false;
             return RunStatus.Success;
         }
@@ -816,11 +945,7 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static RunStatus GilesOptimisedPostSell(object ret)
         {
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Sell routine ending sequence...");
-            //using (ZetaDia.Memory.AcquireFrame())
-            //{
-            //    ZetaDia.Actors.Update();
-            //}
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Sell routine ending sequence...");
 
             // Always repair, but only if we have enough money
             if (bNeedsEquipmentRepairs && iLowestDurabilityFound < 20 && iLowestDurabilityFound > -1 && ZetaDia.Me.Inventory.Coinage < 5000)
@@ -831,17 +956,54 @@ namespace GilesTrinity
             }
             string VendorName = GetTownVendorName();
 
-            if (!Zeta.Internals.UIElement.IsValidElement(12123456831356216535L) || !Zeta.Internals.UIElement.FromHash(12123456831356216535L).IsVisible)
+            if (!Zeta.Internals.UIElements.VendorWindow.IsVisible)
             {
                 DiaUnit townVendor = ZetaDia.Actors.GetActorsOfType<DiaUnit>(true).FirstOrDefault<DiaUnit>(u => u.Name.ToLower().StartsWith(VendorName));
                 if (townVendor == null)
                     return RunStatus.Failure;
                 townVendor.Interact();
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Vendor interact pt2.");
                 return RunStatus.Running;
             }
 
-            // TODO: Open repair tab and Click UIElement to Repair All
             ZetaDia.Me.Inventory.RepairAllItems();
+
+            /*
+             * Per Nesox, 2013 jan 02, clicking repair tab doesn't activate (same issue as stash tabs)
+             */
+            //UIElement repairTab = UIElement.FromHash(0x95EFA3BFC7BD25BC);
+            //UIElement repairAllButton = UIElement.FromHash(0x80F5D06A035848A5);
+
+            //SetStartRandomTimer();
+            //if (RandomTimerIsNotDone())
+            //{
+            //    return RunStatus.Running;
+            //}
+            //else
+            //{
+            //    StopRandomTimer();
+            //}
+
+            //Logging.Write("Repair tab isValid: {0} isVisible: {1}", repairTab.IsValid, repairTab.IsVisible);
+            //Logging.Write("Repair all button isValid: {0} isVisible: {1}", repairAllButton.IsValid, repairAllButton.IsVisible);
+
+            //if (repairTab.IsValid && repairTab.IsVisible && !(repairAllButton.IsValid && repairAllButton.IsVisible) )
+            //{
+            //    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Clicking Repair tab");
+            //    repairTab.Click();
+            //    return RunStatus.Running;
+            //}
+
+            //if (repairAllButton.IsValid && repairAllButton.IsVisible)
+            //{
+            //    UITextObject repairButtonText = null;
+            //    if (repairAllButton.HasText)
+            //        repairButtonText = repairAllButton.TextObject;
+
+            //    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Clicking Repair All button. Text: {0}", repairButtonText.Text);
+            //    repairAllButton.Click();
+            //}
+
 
             bNeedsEquipmentRepairs = false;
             if (loggedJunkThisStash)
@@ -864,22 +1026,22 @@ namespace GilesTrinity
             }
 
             // See if we can close the inventory window
-            if (Zeta.Internals.UIElement.IsValidElement(0x368FF8C552241695))
-            {
-                try
-                {
-                    var el = Zeta.Internals.UIElement.FromHash(0x368FF8C552241695);
-                    if (el != null && el.IsValid && el.IsVisible && el.IsEnabled)
-                        el.Click();
-                }
-                catch
-                {
+            //if (Zeta.Internals.UIElements.InventoryWindow.IsVisible)
+            //{
+            //    try
+            //    {
+            //        var el = Zeta.Internals.UIElement.FromHash(0x368FF8C552241695);
+            //        if (el != null && el.IsValid && el.IsVisible && el.IsEnabled)
+            //            el.Click();
+            //    }
+            //    catch
+            //    {
 
-                    // Do nothing if it fails, just catching to prevent any big errors/plugin crashes from this
-                }
-            }
+            //        // Do nothing if it fails, just catching to prevent any big errors/plugin crashes from this
+            //    }
+            //}
 
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Sell routine finished.");
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Sell routine finished.");
             return RunStatus.Success;
         }
 
@@ -895,19 +1057,43 @@ namespace GilesTrinity
             bool bShouldVisitSmith = false;
 
             // Check for anything to salvage
-            foreach (ACDItem thisitem in ZetaDia.Me.Inventory.Backpack)
+            foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
-                if (thisitem.BaseAddress != IntPtr.Zero)
+                if (item.BaseAddress != IntPtr.Zero)
                 {
-                    if (!ItemManager.ItemIsProtected(thisitem) && !GilesTrinity.weaponSwap.SwapperUsing(thisitem))
+                    if (!ItemManager.ItemIsProtected(item))
                     {
-                        GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
-                            thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
-                            thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
-                        bool bShouldSalvageThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesSalvageValidation(thiscacheditem.InternalName, thiscacheditem.Level, thiscacheditem.Quality, thiscacheditem.DBItemType, thiscacheditem.FollowerType) : ItemManager.ShouldSalvageItem(thisitem);
+                        GilesCachedACDItem cItem = new GilesCachedACDItem(item.Stats)
+                        {
+                            AcdItem = item,
+                            InternalName = item.InternalName,
+                            RealName = item.Name,
+                            Level = item.Level,
+                            Quality = item.ItemQualityLevel,
+                            GoldAmount = item.Gold,
+                            BalanceID = item.GameBalanceId,
+                            DynamicID = item.DynamicId,
+                            OneHanded = item.IsOneHand,
+                            TwoHanded = item.IsTwoHand,
+                            DyeType = item.DyeType,
+                            DBItemType = item.ItemType,
+                            DBBaseType = item.ItemBaseType,
+                            FollowerType = item.FollowerSpecialType,
+                            IsUnidentified = item.IsUnidentified,
+                            ItemStackQuantity = item.ItemStackQuantity,
+                            Row = item.InventoryRow,
+                            Column = item.InventoryColumn,
+                            ItemLink = item.ItemLink
+                        };
+
+
+
+                        bool bShouldSalvageThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesSalvageValidation(cItem) : ItemManager.ShouldSalvageItem(item);
+
+
                         if (bShouldSalvageThis)
                         {
-                            hashGilesCachedSalvageItems.Add(thiscacheditem);
+                            hashGilesCachedSalvageItems.Add(cItem);
                             bShouldVisitSmith = true;
                         }
                     }
@@ -929,7 +1115,7 @@ namespace GilesTrinity
         {
             if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Salvage routine started";
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Salvage routine started.");
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Salvage routine started.");
             //ZetaDia.Actors.Update();
             if (ZetaDia.Actors.Me == null)
             {
@@ -939,7 +1125,7 @@ namespace GilesTrinity
             bGoToSafetyPointFirst = true;
             bGoToSafetyPointSecond = false;
             loggedJunkThisStash = false;
-            bCurrentlyMoving = false;
+            ShouldUseWalk = false;
             bReachedDestination = false;
             currentItemLoops = 0;
             RandomizeTheTimer();
@@ -968,14 +1154,14 @@ namespace GilesTrinity
                         vectorSalvageLocation = new Vector3(379.6096f, 415.6198f, 0.3321424f); break;
                 }
                 float iDistanceFromSalvage = Vector3.Distance(vectorPlayerPosition, vectorSalvageLocation);
-                if (bCurrentlyMoving)
+                if (ShouldUseWalk)
                 {
                     if (iDistanceFromSalvage <= 8f)
                     {
                         bGoToSafetyPointFirst = false;
                         if (ZetaDia.CurrentAct == Act.A3)
                             bGoToSafetyPointSecond = true;
-                        bCurrentlyMoving = false;
+                        ShouldUseWalk = false;
                     }
                     else if (lastDistance == iDistanceFromSalvage)
                     {
@@ -989,10 +1175,10 @@ namespace GilesTrinity
                 if (iDistanceFromSalvage > 8f)
                 {
                     ZetaDia.Me.UsePower(SNOPower.Walk, vectorSalvageLocation, ZetaDia.Me.WorldDynamicId);
-                    bCurrentlyMoving = true;
+                    ShouldUseWalk = true;
                     return RunStatus.Running;
                 }
-                bCurrentlyMoving = false;
+                ShouldUseWalk = false;
                 bGoToSafetyPointFirst = false;
                 if (ZetaDia.CurrentAct == Act.A3)
                     bGoToSafetyPointSecond = true;
@@ -1013,12 +1199,12 @@ namespace GilesTrinity
                         vectorSalvageLocation = new Vector3(328.6024f, 425.4113f, 0.2758033f); break;
                 }
                 float iDistanceFromSalvage = Vector3.Distance(vectorPlayerPosition, vectorSalvageLocation);
-                if (bCurrentlyMoving)
+                if (ShouldUseWalk)
                 {
                     if (iDistanceFromSalvage <= 8f)
                     {
                         bGoToSafetyPointSecond = false;
-                        bCurrentlyMoving = false;
+                        ShouldUseWalk = false;
                     }
                     else if (lastDistance == iDistanceFromSalvage)
                     {
@@ -1032,10 +1218,10 @@ namespace GilesTrinity
                 if (iDistanceFromSalvage > 8f)
                 {
                     ZetaDia.Me.UsePower(SNOPower.Walk, vectorSalvageLocation, ZetaDia.Me.WorldDynamicId);
-                    bCurrentlyMoving = true;
+                    ShouldUseWalk = true;
                     return RunStatus.Running;
                 }
-                bCurrentlyMoving = false;
+                ShouldUseWalk = false;
                 bGoToSafetyPointSecond = false;
                 return RunStatus.Running;
             }
@@ -1058,7 +1244,7 @@ namespace GilesTrinity
                             vectorSalvageLocation = new Vector3(328.6024f, 425.4113f, 0.2758033f); break;
                     }
                 float iDistanceFromSalvage = Vector3.Distance(vectorPlayerPosition, vectorSalvageLocation);
-                if (bCurrentlyMoving)
+                if (ShouldUseWalk)
                 {
                     if (iDistanceFromSalvage <= 9.5f)
                     {
@@ -1078,7 +1264,7 @@ namespace GilesTrinity
                     return RunStatus.Failure;
                 if (iDistanceFromSalvage > 9.5f)
                 {
-                    bCurrentlyMoving = true;
+                    ShouldUseWalk = true;
                     ZetaDia.Me.UsePower(SNOPower.Walk, vectorSalvageLocation, ZetaDia.Me.WorldDynamicId);
                     return RunStatus.Running;
                 }
@@ -1124,7 +1310,7 @@ namespace GilesTrinity
                     return RunStatus.Running;
             }
             bReachedSafety = false;
-            bCurrentlyMoving = false;
+            ShouldUseWalk = false;
             return RunStatus.Success;
         }
 
@@ -1135,7 +1321,7 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static RunStatus GilesOptimisedPostSalvage(object ret)
         {
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Salvage routine ending sequence...");
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Salvage routine ending sequence...");
             //using (ZetaDia.Memory.AcquireFrame())
             //{
             //    ZetaDia.Actors.Update();
@@ -1163,12 +1349,12 @@ namespace GilesTrinity
                 Vector3 vectorPlayerPosition = ZetaDia.Me.Position;
                 Vector3 vectorSafeLocation = new Vector3(379.6096f, 415.6198f, 0.3321424f);
                 float iDistanceFromSafety = Vector3.Distance(vectorPlayerPosition, vectorSafeLocation);
-                if (bCurrentlyMoving)
+                if (ShouldUseWalk)
                 {
                     if (iDistanceFromSafety <= 8f)
                     {
                         bGoToSafetyPointSecond = false;
-                        bCurrentlyMoving = false;
+                        ShouldUseWalk = false;
                     }
                     else if (lastDistance == iDistanceFromSafety)
                     {
@@ -1182,13 +1368,13 @@ namespace GilesTrinity
                 if (iDistanceFromSafety > 8f)
                 {
                     ZetaDia.Me.UsePower(SNOPower.Walk, vectorSafeLocation, ZetaDia.Me.WorldDynamicId);
-                    bCurrentlyMoving = true;
+                    ShouldUseWalk = true;
                     return RunStatus.Running;
                 }
-                bCurrentlyMoving = false;
+                ShouldUseWalk = false;
                 bReachedSafety = true;
             }
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "GSDebug: Salvage routine finished.");
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Salvage routine finished.");
             return RunStatus.Success;
         }
 
@@ -1660,7 +1846,65 @@ namespace GilesTrinity
                     )
                 );
             }
+
+            internal static Composite GetPostTownRunDecorator()
+            {
+                return
+                new Decorator(ret => Zeta.CommonBot.Logic.BrainBehavior.IsVendoring,
+                    new PrioritySelector(
+                        new Decorator(ret => GetPortalReturnPosition(ZetaDia.CurrentAct).Distance2D(ZetaDia.Me.Position) > 10f,
+                            new Sequence(
+                                new Action(ret => DbHelper.Log(LogCategory.UserInformation, "Moving to portal position", true)),
+                                new Action(ret => PlayerMover.NavigateTo(GetPortalReturnPosition(ZetaDia.CurrentAct)))
+                            )
+                        ),
+                        new Decorator(ret => PostTownRunStayInTown,
+                            new Sequence(
+                                new Action(ret => UseHearthPortal(ret))
+                            )
+                        )
+                    )
+                );
+            }
         }
+
+        internal static RunStatus UseHearthPortal(object ctx)
+        {
+            DiaGizmo portal = ZetaDia.Actors.GetActorsOfType<DiaGizmo>(true, false).Where(o => o.ActorInfo.GizmoType == Zeta.Internals.SNO.GizmoType.HearthPortal).FirstOrDefault();
+            if (portal == null)
+            {
+                DbHelper.Log(LogCategory.UserInformation, "Error: could not find hearth portal!");
+                return RunStatus.Failure;
+            }
+            else if (portal.Distance > 10f)
+            {
+                DbHelper.Log(LogCategory.UserInformation, "Error: Hearth portal is too far away!");
+                return RunStatus.Failure;
+            }
+            else
+            {
+                portal.Interact();
+                return RunStatus.Success;
+            }
+        }
+
+        internal static Vector3 GetPortalReturnPosition(Act act)
+        {
+            switch (act)
+            {
+                case Act.A1:
+                    return (new Vector3(2990.895f, 2800.335f, 24.04532f));
+                case Act.A2:
+                    return (new Vector3(313.1483f, 278.3289f, 0.1000038f));
+                case Act.A3:
+                case Act.A4:
+                    return (new Vector3(379.007f, 421.9408f, 0.3321455f));
+                default:
+                    return Vector3.Zero;
+            }
+        }
+
+        internal static bool PostTownRunStayInTown = false;
 
         /// <summary>
         /// Sorts the stash

@@ -149,7 +149,7 @@ namespace GilesTrinity.Cache
             set;
         }
 
-        public float CritPercent 
+        public float CritPercent
         {
             get;
             set;
@@ -470,7 +470,7 @@ namespace GilesTrinity.Cache
 
         }
 
-        public float Distance 
+        public float Distance
         {
             get;
             set;
@@ -711,7 +711,7 @@ namespace GilesTrinity.Cache
 
         internal static float CalculateScore(CacheItem cacheItem)
         {
-        
+
             //TODO : Call Scoring method 
             throw new NotImplementedException();
         }
@@ -730,11 +730,39 @@ namespace GilesTrinity.Cache
             }
             else if (GilesTrinity.Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
             {
-                return GilesTrinity.ItemRulesPickupItemValidation(item.ACDItem.InternalName, item.ACDItem.Level, item.ACDItem.ItemQualityLevel, item.ACDItem.GameBalanceId, item.ACDItem.ItemBaseType, item.ACDItem.ItemType, item.ACDItem.IsOneHand, item.ACDItem.IsTwoHand, item.ACDItem.FollowerSpecialType, item.ACDItem.DynamicId);
+                PickupItem pickupItem = new PickupItem(
+                    item.ACDItem.Name,
+                    item.ACDItem.InternalName,
+                    item.ACDItem.Level,
+                    item.ACDItem.ItemQualityLevel,
+                    item.ACDItem.GameBalanceId,
+                    item.ACDItem.ItemBaseType,
+                    item.ACDItem.ItemType,
+                    item.ACDItem.IsOneHand,
+                    item.ACDItem.IsTwoHand,
+                    item.ACDItem.FollowerSpecialType,
+                    item.ACDItem.DynamicId);
+
+                ACDItem acdItem = item.ACDItem;
+
+                return GilesTrinity.ItemRulesPickupValidation(pickupItem);
             }
             else
             {
-                return GilesTrinity.GilesPickupItemValidation(item.ACDItem.InternalName, item.ACDItem.Level, item.ACDItem.ItemQualityLevel, item.ACDItem.GameBalanceId, item.ACDItem.ItemBaseType, item.ACDItem.ItemType, item.ACDItem.IsOneHand, item.ACDItem.IsTwoHand, item.ACDItem.FollowerSpecialType, item.ACDItem.DynamicId);
+                PickupItem pickupItem = new PickupItem(
+                  item.ACDItem.Name,
+                  item.ACDItem.InternalName,
+                  item.ACDItem.Level,
+                  item.ACDItem.ItemQualityLevel,
+                  item.ACDItem.GameBalanceId,
+                  item.ACDItem.ItemBaseType,
+                  item.ACDItem.ItemType,
+                  item.ACDItem.IsOneHand,
+                  item.ACDItem.IsTwoHand,
+                  item.ACDItem.FollowerSpecialType,
+                  item.ACDItem.DynamicId);
+
+                return GilesTrinity.GilesPickupItemValidation(pickupItem);
             }
         }
 

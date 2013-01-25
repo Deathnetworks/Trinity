@@ -25,7 +25,7 @@ namespace GilesTrinity.XmlTags
             {
                 if (MaxDeaths != GilesTrinity.iMaxDeathsAllowed)
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "Max deaths set by profile. Trinity now handling deaths, and will restart the game after {0}", MaxDeaths); 
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, "Max deaths set by profile. Trinity now handling deaths, and will restart the game after {0}", MaxDeaths); 
                 }
                 GilesTrinity.iMaxDeathsAllowed = MaxDeaths;
                 if (Reset != null && Reset.ToLower() == "true")

@@ -14,7 +14,7 @@ using Zeta.Pathfinding;
 namespace GilesTrinity
 {
     /// <summary>
-    /// Giles Trinity DemonBuddy Plugin 
+    /// Trinity DemonBuddy Plugin 
     /// </summary>
     public partial class GilesTrinity : IPlugin
     {
@@ -31,7 +31,7 @@ namespace GilesTrinity
         {
             get
             {
-                return new Version(1, 7, 1, 13);
+                return new Version(1, 7, 1, 17);
             }
         }
 
@@ -65,7 +65,7 @@ namespace GilesTrinity
         {
             get
             {
-                return string.Format("GilesTrinity Community Edition (version {0})", Version);
+                return string.Format("Trinity v{0}", Version);
             }
         }
 
@@ -74,7 +74,10 @@ namespace GilesTrinity
         /// </summary>
         public void OnPulse()
         {
-            //RefreshDiaObjectCache();
+            if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld || !ZetaDia.CPlayer.IsValid)
+                return;
+
+
         }
 
         /// <summary>
@@ -82,41 +85,38 @@ namespace GilesTrinity
         /// </summary>
         public void OnEnabled()
         {
-            string battleTagName = "";
-            try
-            {
-                battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
-            }
-            catch { }
-
             BotMain.OnStart += TrinityBotStart;
             BotMain.OnStop += TrinityBotStop;
 
             // Set up the pause button
-            Application.Current.Dispatcher.Invoke(PaintMainWindowButtons(battleTagName));
+
+            // rrrix: removing for next DB beta... 
+            //Application.Current.Dispatcher.Invoke(PaintMainWindowButtons());
+
+            SetWindowTitle();
 
             if (!Directory.Exists(FileManager.PluginPath))
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error - cannot enable plugin. Invalid path: {0}", FileManager.PluginPath);
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Please check you have installed the plugin to the correct location, and then restart DemonBuddy and re-enable the plugin.");
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, @"Plugin should be installed to \<DemonBuddyFolder>\Plugins\GilesTrinity\");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, @"Plugin should be installed to \<DemonBuddyFolder>\Plugins\Trinity\");
             }
             else
             {
-                bMappedPlayerAbilities = false;
-                bPluginEnabled = true;
+                HasMappedPlayerAbilities = false;
+                IsPluginEnabled = true;
 
                 // Settings are available after this... 
                 LoadConfiguration();
 
-                Navigator.PlayerMover = new GilesPlayerMover();
+                Navigator.PlayerMover = new PlayerMover();
                 SetUnstuckProvider();
-                GameEvents.OnPlayerDied += GilesTrinityOnDeath;
-                GameEvents.OnGameJoined += GilesTrinityOnJoinGame;
-                GameEvents.OnGameLeft += GilesTrinityOnLeaveGame;
-                CombatTargeting.Instance.Provider = new GilesCombatTargetingReplacer();
-                LootTargeting.Instance.Provider = new GilesLootTargetingProvider();
-                ObstacleTargeting.Instance.Provider = new GilesObstacleTargetingProvider();
+                GameEvents.OnPlayerDied += TrinityOnDeath;
+                GameEvents.OnGameJoined += TrinityOnJoinGame;
+                GameEvents.OnGameLeft += TrinityOnLeaveGame;
+                CombatTargeting.Instance.Provider = new BlankCombatProvider();
+                LootTargeting.Instance.Provider = new BlankLootProvider();
+                ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
 
                 UpdateSearchGridProvider();
 
@@ -125,16 +125,14 @@ namespace GilesTrinity
                 {
                     TrinityBotStart(null);
                     if (ZetaDia.IsInGame)
-                        GilesTrinityOnJoinGame(null, null);
+                        TrinityOnJoinGame(null, null);
                 }
 
                 SetBotTPS();
 
                 TrinityPowerManager.LoadLegacyDelays();
 
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
             }
 
             // reseting stash rules
@@ -160,7 +158,7 @@ namespace GilesTrinity
         {
             if (Settings.Advanced.UnstuckerEnabled)
             {
-                Navigator.StuckHandler = new GilesStuckHandler();
+                Navigator.StuckHandler = new StuckHandler();
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Trinity Unstucker", true);
             }
             else
@@ -170,22 +168,40 @@ namespace GilesTrinity
             }
         }
 
+        internal static void SetWindowTitle(string profileName = "")
+        {
+            Application.Current.Dispatcher.Invoke(new Action( () => {
+            string battleTagName = "";
+            try
+            {
+                battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
+            }
+            catch { }
+            Window mainWindow = Application.Current.MainWindow;
+ 
+            string windowTitle = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
+
+            if (profileName.Trim() != String.Empty)
+            {
+                windowTitle += " - " + profileName;
+            }
+
+            mainWindow.Title = windowTitle;
+                }));
+        }
+
         /// <summary>
         /// Adds the Pause and Town Run buttons to Demonbuddy's main window. Sets Window Title.
         /// </summary>
         /// <param name="battleTagName"></param>
         /// <returns></returns>
-        private static Action PaintMainWindowButtons(string battleTagName)
+        [Obsolete("This has been removed in the latest DemonbuddyBETA")]
+        private static Action PaintMainWindowButtons()
         {
             return new System.Action(
                         () =>
                         {
                             Window mainWindow = Application.Current.MainWindow;
-                            try
-                            {
-                                mainWindow.Title = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
-                            }
-                            catch { }
                             var tab = mainWindow.FindName("tabControlMain") as TabControl;
                             if (tab == null) return;
                             var infoDumpTab = tab.Items[0] as TabItem;
@@ -220,18 +236,19 @@ namespace GilesTrinity
         /// </summary>
         public void OnDisabled()
         {
-            bPluginEnabled = false;
+            IsPluginEnabled = false;
             Navigator.PlayerMover = new DefaultPlayerMover();
             Navigator.StuckHandler = new DefaultStuckHandler();
             CombatTargeting.Instance.Provider = new DefaultCombatTargetingProvider();
             LootTargeting.Instance.Provider = new DefaultLootTargetingProvider();
             ObstacleTargeting.Instance.Provider = new DefaultObstacleTargetingProvider();
-            GameEvents.OnPlayerDied -= GilesTrinityOnDeath;
+            GameEvents.OnPlayerDied -= TrinityOnDeath;
             BotMain.OnStop -= TrinityBotStop;
-            GameEvents.OnGameJoined -= GilesTrinityOnJoinGame;
-            GameEvents.OnGameLeft -= GilesTrinityOnLeaveGame;
+            BotMain.OnStop -= PluginCheck;
+            GameEvents.OnGameJoined -= TrinityOnJoinGame;
+            GameEvents.OnGameLeft -= TrinityOnLeaveGame;
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DISABLED: Giles Trinity is now shut down...");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DISABLED: Trinity is now shut down...");
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
         }
 
@@ -247,8 +264,20 @@ namespace GilesTrinity
         /// </summary>
         public void OnInitialize()
         {
-
+            Zeta.CommonBot.BotMain.OnStart += PluginCheck;
         }
+
+        void PluginCheck(IBot bot)
+        {
+            if (!IsPluginEnabled && bot != null)
+            {
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "\tWARNING: Trinity Plugin is NOT YET ENABLED. Bot start detected");
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "\tIgnore this message if you are not currently using Trinity.");
+                return;
+            }
+        }
+
+
 
         /// <summary>
         /// Gets the displayed name of plugin.
@@ -261,7 +290,7 @@ namespace GilesTrinity
         {
             get
             {
-                return "GilesTrinity";
+                return "Trinity";
             }
         }
 

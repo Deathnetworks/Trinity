@@ -1,8 +1,6 @@
-﻿Unified Trinity Community Edition
-=================================
+﻿# Unified Trinity Community Edition
 
-Major new features: 
--------------------
+## Major new features: 
 
 * Source control :)
 
@@ -18,12 +16,138 @@ Major new features:
 
 * Improved code Readability
 
-Future Planned Improvements: 
-----------------------------
+## Future Planned Improvements: 
 
 * New cache system, trash the HashSet's and Dictionaries for an object based system
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
+
+### Changelog 1.7.1.17:
+
+* Removed all WeaponSwap related code. See this for more info: http://www.thebuddyforum.com/demonbuddy-forum/plugins/trinity/102820-item-swap-future.html
+
+* TrinityExploreDungeon is now fully "release ready". Documentation to follow. Features include reduced backtracking, automatically moving to minimap markers, prioritized scenes, ignored scenes, and more!
+
+* Monk Tempest Rush has new usage options - Always, Movement Only, Elites and Groups, and all Combat. TR is now maintained after combat as needed as well.
+
+* PlayerMover will no longer use special movement within 10 seconds of being stuck
+
+* Disabled checking for Toggle Looting tags and missing Profile PickupLoot elements (your bot should now always loot regardless of bad profiles, like before Trinity .13)
+
+* Disabled check for Profile <Combat /> profile element (combat now default enabled, but still togglable through ToggleTargetting tag)
+
+* Included 4seti's fix for "1 slot left in bag and not townrunning" - hopefully it works?
+
+* Added dynamically increasing radius for Unstucker based off how many stuck attempts - should no longer run away 1/2 a mile and get lost...
+
+* Increased Barricade destructable range
+
+* Added fixed kite locations for Azmodan avoidance
+
+* Added a few memory safety checks in target handler and player mover - should help reduce crashes
+
+* Modified PlayerStatus to no longer cache Primary/Secondary resource, health, and position and is now read directly from DB (this is "fast" since DB .298 / BETA .140)
+
+* TrinityMoveTo will now use the PathFinder in Generated areas, and the Navigator in static areas (should be more reliable) - tested with many profiles including questing, alkaizer, etc.
+
+* Added logic to blacklist targets that are added/removed from object manager too many times (fixes weird stucks trying to pickup gold)
+
+* Improved layout of Advanced tab / logging options
+
+* Fixed backwards destructible weighting (now weights destructables correctly according to distance)
+
+* Changed default ItemRules2 rules to "soft"
+
+* Added new XmlTag: TrinityOffsetMove. Documentation to follow.
+
+* Fix for trash mob in/out of range flip/flop (while moving to attack).
+
+* Merged Persistent Stats from tomasd. Trinity will now record and save persistent statistics in a seperate file, including per-world stats.* 
+
+### KNOWN ISSUES 1.7.1.17:
+
+* Wizard's without a signature spell will not use the default attack, for example CM/WW builds (seems to be a limitation within Demonbuddy... still trying to find a fix)
+
+* Wizards will not cancel archon buff (Coming Soon™!)
+
+* Tempest Rush Movement will sometimes get stuck on corners and objects and requires the unstucker to kick in
+
+* Demonbuddy DungeonExplorer will (at maybe, 0.01% of the time) read and cache incorrect scenes, causing long stucks in generated dungeons. TrinityExploreDungeon has an built in 15 minute timer (adjustable!) as a workaround.
+
+
+### Changelog 1.7.1.16:
+
+* Fixed TrinityMoveTo 
+
+* Disabled dropped items log, and skipped gold log (were really only intended for dev purpose only)
+
+* Fixed not destroying some barricades / operating some gizmos
+
+### Changelog 1.7.1.15:
+
+* Fixed inflated Item Dropped per hour statistics. Your IPH in stats logs will probably decrease considerably.
+
+* Fixed gold pickup derp bug, increased weight for very close gold piles
+
+* Fixed townrun ignoring mobs + extended kill radius logic now includes UseTownPortal profile tag
+
+* Added configurable cache refresh rate in Trinity Advanced tab to optionaly help reduce CPU utilization and diagnose crashes. May cause bot to act strangely, use with caution.
+
+* Added Gold gained to stats log (thanks Tesslerc!)
+
+* Removed Pause/Townrun buttons from GUI (now included natively in latest DemonbuddyBETA).
+
+* Current Profile is now displayed in the DB window title
+
+* Fix for flip/flopping current target if gizmo (shrine/door) changes into and out of range.
+
+* Slightly Modified Champ Hunting Items tab configuration defaults.
+
+* Now logs all items dropped into CSV file in Trinitylogs
+
+* Now logs all skipped gold piles into CSV file in TrinityLogs (or, "ScroogeMcDuck mode" as darkfriend puts it)
+
+* Added caching for if a unit/item/gold/shrine is ever in LoS/Navigable/RayCast (should help with flip flopping and missed targets)
+
+* TrinityMoveTo profile tag now uses Navigator by default (disable with useNavigation="false")
+
+* ItemRules2: Removed Medium Rules (no longer maintaned)
+
+* ItemRules2: Fixes for cached item name bug
+
+* ItemRules2: Added [WeaponDamageType] (Arcane, Holy, etc)
+
+* TrinityExploreDungeon prototype profile tag included. Don't use it, it doesn't work. You will get stuck, and rrrix won't answer questions or help you with it. For educational purposes only.
+
+### Changelog 1.7.1.14:
+
+###### REQUIRES DemonbuddyBETA 1.0.1240.115 OR HIGHER  
+
+###### WILL NOT WORK WITH .294!  
+
+* New XML Tag: TrinityLoadOnce - will load a set of profiles in random order within a single game session.   
+This XML tag will load a random profile from the list, but only once during this game session 
+
+* New Barbarian multi-target Whirlwind and monk tempest rush logic, with GUI option to disable if you don't like it.   
+This helps with "chaining" large packs of trash mobs, rather than X/criss-cross only a single target in a pack.
+
+* Added GUI option to ignore solitary trash mobs. This will cause bot to ignore a trash mob when no other trash mob is within 40yds of it. Automatically disabled if elites are present. 
+
+* Bot will no longer continue on profile behaviors while waiting for pre-TownRun timer.
+
+* Supports new DB BETA CanTownRun() logic, also fixed town run with bags 1/2 full.
+
+* Improved TrinityRandomWait tag (no longer using Thread.Sleep()), does not lock Demonbuddy - allows combat/looting to continue while waiting.
+
+* More improvements to destructibles/barricades logic.
+
+* Increased DemonHunter destructible power range.
+
+* Decreased DemonHunter Caltrops timer from 6 sec to 3 sec.
+
+* Fixed reset gold counter on new game.
+
+* Added additional logging for vendor movement logic during town run (to help determine stucks).
 
 ### Changelog 1.7.1.13:
 
@@ -284,22 +408,15 @@ Future Planned Improvements:
 
 * Lots of refactoring for Logging, many new advanced options for logging selection
 
-
-
-
 ### Changelog 1.7.1.2
 
 * UI Works in all regions now
-
-
 
 ### Changelog 1.7.1.1
 
 * Fix for darkfriend77 item rulesets not being used
 
 * Fixed WD grave injustice checkbox not being saved or used correctly
-
-
 
 ### Changelog 1.7.1.0
 

@@ -17,13 +17,12 @@ namespace GilesTrinity.Technicals
         ScriptRule = 4,
         Configuration = 8,      
         UI = 16,                
-        WeaponSwap = 32,        
-        Behavior = 64,          
-        Performance = 128,
-        Targetting = 256,       
-        Weight = 512,           
-        XmlTag = 1024,          
-        Moving = 2048,          
-        GlobalHandler = 4096    
+        Behavior = 32,          
+        Performance = 64,
+        Targetting = 128,       
+        Weight = 256,           
+        ProfileTag = 512,          
+        Movement = 1024,          
+        GlobalHandler = 2048    
     }
 }

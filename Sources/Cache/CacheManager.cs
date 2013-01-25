@@ -127,7 +127,7 @@ namespace GilesTrinity.Cache
                 _CacheTimeout.Add(CacheType.Object, 60000);
                 _CacheTimeout.Add(CacheType.Other, 60000);
                 _CacheTimeout.Add(CacheType.Unit, 60000);
-                
+
                 _CacheCleaner = new Thread(MaintainCache);
                 _CacheCleaner.Priority = ThreadPriority.Lowest;
                 _CacheCleaner.IsBackground = true;
@@ -146,7 +146,7 @@ namespace GilesTrinity.Cache
                 {
                     _CacheCleaner.Abort();
                     _CacheCleaner = null;
-                } 
+                }
                 lock (_Synchronizer)
                 {
                     _Cache.Clear();
@@ -234,12 +234,12 @@ namespace GilesTrinity.Cache
                     // Search obselete object in cache dictionary
                     IList<int> removableKey = new List<int>();
 
-                    // Find and delete useless CacheObject
-                    foreach (KeyValuePair<int, CacheObject> keyPair in _Cache.ToList())
+                    lock (_Synchronizer)
                     {
-                        if (DateTime.UtcNow.Subtract(keyPair.Value.LastAccessDate).TotalSeconds > _CacheTimeout[keyPair.Value.CacheType])
+                        // Find and delete useless CacheObject
+                        foreach (KeyValuePair<int, CacheObject> keyPair in _Cache.ToList())
                         {
-                            lock (_Synchronizer)
+                            if (DateTime.UtcNow.Subtract(keyPair.Value.LastAccessDate).TotalSeconds > _CacheTimeout[keyPair.Value.CacheType])
                             {
                                 _Cache.Remove(keyPair.Key);
                             }

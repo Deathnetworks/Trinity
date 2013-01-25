@@ -7,20 +7,20 @@ namespace GilesTrinity
     /// <summary>
     /// Blank Stuck Handler - to disable DB stuck handler
     /// </summary>
-    public class GilesStuckHandler : IStuckHandler
+    public class StuckHandler : IStuckHandler
     {
         public bool IsStuck 
         { 
             get 
             { 
-                return GilesPlayerMover.UnstuckChecker(); 
+                return PlayerMover.UnstuckChecker(); 
                 //return false;
             } 
         }
 
         public Vector3 GetUnstuckPos() 
         { 
-            return GilesPlayerMover.UnstuckHandler(); 
+            return PlayerMover.UnstuckHandler(); 
         }
     }
 }

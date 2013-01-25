@@ -12,17 +12,18 @@ namespace GilesTrinity
     {
         // Refresh the skills in our hotbar
         // Also caches the values after - but ONLY if we aren't in archon mode (or if this function is told NOT to cache this)
-        public static void GilesRefreshHotbar(bool dontCacheThis = false)
+        public static void RefreshHotbar(bool dontCacheThis = false)
         {
             using (new PerformanceLogger("RefreshHotbar"))
             {
-                bMappedPlayerAbilities = true;
-                hashPowerHotbarAbilities = new HashSet<SNOPower>();
+                HasMappedPlayerAbilities = true;
+                Hotbar = new HashSet<SNOPower>();
                 for (int i = 0; i <= 5; i++)
-                    hashPowerHotbarAbilities.Add(ZetaDia.Me.GetHotbarPowerId((HotbarSlot)i));
-                bRefreshHotbarAbilities = false;
+                {
+                    Hotbar.Add(ZetaDia.CPlayer.GetPowerForSlot((HotbarSlot)i));
+                } bRefreshHotbarAbilities = false;
                 if (!dontCacheThis)
-                    hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(hashPowerHotbarAbilities);
+                    hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(Hotbar);
             }
         }
         /// <summary>
@@ -30,7 +31,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="power"></param>
         /// <returns></returns>
-        public static bool GilesHasBuff(SNOPower power)
+        public static bool GetHasBuff(SNOPower power)
         {
             int id = (int)power;
             return listCachedBuffs.Any(u => u.SNOId == id);
@@ -41,7 +42,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="power"></param>
         /// <returns></returns>
-        public static int GilesBuffStacks(SNOPower power)
+        public static int GetBuffStacks(SNOPower power)
         {
             int stacks;
             if (dictCachedBuffs.TryGetValue((int)power, out stacks))
@@ -156,7 +157,7 @@ namespace GilesTrinity
                 {
                     if (bHasHadArchonbuff)
                     {
-                        hashPowerHotbarAbilities = new HashSet<SNOPower>(hashCachedPowerHotbarAbilities);
+                        Hotbar = new HashSet<SNOPower>(hashCachedPowerHotbarAbilities);
                     }
                     bHasHadArchonbuff = false;
                 }
@@ -167,7 +168,7 @@ namespace GilesTrinity
         /// <summary>
         /// A default power in case we can't use anything else
         /// </summary>
-        private static GilesPower defaultPower = new GilesPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+        private static TrinityPower defaultPower = new TrinityPower(SNOPower.None, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
 
         /// <summary>
         /// Returns an appropriately selected GilesPower and related information
@@ -176,7 +177,7 @@ namespace GilesTrinity
         /// <param name="bOOCBuff">Buff Out Of Combat</param>
         /// <param name="bDestructiblePower">Is this for breaking destructables?</param>
         /// <returns></returns>
-        internal static GilesPower GilesAbilitySelector(bool bCurrentlyAvoiding = false, bool bOOCBuff = false, bool bDestructiblePower = false)
+        internal static TrinityPower AbilitySelector(bool bCurrentlyAvoiding = false, bool bOOCBuff = false, bool bDestructiblePower = false)
         {
             using (new PerformanceLogger("GilesAbilitySelector"))
             {
@@ -187,14 +188,14 @@ namespace GilesTrinity
 
                 // See if archon just appeared/disappeared, so update the hotbar
                 if (bRefreshHotbarAbilities)
-                    GilesRefreshHotbar(GilesHasBuff(SNOPower.Wizard_Archon));
+                    RefreshHotbar(GetHasBuff(SNOPower.Wizard_Archon));
 
                 // Extra height thingy, not REALLY used as it was originally going to be, will probably get phased out...
                 float iThisHeight = iExtraHeight;
                 // Switch based on the cached character class
                 using (new PerformanceLogger("AbilitySelector.ClassAbility"))
                 {
-                    switch (playerStatus.ActorClass)
+                    switch (PlayerStatus.ActorClass)
                     {
                         // Barbs
                         case ActorClass.Barbarian:
@@ -229,9 +230,55 @@ namespace GilesTrinity
         internal static bool CheckAbilityAndBuff(SNOPower snoPower)
         {
             return
-                (!hashPowerHotbarAbilities.Contains(snoPower) || (hashPowerHotbarAbilities.Contains(snoPower) && GilesHasBuff(snoPower)));
+                (!Hotbar.Contains(snoPower) || (Hotbar.Contains(snoPower) && GetHasBuff(snoPower)));
 
         }
 
+        private static SNOPower GetDefaultWeaponPower()
+        {
+            ACDItem rhItem = ZetaDia.Me.Inventory.Equipped.Where(i => i.InventorySlot == InventorySlot.PlayerLeftHand).FirstOrDefault();
+            if (rhItem == null)
+                return SNOPower.None;
+
+            switch (rhItem.ItemType)
+            {
+                default:
+                    if (rhItem.IsTwoHand)
+                        return SNOPower.Weapon_Melee_Instant_BothHand;
+                    return SNOPower.Weapon_Melee_Instant;
+                case ItemType.Axe:
+                case ItemType.CeremonialDagger:
+                case ItemType.Dagger:
+                case ItemType.Daibo:
+                case ItemType.FistWeapon:
+                case ItemType.Mace:
+                case ItemType.Polearm:
+                case ItemType.Spear:
+                case ItemType.Staff:
+                case ItemType.Sword:
+                    if (rhItem.IsTwoHand)
+                        return SNOPower.Weapon_Melee_Instant_BothHand;
+                   return SNOPower.Weapon_Melee_Instant;
+                case ItemType.Wand:
+                    return SNOPower.Weapon_Ranged_Wand;
+                case ItemType.Bow:
+                case ItemType.Crossbow:
+                case ItemType.HandCrossbow:
+                  return SNOPower.Weapon_Ranged_Instant;
+            }
+        }
+        private static float GetDefaultWeaponDistance()
+        {
+            switch (GetDefaultWeaponPower())
+            {
+                case SNOPower.Weapon_Ranged_Instant:
+                case SNOPower.Weapon_Ranged_Wand:
+                    return 40f;
+                case SNOPower.Weapon_Melee_Instant:
+                case SNOPower.Weapon_Melee_Instant_BothHand:
+                default:
+                    return 10f;
+            }
+        }
     }
 }

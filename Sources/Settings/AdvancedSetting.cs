@@ -12,6 +12,7 @@ namespace GilesTrinity.Settings
         private bool _AllowRestartGame;
         private bool _TPSEnabled;
         private int _TPSLimit;
+        private int _CacheRefreshRate;
         private bool _LogStuckLocation;
         private bool _DebugInStatusBar;
         private LogCategory _LogCategories;
@@ -38,7 +39,7 @@ namespace GilesTrinity.Settings
 
         #region Properties
         [DataMember(IsRequired = false)]
-        [DefaultValue(LogCategory.UserInformation)]
+        [DefaultValue(LogCategory.UserInformation | LogCategory.ProfileTag)]
         public LogCategory LogCategories
         {
             get
@@ -164,7 +165,25 @@ namespace GilesTrinity.Settings
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
+        [DefaultValue(100)]
+        public int CacheRefreshRate
+        {
+            get
+            {
+                return _CacheRefreshRate;
+            }
+            set
+            {
+                if (_CacheRefreshRate != value)
+                {
+                    _CacheRefreshRate = value;
+                    OnPropertyChanged("CacheRefreshRate");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
         public bool DebugInStatusBar
         {
             get
@@ -226,6 +245,16 @@ namespace GilesTrinity.Settings
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+
+        /// <summary>
+        /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserializing()]
+        internal void OnDeserializingMethod(StreamingContext context)
+        {
+            this._CacheRefreshRate = 100;
         }
         #endregion Methods
     }

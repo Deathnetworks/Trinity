@@ -11,7 +11,7 @@ namespace GilesTrinity.DbProvider
     /// This class is injected to DemonBuddy. 
     /// Leave blank, process is bypassed by plugin
     /// </remarks>
-    public class GilesObstacleTargetingProvider : ITargetingProvider
+    public class BlankObstacleProvider : ITargetingProvider
     {
         private static readonly List<DiaObject> listEmptyList = new List<DiaObject>();
 

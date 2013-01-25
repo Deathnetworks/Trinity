@@ -8,6 +8,7 @@ using Zeta.CommonBot.Profile;
 using Zeta.Navigation;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
+using GilesTrinity.DbProvider;
 
 namespace GilesTrinity.XmlTags
 {
@@ -23,7 +24,7 @@ namespace GilesTrinity.XmlTags
         private float fRandomizedDistance;
         private string sDestinationName;
         private string sNoSkip;
-        private string sUseNavigation;
+        private string useNavigator;
         private Vector3? vMainVector;
 
         protected override Composite CreateBehavior()
@@ -54,7 +55,7 @@ namespace GilesTrinity.XmlTags
                     {
                         if (thisObject.Location.Distance(Position) <= thisObject.Radius)
                         {
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "Skipping ahead from moveto {0} to next moveto.", Position);
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, "Skipping ahead from moveto {0} to next moveto.", Position);
                             GilesTrinity.bSkipAheadAGo = true;
                             return RunStatus.Success;
                         }
@@ -68,19 +69,30 @@ namespace GilesTrinity.XmlTags
             }
 
             // Now use Trinity movement to try a direct movement towards that location
-
-            Vector3 NavTarget = Position;
-            Vector3 MyPos = GilesTrinity.playerStatus.CurrentPosition;
-            if (Vector3.Distance(MyPos, NavTarget) > 250)
+            if (!ZetaDia.WorldInfo.IsGenerated)
             {
-                NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
+                // Use DefaultNavigationProvider for static worlds
+                Vector3 NavTarget = Position;
+                Vector3 MyPos = GilesTrinity.PlayerStatus.CurrentPosition;
+                if (Vector3.Distance(MyPos, NavTarget) > 250)
+                {
+                    NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
+                }
+
+                if (useNavigator != null && useNavigator.ToLower() == "false")
+                {
+                    Navigator.PlayerMover.MoveTowards(NavTarget);
+                }
+                else
+                {
+                    Navigator.MoveTo(NavTarget);
+                }
             }
-
-            if (sUseNavigation == null || sUseNavigation.ToLower() != "true")
-                Navigator.PlayerMover.MoveTowards(NavTarget);
             else
-                Navigator.MoveTo(NavTarget);
-
+            {
+                // Use PathFinder for generated worlds
+                PlayerMover.NavigateTo(Position);
+            }
             return RunStatus.Success;
         }
 
@@ -122,15 +134,15 @@ namespace GilesTrinity.XmlTags
         }
 
         [XmlAttribute("navigation")]
-        public string Navigation
+        public string UseNavigator
         {
             get
             {
-                return sUseNavigation;
+                return useNavigator;
             }
             set
             {
-                sUseNavigation = value;
+                useNavigator = value;
             }
         }
 

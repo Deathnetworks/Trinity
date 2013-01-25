@@ -1362,7 +1362,7 @@
 // Empty Socket
 // Item Level: 63
 //[QUALITY] == "Legendary" && [NAME] == "Mempo of Twilight" # [VIT] > 0 || [CRIT%] > 0
-[QUALITY] == "Legendary" && [NAME] == "Mempo of Twilight" # [STR] > 170 || [DEX] > 170 || [CRIT%] > 0 || [PICKUP] > 0 || [MF%] > 15
+[QUALITY] == "Legendary" && [NAME] == "Mempo of Twilight" # [STR] > 170 || [DEX] > 170 || [CRIT%] > 0 || [PICKRAD] > 0 || [MF%] > 15
 
 // - Immortal King's Triumph --------------------------------------------------+
 // Set Helm
@@ -1378,7 +1378,7 @@
 // Immortal King's Legend
 // Item Level: 63
 //[QUALITY] == "Legendary" && [NAME] == "Immortal King's Triumph" # [STRVIT] > 195 || [ALLRES] > 0
-[QUALITY] == "Legendary" && [NAME] == "Immortal King's Triumph" #  [STRVIT] > 120 || [ALLRES] > 0 || [PICKUP] > 0 || [ARMORBONUS] > 180
+[QUALITY] == "Legendary" && [NAME] == "Immortal King's Triumph" #  [STRVIT] > 120 || [ALLRES] > 0 || [PICKRAD] > 0 || [ARMORBONUS] > 180
 
 // - Natalya's Sight ----------------------------------------------------------+
 // Set Helm

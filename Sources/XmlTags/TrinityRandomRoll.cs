@@ -31,7 +31,7 @@ namespace GilesTrinity.XmlTags
                 int iOldValue;
                 Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
                 int iNewRandomValue = (rndNum.Next((Max - Min) + 1)) + Min;
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.XmlTag, "Generating RNG for profile between {0} and {1}, result={2}", Min, Max, iNewRandomValue);
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, "Generating RNG for profile between {0} and {1}, result={2}", Min, Max, iNewRandomValue);
                 if (!GilesTrinity.dictRandomID.TryGetValue(ID, out iOldValue))
                 {
                     GilesTrinity.dictRandomID.Add(ID, iNewRandomValue);

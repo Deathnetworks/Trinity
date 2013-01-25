@@ -6,10 +6,18 @@ using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
+using Zeta.TreeSharp;
+using Zeta.CommonBot;
+using Zeta.CommonBot.Profile.Common;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
+        private static double GetLastHadUnitsInSights()
+        {
+            return Math.Max(DateTime.Now.Subtract(lastHadUnitInSights).TotalMilliseconds, DateTime.Now.Subtract(lastHadEliteUnitInSights).TotalMilliseconds);
+        }
+
         private static void RefreshDiaGetWeights()
         {
             using (new PerformanceLogger("RefreshDiaObjectCache.Weighting"))
@@ -24,24 +32,34 @@ namespace GilesTrinity
                                             ) ||
                                             Settings.Combat.Misc.GoblinPriority < GoblinPriority.Prioritize
                                         ) &&
-                                        playerStatus.CurrentHealthPct >= 0.85d;
+                                        PlayerStatus.CurrentHealthPct >= 0.85d;
 
-                bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || playerStatus.IsRooted);
+                bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || PlayerStatus.IsRooted);
 
-                bool bIsBerserked = GilesHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
+                bool bIsBerserked = GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
+
+                int TrashMobCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsTrashMob);
+                int EliteCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
+
+                bool ShouldIgnoreTrashMobs = (!TownRun.IsTryingToTownPortal() && !PrioritizeCloseRangeUnits && Settings.Combat.Misc.IgnoreSolitaryTrash && EliteCount == 0);
+
                 foreach (GilesObject cacheObject in GilesObjectCache)
                 {
-
                     // Just to make sure each one starts at 0 weight...
                     cacheObject.Weight = 0d;
 
                     // Now do different calculations based on the object type
                     switch (cacheObject.Type)
                     {
+                        // Weight Units
                         case GObjectType.Unit:
                             {
-
-                                // Weight Units
+                                // Ignore Solitary Trash mobs (no elites present)
+                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob &&
+                                    !GilesObjectCache.Any(u => u.IsTrashMob && Vector3.Distance(cacheObject.Position, u.Position) <= 40f))
+                                {
+                                    break;
+                                }
 
                                 // No champions, no mobs nearby, no treasure goblins to prioritize, and not injured, so skip mobs
                                 if (bIgnoreAllUnits)
@@ -60,53 +78,53 @@ namespace GilesTrinity
                                         bAnyBossesInRange = true;
                                     if (cacheObject.RadiusDistance <= 6f)
                                     {
-                                        iAnythingWithinRange[RANGE_6]++;
+                                        AnythingWithinRange[RANGE_6]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_6]++;
+                                            ElitesWithinRange[RANGE_6]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 12f)
                                     {
-                                        iAnythingWithinRange[RANGE_12]++;
+                                        AnythingWithinRange[RANGE_12]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_12]++;
+                                            ElitesWithinRange[RANGE_12]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 15f)
                                     {
-                                        iAnythingWithinRange[RANGE_15]++;
+                                        AnythingWithinRange[RANGE_15]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_15]++;
+                                            ElitesWithinRange[RANGE_15]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 20f)
                                     {
-                                        iAnythingWithinRange[RANGE_20]++;
+                                        AnythingWithinRange[RANGE_20]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_20]++;
+                                            ElitesWithinRange[RANGE_20]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 25f)
                                     {
                                         if (!bAnyNonWWIgnoreMobsInRange && !hashActorSNOWhirlwindIgnore.Contains(cacheObject.ActorSNO))
                                             bAnyNonWWIgnoreMobsInRange = true;
-                                        iAnythingWithinRange[RANGE_25]++;
+                                        AnythingWithinRange[RANGE_25]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_25]++;
+                                            ElitesWithinRange[RANGE_25]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 30f)
                                     {
-                                        iAnythingWithinRange[RANGE_30]++;
+                                        AnythingWithinRange[RANGE_30]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_30]++;
+                                            ElitesWithinRange[RANGE_30]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 40f)
                                     {
-                                        iAnythingWithinRange[RANGE_40]++;
+                                        AnythingWithinRange[RANGE_40]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_40]++;
+                                            ElitesWithinRange[RANGE_40]++;
                                     }
                                     if (cacheObject.RadiusDistance <= 50f)
                                     {
-                                        iAnythingWithinRange[RANGE_50]++;
+                                        AnythingWithinRange[RANGE_50]++;
                                         if (bCountAsElite)
-                                            iElitesWithinRange[RANGE_50]++;
+                                            ElitesWithinRange[RANGE_50]++;
                                     }
                                 }
 
@@ -141,7 +159,7 @@ namespace GilesTrinity
                                             cacheObject.Weight += (1200 * (1 - (cacheObject.RadiusDistance / iCurrentMaxKillRadius)));
 
                                         // Give extra weight to ranged enemies
-                                        if ((playerStatus.ActorClass == ActorClass.Barbarian || playerStatus.ActorClass == ActorClass.Monk) &&
+                                        if ((PlayerStatus.ActorClass == ActorClass.Barbarian || PlayerStatus.ActorClass == ActorClass.Monk) &&
                                             (cacheObject.MonsterStyle == MonsterSize.Ranged || hashActorSNORanged.Contains(c_ActorSNO)))
                                         {
                                             cacheObject.Weight += 1100;
@@ -219,7 +237,7 @@ namespace GilesTrinity
                                         Vector3 point = cacheObject.Position;
                                         float fWeightRemoval = 0;
                                         foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp =>
-                                            GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, point) &&
+                                            GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, point) &&
                                             cp.Location.Distance(point) > GetAvoidanceRadius(cp.ActorSNO)))
                                         {
                                             fWeightRemoval += (float)tempobstacle.Weight * 8;
@@ -231,7 +249,7 @@ namespace GilesTrinity
                                         // Lower the priority if there is AOE *UNDER* the target, by the HIGHEST weight there only
                                         fWeightRemoval = 0;
                                         foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => cp.Location.Distance(point) <= GetAvoidanceRadius(cp.ActorSNO) &&
-                                            cp.Location.Distance(playerStatus.CurrentPosition) <= (cacheObject.RadiusDistance - 4f)))
+                                            cp.Location.Distance(PlayerStatus.CurrentPosition) <= (cacheObject.RadiusDistance - 4f)))
                                         {
 
                                             // Up to 200 weight for a high-priority AOE - maximum 3400 weight reduction
@@ -247,7 +265,7 @@ namespace GilesTrinity
                                         if (PlayerKiteDistance > 0)
                                         {
                                             if (GilesObjectCache.Any(m => m.Type == GObjectType.Unit &&
-                                                GilesIntersectsPath(cacheObject.Position, cacheObject.Radius, playerStatus.CurrentPosition, m.Position) &&
+                                                GilesIntersectsPath(cacheObject.Position, cacheObject.Radius, PlayerStatus.CurrentPosition, m.Position) &&
                                                 m.RActorGuid != cacheObject.RActorGuid))
                                             {
                                                 cacheObject.Weight = 0;
@@ -316,8 +334,8 @@ namespace GilesTrinity
 
 
                                 // Point-blank items get a weight increase 
-                                if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 8f)
-                                    cacheObject.Weight += 600d;
+                                if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 12f)
+                                    cacheObject.Weight += 1000d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == CurrentTargetRactorGUID)
@@ -336,11 +354,11 @@ namespace GilesTrinity
                                     cacheObject.Weight = 18000 - (Math.Floor(cacheObject.CentreDistance) * 200);
 
                                 // If there's a monster in the path-line to the item, reduce the weight to 1
-                                if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius * 1.2f, playerStatus.CurrentPosition, cacheObject.Position)))
+                                if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius * 1.2f, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
                                 // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
-                                if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
+                                if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
                                 // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
@@ -354,7 +372,7 @@ namespace GilesTrinity
                                 // Weight Health Globes
 
                                 // Give all globes 0 weight (so never gone-to), unless we have low health, then go for them
-                                if (playerStatus.CurrentHealthPct > PlayerEmergencyHealthGlobeLimit || !Settings.Combat.Misc.CollectHealthGlobe)
+                                if (PlayerStatus.CurrentHealthPct > PlayerEmergencyHealthGlobeLimit || !Settings.Combat.Misc.CollectHealthGlobe)
                                 {
                                     cacheObject.Weight = 0;
                                 }
@@ -362,7 +380,7 @@ namespace GilesTrinity
                                 {
 
                                     // Ok we have globes enabled, and our health is low...!
-                                    cacheObject.Weight = 17000d - (Math.Floor(cacheObject.CentreDistance) * 90d);
+                                    cacheObject.Weight = 17000d - (Math.Floor(cacheObject.CentreDistance) * 300d);
 
                                     // Point-blank items get a weight increase
                                     if (cacheObject.CentreDistance <= 15f)
@@ -384,20 +402,20 @@ namespace GilesTrinity
                                     // If there's a monster in the path-line to the item, reduce the weight by 15% for each
                                     Vector3 point = cacheObject.Position;
                                     foreach (GilesObstacle tempobstacle in hashMonsterObstacleCache.Where(cp =>
-                                        GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, point)))
+                                        GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, point)))
                                     {
                                         cacheObject.Weight *= 0.85;
                                     }
 
                                     // See if there's any AOE avoidance in that spot, if so reduce the weight by 10%
-                                    if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
+                                    if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                         cacheObject.Weight *= 0.9;
 
                                     // Calculate a spot reaching a little bit further out from the globe, to help globe-movements
                                     if (cacheObject.Weight > 0)
-                                        cacheObject.Position = MathEx.CalculatePointFrom(cacheObject.Position, playerStatus.CurrentPosition, cacheObject.CentreDistance + 3f);
+                                        cacheObject.Position = MathEx.CalculatePointFrom(cacheObject.Position, PlayerStatus.CurrentPosition, cacheObject.CentreDistance + 3f);
 
-                                    // do not collect health globes if we are kiting and health globe is too close to monster
+                                    // do not collect health globes if we are kiting and health globe is too close to monster or avoidance
                                     if (PlayerKiteDistance > 0)
                                     {
                                         if (hashMonsterObstacleCache.Any(m => m.Location.Distance(cacheObject.Position) < PlayerKiteDistance))
@@ -413,11 +431,11 @@ namespace GilesTrinity
                             {
 
                                 // Healths Wells get handled correctly ... 
-                                if (cacheObject.Type == GObjectType.HealthWell && playerStatus.CurrentHealthPct <= .75)
+                                if (cacheObject.Type == GObjectType.HealthWell && PlayerStatus.CurrentHealthPct <= .75)
                                 {
                                     cacheObject.Weight += 7500;
                                 }
-                                if (cacheObject.Type == GObjectType.HealthWell && playerStatus.CurrentHealthPct <= .25)
+                                if (cacheObject.Type == GObjectType.HealthWell && PlayerStatus.CurrentHealthPct <= .25)
                                 {
                                     cacheObject.Weight += 20000d;
                                 }
@@ -459,11 +477,11 @@ namespace GilesTrinity
                                         cacheObject.Weight = 18500d - (Math.Floor(cacheObject.CentreDistance) * 200);
 
                                     // If there's a monster in the path-line to the item, reduce the weight by 25%
-                                    if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
+                                    if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                         cacheObject.Weight *= 0.75;
 
                                     // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
-                                    if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
+                                    if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                         cacheObject.Weight = 1;
                                 }
                                 break;
@@ -484,10 +502,8 @@ namespace GilesTrinity
                             {
 
                                 // rrrix added this as a single "weight" source based on the DestructableRange.
-                                // Calculate the weight based on distance, where a distance = 1 is 5000
-                                //5000*(1+((B2-A2)/B2))
-                                float minRange = Settings.WorldObject.DestructibleRange >= 1 ? Settings.WorldObject.DestructibleRange : 1;
-                                cacheObject.Weight = 5000 * (1 + ((cacheObject.RadiusDistance - minRange) / minRange));
+                                // Calculate the weight based on distance, where a distance = 1 is 5000, 90 = 0
+                                cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 5000f;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
@@ -498,11 +514,11 @@ namespace GilesTrinity
                                 //    cacheObject.Weight += 1500d;
 
                                 // If there's a monster in the path-line to the item, reduce the weight by 50%
-                                if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
+                                if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                     cacheObject.Weight *= 0.5;
 
                                 // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
-                                if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
+                                if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
                                 // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
@@ -528,24 +544,24 @@ namespace GilesTrinity
                                 // Weight Interactable Specials
 
                                 // Very close interactables get a weight increase
-                                cacheObject.Weight = 15000d - (Math.Floor(cacheObject.CentreDistance) * 170d);
+                                cacheObject.Weight = 15000d - (Math.Floor(cacheObject.CentreDistance) * 90d);
                                 if (cacheObject.CentreDistance <= 12f)
-                                    cacheObject.Weight += 800d;
+                                    cacheObject.Weight += 1000d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                     cacheObject.Weight += 400;
 
                                 // If there's a monster in the path-line to the item, reduce the weight by 50%
-                                if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
+                                if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                     cacheObject.Weight *= 0.5;
 
                                 // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
-                                if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
+                                if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
-                                if (bAnyMobsInCloseRange || (CurrentTarget != null && CurrentTarget.IsBossOrEliteRareUnique))
-                                    cacheObject.Weight = 1;
+                                //if (bAnyMobsInCloseRange || (CurrentTarget != null && CurrentTarget.IsBossOrEliteRareUnique))
+                                //    cacheObject.Weight = 1;
 
                                 break;
                             }
@@ -564,11 +580,11 @@ namespace GilesTrinity
                                     cacheObject.Weight += 400;
 
                                 // If there's a monster in the path-line to the item, reduce the weight by 50%
-                                if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
+                                if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                     cacheObject.Weight *= 0.5;
 
                                 // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
-                                if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, cacheObject.Position)))
+                                if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                     cacheObject.Weight = 1;
                                 break;
                             }
@@ -577,13 +593,11 @@ namespace GilesTrinity
                     // Switch on object type
 
                     // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
-                    //if (thisgilesobject.dWeight == 1 && !bRequireAvoidance)
-                    //{
-
-                    //    thisgilesobject.dWeight = 0;
-
-                    //    bStayPutDuringAvoidance = true;
-                    //}
+                    if (cacheObject.Weight == 1 && !StandingInAvoidance && GilesObjectCache.Any(o => o.Type == GObjectType.Avoidance))
+                    {
+                        cacheObject.Weight = 0;
+                        bStayPutDuringAvoidance = true;
+                    }
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2:0} type: {3} mobsInCloseRange: {4} requireAvoidance: {5} PrioritizeCloseRangeUnits: {6}",
                             cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance, PrioritizeCloseRangeUnits);
 
@@ -611,7 +625,7 @@ namespace GilesTrinity
                                 // Distance from avoidance to target is less than avoidance radius
                                 o.Location.Distance(CurrentTarget.Position) <= (GetAvoidanceRadius(o.ActorSNO) * 1.2) &&
                                     // Distance from obstacle to me is <= cacheObject.RadiusDistance
-                                o.Location.Distance(playerStatus.CurrentPosition) <= (cacheObject.RadiusDistance - 4f)
+                                o.Location.Distance(PlayerStatus.CurrentPosition) <= (cacheObject.RadiusDistance - 4f)
                                 );
 
                             // if there's any obstacle within a specified distance of the avoidance radius *1.2 
@@ -632,6 +646,8 @@ namespace GilesTrinity
                 // Loop through all the objects and give them a weight
                 if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.RActorGuid != CurrentTargetRactorGUID)
                 {
+                    RecordTargetHistory();
+
                     DbHelper.Log(TrinityLogLevel.Verbose,
                                     LogCategory.Targetting,
                                     "Target changed to {2} {0} ({1})",
@@ -639,6 +655,35 @@ namespace GilesTrinity
                                     CurrentTarget.ActorSNO,
                                     CurrentTarget.Type);
                 }
+            }
+        }
+
+        private static void RecordTargetHistory()
+        {
+            string targetSha1Hash = HashGenerator.GenerateGilesObjecthash(CurrentTarget);
+
+            // clean up past targets
+            if (!GenericCache.ContainsKey(targetSha1Hash))
+            {
+                CurrentTarget.HasBeenPrimaryTarget = true;
+                CurrentTarget.TimesBeenPrimaryTarget = 1;
+                CurrentTarget.FirstTargetAssignmentTime = DateTime.Now;
+                GenericCache.AddToCache(new GenericCacheObject(targetSha1Hash, CurrentTarget, new TimeSpan(0, 10, 0)));
+            }
+            else if (GenericCache.ContainsKey(targetSha1Hash))
+            {
+                GilesObject cTarget = (GilesObject)GenericCache.GetObject(targetSha1Hash).Value;
+                if (!cTarget.IsBoss && cTarget.TimesBeenPrimaryTarget > 15)
+                {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Blacklisting target {0} due to possible stuck/flipflop!", CurrentTarget.InternalName);
+                    hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
+                }
+                else
+                {
+                    cTarget.TimesBeenPrimaryTarget++;
+                    GenericCache.UpdateObject(new GenericCacheObject(targetSha1Hash, cTarget, new TimeSpan(0, 10, 0)));
+                }
+                
             }
         }
     }

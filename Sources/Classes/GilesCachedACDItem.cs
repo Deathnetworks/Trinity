@@ -78,9 +78,69 @@ namespace GilesTrinity
         public float WeaponAttacksPerSecond { get; set; }
         public float WeaponMaxDamage { get; set; }
         public float WeaponMinDamage { get; set; }
-        public ACDItem item { get; set; }
+        public ACDItem AcdItem { get; set; }
         public int Row { get; set; }
         public int Column { get; set; }
+        public string ItemLink { get; set; }
+
+        public GilesCachedACDItem(ItemStats stats)
+        {
+            WeaponDamagePerSecond = stats.WeaponDamagePerSecond;
+            Dexterity = stats.Dexterity;
+            Intelligence = stats.Intelligence;
+            Strength = stats.Strength;
+            Vitality = stats.Vitality;
+            LifePercent = stats.LifePercent;
+            LifeOnHit = stats.LifeOnHit;
+            LifeSteal = stats.LifeSteal;
+            HealthPerSecond = stats.HealthPerSecond;
+            MagicFind = stats.MagicFind;
+            GoldFind = stats.GoldFind;
+            MovementSpeed = stats.MovementSpeed;
+            PickUpRadius = stats.PickUpRadius;
+            Sockets = stats.Sockets;
+            CritPercent = stats.CritPercent;
+            CritDamagePercent = stats.CritDamagePercent;
+            AttackSpeedPercent = stats.AttackSpeedPercent;
+            MinDamage = stats.MinDamage;
+            MaxDamage = stats.MaxDamage;
+            BlockChance = stats.BlockChance;
+            Thorns = stats.Thorns;
+            ResistAll = stats.ResistAll;
+            ResistArcane = stats.ResistArcane;
+            ResistCold = stats.ResistCold;
+            ResistFire = stats.ResistFire;
+            ResistHoly = stats.ResistHoly;
+            ResistLightning = stats.ResistLightning;
+            ResistPhysical = stats.ResistPhysical;
+            ResistPoison = stats.ResistPoison;
+            WeaponDamagePerSecond = stats.WeaponDamagePerSecond;
+            ArmorBonus = stats.ArmorBonus;
+            MaxDiscipline = stats.MaxDiscipline;
+            MaxMana = stats.MaxMana;
+            ArcaneOnCrit = stats.ArcaneOnCrit;
+            ManaRegen = stats.ManaRegen;
+            GlobeBonus = stats.HealthGlobeBonus;
+            HatredRegen = stats.HatredRegen;
+            MaxFury = stats.MaxFury;
+            SpiritRegen = stats.SpiritRegen;
+            MaxSpirit = stats.MaxSpirit;
+            HealthPerSpiritSpent = stats.HealthPerSpiritSpent;
+            MaxArcanePower = stats.MaxArcanePower;
+            DamageReductionPhysicalPercent = stats.DamageReductionPhysicalPercent;
+            ArmorTotal = stats.ArmorTotal;
+            Armor = stats.Armor;
+            FireDamagePercent = stats.FireDamagePercent;
+            LightningDamagePercent = stats.LightningDamagePercent;
+            ColdDamagePercent = stats.ColdDamagePercent;
+            PoisonDamagePercent = stats.PoisonDamagePercent;
+            ArcaneDamagePercent = stats.ArcaneDamagePercent;
+            HolyDamagePercent = stats.HolyDamagePercent;
+            HealthGlobeBonus = stats.HealthGlobeBonus;
+            WeaponAttacksPerSecond = stats.WeaponAttacksPerSecond;
+            WeaponMaxDamage = stats.WeaponMaxDamage;
+            WeaponMinDamage = stats.WeaponMinDamage;
+        }
 
         public GilesCachedACDItem(
             ACDItem acdItem,
@@ -102,7 +162,7 @@ namespace GilesTrinity
             int stackQuantity, 
             ItemStats itemStats)
         {
-            item = acdItem;
+            AcdItem = acdItem;
             InternalName = internalName;
             RealName = realName;
             Level = level;
@@ -119,6 +179,9 @@ namespace GilesTrinity
             FollowerType = followerType;
             IsUnidentified = unidentified;
             ItemStackQuantity = stackQuantity;
+
+
+
             Dexterity = itemStats.Dexterity;
             Intelligence = itemStats.Intelligence;
             Strength = itemStats.Strength;

@@ -1,6 +1,5 @@
 ﻿using GilesTrinity.ItemRules;
 using GilesTrinity.Settings;
-using GilesTrinity.Swap;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -51,7 +50,7 @@ namespace GilesTrinity
         /// <summary>
         /// Used for letting noobs know they started the bot without Trinity enabled in the plugins tab.
         /// </summary>
-        private static bool bPluginEnabled = false;
+        private static bool IsPluginEnabled = false;
 
         /// <summary>
         /// A flag to say whether any NON-hashActorSNOWhirlwindIgnore things are around
@@ -82,27 +81,27 @@ namespace GilesTrinity
         /// <summary>
         /// A flag to indicate whether we have a new target from the overlord (decorator) or not, in which case don't refresh targets again this first loop
         /// </summary>
-        private static bool bWholeNewTarget = false;
+        private static bool IsWholeNewTarget = false;
 
         /// <summary>
         /// A flag to indicate if we should pick a new power/ability to use or not
         /// </summary>
-        private static bool bPickNewAbilities = false;
+        private static bool ShouldPickNewAbilities = false;
 
         /// <summary>
         /// Flag used to indicate if we are simply waiting for a power to go off - so don't do any new target checking or anything
         /// </summary>
-        private static bool bWaitingForPower = false;
+        private static bool IsWaitingForPower = false;
 
         /// <summary>
         /// A special post power use pause, causes targetHandler to wait on any new decisions
         /// </summary>
-        private static bool bWaitingAfterPower = false;
+        private static bool IsWaitingAfterPower = false;
 
         /// <summary>
         /// If TargetHandle is waiting waiting before popping a potion - we won't refresh cache/change targets/unstuck/etc
         /// </summary>
-        private static bool bWaitingForPotion = false;
+        private static bool IsWaitingForPotion = false;
 
         /// <summary>
         /// Status text for DB main window status
@@ -154,7 +153,10 @@ namespace GilesTrinity
         /// <summary>
         /// Holds all of the player's current info handily cached, updated once per loop with a minimum timer on updates to save D3 memory hits
         /// </summary>
-        public static GilesPlayerCache playerStatus = new GilesPlayerCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, vNullLocation, false, 0, 1, ActorClass.Invalid, String.Empty);
+        public static GilesPlayerCache PlayerStatus = new GilesPlayerCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, vNullLocation, false, 0, 1, ActorClass.Invalid, String.Empty);
+
+        [Obsolete("This property is obsolete; use PlayerStatus instead")]
+        public static GilesPlayerCache playerStatus { get { return PlayerStatus; } }
 
         /// <summary>
         /// Obstacle cache, things we can't or shouldn't move through
@@ -203,10 +205,10 @@ namespace GilesTrinity
         private static DateTime lastRemindedAboutAbilities = DateTime.Today;
 
         // Last had any mob in range, for loot-waiting
-        private static DateTime lastHadUnitInSights = DateTime.Today;
+        internal static DateTime lastHadUnitInSights = DateTime.Today;
 
         // When we last saw a boss/elite etc.
-        private static DateTime lastHadEliteUnitInSights = DateTime.Today;
+        internal static DateTime lastHadEliteUnitInSights = DateTime.Today;
 
         // Do we need to reset the debug bar after combat handling?
         private static bool bResetStatusText = false;
@@ -244,7 +246,7 @@ namespace GilesTrinity
         private static double iTargetLastHealth = 0f;
 
         // This is used so we don't use certain skills until we "top up" our primary resource by enough
-        private static double iWaitingReservedAmount = 0d;
+        private static double MinEnergyReserve = 0d;
 
         /// <summary>
         /// Store the date-time when we *FIRST* picked this target, so we can blacklist after X period of time targeting
@@ -320,7 +322,7 @@ namespace GilesTrinity
         private static bool IsAvoidingProjectiles = false;
 
         // When we last FOUND a safe spot
-        private static DateTime lastFoundSafeSpot = DateTime.Today;
+        private static DateTime lastFoundSafeSpot = DateTime.MinValue;
         private static Vector3 vlastSafeSpot = Vector3.Zero;
 
         /// <summary>
@@ -350,9 +352,9 @@ namespace GilesTrinity
         private static bool wasRootedLastTick = false;
 
         // Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
-        private static GilesPower powerBuff;
-        private static GilesPower currentPower;
-        private static SNOPower powerLastSnoPowerUsed = SNOPower.None;
+        private static TrinityPower powerBuff;
+        private static TrinityPower CurrentPower;
+        internal static SNOPower LastPowerUsed = SNOPower.None;
 
         // Two variables to stop DB from attempting any navigator movement mid-combat/mid-backtrack
         public static bool bDontMoveMeIAmDoingShit = false;
@@ -365,6 +367,7 @@ namespace GilesTrinity
         private static bool bAnyMobsInCloseRange = false;
         private static float iCurrentMaxKillRadius = 0f;
         private static float iCurrentMaxLootRadius = 0f;
+        internal static bool MaintainTempestRush = false;
 
         /// <summary>
         /// Use Beserker Only with "Hard" elites (specific affixes)
@@ -373,28 +376,22 @@ namespace GilesTrinity
         /// <summary>
         /// Are we waiting for a special? Don't waste mana/rage/disc/hate etc.
         /// </summary>
-        private static bool bWaitingForSpecial = false;
+        private static bool IsWaitingForSpecial = false;
 
         /// <summary>
         /// Check LoS if waller avoidance detected
         /// </summary>
         private static bool bCheckGround = false;
 
-        /// <summary>
-        /// Weapon swapping (Monk Sweeping Wind for higher DPS)
-        /// </summary>
-        internal static WeaponSwap weaponSwap = new WeaponSwap();
-        internal static DateTime WeaponSwapTime = DateTime.Today;
-
         // Goblinney things
         private static int iTotalNumberGoblins = 0;
         private static DateTime lastGoblinTime = DateTime.Today;
 
-        internal static DateTime SweepWindSpam = DateTime.Today; //intell -- inna
+        internal static DateTime SweepWindSpam = DateTime.Today; 
 
         // Variables relating to quick-reference of monsters within sepcific ranges (if anyone has suggestion for similar functionality with reduced CPU use, lemme know, but this is fast atm!)
-        private static int[] iElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
-        private static int[] iAnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+        private static int[] ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+        private static int[] AnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
         private static bool bAnyBossesInRange = false;
         private const int RANGE_50 = 0;
         private const int RANGE_40 = 1;
@@ -411,16 +408,16 @@ namespace GilesTrinity
 
         // Unique ID of mob last targetting when using whirlwind
         private static int iACDGUIDLastWhirlwind = 0;
-        private static bool bAlreadyMoving = false;
+        private static bool IsAlreadyMoving = false;
         private static Vector3 vLastMoveToTarget;
         private static float fLastDistanceFromTarget;
         private static DateTime lastMovementCommand = DateTime.Today;
 
         // Actual combat function variables
-        private static bool bMappedPlayerAbilities = false;
+        private static bool HasMappedPlayerAbilities = false;
 
         // Contains our apparent *CURRENT* hotbar abilities, cached in a fast hash
-        public static HashSet<SNOPower> hashPowerHotbarAbilities = new HashSet<SNOPower>();
+        public static HashSet<SNOPower> Hotbar = new HashSet<SNOPower>();
 
         // Contains a hash of our LAST hotbar abilities before we transformed into archon (for quick and safe hotbar restoration)
         public static HashSet<SNOPower> hashCachedPowerHotbarAbilities = new HashSet<SNOPower>();
@@ -437,7 +434,8 @@ namespace GilesTrinity
         private static Vector3 vSideToSideTarget;
         private static DateTime lastChangedZigZag = DateTime.Today;
         private static Vector3 vPositionLastZigZagCheck = Vector3.Zero;
-        public static int iCurrentWorldID = -1;
+        public static int CurrentWorldDynamicId = -1;
+        public static int cachedStaticWorldId = -1; // worldId from profiles, used in persistent stats
         public static GameDifficulty iCurrentGameDifficulty = GameDifficulty.Invalid;
         private const bool USE_COMBAT_ONLY = false;
         private const bool USE_ANY_TIME = true;
@@ -460,19 +458,20 @@ namespace GilesTrinity
         private static bool bMaintainStatTracking = false;
 
         // Store items already logged by item-stats, to make sure no stats get doubled up by accident
-        private static HashSet<int> _hashsetItemStatsLookedAt = new HashSet<int>();
-        private static HashSet<int> _hashsetItemPicksLookedAt = new HashSet<int>();
-        private static HashSet<int> _hashsetItemFollowersIgnored = new HashSet<int>();
-
+        private static HashSet<string> _hashsetItemStatsLookedAt = new HashSet<string>();
+        private static HashSet<string> _hashsetItemPicksLookedAt = new HashSet<string>();
+        private static HashSet<string> _hashsetItemFollowersIgnored = new HashSet<string>();
 
         // These objects are instances of my stats class above, holding identical types of data for two different things - one holds item DROP stats, one holds item PICKUP stats
         internal static GItemStats ItemsDroppedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
         internal static GItemStats ItemsPickedStats = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
-        
-        
+
+
         // Whether to try forcing a vendor-run for custom reasons
         public static bool ForceVendorRunASAP = false;
-        public static bool bWantToTownRun = false;
+        public static bool IsReadyToTownRun = false;
+        [Obsolete("Property bWantToTownRun is obsolete and will eventually be removed. Use IsReadyToTownRun instead.")]
+        public static bool bWantToTownRun { get { return IsReadyToTownRun; } set { IsReadyToTownRun = value; } }
 
         // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
         private static bool[,] StashSlotBlocked = new bool[7, 30];
@@ -506,6 +505,7 @@ namespace GilesTrinity
         private static float c_Radius = 0f;
         private static float c_ZDiff = 0f;
         private static string c_Name = "";
+        private static string c_InternalName = "";
         private static string c_IgnoreReason = "";
         private static string c_IgnoreSubStep = "";
         private static int c_ACDGUID = 0;
@@ -514,6 +514,7 @@ namespace GilesTrinity
         private static int c_BalanceID = 0;
         private static int c_ActorSNO = 0;
         private static int c_ItemLevel = 0;
+        private static string c_ItemLink = String.Empty;
         private static int c_GoldStackSize = 0;
         private static bool c_IsOneHandedItem = false;
         private static bool c_IsTwoHandedItem = false;
@@ -536,6 +537,11 @@ namespace GilesTrinity
         private static bool c_unit_IsAttackable = false;
         private static bool c_ForceLeapAgainst = false;
         private static bool c_IsObstacle = false;
+        private static bool c_HasBeenNavigable = false;
+        private static bool c_HasBeenRaycastable = false;
+        private static bool c_HasBeenInLoS = false;
+        private static string c_ItemSha1Hash = string.Empty;
+
 
         // From main RefreshDiaobjects
         private static Vector3 vSafePointNear;
@@ -583,11 +589,11 @@ namespace GilesTrinity
         /// <summary>
         /// The Grid Provider for Navigation checks
         /// </summary>
-        private static ISearchAreaProvider gp;
+        internal static ISearchAreaProvider gp;
         /// <summary>
         /// The PathFinder for Navigation checks
         /// </summary>
-        private static PathFinder pf;
+        internal static PathFinder pf;
 
         /// <summary>
         /// Behaviors: How close we need to get to the target before we consider it "reached"
@@ -616,20 +622,23 @@ namespace GilesTrinity
 
         // Darkfriend's Looting Rule
         public static Interpreter StashRule = new Interpreter();
-		
+
         // Tesslerc - used for using combination strike
-            // ForesightFirstHit is used to track the 30 second buff from deadly reach.
+        // ForesightFirstHit is used to track the 30 second buff from deadly reach.
         private static DateTime ForeSightFirstHit = new DateTime(1996, 6, 3, 22, 15, 0);
-            // Foresight2 is used to track combination strike buff.
+        // Foresight2 is used to track combination strike buff.
         private static DateTime ForeSight2 = DateTime.Now;
-            // Otherthandeadlyreach is used for other spirit generators to track for combination strike buff.
+        // Otherthandeadlyreach is used for other spirit generators to track for combination strike buff.
         private static DateTime OtherThanDeadlyReach = DateTime.Now;
-            // Set by sweeping winds or by blinding flash if the time is right for a swap.
+        // Set by sweeping winds or by blinding flash if the time is right for a swap.
         private static bool WantToSwap = false;
 
         // Xp Counter
         private static int iTotalXp = 0;
         private static int iLastXp = 0;
-        private static int iNextLvXp = 0;			
+        private static int iNextLvXp = 0;
+		// Gold counter
+        private static int iTotalGold = 0;
+        private static int iLastGold = 0;
     }
 }

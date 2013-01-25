@@ -68,7 +68,8 @@
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseWOTBGoblin}">Use WOTB on Goblins</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpWOTB}">Fury Dump in WOTB Mode</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpAlways}">Fury Dump always</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.WOTBHardOnly}">Use WOTB on hard elites only</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.WOTBHardOnly}" ToolTip="Saves WOTB for use on elites with special affixes">Use WOTB on hard elites only</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.TargetBasedZigZag}" ToolTip="Uses Monster positions as WW points instead of random XYZ">Multi-Target Based ZigZag</CheckBox>
             </UniformGrid>
         </Grid>
         <Grid Grid.Row="3" Margin="2">

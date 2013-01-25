@@ -16,9 +16,6 @@ namespace GilesTrinity
         {
             // Butcher Floor Panels
             201454, 201464, 201426, 201438, 200969, 201423, 201242,
-            // A1 Halls of Agony Fire walls
-            89578, 89579,
-
         };
 
         /// <summary>
@@ -160,7 +157,9 @@ namespace GilesTrinity
             96192,                   89690,           95250,         193077, 
             //Kulle (80509), Small Belial (220160), Big Belial (3349), Diablo 1 (114917), terror Diablo (133562)
             80509,           220160,                3349,              114917,            133562, 
-            
+            //Maghda, Kamyr (MiniBoss before Belial)
+            6031, 51298,
+
             255929, 256711, 256508, 256187, 256189, 256709,
             // Another Cydaea
             137139,
@@ -197,13 +196,13 @@ namespace GilesTrinity
             //bone pile
             218951,245838,
             // rrrix act 1
-            108882, 245919,
+            108882, 245919, 5944, 165475, 199998,
             // rrrix act 2
             213907, 92519, 61544, 105681, 113983, 114527, 114642, 139933, 144405, 156890, 164057, 164195, 180254, 180802, 180809, 181173, 181174, 181177, 181181,
             181182, 181185, 181290, 181292, 181306, 181309, 181313, 181326, 181563, 181857, 181858, 187265, 191433, 191462, 191641, 192880, 192881, 196413, 196435,
             197280, 199191, 199264, 199274, 199597, 199664, 200979, 200982, 201236, 201580, 201581, 201583, 204183, 205746, 205756, 210087, 213907, 218228, 219223,
             220114, 3011, 3205, 3539, 3582, 3584, 3595, 3600, 4580, 52693, 5466, 55005, 5509, 62522, 
-            205756, 5509, 200371, 167185,
+            205756, 5509, 200371, 167185, 181195,
             // rrrix act 3
             60108,
             // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
@@ -239,27 +238,27 @@ namespace GilesTrinity
         /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
         /// </summary>
         internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
-            174900, 191459, 104632, 196211, 200872, 
+            174900, 191459, 104632, 196211, 194682, 81699, 3340, 122558, 123325, 
         };
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 20}, {191459, 13}, {104632, 20}, {196211, 25}, {200872, 25},
+            {174900, 25}, {191459, 13}, {104632, 20}, {196211, 25},  {194682, 20}, {81699, 20}, {3340, 12}, {122558, 15}, {123325, 25},
          };
         /// <summary>
-        /// Destructible things that are very large and need breaking at a bigger distance - eg logstacks, large crates, carts, etc.
+        /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache
         /// </summary>
-        internal static Dictionary<int, int> dictSNOExtendedDestructRange = new Dictionary<int, int> {
+        internal static Dictionary<int, float> dictSNOExtendedDestructRange = new Dictionary<int, float> {
             {2972, 10}, {80357, 16}, {116508, 10}, {113932, 8}, {197514, 18}, {108587, 8}, {108618, 8}, {108612, 8}, {116409, 18}, {121586, 22},
-            {195101, 10}, {195108, 25}, {170657, 1}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 8}, {193963, 10}, {159066, 12}, {160570, 12},
-            {55325, 14}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 25}, {192867, 8}, {155255, 8}
+            {195101, 10}, {195108, 25}, {170657, 5}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 8}, {193963, 5}, {159066, 12}, {160570, 12},
+            {55325, 5}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 30}, {192867, 3.5f}, {155255, 8}, {54530, 6}, {157541, 6},
          };
         /// <summary>
         /// Destructible things that need targeting by a location instead of an ACDGUID (stuff you can't "click on" to destroy in-game)
         /// </summary>
         internal static HashSet<int> hashDestructableLocationTarget = new HashSet<int> {
-            170657, 116409, 121586, 155255, 
+            170657, 116409, 121586, 155255, 104596,
          };
         /// <summary>
         /// Resplendent chest SNO list
@@ -295,10 +294,10 @@ namespace GilesTrinity
         /// Contains ActorSNO's of world objects that should be blacklisted
         /// </summary>
         internal static HashSet<int> hashSNOIgnoreBlacklist = new HashSet<int> {
-            163449, 78030, 2909, 58283, 58309, 58321, 87809, 90150, 91600, 97023, 97350, 97381, 72689, 121327, 54515, 3340, 122076, 123640,
-            60665, 60844, 78554, 86400, 86428, 81699, 86266, 86400, 110769, 192466, 211456, 6190, 80002, 104596, 58836, 104827, 74909, 6155, 6156, 6158, 6159, 75132,
-            181504, 91688, 3016, 3007, 3011, 3014, 130858, 131573, 214396, 182730, 226087, 141639, 206569, 15119, 54413, 54926, 2979, 5776, 3949,
-            108490, 52833, 200371, 153752, 2972, 206527, 
+            163449, 78030, 2909, 58283, 58321, 87809, 90150, 91600, 97023, 97350, 97381, 72689, 121327, 54515, 3340, 122076, 123640,
+            60665, 60844, 78554, 86400, 86428, 81699, 86266, 86400, 192466, 6190, 80002, 104596, 58836, 104827, 74909, 6155, 6156, 6158, 6159, 75132,
+            181504, 91688, 3007, 3011, 3014, 130858, 131573, 214396, 182730, 226087, 141639, 206569, 15119, 54413, 54926, 2979, 5776, 3949,
+            108490, 52833, 200371, 153752, 2972, 206527, 3628,
             //a3dun_crater_st_Demo_ChainPylon_Fire_Azmodan, a3dun_crater_st_Demon_ChainPylon_Fire_MistressOfPain
             198977, 201680,
             //trOut_Leor_painting
@@ -348,7 +347,7 @@ namespace GilesTrinity
                 {SNOPower.Monk_CripplingWave, 5},
                 {SNOPower.Monk_WayOfTheHundredFists, 5},
                 {SNOPower.Monk_LashingTailKick, 250},
-                {SNOPower.Monk_TempestRush, 50},
+                {SNOPower.Monk_TempestRush, 100},
                 {SNOPower.Monk_WaveOfLight, 250},
                 {SNOPower.Monk_BlindingFlash, 15200},
                 {SNOPower.Monk_BreathOfHeaven, 15200},
@@ -432,7 +431,7 @@ namespace GilesTrinity
                 {SNOPower.DemonHunter_RapidFire, 5},
                 {SNOPower.DemonHunter_Chakram, 5},
                 {SNOPower.DemonHunter_ElementalArrow, 5},
-                {SNOPower.DemonHunter_Caltrops, 6000},
+                {SNOPower.DemonHunter_Caltrops, 3000},
                 {SNOPower.DemonHunter_SmokeScreen, 3000},
                 {SNOPower.DemonHunter_ShadowPower, 5000},
                 {SNOPower.DemonHunter_Vault, 400},
@@ -591,11 +590,11 @@ namespace GilesTrinity
         /// Same as above but for gold-amount of pile (RactorGUID based)
         /// </summary>
         private static Dictionary<int, int> dictGilesGoldAmountCache = new Dictionary<int, int>();
-        /// <summary>
-        /// Same as above but for quality of item, we check this twice to make bloody sure we don't miss a legendary from a mis-read though (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, ItemQuality> dictGilesQualityCache = new Dictionary<int, ItemQuality>();
-        private static Dictionary<int, bool> dictGilesQualityRechecked = new Dictionary<int, bool>();
+        ///// <summary>
+        ///// Same as above but for quality of item, we check this twice to make bloody sure we don't miss a legendary from a mis-read though (RactorGUID based)
+        ///// </summary>
+        //private static Dictionary<int, ItemQuality> dictGilesQualityCache = new Dictionary<int, ItemQuality>();
+        //private static Dictionary<int, bool> dictGilesQualityRechecked = new Dictionary<int, bool>();
         /// <summary>
         /// Same as above but for whether we want to pick it up or not (RactorGUID based)
         /// </summary>
@@ -613,9 +612,48 @@ namespace GilesTrinity
         /// </summary>
         private static Dictionary<int, int> dictSummonedByID = new Dictionary<int, int>();
 
+
+        private static Dictionary<int, bool> dictHasBeenNavigableCache = new Dictionary<int, bool>();
+        private static Dictionary<int, bool> dictHasBeenRayCastedCache = new Dictionary<int, bool>();
+        private static Dictionary<int, bool> dictHasBeenInLoSCache = new Dictionary<int, bool>();
+
+        ///// <summary>
+        ///// Do we actually need this?
+        ///// </summary>
+        //private static Dictionary<int, GilesGameBalanceDataCache> dictGilesGameBalanceDataCache = new Dictionary<int, GilesGameBalanceDataCache>();
+
         /// <summary>
-        /// Do we actually need this?
+        /// Spots where we should not kite to (used during boss fights)
         /// </summary>
-        private static Dictionary<int, GilesGameBalanceDataCache> dictGilesGameBalanceDataCache = new Dictionary<int, GilesGameBalanceDataCache>();
+        internal static HashSet<UnSafeZone> UnsafeKiteAreas = new HashSet<UnSafeZone>()
+        {
+            { 
+                new UnSafeZone() {
+                    WorldId = 182976, 
+                    Position = (new Vector3(281.0147f,361.5885f,20.86533f)),
+                    Name = "Chamber of Queen Araneae",
+                    Radius = 90f
+                }
+            },
+            {
+                new UnSafeZone()
+                {
+                    WorldId = 78839,
+                    Position = (new Vector3(59.50927f,60.12386f,0.100002f)),
+                    Name = "Chamber of Suffering (Butcher)",
+                    Radius = 120f
+                }
+            },
+            {
+                new UnSafeZone()
+                {
+                    WorldId = 109143,
+                    Position = (new Vector3(355.8749f,424.0184f,-14.9f)),
+                    Name = "Izual",
+                    Radius = 120f
+                }
+            }
+        };
+
     }
 }

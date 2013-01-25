@@ -43,7 +43,7 @@ namespace GilesTrinity.XmlTags
             }
             catch (Exception exception)
             {
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.XmlTag, ScriptManager.FormatSyntaxErrorException(exception)); 
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.ProfileTag, ScriptManager.FormatSyntaxErrorException(exception)); 
                 BotMain.Stop(false, "");
                 throw;
             }

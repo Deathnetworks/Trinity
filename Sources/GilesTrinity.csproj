@@ -37,9 +37,9 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Demonbuddy, Version=1.0.1204.101, Culture=neutral, PublicKeyToken=eff32ccf253d66d4, processorArchitecture=x86">
+    <Reference Include="Demonbuddy, Version=1.0.1252.119, Culture=neutral, PublicKeyToken=eff32ccf253d66d4, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Demonbuddy.exe</HintPath>
+      <HintPath>..\..\..\db\Demonbuddy.exe</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
@@ -60,7 +60,6 @@
   <ItemGroup>
     <Compile Include="Abilities\Barbarian.cs" />
     <Compile Include="Abilities\Monk.cs" />
-    <Compile Include="Abilities\WeaponSwap.cs" />
     <Compile Include="Abilities\Wizard.cs" />
     <Compile Include="Abilities\DemonHunter.cs" />
     <Compile Include="Abilities\WitchDoctor.cs" />
@@ -71,6 +70,8 @@
     <Compile Include="Cache\CacheItem.cs" />
     <Compile Include="Cache\CacheUnit.cs" />
     <Compile Include="Cache\CacheUtils.cs" />
+    <Compile Include="Cache\GenericCache.cs" />
+    <Compile Include="Cache\PickupItem.cs" />
     <Compile Include="Cache\TrinityItemQuality.cs" />
     <Compile Include="Classes\GilesObjstacle.cs" />
     <Compile Include="Classes\GilesPower.cs" />
@@ -78,16 +79,20 @@
     <Compile Include="Classes\GilesGameBalanceDataCache.cs" />
     <Compile Include="Classes\GilesItemStats.cs" />
     <Compile Include="Classes\GilesStashSort.cs" />
+    <Compile Include="Classes\HashGenerator.cs" />
+    <Compile Include="Classes\MiniMapMarker.cs" />
+    <Compile Include="Classes\SpeedSensor.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Behaviors.cs" />
     <Compile Include="AbilitySelector.cs" />
     <Compile Include="BotManager.cs" />
-    <Compile Include="ItemRules\Core\Formula.cs" />
+    <Compile Include="ItemRules\Core\MaxStats.cs" />
     <Compile Include="ItemRules\Core\Parser.cs" />
     <Compile Include="ItemRules\Core\ParseTree.cs" />
     <Compile Include="ItemRules\Core\Scanner.cs" />
     <Compile Include="ItemRules\Core\TextHighlighter.cs" />
+    <Compile Include="PersistentStats.cs" />
     <Compile Include="Technicals\Loader.cs" />
     <Compile Include="TownRun.cs" />
     <Compile Include="TrinityPowerManager.cs" />
@@ -112,7 +117,7 @@
     <Compile Include="Settings\Combat\BarbarianSetting.cs" />
     <Compile Include="Settings\Combat\CombatSetting.cs" />
     <Compile Include="Settings\Combat\DemonHunterSetting.cs" />
-    <Compile Include="Settings\Combat\GoblinPriority.cs" />
+    <Compile Include="Settings\Combat\EnumOptions.cs" />
     <Compile Include="Settings\Combat\IAvoidanceHealth.cs" />
     <Compile Include="Settings\Combat\MiscCombatSetting.cs" />
     <Compile Include="Settings\Combat\MonkSetting.cs" />
@@ -130,7 +135,6 @@
     <Compile Include="Settings\NotificationSetting.cs" />
     <Compile Include="Settings\TrinitySetting.cs" />
     <Compile Include="Settings\WorldObjectSetting.cs" />
-    <Compile Include="StashSellSalvage.cs" />
     <Compile Include="Technicals\PerformanceLogger.cs" />
     <Compile Include="UIComponents\BoolInverterConverter.cs" />
     <Compile Include="UIComponents\ConfigViewModel.cs" />
@@ -151,22 +155,28 @@
     <Compile Include="Classes\GilesPlayerCache.cs" />
     <Compile Include="Dictionaries.cs" />
     <Compile Include="StuckHandler.cs" />
-    <Compile Include="DbProvider\GilesPlayerMover.cs" />
-    <Compile Include="!Template.cs" />
+    <Compile Include="DbProvider\PlayerMover.cs" />
     <Compile Include="RefreshDiaObject.cs" />
     <Compile Include="GilesTrinity.cs" />
     <Compile Include="RefreshDiaObjects.cs" />
     <Compile Include="XmlTags\BaseComplexNodeTag.cs" />
     <Compile Include="XmlTags\TrinityCastSweepingWinds.cs" />
+    <Compile Include="XmlTags\TrinityExploreDungeon.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="XmlTags\TrinityIfRandom.cs" />
     <Compile Include="XmlTags\TrinityIfSNOInRange.cs" />
     <Compile Include="XmlTags\TrinityIf.cs" />
     <Compile Include="XmlTags\TrinityInteract.cs" />
+    <Compile Include="XmlTags\TrinityLoadOnce.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="XmlTags\TrinityLoadProfile.cs" />
     <Compile Include="XmlTags\TrinityLog.cs" />
     <Compile Include="XmlTags\TrinityMaxDeaths.cs" />
     <Compile Include="XmlTags\TrinityMoveToSNO.cs" />
     <Compile Include="XmlTags\TrinityMoveTo.cs" />
+    <Compile Include="XmlTags\TrinityOffsetMove.cs" />
     <Compile Include="XmlTags\TrinityRandomRoll.cs" />
     <Compile Include="XmlTags\TrinityRandomWait.cs" />
     <Compile Include="XmlTags\TrinityTownRun.cs" />
@@ -255,18 +265,15 @@
     <None Include="Dictionaries.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ItemRules\Rules\config.dis" />
+    <None Include="ItemRules\config.dis" />
     <None Include="ItemRules\Rules\hard\legendary.dis" />
     <None Include="ItemRules\Rules\hard\magic.dis" />
+    <None Include="ItemRules\Rules\hard\pickup.dis" />
     <None Include="ItemRules\Rules\hard\rare.dis" />
     <None Include="ItemRules\Rules\hard\special.dis" />
-    <None Include="ItemRules\Rules\medium\legendary.dis" />
-    <None Include="ItemRules\Rules\medium\magic.dis" />
-    <None Include="ItemRules\Rules\medium\rare.dis" />
-    <None Include="ItemRules\Rules\medium\special.dis" />
-    <None Include="ItemRules\Rules\pickup.dis" />
     <None Include="ItemRules\Rules\soft\legendary.dis" />
     <None Include="ItemRules\Rules\soft\magic.dis" />
+    <None Include="ItemRules\Rules\soft\pickup.dis" />
     <None Include="ItemRules\Rules\soft\rare.dis" />
     <None Include="ItemRules\Rules\soft\special.dis" />
   </ItemGroup>

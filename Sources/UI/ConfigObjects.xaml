@@ -27,7 +27,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Container Open Range :" FontWeight="Bold" TextAlignment="Center"/>
+            <TextBlock Text="Container Open Range:" FontWeight="Bold" TextAlignment="Center"/>
             <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
                     Interval="500" Maximum="60" Minimum="6" 
                     SmallChange="1" LargeChange="5" TickFrequency="5" 
@@ -40,7 +40,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Destructible attack range :" FontWeight="Bold" TextAlignment="Center"/>
+            <TextBlock Text="Destructible attack range:" FontWeight="Bold" TextAlignment="Center"/>
             <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
                     Interval="500" Maximum="30" Minimum="1" 
                     SmallChange="1" LargeChange="5" TickFrequency="1" 
@@ -57,8 +57,8 @@
             </Grid.RowDefinitions>
             <TextBlock Text="Shrines :" FontWeight="Bold" TextAlignment="Center"/>
             <UniformGrid Grid.Row="1" Margin="50,0,50,0" Columns="2" HorizontalAlignment="Center">
-                <RadioButton GroupName="WorldObjectShrine" Content="Ignore shrine" IsChecked="{Binding Path=WorldObject.UseShrine, Converter={StaticResource boolInverterConverter}}" Margin="5"/>
-                <RadioButton GroupName="WorldObjectShrine" Content="Click shrine" IsChecked="{Binding Path=WorldObject.UseShrine}" Margin="5"/>
+                <RadioButton GroupName="WorldObjectShrine" Content="Ignore shrines" IsChecked="{Binding Path=WorldObject.UseShrine, Converter={StaticResource boolInverterConverter}}" Margin="5"/>
+                <RadioButton GroupName="WorldObjectShrine" Content="Use shrines" IsChecked="{Binding Path=WorldObject.UseShrine}" Margin="5"/>
             </UniformGrid>
             <UniformGrid Grid.Row="2" Margin="50,0,50,0" Columns="3" HorizontalAlignment="Center">
                  <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.UseEnlightenedShrine}" ToolTip="Enable collection of Enlightened Shrines">Use Enlightened</CheckBox>
@@ -77,10 +77,10 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Non blocking container :" FontWeight="Bold" TextAlignment="Center"/>
+            <TextBlock Text="Non blocking containers and destructables:" FontWeight="Bold" TextAlignment="Center"/>
             <UniformGrid Grid.Row="1" Margin="50,0,50,0" Columns="2" HorizontalAlignment="Center">
-                <RadioButton GroupName="WorldObjectCorpses" Content="Skip corpses" IsChecked="{Binding Path=WorldObject.IgnoreNonBlocking}" Margin="5"/>
-                <RadioButton GroupName="WorldObjectCorpses" Content="Open it" IsChecked="{Binding Path=WorldObject.IgnoreNonBlocking, Converter={StaticResource boolInverterConverter}}" Margin="5"/>
+                <RadioButton GroupName="WorldObjectCorpses" Content="Skip Destructibles" IsChecked="{Binding Path=WorldObject.IgnoreNonBlocking}" Margin="5"/>
+                <RadioButton GroupName="WorldObjectCorpses" Content="Destroy Destructibles" IsChecked="{Binding Path=WorldObject.IgnoreNonBlocking, Converter={StaticResource boolInverterConverter}}" Margin="5"/>
             </UniformGrid>
         </Grid>
         <!--Reset Button-->

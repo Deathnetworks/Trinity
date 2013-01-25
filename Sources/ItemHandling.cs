@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using GilesTrinity.Cache;
 using GilesTrinity.ItemRules;
 using GilesTrinity.Settings.Loot;
 using GilesTrinity.Technicals;
@@ -17,7 +18,6 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-
         /// <summary>
         /// Pickup Validation - Determines what should or should not be picked up (Item Rules)
         /// </summary>
@@ -32,11 +32,10 @@ namespace GilesTrinity
         /// <param name="followerType"></param>
         /// <param name="dynamicID"></param>
         /// <returns></returns>
-        internal static bool ItemRulesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
+        internal static bool ItemRulesPickupValidation(PickupItem item)
         {
+            Interpreter.InterpreterAction action = StashRule.checkPickUpItem(item);
 
-            Interpreter.InterpreterAction action = StashRule.checkPickUpItem(name, level, quality, dbItemBaseType, dbItemType, isOneHand, isTwoHand, balanceId, dynamicID);
-            
             switch (action)
             {
                 case Interpreter.InterpreterAction.PICKUP:
@@ -47,10 +46,10 @@ namespace GilesTrinity
             }
 
             // TODO: remove if tested
-            if (quality > ItemQuality.Superior)
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Item Rules doesn't handle {0} of type {1} and quality {2}!", name, dbItemType, quality);
-            
-            return GilesPickupItemValidation(name, level, quality, balanceId, dbItemBaseType, dbItemType, isOneHand, isTwoHand, followerType, dynamicID);
+            if (item.Quality > ItemQuality.Superior)
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Item Rules doesn't handle {0} of type {1} and quality {2}!", item.Name, item.DBItemType, item.Quality);
+
+            return GilesPickupItemValidation(item);
         }
         /// <summary>
         /// Pickup Validation - Determines what should or should not be picked up (Scoring)
@@ -63,43 +62,45 @@ namespace GilesTrinity
         /// <param name="followerType"></param>
         /// <param name="dynamicID"></param>
         /// <returns></returns>
-        internal static bool GilesPickupItemValidation(string name, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
+        internal static bool GilesPickupItemValidation(PickupItem item)
         {
 
             // If it's legendary, we always want it *IF* it's level is right
-            if (quality >= ItemQuality.Legendary)
+            if (item.Quality >= ItemQuality.Legendary)
             {
-                return (Settings.Loot.Pickup.LegendaryLevel > 0 && (level >= Settings.Loot.Pickup.LegendaryLevel || Settings.Loot.Pickup.LegendaryLevel == 1));
+                return (Settings.Loot.Pickup.LegendaryLevel > 0 && (item.Level >= Settings.Loot.Pickup.LegendaryLevel || Settings.Loot.Pickup.LegendaryLevel == 1));
             }
 
             // Calculate giles item types and base types etc.
-            GItemType itemType = DetermineItemType(name, dbItemType, followerType);
+            GItemType itemType = DetermineItemType(item.InternalName, item.DBItemType, item.ItemFollowerType);
             GItemBaseType baseType = DetermineBaseType(itemType);
+
+            string itemSha1Hash = HashGenerator.GenerateItemHash(item.Position, item.ActorSNO, item.Name, CurrentWorldDynamicId, item.Quality, item.Level);
 
             switch (baseType)
             {
                 case GItemBaseType.WeaponTwoHand:
                 case GItemBaseType.WeaponOneHand:
                 case GItemBaseType.WeaponRange:
-                    return CheckLevelRequirements(level, quality, Settings.Loot.Pickup.WeaponBlueLevel, Settings.Loot.Pickup.WeaponYellowLevel);
+                    return CheckLevelRequirements(item.Level, item.Quality, Settings.Loot.Pickup.WeaponBlueLevel, Settings.Loot.Pickup.WeaponYellowLevel);
                 case GItemBaseType.Armor:
                 case GItemBaseType.Offhand:
-                    return CheckLevelRequirements(level, quality, Settings.Loot.Pickup.ArmorBlueLevel, Settings.Loot.Pickup.ArmorYellowLevel);
+                    return CheckLevelRequirements(item.Level, item.Quality, Settings.Loot.Pickup.ArmorBlueLevel, Settings.Loot.Pickup.ArmorYellowLevel);
                 case GItemBaseType.Jewelry:
-                    return CheckLevelRequirements(level, quality, Settings.Loot.Pickup.JewelryBlueLevel, Settings.Loot.Pickup.JewelryYellowLevel);
+                    return CheckLevelRequirements(item.Level, item.Quality, Settings.Loot.Pickup.JewelryBlueLevel, Settings.Loot.Pickup.JewelryYellowLevel);
                 case GItemBaseType.FollowerItem:
-                    if (level < 60 || !Settings.Loot.Pickup.FollowerItem || quality < ItemQuality.Rare4)
+                    if (item.Level < 60 || !Settings.Loot.Pickup.FollowerItem || item.Quality < ItemQuality.Rare4)
                     {
-                        if (!_hashsetItemFollowersIgnored.Contains(dynamicID))
+                        if (!_hashsetItemFollowersIgnored.Contains(itemSha1Hash))
                         {
-                            _hashsetItemFollowersIgnored.Add(dynamicID);
+                            _hashsetItemFollowersIgnored.Add(itemSha1Hash);
                             totalFollowerItemsIgnored++;
                         }
                         return false;
                     }
                     break;
                 case GItemBaseType.Gem:
-                    if (level < Settings.Loot.Pickup.GemLevel ||
+                    if (item.Level < Settings.Loot.Pickup.GemLevel ||
                         (itemType == GItemType.Ruby && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Ruby)) ||
                         (itemType == GItemType.Emerald && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Emerald)) ||
                         (itemType == GItemType.Amethyst && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Amethyst)) ||
@@ -111,11 +112,11 @@ namespace GilesTrinity
                 case GItemBaseType.Misc:
 
                     // Note; Infernal keys are misc, so should be picked up here - we aren't filtering them out, so should default to true at the end of this function
-                    if (itemType == GItemType.CraftingMaterial && level < Settings.Loot.Pickup.MiscItemLevel)
+                    if (itemType == GItemType.CraftingMaterial && item.Level < Settings.Loot.Pickup.MiscItemLevel)
                     {
                         return false;
                     }
-                    if (itemType == GItemType.CraftTome && (level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.CraftTomes))
+                    if (itemType == GItemType.CraftTome && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.CraftTomes))
                     {
                         return false;
                     }
@@ -127,7 +128,7 @@ namespace GilesTrinity
                     // Potion filtering
                     if (itemType == GItemType.HealthPotion)
                     {
-                        if (Settings.Loot.Pickup.PotionMode == PotionMode.Ignore || level < Settings.Loot.Pickup.PotionLevel)
+                        if (Settings.Loot.Pickup.PotionMode == PotionMode.Ignore || item.Level < Settings.Loot.Pickup.PotionLevel)
                         {
                             return false;
                         }
@@ -138,7 +139,7 @@ namespace GilesTrinity
                             int iTotalPotions =
                                 (from tempitem in ZetaDia.Me.Inventory.Backpack
                                  where tempitem.BaseAddress != IntPtr.Zero &&
-                                 tempitem.GameBalanceId == balanceId
+                                 tempitem.GameBalanceId == item.BalanceID
                                  select tempitem.ItemStackQuantity).Sum();
                             if (iTotalPotions > 98)
                             {
@@ -182,7 +183,7 @@ namespace GilesTrinity
             {
                 if (requiredBlueLevel == 0 || (requiredBlueLevel != 0 && level < requiredBlueLevel))
                 {
-                    // Between magic and rare, and either we want no blues, or this level is higher than the blue level we want
+                    // Between magic and rare, and either we want no blues, or this level is lower than the blue level we want
                     return false;
                 }
             }
@@ -190,7 +191,7 @@ namespace GilesTrinity
             {
                 if (requiredYellowLevel == 0 || (requiredYellowLevel != 0 && level < requiredYellowLevel))
                 {
-                    // Between magic and rare, and either we want no blues, or this level is higher than the blue level we want
+                    // Either we want no rares or the item is below the level we want
                     return false;
                 }
             }
@@ -223,7 +224,7 @@ namespace GilesTrinity
             if (name.StartsWith("xbow_")) return GItemType.TwoHandCrossbow;
             if (name.StartsWith("twohandedmace_")) return GItemType.TwoHandMace;
             if (name.StartsWith("mightyweapon_2h_")) return GItemType.TwoHandMighty;
-            if (name.StartsWith("polearm_")) return GItemType.TwoHandPolearm;
+            if (name.StartsWith("polearm_") || dbItemType == ItemType.Polearm) return GItemType.TwoHandPolearm;
             if (name.StartsWith("staff_")) return GItemType.TwoHandStaff;
             if (name.StartsWith("twohandedsword_")) return GItemType.TwoHandSword;
             if (name.StartsWith("staffofcow")) return GItemType.StaffOfHerding;
@@ -502,72 +503,72 @@ namespace GilesTrinity
         /// <summary>
         /// Determine if we should stash this item or not based on item type and score, and/or loot rule scripting
         /// </summary>
-        /// <param name="thisitem"></param>
+        /// <param name="cItem"></param>
         /// <returns></returns>
-        internal static bool ShouldWeStashThis(GilesCachedACDItem thisitem)
+        internal static bool ShouldWeStashThis(GilesCachedACDItem cItem, ACDItem acdItem = null)
         {
             // Now look for Misc items we might want to keep
-            GItemType TrueItemType = DetermineItemType(thisitem.InternalName, thisitem.DBItemType, thisitem.FollowerType);
+            GItemType TrueItemType = DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
             GItemBaseType thisGilesBaseType = DetermineBaseType(TrueItemType);
 
             if (TrueItemType == GItemType.StaffOfHerding)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.CraftingMaterial)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, TrueItemType);
                 return true;
             }
 
             if (TrueItemType == GItemType.Emerald)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.Amethyst)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.Topaz)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.Ruby)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.CraftTome)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.InfernalKey)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, TrueItemType);
                 return true;
             }
             if (TrueItemType == GItemType.HealthPotion)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, TrueItemType);
                 return false;
             }
 
             // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
-            if (thisitem.IsUnidentified)
+            if (cItem.IsUnidentified)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] = (autokeep unidentified items)", thisitem.RealName, thisitem.InternalName);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] = (autokeep unidentified items)", cItem.RealName, cItem.InternalName);
                 return true;
             }
 
             if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
-                Interpreter.InterpreterAction action = StashRule.checkItem(thisitem.item);
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", thisitem.item.Name, thisitem.item.InternalName, thisitem.item.ItemType);
+                Interpreter.InterpreterAction action = StashRule.checkItem(acdItem);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
                 switch (action)
                 {
                     case Interpreter.InterpreterAction.KEEP:
@@ -580,29 +581,29 @@ namespace GilesTrinity
             }
 
             // auto trash blue weapons/armor/jewlery
-            if (IsWeaponArmorJewlery(thisitem) && thisitem.Quality < ItemQuality.Rare4)
+            if (IsWeaponArmorJewlery(cItem) && cItem.Quality < ItemQuality.Rare4)
             {
                 return false;
             }
 
 
-            if (thisitem.Quality >= ItemQuality.Legendary)
+            if (cItem.Quality >= ItemQuality.Legendary)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, TrueItemType);
                 return true;
             }
 
             if (TrueItemType == GItemType.CraftingPlan)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", thisitem.RealName, thisitem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, TrueItemType);
                 return true;
             }
 
             // Ok now try to do some decent item scoring based on item types
             double iNeedScore = ScoreNeeded(TrueItemType);
-            double iMyScore = ValueThisItem(thisitem, TrueItemType);
+            double iMyScore = ValueThisItem(cItem, TrueItemType);
 
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", thisitem.RealName, thisitem.InternalName, TrueItemType, iMyScore);
+            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, TrueItemType, iMyScore);
             if (iMyScore >= iNeedScore) return true;
 
             // If we reached this point, then we found no reason to keep the item!
@@ -676,36 +677,12 @@ namespace GilesTrinity
         /// </summary>
         internal static void OutputReport()
         {
-            TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
-
-            // Create whole new file
-            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("Stats - {0}.log", playerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read);
-            using (StreamWriter LogWriter = new StreamWriter(LogStream))
-            {
-                LogWriter.WriteLine("===== Misc Statistics =====");
-                LogWriter.WriteLine("Total tracking time: " + TotalRunningTime.Hours.ToString() + "h " + TotalRunningTime.Minutes.ToString() +
-                    "m " + TotalRunningTime.Seconds.ToString() + "s");
-                LogWriter.WriteLine("Total deaths: " + iTotalDeaths.ToString() + " [" + Math.Round(iTotalDeaths / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                LogWriter.WriteLine("Total games (approx): " + TotalLeaveGames.ToString() + " [" + Math.Round(TotalLeaveGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                if (TotalLeaveGames == 0 && iTotalJoinGames > 0)
-                {
-                    if (iTotalJoinGames == 1 && TotalProfileRecycles > 1)
-                    {
-                        LogWriter.WriteLine("(a profile manager/death handler is interfering with join/leave game events, attempting to guess total runs based on profile-loops)");
-                        LogWriter.WriteLine("Total full profile cycles: " + TotalProfileRecycles.ToString() + " [" + Math.Round(TotalProfileRecycles / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                    }
-                    else
-                    {
-                        LogWriter.WriteLine("(your games left value may be bugged @ 0 due to profile managers/routines etc., now showing games joined instead:)");
-                        LogWriter.WriteLine("Total games joined: " + iTotalJoinGames.ToString() + " [" + Math.Round(iTotalJoinGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                    }
-                }
                 /*
                   Check is Lv 60 or not
                  * If lv 60 use Paragon
                  * If not lv 60 use normal xp/hr
                  */
-                if (ZetaDia.Actors.Me.Level < 60)
+            if (ZetaDia.Actors.Me.Level < 60)
                 {
                     if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
                     {
@@ -737,7 +714,49 @@ namespace GilesTrinity
                     iLastXp = ZetaDia.Actors.Me.ParagonCurrentExperience;
                     iNextLvXp = ZetaDia.Actors.Me.ParagonExperienceNextLevel;
                 }
+
+
+            PersistentOutputReport();
+            TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
+
+            // Create whole new file
+            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("RunStats - {0}.log", PlayerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read);
+            using (StreamWriter LogWriter = new StreamWriter(LogStream))
+            {
+                LogWriter.WriteLine("===== Misc Statistics =====");
+                LogWriter.WriteLine("Total tracking time: " + ((int)TotalRunningTime.TotalHours).ToString() + "h " + TotalRunningTime.Minutes.ToString() +
+                    "m " + TotalRunningTime.Seconds.ToString() + "s");
+                LogWriter.WriteLine("Total deaths: " + iTotalDeaths.ToString() + " [" + Math.Round(iTotalDeaths / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
+                LogWriter.WriteLine("Total games (approx): " + TotalLeaveGames.ToString() + " [" + Math.Round(TotalLeaveGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
+                if (TotalLeaveGames == 0 && iTotalJoinGames > 0)
+                {
+                    if (iTotalJoinGames == 1 && TotalProfileRecycles > 1)
+                    {
+                        LogWriter.WriteLine("(a profile manager/death handler is interfering with join/leave game events, attempting to guess total runs based on profile-loops)");
+                        LogWriter.WriteLine("Total full profile cycles: " + TotalProfileRecycles.ToString() + " [" + Math.Round(TotalProfileRecycles / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
+                    }
+                    else
+                    {
+                        LogWriter.WriteLine("(your games left value may be bugged @ 0 due to profile managers/routines etc., now showing games joined instead:)");
+                        LogWriter.WriteLine("Total games joined: " + iTotalJoinGames.ToString() + " [" + Math.Round(iTotalJoinGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
+                    }
+                }
+
                 LogWriter.WriteLine("Total XP gained: " + Math.Round(iTotalXp / (float)1000000, 2).ToString() + " million [" + Math.Round(iTotalXp / TotalRunningTime.TotalHours / 1000000, 2).ToString() + " million per hour]");
+				if (iLastGold == 0)
+                {
+                    iLastGold = ZetaDia.Me.Inventory.Coinage;
+                }
+                if (ZetaDia.Me.Inventory.Coinage - iLastGold >= 500000)
+                {
+                    iLastGold = ZetaDia.Me.Inventory.Coinage;
+                }
+                else
+                {
+                    iTotalGold += ZetaDia.Me.Inventory.Coinage - iLastGold;
+                    iLastGold = ZetaDia.Me.Inventory.Coinage;
+                }
+                LogWriter.WriteLine("Total Gold gained: " + Math.Round(iTotalGold / (float)1000, 2).ToString() + " Thousand [" + Math.Round(iTotalGold / TotalRunningTime.TotalHours / 1000, 2).ToString() + " Thousand per hour]");
                 LogWriter.WriteLine("");
                 LogWriter.WriteLine("===== Item DROP Statistics =====");
 
@@ -903,6 +922,26 @@ namespace GilesTrinity
             LogStream.Close();
         }
 
+        internal static bool TownVisitShouldTownRun()
+        {
+            double cellsFilled = 0;
+            foreach (ACDItem i in ZetaDia.Me.Inventory.Backpack)
+            {
+                cellsFilled++;
+                if (i.IsTwoSquareItem)
+                    cellsFilled++;
+            }
+
+            double maxCells = 60;
+            double ratioCellsFilled = cellsFilled / maxCells;
+
+            // return true if we're already in town and backpack is 1/2 full
+            if (ratioCellsFilled > .5 && ZetaDia.Me.IsInTown)
+                return true;
+
+            return false;
+        }
+
         /// <summary>
         /// Search backpack to see if we have room for a 2-slot item anywhere
         /// </summary>
@@ -917,13 +956,7 @@ namespace GilesTrinity
             {
                 BackpackSlotBlocked[square.Column, square.Row] = true;
             }
-            if (playerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.SweepingWindWeaponSwap)
-            {
-                BackpackSlotBlocked[9, 4] = true;
-                BackpackSlotBlocked[9, 5] = true;
-            }
 
-            int cellsFilled = 0;
             // Map out all the items already in the backpack
             foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
@@ -936,22 +969,17 @@ namespace GilesTrinity
 
                 // Mark this slot as not-free
                 BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
-                cellsFilled++;
 
                 // Try and reliably find out if this is a two slot item or not
                 GItemType tempItemType = DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType);
                 if (DetermineIsTwoSlot(tempItemType) && inventoryRow < 5)
                 {
-                    cellsFilled++;
                     BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                 }
             }
+
             int iPointX = -1;
             int iPointY = -1;
-
-            // return "true" if we're already in town and backpack is 1/2 full
-            if ((cellsFilled / 60) > .5 && ZetaDia.Me.IsInTown)
-                return new Vector2(iPointX, iPointY);
 
             // 6 rows
             for (int iRow = 0; iRow <= 5; iRow++)
