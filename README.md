@@ -22,6 +22,59 @@
 
 * Add stayInTown attribute for TrinityTownRun Profile Tag 
 
+### Changelog 1.7.1.17:
+
+* Removed all WeaponSwap related code. See this for more info: http://www.thebuddyforum.com/demonbuddy-forum/plugins/trinity/102820-item-swap-future.html
+
+* TrinityExploreDungeon is now fully "release ready". Documentation to follow. Features include reduced backtracking, automatically moving to minimap markers, prioritized scenes, ignored scenes, and more!
+
+* Monk Tempest Rush has new usage options - Always, Movement Only, Elites and Groups, and all Combat. TR is now maintained after combat as needed as well.
+
+* PlayerMover will no longer use special movement within 10 seconds of being stuck
+
+* Disabled checking for Toggle Looting tags and missing Profile PickupLoot elements (your bot should now always loot regardless of bad profiles, like before Trinity .13)
+
+* Disabled check for Profile <Combat /> profile element (combat now default enabled, but still togglable through ToggleTargetting tag)
+
+* Included 4seti's fix for "1 slot left in bag and not townrunning" - hopefully it works?
+
+* Added dynamically increasing radius for Unstucker based off how many stuck attempts - should no longer run away 1/2 a mile and get lost...
+
+* Increased Barricade destructable range
+
+* Added fixed kite locations for Azmodan avoidance
+
+* Added a few memory safety checks in target handler and player mover - should help reduce crashes
+
+* Modified PlayerStatus to no longer cache Primary/Secondary resource, health, and position and is now read directly from DB (this is "fast" since DB .298 / BETA .140)
+
+* TrinityMoveTo will now use the PathFinder in Generated areas, and the Navigator in static areas (should be more reliable) - tested with many profiles including questing, alkaizer, etc.
+
+* Added logic to blacklist targets that are added/removed from object manager too many times (fixes weird stucks trying to pickup gold)
+
+* Improved layout of Advanced tab / logging options
+
+* Fixed backwards destructible weighting (now weights destructables correctly according to distance)
+
+* Changed default ItemRules2 rules to "soft"
+
+* Added new XmlTag: TrinityOffsetMove. Documentation to follow.
+
+* Fix for trash mob in/out of range flip/flop (while moving to attack).
+
+* Merged Persistent Stats from tomasd. Trinity will now record and save persistent statistics in a seperate file, including per-world stats.* 
+
+### KNOWN ISSUES 1.7.1.17:
+
+* Wizard's without a signature spell will not use the default attack, for example CM/WW builds (seems to be a limitation within Demonbuddy... still trying to find a fix)
+
+* Wizards will not cancel archon buff (Coming Soon™!)
+
+* Tempest Rush Movement will sometimes get stuck on corners and objects and requires the unstucker to kick in
+
+* Demonbuddy DungeonExplorer will (at maybe, 0.01% of the time) read and cache incorrect scenes, causing long stucks in generated dungeons. TrinityExploreDungeon has an built in 15 minute timer (adjustable!) as a workaround.
+
+
 ### Changelog 1.7.1.16:
 
 * Fixed TrinityMoveTo 
