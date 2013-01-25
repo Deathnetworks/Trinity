@@ -94,7 +94,7 @@ namespace GilesTrinity
             PlayerMover.vOldPosition = Vector3.Zero;
             PlayerMover.iTimesReachedStuckPoint = 0;
             PlayerMover.TimeLastRecordedPosition = DateTime.Today;
-            PlayerMover.timeStartedUnstuckMeasure = DateTime.Today;
+            PlayerMover.LastGeneratedStuckPosition = DateTime.Today;
             hashUseOnceID = new HashSet<int>();
             dictUseOnceID = new Dictionary<int, int>();
             dictRandomID = new Dictionary<int, int>();

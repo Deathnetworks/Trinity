@@ -199,9 +199,9 @@ namespace GilesTrinity.XmlTags
 
         public enum TimeoutType
         {
-            None,
             Timer,
-            GoldInactivity
+            GoldInactivity,
+            None,
         }
 
         /// <summary>
@@ -1070,6 +1070,9 @@ namespace GilesTrinity.XmlTags
 
             if (MarkerDistance == 0)
                 MarkerDistance = 25f;
+
+            if (TimeoutValue == 0)
+                TimeoutValue = 900;
 
             GilesTrinity.hashSkipAheadAreaCache.Clear();
             PriorityScenesInvestigated.Clear();

@@ -262,7 +262,7 @@ namespace GilesTrinity
                     !PlayerStatus.IsIncapacitated && hashAvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(PlayerStatus.CurrentPosition) <= 15f) >= 2 &&
                     (Settings.Combat.Wizard.CriticalMass || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {
-                    ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, vNullLocation, iCurrentWorldID, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, vNullLocation, CurrentWorldDynamicId, -1);
                 }
             }
             // Only looking for an anti-stuck location?

@@ -435,7 +435,7 @@ namespace GilesTrinity
         {
             bool isNewLogItem = false;
 
-            c_ItemSha1Hash = HashGenerator.GenerateItemHash(c_Position, c_ActorSNO, c_InternalName, iCurrentWorldID, c_ItemQuality, c_ItemLevel);
+            c_ItemSha1Hash = HashGenerator.GenerateItemHash(c_Position, c_ActorSNO, c_InternalName, CurrentWorldDynamicId, c_ItemQuality, c_ItemLevel);
 
             if (!GenericCache.ContainsKey(c_ItemSha1Hash))
             {

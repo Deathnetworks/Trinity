@@ -498,7 +498,7 @@ namespace GilesTrinity
 
                                                 vAttackPoint.Z += 1.5f;
                                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "(NB: Attacking location of destructable)");
-                                                ZetaDia.Me.UsePower(CurrentPower.SNOPower, vAttackPoint, iCurrentWorldID, -1);
+                                                ZetaDia.Me.UsePower(CurrentPower.SNOPower, vAttackPoint, CurrentWorldDynamicId, -1);
                                             }
                                             else
                                             {
@@ -648,7 +648,7 @@ namespace GilesTrinity
                                 //intell
                                 if (!IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource >= 10)
                                 {
-                                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, iCurrentWorldID, -1);
+                                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, CurrentWorldDynamicId, -1);
                                     // Store the current destination for comparison incase of changes next loop
                                     vLastMoveToTarget = vCurrentDestination;
                                     // Reset total body-block count, since we should have moved
@@ -662,7 +662,7 @@ namespace GilesTrinity
                                     Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly &&
                                     Monk_TempestRushReady())
                                 {
-                                    ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, iCurrentWorldID, -1);
+                                    ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, CurrentWorldDynamicId, -1);
                                     dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
                                     LastPowerUsed = SNOPower.Monk_TempestRush;
                                     // Store the current destination for comparison incase of changes next loop
@@ -675,7 +675,7 @@ namespace GilesTrinity
                                 // Strafe for a Demon Hunter
                                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && PlayerStatus.PrimaryResource >= 15)
                                 {
-                                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Strafe, vCurrentDestination, iCurrentWorldID, -1);
+                                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Strafe, vCurrentDestination, CurrentWorldDynamicId, -1);
                                     // Store the current destination for comparison incase of changes next loop
                                     vLastMoveToTarget = vCurrentDestination;
                                     // Reset total body-block count, since we should have moved
@@ -717,7 +717,7 @@ namespace GilesTrinity
                         }
                         if (bUseThisLoop)
                         {
-                            ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, iCurrentWorldID, -1);
+                            ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, CurrentWorldDynamicId, -1);
                             LastPowerUsed = SNOPower.Barbarian_Whirlwind;
                             dictAbilityLastUse[SNOPower.Barbarian_Whirlwind] = DateTime.Now;
                         }
@@ -1046,7 +1046,7 @@ namespace GilesTrinity
                     PowerManager.CanCast(SNOPower.Barbarian_Leap))
                 {
                     WaitWhileAnimating(3, true);
-                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vCurrentDestination, iCurrentWorldID, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vCurrentDestination, CurrentWorldDynamicId, -1);
                     dictAbilityLastUse[SNOPower.Barbarian_Leap] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
@@ -1056,7 +1056,7 @@ namespace GilesTrinity
                     PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge))
                 {
                     WaitWhileAnimating(3, true);
-                    ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vCurrentDestination, iCurrentWorldID, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vCurrentDestination, CurrentWorldDynamicId, -1);
                     dictAbilityLastUse[SNOPower.Barbarian_FuriousCharge] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
@@ -1071,7 +1071,7 @@ namespace GilesTrinity
                     )
                 {
                     WaitWhileAnimating(3, true);
-                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vCurrentDestination, iCurrentWorldID, -1);
+                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vCurrentDestination, CurrentWorldDynamicId, -1);
                     dictAbilityLastUse[SNOPower.DemonHunter_Vault] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
@@ -1082,7 +1082,7 @@ namespace GilesTrinity
                     PowerManager.CanCast(SNOPower.Wizard_Teleport))
                 {
                     WaitWhileAnimating(3, true);
-                    ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vCurrentDestination, iCurrentWorldID, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vCurrentDestination, CurrentWorldDynamicId, -1);
                     dictAbilityLastUse[SNOPower.Wizard_Teleport] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
@@ -1092,7 +1092,7 @@ namespace GilesTrinity
                     PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
                 {
                     WaitWhileAnimating(3, true);
-                    ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vCurrentDestination, iCurrentWorldID, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vCurrentDestination, CurrentWorldDynamicId, -1);
                     dictAbilityLastUse[SNOPower.Wizard_Archon_Teleport] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
@@ -1547,7 +1547,7 @@ namespace GilesTrinity
                 IgnoreTargetForLoops = 3;
                 // Store item pickup stats
 
-                string itemSha1Hash = HashGenerator.GenerateItemHash(CurrentTarget.Position, CurrentTarget.ActorSNO, CurrentTarget.InternalName, iCurrentWorldID, CurrentTarget.ItemQuality, CurrentTarget.ItemLevel);
+                string itemSha1Hash = HashGenerator.GenerateItemHash(CurrentTarget.Position, CurrentTarget.ActorSNO, CurrentTarget.InternalName, CurrentWorldDynamicId, CurrentTarget.ItemQuality, CurrentTarget.ItemLevel);
                 if (!_hashsetItemPicksLookedAt.Contains(itemSha1Hash))
                 {
                     _hashsetItemPicksLookedAt.Add(itemSha1Hash);

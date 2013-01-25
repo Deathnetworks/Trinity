@@ -168,7 +168,7 @@ namespace GilesTrinity
         /// <summary>
         /// A default power in case we can't use anything else
         /// </summary>
-        private static TrinityPower defaultPower = new TrinityPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+        private static TrinityPower defaultPower = new TrinityPower(SNOPower.None, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
 
         /// <summary>
         /// Returns an appropriately selected GilesPower and related information
@@ -256,7 +256,7 @@ namespace GilesTrinity
                 case ItemType.Spear:
                 case ItemType.Staff:
                 case ItemType.Sword:
-                     if (rhItem.IsTwoHand)
+                    if (rhItem.IsTwoHand)
                         return SNOPower.Weapon_Melee_Instant_BothHand;
                    return SNOPower.Weapon_Melee_Instant;
                 case ItemType.Wand:
@@ -275,6 +275,7 @@ namespace GilesTrinity
                 case SNOPower.Weapon_Ranged_Wand:
                     return 40f;
                 case SNOPower.Weapon_Melee_Instant:
+                case SNOPower.Weapon_Melee_Instant_BothHand:
                 default:
                     return 10f;
             }

@@ -75,7 +75,7 @@ namespace GilesTrinity
             GItemType itemType = DetermineItemType(item.InternalName, item.DBItemType, item.ItemFollowerType);
             GItemBaseType baseType = DetermineBaseType(itemType);
 
-            string itemSha1Hash = HashGenerator.GenerateItemHash(item.Position, item.ActorSNO, item.Name, iCurrentWorldID, item.Quality, item.Level);
+            string itemSha1Hash = HashGenerator.GenerateItemHash(item.Position, item.ActorSNO, item.Name, CurrentWorldDynamicId, item.Quality, item.Level);
 
             switch (baseType)
             {

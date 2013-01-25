@@ -92,7 +92,7 @@ namespace GilesTrinity
 
                         // World ID safety caching incase it's ever unavailable
                         if (ZetaDia.CurrentWorldDynamicId != -1)
-                            iCurrentWorldID = ZetaDia.CurrentWorldDynamicId;
+                            CurrentWorldDynamicId = ZetaDia.CurrentWorldDynamicId;
                         if (ZetaDia.CurrentWorldId != -1)
                             cachedStaticWorldId = ZetaDia.CurrentWorldId;
                         // Game difficulty, used really for vault on DH's
@@ -226,7 +226,7 @@ namespace GilesTrinity
             PlayerMover.vOldPosition = Vector3.Zero;
             PlayerMover.iTimesReachedStuckPoint = 0;
             PlayerMover.TimeLastRecordedPosition = DateTime.Today;
-            PlayerMover.timeStartedUnstuckMeasure = DateTime.Today;
+            PlayerMover.LastGeneratedStuckPosition = DateTime.Today;
             PlayerMover.iTimesReachedMaxUnstucks = 0;
             PlayerMover.iCancelUnstuckerForSeconds = 0;
             PlayerMover.timeCancelledUnstuckerFor = DateTime.Today;

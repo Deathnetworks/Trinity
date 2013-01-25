@@ -34,7 +34,7 @@ namespace GilesTrinity.DbProvider
 
         public void MoveStop()
         {
-            ZetaDia.Me.UsePower(SNOPower.Walk, ZetaDia.Me.Position, GilesTrinity.iCurrentWorldID, -1);
+            ZetaDia.Me.UsePower(SNOPower.Walk, ZetaDia.Me.Position, GilesTrinity.CurrentWorldDynamicId, -1);
         }
 
         // Anti-stuck variables
@@ -44,7 +44,7 @@ namespace GilesTrinity.DbProvider
         internal static Vector3 vSafeMovementLocation = Vector3.Zero;
         internal static DateTime TimeLastRecordedPosition = DateTime.Today;
         internal static Vector3 vOldPosition = Vector3.Zero;
-        internal static DateTime timeStartedUnstuckMeasure = DateTime.Today;
+        internal static DateTime LastGeneratedStuckPosition = DateTime.Today;
         internal static int iTimesReachedMaxUnstucks = 0;
         internal static DateTime timeCancelledUnstuckerFor = DateTime.Today;
         internal static DateTime timeLastReportedAnyStuck = DateTime.Today;
@@ -230,7 +230,7 @@ namespace GilesTrinity.DbProvider
             }
 
             // Update the last time we generated a path
-            timeStartedUnstuckMeasure = DateTime.Now;
+            LastGeneratedStuckPosition = DateTime.Now;
             // If we got stuck on a 2nd/3rd/4th "chained" anti-stuck route, then return the old move to target to keep movement of some kind going
             if (iTimesReachedStuckPoint > 0)
             {
@@ -291,7 +291,7 @@ namespace GilesTrinity.DbProvider
             vOldPosition = Vector3.Zero;
             iTimesReachedStuckPoint = 0;
             TimeLastRecordedPosition = DateTime.Today;
-            timeStartedUnstuckMeasure = DateTime.Today;
+            LastGeneratedStuckPosition = DateTime.Today;
             // int iSafetyLoops = 0;
             if (iTimesReachedMaxUnstucks == 1)
             {
@@ -376,7 +376,7 @@ namespace GilesTrinity.DbProvider
                 SpeedSensors.Remove(SpeedSensors.OrderBy(s => s.Timestamp).FirstOrDefault());
             }
             // Clean up the stack
-            if (SpeedSensors.Any(s => s.WorldID != GilesTrinity.iCurrentWorldID))
+            if (SpeedSensors.Any(s => s.WorldID != GilesTrinity.CurrentWorldDynamicId))
             {
                 SpeedSensors.Clear();
                 return 0d;
@@ -408,7 +408,7 @@ namespace GilesTrinity.DbProvider
                         Location = vMyCurrentPosition,
                         TimeSinceLastMove = new TimeSpan(0),
                         Distance = 0f,
-                        WorldID = GilesTrinity.iCurrentWorldID
+                        WorldID = GilesTrinity.CurrentWorldDynamicId
                     });
                 }
                 else
@@ -419,7 +419,7 @@ namespace GilesTrinity.DbProvider
                          Location = vMyCurrentPosition,
                          TimeSinceLastMove = new TimeSpan(DateTime.Now.Subtract(lastSensor.TimeSinceLastMove).Ticks),
                          Distance = Vector3.Distance(vMyCurrentPosition, lastSensor.Location),
-                         WorldID = GilesTrinity.iCurrentWorldID
+                         WorldID = GilesTrinity.CurrentWorldDynamicId
                      });
                 }
 
@@ -455,7 +455,7 @@ namespace GilesTrinity.DbProvider
                 }
                 // Store the "real" (not anti-stuck) destination
                 // See if we can reset the 10-limit unstuck counter, if >120 seconds since we last generated an unstuck location
-                if (iTotalAntiStuckAttempts > 1 && DateTime.Now.Subtract(timeStartedUnstuckMeasure).TotalSeconds >= 120)
+                if (iTotalAntiStuckAttempts > 1 && DateTime.Now.Subtract(LastGeneratedStuckPosition).TotalSeconds >= 120)
                 {
                     iTotalAntiStuckAttempts = 1;
                     iTimesReachedStuckPoint = 0;
@@ -549,8 +549,11 @@ namespace GilesTrinity.DbProvider
                 }
             }
 
+            // don't use special movement within 10 seconds of being stuck
+            bool cancelSpecialMovementAfterStuck = DateTime.Now.Subtract(LastGeneratedStuckPosition).TotalMilliseconds > 10000;
+
             // See if we can use abilities like leap etc. for movement out of combat, but not in town
-            if (GilesTrinity.Settings.Combat.Misc.AllowOOCMovement && !ZetaDia.Me.IsInTown && !GilesTrinity.bDontMoveMeIAmDoingShit)
+            if (GilesTrinity.Settings.Combat.Misc.AllowOOCMovement && !ZetaDia.Me.IsInTown && !GilesTrinity.bDontMoveMeIAmDoingShit && cancelSpecialMovementAfterStuck)
             {
                 bool bTooMuchZChange = (Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z) >= 4f);
 
@@ -563,7 +566,7 @@ namespace GilesTrinity.DbProvider
                     Vector3 vThisTarget = vMoveToTarget;
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
-                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vThisTarget, GilesTrinity.CurrentWorldDynamicId, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.Barbarian_Leap] = DateTime.Now;
                     if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Leap for OOC movement, distance={0}", DestinationDistance);
@@ -578,7 +581,7 @@ namespace GilesTrinity.DbProvider
                     Vector3 vThisTarget = vMoveToTarget;
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
-                    ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vThisTarget, GilesTrinity.CurrentWorldDynamicId, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.Barbarian_FuriousCharge] = DateTime.Now;
                     if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Furious Charge for OOC movement, distance={0}", DestinationDistance);
@@ -600,7 +603,7 @@ namespace GilesTrinity.DbProvider
                     Vector3 vThisTarget = vMoveToTarget;
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
-                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
+                    ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vThisTarget, GilesTrinity.CurrentWorldDynamicId, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault] = DateTime.Now;
                     if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Vault for OOC movement, distance={0}", DestinationDistance);
@@ -636,7 +639,7 @@ namespace GilesTrinity.DbProvider
                     {
                         if (GilesTrinity.GilesUseTimer(SNOPower.Monk_TempestRush))
                         {
-                            ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vTargetAimPoint, GilesTrinity.iCurrentWorldID, -1);
+                            ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vTargetAimPoint, GilesTrinity.CurrentWorldDynamicId, -1);
                             GilesTrinity.dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
                             GilesTrinity.LastPowerUsed = SNOPower.Monk_TempestRush;
 
@@ -647,7 +650,7 @@ namespace GilesTrinity.DbProvider
                                 Location = vMyCurrentPosition,
                                 TimeSinceLastMove = new TimeSpan(0, 0, 0, 0, 1000),
                                 Distance = 5f,
-                                WorldID = GilesTrinity.iCurrentWorldID
+                                WorldID = GilesTrinity.CurrentWorldDynamicId
                             });
 
                             if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
@@ -683,7 +686,7 @@ namespace GilesTrinity.DbProvider
                     Vector3 vThisTarget = vMoveToTarget;
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
-                    ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vThisTarget, GilesTrinity.CurrentWorldDynamicId, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Teleport] = DateTime.Now;
                     if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Teleport for OOC movement, distance={0}", DestinationDistance);
@@ -698,7 +701,7 @@ namespace GilesTrinity.DbProvider
                     Vector3 vThisTarget = vMoveToTarget;
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
-                    ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vThisTarget, GilesTrinity.iCurrentWorldID, -1);
+                    ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vThisTarget, GilesTrinity.CurrentWorldDynamicId, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Archon_Teleport] = DateTime.Now;
                     if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Archon Teleport for OOC movement, distance={0}", DestinationDistance);
@@ -709,7 +712,7 @@ namespace GilesTrinity.DbProvider
             if (vMyCurrentPosition.Distance2D(vMoveToTarget) > 1f)
             {
                 // Default movement
-                ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.iCurrentWorldID, -1);
+                ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, GilesTrinity.CurrentWorldDynamicId, -1);
 
                 if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Moved to:{0} dir: {1} Speed:{2:0.00} Dist:{3:0} ZDiff:{4:0} Nav:{5} LoS:{6}",

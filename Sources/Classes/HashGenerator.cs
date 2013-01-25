@@ -42,7 +42,7 @@ namespace GilesTrinity
         {
             using (SHA1 sha1 = SHA1.Create())
             {
-                string objHashBase = String.Format("{0}{1}{2}{3}", obj.ActorSNO, obj.Position, obj.Type, GilesTrinity.iCurrentWorldID);
+                string objHashBase = String.Format("{0}{1}{2}{3}", obj.ActorSNO, obj.Position, obj.Type, GilesTrinity.CurrentWorldDynamicId);
                 string objHash = GetSha1Hash(sha1, objHashBase);
                 return objHash;
             }

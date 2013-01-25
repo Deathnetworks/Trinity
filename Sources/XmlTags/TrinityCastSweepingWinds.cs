@@ -29,7 +29,7 @@ namespace GilesTrinity.XmlTags
                     {
                         if (GilesTrinity.GetHasBuff(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind))
                         {
-                            ZetaDia.Me.UsePower(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind, GilesTrinity.PlayerStatus.CurrentPosition, GilesTrinity.iCurrentWorldID, -1);
+                            ZetaDia.Me.UsePower(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind, GilesTrinity.PlayerStatus.CurrentPosition, GilesTrinity.CurrentWorldDynamicId, -1);
                             GilesTrinity.SweepWindSpam = DateTime.Now;
                             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Cast Sweeping Winds.");
                         }
