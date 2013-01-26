@@ -357,7 +357,7 @@ namespace GilesTrinity.DbProvider
         internal static double MovementSpeed { get; private set; }
 
         private static List<SpeedSensor> SpeedSensors = new List<SpeedSensor>();
-        private static int MaxSpeedSensors = 3;
+        private static int MaxSpeedSensors = 5;
 
         public static double GetMovementSpeed()
         {
@@ -398,7 +398,7 @@ namespace GilesTrinity.DbProvider
             vMyCurrentPosition = ZetaDia.Me.Position;
 
             // record speed once per second
-            if (DateTime.Now.Subtract(lastRecordedPosition).TotalMilliseconds >= 500)
+            if (DateTime.Now.Subtract(lastRecordedPosition).TotalMilliseconds >= 1000)
             {
                 // Record our current location and time
                 if (!SpeedSensors.Any())
@@ -725,7 +725,7 @@ namespace GilesTrinity.DbProvider
             else
             {
                 if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Reached MoveTowards Destination {0} Current Speed: {0}", vMoveToTarget, MovementSpeed);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Reached MoveTowards Destination {0} Current Speed: {1:0.0}", vMoveToTarget, MovementSpeed);
             }
 
 
@@ -888,81 +888,115 @@ namespace GilesTrinity.DbProvider
 
         internal static IndexedList<Vector3> GeneratePath(Vector3 start, Vector3 destination)
         {
-            Stack<Vector3> pathStack = new Stack<Vector3>();
-            GilesTrinity.UpdateSearchGridProvider();
-
-            PathFindResult pfr = GilesTrinity.pf.FindPath(
-                GilesTrinity.gp.WorldToGrid(start.ToVector2()),
-                GilesTrinity.gp.WorldToGrid(destination.ToVector2()),
-                true, 50, true
-                );
-
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Generated path with {0} points", pfr.PointsReversed.Count());
-
-            if (pfr.Error)
+            using (new PerformanceLogger("GeneratePath"))
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Error in generating path: {0}", pfr.ErrorMessage);
+                Stack<Vector3> pathStack = new Stack<Vector3>();
+                GilesTrinity.UpdateSearchGridProvider();
+
+                PathFindResult pfr = GilesTrinity.pf.FindPath(
+                    GilesTrinity.gp.WorldToGrid(start.ToVector2()),
+                    GilesTrinity.gp.WorldToGrid(destination.ToVector2()),
+                    true, 50, true
+                    );
+
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Navigator, "Generated path with {0} points", pfr.PointsReversed.Count());
+
+                if (pfr.Error)
+                {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Navigator, "Error in generating path: {0}", pfr.ErrorMessage);
+                    return new IndexedList<Vector3>(pathStack, false);
+                }
+
+                if (pfr.IsPartialPath)
+                {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Navigator, "Partial Path Generated!", true);
+                }
+
+                pathStack.Clear();
+
+                Vector3 lastPoint = Vector3.Zero;
+                foreach (Point p in pfr.PointsReversed)
+                {
+                    Vector3 v3 = GilesTrinity.gp.GridToWorld(p).ToVector3();
+
+                    float dist = lastPoint != Vector3.Zero ? v3.Distance2D(lastPoint) : 0;
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Pushing point {0} to stack, nodeDist: {1:0.0} ", v3, dist);
+
+                    pathStack.Push(v3);
+                    lastPoint = v3;
+                }
                 return new IndexedList<Vector3>(pathStack, false);
             }
-
-            if (pfr.IsPartialPath)
-            {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Partial Path Generated!", true);
-            }
-
-            pathStack.Clear();
-
-            foreach (Point p in pfr.PointsReversed)
-            {
-                Vector3 v3 = GilesTrinity.gp.GridToWorld(p).ToVector3();
-                pathStack.Push(v3);
-            }
-            return new IndexedList<Vector3>(pathStack, false);
         }
 
         private static IndexedList<Vector3> PathStack = new IndexedList<Vector3>();
 
         private static DateTime lastGeneratedPath = DateTime.MinValue;
+
+        private static GilesObject CurrentTarget { get { return GilesTrinity.CurrentTarget; } }
+
         internal static MoveResult NavigateTo(Vector3 moveTarget, string destinationName = "")
         {
-            bool newPath = false;
-
-            if (!PathStack.Any() || DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000)
+            using (new PerformanceLogger("NavigateTo"))
             {
-                PathStack = PlayerMover.GeneratePath(ZetaDia.Me.Position, moveTarget);
+                Vector3 MyPos = ZetaDia.Me.Position;
 
-                if (!PathStack.Any())
+                bool newPath = false;
+
+                PositionCache.AddPosition();
+
+                bool MoveTargetIsInLoS = ZetaDia.Physics.Raycast(MyPos, moveTarget, NavCellFlags.AllowWalk);
+
+                if (moveTarget.Distance2D(ZetaDia.Me.Position) <= 5f || MoveTargetIsInLoS)
                 {
+                    DbHelper.Log(LogCategory.Navigator, "Destination within 5f, using MoveTowards", true);
+                    Navigator.PlayerMover.MoveTowards(moveTarget);
+                    return MoveResult.Moved;
+                }
+
+                // generate a new path if needed
+                if (!PathStack.Any() || DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000 || PathStack.Current.Distance2D(MyPos) > 5f)
+                {
+                    PathStack = PlayerMover.GeneratePath(ZetaDia.Me.Position, moveTarget);
+
+                    if (!PathStack.Any())
+                    {
+                        DbHelper.Log(LogCategory.Navigator, "Path Generation Failed, using MoveTowards", true);
+                        Navigator.PlayerMover.MoveTowards(moveTarget);
+                        return MoveResult.PathGenerationFailed;
+                    }
+                    lastGeneratedPath = DateTime.Now;
+                    newPath = true;
+                }
+
+                if (PathStack.Any() && PathStack.Count <= 2 && moveTarget.Distance2D(PathStack[PathStack.Count - 1]) > 5f && newPath)
+                {
+                    DbHelper.Log(LogCategory.Navigator, "Path Stack Size is {0}, target distance is {1:0.0} - unable to fully nav, using MoveTowards", PathStack.Count, moveTarget.Distance2D(MyPos));
                     Navigator.PlayerMover.MoveTowards(moveTarget);
                     return MoveResult.PathGenerationFailed;
                 }
-                lastGeneratedPath = DateTime.Now;
-                newPath = true;
-            }
 
-            if (PathStack.Any() && PathStack.Count <= 2 && moveTarget.Distance2D(PathStack[PathStack.Count - 1]) > 5f && newPath)
-            {
-                Navigator.PlayerMover.MoveTowards(moveTarget);
-                return MoveResult.PathGenerationFailed;
-            }
-
-            if (PathStack.Any())
-            {
-
-                if (PathStack.Current.Distance2D(ZetaDia.Me.Position) <= 5f)
+                if (PathStack.Any())
                 {
-                    PathStack.Next();
-                    PathStack.RemoveAt(0);
+                    while (PathStack.Current.Distance2D(ZetaDia.Me.Position) <= 5f)
+                    {
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Dequeuing path node {0} distance {1:0.0}", PathStack.Current, PathStack.Current.Distance2D(MyPos));
+                        PathStack.Next();
+                        PathStack.RemoveAt(0);
+                    }
                 }
-            }
 
-            if (PathStack.Any())
-            {
-                Navigator.PlayerMover.MoveTowards(PathStack.Current);
-                return MoveResult.Moved;
-            }
+                if (PathStack.Any())
+                {
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Moving to current Path Node {0} distance {1:0.0}", PathStack.Current, PathStack.Current.Distance2D(MyPos));
+                    Navigator.PlayerMover.MoveTowards(PathStack.Current);
+                    return MoveResult.Moved;
+                }
 
-            return MoveResult.ReachedDestination;
+                DbHelper.Log(LogCategory.Navigator, "No Movement from Navigator!", true);
+
+                return MoveResult.ReachedDestination;
+            }
         }
 
         private static DateTime lastRecordedSkipAheadCache = DateTime.MinValue;

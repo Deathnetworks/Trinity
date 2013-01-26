@@ -328,9 +328,9 @@ namespace GilesTrinity
                                 //    cacheObject.Weight = 8000d - (Math.Floor(cacheObject.CentreDistance) * 1900d);
 
                                 if (cacheObject.GoldAmount > 0)
-                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 5000d;
+                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 15000d;
                                 else
-                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 8000d;
+                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 15000d;
 
 
                                 // Point-blank items get a weight increase 

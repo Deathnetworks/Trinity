@@ -99,7 +99,7 @@ namespace GilesTrinity
             {
                 try
                 {
-                    if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || !ZetaDia.CPlayer.IsValid || ZetaDia.IsLoadingWorld)
+                    if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || !ZetaDia.CPlayer.IsValid || ZetaDia.IsLoadingWorld || ZetaDia.Me.IsDead)
                     {
                         DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
                         return RunStatus.Failure;
@@ -128,15 +128,6 @@ namespace GilesTrinity
                             IsWaitingAfterPower = false;
                         return RunStatus.Running;
                     }
-
-                    // Check for death / player being dead
-                    if (PlayerStatus.CurrentHealthPct <= 0)
-                    {
-                        runStatus = HandlerRunStatus.TreeSuccess;
-                    }
-                    //check if we are returning to the tree
-                    if (runStatus != HandlerRunStatus.NotFinished)
-                        return GetTreeSharpRunStatus(runStatus);
 
                     // See if we have been "newly rooted", to force target updates
                     if (PlayerStatus.IsRooted && !wasRootedLastTick)
@@ -195,7 +186,7 @@ namespace GilesTrinity
                     if (CurrentTarget == null)
                     {
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2");
-                        runStatus = HandlerRunStatus.TreeSuccess;
+                        runStatus = HandlerRunStatus.TreeFailure;
                     }
 
                     Monk_MaintainTempestRush();
@@ -256,6 +247,8 @@ namespace GilesTrinity
 
                     using (new PerformanceLogger("HandleTarget.SpecialNavigation"))
                     {
+                        PositionCache.AddPosition();
+
                         // Maintain an area list of all zones we pass through/near while moving, for our custom navigation handler
                         if (DateTime.Now.Subtract(lastAddedLocationCache).TotalMilliseconds >= 100)
                         {
@@ -1252,7 +1245,7 @@ namespace GilesTrinity
             statusText.Append("Weight=");
             statusText.Append(CurrentTarget.Weight.ToString("0"));
 
-            statusText.Append(String.Format(" Duration={0:0}", DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds));
+            statusText.Append(String.Format(" Duration={0:0.000}", DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds));
 
             if (!targetIsInRange)
                 statusText.Append(" MOVING INTO RANGE");
@@ -1283,6 +1276,7 @@ namespace GilesTrinity
                     //Navigator.PlayerMover.MoveTowards(vCurrentDestination);
                     //ZetaDia.Me.Movement.MoveActor(vCurrentDestination);
                     //Navigator.MoveTo(vCurrentDestination, CurrentTarget.InternalName, true);
+
                     PlayerMover.NavigateTo(vCurrentDestination, CurrentTarget.InternalName);
                     lastSentMovePower = DateTime.Now;
 

@@ -140,7 +140,7 @@ namespace GilesTrinity.XmlTags
 
             public PrioritizeScene()
             {
-                PathPrecision = 10f;
+                PathPrecision = 15f;
                 SceneName = String.Empty;
                 SceneId = -1;
             }
@@ -169,7 +169,7 @@ namespace GilesTrinity.XmlTags
             public AlternateActor()
             {
                 ActorId = -1;
-                ObjectDistance = 10f;
+                ObjectDistance = 60f;
             }
         }
 

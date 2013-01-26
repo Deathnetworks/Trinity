@@ -23,6 +23,7 @@ namespace GilesTrinity.Technicals
         Weight = 256,           
         ProfileTag = 512,          
         Movement = 1024,          
-        GlobalHandler = 2048    
+        GlobalHandler = 2048,
+        Navigator = 4096,
     }
 }

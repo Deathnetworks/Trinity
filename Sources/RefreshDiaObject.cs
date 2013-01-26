@@ -812,37 +812,39 @@ namespace GilesTrinity
                     iLastCheckedHealth = 1;
                 }
                 // Update health once every 5 cycles, except for current target, which is every cycle (rrrix: done through TargetHandler for some WTF reason)
-                if (iLastCheckedHealth == 1 || dictActorSNOPriority.Any(p => p.Key == c_ActorSNO && p.Value > 500))
-                {
-                    try
-                    {
-                        HitpointsCur = c_CommonData.GetAttribute<float>(ActorAttributeType.HitpointsCur);
-                    }
-                    catch
-                    {
-                        // This happens so frequently in DB/D3 that this fails, let's not even bother logging it anymore
-                        //Logging.WriteDiagnostic("[Trinity] Safely handled exception getting current health for unit " + tmp_sThisInternalName + " [" + tmp_iThisActorSNO.ToString() + "]");
-                        // Add this monster to our very short-term ignore list
-                        //if (!c_unit_IsBoss)
-                        //{
-                        //    hashRGUIDBlacklist3.Add(c_RActorGuid);
-                        //    dateSinceBlacklist3Clear = DateTime.Now;
-                        //    NeedToClearBlacklist3 = true;
-                        //}
-                        AddToCache = false;
-                    }
-                    RefreshCachedHealth(iLastCheckedHealth, HitpointsCur, bHasCachedHealth);
-                }
-                else
-                {
-                    HitpointsCur = dictGilesLastHealthCache[c_RActorGuid];
-                    dictGilesLastHealthChecked[c_RActorGuid] = iLastCheckedHealth;
-                }
+                //if (iLastCheckedHealth == 1 || dictActorSNOPriority.Any(p => p.Key == c_ActorSNO && p.Value > 500))
+                //{
+                //    try
+                //    {
+                //        HitpointsCur = c_CommonData.GetAttribute<float>(ActorAttributeType.HitpointsCur);
+                //    }
+                //    catch
+                //    {
+                //        // This happens so frequently in DB/D3 that this fails, let's not even bother logging it anymore
+                //        //Logging.WriteDiagnostic("[Trinity] Safely handled exception getting current health for unit " + tmp_sThisInternalName + " [" + tmp_iThisActorSNO.ToString() + "]");
+                //        // Add this monster to our very short-term ignore list
+                //        //if (!c_unit_IsBoss)
+                //        //{
+                //        //    hashRGUIDBlacklist3.Add(c_RActorGuid);
+                //        //    dateSinceBlacklist3Clear = DateTime.Now;
+                //        //    NeedToClearBlacklist3 = true;
+                //        //}
+                //        AddToCache = false;
+                //    }
+                //    RefreshCachedHealth(iLastCheckedHealth, HitpointsCur, bHasCachedHealth);
+                //}
+                //else
+                //{
+                //    HitpointsCur = dictGilesLastHealthCache[c_RActorGuid];
+                //    dictGilesLastHealthChecked[c_RActorGuid] = iLastCheckedHealth;
+                //}
+                HitpointsCur = thisUnit.HitpointsCurrent;
+
                 // And finally put the two together for a current health percentage
                 c_HitPoints = HitpointsCur / dThisMaxHealth;
 
                 // Unit is already dead
-                if (c_HitPoints <= 0d && !c_unit_IsBoss)
+                if (HitpointsCur <= 0d && !c_unit_IsBoss)
                 {
                     // Add this monster to our very short-term ignore list
                     //hashRGUIDBlacklist3.Add(c_RActorGuid);
