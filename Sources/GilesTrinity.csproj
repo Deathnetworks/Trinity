@@ -94,6 +94,7 @@
     <Compile Include="ItemRules\Core\Scanner.cs" />
     <Compile Include="ItemRules\Core\TextHighlighter.cs" />
     <Compile Include="PersistentStats.cs" />
+    <Compile Include="Settings\Loot\ItemRuleType.cs" />
     <Compile Include="Technicals\Loader.cs" />
     <Compile Include="TownRun.cs" />
     <Compile Include="TrinityPowerManager.cs" />

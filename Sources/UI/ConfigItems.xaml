@@ -36,11 +36,20 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{Binding Path=Loot.ItemFilterMode}"  >
-                <ComboBoxItem Content="Trinity Scoring Only" Tag="TrinityOnly" IsSelected="True" ToolTip="Uses Trinity Scoring Only (see Trinity Town-Runs Tab)" />
-                <ComboBoxItem Content="File Based Script Rules" Tag="TrinityWithItemRules" ToolTip="Utilizes Item Rulesets (see ItemRules directory)" />
-                <ComboBoxItem Content="Demonbuddy Loot Rules" Tag="DemonBuddy" ToolTip="Use the Built-in Demonbuddy loot rule logic (see Demonbuddy Settings tab)" />
-            </ComboBox>
+            <WrapPanel HorizontalAlignment="Center">
+                <ComboBox Width="180" SelectedValuePath="Tag" SelectedValue="{Binding Path=Loot.ItemFilterMode}"  Margin="0,0,25,0" >
+                    <ComboBoxItem Content="Trinity Scoring Only" Tag="TrinityOnly" IsSelected="True" ToolTip="Uses Trinity Scoring Only (see Trinity Town-Runs Tab)" />
+                    <ComboBoxItem Content="File Based Script Rules" Tag="TrinityWithItemRules" ToolTip="Utilizes Item Rulesets (see ItemRules directory)" />
+                    <ComboBoxItem Content="Demonbuddy Loot Rules" Tag="DemonBuddy" ToolTip="Use the Built-in Demonbuddy loot rule logic (see Demonbuddy Settings tab)" />
+                </ComboBox>
+                <ComboBox Width="100" SelectedValuePath="Tag" SelectedValue="{Binding Path=Loot.ItemRuleType}" 
+                          Visibility="{Binding Path=Loot.ItemFilterMode, Converter={StaticResource enumVisibilityConverter}, ConverterParameter=TrinityWithItemRules}"  >
+                    <ComboBoxItem Content="config.dis" Tag="Config" ToolTip="Use [RULE] from config.dis" />
+                    <ComboBoxItem Content="Soft" Tag="Soft" IsSelected="True" ToolTip="Use ItemRules\\Soft\\" />
+                    <ComboBoxItem Content="Hard" Tag="Hard" ToolTip="Use ItemRules\\Hard\\" />
+                    <ComboBoxItem Content="Custom* RTFM!" Tag="Custom" ToolTip="Use ItemRules\\Custom\\" Foreground="Red" />
+                </ComboBox>
+            </WrapPanel>
             <TextBlock Grid.Row="1" 
                        Text="WARNING : This mode can sell or salvage your legendary items" 
                        HorizontalAlignment="Center" 

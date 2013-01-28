@@ -1,26 +1,19 @@
 ﻿# Unified Trinity Community Edition
 
-## Major new features: 
 
-* Source control :)
 
-* Split Monolithic single file into seperate files by Class
 
-* Split GilesTrinity class into separate files by Feature
+### Changelog 1.7.1.18:
 
-* Repair Cache System for Gizmo's
+* Improved new Navigator/Pathfinder - Should fix backtracking and stuttering issues
 
-* Create a settings class hierarchy which replaces all private fields in Plugin class.
+* Adjusted speed sensor to better detect when we need to destroy destructables (only when we're stuck!)
 
-* Rebuild entire UI system to utilize XAML/WPF
+* Increased gold weight significantly to help reduce backtracking after combat.
 
-* Improved code Readability
+* Increased default ObjectDistance (60f) in TrinitExploreDungeon for AlternateActors and increased default PathPrecision (15f) for PrioritizedScenes.
 
-## Future Planned Improvements: 
-
-* New cache system, trash the HashSet's and Dictionaries for an object based system
-
-* Add stayInTown attribute for TrinityTownRun Profile Tag 
+* ItemRules now has an optional account-specific ItemRules set (soft/hard/custom) setting through the GUI (still possible to use config.dis as well)
 
 ### Changelog 1.7.1.17:
 

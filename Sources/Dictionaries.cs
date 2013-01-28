@@ -29,8 +29,6 @@ namespace GilesTrinity
             5212,            3865,         123124,      123842,        123839,       161822,        161833,
             // Sha-Ball      Mol Ball      Mage Fire    Diablo Prison  Diablo Meteor Ice-trail
             4103,            160154,       432,         168031,        214845,       260377,
-            // wall of fire
-            199997, 199998,
             // Zolt Bubble	 Zolt Twister  Ghom Gas 	Maghda Proj
             185924,			 139741,	   93837,		166686,
             // Diablo Ring of Fire

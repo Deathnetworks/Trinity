@@ -976,14 +976,11 @@ namespace GilesTrinity.DbProvider
                     return MoveResult.PathGenerationFailed;
                 }
 
-                if (PathStack.Any())
+                while (PathStack.Any() && PathStack.Current.Distance2D(ZetaDia.Me.Position) <= 5f)
                 {
-                    while (PathStack.Current.Distance2D(ZetaDia.Me.Position) <= 5f)
-                    {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Dequeuing path node {0} distance {1:0.0}", PathStack.Current, PathStack.Current.Distance2D(MyPos));
-                        PathStack.Next();
-                        PathStack.RemoveAt(0);
-                    }
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Dequeuing path node {0} distance {1:0.0}", PathStack.Current, PathStack.Current.Distance2D(MyPos));
+                    PathStack.Next();
+                    PathStack.RemoveAt(0);
                 }
 
                 if (PathStack.Any())

@@ -8,6 +8,7 @@ namespace GilesTrinity.Settings.Loot
     {
         #region Fields
         private ItemFilterMode _ItemFilterMode;
+        private ItemRuleType _ItemRuleType;
         private PickupSetting _Pickup;
         private TownRunSetting _TownRun;
         #endregion Fields
@@ -43,6 +44,23 @@ namespace GilesTrinity.Settings.Loot
                 {
                     _ItemFilterMode = value;
                     OnPropertyChanged("ItemFilterMode");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(ItemRuleType.Soft)]
+        public ItemRuleType ItemRuleType
+        {
+            get
+            {
+                return _ItemRuleType;
+            }
+            set
+            {
+                if (_ItemRuleType != value)
+                {
+                    _ItemRuleType = value;
+                    OnPropertyChanged("ItemRuleType");
                 }
             }
         }
@@ -105,6 +123,16 @@ namespace GilesTrinity.Settings.Loot
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+        /// <summary>
+        /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserializing()]
+        internal void OnDeserializingMethod(StreamingContext context)
+        {
+            this.ItemRuleType = ItemRuleType.Config;
+        }
+
         #endregion Methods
     }
 }

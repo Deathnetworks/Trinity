@@ -156,7 +156,13 @@ namespace GilesTrinity.ItemRules
                             debugFlag = Boolean.Parse(match2.Groups[2].Value);
                             break;
                         case "RULE":
-                            ruleType = match2.Groups[2].Value.ToLower();
+                            {
+                                if (GilesTrinity.Settings.Loot.ItemRuleType == Settings.Loot.ItemRuleType.Config)
+
+                                    ruleType = match2.Groups[2].Value.ToLower();
+                                else
+                                    ruleType = GilesTrinity.Settings.Loot.ItemRuleType.ToString().ToLower();
+                            }
                             break;
                         case "PICKLOG":
                             logPickQuality = getQualityValueFromQuality(match2.Groups[2].Value);
