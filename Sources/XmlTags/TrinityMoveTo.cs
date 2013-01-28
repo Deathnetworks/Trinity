@@ -69,30 +69,24 @@ namespace GilesTrinity.XmlTags
             }
 
             // Now use Trinity movement to try a direct movement towards that location
-            if (!ZetaDia.WorldInfo.IsGenerated)
-            {
-                // Use DefaultNavigationProvider for static worlds
-                Vector3 NavTarget = Position;
-                Vector3 MyPos = GilesTrinity.PlayerStatus.CurrentPosition;
-                if (Vector3.Distance(MyPos, NavTarget) > 250)
-                {
-                    NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
-                }
 
-                if (useNavigator != null && useNavigator.ToLower() == "false")
-                {
-                    Navigator.PlayerMover.MoveTowards(NavTarget);
-                }
-                else
-                {
-                    Navigator.MoveTo(NavTarget);
-                }
+            // Use DefaultNavigationProvider for static worlds
+            Vector3 NavTarget = Position;
+            Vector3 MyPos = GilesTrinity.PlayerStatus.CurrentPosition;
+            if (!ZetaDia.WorldInfo.IsGenerated && Vector3.Distance(MyPos, NavTarget) > 250)
+            {
+                NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
+            }
+
+            if (useNavigator != null && useNavigator.ToLower() == "false")
+            {
+                Navigator.PlayerMover.MoveTowards(NavTarget);
             }
             else
             {
-                // Use PathFinder for generated worlds
-                PlayerMover.NavigateTo(Position);
+                Navigator.MoveTo(NavTarget);
             }
+
             return RunStatus.Success;
         }
 

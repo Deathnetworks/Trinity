@@ -282,7 +282,7 @@ namespace GilesTrinity
                                             {
                                                 iTotalNumberGoblins++;
                                                 lastGoblinTime = DateTime.Now;
-                                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Weight, "[Trinity] Goblin #{0} in sight. Distance={1}", iTotalNumberGoblins, cacheObject.CentreDistance);
+                                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "[Trinity] Goblin #{0} in sight. Distance={1}", iTotalNumberGoblins, cacheObject.CentreDistance);
                                             }
                                             else
                                             {
@@ -299,7 +299,7 @@ namespace GilesTrinity
                                                     break;
                                                 case GoblinPriority.Prioritize:
                                                     // Super-high priority option below... 
-                                                    cacheObject.Weight += 10101;
+                                                    cacheObject.Weight += 15000;
                                                     break;
                                                 case GoblinPriority.Kamikaze:
                                                     // KAMIKAZE SUICIDAL TREASURE GOBLIN RAPE AHOY!

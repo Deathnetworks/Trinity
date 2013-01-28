@@ -168,7 +168,7 @@ namespace GilesTrinity
                 }
 
                 // check for navigation obstacles (never TP near demonic forges, etc)
-                if (GilesTrinity.hashNavigationObstacleCache.Any(o => Vector3.Distance(o.Location, GilesTrinity.PlayerStatus.CurrentPosition) < 40f))
+                if (GilesTrinity.hashNavigationObstacleCache.Any(o => Vector3.Distance(o.Location, GilesTrinity.PlayerStatus.CurrentPosition) < 60f))
                 {
                     GilesTrinity.IsReadyToTownRun = false;
                 }
@@ -1026,20 +1026,20 @@ namespace GilesTrinity
             }
 
             // See if we can close the inventory window
-            //if (Zeta.Internals.UIElements.InventoryWindow.IsVisible)
-            //{
-            //    try
-            //    {
-            //        var el = Zeta.Internals.UIElement.FromHash(0x368FF8C552241695);
-            //        if (el != null && el.IsValid && el.IsVisible && el.IsEnabled)
-            //            el.Click();
-            //    }
-            //    catch
-            //    {
+            if (Zeta.Internals.UIElements.InventoryWindow.IsVisible)
+            {
+                try
+                {
+                    var el = Zeta.Internals.UIElement.FromHash(0x368FF8C552241695);
+                    if (el != null && el.IsValid && el.IsVisible && el.IsEnabled)
+                        el.Click();
+                }
+                catch
+                {
 
-            //        // Do nothing if it fails, just catching to prevent any big errors/plugin crashes from this
-            //    }
-            //}
+                    // Do nothing if it fails, just catching to prevent any big errors/plugin crashes from this
+                }
+            }
 
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Sell routine finished.");
             return RunStatus.Success;

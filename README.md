@@ -1,6 +1,4 @@
-﻿# Unified Trinity Community Edition
-
-
+﻿## Unified Trinity Community Edition
 
 
 ### Changelog 1.7.1.18:

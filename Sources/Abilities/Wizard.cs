@@ -142,7 +142,6 @@ namespace GilesTrinity
                 {
                     return new TrinityPower(SNOPower.Wizard_MagicWeapon, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
                 }
-                // Familiar
                 // Magic Weapon
                 if (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_MagicWeapon) &&
                     PlayerStatus.PrimaryResource >= 25 && (GilesUseTimer(SNOPower.Wizard_MagicWeapon) || !GetHasBuff(SNOPower.Wizard_MagicWeapon)))
