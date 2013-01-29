@@ -945,11 +945,16 @@ namespace GilesTrinity.DbProvider
 
                 PositionCache.AddPosition();
 
-                bool MoveTargetIsInLoS = ZetaDia.Physics.Raycast(MyPos, moveTarget, NavCellFlags.AllowWalk);
+                float distanceToTarget = moveTarget.Distance2D(ZetaDia.Me.Position);
 
-                if (moveTarget.Distance2D(ZetaDia.Me.Position) <= 5f || MoveTargetIsInLoS)
+                bool MoveTargetIsInLoS = distanceToTarget <= 90f && ZetaDia.Physics.Raycast(MyPos, moveTarget, NavCellFlags.AllowWalk);
+
+                if (distanceToTarget <= 5f || MoveTargetIsInLoS)
                 {
-                    DbHelper.Log(LogCategory.Navigator, "Destination within 5f, using MoveTowards", true);
+                    if (distanceToTarget <= 5f)
+                        DbHelper.Log(LogCategory.Navigator, "Destination within 5f, using MoveTowards", true);
+                    else
+                        DbHelper.Log(LogCategory.Navigator, "Destination within LoS, using MoveTowards", true);
                     Navigator.PlayerMover.MoveTowards(moveTarget);
                     return MoveResult.Moved;
                 }
@@ -969,7 +974,7 @@ namespace GilesTrinity.DbProvider
                     newPath = true;
                 }
 
-                if (PathStack.Any() && PathStack.Count <= 2 && moveTarget.Distance2D(PathStack[PathStack.Count - 1]) > 5f && newPath)
+                if (PathStack.Any() && PathStack.Count <= 4 && moveTarget.Distance2D(PathStack[PathStack.Count - 1]) > 5f && newPath)
                 {
                     DbHelper.Log(LogCategory.Navigator, "Path Stack Size is {0}, target distance is {1:0.0} - unable to fully nav, using MoveTowards", PathStack.Count, moveTarget.Distance2D(MyPos));
                     Navigator.PlayerMover.MoveTowards(moveTarget);

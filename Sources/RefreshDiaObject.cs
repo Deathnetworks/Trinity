@@ -603,7 +603,7 @@ namespace GilesTrinity
                         else
                         {
                             AddToCache = false;
-                            c_IgnoreSubStep = "bGilesForcedVendoring";
+                            c_IgnoreSubStep = "ForceVendorRunASAP";
                         }
                         break;
 

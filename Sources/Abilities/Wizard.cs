@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GilesTrinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
+using Zeta.Internals;
 using Zeta.Internals.Actors;
 namespace GilesTrinity
 {
@@ -31,8 +33,24 @@ namespace GilesTrinity
             //return new TrinityPower(SNOPower.None, 10f, pos, iCurrentWorldDynamicID, -1, 0, 0, USE_SLOWLY);
 
 
+            // wiz defbuff testing
+            //if (GetHasBuff(SNOPower.Wizard_Archon))
+            //{
+            //    return new TrinityPower(SNOPower.Wizard_Archon_Cancel, -1, vNullLocation, -1, -1, -1, -1, false);
+            //}
 
-
+            // this didn't work either
+            //if (GetHasBuff(SNOPower.Wizard_Archon))
+            //{
+            //[22:15:36.605 N] Mouseover: 0xB2E3B026BC0A6571 Name:Root.NormalLayer.buffs_backgroundScreen.buff Wizard_Archon:2:2019033236:0 dlg.icon
+            //    UIElement archonIcon = UIElement.FromHash(0xB2E3B026BC0A6571);
+            //    if (archonIcon.IsValid && archonIcon.IsVisible)
+            //    {
+            //        DbHelper.LogNormal("Clicking archon icon", true);
+            //        archonIcon.Click();
+            //        return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, -1, -1, false);
+            //    }
+            //}
 
             // Pick the best destructible power available
             if (UseDestructiblePower)
@@ -241,7 +259,7 @@ namespace GilesTrinity
 
 
                 // Energy Twister SPAMS whenever 35 or more ap to generate Arcane Power
-                if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_EnergyTwister) && 
+                if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_EnergyTwister) &&
                     (PlayerStatus.PrimaryResource >= 35 || !bHasSignatureSpell) &&
                     // If using storm chaser, then force a signature spell every 1 stack of the buff, if we have a signature spell
                     (!bHasSignatureSpell || GetBuffStacks(SNOPower.Wizard_EnergyTwister) < 1) &&
@@ -374,6 +392,9 @@ namespace GilesTrinity
         {
             if (Hotbar.Contains(SNOPower.Wizard_EnergyTwister) && PlayerStatus.PrimaryResource >= 35)
                 return new TrinityPower(SNOPower.Wizard_EnergyTwister, 9f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+
+            if (Hotbar.Contains(SNOPower.Wizard_ArcaneOrb))
+                return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 40f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
 
             if (Hotbar.Contains(SNOPower.Wizard_MagicMissile))
                 return new TrinityPower(SNOPower.Wizard_MagicMissile, 15f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);

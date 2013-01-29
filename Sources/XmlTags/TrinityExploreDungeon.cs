@@ -180,6 +180,12 @@ namespace GilesTrinity.XmlTags
         public int SceneId { get; set; }
 
         /// <summary>
+        /// The Scene Name, used with ExploreUntil="SceneFound", a sub-string match will work
+        /// </summary>
+        [XmlAttribute("sceneName")]
+        public string SceneName { get; set; }
+
+        /// <summary>
         /// The distance the bot will mark dungeon nodes as "visited" (default is 1/2 of box size, minimum 10)
         /// </summary>
         [XmlAttribute("pathPrecision")]
@@ -437,12 +443,12 @@ namespace GilesTrinity.XmlTags
                 CheckIsObjectiveFinished(),
                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0 && timesForcedReset > timesForceResetMax,
                     new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, 
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
                             "Visited all nodes but objective not complete, forced reset more than {0} times, finished!", timesForceResetMax)),
                         new Action(ret => isDone = true)
                     )
                 ),
-                new Decorator(ret => GetRouteUnvisitedNodeCount() == 0, 
+                new Decorator(ret => GetRouteUnvisitedNodeCount() == 0,
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Visited all nodes but objective not complete, forcing grid reset!")),
                         new Action(ret => timesForcedReset++),
@@ -506,6 +512,12 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found SceneId {0}!", SceneId)),
                         new Action(ret => isDone = true)
                     )
+                ),
+                new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && ZetaDia.Me.CurrentScene.Name.ToLower().Contains(SceneName.ToLower()),
+                    new Sequence(
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found SceneName {0}!", SceneName)),
+                        new Action(ret => isDone = true)
+                    )
                 )
             );
         }
@@ -534,6 +546,7 @@ namespace GilesTrinity.XmlTags
         private Vector3 PrioritySceneTarget = Vector3.Zero;
         private int PrioritySceneSNOId = -1;
         private Scene CurrentPriorityScene = null;
+        private float PriorityScenePathPrecision = -1f;
         /// <summary>
         /// A list of Scene SNOId's that have already been investigated
         /// </summary>
@@ -557,7 +570,7 @@ namespace GilesTrinity.XmlTags
                     ),
                     new Decorator(ret => PrioritySceneTarget != Vector3.Zero,
                         new PrioritySelector(
-                            new Decorator(ret => PrioritySceneTarget.Distance2D(myPos) <= PathPrecision,
+                            new Decorator(ret => PrioritySceneTarget.Distance2D(myPos) <= PriorityScenePathPrecision,
                                 new Sequence(
                                     new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Successfully navigated to priority scene {0} {1} center {2} Distance {3:0}",
                                         CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos))),
@@ -666,6 +679,7 @@ namespace GilesTrinity.XmlTags
                 PrioritySceneSNOId = nearestPriorityScene.Key;
                 PrioritySceneTarget = nearestPriorityScene.Value;
                 CurrentPriorityScene = foundPriorityScenes.FirstOrDefault(s => s.SceneInfo.SNOId == PrioritySceneSNOId);
+                PriorityScenePathPrecision = GetPriorityScenePathPrecision(PScenes.FirstOrDefault(s => s.SceneInfo.SNOId == nearestPriorityScene.Key));
 
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene {0} - {1} Center {2} Distance {3:0}",
                     CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
@@ -675,6 +689,11 @@ namespace GilesTrinity.XmlTags
             {
                 PrioritySceneTarget = Vector3.Zero;
             }
+        }
+
+        private float GetPriorityScenePathPrecision(Scene scene)
+        {
+            return PriorityScenes.FirstOrDefault(ps => ps.SceneId != 0 && ps.SceneId == scene.SceneInfo.SNOId || scene.Name.ToLower().Contains(ps.SceneName.ToLower())).PathPrecision;
         }
 
         /// <summary>
@@ -779,8 +798,8 @@ namespace GilesTrinity.XmlTags
                 ),
                 new Decorator(ret => CurrentNavTarget.Distance2D(myPos) <= PathPrecision,
                     new Sequence(
-                        new Action(ret => SetNodeVisited(String.Format("Node {0} is within PathPrecision ({1:0}/{2:0})", BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter,
-                            BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter.Distance(ZetaDia.Me.Position), PathPrecision))),
+                        new Action(ret => SetNodeVisited(String.Format("Node {0} is within PathPrecision ({1:0}/{2:0})",
+                            CurrentNavTarget, CurrentNavTarget.Distance2D(myPos), PathPrecision))),
                         new Action(ret => UpdateRoute())
                     )
                 ),
@@ -998,7 +1017,7 @@ namespace GilesTrinity.XmlTags
                 }
             }
 
-            if (!PathStack.Any() || DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000 || 
+            if (!PathStack.Any() || DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000 ||
                 (DateTime.Now.Subtract(GilesTrinity.lastHadUnitInSights).TotalMilliseconds < 250 || DateTime.Now.Subtract(GilesTrinity.lastHadEliteUnitInSights).TotalMilliseconds < 250))
             {
                 // Generate nodes for the PathStack

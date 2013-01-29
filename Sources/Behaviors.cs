@@ -69,22 +69,32 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="rs"></param>
         /// <returns></returns>
-        private static Zeta.TreeSharp.RunStatus GetTreeSharpRunStatus(HandlerRunStatus rs)
+        private static RunStatus GetTreeSharpRunStatus(HandlerRunStatus rs)
         {
             Monk_MaintainTempestRush();
+
+            RunStatus treeRunStatus;
 
             switch (rs)
             {
                 case HandlerRunStatus.TreeFailure:
-                    return RunStatus.Failure;
+                    treeRunStatus = RunStatus.Failure; break;
                 case HandlerRunStatus.TreeRunning:
-                    return RunStatus.Running;
+                    treeRunStatus = RunStatus.Running; break;
                 case HandlerRunStatus.TreeSuccess:
-                    return RunStatus.Success;
+                    treeRunStatus = RunStatus.Success; break;
                 case HandlerRunStatus.NotFinished:
                 default:
                     throw new ApplicationException("Unable to return Non-TreeSharp RunStatus");
             }
+            if (treeRunStatus != null)
+            {
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Handle Target returning {0} to tree", treeRunStatus);
+                return treeRunStatus;
+            }
+            else
+                throw new ApplicationException("Unable to return Non-TreeSharp RunStatus");
+
 
         }
 
@@ -183,13 +193,24 @@ namespace GilesTrinity
                         }
                     }
 
+                    Monk_MaintainTempestRush();
+
+                    if (CurrentTarget == null && (ForceVendorRunASAP || IsReadyToTownRun) && !Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && TownRun.TownRunTimerRunning())
+                    {
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget is null but we are ready to to Town Run, waiting... ");
+                        runStatus = HandlerRunStatus.TreeRunning;
+                    }
+
+                    //check if we are returning to the tree
+                    if (runStatus != HandlerRunStatus.NotFinished)
+                        return GetTreeSharpRunStatus(runStatus);
+
                     if (CurrentTarget == null)
                     {
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2");
                         runStatus = HandlerRunStatus.TreeFailure;
                     }
 
-                    Monk_MaintainTempestRush();
 
                     //check if we are returning to the tree
                     if (runStatus != HandlerRunStatus.NotFinished)

@@ -1,4 +1,68 @@
-﻿## Unified Trinity Community Edition
+﻿#Unified Trinity Community Edition
+
+### Changelog 1.7.1.19:
+
+* Reverted TrinityMoveTo to always use the DB Navigator (but still always with "local" navigation)
+
+
+TODO:
+
+Add Shielded to cache
+Add GilesObject.IsShielded
+Add Weight = 100 for IsShielded
+
+move unstucker into decorator func and assign target to global handler for movement
+if we have target, determine unstucker by last spell, target assingment time, and movement speed
+
+move gold inactivity timer into decorator func
+
+Forum requests:
+Change TownRun order from stash/sell/salvage to salvage/sell/stash - DONE! +2
+
+Monk: Make tempest rush really work well - "like a human", +10 
+
+Combat: Add options to ignore trash mobs +2 
+Stats Logs: Add world names to per-world statistics +2
+Stats Logs: average game length and games per hour calculated from this +1
+Behaviors: Avoid town portals while standing near Demonic Forges +3
+Behaviors: Find and open all resplendent chests +10
+Behaviors: Improve unstucker, make it also work while we have a target +10
+Behaviors: Improve GoldInactivity, allow it to run even while no movement command is being executed +10
+WitchDoctor: Optional spam dogs and gargantuan +5
+
+Wizards: Get Wizards to keep using default attacks when using CM/WW builds
+Wizards: Add option to disable arcane strike in Archon form
+Wizards: Add comprehensive options to cancel archon form (timeout, buffs, no-combat)
+Wizards: Increase buff priority for Familiar
+Wizards: Add options for when to enter archon form (min elites, min trash mob count/distance)
+
+
+
+===Wizard===
+Kite When:
+-Always
+-Archon form only
+-Normal form only
+
+Archon ReBuff ComboBox:
+-Never
+-After timer expires
+-To Rebuff Armor
+-To Rebuff MagicWeapon OR Familiar
+
+Archon ReBuff sliders:
+Timer (seconds) 90-300 tick value 5
+minimum trash mob count slider 1-20
+minimum trash mob range slider 5-50 tick value 5
+
+
+Archon: Disable Arcane Strike
+Familiar: buff first
+
+
+
+
+
 
 
 ### Changelog 1.7.1.18:

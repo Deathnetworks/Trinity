@@ -133,11 +133,15 @@ namespace GilesTrinity
                     Decorator VendorRunDecorator = hook.Value[0] as Decorator;
                     PrioritySelector VendorRunPrioritySelector = VendorRunDecorator.Children[0] as PrioritySelector;
 
+                    //VendorRunPrioritySelector.Children[3] = TownRun.Decorators.GetPreStashDecorator();
+                    //VendorRunPrioritySelector.Children[4] = TownRun.Decorators.GetStashDecorator();
+                    //VendorRunPrioritySelector.Children[5] = TownRun.Decorators.GetSellDecorator();
+                    //VendorRunPrioritySelector.Children[6] = TownRun.Decorators.GetSalvageDecorator();
+
                     VendorRunPrioritySelector.Children[3] = TownRun.Decorators.GetPreStashDecorator();
-                    VendorRunPrioritySelector.Children[4] = TownRun.Decorators.GetStashDecorator();
+                    VendorRunPrioritySelector.Children[4] = TownRun.Decorators.GetSalvageDecorator();
                     VendorRunPrioritySelector.Children[5] = TownRun.Decorators.GetSellDecorator();
-                    VendorRunPrioritySelector.Children[6] = TownRun.Decorators.GetSalvageDecorator();
-                    //VendorRunPrioritySelector.Children[7] = TownRun.Decorators.GetPostTownRunDecorator();
+                    VendorRunPrioritySelector.Children[6] = TownRun.Decorators.GetStashDecorator();
 
                     hook.Value[0] = new Decorator(ret => TownRun.TownRunCanRun(ret), VendorRunPrioritySelector);
 

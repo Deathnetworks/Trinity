@@ -162,6 +162,7 @@
     <Compile Include="GilesTrinity.cs" />
     <Compile Include="RefreshDiaObjects.cs" />
     <Compile Include="XmlTags\BaseComplexNodeTag.cs" />
+    <Compile Include="XmlTags\TrinityMoveToScene.cs" />
     <Compile Include="XmlTags\TrinityCastSweepingWinds.cs" />
     <Compile Include="XmlTags\TrinityExploreDungeon.cs">
       <SubType>Code</SubType>

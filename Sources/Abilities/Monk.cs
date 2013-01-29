@@ -394,12 +394,12 @@ namespace GilesTrinity
         }
         private static void Monk_TempestRushStatus(string trUse)
         {
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0}, anim={1} trOnCD={2} animEndTime={3}, animState={4}",
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0}, anim={1} trOnCD={2} animEndTime={3}, lastUse={4:0}",
                 trUse,
                 ZetaDia.Me.CommonData.CurrentAnimation,
                 PowerManager.CanCast(SNOPower.Monk_TempestRush),
                 ZetaDia.Me.LoopingAnimationEndTime,
-                ZetaDia.Me.CommonData.AnimationInfo.State);
+                DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_TempestRush]).TotalMilliseconds);
         }
 
 

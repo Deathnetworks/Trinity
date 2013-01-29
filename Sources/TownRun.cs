@@ -184,13 +184,23 @@ namespace GilesTrinity
                 }
 
 
-                if ((GilesTrinity.IsReadyToTownRun && TownRunCheckTimer.IsRunning && TownRunCheckTimer.ElapsedMilliseconds > 2000) || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                if ((GilesTrinity.IsReadyToTownRun && TownRunTimerFinished()) || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                     return true;
                 else if (GilesTrinity.IsReadyToTownRun && !TownRunCheckTimer.IsRunning)
                     TownRunCheckTimer.Start();
 
                 return false;
             }
+        }
+
+        internal static bool TownRunTimerFinished()
+        {
+            return TownRunCheckTimer.IsRunning && TownRunCheckTimer.ElapsedMilliseconds > 2000;
+        }
+
+        internal static bool TownRunTimerRunning()
+        {
+            return TownRunCheckTimer.IsRunning && TownRunCheckTimer.ElapsedMilliseconds < 2000;
         }
 
         /// <summary>
@@ -371,6 +381,19 @@ namespace GilesTrinity
         internal static Stopwatch TownRunCheckTimer = new Stopwatch();
 
         /// <summary>
+        /// Determines if we should stash this item or not
+        /// </summary>
+        /// <param name="cItem"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        internal static bool StashValidation(GilesCachedACDItem cItem, ACDItem item)
+        {
+            bool shouldStashItem = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesTrinity.ShouldWeStashThis(cItem, item) : ItemManager.ShouldStashItem(item);
+            return shouldStashItem;
+        }
+
+
+        /// <summary>
         /// Stash Overlord values all items and checks if we have anything to stash
         /// </summary>
         /// <param name="ret"></param>
@@ -385,7 +408,7 @@ namespace GilesTrinity
             TownRunCheckTimer.Reset();
 
             // Force update actors, maybe this will fix item name bug
-            ZetaDia.Actors.Update();
+            //ZetaDia.Actors.Update();
 
             foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
@@ -712,29 +735,34 @@ namespace GilesTrinity
                         };
 
 
-                        bool bShouldSellThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy
+                        bool shouldSellItem = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy
                             ? GilesSellValidation(cItem)
                             : ItemManager.ShouldSellItem(item);
 
                         // if it has gems, always salvage
                         if (item.NumSocketsFilled > 0)
                         {
-                            bShouldSellThis = false;
+                            shouldSellItem = false;
+                        }
+
+                        if (StashValidation(cItem, item))
+                        {
+                            shouldSellItem = false;
                         }
 
                         // Don't sell stuff that we want to salvage, if using custom loot-rules
                         if (GilesTrinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy && ItemManager.ShouldSalvageItem(item))
                         {
-                            bShouldSellThis = false;
+                            shouldSellItem = false;
                         }
 
                         // Sell potions that aren't best quality
                         if (item.IsPotion && item.GameBalanceId != bestPotion.GameBalanceId)
                         {
-                            bShouldSellThis = true;
+                            shouldSellItem = true;
                         }
 
-                        if (bShouldSellThis)
+                        if (shouldSellItem)
                         {
                             hashGilesCachedSellItems.Add(cItem);
                             bShouldVisitVendor = true;
@@ -971,6 +999,7 @@ namespace GilesTrinity
             /*
              * Per Nesox, 2013 jan 02, clicking repair tab doesn't activate (same issue as stash tabs)
              */
+            #region repairTabDoesntWork
             //UIElement repairTab = UIElement.FromHash(0x95EFA3BFC7BD25BC);
             //UIElement repairAllButton = UIElement.FromHash(0x80F5D06A035848A5);
 
@@ -1003,7 +1032,7 @@ namespace GilesTrinity
             //    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Clicking Repair All button. Text: {0}", repairButtonText.Text);
             //    repairAllButton.Click();
             //}
-
+            #endregion
 
             bNeedsEquipmentRepairs = false;
             if (loggedJunkThisStash)
@@ -1088,10 +1117,14 @@ namespace GilesTrinity
 
 
 
-                        bool bShouldSalvageThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesSalvageValidation(cItem) : ItemManager.ShouldSalvageItem(item);
+                        bool shouldSalvageItem = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesSalvageValidation(cItem) : ItemManager.ShouldSalvageItem(item);
 
+                        if (StashValidation(cItem, item))
+                        {
+                            shouldSalvageItem = false;
+                        }
 
-                        if (bShouldSalvageThis)
+                        if (shouldSalvageItem)
                         {
                             hashGilesCachedSalvageItems.Add(cItem);
                             bShouldVisitSmith = true;
@@ -1166,8 +1199,8 @@ namespace GilesTrinity
                     else if (lastDistance == iDistanceFromSalvage)
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSalvageLocation, ZetaDia.Me.WorldDynamicId);
+                        return RunStatus.Running;
                     }
-                    return RunStatus.Running;
                 }
                 lastDistance = iDistanceFromSalvage;
                 if (iDistanceFromSalvage > 120f)
@@ -1209,8 +1242,8 @@ namespace GilesTrinity
                     else if (lastDistance == iDistanceFromSalvage)
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSalvageLocation, ZetaDia.Me.WorldDynamicId);
+                        return RunStatus.Running;
                     }
-                    return RunStatus.Running;
                 }
                 lastDistance = iDistanceFromSalvage;
                 if (iDistanceFromSalvage > 120f)
@@ -1256,8 +1289,8 @@ namespace GilesTrinity
                     else if (lastDistance == iDistanceFromSalvage)
                     {
                         ZetaDia.Me.UsePower(SNOPower.Walk, vectorSalvageLocation, ZetaDia.Me.WorldDynamicId);
+                        return RunStatus.Running;
                     }
-                    return RunStatus.Running;
                 }
                 lastDistance = iDistanceFromSalvage;
                 if (iDistanceFromSalvage > 120f)

@@ -71,6 +71,7 @@ namespace GilesTrinity
                     bool bFoundSafeSpotsFirstLoop = false;
                     float fAdditionalRange = 0f;
                     //K: Direction is more important than distance
+
                     for (int iMultiplier = 1; iMultiplier <= 2; iMultiplier++)
                     {
                         if (iMultiplier == 2)
@@ -141,6 +142,8 @@ namespace GilesTrinity
                             if (bCanRayCast)
                             {
                                 bool bAnyAvoidance = false;
+
+                                // Starting weight is 1000f
                                 float fThisWeight = 1000f;
                                 if (iMultiplier == 2)
                                     fThisWeight -= 80f;
@@ -168,6 +171,12 @@ namespace GilesTrinity
                                 bool bExtraSafetyWeight = hashSkipAheadAreaCache.Any(cp => cp.Location.Distance(vThisZigZag) <= cp.Radius);
                                 if (bExtraSafetyWeight)
                                     fThisWeight += 100f;
+
+
+                                float distanceToPoint = vThisZigZag.Distance2D(PlayerStatus.CurrentPosition);
+                                float distanceToTarget = vTargetLocation.Distance2D(PlayerStatus.CurrentPosition);
+
+                                fThisWeight += (distanceToTarget * 10f);
 
                                 // Use this one if it's more weight, or we haven't even found one yet, or if same weight as another with a random chance
                                 if (fThisWeight > fHighestWeight)

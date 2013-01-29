@@ -259,7 +259,7 @@ namespace GilesTrinity
                 }
                 CurrentTarget = null;
 
-                if (GilesTrinity.IsReadyToTownRun && TownRun.TownRunCheckTimer.IsRunning && TownRun.TownRunCheckTimer.ElapsedMilliseconds < 2000)
+                if ((GilesTrinity.ForceVendorRunASAP || GilesTrinity.IsReadyToTownRun) && TownRun.TownRunTimerRunning())
                 {
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for town run timer", true);
                     return true;

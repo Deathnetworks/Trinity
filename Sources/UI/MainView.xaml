@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:GilesTrinity.UIComponents"
              mc:Ignorable="d" 
-             MinHeight="470" MinWidth="432">
+             MinHeight="470" MinWidth="432"
+             Foreground="{DynamicResource TextBrush}">
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
