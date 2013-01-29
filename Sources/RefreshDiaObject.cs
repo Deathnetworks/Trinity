@@ -13,6 +13,7 @@ using Zeta.Internals.SNO;
 using System.Text;
 using GilesTrinity.Cache;
 using GilesTrinity.Settings.Combat;
+using Zeta.Navigation;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -793,51 +794,8 @@ namespace GilesTrinity
                 }
                 // Now try to get the current health - using temporary and intelligent caching
                 // Health calculations
-                int iLastCheckedHealth;
                 double HitpointsCur = 0d;
-                bool bHasCachedHealth;
-                // See if we already have a cached value for health or not for this monster
-                if (dictGilesLastHealthChecked.TryGetValue(c_RActorGuid, out iLastCheckedHealth))
-                {
-                    bHasCachedHealth = true;
-                    iLastCheckedHealth++;
-                    if (iLastCheckedHealth > 6)
-                        iLastCheckedHealth = 1;
-                    if (CurrentTargetRactorGUID == c_RActorGuid && iLastCheckedHealth > 3)
-                        iLastCheckedHealth = 1;
-                }
-                else
-                {
-                    bHasCachedHealth = false;
-                    iLastCheckedHealth = 1;
-                }
-                // Update health once every 5 cycles, except for current target, which is every cycle (rrrix: done through TargetHandler for some WTF reason)
-                //if (iLastCheckedHealth == 1 || dictActorSNOPriority.Any(p => p.Key == c_ActorSNO && p.Value > 500))
-                //{
-                //    try
-                //    {
-                //        HitpointsCur = c_CommonData.GetAttribute<float>(ActorAttributeType.HitpointsCur);
-                //    }
-                //    catch
-                //    {
-                //        // This happens so frequently in DB/D3 that this fails, let's not even bother logging it anymore
-                //        //Logging.WriteDiagnostic("[Trinity] Safely handled exception getting current health for unit " + tmp_sThisInternalName + " [" + tmp_iThisActorSNO.ToString() + "]");
-                //        // Add this monster to our very short-term ignore list
-                //        //if (!c_unit_IsBoss)
-                //        //{
-                //        //    hashRGUIDBlacklist3.Add(c_RActorGuid);
-                //        //    dateSinceBlacklist3Clear = DateTime.Now;
-                //        //    NeedToClearBlacklist3 = true;
-                //        //}
-                //        AddToCache = false;
-                //    }
-                //    RefreshCachedHealth(iLastCheckedHealth, HitpointsCur, bHasCachedHealth);
-                //}
-                //else
-                //{
-                //    HitpointsCur = dictGilesLastHealthCache[c_RActorGuid];
-                //    dictGilesLastHealthChecked[c_RActorGuid] = iLastCheckedHealth;
-                //}
+
                 HitpointsCur = thisUnit.HitpointsCurrent;
 
                 // And finally put the two together for a current health percentage
@@ -846,11 +804,6 @@ namespace GilesTrinity
                 // Unit is already dead
                 if (HitpointsCur <= 0d && !c_unit_IsBoss)
                 {
-                    // Add this monster to our very short-term ignore list
-                    //hashRGUIDBlacklist3.Add(c_RActorGuid);
-                    //dateSinceBlacklist3Clear = DateTime.Now;
-                    //NeedToClearBlacklist3 = true;
-
                     AddToCache = false;
                     c_IgnoreSubStep = "0HitPoints";
 
@@ -1313,7 +1266,7 @@ namespace GilesTrinity
             {
                 if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
                 {
-                    AddToCache = ItemManager.EvaluateItem((ACDItem)c_CommonData, ItemManager.RuleType.PickUp);
+                    AddToCache = ItemManager.Current.ShouldPickUpItem((ACDItem)c_CommonData);
                 }
                 else if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
                 {
@@ -1569,7 +1522,6 @@ namespace GilesTrinity
             }
             // Now for the specifics
             int iThisPhysicsSNO;
-            int iExtendedRange;
             double iMinDistance;
             bool GizmoUsed = false;
             switch (c_ObjectType)
@@ -2080,7 +2032,7 @@ namespace GilesTrinity
                                         {
                                             if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
-                                                bool isNavigable = pf.IsNavigable(gp.WorldToGrid(c_Position.ToVector2()));
+                                                bool isNavigable = gp.CanStandAt(gp.WorldToGrid(c_Position.ToVector2()));
 
                                                 if (!isNavigable)
                                                 {
@@ -2128,7 +2080,7 @@ namespace GilesTrinity
 
                                                 cPos = MathEx.CalculatePointFrom(myPos, cPos, c_CentreDistance - ZetaDia.Me.GoldPickupRadius);
 
-                                                if (!ZetaDia.Physics.Raycast(myPos, cPos, NavCellFlags.AllowWalk))
+                                                if (Navigator.Raycast(myPos, cPos))
                                                 {
                                                     AddToCache = false;
                                                     c_IgnoreSubStep = "UnableToRayCast";

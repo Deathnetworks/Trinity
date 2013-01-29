@@ -46,7 +46,7 @@ namespace GilesTrinity.XmlTags
         /// </summary>
         private Vector3 myPos { get { return ZetaDia.Me.Position; } }
         private static ISearchAreaProvider gp { get { return GilesTrinity.gp; } }
-        private static PathFinder pf { get { return GilesTrinity.pf; } }
+        //private static PathFinder pf { get { return GilesTrinity.pf; } }
         /// <summary>
         /// The last scene SNOId we entered
         /// </summary>

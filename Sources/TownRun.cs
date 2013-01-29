@@ -42,17 +42,17 @@ namespace GilesTrinity
         // Safety pauses to make sure we aren't still coming through the portal or selling
         internal static bool bPreStashPauseDone = false;
         internal static double iPreStashLoops = 0;
-        internal static bool GilesPreStashPauseOverlord(object ret)
+        internal static bool PreStashPauseOverlord(object ret)
         {
             return (!bPreStashPauseDone);
         }
-        internal static RunStatus GilesStashPrePause(object ret)
+        internal static RunStatus StashRunPrePause(object ret)
         {
             bPreStashPauseDone = true;
             iPreStashLoops = 0;
             return RunStatus.Success;
         }
-        internal static RunStatus GilesStashPause(object ret)
+        internal static RunStatus StashPause(object ret)
         {
             iPreStashLoops++;
             if (iPreStashLoops < 30)
@@ -287,10 +287,10 @@ namespace GilesTrinity
         /// <param name="thisdbitemtype"></param>
         /// <param name="thisfollowertype"></param>
         /// <returns></returns>
-        internal static bool GilesSellValidation(GilesCachedACDItem cItem)
+        internal static bool SellValidation(GilesCachedACDItem cItem)
         {
             // Check this isn't something we want to salvage
-            if (GilesSalvageValidation(cItem))
+            if (SalvageValidation(cItem))
                 return false;
 
             GItemType thisGilesItemType = GilesTrinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
@@ -328,7 +328,7 @@ namespace GilesTrinity
         /// <param name="thisdbitemtype"></param>
         /// <param name="thisfollowertype"></param>
         /// <returns></returns>
-        internal static bool GilesSalvageValidation(GilesCachedACDItem cItem)
+        internal static bool SalvageValidation(GilesCachedACDItem cItem)
         {
             GItemType thisGilesItemType = GilesTrinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
             GItemBaseType thisGilesBaseType = GilesTrinity.DetermineBaseType(thisGilesItemType);
@@ -388,7 +388,8 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool StashValidation(GilesCachedACDItem cItem, ACDItem item)
         {
-            bool shouldStashItem = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesTrinity.ShouldWeStashThis(cItem, item) : ItemManager.ShouldStashItem(item);
+            //bool shouldStashItem = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesTrinity.ShouldWeStashThis(cItem, item) : ItemManager.ShouldStashItem(item);
+            bool shouldStashItem = GilesTrinity.ShouldWeStashThis(cItem, item);
             return shouldStashItem;
         }
 
@@ -398,7 +399,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        internal static bool GilesStashOverlord(object ret)
+        internal static bool StashOverlord(object ret)
         {
             hashGilesCachedKeepItems = new HashSet<GilesCachedACDItem>();
             bNeedsEquipmentRepairs = false;
@@ -415,7 +416,7 @@ namespace GilesTrinity
                 if (item.BaseAddress != IntPtr.Zero)
                 {
                     // Find out if this item's in a protected bag slot
-                    if (!ItemManager.ItemIsProtected(item))
+                    if (!ItemManager.Current.ItemIsProtected(item))
                     {
                         // test
                         DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ScriptRule, "DEBUG: {0},{1},{2}", item.InternalName, item.Name, item.Level);
@@ -443,7 +444,7 @@ namespace GilesTrinity
                             ItemLink = item.ItemLink
                         };
 
-                        bool bShouldStashThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesTrinity.ShouldWeStashThis(cItem, item) : ItemManager.ShouldStashItem(item);
+                        bool bShouldStashThis = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesTrinity.ShouldWeStashThis(cItem, item) : ItemManager.Current.ShouldStashItem(item);
 
                         if (bShouldStashThis)
                         {
@@ -465,7 +466,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        internal static RunStatus GilesOptimisedPreStash(object ret)
+        internal static RunStatus PreStashPauser(object ret)
         {
             if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Stash routine started";
@@ -482,7 +483,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        internal static RunStatus GilesOptimisedPostStash(object ret)
+        internal static RunStatus PostStashReport(object ret)
         {
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Stash routine ending sequence...");
 
@@ -533,7 +534,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        internal static RunStatus GilesOptimisedStash(object ret)
+        internal static RunStatus StashItems(object ret)
         {
             /*
              *  Move to Stash
@@ -661,7 +662,7 @@ namespace GilesTrinity
                 RandomizeTheTimer();
                 GilesCachedACDItem thisitem = hashGilesCachedKeepItems.FirstOrDefault();
 
-                bool bDidStashSucceed = GilesStashAttempt(thisitem);
+                bool bDidStashSucceed = StashSingleItem(thisitem);
 
                 if (!bDidStashSucceed)
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "There was an unknown error stashing an item.");
@@ -678,7 +679,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        internal static bool GilesSellOverlord(object ret)
+        internal static bool SellOverlord(object ret)
         {
             GilesTrinity.ForceVendorRunASAP = false;
             hashGilesCachedSellItems = new HashSet<GilesCachedACDItem>();
@@ -705,7 +706,7 @@ namespace GilesTrinity
             {
                 if (item.BaseAddress != IntPtr.Zero)
                 {
-                    if (!ItemManager.ItemIsProtected(item))
+                    if (!ItemManager.Current.ItemIsProtected(item))
                     {
                         //GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
                         //    thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
@@ -736,8 +737,8 @@ namespace GilesTrinity
 
 
                         bool shouldSellItem = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy
-                            ? GilesSellValidation(cItem)
-                            : ItemManager.ShouldSellItem(item);
+                            ? SellValidation(cItem)
+                            : ItemManager.Current.ShouldSellItem(item);
 
                         // if it has gems, always salvage
                         if (item.NumSocketsFilled > 0)
@@ -751,7 +752,7 @@ namespace GilesTrinity
                         }
 
                         // Don't sell stuff that we want to salvage, if using custom loot-rules
-                        if (GilesTrinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy && ItemManager.ShouldSalvageItem(item))
+                        if (GilesTrinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy && ItemManager.Current.ShouldSalvageItem(item))
                         {
                             shouldSellItem = false;
                         }
@@ -782,7 +783,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        internal static RunStatus GilesOptimisedPreSell(object ret)
+        internal static RunStatus PreSellPause(object ret)
         {
             if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Sell routine started";
@@ -808,7 +809,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        internal static RunStatus GilesOptimisedSell(object ret)
+        internal static RunStatus VendorItems(object ret)
         {
             string VendorName = GetTownVendorName();
             if (bGoToSafetyPointFirst)
@@ -971,7 +972,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        internal static RunStatus GilesOptimisedPostSell(object ret)
+        internal static RunStatus PostSellAndRepair(object ret)
         {
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Sell routine ending sequence...");
 
@@ -1079,7 +1080,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        internal static bool GilesSalvageOverlord(object ret)
+        internal static bool SalvageOverlord(object ret)
         {
             GilesTrinity.ForceVendorRunASAP = false;
             hashGilesCachedSalvageItems = new HashSet<GilesCachedACDItem>();
@@ -1090,7 +1091,7 @@ namespace GilesTrinity
             {
                 if (item.BaseAddress != IntPtr.Zero)
                 {
-                    if (!ItemManager.ItemIsProtected(item))
+                    if (!ItemManager.Current.ItemIsProtected(item))
                     {
                         GilesCachedACDItem cItem = new GilesCachedACDItem(item.Stats)
                         {
@@ -1117,7 +1118,7 @@ namespace GilesTrinity
 
 
 
-                        bool shouldSalvageItem = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesSalvageValidation(cItem) : ItemManager.ShouldSalvageItem(item);
+                        bool shouldSalvageItem = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? SalvageValidation(cItem) : ItemManager.Current.ShouldSalvageItem(item);
 
                         if (StashValidation(cItem, item))
                         {
@@ -1144,7 +1145,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        internal static RunStatus GilesOptimisedPreSalvage(object ret)
+        internal static RunStatus PreSalvagePause(object ret)
         {
             if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
                 BotMain.StatusText = "Town run: Salvage routine started";
@@ -1170,7 +1171,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        internal static RunStatus GilesOptimisedSalvage(object ret)
+        internal static RunStatus SalvageItems(object ret)
         {
             if (bGoToSafetyPointFirst)
             {
@@ -1352,7 +1353,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        internal static RunStatus GilesOptimisedPostSalvage(object ret)
+        internal static RunStatus PostSalvage(object ret)
         {
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Salvage routine ending sequence...");
             //using (ZetaDia.Memory.AcquireFrame())
@@ -1529,7 +1530,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        internal static bool GilesStashAttempt(GilesCachedACDItem item)
+        internal static bool StashSingleItem(GilesCachedACDItem item)
         {
             int iPlayerDynamicID = ZetaDia.Me.CommonData.DynamicId;
             int iOriginalGameBalanceId = item.BalanceID;
@@ -1827,24 +1828,24 @@ namespace GilesTrinity
         {
             internal static Decorator GetPreStashDecorator()
             {
-                return new Decorator(ctx => GilesPreStashPauseOverlord(ctx),
+                return new Decorator(ctx => PreStashPauseOverlord(ctx),
                     new Sequence(
-                        new Action(ctx => GilesStashPrePause(ctx)),
-                        new Action(ctx => GilesStashPause(ctx))
+                        new Action(ctx => StashRunPrePause(ctx)),
+                        new Action(ctx => StashPause(ctx))
                     )
                 );
             }
 
             internal static Decorator GetStashDecorator()
             {
-                return new Decorator(ctx => GilesStashOverlord(ctx),
+                return new Decorator(ctx => StashOverlord(ctx),
                     new Sequence(
-                        new Action(ctx => GilesOptimisedPreStash(ctx)),
-                        new Action(ctx => GilesOptimisedStash(ctx)),
-                        new Action(ctx => GilesOptimisedPostStash(ctx)),
+                        new Action(ctx => PreStashPauser(ctx)),
+                        new Action(ctx => StashItems(ctx)),
+                        new Action(ctx => PostStashReport(ctx)),
                         new Sequence(
-                            new Action(ctx => GilesStashPrePause(ctx)),
-                            new Action(ctx => GilesStashPause(ctx))
+                            new Action(ctx => StashRunPrePause(ctx)),
+                            new Action(ctx => StashPause(ctx))
                         )
                     )
                 );
@@ -1852,14 +1853,14 @@ namespace GilesTrinity
 
             internal static Decorator GetSellDecorator()
             {
-                return new Decorator(ctx => GilesSellOverlord(ctx),
+                return new Decorator(ctx => SellOverlord(ctx),
                     new Sequence(
-                        new Action(ctx => GilesOptimisedPreSell(ctx)),
-                        new Action(ctx => GilesOptimisedSell(ctx)),
-                        new Action(ctx => GilesOptimisedPostSell(ctx)),
+                        new Action(ctx => PreSellPause(ctx)),
+                        new Action(ctx => VendorItems(ctx)),
+                        new Action(ctx => PostSellAndRepair(ctx)),
                         new Sequence(
-                            new Action(ctx => GilesStashPrePause(ctx)),
-                            new Action(ctx => GilesStashPause(ctx))
+                            new Action(ctx => StashRunPrePause(ctx)),
+                            new Action(ctx => StashPause(ctx))
                         )
                     )
                 );
@@ -1867,77 +1868,20 @@ namespace GilesTrinity
 
             internal static Decorator GetSalvageDecorator()
             {
-                return new Decorator(ctx => GilesSalvageOverlord(ctx),
+                return new Decorator(ctx => SalvageOverlord(ctx),
                     new Sequence(
-                        new Action(ctx => GilesOptimisedPreSalvage(ctx)),
-                        new Action(ctx => GilesOptimisedSalvage(ctx)),
-                        new Action(ctx => GilesOptimisedPostSalvage(ctx)),
+                        new Action(ctx => PreSalvagePause(ctx)),
+                        new Action(ctx => SalvageItems(ctx)),
+                        new Action(ctx => PostSalvage(ctx)),
                         new Sequence(
-                            new Action(ctx => GilesStashPrePause(ctx)),
-                            new Action(ctx => GilesStashPause(ctx))
+                            new Action(ctx => StashRunPrePause(ctx)),
+                            new Action(ctx => StashPause(ctx))
                         )
                     )
                 );
             }
-
-            internal static Composite GetPostTownRunDecorator()
-            {
-                return
-                new Decorator(ret => Zeta.CommonBot.Logic.BrainBehavior.IsVendoring,
-                    new PrioritySelector(
-                        new Decorator(ret => GetPortalReturnPosition(ZetaDia.CurrentAct).Distance2D(ZetaDia.Me.Position) > 10f,
-                            new Sequence(
-                                new Action(ret => DbHelper.Log(LogCategory.UserInformation, "Moving to portal position", true)),
-                                new Action(ret => PlayerMover.NavigateTo(GetPortalReturnPosition(ZetaDia.CurrentAct)))
-                            )
-                        ),
-                        new Decorator(ret => PostTownRunStayInTown,
-                            new Sequence(
-                                new Action(ret => UseHearthPortal(ret))
-                            )
-                        )
-                    )
-                );
-            }
+            
         }
-
-        internal static RunStatus UseHearthPortal(object ctx)
-        {
-            DiaGizmo portal = ZetaDia.Actors.GetActorsOfType<DiaGizmo>(true, false).Where(o => o.ActorInfo.GizmoType == Zeta.Internals.SNO.GizmoType.HearthPortal).FirstOrDefault();
-            if (portal == null)
-            {
-                DbHelper.Log(LogCategory.UserInformation, "Error: could not find hearth portal!");
-                return RunStatus.Failure;
-            }
-            else if (portal.Distance > 10f)
-            {
-                DbHelper.Log(LogCategory.UserInformation, "Error: Hearth portal is too far away!");
-                return RunStatus.Failure;
-            }
-            else
-            {
-                portal.Interact();
-                return RunStatus.Success;
-            }
-        }
-
-        internal static Vector3 GetPortalReturnPosition(Act act)
-        {
-            switch (act)
-            {
-                case Act.A1:
-                    return (new Vector3(2990.895f, 2800.335f, 24.04532f));
-                case Act.A2:
-                    return (new Vector3(313.1483f, 278.3289f, 0.1000038f));
-                case Act.A3:
-                case Act.A4:
-                    return (new Vector3(379.007f, 421.9408f, 0.3321455f));
-                default:
-                    return Vector3.Zero;
-            }
-        }
-
-        internal static bool PostTownRunStayInTown = false;
 
         /// <summary>
         /// Sorts the stash

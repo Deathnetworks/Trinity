@@ -37,7 +37,7 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Demonbuddy, Version=1.0.1252.119, Culture=neutral, PublicKeyToken=eff32ccf253d66d4, processorArchitecture=x86">
+    <Reference Include="Demonbuddy, Version=1.0.1323.149, Culture=neutral, PublicKeyToken=eff32ccf253d66d4, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\db\Demonbuddy.exe</HintPath>
     </Reference>
@@ -83,6 +83,7 @@
     <Compile Include="Classes\MiniMapMarker.cs" />
     <Compile Include="Classes\PositionCache.cs" />
     <Compile Include="Classes\SpeedSensor.cs" />
+    <Compile Include="Classes\TrinityItemManager.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Behaviors.cs" />

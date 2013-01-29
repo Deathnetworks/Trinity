@@ -726,7 +726,7 @@ namespace GilesTrinity.Cache
         {
             if (GilesTrinity.Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy && item.BaseType != GItemBaseType.HealthGlobe)
             {
-                return ItemManager.EvaluateItem(item.ACDItem, ItemManager.RuleType.PickUp);
+                return ItemManager.Current.ShouldPickUpItem(item.ACDItem);
             }
             else if (GilesTrinity.Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
             {

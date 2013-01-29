@@ -247,12 +247,18 @@ namespace GilesTrinity.XmlTags
         /// The current player position
         /// </summary>
         private Vector3 myPos { get { return ZetaDia.Me.Position; } }
-        private static ISearchAreaProvider gp { get { return GilesTrinity.gp; } }
-        private static PathFinder pf { get { return GilesTrinity.pf; } }
+        private static ISearchAreaProvider gp
+        {
+            get
+            {
+                return GilesTrinity.gp;
+            }
+        }
+        //private static PathFinder pf { get { return GilesTrinity.pf; } }
         /// <summary>
         /// Contains the current navigation path
         /// </summary>
-        private IndexedList<Vector3> PathStack = new IndexedList<Vector3>();
+        //private IndexedList<Vector3> PathStack = new IndexedList<Vector3>();
         /// <summary>
         /// The last scene SNOId we entered
         /// </summary>
@@ -803,7 +809,7 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => UpdateRoute())
                     )
                 ),
-                new Decorator(ret => CurrentNavTarget.Distance2D(myPos) <= 90f && !pf.IsNavigable(gp.WorldToGrid(CurrentNavTarget.ToVector2())),
+                new Decorator(ret => CurrentNavTarget.Distance2D(myPos) <= 90f && !gp.CanStandAt(gp.WorldToGrid(CurrentNavTarget.ToVector2())),
                     new Sequence(
                         new Action(ret => SetNodeVisited("Center Not Navigable")),
                         new Action(ret => UpdateRoute())
@@ -815,7 +821,7 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => UpdateRoute())
                     )
                 ),
-                new Decorator(ret => PlayerMover.GetMovementSpeed() < 1 && myPos.Distance2D(CurrentNavTarget) <= 50f && ZetaDia.Physics.Raycast(myPos, CurrentNavTarget, Zeta.Internals.SNO.NavCellFlags.AllowWalk),
+                new Decorator(ret => PlayerMover.GetMovementSpeed() < 1 && myPos.Distance2D(CurrentNavTarget) <= 50f && !Navigator.Raycast(myPos, CurrentNavTarget),
                     new Sequence(
                         new Action(ret => SetNodeVisited("Stuck moving to node point, marking done (in LoS and nearby!)")),
                         new Action(ret => UpdateRoute())
@@ -891,7 +897,7 @@ namespace GilesTrinity.XmlTags
                     catch { }
                 }
 
-                var log = String.Format("Nodes [Unvisited: Route:{1} Grid:{3} | Grid-Visited: {2}] Box:{4}/{5} Step:{6} {7} Nav:{8} RayCast:{9} PP:{10:0} Dir: {11} ZDiff:{12:0} PathSize:{13}",
+                var log = String.Format("Nodes [Unvisited: Route:{1} Grid:{3} | Grid-Visited: {2}] Box:{4}/{5} Step:{6} {7} Nav:{8} RayCast:{9} PP:{10:0} Dir: {11} ZDiff:{12:0}",
                     GetRouteVisistedNodeCount(),                                 // 0
                     GetRouteUnvisitedNodeCount(),                                // 1
                     GetGridSegmentationVisistedNodeCount(),                      // 2
@@ -900,12 +906,11 @@ namespace GilesTrinity.XmlTags
                     GridSegmentation.BoxTolerance,                               // 5
                     step,                                                        // 6
                     nodeDistance,                                                // 7
-                    (pf != null ? pf.IsNavigable(gp.WorldToGrid(CurrentNavTarget.ToVector2())) : false), // 8
-                    ZetaDia.Physics.Raycast(myPos, CurrentNavTarget, Zeta.Internals.SNO.NavCellFlags.AllowWalk),
+                    gp.CanStandAt(gp.WorldToGrid(CurrentNavTarget.ToVector2())), // 8
+                    !Navigator.Raycast(myPos, CurrentNavTarget),
                     PathPrecision,
                     GilesTrinity.GetHeadingToPoint(CurrentNavTarget),
-                    Math.Abs(myPos.Z - CurrentNavTarget.Z),
-                    PathStack.Count
+                    Math.Abs(myPos.Z - CurrentNavTarget.Z)
                     );
 
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, log);
@@ -996,16 +1001,13 @@ namespace GilesTrinity.XmlTags
         /// </summary>
         private void MoveToNextNode()
         {
-            bool newPath = false;
-
             PlayerMover.RecordSkipAheadCachePoint();
 
             NextNode = BrainBehavior.DungeonExplorer.CurrentNode;
             Vector3 moveTarget = NextNode.NavigableCenter;
 
-            string nodeName = String.Format("{0} Distance: {1:0} Direction: {2} PathStack: {3}",
-                NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition), GilesTrinity.GetHeadingToPoint(NextNode.NavigableCenter),
-                PathStack.Count);
+            string nodeName = String.Format("{0} Distance: {1:0} Direction: {2}",
+                NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition), GilesTrinity.GetHeadingToPoint(NextNode.NavigableCenter));
 
             if (DateTime.Now.Subtract(GilesTrinity.lastAddedLocationCache).TotalMilliseconds >= 100)
             {
@@ -1017,48 +1019,50 @@ namespace GilesTrinity.XmlTags
                 }
             }
 
-            if (!PathStack.Any() || DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000 ||
-                (DateTime.Now.Subtract(GilesTrinity.lastHadUnitInSights).TotalMilliseconds < 250 || DateTime.Now.Subtract(GilesTrinity.lastHadEliteUnitInSights).TotalMilliseconds < 250))
-            {
-                // Generate nodes for the PathStack
-                PathStack = PlayerMover.GeneratePath(myPos, NextNode.NavigableCenter);
-                lastGeneratedPath = DateTime.Now;
-                newPath = true;
-            }
+            //if (DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000 ||
+            //    (DateTime.Now.Subtract(GilesTrinity.lastHadUnitInSights).TotalMilliseconds < 250 || DateTime.Now.Subtract(GilesTrinity.lastHadEliteUnitInSights).TotalMilliseconds < 250))
+            //{
+            //    // Generate nodes for the PathStack
+            //    //PathStack = PlayerMover.GeneratePath(myPos, NextNode.NavigableCenter);
+            //    Navigator.Clear();
+            //    lastGeneratedPath = DateTime.Now;
+            //    newPath = true;
+            //}
 
-            if (DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000 && PlayerMover.GetMovementSpeed() < 1)
-            {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Clearing current dungeon path newPath={0}, MS={1}, PathSize={2} LastGeneratedPath={3}",
-                    newPath, PlayerMover.GetMovementSpeed(), PathStack.Count, DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds);
-                PathStack.Clear();
-            }
+            //if (DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000 && PlayerMover.GetMovementSpeed() < 1)
+            //{
+            //    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Clearing current dungeon path newPath={0}, MS={1}, LastGeneratedPath={2}",
+            //        newPath, PlayerMover.GetMovementSpeed(), DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds);
+            //    Navigator.Clear();
+            //}
 
-            if (PathStack.Any())
-            {
-                moveTarget = PathStack.Current;
-            }
+            //if (PathStack.Any())
+            //{
+            //    moveTarget = PathStack.Current;
+            //}
 
-            var distToTarget = moveTarget.Distance2D(myPos);
-            if (distToTarget <= 5f || (PlayerMover.GetMovementSpeed() < 1 && distToTarget <= 50f && ZetaDia.Physics.Raycast(moveTarget, myPos, NavCellFlags.AllowWalk)))
-            {
-                Vector3 lastStep = PathStack.Current;
-                PathStack.Next();
-                PathStack.RemoveAt(0);
-                if (PathStack.Any())
-                {
-                    moveTarget = PathStack.Current;
-                    distToTarget = moveTarget.Distance2D(myPos);
-                    DbHelper.Log(LogCategory.Movement, "[Path] removed:{0} next:{1} dist:{2} dir:{3}",
-                        lastStep, moveTarget, Vector3.Distance(lastStep, moveTarget), GilesTrinity.GetHeadingToPoint(moveTarget));
-                }
-                else
-                {
-                    SetNodeVisited("Current movement stack is empty!");
-                    UpdateRoute();
-                }
-            }
+            //var distToTarget = moveTarget.Distance2D(myPos);
+            //if (distToTarget <= 5f || (PlayerMover.GetMovementSpeed() < 1 && distToTarget <= 50f && Navigator.Raycast(moveTarget, myPos)))
+            //{
+            //    Vector3 lastStep = PathStack.Current;
+            //    PathStack.Next();
+            //    PathStack.RemoveAt(0);
+            //    if (PathStack.Any())
+            //    {
+            //        moveTarget = PathStack.Current;
+            //        distToTarget = moveTarget.Distance2D(myPos);
+            //        DbHelper.Log(LogCategory.Movement, "[Path] removed:{0} next:{1} dist:{2} dir:{3}",
+            //            lastStep, moveTarget, Vector3.Distance(lastStep, moveTarget), GilesTrinity.GetHeadingToPoint(moveTarget));
+            //    }
+            //    else
+            //    {
+            //        SetNodeVisited("Current movement stack is empty!");
+            //        UpdateRoute();
+            //    }
+            //}
 
-            Navigator.PlayerMover.MoveTowards(moveTarget);
+            Navigator.MoveTo(CurrentNavTarget);
+            //Navigator.PlayerMover.MoveTowards(moveTarget);
         }
         /// <summary>
         /// Initizializes the profile tag and sets defaults as needed

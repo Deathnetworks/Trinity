@@ -51,7 +51,7 @@ namespace GilesTrinity
                             return false;
                         }
 
-                        if (Settings.Combat.Misc.UseNavMeshTargeting && !pf.IsNavigable(gp.WorldToGrid(PlayerStatus.CurrentPosition.ToVector2())))
+                        if (Settings.Combat.Misc.UseNavMeshTargeting && !gp.CanStandAt(gp.WorldToGrid(PlayerStatus.CurrentPosition.ToVector2())))
                         {
                             UpdateSearchGridProvider();
                         }
@@ -635,7 +635,7 @@ namespace GilesTrinity
                 }
                 // See if we can raytrace to the final location and it's within 25 feet
                 if (iTotalBacktracks >= 2 && Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[1]) <= 25f &&
-                    GilesCanRayCast(PlayerStatus.CurrentPosition, vBacktrackList[1], NavCellFlags.AllowWalk))
+                    GilesCanRayCast(PlayerStatus.CurrentPosition, vBacktrackList[1]))
                 {
                     vBacktrackList = new SortedList<int, Vector3>();
                     iTotalBacktracks = 0;

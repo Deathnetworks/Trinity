@@ -84,7 +84,7 @@ namespace GilesTrinity.XmlTags
 
         public Vector3 MyPos { get { return ZetaDia.Me.Position; } }
         private ISearchAreaProvider gp { get { return GilesTrinity.gp; } }
-        private PathFinder pf { get { return GilesTrinity.pf; } }
+        //private PathFinder pf { get { return GilesTrinity.pf; } }
 
         public override void OnStart()
         {

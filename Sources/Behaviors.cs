@@ -87,14 +87,8 @@ namespace GilesTrinity
                 default:
                     throw new ApplicationException("Unable to return Non-TreeSharp RunStatus");
             }
-            if (treeRunStatus != null)
-            {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Handle Target returning {0} to tree", treeRunStatus);
-                return treeRunStatus;
-            }
-            else
-                throw new ApplicationException("Unable to return Non-TreeSharp RunStatus");
-
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Handle Target returning {0} to tree", treeRunStatus);
+            return treeRunStatus;
 
         }
 
@@ -308,7 +302,7 @@ namespace GilesTrinity
 
                         if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade && CurrentTarget.Type != GObjectType.Destructible)
                         {
-                            CurrentTargetIsInLoS = (GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
+                            CurrentTargetIsInLoS = (GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
                         }
                         else
                         {
@@ -326,7 +320,7 @@ namespace GilesTrinity
                             {
                                 //vlastSafeSpot = vNullLocation;
                                 bForceTargetUpdate = true;
-                                bAvoidDirectionBlacklisting = false;
+                                //bAvoidDirectionBlacklisting = false;
                                 runStatus = HandlerRunStatus.TreeRunning;
                             }
                             //check if we are returning to the tree
@@ -602,10 +596,10 @@ namespace GilesTrinity
                                     {
                                         float fDirectionToTarget = GilesTrinity.FindDirectionDegree(PlayerStatus.CurrentPosition, vCurrentDestination);
                                         vCurrentDestination = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget - 50));
-                                        if (!GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk))
+                                        if (!GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination))
                                         {
                                             vCurrentDestination = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget + 50));
-                                            if (!GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk))
+                                            if (!GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination))
                                             {
                                                 vCurrentDestination = point;
                                             }
@@ -651,7 +645,7 @@ namespace GilesTrinity
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||
                             CurrentTarget.Type == GObjectType.Globe ||
                             (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
-                            && GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination, NavCellFlags.AllowWalk)
+                            && GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination)
                             )
                         {
                             bool bFoundSpecialMovement = UsedSpecialMovement();
@@ -750,7 +744,7 @@ namespace GilesTrinity
                     return RunStatus.Failure;
                 }
 
-                GilesHandleTargetBasicMovement(bForceNewMovement);
+                HandleTargetBasicMovement(bForceNewMovement);
 
                 return RunStatus.Running;
             }
@@ -776,7 +770,7 @@ namespace GilesTrinity
                         // Blacklist an 80 degree direction for avoidance
                         if (CurrentTarget.Type == GObjectType.Avoidance)
                         {
-                            bAvoidDirectionBlacklisting = true;
+                            //bAvoidDirectionBlacklisting = true;
                             fAvoidBlacklistDirection = FindDirectionDegree(PlayerStatus.CurrentPosition, CurrentTarget.Position);
                         }
                         // Handle body blocking by blacklisting
@@ -845,7 +839,7 @@ namespace GilesTrinity
                     bool isNavigable;
 
                     if (Settings.Combat.Misc.UseNavMeshTargeting)
-                        isNavigable = pf.IsNavigable(gp.WorldToGrid(CurrentTarget.Position.ToVector2()));
+                        isNavigable = gp.CanStandAt(gp.WorldToGrid(CurrentTarget.Position.ToVector2()));
                     else
                         isNavigable = true;
 
@@ -864,7 +858,7 @@ namespace GilesTrinity
                         GetSecondsSinceTargetUpdate() > 4 &&
                         CurrentTarget.HitPoints > 0.90)
                     {
-                        if (GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position, NavCellFlags.AllowWalk))
+                        if (GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
                         {
                             addTargetToBlacklist = false;
                         }
@@ -1166,7 +1160,7 @@ namespace GilesTrinity
                             case GObjectType.Gold:
                             case GObjectType.Item:
                                 // No raycast available, try and force-ignore this for a little while, and blacklist for a few seconds
-                                if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position, NavCellFlags.AllowWalk))
+                                if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
                                 {
                                     IgnoreRactorGUID = CurrentTarget.RActorGuid;
                                     IgnoreTargetForLoops = 6;
@@ -1283,7 +1277,7 @@ namespace GilesTrinity
         /// Moves our player if no special ability is available
         /// </summary>
         /// <param name="bForceNewMovement"></param>
-        private static void GilesHandleTargetBasicMovement(bool bForceNewMovement)
+        private static void HandleTargetBasicMovement(bool bForceNewMovement)
         {
             using (new PerformanceLogger("HandleTarget.HandleBasicMovement"))
             {
@@ -1292,12 +1286,6 @@ namespace GilesTrinity
                 lastMovementCommand = DateTime.Now;
                 if (DateTime.Now.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(vLastMoveToTarget, vCurrentDestination) >= 2f || bForceNewMovement)
                 {
-                    //ZetaDia.Me.UsePower(SNOPower.Walk, vCurrentDestination, iCurrentWorldID, -1);
-
-                    //Navigator.PlayerMover.MoveTowards(vCurrentDestination);
-                    //ZetaDia.Me.Movement.MoveActor(vCurrentDestination);
-                    //Navigator.MoveTo(vCurrentDestination, CurrentTarget.InternalName, true);
-
                     PlayerMover.NavigateTo(vCurrentDestination, CurrentTarget.InternalName);
                     lastSentMovePower = DateTime.Now;
 
@@ -1525,7 +1513,7 @@ namespace GilesTrinity
                 // if at full or nearly full health, see if we can raycast to it, if not, ignore it for 2000 ms
                 if (CurrentTarget.HitPoints >= 0.9d && AnythingWithinRange[RANGE_50] > 3)
                 {
-                    if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position, NavCellFlags.AllowWalk))
+                    if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
                     {
                         IgnoreRactorGUID = CurrentTarget.RActorGuid;
                         IgnoreTargetForLoops = 6;

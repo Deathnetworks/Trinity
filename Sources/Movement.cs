@@ -128,14 +128,14 @@ namespace GilesTrinity
                                 if (bCheckGround)
                                 {
                                     vThisZigZag.Z = gp.GetHeight(vThisZigZag.ToVector2());
-                                    bCanRayCast = ZetaDia.Physics.Raycast(PlayerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
+                                    bCanRayCast = !Navigator.Raycast(PlayerStatus.CurrentPosition, vThisZigZag);
                                 }
                                 else
-                                    bCanRayCast = pf.IsNavigable(gp.WorldToGrid(vThisZigZag.ToVector2()));
+                                    bCanRayCast = gp.CanStandAt(gp.WorldToGrid(vThisZigZag.ToVector2()));
                             }
                             else
                             {
-                                bCanRayCast = ZetaDia.Physics.Raycast(PlayerStatus.CurrentPosition, vThisZigZag, NavCellFlags.AllowWalk);
+                                bCanRayCast = !Navigator.Raycast(PlayerStatus.CurrentPosition, vThisZigZag);
                             }
 
                             // Give weight to each zigzag point, so we can find the best one to aim for
@@ -205,9 +205,17 @@ namespace GilesTrinity
             }
         }
         // Quick Easy Raycast Function for quick changes
-        public static bool GilesCanRayCast(Vector3 vStartLocation, Vector3 vDestination, NavCellFlags NavType = NavCellFlags.AllowWalk, float ZDiff = 4f)
+        public static bool GilesCanRayCast(Vector3 vStartLocation, Vector3 vDestination, float ZDiff = 4f)
         {
-            if (ZetaDia.Physics.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + ZDiff), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + ZDiff), NavType))
+            // Navigator.Raycast is REVERSE Of ZetaDia.Physics.Raycast
+            // Navigator.Raycast returns True if it "hits" an edge
+            // ZetaDia.Physics.Raycast returns False if it "hits" an edge
+            // So ZetaDia.Physics.Raycast() == !Navigator.Raycast()
+            // We're using Navigator.Raycast now because it's "faster" (per Nesox)
+
+            bool rc  = Navigator.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + ZDiff), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + ZDiff));
+
+            if (!rc)
             {
                 if (hashNavigationObstacleCache.Any(o => MathEx.IntersectsPath(o.Location, o.Radius, vStartLocation, vDestination)))
                     return false;
@@ -223,7 +231,7 @@ namespace GilesTrinity
             return (float)RadianToDegree(NormalizeRadian((float)Math.Atan2(vTargetLocation.Y - vStartLocation.Y, vTargetLocation.X - vStartLocation.X)));
         }
         // Find A Safe Movement Location
-        private static bool bAvoidDirectionBlacklisting = false;
+        //private static bool bAvoidDirectionBlacklisting = false;
         private static float fAvoidBlacklistDirection = 0f;
 
         /// <summary>
@@ -366,12 +374,12 @@ namespace GilesTrinity
             //            // Now see if the client can navigate there, and we haven't temporarily blacklisted this spot
             //            //if (!bAvoidBlackspot)
             //            //{
-            //            //    bCanRaycast = GilesCanRayCast(playerStatus.vCurrentPosition, vTestPoint, NavCellFlags.AllowWalk);
+            //            //    bCanRaycast = GilesCanRayCast(playerStatus.vCurrentPosition, vTestPoint);
             //            //}
 
             //            if (!bAvoidBlackspot)
             //            {
-            //                bCanRaycast = pf.IsNavigable(gp.WorldToGrid(vTestPoint.ToVector2()));
+            //                bCanRaycast = gp.CanStandAt(gp.WorldToGrid(vTestPoint.ToVector2()));
             //            }
             //            if (!bAvoidBlackspot && bCanRaycast)
             //            {
@@ -591,7 +599,7 @@ namespace GilesTrinity
                     if (Settings.Combat.Misc.UseNavMeshTargeting)
                     {
                         p_xy = gp.WorldToGrid(xy);
-                        if (!pf.IsNavigable(p_xy))
+                        if (!gp.CanStandAt(p_xy))
                         {
                             nodesNotNavigable++;
                             continue;
@@ -606,7 +614,7 @@ namespace GilesTrinity
                             continue;
                         }
                     }
-                    if (gridPoint.Distance > 45 && !ZetaDia.Physics.Raycast(origin, xyz, NavCellFlags.AllowWalk))
+                    if (gridPoint.Distance > 45 && Navigator.Raycast(origin, xyz))
                     {
                         nodesGT45Raycast++;
                         continue;
@@ -661,59 +669,59 @@ namespace GilesTrinity
                         /*
                          * This little bit is insanely CPU intensive and causes lots of small game freezes.
                          */
-                        if (Settings.Combat.Misc.UseNavMeshTargeting && !hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 75)
-                        {
-                            if (p_xy == Point.Empty)
-                                p_xy = gp.WorldToGrid(xy);
+                        //if (Settings.Combat.Misc.UseNavMeshTargeting && !hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 75)
+                        //{
+                        //    if (p_xy == Point.Empty)
+                        //        p_xy = gp.WorldToGrid(xy);
 
-                            PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 50, true);
+                        //    PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 50, true);
 
-                            bool pathFailure = false;
-                            Point lastNode = gp.WorldToGrid(origin.ToVector2());
+                        //    bool pathFailure = false;
+                        //    Point lastNode = gp.WorldToGrid(origin.ToVector2());
 
-                            if (pfr.IsPartialPath)
-                            {
-                                pathFailures++;
-                                continue;
-                            }
-                            // analyze pathing to a safe point
-                            foreach (Point node in pfr.PointsReversed)
-                            {
-                                Vector2 node_xy = gp.GridToWorld(node);
-                                Vector3 node_xyz = new Vector3(node_xy.X, node_xy.Y, gp.GetHeight(node_xy));
+                        //    if (pfr.IsPartialPath)
+                        //    {
+                        //        pathFailures++;
+                        //        continue;
+                        //    }
+                        //    // analyze pathing to a safe point
+                        //    foreach (Point node in pfr.PointsReversed)
+                        //    {
+                        //        Vector2 node_xy = gp.GridToWorld(node);
+                        //        Vector3 node_xyz = new Vector3(node_xy.X, node_xy.Y, gp.GetHeight(node_xy));
 
-                                // never skip first-step nodes
-                                if (node_xyz.Distance(origin) < 10)
-                                {
-                                    continue;
-                                }
+                        //        // never skip first-step nodes
+                        //        if (node_xyz.Distance(origin) < 10)
+                        //        {
+                        //            continue;
+                        //        }
 
-                                // ignore any path points where monsters are standing in it
-                                if (hashMonsterObstacleCache.Any(m => m.Location.Distance(node_xyz) <= m.Radius))
-                                {
-                                    pathFailure = true;
-                                    break;
-                                }
-                                // Any monsters blocking previous and this node
-                                foreach (GilesObstacle monster in hashMonsterObstacleCache.Where(m =>
-                                    MathEx.IntersectsPath(
-                                        new Vector3(m.Location.X, m.Location.Y, 0),
-                                        m.Radius,
-                                        new Vector3(lastNode.X, lastNode.Y, 0),
-                                        new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
-                                    ))
-                                {
-                                    pathFailure = true;
-                                    break;
-                                }
-                            }
+                        //        // ignore any path points where monsters are standing in it
+                        //        if (hashMonsterObstacleCache.Any(m => m.Location.Distance(node_xyz) <= m.Radius))
+                        //        {
+                        //            pathFailure = true;
+                        //            break;
+                        //        }
+                        //        // Any monsters blocking previous and this node
+                        //        foreach (GilesObstacle monster in hashMonsterObstacleCache.Where(m =>
+                        //            MathEx.IntersectsPath(
+                        //                new Vector3(m.Location.X, m.Location.Y, 0),
+                        //                m.Radius,
+                        //                new Vector3(lastNode.X, lastNode.Y, 0),
+                        //                new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
+                        //            ))
+                        //        {
+                        //            pathFailure = true;
+                        //            break;
+                        //        }
+                        //    }
 
-                            if (pathFailure)
-                            {
-                                pathFailures++;
-                                continue;
-                            }
-                        }
+                        //    if (pathFailure)
+                        //    {
+                        //        pathFailures++;
+                        //        continue;
+                        //    }
+                        //}
 
                     }
 
@@ -902,10 +910,10 @@ namespace GilesTrinity
 
             if (Settings.Combat.Misc.UseNavMeshTargeting || force)
             {
-                if (gp == null)
-                    gp = Navigator.SearchGridProvider;
-                if (pf == null)
-                    pf = new PathFinder(gp);
+                //if (gp == null)
+                //    gp = Navigator.SearchGridProvider;
+                //if (pf == null)
+                //    pf = new PathFinder(gp);
 
                 if (ZetaDia.IsInGame)
                 {

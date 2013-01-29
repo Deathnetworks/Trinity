@@ -58,11 +58,15 @@ namespace GilesTrinity
             return KnownMarkers.OrderBy(m => m.MarkerNameHash != 0).ThenBy(m => Vector3.Distance(near, m.Position)).FirstOrDefault(m => !m.Visited && !m.Failed);
         }
 
+        private static DefaultNavigationProvider NavProvider;
+
         internal static void UpdateFailedMarkers()
         {
+            if (NavProvider == null)
+                NavProvider = new DefaultNavigationProvider();
             foreach (MiniMapMarker marker in KnownMarkers.Where(m => m.Failed))
             {
-                if (PlayerMover.CanFullyPathTo(marker.Position, 10f))
+                if (NavProvider.CanPathWithinDistance(marker.Position, 10f))
                 {
                     DbHelper.LogNormal("Was able to generate full path to failed MiniMapMarker {0} at {1}, marking as good", marker.MarkerNameHash, marker.Position); 
                     marker.Failed = false;

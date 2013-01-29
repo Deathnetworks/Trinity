@@ -11,6 +11,7 @@ using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
 using Zeta.Pathfinding;
+using Zeta.Navigation;
 
 namespace GilesTrinity
 {
@@ -387,7 +388,7 @@ namespace GilesTrinity
         private static int iTotalNumberGoblins = 0;
         private static DateTime lastGoblinTime = DateTime.Today;
 
-        internal static DateTime SweepWindSpam = DateTime.Today; 
+        internal static DateTime SweepWindSpam = DateTime.Today;
 
         // Variables relating to quick-reference of monsters within sepcific ranges (if anyone has suggestion for similar functionality with reduced CPU use, lemme know, but this is fast atm!)
         private static int[] ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
@@ -589,11 +590,17 @@ namespace GilesTrinity
         /// <summary>
         /// The Grid Provider for Navigation checks
         /// </summary>
-        internal static ISearchAreaProvider gp;
+        internal static ISearchAreaProvider gp
+        {
+            get
+            {
+                return (Navigator.SearchGridProvider as MainGridProvider);
+            }
+        }
         /// <summary>
         /// The PathFinder for Navigation checks
         /// </summary>
-        internal static PathFinder pf;
+        //internal static PathFinder pf;
 
         /// <summary>
         /// Behaviors: How close we need to get to the target before we consider it "reached"
@@ -637,7 +644,7 @@ namespace GilesTrinity
         private static int iTotalXp = 0;
         private static int iLastXp = 0;
         private static int iNextLvXp = 0;
-		// Gold counter
+        // Gold counter
         private static int iTotalGold = 0;
         private static int iLastGold = 0;
     }
