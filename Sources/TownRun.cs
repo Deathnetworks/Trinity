@@ -1546,6 +1546,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
+        [Obsolete("This function isn't used anymore ...")]
         internal static bool StashSingleItem(GilesCachedACDItem item)
         {
             int iPlayerDynamicID = ZetaDia.Me.CommonData.DynamicId;
@@ -1556,8 +1557,14 @@ namespace GilesTrinity
             string sOriginalInternalName = item.InternalName;
             GItemType OriginalGilesItemType = GilesTrinity.DetermineItemType(item.InternalName, item.DBItemType, item.FollowerType);
             GItemBaseType thisGilesBaseType = GilesTrinity.DetermineBaseType(OriginalGilesItemType);
-            bool bOriginalTwoSlot = GilesTrinity.DetermineIsTwoSlot(OriginalGilesItemType);
-            bool bOriginalIsStackable = GilesTrinity.DetermineIsStackable(OriginalGilesItemType);
+
+            // StashSingleItem not used anymore
+            //bool bOriginalTwoSlot = GilesTrinity.DetermineIsTwoSlot(OriginalGilesItemType);
+            bool bOriginalTwoSlot = false;
+
+            //bool bOriginalIsStackable = GilesTrinity.DetermineIsStackable(OriginalGilesItemType);
+            bool bOriginalIsStackable = false;
+            
             int iAttempts;
             if (_dictItemStashAttempted.TryGetValue(iOriginalDynamicID, out iAttempts))
             {
@@ -1991,10 +1998,12 @@ namespace GilesTrinity
                     item.IsUnidentified, item.ItemStackQuantity, item.Stats);
 
                 double ItemValue = GilesTrinity.ValueThisItem(thiscacheditem, itemType);
-                double NeedScore = GilesTrinity.ScoreNeeded(itemType);
+                double NeedScore = GilesTrinity.ScoreNeeded(item.ItemBaseType);
 
+                
                 // Ignore stackable items
-                if (!GilesTrinity.DetermineIsStackable(itemType) && itemType != GItemType.StaffOfHerding)
+                // TODO check if item.MaxStackCount is 0 on non stackable items or 1
+                if (!(item.MaxStackCount > 1) && itemType != GItemType.StaffOfHerding)
                 {
                     listSortMyStash.Add(new GilesStashSort(((ItemValue / NeedScore) * 1000), 1, inventoryColumn, inventoryRow, item.DynamicId, item.IsTwoSquareItem));
                 }
