@@ -221,11 +221,13 @@ namespace GilesTrinity
             }
 
             // auto trash blue weapons/armor/jewlery
-            if (IsWeaponArmorJewlery(cItem) && cItem.Quality < ItemQuality.Rare4)
+            if ((item.ItemBaseType == ItemBaseType.Armor
+                || item.ItemBaseType == ItemBaseType.Weapon
+                || item.ItemBaseType == ItemBaseType.Jewelry)
+                   && item.ItemQualityLevel < ItemQuality.Rare4)
             {
                 return false;
             }
-
 
             if (cItem.Quality >= ItemQuality.Legendary)
             {
@@ -251,10 +253,10 @@ namespace GilesTrinity
 
         }
 
-        internal static bool IsWeaponArmorJewlery(GilesCachedACDItem thisitem)
-        {
-            return (thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Armor || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Jewelry || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Weapon);
-        }
+        //internal static bool IsWeaponArmorJewlery(GilesCachedACDItem thisitem)
+        //{
+        //    return (thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Armor || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Jewelry || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Weapon);
+        //}
 
         internal static SalvageOption GetSalvageOption(ItemQuality quality)
         {
