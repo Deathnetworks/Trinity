@@ -117,6 +117,7 @@ namespace GilesTrinity
                 CombatTargeting.Instance.Provider = new BlankCombatProvider();
                 LootTargeting.Instance.Provider = new BlankLootProvider();
                 ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
+                ItemManager.Current = new TrinityItemManager();
 
                 UpdateSearchGridProvider();
 
@@ -242,6 +243,7 @@ namespace GilesTrinity
             CombatTargeting.Instance.Provider = new DefaultCombatTargetingProvider();
             LootTargeting.Instance.Provider = new DefaultLootTargetingProvider();
             ObstacleTargeting.Instance.Provider = new DefaultObstacleTargetingProvider();
+
             GameEvents.OnPlayerDied -= TrinityOnDeath;
             BotMain.OnStop -= TrinityBotStop;
             BotMain.OnStop -= PluginCheck;

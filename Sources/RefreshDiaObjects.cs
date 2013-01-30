@@ -514,7 +514,7 @@ namespace GilesTrinity
                         dUseKillRadius = 200;
             }
             // Special short-range list to ignore weakling mobs
-            if (PlayerKiteDistance <= 0)
+            if (PlayerKiteDistance <= 0 && !GetHasBuff(SNOPower.Wizard_Archon))
             {
                 if (hashActorSNOShortRangeOnly.Contains(c_ActorSNO))
                     dUseKillRadius = 12;
