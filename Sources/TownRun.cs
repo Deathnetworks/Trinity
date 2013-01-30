@@ -651,19 +651,17 @@ namespace GilesTrinity
                         // Mark this slot as not-free
                         StashSlotBlocked[inventoryColumn, inventoryRow] = true;
 
-                        // Try and reliably find out if this is a two slot item or not
-                        GItemType tempItemType = GilesTrinity.DetermineItemType(tempitem.InternalName, tempitem.ItemType, tempitem.FollowerSpecialType);
-                        if (GilesTrinity.DetermineIsTwoSlot(tempItemType) && inventoryRow != 9 && inventoryRow != 19 && inventoryRow != 29)
+                        if (tempitem.IsTwoSquareItem && inventoryRow != 9 && inventoryRow != 19 && inventoryRow != 29)
                         {
                             StashSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                         }
-                        else if (GilesTrinity.DetermineIsTwoSlot(tempItemType) && (inventoryRow == 9 || inventoryRow == 19 || inventoryRow == 29))
+                        else if (tempitem.IsTwoSquareItem && (inventoryRow == 9 || inventoryRow == 19 || inventoryRow == 29))
                         {
                             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation,
                                 "GSError: DemonBuddy thinks this item is 2 slot even though it's at bottom row of a stash page: {0} [{1}] type={2} @ slot {3}/{4}",
                                 tempitem.Name,
                                 tempitem.InternalName,
-                                tempItemType,
+                                tempitem.ItemType,
                                 (inventoryRow + 1),
                                 (inventoryColumn + 1));
                         }
@@ -1944,8 +1942,7 @@ namespace GilesTrinity
                 GilesTrinity.BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
 
                 // Try and reliably find out if this is a two slot item or not
-                GItemType tempItemType = GilesTrinity.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType);
-                if (GilesTrinity.DetermineIsTwoSlot(tempItemType) && inventoryRow < 5)
+                if (item.IsTwoSquareItem && inventoryRow < 5)
                 {
                     GilesTrinity.BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                 }
@@ -1979,12 +1976,11 @@ namespace GilesTrinity
                 // Try and reliably find out if this is a two slot item or not
                 GItemType itemType = GilesTrinity.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType);
 
-                bool isTwoSlot = GilesTrinity.DetermineIsTwoSlot(itemType);
-                if (isTwoSlot && inventoryRow != 19 && inventoryRow != 9 && inventoryRow != 29)
+                if (item.IsTwoSquareItem && inventoryRow != 19 && inventoryRow != 9 && inventoryRow != 29)
                 {
                     StashSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                 }
-                else if (isTwoSlot && (inventoryRow == 19 || inventoryRow == 9 || inventoryRow == 29))
+                else if (item.IsTwoSquareItem && (inventoryRow == 19 || inventoryRow == 9 || inventoryRow == 29))
                 {
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: There was an error reading your stash, abandoning the process.");
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Always make sure you empty your backpack, open the stash, then RESTART DEMONBUDDY before sorting!");
@@ -2000,7 +1996,7 @@ namespace GilesTrinity
                 // Ignore stackable items
                 if (!GilesTrinity.DetermineIsStackable(itemType) && itemType != GItemType.StaffOfHerding)
                 {
-                    listSortMyStash.Add(new GilesStashSort(((ItemValue / NeedScore) * 1000), 1, inventoryColumn, inventoryRow, item.DynamicId, isTwoSlot));
+                    listSortMyStash.Add(new GilesStashSort(((ItemValue / NeedScore) * 1000), 1, inventoryColumn, inventoryRow, item.DynamicId, item.IsTwoSquareItem));
                 }
             }
 

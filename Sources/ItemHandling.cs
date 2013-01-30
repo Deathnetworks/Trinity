@@ -971,8 +971,7 @@ namespace GilesTrinity
                 BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
 
                 // Try and reliably find out if this is a two slot item or not
-                GItemType tempItemType = DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType);
-                if (DetermineIsTwoSlot(tempItemType) && inventoryRow < 5)
+                if (item.IsTwoSquareItem && inventoryRow < 5)
                 {
                     BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
                 }
