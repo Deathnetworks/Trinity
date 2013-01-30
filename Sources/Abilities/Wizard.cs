@@ -36,9 +36,16 @@ namespace GilesTrinity
             // wiz defbuff testing
             //if (GetHasBuff(SNOPower.Wizard_Archon))
             //{
-            //    return new TrinityPower(SNOPower.Wizard_Archon_Cancel, -1, vNullLocation, -1, -1, -1, -1, false);
+            //    return new TrinityPower(SNOPower.Wizard_Archon_Cancel, 0f, vNullLocation, -1, -1, -1, -1, false);
             //}
 
+            //if (GetHasBuff(SNOPower.Wizard_Archon) && GilesUseTimer(SNOPower.Wizard_Archon_Cancel))
+            //{
+            //    Logging.Write("Cancelling Archon");
+            //    //ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Cancel, PlayerStatus.CurrentPosition, CurrentWorldDynamicId, ZetaDia.Me.CommonData.ACDGuid);
+            //    return new TrinityPower(SNOPower.Wizard_Archon_Cancel, 0f, ZetaDia.Me.Position, -1, -1, -1, -1, false);
+            //}
+            
             // this didn't work either
             //if (GetHasBuff(SNOPower.Wizard_Archon))
             //{
@@ -126,6 +133,13 @@ namespace GilesTrinity
                 {
                     return new TrinityPower(SNOPower.Wizard_DiamondSkin, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 1, USE_SLOWLY);
                 }
+                // Familiar
+                if (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Familiar) &&
+                    PlayerStatus.PrimaryResource >= 20 && GilesUseTimer(SNOPower.Wizard_Familiar))
+                {
+                    return new TrinityPower(SNOPower.Wizard_Familiar, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
+                }
+
                 // The three wizard armors, done in an else-if loop so it doesn't keep replacing one with the other
                 if (!PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 25)
                 {
@@ -166,12 +180,6 @@ namespace GilesTrinity
                 {
                     return new TrinityPower(SNOPower.Wizard_MagicWeapon, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
                 }
-                // Familiar
-                if (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Familiar) &&
-                    PlayerStatus.PrimaryResource >= 25 && GilesUseTimer(SNOPower.Wizard_Familiar))
-                {
-                    return new TrinityPower(SNOPower.Wizard_Familiar, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
-                }
                 // Hydra
                 if (!UseOOCBuff && !PlayerStatus.IsIncapacitated &&
                     LastPowerUsed != SNOPower.Wizard_Hydra &&
@@ -201,7 +209,8 @@ namespace GilesTrinity
                 }
                 // Archon
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_Archon) &&
-                    (ElitesWithinRange[RANGE_30] >= 1 || AnythingWithinRange[RANGE_25] >= 3 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 30f)) &&
+                    (TargetUtil.AnyElitesInRange(30, 1) || TargetUtil.AnyTrashMobsInRange(Settings.Combat.Wizard.ArchonMobDistance, Settings.Combat.Wizard.ArchonMobCount) ||
+                    TargetUtil.IsEliteTargetInRange(30f)) &&
                     PlayerStatus.PrimaryResource >= 25 && PlayerStatus.CurrentHealthPct >= 0.10 &&
                     PowerManager.CanCast(SNOPower.Wizard_Archon))
                 {
@@ -375,7 +384,7 @@ namespace GilesTrinity
                 }
                 // Arcane Strike (Arcane Strike) Rapid Spam at close-range only
                 if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && CurrentTarget.RadiusDistance <= 7f &&
-                    CurrentTarget.IsBossOrEliteRareUnique)
+                    CurrentTarget.IsBossOrEliteRareUnique && !Settings.Combat.Wizard.NoArcaneStrike)
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 7f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
                 }

@@ -50,7 +50,7 @@ namespace GilesTrinity
 
                     // Store all of the player's abilities every now and then, to keep it cached and handy, also check for critical-mass timer changes etc.
                     iCombatLoops++;
-                    if (!HasMappedPlayerAbilities || iCombatLoops >= 50 || bRefreshHotbarAbilities)
+                    if (!HasMappedPlayerAbilities || iCombatLoops >= 5 || bRefreshHotbarAbilities)
                     {
                         // Update the cached player's cache
                         ActorClass tempClass = ActorClass.Invalid;
@@ -64,7 +64,7 @@ namespace GilesTrinity
                         }
 
                         iCombatLoops = 0;
-                        RefreshHotbar(GetHasBuff(SNOPower.Wizard_Archon));
+                        RefreshHotbar();
                         dictAbilityRepeatDelay = new Dictionary<SNOPower, int>(dictAbilityRepeatDefaults);
                         if (Settings.Combat.Wizard.CriticalMass && PlayerStatus.ActorClass == ActorClass.Wizard)
                         {

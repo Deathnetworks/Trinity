@@ -1103,12 +1103,6 @@ namespace GilesTrinity
         }
         private static bool RefreshGilesItem()
         {
-            /*
-             * rrrix note: avoid casting the DiaObject into a DiaItem, and accessing the ACDItem.Name property before the item is identified.
-             * Demonbuddy will cache the item name pre-identification and will cause problems post-identification during Stash/Sell/Salvage routines, which rely on item names for
-             * processing keep/sell logic.
-             */
-
             bool logNewItem = false;
             bool AddToCache = false;
 
@@ -1144,55 +1138,7 @@ namespace GilesTrinity
                 Position = c_Position,
                 ActorSNO = c_ActorSNO
             };
-
-            //// Try and pull up cached item data on this item, if not, add to our local memory cache
-            //GilesGameBalanceDataCache balanceCachEntry;
-            //if (!dictGilesGameBalanceDataCache.TryGetValue(c_BalanceID, out balanceCachEntry))
-            //{
-            //    if (c_diaObject.CommonData != null)
-            //    {
-            //        try
-            //        {
-            //            DiaItem item = c_diaObject as DiaItem;
-            //            c_Name = item.CommonData.Name;
-            //            c_ItemLevel = item.CommonData.Level;
-            //            c_DBItemBaseType = item.CommonData.ItemBaseType;
-            //            c_DBItemType = item.CommonData.ItemType;
-            //            c_IsOneHandedItem = item.CommonData.IsOneHand;
-            //            c_IsTwoHandedItem = item.CommonData.IsTwoHand;
-            //            c_item_tFollowerType = item.CommonData.FollowerSpecialType;
-
-            //            // Add to session cache
-            //            dictGilesGameBalanceDataCache.Add(c_BalanceID, new GilesGameBalanceDataCache(c_Name, c_ItemLevel, c_DBItemBaseType, c_DBItemType, c_IsOneHandedItem, c_IsTwoHandedItem, c_item_tFollowerType));
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-            //                "Safely handled exception getting un-cached ACD Item data (level/item type etc.) for item {0} [{1}]", c_InternalName, c_ActorSNO);
-            //            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-            //            AddToCache = false;
-            //            c_IgnoreSubStep = "CommonDataException";
-            //        }
-            //    }
-            //    else
-            //    {
-            //        // Couldn't get the game balance data for this item, so ignore it for now
-            //        AddToCache = false;
-            //        c_IgnoreSubStep = "NoBalanceData";
-            //    }
-            //}
-            //else
-            //{
-            //    // We pulled this data from the dictionary cache, so use it instead of trying to get new data from DB/D3 memory!
-            //    c_Name = balanceCachEntry.Name;
-            //    c_ItemLevel = balanceCachEntry.ItemLevel;
-            //    c_DBItemBaseType = balanceCachEntry.ItemBaseType;
-            //    c_DBItemType = balanceCachEntry.ItemType;
-            //    c_IsOneHandedItem = balanceCachEntry.OneHand;
-            //    c_IsTwoHandedItem = balanceCachEntry.TwoHand;
-            //    c_item_tFollowerType = balanceCachEntry.FollowerType;
-            //}
-
+            
             // Calculate custom Giles item type
             c_item_GItemType = DetermineItemType(c_InternalName, c_DBItemType, c_item_tFollowerType);
 
@@ -1207,57 +1153,7 @@ namespace GilesTrinity
                 dictGilesObjectTypeCache[c_RActorGuid] = c_ObjectType;
                 AddToCache = true;
             }
-
-            //// Quality of item for "genuine" items
-            //c_ItemQuality = ItemQuality.Invalid;
-            //if (itemBaseType != GItemBaseType.Unknown && itemBaseType != GItemBaseType.HealthGlobe && itemBaseType != GItemBaseType.Gem && itemBaseType != GItemBaseType.Misc &&
-            //    !hashForceSNOToItemList.Contains(c_ActorSNO))
-            //{
-            //    // Get the quality of this item, cached if possible
-            //    if (!dictGilesQualityCache.TryGetValue(c_RActorGuid, out c_ItemQuality))
-            //    {
-            //        try
-            //        {
-            //            c_ItemQuality = (ItemQuality)c_CommonData.GetAttribute<int>(ActorAttributeType.ItemQualityLevel);
-            //        }
-            //        catch
-            //        {
-            //            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting item-quality for item {0} [{1}]", c_InternalName, c_ActorSNO);
-            //            AddToCache = false;
-            //            c_IgnoreSubStep = "ItemQualityLevelException";
-            //        }
-            //        dictGilesQualityCache.Add(c_RActorGuid, c_ItemQuality);
-            //        dictGilesQualityRechecked.Add(c_RActorGuid, false);
-            //    }
-            //    else
-            //    {
-            //        // Because item-quality is such a sensitive thing, we don't want to risk losing items
-            //        // So we check a cached item quality a 2nd time - as long as it's the same, we won't check again
-            //        // However, if there's any inconsistencies, we keep checking, and keep the highest-read quality as the real value
-            //        if (!dictGilesQualityRechecked[c_RActorGuid])
-            //        {
-            //            ItemQuality temporaryItemQualityCheck = ItemQuality.Invalid;
-            //            try
-            //            {
-            //                temporaryItemQualityCheck = (ItemQuality)c_CommonData.GetAttribute<int>(ActorAttributeType.ItemQualityLevel);
-            //                // If the newly-received quality is higher, then store the new quality
-            //                if (temporaryItemQualityCheck > c_ItemQuality)
-            //                {
-            //                    dictGilesQualityCache[c_RActorGuid] = temporaryItemQualityCheck;
-            //                    c_ItemQuality = temporaryItemQualityCheck;
-            //                }
-            //                // And now flag it so we don't check this item again
-            //                dictGilesQualityRechecked[c_RActorGuid] = true;
-            //            }
-            //            catch
-            //            {
-            //                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-            //                    "Safely handled exception double-checking item-quality for item {0} [{1}]", c_InternalName, c_ActorSNO);
-            //            }
-            //        }
-            //    }
-            //}
-
+            
             // Item stats
             logNewItem = RefreshItemStats(itemBaseType);
 

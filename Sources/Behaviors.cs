@@ -119,7 +119,7 @@ namespace GilesTrinity
                     // See if we should update hotbar abilities
                     if (bRefreshHotbarAbilities)
                     {
-                        RefreshHotbar(GetHasBuff(SNOPower.Wizard_Archon));
+                        RefreshHotbar();
                     }
                     if (CurrentPower == null)
                         CurrentPower = AbilitySelector();
@@ -817,13 +817,13 @@ namespace GilesTrinity
 
                 bool shouldTryBlacklist = false;
 
-                if (!CurrentTargetIsNotAvoidance())
+                if (CurrentTarget.Type == GObjectType.Avoidance)
                     return HandlerRunStatus.NotFinished;
 
                 if (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6)
                     shouldTryBlacklist = true;
 
-                if ((CurrentTargetIsUnit() && GetSecondsSinceTargetUpdate() > 15))
+                if ((CurrentTargetIsUnit() && CurrentTarget.IsBoss && GetSecondsSinceTargetUpdate() > 15))
                     shouldTryBlacklist = true;
 
                 // special raycast check for current target after 5 sec
@@ -836,33 +836,26 @@ namespace GilesTrinity
                     // So it won't blacklist a monster "on the edge of the screen" who isn't even being targetted
                     // Don't blacklist monsters on <= 50% health though, as they can't be in a stuck location... can they!? Maybe give them some extra time!
 
-                    bool isNavigable;
-
-                    if (Settings.Combat.Misc.UseNavMeshTargeting)
-                        isNavigable = gp.CanStandAt(gp.WorldToGrid(CurrentTarget.Position.ToVector2()));
-                    else
-                        isNavigable = true;
+                    bool isNavigable = GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination);
 
                     bool addTargetToBlacklist = true;
 
-
                     // PREVENT blacklisting a monster on less than 90% health unless we haven't damaged it for more than 2 minutes
-                    if (CurrentTarget.Type == GObjectType.Unit && isNavigable)
+                    if (CurrentTarget.Type == GObjectType.Unit && isNavigable && CurrentTarget.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Kamikaze)
                     {
-                        if (CurrentTarget.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Kamikaze)
-                            addTargetToBlacklist = false;
+                        addTargetToBlacklist = false;
                     }
 
                     // Check if we can Raycast to a trash mob
-                    if (CurrentTarget.IsTrashMob &&
-                        GetSecondsSinceTargetUpdate() > 4 &&
-                        CurrentTarget.HitPoints > 0.90)
-                    {
-                        if (GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
-                        {
-                            addTargetToBlacklist = false;
-                        }
-                    }
+                    //if (CurrentTarget.IsTrashMob &&
+                    //    GetSecondsSinceTargetUpdate() > 4 &&
+                    //    CurrentTarget.HitPoints > 0.90)
+                    //{
+                    //    if (GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
+                    //    {
+                    //        addTargetToBlacklist = false;
+                    //    }
+                    //}
 
                     if (addTargetToBlacklist)
                     {
@@ -1260,7 +1253,7 @@ namespace GilesTrinity
             statusText.Append("Weight=");
             statusText.Append(CurrentTarget.Weight.ToString("0"));
 
-            statusText.Append(String.Format(" Duration={0:0.000}", DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds));
+            statusText.Append(String.Format(" Duration={0:0.0}", DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds));
 
             if (!targetIsInRange)
                 statusText.Append(" MOVING INTO RANGE");

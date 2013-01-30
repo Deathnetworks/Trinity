@@ -346,7 +346,7 @@ namespace GilesTrinity
                 {SNOPower.Monk_WayOfTheHundredFists, 5},
                 {SNOPower.Monk_LashingTailKick, 250},
                 {SNOPower.Monk_TempestRush, 50},
-                {SNOPower.Monk_WaveOfLight, 250},
+                {SNOPower.Monk_WaveOfLight, 750},
                 {SNOPower.Monk_BlindingFlash, 15200},
                 {SNOPower.Monk_BreathOfHeaven, 15200},
                 {SNOPower.Monk_Serenity, 20200},
@@ -397,6 +397,7 @@ namespace GilesTrinity
                 {SNOPower.Wizard_Archon_DisintegrationWave, 5},
                 {SNOPower.Wizard_Archon_SlowTime, 16000},
                 {SNOPower.Wizard_Archon_Teleport, 10000},
+                {SNOPower.Wizard_Archon_Cancel, 1500},
                 // Witch Doctor skills
                 {SNOPower.Witchdoctor_PoisonDart, 5},
                 {SNOPower.Witchdoctor_CorpseSpider, 5},

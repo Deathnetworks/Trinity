@@ -5,14 +5,16 @@ using GilesTrinity.Technicals;
 using Zeta;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
+using Zeta.Internals;
 using Zeta.Internals.Actors;
+
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
         // Refresh the skills in our hotbar
-        // Also caches the values after - but ONLY if we aren't in archon mode (or if this function is told NOT to cache this)
-        public static void RefreshHotbar(bool dontCacheThis = false)
+        // Also caches the values after - but ONLY if we aren't in archon mode
+        public static void RefreshHotbar()
         {
             using (new PerformanceLogger("RefreshHotbar"))
             {
@@ -21,8 +23,12 @@ namespace GilesTrinity
                 for (int i = 0; i <= 5; i++)
                 {
                     Hotbar.Add(ZetaDia.CPlayer.GetPowerForSlot((HotbarSlot)i));
-                } bRefreshHotbarAbilities = false;
-                if (!dontCacheThis)
+                } 
+                bRefreshHotbarAbilities = false;
+
+                HotbarSkills.Update();
+
+                if (!GetHasBuff(SNOPower.Wizard_Archon))
                     hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(Hotbar);
             }
         }
@@ -188,7 +194,7 @@ namespace GilesTrinity
 
                 // See if archon just appeared/disappeared, so update the hotbar
                 if (bRefreshHotbarAbilities)
-                    RefreshHotbar(GetHasBuff(SNOPower.Wizard_Archon));
+                    RefreshHotbar();
 
                 // Extra height thingy, not REALLY used as it was originally going to be, will probably get phased out...
                 float iThisHeight = iExtraHeight;
@@ -223,7 +229,7 @@ namespace GilesTrinity
         }
 
         /// <summary>
-        /// Returns true if we have the ability and the buff is up, or if we don't have the ability in our hotbar
+        /// Returns true if we have the ability and the buff is up, or true if we don't have the ability in our hotbar
         /// </summary>
         /// <param name="snoPower"></param>
         /// <returns></returns>
@@ -280,5 +286,10 @@ namespace GilesTrinity
                     return 10f;
             }
         }
+
+
+
+
     }
+
 }

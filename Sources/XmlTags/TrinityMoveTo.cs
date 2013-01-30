@@ -69,8 +69,6 @@ namespace GilesTrinity.XmlTags
             }
 
             // Now use Trinity movement to try a direct movement towards that location
-
-            // Use DefaultNavigationProvider for static worlds
             Vector3 NavTarget = Position;
             Vector3 MyPos = GilesTrinity.PlayerStatus.CurrentPosition;
             if (!ZetaDia.WorldInfo.IsGenerated && Vector3.Distance(MyPos, NavTarget) > 250)

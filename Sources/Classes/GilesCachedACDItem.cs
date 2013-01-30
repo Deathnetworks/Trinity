@@ -3,7 +3,7 @@ using Zeta.Internals;
 using Zeta.Internals.Actors;
 namespace GilesTrinity
 {
-    // GilesCachedACDItem - Special caching class to help with backpack-item handling
+    // CachedACDItem - Special caching class to help with backpack-item handling
     // So we can make an object, read all item stats from a backpack item *ONCE*, then store it here while my behavior trees process everything
     // Preventing any need for calling D3 memory again after the initial read (every D3 memory read is a chance for a DB crash/item mis-read/stuck!)
     public class GilesCachedACDItem : IComparable
@@ -20,7 +20,9 @@ namespace GilesTrinity
         public bool TwoHanded { get; set; }
         public DyeType DyeType { get; set; }
         public ItemType DBItemType { get; set; }
-        public Zeta.Internals.Actors.ItemBaseType DBBaseType { get; set; }
+        public ItemBaseType DBBaseType { get; set; }
+        public GItemBaseType TrinityItemBaseType { get; set; }
+        public GItemType TrinityItemType { get; set; }
         public FollowerType FollowerType { get; set; }
         public bool IsUnidentified { get; set; }
         public int ItemStackQuantity { get; set; }
@@ -144,22 +146,22 @@ namespace GilesTrinity
 
         public GilesCachedACDItem(
             ACDItem acdItem,
-            string internalName, 
-            string realName, 
-            int level, 
-            ItemQuality quality, 
-            int goldAmount, 
-            int balanceId, 
-            int dynamicId, 
+            string internalName,
+            string realName,
+            int level,
+            ItemQuality quality,
+            int goldAmount,
+            int balanceId,
+            int dynamicId,
             float dps,
-            bool oneHanded, 
+            bool oneHanded,
             bool twoHanded,
-            DyeType dyeType, 
+            DyeType dyeType,
             ItemType itemType,
-            Zeta.Internals.Actors.ItemBaseType itembasetype, 
-            FollowerType followerType, 
-            bool unidentified, 
-            int stackQuantity, 
+            Zeta.Internals.Actors.ItemBaseType itembasetype,
+            FollowerType followerType,
+            bool unidentified,
+            int stackQuantity,
             ItemStats itemStats)
         {
             AcdItem = acdItem;
@@ -237,6 +239,8 @@ namespace GilesTrinity
             WeaponMaxDamage = itemStats.WeaponMaxDamage;
             WeaponMinDamage = itemStats.WeaponMinDamage;
 
+            TrinityItemType = GilesTrinity.DetermineItemType(internalName, itemType, followerType);
+            TrinityItemBaseType = GilesTrinity.DetermineBaseType(TrinityItemType);
         }
 
 
@@ -252,6 +256,36 @@ namespace GilesTrinity
                 return 0;
             else
                 return 1;
+        }
+
+        public static GilesCachedACDItem GetCachedItem(ACDItem item)
+        {
+            GilesCachedACDItem cItem = new GilesCachedACDItem(item.Stats)
+            {
+                AcdItem = item,
+                InternalName = item.InternalName,
+                RealName = item.Name,
+                Level = item.Level,
+                Quality = item.ItemQualityLevel,
+                GoldAmount = item.Gold,
+                BalanceID = item.GameBalanceId,
+                DynamicID = item.DynamicId,
+                OneHanded = item.IsOneHand,
+                TwoHanded = item.IsTwoHand,
+                DyeType = item.DyeType,
+                DBItemType = item.ItemType,
+                DBBaseType = item.ItemBaseType,
+                FollowerType = item.FollowerSpecialType,
+                IsUnidentified = item.IsUnidentified,
+                ItemStackQuantity = item.ItemStackQuantity,
+                Row = item.InventoryRow,
+                Column = item.InventoryColumn,
+                ItemLink = item.ItemLink,
+                TrinityItemType = GilesTrinity.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType),
+                TrinityItemBaseType = GilesTrinity.DetermineBaseType(GilesTrinity.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType))
+            };
+
+            return cItem;
         }
     }
 }

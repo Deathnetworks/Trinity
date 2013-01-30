@@ -293,6 +293,14 @@ namespace GilesTrinity
             if (SalvageValidation(cItem))
                 return false;
 
+            if (StashValidation(cItem, cItem.AcdItem))
+                return false;
+
+            if (ItemManager.Current.ItemIsProtected(cItem.AcdItem))
+            {
+                return false;
+            }
+
             GItemType thisGilesItemType = GilesTrinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
             GItemBaseType thisGilesBaseType = GilesTrinity.DetermineBaseType(thisGilesItemType);
             switch (thisGilesBaseType)
@@ -335,6 +343,11 @@ namespace GilesTrinity
 
             // Take Salvage Option corresponding to ItemLevel
             SalvageOption salvageOption = GetSalvageOption(cItem.Quality);
+
+            if (ItemManager.Current.ItemIsProtected(cItem.AcdItem))
+            {
+                return false;
+            }
 
             if (cItem.Quality >= ItemQuality.Legendary && salvageOption == SalvageOption.InfernoOnly && cItem.Level >= 60)
                 return true;
@@ -380,6 +393,11 @@ namespace GilesTrinity
 
         internal static Stopwatch TownRunCheckTimer = new Stopwatch();
 
+        internal static bool StashValidation(GilesCachedACDItem cItem)
+        {
+            return StashValidation(cItem, cItem.AcdItem);
+        }
+
         /// <summary>
         /// Determines if we should stash this item or not
         /// </summary>
@@ -388,7 +406,11 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool StashValidation(GilesCachedACDItem cItem, ACDItem item)
         {
-            //bool shouldStashItem = GilesTrinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy ? GilesTrinity.ShouldWeStashThis(cItem, item) : ItemManager.ShouldStashItem(item);
+            if (ItemManager.Current.ItemIsProtected(cItem.AcdItem))
+            {
+                return false;
+            }
+
             bool shouldStashItem = GilesTrinity.ShouldWeStashThis(cItem, item);
             return shouldStashItem;
         }
@@ -708,10 +730,6 @@ namespace GilesTrinity
                 {
                     if (!ItemManager.Current.ItemIsProtected(item))
                     {
-                        //GilesCachedACDItem thiscacheditem = new GilesCachedACDItem(thisitem, thisitem.InternalName, thisitem.Name, thisitem.Level, thisitem.ItemQualityLevel, thisitem.Gold, thisitem.GameBalanceId,
-                        //    thisitem.DynamicId, thisitem.Stats.WeaponDamagePerSecond, thisitem.IsOneHand, thisitem.IsTwoHand, thisitem.DyeType, thisitem.ItemType, thisitem.ItemBaseType, thisitem.FollowerSpecialType,
-                        //    thisitem.IsUnidentified, thisitem.ItemStackQuantity, thisitem.Stats);
-
                         GilesCachedACDItem cItem = new GilesCachedACDItem(item.Stats)
                         {
                             AcdItem = item,

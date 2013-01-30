@@ -1,5 +1,6 @@
 using GilesTrinity.Technicals;
 using System;
+using System.Linq;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
@@ -92,16 +93,15 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 1, USE_SLOWLY);
             }
 
-
             // Sweeping wind
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) &&
-                (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_20] >= 3 || (AnythingWithinRange[RANGE_20] >= 1 && Settings.Combat.Monk.HasInnaSet) ||
+            if (Hotbar.Contains(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) &&
+                (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_20] >= 3 || Settings.Combat.Monk.HasInnaSet ||
                 (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 25f)) &&
+                // Check our mantras, if we have them, are up first
+                Monk_HasMantraAbilityAndBuff() &&
                 // Check if either we don't have blinding flash, or we do and it's been cast in the last 8000ms
                 (DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 8000 || CheckAbilityAndBuff(SNOPower.Monk_BlindingFlash) ||
                 ElitesWithinRange[RANGE_25] > 0 && DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 12500) &&
-                // Check our mantras, if we have them, are up first
-                Monk_HasMantraAbilityAndBuff() &&
                 // Check the re-use timer and energy costs
                 (PlayerStatus.PrimaryResource >= 75 || (Settings.Combat.Monk.HasInnaSet && PlayerStatus.PrimaryResource >= 5)))
             {
@@ -127,12 +127,23 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.Monk_ExplodingPalm, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
+
+            //SkillDict.Add("CycloneStrike", SNOPower.Monk_CycloneStrike);
+            //RuneDict.Add("EyeOfTheStorm", 3);
+            //RuneDict.Add("Implosion", 1);
+            //RuneDict.Add("Sunburst", 0);
+            //RuneDict.Add("WallOfWind", 4);
+            //RuneDict.Add("SoothingBreeze", 2);
+
+            bool hasCycloneStikeEyeOfTheStorm = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_CycloneStrike && s.RuneIndex == 3);
+            bool hasCycloneStikeImposion = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_CycloneStrike && s.RuneIndex == 1);
+
             // Cyclone Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_20] >= 1 || AnythingWithinRange[RANGE_20] >= 2 ||
+                (ElitesWithinRange[RANGE_20] >= 1 || AnythingWithinRange[RANGE_20] >= 2 || (hasCycloneStikeImposion && AnythingWithinRange[RANGE_30] >= 2) ||
                 (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 18f)) &&
                 Hotbar.Contains(SNOPower.Monk_CycloneStrike) &&
-                ((PlayerStatus.PrimaryResource >= 50 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
+                (((PlayerStatus.PrimaryResource >= 50 || (hasCycloneStikeEyeOfTheStorm && PlayerStatus.PrimaryResource >= 30)) && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                 GilesUseTimer(SNOPower.Monk_CycloneStrike) && PowerManager.CanCast(SNOPower.Monk_CycloneStrike))
             {
                 return new TrinityPower(SNOPower.Monk_CycloneStrike, 0f, vNullLocation, CurrentWorldDynamicId, -1, 2, 2, USE_SLOWLY);
@@ -204,14 +215,25 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
+
+
+            // thanks tinnvec :)
+            //SkillDict.Add("WaveOfLight", SNOPower.Monk_WaveOfLight);
+            //RuneDict.Add("WallOfLight", 0);
+            //RuneDict.Add("ExplosiveLight", 1);
+            //RuneDict.Add("EmpoweredWave", 3);
+            //RuneDict.Add("BlindingLight", 4);
+            //RuneDict.Add("PillarOfTheAncients", 2);
+            bool hasEmpoweredWaveRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WaveOfLight && s.RuneIndex == 3);
+
             // Wave of light
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_25] > 0 ||
-                (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 14f) ||
-                AnythingWithinRange[RANGE_15] > 2) &&
                 Hotbar.Contains(SNOPower.Monk_WaveOfLight) &&
                 GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
-                (PlayerStatus.PrimaryResource >= 90 || PlayerStatus.PrimaryResourcePct >= 0.85) && Monk_HasMantraAbilityAndBuff())
+                (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 20f)) &&
+                (PlayerStatus.PrimaryResource >= 70 || 
+                 (hasEmpoweredWaveRune && PlayerStatus.PrimaryResource >= 40 && !IsWaitingForSpecial)) && // Empowered Wave
+                Monk_HasMantraAbilityAndBuff())
             {
                 return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }

@@ -75,7 +75,7 @@
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Kite:" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="Normal" />
-                <ComboBox Grid.Column="1" Grid.Row="0"  Width="150" SelectedValuePath="Tag" SelectedValue="{Binding Path=Wiz.KiteOptions}" Margin="15,0,0,0">
+                <ComboBox Grid.Column="1" Grid.Row="0"  Width="150" SelectedValuePath="Tag" SelectedValue="{Binding Path=Wiz.KiteOption}" Margin="15,0,0,0">
                     <ComboBoxItem Content="Anytime" Tag="Anytime" ToolTip="Always Kite" />
                     <ComboBoxItem Content="Archon Form Only" Tag="ArchonOnly" IsSelected="True" ToolTip="Kite in Archon Form Only" />
                     <ComboBoxItem Content="Normal Form Only" Tag="NormalOnly" ToolTip="Kite in Normal Form Only" />
@@ -118,14 +118,14 @@
                 Interval="500" Maximum="10" Minimum="1" 
                 SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True"
                 TickPlacement="BottomRight" TickFrequency="1"
-                Value="{Binding Path=Wiz.ArchonCancelSeconds}" 
+                Value="{Binding Path=Wiz.ArchonMobCount}" 
                 HorizontalAlignment="Stretch"  Margin="5,0,0,0"/>
-            <TextBlock Grid.Column="2"  Text="Mob Range" FontWeight="Normal" TextAlignment="Center" VerticalAlignment="Center"  Margin="5,0,0,0"/>
+            <TextBlock Grid.Column="2"  Text="Min Range" FontWeight="Normal" TextAlignment="Center" VerticalAlignment="Center"  Margin="5,0,0,0"/>
             <Slider Grid.Column="3" Template="{DynamicResource Slider}" Width="120"
                 Interval="500" Maximum="50" Minimum="5" 
                 SmallChange="1" LargeChange="5"  IsSnapToTickEnabled="True"
                 TickPlacement="BottomRight" TickFrequency="5"
-                Value="{Binding Path=Wiz.ArchonCancelSeconds}" 
+                Value="{Binding Path=Wiz.ArchonMobDistance}" 
                 HorizontalAlignment="Stretch"  Margin="5,0,0,0"/>
         </Grid>
 

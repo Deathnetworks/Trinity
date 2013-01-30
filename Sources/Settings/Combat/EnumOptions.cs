@@ -16,4 +16,10 @@ namespace GilesTrinity.Settings.Combat
         CombatOnly = 2,
         Always = 3
     }
+    public enum WizardKiteOption
+    {
+        Anytime,
+        ArchonOnly,
+        NormalOnly
+    }
 }

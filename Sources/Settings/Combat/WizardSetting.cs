@@ -39,6 +39,11 @@ namespace GilesTrinity.Settings.Combat
         private bool _CriticalMass;
         private bool _OnlyKiteInArchon;
         private bool _WaitArchon;
+
+        private bool _NoArcaneStrike;
+        private int _ArchonMobCount;
+        private float _ArchonMobDistance;
+        private WizardKiteOption _KiteOption;
         #endregion Fields
 
         #region Events
@@ -60,6 +65,78 @@ namespace GilesTrinity.Settings.Combat
 
         #region Properties
         [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool NoArcaneStrike
+        {
+            get
+            {
+                return _NoArcaneStrike;
+            }
+            set
+            {
+                if (_NoArcaneStrike != value)
+                {
+                    _NoArcaneStrike = value;
+                    OnPropertyChanged("NoArcaneStrike");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(2)]
+        public int ArchonMobCount
+        {
+            get
+            {
+                return _ArchonMobCount;
+            }
+            set
+            {
+                if (_ArchonMobCount != value)
+                {
+                    _ArchonMobCount = value;
+                    OnPropertyChanged("ArchonMobCount");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.7f)]
+        public float ArchonMobDistance
+        {
+            get
+            {
+                return _ArchonMobDistance;
+            }
+            set
+            {
+                if (_ArchonMobDistance != value)
+                {
+                    _ArchonMobDistance = value;
+                    OnPropertyChanged("ArchonMobDistance");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(WizardKiteOption.Anytime)]
+        public WizardKiteOption KiteOption
+        {
+            get
+            {
+                return _KiteOption;
+            }
+            set
+            {
+                if (_KiteOption != value)
+                {
+                    _KiteOption = value;
+                    OnPropertyChanged("KiteOption");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.7f)]
         public float PotionLevel
         {
@@ -73,6 +150,59 @@ namespace GilesTrinity.Settings.Combat
                 {
                     _PotionLevel = value;
                     OnPropertyChanged("PotionLevel");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool CriticalMass
+        {
+            get
+            {
+                return _CriticalMass;
+            }
+            set
+            {
+                if (_CriticalMass != value)
+                {
+                    _CriticalMass = value;
+                    OnPropertyChanged("CriticalMass");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool OnlyKiteInArchon
+        {
+            get
+            {
+                return _OnlyKiteInArchon;
+            }
+            set
+            {
+                if (_OnlyKiteInArchon != value)
+                {
+                    _OnlyKiteInArchon = value;
+                    OnPropertyChanged("OnlyKiteInArchon");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool WaitArchon
+        {
+            get
+            {
+                return _WaitArchon;
+            }
+            set
+            {
+                if (_WaitArchon != value)
+                {
+                    _WaitArchon = value;
+                    OnPropertyChanged("WaitArchon");
                 }
             }
         }
@@ -581,59 +711,7 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool CriticalMass
-        {
-            get
-            {
-                return _CriticalMass;
-            }
-            set
-            {
-                if (_CriticalMass != value)
-                {
-                    _CriticalMass = value;
-                    OnPropertyChanged("CriticalMass");
-                }
-            }
-        }
 
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool OnlyKiteInArchon
-        {
-            get
-            {
-                return _OnlyKiteInArchon;
-            }
-            set
-            {
-                if (_OnlyKiteInArchon != value)
-                {
-                    _OnlyKiteInArchon = value;
-                    OnPropertyChanged("OnlyKiteInArchon");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool WaitArchon
-        {
-            get
-            {
-                return _WaitArchon;
-            }
-            set
-            {
-                if (_WaitArchon != value)
-                {
-                    _WaitArchon = value;
-                    OnPropertyChanged("WaitArchon");
-                }
-            }
-        }
         #endregion Properties
 
         #region Methods
@@ -663,6 +741,18 @@ namespace GilesTrinity.Settings.Combat
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        /// <summary>
+        /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserializing()]
+        internal void OnDeserializingMethod(StreamingContext context)
+        {
+            this._ArchonMobDistance = 25;
+            this._ArchonMobCount = 3;
+        }
+
         #endregion Methods
     }
 }

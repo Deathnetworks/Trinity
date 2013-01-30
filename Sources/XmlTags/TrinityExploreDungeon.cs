@@ -254,11 +254,7 @@ namespace GilesTrinity.XmlTags
                 return GilesTrinity.gp;
             }
         }
-        //private static PathFinder pf { get { return GilesTrinity.pf; } }
-        /// <summary>
-        /// Contains the current navigation path
-        /// </summary>
-        //private IndexedList<Vector3> PathStack = new IndexedList<Vector3>();
+
         /// <summary>
         /// The last scene SNOId we entered
         /// </summary>
@@ -1019,50 +1015,7 @@ namespace GilesTrinity.XmlTags
                 }
             }
 
-            //if (DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000 ||
-            //    (DateTime.Now.Subtract(GilesTrinity.lastHadUnitInSights).TotalMilliseconds < 250 || DateTime.Now.Subtract(GilesTrinity.lastHadEliteUnitInSights).TotalMilliseconds < 250))
-            //{
-            //    // Generate nodes for the PathStack
-            //    //PathStack = PlayerMover.GeneratePath(myPos, NextNode.NavigableCenter);
-            //    Navigator.Clear();
-            //    lastGeneratedPath = DateTime.Now;
-            //    newPath = true;
-            //}
-
-            //if (DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds > 5000 && PlayerMover.GetMovementSpeed() < 1)
-            //{
-            //    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Clearing current dungeon path newPath={0}, MS={1}, LastGeneratedPath={2}",
-            //        newPath, PlayerMover.GetMovementSpeed(), DateTime.Now.Subtract(lastGeneratedPath).TotalMilliseconds);
-            //    Navigator.Clear();
-            //}
-
-            //if (PathStack.Any())
-            //{
-            //    moveTarget = PathStack.Current;
-            //}
-
-            //var distToTarget = moveTarget.Distance2D(myPos);
-            //if (distToTarget <= 5f || (PlayerMover.GetMovementSpeed() < 1 && distToTarget <= 50f && Navigator.Raycast(moveTarget, myPos)))
-            //{
-            //    Vector3 lastStep = PathStack.Current;
-            //    PathStack.Next();
-            //    PathStack.RemoveAt(0);
-            //    if (PathStack.Any())
-            //    {
-            //        moveTarget = PathStack.Current;
-            //        distToTarget = moveTarget.Distance2D(myPos);
-            //        DbHelper.Log(LogCategory.Movement, "[Path] removed:{0} next:{1} dist:{2} dir:{3}",
-            //            lastStep, moveTarget, Vector3.Distance(lastStep, moveTarget), GilesTrinity.GetHeadingToPoint(moveTarget));
-            //    }
-            //    else
-            //    {
-            //        SetNodeVisited("Current movement stack is empty!");
-            //        UpdateRoute();
-            //    }
-            //}
-
             Navigator.MoveTo(CurrentNavTarget);
-            //Navigator.PlayerMover.MoveTowards(moveTarget);
         }
         /// <summary>
         /// Initizializes the profile tag and sets defaults as needed
