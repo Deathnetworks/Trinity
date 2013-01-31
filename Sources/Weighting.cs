@@ -282,7 +282,7 @@ namespace GilesTrinity
                                             {
                                                 iTotalNumberGoblins++;
                                                 lastGoblinTime = DateTime.Now;
-                                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "[Trinity] Goblin #{0} in sight. Distance={1}", iTotalNumberGoblins, cacheObject.CentreDistance);
+                                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Goblin #{0} in sight. Distance={1:0}", iTotalNumberGoblins, cacheObject.CentreDistance);
                                             }
                                             else
                                             {

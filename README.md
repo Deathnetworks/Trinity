@@ -2,66 +2,59 @@
 
 ### Changelog 1.7.1.19:
 
+* Requires DemonbuddyBETA .155 or higher (will not compile otherwise)
+
+* Implimented new Item Manager - Demonbuddy is now (mostly) in control of town runs (stashing, selling, salvaging)
+
+* Fixed Monk SeepingWind not spamming 
+
+* Modified all PathFinding and Navigation code to use the DB Navigator now (there were fixes for generated worlds in .151)
+
+* Improved a few monk abilities with rune detection / cyclone strike / wave of light
+
+* Wired up new Wiz GUI options to Wizard Ability selection - can now select minimum archon mob count and minimum mob distance, and selectable archon kite form (anytime/normal only/archon only)
+
+* Created new TargetUtil helper class - makes for a cleaner, more organized ability selector spaghetti
+
+* Created new HotbarSkills helper class - we can now detect runes in ability selection
+
+* Stucks are again logged to UserInformation category (always visible in logs)
+
+* Changed Raycast methods to use DB Navigator/Mesh raycast (should be faster and hopefully crash less!)  
+
+* Should no longer continue with profile tags while bags are full before doing a town run. 
+
+* Barbarian WW / Monk TR single target zig zag should now work a little better
+
+* TrinityExploreDungeon can now use sceneName with until="SceneFound", and PrioritizeScenes pathPrecision attribute actually works now (instead of using tag pa
+
+* Added new TrinityMoveToScene tag - moves to the center of a matching scene, if found (basically same code from TrinityExploreDungeon)
+
+* Increased treasure goblin 'Prioritize' weight from 10k to 15k
+
 * Reverted TrinityMoveTo to always use the DB Navigator (but still always with "local" navigation)
 
+ItemRules changes:  
 
-TODO:
+    - added [WEIGHTS] you can use now scoring from DB inside rules  
 
-Add Shielded to cache
-Add GilesObject.IsShielded
-Add Weight = 100 for IsShielded
-
-move unstucker into decorator func and assign target to global handler for movement
-if we have target, determine unstucker by last spell, target assingment time, and movement speed
-
-move gold inactivity timer into decorator func
-
-Forum requests:
-Change TownRun order from stash/sell/salvage to salvage/sell/stash - DONE! +2
-
-Monk: Make tempest rush really work well - "like a human", +10 
-
-Combat: Add options to ignore trash mobs +2 
-Stats Logs: Add world names to per-world statistics +2
-Stats Logs: average game length and games per hour calculated from this +1
-Behaviors: Avoid town portals while standing near Demonic Forges +3
-Behaviors: Find and open all resplendent chests +10
-Behaviors: Improve unstucker, make it also work while we have a target +10
-Behaviors: Improve GoldInactivity, allow it to run even while no movement command is being executed +10
-WitchDoctor: Optional spam dogs and gargantuan +5
-
-Wizards: Get Wizards to keep using default attacks when using CM/WW builds
-Wizards: Add option to disable arcane strike in Archon form
-Wizards: Add comprehensive options to cancel archon form (timeout, buffs, no-combat)
-Wizards: Increase buff priority for Familiar
-Wizards: Add options for when to enter archon form (min elites, min trash mob count/distance)
-
-
-
-===Wizard===
-Kite When:
--Always
--Archon form only
--Normal form only
-
-Archon ReBuff ComboBox:
--Never
--After timer expires
--To Rebuff Armor
--To Rebuff MagicWeapon OR Familiar
-
-Archon ReBuff sliders:
-Timer (seconds) 90-300 tick value 5
-minimum trash mob count slider 1-20
-minimum trash mob range slider 5-50 tick value 5
-
-
-Archon: Disable Arcane Strike
-Familiar: buff first
-
-
-
-
+    - fixed [AS%] working now on weapon, armor and jewelry  
+    - name is now correctly working (item name bug is fixed)  
+    - changed [AS%] now working also on weapons   
+    - changed [BLOCK%] now working also on shield  
+    - added [TOTBLOCK%] for total blockchance on shield  
+    - added [DMGVSELITE%] for percent damage bonus vs elite  
+    - added [DMGREDELITE%] for percent damage reduction from elite  
+    - added [EXPBONUS] for experience bonus  
+    - added [LOK] for Life on kill  
+    - added [REQLEVEL] for item required level  
+    - added [WEAPDMGTYPE] (Arcane,Holy, etv.)  
+    - added [WEAPDMG%] for damage % enhancment on wepon  
+    - added [ROLL] representing the attribut roll on magic and rare items  
+    - added [D3QUALITY] orginal db quality rare3,rare4 etc.  
+    - Polearm and Andariels workaround removed again ... DB is right now  
+    - maximum function is now usable examples will follow  
+    - changed logging to use with itemviewer  
 
 
 
