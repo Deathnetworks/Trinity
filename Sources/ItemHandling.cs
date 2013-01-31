@@ -389,34 +389,36 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        internal static bool DetermineIsStackable(GItemType itemType)
-        {
-            return itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome || itemType == GItemType.Ruby ||
-                   itemType == GItemType.Emerald || itemType == GItemType.Topaz || itemType == GItemType.Amethyst ||
-                   itemType == GItemType.HealthPotion || itemType == GItemType.CraftingPlan || itemType == GItemType.Dye ||
-                   itemType == GItemType.InfernalKey;
-        }
+        //internal static bool DetermineIsStackable(GItemType itemType)
+        //{
+
+
+        //    return itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome || itemType == GItemType.Ruby ||
+        //           itemType == GItemType.Emerald || itemType == GItemType.Topaz || itemType == GItemType.Amethyst ||
+        //           itemType == GItemType.HealthPotion || itemType == GItemType.CraftingPlan || itemType == GItemType.Dye ||
+        //           itemType == GItemType.InfernalKey;
+        //}
 
         /// <summary>
         /// DetermineIsTwoSlot - Tries to calculate what items take up 2 slots or 1
         /// </summary>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        internal static bool DetermineIsTwoSlot(GItemType itemType)
-        {
-            return (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
-                    itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
-                    itemType == GItemType.Spear || itemType == GItemType.Sword || itemType == GItemType.Wand ||
-                    itemType == GItemType.TwoHandDaibo || itemType == GItemType.TwoHandCrossbow || itemType == GItemType.TwoHandMace ||
-                    itemType == GItemType.TwoHandMighty || itemType == GItemType.TwoHandPolearm || itemType == GItemType.TwoHandStaff ||
-                    itemType == GItemType.TwoHandSword || itemType == GItemType.TwoHandAxe || itemType == GItemType.HandCrossbow ||
-                    itemType == GItemType.TwoHandBow || itemType == GItemType.Mojo || itemType == GItemType.Orb ||
-                    itemType == GItemType.Quiver || itemType == GItemType.Shield || itemType == GItemType.Boots ||
-                    itemType == GItemType.Bracer || itemType == GItemType.Chest || itemType == GItemType.Cloak ||
-                    itemType == GItemType.Gloves || itemType == GItemType.Helm || itemType == GItemType.Legs ||
-                    itemType == GItemType.Shoulder || itemType == GItemType.SpiritStone ||
-                    itemType == GItemType.VoodooMask || itemType == GItemType.WizardHat || itemType == GItemType.StaffOfHerding);
-        }
+        //internal static bool DetermineIsTwoSlot(GItemType itemType)
+        //{
+        //    return (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
+        //            itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
+        //            itemType == GItemType.Spear || itemType == GItemType.Sword || itemType == GItemType.Wand ||
+        //            itemType == GItemType.TwoHandDaibo || itemType == GItemType.TwoHandCrossbow || itemType == GItemType.TwoHandMace ||
+        //            itemType == GItemType.TwoHandMighty || itemType == GItemType.TwoHandPolearm || itemType == GItemType.TwoHandStaff ||
+        //            itemType == GItemType.TwoHandSword || itemType == GItemType.TwoHandAxe || itemType == GItemType.HandCrossbow ||
+        //            itemType == GItemType.TwoHandBow || itemType == GItemType.Mojo || itemType == GItemType.Orb ||
+        //            itemType == GItemType.Quiver || itemType == GItemType.Shield || itemType == GItemType.Boots ||
+        //            itemType == GItemType.Bracer || itemType == GItemType.Chest || itemType == GItemType.Cloak ||
+        //            itemType == GItemType.Gloves || itemType == GItemType.Helm || itemType == GItemType.Legs ||
+        //            itemType == GItemType.Shoulder || itemType == GItemType.SpiritStone ||
+        //            itemType == GItemType.VoodooMask || itemType == GItemType.WizardHat || itemType == GItemType.StaffOfHerding);
+        //}
 
         /// <summary>
         /// Search backpack to see if we have room for a 2-slot item anywhere
@@ -581,7 +583,10 @@ namespace GilesTrinity
             }
 
             // auto trash blue weapons/armor/jewlery
-            if (IsWeaponArmorJewlery(cItem) && cItem.Quality < ItemQuality.Rare4)
+            if ((acdItem.ItemBaseType == ItemBaseType.Armor
+               || acdItem.ItemBaseType == ItemBaseType.Weapon
+               || acdItem.ItemBaseType == ItemBaseType.Jewelry)
+                  && cItem.Quality < ItemQuality.Rare4)
             {
                 return false;
             }
@@ -600,7 +605,7 @@ namespace GilesTrinity
             }
 
             // Ok now try to do some decent item scoring based on item types
-            double iNeedScore = ScoreNeeded(TrueItemType);
+            double iNeedScore = ScoreNeeded(acdItem.ItemBaseType);
             double iMyScore = ValueThisItem(cItem, TrueItemType);
 
             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, TrueItemType, iMyScore);
@@ -620,33 +625,46 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="thisGilesItemType"></param>
         /// <returns></returns>
-        internal static double ScoreNeeded(GItemType thisGilesItemType)
+        internal static double ScoreNeeded(ItemBaseType itemBaseType)
         {
-            double iThisNeedScore = 0;
+            switch (itemBaseType)
+            {
+                case ItemBaseType.Weapon:
+                    return Math.Round((double)Settings.Loot.TownRun.WeaponScore);
+                case ItemBaseType.Armor:
+                    return Math.Round((double)Settings.Loot.TownRun.ArmorScore);
+                case ItemBaseType.Jewelry:
+                    return Math.Round((double)Settings.Loot.TownRun.JewelryScore);
+                default:
+                    return 0;
+            }
 
-            // Weapons
-            if (thisGilesItemType == GItemType.Axe || thisGilesItemType == GItemType.CeremonialKnife || thisGilesItemType == GItemType.Dagger ||
-                thisGilesItemType == GItemType.FistWeapon || thisGilesItemType == GItemType.Mace || thisGilesItemType == GItemType.MightyWeapon ||
-                thisGilesItemType == GItemType.Spear || thisGilesItemType == GItemType.Sword || thisGilesItemType == GItemType.Wand ||
-                thisGilesItemType == GItemType.TwoHandDaibo || thisGilesItemType == GItemType.TwoHandCrossbow || thisGilesItemType == GItemType.TwoHandMace ||
-                thisGilesItemType == GItemType.TwoHandMighty || thisGilesItemType == GItemType.TwoHandPolearm || thisGilesItemType == GItemType.TwoHandStaff ||
-                thisGilesItemType == GItemType.TwoHandSword || thisGilesItemType == GItemType.TwoHandAxe || thisGilesItemType == GItemType.HandCrossbow || thisGilesItemType == GItemType.TwoHandBow)
-                iThisNeedScore = Settings.Loot.TownRun.WeaponScore;
+            //double iThisNeedScore = 0;
+            //
+            //// Weapons
+            //if (thisGilesItemType == GItemType.Axe || thisGilesItemType == GItemType.CeremonialKnife || thisGilesItemType == GItemType.Dagger ||
+            //    thisGilesItemType == GItemType.FistWeapon || thisGilesItemType == GItemType.Mace || thisGilesItemType == GItemType.MightyWeapon ||
+            //    thisGilesItemType == GItemType.Spear || thisGilesItemType == GItemType.Sword || thisGilesItemType == GItemType.Wand ||
+            //    thisGilesItemType == GItemType.TwoHandDaibo || thisGilesItemType == GItemType.TwoHandCrossbow || thisGilesItemType == GItemType.TwoHandMace ||
+            //    thisGilesItemType == GItemType.TwoHandMighty || thisGilesItemType == GItemType.TwoHandPolearm || thisGilesItemType == GItemType.TwoHandStaff ||
+            //    thisGilesItemType == GItemType.TwoHandSword || thisGilesItemType == GItemType.TwoHandAxe || thisGilesItemType == GItemType.HandCrossbow || thisGilesItemType == GItemType.TwoHandBow)
+            //    iThisNeedScore = Settings.Loot.TownRun.WeaponScore;
 
-            // Jewelry
-            if (thisGilesItemType == GItemType.Ring || thisGilesItemType == GItemType.Amulet || thisGilesItemType == GItemType.FollowerEnchantress ||
-                thisGilesItemType == GItemType.FollowerScoundrel || thisGilesItemType == GItemType.FollowerTemplar)
-                iThisNeedScore = Settings.Loot.TownRun.JewelryScore;
+            //// Jewelry
+            //if (thisGilesItemType == GItemType.Ring || thisGilesItemType == GItemType.Amulet || thisGilesItemType == GItemType.FollowerEnchantress ||
+            //    thisGilesItemType == GItemType.FollowerScoundrel || thisGilesItemType == GItemType.FollowerTemplar)
+            //    iThisNeedScore = Settings.Loot.TownRun.JewelryScore;
 
-            // Armor
-            if (thisGilesItemType == GItemType.Mojo || thisGilesItemType == GItemType.Orb || thisGilesItemType == GItemType.Quiver ||
-                thisGilesItemType == GItemType.Shield || thisGilesItemType == GItemType.Belt || thisGilesItemType == GItemType.Boots ||
-                thisGilesItemType == GItemType.Bracer || thisGilesItemType == GItemType.Chest || thisGilesItemType == GItemType.Cloak ||
-                thisGilesItemType == GItemType.Gloves || thisGilesItemType == GItemType.Helm || thisGilesItemType == GItemType.Legs ||
-                thisGilesItemType == GItemType.MightyBelt || thisGilesItemType == GItemType.Shoulder || thisGilesItemType == GItemType.SpiritStone ||
-                thisGilesItemType == GItemType.VoodooMask || thisGilesItemType == GItemType.WizardHat)
-                iThisNeedScore = Settings.Loot.TownRun.ArmorScore;
-            return Math.Round(iThisNeedScore);
+            //// Armor
+            //if (thisGilesItemType == GItemType.Mojo || thisGilesItemType == GItemType.Orb || thisGilesItemType == GItemType.Quiver ||
+            //    thisGilesItemType == GItemType.Shield || thisGilesItemType == GItemType.Belt || thisGilesItemType == GItemType.Boots ||
+            //    thisGilesItemType == GItemType.Bracer || thisGilesItemType == GItemType.Chest || thisGilesItemType == GItemType.Cloak ||
+            //    thisGilesItemType == GItemType.Gloves || thisGilesItemType == GItemType.Helm || thisGilesItemType == GItemType.Legs ||
+            //    thisGilesItemType == GItemType.MightyBelt || thisGilesItemType == GItemType.Shoulder || thisGilesItemType == GItemType.SpiritStone ||
+            //    thisGilesItemType == GItemType.VoodooMask || thisGilesItemType == GItemType.WizardHat)
+            //    iThisNeedScore = Settings.Loot.TownRun.ArmorScore;
+
+            //return Math.Round(iThisNeedScore);
         }
 
         /// <summary>
@@ -677,43 +695,43 @@ namespace GilesTrinity
         /// </summary>
         internal static void OutputReport()
         {
-                /*
-                  Check is Lv 60 or not
-                 * If lv 60 use Paragon
-                 * If not lv 60 use normal xp/hr
-                 */
+            /*
+              Check is Lv 60 or not
+             * If lv 60 use Paragon
+             * If not lv 60 use normal xp/hr
+             */
             if (ZetaDia.Actors.Me.Level < 60)
+            {
+                if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
                 {
-                    if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
+                    if (iLastXp > ZetaDia.Actors.Me.CurrentExperience)
                     {
-                        if (iLastXp > ZetaDia.Actors.Me.CurrentExperience)
-                        {
-                            iTotalXp += iNextLvXp;
-                        }
-                        else
-                        {
-                            iTotalXp += ZetaDia.Actors.Me.CurrentExperience - iLastXp;
-                        }
+                        iTotalXp += iNextLvXp;
                     }
-                    iLastXp = ZetaDia.Actors.Me.CurrentExperience;
-                    iNextLvXp = ZetaDia.Actors.Me.ExperienceNextLevel;
+                    else
+                    {
+                        iTotalXp += ZetaDia.Actors.Me.CurrentExperience - iLastXp;
+                    }
                 }
-                else
+                iLastXp = ZetaDia.Actors.Me.CurrentExperience;
+                iNextLvXp = ZetaDia.Actors.Me.ExperienceNextLevel;
+            }
+            else
+            {
+                if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
                 {
-                    if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
+                    if (iLastXp > ZetaDia.Actors.Me.ParagonCurrentExperience)
                     {
-                        if (iLastXp > ZetaDia.Actors.Me.ParagonCurrentExperience)
-                        {
-                            iTotalXp += iNextLvXp;
-                        }
-                        else
-                        {
-                            iTotalXp += ZetaDia.Actors.Me.ParagonCurrentExperience - iLastXp;
-                        }
+                        iTotalXp += iNextLvXp;
                     }
-                    iLastXp = ZetaDia.Actors.Me.ParagonCurrentExperience;
-                    iNextLvXp = ZetaDia.Actors.Me.ParagonExperienceNextLevel;
+                    else
+                    {
+                        iTotalXp += ZetaDia.Actors.Me.ParagonCurrentExperience - iLastXp;
+                    }
                 }
+                iLastXp = ZetaDia.Actors.Me.ParagonCurrentExperience;
+                iNextLvXp = ZetaDia.Actors.Me.ParagonExperienceNextLevel;
+            }
 
 
             PersistentOutputReport();
@@ -743,7 +761,7 @@ namespace GilesTrinity
                 }
 
                 LogWriter.WriteLine("Total XP gained: " + Math.Round(iTotalXp / (float)1000000, 2).ToString() + " million [" + Math.Round(iTotalXp / TotalRunningTime.TotalHours / 1000000, 2).ToString() + " million per hour]");
-				if (iLastGold == 0)
+                if (iLastGold == 0)
                 {
                     iLastGold = ZetaDia.Me.Inventory.Coinage;
                 }
