@@ -114,6 +114,11 @@ namespace GilesTrinity
                 GameEvents.OnPlayerDied += TrinityOnDeath;
                 GameEvents.OnGameJoined += TrinityOnJoinGame;
                 GameEvents.OnGameLeft += TrinityOnLeaveGame;
+
+                GameEvents.OnItemSold += TrinityOnItemSold;
+                GameEvents.OnItemSalvaged += TrinityOnItemSalvaged;
+                GameEvents.OnItemStashed += TrinityOnItemStashed;
+
                 CombatTargeting.Instance.Provider = new BlankCombatProvider();
                 LootTargeting.Instance.Provider = new BlankLootProvider();
                 ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
@@ -139,6 +144,27 @@ namespace GilesTrinity
             // reseting stash rules
             StashRule.reset();
         }
+
+        private void TrinityOnItemStashed(object sender, EventArgs e)
+        {
+
+
+            ForceVendorRunASAP = false;
+            IsReadyToTownRun = false;
+        }
+
+        private void TrinityOnItemSalvaged(object sender, EventArgs e)
+        {
+            ForceVendorRunASAP = false;
+            IsReadyToTownRun = false;
+        }
+
+        private void TrinityOnItemSold(object sender, EventArgs e)
+        {
+            ForceVendorRunASAP = false;
+            IsReadyToTownRun = false;
+        }
+
 
         internal static void SetBotTPS()
         {

@@ -93,6 +93,23 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 1, USE_SLOWLY);
             }
 
+
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && GetHasBuff(SNOPower.Monk_SweepingWind) && !PlayerStatus.IsIncapacitated && 
+                (DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds <= 4000 || DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds > 8500) &&
+                AnythingWithinRange[RANGE_15] >= 1 && CurrentTarget.RadiusDistance <= 15f)
+            {
+                SweepWindSpam = DateTime.Now;
+            }
+
+            // Sweeping winds spam
+            if ((PlayerStatus.PrimaryResource >= 75 || (Settings.Combat.Monk.HasInnaSet && PlayerStatus.PrimaryResource >= 5)) &&
+                Hotbar.Contains(SNOPower.Monk_SweepingWind) && GetHasBuff(SNOPower.Monk_SweepingWind) && 
+                DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 4000 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds <= 5400)
+            {
+                SweepWindSpam = DateTime.Now;
+                return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 1, USE_SLOWLY);
+            }
+
             // Sweeping wind
             if (Hotbar.Contains(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) &&
                 (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_20] >= 3 || Settings.Combat.Monk.HasInnaSet ||
@@ -231,7 +248,7 @@ namespace GilesTrinity
                 Hotbar.Contains(SNOPower.Monk_WaveOfLight) &&
                 GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
                 (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 20f)) &&
-                (PlayerStatus.PrimaryResource >= 70 || 
+                (PlayerStatus.PrimaryResource >= 70 ||
                  (hasEmpoweredWaveRune && PlayerStatus.PrimaryResource >= 40 && !IsWaitingForSpecial)) && // Empowered Wave
                 Monk_HasMantraAbilityAndBuff())
             {
@@ -401,7 +418,7 @@ namespace GilesTrinity
             }
             else
             {
-                shouldMaintain = true;   
+                shouldMaintain = true;
             }
 
 

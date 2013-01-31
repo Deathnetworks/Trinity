@@ -273,6 +273,18 @@ namespace GilesTrinity
             return SalvageOption.None;
         }
 
+        internal static void OnItemSalvaged(object sender, EventArgs e)
+        {
+
+        }
+        internal static void OnItemSold(object sender, EventArgs e)
+        {
+
+        }
+        internal static void OnItemStashed(object sender, EventArgs e)
+        {
+
+        }
 
 
     }
