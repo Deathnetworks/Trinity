@@ -53,6 +53,8 @@ namespace GilesTrinity
             AmountHighestScoringPrimary = 0;
             TotalRequirements = 0;
             GlobalMultiplier = 1;
+            TownRun.junkItemStatString = "";
+            TownRun.ValueItemStatString = "";
 
             // Checks for Invalid Item Types
             CheckForInvalidItemType(itemType);
@@ -70,8 +72,7 @@ namespace GilesTrinity
 
             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "NEXT ITEM= " + item.RealName + " - " + item.InternalName + " [" + baseItemType.ToString() + " - " + itemType.ToString() + "]");
 
-            TownRun.ValueItemStatString = "";
-            TownRun.junkItemStatString = "";
+            ResetValuationStatStrings();
 
             // We loop through all of the stats, in a particular order. The order *IS* important, because it pulls up primary stats first, BEFORE other stats
             for (int i = 0; i <= (TOTALSTATS - 1); i++)
@@ -1046,6 +1047,12 @@ namespace GilesTrinity
             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "");
             
             return Math.Round(TotalItemPoints);
+        }
+
+        private static void ResetValuationStatStrings()
+        {
+            TownRun.ValueItemStatString = "";
+            TownRun.junkItemStatString = "";
         }
 
         private static void CheckForInvalidItemType(GItemType itemType)

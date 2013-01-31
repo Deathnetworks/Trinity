@@ -105,7 +105,8 @@ namespace GilesTrinity
                 {
                     if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || !ZetaDia.CPlayer.IsValid || ZetaDia.IsLoadingWorld || ZetaDia.Me.IsDead)
                     {
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
+                        if (!Me.IsDead)
+                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
                         return RunStatus.Failure;
                     }
                     HandlerRunStatus runStatus = HandlerRunStatus.NotFinished;

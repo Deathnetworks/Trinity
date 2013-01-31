@@ -144,11 +144,11 @@ namespace GilesTrinity.DbProvider
             if (DateTime.Now.Subtract(TimeLastRecordedPosition).TotalMilliseconds >= checkDuration)
             {
                 // We're not stuck if we're vendoring!
-                if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
-                {
-                    UnStuckCheckerLastResult = false;
-                    return UnStuckCheckerLastResult;
-                }
+                //if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                //{
+                //    UnStuckCheckerLastResult = false;
+                //    return UnStuckCheckerLastResult;
+                //}
 
                 if (checkDuration >= 3000)
                 {
@@ -876,9 +876,9 @@ namespace GilesTrinity.DbProvider
                 if (distanceToTarget <= 5f || MoveTargetIsInLoS)
                 {
                     if (distanceToTarget <= 5f)
-                        DbHelper.Log(LogCategory.Navigator, "Destination within 5f, using MoveTowards", true);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Destination within 5f, using MoveTowards", true);
                     else
-                        DbHelper.Log(LogCategory.Navigator, "Destination within LoS, using MoveTowards", true);
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Destination within LoS, using MoveTowards", true);
                     Navigator.PlayerMover.MoveTowards(moveTarget);
                     return MoveResult.Moved;
                 }

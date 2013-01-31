@@ -65,6 +65,7 @@
     <Compile Include="Abilities\WitchDoctor.cs" />
     <Compile Include="AvoidanceManager.cs" />
     <Compile Include="AvoidanceType.cs" />
+    <Compile Include="BotEvents.cs" />
     <Compile Include="Cache\CacheAvoidance.cs" />
     <Compile Include="Cache\CacheGizmo.cs" />
     <Compile Include="Cache\CacheItem.cs" />

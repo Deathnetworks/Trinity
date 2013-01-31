@@ -247,11 +247,11 @@ namespace GilesTrinity.ItemRules
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        internal InterpreterAction checkItem(ACDItem item)
+        internal InterpreterAction checkItem(ACDItem item, bool writeToLog = true)
         {
             fillDic(item);
 
-            return checkItem(false);
+            return checkItem(false, writeToLog);
         }
 
         /// <summary>
@@ -259,7 +259,7 @@ namespace GilesTrinity.ItemRules
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public InterpreterAction checkItem(bool pickUp)
+        public InterpreterAction checkItem(bool pickUp, bool writeToLog = true)
         {
 
             InterpreterAction action = InterpreterAction.NULL;
@@ -305,8 +305,8 @@ namespace GilesTrinity.ItemRules
                         + SEP + getFullItem(), InterpreterAction.NULL, LogType.ERROR);
                 }
             }
-
-            logOut(pickUp, validRule, action);
+            if (writeToLog)
+                logOut(pickUp, validRule, action);
 
             return action;
         }
@@ -560,7 +560,7 @@ namespace GilesTrinity.ItemRules
             else
                 itemDic.Add("[ROLL]", 0);
             //itemDic.Add("[ROLL]", Regex.Replace(item.Quality.ToString(), @"[^\d]", string.Empty));
-            
+
             // - NAME -------------------------------------------------------------//
             if ((item.DBItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.DBItemType == ItemType.CraftingPlan)
                 //{c:ffffff00}Plan: Exalted Fine Doomcaster{/c}
@@ -614,7 +614,7 @@ namespace GilesTrinity.ItemRules
                 result = Regex.Replace(item.ItemQualityLevel.ToString(), @"[\d-]", string.Empty);
             itemDic.Add("[QUALITY]", result);
             itemDic.Add("[D3QUALITY]", item.ItemQualityLevel.ToString());
-            
+
             // - ROLL ----------------------------------------------------------//
             float roll;
             if (float.TryParse(Regex.Replace(item.ItemQualityLevel.ToString(), @"[^\d]", string.Empty), out roll))
@@ -622,7 +622,7 @@ namespace GilesTrinity.ItemRules
             else
                 itemDic.Add("[ROLL]", 0);
             //itemDic.Add("[ROLL]", Regex.Replace(item.Quality.ToString(), @"[^\d]", string.Empty));
-            
+
             // - NAME -------------------------------------------------------------//
             if ((item.ItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.ItemType == ItemType.CraftingPlan)
                 //{c:ffffff00}Plan: Exalted Fine Doomcaster{/c}
@@ -644,7 +644,7 @@ namespace GilesTrinity.ItemRules
             itemDic.Add("[DEX]", item.Stats.Dexterity);
             itemDic.Add("[INT]", item.Stats.Intelligence);
             itemDic.Add("[VIT]", item.Stats.Vitality);
-            itemDic.Add("[AS%]", item.Stats.AttackSpeedPercent > 0?item.Stats.AttackSpeedPercent:item.Stats.AttackSpeedPercentBonus);
+            itemDic.Add("[AS%]", item.Stats.AttackSpeedPercent > 0 ? item.Stats.AttackSpeedPercent : item.Stats.AttackSpeedPercentBonus);
             itemDic.Add("[MS%]", item.Stats.MovementSpeed);
             itemDic.Add("[LIFE%]", item.Stats.LifePercent);
             itemDic.Add("[LS%]", item.Stats.LifeSteal);

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using GilesTrinity.ItemRules;
+﻿using GilesTrinity.ItemRules;
 using GilesTrinity.Settings.Loot;
 using GilesTrinity.Technicals;
 using Zeta.CommonBot;
@@ -52,21 +48,21 @@ namespace GilesTrinity
             }
             return false;
         }
-        //public override bool ItemIsProtected(ACDItem item)
-        //{
-        //    return false;
-        //}
-        //public override bool ShouldPickUpItem(ACDItem item)
-        //{
-        //    return false;
-        //}
 
         public override bool ShouldSalvageItem(ACDItem item)
+        {
+            return ShouldSalvageItem(item, true);
+        }
+
+        public bool ShouldSalvageItem(ACDItem item, bool writeToLog = true)
         {
             if (ItemManager.Current.ItemIsProtected(item))
             {
                 return false;
             }
+
+            if (ShouldStashItem(item, false))
+                return false;
 
             GilesCachedACDItem cItem = GilesCachedACDItem.GetCachedItem(item);
 
@@ -100,14 +96,20 @@ namespace GilesTrinity
             }
 
         }
+
         public override bool ShouldSellItem(ACDItem item)
+        {
+            return ShouldSellItem(item, true);
+        }
+
+        public bool ShouldSellItem(ACDItem item, bool writeToLog = true)
         {
             GilesCachedACDItem cItem = GilesCachedACDItem.GetCachedItem(item);
 
-            if (ShouldStashItem(item))
+            if (ShouldStashItem(item, false))
                 return false;
 
-            if (ShouldSalvageItem(item))
+            if (ShouldSalvageItem(item, false))
                 return false;
 
             if (ItemManager.Current.ItemIsProtected(cItem.AcdItem))
@@ -138,7 +140,13 @@ namespace GilesTrinity
             // Switch giles base item type
             return false;
         }
+
         public override bool ShouldStashItem(ACDItem item)
+        {
+            return ShouldStashItem(item, true);
+        }
+
+        public bool ShouldStashItem(ACDItem item, bool writeToLog = true)
         {
             if (ItemManager.Current.ItemIsProtected(item))
             {
@@ -153,62 +161,73 @@ namespace GilesTrinity
 
             if (trinityItemType == GItemType.StaffOfHerding)
             {
+                if (writeToLog)
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.CraftingMaterial)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, trinityItemType);
+                if (writeToLog)
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
 
             if (trinityItemType == GItemType.Emerald)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
+                if (writeToLog)
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.Amethyst)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
+                if (writeToLog)
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.Topaz)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
+                if (writeToLog)
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.Ruby)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
+                if (writeToLog)
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.CraftTome)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, trinityItemType);
+                if (writeToLog)
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.InfernalKey)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, trinityItemType);
+                if (writeToLog)
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.HealthPotion)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, trinityItemType);
+                if (writeToLog)
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return false;
             }
 
             // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
             if (cItem.IsUnidentified)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] = (autokeep unidentified items)", cItem.RealName, cItem.InternalName);
+                if (writeToLog)
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] = (autokeep unidentified items)", cItem.RealName, cItem.InternalName);
                 return true;
             }
 
             if (GilesTrinity.Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
-                Interpreter.InterpreterAction action = GilesTrinity.StashRule.checkItem(item);
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
+                Interpreter.InterpreterAction action = GilesTrinity.StashRule.checkItem(item, writeToLog);
+                if (writeToLog)
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
                 switch (action)
                 {
                     case Interpreter.InterpreterAction.KEEP:
@@ -231,13 +250,15 @@ namespace GilesTrinity
 
             if (cItem.Quality >= ItemQuality.Legendary)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, trinityItemType);
+                if (writeToLog)
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
 
             if (trinityItemType == GItemType.CraftingPlan)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, trinityItemType);
+                if (writeToLog)
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
 
@@ -245,7 +266,8 @@ namespace GilesTrinity
             double iNeedScore = GilesTrinity.ScoreNeeded(item.ItemBaseType);
             double iMyScore = GilesTrinity.ValueThisItem(cItem, trinityItemType);
 
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, trinityItemType, iMyScore);
+            if (writeToLog)
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, trinityItemType, iMyScore);
             if (iMyScore >= iNeedScore) return true;
 
             // If we reached this point, then we found no reason to keep the item!

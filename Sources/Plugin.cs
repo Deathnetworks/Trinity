@@ -1,16 +1,13 @@
-﻿using GilesTrinity.DbProvider;
-using GilesTrinity.Technicals;
-using System;
+﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using GilesTrinity.DbProvider;
+using GilesTrinity.Technicals;
 using Zeta;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Navigation;
-using Zeta.Pathfinding;
-using Zeta.Internals.Actors;
 
 namespace GilesTrinity
 {
@@ -77,6 +74,13 @@ namespace GilesTrinity
         {
             if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld || !ZetaDia.CPlayer.IsValid)
                 return;
+
+            // hax for sending notifications after a town run
+            if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !ZetaDia.Me.IsInTown)
+            {
+                TownRun.SendEmailNotification();
+                TownRun.SendMobileNotifications();
+            }
 
 
         }
@@ -146,43 +150,6 @@ namespace GilesTrinity
             StashRule.reset();
         }
 
-        private void TrinityOnItemStashed(object sender, ItemEventArgs e)
-        {
-            ACDItem i = e.Item;
-
-            var cachedItem = GilesCachedACDItem.GetCachedItem(i);
-
-            TownRun.LogGoodItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, GilesTrinity.ValueThisItem(cachedItem, cachedItem.TrinityItemType)); 
-
-            ForceVendorRunASAP = false;
-            IsReadyToTownRun = false;
-        }
-
-        private void TrinityOnItemSalvaged(object sender, ItemEventArgs e)
-        {
-            ACDItem i = e.Item;
-
-            var cachedItem = GilesCachedACDItem.GetCachedItem(i);
-
-            TownRun.LogJunkItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, GilesTrinity.ValueThisItem(cachedItem, cachedItem.TrinityItemType));
-
-            ForceVendorRunASAP = false;
-            IsReadyToTownRun = false;
-        }
-
-        private void TrinityOnItemSold(object sender, ItemEventArgs e)
-        {
-            ACDItem i = e.Item;
-
-            var cachedItem = GilesCachedACDItem.GetCachedItem(i);
-
-            TownRun.LogJunkItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, GilesTrinity.ValueThisItem(cachedItem, cachedItem.TrinityItemType));
-
-            ForceVendorRunASAP = false;
-            IsReadyToTownRun = false;
-        }
-
-
         internal static void SetBotTPS()
         {
             // Carguy's ticks-per-second feature
@@ -214,24 +181,25 @@ namespace GilesTrinity
 
         internal static void SetWindowTitle(string profileName = "")
         {
-            Application.Current.Dispatcher.Invoke(new Action( () => {
-            string battleTagName = "";
-            try
+            Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
-            }
-            catch { }
-            Window mainWindow = Application.Current.MainWindow;
- 
-            string windowTitle = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
+                string battleTagName = "";
+                try
+                {
+                    battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
+                }
+                catch { }
+                Window mainWindow = Application.Current.MainWindow;
 
-            if (profileName.Trim() != String.Empty)
-            {
-                windowTitle += " - " + profileName;
-            }
+                string windowTitle = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
 
-            mainWindow.Title = windowTitle;
-                }));
+                if (profileName.Trim() != String.Empty)
+                {
+                    windowTitle += " - " + profileName;
+                }
+
+                mainWindow.Title = windowTitle;
+            }));
         }
 
         /// <summary>

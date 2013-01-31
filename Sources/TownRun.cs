@@ -26,32 +26,41 @@ namespace GilesTrinity
     internal class TownRun
     {
         // Whether salvage/sell run should go to a middle-waypoint first to help prevent stucks
+
         private static bool bGoToSafetyPointFirst = false;
         private static bool bGoToSafetyPointSecond = false;
         private static bool bReachedSafety = false;
         internal static bool bLastTownRunCheckResult = false;
         // Random variables used during item handling and town-runs
+
         private static int itemDelayLoopLimit = 0;
+
         private static int currentItemLoops = 0;
         private static bool loggedAnythingThisStash = false;
+
         private static bool updatedStashMap = false;
         private static bool loggedJunkThisStash = false;
         internal static string ValueItemStatString = "";
         internal static string junkItemStatString = "";
         internal static bool testingBackpack = false;
         // Safety pauses to make sure we aren't still coming through the portal or selling
+
         internal static bool bPreStashPauseDone = false;
+
         internal static double iPreStashLoops = 0;
+
         internal static bool PreStashPauseOverlord(object ret)
         {
             return (!bPreStashPauseDone);
         }
+
         internal static RunStatus StashRunPrePause(object ret)
         {
             bPreStashPauseDone = true;
             iPreStashLoops = 0;
             return RunStatus.Success;
         }
+
         internal static RunStatus StashPause(object ret)
         {
             iPreStashLoops++;
@@ -59,20 +68,30 @@ namespace GilesTrinity
                 return RunStatus.Running;
             return RunStatus.Success;
         }
+
         internal static HashSet<GilesCachedACDItem> hashGilesCachedKeepItems = new HashSet<GilesCachedACDItem>();
+
         internal static HashSet<GilesCachedACDItem> hashGilesCachedSalvageItems = new HashSet<GilesCachedACDItem>();
+
         internal static HashSet<GilesCachedACDItem> hashGilesCachedSellItems = new HashSet<GilesCachedACDItem>();
         // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
+
         private static bool[,] StashSlotBlocked = new bool[7, 30];
+
         internal static float iLowestDurabilityFound = -1;
+
         internal static bool bNeedsEquipmentRepairs = false;
         // DateTime check to prevent inventory-check spam when looking for repairs being needed
         internal static DateTime timeLastAttemptedTownRun = DateTime.Now;
+
         internal static bool ShouldUseWalk = false;
+
         internal static bool bReachedDestination = false;
         // The distance last loop, so we can compare to current distance to work out if we moved
+
         internal static float lastDistance = 0f;
         // This dictionary stores attempted stash counts on items, to help detect any stash stucks on the same item etc.
+
         internal static Dictionary<int, int> _dictItemStashAttempted = new Dictionary<int, int>();
 
         /// <summary>
@@ -187,8 +206,11 @@ namespace GilesTrinity
                 if ((GilesTrinity.IsReadyToTownRun && TownRunTimerFinished()) || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                     return true;
                 else if (GilesTrinity.IsReadyToTownRun && !TownRunCheckTimer.IsRunning)
+                {
                     TownRunCheckTimer.Start();
-
+                    loggedAnythingThisStash = false;
+                    loggedJunkThisStash = false;
+                }
                 return false;
             }
         }
@@ -287,6 +309,7 @@ namespace GilesTrinity
         /// <param name="thisdbitemtype"></param>
         /// <param name="thisfollowertype"></param>
         /// <returns></returns>
+
         internal static bool SellValidation(GilesCachedACDItem cItem)
         {
             // Check this isn't something we want to salvage
@@ -336,6 +359,7 @@ namespace GilesTrinity
         /// <param name="thisdbitemtype"></param>
         /// <param name="thisfollowertype"></param>
         /// <returns></returns>
+
         internal static bool SalvageValidation(GilesCachedACDItem cItem)
         {
             GItemType thisGilesItemType = GilesTrinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
@@ -374,6 +398,7 @@ namespace GilesTrinity
             return false;
         }
 
+
         internal static SalvageOption GetSalvageOption(ItemQuality thisquality)
         {
             if (thisquality >= ItemQuality.Magic1 && thisquality <= ItemQuality.Magic3)
@@ -393,6 +418,7 @@ namespace GilesTrinity
 
         internal static Stopwatch TownRunCheckTimer = new Stopwatch();
 
+
         internal static bool StashValidation(GilesCachedACDItem cItem)
         {
             return StashValidation(cItem, cItem.AcdItem);
@@ -404,6 +430,7 @@ namespace GilesTrinity
         /// <param name="cItem"></param>
         /// <param name="item"></param>
         /// <returns></returns>
+
         internal static bool StashValidation(GilesCachedACDItem cItem, ACDItem item)
         {
             if (ItemManager.Current.ItemIsProtected(cItem.AcdItem))
@@ -421,6 +448,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
+
         internal static bool StashOverlord(object ret)
         {
             hashGilesCachedKeepItems = new HashSet<GilesCachedACDItem>();
@@ -488,6 +516,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
+
         internal static RunStatus PreStashPauser(object ret)
         {
             if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
@@ -505,6 +534,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
+
         internal static RunStatus PostStashReport(object ret)
         {
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Stash routine ending sequence...");
@@ -523,21 +553,10 @@ namespace GilesTrinity
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
                         LogWriter.WriteLine("");
                     LogStream.Close();
-                    if (GilesTrinity.Settings.Notification.MailEnabled && NotificationManager.EmailMessage.Length > 0)
-                        NotificationManager.SendEmail(
-                            GilesTrinity.Settings.Notification.EmailAddress,
-                            GilesTrinity.Settings.Notification.EmailAddress,
-                            "New DB stash loot - " + ZetaDia.Service.CurrentHero.BattleTagName,
-                            NotificationManager.EmailMessage.ToString(),
-                            NotificationManager.SmtpServer,
-                            GilesTrinity.Settings.Notification.EmailPassword);
-                    NotificationManager.EmailMessage.Clear();
+                    SendEmailNotification();
 
                     // Send notification to IPhone & Android
-                    while (NotificationManager.pushQueue.Count > 0)
-                    {
-                        NotificationManager.SendNotification(NotificationManager.pushQueue.Dequeue());
-                    }
+                    SendMobileNotifications();
                 }
                 catch (IOException)
                 {
@@ -551,11 +570,33 @@ namespace GilesTrinity
             return RunStatus.Success;
         }
 
+        internal static void SendEmailNotification()
+        {
+            if (GilesTrinity.Settings.Notification.MailEnabled && NotificationManager.EmailMessage.Length > 0)
+                NotificationManager.SendEmail(
+                    GilesTrinity.Settings.Notification.EmailAddress,
+                    GilesTrinity.Settings.Notification.EmailAddress,
+                    "New DB stash loot - " + ZetaDia.Service.CurrentHero.BattleTagName,
+                    NotificationManager.EmailMessage.ToString(),
+                    NotificationManager.SmtpServer,
+                    GilesTrinity.Settings.Notification.EmailPassword);
+            NotificationManager.EmailMessage.Clear();
+        }
+
+        internal static void SendMobileNotifications()
+        {
+            while (NotificationManager.pushQueue.Count > 0)
+            {
+                NotificationManager.SendNotification(NotificationManager.pushQueue.Dequeue());
+            }
+        }
+
         /// <summary>
         /// Lovely smooth one-at-a-time stashing routine
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
+
         internal static RunStatus StashItems(object ret)
         {
             /*
@@ -699,6 +740,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
+
         internal static bool SellOverlord(object ret)
         {
             GilesTrinity.ForceVendorRunASAP = false;
@@ -799,6 +841,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
+
         internal static RunStatus PreSellPause(object ret)
         {
             if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
@@ -825,6 +868,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
+
         internal static RunStatus VendorItems(object ret)
         {
             string VendorName = GetTownVendorName();
@@ -966,6 +1010,7 @@ namespace GilesTrinity
             return RunStatus.Success;
         }
 
+
         private static string GetTownVendorName()
         {
             string sVendorName = "";
@@ -988,6 +1033,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
+
         internal static RunStatus PostSellAndRepair(object ret)
         {
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Sell routine ending sequence...");
@@ -1096,6 +1142,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
+
         internal static bool SalvageOverlord(object ret)
         {
             GilesTrinity.ForceVendorRunASAP = false;
@@ -1161,6 +1208,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
+
         internal static RunStatus PreSalvagePause(object ret)
         {
             if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
@@ -1187,6 +1235,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
+
         internal static RunStatus SalvageItems(object ret)
         {
             if (bGoToSafetyPointFirst)
@@ -1369,6 +1418,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
+
         internal static RunStatus PostSalvage(object ret)
         {
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Salvage routine ending sequence...");
@@ -1546,7 +1596,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        [Obsolete("This function isn't used anymore ...")]
+
         internal static bool StashSingleItem(GilesCachedACDItem item)
         {
             int iPlayerDynamicID = ZetaDia.Me.CommonData.DynamicId;
