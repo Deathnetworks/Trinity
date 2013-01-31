@@ -841,6 +841,22 @@ namespace GilesTrinity
 
         private static bool IsWizardShouldKite()
         {
+            if (PlayerStatus.ActorClass == ActorClass.Wizard)
+            {
+                if (Settings.Combat.Wizard.KiteOption == WizardKiteOption.Anytime)
+                    return true;
+
+                if (GetHasBuff(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.KiteOption == WizardKiteOption.ArchonOnly)
+                    return true;
+                if (!GetHasBuff(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.KiteOption == WizardKiteOption.NormalOnly)
+                    return true;
+
+                return false;
+
+            }
+            else
+                return false;
+
             return (PlayerStatus.ActorClass == ActorClass.Wizard && (!Settings.Combat.Wizard.OnlyKiteInArchon || GetHasBuff(SNOPower.Wizard_Archon)));
         }
     }
