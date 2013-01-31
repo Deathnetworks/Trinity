@@ -10,6 +10,7 @@ using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Navigation;
 using Zeta.Pathfinding;
+using Zeta.Internals.Actors;
 
 namespace GilesTrinity
 {
@@ -145,22 +146,38 @@ namespace GilesTrinity
             StashRule.reset();
         }
 
-        private void TrinityOnItemStashed(object sender, EventArgs e)
+        private void TrinityOnItemStashed(object sender, ItemEventArgs e)
         {
+            ACDItem i = e.Item;
 
+            var cachedItem = GilesCachedACDItem.GetCachedItem(i);
+
+            TownRun.LogGoodItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, GilesTrinity.ValueThisItem(cachedItem, cachedItem.TrinityItemType)); 
 
             ForceVendorRunASAP = false;
             IsReadyToTownRun = false;
         }
 
-        private void TrinityOnItemSalvaged(object sender, EventArgs e)
+        private void TrinityOnItemSalvaged(object sender, ItemEventArgs e)
         {
+            ACDItem i = e.Item;
+
+            var cachedItem = GilesCachedACDItem.GetCachedItem(i);
+
+            TownRun.LogJunkItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, GilesTrinity.ValueThisItem(cachedItem, cachedItem.TrinityItemType));
+
             ForceVendorRunASAP = false;
             IsReadyToTownRun = false;
         }
 
-        private void TrinityOnItemSold(object sender, EventArgs e)
+        private void TrinityOnItemSold(object sender, ItemEventArgs e)
         {
+            ACDItem i = e.Item;
+
+            var cachedItem = GilesCachedACDItem.GetCachedItem(i);
+
+            TownRun.LogJunkItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, GilesTrinity.ValueThisItem(cachedItem, cachedItem.TrinityItemType));
+
             ForceVendorRunASAP = false;
             IsReadyToTownRun = false;
         }
