@@ -51,17 +51,16 @@ namespace GilesTrinity
 
         public override bool ShouldSalvageItem(ACDItem item)
         {
-            return ShouldSalvageItem(item, true);
+            return ShouldSalvageItem(item, ItemEvaluationType.Salvage);
         }
 
-        public bool ShouldSalvageItem(ACDItem item, bool writeToLog = true)
+        public bool ShouldSalvageItem(ACDItem item, ItemEvaluationType evaluationType)
         {
-            if (ItemManager.Current.ItemIsProtected(item))
-            {
-                return false;
-            }
 
-            if (ShouldStashItem(item, false))
+            if (ItemManager.Current.ItemIsProtected(item))
+                return false;
+
+            if (ShouldStashItem(item, evaluationType))
                 return false;
 
             GilesCachedACDItem cItem = GilesCachedACDItem.GetCachedItem(item);
@@ -99,17 +98,18 @@ namespace GilesTrinity
 
         public override bool ShouldSellItem(ACDItem item)
         {
-            return ShouldSellItem(item, true);
+            return ShouldSellItem(item, ItemEvaluationType.Sell);
         }
 
-        public bool ShouldSellItem(ACDItem item, bool writeToLog = true)
+        public bool ShouldSellItem(ACDItem item, ItemEvaluationType evaluationType)
         {
+
             GilesCachedACDItem cItem = GilesCachedACDItem.GetCachedItem(item);
 
-            if (ShouldStashItem(item, false))
+            if (ShouldStashItem(item, evaluationType))
                 return false;
 
-            if (ShouldSalvageItem(item, false))
+            if (ShouldSalvageItem(item, evaluationType))
                 return false;
 
             if (ItemManager.Current.ItemIsProtected(cItem.AcdItem))
@@ -143,15 +143,14 @@ namespace GilesTrinity
 
         public override bool ShouldStashItem(ACDItem item)
         {
-            return ShouldStashItem(item, true);
+            return ShouldStashItem(item, ItemEvaluationType.Keep);
         }
 
-        public bool ShouldStashItem(ACDItem item, bool writeToLog = true)
+        public bool ShouldStashItem(ACDItem item, ItemEvaluationType evaluationType)
         {
+
             if (ItemManager.Current.ItemIsProtected(item))
-            {
                 return false;
-            }
 
             GilesCachedACDItem cItem = GilesCachedACDItem.GetCachedItem(item);
 
@@ -161,56 +160,56 @@ namespace GilesTrinity
 
             if (trinityItemType == GItemType.StaffOfHerding)
             {
-                if (writeToLog)
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, trinityItemType);
+                if (evaluationType == ItemEvaluationType.Keep)
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.CraftingMaterial)
             {
-                if (writeToLog)
+                if (evaluationType == ItemEvaluationType.Keep)
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
 
             if (trinityItemType == GItemType.Emerald)
             {
-                if (writeToLog)
+                if (evaluationType == ItemEvaluationType.Keep)
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.Amethyst)
             {
-                if (writeToLog)
+                if (evaluationType == ItemEvaluationType.Keep)
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.Topaz)
             {
-                if (writeToLog)
+                if (evaluationType == ItemEvaluationType.Keep)
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.Ruby)
             {
-                if (writeToLog)
+                if (evaluationType == ItemEvaluationType.Keep)
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.CraftTome)
             {
-                if (writeToLog)
+                if (evaluationType == ItemEvaluationType.Keep)
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.InfernalKey)
             {
-                if (writeToLog)
+                if (evaluationType == ItemEvaluationType.Keep)
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.HealthPotion)
             {
-                if (writeToLog)
+                if (evaluationType == ItemEvaluationType.Keep)
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return false;
             }
@@ -218,15 +217,15 @@ namespace GilesTrinity
             // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
             if (cItem.IsUnidentified)
             {
-                if (writeToLog)
+                if (evaluationType == ItemEvaluationType.Keep)
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] = (autokeep unidentified items)", cItem.RealName, cItem.InternalName);
                 return true;
             }
 
             if (GilesTrinity.Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
-                Interpreter.InterpreterAction action = GilesTrinity.StashRule.checkItem(item, writeToLog);
-                if (writeToLog)
+                Interpreter.InterpreterAction action = GilesTrinity.StashRule.checkItem(item, evaluationType);
+                if (evaluationType == ItemEvaluationType.Keep)
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
                 switch (action)
                 {
@@ -250,14 +249,14 @@ namespace GilesTrinity
 
             if (cItem.Quality >= ItemQuality.Legendary)
             {
-                if (writeToLog)
+                if (evaluationType == ItemEvaluationType.Keep)
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
 
             if (trinityItemType == GItemType.CraftingPlan)
             {
-                if (writeToLog)
+                if (evaluationType == ItemEvaluationType.Keep)
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
@@ -266,7 +265,7 @@ namespace GilesTrinity
             double iNeedScore = GilesTrinity.ScoreNeeded(item.ItemBaseType);
             double iMyScore = GilesTrinity.ValueThisItem(cItem, trinityItemType);
 
-            if (writeToLog)
+            if (evaluationType == ItemEvaluationType.Keep)
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, trinityItemType, iMyScore);
             if (iMyScore >= iNeedScore) return true;
 
