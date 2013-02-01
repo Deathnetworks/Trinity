@@ -11,6 +11,7 @@ using GilesTrinity.Technicals;
 using Zeta;
 using GilesTrinity.Cache;
 using Zeta.CommonBot.Items;
+using Zeta.CommonBot;
 
 namespace GilesTrinity.ItemRules
 {
@@ -235,11 +236,11 @@ namespace GilesTrinity.ItemRules
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        internal InterpreterAction checkPickUpItem(PickupItem item)
+        internal InterpreterAction checkPickUpItem(PickupItem item, ItemEvaluationType evaluationType)
         {
             fillPickupDic(item);
 
-            return checkItem(true);
+            return checkItem(evaluationType);
         }
 
         /// <summary>
@@ -247,11 +248,11 @@ namespace GilesTrinity.ItemRules
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        internal InterpreterAction checkItem(ACDItem item, bool writeToLog = true)
+        internal InterpreterAction checkItem(ACDItem item, ItemEvaluationType evaluationType)
         {
             fillDic(item);
 
-            return checkItem(false, writeToLog);
+            return checkItem(evaluationType);
         }
 
         /// <summary>
@@ -259,7 +260,7 @@ namespace GilesTrinity.ItemRules
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public InterpreterAction checkItem(bool pickUp, bool writeToLog = true)
+        public InterpreterAction checkItem(ItemEvaluationType evaluationType)
         {
 
             InterpreterAction action = InterpreterAction.NULL;
@@ -267,7 +268,7 @@ namespace GilesTrinity.ItemRules
             string validRule = "";
 
             ArrayList rules;
-            if (pickUp) rules = pickUpRuleSet;
+            if (evaluationType == ItemEvaluationType.PickUp) rules = pickUpRuleSet;
             else rules = ruleSet;
 
             foreach (string str in rules)
@@ -276,7 +277,7 @@ namespace GilesTrinity.ItemRules
 
                 // default configuration for positive rules is pickup and keep
                 InterpreterAction tempAction;
-                if (pickUp) tempAction = InterpreterAction.PICKUP;
+                if (evaluationType == ItemEvaluationType.PickUp) tempAction = InterpreterAction.PICKUP;
                 else tempAction = InterpreterAction.KEEP;
 
                 string[] strings = str.Split(new string[] { assign }, StringSplitOptions.None);
@@ -305,8 +306,8 @@ namespace GilesTrinity.ItemRules
                         + SEP + getFullItem(), InterpreterAction.NULL, LogType.ERROR);
                 }
             }
-            if (writeToLog)
-                logOut(pickUp, validRule, action);
+
+            logOut(evaluationType, validRule, action);
 
             return action;
         }
@@ -317,8 +318,12 @@ namespace GilesTrinity.ItemRules
         /// <param name="pickUp"></param>
         /// <param name="validRule"></param>
         /// <param name="action"></param>
-        private void logOut(bool pickUp, string validRule, InterpreterAction action)
+        private void logOut(ItemEvaluationType evaluationType, string validRule, InterpreterAction action)
         {
+            // return if we have a evaluationtype sell or salvage
+            if (evaluationType == ItemEvaluationType.Salvage || evaluationType == ItemEvaluationType.Sell)
+                return;
+
             string logString = getFullItem() + validRule;
 
             switch (action)

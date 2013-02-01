@@ -34,7 +34,7 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool ItemRulesPickupValidation(PickupItem item)
         {
-            Interpreter.InterpreterAction action = StashRule.checkPickUpItem(item);
+            Interpreter.InterpreterAction action = StashRule.checkPickUpItem(item, ItemEvaluationType.PickUp);
 
             switch (action)
             {
@@ -569,7 +569,7 @@ namespace GilesTrinity
 
             if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
-                Interpreter.InterpreterAction action = StashRule.checkItem(acdItem);
+                Interpreter.InterpreterAction action = StashRule.checkItem(acdItem, ItemEvaluationType.Keep);
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
                 switch (action)
                 {
