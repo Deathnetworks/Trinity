@@ -12,6 +12,7 @@ using Zeta.Navigation;
 using Zeta.Pathfinding;
 using GilesTrinity.Cache;
 using Zeta.Internals;
+using GilesTrinity.DbProvider;
 
 namespace GilesTrinity
 {
@@ -38,10 +39,11 @@ namespace GilesTrinity
                         vPositionLastZigZagCheck = Vector3.Zero;
                         return false;
                     }
-                    // Big main-bot pause button
-                    if (bMainBotPaused)
+
+                    if (PlayerMover.GoldInactive())
                     {
-                        return true;
+                        PlayerMover.GoldInactiveLeaveGame();
+                        return false;
                     }
 
                 }

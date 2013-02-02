@@ -150,6 +150,12 @@ namespace GilesTrinity.DbProvider
                 //    return UnStuckCheckerLastResult;
                 //}
 
+                if (ZetaDia.Me.IsInTown && (UIElements.VendorWindow.IsVisible || UIElements.SalvageWindow.IsVisible))
+                {
+                    UnStuckCheckerLastResult = false;
+                    return UnStuckCheckerLastResult;
+                }
+
                 if (checkDuration >= 3000)
                 {
                     TimeLastRecordedPosition = DateTime.Now;
@@ -221,12 +227,6 @@ namespace GilesTrinity.DbProvider
         // Actually deal with a stuck - find an unstuck point etc.
         public static Vector3 UnstuckHandler(Vector3 vMyCurrentPosition, Vector3 vOriginalDestination)
         {
-            if (GoldInactive())
-            {
-                GoldInactiveLeaveGame();
-                return vOriginalDestination;
-            }
-
             // Update the last time we generated a path
             LastGeneratedStuckPosition = DateTime.Now;
             // If we got stuck on a 2nd/3rd/4th "chained" anti-stuck route, then return the old move to target to keep movement of some kind going
@@ -730,7 +730,7 @@ namespace GilesTrinity.DbProvider
 
         }
 
-        private static void GoldInactiveLeaveGame()
+        internal static void GoldInactiveLeaveGame()
         {
             // Exit the game and reload the profile
             timeLastRestartedGame = DateTime.Now;

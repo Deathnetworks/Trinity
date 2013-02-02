@@ -274,9 +274,10 @@ namespace GilesTrinity
             116807, // Butcher Health Well
             180575, // Diablo arena Health Well
             129031, // A3 Skycrown Catapults
-            //Small Belial (220160), Big Belial (3349),
-            220160,                3349,             
+            220160, // Small Belial (220160), 
+            3349,   // Big Belial (3349),    
             210268, // Corrupt Growths 2nd Tier
+            193077, // a3dun_Crater_ST_GiantDemonHeart_Mob
         };
         /// <summary>
         /// Chests/average-level containers that deserve a bit of extra radius (ie - they are more worthwhile to loot than "random" misc/junk containers)

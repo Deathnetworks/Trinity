@@ -421,10 +421,9 @@ namespace GilesTrinity
                 shouldMaintain = true;
             }
 
-
             if (Monk_TempestRushReady() && Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly && GilesUseTimer(SNOPower.Monk_TempestRush) && shouldMaintain)
             {
-                Vector3 target = CurrentTarget != null ? FindZigZagTargetLocation(CurrentTarget.Position, 15f) : MathEx.GetPointAt(ZetaDia.Me.Position, 25f, ZetaDia.Me.Rotation);
+                Vector3 target = CurrentTarget != null ? FindZigZagTargetLocation(CurrentTarget.Position, 15f) : MathEx.GetPointAt(ZetaDia.Me.Position, 25f, ZetaDia.Me.Movement.Rotation);
 
                 Monk_TempestRushStatus("Using Tempest Rush to maintain channeling");
                 ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, CurrentWorldDynamicId, -1);
