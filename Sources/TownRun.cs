@@ -20,6 +20,7 @@ using System.Threading;
 using System.Diagnostics;
 using Zeta.CommonBot.Profile.Common;
 using GilesTrinity.DbProvider;
+using NotificationManager = GilesTrinity.Notifications.NotificationManager;
 
 namespace GilesTrinity
 {

@@ -82,7 +82,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="1" FontWeight="Bold" Margin="2" Text="Magic Items:"/>
-                <TextBlock Grid.Row="0" Grid.Column="2" Foreground="Black" FontWeight="Bold" Margin="2" Text="Rare Items:"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" FontWeight="Bold" Margin="2" Text="Rare Items:"/>
                 <TextBlock Grid.Row="0" Grid.Column="3" FontWeight="Bold" Margin="2" Text="Misc Items:"/>
                 <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" Text="Weapons:"/>
                 <ComboBox Grid.Row="1" Grid.Column="1" SelectedValue="{Binding Path=Pickup.WeaponBlueLevel}" SelectedValuePath="Tag" Margin="8,2">
