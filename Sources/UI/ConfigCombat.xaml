@@ -9,19 +9,19 @@
             <TabItem Header="Misc">
                 <Border Tag="Combat\ConfigMisc.xaml"/>
             </TabItem>
-            <TabItem Header="Barb">
+            <TabItem Header="Barbarian">
                 <Border Tag="Combat\ConfigBarb.xaml"/>
             </TabItem>
             <TabItem Header="Monk">
                 <Border Tag="Combat\ConfigMonk.xaml"/>
             </TabItem>
-            <TabItem Header="Wiz">
+            <TabItem Header="Wizard">
                 <Border Tag="Combat\ConfigWiz.xaml"/>
             </TabItem>
-            <TabItem Header="WD">
+            <TabItem Header="WitchDoctor">
                 <Border Tag="Combat\ConfigWD.xaml"/>
             </TabItem>
-            <TabItem Header="DH">
+            <TabItem Header="DemonHunter">
                 <Border Tag="Combat\ConfigDH.xaml"/>
             </TabItem>
         </TabControl>

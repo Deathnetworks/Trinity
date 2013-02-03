@@ -22,4 +22,12 @@ namespace GilesTrinity.Settings.Combat
         ArchonOnly,
         NormalOnly
     }
+
+    public enum WizardArchonCancelOption
+    {
+        Never,
+        Timer,
+        RebuffArmor,
+        RebuffMagicWeaponFamiliar,
+    }
 }

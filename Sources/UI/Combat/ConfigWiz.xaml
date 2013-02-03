@@ -11,6 +11,7 @@
             <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="..\Template.xaml"/></ResourceDictionary.MergedDictionaries>
 
             <ut:PercentConverter x:Key="percentConverter" />
+            <ut:EnumVisibilityConverter x:Key="enumVisibilityConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -80,32 +81,37 @@
                     <ComboBoxItem Content="Archon Form Only" Tag="ArchonOnly" IsSelected="True" ToolTip="Kite in Archon Form Only" />
                     <ComboBoxItem Content="Normal Form Only" Tag="NormalOnly" ToolTip="Kite in Normal Form Only" />
                 </ComboBox>
-                <!--<TextBlock Grid.Column="0" Grid.Row="1"  Text="Rebuff Archon:" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Normal" />
-                <ComboBox Grid.Column="1" Grid.Row="1"   Width="150" SelectedValuePath="Tag" SelectedValue="{Binding Path=Wiz.ArchonCancelOptions}" Margin="15,0,0,0">
-                        <ComboBoxItem Content="Never" Tag="Config" ToolTip="Never cancel archon, let it expire on its own" />
-                        <ComboBoxItem Content="After Timer Expires" Tag="Soft" IsSelected="True" ToolTip="Cancel Archon after the timer expires" />
-                        <ComboBoxItem Content="To Rebuff Armor" Tag="Hard" ToolTip="Cancel Archon only to Rebuff Armor" />
-                        <ComboBoxItem Content="To Rebuff MagicWeapon/Familiar" Tag="Hard" ToolTip="Cancel Archon only to Rebuff Magic Weapon or Familiar" />
-                </ComboBox>-->
+                <TextBlock Grid.Column="0" Grid.Row="1"  Text="Cancel and Rebuff Archon:" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Normal" />
+                <ComboBox Grid.Column="1" Grid.Row="1"   Width="215" SelectedValuePath="Tag" SelectedValue="{Binding Path=Wiz.ArchonCancelOption}" Margin="15,5,0,5">
+                        <ComboBoxItem Content="Never" Tag="Never" ToolTip="Never cancel archon, let it expire on its own" />
+                        <ComboBoxItem Content="After Timer Expires" Tag="Timer" IsSelected="True" ToolTip="Cancel Archon after the timer expires" />
+                        <ComboBoxItem Content="To Rebuff Armor" Tag="RebuffArmor" ToolTip="Cancel Archon only to Rebuff Armor" />
+                        <ComboBoxItem Content="To Rebuff MagicWeapon/Familiar" Tag="RebuffMagicWeaponFamiliar" ToolTip="Cancel Archon only to Rebuff Magic Weapon or Familiar" />
+                </ComboBox>
             </Grid>
         </Grid>
 
-        <!--<Grid Grid.Row="3" HorizontalAlignment="Center">
+        <Grid Grid.Row="3" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Cancel Archon After" FontWeight="Normal" TextAlignment="Center" VerticalAlignment="Center"/>
-            <Slider Grid.Column="1" Template="{DynamicResource Slider}" Width="180"
-                Interval="500" Maximum="300" Minimum="90" 
+            <TextBlock Text="Cancel Archon After" FontWeight="Normal" TextAlignment="Center" VerticalAlignment="Center"
+                Visibility="{Binding Path=Wiz.ArchonCancelOption, Converter={StaticResource enumVisibilityConverter}, ConverterParameter=Timer}"
+                       />
+            <Slider Grid.Column="1" Template="{DynamicResource Slider}" Width="180" 
+                Visibility="{Binding Path=Wiz.ArchonCancelOption, Converter={StaticResource enumVisibilityConverter}, ConverterParameter=Timer}"
+                Interval="500" Maximum="300" Minimum="5" 
                 SmallChange="1" LargeChange="5"  IsSnapToTickEnabled="True"
                 TickPlacement="BottomRight" TickFrequency="10"
                 Value="{Binding Path=Wiz.ArchonCancelSeconds}" 
                 HorizontalAlignment="Stretch"  Margin="10,0,0,0"/>
-            <TextBlock Grid.Column="2"  Text="Seconds" FontWeight="Normal" TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"/>
-        </Grid>-->
+            <TextBlock Grid.Column="2"  Text="Seconds" FontWeight="Normal" TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"
+                Visibility="{Binding Path=Wiz.ArchonCancelOption, Converter={StaticResource enumVisibilityConverter}, ConverterParameter=Timer}"
+                       />
+        </Grid>
         <Grid Grid.Row="4" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>

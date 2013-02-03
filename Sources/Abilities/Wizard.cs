@@ -8,58 +8,15 @@ using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals;
 using Zeta.Internals.Actors;
+using GilesTrinity.Settings.Combat;
+
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
         private static TrinityPower GetWizardPower(bool IsCurrentlyAvoiding, bool UseOOCBuff, bool UseDestructiblePower)
         {
-            // CAN'T GET THIS SHIT TO WORK ... ARGH!! @#*#%&*
-            //Vector3 pos = new Vector3(ZetaDia.Me.Position.X + 20f, ZetaDia.Me.Position.Y, ZetaDia.Me.Position.Z);
-
-            //int r = new Random().Next(0, 1);
-            //SNOPower pow = SNOPower.None;
-            //switch (r)
-            //{
-            //    case 0:
-            //        pow = SNOPower.Weapon_Melee_Instant; break;
-            //    case 1:
-            //        pow = SNOPower.Wizard_EnergyTwister; break;
-            //}
-            //Logging.Write("Casting {0}", pow);
-
-            //ZetaDia.Me.UsePower(pow, pos, ZetaDia.CurrentWorldDynamicId, -1);
-
-            //return new TrinityPower(SNOPower.None, 10f, pos, iCurrentWorldDynamicID, -1, 0, 0, USE_SLOWLY);
-
-
-            // wiz defbuff testing
-            //if (GetHasBuff(SNOPower.Wizard_Archon))
-            //{
-            //    return new TrinityPower(SNOPower.Wizard_Archon_Cancel, 0f, vNullLocation, -1, -1, -1, -1, false);
-            //}
-
-            //if (GetHasBuff(SNOPower.Wizard_Archon) && GilesUseTimer(SNOPower.Wizard_Archon_Cancel))
-            //{
-            //    Logging.Write("Cancelling Archon");
-            //    //ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Cancel, PlayerStatus.CurrentPosition, CurrentWorldDynamicId, ZetaDia.Me.CommonData.ACDGuid);
-            //    return new TrinityPower(SNOPower.Wizard_Archon_Cancel, 0f, ZetaDia.Me.Position, -1, -1, -1, -1, false);
-            //}
-            
-            // this didn't work either
-            //if (GetHasBuff(SNOPower.Wizard_Archon))
-            //{
-            //[22:15:36.605 N] Mouseover: 0xB2E3B026BC0A6571 Name:Root.NormalLayer.buffs_backgroundScreen.buff Wizard_Archon:2:2019033236:0 dlg.icon
-            //    UIElement archonIcon = UIElement.FromHash(0xB2E3B026BC0A6571);
-            //    if (archonIcon.IsValid && archonIcon.IsVisible)
-            //    {
-            //        DbHelper.LogNormal("Clicking archon icon", true);
-            //        archonIcon.Click();
-            //        return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, -1, -1, false);
-            //    }
-            //}
-
-            // Pick the best destructible power available
+             // Pick the best destructible power available
             if (UseDestructiblePower)
             {
                 if (!GetHasBuff(SNOPower.Wizard_Archon))
@@ -356,6 +313,31 @@ namespace GilesTrinity
             }
             else
             {
+                bool cancelArchon = false;
+
+                if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.RebuffArmor && !Wizard_HasWizardArmor())
+                    cancelArchon = true;
+
+                if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.RebuffMagicWeaponFamiliar && (!GetHasBuff(SNOPower.Wizard_MagicWeapon) || !GetHasBuff(SNOPower.Wizard_Familiar)))
+                    cancelArchon = true;
+
+                if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.Timer &&
+                    DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_Archon]).TotalSeconds >= Settings.Combat.Wizard.ArchonCancelSeconds)
+                    cancelArchon = true;
+
+                if (cancelArchon)
+                {
+                    var archonBuff = ZetaDia.Me.GetBuff(SNOPower.Wizard_Archon);
+                    if (archonBuff != null && archonBuff.IsCancelable)
+                    {
+                        // this actually cancels Archon
+                        archonBuff.Cancel();
+
+                        // this SNOPower is fake - it isn't actually used, we're just putting it here to force a BehaviorTree return/recheck
+                        return new TrinityPower(SNOPower.Wizard_Archon_Cancel, 0f, vNullLocation, -1, -1, -1, -1, false);
+                    }
+                }
+
                 // Archon form
                 // Archon Slow Time for in combat
                 if (!UseOOCBuff && !PlayerStatus.IsIncapacitated &&
@@ -383,7 +365,7 @@ namespace GilesTrinity
                     return new TrinityPower(SNOPower.Wizard_Archon_ArcaneBlast, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
                 }
                 // Arcane Strike (Arcane Strike) Rapid Spam at close-range only
-                if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && CurrentTarget.RadiusDistance <= 7f &&
+                if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && CurrentTarget.RadiusDistance <= 5f && TargetUtil.AnyTrashMobsInRange(7f, 2) &&
                     CurrentTarget.IsBossOrEliteRareUnique && !Settings.Combat.Wizard.NoArcaneStrike)
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 7f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
@@ -395,6 +377,11 @@ namespace GilesTrinity
                 }
                 return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             }
+        }
+
+        private static bool Wizard_HasWizardArmor()
+        {
+            return (GetHasBuff(SNOPower.Wizard_EnergyArmor) || GetHasBuff(SNOPower.Wizard_IceArmor) || GetHasBuff(SNOPower.Wizard_StormArmor));
         }
 
         private static TrinityPower GetWizardDestructablePower()

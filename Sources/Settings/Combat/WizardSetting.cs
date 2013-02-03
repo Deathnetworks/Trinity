@@ -44,6 +44,8 @@ namespace GilesTrinity.Settings.Combat
         private int _ArchonMobCount;
         private float _ArchonMobDistance;
         private WizardKiteOption _KiteOption;
+        private WizardArchonCancelOption _ArchonCancelOption;
+        private int _ArchonCancelSeconds;
         #endregion Fields
 
         #region Events
@@ -101,7 +103,7 @@ namespace GilesTrinity.Settings.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(0.7f)]
+        [DefaultValue(35f)]
         public float ArchonMobDistance
         {
             get
@@ -118,6 +120,41 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(300)]
+        public int ArchonCancelSeconds
+        {
+            get
+            {
+                return _ArchonCancelSeconds;
+            }
+            set
+            {
+                if (_ArchonCancelSeconds != value)
+                {
+                    _ArchonCancelSeconds = value;
+                    OnPropertyChanged("ArchonCancelSeconds");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(WizardArchonCancelOption.RebuffMagicWeaponFamiliar)]
+        public WizardArchonCancelOption ArchonCancelOption
+        {
+            get
+            {
+                return _ArchonCancelOption;
+            }
+            set
+            {
+                if (_ArchonCancelOption != value)
+                {
+                    _ArchonCancelOption = value;
+                    OnPropertyChanged("ArchonCancelOption");
+                }
+            }
+        }
         [DataMember(IsRequired = false)]
         [DefaultValue(WizardKiteOption.Anytime)]
         public WizardKiteOption KiteOption
@@ -749,8 +786,10 @@ namespace GilesTrinity.Settings.Combat
         [OnDeserializing()]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this._ArchonMobDistance = 25;
+            this._ArchonMobDistance = 35;
             this._ArchonMobCount = 3;
+            this._ArchonCancelSeconds = 300;
+            this._ArchonCancelOption = WizardArchonCancelOption.RebuffMagicWeaponFamiliar;
         }
 
         #endregion Methods
