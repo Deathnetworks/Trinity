@@ -158,11 +158,11 @@ namespace GilesTrinity.ItemRules
                             break;
                         case "RULE":
                             {
-                                if (GilesTrinity.Settings.Loot.ItemRuleType == Settings.Loot.ItemRuleType.Config)
+                                if (GilesTrinity.Settings.Loot.ItemRules.ItemRuleType == Settings.Loot.ItemRuleType.Config)
 
                                     ruleType = match2.Groups[2].Value.ToLower();
                                 else
-                                    ruleType = GilesTrinity.Settings.Loot.ItemRuleType.ToString().ToLower();
+                                    ruleType = GilesTrinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower();
                             }
                             break;
                         case "PICKLOG":

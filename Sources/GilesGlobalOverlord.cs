@@ -40,9 +40,13 @@ namespace GilesTrinity
                         return false;
                     }
 
-                    if (PlayerMover.GoldInactive())
+                    if (ZetaDia.Me.IsDead)
                     {
-                        PlayerMover.GoldInactiveLeaveGame();
+                        GoldInactivity.ResetCheckGold();
+                    }
+                    else if (GoldInactivity.GoldInactive())
+                    {
+                        BotMain.PauseWhile(GoldInactivity.GoldInactiveLeaveGame);
                         return false;
                     }
 

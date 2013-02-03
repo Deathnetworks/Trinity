@@ -80,6 +80,7 @@
     <Compile Include="Classes\GilesGameBalanceDataCache.cs" />
     <Compile Include="Classes\GilesItemStats.cs" />
     <Compile Include="Classes\GilesStashSort.cs" />
+    <Compile Include="Classes\GoldInactivity.cs" />
     <Compile Include="Classes\HashGenerator.cs" />
     <Compile Include="Classes\HotbarSkills.cs" />
     <Compile Include="Classes\MiniMapMarker.cs" />
@@ -98,7 +99,8 @@
     <Compile Include="ItemRules\Core\Scanner.cs" />
     <Compile Include="ItemRules\Core\TextHighlighter.cs" />
     <Compile Include="PersistentStats.cs" />
-    <Compile Include="Settings\Loot\ItemRuleType.cs" />
+    <Compile Include="Settings\Loot\ItemEnumOptions.cs" />
+    <Compile Include="Settings\Loot\ItemRuleSetting.cs" />
     <Compile Include="Technicals\Loader.cs" />
     <Compile Include="TownRun.cs" />
     <Compile Include="TrinityPowerManager.cs" />
@@ -130,12 +132,8 @@
     <Compile Include="Settings\Combat\WitchDoctorSetting.cs" />
     <Compile Include="Settings\Combat\WizardSetting.cs" />
     <Compile Include="Settings\ITrinitySetting.cs" />
-    <Compile Include="Settings\Loot\GemType.cs" />
-    <Compile Include="Settings\Loot\ItemFilterMode.cs" />
     <Compile Include="Settings\Loot\ItemSetting.cs" />
     <Compile Include="Settings\Loot\PickupSetting.cs" />
-    <Compile Include="Settings\Loot\PotionMode.cs" />
-    <Compile Include="Settings\Loot\SalvageOption.cs" />
     <Compile Include="Settings\Loot\TownRunSetting.cs" />
     <Compile Include="Settings\MailServerSetting.cs" />
     <Compile Include="Settings\NotificationSetting.cs" />
@@ -220,15 +218,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\ConfigLog.xaml">
+    <Page Include="UI\ConfigItems.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\ConfigEmail.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="UI\Items\ConfigItemRules.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\ConfigMobile.xaml">
+    <Page Include="UI\Items\ConfigNotification.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -236,11 +234,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\ConfigTownRuns.xaml">
+    <Page Include="UI\Items\ConfigScoring.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\ConfigItems.xaml">
+    <Page Include="UI\Items\ConfigPickup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

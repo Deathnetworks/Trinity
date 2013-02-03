@@ -165,10 +165,7 @@ namespace GilesTrinity
                     return new TrinityPower(SNOPower.Wizard_MirrorImage, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
                 }
                 // Archon
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_Archon) &&
-                    (TargetUtil.AnyElitesInRange(30, 1) || TargetUtil.AnyTrashMobsInRange(Settings.Combat.Wizard.ArchonMobDistance, Settings.Combat.Wizard.ArchonMobCount) ||
-                    TargetUtil.IsEliteTargetInRange(30f)) &&
-                    PlayerStatus.PrimaryResource >= 25 && PlayerStatus.CurrentHealthPct >= 0.10 &&
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_Archon) && Wizard_ShouldStartArchon() &&
                     PowerManager.CanCast(SNOPower.Wizard_Archon))
                 {
                     // Familiar has been removed for now. Uncomment the three comments below relating to familiars to force re-buffing them
@@ -325,8 +322,10 @@ namespace GilesTrinity
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_Archon]).TotalSeconds >= Settings.Combat.Wizard.ArchonCancelSeconds)
                     cancelArchon = true;
 
-                if (cancelArchon)
+                if (cancelArchon && Wizard_ShouldStartArchon())
                 {
+                    
+
                     var archonBuff = ZetaDia.Me.GetBuff(SNOPower.Wizard_Archon);
                     if (archonBuff != null && archonBuff.IsCancelable)
                     {
@@ -377,6 +376,13 @@ namespace GilesTrinity
                 }
                 return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             }
+        }
+
+        private static bool Wizard_ShouldStartArchon()
+        {
+            return (TargetUtil.AnyElitesInRange(30, 1) || TargetUtil.AnyTrashMobsInRange(Settings.Combat.Wizard.ArchonMobDistance, Settings.Combat.Wizard.ArchonMobCount) ||
+                    TargetUtil.IsEliteTargetInRange(30f)) &&
+                    PlayerStatus.PrimaryResource >= 25 && PlayerStatus.CurrentHealthPct >= 0.10;
         }
 
         private static bool Wizard_HasWizardArmor()

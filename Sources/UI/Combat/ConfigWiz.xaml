@@ -140,7 +140,6 @@
             <UniformGrid Columns="2">
                 <CheckBox Margin="2" IsChecked="{Binding Path=Wiz.NoArcaneStrike}">Disable Archon Arcane Strike</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Wiz.CriticalMass}" ToolTip="Allows rapid-spam of certain spells">Critical Mass</CheckBox>
-                <!--<CheckBox Margin="2" IsChecked="{Binding Path=Wiz.OnlyKiteInArchon}">Only Kite in Archon Form</CheckBox>-->
                 <CheckBox Margin="2" IsChecked="{Binding Path=Wiz.WaitArchon}">Wait for Archon CD at Azmo</CheckBox>
             </UniformGrid>
         </Grid>

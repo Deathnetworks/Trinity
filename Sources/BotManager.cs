@@ -57,7 +57,7 @@ namespace GilesTrinity
 
             PlayerMover.TimeLastRecordedPosition = DateTime.Now;
             PlayerMover.timeLastRestartedGame = DateTime.Now;
-            PlayerMover.ResetCheckGold();
+            GoldInactivity.ResetCheckGold();
 
             if (Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius < 20)
             {

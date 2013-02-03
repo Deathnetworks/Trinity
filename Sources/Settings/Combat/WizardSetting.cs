@@ -37,7 +37,6 @@ namespace GilesTrinity.Settings.Combat
         private float _AvoidZoltBubbleHealth;
         private float _AvoidZoltTwisterHealth;
         private bool _CriticalMass;
-        private bool _OnlyKiteInArchon;
         private bool _WaitArchon;
 
         private bool _NoArcaneStrike;
@@ -204,24 +203,6 @@ namespace GilesTrinity.Settings.Combat
                 {
                     _CriticalMass = value;
                     OnPropertyChanged("CriticalMass");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool OnlyKiteInArchon
-        {
-            get
-            {
-                return _OnlyKiteInArchon;
-            }
-            set
-            {
-                if (_OnlyKiteInArchon != value)
-                {
-                    _OnlyKiteInArchon = value;
-                    OnPropertyChanged("OnlyKiteInArchon");
                 }
             }
         }

@@ -856,8 +856,6 @@ namespace GilesTrinity
             }
             else
                 return false;
-
-            return (PlayerStatus.ActorClass == ActorClass.Wizard && (!Settings.Combat.Wizard.OnlyKiteInArchon || GetHasBuff(SNOPower.Wizard_Archon)));
         }
     }
 }

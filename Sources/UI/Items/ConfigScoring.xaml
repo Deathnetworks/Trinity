@@ -3,12 +3,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:GilesTrinity.UIComponents"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"  Foreground="{DynamicResource TextBrush}"
              d:DesignHeight="420" d:DesignWidth="390">
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
-            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Template.xaml"/></ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="..\Template.xaml"/></ResourceDictionary.MergedDictionaries>
 
             <ut:EnumBooleanConverter x:Key="enumBooleanConverter" />
         </ResourceDictionary>

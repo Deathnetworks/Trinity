@@ -147,7 +147,7 @@ namespace GilesTrinity
                 bMainBotPaused = true;
             }
 
-            PlayerMover.ResetCheckGold();
+            GoldInactivity.ResetCheckGold();
 
         }
 
@@ -256,7 +256,7 @@ namespace GilesTrinity
 
 
             UpdateSearchGridProvider();
-            PlayerMover.ResetCheckGold();
+            GoldInactivity.ResetCheckGold();
 
             global::GilesTrinity.XmlTags.TrinityLoadOnce.UsedProfiles = new List<string>();
 

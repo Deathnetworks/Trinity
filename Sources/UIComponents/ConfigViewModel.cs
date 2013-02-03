@@ -6,6 +6,8 @@ using GilesTrinity.UI;
 using System.Diagnostics;
 using System.Windows.Input;
 using GilesTrinity.Technicals;
+using System;
+using System.Windows.Forms;
 
 namespace GilesTrinity.UIComponents
 {
@@ -15,8 +17,8 @@ namespace GilesTrinity.UIComponents
     public class ConfigViewModel
     {
         private TrinitySetting _Model;
-        private TrinitySetting _OriginalModel; 
-        
+        private TrinitySetting _OriginalModel;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigViewModel" /> class.
         /// </summary>
@@ -67,8 +69,23 @@ namespace GilesTrinity.UIComponents
                                     {
                                         ConfigQuestingLoot();
                                     });
+            LoadItemRuleSetCommand = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        LoadItemRulesPath();
+                                    });
+
         }
 
+        /// <summary>
+        /// Gets the HelpLink command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand LoadItemRuleSetCommand
+        {
+            get;
+            private set;
+        }
         /// <summary>
         /// Gets the HelpLink command.
         /// </summary>
@@ -214,6 +231,16 @@ namespace GilesTrinity.UIComponents
         /// </summary>
         /// <value>The reset command for Items Tab.</value>
         public ICommand ResetItemCommand
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the reset command for Items Tab.
+        /// </summary>
+        /// <value>The reset command for Items Tab.</value>
+        public ICommand ResetItemRulesCommand
         {
             get;
             private set;
@@ -409,6 +436,17 @@ namespace GilesTrinity.UIComponents
                 return _Model.Loot;
             }
         }
+        /// <summary>
+        /// Gets the Pickup Configuration Model.
+        /// </summary>
+        /// <value>The Pickup Configuration Model.</value>
+        public ItemRuleSetting ItemRules
+        {
+            get
+            {
+                return _Model.Loot.ItemRules;
+            }
+        }
 
         /// <summary>
         /// Gets the Pickup Configuration Model.
@@ -420,7 +458,7 @@ namespace GilesTrinity.UIComponents
             {
                 return _Model.Notification;
             }
-        }        
+        }
 
         /// <summary>
         /// Initializes the Reset commands.
@@ -471,6 +509,11 @@ namespace GilesTrinity.UIComponents
                                     (parameter) =>
                                     {
                                         _Model.Loot.Pickup.Reset();
+                                    });
+            ResetItemRulesCommand = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        _Model.Loot.ItemRules.Reset();
                                     });
             ReloadScriptRulesCommand = new RelayCommand(
                                     (parameter) =>
@@ -539,6 +582,32 @@ namespace GilesTrinity.UIComponents
             _Model.Loot.Pickup.PotionMode = PotionMode.Cap;
             _Model.Loot.Pickup.DesignPlan = true;
             _Model.Loot.Pickup.CraftTomes = true;
+        }
+
+        private void LoadItemRulesPath()
+        {
+
+            var folderDialog = new FolderBrowserDialog();
+
+            folderDialog.ShowNewFolderButton = false;
+            folderDialog.SelectedPath = FileManager.ItemRulePath;
+
+            DialogResult result = folderDialog.ShowDialog();
+
+
+            // Get the selected file name and display in a TextBox 
+            if (result == DialogResult.OK)
+            {
+                // Open document 
+                string directory = folderDialog.SelectedPath;
+
+                if (directory != FileManager.ItemRulePath)
+                {
+                    ItemRules.ItemRuleSetPath = directory;
+
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loaded ItemRule Set {0}", ItemRules.ItemRuleSetPath);
+                }
+            }
         }
     }
 }

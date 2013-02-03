@@ -8,9 +8,9 @@ namespace GilesTrinity.Settings.Loot
     {
         #region Fields
         private ItemFilterMode _ItemFilterMode;
-        private ItemRuleType _ItemRuleType;
         private PickupSetting _Pickup;
         private TownRunSetting _TownRun;
+        private ItemRuleSetting _ItemRules;
         #endregion Fields
 
         #region Events
@@ -26,6 +26,7 @@ namespace GilesTrinity.Settings.Loot
             Reset();
             Pickup = new PickupSetting();
             TownRun = new TownRunSetting();
+            ItemRules = new ItemRuleSetting();
         }
         #endregion Constructors
 
@@ -44,23 +45,6 @@ namespace GilesTrinity.Settings.Loot
                 {
                     _ItemFilterMode = value;
                     OnPropertyChanged("ItemFilterMode");
-                }
-            }
-        }
-        [DataMember(IsRequired = false)]
-        [DefaultValue(ItemRuleType.Soft)]
-        public ItemRuleType ItemRuleType
-        {
-            get
-            {
-                return _ItemRuleType;
-            }
-            set
-            {
-                if (_ItemRuleType != value)
-                {
-                    _ItemRuleType = value;
-                    OnPropertyChanged("ItemRuleType");
                 }
             }
         }
@@ -98,6 +82,22 @@ namespace GilesTrinity.Settings.Loot
                 }
             }
         }
+        [DataMember(IsRequired = false)]
+        public ItemRuleSetting ItemRules
+        {
+            get
+            {
+                return _ItemRules;
+            }
+            set
+            {
+                if (_ItemRules != value)
+                {
+                    _ItemRules = value;
+                    OnPropertyChanged("ItemRules");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -130,7 +130,7 @@ namespace GilesTrinity.Settings.Loot
         [OnDeserializing()]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this.ItemRuleType = ItemRuleType.Config;
+
         }
 
         #endregion Methods

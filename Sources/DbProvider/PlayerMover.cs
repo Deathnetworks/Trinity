@@ -55,82 +55,8 @@ namespace GilesTrinity.DbProvider
         // Store player current position
         public static Vector3 vMyCurrentPosition = Vector3.Zero;
 
-        private static int lastKnowCoin;
-        private static DateTime lastCheckBag;
-        private static DateTime lastRefreshCoin;
-
         //For Tempest Rush Monks
         private static bool CanChannelTempestRush = false;
-
-        /// <summary>
-        /// Resets the gold inactivity timer
-        /// </summary>
-        internal static void ResetCheckGold()
-        {
-            lastCheckBag = DateTime.Now;
-            lastRefreshCoin = DateTime.Now;
-            lastKnowCoin = 0;
-        }
-
-        /// <summary>
-        /// Determines whether or not to leave the game based on the gold inactivity timer
-        /// </summary>
-        /// <returns></returns>
-        internal static bool GoldInactive()
-        {
-            if (!GilesTrinity.Settings.Advanced.GoldInactivityEnabled)
-            {
-                // timer isn't enabled so move along!
-                ResetCheckGold();
-                return false;
-            }
-            try
-            {
-                if (!ZetaDia.IsInGame)
-                {
-                    ResetCheckGold(); //If not in game, reset the timer
-                    return false;
-                }
-                if (ZetaDia.IsLoadingWorld || lastCheckBag == null)
-                    return false;
-                if ((DateTime.Now.Subtract(lastCheckBag).TotalSeconds < 5))
-                    return false;
-
-                // sometimes bosses take a LONG time
-                if (GilesTrinity.CurrentTarget != null && GilesTrinity.CurrentTarget.IsBoss)
-                {
-                    ResetCheckGold();
-                    return false;
-                }
-
-                lastCheckBag = DateTime.Now;
-                int currentcoin = ZetaDia.Me.Inventory.Coinage;
-
-                if (currentcoin != lastKnowCoin && currentcoin != 0)
-                {
-                    lastRefreshCoin = DateTime.Now;
-                    lastKnowCoin = currentcoin;
-                }
-                int notpickupgoldsec = Convert.ToInt32(DateTime.Now.Subtract(lastRefreshCoin).TotalSeconds);
-                if (notpickupgoldsec >= GilesTrinity.Settings.Advanced.GoldInactivityTimer)
-                {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Gold inactivity after {0}s. Sending abort.", notpickupgoldsec);
-                    lastRefreshCoin = DateTime.Now;
-                    lastKnowCoin = currentcoin;
-                    notpickupgoldsec = 0;
-                    return true;
-                }
-                else if (notpickupgoldsec > 0)
-                {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Gold unchanged for {0}s", notpickupgoldsec);
-                }
-            }
-            catch (Exception e)
-            {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, e.Message);
-            }
-            return false;
-        }
 
         /// <summary>
         /// Check if we are stuck or not by simply checking for position changing max once every 3 seconds
@@ -173,7 +99,7 @@ namespace GilesTrinity.DbProvider
                 if (c != null && c.GetType() == typeof(WaitTimerTag))
                 {
                     vOldPosition = Vector3.Zero;
-                    ResetCheckGold();
+                    GoldInactivity.ResetCheckGold();
                     UnStuckCheckerLastResult = false;
                     return UnStuckCheckerLastResult;
                 }
@@ -184,7 +110,7 @@ namespace GilesTrinity.DbProvider
                 if (ZetaDia.Me.IsInConversation || ZetaDia.IsPlayingCutscene || ZetaDia.IsLoadingWorld || (vendorWindow.IsValid && vendorWindow.IsVisible))
                 {
                     vOldPosition = Vector3.Zero;
-                    ResetCheckGold();
+                    GoldInactivity.ResetCheckGold();
                     UnStuckCheckerLastResult = false;
                     return UnStuckCheckerLastResult;
                 }
@@ -196,7 +122,7 @@ namespace GilesTrinity.DbProvider
                     aState == AnimationState.Channeling)
                 {
                     vOldPosition = Vector3.Zero;
-                    ResetCheckGold();
+                    GoldInactivity.ResetCheckGold();
                     UnStuckCheckerLastResult = false;
                     return UnStuckCheckerLastResult;
                 }
@@ -446,11 +372,11 @@ namespace GilesTrinity.DbProvider
             // Do unstuckery things
             if (GilesTrinity.Settings.Advanced.UnstuckerEnabled)
             {
-                if (GoldInactive())
-                {
-                    GoldInactiveLeaveGame();
-                    return;
-                }
+                //if (GoldInactivity.GoldInactive())
+                //{
+                //    GoldInactivity.GoldInactiveLeaveGame();
+                //    return;
+                //}
                 // Store the "real" (not anti-stuck) destination
                 // See if we can reset the 10-limit unstuck counter, if >120 seconds since we last generated an unstuck location
                 if (iTotalAntiStuckAttempts > 1 && DateTime.Now.Subtract(LastGeneratedStuckPosition).TotalSeconds >= 120)
@@ -730,26 +656,6 @@ namespace GilesTrinity.DbProvider
 
         }
 
-        internal static void GoldInactiveLeaveGame()
-        {
-            // Exit the game and reload the profile
-            timeLastRestartedGame = DateTime.Now;
-            string sUseProfile = GilesTrinity.sFirstProfileSeen;
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Gold Inactivity timer tripped - Anti-stuck measures exiting current game.");
-            // Load the first profile seen last run
-            ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
-                                    ? sUseProfile
-                                    : Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
-            Thread.Sleep(1000);
-            GilesTrinity.GilesResetEverythingNewGame();
-            ZetaDia.Service.Games.LeaveGame();
-            // Wait for 10 second log out timer if not in town
-            if (!ZetaDia.Me.IsInTown)
-            {
-                Thread.Sleep(12000);
-            }
-            return;
-        }
 
         internal static int GetObstacleNavigationSize(GilesObstacle obstacle)
         {

@@ -3,12 +3,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:GilesTrinity.UIComponents"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"  Foreground="{DynamicResource TextBrush}"
              d:DesignHeight="420" d:DesignWidth="390">
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
-            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Template.xaml"/></ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="..\Template.xaml"/></ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -58,19 +58,19 @@
             <StackPanel Grid.Row="1" Margin="2"  HorizontalAlignment="Stretch" Orientation="Vertical">
                 <TextBlock Text="Weapon Score : (100 000+ recommended)" Margin="5"/>
                 <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
-                    Interval="500" 
+                    Interval="500" IsSnapToTickEnabled="True"
                     Maximum="150000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="2000" TickPlacement="BottomRight" 
                     Value="{Binding Path=Notification.WeaponScore}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
                 <TextBlock Text="Armor Score : (16 000+ recommended)" Margin="5"/>
                 <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
-                    Interval="500" 
+                    Interval="500"  IsSnapToTickEnabled="True"
                     Maximum="50000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" 
                     Value="{Binding Path=Notification.ArmorScore}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
                 <TextBlock Text="Jewelry Score : (15 000+ recommended)" Margin="5"/>
                 <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
-                    Interval="500" 
+                    Interval="500"  IsSnapToTickEnabled="True"
                     Maximum="50000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" 
                     Value="{Binding Path=Notification.JewelryScore}" 
                     HorizontalAlignment="Stretch" Margin="2"/>

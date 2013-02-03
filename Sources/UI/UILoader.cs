@@ -50,7 +50,7 @@ namespace GilesTrinity.UI
                 _ConfigWindow.Width = 480;
                 _ConfigWindow.MinHeight = 520;
                 _ConfigWindow.MinWidth = 480;
-                _ConfigWindow.Title = "Giles Trinity";
+                _ConfigWindow.Title = "Trinity";
                 
                 // Event handling for the config window loading up/closing
                 //configWindow.Loaded += configWindow_Loaded;
