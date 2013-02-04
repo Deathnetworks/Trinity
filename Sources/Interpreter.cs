@@ -143,14 +143,14 @@ namespace GilesTrinity.ItemRules
                 DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Using 'UseItemIDs-translation' is still in beta testing and not activated in this release!");
 
             // fill translation dictionary
-            //nameToBalanceId = new Dictionary<string, string>();
-            //StreamReader streamReader = new StreamReader(Path.Combine(FileManager.ItemRulePath, translationFile));
-            //string str;
-            //while ((str = streamReader.ReadLine()) != null)
-            //{
-            //    string[] strArrray = str.Split(';');
-            //    nameToBalanceId[strArrray[1].Replace(" ", "")] = strArrray[0];
-            //}
+            nameToBalanceId = new Dictionary<string, string>();
+            StreamReader streamReader = new StreamReader(Path.Combine(FileManager.ItemRulePath, translationFile));
+            string str;
+            while ((str = streamReader.ReadLine()) != null)
+            {
+                string[] strArrray = str.Split(';');
+                nameToBalanceId[strArrray[1].Replace(" ", "")] = strArrray[0];
+            }
             //DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} ITEMID translations", nameToBalanceId.Count);
 
             // parse pickup file
