@@ -43,7 +43,7 @@ namespace GilesTrinity
 
         public static bool IsEliteTargetInRange(float range = 10f)
         {
-            return GilesTrinity.CurrentTarget.IsBossOrEliteRareUnique && GilesTrinity.CurrentTarget.RadiusDistance <= range;
+            return GilesTrinity.CurrentTarget != null && GilesTrinity.CurrentTarget.IsBossOrEliteRareUnique && GilesTrinity.CurrentTarget.RadiusDistance <= range;
         }
 
     }
