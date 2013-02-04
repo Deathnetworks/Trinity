@@ -49,18 +49,15 @@ namespace GilesTrinity.ItemRules
         };
 
         // final variables
-        readonly string version = "2.1.1.0";
-        readonly string configFile = "config.dis";
+        readonly string version = "2.2.0.0";
+        readonly string translationFile = "translation.dis";
         readonly string pickupFile = "pickup.dis";
         readonly string logFile = "ItemRules.log";
+        readonly string transFixFile = "TranslationFix.log";
         readonly string assign = "->", SEP = ";";
-        readonly Regex filePattern = new Regex(@"\[FILE\][ ]*==[ ]*([A-Za-z]+.dis)", RegexOptions.Compiled);
-        readonly Regex flagPattern = new Regex(@"\[([A-Z]+)\][ ]*==[ ]*(.+)", RegexOptions.Compiled);
         readonly Regex macroPattern = new Regex(@"(@[A-Z]+)[ ]*:=[ ]*(.+)", RegexOptions.Compiled);
 
-        string ruleType = "soft";
-        int logPickQuality = 4;
-        int logKeepQuality = 4;
+        TrinityItemQuality logPickQuality,logKeepQuality;
 
         // objects
         ArrayList ruleSet, pickUpRuleSet;
@@ -69,14 +66,15 @@ namespace GilesTrinity.ItemRules
         Parser parser;
         //TextHighlighter highlighter;
 
-        // flags
-        bool debugFlag = false;
-
         // dictonary for the item
         public static Dictionary<string, object> itemDic;
 
+        // dictonary for the translation
+        private Dictionary<string, string> nameToBalanceId;
+
         // dictonary for the use of macros
         private Dictionary<string, string> macroDic;
+
         /// <summary>
         /// 
         /// </summary>
@@ -118,8 +116,6 @@ namespace GilesTrinity.ItemRules
         {
             reset();
 
-            StreamReader streamReader = new StreamReader(Path.Combine(FileManager.ItemRulePath, configFile));
-
             // initialize or reset ruleSet array
             ruleSet = new ArrayList();
             pickUpRuleSet = new ArrayList();
@@ -127,74 +123,55 @@ namespace GilesTrinity.ItemRules
             // instantiating our macro dictonary
             macroDic = new Dictionary<string, string>();
 
-            // instantiating our itemfilename array
-            List<string> itemFileNames = new List<string>();
+            // use giles setting
+            if (GilesTrinity.Settings.Loot.ItemRules.Debug)
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is running in debug mode!", logPickQuality);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is using the {0} rule set.", GilesTrinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
+            logPickQuality = getTrinityItemQualityFromString(GilesTrinity.Settings.Loot.ItemRules.PickupLogLevel.ToString());
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "PICKLOG = {0} ", logPickQuality);
+            logKeepQuality = getTrinityItemQualityFromString(GilesTrinity.Settings.Loot.ItemRules.KeepLogLevel.ToString());
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "KEEPLOG = {0} ", logKeepQuality);
+            
+            string rulesPath;
+            if (GilesTrinity.Settings.Loot.ItemRules.ItemRuleSetPath.ToString() != String.Empty)
+                rulesPath = @GilesTrinity.Settings.Loot.ItemRules.ItemRuleSetPath.ToString();
+            else
+                rulesPath = Path.Combine(FileManager.ItemRulePath, "Rules", GilesTrinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
 
-            // set default rules path
-            string rulesPath = Path.Combine(FileManager.ItemRulePath, "Rules");
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "RULEPATH = {0} ", rulesPath);
+            if (GilesTrinity.Settings.Loot.ItemRules.UseItemIDs)
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Using 'UseItemIDs-translation' is still in beta testing and not activated in this release!");
 
-            string str;
-            Match match1, match2;
-            while ((str = streamReader.ReadLine()) != null)
-            {
-                str = str.Split(new string[] { "//" }, StringSplitOptions.None)[0].Replace(" ", "").Replace("\t", "");
-                if (str.Length == 0) continue;
+            // fill translation dictionary
+            //nameToBalanceId = new Dictionary<string, string>();
+            //StreamReader streamReader = new StreamReader(Path.Combine(FileManager.ItemRulePath, translationFile));
+            //string str;
+            //while ((str = streamReader.ReadLine()) != null)
+            //{
+            //    string[] strArrray = str.Split(';');
+            //    nameToBalanceId[strArrray[1].Replace(" ", "")] = strArrray[0];
+            //}
+            //DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} ITEMID translations", nameToBalanceId.Count);
 
-                match1 = filePattern.Match(str);
-                match2 = flagPattern.Match(str);
-
-                if (match1.Success && File.Exists(Path.Combine(rulesPath, ruleType, match1.Groups[1].Value)))
-                {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "path = {0}", Path.Combine(rulesPath, ruleType, match1.Groups[1].Value));
-                    itemFileNames.Add(match1.Groups[1].Value);
-                }
-                else if (match2.Success)
-                {
-
-                    switch (match2.Groups[1].Value)
-                    {
-                        case "DEBUG":
-                            debugFlag = Boolean.Parse(match2.Groups[2].Value);
-                            break;
-                        case "RULE":
-                            {
-                                if (GilesTrinity.Settings.Loot.ItemRules.ItemRuleType == Settings.Loot.ItemRuleType.Config)
-
-                                    ruleType = match2.Groups[2].Value.ToLower();
-                                else
-                                    ruleType = GilesTrinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower();
-                            }
-                            break;
-                        case "PICKLOG":
-                            logPickQuality = getQualityValueFromQuality(match2.Groups[2].Value);
-                            break;
-                        case "KEEPLOG":
-                            logKeepQuality = getQualityValueFromQuality(match2.Groups[2].Value);
-                            break;
-                        case "RULEPATH":
-                            rulesPath = @match2.Groups[2].Value;
-                            break;
-                    }
-                }
-
-            }
-
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "PICKLOG {0} ", logPickQuality);
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "KEEPLOG {0} ", logKeepQuality);
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "RULEPATH {0} ", rulesPath);
             // parse pickup file
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "reading ... {0} ", pickupFile);
-            pickUpRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, ruleType, pickupFile)), pickUpRuleSet);
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... loaded: {0} pickup rules", pickUpRuleSet.Count);
+            pickUpRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, pickupFile)), pickUpRuleSet);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Pickup rules",pickUpRuleSet.Count);
 
             // parse all item files
-            foreach (string itemFileName in itemFileNames)
+            foreach (TrinityItemQuality itemQuality in Enum.GetValues(typeof(TrinityItemQuality)))
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Reading ... {0}", itemFileName);
-                ruleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, ruleType, itemFileName)), ruleSet);
+                string fileName = itemQuality.ToString().ToLower() + ".dis";
+                string filePath = Path.Combine(rulesPath, fileName);
+                int oldValue = ruleSet.Count;
+                if (File.Exists(filePath))
+                {
+                    ruleSet = readLinesToArray(new StreamReader(filePath), ruleSet);
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} {1} rules", (ruleSet.Count - oldValue), itemQuality.ToString());
+                }
             }
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... loaded: {0} item " + ruleType + " rules", ruleSet.Count);
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ... loaded: {0} macros", macroDic.Count);
+            
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Macros", macroDic.Count);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules loaded a total of {0} {1} rules!", ruleSet.Count, GilesTrinity.Settings.Loot.ItemRules.ItemRuleType.ToString());
         }
 
         /// <summary>
@@ -212,6 +189,7 @@ namespace GilesTrinity.ItemRules
                 str = str.Split(new string[] { "//" }, StringSplitOptions.None)[0]
                     .Replace(" ", "")
                     .Replace("\t", "");
+
                 if (str.Length == 0)
                     continue;
 
@@ -225,6 +203,25 @@ namespace GilesTrinity.ItemRules
                     continue;
                 }
                 // - stop macro transformation
+
+
+                //// do simple translation with name to itemid
+                //if (GilesTrinity.Settings.Loot.ItemRules.UseItemIDs && str.Contains("[NAME]"))
+                //{
+                //    bool foundTranslation = false;
+                //    foreach (string key in nameToBalanceId.Keys.ToList())
+                //    {
+                //        key.Replace(" ", "").Replace("\t", "");
+                //        if (str.Contains(key))
+                //        {
+                //            str = str.Replace(key, nameToBalanceId[key]).Replace("[NAME]", "[ITEMID]");
+                //            foundTranslation = true;
+                //            break;
+                //        }
+                //    }
+                //    if (!foundTranslation && GilesTrinity.Settings.Loot.ItemRules.Debug)
+                //        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No translation found for rule: {0}", str);
+                //}
 
                 array.Add(str);
             }
@@ -326,33 +323,32 @@ namespace GilesTrinity.ItemRules
 
             string logString = getFullItem() + validRule;
 
+            TrinityItemQuality quality = getTrinityItemQualityFromString(itemDic["[QUALITY]"]);
+
             switch (action)
             {
                 case InterpreterAction.PICKUP:
-                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= logPickQuality)
+                    if (quality >= logPickQuality)
                         logOut(logString, action, LogType.LOG);
                     break;
                 case InterpreterAction.IGNORE:
-                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= logPickQuality)
+                    if (quality >= logPickQuality)
                         logOut(logString, action, LogType.LOG);
                     break;
                 case InterpreterAction.KEEP:
-                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= logKeepQuality)
+                    if (quality >= logKeepQuality)
                         logOut(logString, action, LogType.LOG);
                     break;
                 case InterpreterAction.TRASH:
-                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= logKeepQuality)
+                    if (quality >= logKeepQuality)
                         logOut(logString, action, LogType.LOG);
                     break;
                 case InterpreterAction.SCORE:
-                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= logKeepQuality)
+                    if (quality >= logKeepQuality)
                         logOut(logString, action, LogType.LOG);
                     break;
                 case InterpreterAction.NULL:
-                    //if (pickUp || getQualityValueFromQuality(itemDic["[QUALITY]"]) >= logPickQuality)
-                    //    logOut(logString, action, LogType.DEBUG);
-                    //else
-                    if (getQualityValueFromQuality(itemDic["[QUALITY]"]) >= logPickQuality)
+                    if (quality >= logPickQuality)
                         logOut(logString, action, LogType.LOG);
                     break;
             }
@@ -364,21 +360,25 @@ namespace GilesTrinity.ItemRules
         /// </summary>
         /// <param name="quality"></param>
         /// <returns></returns>
-        private int getQualityValueFromQuality(object quality)
+        private TrinityItemQuality getTrinityItemQualityFromString(object quality)
         {
-            switch (quality.ToString().ToLower())
+            TrinityItemQuality trinityItemQuality;
+            if (Enum.TryParse<TrinityItemQuality>(quality.ToString(), true, out trinityItemQuality))
+                return trinityItemQuality;
+            else
+                return TrinityItemQuality.Common;
+        }
+
+        private List<string> getDistinctItemQualitiesList()
+        {
+            List<string> result = new List<string>();
+            foreach(ItemQuality itemQuality in Enum.GetValues(typeof(ItemQuality)))
             {
-                case "legendary":
-                    return 4;
-                case "rare":
-                    return 3;
-                case "magic":
-                    return 2;
-                case "normal":
-                    return 1;
-                default:
-                    return 0;
-            }
+                string quality = Regex.Replace(itemQuality.ToString(), @"[\d]", string.Empty);
+                if (!result.Contains(quality))
+                    result.Add(quality);
+            };
+            return result;
         }
 
         /// <summary>
@@ -435,7 +435,7 @@ namespace GilesTrinity.ItemRules
         public void logOut(string str, InterpreterAction action, LogType logType)
         {
             // no debugging when flag set false
-            if (logType == LogType.DEBUG && !debugFlag)
+            if (logType == LogType.DEBUG && !GilesTrinity.Settings.Loot.ItemRules.Debug)
                 return;
 
             log = new StreamWriter(Path.Combine(FileManager.LoggingPath, logFile), true);
@@ -537,7 +537,7 @@ namespace GilesTrinity.ItemRules
             itemDic = new Dictionary<string, object>();
 
             // add log unique key
-            itemDic.Add("[KEY]", getHashKey(item.BalanceID, item.DynamicID));
+            itemDic.Add("[KEY]", item.DynamicID.ToString());
 
             // - BASETYPE ---------------------------------------------------------//
             itemDic.Add("[BASETYPE]", item.DBBaseType.ToString());
@@ -579,7 +579,7 @@ namespace GilesTrinity.ItemRules
             itemDic.Add("[TWOHAND]", item.IsTwoHand);
             itemDic.Add("[UNIDENT]", (bool)true);
             itemDic.Add("[INTNAME]", item.InternalName);
-            //itemDic.Add("[GAMEBALANCEID]", (float)item.GameBalanceId);
+            itemDic.Add("[ITEMID]", item.BalanceID.ToString());
         }
 
         /// <summary>
@@ -598,8 +598,12 @@ namespace GilesTrinity.ItemRules
                 return;
             }
 
+            // check for missing translations
+            if (item.ItemQualityLevel == ItemQuality.Legendary)
+                checkItemForMissingTranslation(item);
+
             // add log unique key
-            itemDic.Add("[KEY]", getHashKey(item.GameBalanceId, item.DynamicId));
+            itemDic.Add("[KEY]", item.DynamicId.ToString());
 
             // - BASETYPE ---------------------------------------------------------//
             itemDic.Add("[BASETYPE]", item.ItemBaseType.ToString());
@@ -641,7 +645,8 @@ namespace GilesTrinity.ItemRules
             itemDic.Add("[TWOHAND]", item.IsTwoHand);
             itemDic.Add("[UNIDENT]", item.IsUnidentified);
             itemDic.Add("[INTNAME]", item.InternalName);
-            itemDic.Add("[ITEMLINK]", item.ItemLink);
+            itemDic.Add("[ITEMID]", item.GameBalanceId.ToString());
+
             // if there are no stats return
             //if (item.Stats == null) return;
 
@@ -774,6 +779,27 @@ namespace GilesTrinity.ItemRules
             // end macro implementation
         }
 
+        private void checkItemForMissingTranslation(ACDItem item)
+        {
+            string balanceIDstr;
+            if (!nameToBalanceId.TryGetValue(item.Name.Replace(" ", ""), out balanceIDstr))
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Translation: Missing: " + item.GameBalanceId.ToString() + ";" + item.Name);
+                // not found missing name
+                StreamWriter transFix = new StreamWriter(Path.Combine(FileManager.LoggingPath, transFixFile), true);
+                transFix.WriteLine("Missing: " + item.GameBalanceId.ToString() + ";" + item.Name);
+                transFix.Close();
+            }
+            else if (balanceIDstr != item.GameBalanceId.ToString())
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Translation: Wrong(" + balanceIDstr + "): " + item.GameBalanceId.ToString() + ";" + item.Name);
+                // wrong reference
+                StreamWriter transFix = new StreamWriter(Path.Combine(FileManager.LoggingPath, transFixFile), true);
+                transFix.WriteLine("Wrong(" + balanceIDstr + "): " + item.GameBalanceId.ToString() + ";" + item.Name);
+                transFix.Close();
+            }
+        }
+
         private object getPlanQualityFromName(string name)
         {
             if (name.Contains("ffbf642f"))
@@ -786,11 +812,6 @@ namespace GilesTrinity.ItemRules
                 return ItemQuality.Rare4.ToString();
             else
                 return ItemQuality.Normal.ToString();
-        }
-
-        private object getHashKey(int gameBalanceId, int dynamicId)
-        {
-            return dynamicId;
         }
 
     }

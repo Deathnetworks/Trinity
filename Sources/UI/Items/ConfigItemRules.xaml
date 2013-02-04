@@ -31,10 +31,9 @@
         <UniformGrid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Rows="3" Columns="2">
             <TextBlock Text="Use Rule Set: " Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center" />
             <ComboBox Width="150" SelectedValuePath="Tag" SelectedValue="{Binding Path=ItemRules.ItemRuleType}">
-                <ComboBoxItem Content="config.dis" Tag="Config" ToolTip="Use [RULE] from config.dis" />
                 <ComboBoxItem Content="Soft" Tag="Soft" IsSelected="True" ToolTip="Use ItemRules\\Soft\\" />
                 <ComboBoxItem Content="Hard" Tag="Hard" ToolTip="Use ItemRules\\Hard\\" />
-                <ComboBoxItem Content="Custom* RTFM!" Tag="Custom" ToolTip="Use ItemRules\\Custom\\ or Custom Path" Foreground="Red" />
+                <ComboBoxItem Content="Custom* RTFM!" Tag="Custom" ToolTip="Use Custom Path" Foreground="Red" />
             </ComboBox>
             <TextBlock Text="Pickup Log Level: " Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center" />
             <ComboBox Width="150" SelectedValuePath="Tag" SelectedValue="{Binding Path=ItemRules.PickupLogLevel}">
@@ -57,7 +56,7 @@
         </StackPanel>
         <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Center" Visibility="{Binding Path=ItemRules.ItemRuleType, Converter={StaticResource enumVisibilityConverter}, ConverterParameter=Custom}">
             <TextBlock Text="Optional Custom Item Rule Set Path:" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBox Width="150" IsEnabled="False" Text="{Binding Path=ItemRules.ItemRuleSetPath}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <TextBox Width="150" IsEnabled="True" Text="{Binding Path=ItemRules.ItemRuleSetPath}" HorizontalAlignment="Center" VerticalAlignment="Center" />
             <Button Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center" Command="{Binding LoadItemRuleSetCommand}">Browse</Button>
         </StackPanel>
 
