@@ -60,8 +60,8 @@ namespace GilesTrinity
             if (ItemManager.Current.ItemIsProtected(item))
                 return false;
 
-            if (ShouldStashItem(item, evaluationType))
-                return false;
+            //if (ShouldStashItem(item, evaluationType))
+            //    return false;
 
             GilesCachedACDItem cItem = GilesCachedACDItem.GetCachedItem(item);
 
@@ -106,11 +106,11 @@ namespace GilesTrinity
 
             GilesCachedACDItem cItem = GilesCachedACDItem.GetCachedItem(item);
 
-            if (ShouldStashItem(item, evaluationType))
-                return false;
+            //if (ShouldStashItem(item, evaluationType))
+            //    return false;
 
-            if (ShouldSalvageItem(item, evaluationType))
-                return false;
+            //if (ShouldSalvageItem(item, evaluationType))
+            //    return false;
 
             if (ItemManager.Current.ItemIsProtected(cItem.AcdItem))
             {
