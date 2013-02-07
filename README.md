@@ -1,5 +1,23 @@
 ﻿#Unified Trinity Community Edition
 
+### Changelog 1.7.2.0:
+
+* Requires DemonbuddyBETA .159+
+
+* ItemRules2 now has a GUI that replaces config.dis
+
+* Wizards now have Archon Cancellation options (thank Nesox!)
+
+* Wizard-Archon arcane strike is now only used when the current target is within melee range, and there are 2 or more targets within melee range
+
+* Unstucker will activate in town if needed - but not with vendor/salvage window open
+
+* Added fix for not attacking Sin Heart in Heart of the Cursed
+
+* Small fix for Wizard Kiting options (forgot to hook settings to kite logic in .19)
+
+* Fixed performance bug with Stashing/Selling/Salvaging logic
+
 ### Changelog 1.7.1.19:
 
 * Requires DemonbuddyBETA .155 or higher (will not compile otherwise)
