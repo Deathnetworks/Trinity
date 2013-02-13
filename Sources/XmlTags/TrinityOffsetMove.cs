@@ -50,12 +50,13 @@ namespace GilesTrinity.XmlTags
         public float PathPrecision { get; set; }
 
         public Vector3 Position { get; set; }
+        private static MoveResult lastMoveResult = MoveResult.Moved;
 
         protected override Composite CreateBehavior()
         {
             return
             new PrioritySelector(
-                new Decorator(ret => Position.Distance2D(MyPos) <= PathPrecision,
+                new Decorator(ret => Position.Distance2D(MyPos) <= PathPrecision || lastMoveResult == MoveResult.ReachedDestination,
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Finished Offset Move x={0} y={1} position={3}", 
                             OffsetX, OffsetY, Position.Distance2D(MyPos), Position)),
@@ -71,9 +72,9 @@ namespace GilesTrinity.XmlTags
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Moving to offset x={0} y={1} distance={2:0} position={3}",
                         OffsetX, OffsetY, Position.Distance2D(MyPos), Position);
 
-            MoveResult mr = PlayerMover.NavigateTo(Position);
+            lastMoveResult = PlayerMover.NavigateTo(Position);
 
-            if (mr == MoveResult.PathGenerationFailed)
+            if (lastMoveResult == MoveResult.PathGenerationFailed)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error moving to offset x={0} y={1} distance={2:0} position={3}",
                            OffsetX, OffsetY, Position.Distance2D(MyPos), Position);

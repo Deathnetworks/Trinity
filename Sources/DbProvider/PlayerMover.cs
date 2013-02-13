@@ -190,6 +190,9 @@ namespace GilesTrinity.DbProvider
                     "worldId=\"" + ZetaDia.CurrentWorldId + "\""
                 );
 
+                // check failed minimap markers
+                MiniMapMarker.UpdateFailedMarkers();
+
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
 
                 vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
