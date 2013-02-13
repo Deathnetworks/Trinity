@@ -1,5 +1,13 @@
 ﻿#Unified Trinity Community Edition
 
+### Changelog 1.7.2.1:
+
+* Requires DemonbuddyBETA .172+ or Demonbuddy release .300+
+
+* Picks up demonic essances with both Trinity scoring and ItemRules 
+
+* Fixes for TrinityOffsetMove and MiniMapMarker investigation attempting to move to un-navigable locations
+
 ### Changelog 1.7.2.0:
 
 * Requires DemonbuddyBETA .159+
