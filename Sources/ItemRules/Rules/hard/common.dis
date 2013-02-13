@@ -17,3 +17,5 @@
 [QUALITY] == "Rare5" && [TYPE] == "CraftingPlan" -> [TRASH]
 [QUALITY] == "Rare4" && [TYPE] == "CraftingPlan" -> [TRASH]
 
+// keep demonic essences
+[TYPE] == "CraftingReagent"

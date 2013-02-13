@@ -14,7 +14,10 @@
 // +---------------------------------------------------------------------------+                                               
 
 // craftingPlans on the ground have all quality normal cant decide here
-[QUALITY] == "Normal" && [TYPE] == "CraftingPlan"
+[TYPE] == "CraftingPlan"
+
+// craftingReagents like Demonic Essences
+[TYPE] == "CraftingReagent"
 
 // +---------------------------------------------------------------------------+
 // |  _____   _______ _______ _______ _______ _____  _______ ______ ___ ___ 
