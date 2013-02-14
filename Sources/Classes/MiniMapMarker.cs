@@ -23,7 +23,7 @@ namespace GilesTrinity
         public MiniMapMarker() { }
         internal static List<MiniMapMarker> KnownMarkers = new List<MiniMapMarker>();
 
-        internal static MoveResult lastMoveResult = MoveResult.ReachedDestination;
+        internal static MoveResult lastMoveResult = MoveResult.Moved;
 
         internal static bool AnyUnvisitedMarkers()
         {
