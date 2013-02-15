@@ -44,7 +44,7 @@ namespace GilesTrinity.Settings.Loot
 
         #region Properties
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(0)]
         public int WeaponBlueLevel
         {
             get
@@ -62,7 +62,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(63)]
         public int WeaponYellowLevel
         {
             get
@@ -80,7 +80,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(0)]
         public int ArmorBlueLevel
         {
             get
@@ -98,7 +98,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(63)]
         public int ArmorYellowLevel
         {
             get
@@ -116,7 +116,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(0)]
         public int JewelryBlueLevel
         {
             get
@@ -134,7 +134,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(58)]
         public int JewelryYellowLevel
         {
             get
@@ -170,7 +170,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(60)]
         public int PotionLevel
         {
             get
@@ -242,7 +242,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(100)]
         public int MinimumGoldStack
         {
             get
@@ -314,7 +314,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(60)]
         public int MiscItemLevel
         {
             get

@@ -131,7 +131,8 @@ namespace GilesTrinity
                                 // Force a close range target because we seem to be stuck *OR* if not ranged and currently rooted
                                 if (PrioritizeCloseRangeUnits)
                                 {
-                                    cacheObject.Weight = 20000 - (Math.Floor(cacheObject.CentreDistance) * 200);
+                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 20000d;
+                                    //cacheObject.Weight = 20000 - (Math.Floor(cacheObject.CentreDistance) * 200);
 
                                     // Goblin priority KAMIKAZEEEEEEEE
                                     if (cacheObject.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority == GoblinPriority.Kamikaze)
@@ -351,7 +352,7 @@ namespace GilesTrinity
 
                                 // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
                                 if (PrioritizeCloseRangeUnits)
-                                    cacheObject.Weight = 18000 - (Math.Floor(cacheObject.CentreDistance) * 200);
+                                    cacheObject.Weight = (200f - cacheObject.RadiusDistance) / 200f * 18000d;
 
                                 // If there's a monster in the path-line to the item, reduce the weight to 1
                                 if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius * 1.2f, PlayerStatus.CurrentPosition, cacheObject.Position)))
@@ -380,7 +381,7 @@ namespace GilesTrinity
                                 {
 
                                     // Ok we have globes enabled, and our health is low...!
-                                    cacheObject.Weight = 17000d - (Math.Floor(cacheObject.CentreDistance) * 300d);
+                                    cacheObject.Weight = (300f - cacheObject.RadiusDistance) / 300f * 17000d;
 
                                     // Point-blank items get a weight increase
                                     if (cacheObject.CentreDistance <= 15f)
@@ -443,38 +444,19 @@ namespace GilesTrinity
                             }
                         case GObjectType.Shrine:
                             {
-
                                 // Weight Shrines
-                                cacheObject.Weight = 14500d - (Math.Floor(cacheObject.CentreDistance) * 170d);
+                                cacheObject.Weight = (300f - cacheObject.RadiusDistance) / 300f * 14500f;
 
                                 // Very close shrines get a weight increase
                                 if (cacheObject.CentreDistance <= 20f)
                                     cacheObject.Weight += 1000d;
-                                switch (cacheObject.ActorSNO)
-                                {
-                                    case 176074:
 
-                                        // protection shrine
-                                        break;
-                                    case 176076:
-
-                                        // fortune shrine
-                                        break;
-                                    case 176077:
-
-                                        // frenzied shrine
-                                        break;
-                                }
                                 if (cacheObject.Weight > 0)
                                 {
 
                                     // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                     if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                         cacheObject.Weight += 400;
-
-                                    // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
-                                    if (PrioritizeCloseRangeUnits)
-                                        cacheObject.Weight = 18500d - (Math.Floor(cacheObject.CentreDistance) * 200);
 
                                     // If there's a monster in the path-line to the item, reduce the weight by 25%
                                     if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
@@ -523,7 +505,7 @@ namespace GilesTrinity
 
                                 // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
                                 if (PrioritizeCloseRangeUnits)
-                                    cacheObject.Weight = 19200d - (Math.Floor(cacheObject.CentreDistance) * 200d);
+                                    cacheObject.Weight = (200d - cacheObject.CentreDistance) / 200d * 19200d;
 
                                 //// Very close destructibles get a final weight increase
                                 //if (cacheObject.CentreDistance <= 12f)
@@ -544,7 +526,7 @@ namespace GilesTrinity
                                 // Weight Interactable Specials
 
                                 // Very close interactables get a weight increase
-                                cacheObject.Weight = 15000d - (Math.Floor(cacheObject.CentreDistance) * 90d);
+                                cacheObject.Weight = (90d - cacheObject.CentreDistance) / 90d * 15000d;
                                 if (cacheObject.CentreDistance <= 12f)
                                     cacheObject.Weight += 1000d;
 
@@ -571,7 +553,7 @@ namespace GilesTrinity
                                 // Weight Containers
 
                                 // Very close containers get a weight increase
-                                cacheObject.Weight = 11000d - (Math.Floor(cacheObject.CentreDistance) * 190d);
+                                cacheObject.Weight = (190d - cacheObject.CentreDistance) / 190d * 11000d;
                                 if (cacheObject.CentreDistance <= 12f)
                                     cacheObject.Weight += 600d;
 
@@ -683,7 +665,7 @@ namespace GilesTrinity
                     cTarget.TimesBeenPrimaryTarget++;
                     GenericCache.UpdateObject(new GenericCacheObject(targetSha1Hash, cTarget, new TimeSpan(0, 10, 0)));
                 }
-                
+
             }
         }
     }

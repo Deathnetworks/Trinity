@@ -127,8 +127,11 @@ namespace GilesTrinity
                 CombatTargeting.Instance.Provider = new BlankCombatProvider();
                 LootTargeting.Instance.Provider = new BlankLootProvider();
                 ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
-                ItemManager.Current = new TrinityItemManager();
 
+                if (Settings.Loot.ItemFilterMode != global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+                {
+                    ItemManager.Current = new TrinityItemManager();
+                }
                 UpdateSearchGridProvider();
 
                 // Safety check incase DB "OnStart" event didn't fire properly
@@ -162,6 +165,18 @@ namespace GilesTrinity
             {
                 BotMain.TicksPerSecond = 10;
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Reset bot TPS to default", (int)Settings.Advanced.TPSLimit);
+            }
+        }
+
+        internal static void SetItemManagerProvider()
+        {
+            if (Settings.Loot.ItemFilterMode != global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+            {
+                ItemManager.Current = new TrinityItemManager();
+            }
+            else
+            {
+                ItemManager.Current = new LootRuleItemManager();
             }
         }
 

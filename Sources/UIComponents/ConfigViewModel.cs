@@ -36,6 +36,7 @@ namespace GilesTrinity.UIComponents
                                         _OriginalModel.Save();
                                         GilesTrinity.SetBotTPS();
                                         GilesTrinity.SetUnstuckProvider();
+                                        GilesTrinity.SetItemManagerProvider();
                                         UILoader.CloseWindow();
                                     });
             TestScoreCommand = new RelayCommand(

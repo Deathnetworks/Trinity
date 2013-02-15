@@ -546,11 +546,11 @@ namespace GilesTrinity
                 if (c_HitPoints <= 0.99)
                 {
                     dUseKillRadius *= 2;
-                    if (dUseKillRadius <= 90) dUseKillRadius = 90;
+                    if (dUseKillRadius <= 150) dUseKillRadius = 150;
                 }
                 else
                 {
-                    if (dUseKillRadius <= 60) dUseKillRadius = 60;
+                    if (dUseKillRadius <= 120) dUseKillRadius = 120;
                 }
             }
             // Safety for TownRun and UseTownPortalTag
