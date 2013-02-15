@@ -256,7 +256,8 @@ namespace GilesTrinity
             }
             // Dashing Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_25] > 0 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 14f) || AnythingWithinRange[RANGE_15] > 2) &&
+                (ElitesWithinRange[RANGE_25] == 0 && AnythingWithinRange[RANGE_25] <= 2 && !CurrentTarget.IsBossOrEliteRareUnique || (ElitesWithinRange[RANGE_25] == 1 || CurrentTarget.IsBossOrEliteRareUnique) && AnythingWithinRange[RANGE_25] == 1 && CurrentTarget.HitPoints <= 0.2 
+                || CurrentTarget.CentreDistance >= 40f) &&
                 Hotbar.Contains(SNOPower.Monk_DashingStrike) && ((PlayerStatus.PrimaryResource >= 30 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.Monk_DashingStrike, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);

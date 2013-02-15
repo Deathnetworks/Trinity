@@ -315,7 +315,8 @@ namespace GilesTrinity
                 if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.RebuffArmor && !Wizard_HasWizardArmor())
                     cancelArchon = true;
 
-                if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.RebuffMagicWeaponFamiliar && (!GetHasBuff(SNOPower.Wizard_MagicWeapon) || !GetHasBuff(SNOPower.Wizard_Familiar)))
+                if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.RebuffMagicWeaponFamiliar &&
+                    (!CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon) || !CheckAbilityAndBuff(SNOPower.Wizard_Familiar)))
                     cancelArchon = true;
 
                 if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.Timer &&
