@@ -52,6 +52,8 @@ namespace GilesTrinity.DbProvider
         internal static DateTime timeLastRestartedGame = DateTime.Today;
         internal static bool UnStuckCheckerLastResult = false;
 
+        private static int WizardTeleportCount = 0;
+
         // Store player current position
         public static Vector3 vMyCurrentPosition = Vector3.Zero;
 
@@ -604,12 +606,22 @@ namespace GilesTrinity.DbProvider
                         GilesTrinity.MaintainTempestRush = false;
                     }
                 }
+
+                bool hasWormHole = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 4);
+
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (GilesTrinity.Hotbar.Contains(SNOPower.Wizard_Teleport) &&
-                    DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Wizard_Teleport] &&
-                    DestinationDistance >= 20f &&
-                    PowerManager.CanCast(SNOPower.Wizard_Teleport) && !ShrinesInArea(vMoveToTarget))
+                    (DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Wizard_Teleport] ||
+                    hasWormHole && WizardTeleportCount < 3 && DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= 250) &&
+                    DestinationDistance >= 10f && !ShrinesInArea(vMoveToTarget))
                 {
+                    // Reset teleport count if we've already hit the max
+                    if (WizardTeleportCount >= 3)
+                        WizardTeleportCount = 0;
+                    
+                    // increment the teleport count for wormhole rune
+                    WizardTeleportCount++;
+
                     Vector3 vThisTarget = vMoveToTarget;
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);

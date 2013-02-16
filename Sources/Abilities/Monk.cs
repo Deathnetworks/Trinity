@@ -94,7 +94,7 @@ namespace GilesTrinity
             }
 
 
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && GetHasBuff(SNOPower.Monk_SweepingWind) && !PlayerStatus.IsIncapacitated && 
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && GetHasBuff(SNOPower.Monk_SweepingWind) && !PlayerStatus.IsIncapacitated &&
                 (DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds <= 4000 || DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds > 8500) &&
                 AnythingWithinRange[RANGE_15] >= 1 && CurrentTarget.RadiusDistance <= 15f)
             {
@@ -103,7 +103,7 @@ namespace GilesTrinity
 
             // Sweeping winds spam
             if ((PlayerStatus.PrimaryResource >= 75 || (Settings.Combat.Monk.HasInnaSet && PlayerStatus.PrimaryResource >= 5)) &&
-                Hotbar.Contains(SNOPower.Monk_SweepingWind) && GetHasBuff(SNOPower.Monk_SweepingWind) && 
+                Hotbar.Contains(SNOPower.Monk_SweepingWind) && GetHasBuff(SNOPower.Monk_SweepingWind) &&
                 DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds >= 4000 && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds <= 5400)
             {
                 SweepWindSpam = DateTime.Now;
@@ -168,6 +168,7 @@ namespace GilesTrinity
 
             // For tempest rush re-use
             if (!UseOOCBuff && LastPowerUsed == SNOPower.Monk_TempestRush && PlayerStatus.PrimaryResource >= 15 &&
+                DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_TempestRush]).TotalMilliseconds <= 500 &&
                 (Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly))
             {
                 GenerateMonkZigZag();
@@ -256,7 +257,7 @@ namespace GilesTrinity
             }
             // Dashing Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_25] == 0 && AnythingWithinRange[RANGE_25] <= 2 && !CurrentTarget.IsBossOrEliteRareUnique || (ElitesWithinRange[RANGE_25] == 1 || CurrentTarget.IsBossOrEliteRareUnique) && AnythingWithinRange[RANGE_25] == 1 && CurrentTarget.HitPoints <= 0.2 
+                (ElitesWithinRange[RANGE_25] == 0 && AnythingWithinRange[RANGE_25] <= 2 && !CurrentTarget.IsBossOrEliteRareUnique || (ElitesWithinRange[RANGE_25] == 1 || CurrentTarget.IsBossOrEliteRareUnique) && AnythingWithinRange[RANGE_25] == 1 && CurrentTarget.HitPoints <= 0.2
                 || CurrentTarget.CentreDistance >= 40f) &&
                 Hotbar.Contains(SNOPower.Monk_DashingStrike) && ((PlayerStatus.PrimaryResource >= 30 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
@@ -394,7 +395,7 @@ namespace GilesTrinity
                 return true;
 
             // Minimum 25 Spirit to start Tempest Rush
-            if (PowerManager.CanCast(SNOPower.Monk_TempestRush) && currentSpirit > 25f)
+            if (PowerManager.CanCast(SNOPower.Monk_TempestRush) && currentSpirit > Settings.Combat.Monk.TR_MinSpirit)
                 return true;
 
             return isReady;
@@ -433,11 +434,10 @@ namespace GilesTrinity
         }
         private static void Monk_TempestRushStatus(string trUse)
         {
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0}, anim={1} trOnCD={2} animEndTime={3}, lastUse={4:0}",
+
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0}, spirit={1:0} cd={2} lastUse={3:0}",
                 trUse,
-                ZetaDia.Me.CommonData.CurrentAnimation,
-                PowerManager.CanCast(SNOPower.Monk_TempestRush),
-                ZetaDia.Me.LoopingAnimationEndTime,
+                GilesTrinity.PlayerStatus.PrimaryResource, PowerManager.CanCast(SNOPower.Monk_TempestRush),
                 DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_TempestRush]).TotalMilliseconds);
         }
 

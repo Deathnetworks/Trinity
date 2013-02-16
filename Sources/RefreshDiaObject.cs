@@ -1342,7 +1342,7 @@ namespace GilesTrinity
             bool openResplendentChests = Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_InternalName.ToLower().Contains("chest_rare");
 
             // Ignore it if it's not in range yet, except health wells and resplendent chests if we're opening chests
-            if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell && c_RActorGuid != CurrentTargetRactorGUID)
+            if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell && c_ObjectType != GObjectType.Shrine && c_RActorGuid != CurrentTargetRactorGUID)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotInRange";

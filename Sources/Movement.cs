@@ -31,15 +31,14 @@ namespace GilesTrinity
                     if (PlayerStatus.ActorClass == ActorClass.Barbarian)
                         useTargetBasedZigZag = (Settings.Combat.Barbarian.TargetBasedZigZag);
 
-                    float minDistance = 2f;
-                    float maxDistance = 20f;
-                    int minTargets = 3;
+                    float maxDistance = 30f;
+                    int minTargets = 2;
 
                     if (useTargetBasedZigZag && !bAnyTreasureGoblinsPresent && GilesObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
                     {
                         IEnumerable<GilesObject> zigZagTargets =
                             from u in GilesObjectCache
-                            where u.Type == GObjectType.Unit && u.RadiusDistance > minDistance && u.RadiusDistance < maxDistance && u.RActorGuid != CurrentTarget.RActorGuid &&
+                            where u.Type == GObjectType.Unit && u.RadiusDistance < maxDistance &&
                             !hashAvoidanceObstacleCache.Any(a => Vector3.Distance(u.Position, a.Location) < GetAvoidanceRadius(a.ActorSNO) && PlayerStatus.CurrentHealthPct <= GetAvoidanceHealth(a.ActorSNO))
                             select u;
                         if (zigZagTargets.Count() >= minTargets)
@@ -277,7 +276,7 @@ namespace GilesTrinity
                 if (!shouldKite && PlayerStatus.ActorClass == ActorClass.Wizard && Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && PlayerStatus.PrimaryResource >= 25 &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_WaveOfForce] &&
                     !PlayerStatus.IsIncapacitated && hashAvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(PlayerStatus.CurrentPosition) <= 15f) >= 2 &&
-                    (Settings.Combat.Wizard.CriticalMass || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
+                    (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, vNullLocation, CurrentWorldDynamicId, -1);
                 }

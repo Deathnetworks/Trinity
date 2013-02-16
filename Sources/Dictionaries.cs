@@ -183,7 +183,7 @@ namespace GilesTrinity
             194263, 87189, 90072, 107031, 106584, 186130, 187265,
             108012, 103279, 74004, 84531, 84538,  190492, 209133, 6318, 107705, 105681, 89934,
             89933, 182276, 117574, 182271, 182283, 182278, 128895, 81980, 82111, 81226, 81227, 107067, 106749,
-            107107, 107112, 106731, 107752, 107829, 90321, 107828, 121327, 185391, 249320, 81232, 81231, 81239, 81515, 210433, 195414,
+            107107, 107112, 106731, 107752, 107829, 90321, 107828, 121327, 249320, 81232, 81231, 81239, 81515, 210433, 195414,
             80758, 80757, 80745, 81229, 81230, 82109, 83024, 83025, 82972, 83959, 249190, 251396, 138472, 118260, 200226, 192654, 245828,
             215103, 132951, 217508, 199998, 199997, 114527, 245910, 169123, 123885, 169890, 168878, 169891, 169077, 169904, 169907,
             169906, 169908, 169905, 169909, 179780, 179778, 179772, 179779, 179776, 122305, 110959, 103235, 103215, 105763, 103217, 51353, 80140,
@@ -236,13 +236,13 @@ namespace GilesTrinity
         /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
         /// </summary>
         internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
-            174900, 191459, 104632, 196211, 194682, 81699, 3340, 122558, 123325, 
+            174900, 191459, 104632, 196211, 194682, 81699, 3340, 122558, 123325, 185391,
         };
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 25}, {191459, 13}, {104632, 20}, {196211, 25},  {194682, 20}, {81699, 20}, {3340, 12}, {122558, 15}, {123325, 25},
+            {174900, 25}, {191459, 13}, {104632, 20}, {196211, 25},  {194682, 20}, {81699, 20}, {3340, 12}, {122558, 15}, {123325, 25}, {185391, 15},
          };
         /// <summary>
         /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache
@@ -374,7 +374,6 @@ namespace GilesTrinity
                 {SNOPower.Wizard_FrostNova, 9000},
                 {SNOPower.Wizard_DiamondSkin, 15000},
                 {SNOPower.Wizard_SlowTime, 16000},
-                // Is actually 20 seconds, with a rune that changes to 16 seconds
                 {SNOPower.Wizard_Teleport, 16000},
                 // Need to be able to check rune that let's us spam this 3 times in a row then cooldown
                 {SNOPower.Wizard_WaveOfForce, 12000},
@@ -382,7 +381,7 @@ namespace GilesTrinity
                 {SNOPower.Wizard_EnergyTwister, 5},
                 {SNOPower.Wizard_Hydra, 12000},
                 {SNOPower.Wizard_Meteor, 1000},
-                {SNOPower.Wizard_Blizzard, 6000},
+                {SNOPower.Wizard_Blizzard, 4000},
                 // Effect lasts for 6 seconds, actual cooldown is 0...
                 {SNOPower.Wizard_IceArmor, 60000},
                 {SNOPower.Wizard_StormArmor, 60000},

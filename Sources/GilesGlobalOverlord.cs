@@ -72,7 +72,7 @@ namespace GilesTrinity
                         iCombatLoops = 0;
                         RefreshHotbar();
                         dictAbilityRepeatDelay = new Dictionary<SNOPower, int>(dictAbilityRepeatDefaults);
-                        if (Settings.Combat.Wizard.CriticalMass && PlayerStatus.ActorClass == ActorClass.Wizard)
+                        if (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) && PlayerStatus.ActorClass == ActorClass.Wizard)
                         {
                             dictAbilityRepeatDelay[SNOPower.Wizard_FrostNova] = 25;
                             dictAbilityRepeatDelay[SNOPower.Wizard_ExplosiveBlast] = 25;

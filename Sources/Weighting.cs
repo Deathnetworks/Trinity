@@ -300,7 +300,7 @@ namespace GilesTrinity
                                                     break;
                                                 case GoblinPriority.Prioritize:
                                                     // Super-high priority option below... 
-                                                    cacheObject.Weight += 15000;
+                                                    cacheObject.Weight += 20000;
                                                     break;
                                                 case GoblinPriority.Kamikaze:
                                                     // KAMIKAZE SUICIDAL TREASURE GOBLIN RAPE AHOY!
@@ -448,8 +448,8 @@ namespace GilesTrinity
                                 cacheObject.Weight = (300f - cacheObject.RadiusDistance) / 300f * 14500f;
 
                                 // Very close shrines get a weight increase
-                                if (cacheObject.CentreDistance <= 20f)
-                                    cacheObject.Weight += 1000d;
+                                if (cacheObject.CentreDistance <= 30f)
+                                    cacheObject.Weight += 10000d;
 
                                 if (cacheObject.Weight > 0)
                                 {
@@ -522,7 +522,6 @@ namespace GilesTrinity
                             }
                         case GObjectType.Interactable:
                             {
-
                                 // Weight Interactable Specials
 
                                 // Very close interactables get a weight increase

@@ -249,8 +249,8 @@ namespace GilesTrinity
             switch (rhItem.ItemType)
             {
                 default:
-                    if (rhItem.IsTwoHand)
-                        return SNOPower.Weapon_Melee_Instant_BothHand;
+                    //if (rhItem.IsTwoHand)
+                    //    return SNOPower.Weapon_Melee_Instant_BothHand;
                     return SNOPower.Weapon_Melee_Instant;
                 case ItemType.Axe:
                 case ItemType.CeremonialDagger:
@@ -262,8 +262,8 @@ namespace GilesTrinity
                 case ItemType.Spear:
                 case ItemType.Staff:
                 case ItemType.Sword:
-                    if (rhItem.IsTwoHand)
-                        return SNOPower.Weapon_Melee_Instant_BothHand;
+                    //if (rhItem.IsTwoHand)
+                    //    return SNOPower.Weapon_Melee_Instant_BothHand;
                    return SNOPower.Weapon_Melee_Instant;
                 case ItemType.Wand:
                     return SNOPower.Weapon_Ranged_Wand;
