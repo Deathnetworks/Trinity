@@ -256,7 +256,7 @@ namespace GilesTrinity.DbProvider
                                         : Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
                 Thread.Sleep(1000);
                 GilesTrinity.GilesResetEverythingNewGame();
-                ZetaDia.Service.Games.LeaveGame();
+                ZetaDia.Service.Party.LeaveGame();
                 // Wait for 10 second log out timer if not in town
                 if (!ZetaDia.Me.IsInTown)
                 {

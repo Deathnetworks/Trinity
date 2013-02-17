@@ -270,7 +270,6 @@
     <None Include="Dictionaries.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ItemRules\config.dis" />
     <None Include="ItemRules\Rules\hard\legendary.dis" />
     <None Include="ItemRules\Rules\hard\magic.dis" />
     <None Include="ItemRules\Rules\hard\pickup.dis" />
@@ -281,6 +280,7 @@
     <None Include="ItemRules\Rules\soft\pickup.dis" />
     <None Include="ItemRules\Rules\soft\rare.dis" />
     <None Include="ItemRules\Rules\soft\special.dis" />
+    <None Include="ItemRules\translation.dis" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
@@ -293,7 +293,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>rd /S /Q "$(ProjectDir)obj\"
-REM rd /S /Q "$(ProjectDir)bin\"
+rem rd /S /Q "$(ProjectDir)bin\"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>

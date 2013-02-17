@@ -242,26 +242,30 @@ namespace GilesTrinity
             //RuneDict.Add("EmpoweredWave", 3);
             //RuneDict.Add("BlindingLight", 4);
             //RuneDict.Add("PillarOfTheAncients", 2);
+            //bool hasEmpoweredWaveRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WaveOfLight && s.RuneIndex == 3);
+
+
             bool hasEmpoweredWaveRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WaveOfLight && s.RuneIndex == 3);
+
+            // Dashing Strike
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
+                (AnythingWithinRange[RANGE_40] == 1 && (!CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.HitPoints <= 0.2)
+                || CurrentTarget.CentreDistance >= 40f) &&
+                Hotbar.Contains(SNOPower.Monk_DashingStrike) && ((PlayerStatus.PrimaryResource >= 30 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
+            {
+                return new TrinityPower(SNOPower.Monk_DashingStrike, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
+            }
 
             // Wave of light
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
                 Hotbar.Contains(SNOPower.Monk_WaveOfLight) &&
                 GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
-                (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 20f)) &&
+                (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2 || ((CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 20f)) &&
                 (PlayerStatus.PrimaryResource >= 70 ||
                  (hasEmpoweredWaveRune && PlayerStatus.PrimaryResource >= 40 && !IsWaitingForSpecial)) && // Empowered Wave
                 Monk_HasMantraAbilityAndBuff())
             {
                 return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
-            }
-            // Dashing Strike
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_25] == 0 && AnythingWithinRange[RANGE_25] <= 2 && !CurrentTarget.IsBossOrEliteRareUnique || (ElitesWithinRange[RANGE_25] == 1 || CurrentTarget.IsBossOrEliteRareUnique) && AnythingWithinRange[RANGE_25] == 1 && CurrentTarget.HitPoints <= 0.2
-                || CurrentTarget.CentreDistance >= 40f) &&
-                Hotbar.Contains(SNOPower.Monk_DashingStrike) && ((PlayerStatus.PrimaryResource >= 30 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
-            {
-                return new TrinityPower(SNOPower.Monk_DashingStrike, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
             }
 
             // Fists of thunder as the primary, repeatable attack
@@ -425,7 +429,9 @@ namespace GilesTrinity
 
             if (Monk_TempestRushReady() && Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly && GilesUseTimer(SNOPower.Monk_TempestRush) && shouldMaintain)
             {
-                Vector3 target = CurrentTarget != null ? FindZigZagTargetLocation(CurrentTarget.Position, 15f) : MathEx.GetPointAt(ZetaDia.Me.Position, 25f, ZetaDia.Me.Movement.Rotation);
+                //Vector3 target = CurrentTarget != null ? FindZigZagTargetLocation(CurrentTarget.Position, 15f) : MathEx.GetPointAt(ZetaDia.Me.Position, 25f, ZetaDia.Me.Movement.Rotation);
+
+                Vector3 target = PlayerMover.vOldMoveToTarget;
 
                 Monk_TempestRushStatus("Using Tempest Rush to maintain channeling");
                 ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, CurrentWorldDynamicId, -1);

@@ -1,5 +1,41 @@
 ﻿#Unified Trinity Community Edition
 
+### Changelog 1.7.2.2:
+
+* Fix for stucks investigating MiniMapMarkers (also helps with until=ExitFound on TrinityExplore.. )  
+
+* Wizard Archon Cancel for MagicWeapon and Familiar now works correctly  
+
+* Changed Default Trinity pickup settings to "Champion Hunting" (was Questing... legacy from my Questing pack)  
+
+* Fixed Demonbuddy Crashing on first item drop when trying to use Demonbuddy Loot rules  
+
+* Updated all Weighting formulas for consistency - removed magic number/formula weights, max distance and max weight are clear now. Shrines work again  
+
+* Doubled minimum elite kill radius (from 60 to 120)  
+
+* Wizard Critical Mass passive now automatically detected, updated all skills to use passive detection  
+
+* Wizard Frost Nova now detects Deep Freeze rune.  
+
+* Wizard Frost Nova is now properly spammed when paired with Critical Mass regardless of rune  
+
+* Wizard Blizzard now detects Snowbound Rune  
+
+* Wizard Energy Twister + Wicked Wind rune works better  
+
+* Wizard Teleport Wormhole rune works now  
+
+* Fixed default attacks for 2Handed weapons (e.g. for Wiz CM/WW with a 2H)  
+
+* Removed maximum range for shrines (still weighted based on range)  
+
+* Tweaked Barbarian Multi-Target Whirlwind ZigZag a little bit (added range and reduce minimum mob count)  
+
+* Tweaked Monk Tempest Rush check a little bit, improved debug logging  
+
+* Added tesslerc's Monk Dashing Strike tweaks
+
 ### Changelog 1.7.2.1:
 
 * Requires DemonbuddyBETA .172+ or Demonbuddy release .300+

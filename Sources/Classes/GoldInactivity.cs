@@ -142,7 +142,7 @@ namespace GilesTrinity
 
             if (!leaveGameInitiated && isLeavingGame)
             {
-                ZetaDia.Service.Games.LeaveGame();
+                ZetaDia.Service.Party.LeaveGame();
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "GoldInactiveLeaveGame initiated LeaveGame");
                 return true;
             }            

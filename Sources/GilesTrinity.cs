@@ -179,7 +179,7 @@ namespace GilesTrinity
                                                 : Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
                         Thread.Sleep(1000);
                         GilesResetEverythingNewGame();
-                        ZetaDia.Service.Games.LeaveGame();
+                        ZetaDia.Service.Party.LeaveGame();
                         Thread.Sleep(10000);
                     }
                     else
