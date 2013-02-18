@@ -36,7 +36,6 @@ namespace GilesTrinity.Settings.Combat
         private float _AvoidWallOfFireHealth;
         private float _AvoidZoltBubbleHealth;
         private float _AvoidZoltTwisterHealth;
-        private bool _CriticalMass;
         private bool _WaitArchon;
 
         private bool _NoArcaneStrike;
@@ -186,23 +185,6 @@ namespace GilesTrinity.Settings.Combat
                 {
                     _PotionLevel = value;
                     OnPropertyChanged("PotionLevel");
-                }
-            }
-        }
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool CriticalMass
-        {
-            get
-            {
-                return _CriticalMass;
-            }
-            set
-            {
-                if (_CriticalMass != value)
-                {
-                    _CriticalMass = value;
-                    OnPropertyChanged("CriticalMass");
                 }
             }
         }

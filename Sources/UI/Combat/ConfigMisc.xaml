@@ -17,6 +17,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -60,10 +61,36 @@
                     Value="{Binding Path=Misc.DelayAfterKill}" 
                     HorizontalAlignment="Stretch" Margin="25,0,25,0"/>
         </Grid>
+        
+        <Grid Grid.Row="3" Margin="5" HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="Minimum Trash Mob Pack Size:" FontWeight="Bold" TextAlignment="Center"/>
+            <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
+                    Interval="100" IsSnapToTickEnabled="True"
+                    Maximum="5" Minimum="1" SmallChange="100" TickFrequency="1" TickPlacement="BottomRight" 
+                    Value="{Binding Path=Misc.TrashPackSize}" 
+                    HorizontalAlignment="Stretch" Margin="0,0,0,0"
+                    MinWidth="175"/>
+            <TextBlock Grid.Column="1" Text="Trash Pack Cluster Radius:" FontWeight="Bold" TextAlignment="Center"/>
+            <Slider  Grid.Row="1" Grid.Column="1" Template="{DynamicResource Slider}" 
+                    Interval="100" IsSnapToTickEnabled="True"
+                    Maximum="90" Minimum="0" SmallChange="100" TickFrequency="5" TickPlacement="BottomRight" 
+                    Value="{Binding Path=Misc.TrashPackClusterRadius}" 
+                    HorizontalAlignment="Stretch" Margin="0,0,0,0"
+                    MinWidth="175"/>
+
+        </Grid>
+        
         <!--All CheckBox-->
-        <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Center" Margin="5">
+        <StackPanel Grid.Row="4" Orientation="Vertical" HorizontalAlignment="Center" Margin="5">
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.ExtendedTrashKill}" ToolTip="Extended range for ~ 2 seconds">Extend trash-kill range after combat</CheckBox>
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.IgnoreSolitaryTrash}" ToolTip="Ignore single trash mobs">Ignore solitary trash mobs (40yd range)</CheckBox>
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AvoidAOE}">Attempt to avoid AOE</CheckBox>
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.CollectHealthGlobe}">Attempt to collect health globes</CheckBox>
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Allow out-of-combat movement powers</CheckBox>
@@ -71,6 +98,6 @@
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>
         </StackPanel>
         <!--Reset Button-->
-        <Button Grid.Row="4" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetMiscCommand}">Reset</Button>
+        <Button Grid.Row="5" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetMiscCommand}">Reset</Button>
     </Grid>
 </UserControl>

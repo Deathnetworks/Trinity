@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Zeta.Common;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
@@ -127,6 +128,16 @@ namespace GilesTrinity
                 ForceLeapAgainst = ForceLeapAgainst
             };
             return newGilesObject;
+        }
+
+        public int UnitsNear(float range = 5f)
+        {
+            if (this.Type != GObjectType.Unit)
+                return 0;
+
+            return GilesTrinity.GilesObjectCache
+                .Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= range && u.HasBeenInLoS && u.RActorGuid != GilesTrinity.CurrentTarget.RActorGuid);
+
         }
     }
 }

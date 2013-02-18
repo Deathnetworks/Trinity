@@ -41,7 +41,7 @@ namespace GilesTrinity
                 int TrashMobCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsTrashMob);
                 int EliteCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
 
-                bool ShouldIgnoreTrashMobs = (!TownRun.IsTryingToTownPortal() && !PrioritizeCloseRangeUnits && Settings.Combat.Misc.IgnoreSolitaryTrash && EliteCount == 0);
+                bool ShouldIgnoreTrashMobs = (!TownRun.IsTryingToTownPortal() && !PrioritizeCloseRangeUnits && Settings.Combat.Misc.TrashPackSize > 0 && EliteCount == 0);
 
                 foreach (GilesObject cacheObject in GilesObjectCache)
                 {
@@ -55,8 +55,8 @@ namespace GilesTrinity
                         case GObjectType.Unit:
                             {
                                 // Ignore Solitary Trash mobs (no elites present)
-                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob &&
-                                    !GilesObjectCache.Any(u => u.IsTrashMob && Vector3.Distance(cacheObject.Position, u.Position) <= 40f))
+                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && !cacheObject.HasBeenPrimaryTarget &&
+                                    !(GilesObjectCache.Count(u => u.IsTrashMob && Vector3.Distance(cacheObject.Position, u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius) >= Settings.Combat.Misc.TrashPackSize))
                                 {
                                     break;
                                 }

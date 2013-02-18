@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using GilesTrinity.DbProvider;
@@ -29,7 +31,7 @@ namespace GilesTrinity
         {
             get
             {
-                return new Version(1, 7, 2, 2);
+                return new Version(1, 7, 2, 3);
             }
         }
 
@@ -123,6 +125,8 @@ namespace GilesTrinity
                 GameEvents.OnItemSold += TrinityOnItemSold;
                 GameEvents.OnItemSalvaged += TrinityOnItemSalvaged;
                 GameEvents.OnItemStashed += TrinityOnItemStashed;
+
+                ZetaDia.Memory.Process.EnableRaisingEvents = false;
 
                 CombatTargeting.Instance.Provider = new BlankCombatProvider();
                 LootTargeting.Instance.Provider = new BlankLootProvider();

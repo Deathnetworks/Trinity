@@ -2,12 +2,33 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Zeta.Common;
 
 namespace GilesTrinity
 {
     public class TargetUtil
     {
-        public static bool AnyTrashMobsInRange(float range = 10f)
+        public static Vector3 GetBestClusterPoint(float range = 15f)
+        {
+            Vector3 bestClusterPoint = Vector3.Zero;
+            var clusterUnits =
+                (from u in GilesTrinity.GilesObjectCache
+                 where u.Type == GObjectType.Unit
+                 orderby u.UnitsNear(range)
+                 orderby u.HitPoints descending
+                 select u.Position).ToList();
+
+            if (clusterUnits.Any())
+                bestClusterPoint = clusterUnits.FirstOrDefault();
+            else if (GilesTrinity.CurrentTarget != null)
+                bestClusterPoint = GilesTrinity.CurrentTarget.Position;
+            else
+                bestClusterPoint = GilesTrinity.PlayerStatus.CurrentPosition;
+
+            return bestClusterPoint;
+        }
+
+        public static bool AnyMobsInRange(float range = 10f)
         {
             return (from o in GilesTrinity.GilesObjectCache
                     where o.Type == GObjectType.Unit &&

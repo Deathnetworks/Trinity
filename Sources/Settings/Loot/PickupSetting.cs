@@ -23,6 +23,7 @@ namespace GilesTrinity.Settings.Loot
         private bool _DesignPlan;
         private bool _FollowerItem;
         private int _MiscItemLevel;
+        private bool _CraftMaterials;
         #endregion Fields
 
         #region Events
@@ -330,6 +331,24 @@ namespace GilesTrinity.Settings.Loot
                 }
             }
         }
+  
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool CraftMaterials
+        {
+            get
+            {
+                return _CraftMaterials;
+            }
+            set
+            {
+                if (_CraftMaterials != value)
+                {
+                    _CraftMaterials = value;
+                    OnPropertyChanged("CraftMaterials");
+                }
+            }
+        }      
         #endregion Properties
 
         #region Methods
@@ -354,6 +373,16 @@ namespace GilesTrinity.Settings.Loot
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+ 
+        /// <summary>
+        /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserializing()]
+        internal void OnDeserializingMethod(StreamingContext context)
+        {
+            this.CraftMaterials = true;
         }
         #endregion Methods
     }

@@ -319,6 +319,7 @@ namespace GilesTrinity.XmlTags
                     MiniMapMarker.DetectMiniMapMarkers(ExitNameHash)
                 ),
                 UpdateSearchGridProvider(),
+                new Action(ret => CheckResetDungeonExplorer()),
                 new PrioritySelector(
                     CheckIsObjectiveFinished(),
                     PrioritySceneCheck(),
@@ -596,7 +597,7 @@ namespace GilesTrinity.XmlTags
 
             MoveResult moveResult = PlayerMover.NavigateTo(PrioritySceneTarget);
 
-            if (moveResult == MoveResult.PathGenerationFailed)
+            if (moveResult == MoveResult.PathGenerationFailed || moveResult == MoveResult.ReachedDestination)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Unable to navigate to Scene {0} - {1} Center {2} Distance {3:0}, cancelling!",
                     CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));

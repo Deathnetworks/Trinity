@@ -1,5 +1,11 @@
 ﻿#Unified Trinity Community Edition
 
+### Changelog 1.7.2.3:
+
+* Added options to set minimum trash mob pack size and trash mob pack radius (default = 1, 20f)
+
+
+
 ### Changelog 1.7.2.2:
 
 * Fix for stucks investigating MiniMapMarkers (also helps with until=ExitFound on TrinityExplore.. )  

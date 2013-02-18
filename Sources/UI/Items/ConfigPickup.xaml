@@ -284,6 +284,7 @@
                     <ComboBoxItem Content="63+" Tag="63" />
                 </ComboBox>
                 <CheckBox Grid.Row="4" Grid.Column="3" Content="Pickup Follower Items" IsChecked="{Binding Path=Pickup.FollowerItem}" Margin="2"/>
+                <CheckBox Grid.Row="5" Grid.Column="3" Content="Pickup Craft Materials" IsChecked="{Binding Path=Pickup.CraftMaterials}" Margin="2"/>
             </Grid>
         </Grid>
         <Grid Grid.Row="4" Margin="2">

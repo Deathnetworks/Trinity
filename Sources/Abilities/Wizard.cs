@@ -50,7 +50,7 @@ namespace GilesTrinity
                     (
                     // Check this isn't a critical mass wizard, cos they won't want to use this except for low health unless they don't have nova/blast in which case go for it
                     (hasCriticalMass && ((!Hotbar.Contains(SNOPower.Wizard_FrostNova) && !Hotbar.Contains(SNOPower.Wizard_ExplosiveBlast)) ||
-                        (PlayerStatus.CurrentHealthPct <= 0.7 && (TargetUtil.AnyTrashMobsInRange(15f) || TargetUtil.IsEliteTargetInRange(23f)))))
+                        (PlayerStatus.CurrentHealthPct <= 0.7 && (TargetUtil.AnyMobsInRange(15f) || TargetUtil.IsEliteTargetInRange(23f)))))
                     // Else normal wizard in which case check standard stuff
                     || (!hasCriticalMass && ElitesWithinRange[RANGE_15] > 0 || AnythingWithinRange[RANGE_15] > 3 || PlayerStatus.CurrentHealthPct <= 0.7 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 23f))
                     ) &&
@@ -236,7 +236,7 @@ namespace GilesTrinity
 
                 // Explosive Blast SPAM when enough AP, blow erry thing up, nah mean
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_ExplosiveBlast) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 20 &&
-                    ((ElitesWithinRange[RANGE_25] >= 1 || AnythingWithinRange[RANGE_25] >= 1 || PlayerStatus.CurrentHealthPct <= 0.7) && CurrentTarget.RadiusDistance <= 12f) &&
+                    (TargetUtil.AnyMobsInRange(25) && CurrentTarget.RadiusDistance <= 25f) &&
                     PowerManager.CanCast(SNOPower.Wizard_ExplosiveBlast))
                 {
                     float fThisRange = 11f;
@@ -270,10 +270,13 @@ namespace GilesTrinity
                 {
                     Vector3 targetDirection = MathEx.CalculatePointFrom(PlayerStatus.CurrentPosition, CurrentTarget.Position, 3f);
                     ZetaDia.Me.UsePower(SNOPower.Walk, targetDirection);
+
+                    Vector3 bestClusterPoint = TargetUtil.GetBestClusterPoint(15f);
+
                     float twisterRange = 28f;
                     if (hasCriticalMass)
                         twisterRange = 60f;
-                    return new TrinityPower(SNOPower.Wizard_EnergyTwister, twisterRange, CurrentTarget.Position, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_EnergyTwister, twisterRange, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
                 }
 
                 // Disintegrate
