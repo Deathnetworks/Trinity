@@ -174,9 +174,15 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool CheckLevelRequirements(int level, ItemQuality quality, int requiredBlueLevel, int requiredYellowLevel)
         {
-            if (quality < ItemQuality.Magic1)
+            if (quality < ItemQuality.Normal && ZetaDia.Me.Level > 5)
             {
-                // White item, blacklist
+                // Grey item, ignore if we're over level 5
+                return false;
+            }
+
+            if (quality < ItemQuality.Magic1 && ZetaDia.Me.Level > 10)
+            {
+                // White item, ignore if we're over level 10
                 return false;
             }
             if (quality >= ItemQuality.Magic1 && quality < ItemQuality.Rare4)

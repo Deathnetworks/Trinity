@@ -82,6 +82,13 @@ namespace GilesTrinity
                 if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
             }
 
+            using (new PerformanceLogger("RefreshDiaObject.PlayerSummons"))
+            {
+                // Summons by the player 
+                AddToCache = RefreshStepCachedPlayerSummons(AddToCache);
+                if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
+            }
+
             using (new PerformanceLogger("RefreshDiaObject.Blacklists"))
             {
                 // Check Blacklists
@@ -97,13 +104,6 @@ namespace GilesTrinity
                 // Set Giles Object Type
                 AddToCache = RefreshStepCachedObjectType(AddToCache);
                 if (!AddToCache) { c_IgnoreReason = "CachedObjectType"; return AddToCache; }
-            }
-
-            using (new PerformanceLogger("RefreshDiaObject.PlayerSummons"))
-            {
-                // Summons by the player 
-                AddToCache = RefreshStepCachedPlayerSummons(AddToCache);
-                if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
             }
 
             using (new PerformanceLogger("RefreshDiaObject.Position"))

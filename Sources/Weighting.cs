@@ -9,6 +9,8 @@ using Zeta.Internals.SNO;
 using Zeta.TreeSharp;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Profile.Common;
+using Zeta;
+using GilesTrinity.DbProvider;
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
@@ -40,8 +42,16 @@ namespace GilesTrinity
 
                 int TrashMobCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsTrashMob);
                 int EliteCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
+                int CloseUnitCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= 10f);
 
-                bool ShouldIgnoreTrashMobs = (!TownRun.IsTryingToTownPortal() && !PrioritizeCloseRangeUnits && Settings.Combat.Misc.TrashPackSize > 0 && EliteCount == 0);
+                bool ShouldIgnoreTrashMobs = 
+                    (!TownRun.IsTryingToTownPortal() && 
+                    !PrioritizeCloseRangeUnits && 
+                    Settings.Combat.Misc.TrashPackSize > 0 && 
+                    EliteCount == 0 && 
+                    ZetaDia.Me.Level >= 15 &&
+                    PlayerMover.MovementSpeed > 1 &&
+                    CloseUnitCount > 1);
 
                 foreach (GilesObject cacheObject in GilesObjectCache)
                 {
@@ -55,7 +65,7 @@ namespace GilesTrinity
                         case GObjectType.Unit:
                             {
                                 // Ignore Solitary Trash mobs (no elites present)
-                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && !cacheObject.HasBeenPrimaryTarget &&
+                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && !cacheObject.HasBeenPrimaryTarget && cacheObject.RadiusDistance >= 10f && 
                                     !(GilesObjectCache.Count(u => u.IsTrashMob && Vector3.Distance(cacheObject.Position, u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius) >= Settings.Combat.Misc.TrashPackSize))
                                 {
                                     break;

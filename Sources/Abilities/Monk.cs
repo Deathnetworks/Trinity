@@ -418,6 +418,9 @@ namespace GilesTrinity
             if (TownRun.IsTryingToTownPortal())
                 return;
 
+            if (TimeSinceUse(SNOPower.Monk_TempestRush) > 150)
+                return;
+
             bool shouldMaintain = false;
             bool nullTarget = CurrentTarget == null;
             if (!nullTarget)
@@ -484,7 +487,6 @@ namespace GilesTrinity
                 GilesTrinity.PlayerStatus.PrimaryResource, PowerManager.CanCast(SNOPower.Monk_TempestRush),
                 DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_TempestRush]).TotalMilliseconds);
         }
-
 
 
     }

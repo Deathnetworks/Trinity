@@ -15,6 +15,7 @@ namespace GilesTrinity
                 (from u in GilesTrinity.GilesObjectCache
                  where u.Type == GObjectType.Unit
                  orderby u.UnitsNear(range) descending
+                 orderby u.CentreDistance
                  orderby u.HitPoints descending
                  select u.Position).ToList();
 
@@ -36,7 +37,7 @@ namespace GilesTrinity
                     select o).Any();
         }
 
-        public static bool AnyTrashMobsInRange(float range = 10f, int minCount = 1)
+        public static bool AnyMobsInRange(float range = 10f, int minCount = 1)
         {
             return (from o in GilesTrinity.GilesObjectCache
                     where o.Type == GObjectType.Unit &&

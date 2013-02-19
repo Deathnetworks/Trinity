@@ -27,9 +27,9 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool CheckHasTarget(object ret)
         {
-            using (new PerformanceLogger("GilesTrinity.GilesGlobalOverlord"))
+            using (new PerformanceLogger("Trinity.CheckHasTarget"))
             {
-                using (new PerformanceLogger("GilesGlobalOverlord.Validation"))
+                using (new PerformanceLogger("CheckHasTarget.Validation"))
                 {
 
                     // If we aren't in the game or a world is loading, don't do anything yet
@@ -51,7 +51,7 @@ namespace GilesTrinity
                     }
 
                 }
-                using (new PerformanceLogger("GilesGlobalOverlord.RefreshHotBar"))
+                using (new PerformanceLogger("CheckHasTarget.RefreshHotBar"))
                 {
 
                     // Store all of the player's abilities every now and then, to keep it cached and handy, also check for critical-mass timer changes etc.
@@ -146,7 +146,7 @@ namespace GilesTrinity
                 }
                 // Clear target current and reset key variables used during the target-handling function
 
-                using (new PerformanceLogger("GilesGlobalOverlord.ClearBlacklist"))
+                using (new PerformanceLogger("CheckHasTarget.ClearBlacklist"))
                 {
                     //CurrentTarget = null;
                     bDontMoveMeIAmDoingShit = false;
@@ -161,7 +161,7 @@ namespace GilesTrinity
 
                     ClearBlacklists();
                 }
-                using (new PerformanceLogger("GilesGlobalOverlord.RefreshCache"))
+                using (new PerformanceLogger("CheckHasTarget.RefreshCache"))
                 {
                     // Refresh Cache if needed
                     bool CacheWasRefreshed = RefreshDiaObjectCache();
@@ -178,7 +178,7 @@ namespace GilesTrinity
 
                 //Monk_MaintainTempestRush();
 
-                using (new PerformanceLogger("GilesGlobalOverlord.UsePotion"))
+                using (new PerformanceLogger("CheckHasTarget.UsePotion"))
                 {
 
                     // Pop a potion when necessary
@@ -211,7 +211,7 @@ namespace GilesTrinity
                 {
                     lastMaintenanceCheck = DateTime.Now;
 
-                    using (new PerformanceLogger("GilesGlobalOverlord.Maintenence"))
+                    using (new PerformanceLogger("CheckHasTarget.Maintenence"))
                     {
 
                         lastChangedZigZag = DateTime.Today;

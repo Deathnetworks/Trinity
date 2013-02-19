@@ -287,7 +287,13 @@ namespace GilesTrinity
             }
         }
 
-
+        private static double TimeSinceUse(SNOPower power)
+        {
+            if (dictAbilityLastUse.ContainsKey(power))
+                return DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds;
+            else
+                return -1;
+        }
 
 
     }

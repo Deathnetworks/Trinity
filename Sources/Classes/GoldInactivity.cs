@@ -125,6 +125,16 @@ namespace GilesTrinity
                 return false;
             }
 
+            if (!BotMain.IsRunning)
+            {
+                return false;
+            }
+
+            if (BotMain.IsPaused)
+            {
+                return false;
+            }
+
             if (!isLeavingGame && !leaveGameInitiated)
             {
                 // Exit the game and reload the profile

@@ -77,12 +77,15 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
             }
+
             // Grasp of the Dead, look below, droping globes and dogs when using it on elites and 3 norms
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_GraspOfTheDead) && !PlayerStatus.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2) &&
-                PlayerStatus.PrimaryResource >= 122 && PowerManager.CanCast(SNOPower.Witchdoctor_GraspOfTheDead))
+                (TargetUtil.AnyMobsInRange(30,2)) &&
+                PlayerStatus.PrimaryResource >= 78 && PowerManager.CanCast(SNOPower.Witchdoctor_GraspOfTheDead))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_GraspOfTheDead, 25f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15);
+
+                return new TrinityPower(SNOPower.Witchdoctor_GraspOfTheDead, 25f, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
             }
             // Horrify Buff When not in combat for movement speed
             if (UseOOCBuff && Settings.Combat.WitchDoctor.GraveInjustice == true && Hotbar.Contains(SNOPower.Witchdoctor_Horrify) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 37 &&
@@ -156,7 +159,7 @@ namespace GilesTrinity
             // Fire Bats fast-attack
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Firebats) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 98)
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Firebats, 40f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Witchdoctor_Firebats, 20f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
             }
             // Poison Darts fast-attack Spams Darts when mana is too low (to cast bears) @12yds or @10yds if Bears avialable
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_PoisonDart) && !PlayerStatus.IsIncapacitated)

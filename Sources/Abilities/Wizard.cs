@@ -71,7 +71,7 @@ namespace GilesTrinity
 
                 // Blizzard
                 if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Blizzard) && CurrentTarget != null &&
-                    (TargetUtil.AnyElitesInRange(25) || TargetUtil.AnyTrashMobsInRange(25,2) || TargetUtil.IsEliteTargetInRange(25)) &&
+                    (TargetUtil.AnyElitesInRange(25) || TargetUtil.AnyMobsInRange(25,2) || TargetUtil.IsEliteTargetInRange(25)) &&
                     (PlayerStatus.PrimaryResource >= 40 || (hasSnowBoundRune && PlayerStatus.PrimaryResource >= 20)) && GilesUseTimer(SNOPower.Wizard_Blizzard))
                 {
                     Vector3 targetDirection = MathEx.CalculatePointFrom(PlayerStatus.CurrentPosition, CurrentTarget.Position, 1f);
@@ -220,7 +220,7 @@ namespace GilesTrinity
 
                 // Frost Nova
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_FrostNova) && !PlayerStatus.IsIncapacitated &&
-                    ((hasDeepFreeze && TargetUtil.AnyTrashMobsInRange(25, 5)) || (!hasDeepFreeze && (TargetUtil.AnyTrashMobsInRange(25, 1) || PlayerStatus.CurrentHealthPct <= 0.7)) &&
+                    ((hasDeepFreeze && TargetUtil.AnyMobsInRange(25, 5)) || (!hasDeepFreeze && (TargetUtil.AnyMobsInRange(25, 1) || PlayerStatus.CurrentHealthPct <= 0.7)) &&
                     CurrentTarget.RadiusDistance <= 25f) &&
                     PowerManager.CanCast(SNOPower.Wizard_FrostNova))
                 {
@@ -229,7 +229,7 @@ namespace GilesTrinity
 
                 // Frost Nova for Critical Mass builds
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_FrostNova) && !PlayerStatus.IsIncapacitated &&
-                    hasCriticalMass && TargetUtil.AnyTrashMobsInRange(25, 1) && PowerManager.CanCast(SNOPower.Wizard_FrostNova))
+                    hasCriticalMass && TargetUtil.AnyMobsInRange(25, 1) && PowerManager.CanCast(SNOPower.Wizard_FrostNova))
                 {
                     return new TrinityPower(SNOPower.Wizard_FrostNova, 20f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
                 }
@@ -404,7 +404,7 @@ namespace GilesTrinity
                     return new TrinityPower(SNOPower.Wizard_Archon_ArcaneBlast, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
                 }
                 // Arcane Strike (Arcane Strike) Rapid Spam at close-range only
-                if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && CurrentTarget.RadiusDistance <= 5f && TargetUtil.AnyTrashMobsInRange(7f, 2) &&
+                if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && CurrentTarget.RadiusDistance <= 5f && TargetUtil.AnyMobsInRange(7f, 2) &&
                     CurrentTarget.IsBossOrEliteRareUnique && !Settings.Combat.Wizard.NoArcaneStrike)
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 7f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
@@ -420,7 +420,7 @@ namespace GilesTrinity
 
         private static bool Wizard_ShouldStartArchon()
         {
-            return (TargetUtil.AnyElitesInRange(30, 1) || TargetUtil.AnyTrashMobsInRange(Settings.Combat.Wizard.ArchonMobDistance, Settings.Combat.Wizard.ArchonMobCount) ||
+            return (TargetUtil.AnyElitesInRange(30, 1) || TargetUtil.AnyMobsInRange(Settings.Combat.Wizard.ArchonMobDistance, Settings.Combat.Wizard.ArchonMobCount) ||
                     TargetUtil.IsEliteTargetInRange(30f)) &&
                     PlayerStatus.PrimaryResource >= 25 && PlayerStatus.CurrentHealthPct >= 0.10;
         }
