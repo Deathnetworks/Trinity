@@ -84,7 +84,7 @@ namespace GilesTrinity
                 TownRun.SendMobileNotifications();
             }
 
-
+            Monk_MaintainTempestRush();
         }
 
         /// <summary>
@@ -153,8 +153,11 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
             }
 
-            // reseting stash rules
-            StashRule.reset();
+            if (StashRule != null)
+            {
+                // reseting stash rules
+                StashRule.reset();
+            }
         }
 
         internal static void SetBotTPS()

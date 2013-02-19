@@ -270,11 +270,12 @@
     <None Include="Dictionaries.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="ItemRules\Rules\hard\common.dis" />
     <None Include="ItemRules\Rules\hard\legendary.dis" />
     <None Include="ItemRules\Rules\hard\magic.dis" />
     <None Include="ItemRules\Rules\hard\pickup.dis" />
     <None Include="ItemRules\Rules\hard\rare.dis" />
-    <None Include="ItemRules\Rules\hard\special.dis" />
+    <None Include="ItemRules\Rules\hard\set.dis" />
     <None Include="ItemRules\Rules\soft\legendary.dis" />
     <None Include="ItemRules\Rules\soft\magic.dis" />
     <None Include="ItemRules\Rules\soft\pickup.dis" />

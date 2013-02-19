@@ -628,7 +628,7 @@ namespace GilesTrinity
         private static bool CanCastArchon = false;
 
         // Darkfriend's Looting Rule
-        public static Interpreter StashRule = new Interpreter();
+        public static Interpreter StashRule = null; // = new Interpreter();
 
         // Tesslerc - used for using combination strike
         // ForesightFirstHit is used to track the 30 second buff from deadly reach.

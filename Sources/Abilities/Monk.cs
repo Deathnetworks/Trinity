@@ -167,8 +167,8 @@ namespace GilesTrinity
             }
 
             // For tempest rush re-use
-            if (!UseOOCBuff && LastPowerUsed == SNOPower.Monk_TempestRush && PlayerStatus.PrimaryResource >= 15 &&
-                DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_TempestRush]).TotalMilliseconds <= 500 &&
+            if (!UseOOCBuff && PlayerStatus.PrimaryResource >= 15 &&
+                DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_TempestRush]).TotalMilliseconds <= 150 &&
                 (Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly))
             {
                 GenerateMonkZigZag();
@@ -183,7 +183,7 @@ namespace GilesTrinity
                 ((PlayerStatus.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                 (Settings.Combat.Monk.TROption == TempestRushOption.Always ||
                 Settings.Combat.Monk.TROption == TempestRushOption.CombatOnly ||
-                (Settings.Combat.Monk.TROption == TempestRushOption.ElitesGroupsOnly && (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_15] > 2))))
+                (Settings.Combat.Monk.TROption == TempestRushOption.ElitesGroupsOnly && (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2))))
             {
                 GenerateMonkZigZag();
                 MaintainTempestRush = true;
@@ -399,17 +399,30 @@ namespace GilesTrinity
                 return true;
 
             // Minimum 25 Spirit to start Tempest Rush
-            if (PowerManager.CanCast(SNOPower.Monk_TempestRush) && currentSpirit > Settings.Combat.Monk.TR_MinSpirit)
+            if (PowerManager.CanCast(SNOPower.Monk_TempestRush) && currentSpirit > Settings.Combat.Monk.TR_MinSpirit && DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_TempestRush]).TotalMilliseconds > 1010)
                 return true;
 
             return isReady;
         }
         private static void Monk_MaintainTempestRush()
         {
+            if (PlayerStatus.ActorClass != ActorClass.Monk)
+                return;
+
+            if (!Hotbar.Contains(SNOPower.Monk_TempestRush))
+                return;
+
+            if (ZetaDia.Me.IsInTown || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                return;
+
+            if (TownRun.IsTryingToTownPortal())
+                return;
+
             bool shouldMaintain = false;
             bool nullTarget = CurrentTarget == null;
             if (!nullTarget)
             {
+                // maintain for everything except items, doors, interactables... stuff we have to "click" on
                 switch (CurrentTarget.Type)
                 {
                     case GObjectType.Unit:
@@ -433,8 +446,33 @@ namespace GilesTrinity
 
                 Vector3 target = PlayerMover.vOldMoveToTarget;
 
-                Monk_TempestRushStatus("Using Tempest Rush to maintain channeling");
-                ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, CurrentWorldDynamicId, -1);
+                string locationSource = "PlayerMover";
+
+                if (PlayerMover.TimeLastUsedPlayerMover.Ticks < dateSincePickedTarget.Ticks && CurrentTarget != null)
+                {
+                    locationSource = "Current Target Position";
+                    target = CurrentTarget.Position;
+                }
+
+                if (target.Distance2D(ZetaDia.Me.Position) <= 1f)
+                {
+                    locationSource = "ZigZag";
+                    target = FindZigZagTargetLocation(target, 15f);
+                }
+
+                if (target == Vector3.Zero)
+                    return;
+
+                float DestinationDistance = target.Distance2D(ZetaDia.Me.Position);
+
+                float aimPointDistance = 10f;
+                if (DestinationDistance > aimPointDistance)
+                {
+                    target = MathEx.CalculatePointFrom(target, ZetaDia.Me.Position, aimPointDistance);
+                }
+
+                Monk_TempestRushStatus(String.Format("Using Tempest Rush to maintain channeling, source={0}, V3={1} dist={2:0}", locationSource, target, DestinationDistance));
+                ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, target, CurrentWorldDynamicId, -1);
                 dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
             }
         }

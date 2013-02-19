@@ -51,6 +51,9 @@ namespace GilesTrinity.DbProvider
         internal static int iCancelUnstuckerForSeconds = 60;
         internal static DateTime timeLastRestartedGame = DateTime.Today;
         internal static bool UnStuckCheckerLastResult = false;
+        internal static DateTime TimeLastUsedPlayerMover = DateTime.MinValue;
+
+        internal static Vector3 LastTempestRushPosition = Vector3.Zero;
 
         private static int WizardTeleportCount = 0;
 
@@ -324,7 +327,9 @@ namespace GilesTrinity.DbProvider
                 return;
             }
 
+            TimeLastUsedPlayerMover = DateTime.Now;
             vMyCurrentPosition = ZetaDia.Me.Position;
+            vOldMoveToTarget = vMoveToTarget;
 
             // record speed once per second
             if (DateTime.Now.Subtract(lastRecordedPosition).TotalMilliseconds >= 1000)
@@ -372,7 +377,6 @@ namespace GilesTrinity.DbProvider
             // Store distance to current moveto target
             float DestinationDistance;
             DestinationDistance = vMyCurrentPosition.Distance2D(vMoveToTarget);
-            vOldMoveToTarget = vMoveToTarget;
 
             // Do unstuckery things
             if (GilesTrinity.Settings.Advanced.UnstuckerEnabled)
@@ -551,13 +555,15 @@ namespace GilesTrinity.DbProvider
 
                     bool canRayCastTarget = GilesTrinity.GilesCanRayCast(vMyCurrentPosition, vTargetAimPoint);
 
-                    if (!CanChannelTempestRush && GilesTrinity.PlayerStatus.PrimaryResource >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit &&
-                        DestinationDistance >= GilesTrinity.Settings.Combat.Monk.TR_MinDist &&
+                    if (!CanChannelTempestRush && 
+                        ((GilesTrinity.PlayerStatus.PrimaryResource >= GilesTrinity.Settings.Combat.Monk.TR_MinSpirit &&
+                        DestinationDistance >= GilesTrinity.Settings.Combat.Monk.TR_MinDist) ||
+                         DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Monk_TempestRush]).TotalMilliseconds <= 150) &&
                         canRayCastTarget && PowerManager.CanCast(SNOPower.Monk_TempestRush))
                     {
                         CanChannelTempestRush = true;
                     }
-                    else if (CanChannelTempestRush && (GilesTrinity.PlayerStatus.PrimaryResource < 10f) && canRayCastTarget)
+                    else if ((CanChannelTempestRush && (GilesTrinity.PlayerStatus.PrimaryResource < 10f)) || !canRayCastTarget)
                     {
                         CanChannelTempestRush = false;
                     }
@@ -568,6 +574,8 @@ namespace GilesTrinity.DbProvider
                     {
                         if (GilesTrinity.GilesUseTimer(SNOPower.Monk_TempestRush))
                         {
+                            LastTempestRushPosition = vTargetAimPoint;
+
                             ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vTargetAimPoint, GilesTrinity.CurrentWorldDynamicId, -1);
                             GilesTrinity.dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
                             GilesTrinity.LastPowerUsed = SNOPower.Monk_TempestRush;
@@ -583,8 +591,8 @@ namespace GilesTrinity.DbProvider
                             });
 
                             if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Tempest Rush for OOC movement, distance={0:0} spirit={1:0} cd={2} lastUse={3:0}",
-                                    DestinationDistance, GilesTrinity.PlayerStatus.PrimaryResource, PowerManager.CanCast(SNOPower.Monk_TempestRush), lastUse);
+                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Tempest Rush for OOC movement, distance={0:0} spirit={1:0} cd={2} lastUse={3:0} V3={4} vAim={5}",
+                                    DestinationDistance, GilesTrinity.PlayerStatus.PrimaryResource, PowerManager.CanCast(SNOPower.Monk_TempestRush), lastUse, vMoveToTarget, vTargetAimPoint);
                             return;
                         }
                         else
@@ -611,8 +619,8 @@ namespace GilesTrinity.DbProvider
 
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (GilesTrinity.Hotbar.Contains(SNOPower.Wizard_Teleport) &&
-                    (DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Wizard_Teleport] ||
-                    hasWormHole && WizardTeleportCount < 3 && DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= 250) &&
+                    ((PowerManager.CanCast(SNOPower.Wizard_Teleport) && DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Wizard_Teleport]) ||
+                    (hasWormHole && WizardTeleportCount < 3 && DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= 250)) &&
                     DestinationDistance >= 10f && !ShrinesInArea(vMoveToTarget))
                 {
                     // Reset teleport count if we've already hit the max

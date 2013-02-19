@@ -4,7 +4,9 @@
 
 * Added options to set minimum trash mob pack size and trash mob pack radius (default = 1, 20f)
 
+* Set Demonbuddy to not close when game client crashes (should help with crash reports, except when using YAR)
 
+* 
 
 ### Changelog 1.7.2.2:
 

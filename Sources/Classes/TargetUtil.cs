@@ -14,7 +14,7 @@ namespace GilesTrinity
             var clusterUnits =
                 (from u in GilesTrinity.GilesObjectCache
                  where u.Type == GObjectType.Unit
-                 orderby u.UnitsNear(range)
+                 orderby u.UnitsNear(range) descending
                  orderby u.HitPoints descending
                  select u.Position).ToList();
 

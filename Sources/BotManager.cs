@@ -71,6 +71,9 @@ namespace GilesTrinity
                     Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius);
             }
 
+            if (StashRule == null)
+                StashRule = new ItemRules.Interpreter();
+
             StashRule.readConfiguration();
 
         }
