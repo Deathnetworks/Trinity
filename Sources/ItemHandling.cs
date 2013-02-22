@@ -111,16 +111,29 @@ namespace GilesTrinity
                     break;
                 case GItemBaseType.Misc:
 
-                    // Note; Infernal keys are misc, so should be picked up here - we aren't filtering them out, so should default to true at the end of this function
                     if (itemType == GItemType.CraftingMaterial && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.CraftMaterials))
                     {
                         return false;
                     }
+
                     if (itemType == GItemType.CraftTome && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.CraftTomes))
                     {
                         return false;
                     }
-                    if (itemType == GItemType.CraftingPlan && !Settings.Loot.Pickup.DesignPlan)
+
+                    // Plans
+                    if (item.InternalName.ToLower().StartsWith("craftingplan_smith") && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.Plans))
+                    {
+                        return false;
+                    }
+
+                    // Designs
+                    if (item.InternalName.ToLower().StartsWith("craftingplan_jeweler") && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.Designs))
+                    {
+                        return false;
+                    }
+
+                    if (itemType == GItemType.InfernalKey && !Settings.Loot.Pickup.InfernalKeys)
                     {
                         return false;
                     }

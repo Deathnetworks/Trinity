@@ -20,10 +20,12 @@ namespace GilesTrinity.Settings.Loot
         private int _LegendaryLevel;
         private int _MinimumGoldStack;
         private bool _CraftTomes;
-        private bool _DesignPlan;
+        private bool _Plans;
+        private bool _Designs;
         private bool _FollowerItem;
         private int _MiscItemLevel;
         private bool _CraftMaterials;
+        private bool _InfernalKeys;
         #endregion Fields
 
         #region Events
@@ -280,18 +282,35 @@ namespace GilesTrinity.Settings.Loot
 
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
-        public bool DesignPlan
+        public bool Plans
         {
             get
             {
-                return _DesignPlan;
+                return _Plans;
             }
             set
             {
-                if (_DesignPlan != value)
+                if (_Plans != value)
                 {
-                    _DesignPlan = value;
-                    OnPropertyChanged("DesignPlan");
+                    _Plans = value;
+                    OnPropertyChanged("Plans");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool Designs
+        {
+            get
+            {
+                return _Designs;
+            }
+            set
+            {
+                if (_Designs != value)
+                {
+                    _Designs = value;
+                    OnPropertyChanged("Designs");
                 }
             }
         }
@@ -315,7 +334,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(60)]
+        [DefaultValue(63)]
         public int MiscItemLevel
         {
             get
@@ -331,7 +350,7 @@ namespace GilesTrinity.Settings.Loot
                 }
             }
         }
-  
+
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool CraftMaterials
@@ -346,6 +365,23 @@ namespace GilesTrinity.Settings.Loot
                 {
                     _CraftMaterials = value;
                     OnPropertyChanged("CraftMaterials");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool InfernalKeys
+        {
+            get
+            {
+                return _InfernalKeys;
+            }
+            set
+            {
+                if (_InfernalKeys != value)
+                {
+                    _InfernalKeys = value;
+                    OnPropertyChanged("InfernalKeys");
                 }
             }
         }      
@@ -383,6 +419,10 @@ namespace GilesTrinity.Settings.Loot
         internal void OnDeserializingMethod(StreamingContext context)
         {
             this.CraftMaterials = true;
+            this.InfernalKeys = true;
+            this.Designs = true;
+            this.Plans = true;
+            
         }
         #endregion Methods
     }
