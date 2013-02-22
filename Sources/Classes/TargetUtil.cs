@@ -10,23 +10,26 @@ namespace GilesTrinity
     {
         public static Vector3 GetBestClusterPoint(float range = 15f)
         {
-            Vector3 bestClusterPoint = Vector3.Zero;
-            var clusterUnits =
-                (from u in GilesTrinity.GilesObjectCache
-                 where u.Type == GObjectType.Unit
-                 orderby u.UnitsNear(range) descending
-                 orderby u.CentreDistance
-                 orderby u.HitPoints descending
-                 select u.Position).ToList();
+            using (new Technicals.PerformanceLogger("TargetUtil.GetBestClusterPoint"))
+            {
+                Vector3 bestClusterPoint = Vector3.Zero;
+                var clusterUnits =
+                    (from u in GilesTrinity.GilesObjectCache
+                     where u.Type == GObjectType.Unit
+                     orderby u.UnitsNear(range) descending
+                     orderby u.CentreDistance
+                     orderby u.HitPoints descending
+                     select u.Position).ToList();
 
-            if (clusterUnits.Any())
-                bestClusterPoint = clusterUnits.FirstOrDefault();
-            else if (GilesTrinity.CurrentTarget != null)
-                bestClusterPoint = GilesTrinity.CurrentTarget.Position;
-            else
-                bestClusterPoint = GilesTrinity.PlayerStatus.CurrentPosition;
+                if (clusterUnits.Any())
+                    bestClusterPoint = clusterUnits.FirstOrDefault();
+                else if (GilesTrinity.CurrentTarget != null)
+                    bestClusterPoint = GilesTrinity.CurrentTarget.Position;
+                else
+                    bestClusterPoint = GilesTrinity.PlayerStatus.CurrentPosition;
 
-            return bestClusterPoint;
+                return bestClusterPoint;
+            }
         }
 
         public static bool AnyMobsInRange(float range = 10f)

@@ -42,16 +42,15 @@ namespace GilesTrinity
 
                 int TrashMobCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsTrashMob);
                 int EliteCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
-                int CloseUnitCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= 10f);
 
                 bool ShouldIgnoreTrashMobs = 
                     (!TownRun.IsTryingToTownPortal() && 
                     !PrioritizeCloseRangeUnits && 
-                    Settings.Combat.Misc.TrashPackSize > 0 && 
+                    Settings.Combat.Misc.TrashPackSize > 1 && 
                     EliteCount == 0 && 
                     ZetaDia.Me.Level >= 15 &&
-                    PlayerMover.MovementSpeed > 1 &&
-                    CloseUnitCount > 1);
+                    PlayerMover.MovementSpeed > 1
+                    );
 
                 foreach (GilesObject cacheObject in GilesObjectCache)
                 {

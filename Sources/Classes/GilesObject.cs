@@ -43,8 +43,8 @@ namespace GilesTrinity
         public bool IsTreasureGoblin { get; set; }
         public bool IsEliteRareUnique { get; set; }
         public bool IsBoss { get; set; }
-        public bool IsBossOrEliteRareUnique { get { return (this.Type == GObjectType.Unit &&(IsEliteRareUnique || IsBoss)); } }
-        public bool IsTrashMob { get { return (this.Type == GObjectType.Unit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } } 
+        public bool IsBossOrEliteRareUnique { get { return (this.Type == GObjectType.Unit && (IsEliteRareUnique || IsBoss)); } }
+        public bool IsTrashMob { get { return (this.Type == GObjectType.Unit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         public bool IsAttackable { get; set; }
         /// <summary>
         /// Percentage hit points
@@ -132,12 +132,14 @@ namespace GilesTrinity
 
         public int UnitsNear(float range = 5f)
         {
-            if (this.Type != GObjectType.Unit)
-                return 0;
+            using (new Technicals.PerformanceLogger("CacheObject.UnitsNear"))
+            {
+                if (this.Type != GObjectType.Unit)
+                    return 0;
 
-            return GilesTrinity.GilesObjectCache
-                .Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= range && u.HasBeenInLoS && u.RActorGuid != GilesTrinity.CurrentTarget.RActorGuid);
-
+                return GilesTrinity.GilesObjectCache
+                    .Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= range && u.HasBeenInLoS && u.RActorGuid != GilesTrinity.CurrentTarget.RActorGuid);
+            }
         }
     }
 }

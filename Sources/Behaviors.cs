@@ -631,7 +631,10 @@ namespace GilesTrinity
                         }
                     }
 
-
+                    if (TimeSinceUse(SNOPower.Monk_TempestRush) < 250)
+                    {
+                        bForceNewMovement = true;
+                    }
 
                     // Only position-shift when not avoiding
                     // See if we want to ACTUALLY move, or are just waiting for the last move command...
@@ -1278,6 +1281,7 @@ namespace GilesTrinity
                 // Now for the actual movement request stuff
                 IsAlreadyMoving = true;
                 lastMovementCommand = DateTime.Now;
+
                 if (DateTime.Now.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(vLastMoveToTarget, vCurrentDestination) >= 2f || bForceNewMovement)
                 {
                     PlayerMover.NavigateTo(vCurrentDestination, CurrentTarget.InternalName);
@@ -1347,7 +1351,7 @@ namespace GilesTrinity
                     case GObjectType.HealthWell:
                         {
                             TargetRangeRequired = CurrentTarget.Radius + 5f;
-                            TargetRangeRequired = 5f;
+                            //TargetRangeRequired = 5f;
                             int _range;
                             if (dictInteractableRange.TryGetValue(CurrentTarget.ActorSNO, out _range))
                             {

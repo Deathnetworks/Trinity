@@ -87,14 +87,15 @@ namespace GilesTrinity
                     return new TrinityPower(SNOPower.Wizard_Meteor, 21f, new Vector3(CurrentTarget.Position.X, CurrentTarget.Position.Y, CurrentTarget.Position.Z), CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
                 }
                 // Teleport in combat for critical-mass wizards
-                //if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Teleport) && hasCriticalMass &&
-                //    LastPowerUsed != SNOPower.Wizard_Teleport &&
-                //    PlayerStatus.PrimaryResource >= 15 && CurrentTarget.CentreDistance <= 35f &&
-                //    PowerManager.CanCast(SNOPower.Wizard_Teleport))
-                //{
-                //    vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, CurrentTarget.CentreDistance, true);
-                //    return new TrinityPower(SNOPower.Wizard_Teleport, 35f, vSideToSideTarget, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
-                //}
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Teleport) && hasCriticalMass &&
+                    LastPowerUsed != SNOPower.Wizard_Teleport &&
+                    PlayerStatus.PrimaryResource >= 15 && CurrentTarget.CentreDistance <= 35f &&
+                    PowerManager.CanCast(SNOPower.Wizard_Teleport))
+                {
+                    vSideToSideTarget = TargetUtil.GetBestClusterPoint(35f);
+                    return new TrinityPower(SNOPower.Wizard_Teleport, 35f, vSideToSideTarget, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
+                }
+
                 // Diamond Skin SPAM
                 if (Hotbar.Contains(SNOPower.Wizard_DiamondSkin) && LastPowerUsed != SNOPower.Wizard_DiamondSkin &&
                     (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 0 || PlayerStatus.CurrentHealthPct <= 0.90 || PlayerStatus.IsIncapacitated || PlayerStatus.IsRooted || (!UseOOCBuff && CurrentTarget.RadiusDistance <= 40f)) &&
@@ -275,7 +276,7 @@ namespace GilesTrinity
 
                     float twisterRange = 28f;
                     if (hasCriticalMass)
-                        twisterRange = 60f;
+                        twisterRange = 9f;
                     return new TrinityPower(SNOPower.Wizard_EnergyTwister, twisterRange, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
                 }
 

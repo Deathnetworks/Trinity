@@ -16,8 +16,8 @@
 // craftingPlans on the ground have all quality normal cant decide here
 [TYPE] == "CraftingPlan"
 
-// craftingReagents like Demonic Essences
-[TYPE] == "CraftingReagent"
+// craftingReagents like Demonic Essences (now handled through Trinity)
+//[TYPE] == "CraftingReagent"
 
 // +---------------------------------------------------------------------------+
 // |  _____   _______ _______ _______ _______ _____  _______ ______ ___ ___ 

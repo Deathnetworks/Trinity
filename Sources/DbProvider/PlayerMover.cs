@@ -75,11 +75,11 @@ namespace GilesTrinity.DbProvider
             if (DateTime.Now.Subtract(TimeLastRecordedPosition).TotalMilliseconds >= checkDuration)
             {
                 // We're not stuck if we're vendoring!
-                //if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
-                //{
-                //    UnStuckCheckerLastResult = false;
-                //    return UnStuckCheckerLastResult;
-                //}
+                if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                {
+                    UnStuckCheckerLastResult = false;
+                    return UnStuckCheckerLastResult;
+                }
 
                 if (ZetaDia.Me.IsInTown && (UIElements.VendorWindow.IsVisible || UIElements.SalvageWindow.IsVisible))
                 {
@@ -466,6 +466,7 @@ namespace GilesTrinity.DbProvider
                     // Make sure we only shift max once every 1 second
                     if (DateTime.Now.Subtract(lastShiftedPosition).TotalSeconds >= 1)
                     {
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Shifting position for Navigation Obstacle {0} {1} at {2}", obstacle.ActorSNO, obstacle.Name, obstacle.Location);
                         GetShiftedPosition(ref vMoveToTarget, ref point, obstacle.Radius + 5f);
                     }
                 }

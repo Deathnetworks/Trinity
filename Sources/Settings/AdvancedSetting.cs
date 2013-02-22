@@ -18,6 +18,7 @@ namespace GilesTrinity.Settings
         private LogCategory _LogCategories;
         private bool _GoldInactivityEnabled;
         private int _GoldInactivityTimer;
+        private bool _LogDroppedItems;
         #endregion Fields
 
         #region Events
@@ -214,6 +215,24 @@ namespace GilesTrinity.Settings
                 {
                     _LogStuckLocation = value;
                     OnPropertyChanged("LogStuckLocation");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool LogDroppedItems
+        {
+            get
+            {
+                return _LogDroppedItems;
+            }
+            set
+            {
+                if (_LogDroppedItems != value)
+                {
+                    _LogDroppedItems = value;
+                    OnPropertyChanged("LogDroppedItems");
                 }
             }
         }

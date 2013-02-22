@@ -13,12 +13,15 @@ using Zeta.Pathfinding;
 using GilesTrinity.Cache;
 using Zeta.Internals;
 using GilesTrinity.DbProvider;
+using System.Diagnostics;
 
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
         internal static int lastSceneId = -1;
+
+        internal static Stopwatch HotbarRefreshTimer = new Stopwatch();
 
         /// <summary>
         /// Find fresh targets, start main BehaviorTree if needed, cast any buffs needed etc.
@@ -53,10 +56,10 @@ namespace GilesTrinity
                 }
                 using (new PerformanceLogger("CheckHasTarget.RefreshHotBar"))
                 {
+                    if (!HotbarRefreshTimer.IsRunning)
+                        HotbarRefreshTimer.Start();
 
-                    // Store all of the player's abilities every now and then, to keep it cached and handy, also check for critical-mass timer changes etc.
-                    iCombatLoops++;
-                    if (!HasMappedPlayerAbilities || iCombatLoops >= 5 || bRefreshHotbarAbilities)
+                    if (!HasMappedPlayerAbilities || HotbarRefreshTimer.ElapsedMilliseconds > 10000 || bRefreshHotbarAbilities)
                     {
                         // Update the cached player's cache
                         ActorClass tempClass = ActorClass.Invalid;
@@ -69,8 +72,9 @@ namespace GilesTrinity
                             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.GlobalHandler, "Safely handled exception trying to get character class.");
                         }
 
-                        iCombatLoops = 0;
                         RefreshHotbar();
+                        HotbarRefreshTimer.Restart();
+
                         dictAbilityRepeatDelay = new Dictionary<SNOPower, int>(dictAbilityRepeatDefaults);
                         if (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) && PlayerStatus.ActorClass == ActorClass.Wizard)
                         {

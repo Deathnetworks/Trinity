@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using GilesTrinity.Technicals;
 
 namespace GilesTrinity
 {
@@ -10,6 +13,8 @@ namespace GilesTrinity
         private static HashSet<GenericCacheObject> CacheList = new HashSet<GenericCacheObject>();
 
         private static readonly object _Synchronizer = new object();
+
+        private static Thread Manager;
 
         public static bool AddToCache(GenericCacheObject obj)
         {
@@ -41,7 +46,7 @@ namespace GilesTrinity
         {
             lock (_Synchronizer)
             {
-                return CacheList.Any(o => o.Key == key);
+                return CacheList.AsParallel().Any(o => o.Key == key);
             }
         }
 
@@ -50,7 +55,7 @@ namespace GilesTrinity
             lock (_Synchronizer)
             {
                 if (ContainsKey(key))
-                    return CacheList.FirstOrDefault(o => o.Key == key);
+                    return CacheList.AsParallel().FirstOrDefault(o => o.Key == key);
                 else
                     return new GenericCacheObject();
             }
@@ -58,9 +63,48 @@ namespace GilesTrinity
 
         public static void MaintainCache()
         {
-            lock (_Synchronizer)
+            if (Manager == null)
             {
-                CacheList.RemoveWhere(o => o.IsExpired());
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Starting up Generic Cache Manage thread");
+                Manager = new Thread(Manage)
+                {
+                    IsBackground = true,
+                    Priority = ThreadPriority.Lowest
+                };
+            }
+        }
+
+        private static int threadTimer = 10000;
+        private static void Manage()
+        {
+            Stopwatch timer = new Stopwatch();
+            while (true)
+            {
+                if (!timer.IsRunning)
+                {
+                    timer.Start();
+                    return;
+                }
+                if (timer.ElapsedMilliseconds > threadTimer)
+                {
+                    timer.Restart();
+
+                    long NowTicks = DateTime.Now.Ticks;
+
+                    lock (_Synchronizer)
+                    {
+                        CacheList.RemoveWhere(o => o.Expires.Ticks < NowTicks);
+                    }
+                }
+                Thread.Sleep(100);
+            }
+        }
+
+        public static void Shutdown()
+        {
+            if (Manager != null)
+            {
+                Manager.Abort();
             }
         }
 
@@ -86,11 +130,6 @@ namespace GilesTrinity
             Key = key;
             Value = value;
             Expires = DateTime.Now.Add(expirationDuration);
-        }
-
-        public bool IsExpired()
-        {
-            return DateTime.Now.Subtract(Expires).TotalMilliseconds > 0;
         }
     }
 }

@@ -39,6 +39,7 @@ namespace GilesTrinity
                 {
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Setting MiniMapMarker {0} as Visited, within PathPrecision {1:0}", marker.MarkerNameHash, pathPrecision);
                     marker.Visited = true;
+                    lastMoveResult = MoveResult.Moved;
                 }
 
                 // Navigator will return "ReacheDestination" when it can't fully move to the specified position
@@ -48,6 +49,7 @@ namespace GilesTrinity
                     {
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Setting MiniMapMarker {0} as Visited, MoveResult=ReachedDestination", marker.MarkerNameHash);
                         marker.Visited = true;
+                        lastMoveResult = MoveResult.Moved;
                     }
                 }
 
@@ -57,6 +59,7 @@ namespace GilesTrinity
                     {
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Unable to navigate to marker, setting MiniMapMarker {0} at {1} as failed", marker.MarkerNameHash, marker.Position);
                         marker.Failed = true;
+                        lastMoveResult = MoveResult.Moved;
                     }
                 }
             }

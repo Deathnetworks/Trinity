@@ -93,14 +93,6 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.Monk_BlindingFlash, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 1, USE_SLOWLY);
             }
 
-
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && GetHasBuff(SNOPower.Monk_SweepingWind) && !PlayerStatus.IsIncapacitated &&
-                (DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds <= 4000 || DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds > 8500) &&
-                AnythingWithinRange[RANGE_15] >= 1 && CurrentTarget.RadiusDistance <= 15f)
-            {
-                SweepWindSpam = DateTime.Now;
-            }
-
             // Sweeping winds spam
             if ((PlayerStatus.PrimaryResource >= 75 || (Settings.Combat.Monk.HasInnaSet && PlayerStatus.PrimaryResource >= 5)) &&
                 Hotbar.Contains(SNOPower.Monk_SweepingWind) && GetHasBuff(SNOPower.Monk_SweepingWind) &&
@@ -263,6 +255,7 @@ namespace GilesTrinity
                 (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2 || ((CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 20f)) &&
                 (PlayerStatus.PrimaryResource >= 70 ||
                  (hasEmpoweredWaveRune && PlayerStatus.PrimaryResource >= 40 && !IsWaitingForSpecial)) && // Empowered Wave
+                 // (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) && // optional check for SW stacks
                 Monk_HasMantraAbilityAndBuff())
             {
                 return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
