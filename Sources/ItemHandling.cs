@@ -133,6 +133,12 @@ namespace GilesTrinity
                         return false;
                     }
 
+                    // Always pickup Legendary plans
+                    if (itemType == GItemType.CraftingPlan && item.Quality >= ItemQuality.Legendary && Settings.Loot.Pickup.LegendaryPlans)
+                    {
+                        return true;
+                    }
+
                     if (itemType == GItemType.InfernalKey && !Settings.Loot.Pickup.InfernalKeys)
                     {
                         return false;

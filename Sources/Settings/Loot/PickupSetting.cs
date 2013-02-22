@@ -21,6 +21,7 @@ namespace GilesTrinity.Settings.Loot
         private int _MinimumGoldStack;
         private bool _CraftTomes;
         private bool _Plans;
+        private bool _LegendaryPlans;
         private bool _Designs;
         private bool _FollowerItem;
         private int _MiscItemLevel;
@@ -299,6 +300,23 @@ namespace GilesTrinity.Settings.Loot
         }
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
+        public bool LegendaryPlans
+        {
+            get
+            {
+                return _LegendaryPlans;
+            }
+            set
+            {
+                if (_LegendaryPlans != value)
+                {
+                    _LegendaryPlans = value;
+                    OnPropertyChanged("LegendaryPlans");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
         public bool Designs
         {
             get
@@ -422,7 +440,7 @@ namespace GilesTrinity.Settings.Loot
             this.InfernalKeys = true;
             this.Designs = true;
             this.Plans = true;
-            
+            this.LegendaryPlans = true;
         }
         #endregion Methods
     }

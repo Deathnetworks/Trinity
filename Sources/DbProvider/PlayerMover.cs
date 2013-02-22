@@ -69,7 +69,7 @@ namespace GilesTrinity.DbProvider
         /// <param name="vMyCurrentPosition"></param>
         /// <param name="checkDuration"></param>
         /// <returns></returns>
-        public static bool UnstuckChecker(Vector3 vMyCurrentPosition, int checkDuration = 3000)
+        public static bool UnstuckChecker(Vector3 vMyCurrentPosition, int checkDuration = 5000)
         {
             // Keep checking distance changes every 3 seconds
             if (DateTime.Now.Subtract(TimeLastRecordedPosition).TotalMilliseconds >= checkDuration)
@@ -87,7 +87,7 @@ namespace GilesTrinity.DbProvider
                     return UnStuckCheckerLastResult;
                 }
 
-                if (checkDuration >= 3000)
+                if (checkDuration >= 5000)
                 {
                     TimeLastRecordedPosition = DateTime.Now;
                 }
@@ -138,7 +138,7 @@ namespace GilesTrinity.DbProvider
                     return UnStuckCheckerLastResult;
                 }
 
-                if (checkDuration >= 3000)
+                if (checkDuration >= 5000)
                 {
                     vOldPosition = vMyCurrentPosition;
                 }
