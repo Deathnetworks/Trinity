@@ -1,10 +1,14 @@
-﻿#Unified Trinity Community Edition
+﻿Unified Trinity Community Edition
 
 ### Known issues 1.7.2.3:
 
 * WD Gargantuan is still spammed
 
-* 
+* Gold Inactivity Timer will currently crash D3 - this is believed to be a Demonbuddy related problem (Nesox has confirmed a fix in the next version). No workaround currently available.
+
+* Disconnects still being investigated.
+
+* More analysis to be done on CPU utilization (but this version is at least better)
 
 ### Changelog 1.7.2.3:
 
