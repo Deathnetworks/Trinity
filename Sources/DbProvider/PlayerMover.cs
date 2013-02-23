@@ -358,9 +358,9 @@ namespace GilesTrinity.DbProvider
                 }
 
                 lastRecordedPosition = DateTime.Now;
-                // Set the public variable
-                MovementSpeed = GetMovementSpeed();
             }
+            // Set the public variable
+            MovementSpeed = GetMovementSpeed();
 
             // rrrix-note: This really shouldn't be here... 
             // Recording of all the XML's in use this run

@@ -116,7 +116,7 @@ namespace GilesTrinity
                         return false;
                     }
 
-                    if (itemType == GItemType.CraftTome && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.CraftTomes))
+                    if (itemType == GItemType.CraftTome && !Settings.Loot.Pickup.CraftTomes)
                     {
                         return false;
                     }

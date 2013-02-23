@@ -130,7 +130,7 @@ namespace GilesTrinity
             return newGilesObject;
         }
 
-        public int UnitsNear(float range = 5f)
+        public int NearbyUnitsWithinDistance(float range = 5f)
         {
             using (new Technicals.PerformanceLogger("CacheObject.UnitsNear"))
             {
@@ -138,7 +138,7 @@ namespace GilesTrinity
                     return 0;
 
                 return GilesTrinity.GilesObjectCache
-                    .Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= range && u.HasBeenInLoS && u.RActorGuid != GilesTrinity.CurrentTarget.RActorGuid);
+                    .Count(u => u.Type == GObjectType.Unit && u.Position.Distance2D(this.Position) <= range && u.HasBeenInLoS && u.RActorGuid != GilesTrinity.CurrentTarget.RActorGuid);
             }
         }
     }

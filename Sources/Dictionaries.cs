@@ -157,7 +157,9 @@ namespace GilesTrinity
             80509,           220160,                3349,              114917,            133562, 
             //Maghda, Kamyr (MiniBoss before Belial)
             6031, 51298,
-
+            // Ghom
+            87642,
+            // I dunno?
             255929, 256711, 256508, 256187, 256189, 256709,
             // Another Cydaea
             137139,

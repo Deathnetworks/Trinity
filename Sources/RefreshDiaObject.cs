@@ -872,7 +872,7 @@ namespace GilesTrinity
                 }
             }
 
-            AddToCache = RefreshUnitAttributes();
+            AddToCache = RefreshUnitAttributes(AddToCache, diaUnit);
             if (!AddToCache)
             {
                 return AddToCache;
@@ -1002,32 +1002,38 @@ namespace GilesTrinity
             return AddToCache;
         }
 
-        private static bool RefreshUnitAttributes(bool AddToCache = true)
+        private static bool RefreshUnitAttributes(bool AddToCache = true, DiaUnit unit = null)
         {
-            if (((DiaUnit)c_diaObject).IsAttackable)
+            try
             {
-                try
-                {
-                    int isNPC = c_CommonData.GetAttribute<int>(ActorAttributeType.TeamID);
-                    if (isNPC == 1)
-                    {
-                        AddToCache = false;
-                        c_IgnoreSubStep += "IsTeam1+";
-                        return AddToCache;
-                    }
-                }
-                catch
+                int isNPC = c_CommonData.GetAttribute<int>(ActorAttributeType.TeamID);
+                if (isNPC == 1)
                 {
                     AddToCache = false;
-                    c_IgnoreSubStep += "IsTeam1-";
+                    c_IgnoreSubStep += "IsTeam1+";
                     return AddToCache;
                 }
-                return true;
             }
-            else
+            catch
             {
-                return false;
+                AddToCache = false;
+                c_IgnoreSubStep += "IsTeam1-";
+                return AddToCache;
             }
+
+         
+            if (unit.IsUntargetable &&
+                unit.IsInvulnerable &&
+                unit.IsBurrowed // &&
+                //unit.IsHelper &&
+                //unit.IsNPC
+                )
+                AddToCache = false;
+            c_IgnoreSubStep = "NotAttackable";
+
+            return AddToCache;
+
+
 
             // Disabled - lets use native DB IsAttackable
             /*
@@ -1177,7 +1183,7 @@ namespace GilesTrinity
                 Position = c_Position,
                 ActorSNO = c_ActorSNO
             };
-            
+
             // Calculate custom Giles item type
             c_item_GItemType = DetermineItemType(c_InternalName, c_DBItemType, c_item_tFollowerType);
 
@@ -1192,7 +1198,7 @@ namespace GilesTrinity
                 dictGilesObjectTypeCache[c_RActorGuid] = c_ObjectType;
                 AddToCache = true;
             }
-            
+
             // Item stats
             logNewItem = RefreshItemStats(itemBaseType);
 
@@ -1879,7 +1885,7 @@ namespace GilesTrinity
             bool bIgnoreThisAvoidance = false;
             double dThisHealthAvoid = GetAvoidanceHealth(c_ActorSNO);
             // Monks with Serenity up ignore all AOE's
-            if (PlayerStatus.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_Serenity) && GetHasBuff(SNOPower.Monk_Serenity))
+            if (PlayerStatus.ActorClass == ActorClass.Monk && CheckAbilityAndBuff(SNOPower.Monk_Serenity))
             {
                 // Monks with serenity are immune
                 bIgnoreThisAvoidance = true;
@@ -1911,9 +1917,6 @@ namespace GilesTrinity
                     else if (c_ActorSNO == 84608)
                         // Desecrator
                         dThisHealthAvoid *= 0.2;
-                    else if (c_ActorSNO == 4803 || c_ActorSNO == 4804 || c_ActorSNO == 224225 || c_ActorSNO == 247987)
-                        // Molten core
-                        dThisHealthAvoid *= 1;
                     else
                         // Anything else
                         dThisHealthAvoid *= 0.3;
@@ -2365,7 +2368,8 @@ namespace GilesTrinity
                     AddToCache = false;
                     var dog = ((DiaUnit)c_diaObject);
 
-                    DbHelper.Log(LogCategory.CacheManagement, "Found Zombie dog - Owner={0} SummonerId={1} ActorSNO={2} myRactorGuid={3}", dog.PetOwner, dog.SummonerId, dog.ActorSNO, Me.RActorGuid);
+                    DbHelper.Log(LogCategory.CacheManagement, "Found Zombie dog - Owner={0} SummonerId={1} ActorSNO={2} myRactorGuid={3} SummonedByACDId={4} myACDId={5}", 
+                        dog.PetOwner, dog.SummonerId, dog.ActorSNO, Me.RActorGuid, dog.SummonedByACDId, ZetaDia.Me.CommonData.ACDGuid);
                 }
             }
             return AddToCache;

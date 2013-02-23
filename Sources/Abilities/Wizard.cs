@@ -92,7 +92,7 @@ namespace GilesTrinity
                     PlayerStatus.PrimaryResource >= 15 && CurrentTarget.CentreDistance <= 35f &&
                     PowerManager.CanCast(SNOPower.Wizard_Teleport))
                 {
-                    vSideToSideTarget = TargetUtil.GetBestClusterPoint(35f);
+                    vSideToSideTarget = TargetUtil.GetBestClusterPoint(15f, 35f);
                     return new TrinityPower(SNOPower.Wizard_Teleport, 35f, vSideToSideTarget, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
                 }
 
@@ -272,7 +272,7 @@ namespace GilesTrinity
                     Vector3 targetDirection = MathEx.CalculatePointFrom(PlayerStatus.CurrentPosition, CurrentTarget.Position, 3f);
                     ZetaDia.Me.UsePower(SNOPower.Walk, targetDirection);
 
-                    Vector3 bestClusterPoint = TargetUtil.GetBestClusterPoint(15f);
+                    Vector3 bestClusterPoint = TargetUtil.GetBestClusterPoint(10f, 15f);
 
                     float twisterRange = 28f;
                     if (hasCriticalMass)

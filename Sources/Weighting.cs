@@ -49,7 +49,7 @@ namespace GilesTrinity
                     Settings.Combat.Misc.TrashPackSize > 1 && 
                     EliteCount == 0 && 
                     ZetaDia.Me.Level >= 15 &&
-                    PlayerMover.MovementSpeed > 1
+                    PlayerMover.GetMovementSpeed() > 0.5
                     );
 
                 foreach (GilesObject cacheObject in GilesObjectCache)
@@ -64,7 +64,7 @@ namespace GilesTrinity
                         case GObjectType.Unit:
                             {
                                 // Ignore Solitary Trash mobs (no elites present)
-                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && !cacheObject.HasBeenPrimaryTarget && cacheObject.RadiusDistance >= 10f && 
+                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && !cacheObject.HasBeenPrimaryTarget && cacheObject.RadiusDistance >= 2f && 
                                     !(GilesObjectCache.Count(u => u.IsTrashMob && Vector3.Distance(cacheObject.Position, u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius) >= Settings.Combat.Misc.TrashPackSize))
                                 {
                                     break;

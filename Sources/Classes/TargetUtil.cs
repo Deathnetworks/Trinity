@@ -8,7 +8,7 @@ namespace GilesTrinity
 {
     public class TargetUtil
     {
-        public static Vector3 GetBestClusterPoint(float range = 15f)
+        public static Vector3 GetBestClusterPoint(float radius = 15f, float maxRange = 15f)
         {
             using (new Technicals.PerformanceLogger("TargetUtil.GetBestClusterPoint"))
             {
@@ -16,7 +16,7 @@ namespace GilesTrinity
                 var clusterUnits =
                     (from u in GilesTrinity.GilesObjectCache
                      where u.Type == GObjectType.Unit
-                     orderby u.UnitsNear(range) descending
+                     orderby u.NearbyUnitsWithinDistance(radius) descending
                      orderby u.CentreDistance
                      orderby u.HitPoints descending
                      select u.Position).ToList();

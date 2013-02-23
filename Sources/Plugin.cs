@@ -1,7 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
 using System.IO;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using GilesTrinity.DbProvider;
@@ -31,7 +29,7 @@ namespace GilesTrinity
         {
             get
             {
-                return new Version(1, 7, 2, 3);
+                return new Version(1, 7, 2, 4);
             }
         }
 

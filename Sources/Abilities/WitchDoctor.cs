@@ -144,17 +144,19 @@ namespace GilesTrinity
                 PlayerStatus.PrimaryResource >= 172 && PowerManager.CanCast(SNOPower.Witchdoctor_AcidCloud))
             {
                 // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
-                float fExtraDistance = 0f;
-                if (CurrentTarget.CentreDistance > 17f && !CurrentTarget.IsTreasureGoblin)
-                {
-                    fExtraDistance = CurrentTarget.CentreDistance - 17f;
-                    if (fExtraDistance > 5f)
-                        fExtraDistance = 5f;
-                    if (CurrentTarget.CentreDistance - fExtraDistance < 15f)
-                        fExtraDistance -= 2;
-                }
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, PlayerStatus.CurrentPosition, CurrentTarget.CentreDistance - fExtraDistance);
-                return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 30f, vNewTarget, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
+                //float fExtraDistance = 0f;
+                //if (CurrentTarget.CentreDistance > 17f && !CurrentTarget.IsTreasureGoblin)
+                //{
+                //    fExtraDistance = CurrentTarget.CentreDistance - 17f;
+                //    if (fExtraDistance > 5f)
+                //        fExtraDistance = 5f;
+                //    if (CurrentTarget.CentreDistance - fExtraDistance < 15f)
+                //        fExtraDistance -= 2;
+                //}
+                //Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, PlayerStatus.CurrentPosition, CurrentTarget.CentreDistance - fExtraDistance);
+
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 30f);
+                return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 30f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
             }
             // Fire Bats fast-attack
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Firebats) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 98)
