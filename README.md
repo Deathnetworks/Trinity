@@ -1,12 +1,50 @@
 ﻿#Unified Trinity Community Edition
 
+### Known issues 1.7.2.3:
+
+* WD Gargantuan is still spammed
+
+* 
+
 ### Changelog 1.7.2.3:
 
 * Added options to set minimum trash mob pack size and trash mob pack radius (default = 1, 20f)
 
 * Set Demonbuddy to not close when game client crashes (should help with crash reports, except when using YAR)
 
-* 
+* Made a bunch of optimizations that should help reduce CPU utilization
+
+* Added more fine-grained pickup options for Designs/Plans, Essences, etc
+
+* Monk SW buff logic is no longer "ticked" when merely running past a monster
+
+* Unstucker is slightly less sensitive (now requires stuck for 5 seconds instead of 3). 
+
+* Unstucker no longer kicks-in on Town Runs.
+
+* Added additional logging mechanism to log ALL dropped items (and whether or not we wanted to pick it up) with a bunch of useful info for Devs
+
+* Fixed Player Summons counters (e.g. Zombie dogs/Gargantuan) not counting correctly - still needs more stuff to work in PVP/Multiplayer games
+
+* Gold Inactivity timer will no longer keep trying to leave the game if bot stop button is pressed
+
+* Will now pickup Grey and White Items if player level is less than 6 and 11 (respectively)
+
+* Added GUI options to pickup/ignore Crafting Materials (Demonic Essences)
+
+* Removed 'Ignore solitary trash mob (40f)' option
+
+* Added psuedo clustering logic into TargetUtil - could be useful for all "AoE" type of powers!
+
+* Wizard: CM/WW Wiz's will now move into melee range before casting energy twister (like Trinity 1.6)
+
+* Wizard Energy Twister will now try to use the best 'cluster' to drop tornadoes
+
+* CM/WW Wizards may now teleport into the best nearby cluster location
+
+* TrinityExploreDungeon will be better about checking for Grid Segmentation resets
+
+* Removed a bunch of unused legacy code 
 
 ### Changelog 1.7.2.2:
 
