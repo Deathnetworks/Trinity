@@ -596,7 +596,7 @@ namespace GilesTrinity
                         //    c_IgnoreSubStep = "LootingDisabled";
                         //    break;
                         //}
-                        if (!ForceVendorRunASAP)
+                        if (!ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
                         {
                             AddToCache = RefreshGilesItem();
                             c_IgnoreReason = "RefreshGilesItem";
@@ -969,7 +969,7 @@ namespace GilesTrinity
                 if (c_IsEliteRareUnique || c_unit_IsBoss)
                     bAnyChampionsPresent = true;
                 // Extended kill radius after last fighting, or when we want to force a town run
-                if ((Settings.Combat.Misc.ExtendedTrashKill && iKeepKillRadiusExtendedFor > 0) || ForceVendorRunASAP)
+                if ((Settings.Combat.Misc.ExtendedTrashKill && iKeepKillRadiusExtendedFor > 0) || ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
                 {
                     if (c_RadiusDistance <= dUseKillRadius && AddToCache)
                         bAnyMobsInCloseRange = true;

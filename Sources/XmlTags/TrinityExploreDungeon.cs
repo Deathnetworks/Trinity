@@ -384,7 +384,8 @@ namespace GilesTrinity.XmlTags
                             new Sequence(
                                 new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, 
                                     "TrinityExploreDungeon inactivity timer tripped ({0}), tag Using Town Portal!", TimeoutValue)),
-                                Zeta.CommonBot.CommonBehaviors.CreateUseTownPortal()                                
+                                Zeta.CommonBot.CommonBehaviors.CreateUseTownPortal(),
+                                new Action(ret => isDone = true)
                             )
                         ),
                         new DecoratorContinue(ret => !TownPortalOnTimeout,
@@ -540,6 +541,12 @@ namespace GilesTrinity.XmlTags
                 new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && ZetaDia.Me.CurrentScene.Name.ToLower().Contains(SceneName.ToLower()),
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found SceneName {0}!", SceneName)),
+                        new Action(ret => isDone = true)
+                    )
+                ),
+                new Decorator(ret => ZetaDia.Me.IsInTown,
+                    new Sequence(
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Cannot use TrinityExploreDungeon in town - tag finished!", SceneName)),
                         new Action(ret => isDone = true)
                     )
                 )
@@ -814,6 +821,13 @@ namespace GilesTrinity.XmlTags
         {
             return
             new PrioritySelector(
+                new Decorator(ret => LastMoveResult == MoveResult.ReachedDestination,
+                    new Sequence(
+                        new Action(ret => SetNodeVisited("Reached Destination")),
+                        new Action(ret => LastMoveResult = MoveResult.Moved),
+                        new Action(ret => UpdateRoute())
+                    )
+                ),
                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0 || !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Error - CheckIsNodeFinished() called while Route is empty!")),
@@ -1012,7 +1026,7 @@ namespace GilesTrinity.XmlTags
                 return 0;
         }
 
-
+        private MoveResult LastMoveResult = MoveResult.Moved;
         private DateTime lastGeneratedPath = DateTime.MinValue;
         /// <summary>
         /// Moves the bot to the next DungeonExplorer node
@@ -1037,7 +1051,7 @@ namespace GilesTrinity.XmlTags
                 }
             }
 
-            Navigator.MoveTo(CurrentNavTarget);
+            LastMoveResult = Navigator.MoveTo(CurrentNavTarget);
         }
         /// <summary>
         /// Initizializes the profile tag and sets defaults as needed
