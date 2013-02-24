@@ -1,6 +1,32 @@
 ﻿Unified Trinity Community Edition
 
-### Known issues 1.7.2.3:
+### Changelog 1.7.2.4:
+
+* Now picks up craft tomes regardless of misc item level selection if we've chosen to pickup craft tomes
+
+* Hard rules will now always keep Archon plans and Marquise designs - feel free to edit :)
+
+* Should be better about checking for nearby monsters while trying to Town Portal
+
+* Added a few missing entries to translation.dis
+
+* Fixed TrinityExploreDungeon using townportal on timeout and not finishing tag. Also added extra node-done check for ReachedDestination (since we're using DB navigator now)
+
+* Fixed molten core avoidance (i hope!)
+
+* Wizard Teleport, Twister, and WitchDoctor Acid Rain are now better at finding cluster targets
+
+* Some additions and fixes/tweaks to TargetUtil GetBestClusterPoint
+
+* Once again attacks and kills Ghom (his boss SNO was missing... weird)
+
+* Small adjustment to IsAttackable detection - should be faster and more reliable as well
+
+* Small adjustment to TrashMob Cluster detection - changed movement speed update to every Movement request/tick and reduced minimum movement speed to ignore trash mobs, and reduced minimum range for trash mob to be ignored to 2f RadiusDistance
+
+* Added townPortalOnTimeout="True/False" to TrinityExploreDungeon (for tinnvec :))
+
+### Known issues 1.7.2.3/4:
 
 * WD Gargantuan is still spammed
 

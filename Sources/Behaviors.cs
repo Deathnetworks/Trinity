@@ -532,6 +532,7 @@ namespace GilesTrinity
                                             IgnoreTargetForLoops = 3;
                                             // Add this destructible/barricade to our very short-term ignore list
                                             hashRGUIDDestructible3SecBlacklist.Add(CurrentTarget.RActorGuid);
+                                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 3 seconds for Destrucable attack", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
                                             lastDestroyedDestructible = DateTime.Now;
                                             bNeedClearDestructibles = true;
                                         }
@@ -1157,10 +1158,11 @@ namespace GilesTrinity
                             case GObjectType.Gold:
                             case GObjectType.Item:
                                 // No raycast available, try and force-ignore this for a little while, and blacklist for a few seconds
-                                if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
+                                if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position) && CurrentTarget.Unit.InLineOfSight)
                                 {
                                     IgnoreRactorGUID = CurrentTarget.RActorGuid;
                                     IgnoreTargetForLoops = 6;
+                                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 60 seconds due to BodyBlocking", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO); 
                                     hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
                                     //dateSinceBlacklist90Clear = DateTime.Now;
                                 }
@@ -1519,6 +1521,7 @@ namespace GilesTrinity
                         if (!CurrentTarget.IsBoss)
                         {
                             hashRGUIDBlacklist3.Add(CurrentTarget.RActorGuid);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 3 seconds due to Raycast failure", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
                             dateSinceBlacklist3Clear = DateTime.Now;
                             NeedToClearBlacklist3 = true;
                         }
