@@ -893,6 +893,11 @@ namespace GilesTrinity
                             CurrentTarget = null;
                             runStatus = HandlerRunStatus.TreeSuccess;
                         }
+                        else if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
+                        {
+                            // Don't blacklist legendaries!!
+                            runStatus = HandlerRunStatus.TreeSuccess;
+                        }
                         else
                         {
                             hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
@@ -1162,8 +1167,9 @@ namespace GilesTrinity
                                 {
                                     IgnoreRactorGUID = CurrentTarget.RActorGuid;
                                     IgnoreTargetForLoops = 6;
-                                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 60 seconds due to BodyBlocking", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO); 
-                                    hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
+                                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 60 seconds due to BodyBlocking", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
+                                    if (!(CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)) // don't blacklist legendaries
+                                        hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
                                     //dateSinceBlacklist90Clear = DateTime.Now;
                                 }
                                 break;
@@ -1641,10 +1647,9 @@ namespace GilesTrinity
                     dictTotalInteractionAttempts[CurrentTarget.RActorGuid]++;
                 }
                 // If we've tried interacting too many times, blacklist this for a while
-                if (iInteractAttempts > 20)
+                if (iInteractAttempts > 20 && CurrentTarget.ItemQuality < ItemQuality.Legendary)
                 {
                     hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
-                    //dateSinceBlacklist90Clear = DateTime.Now;
                 }
                 // Now tell Trinity to get a new target!
                 bForceTargetUpdate = true;
