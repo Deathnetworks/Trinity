@@ -168,6 +168,11 @@ namespace GilesTrinity
                         return avoidanceHealth.AvoidZoltBubbleHealth;
                     case AvoidanceType.ZoltTwister:
                         return avoidanceHealth.AvoidZoltTwisterHealth;
+                    default:
+                        {
+                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.Behavior, "Unknown Avoidance type {0}", type.ToString());
+                            return 1;
+                        }
                 }
             }
             return defaultValue;

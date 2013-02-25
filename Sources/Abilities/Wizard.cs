@@ -12,10 +12,17 @@ using GilesTrinity.Settings.Combat;
 
 namespace GilesTrinity
 {
+
     public partial class GilesTrinity : IPlugin
     {
         private static TrinityPower GetWizardPower(bool IsCurrentlyAvoiding, bool UseOOCBuff, bool UseDestructiblePower)
         {
+            // TODO
+            //- AI so Trinity knows that it is already in the densest monster area and not to teleport.
+            //- AI to use teleport when ranged attacks are approaching (succubus slow moving torpedo-orb)
+            //- AI to avoid AoE's (plague, molten, desecrator)
+            //- For Trinity to cast one or two Twisters before moving into melee range or teleporting closer. 
+
             // Pick the best destructible power available
             if (UseDestructiblePower)
             {

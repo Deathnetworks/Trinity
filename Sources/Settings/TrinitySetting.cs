@@ -8,6 +8,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Zeta;
+using System.Xml;
 
 namespace GilesTrinity.Settings
 {
@@ -197,7 +198,12 @@ namespace GilesTrinity.Settings
                     using (Stream stream = File.Open(filename, FileMode.Create))
                     {
                         DataContractSerializer serializer = new DataContractSerializer(typeof(TrinitySetting));
-                        serializer.WriteObject(stream, this);
+
+                        var xmlWriterSettings = new XmlWriterSettings { Indent = true };
+                        using (var xmlWriter = XmlWriter.Create(stream, xmlWriterSettings))
+                        {
+                            serializer.WriteObject(xmlWriter, this);
+                        }
                         stream.Close();
                     }
                 }
