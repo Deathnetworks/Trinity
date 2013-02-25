@@ -871,7 +871,7 @@ namespace GilesTrinity
                                 CurrentTarget.InternalName,         // 0
                                 CurrentTarget.ActorSNO,             // 1
                                 CurrentTarget.CentreDistance,       // 2
-                                CurrentTarget.HitPoints,            // 3
+                                CurrentTarget.HitPointsPct,            // 3
                                 CurrentTarget.RActorGuid            // 4
                                 );
                         }
@@ -1026,7 +1026,7 @@ namespace GilesTrinity
                                     }
                                     else
                                     {
-                                        CurrentTarget.HitPoints = dTempHitpoints;
+                                        CurrentTarget.HitPointsPct = dTempHitpoints;
                                         CurrentTarget.Position = CurrentTarget.Unit.Position;
                                     }
                                 }
@@ -1517,7 +1517,7 @@ namespace GilesTrinity
                 timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
                 iKeepLootRadiusExtendedFor = 8;
                 // if at full or nearly full health, see if we can raycast to it, if not, ignore it for 2000 ms
-                if (CurrentTarget.HitPoints >= 0.9d && AnythingWithinRange[RANGE_50] > 3)
+                if (CurrentTarget.HitPointsPct >= 0.9d && AnythingWithinRange[RANGE_50] > 3)
                 {
                     if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
                     {

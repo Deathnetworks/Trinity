@@ -198,22 +198,22 @@ namespace GilesTrinity
                                             cacheObject.Weight += 150;
 
                                         // Lower health gives higher weight - health is worth up to 300 extra weight
-                                        if (cacheObject.HitPoints < 0.20)
-                                            cacheObject.Weight += (300 * (1 - (cacheObject.HitPoints / 0.5)));
+                                        if (cacheObject.HitPointsPct < 0.20)
+                                            cacheObject.Weight += (300 * (1 - (cacheObject.HitPointsPct / 0.5)));
 
                                         // Elites on low health get extra priority - up to 1500
-                                        if ((cacheObject.IsEliteRareUnique || cacheObject.IsTreasureGoblin) && cacheObject.HitPoints < 0.20)
-                                            cacheObject.Weight += (1500 * (1 - (cacheObject.HitPoints / 0.45)));
+                                        if ((cacheObject.IsEliteRareUnique || cacheObject.IsTreasureGoblin) && cacheObject.HitPointsPct < 0.20)
+                                            cacheObject.Weight += (1500 * (1 - (cacheObject.HitPointsPct / 0.45)));
 
                                         // Magi - Elites/Bosses that are killed should have weight erased so we don't keep attacking
-                                        if ((cacheObject.IsEliteRareUnique || cacheObject.IsBoss) && cacheObject.HitPoints <= 0)
+                                        if ((cacheObject.IsEliteRareUnique || cacheObject.IsBoss) && cacheObject.HitPointsPct <= 0)
                                         {
                                             cacheObject.Weight = 0;
                                         }
 
                                         // Goblins on low health get extra priority - up to 2500
-                                        if (Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize && cacheObject.IsTreasureGoblin && cacheObject.HitPoints <= 0.98)
-                                            cacheObject.Weight += (3000 * (1 - (cacheObject.HitPoints / 0.85)));
+                                        if (Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize && cacheObject.IsTreasureGoblin && cacheObject.HitPointsPct <= 0.98)
+                                            cacheObject.Weight += (3000 * (1 - (cacheObject.HitPointsPct / 0.85)));
 
                                         // Bonuses to priority type monsters from the dictionary/hashlist set at the top of the code
                                         int iExtraPriority;

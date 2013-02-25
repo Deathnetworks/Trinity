@@ -210,7 +210,7 @@ namespace GilesTrinity
                         IsTreasureGoblin = c_unit_IsTreasureGoblin,
                         IsBoss = c_unit_IsBoss,
                         IsAttackable = c_unit_IsAttackable,
-                        HitPoints = c_HitPoints,
+                        HitPointsPct = c_HitPointsPct,
                         Radius = c_Radius,
                         MonsterStyle = c_unit_MonsterSize,
                         IsEliteRareUnique = c_IsEliteRareUnique,
@@ -293,6 +293,7 @@ namespace GilesTrinity
             c_ActorSNO = -1;
             c_ItemLevel = -1;
             c_GoldStackSize = -1;
+            c_HitPointsPct = -1;
             c_HitPoints = -1;
             c_IsOneHandedItem = false;
             c_IsTwoHandedItem = false;
@@ -794,15 +795,13 @@ namespace GilesTrinity
                 }
                 // Now try to get the current health - using temporary and intelligent caching
                 // Health calculations
-                double HitpointsCur = 0d;
-
-                HitpointsCur = diaUnit.HitpointsCurrent;
+                c_HitPoints = diaUnit.HitpointsCurrent;
 
                 // And finally put the two together for a current health percentage
-                c_HitPoints = HitpointsCur / dThisMaxHealth;
+                c_HitPointsPct = c_HitPoints / dThisMaxHealth;
 
                 // Unit is already dead
-                if (HitpointsCur <= 0d && !c_unit_IsBoss)
+                if (c_HitPoints <= 0d && !c_unit_IsBoss)
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "0HitPoints";

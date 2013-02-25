@@ -125,6 +125,9 @@ namespace GilesTrinity
                 return true;
             }
 
+            // Fixes a race condition crash. Zomg!
+            Thread.Sleep(5000);
+
             if (!ZetaDia.IsInGame || ZetaDia.Me == null || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
             {
                 isLeavingGame = false;

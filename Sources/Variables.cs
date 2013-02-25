@@ -495,6 +495,7 @@ namespace GilesTrinity
         /// <summary>
         /// Percent of total health remaining on unit
         /// </summary>
+        private static double c_HitPointsPct = 0d;
         private static double c_HitPoints = 0d;
         private static float c_CentreDistance = 0f;
         private static float c_RadiusDistance = 0f;

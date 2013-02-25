@@ -71,15 +71,22 @@ namespace GilesTrinity.DbProvider
         /// <returns></returns>
         public static bool UnstuckChecker(Vector3 vMyCurrentPosition, int checkDuration = 5000)
         {
+            // set checkDuration to 30 sec while in town or vendoring, just to avoid annoyances
+            if (ZetaDia.Me.IsInTown || GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+            {
+                checkDuration = 30000;
+            }
+
             // Keep checking distance changes every 3 seconds
             if (DateTime.Now.Subtract(TimeLastRecordedPosition).TotalMilliseconds >= checkDuration)
             {
                 // We're not stuck if we're vendoring!
-                if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
-                {
-                    UnStuckCheckerLastResult = false;
-                    return UnStuckCheckerLastResult;
-                }
+                // EDIT: Apparently we can get stuck Vendoring at A3 blacksmith.
+                //if (GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                //{
+                //    UnStuckCheckerLastResult = false;
+                //    return UnStuckCheckerLastResult;
+                //}
 
                 if (ZetaDia.Me.IsInTown && (UIElements.VendorWindow.IsVisible || UIElements.SalvageWindow.IsVisible))
                 {

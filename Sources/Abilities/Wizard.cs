@@ -180,7 +180,7 @@ namespace GilesTrinity
                 }
                 // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_MirrorImage) &&
-                    (PlayerStatus.CurrentHealthPct <= 0.50 || AnythingWithinRange[RANGE_30] >= 5 || PlayerStatus.IsIncapacitated || PlayerStatus.IsRooted || (ElitesWithinRange[RANGE_30] == 1 && CurrentTarget.IsEliteRareUnique && !CurrentTarget.IsBoss && CurrentTarget.HitPoints <= 0.35)) &&
+                    (PlayerStatus.CurrentHealthPct <= 0.50 || AnythingWithinRange[RANGE_30] >= 5 || PlayerStatus.IsIncapacitated || PlayerStatus.IsRooted || (ElitesWithinRange[RANGE_30] == 1 && CurrentTarget.IsEliteRareUnique && !CurrentTarget.IsBoss && CurrentTarget.HitPointsPct <= 0.35)) &&
                     PowerManager.CanCast(SNOPower.Wizard_MirrorImage))
                 {
                     return new TrinityPower(SNOPower.Wizard_MirrorImage, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
@@ -237,9 +237,9 @@ namespace GilesTrinity
 
                 // Frost Nova for Critical Mass builds
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_FrostNova) && !PlayerStatus.IsIncapacitated &&
-                    hasCriticalMass && TargetUtil.AnyMobsInRange(25, 1) && PowerManager.CanCast(SNOPower.Wizard_FrostNova))
+                    hasCriticalMass && TargetUtil.AnyMobsInRange(20, 1) && PowerManager.CanCast(SNOPower.Wizard_FrostNova))
                 {
-                    return new TrinityPower(SNOPower.Wizard_FrostNova, 20f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_FrostNova, 15f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
                 }
 
                 // Explosive Blast SPAM when enough AP, blow erry thing up, nah mean

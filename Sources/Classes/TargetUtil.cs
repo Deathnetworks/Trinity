@@ -18,7 +18,7 @@ namespace GilesTrinity
                      where u.Type == GObjectType.Unit
                      orderby u.NearbyUnitsWithinDistance(radius) descending
                      orderby u.CentreDistance
-                     orderby u.HitPoints descending
+                     orderby u.HitPointsPct descending
                      select u.Position).ToList();
 
                 if (clusterUnits.Any())

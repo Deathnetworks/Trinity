@@ -49,6 +49,7 @@ namespace GilesTrinity
         /// <summary>
         /// Percentage hit points
         /// </summary>
+        public double HitPointsPct { get; set; }
         public double HitPoints { get; set; }
         public float Radius { get; set; }
         public bool ForceLeapAgainst { get; set; }
@@ -122,6 +123,7 @@ namespace GilesTrinity
                 IsEliteRareUnique = IsEliteRareUnique,
                 IsBoss = IsBoss,
                 IsAttackable = IsAttackable,
+                HitPointsPct = HitPointsPct,
                 HitPoints = HitPoints,
                 Radius = Radius,
                 MonsterStyle = MonsterStyle,

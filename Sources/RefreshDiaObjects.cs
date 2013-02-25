@@ -175,14 +175,14 @@ namespace GilesTrinity
                         if (CurrentTarget.Type == GObjectType.Unit)
                         {
                             // Check if the health has changed, if so update the target-pick time before we blacklist them again
-                            if (CurrentTarget.HitPoints != iTargetLastHealth)
+                            if (CurrentTarget.HitPointsPct != iTargetLastHealth)
                             {
                                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Keeping Target - CurrentTarget.iHitPoints: {1:0.00}  iTargetLastHealth: {2:0.00} ",
-                                                DateTime.Now, CurrentTarget.HitPoints, iTargetLastHealth);
+                                                DateTime.Now, CurrentTarget.HitPointsPct, iTargetLastHealth);
                                 dateSincePickedTarget = DateTime.Now;
                             }
                             // Now store the target's last-known health
-                            iTargetLastHealth = CurrentTarget.HitPoints;
+                            iTargetLastHealth = CurrentTarget.HitPointsPct;
                         }
                     }
                 }
@@ -505,7 +505,7 @@ namespace GilesTrinity
                     // Kulle Exception
                     dUseKillRadius *= 1.5;
                 // And even more if they're already injured
-                if (c_HitPoints <= 0.98)
+                if (c_HitPointsPct <= 0.98)
                     dUseKillRadius *= 4;
                 // And make sure we have a MINIMUM range for bosses - incase they are at screen edge etc.
                 if (dUseKillRadius <= 200)
@@ -529,7 +529,7 @@ namespace GilesTrinity
             if (c_ActorSNO == 256015 || c_ActorSNO == 256000 || c_ActorSNO == 255996)
                 dUseKillRadius = 80;
             // Injured treasure goblins get a huge extra radius - since they don't stay on the map long if injured, anyway!
-            if (c_unit_IsTreasureGoblin && (c_CentreDistance <= 60 || c_HitPoints <= 0.99))
+            if (c_unit_IsTreasureGoblin && (c_CentreDistance <= 60 || c_HitPointsPct <= 0.99))
             {
                 c_ForceLeapAgainst = true;
                 if (Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize)
@@ -543,7 +543,7 @@ namespace GilesTrinity
             else if ((c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion))
             {
                 c_ForceLeapAgainst = true;
-                if (c_HitPoints <= 0.99)
+                if (c_HitPointsPct <= 0.99)
                 {
                     dUseKillRadius *= 2;
                     if (dUseKillRadius <= 150) dUseKillRadius = 150;
@@ -738,7 +738,7 @@ namespace GilesTrinity
                                   where m.Type == GObjectType.Unit &&
                                   m.RadiusDistance <= PlayerKiteDistance &&
                                   (m.IsBossOrEliteRareUnique ||
-                                   ((m.HitPoints >= .15 || m.MonsterStyle != MonsterSize.Swarm) && !m.IsBossOrEliteRareUnique)
+                                   ((m.HitPointsPct >= .15 || m.MonsterStyle != MonsterSize.Swarm) && !m.IsBossOrEliteRareUnique)
                                    )
                                   select m;
 

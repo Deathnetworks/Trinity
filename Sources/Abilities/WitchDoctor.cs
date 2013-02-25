@@ -19,7 +19,7 @@ namespace GilesTrinity
             if (Hotbar.Contains(SNOPower.Witchdoctor_SpiritWalk) && PlayerStatus.PrimaryResource >= 49 &&
                 (
                  PlayerStatus.CurrentHealthPct <= 0.65 || PlayerStatus.IsIncapacitated || PlayerStatus.IsRooted || (Settings.Combat.Misc.AllowOOCMovement && UseOOCBuff) ||
-                 (!UseOOCBuff && CurrentTarget.IsTreasureGoblin && CurrentTarget.HitPoints < 0.90 && CurrentTarget.RadiusDistance <= 40f)
+                 (!UseOOCBuff && CurrentTarget.IsTreasureGoblin && CurrentTarget.HitPointsPct < 0.90 && CurrentTarget.RadiusDistance <= 40f)
                 ) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_SpiritWalk))
             {

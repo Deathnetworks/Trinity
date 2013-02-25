@@ -241,7 +241,7 @@ namespace GilesTrinity
 
             // Dashing Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
-                (AnythingWithinRange[RANGE_40] == 1 && (!CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.HitPoints <= 0.2)
+                (AnythingWithinRange[RANGE_40] == 1 && (!CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.HitPointsPct <= 0.2)
                 || CurrentTarget.CentreDistance >= 40f) &&
                 Hotbar.Contains(SNOPower.Monk_DashingStrike) && ((PlayerStatus.PrimaryResource >= 30 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
@@ -258,7 +258,8 @@ namespace GilesTrinity
                  // (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) && // optional check for SW stacks
                 Monk_HasMantraAbilityAndBuff())
             {
-                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 15f);
+                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, bestClusterPoint, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
 
             // Fists of thunder as the primary, repeatable attack
