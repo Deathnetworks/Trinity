@@ -29,7 +29,7 @@ namespace GilesTrinity
         {
             get
             {
-                return new Version(1, 7, 2, 4);
+                return new Version(1, 7, 2, 5);
             }
         }
 
@@ -46,7 +46,7 @@ namespace GilesTrinity
         {
             get
             {
-                return "GilesSmith + Demonbuddy Community Devs";
+                return "GilesSmith + rrrix + Community Devs";
             }
         }
 
