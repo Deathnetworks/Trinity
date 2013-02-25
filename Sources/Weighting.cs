@@ -284,7 +284,7 @@ namespace GilesTrinity
 
 
                                         // Deal with treasure goblins - note, of priority is set to "0", then the is-a-goblin flag isn't even set for use here - the monster is ignored
-                                        if (cacheObject.IsTreasureGoblin)
+                                        if (cacheObject.IsTreasureGoblin && !GilesObjectCache.Any(u => (u.Type == GObjectType.Door || u.Type == GObjectType.Barricade) && u.RadiusDistance <= 40f))
                                         {
 
                                             // Logging goblin sightings
@@ -521,8 +521,8 @@ namespace GilesTrinity
                                 //    cacheObject.Weight += 10000d;
 
                                 //// We're standing on the damn thing... break it
-                                //if (cacheObject.RadiusDistance <= 5f)
-                                //    cacheObject.Weight += 20000d;
+                                if (cacheObject.RadiusDistance <= 5f)
+                                    cacheObject.Weight += 40000d;
 
                                 //// Fix for WhimsyShire Pinata
                                 if (hashSNOContainerResplendant.Contains(cacheObject.ActorSNO))
