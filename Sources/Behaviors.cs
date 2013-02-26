@@ -837,11 +837,11 @@ namespace GilesTrinity
                 if (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6)
                     shouldTryBlacklist = true;
 
-                if ((CurrentTargetIsUnit() && CurrentTarget.IsBoss && GetSecondsSinceTargetUpdate() > 15))
+                if ((CurrentTargetIsUnit() && CurrentTarget.IsBoss && GetSecondsSinceTargetUpdate() > 45))
                     shouldTryBlacklist = true;
 
-                // special raycast check for current target after 5 sec
-                if ((CurrentTargetIsUnit() && GetSecondsSinceTargetUpdate() > 5))
+                // special raycast check for current target after 10 sec
+                if ((CurrentTargetIsUnit() && !CurrentTarget.IsBoss && GetSecondsSinceTargetUpdate() > 10))
                     shouldTryBlacklist = true;
 
                 if (shouldTryBlacklist)
