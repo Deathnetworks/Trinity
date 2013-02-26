@@ -200,6 +200,12 @@ namespace GilesTrinity
                     if (runStatus != HandlerRunStatus.NotFinished)
                         return GetTreeSharpRunStatus(runStatus);
 
+                    if (CurrentTarget == null && TownRun.IsTryingToTownPortal())
+                    {
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Waiting for town run... ");
+                        runStatus = HandlerRunStatus.TreeSuccess;
+                    }
+
                     if (CurrentTarget == null)
                     {
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2");
@@ -823,6 +829,9 @@ namespace GilesTrinity
                 bool shouldTryBlacklist = false;
 
                 if (CurrentTarget.Type == GObjectType.Avoidance)
+                    return HandlerRunStatus.NotFinished;
+
+                if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
                     return HandlerRunStatus.NotFinished;
 
                 if (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6)

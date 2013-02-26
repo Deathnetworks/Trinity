@@ -188,7 +188,7 @@ namespace GilesTrinity
                 }
 
                 // check for navigation obstacles (never TP near demonic forges, etc)
-                if (GilesTrinity.hashNavigationObstacleCache.Any(o => Vector3.Distance(o.Location, GilesTrinity.PlayerStatus.CurrentPosition) < 60f))
+                if (GilesTrinity.hashNavigationObstacleCache.Any(o => Vector3.Distance(o.Location, GilesTrinity.PlayerStatus.CurrentPosition) < 90f))
                 {
                     GilesTrinity.IsReadyToTownRun = false;
                 }
@@ -237,6 +237,9 @@ namespace GilesTrinity
             if (GilesTrinity.IsReadyToTownRun)
                 result = true;
 
+            if (GilesTrinity.ForceVendorRunASAP)
+                result = true;
+
             if (TownRunCheckTimer.IsRunning)
                 result = true;
 
@@ -253,9 +256,6 @@ namespace GilesTrinity
             {
                 result = true;
             }
-
-            if (GilesTrinity.ForceVendorRunASAP)
-                result = true;
 
             if (Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                 result = true;

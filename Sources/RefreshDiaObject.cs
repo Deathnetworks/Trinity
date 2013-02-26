@@ -597,7 +597,7 @@ namespace GilesTrinity
                         //    c_IgnoreSubStep = "LootingDisabled";
                         //    break;
                         //}
-                        if (!ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
+                        if (!ForceVendorRunASAP && !TownRun.IsTryingToTownPortal())
                         {
                             AddToCache = RefreshGilesItem();
                             c_IgnoreReason = "RefreshGilesItem";
@@ -605,7 +605,7 @@ namespace GilesTrinity
                         else
                         {
                             AddToCache = false;
-                            c_IgnoreSubStep = "ForceVendorRunASAP";
+                            c_IgnoreSubStep = "IsTryingToTownPortal";
                         }
                         break;
 

@@ -175,7 +175,8 @@ namespace GilesTrinity
                 ((PlayerStatus.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                 (Settings.Combat.Monk.TROption == TempestRushOption.Always ||
                 Settings.Combat.Monk.TROption == TempestRushOption.CombatOnly ||
-                (Settings.Combat.Monk.TROption == TempestRushOption.ElitesGroupsOnly && (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2))))
+                (Settings.Combat.Monk.TROption == TempestRushOption.ElitesGroupsOnly && (TargetUtil.AnyElitesInRange(25) || TargetUtil.AnyMobsInRange(25,2))) ||
+                (Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly && (!TargetUtil.AnyElitesInRange(90f) && TargetUtil.AnyMobsInRange(40f)))))
             {
                 GenerateMonkZigZag();
                 MaintainTempestRush = true;
