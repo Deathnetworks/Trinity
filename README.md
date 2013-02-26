@@ -1,5 +1,25 @@
 ﻿Unified Trinity Community Edition
 
+### Changelog 1.7.2.5:
+
+* Removed A3 Skycrown signal fires from navigation obstacle list... was causing stucks!
+
+* Re-enabled DB closing on D3 crash.
+
+* Fixed a townrun bug & missing legendary loot. Bot will not properly stand around and wait for a target while townrun timer is running.
+
+* Added TempestRush on Trash only option.
+
+* Small fix for Treasure Goblins behind doors and Keeps 2 Destructible (Barricade) doors
+
+* Gold Inactivity timer should no longer crash D3/DB
+
+* GilesTrinity.xml will now be saved in with indentation (for easier human consumption)
+
+* Added some additional safety checks for not picking legendary items
+
+* Added a LineOfSight check for BodyBlocking for Items/Shrines/Gold/Containers - should help the mysterious "zomg didn't pickup my legendary!" and missing random shrines etc
+
 ### Changelog 1.7.2.4:
 
 * Now picks up craft tomes regardless of misc item level selection if we've chosen to pickup craft tomes
