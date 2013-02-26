@@ -124,7 +124,8 @@ namespace GilesTrinity
                 GameEvents.OnItemSalvaged += TrinityOnItemSalvaged;
                 GameEvents.OnItemStashed += TrinityOnItemStashed;
 
-                ZetaDia.Memory.Process.EnableRaisingEvents = false;
+                // enable or disable process exit events
+                ZetaDia.Memory.Process.EnableRaisingEvents = true;
 
                 CombatTargeting.Instance.Provider = new BlankCombatProvider();
                 LootTargeting.Instance.Provider = new BlankLootProvider();
