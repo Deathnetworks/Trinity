@@ -13,7 +13,15 @@ namespace GilesTrinity
         /// </summary>
         static AvoidanceManager()
         {
-            SNOAvoidanceType = FileManager.Load<int, AvoidanceType>("AvoidanceType", "SNO", "Type");
+            LoadAvoidanceDictionary();
+        }
+
+        private static void LoadAvoidanceDictionary(bool force = false)
+        {
+            if (SNOAvoidanceType == null || force)
+            {
+                SNOAvoidanceType = FileManager.Load<int, AvoidanceType>("AvoidanceType", "SNO", "Type");
+            }
         }
 
         private static IDictionary<int, AvoidanceType> SNOAvoidanceType
@@ -24,6 +32,7 @@ namespace GilesTrinity
 
         public static float GetAvoidanceRadius(AvoidanceType type, float defaultValue)
         {
+            LoadAvoidanceDictionary(false);
             //TODO : Make mapping between Type and Config
             switch (type)
             {
@@ -31,7 +40,7 @@ namespace GilesTrinity
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.Arcane;
                 case AvoidanceType.AzmodanBody:
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.AzmoBodies;
-                case AvoidanceType.AzmodanFireball:
+                case AvoidanceType.AzmoFireball:
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.AzmoFireBall;
                 case AvoidanceType.AzmodanPool:
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.AzmoPools;
@@ -63,20 +72,27 @@ namespace GilesTrinity
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.MoltenCore;
                 case AvoidanceType.MoltenTrail:
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.MoltenTrail;
+                case AvoidanceType.MoltenBall:
+                    return GilesTrinity.Settings.Combat.AvoidanceRadius.MoltenBall;
                 case AvoidanceType.PlagueCloud:
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.PlagueCloud;
                 case AvoidanceType.PlagueHand:
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.PlagueHands;
                 case AvoidanceType.PoisonTree:
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.PoisonTree;
+                case AvoidanceType.SuccubusStar:
+                    return GilesTrinity.Settings.Combat.AvoidanceRadius.SuccubusStar;
                 case AvoidanceType.ShamanFire:
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.ShamanFire;
-                case AvoidanceType.WallOfFire:
-                    return GilesTrinity.Settings.Combat.AvoidanceRadius.WallOfFire;
                 case AvoidanceType.ZoltBubble:
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.ZoltBubble;
                 case AvoidanceType.ZoltTwister:
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.ZoltTwister;
+                default:
+                    {
+                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.Avoidance, "Unknown Avoidance type in Radius Switch! {0}", type.ToString());
+                        return defaultValue;
+                    }
             }
             return defaultValue;
         }
@@ -85,7 +101,13 @@ namespace GilesTrinity
         {
             if (SNOAvoidanceType.ContainsKey(snoId))
             {
-                return GetAvoidanceRadius(SNOAvoidanceType[snoId], defaultValue);
+                float radius = GetAvoidanceRadius(SNOAvoidanceType[snoId], defaultValue);
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Radius of={0} for snoId={1} (default={2})", radius, snoId, defaultValue);
+                return radius;
+            }
+            else
+            {
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Radius! {0}", snoId);
             }
             return defaultValue;
         }
@@ -93,6 +115,7 @@ namespace GilesTrinity
         public static float GetAvoidanceHealth(AvoidanceType type, float defaultValue)
         {
             //TODO : Make mapping between Type and Config
+            LoadAvoidanceDictionary(false);
             IAvoidanceHealth avoidanceHealth = null;
             switch (GilesTrinity.PlayerStatus.ActorClass)
             {
@@ -120,7 +143,7 @@ namespace GilesTrinity
                         return avoidanceHealth.AvoidArcaneHealth;
                     case AvoidanceType.AzmodanBody:
                         return avoidanceHealth.AvoidAzmoBodiesHealth;
-                    case AvoidanceType.AzmodanFireball:
+                    case AvoidanceType.AzmoFireball:
                         return avoidanceHealth.AvoidAzmoFireBallHealth;
                     case AvoidanceType.AzmodanPool:
                         return avoidanceHealth.AvoidAzmoPoolsHealth;
@@ -160,18 +183,18 @@ namespace GilesTrinity
                         return avoidanceHealth.AvoidPlagueHandsHealth;
                     case AvoidanceType.PoisonTree:
                         return avoidanceHealth.AvoidPoisonTreeHealth;
+                    case AvoidanceType.SuccubusStar:
+                        return avoidanceHealth.AvoidSuccubusStarHealth;
                     case AvoidanceType.ShamanFire:
                         return avoidanceHealth.AvoidShamanFireHealth;
-                    case AvoidanceType.WallOfFire:
-                        return avoidanceHealth.AvoidWallOfFireHealth;
                     case AvoidanceType.ZoltBubble:
                         return avoidanceHealth.AvoidZoltBubbleHealth;
                     case AvoidanceType.ZoltTwister:
                         return avoidanceHealth.AvoidZoltTwisterHealth;
                     default:
                         {
-                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.Behavior, "Unknown Avoidance type {0}", type.ToString());
-                            return 1;
+                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.Avoidance, "Unknown Avoidance type in Health Switch! {0}", type.ToString());
+                            return defaultValue;
                         }
                 }
             }
@@ -182,7 +205,15 @@ namespace GilesTrinity
         {
             if (SNOAvoidanceType.ContainsKey(snoId))
             {
-                return GetAvoidanceHealth(SNOAvoidanceType[snoId], defaultValue);
+                float health = GetAvoidanceHealth(SNOAvoidanceType[snoId], defaultValue);
+
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Health of={0} for snoId={1} (default={2})", health, snoId, defaultValue);
+
+                return health;
+            }
+            else
+            {
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Health! {0}", snoId);
             }
             return defaultValue;
         }

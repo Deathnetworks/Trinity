@@ -1301,7 +1301,14 @@ namespace GilesTrinity
 
                 if (DateTime.Now.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(vLastMoveToTarget, vCurrentDestination) >= 2f || bForceNewMovement)
                 {
-                    PlayerMover.NavigateTo(vCurrentDestination, CurrentTarget.InternalName);
+                    string destname = String.Format("Name={0} Dist={1} IsElite={2} HasBeenInLoS={3} HitPointsPct={4}",
+                        CurrentTarget.InternalName,
+                        CurrentTarget.RadiusDistance,
+                        CurrentTarget.IsBossOrEliteRareUnique,
+                        CurrentTarget.HasBeenInLoS,
+                        CurrentTarget.HitPointsPct);
+
+                    PlayerMover.NavigateTo(vCurrentDestination, destname);
                     lastSentMovePower = DateTime.Now;
 
                     // Store the current destination for comparison incase of changes next loop

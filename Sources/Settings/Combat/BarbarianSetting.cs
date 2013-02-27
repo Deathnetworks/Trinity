@@ -36,6 +36,7 @@ namespace GilesTrinity.Settings.Combat
         private float _AvoidWallOfFireHealth;
         private float _AvoidZoltBubbleHealth;
         private float _AvoidZoltTwisterHealth;
+        private float _AvoidSuccubusStarHealth;
         private bool _SelectiveWirlwind;
         private bool _BoonBulKathosPassive;
         private bool _WaitWOTB;
@@ -587,6 +588,23 @@ namespace GilesTrinity.Settings.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(0.7f)]
+        public float AvoidSuccubusStarHealth
+        {
+            get
+            {
+                return _AvoidSuccubusStarHealth;
+            }
+            set
+            {
+                if (_AvoidSuccubusStarHealth != value)
+                {
+                    _AvoidSuccubusStarHealth = value;
+                    OnPropertyChanged("AvoidSuccubusStarHealth");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool SelectiveWhirlwind
         {
@@ -767,6 +785,7 @@ namespace GilesTrinity.Settings.Combat
         internal void OnDeserializingMethod(StreamingContext context)
         {
             this._TargetBasedZigZag = true;
+            this._AvoidSuccubusStarHealth = 0.7f;
         }
 
         #endregion Methods

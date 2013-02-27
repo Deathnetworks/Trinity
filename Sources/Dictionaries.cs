@@ -171,6 +171,8 @@ namespace GilesTrinity
             //210120, // A4 Corrupt Growths            
             // Rakanoth
             4630, 
+            //Xah'Rith Keywarden
+            256015, 
          };
         // IGNORE LIST / BLACKLIST - for units / monsters / npcs
         // Special blacklist for things like ravens, templar/scoundrel/enchantress in town, witch-doctor summons, tornado-animations etc. etc. that should never be attacked
@@ -356,7 +358,7 @@ namespace GilesTrinity
                 {SNOPower.Monk_InnerSanctuary, 20200},
                 {SNOPower.Monk_DashingStrike, 1000},
                 {SNOPower.Monk_ExplodingPalm, 5000},
-                {SNOPower.Monk_SweepingWind, 5700},
+                {SNOPower.Monk_SweepingWind, 1500},
                 {SNOPower.Monk_CycloneStrike, 10000},
                 {SNOPower.Monk_SevenSidedStrike, 30200},
                 {SNOPower.Monk_MysticAlly, 30000},

@@ -33,6 +33,7 @@ namespace GilesTrinity.Settings.Combat
         private int _WallOfFire;
         private int _ZoltBubble;
         private int _ZoltTwister;
+        private int _SuccubusStar;
         #endregion Fields
 
         #region Events
@@ -520,6 +521,24 @@ namespace GilesTrinity.Settings.Combat
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(10)]
+        public int SuccubusStar
+        {
+            get
+            {
+                return _SuccubusStar;
+            }
+            set
+            {
+                if (_SuccubusStar != value)
+                {
+                    _SuccubusStar = value;
+                    OnPropertyChanged("SuccubusStar");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -548,6 +567,17 @@ namespace GilesTrinity.Settings.Combat
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+
+        /// <summary>
+        /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserializing()]
+        internal void OnDeserializingMethod(StreamingContext context)
+        {
+
+            this.SuccubusStar = 10;
         }
         #endregion Methods
     }
