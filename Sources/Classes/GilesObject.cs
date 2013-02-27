@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Zeta.Common;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
@@ -42,12 +43,13 @@ namespace GilesTrinity
         public bool IsTreasureGoblin { get; set; }
         public bool IsEliteRareUnique { get; set; }
         public bool IsBoss { get; set; }
-        public bool IsBossOrEliteRareUnique { get { return (this.Type == GObjectType.Unit &&(IsEliteRareUnique || IsBoss)); } }
-        public bool IsTrashMob { get { return (this.Type == GObjectType.Unit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } } 
+        public bool IsBossOrEliteRareUnique { get { return (this.Type == GObjectType.Unit && (IsEliteRareUnique || IsBoss)); } }
+        public bool IsTrashMob { get { return (this.Type == GObjectType.Unit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         public bool IsAttackable { get; set; }
         /// <summary>
         /// Percentage hit points
         /// </summary>
+        public double HitPointsPct { get; set; }
         public double HitPoints { get; set; }
         public float Radius { get; set; }
         public bool ForceLeapAgainst { get; set; }
@@ -121,12 +123,25 @@ namespace GilesTrinity
                 IsEliteRareUnique = IsEliteRareUnique,
                 IsBoss = IsBoss,
                 IsAttackable = IsAttackable,
+                HitPointsPct = HitPointsPct,
                 HitPoints = HitPoints,
                 Radius = Radius,
                 MonsterStyle = MonsterStyle,
                 ForceLeapAgainst = ForceLeapAgainst
             };
             return newGilesObject;
+        }
+
+        public int NearbyUnitsWithinDistance(float range = 5f)
+        {
+            using (new Technicals.PerformanceLogger("CacheObject.UnitsNear"))
+            {
+                if (this.Type != GObjectType.Unit)
+                    return 0;
+
+                return GilesTrinity.GilesObjectCache
+                    .Count(u => u.Type == GObjectType.Unit && u.Position.Distance2D(this.Position) <= range && u.HasBeenInLoS && u.RActorGuid != GilesTrinity.CurrentTarget.RActorGuid);
+            }
         }
     }
 }

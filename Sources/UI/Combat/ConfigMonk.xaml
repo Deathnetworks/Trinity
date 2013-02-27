@@ -63,6 +63,7 @@
                 <RadioButton Margin="20,0" GroupName="TempestRushOption" Content="Always" IsChecked="{Binding Path=Monk.TROption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Always}" />
                 <RadioButton Margin="20,0" GroupName="TempestRushOption" Content="Movement Only" IsChecked="{Binding Path=Monk.TROption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=MovementOnly}" />
                 <RadioButton Margin="20,0" GroupName="TempestRushOption" Content="Elites and Groups Only" IsChecked="{Binding Path=Monk.TROption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=ElitesGroupsOnly}" />
+                <RadioButton Margin="20,0" GroupName="TempestRushOption" Content="Trash Mobs Only" IsChecked="{Binding Path=Monk.TROption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=TrashOnly}" />
                 <RadioButton Margin="20,0" GroupName="TempestRushOption" Content="Combat Only" IsChecked="{Binding Path=Monk.TROption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=CombatOnly}" />
             </UniformGrid>
        </Grid>

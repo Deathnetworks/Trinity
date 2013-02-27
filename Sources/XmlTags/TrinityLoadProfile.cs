@@ -77,7 +77,7 @@ namespace GilesTrinity.XmlTags
                             break;
                     }
                     Thread.Sleep(1000);
-                    ZetaDia.Service.Games.LeaveGame();
+                    ZetaDia.Service.Party.LeaveGame();
                     GilesTrinity.GilesResetEverythingNewGame();
 
                     // Wait for 10 second log out timer if not in town, else wait for 3 seconds instead

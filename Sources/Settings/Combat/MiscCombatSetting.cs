@@ -16,7 +16,8 @@ namespace GilesTrinity.Settings.Combat
         private bool _AllowBacktracking;
         private int _DelayAfterKill;
         private bool _UseNavMeshTargeting;
-        private bool _IgnoreSolitaryTrash;
+        private int _TrashPackSize;
+        private float _TrashPackClusterRadius;
         #endregion Fields
 
         #region Events
@@ -36,19 +37,37 @@ namespace GilesTrinity.Settings.Combat
         #region Properties
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool IgnoreSolitaryTrash
+        [DefaultValue(2)]
+        public int TrashPackSize
         {
             get
             {
-                return _IgnoreSolitaryTrash;
+                return _TrashPackSize;
             }
             set
             {
-                if (_IgnoreSolitaryTrash != value)
+                if (_TrashPackSize != value)
                 {
-                    _IgnoreSolitaryTrash = value;
-                    OnPropertyChanged("IgnoreSolitaryTrash");
+                    _TrashPackSize = value;
+                    OnPropertyChanged("TrashPackSize");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(40f)]
+        public float TrashPackClusterRadius
+        {
+            get
+            {
+                return _TrashPackClusterRadius;
+            }
+            set
+            {
+                if (_TrashPackClusterRadius != value)
+                {
+                    _TrashPackClusterRadius = value;
+                    OnPropertyChanged("TrashPackClusterRadius");
                 }
             }
         }
@@ -252,6 +271,8 @@ namespace GilesTrinity.Settings.Combat
         internal void OnDeserializingMethod(StreamingContext context)
         {
             this.UseNavMeshTargeting = true;
+            this.TrashPackClusterRadius = 40f;
+            this.TrashPackSize = 2;
         }
         #endregion Methods
     }

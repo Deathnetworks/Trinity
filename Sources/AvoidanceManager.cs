@@ -59,8 +59,6 @@ namespace GilesTrinity
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.MageFire;
                 case AvoidanceType.MaghdaProjectille:
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.MaghdaProjectille;
-                case AvoidanceType.MoltenBall:
-                    return GilesTrinity.Settings.Combat.AvoidanceRadius.MoltenBall;
                 case AvoidanceType.MoltenCore:
                     return GilesTrinity.Settings.Combat.AvoidanceRadius.MoltenCore;
                 case AvoidanceType.MoltenTrail:
@@ -170,6 +168,11 @@ namespace GilesTrinity
                         return avoidanceHealth.AvoidZoltBubbleHealth;
                     case AvoidanceType.ZoltTwister:
                         return avoidanceHealth.AvoidZoltTwisterHealth;
+                    default:
+                        {
+                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.Behavior, "Unknown Avoidance type {0}", type.ToString());
+                            return 1;
+                        }
                 }
             }
             return defaultValue;

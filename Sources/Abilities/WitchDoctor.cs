@@ -19,7 +19,7 @@ namespace GilesTrinity
             if (Hotbar.Contains(SNOPower.Witchdoctor_SpiritWalk) && PlayerStatus.PrimaryResource >= 49 &&
                 (
                  PlayerStatus.CurrentHealthPct <= 0.65 || PlayerStatus.IsIncapacitated || PlayerStatus.IsRooted || (Settings.Combat.Misc.AllowOOCMovement && UseOOCBuff) ||
-                 (!UseOOCBuff && CurrentTarget.IsTreasureGoblin && CurrentTarget.HitPoints < 0.90 && CurrentTarget.RadiusDistance <= 40f)
+                 (!UseOOCBuff && CurrentTarget.IsTreasureGoblin && CurrentTarget.HitPointsPct < 0.90 && CurrentTarget.RadiusDistance <= 40f)
                 ) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_SpiritWalk))
             {
@@ -77,12 +77,15 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
             }
+
             // Grasp of the Dead, look below, droping globes and dogs when using it on elites and 3 norms
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_GraspOfTheDead) && !PlayerStatus.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2) &&
-                PlayerStatus.PrimaryResource >= 122 && PowerManager.CanCast(SNOPower.Witchdoctor_GraspOfTheDead))
+                (TargetUtil.AnyMobsInRange(30,2)) &&
+                PlayerStatus.PrimaryResource >= 78 && PowerManager.CanCast(SNOPower.Witchdoctor_GraspOfTheDead))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_GraspOfTheDead, 25f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15);
+
+                return new TrinityPower(SNOPower.Witchdoctor_GraspOfTheDead, 25f, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
             }
             // Horrify Buff When not in combat for movement speed
             if (UseOOCBuff && Settings.Combat.WitchDoctor.GraveInjustice == true && Hotbar.Contains(SNOPower.Witchdoctor_Horrify) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 37 &&
@@ -141,22 +144,24 @@ namespace GilesTrinity
                 PlayerStatus.PrimaryResource >= 172 && PowerManager.CanCast(SNOPower.Witchdoctor_AcidCloud))
             {
                 // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
-                float fExtraDistance = 0f;
-                if (CurrentTarget.CentreDistance > 17f && !CurrentTarget.IsTreasureGoblin)
-                {
-                    fExtraDistance = CurrentTarget.CentreDistance - 17f;
-                    if (fExtraDistance > 5f)
-                        fExtraDistance = 5f;
-                    if (CurrentTarget.CentreDistance - fExtraDistance < 15f)
-                        fExtraDistance -= 2;
-                }
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, PlayerStatus.CurrentPosition, CurrentTarget.CentreDistance - fExtraDistance);
-                return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 30f, vNewTarget, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
+                //float fExtraDistance = 0f;
+                //if (CurrentTarget.CentreDistance > 17f && !CurrentTarget.IsTreasureGoblin)
+                //{
+                //    fExtraDistance = CurrentTarget.CentreDistance - 17f;
+                //    if (fExtraDistance > 5f)
+                //        fExtraDistance = 5f;
+                //    if (CurrentTarget.CentreDistance - fExtraDistance < 15f)
+                //        fExtraDistance -= 2;
+                //}
+                //Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, PlayerStatus.CurrentPosition, CurrentTarget.CentreDistance - fExtraDistance);
+
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 30f);
+                return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 30f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
             }
             // Fire Bats fast-attack
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Firebats) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 98)
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Firebats, 40f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Witchdoctor_Firebats, 20f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
             }
             // Poison Darts fast-attack Spams Darts when mana is too low (to cast bears) @12yds or @10yds if Bears avialable
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_PoisonDart) && !PlayerStatus.IsIncapacitated)

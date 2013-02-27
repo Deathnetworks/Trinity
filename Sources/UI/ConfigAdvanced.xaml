@@ -42,7 +42,7 @@
             <UniformGrid Grid.Row="1" Columns="2" HorizontalAlignment="Stretch">
                 <CheckBox IsChecked="{Binding Advanced.GoldInactivityEnabled}" Content="Enable Gold Inactivity" Height="20" Margin="5,0"/>
                 <Slider Template="{DynamicResource Slider}" IsEnabled="{Binding Advanced.GoldInactivityEnabled}"
-                	Interval="500" Maximum="600" Minimum="1" SmallChange="1" TickFrequency="10" TickPlacement="BottomRight"
+                	Interval="500" Maximum="600" Minimum="0" SmallChange="1" TickFrequency="10" TickPlacement="BottomRight"
                 	Value="{Binding Advanced.GoldInactivityTimer}" IsSnapToTickEnabled="True"
                 	ToolTip="Number of seconds after which if no gold is collected the game will restart" Margin="5,0,5,0"/>
             </UniformGrid>
@@ -114,6 +114,7 @@
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=UI}">Log UI Loading</CheckBox>
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=ScriptRule}">Log Script Rules System</CheckBox>
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogStuckLocation}" ToolTip="Create a separated file for stuck locations">Log stuck locations</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogDroppedItems}" ToolTip="Create a CSV file for all dropped items">Log dropped Items</CheckBox>
             </UniformGrid>
         </Grid>
         <!--Reset Button-->

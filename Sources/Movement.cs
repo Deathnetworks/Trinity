@@ -31,15 +31,14 @@ namespace GilesTrinity
                     if (PlayerStatus.ActorClass == ActorClass.Barbarian)
                         useTargetBasedZigZag = (Settings.Combat.Barbarian.TargetBasedZigZag);
 
-                    float minDistance = 2f;
-                    float maxDistance = 20f;
-                    int minTargets = 3;
+                    float maxDistance = 30f;
+                    int minTargets = 2;
 
                     if (useTargetBasedZigZag && !bAnyTreasureGoblinsPresent && GilesObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
                     {
                         IEnumerable<GilesObject> zigZagTargets =
                             from u in GilesObjectCache
-                            where u.Type == GObjectType.Unit && u.RadiusDistance > minDistance && u.RadiusDistance < maxDistance && u.RActorGuid != CurrentTarget.RActorGuid &&
+                            where u.Type == GObjectType.Unit && u.RadiusDistance < maxDistance &&
                             !hashAvoidanceObstacleCache.Any(a => Vector3.Distance(u.Position, a.Location) < GetAvoidanceRadius(a.ActorSNO) && PlayerStatus.CurrentHealthPct <= GetAvoidanceHealth(a.ActorSNO))
                             select u;
                         if (zigZagTargets.Count() >= minTargets)
@@ -277,221 +276,14 @@ namespace GilesTrinity
                 if (!shouldKite && PlayerStatus.ActorClass == ActorClass.Wizard && Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && PlayerStatus.PrimaryResource >= 25 &&
                     DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_WaveOfForce] &&
                     !PlayerStatus.IsIncapacitated && hashAvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(PlayerStatus.CurrentPosition) <= 15f) >= 2 &&
-                    (Settings.Combat.Wizard.CriticalMass || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
+                    (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, vNullLocation, CurrentWorldDynamicId, -1);
                 }
             }
-            // Only looking for an anti-stuck location?
-            // Now find a randomized safe point we can actually move to
-
-            // We randomize the order so we don't spam walk by accident back and forth
-            //Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
-            //int DirectionStartDegree = (rndNum.Next(36)) * 10;
-
-            //DirectionStartDegree = (int)(FindDirectionDegree(playerStatus.CurrentPosition, dangerPoint) - 180);
 
             float fHighestWeight = 0f;
             Vector3 vBestLocation = vNullLocation;
-
-            #region oldjunk
-            //// Start off checking every 12 degrees (which is 30 loops for a full circle)
-            //const int iMaxRadiusChecks = 30;
-
-            //// 
-            //const int iRadiusMultiplier = 12;
-
-            //// Multiply ring size by this
-            //const int KiteRingMultiplier = 3;
-
-            //for (int concentricRingStep = 0; concentricRingStep <= 11; concentricRingStep++)
-            //{
-            //    // Distance of 10 for each step loop at first
-            //    int concentricRingDistance = 10;
-
-            //    if (shouldKite)
-            //    {
-            //        /* 10+(6*1), 10+(6*2), 10+(6*n)... 
-            //         * Should be between 10 and 90-ish yards
-            //         */
-            //        concentricRingDistance = PlayerKiteDistance + (KiteRingMultiplier * concentricRingStep);
-
-            //    }
-            //    else
-            //    {
-            //        // Avoidance
-            //        switch (concentricRingStep)
-            //        {
-            //            case 1: concentricRingDistance = 10; break;
-            //            case 2: concentricRingDistance = 18; break;
-            //            case 3: concentricRingDistance = 26; break;
-            //            case 4: concentricRingDistance = 34; break;
-            //            case 5: concentricRingDistance = 42; break;
-            //            case 6: concentricRingDistance = 50; break;
-            //            case 7: concentricRingDistance = 58; break;
-            //            case 8: concentricRingDistance = 66; break;
-            //            default:
-            //                concentricRingDistance = concentricRingDistance + (concentricRingStep * 8);
-            //                break;
-            //        }
-            //    }
-
-            //    int iRandomUse = 3 + Math.Max(((concentricRingStep - 1) * 4), 1);
-
-            //    // Try to return "early", or as soon as possible, beyond step 4, except when unstucking, when the max steps is based on the unstuck attempt
-            //    if (fHighestWeight > 0 &&
-            //        ((!isStuck && concentricRingStep > 5) || (isStuck && concentricRingStep > stuckAttempts))
-            //        )
-            //    {
-            //        lastFoundSafeSpot = DateTime.Now;
-            //        vlastSafeSpot = vBestLocation;
-            //        break;
-            //    }
-            //    // Loop through all possible radii
-            //    for (int iThisRadius = 0; iThisRadius < iMaxRadiusChecks; iThisRadius++)
-            //    {
-            //        int iPosition = DirectionStartDegree + (iThisRadius * iRadiusMultiplier);
-
-            //        if (iPosition >= 360)
-            //            iPosition -= 360;
-
-            //        float fBonusAmount = 0f;
-            //        // See if we've blacklisted a 70 degree arc around this direction
-            //        if (bAvoidDirectionBlacklisting)
-            //        {
-            //            if (Math.Abs(fAvoidBlacklistDirection - iPosition) <= 35 || Math.Abs(fAvoidBlacklistDirection - iPosition) >= 325)
-            //                continue;
-            //            if (Math.Abs(fAvoidBlacklistDirection - iPosition) >= 145 || Math.Abs(fAvoidBlacklistDirection - iPosition) <= 215)
-            //                fBonusAmount = 200f;
-            //        }
-            //        Vector3 vTestPoint = MathEx.GetPointAt(playerStatus.CurrentPosition, concentricRingDistance, MathEx.ToRadians(iPosition));
-            //        // First check no avoidance obstacles in this spot
-            //        if (!hashAvoidanceObstacleCache.Any(u => u.Location.Distance(vTestPoint) <= GetAvoidanceRadius(u.ActorSNO)))
-            //        {
-            //            bool bAvoidBlackspot = hashAvoidanceBlackspot.Any(cp => Vector3.Distance(cp.Location, vTestPoint) <= cp.Radius);
-            //            bool bCanRaycast = false;
-
-            //            // Now see if the client can navigate there, and we haven't temporarily blacklisted this spot
-            //            //if (!bAvoidBlackspot)
-            //            //{
-            //            //    bCanRaycast = GilesCanRayCast(playerStatus.vCurrentPosition, vTestPoint);
-            //            //}
-
-            //            if (!bAvoidBlackspot)
-            //            {
-            //                bCanRaycast = gp.CanStandAt(gp.WorldToGrid(vTestPoint.ToVector2()));
-            //            }
-            //            if (!bAvoidBlackspot && bCanRaycast)
-            //            {
-            //                // Now calculate a weight to pick the "best" avoidance safety spot at the moment
-            //                float pointWeight = 1000f + fBonusAmount;
-            //                if (!isStuck)
-            //                {
-            //                    pointWeight -= ((concentricRingStep - 1) * 150);
-            //                }
-            //                // is it near a point we'd prefer to be close to?
-            //                if (dangerPoint != vNullLocation)
-            //                {
-            //                    float fDistanceToNearby = Vector3.Distance(vTestPoint, dangerPoint);
-            //                    if (fDistanceToNearby <= 25f)
-            //                    {
-            //                        if (!shouldKite)
-            //                            pointWeight += (160 * (1 - (fDistanceToNearby / 25)));
-            //                        else
-            //                            pointWeight -= (300 * (1 - (fDistanceToNearby / 25)));
-            //                    }
-            //                }
-            //                // Give extra weight to areas we've been inside before
-            //                bool bExtraSafetyWeight = hashSkipAheadAreaCache.Any(cp => cp.Location.Distance(vTestPoint) <= cp.Radius);
-            //                if (bExtraSafetyWeight)
-            //                {
-            //                    if (shouldKite)
-            //                    {
-            //                        pointWeight += 350f;
-            //                    }
-            //                    else if (isStuck)
-            //                    {
-            //                        pointWeight += 300f;
-            //                    }
-            //                    else
-            //                    {
-            //                        pointWeight += 100f;
-            //                    }
-            //                }
-            //                // See if we should check for avoidance spots and monsters in the pathing
-            //                if (!isStuck)
-            //                {
-            //                    Vector3 point = vTestPoint;
-            //                    int iMonsterCount = hashMonsterObstacleCache.Count(cp => GilesIntersectsPath(cp.Location, cp.Radius, playerStatus.CurrentPosition, point));
-            //                    pointWeight -= (iMonsterCount * 30);
-            //                    foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => GilesIntersectsPath(cp.Location, cp.Radius * 2f, playerStatus.CurrentPosition, point)))
-            //                    {
-            //                        // We don't want to kite through avoidance... 
-            //                        if (shouldKite)
-            //                            pointWeight = 0;
-            //                        else
-            //                            pointWeight -= (float)(tempobstacle.Weight * 0.6);
-            //                    }
-            //                    foreach (GilesObstacle tempobstacle in hashMonsterObstacleCache.Where(cp => GilesIntersectsPath(cp.Location, cp.Radius * 2f, playerStatus.CurrentPosition, point)))
-            //                    {
-            //                        // We don't want to kite through monsters... 
-            //                        if (shouldKite)
-            //                            pointWeight = 0;
-            //                        else
-            //                            pointWeight -= (float)(tempobstacle.Weight * 0.6);
-            //                    }
-            //                    if (shouldKite)
-            //                    {
-            //                        foreach (GilesObstacle tempobstacle in hashNavigationObstacleCache.Where(cp => GilesIntersectsPath(cp.Location, cp.Radius * 2f, playerStatus.CurrentPosition, point)))
-            //                        {
-            //                            // We don't want to kite through obstacles...
-            //                            pointWeight = 0;
-            //                        }
-            //                    }
-            //                    foreach (GilesObstacle tempobstacle in hashMonsterObstacleCache)
-            //                    {
-            //                        float fDistFromMonster = tempobstacle.Location.Distance(dangerPoint);
-            //                        float fDistFromMe = vTestPoint.Distance(dangerPoint);
-            //                        if (fDistFromMonster < fDistFromMe)
-            //                        {
-            //                            // if the vTestPoint is closer to any monster than it is to me, give it less weight
-            //                            //fThisWeight -= fDistFromMe * 15;
-            //                            pointWeight = 0;
-            //                        }
-            //                        else
-            //                        {
-            //                            // otherwise, give it more weight, the further it is from the monster
-            //                            pointWeight += fDistFromMe * 15;
-            //                        }
-            //                    }
-            //                }
-            //                if (shouldKite)
-            //                {
-            //                    // Kiting spots don't like to end up near other monsters
-            //                    foreach (GilesObstacle tempobstacle in hashMonsterObstacleCache.Where(cp => Vector3.Distance(cp.Location, vTestPoint) <= (cp.Radius + PlayerKiteDistance)))
-            //                    {
-            //                        pointWeight = 0;
-            //                    }
-            //                }
-            //                if (pointWeight <= 1)
-            //                    pointWeight = 1;
-            //                // Use this one if it's more weight, or we haven't even found one yet, or if same weight as another with a random chance
-            //                //if (fThisWeight > fHighestWeight || fHighestWeight == 0f || (fThisWeight == fHighestWeight && rndNum.Next(iRandomUse) == 1))                            
-            //                if (pointWeight > fHighestWeight || fHighestWeight == 0f)
-            //                {
-            //                    fHighestWeight = pointWeight;
-            //                    vBestLocation = vTestPoint;
-            //                    // Found a very good spot so just use this one!
-            //                    //if (iAOECount == 0 && fThisWeight > 400)
-            //                    //    break;
-            //                }
-            //            }
-            //        }
-            //    }
-            //    // Loop through the circle
-            //}
-            #endregion
-
 
             if (monsterList == null)
                 monsterList = new List<GilesObject>();
@@ -665,64 +457,6 @@ namespace GilesTrinity
                         }
 
                         int nearbyMonsters = (monsterList != null ? monsterList.Count() : 0);
-
-                        /*
-                         * This little bit is insanely CPU intensive and causes lots of small game freezes.
-                         */
-                        //if (Settings.Combat.Misc.UseNavMeshTargeting && !hasEmergencyTeleportUp && nearbyMonsters > 3 && gridPoint.Distance <= 75)
-                        //{
-                        //    if (p_xy == Point.Empty)
-                        //        p_xy = gp.WorldToGrid(xy);
-
-                        //    PathFindResult pfr = pf.FindPath(gp.WorldToGrid(origin.ToVector2()), p_xy, true, 50, true);
-
-                        //    bool pathFailure = false;
-                        //    Point lastNode = gp.WorldToGrid(origin.ToVector2());
-
-                        //    if (pfr.IsPartialPath)
-                        //    {
-                        //        pathFailures++;
-                        //        continue;
-                        //    }
-                        //    // analyze pathing to a safe point
-                        //    foreach (Point node in pfr.PointsReversed)
-                        //    {
-                        //        Vector2 node_xy = gp.GridToWorld(node);
-                        //        Vector3 node_xyz = new Vector3(node_xy.X, node_xy.Y, gp.GetHeight(node_xy));
-
-                        //        // never skip first-step nodes
-                        //        if (node_xyz.Distance(origin) < 10)
-                        //        {
-                        //            continue;
-                        //        }
-
-                        //        // ignore any path points where monsters are standing in it
-                        //        if (hashMonsterObstacleCache.Any(m => m.Location.Distance(node_xyz) <= m.Radius))
-                        //        {
-                        //            pathFailure = true;
-                        //            break;
-                        //        }
-                        //        // Any monsters blocking previous and this node
-                        //        foreach (GilesObstacle monster in hashMonsterObstacleCache.Where(m =>
-                        //            MathEx.IntersectsPath(
-                        //                new Vector3(m.Location.X, m.Location.Y, 0),
-                        //                m.Radius,
-                        //                new Vector3(lastNode.X, lastNode.Y, 0),
-                        //                new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
-                        //            ))
-                        //        {
-                        //            pathFailure = true;
-                        //            break;
-                        //        }
-                        //    }
-
-                        //    if (pathFailure)
-                        //    {
-                        //        pathFailures++;
-                        //        continue;
-                        //    }
-                        //}
-
                     }
 
                     if (isStuck && UsedStuckSpots.Any(p => Vector3.Distance(p.Position, gridPoint.Position) <= gridSquareRadius))
@@ -859,25 +593,6 @@ namespace GilesTrinity
         public static bool GilesIntersectsPath(Vector3 obstacle, float radius, Vector3 start, Vector3 destination)
         {
             return MathEx.IntersectsPath(obstacle, radius, start, destination);
-
-            //// should fix height differences (basically makes this a 2D check)
-            //start.Z = obstacle.Z;
-            //destination.Z = obstacle.Z;
-
-            //double dAngle = GetRelativeAngularVariance(start, obstacle, destination);
-            ////if (dAngle > 30)
-            ////{
-            ////    return false;
-            ////}
-            ////if (radius <= 1f) radius = 1f;
-            ////if (radius >= 15f) radius = 15f;
-
-            //Ray ray = new Ray(start, Vector3.NormalizedDirection(start, destination));
-
-            //Sphere sphere = new Sphere(obstacle, radius);
-            //float? nullable = ray.Intersects(sphere);
-            //bool result = (nullable.HasValue && (nullable.Value < start.Distance(destination)));
-            //return result;
         }
         public static double Normalize180(double angleA, double angleB)
         {

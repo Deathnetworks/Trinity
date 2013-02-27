@@ -13,12 +13,15 @@ using Zeta.Pathfinding;
 using GilesTrinity.Cache;
 using Zeta.Internals;
 using GilesTrinity.DbProvider;
+using System.Diagnostics;
 
 namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
         internal static int lastSceneId = -1;
+
+        internal static Stopwatch HotbarRefreshTimer = new Stopwatch();
 
         /// <summary>
         /// Find fresh targets, start main BehaviorTree if needed, cast any buffs needed etc.
@@ -27,9 +30,9 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool CheckHasTarget(object ret)
         {
-            using (new PerformanceLogger("GilesTrinity.GilesGlobalOverlord"))
+            using (new PerformanceLogger("Trinity.CheckHasTarget"))
             {
-                using (new PerformanceLogger("GilesGlobalOverlord.Validation"))
+                using (new PerformanceLogger("CheckHasTarget.Validation"))
                 {
 
                     // If we aren't in the game or a world is loading, don't do anything yet
@@ -51,12 +54,12 @@ namespace GilesTrinity
                     }
 
                 }
-                using (new PerformanceLogger("GilesGlobalOverlord.RefreshHotBar"))
+                using (new PerformanceLogger("CheckHasTarget.RefreshHotBar"))
                 {
+                    if (!HotbarRefreshTimer.IsRunning)
+                        HotbarRefreshTimer.Start();
 
-                    // Store all of the player's abilities every now and then, to keep it cached and handy, also check for critical-mass timer changes etc.
-                    iCombatLoops++;
-                    if (!HasMappedPlayerAbilities || iCombatLoops >= 5 || bRefreshHotbarAbilities)
+                    if (!HasMappedPlayerAbilities || HotbarRefreshTimer.ElapsedMilliseconds > 10000 || bRefreshHotbarAbilities)
                     {
                         // Update the cached player's cache
                         ActorClass tempClass = ActorClass.Invalid;
@@ -69,10 +72,11 @@ namespace GilesTrinity
                             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.GlobalHandler, "Safely handled exception trying to get character class.");
                         }
 
-                        iCombatLoops = 0;
                         RefreshHotbar();
+                        HotbarRefreshTimer.Restart();
+
                         dictAbilityRepeatDelay = new Dictionary<SNOPower, int>(dictAbilityRepeatDefaults);
-                        if (Settings.Combat.Wizard.CriticalMass && PlayerStatus.ActorClass == ActorClass.Wizard)
+                        if (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) && PlayerStatus.ActorClass == ActorClass.Wizard)
                         {
                             dictAbilityRepeatDelay[SNOPower.Wizard_FrostNova] = 25;
                             dictAbilityRepeatDelay[SNOPower.Wizard_ExplosiveBlast] = 25;
@@ -146,7 +150,7 @@ namespace GilesTrinity
                 }
                 // Clear target current and reset key variables used during the target-handling function
 
-                using (new PerformanceLogger("GilesGlobalOverlord.ClearBlacklist"))
+                using (new PerformanceLogger("CheckHasTarget.ClearBlacklist"))
                 {
                     //CurrentTarget = null;
                     bDontMoveMeIAmDoingShit = false;
@@ -161,7 +165,7 @@ namespace GilesTrinity
 
                     ClearBlacklists();
                 }
-                using (new PerformanceLogger("GilesGlobalOverlord.RefreshCache"))
+                using (new PerformanceLogger("CheckHasTarget.RefreshCache"))
                 {
                     // Refresh Cache if needed
                     bool CacheWasRefreshed = RefreshDiaObjectCache();
@@ -178,7 +182,7 @@ namespace GilesTrinity
 
                 //Monk_MaintainTempestRush();
 
-                using (new PerformanceLogger("GilesGlobalOverlord.UsePotion"))
+                using (new PerformanceLogger("CheckHasTarget.UsePotion"))
                 {
 
                     // Pop a potion when necessary
@@ -211,7 +215,7 @@ namespace GilesTrinity
                 {
                     lastMaintenanceCheck = DateTime.Now;
 
-                    using (new PerformanceLogger("GilesGlobalOverlord.Maintenence"))
+                    using (new PerformanceLogger("CheckHasTarget.Maintenence"))
                     {
 
                         lastChangedZigZag = DateTime.Today;

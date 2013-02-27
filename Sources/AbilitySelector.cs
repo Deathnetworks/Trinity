@@ -65,7 +65,7 @@ namespace GilesTrinity
         /// <returns>
         /// Returns whether or not we can use a skill, or if it's on our own internal Trinity cooldown timer
         /// </returns>
-        internal static bool GilesUseTimer(SNOPower power, bool recheck = false)
+        public static bool GilesUseTimer(SNOPower power, bool recheck = false)
         {
             if (DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds >= dictAbilityRepeatDelay[power])
                 return true;
@@ -249,8 +249,8 @@ namespace GilesTrinity
             switch (rhItem.ItemType)
             {
                 default:
-                    if (rhItem.IsTwoHand)
-                        return SNOPower.Weapon_Melee_Instant_BothHand;
+                    //if (rhItem.IsTwoHand)
+                    //    return SNOPower.Weapon_Melee_Instant_BothHand;
                     return SNOPower.Weapon_Melee_Instant;
                 case ItemType.Axe:
                 case ItemType.CeremonialDagger:
@@ -262,8 +262,8 @@ namespace GilesTrinity
                 case ItemType.Spear:
                 case ItemType.Staff:
                 case ItemType.Sword:
-                    if (rhItem.IsTwoHand)
-                        return SNOPower.Weapon_Melee_Instant_BothHand;
+                    //if (rhItem.IsTwoHand)
+                    //    return SNOPower.Weapon_Melee_Instant_BothHand;
                    return SNOPower.Weapon_Melee_Instant;
                 case ItemType.Wand:
                     return SNOPower.Weapon_Ranged_Wand;
@@ -287,7 +287,13 @@ namespace GilesTrinity
             }
         }
 
-
+        private static double TimeSinceUse(SNOPower power)
+        {
+            if (dictAbilityLastUse.ContainsKey(power))
+                return DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds;
+            else
+                return -1;
+        }
 
 
     }

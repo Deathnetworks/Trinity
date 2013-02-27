@@ -34,17 +34,21 @@ namespace GilesTrinity
 
         public override bool EvaluateItem(ACDItem item, ItemEvaluationType evaluationType)
         {
-
-            switch (evaluationType)
+            if (GilesTrinity.Settings.Loot.ItemFilterMode != global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
             {
-                case ItemEvaluationType.Keep:
-                    return ShouldStashItem(item);
-                case ItemEvaluationType.PickUp:
-                    return ShouldPickUpItem(item);
-                case ItemEvaluationType.Salvage:
-                    return ShouldSalvageItem(item);
-                case ItemEvaluationType.Sell:
-                    return ShouldSellItem(item);
+                LootRuleItemManager.Current.EvaluateItem(item, evaluationType);
+            }
+            else
+            {
+                switch (evaluationType)
+                {
+                    case ItemEvaluationType.Keep:
+                        return ShouldStashItem(item);
+                    case ItemEvaluationType.Salvage:
+                        return ShouldSalvageItem(item);
+                    case ItemEvaluationType.Sell:
+                        return ShouldSellItem(item);
+                }
             }
             return false;
         }

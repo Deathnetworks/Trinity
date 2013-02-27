@@ -110,7 +110,7 @@ namespace GilesTrinity.ItemRules
         }
 
         /// <summary>
-        /// 
+        /// Loads (or re-loads) the ItemRules configuration from settings and .dis entries
         /// </summary>
         public void readConfiguration()
         {

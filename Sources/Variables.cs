@@ -195,8 +195,8 @@ namespace GilesTrinity
 
         // A count for player mystic ally, gargantuans, and zombie dogs
         private static int iPlayerOwnedMysticAlly = 0;
-        private static int iPlayerOwnedGargantuan = 0;
-        private static int iPlayerOwnedZombieDog = 0;
+        public static int iPlayerOwnedGargantuan = 0;
+        public static int iPlayerOwnedZombieDog = 0;
         private static int iPlayerOwnedDHPets = 0;
 
         // These are a bunch of safety counters for how many times in a row we register having *NO* ability to select when we need one (eg all off cooldown)
@@ -253,11 +253,6 @@ namespace GilesTrinity
         /// Store the date-time when we *FIRST* picked this target, so we can blacklist after X period of time targeting
         /// </summary>
         private static DateTime dateSincePickedTarget = DateTime.Today;
-
-        /// <summary>
-        /// Total main loops so we can update things every XX (20/50/100) loops (hot bar abilities, backpack, etc)
-        /// </summary>
-        private static int iCombatLoops = 0;
 
         // These values below are set on a per-class basis later on, so don't bother changing them here! These are the old default values
         private static double PlayerEmergencyHealthPotionLimit = 0.46;
@@ -500,12 +495,14 @@ namespace GilesTrinity
         /// <summary>
         /// Percent of total health remaining on unit
         /// </summary>
+        private static double c_HitPointsPct = 0d;
         private static double c_HitPoints = 0d;
         private static float c_CentreDistance = 0f;
         private static float c_RadiusDistance = 0f;
         private static float c_Radius = 0f;
         private static float c_ZDiff = 0f;
         private static string c_Name = "";
+        private static int c_GameBalanceID = 0;
         private static string c_InternalName = "";
         private static string c_IgnoreReason = "";
         private static string c_IgnoreSubStep = "";
@@ -628,7 +625,7 @@ namespace GilesTrinity
         private static bool CanCastArchon = false;
 
         // Darkfriend's Looting Rule
-        public static Interpreter StashRule = new Interpreter();
+        public static Interpreter StashRule = null; // = new Interpreter();
 
         // Tesslerc - used for using combination strike
         // ForesightFirstHit is used to track the 30 second buff from deadly reach.

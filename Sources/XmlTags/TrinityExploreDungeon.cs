@@ -224,6 +224,12 @@ namespace GilesTrinity.XmlTags
         public int TimeoutValue { get; set; }
 
         /// <summary>
+        /// If we want to use a townportal before ending the tag when a timeout happens
+        /// </summary>
+        [XmlAttribute("townPortalOnTimeout")]
+        public bool TownPortalOnTimeout { get; set; }
+
+        /// <summary>
         /// The Position of the CurrentNode NavigableCenter
         /// </summary>
         private Vector3 CurrentNavTarget
@@ -319,6 +325,7 @@ namespace GilesTrinity.XmlTags
                     MiniMapMarker.DetectMiniMapMarkers(ExitNameHash)
                 ),
                 UpdateSearchGridProvider(),
+                new Action(ret => CheckResetDungeonExplorer()),
                 new PrioritySelector(
                     CheckIsObjectiveFinished(),
                     PrioritySceneCheck(),
@@ -371,6 +378,21 @@ namespace GilesTrinity.XmlTags
         {
             return
             new PrioritySelector(
+                new Decorator(ret => timeoutBreached,
+                    new Sequence(
+                        new DecoratorContinue(ret => TownPortalOnTimeout && !ZetaDia.Me.IsInTown,
+                            new Sequence(
+                                new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, 
+                                    "TrinityExploreDungeon inactivity timer tripped ({0}), tag Using Town Portal!", TimeoutValue)),
+                                Zeta.CommonBot.CommonBehaviors.CreateUseTownPortal(),
+                                new Action(ret => isDone = true)
+                            )
+                        ),
+                        new DecoratorContinue(ret => !TownPortalOnTimeout,
+                            new Action(ret => isDone = true)
+                        )
+                    )
+                ),
                 new Decorator(ret => ExploreTimeoutType == TimeoutType.Timer,
                     new Action(ret => CheckSetTimer(ret))
                 ),
@@ -380,6 +402,7 @@ namespace GilesTrinity.XmlTags
             );
         }
 
+        bool timeoutBreached = false;
         Stopwatch TagTimer = new Stopwatch();
         /// <summary>
         /// Will start the timer if needed, and end the tag if the timer has exceeded the TimeoutValue
@@ -396,7 +419,7 @@ namespace GilesTrinity.XmlTags
             if (ExploreTimeoutType == TimeoutType.Timer && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityExploreDungeon timer ended ({0}), tag finished!", TimeoutValue);
-                isDone = true;
+                timeoutBreached = true;
                 return RunStatus.Success;
             }
             return RunStatus.Failure;
@@ -424,7 +447,7 @@ namespace GilesTrinity.XmlTags
             else if (lastCoinage == ZetaDia.Me.Inventory.Coinage && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityExploreDungeon gold inactivity timer tripped ({0}), tag finished!", TimeoutValue);
-                isDone = true;
+                timeoutBreached = true;
                 return RunStatus.Success;
             }
 
@@ -520,6 +543,12 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found SceneName {0}!", SceneName)),
                         new Action(ret => isDone = true)
                     )
+                ),
+                new Decorator(ret => ZetaDia.Me.IsInTown,
+                    new Sequence(
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Cannot use TrinityExploreDungeon in town - tag finished!", SceneName)),
+                        new Action(ret => isDone = true)
+                    )
                 )
             );
         }
@@ -596,7 +625,7 @@ namespace GilesTrinity.XmlTags
 
             MoveResult moveResult = PlayerMover.NavigateTo(PrioritySceneTarget);
 
-            if (moveResult == MoveResult.PathGenerationFailed)
+            if (moveResult == MoveResult.PathGenerationFailed || moveResult == MoveResult.ReachedDestination)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Unable to navigate to Scene {0} - {1} Center {2} Distance {3:0}, cancelling!",
                     CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
@@ -792,6 +821,13 @@ namespace GilesTrinity.XmlTags
         {
             return
             new PrioritySelector(
+                new Decorator(ret => LastMoveResult == MoveResult.ReachedDestination,
+                    new Sequence(
+                        new Action(ret => SetNodeVisited("Reached Destination")),
+                        new Action(ret => LastMoveResult = MoveResult.Moved),
+                        new Action(ret => UpdateRoute())
+                    )
+                ),
                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0 || !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Error - CheckIsNodeFinished() called while Route is empty!")),
@@ -990,7 +1026,7 @@ namespace GilesTrinity.XmlTags
                 return 0;
         }
 
-
+        private MoveResult LastMoveResult = MoveResult.Moved;
         private DateTime lastGeneratedPath = DateTime.MinValue;
         /// <summary>
         /// Moves the bot to the next DungeonExplorer node
@@ -1015,7 +1051,7 @@ namespace GilesTrinity.XmlTags
                 }
             }
 
-            Navigator.MoveTo(CurrentNavTarget);
+            LastMoveResult = Navigator.MoveTo(CurrentNavTarget);
         }
         /// <summary>
         /// Initizializes the profile tag and sets defaults as needed

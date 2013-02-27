@@ -1,4 +1,144 @@
-﻿#Unified Trinity Community Edition
+﻿Unified Trinity Community Edition
+
+### Changelog 1.7.2.5:
+
+* Removed A3 Skycrown signal fires from navigation obstacle list... was causing stucks!
+
+* Re-enabled DB closing on D3 crash.
+
+* Fixed a townrun bug & missing legendary loot. Bot will not properly stand around and wait for a target while townrun timer is running.
+
+* Added TempestRush on Trash only option.
+
+* Small fix for Treasure Goblins behind doors and Keeps 2 Destructible (Barricade) doors
+
+* Gold Inactivity timer should no longer crash D3/DB
+
+* GilesTrinity.xml will now be saved in with indentation (for easier human consumption)
+
+* Added some additional safety checks for not picking legendary items
+
+* Added a LineOfSight check for BodyBlocking for Items/Shrines/Gold/Containers - should help the mysterious "zomg didn't pickup my legendary!" and missing random shrines etc
+
+### Changelog 1.7.2.4:
+
+* Now picks up craft tomes regardless of misc item level selection if we've chosen to pickup craft tomes
+
+* Hard rules will now always keep Archon plans and Marquise designs - feel free to edit :)
+
+* Should be better about checking for nearby monsters while trying to Town Portal
+
+* Added a few missing entries to translation.dis
+
+* Fixed TrinityExploreDungeon using townportal on timeout and not finishing tag. Also added extra node-done check for ReachedDestination (since we're using DB navigator now)
+
+* Fixed molten core avoidance (i hope!)
+
+* Wizard Teleport, Twister, and WitchDoctor Acid Rain are now better at finding cluster targets
+
+* Some additions and fixes/tweaks to TargetUtil GetBestClusterPoint
+
+* Once again attacks and kills Ghom (his boss SNO was missing... weird)
+
+* Small adjustment to IsAttackable detection - should be faster and more reliable as well
+
+* Small adjustment to TrashMob Cluster detection - changed movement speed update to every Movement request/tick and reduced minimum movement speed to ignore trash mobs, and reduced minimum range for trash mob to be ignored to 2f RadiusDistance
+
+* Added townPortalOnTimeout="True/False" to TrinityExploreDungeon (for tinnvec :))
+
+### Known issues 1.7.2.3/4:
+
+* WD Gargantuan is still spammed
+
+* Gold Inactivity Timer will currently crash D3 - this is believed to be a Demonbuddy related problem (Nesox has confirmed a fix in the next version). No workaround currently available.
+
+* Disconnects still being investigated.
+
+* More analysis to be done on CPU utilization (but this version is at least better)
+
+### Changelog 1.7.2.3:
+
+* Added options to set minimum trash mob pack size and trash mob pack radius (default = 1, 20f)
+
+* Set Demonbuddy to not close when game client crashes (should help with crash reports, except when using YAR)
+
+* Made a bunch of optimizations that should help reduce CPU utilization
+
+* Added more fine-grained pickup options for Designs/Plans, Essences, etc
+
+* Monk SW buff logic is no longer "ticked" when merely running past a monster
+
+* Unstucker is slightly less sensitive (now requires stuck for 5 seconds instead of 3). 
+
+* Unstucker no longer kicks-in on Town Runs.
+
+* Added additional logging mechanism to log ALL dropped items (and whether or not we wanted to pick it up) with a bunch of useful info for Devs
+
+* Fixed Player Summons counters (e.g. Zombie dogs/Gargantuan) not counting correctly - still needs more stuff to work in PVP/Multiplayer games
+
+* Gold Inactivity timer will no longer keep trying to leave the game if bot stop button is pressed
+
+* Will now pickup Grey and White Items if player level is less than 6 and 11 (respectively)
+
+* Added GUI options to pickup/ignore Crafting Materials (Demonic Essences)
+
+* Removed 'Ignore solitary trash mob (40f)' option
+
+* Added psuedo clustering logic into TargetUtil - could be useful for all "AoE" type of powers!
+
+* Wizard: CM/WW Wiz's will now move into melee range before casting energy twister (like Trinity 1.6)
+
+* Wizard Energy Twister will now try to use the best 'cluster' to drop tornadoes
+
+* CM/WW Wizards may now teleport into the best nearby cluster location
+
+* TrinityExploreDungeon will be better about checking for Grid Segmentation resets
+
+* Removed a bunch of unused legacy code 
+
+### Changelog 1.7.2.2:
+
+* Fix for stucks investigating MiniMapMarkers (also helps with until=ExitFound on TrinityExplore.. )  
+
+* Wizard Archon Cancel for MagicWeapon and Familiar now works correctly  
+
+* Changed Default Trinity pickup settings to "Champion Hunting" (was Questing... legacy from my Questing pack)  
+
+* Fixed Demonbuddy Crashing on first item drop when trying to use Demonbuddy Loot rules  
+
+* Updated all Weighting formulas for consistency - removed magic number/formula weights, max distance and max weight are clear now. Shrines work again  
+
+* Doubled minimum elite kill radius (from 60 to 120)  
+
+* Wizard Critical Mass passive now automatically detected, updated all skills to use passive detection  
+
+* Wizard Frost Nova now detects Deep Freeze rune.  
+
+* Wizard Frost Nova is now properly spammed when paired with Critical Mass regardless of rune  
+
+* Wizard Blizzard now detects Snowbound Rune  
+
+* Wizard Energy Twister + Wicked Wind rune works better  
+
+* Wizard Teleport Wormhole rune works now  
+
+* Fixed default attacks for 2Handed weapons (e.g. for Wiz CM/WW with a 2H)  
+
+* Removed maximum range for shrines (still weighted based on range)  
+
+* Tweaked Barbarian Multi-Target Whirlwind ZigZag a little bit (added range and reduce minimum mob count)  
+
+* Tweaked Monk Tempest Rush check a little bit, improved debug logging  
+
+* Added tesslerc's Monk Dashing Strike tweaks
+
+### Changelog 1.7.2.1:
+
+* Requires DemonbuddyBETA .172+ or Demonbuddy release .300+
+
+* Picks up demonic essances with both Trinity scoring and ItemRules 
+
+* Fixes for TrinityOffsetMove and MiniMapMarker investigation attempting to move to un-navigable locations
 
 ### Changelog 1.7.2.0:
 

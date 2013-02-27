@@ -111,16 +111,35 @@ namespace GilesTrinity
                     break;
                 case GItemBaseType.Misc:
 
-                    // Note; Infernal keys are misc, so should be picked up here - we aren't filtering them out, so should default to true at the end of this function
-                    if (itemType == GItemType.CraftingMaterial && item.Level < Settings.Loot.Pickup.MiscItemLevel)
+                    if (itemType == GItemType.CraftingMaterial && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.CraftMaterials))
                     {
                         return false;
                     }
-                    if (itemType == GItemType.CraftTome && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.CraftTomes))
+
+                    if (itemType == GItemType.CraftTome && !Settings.Loot.Pickup.CraftTomes)
                     {
                         return false;
                     }
-                    if (itemType == GItemType.CraftingPlan && !Settings.Loot.Pickup.DesignPlan)
+
+                    // Plans
+                    if (item.InternalName.ToLower().StartsWith("craftingplan_smith") && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.Plans))
+                    {
+                        return false;
+                    }
+
+                    // Designs
+                    if (item.InternalName.ToLower().StartsWith("craftingplan_jeweler") && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.Designs))
+                    {
+                        return false;
+                    }
+
+                    // Always pickup Legendary plans
+                    if (itemType == GItemType.CraftingPlan && item.Quality >= ItemQuality.Legendary && Settings.Loot.Pickup.LegendaryPlans)
+                    {
+                        return true;
+                    }
+
+                    if (itemType == GItemType.InfernalKey && !Settings.Loot.Pickup.InfernalKeys)
                     {
                         return false;
                     }
@@ -174,9 +193,15 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool CheckLevelRequirements(int level, ItemQuality quality, int requiredBlueLevel, int requiredYellowLevel)
         {
-            if (quality < ItemQuality.Magic1)
+            if (quality < ItemQuality.Normal && ZetaDia.Me.Level > 5)
             {
-                // White item, blacklist
+                // Grey item, ignore if we're over level 5
+                return false;
+            }
+
+            if (quality < ItemQuality.Magic1 && ZetaDia.Me.Level > 10)
+            {
+                // White item, ignore if we're over level 10
                 return false;
             }
             if (quality >= ItemQuality.Magic1 && quality < ItemQuality.Rare4)
@@ -256,6 +281,7 @@ namespace GilesTrinity
             if (name.StartsWith("followeritem_scoundrel_") || dbFollowerType == FollowerType.Scoundrel) return GItemType.FollowerScoundrel;
             if (name.StartsWith("followeritem_templar_") || dbFollowerType == FollowerType.Templar) return GItemType.FollowerTemplar;
             if (name.StartsWith("craftingplan_")) return GItemType.CraftingPlan;
+            if (name.StartsWith("craftingmaterials_")) return GItemType.CraftingMaterial;
             if (name.StartsWith("dye_")) return GItemType.Dye;
             if (name.StartsWith("a1_")) return GItemType.SpecialItem;
             if (name.StartsWith("healthglobe")) return GItemType.HealthGlobe;
@@ -383,42 +409,6 @@ namespace GilesTrinity
             }
             return thisGilesBaseType;
         }
-
-        /// <summary>
-        /// DetermineIsStackable - Calculates what items can be stacked up
-        /// </summary>
-        /// <param name="itemType"></param>
-        /// <returns></returns>
-        //internal static bool DetermineIsStackable(GItemType itemType)
-        //{
-
-
-        //    return itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome || itemType == GItemType.Ruby ||
-        //           itemType == GItemType.Emerald || itemType == GItemType.Topaz || itemType == GItemType.Amethyst ||
-        //           itemType == GItemType.HealthPotion || itemType == GItemType.CraftingPlan || itemType == GItemType.Dye ||
-        //           itemType == GItemType.InfernalKey;
-        //}
-
-        /// <summary>
-        /// DetermineIsTwoSlot - Tries to calculate what items take up 2 slots or 1
-        /// </summary>
-        /// <param name="itemType"></param>
-        /// <returns></returns>
-        //internal static bool DetermineIsTwoSlot(GItemType itemType)
-        //{
-        //    return (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
-        //            itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
-        //            itemType == GItemType.Spear || itemType == GItemType.Sword || itemType == GItemType.Wand ||
-        //            itemType == GItemType.TwoHandDaibo || itemType == GItemType.TwoHandCrossbow || itemType == GItemType.TwoHandMace ||
-        //            itemType == GItemType.TwoHandMighty || itemType == GItemType.TwoHandPolearm || itemType == GItemType.TwoHandStaff ||
-        //            itemType == GItemType.TwoHandSword || itemType == GItemType.TwoHandAxe || itemType == GItemType.HandCrossbow ||
-        //            itemType == GItemType.TwoHandBow || itemType == GItemType.Mojo || itemType == GItemType.Orb ||
-        //            itemType == GItemType.Quiver || itemType == GItemType.Shield || itemType == GItemType.Boots ||
-        //            itemType == GItemType.Bracer || itemType == GItemType.Chest || itemType == GItemType.Cloak ||
-        //            itemType == GItemType.Gloves || itemType == GItemType.Helm || itemType == GItemType.Legs ||
-        //            itemType == GItemType.Shoulder || itemType == GItemType.SpiritStone ||
-        //            itemType == GItemType.VoodooMask || itemType == GItemType.WizardHat || itemType == GItemType.StaffOfHerding);
-        //}
 
         /// <summary>
         /// Search backpack to see if we have room for a 2-slot item anywhere

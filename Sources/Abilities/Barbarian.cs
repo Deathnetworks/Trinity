@@ -61,11 +61,11 @@ namespace GilesTrinity
                 // Make sure we are allowed to use wrath on goblins, else make sure this isn't a goblin
                 (Settings.Combat.Barbarian.UseWOTBGoblin || !CurrentTarget.IsTreasureGoblin || ElitesWithinRange[RANGE_15] >= 1) &&
                 // If on a boss, only when injured
-                ((CurrentTarget.IsBoss && CurrentTarget.HitPoints <= 0.99 && !Hotbar.Contains(SNOPower.Barbarian_Whirlwind)) ||
+                ((CurrentTarget.IsBoss && CurrentTarget.HitPointsPct <= 0.99 && !Hotbar.Contains(SNOPower.Barbarian_Whirlwind)) ||
                 // If *NOT* on a boss, and definitely no boss in range, then judge based on any elites at all within 30 feet
                  ((!CurrentTarget.IsBoss || Hotbar.Contains(SNOPower.Barbarian_Whirlwind)) &&
                    (!bAnyBossesInRange || Hotbar.Contains(SNOPower.Barbarian_Whirlwind)) &&
-                   ((ElitesWithinRange[RANGE_20] >= 1 || CurrentTarget.IsEliteRareUnique) && (CurrentTarget.HitPoints >= 0.30 || PlayerStatus.CurrentHealthPct <= 0.60))
+                   ((ElitesWithinRange[RANGE_20] >= 1 || CurrentTarget.IsEliteRareUnique) && (CurrentTarget.HitPointsPct >= 0.30 || PlayerStatus.CurrentHealthPct <= 0.60))
                  )) &&
 				//Do not activate too far from targets (for bosses / uber elites)
 				CurrentTarget.CentreDistance <= 35f &&
@@ -291,7 +291,7 @@ namespace GilesTrinity
             if (!UseOOCBuff && !IsWaitingForSpecial && Hotbar.Contains(SNOPower.Barbarian_SeismicSlam) && !PlayerStatus.IsIncapacitated &&
                 (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage))) &&
                 PlayerStatus.PrimaryResource >= 15 && CurrentTarget.CentreDistance <= 40f && (AnythingWithinRange[RANGE_50] > 1 ||
-                (AnythingWithinRange[RANGE_50] > 0 && PlayerStatus.PrimaryResourcePct >= 0.85 && CurrentTarget.HitPoints >= 0.30) ||
+                (AnythingWithinRange[RANGE_50] > 0 && PlayerStatus.PrimaryResourcePct >= 0.85 && CurrentTarget.HitPointsPct >= 0.30) ||
                 (CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || (CurrentTarget.IsTreasureGoblin && CurrentTarget.CentreDistance <= 20f))))
             {
                 return new TrinityPower(SNOPower.Barbarian_SeismicSlam, 40f, vNullLocation, -1, CurrentTarget.ACDGuid, 2, 2, USE_SLOWLY);
@@ -299,7 +299,7 @@ namespace GilesTrinity
             // Ancient spear 
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_AncientSpear) &&
                 GilesUseTimer(SNOPower.Barbarian_AncientSpear) && PowerManager.CanCast(SNOPower.Barbarian_AncientSpear) &&
-				CurrentTarget.HitPoints >= 0.20)
+				CurrentTarget.HitPointsPct >= 0.20)
             {
                 // For close-by monsters, try to leap a little further than their centre-point
                 float fExtraDistance = CurrentTarget.Radius;
@@ -337,7 +337,7 @@ namespace GilesTrinity
                 (!Settings.Combat.Barbarian.SelectiveWhirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)) &&
                 // Only if within 15 foot of main target
                 ((CurrentTarget.RadiusDistance <= 25f || AnythingWithinRange[RANGE_25] >= 1)) &&
-                (AnythingWithinRange[RANGE_50] >= 2 || CurrentTarget.HitPoints >= 0.30 || CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || PlayerStatus.CurrentHealthPct <= 0.60) &&
+                (AnythingWithinRange[RANGE_50] >= 2 || CurrentTarget.HitPointsPct >= 0.30 || CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || PlayerStatus.CurrentHealthPct <= 0.60) &&
                 // Check for energy reservation amounts
                 //((playerStatus.dCurrentEnergy >= 20 && !playerStatus.bWaitingForReserveEnergy) || playerStatus.dCurrentEnergy >= iWaitingReservedAmount) &&
                 PlayerStatus.PrimaryResource >= 10 &&

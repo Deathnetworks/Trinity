@@ -23,7 +23,7 @@ namespace GilesTrinity
         public MiniMapMarker() { }
         internal static List<MiniMapMarker> KnownMarkers = new List<MiniMapMarker>();
 
-        internal static MoveResult lastMoveResult = MoveResult.ReachedDestination;
+        internal static MoveResult lastMoveResult = MoveResult.Moved;
 
         internal static bool AnyUnvisitedMarkers()
         {
@@ -37,8 +37,20 @@ namespace GilesTrinity
             {
                 foreach (MiniMapMarker marker in KnownMarkers.Where(m => m.Equals(nearestMarker) && near.Distance2D(m.Position) <= pathPrecision))
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Setting MiniMapMarker {0} as Visited", marker.MarkerNameHash);
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Setting MiniMapMarker {0} as Visited, within PathPrecision {1:0}", marker.MarkerNameHash, pathPrecision);
                     marker.Visited = true;
+                    lastMoveResult = MoveResult.Moved;
+                }
+
+                // Navigator will return "ReacheDestination" when it can't fully move to the specified position
+                if (lastMoveResult == MoveResult.ReachedDestination)
+                {
+                    foreach (MiniMapMarker marker in KnownMarkers.Where(m => m.Equals(nearestMarker)))
+                    {
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Setting MiniMapMarker {0} as Visited, MoveResult=ReachedDestination", marker.MarkerNameHash);
+                        marker.Visited = true;
+                        lastMoveResult = MoveResult.Moved;
+                    }
                 }
 
                 if (lastMoveResult == MoveResult.PathGenerationFailed)
@@ -47,6 +59,7 @@ namespace GilesTrinity
                     {
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Unable to navigate to marker, setting MiniMapMarker {0} at {1} as failed", marker.MarkerNameHash, marker.Position);
                         marker.Failed = true;
+                        lastMoveResult = MoveResult.Moved;
                     }
                 }
             }
@@ -64,11 +77,12 @@ namespace GilesTrinity
         {
             if (NavProvider == null)
                 NavProvider = new DefaultNavigationProvider();
+
             foreach (MiniMapMarker marker in KnownMarkers.Where(m => m.Failed))
             {
                 if (NavProvider.CanPathWithinDistance(marker.Position, 10f))
                 {
-                    DbHelper.LogNormal("Was able to generate full path to failed MiniMapMarker {0} at {1}, marking as good", marker.MarkerNameHash, marker.Position); 
+                    DbHelper.LogNormal("Was able to generate full path to failed MiniMapMarker {0} at {1}, marking as good", marker.MarkerNameHash, marker.Position);
                     marker.Failed = false;
                     lastMoveResult = MoveResult.PathGenerated;
                 }
@@ -124,10 +138,12 @@ namespace GilesTrinity
         {
             MiniMapMarker m = MiniMapMarker.GetNearestUnvisitedMarker(near);
             PlayerMover.RecordSkipAheadCachePoint();
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Moving to inspect nameHash {0} at {1} distance {2:0}", 
-                m.MarkerNameHash, m.Position, ZetaDia.Me.Position.Distance2D(m.Position));
 
-            lastMoveResult = PlayerMover.NavigateTo(MiniMapMarker.GetNearestUnvisitedMarker(near).Position);
+            lastMoveResult = Navigator.MoveTo(MiniMapMarker.GetNearestUnvisitedMarker(near).Position);
+
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Moving to inspect nameHash {0} at {1} distance {2:0} mr: {3}",
+                m.MarkerNameHash, m.Position, ZetaDia.Me.Position.Distance2D(m.Position), lastMoveResult);
+
 
             return RunStatus.Success;
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -110,18 +111,33 @@ namespace GilesTrinity
         }
 
         private static bool isLeavingGame = false;
-        private static bool leaveGameInitiated = false;        
+        private static bool leaveGameInitiated = false;
+
+        private static Stopwatch leaveGameTimer = new Stopwatch();
 
         /// <summary>
         /// Leaves the game if gold inactivity timer is tripped
         /// </summary>
         internal static bool GoldInactiveLeaveGame()
         {
+            if (leaveGameTimer.IsRunning && leaveGameTimer.ElapsedMilliseconds < 12000)
+            {
+                return true;
+            }
+
+            // Fixes a race condition crash. Zomg!
+            Thread.Sleep(5000);
+
             if (!ZetaDia.IsInGame || ZetaDia.Me == null || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
             {
                 isLeavingGame = false;
                 leaveGameInitiated = false;
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "GoldInactiveLeaveGame called but not in game!");
+                return false;
+            }
+
+            if (!BotMain.IsRunning)
+            {
                 return false;
             }
 
@@ -142,7 +158,8 @@ namespace GilesTrinity
 
             if (!leaveGameInitiated && isLeavingGame)
             {
-                ZetaDia.Service.Games.LeaveGame();
+                leaveGameTimer.Start();
+                ZetaDia.Service.Party.LeaveGame();
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "GoldInactiveLeaveGame initiated LeaveGame");
                 return true;
             }            

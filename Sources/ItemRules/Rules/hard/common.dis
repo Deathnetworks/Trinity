@@ -13,9 +13,31 @@
 
 // crafting plans setting
 [QUALITY] == "Legendary" && [TYPE] == "CraftingPlan"
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Gauntlets of Dexterity"
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Gauntlets of Intelligence"
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Gauntlets of Strength"
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Gauntlets of Vitality"
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Spaulders of Dexterity"
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Spaulders of Intelligence"
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Spaulders of Strength
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Spaulders of Vitality"
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Armor of Dexterity"
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Armor of Intelligence"
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Armor of Strength
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Armor of Vitality"
+[TYPE] == "CraftingPlan" && [NAME] == "Design: Marquise Amethyst"
+[TYPE] == "CraftingPlan" && [NAME] == "Design: Marquise Emerald"
+[TYPE] == "CraftingPlan" && [NAME] == "Design: Marquise Topaz"
+[TYPE] == "CraftingPlan" && [NAME] == "Design: Marquise Ruby"
+[NAME] == "Tome of Secrets"
+[NAME] == "Tome of Blacksmithing"
+[NAME] == "Tome of Jewelcrafting"
+
 [QUALITY] == "Rare6" && [TYPE] == "CraftingPlan" -> [TRASH]
 [QUALITY] == "Rare5" && [TYPE] == "CraftingPlan" -> [TRASH]
 [QUALITY] == "Rare4" && [TYPE] == "CraftingPlan" -> [TRASH]
 
+
+
 // keep demonic essences
-[TYPE] == "CraftingReagent"
+//[TYPE] == "CraftingReagent"

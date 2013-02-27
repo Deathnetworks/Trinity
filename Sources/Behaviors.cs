@@ -200,6 +200,12 @@ namespace GilesTrinity
                     if (runStatus != HandlerRunStatus.NotFinished)
                         return GetTreeSharpRunStatus(runStatus);
 
+                    if (CurrentTarget == null && TownRun.IsTryingToTownPortal())
+                    {
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Waiting for town run... ");
+                        runStatus = HandlerRunStatus.TreeSuccess;
+                    }
+
                     if (CurrentTarget == null)
                     {
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2");
@@ -532,6 +538,7 @@ namespace GilesTrinity
                                             IgnoreTargetForLoops = 3;
                                             // Add this destructible/barricade to our very short-term ignore list
                                             hashRGUIDDestructible3SecBlacklist.Add(CurrentTarget.RActorGuid);
+                                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 3 seconds for Destrucable attack", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
                                             lastDestroyedDestructible = DateTime.Now;
                                             bNeedClearDestructibles = true;
                                         }
@@ -631,7 +638,10 @@ namespace GilesTrinity
                         }
                     }
 
-
+                    if (TimeSinceUse(SNOPower.Monk_TempestRush) < 250)
+                    {
+                        bForceNewMovement = true;
+                    }
 
                     // Only position-shift when not avoiding
                     // See if we want to ACTUALLY move, or are just waiting for the last move command...
@@ -821,14 +831,17 @@ namespace GilesTrinity
                 if (CurrentTarget.Type == GObjectType.Avoidance)
                     return HandlerRunStatus.NotFinished;
 
+                if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
+                    return HandlerRunStatus.NotFinished;
+
                 if (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6)
                     shouldTryBlacklist = true;
 
-                if ((CurrentTargetIsUnit() && CurrentTarget.IsBoss && GetSecondsSinceTargetUpdate() > 15))
+                if ((CurrentTargetIsUnit() && CurrentTarget.IsBoss && GetSecondsSinceTargetUpdate() > 45))
                     shouldTryBlacklist = true;
 
-                // special raycast check for current target after 5 sec
-                if ((CurrentTargetIsUnit() && GetSecondsSinceTargetUpdate() > 5))
+                // special raycast check for current target after 10 sec
+                if ((CurrentTargetIsUnit() && !CurrentTarget.IsBoss && GetSecondsSinceTargetUpdate() > 10))
                     shouldTryBlacklist = true;
 
                 if (shouldTryBlacklist)
@@ -867,7 +880,7 @@ namespace GilesTrinity
                                 CurrentTarget.InternalName,         // 0
                                 CurrentTarget.ActorSNO,             // 1
                                 CurrentTarget.CentreDistance,       // 2
-                                CurrentTarget.HitPoints,            // 3
+                                CurrentTarget.HitPointsPct,            // 3
                                 CurrentTarget.RActorGuid            // 4
                                 );
                         }
@@ -887,6 +900,11 @@ namespace GilesTrinity
                             hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
                             dateSinceBlacklist15Clear = DateTime.Now;
                             CurrentTarget = null;
+                            runStatus = HandlerRunStatus.TreeSuccess;
+                        }
+                        else if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
+                        {
+                            // Don't blacklist legendaries!!
                             runStatus = HandlerRunStatus.TreeSuccess;
                         }
                         else
@@ -1017,7 +1035,7 @@ namespace GilesTrinity
                                     }
                                     else
                                     {
-                                        CurrentTarget.HitPoints = dTempHitpoints;
+                                        CurrentTarget.HitPointsPct = dTempHitpoints;
                                         CurrentTarget.Position = CurrentTarget.Unit.Position;
                                     }
                                 }
@@ -1154,11 +1172,13 @@ namespace GilesTrinity
                             case GObjectType.Gold:
                             case GObjectType.Item:
                                 // No raycast available, try and force-ignore this for a little while, and blacklist for a few seconds
-                                if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
+                                if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position) && CurrentTarget.Unit.InLineOfSight)
                                 {
                                     IgnoreRactorGUID = CurrentTarget.RActorGuid;
                                     IgnoreTargetForLoops = 6;
-                                    hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
+                                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 60 seconds due to BodyBlocking", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
+                                    if (!(CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)) // don't blacklist legendaries
+                                        hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
                                     //dateSinceBlacklist90Clear = DateTime.Now;
                                 }
                                 break;
@@ -1278,6 +1298,7 @@ namespace GilesTrinity
                 // Now for the actual movement request stuff
                 IsAlreadyMoving = true;
                 lastMovementCommand = DateTime.Now;
+
                 if (DateTime.Now.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(vLastMoveToTarget, vCurrentDestination) >= 2f || bForceNewMovement)
                 {
                     PlayerMover.NavigateTo(vCurrentDestination, CurrentTarget.InternalName);
@@ -1347,7 +1368,7 @@ namespace GilesTrinity
                     case GObjectType.HealthWell:
                         {
                             TargetRangeRequired = CurrentTarget.Radius + 5f;
-                            TargetRangeRequired = 5f;
+                            //TargetRangeRequired = 5f;
                             int _range;
                             if (dictInteractableRange.TryGetValue(CurrentTarget.ActorSNO, out _range))
                             {
@@ -1505,7 +1526,7 @@ namespace GilesTrinity
                 timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
                 iKeepLootRadiusExtendedFor = 8;
                 // if at full or nearly full health, see if we can raycast to it, if not, ignore it for 2000 ms
-                if (CurrentTarget.HitPoints >= 0.9d && AnythingWithinRange[RANGE_50] > 3)
+                if (CurrentTarget.HitPointsPct >= 0.9d && AnythingWithinRange[RANGE_50] > 3)
                 {
                     if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
                     {
@@ -1515,6 +1536,7 @@ namespace GilesTrinity
                         if (!CurrentTarget.IsBoss)
                         {
                             hashRGUIDBlacklist3.Add(CurrentTarget.RActorGuid);
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 3 seconds due to Raycast failure", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
                             dateSinceBlacklist3Clear = DateTime.Now;
                             NeedToClearBlacklist3 = true;
                         }
@@ -1634,10 +1656,9 @@ namespace GilesTrinity
                     dictTotalInteractionAttempts[CurrentTarget.RActorGuid]++;
                 }
                 // If we've tried interacting too many times, blacklist this for a while
-                if (iInteractAttempts > 20)
+                if (iInteractAttempts > 20 && CurrentTarget.ItemQuality < ItemQuality.Legendary)
                 {
                     hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
-                    //dateSinceBlacklist90Clear = DateTime.Now;
                 }
                 // Now tell Trinity to get a new target!
                 bForceTargetUpdate = true;

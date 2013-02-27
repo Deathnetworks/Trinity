@@ -14,7 +14,8 @@ namespace GilesTrinity.Settings.Combat
         MovementOnly = 0,
         ElitesGroupsOnly = 1,
         CombatOnly = 2,
-        Always = 3
+        Always = 3,
+        TrashOnly = 4,
     }
     public enum WizardKiteOption
     {

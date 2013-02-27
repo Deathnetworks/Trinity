@@ -71,17 +71,11 @@ namespace GilesTrinity
                     Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius);
             }
 
+            if (StashRule == null)
+                StashRule = new ItemRules.Interpreter();
+
             StashRule.readConfiguration();
 
-            //try
-            //{
-            //    CacheManager.Initialize();
-            //}
-            //catch (Exception ex)
-            //{
-            //    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Error Initializing CacheManager");
-            //    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
-            //}
         }
 
         // When the bot stops, output a final item-stats report so it is as up-to-date as can be
@@ -127,43 +121,7 @@ namespace GilesTrinity
 
             // Loot tree is now empty and never runs (Loot is handled through combat)
             TreeHooks.Instance.ReplaceHook("Loot", new Decorator(ret => false, new Action()));
-
-            //foreach (var hook in TreeHooks.Instance.Hooks)
-            //{
-            //    // Replace the combat behavior tree, as that happens first and so gets done quicker!
-            //    if (hook.Key.Contains("Combat"))
-            //    {
-            //        hook.Value[0] = new Zeta.TreeSharp.Decorator(ctx => CheckHasTarget(ctx), HandleTargetAction());
-            //    }
-
-            //    // Vendor run hook
-            //    // Wipe the vendorrun and loot behavior trees, since we no longer want them
-            //    if (hook.Key.Contains("VendorRun"))
-            //    {
-            //        //Decorator VendorRunDecorator = hook.Value[0] as Decorator;
-            //        //PrioritySelector VendorRunPrioritySelector = VendorRunDecorator.Children[0] as PrioritySelector;
-
-            //        //VendorRunPrioritySelector.Children[3] = TownRun.Decorators.GetPreStashDecorator();
-            //        //VendorRunPrioritySelector.Children[4] = TownRun.Decorators.GetStashDecorator();
-            //        //VendorRunPrioritySelector.Children[5] = TownRun.Decorators.GetSellDecorator();
-            //        //VendorRunPrioritySelector.Children[6] = TownRun.Decorators.GetSalvageDecorator();
-
-            //        //VendorRunPrioritySelector.Children[3] = TownRun.Decorators.GetPreStashDecorator();
-            //        //VendorRunPrioritySelector.Children[4] = TownRun.Decorators.GetSalvageDecorator();
-            //        //VendorRunPrioritySelector.Children[5] = TownRun.Decorators.GetSellDecorator();
-            //        //VendorRunPrioritySelector.Children[6] = TownRun.Decorators.GetStashDecorator();
-
-            //        hook.Value[0] = new Decorator(ret => TownRun.TownRunCanRun(ret), VendorRunPrioritySelector);
-
-            //    }
-
-            //    if (hook.Key.Contains("Loot"))
-            //    {
-            //        // Replace the loot behavior tree with a blank one, as we no longer need it
-            //        hook.Value[0] = new Decorator(ret => false, new Action());
-            //    }
-
-            //}
+            
         }
     }
 }

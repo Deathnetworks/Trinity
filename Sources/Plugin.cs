@@ -29,7 +29,7 @@ namespace GilesTrinity
         {
             get
             {
-                return new Version(1, 7, 2, 0);
+                return new Version(1, 7, 2, 5);
             }
         }
 
@@ -46,7 +46,7 @@ namespace GilesTrinity
         {
             get
             {
-                return "GilesSmith + Demonbuddy Community Devs";
+                return "GilesSmith + rrrix + Community Devs";
             }
         }
 
@@ -82,7 +82,7 @@ namespace GilesTrinity
                 TownRun.SendMobileNotifications();
             }
 
-
+            Monk_MaintainTempestRush();
         }
 
         /// <summary>
@@ -124,11 +124,17 @@ namespace GilesTrinity
                 GameEvents.OnItemSalvaged += TrinityOnItemSalvaged;
                 GameEvents.OnItemStashed += TrinityOnItemStashed;
 
+                // enable or disable process exit events
+                ZetaDia.Memory.Process.EnableRaisingEvents = true;
+
                 CombatTargeting.Instance.Provider = new BlankCombatProvider();
                 LootTargeting.Instance.Provider = new BlankLootProvider();
                 ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
-                ItemManager.Current = new TrinityItemManager();
 
+                if (Settings.Loot.ItemFilterMode != global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+                {
+                    ItemManager.Current = new TrinityItemManager();
+                }
                 UpdateSearchGridProvider();
 
                 // Safety check incase DB "OnStart" event didn't fire properly
@@ -146,8 +152,11 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
             }
 
-            // reseting stash rules
-            StashRule.reset();
+            if (StashRule != null)
+            {
+                // reseting stash rules
+                StashRule.reset();
+            }
         }
 
         internal static void SetBotTPS()
@@ -162,6 +171,18 @@ namespace GilesTrinity
             {
                 BotMain.TicksPerSecond = 10;
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Reset bot TPS to default", (int)Settings.Advanced.TPSLimit);
+            }
+        }
+
+        internal static void SetItemManagerProvider()
+        {
+            if (Settings.Loot.ItemFilterMode != global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+            {
+                ItemManager.Current = new TrinityItemManager();
+            }
+            else
+            {
+                ItemManager.Current = new LootRuleItemManager();
             }
         }
 
@@ -263,6 +284,7 @@ namespace GilesTrinity
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DISABLED: Trinity is now shut down...");
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
+            GenericCache.Shutdown();
         }
 
         /// <summary>
@@ -270,6 +292,7 @@ namespace GilesTrinity
         /// </summary>
         public void OnShutdown()
         {
+            GenericCache.Shutdown();
         }
 
         /// <summary>
@@ -319,10 +342,22 @@ namespace GilesTrinity
             return (other.Name == Name) && (other.Version == Version);
         }
 
+        private static GilesTrinity _instance;
+        public static GilesTrinity Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new GilesTrinity();
+                }
+                return _instance;
+            }
+        }
 
         public GilesTrinity()
         {
-
+            _instance = this;
         }
     }
 }

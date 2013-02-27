@@ -36,6 +36,7 @@ namespace GilesTrinity.UIComponents
                                         _OriginalModel.Save();
                                         GilesTrinity.SetBotTPS();
                                         GilesTrinity.SetUnstuckProvider();
+                                        GilesTrinity.SetItemManagerProvider();
                                         UILoader.CloseWindow();
                                     });
             TestScoreCommand = new RelayCommand(
@@ -560,7 +561,7 @@ namespace GilesTrinity.UIComponents
             _Model.Loot.Pickup.MiscItemLevel = 1;
             _Model.Loot.Pickup.PotionLevel = 1;
             _Model.Loot.Pickup.PotionMode = PotionMode.Cap;
-            _Model.Loot.Pickup.DesignPlan = true;
+            _Model.Loot.Pickup.Plans = true;
             _Model.Loot.Pickup.CraftTomes = true;
         }
 
@@ -580,7 +581,7 @@ namespace GilesTrinity.UIComponents
             _Model.Loot.Pickup.MiscItemLevel = 60;
             _Model.Loot.Pickup.PotionLevel = 60;
             _Model.Loot.Pickup.PotionMode = PotionMode.Cap;
-            _Model.Loot.Pickup.DesignPlan = true;
+            _Model.Loot.Pickup.Plans = true;
             _Model.Loot.Pickup.CraftTomes = true;
         }
 

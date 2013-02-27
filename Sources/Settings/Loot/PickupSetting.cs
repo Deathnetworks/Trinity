@@ -20,9 +20,13 @@ namespace GilesTrinity.Settings.Loot
         private int _LegendaryLevel;
         private int _MinimumGoldStack;
         private bool _CraftTomes;
-        private bool _DesignPlan;
+        private bool _Plans;
+        private bool _LegendaryPlans;
+        private bool _Designs;
         private bool _FollowerItem;
         private int _MiscItemLevel;
+        private bool _CraftMaterials;
+        private bool _InfernalKeys;
         #endregion Fields
 
         #region Events
@@ -44,7 +48,7 @@ namespace GilesTrinity.Settings.Loot
 
         #region Properties
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(0)]
         public int WeaponBlueLevel
         {
             get
@@ -62,7 +66,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(63)]
         public int WeaponYellowLevel
         {
             get
@@ -80,7 +84,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(0)]
         public int ArmorBlueLevel
         {
             get
@@ -98,7 +102,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(63)]
         public int ArmorYellowLevel
         {
             get
@@ -116,7 +120,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(0)]
         public int JewelryBlueLevel
         {
             get
@@ -134,7 +138,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(58)]
         public int JewelryYellowLevel
         {
             get
@@ -170,7 +174,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(60)]
         public int PotionLevel
         {
             get
@@ -242,7 +246,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(100)]
         public int MinimumGoldStack
         {
             get
@@ -279,18 +283,52 @@ namespace GilesTrinity.Settings.Loot
 
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
-        public bool DesignPlan
+        public bool Plans
         {
             get
             {
-                return _DesignPlan;
+                return _Plans;
             }
             set
             {
-                if (_DesignPlan != value)
+                if (_Plans != value)
                 {
-                    _DesignPlan = value;
-                    OnPropertyChanged("DesignPlan");
+                    _Plans = value;
+                    OnPropertyChanged("Plans");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool LegendaryPlans
+        {
+            get
+            {
+                return _LegendaryPlans;
+            }
+            set
+            {
+                if (_LegendaryPlans != value)
+                {
+                    _LegendaryPlans = value;
+                    OnPropertyChanged("LegendaryPlans");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool Designs
+        {
+            get
+            {
+                return _Designs;
+            }
+            set
+            {
+                if (_Designs != value)
+                {
+                    _Designs = value;
+                    OnPropertyChanged("Designs");
                 }
             }
         }
@@ -314,7 +352,7 @@ namespace GilesTrinity.Settings.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(63)]
         public int MiscItemLevel
         {
             get
@@ -330,6 +368,41 @@ namespace GilesTrinity.Settings.Loot
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool CraftMaterials
+        {
+            get
+            {
+                return _CraftMaterials;
+            }
+            set
+            {
+                if (_CraftMaterials != value)
+                {
+                    _CraftMaterials = value;
+                    OnPropertyChanged("CraftMaterials");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool InfernalKeys
+        {
+            get
+            {
+                return _InfernalKeys;
+            }
+            set
+            {
+                if (_InfernalKeys != value)
+                {
+                    _InfernalKeys = value;
+                    OnPropertyChanged("InfernalKeys");
+                }
+            }
+        }      
         #endregion Properties
 
         #region Methods
@@ -354,6 +427,20 @@ namespace GilesTrinity.Settings.Loot
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+ 
+        /// <summary>
+        /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserializing()]
+        internal void OnDeserializingMethod(StreamingContext context)
+        {
+            this.CraftMaterials = true;
+            this.InfernalKeys = true;
+            this.Designs = true;
+            this.Plans = true;
+            this.LegendaryPlans = true;
         }
         #endregion Methods
     }
