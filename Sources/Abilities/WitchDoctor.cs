@@ -27,8 +27,7 @@ namespace GilesTrinity
             }
             // Soul Harvest Any Elites or 2+ Norms and baby it's harvest season
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_SoulHarvest) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 59 && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) < 4 &&
-               (ElitesWithinRange[RANGE_6] >= 1 || AnythingWithinRange[RANGE_6] >= 2 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 7f)) &&
-                PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
+                (TargetUtil.AnyMobsInRange(16f,2) || TargetUtil.IsEliteTargetInRange(16f)) && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
             }

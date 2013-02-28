@@ -112,7 +112,7 @@ namespace GilesTrinity.Settings
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(225)]
+        [DefaultValue(600)]
         public int GoldInactivityTimer
         {
             get

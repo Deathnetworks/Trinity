@@ -145,12 +145,9 @@ namespace GilesTrinity
             {
                 // Exit the game and reload the profile
                 PlayerMover.timeLastRestartedGame = DateTime.Now;
-                string sUseProfile = GilesTrinity.sFirstProfileSeen;
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Gold Inactivity timer tripped - Anti-stuck measures exiting current game.");
-                // Load the first profile seen last run
-                ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
-                                        ? sUseProfile
-                                        : Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
+                // Reload this profile
+                ProfileManager.Load(Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
                 GilesTrinity.GilesResetEverythingNewGame();
                 isLeavingGame = true;
                 return true;

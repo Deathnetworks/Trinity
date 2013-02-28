@@ -553,7 +553,7 @@ namespace GilesTrinity.DbProvider
                 }
                 // Tempest rush for a monk
                 if (GilesTrinity.Hotbar.Contains(SNOPower.Monk_TempestRush) &&
-                    (GilesTrinity.Settings.Combat.Monk.TROption == TempestRushOption.MovementOnly || GilesTrinity.Settings.Combat.Monk.TROption == TempestRushOption.Always))
+                    (GilesTrinity.Settings.Combat.Monk.TROption == TempestRushOption.MovementOnly || GilesTrinity.Settings.Combat.Monk.TROption == TempestRushOption.Always || GilesTrinity.Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly))
                 {
                     float aimPointDistance = 10f;
                     Vector3 vTargetAimPoint = vMoveToTarget;

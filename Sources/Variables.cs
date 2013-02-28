@@ -329,7 +329,7 @@ namespace GilesTrinity
         /// <summary>
         /// This force-prevents avoidance for XX loops incase we get stuck trying to avoid stuff
         /// </summary>
-        private static DateTime timeCancelledEmergencyMove = DateTime.Now;
+        private static DateTime timeCancelledEmergencyMove = DateTime.MinValue;
         private static int cancelledEmergencyMoveForMilliseconds = 0;
 
         /// <summary>

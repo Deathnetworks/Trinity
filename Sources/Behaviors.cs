@@ -788,7 +788,8 @@ namespace GilesTrinity
                             fAvoidBlacklistDirection = FindDirectionDegree(PlayerStatus.CurrentPosition, CurrentTarget.Position);
                         }
                         // Handle body blocking by blacklisting
-                        GilesHandleBodyBlocking();
+                        //GilesHandleBodyBlocking();
+                        
                         // If we were backtracking and failed, remove the current backtrack and try and move to the next
                         if (CurrentTarget.Type == GObjectType.Backtrack && TimesBlockedMoving >= 2)
                         {

@@ -364,18 +364,18 @@ namespace GilesTrinity
 
                                 // Give yellows more weight
                                 if (cacheObject.GoldAmount <= 0 && cacheObject.ItemQuality >= ItemQuality.Rare4)
-                                    cacheObject.Weight += 6000d;
+                                    cacheObject.Weight += 4000d;
 
                                 // Give legendaries more weight
                                 if (cacheObject.GoldAmount <= 0 && cacheObject.ItemQuality >= ItemQuality.Legendary)
-                                    cacheObject.Weight += 10000d;
+                                    cacheObject.Weight += 15000d;
 
                                 // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
                                 if (PrioritizeCloseRangeUnits)
-                                    cacheObject.Weight = (200f - cacheObject.RadiusDistance) / 200f * 18000d;
+                                    cacheObject.Weight = (200f - cacheObject.CentreDistance) / 200f * 18000d;
 
-                                // If there's a monster in the path-line to the item, reduce the weight to 1
-                                if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius * 1.2f, PlayerStatus.CurrentPosition, cacheObject.Position)))
+                                // If there's a monster in the path-line to the item, reduce the weight to 1, except legendaries
+                                if (cacheObject.ItemQuality < ItemQuality.Legendary && hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius * 1.2f, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
                                 // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
@@ -383,7 +383,7 @@ namespace GilesTrinity
                                     cacheObject.Weight = 1;
 
                                 // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
-                                if (CurrentTarget != null && bAnyMobsInCloseRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting)
+                                if (CurrentTarget != null && bAnyMobsInCloseRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting && cacheObject.ItemQuality < ItemQuality.Legendary)
                                     cacheObject.Weight = 1;
 
                                 break;
