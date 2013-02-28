@@ -39,6 +39,7 @@ namespace GilesTrinity.Settings.Combat
         private float _AvoidWallOfFireHealth;
         private float _AvoidZoltBubbleHealth;
         private float _AvoidZoltTwisterHealth;
+        private float _AvoidSuccubusStarHealth;
         #endregion Fields
 
         #region Events
@@ -618,6 +619,23 @@ namespace GilesTrinity.Settings.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(0.7f)]
+        public float AvoidSuccubusStarHealth
+        {
+            get
+            {
+                return _AvoidSuccubusStarHealth;
+            }
+            set
+            {
+                if (_AvoidSuccubusStarHealth != value)
+                {
+                    _AvoidSuccubusStarHealth = value;
+                    OnPropertyChanged("AvoidSuccubusStarHealth");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
         [DefaultValue(400)]
         public int VaultMovementDelay
         {
@@ -662,6 +680,16 @@ namespace GilesTrinity.Settings.Combat
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+           /// <summary>
+        /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserializing()]
+        internal void OnDeserializingMethod(StreamingContext context)
+        {
+
+            this._AvoidSuccubusStarHealth = 0.7f;
         }
         #endregion Methods
     }

@@ -171,18 +171,18 @@ namespace GilesTrinity.Settings
                             TrinitySetting loadedSetting = (TrinitySetting)serializer.ReadObject(stream);
                             stream.Close();
                             loadedSetting.CopyTo(this);
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Configuration file loaded: {0}", filename);
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Configuration file loaded");
                         }
                     }
                     else
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Config file '{0}' not found.", filename);
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Configuration file not found.");
                         Reset();
                     }
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Critical, LogCategory.UserInformation, "Error while loading Config file '{0}' :{1}{2}", filename, Environment.NewLine, ex);
+                    DbHelper.Log(TrinityLogLevel.Critical, LogCategory.UserInformation, "Error while loading Config file:{0}{1}", Environment.NewLine, ex);
                 }
             }
         }
@@ -194,7 +194,7 @@ namespace GilesTrinity.Settings
                 string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "GilesTrinity.xml");
                 try
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Save Config file : {0}", filename);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Saving Config file");
                     using (Stream stream = File.Open(filename, FileMode.Create))
                     {
                         DataContractSerializer serializer = new DataContractSerializer(typeof(TrinitySetting));

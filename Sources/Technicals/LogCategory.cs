@@ -25,5 +25,6 @@ namespace GilesTrinity.Technicals
         Movement = 1024,          
         GlobalHandler = 2048,
         Navigator = 4096,
+        Avoidance = 8192,
     }
 }

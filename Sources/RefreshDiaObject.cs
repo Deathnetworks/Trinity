@@ -1020,13 +1020,10 @@ namespace GilesTrinity
                 return AddToCache;
             }
 
-         
-            if (unit.IsUntargetable &&
-                unit.IsInvulnerable &&
-                unit.IsBurrowed // &&
-                //unit.IsHelper &&
-                //unit.IsNPC
-                )
+
+            if (unit.IsUntargetable ||
+                unit.IsInvulnerable ||
+                unit.IsBurrowed)
                 AddToCache = false;
             c_IgnoreSubStep = "NotAttackable";
 
@@ -1156,7 +1153,7 @@ namespace GilesTrinity
             }
 
             DiaItem item = c_diaObject as DiaItem;
-            c_Name = item.CommonData.Name;
+            c_ItemDisplayName = item.CommonData.Name;
             c_GameBalanceID = item.CommonData.GameBalanceId;
             c_ItemQuality = item.CommonData.ItemQualityLevel;
             c_ItemLevel = item.CommonData.Level;
@@ -1168,7 +1165,7 @@ namespace GilesTrinity
 
             PickupItem pickupItem = new PickupItem()
             {
-                Name = c_Name,
+                Name = c_ItemDisplayName,
                 InternalName = c_InternalName,
                 Level = c_ItemLevel,
                 Quality = c_ItemQuality,
@@ -1277,7 +1274,7 @@ namespace GilesTrinity
                 // GameBalanceID
                 LogWriter.Write(FormatCSVField(c_GameBalanceID));
                 LogWriter.Write(FormatCSVField(c_ACDGUID));
-                LogWriter.Write(FormatCSVField(c_Name));
+                LogWriter.Write(FormatCSVField(c_ItemDisplayName));
                 LogWriter.Write(FormatCSVField(c_InternalName));
                 LogWriter.Write(FormatCSVField(c_DBItemBaseType.ToString()));
                 LogWriter.Write(FormatCSVField(DetermineBaseType(c_item_GItemType).ToString()));
@@ -1874,6 +1871,24 @@ namespace GilesTrinity
             //    
             //return bWantThis;
             //}
+            // Retrieve collision sphere radius, cached if possible
+            if (!dictGilesCollisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
+            {
+                try
+                {
+                    c_Radius = c_diaObject.CollisionSphere.Radius;
+                    if (c_Radius <= 5f)
+                        c_Radius = 5f;
+                }
+                catch (Exception ex)
+                {
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for Avoidance {0} [{1}]", c_InternalName, c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                    AddToCache = false;
+                    return AddToCache;
+                }
+                dictGilesCollisionSphereCache.Add(c_ActorSNO, c_Radius);
+            }
 
             try
             {
@@ -1881,13 +1896,16 @@ namespace GilesTrinity
             }
             catch { }
 
-            bool bIgnoreThisAvoidance = false;
-            double dThisHealthAvoid = GetAvoidanceHealth(c_ActorSNO);
+            bool ignoreAvoidance = false;
+            double minAvoidanceHealth = GetAvoidanceHealth(c_ActorSNO);
+            double minAvoidanceRadius = GetAvoidanceRadius(c_ActorSNO, c_Radius);
+
             // Monks with Serenity up ignore all AOE's
-            if (PlayerStatus.ActorClass == ActorClass.Monk && CheckAbilityAndBuff(SNOPower.Monk_Serenity))
+            if (PlayerStatus.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_Serenity) && GetHasBuff(SNOPower.Monk_Serenity))
             {
                 // Monks with serenity are immune
-                bIgnoreThisAvoidance = true;
+                ignoreAvoidance = true;
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a Monk with Serenity");
             }
             // Witch doctors with spirit walk available and not currently Spirit Walking will subtly ignore ice balls, arcane, desecrator & plague cloud
             if (PlayerStatus.ActorClass == ActorClass.WitchDoctor && Hotbar.Contains(SNOPower.Witchdoctor_SpiritWalk) &&
@@ -1896,7 +1914,8 @@ namespace GilesTrinity
                 if (c_ActorSNO == 223675 || c_ActorSNO == 402 || c_ActorSNO == 219702 || c_ActorSNO == 221225 || c_ActorSNO == 84608 || c_ActorSNO == 108869)
                 {
                     // Ignore ICE/Arcane/Desc/PlagueCloud altogether with spirit walk up or available
-                    bIgnoreThisAvoidance = true;
+                    ignoreAvoidance = true;
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a WitchDoctor with Spirit Walk");
                 }
             }
             // Remove ice balls if the barbarian has wrath of the berserker up, and reduce health from most other SNO avoidances
@@ -1905,39 +1924,71 @@ namespace GilesTrinity
                 if (c_ActorSNO == 223675 || c_ActorSNO == 402)
                 {
                     // Ignore ice-balls altogether with wrath up
-                    bIgnoreThisAvoidance = true;
+                    ignoreAvoidance = true;
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a Barbarian with WOTB");
                 }
                 else
                 {
                     // Use half-health for anything else except arcanes or desecrate with wrath up
                     if (c_ActorSNO == 219702 || c_ActorSNO == 221225)
+                    {
                         // Arcane
-                        bIgnoreThisAvoidance = true;
+                        ignoreAvoidance = true;
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a Barbarian with WOTB");
+                    }
                     else if (c_ActorSNO == 84608)
                         // Desecrator
-                        dThisHealthAvoid *= 0.2;
+                        minAvoidanceHealth *= 0.2;
                     else
                         // Anything else
-                        dThisHealthAvoid *= 0.3;
+                        minAvoidanceHealth *= 0.3;
                 }
             }
+            if (ignoreAvoidance)
+            {
+                AddToCache = false;
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Ignoring Avoidance! Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+                       c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
+                return AddToCache;
+
+            }
+
             // Add it to the list of known avoidance objects, *IF* our health is lower than this avoidance health limit
-            if (!bIgnoreThisAvoidance && dThisHealthAvoid >= PlayerStatus.CurrentHealthPct)
+            if (minAvoidanceHealth >= PlayerStatus.CurrentHealthPct)
             {
                 // Generate a "weight" for how badly we want to avoid this obstacle, based on a percentage of 100% the avoidance health is, multiplied into a max of 200 weight
-                double dThisWeight = (200 * dThisHealthAvoid);
+                double dThisWeight = (200 * minAvoidanceHealth);
 
                 hashAvoidanceObstacleCache.Add(new GilesObstacle(c_Position, (float)GetAvoidanceRadius(), c_ActorSNO, dThisWeight, c_InternalName));
 
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
-                if (c_CentreDistance <= GetAvoidanceRadius())
+                if (c_CentreDistance <= minAvoidanceRadius)
                 {
                     StandingInAvoidance = true;
 
                     // Note if this is a travelling projectile or not so we can constantly update our safe points
                     if (hashAvoidanceSNOProjectiles.Contains(c_ActorSNO))
+                    {
                         IsAvoidingProjectiles = true;
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Is standing in avoidance for projectile Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+                           c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
+                    }
+                    else
+                    {
+                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Is standing in avoidance Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+                       c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
+                    }
                 }
+                else
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "NOT standing in Avoidance Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+                   c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
+                }
+            }
+            else
+            {
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Enough health for avoidance, ignoring Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+               c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
             }
 
             return AddToCache;
@@ -2367,7 +2418,7 @@ namespace GilesTrinity
                     AddToCache = false;
                     var dog = ((DiaUnit)c_diaObject);
 
-                    DbHelper.Log(LogCategory.CacheManagement, "Found Zombie dog - Owner={0} SummonerId={1} ActorSNO={2} myRactorGuid={3} SummonedByACDId={4} myACDId={5}", 
+                    DbHelper.Log(LogCategory.CacheManagement, "Found Zombie dog - Owner={0} SummonerId={1} ActorSNO={2} myRactorGuid={3} SummonedByACDId={4} myACDId={5}",
                         dog.PetOwner, dog.SummonerId, dog.ActorSNO, Me.RActorGuid, dog.SummonedByACDId, ZetaDia.Me.CommonData.ACDGuid);
                 }
             }
@@ -2460,44 +2511,44 @@ namespace GilesTrinity
             }
             return output;
         }
-        private static double GetAvoidanceRadius()
+        private static double GetAvoidanceRadius(int actorSNO = -1, float radius = -1f)
         {
+            if (actorSNO == -1)
+                actorSNO = c_ActorSNO;
+
+            if (radius == -1f)
+                radius = 20f;
+
             try
             {
-                return AvoidanceManager.GetAvoidanceRadiusBySNO(c_ActorSNO, c_Radius);
+
+                return AvoidanceManager.GetAvoidanceRadiusBySNO(actorSNO, radius);
             }
-            catch
+            catch (Exception ex)
             {
-                return c_Radius;
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0} radius={1}", actorSNO, radius);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, ex.ToString());
+                return radius;
             }
 
         }
-        private static double GetAvoidanceRadius(int actorSNO)
-        {
-            try
-            {
-                return AvoidanceManager.GetAvoidanceRadiusBySNO(actorSNO, c_Radius);
-            }
-            catch
-            {
-                return c_Radius;
-            }
 
-        }
-        private static double GetAvoidanceHealth(int actorSno = -1)
+        private static double GetAvoidanceHealth(int actorSNO = -1)
         {
             // snag our SNO from cache variable if not provided
-            if (actorSno == -1)
-                actorSno = c_ActorSNO;
+            if (actorSNO == -1)
+                actorSNO = c_ActorSNO;
             try
             {
-                if (actorSno != -1)
+                if (actorSNO != -1)
                     return AvoidanceManager.GetAvoidanceHealthBySNO(c_ActorSNO, 1);
                 else
-                    return AvoidanceManager.GetAvoidanceHealthBySNO(actorSno, 1);
+                    return AvoidanceManager.GetAvoidanceHealthBySNO(actorSNO, 1);
             }
-            catch
+            catch (Exception ex)
             {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0}", actorSNO);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, ex.ToString());
                 // 100% unless specified
                 return 1;
             }

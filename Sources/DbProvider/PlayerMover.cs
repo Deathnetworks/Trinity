@@ -470,8 +470,8 @@ namespace GilesTrinity.DbProvider
             {
                 if (vShiftedPosition == Vector3.Zero)
                 {
-                    // Make sure we only shift max once every 1 second
-                    if (DateTime.Now.Subtract(lastShiftedPosition).TotalSeconds >= 1)
+                    // Make sure we only shift max once every 6 seconds
+                    if (DateTime.Now.Subtract(lastShiftedPosition).TotalMilliseconds >= 6000)
                     {
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Shifting position for Navigation Obstacle {0} {1} at {2}", obstacle.ActorSNO, obstacle.Name, obstacle.Location);
                         GetShiftedPosition(ref vMoveToTarget, ref point, obstacle.Radius + 5f);
@@ -720,7 +720,7 @@ namespace GilesTrinity.DbProvider
             if (vMoveToTarget != point)
             {
                 vShiftedPosition = vMoveToTarget;
-                iShiftPositionFor = 900;
+                iShiftPositionFor = 3000;
                 lastShiftedPosition = DateTime.Now;
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Navigation handler position shift to: " + vMoveToTarget.ToString() + " (was " + point.ToString() + ")");
             }

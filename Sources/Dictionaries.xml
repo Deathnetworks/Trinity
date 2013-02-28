@@ -44,7 +44,7 @@
     <Entry SNO="123839" Type="AzmodanBody" />
     <Entry SNO="161822" Type="Belial" />
     <Entry SNO="161833" Type="Belial" />
-    <Entry SNO="123842" Type="AzmodanFireball" />
+    <Entry SNO="123842" Type="AzmoFireball" />
     <Entry SNO="432" Type="MageFire" />
     <Entry SNO="168031" Type="DiabloPrison" />
     <Entry SNO="214845" Type="DiabloMeteor" />
@@ -62,6 +62,7 @@
     <Entry SNO="201242" Type="ButcherFloorPanel" />
     <Entry SNO="226350" Type="DiabloRingOfFire" />
     <Entry SNO="226525" Type="DiabloRingOfFire" />
+    <Entry SNO="164829" Type="SuccubusStar"/>
   </Dictionary>
   <Dictionary Name="AvoidanceProjectileSNO">
     <Entry SNO="5212" Type="BeesWasps"/>

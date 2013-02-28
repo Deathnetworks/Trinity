@@ -36,6 +36,7 @@ namespace GilesTrinity.Settings.Combat
         private float _AvoidWallOfFireHealth;
         private float _AvoidZoltBubbleHealth;
         private float _AvoidZoltTwisterHealth;
+        private float _AvoidSuccubusStarHealth;
         private int _TR_MinSpirit;
         private int _TR_MinDist;
         private bool _HasInnaSet;
@@ -566,6 +567,23 @@ namespace GilesTrinity.Settings.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(0.7f)]
+        public float AvoidSuccubusStarHealth
+        {
+            get
+            {
+                return _AvoidSuccubusStarHealth;
+            }
+            set
+            {
+                if (_AvoidSuccubusStarHealth != value)
+                {
+                    _AvoidSuccubusStarHealth = value;
+                    OnPropertyChanged("AvoidSuccubusStarHealth");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
         [DefaultValue(60)]
         public float TR_MinSpirit
         {
@@ -708,6 +726,7 @@ namespace GilesTrinity.Settings.Combat
             this._TR_MinDist = 10;
             this._TargetBasedZigZag = true;
             this._TROption = TempestRushOption.Always;
+            this._AvoidSuccubusStarHealth = 0.7f;
         }
         #endregion Methods
     }

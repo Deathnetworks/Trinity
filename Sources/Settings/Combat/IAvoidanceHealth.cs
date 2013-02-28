@@ -3,47 +3,33 @@ namespace GilesTrinity.Settings.Combat
 {
     public interface IAvoidanceHealth
     {
-        float AvoidArcaneHealth
-        { get; set; }
+        float AvoidArcaneHealth { get; set; }
 
-        float AvoidDesecratorHealth
-        { get; set; }
+        float AvoidDesecratorHealth { get; set; }
 
-        float AvoidMoltenCoreHealth
-        { get; set; }
+        float AvoidMoltenCoreHealth { get; set; }
 
-        float AvoidMoltenTrailHealth
-        { get; set; }
+        float AvoidMoltenTrailHealth { get; set; }
 
-        float AvoidPoisonTreeHealth
-        { get; set; }
+        float AvoidPoisonTreeHealth { get; set; }
 
-        float AvoidPlagueCloudHealth
-        { get; set; }
+        float AvoidPlagueCloudHealth { get; set; }
 
-        float AvoidIceBallsHealth
-        { get; set; }
+        float AvoidIceBallsHealth { get; set; }
 
-        float AvoidPlagueHandsHealth
-        { get; set; }
+        float AvoidPlagueHandsHealth { get; set; }
 
-        float AvoidBeesWaspsHealth
-        { get; set; }
+        float AvoidBeesWaspsHealth { get; set; }
 
-        float AvoidAzmoPoolsHealth
-        { get; set; }
+        float AvoidAzmoPoolsHealth { get; set; }
 
-        float AvoidAzmoBodiesHealth
-        { get; set; }
+        float AvoidAzmoBodiesHealth { get; set; }
 
-        float AvoidShamanFireHealth
-        { get; set; }
+        float AvoidShamanFireHealth { get; set; }
 
-        float AvoidGhomGasHealth
-        { get; set; }
+        float AvoidGhomGasHealth { get; set; }
 
-        float AvoidAzmoFireBallHealth
-        { get; set; }
+        float AvoidAzmoFireBallHealth { get; set; }
 
         float AvoidBelialHealth { get; set; }
 
@@ -68,5 +54,7 @@ namespace GilesTrinity.Settings.Combat
         float AvoidZoltBubbleHealth { get; set; }
 
         float AvoidZoltTwisterHealth { get; set; }
+
+        float AvoidSuccubusStarHealth { get; set; }
     }
 }

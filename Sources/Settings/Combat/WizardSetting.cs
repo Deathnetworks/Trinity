@@ -36,6 +36,7 @@ namespace GilesTrinity.Settings.Combat
         private float _AvoidWallOfFireHealth;
         private float _AvoidZoltBubbleHealth;
         private float _AvoidZoltTwisterHealth;
+        private float _AvoidSuccubusStarHealth;
         private bool _WaitArchon;
 
         private bool _NoArcaneStrike;
@@ -711,6 +712,23 @@ namespace GilesTrinity.Settings.Combat
             }
         }
 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.7f)]
+        public float AvoidSuccubusStarHealth
+        {
+            get
+            {
+                return _AvoidSuccubusStarHealth;
+            }
+            set
+            {
+                if (_AvoidSuccubusStarHealth != value)
+                {
+                    _AvoidSuccubusStarHealth = value;
+                    OnPropertyChanged("AvoidSuccubusStarHealth");
+                }
+            }
+        }
 
         #endregion Properties
 
@@ -753,6 +771,7 @@ namespace GilesTrinity.Settings.Combat
             this._ArchonMobCount = 3;
             this._ArchonCancelSeconds = 300;
             this._ArchonCancelOption = WizardArchonCancelOption.RebuffMagicWeaponFamiliar;
+            this._AvoidSuccubusStarHealth = 0.7f;
         }
 
         #endregion Methods

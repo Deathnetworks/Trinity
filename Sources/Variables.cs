@@ -501,7 +501,7 @@ namespace GilesTrinity
         private static float c_RadiusDistance = 0f;
         private static float c_Radius = 0f;
         private static float c_ZDiff = 0f;
-        private static string c_Name = "";
+        private static string c_ItemDisplayName = "";
         private static int c_GameBalanceID = 0;
         private static string c_InternalName = "";
         private static string c_IgnoreReason = "";
