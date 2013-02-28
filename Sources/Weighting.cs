@@ -44,7 +44,7 @@ namespace GilesTrinity
                 int EliteCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
 
                 bool profileTagCheck = false;
-                Type behaviorType = ProfileManager.CurrentProfileBehavior.Behavior.GetType();
+                Type behaviorType = ProfileManager.CurrentProfileBehavior.GetType();
                 if (behaviorType == typeof(WaitTimerTag) || behaviorType == typeof(UseTownPortalTag))
                 {
                     profileTagCheck = true;

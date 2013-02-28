@@ -828,10 +828,16 @@ namespace GilesTrinity
 
                 bool shouldTryBlacklist = false;
 
+                // don't timeout on avoidance
                 if (CurrentTarget.Type == GObjectType.Avoidance)
                     return HandlerRunStatus.NotFinished;
 
+                // don't timeout on legendary items
                 if (CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)
+                    return HandlerRunStatus.NotFinished;
+
+                // don't timeout if we're actively moving
+                if (PlayerMover.MovementSpeed >= 1)
                     return HandlerRunStatus.NotFinished;
 
                 if (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6)

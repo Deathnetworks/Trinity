@@ -21,6 +21,7 @@ using System.Diagnostics;
 using Zeta.CommonBot.Profile.Common;
 using GilesTrinity.DbProvider;
 using NotificationManager = GilesTrinity.Notifications.NotificationManager;
+using Zeta.CommonBot.Profile;
 
 namespace GilesTrinity
 {
@@ -243,16 +244,20 @@ namespace GilesTrinity
             if (TownRunCheckTimer.IsRunning)
                 result = true;
 
-            Composite CurrentProfileBehavior = null;
+            ProfileBehavior CurrentProfileBehavior = null;
 
             try
             {
                 if (ProfileManager.CurrentProfileBehavior != null)
-                    CurrentProfileBehavior = ProfileManager.CurrentProfileBehavior.Behavior;
+                    CurrentProfileBehavior = ProfileManager.CurrentProfileBehavior;
             }
-            catch { }
-
-            if (CurrentProfileBehavior != null && CurrentProfileBehavior.GetType() == typeof(UseTownPortalTag))
+            catch (Exception ex)
+            {
+                DbHelper.Log(LogCategory.UserInformation, "Exception while checking for TownPortal!");
+                DbHelper.Log(LogCategory.GlobalHandler, ex.ToString());
+            }
+            Type profileBehaviortype = CurrentProfileBehavior.GetType();
+            if (profileBehaviortype != null && (profileBehaviortype == typeof(UseTownPortalTag) || profileBehaviortype == typeof(WaitTimerTag)))
             {
                 result = true;
             }
@@ -442,7 +447,7 @@ namespace GilesTrinity
             bool shouldStashItem = GilesTrinity.ShouldWeStashThis(cItem, item);
             return shouldStashItem;
         }
-        
+
         /// <summary>
         /// Pre Stash prepares stuff for our stash run
         /// </summary>
@@ -717,7 +722,7 @@ namespace GilesTrinity
                 double ItemValue = GilesTrinity.ValueThisItem(thiscacheditem, itemType);
                 double NeedScore = GilesTrinity.ScoreNeeded(item.ItemBaseType);
 
-                
+
                 // Ignore stackable items
                 // TODO check if item.MaxStackCount is 0 on non stackable items or 1
                 if (!(item.MaxStackCount > 1) && itemType != GItemType.StaffOfHerding)
