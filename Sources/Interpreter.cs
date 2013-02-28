@@ -49,7 +49,7 @@ namespace GilesTrinity.ItemRules
         };
 
         // final variables
-        readonly string version = "2.2.0.0";
+        readonly string version = "2.2.0.3";
         readonly string translationFile = "translation.dis";
         readonly string pickupFile = "pickup.dis";
         readonly string logFile = "ItemRules.log";
@@ -210,24 +210,23 @@ namespace GilesTrinity.ItemRules
                 }
                 // - stop macro transformation
 
-
-                //// do simple translation with name to itemid
-                //if (GilesTrinity.Settings.Loot.ItemRules.UseItemIDs && str.Contains("[NAME]"))
-                //{
-                //    bool foundTranslation = false;
-                //    foreach (string key in nameToBalanceId.Keys.ToList())
-                //    {
-                //        key.Replace(" ", "").Replace("\t", "");
-                //        if (str.Contains(key))
-                //        {
-                //            str = str.Replace(key, nameToBalanceId[key]).Replace("[NAME]", "[ITEMID]");
-                //            foundTranslation = true;
-                //            break;
-                //        }
-                //    }
-                //    if (!foundTranslation && GilesTrinity.Settings.Loot.ItemRules.Debug)
-                //        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No translation found for rule: {0}", str);
-                //}
+                // do simple translation with name to itemid
+                if (GilesTrinity.Settings.Loot.ItemRules.UseItemIDs && str.Contains("[NAME]"))
+                {
+                    bool foundTranslation = false;
+                    foreach (string key in nameToBalanceId.Keys.ToList())
+                    {
+                        key.Replace(" ", "").Replace("\t", "");
+                        if (str.Contains(key))
+                        {
+                            str = str.Replace(key, nameToBalanceId[key]).Replace("[NAME]", "[ITEMID]");
+                            foundTranslation = true;
+                            break;
+                        }
+                    }
+                    if (!foundTranslation && GilesTrinity.Settings.Loot.ItemRules.Debug)
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No translation found for rule: {0}", str);
+                }
 
                 array.Add(str);
             }
@@ -788,9 +787,9 @@ namespace GilesTrinity.ItemRules
         private void checkItemForMissingTranslation(ACDItem item)
         {
             string balanceIDstr;
-            if (!nameToBalanceId.TryGetValue(item.Name.Replace(" ", ""), out balanceIDstr))
+            if (!nameToBalanceId.TryGetValue(item.Name.Replace(" ", ""), out balanceIDstr) && !nameToBalanceId.ContainsValue(item.GameBalanceId.ToString()))
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Translation: Missing: " + item.GameBalanceId.ToString() + ";" + item.Name);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Translation: Missing: " + item.GameBalanceId.ToString() + ";" + item.Name + " (ID is missing report)");
                 // not found missing name
                 StreamWriter transFix = new StreamWriter(Path.Combine(FileManager.LoggingPath, transFixFile), true);
                 transFix.WriteLine("Missing: " + item.GameBalanceId.ToString() + ";" + item.Name);
