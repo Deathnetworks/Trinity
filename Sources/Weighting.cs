@@ -44,12 +44,14 @@ namespace GilesTrinity
                 int EliteCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
 
                 bool profileTagCheck = false;
-                Type behaviorType = ProfileManager.CurrentProfileBehavior.GetType();
-                if (behaviorType == typeof(WaitTimerTag) || behaviorType == typeof(UseTownPortalTag))
+                if (ProfileManager.CurrentProfileBehavior != null)
                 {
-                    profileTagCheck = true;
+                    Type behaviorType = ProfileManager.CurrentProfileBehavior.GetType();
+                    if (behaviorType == typeof(WaitTimerTag) || behaviorType == typeof(UseTownPortalTag))
+                    {
+                        profileTagCheck = true;
+                    }
                 }
-                
 
                 bool ShouldIgnoreTrashMobs = 
                     (!TownRun.IsTryingToTownPortal() && 

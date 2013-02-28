@@ -17,6 +17,7 @@ using Zeta.Pathfinding;
 using System.Drawing;
 using GilesTrinity.Settings.Combat;
 using Zeta.Internals;
+using Zeta.CommonBot.Profile;
 
 namespace GilesTrinity.DbProvider
 {
@@ -99,12 +100,12 @@ namespace GilesTrinity.DbProvider
                     TimeLastRecordedPosition = DateTime.Now;
                 }
 
-                Composite c = null;
+                ProfileBehavior c = null;
 
                 try
                 {
                     if (ProfileManager.CurrentProfileBehavior != null)
-                        c = ProfileManager.CurrentProfileBehavior.Behavior;
+                        c = ProfileManager.CurrentProfileBehavior;
                 }
                 catch { }
 
@@ -270,7 +271,7 @@ namespace GilesTrinity.DbProvider
                 // Wait for 10 second log out timer if not in town
                 if (!ZetaDia.Me.IsInTown)
                 {
-                    Thread.Sleep(10000);
+                    Thread.Sleep(15000);
                 }
             }
             else

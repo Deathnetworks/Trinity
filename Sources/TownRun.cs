@@ -227,12 +227,18 @@ namespace GilesTrinity
             return TownRunCheckTimer.IsRunning && TownRunCheckTimer.ElapsedMilliseconds < 2000;
         }
 
+        private static bool lastTownPortalCheckResult = false;
+        private static DateTime lastTownPortalCheckTime = DateTime.MinValue;
+
         /// <summary>
         /// Returns if we're trying to TownRun or if profile tag is UseTownPortalTag
         /// </summary>
         /// <returns></returns>
         internal static bool IsTryingToTownPortal()
         {
+            if (DateTime.Now.Subtract(lastTownPortalCheckTime).TotalMilliseconds < GilesTrinity.Settings.Advanced.CacheRefreshRate)
+                return lastTownPortalCheckResult;
+
             bool result = false;
 
             if (GilesTrinity.IsReadyToTownRun)
@@ -256,15 +262,21 @@ namespace GilesTrinity
                 DbHelper.Log(LogCategory.UserInformation, "Exception while checking for TownPortal!");
                 DbHelper.Log(LogCategory.GlobalHandler, ex.ToString());
             }
-            Type profileBehaviortype = CurrentProfileBehavior.GetType();
-            if (profileBehaviortype != null && (profileBehaviortype == typeof(UseTownPortalTag) || profileBehaviortype == typeof(WaitTimerTag)))
+            if (ProfileManager.CurrentProfileBehavior != null)
             {
-                result = true;
+                Type profileBehaviortype = CurrentProfileBehavior.GetType();
+                if (profileBehaviortype != null && (profileBehaviortype == typeof(UseTownPortalTag) || profileBehaviortype == typeof(WaitTimerTag)))
+                {
+                    result = true;
+                }
             }
 
             if (Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                 result = true;
 
+
+            lastTownPortalCheckTime = DateTime.Now;
+            lastTownPortalCheckResult = result;
             return result;
         }
 

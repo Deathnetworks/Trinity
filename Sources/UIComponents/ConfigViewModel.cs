@@ -8,6 +8,7 @@ using System.Windows.Input;
 using GilesTrinity.Technicals;
 using System;
 using System.Windows.Forms;
+using Zeta.CommonBot;
 
 namespace GilesTrinity.UIComponents
 {
@@ -519,7 +520,7 @@ namespace GilesTrinity.UIComponents
             ReloadScriptRulesCommand = new RelayCommand(
                                     (parameter) =>
                                     {
-                                        GilesTrinity.StashRule.readConfiguration();
+                                        BotMain.PauseWhile(GilesTrinity.StashRule.reloadFromUI);
                                     }
                                     );
             ResetTownRunCommand = new RelayCommand(

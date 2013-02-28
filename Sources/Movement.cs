@@ -212,7 +212,7 @@ namespace GilesTrinity
             // So ZetaDia.Physics.Raycast() == !Navigator.Raycast()
             // We're using Navigator.Raycast now because it's "faster" (per Nesox)
 
-            bool rc  = Navigator.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + ZDiff), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + ZDiff));
+            bool rc = Navigator.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + ZDiff), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + ZDiff));
 
             if (!rc)
             {

@@ -103,10 +103,13 @@ namespace GilesTrinity
             {
                 try
                 {
-                    if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || !ZetaDia.CPlayer.IsValid || ZetaDia.IsLoadingWorld || ZetaDia.Me.IsDead)
+                    if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                     {
-                        if (!Me.IsDead)
-                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
+                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
+                        return RunStatus.Failure;
+                    }
+                    if (ZetaDia.Me.IsDead)
+                    {
                         return RunStatus.Failure;
                     }
                     HandlerRunStatus runStatus = HandlerRunStatus.NotFinished;
@@ -766,10 +769,10 @@ namespace GilesTrinity
             using (new PerformanceLogger("HandleTarget.DistanceEqualCheck"))
             {
                 // Count how long we have failed to move - body block stuff etc.
-                if (Math.Abs(TargetCurrentDistance - fLastDistanceFromTarget) < 2f)
+                if (Math.Abs(TargetCurrentDistance - fLastDistanceFromTarget) < 5f && PlayerMover.GetMovementSpeed() < 1)
                 {
                     bForceNewMovement = true;
-                    if (DateTime.Now.Subtract(lastMovedDuringCombat).TotalMilliseconds >= 250)
+                    if (DateTime.Now.Subtract(lastMovedDuringCombat).TotalMilliseconds >= 500)
                     {
                         lastMovedDuringCombat = DateTime.Now;
                         // We've been stuck at least 250 ms, let's go and pick new targets etc.
@@ -837,7 +840,7 @@ namespace GilesTrinity
                     return HandlerRunStatus.NotFinished;
 
                 // don't timeout if we're actively moving
-                if (PlayerMover.MovementSpeed >= 1)
+                if (PlayerMover.GetMovementSpeed() >= 1)
                     return HandlerRunStatus.NotFinished;
 
                 if (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6)
@@ -1160,6 +1163,7 @@ namespace GilesTrinity
                 // Tell target finder to prioritize close-combat targets incase we were bodyblocked
                 switch (TimesBlockedMoving)
                 {
+                    case 0:
                     case 1:
                         ForceCloseRangeForMilliseconds = 850;
                         break;
@@ -1167,6 +1171,7 @@ namespace GilesTrinity
                         ForceCloseRangeForMilliseconds = 1300;
                         // Cancel avoidance attempts for 500ms
                         cancelledEmergencyMoveForMilliseconds = 1500;
+                        DbHelper.Log(LogCategory.Movement, "Canceling emergency movement for {0} ms", cancelledEmergencyMoveForMilliseconds);
                         timeCancelledEmergencyMove = DateTime.Now;
                         vlastSafeSpot = vNullLocation;
                         // Check for raycastability against objects
@@ -1194,6 +1199,7 @@ namespace GilesTrinity
                         ForceCloseRangeForMilliseconds = 2000;
                         // Cancel avoidance attempts for 1.5 seconds
                         cancelledEmergencyMoveForMilliseconds = 2000;
+                        DbHelper.Log(LogCategory.Movement, "Canceling emergency movement for {0} ms", cancelledEmergencyMoveForMilliseconds);
                         timeCancelledEmergencyMove = DateTime.Now;
                         vlastSafeSpot = vNullLocation;
                         // Blacklist the current avoidance target area for the next avoidance-spot find
@@ -1204,6 +1210,7 @@ namespace GilesTrinity
                         ForceCloseRangeForMilliseconds = 4000;
                         // Cancel avoidance attempts for 3.5 seconds
                         cancelledEmergencyMoveForMilliseconds = 4000;
+                        DbHelper.Log(LogCategory.Movement, "Canceling emergency movement for {0} ms", cancelledEmergencyMoveForMilliseconds);
                         timeCancelledEmergencyMove = DateTime.Now;
                         vlastSafeSpot = vNullLocation;
                         // Blacklist the current avoidance target area for the next avoidance-spot find

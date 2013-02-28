@@ -240,13 +240,14 @@ namespace GilesTrinity
         /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
         /// </summary>
         internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
-            174900, 104632, 194682, 81699, 3340, 123325, 185391,
+            174900, 104632, 194682, 81699, 3340, 123325, 
+            56947, // A3 blacksmith
         };
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 25}, {104632, 20}, {194682, 20}, {81699, 20}, {3340, 12}, {123325, 25}, {185391, 15},
+            {174900, 25}, {104632, 20}, {194682, 20}, {81699, 20}, {3340, 12}, {123325, 25}, {185391, 15}, 
          };
         /// <summary>
         /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache
@@ -266,7 +267,7 @@ namespace GilesTrinity
         /// Resplendent chest SNO list
         /// </summary>
         internal static HashSet<int> hashSNOContainerResplendant = new HashSet<int> {
-            62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866,
+            62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866, 109264,
             // Magi
 			112182,
          };

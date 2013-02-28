@@ -19,11 +19,11 @@
 [TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Gauntlets of Vitality"
 [TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Spaulders of Dexterity"
 [TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Spaulders of Intelligence"
-[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Spaulders of Strength
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Spaulders of Strength"
 [TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Spaulders of Vitality"
 [TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Armor of Dexterity"
 [TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Armor of Intelligence"
-[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Armor of Strength
+[TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Armor of Strength"
 [TYPE] == "CraftingPlan" && [NAME] == "Plan: Archon Armor of Vitality"
 [TYPE] == "CraftingPlan" && [NAME] == "Design: Marquise Amethyst"
 [TYPE] == "CraftingPlan" && [NAME] == "Design: Marquise Emerald"

@@ -13,6 +13,7 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
+        private static float Monk_MaxDashingStrikeRange = 55f;
         private static TrinityPower GetMonkPower(bool IsCurrentlyAvoiding, bool UseOOCBuff, bool UseDestructiblePower)
         {
             // Monks need 80 for special spam like tempest rushing
@@ -242,11 +243,27 @@ namespace GilesTrinity
 
             // Dashing Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
-                (AnythingWithinRange[RANGE_40] == 1 && (!CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.HitPointsPct <= 0.2)
-                || CurrentTarget.CentreDistance >= 40f) &&
+                ((CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.HitPointsPct <= 0.2) || CurrentTarget.CentreDistance >= 40f) &&
                 Hotbar.Contains(SNOPower.Monk_DashingStrike) && ((PlayerStatus.PrimaryResource >= 30 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
-                return new TrinityPower(SNOPower.Monk_DashingStrike, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
+            }
+
+            //skillDict.Add("DashingStrike", SNOPower.Monk_DashingStrike);
+            //runeDict.Add("WayOfTheFallingStar", 1);
+            //runeDict.Add("FlyingSideKick", 4);
+            //runeDict.Add("Quicksilver", 3);
+            //runeDict.Add("SoaringSkull", 0);
+            //runeDict.Add("BlindingSpeed", 2);
+
+            bool hasWayOfTheFallingStar = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_DashingStrike && s.RuneIndex == 1);
+
+            // Dashing strike + way of the fallen Star
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_DashingStrike) &&
+                (TimeSinceUse(SNOPower.Monk_DashingStrike) >= 2800) && hasWayOfTheFallingStar &&
+                ((PlayerStatus.PrimaryResource >= 25 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
+            {
+                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
             }
 
             // Wave of light
@@ -345,6 +362,8 @@ namespace GilesTrinity
         {
             if (Monk_TempestRushReady())
                 return new TrinityPower(SNOPower.Monk_TempestRush, 40f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+            if (Hotbar.Contains(SNOPower.Monk_DashingStrike))
+                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (Hotbar.Contains(SNOPower.Monk_FistsofThunder))
                 return new TrinityPower(SNOPower.Monk_FistsofThunder, 15f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
             if (Hotbar.Contains(SNOPower.Monk_DeadlyReach))

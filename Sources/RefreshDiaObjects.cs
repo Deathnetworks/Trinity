@@ -103,7 +103,7 @@ namespace GilesTrinity
                             // Didn't find any safe spot we could reach, so don't look for any more safe spots for at least 2.8 seconds
                             cancelledEmergencyMoveForMilliseconds = 2800;
                             timeCancelledEmergencyMove = DateTime.Now;
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Unable to find kite location, canceling kite movement for {0}ms", cancelledKiteMoveForMilliseconds);
+                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Unable to find kite location, canceling emergency movement for {0}ms", cancelledEmergencyMoveForMilliseconds);
                         }
                     }
                 }
@@ -809,7 +809,7 @@ namespace GilesTrinity
                                             {
                                                 Position = vAnySafePoint,
                                                 Type = GObjectType.Avoidance,
-                                                Weight = 20000,
+                                                Weight = 90000,
                                                 CentreDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vAnySafePoint),
                                                 RadiusDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vAnySafePoint),
                                                 InternalName = "KitePoint"

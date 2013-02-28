@@ -109,6 +109,12 @@ namespace GilesTrinity.ItemRules
             File.Delete(actualLog);
         }
 
+        public bool reloadFromUI()
+        {
+            readConfiguration();
+            return false;
+        }
+
         /// <summary>
         /// Loads (or re-loads) the ItemRules configuration from settings and .dis entries
         /// </summary>
