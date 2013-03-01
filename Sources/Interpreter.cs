@@ -443,6 +443,9 @@ namespace GilesTrinity.ItemRules
             if (logType == LogType.DEBUG && !GilesTrinity.Settings.Loot.ItemRules.Debug)
                 return;
 
+            if (!GilesTrinity.Settings.Advanced.ItemRulesLogs)
+                return;
+
             log = new StreamWriter(Path.Combine(FileManager.LoggingPath, logFile), true);
             log.WriteLine(DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".Hero" + SEP + logType + SEP + action + SEP + str);
             log.Close();

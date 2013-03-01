@@ -19,6 +19,8 @@ namespace GilesTrinity.Settings
         private bool _GoldInactivityEnabled;
         private int _GoldInactivityTimer;
         private bool _LogDroppedItems;
+        private bool _OutputReports;
+        private bool _ItemRulesLogs;
         #endregion Fields
 
         #region Events
@@ -236,6 +238,40 @@ namespace GilesTrinity.Settings
                 }
             }
         }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool OutputReports
+        {
+            get
+            {
+                return _OutputReports;
+            }
+            set
+            {
+                if (_OutputReports != value)
+                {
+                    _OutputReports = value;
+                    OnPropertyChanged("OutputReports");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool ItemRulesLogs
+        {
+            get
+            {
+                return _ItemRulesLogs;
+            }
+            set
+            {
+                if (_ItemRulesLogs != value)
+                {
+                    _ItemRulesLogs = value;
+                    OnPropertyChanged("ItemRulesLogs");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -274,6 +310,8 @@ namespace GilesTrinity.Settings
         internal void OnDeserializingMethod(StreamingContext context)
         {
             this._CacheRefreshRate = 100;
+            this._OutputReports = true;
+            this._ItemRulesLogs = true;
         }
         #endregion Methods
     }

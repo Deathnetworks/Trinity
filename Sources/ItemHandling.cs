@@ -685,6 +685,11 @@ namespace GilesTrinity
         /// </summary>
         internal static void OutputReport()
         {
+            if (!Settings.Advanced.OutputReports)
+            {
+                return;
+            }
+
             /*
               Check is Lv 60 or not
              * If lv 60 use Paragon

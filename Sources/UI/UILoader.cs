@@ -46,9 +46,9 @@ namespace GilesTrinity.UI
 
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Configure Window");
                 _ConfigWindow.Content = mainControl;
-                _ConfigWindow.Height = 520;
+                _ConfigWindow.Height = 620;
                 _ConfigWindow.Width = 480;
-                _ConfigWindow.MinHeight = 520;
+                _ConfigWindow.MinHeight = 580;
                 _ConfigWindow.MinWidth = 480;
                 _ConfigWindow.Title = "Trinity";
                 
