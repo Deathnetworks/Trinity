@@ -49,7 +49,7 @@ namespace GilesTrinity.ItemRules
         };
 
         // final variables
-        readonly string version = "2.2.0.3";
+        readonly string version = "2.2.1.5";
         readonly string translationFile = "translation.dis";
         readonly string pickupFile = "pickup.dis";
         readonly string logFile = "ItemRules.log";
@@ -551,19 +551,17 @@ namespace GilesTrinity.ItemRules
             itemDic.Add("[BASETYPE]", item.DBBaseType.ToString());
 
             // - TYPE -------------------------------------------------------------//
-            // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
-            if (item.DBItemType == ItemType.Unknown && item.Name.Contains("Plan"))
+            /// TODO remove this check if it isnt necessary anymore
+            if (item.DBItemType == ItemType.Unknown && (item.Name.Contains("Plan") || item.Name.Contains("Design")))
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "There are still buggy itemType infos for craftingPlan around {0} has itemType = {1}", item.Name, item.DBItemType);
                 result = ItemType.CraftingPlan.ToString();
+            }
             else result = item.DBItemType.ToString();
             itemDic.Add("[TYPE]", result);
 
             // - QUALITY -------------------------------------------------------//
-            // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
-            if ((item.DBItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.DBItemType == ItemType.CraftingPlan)
-                result = getPlanQualityFromName(item.Name);
-            else
-                result = Regex.Replace(item.Quality.ToString(), @"[\d-]", string.Empty);
-            itemDic.Add("[QUALITY]", result);
+            itemDic.Add("[QUALITY]", Regex.Replace(item.Quality.ToString(), @"[\d-]", string.Empty));
             itemDic.Add("[D3QUALITY]", item.Quality.ToString());
 
             // - ROLL ----------------------------------------------------------//
@@ -572,14 +570,9 @@ namespace GilesTrinity.ItemRules
                 itemDic.Add("[ROLL]", roll);
             else
                 itemDic.Add("[ROLL]", 0);
-            //itemDic.Add("[ROLL]", Regex.Replace(item.Quality.ToString(), @"[^\d]", string.Empty));
 
             // - NAME -------------------------------------------------------------//
-            if ((item.DBItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.DBItemType == ItemType.CraftingPlan)
-                //{c:ffffff00}Plan: Exalted Fine Doomcaster{/c}
-                itemDic.Add("[NAME]", Regex.Replace(item.Name, @"{[/:a-zA-Z0-9 ]*}", string.Empty).Replace(" ", ""));
-            else
-                itemDic.Add("[NAME]", item.Name.ToString().Replace(" ", ""));
+            itemDic.Add("[NAME]", item.Name.ToString().Replace(" ", ""));
 
             // - LEVEL ------------------------------------------------------------//
             itemDic.Add("[LEVEL]", (float)item.Level);
@@ -617,19 +610,17 @@ namespace GilesTrinity.ItemRules
             itemDic.Add("[BASETYPE]", item.ItemBaseType.ToString());
 
             // - TYPE -------------------------------------------------------------//
-            // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
+            /// TODO remove this check if it isnt necessary anymore
             if (item.ItemType == ItemType.Unknown && item.Name.Contains("Plan"))
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "There are still buggy itemType infos for craftingPlan around {0} has itemType = {1}", item.Name, item.ItemType);
                 result = ItemType.CraftingPlan.ToString();
+            }
             else result = item.ItemType.ToString();
             itemDic.Add("[TYPE]", result);
 
             // - QUALITY -------------------------------------------------------//
-            // TODO: this an ugly redundant piece of shit ... db returns unknow itemtype for legendary plans
-            if ((item.ItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.ItemType == ItemType.CraftingPlan)
-                result = getPlanQualityFromName(item.Name);
-            else
-                result = Regex.Replace(item.ItemQualityLevel.ToString(), @"[\d-]", string.Empty);
-            itemDic.Add("[QUALITY]", result);
+            itemDic.Add("[QUALITY]", Regex.Replace(item.ItemQualityLevel.ToString(), @"[\d-]", string.Empty));
             itemDic.Add("[D3QUALITY]", item.ItemQualityLevel.ToString());
 
             // - ROLL ----------------------------------------------------------//
@@ -638,14 +629,9 @@ namespace GilesTrinity.ItemRules
                 itemDic.Add("[ROLL]", roll);
             else
                 itemDic.Add("[ROLL]", 0);
-            //itemDic.Add("[ROLL]", Regex.Replace(item.Quality.ToString(), @"[^\d]", string.Empty));
 
             // - NAME -------------------------------------------------------------//
-            if ((item.ItemType == ItemType.Unknown && item.Name.Contains("Plan")) || item.ItemType == ItemType.CraftingPlan)
-                //{c:ffffff00}Plan: Exalted Fine Doomcaster{/c}
-                itemDic.Add("[NAME]", Regex.Replace(item.Name, @"{[/:a-zA-Z0-9 ]*}", string.Empty).Replace(" ", ""));
-            else
-                itemDic.Add("[NAME]", item.Name.ToString().Replace(" ", ""));
+            itemDic.Add("[NAME]", item.Name.ToString().Replace(" ", ""));
 
             // - LEVEL ------------------------------------------------------------//
             itemDic.Add("[LEVEL]", (float)item.Level);
@@ -807,21 +793,6 @@ namespace GilesTrinity.ItemRules
                 transFix.Close();
             }
         }
-
-        private object getPlanQualityFromName(string name)
-        {
-            if (name.Contains("ffbf642f"))
-                return ItemQuality.Legendary.ToString();
-            else if (name.Contains("Exalted Grand"))
-                return ItemQuality.Rare6.ToString();
-            else if (name.Contains("Exalted Fine"))
-                return ItemQuality.Rare5.ToString();
-            else if (name.Contains("Exalted"))
-                return ItemQuality.Rare4.ToString();
-            else
-                return ItemQuality.Normal.ToString();
-        }
-
     }
 
     #endregion Interpreter
