@@ -102,7 +102,7 @@ namespace GilesTrinity
             if (SNOAvoidanceType.ContainsKey(snoId))
             {
                 float radius = GetAvoidanceRadius(SNOAvoidanceType[snoId], defaultValue);
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Radius of={0} for snoId={1} (default={2})", radius, snoId, defaultValue);
+                //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Radius of={0} for snoId={1} (default={2})", radius, snoId, defaultValue);
                 return radius;
             }
             else
@@ -206,9 +206,7 @@ namespace GilesTrinity
             if (SNOAvoidanceType.ContainsKey(snoId))
             {
                 float health = GetAvoidanceHealth(SNOAvoidanceType[snoId], defaultValue);
-
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Health of={0} for snoId={1} (default={2})", health, snoId, defaultValue);
-
+                //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Found avoidance Health of={0} for snoId={1} (default={2})", health, snoId, defaultValue);
                 return health;
             }
             else

@@ -268,10 +268,8 @@ namespace GilesTrinity
             }
 
             // Wave of light
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
-                Hotbar.Contains(SNOPower.Monk_WaveOfLight) &&
-                GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
-                (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2 || ((CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 20f)) &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_WaveOfLight) && GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
+                //(ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2 || ((CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 20f)) &&
                 (PlayerStatus.PrimaryResource >= 70 ||
                  (hasEmpoweredWaveRune && PlayerStatus.PrimaryResource >= 40 && !IsWaitingForSpecial)) && // Empowered Wave
                  // (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) && // optional check for SW stacks

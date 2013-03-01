@@ -1278,6 +1278,8 @@ namespace GilesTrinity
             statusText.Append(TargetRangeRequired.ToString("0.0"));
             statusText.Append(". DistfromTrgt: ");
             statusText.Append(TargetCurrentDistance.ToString("0.0"));
+            statusText.Append(". Health: ");
+            statusText.Append((PlayerStatus.CurrentHealthPct*100).ToString("0"));
             statusText.Append(". InLoS: ");
             statusText.Append(CurrentTargetIsInLoS);
             statusText.Append(". ");
