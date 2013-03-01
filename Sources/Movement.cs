@@ -26,14 +26,19 @@ namespace GilesTrinity
                 using (new PerformanceLogger("FindZigZagTargetLocation.CheckObjectCache"))
                 {
                     bool useTargetBasedZigZag = false;
-                    if (PlayerStatus.ActorClass == ActorClass.Monk)
-                        useTargetBasedZigZag = (Settings.Combat.Monk.TargetBasedZigZag);
-                    if (PlayerStatus.ActorClass == ActorClass.Barbarian)
-                        useTargetBasedZigZag = (Settings.Combat.Barbarian.TargetBasedZigZag);
-
                     float maxDistance = 30f;
                     int minTargets = 2;
 
+                    if (PlayerStatus.ActorClass == ActorClass.Monk)
+                    {
+                        maxDistance = 20f;
+                        minTargets = 3;
+                        useTargetBasedZigZag = (Settings.Combat.Monk.TargetBasedZigZag);
+                    }
+                    if (PlayerStatus.ActorClass == ActorClass.Barbarian)
+                    {
+                        useTargetBasedZigZag = (Settings.Combat.Barbarian.TargetBasedZigZag);
+                    }
                     if (useTargetBasedZigZag && !bAnyTreasureGoblinsPresent && GilesObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
                     {
                         IEnumerable<GilesObject> zigZagTargets =

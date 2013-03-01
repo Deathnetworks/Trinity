@@ -8,6 +8,7 @@ using Zeta.Internals.Actors;
 using GilesTrinity.Settings.Combat;
 using Zeta;
 using GilesTrinity.DbProvider;
+using Zeta.CommonBot.Profile.Common;
 
 namespace GilesTrinity
 {
@@ -150,8 +151,8 @@ namespace GilesTrinity
 
             // Cyclone Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_20] >= 1 || AnythingWithinRange[RANGE_20] >= 2 || (hasCycloneStikeImposion && AnythingWithinRange[RANGE_30] >= 2) ||
-                (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 18f)) &&
+                (TargetUtil.AnyElitesInRange(24) || TargetUtil.AnyMobsInRange(24,2) || (hasCycloneStikeImposion && TargetUtil.AnyMobsInRange(34,2)) ||
+                (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 24f)) &&
                 Hotbar.Contains(SNOPower.Monk_CycloneStrike) &&
                 (((PlayerStatus.PrimaryResource >= 50 || (hasCycloneStikeEyeOfTheStorm && PlayerStatus.PrimaryResource >= 30)) && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                 GilesUseTimer(SNOPower.Monk_CycloneStrike) && PowerManager.CanCast(SNOPower.Monk_CycloneStrike))
@@ -400,6 +401,16 @@ namespace GilesTrinity
         {
             bool isReady = false;
 
+            if (ProfileManager.CurrentProfileBehavior != null)
+            {
+                Type profileBehaviorType = ProfileManager.CurrentProfileBehavior.GetType();
+                if (profileBehaviorType == typeof(UseObjectTag) || 
+                    profileBehaviorType == typeof(UsePortalTag) || 
+                    profileBehaviorType == typeof(UseWaypointTag) || 
+                    profileBehaviorType == typeof(UseTownPortalTag))
+                    return false;
+            }
+
             if (!Hotbar.Contains(SNOPower.Monk_TempestRush))
                 return false;
 
@@ -432,7 +443,7 @@ namespace GilesTrinity
             if (TownRun.IsTryingToTownPortal())
                 return;
 
-            if (TimeSinceUse(SNOPower.Monk_TempestRush) > 150)
+            if (TimeSinceUse(SNOPower.Monk_TempestRush) > 75)
                 return;
 
             bool shouldMaintain = false;
@@ -487,10 +498,13 @@ namespace GilesTrinity
                 {
                     target = MathEx.CalculatePointFrom(target, ZetaDia.Me.Position, aimPointDistance);
                 }
+                if (DestinationDistance > 2f)
+                {
 
-                Monk_TempestRushStatus(String.Format("Using Tempest Rush to maintain channeling, source={0}, V3={1} dist={2:0}", locationSource, target, DestinationDistance));
-                ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, target, CurrentWorldDynamicId, -1);
-                dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
+                    Monk_TempestRushStatus(String.Format("Using Tempest Rush to maintain channeling, source={0}, V3={1} dist={2:0}", locationSource, target, DestinationDistance));
+                    ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, target, CurrentWorldDynamicId, -1);
+                    dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
+                }
             }
         }
         private static void Monk_TempestRushStatus(string trUse)

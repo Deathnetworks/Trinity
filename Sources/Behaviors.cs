@@ -150,6 +150,8 @@ namespace GilesTrinity
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget was passed as null! Continuing...");
                     }
 
+                    Monk_MaintainTempestRush();
+
                     CheckStaleCache();
                     using (new PerformanceLogger("HandleTarget.CheckForNewTarget"))
                     {
@@ -190,8 +192,6 @@ namespace GilesTrinity
                             }
                         }
                     }
-
-                    Monk_MaintainTempestRush();
 
                     if (CurrentTarget == null && (ForceVendorRunASAP || IsReadyToTownRun) && !Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && TownRun.TownRunTimerRunning())
                     {
@@ -658,6 +658,10 @@ namespace GilesTrinity
                         // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||
                             CurrentTarget.Type == GObjectType.Globe ||
+                            CurrentTarget.Type == GObjectType.Gold ||
+                            CurrentTarget.Type == GObjectType.Unit ||
+                            CurrentTarget.Type == GObjectType.Barricade ||
+                            CurrentTarget.Type == GObjectType.Destructible ||
                             (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
                             && GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination)
                             )

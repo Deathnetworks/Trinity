@@ -75,7 +75,7 @@ namespace GilesTrinity.DbProvider
             // set checkDuration to 30 sec while in town or vendoring, just to avoid annoyances
             if (ZetaDia.Me.IsInTown || GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
             {
-                checkDuration = 30000;
+                checkDuration = 15000;
             }
 
             // Keep checking distance changes every 3 seconds

@@ -386,6 +386,11 @@ namespace GilesTrinity
                                 if (CurrentTarget != null && bAnyMobsInCloseRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting && cacheObject.ItemQuality < ItemQuality.Legendary)
                                     cacheObject.Weight = 1;
 
+                                if (PlayerStatus.ActorClass == ActorClass.Monk && TimeSinceUse(SNOPower.Monk_TempestRush) < 1000 && cacheObject.ItemQuality < ItemQuality.Legendary)
+                                {
+                                    cacheObject.Weight = 1;
+                                }
+
                                 break;
                             }
                         case GObjectType.Globe:
