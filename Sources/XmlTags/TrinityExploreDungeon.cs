@@ -894,6 +894,18 @@ namespace GilesTrinity.XmlTags
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Dequeueing current node {0} - {1}", BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter, reason);
             BrainBehavior.DungeonExplorer.CurrentNode.Visited = true;
             BrainBehavior.DungeonExplorer.CurrentRoute.Dequeue();
+
+            foreach (DungeonNode node in GridSegmentation.Nodes.Where(n => !n.Visited))
+            {
+                float distance = node.NavigableCenter.Distance2D(myPos);
+                if (distance <= PathPrecision)
+                {
+                    node.Visited = true;
+                    string reason2 = String.Format("Node {0} is within path precision {1:0}/{2:0}", node.NavigableCenter, distance, PathPrecision);
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Marking unvisited nearby node as visited - {0}", reason2);
+                }
+            }
+
             PrintNodeCounts("SetNodeVisited");
         }
 
