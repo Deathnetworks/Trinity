@@ -40,6 +40,7 @@ namespace GilesTrinity
                 using (new PerformanceLogger("RefreshDiaObjectCache.UpdateBlock"))
                 {
                     GenericCache.MaintainCache();
+                    GenericBlacklist.MaintainBlacklist();
                     
                     using (ZetaDia.Memory.AcquireFrame())
                     {

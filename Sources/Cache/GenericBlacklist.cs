@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -33,7 +32,7 @@ namespace GilesTrinity
         {
             lock (_Synchronizer)
             {
-                if (ContainsKey(obj.Key))
+                if (Contains(obj))
                 {
                     Blacklist.RemoveWhere(o => o.Key == obj.Key);
                 }
@@ -42,11 +41,22 @@ namespace GilesTrinity
             }
         }
 
+        public static bool Contains(GenericCacheObject obj)
+        {
+            lock (_Synchronizer)
+            {
+                return Blacklist.Contains(obj);
+            }
+        }
+
         public static bool ContainsKey(string key)
         {
             lock (_Synchronizer)
             {
-                return Blacklist.AsParallel().Any(o => o.Key == key);
+                return Blacklist.Contains(new GenericCacheObject()
+                {
+                    Key = key
+                });
             }
         }
 
@@ -63,15 +73,23 @@ namespace GilesTrinity
 
         public static void MaintainBlacklist()
         {
-            if (Manager == null || (Manager != null && Manager.ThreadState != System.Threading.ThreadState.Running))
+            try
             {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Starting up Generic Blacklist Manager thread");
-                Manager = new Thread(Manage)
+                if (Manager == null || (Manager != null && !Manager.IsAlive))
                 {
-                    IsBackground = true,
-                    Priority = ThreadPriority.Lowest
-                };
-                Manager.Start();
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Starting up Generic Blacklist Manager thread");
+                    Manager = new Thread(Manage)
+                    {
+                        IsBackground = true,
+                        Priority = ThreadPriority.Lowest
+                    };
+                    Manager.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Exception in Generic Blacklist Manager");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, ex.ToString());
             }
         }
 

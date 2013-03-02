@@ -479,7 +479,7 @@ namespace GilesTrinity
                         case GObjectType.Shrine:
                             {
                                 // Weight Shrines
-                                cacheObject.Weight = (300f - cacheObject.RadiusDistance) / 300f * 14500f;
+                                cacheObject.Weight = (75f - cacheObject.RadiusDistance) / 75f * 14500f;
 
                                 // Very close shrines get a weight increase
                                 if (cacheObject.CentreDistance <= 30f)

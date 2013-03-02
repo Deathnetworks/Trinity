@@ -241,7 +241,6 @@ namespace GilesTrinity
         /// </summary>
         internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
             174900, 104632, 194682, 81699, 3340, 123325, 
-            56947, // A3 blacksmith
         };
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)

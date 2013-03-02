@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -46,7 +45,18 @@ namespace GilesTrinity
         {
             lock (_Synchronizer)
             {
-                return CacheList.AsParallel().Any(o => o.Key == key);
+                return CacheList.Contains(new GenericCacheObject()
+                {
+                    Key = key
+                });
+            }
+        }
+
+        public static bool Contains(GenericCacheObject obj)
+        {
+            lock (_Synchronizer)
+            {
+                return CacheList.Contains(obj);
             }
         }
 
@@ -63,9 +73,9 @@ namespace GilesTrinity
 
         public static void MaintainCache()
         {
-            if (Manager == null || (Manager != null && Manager.ThreadState != System.Threading.ThreadState.Running))
+            if (Manager == null || (Manager != null && !Manager.IsAlive))
             {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Starting up Generic Cache Manage thread");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Starting up Generic Cache Manage thread");
                 Manager = new Thread(Manage)
                 {
                     IsBackground = true,
@@ -77,16 +87,25 @@ namespace GilesTrinity
 
         private static void Manage()
         {
-            while (true)
+            try
             {
-                long NowTicks = DateTime.Now.Ticks;
-
-                lock (_Synchronizer)
+                while (true)
                 {
-                    CacheList.RemoveWhere(o => o.Expires.Ticks < NowTicks);
-                }
 
-                Thread.Sleep(100);
+                    long NowTicks = DateTime.Now.Ticks;
+
+                    lock (_Synchronizer)
+                    {
+                        CacheList.RemoveWhere(o => o.Expires.Ticks < NowTicks);
+                    }
+
+                    Thread.Sleep(100);
+                }
+            }
+            catch (Exception ex)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Exception in Generic Cache Manager");
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, ex.ToString());
             }
         }
 
@@ -107,7 +126,7 @@ namespace GilesTrinity
         }
     }
 
-    internal class GenericCacheObject
+    internal class GenericCacheObject : Comparer<GenericCacheObject>
     {
         public string Key { get; set; }
         public object Value { get; set; }
@@ -120,6 +139,11 @@ namespace GilesTrinity
             Key = key;
             Value = value;
             Expires = DateTime.Now.Add(expirationDuration);
+        }
+
+        public override int Compare(GenericCacheObject x, GenericCacheObject y)
+        {
+            return x.Key.CompareTo(y.Key);
         }
     }
 }
