@@ -145,8 +145,6 @@ namespace GilesTrinity.ItemRules
                 rulesPath = Path.Combine(FileManager.ItemRulePath, "Rules", GilesTrinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
 
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "RULEPATH = {0} ", rulesPath);
-            if (GilesTrinity.Settings.Loot.ItemRules.UseItemIDs)
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Using 'UseItemIDs-translation' is still in beta testing and not activated in this release!");
 
             // fill translation dictionary
             nameToBalanceId = new Dictionary<string, string>();
