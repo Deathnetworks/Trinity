@@ -113,7 +113,7 @@ namespace GilesTrinity
                 if (!AddToCache) { c_IgnoreReason = "CachedPosition"; return AddToCache; }
             }
 
-            if (c_ObjectType != GObjectType.Unit)
+            if (c_ObjectType == GObjectType.Item)
             {
                 /* Generic Blacklisting for shifting RActorGUID bug */
                 c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, c_Position, c_ObjectType.ToString(), GilesTrinity.CurrentWorldDynamicId);

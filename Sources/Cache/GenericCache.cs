@@ -63,7 +63,7 @@ namespace GilesTrinity
 
         public static void MaintainCache()
         {
-            if (Manager == null)
+            if (Manager == null || (Manager != null && Manager.ThreadState != System.Threading.ThreadState.Running))
             {
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Starting up Generic Cache Manage thread");
                 Manager = new Thread(Manage)
@@ -71,6 +71,7 @@ namespace GilesTrinity
                     IsBackground = true,
                     Priority = ThreadPriority.Lowest
                 };
+                Manager.Start();
             }
         }
 
