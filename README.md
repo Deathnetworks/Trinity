@@ -1,4 +1,69 @@
-﻿Unified Trinity Community Edition
+﻿
+# Unified Trinity Community Edition
+
+### Changelog 1.7.2.6:
+
+* Fixed Avoidance ... yes... all avoidance :) It actually works now. Molten cores and Arcane sentries and everything.. 
+
+* Disabled ignoring trash mobs while avoidance is nearby
+
+* Monk Wave of Light is now used more liberally
+
+* Added GUI options for Minimum trash mob counts for Monk Wave of Light and Cyclone Strike
+
+* Optimized Monk Cyclone Strike timing and monster clustering
+
+* Tempest Rush should no longer be maintained with UseObject/UsePortal/UseWaypoint/UseTownPortal tags
+
+* Tempest Rush is now maintained when picking up gold and moving to monsters, barricades and destructibles
+
+* Improved Tempest Rush ZigZag cluster numbers
+
+* Tempest Rush will be better about *not* picking up non-legendary items while channeling with monsters nearby
+
+* Optimized Monk Dashing Strike. Added support for Way of the Falling Star rune.
+
+* Fixed legendary plans in ItemRules 
+
+* Barb Rend is now used more intelligently (borrowed some code from herbfunk!)
+
+* Barb Hammer of the Ancients is now actually used (was incorrectly setup)
+
+* Hopefully fixed flip/flop item pickup bug
+
+* Forced units within 20 yards to be in LoS regardless if Navigator Raycast says so or not
+
+* Force close range fighting/targeting is now detected faster - should help reduce deaths and stucks from trying to run into large packs walls of monsters (after a shrine, perhaps?)
+
+* Changed world object tracking hashing method from SHA1 to MD5 (should reduce CPU slightly)
+
+* Added options to completely disable TrinityLogs outputs (ItemRules, Reports)
+
+* Small optimization for TrinityExploreDungeon to mark future nodes as already visited if the navigable center is also nearby (within PathPrecision distance)
+
+* Unstucker in town now used at 15 sec instead of 30, should help with lame Demonbuddy A3 blacksmith stucks
+
+* Adjustments/optimizations to WD soul harvest
+
+* GoldInactivity now reloads the current profile instead of the last used profile when exiting game
+
+* Changed default value of GoldInactivity to 600sec
+
+* Adjusted weighting for Legendary items (should help pick them up faster to avoid being missed)
+
+* Fixed crash on 'Reload Item Rules' button
+
+* Changed HandleTargetTimeout (target blacklisting) to only trigger if we're not moving/attacking.
+
+* Fixed IsTryingToTownPortal - it now correctly detects if the current profile behavior is a UseTownPortal tag and extends trash kill range appropriately
+
+* Fixed bot attacking Untargettable/Invulnerable/Burrowed units (|| instead of && derp) - fixes "wall climbers"!
+
+* Added avoidance for succubus projectiles
+
+* Fixed weird monk bug where it was trying to cast sweeping winds 10 times per second after taking a town portal
+
+* Adjusted movement position shift handler - should help with weird stucks near demonic forges and other navigation obstacles
 
 ### Changelog 1.7.2.5:
 
