@@ -9,35 +9,35 @@ namespace GilesTrinity
     internal class TrinityPower
     {
         public SNOPower SNOPower { get; set; }
-        public float iMinimumRange { get; set; }
-        public Vector3 vTargetLocation { get; set; }
-        public int iTargetWorldID { get; set; }
-        public int iTargetGUID { get; set; }
-        public int iForceWaitLoopsBefore { get; set; }
-        public int ForceWaitLoopsAfter { get; set; }
-        public bool bWaitWhileAnimating { get; set; }
+        public float MinimumRange { get; set; }
+        public Vector3 TargetPosition { get; set; }
+        public int TargetDynamicWorldId { get; set; }
+        public int TargetRActorGUID { get; set; }
+        public int WaitTicksBeforeUse { get; set; }
+        public int WaitTicksAfterUse { get; set; }
+        public bool WaitForAnimationFinished { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TrinityPower" /> class.
         /// </summary>
         /// <param name="snoPower">The sno power.</param>
-        /// <param name="fRange">The f range.</param>
-        /// <param name="vPosition">The v position.</param>
-        /// <param name="iWorldId">The i world id.</param>
-        /// <param name="iGuid">The i GUID.</param>
-        /// <param name="iWaitLoops">The i wait loops.</param>
-        /// <param name="iAfterLoops">The i after loops.</param>
-        /// <param name="bRepeat">if set to <c>true</c> [b repeat].</param>
-        public TrinityPower(SNOPower snoPower, float fRange, Vector3 vPosition, int iWorldId, int iGuid, int iWaitLoops, int iAfterLoops, bool bRepeat)
+        /// <param name="minimumRange">The f range.</param>
+        /// <param name="position">The v position.</param>
+        /// <param name="targetDynamicWorldId">The i world id.</param>
+        /// <param name="targetRActorGUID">The i GUID.</param>
+        /// <param name="waitTicksBeforeUse">The i wait loops.</param>
+        /// <param name="waitTicksAfterUse">The i after loops.</param>
+        /// <param name="waitForAnimationFinished">if set to <c>true</c> [b repeat].</param>
+        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position, int targetDynamicWorldId, int targetRActorGUID, int waitTicksBeforeUse, int waitTicksAfterUse, bool waitForAnimationFinished)
         {
             SNOPower = snoPower;
-            iMinimumRange = fRange;
-            vTargetLocation = vPosition;
-            iTargetWorldID = iWorldId;
-            iTargetGUID = iGuid;
-            iForceWaitLoopsBefore = iWaitLoops;
-            ForceWaitLoopsAfter = iAfterLoops;
-            bWaitWhileAnimating = bRepeat;
+            MinimumRange = minimumRange;
+            TargetPosition = position;
+            TargetDynamicWorldId = targetDynamicWorldId;
+            TargetRActorGUID = targetRActorGUID;
+            WaitTicksBeforeUse = waitTicksBeforeUse;
+            WaitTicksAfterUse = waitTicksAfterUse;
+            WaitForAnimationFinished = waitForAnimationFinished;
         }
     }
 }

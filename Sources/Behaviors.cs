@@ -128,11 +128,11 @@ namespace GilesTrinity
                     if (CurrentPower == null)
                         CurrentPower = AbilitySelector();
                     // Special pausing *AFTER* using certain powers
-                    if (IsWaitingAfterPower && CurrentPower.ForceWaitLoopsAfter >= 1)
+                    if (IsWaitingAfterPower && CurrentPower.WaitTicksAfterUse >= 1)
                     {
-                        if (CurrentPower.ForceWaitLoopsAfter >= 1)
-                            CurrentPower.ForceWaitLoopsAfter--;
-                        if (CurrentPower.ForceWaitLoopsAfter <= 0)
+                        if (CurrentPower.WaitTicksAfterUse >= 1)
+                            CurrentPower.WaitTicksAfterUse--;
+                        if (CurrentPower.WaitTicksAfterUse <= 0)
                             IsWaitingAfterPower = false;
                         return RunStatus.Running;
                     }
@@ -255,7 +255,7 @@ namespace GilesTrinity
                             powerBuff = AbilitySelector(true, false, false);
                             if (powerBuff.SNOPower != SNOPower.None)
                             {
-                                ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.vTargetLocation, powerBuff.iTargetWorldID, powerBuff.iTargetGUID);
+                                ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetRActorGUID);
                                 LastPowerUsed = powerBuff.SNOPower;
                                 dictAbilityLastUse[powerBuff.SNOPower] = DateTime.Now;
                             }
@@ -310,7 +310,11 @@ namespace GilesTrinity
                         if (TargetCurrentDistance < 0f)
                             TargetCurrentDistance = 0f;
 
-                        if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade && CurrentTarget.Type != GObjectType.Destructible)
+                        if (TargetCurrentDistance <= 20f)
+                        {
+                            CurrentTargetIsInLoS = true;
+                        }
+                        else if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade && CurrentTarget.Type != GObjectType.Destructible)
                         {
                             CurrentTargetIsInLoS = (GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
                         }
@@ -349,11 +353,11 @@ namespace GilesTrinity
                                         if (CurrentPower.SNOPower != SNOPower.None)
                                         {
                                             // Force waiting for global cooldown timer or long-animation abilities
-                                            if (CurrentPower.iForceWaitLoopsBefore >= 1 || (CurrentPower.bWaitWhileAnimating != SIGNATURE_SPAM && DateTime.Now.Subtract(lastGlobalCooldownUse).TotalMilliseconds <= 50))
+                                            if (CurrentPower.WaitTicksBeforeUse >= 1 || (CurrentPower.WaitForAnimationFinished != SIGNATURE_SPAM && DateTime.Now.Subtract(lastGlobalCooldownUse).TotalMilliseconds <= 50))
                                             {
                                                 IsWaitingForPower = true;
-                                                if (CurrentPower.iForceWaitLoopsBefore >= 1)
-                                                    CurrentPower.iForceWaitLoopsBefore--;
+                                                if (CurrentPower.WaitTicksBeforeUse >= 1)
+                                                    CurrentPower.WaitTicksBeforeUse--;
                                                 runStatus = HandlerRunStatus.TreeRunning;
                                             }
                                             else
@@ -1279,7 +1283,9 @@ namespace GilesTrinity
             statusText.Append(". DistfromTrgt: ");
             statusText.Append(TargetCurrentDistance.ToString("0.0"));
             statusText.Append(". Health: ");
-            statusText.Append((PlayerStatus.CurrentHealthPct*100).ToString("0"));
+            statusText.Append((PlayerStatus.CurrentHealthPct * 100).ToString("0"));
+            statusText.Append(". Resource: ");
+            statusText.Append((PlayerStatus.PrimaryResource).ToString("0"));
             statusText.Append(". InLoS: ");
             statusText.Append(CurrentTargetIsInLoS);
             statusText.Append(". ");
@@ -1363,7 +1369,7 @@ namespace GilesTrinity
                             if (TargetDistanceReduction <= 0f)
                                 TargetDistanceReduction = 0f;
                             // Pick a range to try to reach
-                            TargetRangeRequired = CurrentPower.SNOPower == SNOPower.None ? 9f : CurrentPower.iMinimumRange;
+                            TargetRangeRequired = CurrentPower.SNOPower == SNOPower.None ? 9f : CurrentPower.MinimumRange;
                             break;
                         }
                     // * Item - need to get within 6 feet and then interact with it
@@ -1443,7 +1449,7 @@ namespace GilesTrinity
                     case GObjectType.Destructible:
                         {
                             // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
-                            TargetRangeRequired = CurrentPower.SNOPower == SNOPower.None ? 9f : CurrentPower.iMinimumRange;
+                            TargetRangeRequired = CurrentPower.SNOPower == SNOPower.None ? 9f : CurrentPower.MinimumRange;
                             TargetDistanceReduction = CurrentTarget.Radius;
 
                             if (ForceCloseRangeTarget)
@@ -1459,7 +1465,7 @@ namespace GilesTrinity
                     case GObjectType.Barricade:
                         {
                             // Pick a range to try to reach + (tmp_fThisRadius * 0.70);
-                            TargetRangeRequired = CurrentPower.SNOPower == SNOPower.None ? 9f : CurrentPower.iMinimumRange;
+                            TargetRangeRequired = CurrentPower.SNOPower == SNOPower.None ? 9f : CurrentPower.MinimumRange;
                             TargetDistanceReduction = CurrentTarget.Radius;
 
                             if (ForceCloseRangeTarget)
@@ -1503,14 +1509,14 @@ namespace GilesTrinity
             {
                 IsWaitingForPower = false;
                 // Wait while animating before an attack
-                if (CurrentPower.bWaitWhileAnimating)
+                if (CurrentPower.WaitForAnimationFinished)
                     WaitWhileAnimating(5, false);
                 // Use the power
                 bool bUsePowerSuccess = false;
                 // Note that whirlwinds use an off-on-off-on to avoid spam
                 if (CurrentPower.SNOPower != SNOPower.Barbarian_Whirlwind && CurrentPower.SNOPower != SNOPower.DemonHunter_Strafe)
                 {
-                    ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.vTargetLocation, CurrentPower.iTargetWorldID, CurrentPower.iTargetGUID);
+                    ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetDynamicWorldId, CurrentPower.TargetRActorGUID);
                     bUsePowerSuccess = true;
                     lastChangedZigZag = DateTime.Today;
                     vPositionLastZigZagCheck = Vector3.Zero;
@@ -1527,7 +1533,7 @@ namespace GilesTrinity
                     }
                     if (bUseThisLoop)
                     {
-                        ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.vTargetLocation, CurrentPower.iTargetWorldID, CurrentPower.iTargetGUID);
+                        ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetDynamicWorldId, CurrentPower.TargetRActorGUID);
                         bUsePowerSuccess = true;
                     }
                 }
@@ -1541,11 +1547,11 @@ namespace GilesTrinity
                     LastPowerUsed = CurrentPower.SNOPower;
                     CurrentPower.SNOPower = SNOPower.None;
                     // Wait for animating AFTER the attack
-                    if (CurrentPower.bWaitWhileAnimating)
+                    if (CurrentPower.WaitForAnimationFinished)
                         WaitWhileAnimating(3, false);
                 }
                 // Wait for animating AFTER the attack
-                if (CurrentPower.bWaitWhileAnimating)
+                if (CurrentPower.WaitForAnimationFinished)
                     WaitWhileAnimating(3, false);
                 ShouldPickNewAbilities = true;
                 // Keep looking for monsters at "normal kill range" a few moments after we successfully attack a monster incase we can pull them into range
@@ -1572,7 +1578,7 @@ namespace GilesTrinity
                 // See if we should force a long wait AFTERWARDS, too
                 // Force waiting AFTER power use for certain abilities
                 IsWaitingAfterPower = false;
-                if (CurrentPower.ForceWaitLoopsAfter >= 1)
+                if (CurrentPower.WaitTicksAfterUse >= 1)
                 {
                     IsWaitingAfterPower = true;
                 }

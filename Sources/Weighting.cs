@@ -36,12 +36,13 @@ namespace GilesTrinity
                                         ) &&
                                         PlayerStatus.CurrentHealthPct >= 0.85d;
 
-                bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || PlayerStatus.IsRooted);
+                bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || PlayerStatus.IsRooted || PlayerMover.GetMovementSpeed() < 1);
 
                 bool bIsBerserked = GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
 
                 int TrashMobCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsTrashMob);
                 int EliteCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
+                int AvoidanceCount = GilesObjectCache.Count(o => o.Type == GObjectType.Avoidance && o.CentreDistance <= 50f);
 
                 bool profileTagCheck = false;
                 if (ProfileManager.CurrentProfileBehavior != null)
@@ -53,12 +54,13 @@ namespace GilesTrinity
                     }
                 }
 
-                bool ShouldIgnoreTrashMobs = 
-                    (!TownRun.IsTryingToTownPortal() && 
+                bool ShouldIgnoreTrashMobs =
+                    (!TownRun.IsTryingToTownPortal() &&
                     !profileTagCheck &&
-                    !PrioritizeCloseRangeUnits && 
-                    Settings.Combat.Misc.TrashPackSize > 1 && 
-                    EliteCount == 0 && 
+                    !PrioritizeCloseRangeUnits &&
+                    Settings.Combat.Misc.TrashPackSize > 1 &&
+                    EliteCount == 0 &&
+                    AvoidanceCount == 0 &&
                     ZetaDia.Me.Level >= 15 &&
                     PlayerMover.MovementSpeed > 0.5
                     );
@@ -75,7 +77,7 @@ namespace GilesTrinity
                         case GObjectType.Unit:
                             {
                                 // Ignore Solitary Trash mobs (no elites present)
-                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && !cacheObject.HasBeenPrimaryTarget && cacheObject.RadiusDistance >= 2f && 
+                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && !cacheObject.HasBeenPrimaryTarget && cacheObject.RadiusDistance >= 2f &&
                                     !(GilesObjectCache.Count(u => u.IsTrashMob && Vector3.Distance(cacheObject.Position, u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius) >= Settings.Combat.Misc.TrashPackSize))
                                 {
                                     break;
@@ -93,6 +95,9 @@ namespace GilesTrinity
                                     bool bCountAsElite = (cacheObject.IsEliteRareUnique || cacheObject.IsBoss);
                                     //intell -- removed thisgilesobject.bThisTreasureGoblin
 
+
+                                    bool isRended = cacheObject.HasDotDPS;
+
                                     // Flag up any bosses in range
                                     if (cacheObject.IsBoss)
                                         bAnyBossesInRange = true;
@@ -101,6 +106,10 @@ namespace GilesTrinity
                                         AnythingWithinRange[RANGE_6]++;
                                         if (bCountAsElite)
                                             ElitesWithinRange[RANGE_6]++;
+                                    }
+                                    if (cacheObject.RadiusDistance <= 9f && !isRended)
+                                    {
+                                        NonRendedTargets_9++;
                                     }
                                     if (cacheObject.RadiusDistance <= 12f)
                                     {
@@ -151,7 +160,7 @@ namespace GilesTrinity
                                 // Force a close range target because we seem to be stuck *OR* if not ranged and currently rooted
                                 if (PrioritizeCloseRangeUnits)
                                 {
-                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 20000d;
+                                    cacheObject.Weight = (50 - cacheObject.RadiusDistance) / 50 * 20000d;
                                     //cacheObject.Weight = 20000 - (Math.Floor(cacheObject.CentreDistance) * 200);
 
                                     // Goblin priority KAMIKAZEEEEEEEE
@@ -349,7 +358,7 @@ namespace GilesTrinity
                                 //    cacheObject.Weight = 8000d - (Math.Floor(cacheObject.CentreDistance) * 1900d);
 
                                 if (cacheObject.GoldAmount > 0)
-                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 15000d;
+                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 10000d;
                                 else
                                     cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 15000d;
 
@@ -666,7 +675,7 @@ namespace GilesTrinity
 
         private static void RecordTargetHistory()
         {
-            string targetSha1Hash = HashGenerator.GenerateGilesObjecthash(CurrentTarget);
+            string targetSha1Hash = HashGenerator.GenerateObjecthash(CurrentTarget);
 
             // clean up past targets
             if (!GenericCache.ContainsKey(targetSha1Hash))
@@ -679,10 +688,21 @@ namespace GilesTrinity
             else if (GenericCache.ContainsKey(targetSha1Hash))
             {
                 GilesObject cTarget = (GilesObject)GenericCache.GetObject(targetSha1Hash).Value;
-                if (!cTarget.IsBoss && cTarget.TimesBeenPrimaryTarget > 15)
+                if (!cTarget.IsBoss && cTarget.TimesBeenPrimaryTarget > 15 && !(cTarget.Type == GObjectType.Item && cTarget.ItemQuality >= ItemQuality.Legendary))
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Blacklisting target {0} due to possible stuck/flipflop!", CurrentTarget.InternalName);
-                    hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Blacklisting target {0} ActorSNO={1} RActorGUID={2} due to possible stuck/flipflop!", 
+                        CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid);
+
+                    hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
+
+                    // Add to generic blacklist for safety, as the RActorGUID on items and gold can change as we move away and get closer to the items (while walking around corners)
+                    // So we can't use any ID's but rather have to use some data which never changes (actorSNO, position, type, worldID)
+                    GenericBlacklist.AddToBlacklist(new GenericCacheObject()
+                    {
+                         Key = CurrentTarget.ObjectHash,
+                         Value = null,
+                         Expires = DateTime.Now.AddSeconds(60)
+                    });
                 }
                 else
                 {

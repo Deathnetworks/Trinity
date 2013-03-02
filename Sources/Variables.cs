@@ -398,6 +398,7 @@ namespace GilesTrinity
         private const int RANGE_12 = 6;
         private const int RANGE_6 = 7;
         private static int iWithinRangeLastRend = 0;
+        private static int NonRendedTargets_9 = 0;
 
         // Unique ID of mob last targetting when using rend
         private static int iACDGUIDLastRend = 0;
@@ -433,9 +434,21 @@ namespace GilesTrinity
         public static int CurrentWorldDynamicId = -1;
         public static int cachedStaticWorldId = -1; // worldId from profiles, used in persistent stats
         public static GameDifficulty iCurrentGameDifficulty = GameDifficulty.Invalid;
+        /// <summary>
+        /// Do not wait for animation
+        /// </summary>
         private const bool USE_COMBAT_ONLY = false;
+        /// <summary>
+        /// Wait for animation
+        /// </summary>
         private const bool USE_ANY_TIME = true;
+        /// <summary>
+        /// Do not wait for animation
+        /// </summary>
         private const bool SIGNATURE_SPAM = false;
+        /// <summary>
+        /// Wait for animation
+        /// </summary>
         private const bool USE_SLOWLY = true;
 
         // Constants and variables used by the item-stats stuff
@@ -539,6 +552,8 @@ namespace GilesTrinity
         private static bool c_HasBeenRaycastable = false;
         private static bool c_HasBeenInLoS = false;
         private static string c_ItemSha1Hash = string.Empty;
+        private static bool c_HasDotDPS = false;
+        private static string c_ObjectHash = String.Empty;
 
 
         // From main RefreshDiaobjects

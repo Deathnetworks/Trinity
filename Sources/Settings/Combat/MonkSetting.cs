@@ -42,6 +42,8 @@ namespace GilesTrinity.Settings.Combat
         private bool _HasInnaSet;
         private bool _DisableMantraSpam;
         private bool _TargetBasedZigZag;
+        private int _MinCycloneTrashCount;
+        private int _MinWoLTrashCount;
         #endregion Fields
 
         #region Events
@@ -690,6 +692,41 @@ namespace GilesTrinity.Settings.Combat
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(2)]
+        public int MinCycloneTrashCount
+        {
+            get
+            {
+                return _MinCycloneTrashCount;
+            }
+            set
+            {
+                if (_MinCycloneTrashCount != value)
+                {
+                    _MinCycloneTrashCount = (int)value;
+                    OnPropertyChanged("MinCycloneTrashCount");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(2)]
+        public int MinWoLTrashCount
+        {
+            get
+            {
+                return _MinWoLTrashCount;
+            }
+            set
+            {
+                if (_MinWoLTrashCount != value)
+                {
+                    _MinWoLTrashCount = (int)value;
+                    OnPropertyChanged("MinWoLTrashCount");
+                }
+            }
+        }        
         #endregion Properties
 
         #region Methods
@@ -727,6 +764,8 @@ namespace GilesTrinity.Settings.Combat
             this._TargetBasedZigZag = true;
             this._TROption = TempestRushOption.Always;
             this._AvoidSuccubusStarHealth = 0.7f;
+            this._MinCycloneTrashCount = 2;
+            this._MinWoLTrashCount = 2;
         }
         #endregion Methods
     }

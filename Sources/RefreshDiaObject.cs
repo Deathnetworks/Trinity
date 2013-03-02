@@ -113,6 +113,18 @@ namespace GilesTrinity
                 if (!AddToCache) { c_IgnoreReason = "CachedPosition"; return AddToCache; }
             }
 
+            if (c_ObjectType != GObjectType.Unit)
+            {
+                /* Generic Blacklisting for shifting RActorGUID bug */
+                c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, c_Position, c_ObjectType.ToString(), GilesTrinity.CurrentWorldDynamicId);
+
+                if (GenericBlacklist.ContainsKey(c_ObjectHash))
+                {
+                    AddToCache = false;
+                    c_IgnoreReason = "GenericBlacklist";
+                    return AddToCache;
+                }
+            }
             using (new PerformanceLogger("RefreshDiaObject.Distance"))
             {
                 // Always Refresh Distance for every object
@@ -214,7 +226,9 @@ namespace GilesTrinity
                         Radius = c_Radius,
                         MonsterStyle = c_unit_MonsterSize,
                         IsEliteRareUnique = c_IsEliteRareUnique,
-                        ForceLeapAgainst = c_ForceLeapAgainst
+                        ForceLeapAgainst = c_ForceLeapAgainst,
+                        HasDotDPS = c_HasDotDPS,
+                        ObjectHash = c_ObjectHash
                     });
             }
             return true;
@@ -319,6 +333,8 @@ namespace GilesTrinity
             c_unit_MonsterSize = MonsterSize.Unknown;
             c_diaObject = null;
             c_CurrentAnimation = SNOAnim.Invalid;
+            c_HasDotDPS = false;
+            c_ObjectHash = String.Empty;
         }
         /// <summary>
         /// Inserts the ActorSNO <see cref="dictGilesActorSNOCache"/> and sets <see cref="c_ActorSNO"/>
@@ -1027,6 +1043,15 @@ namespace GilesTrinity
                 AddToCache = false;
             c_IgnoreSubStep = "NotAttackable";
 
+            // only check for DotDPS/Bleeding in certain conditions to save CPU for everyone else
+            if (PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_Rend))
+            {
+                bool hasdotDPS = c_CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;
+                bool isBleeding = c_CommonData.GetAttribute<int>(ActorAttributeType.Bleeding) != 0;
+                c_HasDotDPS = hasdotDPS && isBleeding;
+                if (hasdotDPS || isBleeding)
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "HasDotDPS={0} isBleeding={1}", hasdotDPS, isBleeding);
+            }
             return AddToCache;
 
 
@@ -2481,6 +2506,12 @@ namespace GilesTrinity
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "hashRGUIDBlacklist15";
+                    return AddToCache;
+                }
+                if (GenericBlacklist.ContainsKey(c_ObjectHash))
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "GenericBlacklist";
                     return AddToCache;
                 }
             }

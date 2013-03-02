@@ -15,7 +15,7 @@ namespace GilesTrinity
          */
 
         /// <summary>
-        /// Generates an SHA1 Hash given the dropped item parameters
+        /// Generates an MD5 Hash given the dropped item parameters
         /// </summary>
         /// <param name="position">The Vector3 position of hte item</param>
         /// <param name="actorSNO">The ActorSNO of the item</param>
@@ -25,10 +25,10 @@ namespace GilesTrinity
         /// <param name="itemLevel">The Item Level</param>
         public static string GenerateItemHash(Vector3 position, int actorSNO, string name, int worldID, ItemQuality itemQuality, int itemLevel)
         {
-            using (SHA1 sha1 = SHA1.Create())
+            using (MD5 md5 = MD5.Create())
             {
                 string itemHashBase = String.Format("{0}{1}{2}{3}{4}{5}", position, actorSNO, name, worldID, itemQuality, itemLevel);
-                string itemHash = GetSha1Hash(sha1, itemHashBase);
+                string itemHash = GetMd5Hash(md5, itemHashBase);
                 return itemHash;
             }
         }
@@ -38,19 +38,39 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static string GenerateGilesObjecthash(GilesObject obj)
+        public static string GenerateObjecthash(GilesObject obj)
         {
-            using (SHA1 sha1 = SHA1.Create())
+            using (MD5 md5 = MD5.Create())
             {
                 string objHashBase = String.Format("{0}{1}{2}{3}", obj.ActorSNO, obj.Position, obj.Type, GilesTrinity.CurrentWorldDynamicId);
-                string objHash = GetSha1Hash(sha1, objHashBase);
+                string objHash = GetMd5Hash(md5, objHashBase);
                 return objHash;
             }
         }
-        static string GetSha1Hash(SHA1 sha1Hash, string input)
+
+        /// <summary>
+        /// This is a "psuedo" hash, and used just to compare objects which might have a shifting RActorGUID
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static string GenerateWorldObjectHash(DiaObject obj)
+        {
+            return GenerateWorldObjectHash(obj.ActorSNO, obj.Position, obj.GetType().ToString(), obj.WorldDynamicId);
+        }
+        /// <summary>
+        /// This is a "psuedo" hash, and used just to compare objects which might have a shifting RActorGUID
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static string GenerateWorldObjectHash(int actorSNO, Vector3 position, string type, int dynanmicWorldId)
+        {
+            return String.Format("{0}{1}{2}{3}", actorSNO, position, type, dynanmicWorldId);
+        }
+
+        static string GetMd5Hash(MD5 md5Hash, string input)
         {
             // Convert the input string to a byte array and compute the hash. 
-            byte[] data = sha1Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
+            byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
 
             // Create a new Stringbuilder to collect the bytes 
             // and create a string.
@@ -67,10 +87,10 @@ namespace GilesTrinity
             return sBuilder.ToString();
         }
         // Verify a hash against a string. 
-        static bool VerifySha1Hash(SHA1 sha1Hash, string input, string hash)
+        static bool VerifySha1Hash(MD5 md5Hash, string input, string hash)
         {
             // Hash the input. 
-            string hashOfInput = GetSha1Hash(sha1Hash, input);
+            string hashOfInput = GetMd5Hash(md5Hash, input);
 
             // Create a StringComparer an compare the hashes.
             StringComparer comparer = StringComparer.OrdinalIgnoreCase;

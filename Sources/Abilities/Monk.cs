@@ -149,13 +149,14 @@ namespace GilesTrinity
             bool hasCycloneStikeEyeOfTheStorm = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_CycloneStrike && s.RuneIndex == 3);
             bool hasCycloneStikeImposion = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_CycloneStrike && s.RuneIndex == 1);
 
+            var cycloneStrikeRange = hasCycloneStikeImposion ? 34f : 24f;
+            var cycloneStrikeSpirit = hasCycloneStikeEyeOfTheStorm ? 30 : 50;
+
             // Cyclone Strike
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
-                (TargetUtil.AnyElitesInRange(24) || TargetUtil.AnyMobsInRange(24,2) || (hasCycloneStikeImposion && TargetUtil.AnyMobsInRange(34,2)) ||
-                (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 24f)) &&
-                Hotbar.Contains(SNOPower.Monk_CycloneStrike) &&
-                (((PlayerStatus.PrimaryResource >= 50 || (hasCycloneStikeEyeOfTheStorm && PlayerStatus.PrimaryResource >= 30)) && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
-                GilesUseTimer(SNOPower.Monk_CycloneStrike) && PowerManager.CanCast(SNOPower.Monk_CycloneStrike))
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_CycloneStrike) && GilesUseTimer(SNOPower.Monk_CycloneStrike) &&
+                (TargetUtil.AnyElitesInRange(cycloneStrikeRange) || TargetUtil.AnyMobsInRange(cycloneStrikeRange, Settings.Combat.Monk.MinCycloneTrashCount) || TargetUtil.IsEliteTargetInRange(cycloneStrikeRange)) &&                
+                ((PlayerStatus.PrimaryResource >= cycloneStrikeSpirit && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
+                 PowerManager.CanCast(SNOPower.Monk_CycloneStrike))
             {
                 return new TrinityPower(SNOPower.Monk_CycloneStrike, 0f, vNullLocation, CurrentWorldDynamicId, -1, 2, 2, USE_SLOWLY);
             }
@@ -178,7 +179,7 @@ namespace GilesTrinity
                 (Settings.Combat.Monk.TROption == TempestRushOption.Always ||
                 Settings.Combat.Monk.TROption == TempestRushOption.CombatOnly ||
                 (Settings.Combat.Monk.TROption == TempestRushOption.ElitesGroupsOnly && (TargetUtil.AnyElitesInRange(25) || TargetUtil.AnyMobsInRange(25,2))) ||
-                (Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly && (!TargetUtil.AnyElitesInRange(90f) && TargetUtil.AnyMobsInRange(40f)))))
+                (Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly && !TargetUtil.AnyElitesInRange(90f) && TargetUtil.AnyMobsInRange(40f))))
             {
                 GenerateMonkZigZag();
                 MaintainTempestRush = true;
@@ -229,25 +230,12 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
 
-
-            // thanks tinnvec :)
-            //SkillDict.Add("WaveOfLight", SNOPower.Monk_WaveOfLight);
-            //RuneDict.Add("WallOfLight", 0);
-            //RuneDict.Add("ExplosiveLight", 1);
-            //RuneDict.Add("EmpoweredWave", 3);
-            //RuneDict.Add("BlindingLight", 4);
-            //RuneDict.Add("PillarOfTheAncients", 2);
-            //bool hasEmpoweredWaveRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WaveOfLight && s.RuneIndex == 3);
-
-
-            bool hasEmpoweredWaveRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WaveOfLight && s.RuneIndex == 3);
-
             // Dashing Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
                 ((CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.HitPointsPct <= 0.2) || CurrentTarget.CentreDistance >= 40f) &&
                 Hotbar.Contains(SNOPower.Monk_DashingStrike) && ((PlayerStatus.PrimaryResource >= 30 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
-                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, vNullLocation, -1, CurrentTarget.ACDGuid, 2, 2, USE_SLOWLY);
             }
 
             //skillDict.Add("DashingStrike", SNOPower.Monk_DashingStrike);
@@ -264,19 +252,28 @@ namespace GilesTrinity
                 (TimeSinceUse(SNOPower.Monk_DashingStrike) >= 2800) && hasWayOfTheFallingStar &&
                 ((PlayerStatus.PrimaryResource >= 25 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
-                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, vNullLocation, -1, CurrentTarget.ACDGuid, 2, 2, USE_SLOWLY);
             }
 
+            //SkillDict.Add("WaveOfLight", SNOPower.Monk_WaveOfLight);
+            //RuneDict.Add("WallOfLight", 0);
+            //RuneDict.Add("ExplosiveLight", 1);
+            //RuneDict.Add("EmpoweredWave", 3);
+            //RuneDict.Add("BlindingLight", 4);
+            //RuneDict.Add("PillarOfTheAncients", 2);
+            //bool hasEmpoweredWaveRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WaveOfLight && s.RuneIndex == 3);
+
+            bool hasEmpoweredWaveRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WaveOfLight && s.RuneIndex == 3);
+            var minWoLSpirit = hasEmpoweredWaveRune ? 40 : 70;
             // Wave of light
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_WaveOfLight) && GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
-                //(ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2 || ((CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 20f)) &&
-                (PlayerStatus.PrimaryResource >= 70 ||
-                 (hasEmpoweredWaveRune && PlayerStatus.PrimaryResource >= 40 && !IsWaitingForSpecial)) && // Empowered Wave
+                (TargetUtil.AnyMobsInRange(90f,Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(20f)) &&
+                (PlayerStatus.PrimaryResource >= minWoLSpirit || !IsWaitingForSpecial) && 
                  // (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) && // optional check for SW stacks
                 Monk_HasMantraAbilityAndBuff())
             {
                 var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 15f);
-                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, bestClusterPoint, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, bestClusterPoint, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
             }
 
             // Fists of thunder as the primary, repeatable attack
@@ -288,7 +285,7 @@ namespace GilesTrinity
                     OtherThanDeadlyReach = DateTime.Now;
                 if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
                     SweepWindSpam = DateTime.Now; //intell -- inna
-                return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, SIGNATURE_SPAM);
+                return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, SIGNATURE_SPAM);
             }
             // Crippling wave
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Monk_CripplingWave)

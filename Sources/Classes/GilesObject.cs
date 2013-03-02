@@ -43,9 +43,10 @@ namespace GilesTrinity
         public bool IsTreasureGoblin { get; set; }
         public bool IsEliteRareUnique { get; set; }
         public bool IsBoss { get; set; }
-        public bool IsBossOrEliteRareUnique { get { return (this.Type == GObjectType.Unit && (IsEliteRareUnique || IsBoss)); } }
+        public bool IsBossOrEliteRareUnique { get { return (this.Type == GObjectType.Unit && (IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         public bool IsTrashMob { get { return (this.Type == GObjectType.Unit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         public bool IsAttackable { get; set; }
+        public bool HasDotDPS { get; set; }
         /// <summary>
         /// Percentage hit points
         /// </summary>
@@ -84,6 +85,7 @@ namespace GilesTrinity
             }
         }
         public DiaObject DiaObject { get; set; }
+        public string ObjectHash { get; set; }
 
         public GilesObject(DiaObject _DiaObject = null)
         {
@@ -127,7 +129,8 @@ namespace GilesTrinity
                 HitPoints = HitPoints,
                 Radius = Radius,
                 MonsterStyle = MonsterStyle,
-                ForceLeapAgainst = ForceLeapAgainst
+                ForceLeapAgainst = ForceLeapAgainst,
+                ObjectHash = ObjectHash
             };
             return newGilesObject;
         }

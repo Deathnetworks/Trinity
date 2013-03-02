@@ -289,6 +289,7 @@ namespace GilesTrinity
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DISABLED: Trinity is now shut down...");
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
             GenericCache.Shutdown();
+            GenericBlacklist.Shutdown();
         }
 
         /// <summary>
@@ -297,6 +298,7 @@ namespace GilesTrinity
         public void OnShutdown()
         {
             GenericCache.Shutdown();
+            GenericBlacklist.Shutdown();
         }
 
         /// <summary>

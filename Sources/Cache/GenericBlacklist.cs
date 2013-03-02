@@ -8,21 +8,21 @@ using GilesTrinity.Technicals;
 
 namespace GilesTrinity
 {
-    internal class GenericCache
+    internal class GenericBlacklist
     {
-        private static HashSet<GenericCacheObject> CacheList = new HashSet<GenericCacheObject>();
+        private static HashSet<GenericCacheObject> Blacklist = new HashSet<GenericCacheObject>();
 
         private static readonly object _Synchronizer = new object();
 
         private static Thread Manager;
 
-        public static bool AddToCache(GenericCacheObject obj)
+        public static bool AddToBlacklist(GenericCacheObject obj)
         {
             lock (_Synchronizer)
             {
                 if (!ContainsKey(obj.Key))
                 {
-                    CacheList.Add(obj);
+                    Blacklist.Add(obj);
                     return true;
                 }
                 return false;
@@ -35,9 +35,9 @@ namespace GilesTrinity
             {
                 if (ContainsKey(obj.Key))
                 {
-                    CacheList.RemoveWhere(o => o.Key == obj.Key);
+                    Blacklist.RemoveWhere(o => o.Key == obj.Key);
                 }
-                CacheList.Add(obj);
+                Blacklist.Add(obj);
                 return true;
             }
         }
@@ -46,7 +46,7 @@ namespace GilesTrinity
         {
             lock (_Synchronizer)
             {
-                return CacheList.AsParallel().Any(o => o.Key == key);
+                return Blacklist.AsParallel().Any(o => o.Key == key);
             }
         }
 
@@ -55,17 +55,17 @@ namespace GilesTrinity
             lock (_Synchronizer)
             {
                 if (ContainsKey(key))
-                    return CacheList.AsParallel().FirstOrDefault(o => o.Key == key);
+                    return Blacklist.AsParallel().FirstOrDefault(o => o.Key == key);
                 else
                     return new GenericCacheObject();
             }
         }
 
-        public static void MaintainCache()
+        public static void MaintainBlacklist()
         {
             if (Manager == null)
             {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Starting up Generic Cache Manage thread");
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Starting up Generic Blacklist Manager thread");
                 Manager = new Thread(Manage)
                 {
                     IsBackground = true,
@@ -82,7 +82,7 @@ namespace GilesTrinity
 
                 lock (_Synchronizer)
                 {
-                    CacheList.RemoveWhere(o => o.Expires.Ticks < NowTicks);
+                    Blacklist.RemoveWhere(o => o.Expires.Ticks < NowTicks);
                 }
 
                 Thread.Sleep(100);
@@ -97,28 +97,13 @@ namespace GilesTrinity
             }
         }
 
-        public static void ClearCache()
+        public static void ClearBlacklist()
         {
             lock (_Synchronizer)
             {
-                CacheList.Clear();
+                Blacklist.Clear();
             }
         }
     }
 
-    internal class GenericCacheObject
-    {
-        public string Key { get; set; }
-        public object Value { get; set; }
-        public DateTime Expires { get; set; }
-
-        public GenericCacheObject() { }
-
-        public GenericCacheObject(string key, object value, TimeSpan expirationDuration)
-        {
-            Key = key;
-            Value = value;
-            Expires = DateTime.Now.Add(expirationDuration);
-        }
-    }
 }

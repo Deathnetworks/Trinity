@@ -334,6 +334,7 @@ namespace GilesTrinity
                 // Reset the counters for monsters at various ranges
                 ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
                 AnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+                NonRendedTargets_9 = 0;
                 bAnyBossesInRange = false;
                 // Flag for if we should search for an avoidance spot or not
                 StandingInAvoidance = false;

@@ -238,7 +238,7 @@ namespace GilesTrinity
                             {
                                 WaitWhileAnimating(4, true);
                                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", powerBuff.SNOPower.ToString());
-                                ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.vTargetLocation, powerBuff.iTargetWorldID, powerBuff.iTargetGUID);
+                                ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetRActorGUID);
                                 LastPowerUsed = powerBuff.SNOPower;
                                 dictAbilityLastUse[powerBuff.SNOPower] = DateTime.Now;
                                 WaitWhileAnimating(3, true);
