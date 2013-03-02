@@ -277,11 +277,12 @@
     <None Include="ItemRules\Rules\hard\pickup.dis" />
     <None Include="ItemRules\Rules\hard\rare.dis" />
     <None Include="ItemRules\Rules\hard\set.dis" />
+    <None Include="ItemRules\Rules\soft\common.dis" />
     <None Include="ItemRules\Rules\soft\legendary.dis" />
     <None Include="ItemRules\Rules\soft\magic.dis" />
     <None Include="ItemRules\Rules\soft\pickup.dis" />
     <None Include="ItemRules\Rules\soft\rare.dis" />
-    <None Include="ItemRules\Rules\soft\special.dis" />
+    <None Include="ItemRules\Rules\soft\set.dis" />
     <None Include="ItemRules\translation.dis" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
