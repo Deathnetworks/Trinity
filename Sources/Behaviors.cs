@@ -1032,8 +1032,9 @@ namespace GilesTrinity
                             {
                                 try
                                 {
-                                    dThisMaxHealth = CurrentTarget.Unit.CommonData.GetAttribute<float>(ActorAttributeType.HitpointsMax);
-                                    dictGilesMaxHealthCache.Add(c_RActorGuid, dThisMaxHealth);
+
+                                    dThisMaxHealth = CurrentTarget.Unit.HitpointsMax;
+                                    dictGilesMaxHealthCache.Add(c_RActorGuid, CurrentTarget.Unit.HitpointsMax);
                                 }
                                 catch
                                 {
@@ -1046,7 +1047,7 @@ namespace GilesTrinity
                             {
                                 try
                                 {
-                                    double dTempHitpoints = (CurrentTarget.Unit.CommonData.GetAttribute<float>(ActorAttributeType.HitpointsCur) / dThisMaxHealth);
+                                    double dTempHitpoints = CurrentTarget.Unit.HitpointsCurrent / dThisMaxHealth;
                                     if (dTempHitpoints <= 0d)
                                     {
                                         StaleCache = true;
@@ -1382,7 +1383,7 @@ namespace GilesTrinity
                     // * Gold - need to get within pickup radius only
                     case GObjectType.Gold:
                         {
-                            TargetRangeRequired = (float)ZetaDia.Me.GoldPickUpRadius;
+                            TargetRangeRequired = PlayerStatus.GoldPickupRadius;
                             if (TargetRangeRequired < 2f)
                                 TargetRangeRequired = 2f;
                             break;
@@ -1390,7 +1391,7 @@ namespace GilesTrinity
                     // * Globes - need to get within pickup radius only
                     case GObjectType.Globe:
                         {
-                            TargetRangeRequired = (float)ZetaDia.Me.GoldPickUpRadius;
+                            TargetRangeRequired = PlayerStatus.GoldPickupRadius;
                             if (TargetRangeRequired < 2f)
                                 TargetRangeRequired = 2f;
                             if (TargetRangeRequired > 5f)

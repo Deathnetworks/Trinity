@@ -153,7 +153,6 @@ namespace GilesTrinity
                         }
                         if (Settings.Loot.Pickup.PotionMode == PotionMode.Cap)
                         {
-
                             // Map out all the items already in the backpack
                             int iTotalPotions =
                                 (from tempitem in ZetaDia.Me.Inventory.Backpack
@@ -193,13 +192,13 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool CheckLevelRequirements(int level, ItemQuality quality, int requiredBlueLevel, int requiredYellowLevel)
         {
-            if (quality < ItemQuality.Normal && ZetaDia.Me.Level > 5)
+            if (quality < ItemQuality.Normal && PlayerStatus.Level > 5)
             {
                 // Grey item, ignore if we're over level 5
                 return false;
             }
 
-            if (quality < ItemQuality.Magic1 && ZetaDia.Me.Level > 10)
+            if (quality < ItemQuality.Magic1 && PlayerStatus.Level > 10)
             {
                 // White item, ignore if we're over level 10
                 return false;
@@ -758,16 +757,16 @@ namespace GilesTrinity
                 LogWriter.WriteLine("Total XP gained: " + Math.Round(iTotalXp / (float)1000000, 2).ToString() + " million [" + Math.Round(iTotalXp / TotalRunningTime.TotalHours / 1000000, 2).ToString() + " million per hour]");
                 if (iLastGold == 0)
                 {
-                    iLastGold = ZetaDia.Me.Inventory.Coinage;
+                    iLastGold = PlayerStatus.Coinage;
                 }
-                if (ZetaDia.Me.Inventory.Coinage - iLastGold >= 500000)
+                if (PlayerStatus.Coinage - iLastGold >= 500000)
                 {
-                    iLastGold = ZetaDia.Me.Inventory.Coinage;
+                    iLastGold = PlayerStatus.Coinage;
                 }
                 else
                 {
-                    iTotalGold += ZetaDia.Me.Inventory.Coinage - iLastGold;
-                    iLastGold = ZetaDia.Me.Inventory.Coinage;
+                    iTotalGold += PlayerStatus.Coinage - iLastGold;
+                    iLastGold = PlayerStatus.Coinage;
                 }
                 LogWriter.WriteLine("Total Gold gained: " + Math.Round(iTotalGold / (float)1000, 2).ToString() + " Thousand [" + Math.Round(iTotalGold / TotalRunningTime.TotalHours / 1000, 2).ToString() + " Thousand per hour]");
                 LogWriter.WriteLine("");

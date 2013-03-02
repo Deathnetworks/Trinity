@@ -154,7 +154,7 @@ namespace GilesTrinity
 
             // Cyclone Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_CycloneStrike) && GilesUseTimer(SNOPower.Monk_CycloneStrike) &&
-                (TargetUtil.AnyElitesInRange(cycloneStrikeRange) || TargetUtil.AnyMobsInRange(cycloneStrikeRange, Settings.Combat.Monk.MinCycloneTrashCount) || TargetUtil.IsEliteTargetInRange(cycloneStrikeRange)) &&                
+                (TargetUtil.AnyElitesInRange(cycloneStrikeRange) || TargetUtil.AnyMobsInRange(cycloneStrikeRange, Settings.Combat.Monk.MinCycloneTrashCount) || TargetUtil.IsEliteTargetInRange(cycloneStrikeRange)) &&
                 ((PlayerStatus.PrimaryResource >= cycloneStrikeSpirit && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                  PowerManager.CanCast(SNOPower.Monk_CycloneStrike))
             {
@@ -178,7 +178,7 @@ namespace GilesTrinity
                 ((PlayerStatus.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                 (Settings.Combat.Monk.TROption == TempestRushOption.Always ||
                 Settings.Combat.Monk.TROption == TempestRushOption.CombatOnly ||
-                (Settings.Combat.Monk.TROption == TempestRushOption.ElitesGroupsOnly && (TargetUtil.AnyElitesInRange(25) || TargetUtil.AnyMobsInRange(25,2))) ||
+                (Settings.Combat.Monk.TROption == TempestRushOption.ElitesGroupsOnly && (TargetUtil.AnyElitesInRange(25) || TargetUtil.AnyMobsInRange(25, 2))) ||
                 (Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly && !TargetUtil.AnyElitesInRange(90f) && TargetUtil.AnyMobsInRange(40f))))
             {
                 GenerateMonkZigZag();
@@ -267,9 +267,9 @@ namespace GilesTrinity
             var minWoLSpirit = hasEmpoweredWaveRune ? 40 : 70;
             // Wave of light
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_WaveOfLight) && GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
-                (TargetUtil.AnyMobsInRange(90f,Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(20f)) &&
-                (PlayerStatus.PrimaryResource >= minWoLSpirit || !IsWaitingForSpecial) && 
-                 // (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) && // optional check for SW stacks
+                (TargetUtil.AnyMobsInRange(16f, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(20f)) &&
+                (PlayerStatus.PrimaryResource >= minWoLSpirit && !IsWaitingForSpecial || PlayerStatus.PrimaryResource > MinEnergyReserve) &&
+                // (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) && // optional check for SW stacks
                 Monk_HasMantraAbilityAndBuff())
             {
                 var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 15f);
@@ -399,9 +399,9 @@ namespace GilesTrinity
             if (ProfileManager.CurrentProfileBehavior != null)
             {
                 Type profileBehaviorType = ProfileManager.CurrentProfileBehavior.GetType();
-                if (profileBehaviorType == typeof(UseObjectTag) || 
-                    profileBehaviorType == typeof(UsePortalTag) || 
-                    profileBehaviorType == typeof(UseWaypointTag) || 
+                if (profileBehaviorType == typeof(UseObjectTag) ||
+                    profileBehaviorType == typeof(UsePortalTag) ||
+                    profileBehaviorType == typeof(UseWaypointTag) ||
                     profileBehaviorType == typeof(UseTownPortalTag))
                     return false;
             }
@@ -412,7 +412,7 @@ namespace GilesTrinity
             if (!Monk_HasMantraAbilityAndBuff())
                 return false;
 
-            float currentSpirit = ZetaDia.Me.CurrentPrimaryResource;
+            double currentSpirit = PlayerStatus.PrimaryResource;
 
             // Minimum 10 spirit to continue channeling tempest rush
             if (DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_TempestRush]).TotalMilliseconds < 150 && currentSpirit > 10f)
@@ -432,7 +432,7 @@ namespace GilesTrinity
             if (!Hotbar.Contains(SNOPower.Monk_TempestRush))
                 return;
 
-            if (ZetaDia.Me.IsInTown || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+            if (PlayerStatus.IsInTown || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                 return;
 
             if (TownRun.IsTryingToTownPortal())
@@ -465,8 +465,6 @@ namespace GilesTrinity
 
             if (Monk_TempestRushReady() && Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly && GilesUseTimer(SNOPower.Monk_TempestRush) && shouldMaintain)
             {
-                //Vector3 target = CurrentTarget != null ? FindZigZagTargetLocation(CurrentTarget.Position, 15f) : MathEx.GetPointAt(ZetaDia.Me.Position, 25f, ZetaDia.Me.Movement.Rotation);
-
                 Vector3 target = PlayerMover.vOldMoveToTarget;
 
                 string locationSource = "PlayerMover";
@@ -477,7 +475,7 @@ namespace GilesTrinity
                     target = CurrentTarget.Position;
                 }
 
-                if (target.Distance2D(ZetaDia.Me.Position) <= 1f)
+                if (target.Distance2D(PlayerStatus.CurrentPosition) <= 1f)
                 {
                     locationSource = "ZigZag";
                     target = FindZigZagTargetLocation(target, 15f);
@@ -486,12 +484,12 @@ namespace GilesTrinity
                 if (target == Vector3.Zero)
                     return;
 
-                float DestinationDistance = target.Distance2D(ZetaDia.Me.Position);
+                float DestinationDistance = target.Distance2D(PlayerStatus.CurrentPosition);
 
                 float aimPointDistance = 10f;
                 if (DestinationDistance > aimPointDistance)
                 {
-                    target = MathEx.CalculatePointFrom(target, ZetaDia.Me.Position, aimPointDistance);
+                    target = MathEx.CalculatePointFrom(target, PlayerStatus.CurrentPosition, aimPointDistance);
                 }
                 if (DestinationDistance > 2f)
                 {

@@ -28,6 +28,13 @@ namespace GilesTrinity
         public int LevelAreaId { get; set; }
         public double PlayerDamagePerSecond { get; set; }
         public SceneInfo Scene { get; set; }
+        public int WorldDynamicID { get; set; }
+        public int WorldID { get; set; }
+        public bool IsInGame { get; set; }
+        public bool IsDead { get; set; }
+        public bool IsLoadingWorld { get; set; }
+        public int Coinage { get; set; }
+        public float GoldPickupRadius { get; set; }
 
         public GilesPlayerCache()
         {

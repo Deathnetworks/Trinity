@@ -252,7 +252,7 @@ namespace GilesTrinity.XmlTags
         /// <summary>
         /// The current player position
         /// </summary>
-        private Vector3 myPos { get { return ZetaDia.Me.Position; } }
+        private Vector3 myPos { get { return GilesTrinity.PlayerStatus.CurrentPosition; } }
         private static ISearchAreaProvider gp
         {
             get
@@ -360,9 +360,9 @@ namespace GilesTrinity.XmlTags
         private Composite UpdateSearchGridProvider()
         {
             return
-            new DecoratorContinue(ret => mySceneId != ZetaDia.Me.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
+            new DecoratorContinue(ret => mySceneId != GilesTrinity.PlayerStatus.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
                 new Sequence(
-                    new Action(ret => mySceneId = ZetaDia.Me.SceneId),
+                    new Action(ret => mySceneId = GilesTrinity.PlayerStatus.SceneId),
                     new Action(ret => GPUpdatePosition = myPos),
                     new Action(ret => GilesTrinity.UpdateSearchGridProvider(true)),
                     new Action(ret => MiniMapMarker.UpdateFailedMarkers())
@@ -380,7 +380,7 @@ namespace GilesTrinity.XmlTags
             new PrioritySelector(
                 new Decorator(ret => timeoutBreached,
                     new Sequence(
-                        new DecoratorContinue(ret => TownPortalOnTimeout && !ZetaDia.Me.IsInTown,
+                        new DecoratorContinue(ret => TownPortalOnTimeout && !GilesTrinity.PlayerStatus.IsInTown,
                             new Sequence(
                                 new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, 
                                     "TrinityExploreDungeon inactivity timer tripped ({0}), tag Using Town Portal!", TimeoutValue)),
@@ -436,15 +436,15 @@ namespace GilesTrinity.XmlTags
             CheckSetTimer(ctx);
             if (lastCoinage == -1)
             {
-                lastCoinage = ZetaDia.Me.Inventory.Coinage;
+                lastCoinage = GilesTrinity.PlayerStatus.Coinage;
                 return RunStatus.Failure;
             }
-            else if (lastCoinage != ZetaDia.Me.Inventory.Coinage)
+            else if (lastCoinage != GilesTrinity.PlayerStatus.Coinage)
             {
                 TagTimer.Restart();
                 return RunStatus.Failure;
             }
-            else if (lastCoinage == ZetaDia.Me.Inventory.Coinage && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
+            else if (lastCoinage == GilesTrinity.PlayerStatus.Coinage && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityExploreDungeon gold inactivity timer tripped ({0}), tag finished!", TimeoutValue);
                 timeoutBreached = true;
@@ -532,19 +532,19 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => isDone = true)
                     )
                 ),
-                new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && ZetaDia.Me.SceneId == SceneId,
+                new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && GilesTrinity.PlayerStatus.SceneId == SceneId,
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found SceneId {0}!", SceneId)),
                         new Action(ret => isDone = true)
                     )
                 ),
-                new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && ZetaDia.Me.CurrentScene.Name.ToLower().Contains(SceneName.ToLower()),
+                new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && SceneName.Trim() != String.Empty && ZetaDia.Me.CurrentScene.Name.ToLower().Contains(SceneName.ToLower()),
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found SceneName {0}!", SceneName)),
                         new Action(ret => isDone = true)
                     )
                 ),
-                new Decorator(ret => ZetaDia.Me.IsInTown,
+                new Decorator(ret => GilesTrinity.PlayerStatus.IsInTown,
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Cannot use TrinityExploreDungeon in town - tag finished!", SceneName)),
                         new Action(ret => isDone = true)

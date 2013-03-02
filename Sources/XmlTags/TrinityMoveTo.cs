@@ -99,7 +99,7 @@ namespace GilesTrinity.XmlTags
             }
 
             // Ok not skipping, now see if we are already within pathprecision range of that location
-            return (ZetaDia.Me.Position.Distance(Position) <= Math.Max(PathPrecision, Navigator.PathPrecision));
+            return (GilesTrinity.PlayerStatus.CurrentPosition.Distance(Position) <= Math.Max(PathPrecision, Navigator.PathPrecision));
         }
 
         private void FlagTagAsCompleted(object object_0)

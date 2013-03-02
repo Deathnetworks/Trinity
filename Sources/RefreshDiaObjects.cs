@@ -437,11 +437,11 @@ namespace GilesTrinity
         {
             bool isNewLogItem = false;
 
-            c_ItemSha1Hash = HashGenerator.GenerateItemHash(c_Position, c_ActorSNO, c_InternalName, CurrentWorldDynamicId, c_ItemQuality, c_ItemLevel);
+            c_ItemMd5Hash = HashGenerator.GenerateItemHash(c_Position, c_ActorSNO, c_InternalName, CurrentWorldDynamicId, c_ItemQuality, c_ItemLevel);
 
-            if (!GenericCache.ContainsKey(c_ItemSha1Hash))
+            if (!GenericCache.ContainsKey(c_ItemMd5Hash))
             {
-                GenericCache.AddToCache(new GenericCacheObject(c_ItemSha1Hash, null, new TimeSpan(1, 0, 0)));
+                GenericCache.AddToCache(new GenericCacheObject(c_ItemMd5Hash, null, new TimeSpan(1, 0, 0)));
 
                 isNewLogItem = true;
                 if (tempbasetype == GItemBaseType.Armor || tempbasetype == GItemBaseType.WeaponOneHand || tempbasetype == GItemBaseType.WeaponTwoHand ||
@@ -495,119 +495,6 @@ namespace GilesTrinity
                 }
             }
             return isNewLogItem;
-        }
-        private static double RefreshKillRadius()
-        {
-            // Cancel altogether if it's not even in range, unless it's a boss or an injured treasure goblin
-            double dUseKillRadius = iCurrentMaxKillRadius;
-            // Bosses get extra radius
-            if (c_unit_IsBoss)
-            {
-                if (c_ActorSNO != 80509)
-                    // Kulle Exception
-                    dUseKillRadius *= 1.5;
-                // And even more if they're already injured
-                if (c_HitPointsPct <= 0.98)
-                    dUseKillRadius *= 4;
-                // And make sure we have a MINIMUM range for bosses - incase they are at screen edge etc.
-                if (dUseKillRadius <= 200)
-                    if (c_ActorSNO != 80509)
-                        // Kulle Exception
-                        dUseKillRadius = 200;
-            }
-            // Special short-range list to ignore weakling mobs
-            if (PlayerKiteDistance <= 0 && !GetHasBuff(SNOPower.Wizard_Archon))
-            {
-                if (hashActorSNOShortRangeOnly.Contains(c_ActorSNO))
-                    dUseKillRadius = 12;
-            }
-            // Prevent long-range mobs beign ignored while they may be pounding on us
-            if (dUseKillRadius <= 30 && hashActorSNORanged.Contains(c_ActorSNO))
-                dUseKillRadius = 80;
-            //intell
-            //GoatMutant_Ranged_A_Unique_Uber-10955 ActorSNO:	255996 	(act 1)
-            //DuneDervish_B_Unique_Uber-14252 ActorSNO: 		256000	(act 2)
-            //morluSpellcaster_A_Unique_Uber-17451 ActorSNO:	256015	(act 3)
-            if (c_ActorSNO == 256015 || c_ActorSNO == 256000 || c_ActorSNO == 255996)
-                dUseKillRadius = 80;
-            // Injured treasure goblins get a huge extra radius - since they don't stay on the map long if injured, anyway!
-            if (c_unit_IsTreasureGoblin && (c_CentreDistance <= 60 || c_HitPointsPct <= 0.99))
-            {
-                c_ForceLeapAgainst = true;
-                if (Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize)
-                    dUseKillRadius *= 2.5;
-                else
-                    dUseKillRadius *= 4;
-                // Minimum distance of 60
-                if (dUseKillRadius <= 60) dUseKillRadius = 60;
-            }
-            // Elitey type mobs and things
-            else if ((c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion))
-            {
-                c_ForceLeapAgainst = true;
-                if (c_HitPointsPct <= 0.99)
-                {
-                    dUseKillRadius *= 2;
-                    if (dUseKillRadius <= 150) dUseKillRadius = 150;
-                }
-                else
-                {
-                    if (dUseKillRadius <= 120) dUseKillRadius = 120;
-                }
-            }
-            // Safety for TownRun and UseTownPortalTag
-            if (TownRun.IsTryingToTownPortal())
-            {
-                if (dUseKillRadius <= 90) dUseKillRadius = 90;
-            }
-            return dUseKillRadius;
-        }
-        private static MonsterAffixes RefreshAffixes(ACD tempCommonData)
-        {
-            MonsterAffixes theseaffixes;
-            if (!dictGilesMonsterAffixCache.TryGetValue(c_RActorGuid, out theseaffixes))
-            {
-                try
-                {
-                    theseaffixes = tempCommonData.MonsterAffixes;
-                    dictGilesMonsterAffixCache.Add(c_RActorGuid, theseaffixes);
-                }
-                catch
-                {
-                    theseaffixes = MonsterAffixes.None;
-                }
-            }
-            c_unit_IsElite = theseaffixes.HasFlag(MonsterAffixes.Elite);
-            c_unit_IsRare = theseaffixes.HasFlag(MonsterAffixes.Rare);
-            c_unit_IsUnique = theseaffixes.HasFlag(MonsterAffixes.Unique);
-            c_unit_IsMinion = theseaffixes.HasFlag(MonsterAffixes.Minion);
-            return theseaffixes;
-        }
-        private static MonsterType RefreshMonsterType(ACD tempCommonData, MonsterType monsterType, bool bAddToDictionary)
-        {
-            SNORecordMonster monsterInfo = tempCommonData.MonsterInfo;
-            if (monsterInfo != null)
-            {
-                // Force Jondar as an undead, since Diablo 3 sticks him as a permanent ally
-                if (c_ActorSNO == 86624)
-                {
-                    monsterType = MonsterType.Undead;
-                }
-                else
-                {
-                    monsterType = monsterInfo.MonsterType;
-                }
-                // Is this going to be a new dictionary entry, or updating one already existing?
-                if (bAddToDictionary)
-                    dictionaryStoredMonsterTypes.Add(c_ActorSNO, monsterType);
-                else
-                    dictionaryStoredMonsterTypes[c_ActorSNO] = monsterType;
-            }
-            else
-            {
-                monsterType = MonsterType.Undead;
-            }
-            return monsterType;
         }
         private static void RefreshDoBackTrack()
         {

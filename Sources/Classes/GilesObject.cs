@@ -43,6 +43,7 @@ namespace GilesTrinity
         public bool IsTreasureGoblin { get; set; }
         public bool IsEliteRareUnique { get; set; }
         public bool IsBoss { get; set; }
+        public bool IsShielded { get; set; }
         public bool IsBossOrEliteRareUnique { get { return (this.Type == GObjectType.Unit && (IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         public bool IsTrashMob { get { return (this.Type == GObjectType.Unit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         public bool IsAttackable { get; set; }
@@ -86,6 +87,7 @@ namespace GilesTrinity
         }
         public DiaObject DiaObject { get; set; }
         public string ObjectHash { get; set; }
+        public double KillRange { get; set; }
 
         public GilesObject(DiaObject _DiaObject = null)
         {

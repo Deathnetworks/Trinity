@@ -83,7 +83,7 @@ namespace GilesTrinity.XmlTags
         }
 
 
-        public Vector3 MyPos { get { return ZetaDia.Me.Position; } }
+        public Vector3 MyPos { get { return GilesTrinity.PlayerStatus.CurrentPosition; } }
         private ISearchAreaProvider gp { get { return GilesTrinity.gp; } }
         //private PathFinder pf { get { return GilesTrinity.pf; } }
 

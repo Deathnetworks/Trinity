@@ -194,7 +194,7 @@ namespace GilesTrinity
                     GilesTrinity.IsReadyToTownRun = false;
                 }
 
-                if (GilesTrinity.IsReadyToTownRun && !(Zeta.CommonBot.Logic.BrainBehavior.IsVendoring || ZetaDia.Me.IsInTown))
+                if (GilesTrinity.IsReadyToTownRun && !(Zeta.CommonBot.Logic.BrainBehavior.IsVendoring || GilesTrinity.PlayerStatus.IsInTown))
                 {
                     string cantUseTPreason = String.Empty;
                     if (!ZetaDia.Me.CanUseTownPortal(out cantUseTPreason))
@@ -653,7 +653,7 @@ namespace GilesTrinity
             int iPlayerDynamicID = -1;
             try
             {
-                iPlayerDynamicID = ZetaDia.Me.CommonData.DynamicId;
+                iPlayerDynamicID = GilesTrinity.PlayerStatus.MyDynamicID;
             }
             catch
             {

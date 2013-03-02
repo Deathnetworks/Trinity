@@ -31,7 +31,7 @@ namespace GilesTrinity.XmlTags
         public override bool GetConditionExec()
         {
             bool flag;
-            Vector3 vMyLocation = ZetaDia.Me.Position;
+            Vector3 vMyLocation = GilesTrinity.PlayerStatus.CurrentPosition;
             if (sType != null && sType == "reverse")
                 flag = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).FirstOrDefault<DiaObject>(a => a.ActorSNO == SNOID && a.Position.Distance(vMyLocation) <= Range) == null;
             else

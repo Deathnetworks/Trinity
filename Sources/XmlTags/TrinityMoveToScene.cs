@@ -44,7 +44,7 @@ namespace GilesTrinity.XmlTags
         /// <summary>
         /// The current player position
         /// </summary>
-        private Vector3 myPos { get { return ZetaDia.Me.Position; } }
+        private Vector3 myPos { get { return GilesTrinity.PlayerStatus.CurrentPosition; } }
         private static ISearchAreaProvider gp { get { return GilesTrinity.gp; } }
         //private static PathFinder pf { get { return GilesTrinity.pf; } }
         /// <summary>
@@ -151,9 +151,9 @@ namespace GilesTrinity.XmlTags
         private Composite UpdateSearchGridProvider()
         {
             return
-            new DecoratorContinue(ret => mySceneId != ZetaDia.Me.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
+            new DecoratorContinue(ret => mySceneId != GilesTrinity.PlayerStatus.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
                 new Sequence(
-                    new Action(ret => mySceneId = ZetaDia.Me.SceneId),
+                    new Action(ret => mySceneId = GilesTrinity.PlayerStatus.SceneId),
                     new Action(ret => GPUpdatePosition = myPos),
                     new Action(ret => GilesTrinity.UpdateSearchGridProvider(true)),
                     new Action(ret => MiniMapMarker.UpdateFailedMarkers())

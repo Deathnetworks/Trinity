@@ -838,7 +838,7 @@ namespace GilesTrinity.Cache
                 item.Name = acd.Name;
                 item.Position = acd.Position;
                 item.Level = acd.Stats.Level;
-                item.Distance = acd.Position.Distance(ZetaDia.Me.Position);
+                item.Distance = acd.Position.Distance(GilesTrinity.PlayerStatus.CurrentPosition);
 
                 if (item.Gold > 0)
                     item.ShouldPickup = ShouldPickupGold(item.Gold, item.Distance);

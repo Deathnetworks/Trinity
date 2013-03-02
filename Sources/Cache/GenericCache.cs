@@ -126,7 +126,7 @@ namespace GilesTrinity
         }
     }
 
-    internal class GenericCacheObject : Comparer<GenericCacheObject>
+    internal class GenericCacheObject 
     {
         public string Key { get; set; }
         public object Value { get; set; }
@@ -141,9 +141,18 @@ namespace GilesTrinity
             Expires = DateTime.Now.Add(expirationDuration);
         }
 
-        public override int Compare(GenericCacheObject x, GenericCacheObject y)
+        public override bool Equals(object obj)
         {
-            return x.Key.CompareTo(y.Key);
+            var other = obj as GenericCacheObject;
+            if (other == null)
+                return false;
+
+            return this.Key == other.Key;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Key.GetHashCode();
         }
     }
 }

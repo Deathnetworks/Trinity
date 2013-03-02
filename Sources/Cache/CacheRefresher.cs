@@ -67,7 +67,7 @@ namespace GilesTrinity.Cache
             try
             {
                 ACDItem acd = (ACDItem)item.CommonData;
-                item.Distance = acd.Position.Distance(ZetaDia.Me.Position);
+                item.Distance = acd.Position.Distance(GilesTrinity.PlayerStatus.CurrentPosition);
                 if (acd.IsUnidentified != item.IsUnidentified || item.Gold > 0)
                 {
                     CacheItem.ComputeItemProperty(item);

@@ -38,6 +38,10 @@ namespace GilesTrinity
 
                     PlayerStatus.LastUpdated = DateTime.Now;
                     PlayerStatus.IsInTown = me.IsInTown;
+                    PlayerStatus.IsDead = me.IsDead;
+                    PlayerStatus.IsInGame = ZetaDia.IsInGame;
+                    PlayerStatus.IsLoadingWorld = ZetaDia.IsLoadingWorld;
+
                     PlayerStatus.IsIncapacitated = (me.IsFeared || me.IsStunned || me.IsFrozen || me.IsBlind);
                     PlayerStatus.IsRooted = me.IsRooted;
 
@@ -48,15 +52,20 @@ namespace GilesTrinity
                     PlayerStatus.SecondaryResourcePct = PlayerStatus.SecondaryResource / me.MaxSecondaryResource;
                     PlayerStatus.CurrentPosition = me.Position;
 
+                    PlayerStatus.GoldPickupRadius = me.GoldPickupRadius;
+                    PlayerStatus.Coinage = me.Inventory.Coinage;
+
                     if (PlayerStatus.PrimaryResource >= MinEnergyReserve)
                         PlayerStatus.WaitingForReserveEnergy = false;
                     if (PlayerStatus.PrimaryResource < 20)
                         PlayerStatus.WaitingForReserveEnergy = true;
+
                     PlayerStatus.MyDynamicID = me.CommonData.DynamicId;
                     PlayerStatus.Level = me.Level;
                     PlayerStatus.ActorClass = me.ActorClass;
                     PlayerStatus.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
                     PlayerStatus.LevelAreaId = ZetaDia.CurrentLevelAreaId;
+
                     if (DateTime.Now.Subtract(PlayerStatus.Scene.LastUpdate).TotalMilliseconds > 1000 && Settings.Combat.Misc.UseNavMeshTargeting)
                     {
                         int CurrentSceneSNO = -1;
@@ -70,14 +79,12 @@ namespace GilesTrinity
                     }
 
                     // World ID safety caching incase it's ever unavailable
-                    if (ZetaDia.CurrentWorldDynamicId != -1)
-                        CurrentWorldDynamicId = ZetaDia.CurrentWorldDynamicId;
-                    if (ZetaDia.CurrentWorldId != -1)
-                        cachedStaticWorldId = ZetaDia.CurrentWorldId;
+                    CurrentWorldDynamicId = ZetaDia.CurrentWorldDynamicId;
+                    PlayerStatus.WorldDynamicID = ZetaDia.CurrentWorldDynamicId;
+                    PlayerStatus.WorldID = ZetaDia.CurrentWorldId;
+                    cachedStaticWorldId = ZetaDia.CurrentWorldId;
                     // Game difficulty, used really for vault on DH's
-                    if (ZetaDia.Service.CurrentHero.CurrentDifficulty != GameDifficulty.Invalid)
-                        iCurrentGameDifficulty = ZetaDia.Service.CurrentHero.CurrentDifficulty;
-
+                    iCurrentGameDifficulty = ZetaDia.Service.CurrentHero.CurrentDifficulty;
 
                     // Refresh player buffs (to check for archon)
                     GilesRefreshBuffs();

@@ -630,11 +630,6 @@ namespace GilesTrinity
 
             if (Settings.Combat.Misc.UseNavMeshTargeting || force)
             {
-                //if (gp == null)
-                //    gp = Navigator.SearchGridProvider;
-                //if (pf == null)
-                //    pf = new PathFinder(gp);
-
                 if (ZetaDia.IsInGame)
                 {
                     DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "Updating Grid Provider", true);

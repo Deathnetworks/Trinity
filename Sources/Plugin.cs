@@ -29,7 +29,7 @@ namespace GilesTrinity
         {
             get
             {
-                return new Version(1, 7, 2, 6);
+                return new Version(1, 7, 2, 7);
             }
         }
 
@@ -72,11 +72,11 @@ namespace GilesTrinity
         /// </summary>
         public void OnPulse()
         {
-            if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld || !ZetaDia.CPlayer.IsValid)
+            if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                 return;
 
             // hax for sending notifications after a town run
-            if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !ZetaDia.Me.IsInTown)
+            if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !PlayerStatus.IsInTown)
             {
                 TownRun.SendEmailNotification();
                 TownRun.SendMobileNotifications();

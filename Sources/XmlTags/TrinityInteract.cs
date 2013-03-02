@@ -27,7 +27,7 @@ namespace GilesTrinity.XmlTags
             {
                 float fClosestRange = -1;
                 int iACDGuid = -1;
-                Vector3 vMyLocation = ZetaDia.Me.Position;
+                Vector3 vMyLocation = GilesTrinity.PlayerStatus.CurrentPosition;
                 foreach (DiaObject thisobject in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Where<DiaObject>(a => a.ActorSNO == SNOID))
                 {
                     if (fClosestRange == -1 || thisobject.Position.Distance(vMyLocation) <= fClosestRange)

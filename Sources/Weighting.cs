@@ -61,7 +61,7 @@ namespace GilesTrinity
                     Settings.Combat.Misc.TrashPackSize > 1 &&
                     EliteCount == 0 &&
                     AvoidanceCount == 0 &&
-                    ZetaDia.Me.Level >= 15 &&
+                    PlayerStatus.Level >= 15 &&
                     PlayerMover.MovementSpeed > 0.5
                     );
 
@@ -85,6 +85,12 @@ namespace GilesTrinity
 
                                 // No champions, no mobs nearby, no treasure goblins to prioritize, and not injured, so skip mobs
                                 if (bIgnoreAllUnits)
+                                {
+                                    break;
+                                }
+
+                                // Monster is in cache but not within kill range
+                                if (cacheObject.RadiusDistance > cacheObject.KillRange)
                                 {
                                     break;
                                 }
@@ -675,19 +681,19 @@ namespace GilesTrinity
 
         private static void RecordTargetHistory()
         {
-            string targetSha1Hash = HashGenerator.GenerateObjecthash(CurrentTarget);
+            string targetMd5Hash = HashGenerator.GenerateObjecthash(CurrentTarget);
 
             // clean up past targets
-            if (!GenericCache.ContainsKey(targetSha1Hash))
+            if (!GenericCache.ContainsKey(targetMd5Hash))
             {
                 CurrentTarget.HasBeenPrimaryTarget = true;
                 CurrentTarget.TimesBeenPrimaryTarget = 1;
                 CurrentTarget.FirstTargetAssignmentTime = DateTime.Now;
-                GenericCache.AddToCache(new GenericCacheObject(targetSha1Hash, CurrentTarget, new TimeSpan(0, 10, 0)));
+                GenericCache.AddToCache(new GenericCacheObject(targetMd5Hash, CurrentTarget, new TimeSpan(0, 10, 0)));
             }
-            else if (GenericCache.ContainsKey(targetSha1Hash))
+            else if (GenericCache.ContainsKey(targetMd5Hash))
             {
-                GilesObject cTarget = (GilesObject)GenericCache.GetObject(targetSha1Hash).Value;
+                GilesObject cTarget = (GilesObject)GenericCache.GetObject(targetMd5Hash).Value;
                 if (!cTarget.IsBoss && cTarget.TimesBeenPrimaryTarget > 15 && !(cTarget.Type == GObjectType.Item && cTarget.ItemQuality >= ItemQuality.Legendary))
                 {
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Blacklisting target {0} ActorSNO={1} RActorGUID={2} due to possible stuck/flipflop!", 
@@ -707,7 +713,7 @@ namespace GilesTrinity
                 else
                 {
                     cTarget.TimesBeenPrimaryTarget++;
-                    GenericCache.UpdateObject(new GenericCacheObject(targetSha1Hash, cTarget, new TimeSpan(0, 10, 0)));
+                    GenericCache.UpdateObject(new GenericCacheObject(targetMd5Hash, cTarget, new TimeSpan(0, 10, 0)));
                 }
 
             }

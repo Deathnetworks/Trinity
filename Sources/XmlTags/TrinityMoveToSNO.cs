@@ -48,7 +48,7 @@ namespace GilesTrinity.XmlTags
             DiaObject tempObject = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).FirstOrDefault<DiaObject>(a => a.ActorSNO == SNOID);
             if (tempObject != null)
             {
-                return (ZetaDia.Me.Position.Distance(tempObject.Position) <= Math.Max(PathPrecision, Navigator.PathPrecision));
+                return (GilesTrinity.PlayerStatus.CurrentPosition.Distance(tempObject.Position) <= Math.Max(PathPrecision, Navigator.PathPrecision));
             }
             return false;
         }

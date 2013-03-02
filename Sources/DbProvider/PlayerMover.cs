@@ -35,7 +35,7 @@ namespace GilesTrinity.DbProvider
 
         public void MoveStop()
         {
-            ZetaDia.Me.UsePower(SNOPower.Walk, ZetaDia.Me.Position, GilesTrinity.CurrentWorldDynamicId, -1);
+            ZetaDia.Me.UsePower(SNOPower.Walk, GilesTrinity.PlayerStatus.CurrentPosition, GilesTrinity.CurrentWorldDynamicId, -1);
         }
 
         // Anti-stuck variables
@@ -336,7 +336,7 @@ namespace GilesTrinity.DbProvider
             }
 
             TimeLastUsedPlayerMover = DateTime.Now;
-            vMyCurrentPosition = ZetaDia.Me.Position;
+            vMyCurrentPosition = GilesTrinity.PlayerStatus.CurrentPosition;
             vOldMoveToTarget = vMoveToTarget;
 
             // record speed once per second
@@ -495,7 +495,7 @@ namespace GilesTrinity.DbProvider
             bool cancelSpecialMovementAfterStuck = DateTime.Now.Subtract(LastGeneratedStuckPosition).TotalMilliseconds > 10000;
 
             // See if we can use abilities like leap etc. for movement out of combat, but not in town
-            if (GilesTrinity.Settings.Combat.Misc.AllowOOCMovement && !ZetaDia.Me.IsInTown && !GilesTrinity.bDontMoveMeIAmDoingShit && cancelSpecialMovementAfterStuck)
+            if (GilesTrinity.Settings.Combat.Misc.AllowOOCMovement && !GilesTrinity.PlayerStatus.IsInTown && !GilesTrinity.bDontMoveMeIAmDoingShit && cancelSpecialMovementAfterStuck)
             {
                 bool bTooMuchZChange = (Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z) >= 4f);
 
@@ -739,7 +739,7 @@ namespace GilesTrinity.DbProvider
                 {
                     float fDistance = Vector3.Distance(vMoveToTarget, vLastMoveTo);
                     // Log if not in town, last waypoint wasn't FROM town, and the distance is >200 but <2000 (cos 2000+ probably means we changed map zones!)
-                    if (!ZetaDia.Me.IsInTown && !bLastWaypointWasTown && fDistance >= 200 & fDistance <= 2000)
+                    if (!GilesTrinity.PlayerStatus.IsInTown && !bLastWaypointWasTown && fDistance >= 200 & fDistance <= 2000)
                     {
                         if (!hashDoneThisVector.Contains(vMoveToTarget))
                         {
@@ -757,7 +757,7 @@ namespace GilesTrinity.DbProvider
                     }
                     vLastMoveTo = vMoveToTarget;
                     bLastWaypointWasTown = false;
-                    if (ZetaDia.Me.IsInTown)
+                    if (GilesTrinity.PlayerStatus.IsInTown)
                         bLastWaypointWasTown = true;
                 }
             }
@@ -803,11 +803,11 @@ namespace GilesTrinity.DbProvider
         {
             using (new PerformanceLogger("NavigateTo"))
             {
-                Vector3 MyPos = ZetaDia.Me.Position;
+                Vector3 MyPos = GilesTrinity.PlayerStatus.CurrentPosition;
 
                 PositionCache.AddPosition();
 
-                float distanceToTarget = moveTarget.Distance2D(ZetaDia.Me.Position);
+                float distanceToTarget = moveTarget.Distance2D(GilesTrinity.PlayerStatus.CurrentPosition);
 
                 bool MoveTargetIsInLoS = distanceToTarget <= 90f && !Navigator.Raycast(MyPos, moveTarget);
 
@@ -833,9 +833,9 @@ namespace GilesTrinity.DbProvider
 
             lastRecordedSkipAheadCache = DateTime.Now;
 
-            if (!GilesTrinity.hashSkipAheadAreaCache.Any(p => p.Location.Distance2D(ZetaDia.Me.Position) <= 5f))
+            if (!GilesTrinity.hashSkipAheadAreaCache.Any(p => p.Location.Distance2D(GilesTrinity.PlayerStatus.CurrentPosition) <= 5f))
             {
-                GilesTrinity.hashSkipAheadAreaCache.Add(new GilesObstacle() { Location = ZetaDia.Me.Position, Radius = 20f });
+                GilesTrinity.hashSkipAheadAreaCache.Add(new GilesObstacle() { Location = GilesTrinity.PlayerStatus.CurrentPosition, Radius = 20f });
             }
         }
 

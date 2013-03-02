@@ -126,8 +126,8 @@ namespace GilesTrinity
             return
             new Decorator(ret => MiniMapMarker.AnyUnvisitedMarkers(),
                 new Sequence(
-                    new Action(ret => MiniMapMarker.SetNearbyMarkersVisited(ZetaDia.Me.Position, markerDistance)),
-                    new Decorator(ret => MiniMapMarker.GetNearestUnvisitedMarker(ZetaDia.Me.Position) != null,
+                    new Action(ret => MiniMapMarker.SetNearbyMarkersVisited(GilesTrinity.PlayerStatus.CurrentPosition, markerDistance)),
+                    new Decorator(ret => MiniMapMarker.GetNearestUnvisitedMarker(GilesTrinity.PlayerStatus.CurrentPosition) != null,
                         new Action(ret => MoveToNearestMarker(near))
                     )
                 )
@@ -142,7 +142,7 @@ namespace GilesTrinity
             lastMoveResult = Navigator.MoveTo(MiniMapMarker.GetNearestUnvisitedMarker(near).Position);
 
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Moving to inspect nameHash {0} at {1} distance {2:0} mr: {3}",
-                m.MarkerNameHash, m.Position, ZetaDia.Me.Position.Distance2D(m.Position), lastMoveResult);
+                m.MarkerNameHash, m.Position, GilesTrinity.PlayerStatus.CurrentPosition.Distance2D(m.Position), lastMoveResult);
 
 
             return RunStatus.Success;

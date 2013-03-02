@@ -82,7 +82,7 @@ namespace GilesTrinity
 
 
                 lastCheckBag = DateTime.Now;
-                int currentcoin = ZetaDia.Me.Inventory.Coinage;
+                int currentcoin = GilesTrinity.PlayerStatus.Coinage;
 
                 if (currentcoin != lastKnowCoin && currentcoin != 0)
                 {
@@ -128,7 +128,7 @@ namespace GilesTrinity
             // Fixes a race condition crash. Zomg!
             Thread.Sleep(5000);
 
-            if (!ZetaDia.IsInGame || ZetaDia.Me == null || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
+            if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
             {
                 isLeavingGame = false;
                 leaveGameInitiated = false;

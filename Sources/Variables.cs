@@ -536,6 +536,7 @@ namespace GilesTrinity
         private static GItemType c_item_GItemType = GItemType.Unknown;
         private static MonsterSize c_unit_MonsterSize = MonsterSize.Unknown;
         private static DiaObject c_diaObject = null;
+        private static DiaUnit c_diaUnit = null;
         private static ACD c_CommonData = null;
         private static SNOAnim c_CurrentAnimation = SNOAnim.Invalid;
         private static bool c_unit_IsElite = false;
@@ -546,15 +547,16 @@ namespace GilesTrinity
         private static bool c_IsEliteRareUnique = false;
         private static bool c_unit_IsBoss = false;
         private static bool c_unit_IsAttackable = false;
+        private static bool c_unit_IsShielded = false;
         private static bool c_ForceLeapAgainst = false;
         private static bool c_IsObstacle = false;
         private static bool c_HasBeenNavigable = false;
         private static bool c_HasBeenRaycastable = false;
         private static bool c_HasBeenInLoS = false;
-        private static string c_ItemSha1Hash = string.Empty;
+        private static string c_ItemMd5Hash = string.Empty;
         private static bool c_HasDotDPS = false;
         private static string c_ObjectHash = String.Empty;
-
+        private static double c_KillRange = 0f;
 
         // From main RefreshDiaobjects
         private static Vector3 vSafePointNear;
