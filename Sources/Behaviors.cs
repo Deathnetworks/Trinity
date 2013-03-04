@@ -1342,9 +1342,15 @@ namespace GilesTrinity
                         CurrentTarget.HasBeenInLoS,
                         CurrentTarget.HitPointsPct);
 
-                    PlayerMover.NavigateTo(vCurrentDestination, destname);
+                    MoveResult lastMoveResult = PlayerMover.NavigateTo(vCurrentDestination, destname);
                     lastSentMovePower = DateTime.Now;
 
+                    if (lastMoveResult == MoveResult.ReachedDestination && vCurrentDestination.Distance2D(PlayerStatus.CurrentPosition) > 40f)
+                    {
+                        hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Blacklisting {0} {1} {2} dist={3} " + (CurrentTarget.IsElite ? " IsElite" : "") + (CurrentTarget.ItemQuality >= ItemQuality.Legendary ? "IsLegendaryItem" : ""),
+                            CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid, CurrentTarget.CentreDistance);
+                    }
                     // Store the current destination for comparison incase of changes next loop
                     vLastMoveToTarget = vCurrentDestination;
                     // Reset total body-block count, since we should have moved

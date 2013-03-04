@@ -177,9 +177,8 @@ namespace GilesTrinity
                                 {
 
                                     // Not attackable, could be shielded, make super low priority
-                                    if (!cacheObject.IsAttackable)
+                                    if (cacheObject.IsShielded)
                                     {
-
                                         // Only 500 weight helps prevent it being prioritized over an unshielded
                                         cacheObject.Weight = 500;
                                     }
