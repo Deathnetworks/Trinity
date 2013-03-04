@@ -112,7 +112,7 @@ namespace GilesTrinity
         /// <summary>
         /// A flag to indicate if we just entered or just left archon form (and so to force-update the hotbar)
         /// </summary>
-        private static bool bHasHadArchonbuff = false;
+        private static bool HasHadArchonbuff = false;
 
         /// <summary>
         /// A flag to see if we need to refresh hot bar abilities

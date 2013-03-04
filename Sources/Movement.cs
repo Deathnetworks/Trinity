@@ -209,7 +209,7 @@ namespace GilesTrinity
             }
         }
         // Quick Easy Raycast Function for quick changes
-        public static bool GilesCanRayCast(Vector3 vStartLocation, Vector3 vDestination, float ZDiff = 4f)
+        public static bool CanRayCast(Vector3 vStartLocation, Vector3 vDestination, float ZDiff = 4f)
         {
             // Navigator.Raycast is REVERSE Of ZetaDia.Physics.Raycast
             // Navigator.Raycast returns True if it "hits" an edge
@@ -228,11 +228,28 @@ namespace GilesTrinity
             }
             return false;
         }
-        // Calculate direction of A to B
-        // Quickly calculate the direction a vector is from ourselves, and return it as a float
+        /// <summary>
+        /// Returns the Degree angle of a target location
+        /// </summary>
+        /// <param name="vStartLocation"></param>
+        /// <param name="vTargetLocation"></param>
+        /// <returns></returns>
         public static float FindDirectionDegree(Vector3 vStartLocation, Vector3 vTargetLocation)
         {
             return (float)RadianToDegree(NormalizeRadian((float)Math.Atan2(vTargetLocation.Y - vStartLocation.Y, vTargetLocation.X - vStartLocation.X)));
+        }
+        public static double FindDirectionRadian(Vector3 start, Vector3 end)
+        {
+            double radian = Math.Atan2(end.Y - start.Y, end.X - start.X);
+
+            if (radian < 0)
+            {
+                double mod = -radian;
+                mod %= Math.PI * 2d;
+                mod = -mod + Math.PI * 2d;
+                return mod;
+            }
+            return (radian % (Math.PI * 2d));
         }
         // Find A Safe Movement Location
         //private static bool bAvoidDirectionBlacklisting = false;

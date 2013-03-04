@@ -731,7 +731,7 @@ namespace GilesTrinity
                     item.DynamicId, item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.IsTwoHand, item.DyeType, item.ItemType, item.ItemBaseType, item.FollowerSpecialType,
                     item.IsUnidentified, item.ItemStackQuantity, item.Stats);
 
-                double ItemValue = GilesTrinity.ValueThisItem(thiscacheditem, itemType);
+                double ItemValue = ItemValuation.ValueThisItem(thiscacheditem, itemType);
                 double NeedScore = GilesTrinity.ScoreNeeded(item.ItemBaseType);
 
 

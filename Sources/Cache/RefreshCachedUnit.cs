@@ -9,7 +9,7 @@ using Zeta.Internals.SNO;
 
 namespace GilesTrinity
 {
-    public partial class GilesTrinity 
+    public partial class GilesTrinity
     {
         private static bool RefreshGilesUnit(bool AddToCache)
         {
@@ -17,8 +17,6 @@ namespace GilesTrinity
 
             // See if this is a boss
             c_unit_IsBoss = hashBossSNO.Contains(c_ActorSNO);
-
-            c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
 
             // hax for Diablo_shadowClone
             c_unit_IsAttackable = c_InternalName.StartsWith("Diablo_shadowClone");
@@ -92,23 +90,6 @@ namespace GilesTrinity
             if (!AddToCache)
                 return AddToCache;
 
-            using (new PerformanceLogger("RefreshUnit.7"))
-            {
-                double dThisMaxHealth = RefreshMonsterHealth();
-
-                // And finally put the two together for a current health percentage
-                c_HitPointsPct = c_HitPoints / dThisMaxHealth;
-
-                // Unit is already dead
-                if (c_HitPoints <= 0d && !c_unit_IsBoss)
-                {
-                    AddToCache = false;
-                    c_IgnoreSubStep = "0HitPoints";
-
-                    // return here immediately
-                    return AddToCache;
-                }
-            }
             MonsterAffixes monsterAffixes;
             using (new PerformanceLogger("RefreshUnit.8"))
             {
@@ -125,6 +106,7 @@ namespace GilesTrinity
                     {
                         AddToCache = false;
                         c_IgnoreSubStep = "IgnoreTreasureGoblins";
+                        return AddToCache;
                     }
                 }
                 // Pull up the Monster Affix cached data
@@ -172,92 +154,104 @@ namespace GilesTrinity
                 //}
             }
 
-            AddToCache = RefreshUnitAttributes(AddToCache, c_diaUnit);
-            if (!AddToCache)
-            {
-                return AddToCache;
-            }
-
             if (monsterAffixes.HasFlag(MonsterAffixes.Shielding))
                 c_unit_IsShielded = true;
 
-            using (new PerformanceLogger("RefreshUnit.11"))
+            // Only if at full health, else don't bother checking each loop
+            // See if we already have this monster's size stored, if not get it and cache it
+            if (!dictionaryStoredMonsterSizes.TryGetValue(c_ActorSNO, out c_unit_MonsterSize))
             {
-                // Only if at full health, else don't bother checking each loop
-                // See if we already have this monster's size stored, if not get it and cache it
-                if (!dictionaryStoredMonsterSizes.TryGetValue(c_ActorSNO, out c_unit_MonsterSize))
+                try
                 {
-                    try
-                    {
-                        RefreshMonsterSize();
-                    }
-                    catch (Exception ex)
-                    {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monstersize info for unit {0} [{1}]", c_InternalName, c_ActorSNO);
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                        AddToCache = false;
-                        return AddToCache;
-                    }
+                    RefreshMonsterSize();
+                }
+                catch (Exception ex)
+                {
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monstersize info for unit {0} [{1}]", c_InternalName, c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                    AddToCache = false;
+                    return AddToCache;
                 }
             }
-            using (new PerformanceLogger("RefreshUnit.12"))
+            // Retrieve collision sphere radius, cached if possible
+            if (!dictGilesCollisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
             {
-                // Retrieve collision sphere radius, cached if possible
-                if (!dictGilesCollisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
+                try
                 {
-                    try
-                    {
-                        RefreshMonsterRadius();
-                    }
-                    catch (Exception ex)
-                    {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for unit {0} [{1}]", c_InternalName, c_ActorSNO);
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                        AddToCache = false;
-                        return AddToCache;
-                    }
-                    dictGilesCollisionSphereCache.Add(c_ActorSNO, c_Radius);
+                    RefreshMonsterRadius();
+                }
+                catch (Exception ex)
+                {
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for unit {0} [{1}]", c_InternalName, c_ActorSNO);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                    AddToCache = false;
+                    return AddToCache;
+                }
+                dictGilesCollisionSphereCache.Add(c_ActorSNO, c_Radius);
+            }
+
+            // only refresh active attributes if within killrange
+            if (c_RadiusDistance <= c_KillRange)
+            {
+                double dThisMaxHealth = RefreshMonsterHealth();
+
+                // And finally put the two together for a current health percentage
+                c_HitPointsPct = c_HitPoints / dThisMaxHealth;
+
+                // Unit is already dead
+                if (c_HitPoints <= 0d && !c_unit_IsBoss)
+                {
+                    AddToCache = false;
+                    c_IgnoreSubStep = "0HitPoints";
+
+                    // return here immediately
+                    return AddToCache;
                 }
             }
-            using (new PerformanceLogger("RefreshUnit.13"))
+
+            AddToCache = RefreshUnitAttributes(AddToCache, c_diaUnit);
+
+            if (!AddToCache)
+                return AddToCache;
+
+            c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
+
+            // A "fake distance" to account for the large-object size of monsters
+            c_RadiusDistance -= (float)c_Radius;
+            if (c_RadiusDistance <= 1f)
+                c_RadiusDistance = 1f;
+            // All-in-one flag for quicker if checks throughout
+            c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion);
+            // Special flags to decide whether to target anything at all
+            if (c_IsEliteRareUnique || c_unit_IsBoss)
+                bAnyChampionsPresent = true;
+            // Extended kill radius after last fighting, or when we want to force a town run
+            if ((Settings.Combat.Misc.ExtendedTrashKill && iKeepKillRadiusExtendedFor > 0) || ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
             {
-                // A "fake distance" to account for the large-object size of monsters
-                c_RadiusDistance -= (float)c_Radius;
-                if (c_RadiusDistance <= 1f)
-                    c_RadiusDistance = 1f;
-                // All-in-one flag for quicker if checks throughout
-                c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion);
-                // Special flags to decide whether to target anything at all
-                if (c_IsEliteRareUnique || c_unit_IsBoss)
-                    bAnyChampionsPresent = true;
-                // Extended kill radius after last fighting, or when we want to force a town run
-                if ((Settings.Combat.Misc.ExtendedTrashKill && iKeepKillRadiusExtendedFor > 0) || ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
+                if (c_RadiusDistance <= dUseKillRadius && AddToCache)
+                    bAnyMobsInCloseRange = true;
+            }
+            else
+            {
+                if (c_RadiusDistance <= Settings.Combat.Misc.NonEliteRange && AddToCache)
+                    bAnyMobsInCloseRange = true;
+            }
+            if (c_unit_IsTreasureGoblin)
+                bAnyTreasureGoblinsPresent = true;
+            // Units with very high priority (1900+) allow an extra 50% on the non-elite kill slider range
+            if (!bAnyMobsInCloseRange && !bAnyChampionsPresent && !bAnyTreasureGoblinsPresent && c_RadiusDistance <= (Settings.Combat.Misc.NonEliteRange * 1.5))
+            {
+                int iExtraPriority;
+                // Enable extended kill radius for specific unit-types
+                if (hashActorSNORanged.Contains(c_ActorSNO))
                 {
-                    if (c_RadiusDistance <= dUseKillRadius && AddToCache)
-                        bAnyMobsInCloseRange = true;
+                    bAnyMobsInCloseRange = true;
                 }
-                else
+                if (!bAnyMobsInCloseRange && dictActorSNOPriority.TryGetValue(c_ActorSNO, out iExtraPriority))
                 {
-                    if (c_RadiusDistance <= Settings.Combat.Misc.NonEliteRange && AddToCache)
-                        bAnyMobsInCloseRange = true;
-                }
-                if (c_unit_IsTreasureGoblin)
-                    bAnyTreasureGoblinsPresent = true;
-                // Units with very high priority (1900+) allow an extra 50% on the non-elite kill slider range
-                if (!bAnyMobsInCloseRange && !bAnyChampionsPresent && !bAnyTreasureGoblinsPresent && c_RadiusDistance <= (Settings.Combat.Misc.NonEliteRange * 1.5))
-                {
-                    int iExtraPriority;
-                    // Enable extended kill radius for specific unit-types
-                    if (hashActorSNORanged.Contains(c_ActorSNO))
+                    if (iExtraPriority >= 1900)
                     {
                         bAnyMobsInCloseRange = true;
-                    }
-                    if (!bAnyMobsInCloseRange && dictActorSNOPriority.TryGetValue(c_ActorSNO, out iExtraPriority))
-                    {
-                        if (iExtraPriority >= 1900)
-                        {
-                            bAnyMobsInCloseRange = true;
-                        }
                     }
                 }
             }
@@ -331,11 +325,13 @@ namespace GilesTrinity
             if (unit.IsUntargetable ||
                 unit.IsInvulnerable ||
                 unit.IsBurrowed)
+            {
                 AddToCache = false;
-            c_IgnoreSubStep = "NotAttackable";
+                c_IgnoreSubStep = "NotAttackable";
+            }
 
             // only check for DotDPS/Bleeding in certain conditions to save CPU for everyone else
-            if (PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_Rend))
+            if (AddToCache && PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_Rend))
             {
                 bool hasdotDPS = c_CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;
                 bool isBleeding = c_CommonData.GetAttribute<int>(ActorAttributeType.Bleeding) != 0;
@@ -371,13 +367,8 @@ namespace GilesTrinity
             }
             // Prevent long-range mobs beign ignored while they may be pounding on us
             if (dUseKillRadius <= 30 && hashActorSNORanged.Contains(c_ActorSNO))
-                dUseKillRadius = 80;
-            //intell
-            //GoatMutant_Ranged_A_Unique_Uber-10955 ActorSNO:	255996 	(act 1)
-            //DuneDervish_B_Unique_Uber-14252 ActorSNO: 		256000	(act 2)
-            //morluSpellcaster_A_Unique_Uber-17451 ActorSNO:	256015	(act 3)
-            if (c_ActorSNO == 256015 || c_ActorSNO == 256000 || c_ActorSNO == 255996)
-                dUseKillRadius = 80;
+                dUseKillRadius = 120f;
+
             // Injured treasure goblins get a huge extra radius - since they don't stay on the map long if injured, anyway!
             if (c_unit_IsTreasureGoblin && (c_CentreDistance <= 60 || c_HitPointsPct <= 0.99))
             {

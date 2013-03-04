@@ -167,7 +167,7 @@ namespace GilesTrinity.Technicals
         }
 
         /// <summary>
-        /// Gets the logging path.
+        /// Gets the logging path for battletag specific logging
         /// </summary>
         /// <value>The logging path.</value>
         public static string LoggingPath
@@ -175,6 +175,19 @@ namespace GilesTrinity.Technicals
             get
             {
                 string path = Path.Combine(DemonBuddyPath, "TrinityLogs", ZetaDia.Service.CurrentHero.BattleTagName);
+                CreateDirectory(path);
+                return path;
+            }
+        }
+
+        /// <summary>
+        /// Gets the TrinityLogs path - for NON-battletag specific logging
+        /// </summary>
+        public static string TrinityLogsPath
+        {
+            get
+            {
+                string path = Path.Combine(DemonBuddyPath, "TrinityLogs");
                 CreateDirectory(path);
                 return path;
             }

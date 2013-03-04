@@ -595,7 +595,7 @@ namespace GilesTrinity
 
             // Ok now try to do some decent item scoring based on item types
             double iNeedScore = ScoreNeeded(acdItem.ItemBaseType);
-            double iMyScore = ValueThisItem(cItem, TrueItemType);
+            double iMyScore = ItemValuation.ValueThisItem(cItem, TrueItemType);
 
             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, TrueItemType, iMyScore);
             if (iMyScore >= iNeedScore) return true;
@@ -627,33 +627,6 @@ namespace GilesTrinity
                 default:
                     return 0;
             }
-
-            //double iThisNeedScore = 0;
-            //
-            //// Weapons
-            //if (thisGilesItemType == GItemType.Axe || thisGilesItemType == GItemType.CeremonialKnife || thisGilesItemType == GItemType.Dagger ||
-            //    thisGilesItemType == GItemType.FistWeapon || thisGilesItemType == GItemType.Mace || thisGilesItemType == GItemType.MightyWeapon ||
-            //    thisGilesItemType == GItemType.Spear || thisGilesItemType == GItemType.Sword || thisGilesItemType == GItemType.Wand ||
-            //    thisGilesItemType == GItemType.TwoHandDaibo || thisGilesItemType == GItemType.TwoHandCrossbow || thisGilesItemType == GItemType.TwoHandMace ||
-            //    thisGilesItemType == GItemType.TwoHandMighty || thisGilesItemType == GItemType.TwoHandPolearm || thisGilesItemType == GItemType.TwoHandStaff ||
-            //    thisGilesItemType == GItemType.TwoHandSword || thisGilesItemType == GItemType.TwoHandAxe || thisGilesItemType == GItemType.HandCrossbow || thisGilesItemType == GItemType.TwoHandBow)
-            //    iThisNeedScore = Settings.Loot.TownRun.WeaponScore;
-
-            //// Jewelry
-            //if (thisGilesItemType == GItemType.Ring || thisGilesItemType == GItemType.Amulet || thisGilesItemType == GItemType.FollowerEnchantress ||
-            //    thisGilesItemType == GItemType.FollowerScoundrel || thisGilesItemType == GItemType.FollowerTemplar)
-            //    iThisNeedScore = Settings.Loot.TownRun.JewelryScore;
-
-            //// Armor
-            //if (thisGilesItemType == GItemType.Mojo || thisGilesItemType == GItemType.Orb || thisGilesItemType == GItemType.Quiver ||
-            //    thisGilesItemType == GItemType.Shield || thisGilesItemType == GItemType.Belt || thisGilesItemType == GItemType.Boots ||
-            //    thisGilesItemType == GItemType.Bracer || thisGilesItemType == GItemType.Chest || thisGilesItemType == GItemType.Cloak ||
-            //    thisGilesItemType == GItemType.Gloves || thisGilesItemType == GItemType.Helm || thisGilesItemType == GItemType.Legs ||
-            //    thisGilesItemType == GItemType.MightyBelt || thisGilesItemType == GItemType.Shoulder || thisGilesItemType == GItemType.SpiritStone ||
-            //    thisGilesItemType == GItemType.VoodooMask || thisGilesItemType == GItemType.WizardHat)
-            //    iThisNeedScore = Settings.Loot.TownRun.ArmorScore;
-
-            //return Math.Round(iThisNeedScore);
         }
 
         /// <summary>

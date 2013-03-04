@@ -1,4 +1,15 @@
-﻿# Unified Trinity Community Edition
+﻿
+# Unified Trinity Community Edition
+
+### Changelog 1.7.2.7:
+
+* Fixed Monk Wave of Light spirit check (was attempting to cast even without enough spirit)
+
+* Fixed RunStats Item Stats (IPH) counter / GenericObjectCache
+
+* Monsters are now always added to the cache regardless of kill radius, but are now ignored from weighting based on kill radius (so they can be included in TargetUtil checks)
+
+* Started work on using only cached values and minimizing reads from DB/D3 memory - focus on ZeteDia and ZetaDia.Me
 
 ### Changelog 1.7.2.6:
 

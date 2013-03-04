@@ -22,7 +22,7 @@ namespace GilesTrinity.Cache
         private static readonly object _Synchronizer = new object();
         private static Thread _CacheCleaner;
         private static readonly IDictionary<CacheType, uint> _CacheTimeout = new Dictionary<CacheType, uint>();
-        private static uint _MaxRefreshRate = 300;
+        private static int _MaxRefreshRate = 300;
         #endregion Fields
 
         #region Properties
@@ -91,7 +91,7 @@ namespace GilesTrinity.Cache
         /// Gets or sets the max refresh rate.
         /// </summary>
         /// <value>The max refresh rate.</value>
-        public static uint MaxRefreshRate
+        public static int MaxRefreshRate
         {
             get
             {

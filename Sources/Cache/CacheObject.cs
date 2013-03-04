@@ -246,35 +246,5 @@ namespace GilesTrinity.Cache
             set;
         }
     }
-
-
-    /// <summary>
-    /// Cached Items
-    /// </summary>
-    //internal class CacheItem2 : CacheObject
-    //{
-    //    public CacheItem2(ACD acd)
-    //        : base(acd)
-    //    {
-
-    //    }
-    //    /// <summary>
-    //    /// Gets the DiaItem
-    //    /// </summary>
-    //    public DiaItem InternalItem { get; set; }
-    //    public GItemType ItemType { get; set; }
-    //    public ItemQuality ItemQuality { get; set; }
-    //    public GItemType InternalItemType { get; set; }
-    //    public FollowerType FollowerType { get; set; }
-    //    public int ItemLevel { get; set; }
-    //    public int GoldStackSize { get; set; }
-    //    public bool IsOneHandedItem { get; set; }
-
-    //    public override CacheObject Clone()
-    //    {
-    //        return (CacheObject)this.MemberwiseClone();
-    //    }
-    //}
-
-
+    
 }

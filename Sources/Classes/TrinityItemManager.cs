@@ -267,7 +267,7 @@ namespace GilesTrinity
 
             // Ok now try to do some decent item scoring based on item types
             double iNeedScore = GilesTrinity.ScoreNeeded(item.ItemBaseType);
-            double iMyScore = GilesTrinity.ValueThisItem(cItem, trinityItemType);
+            double iMyScore = ItemValuation.ValueThisItem(cItem, trinityItemType);
 
             if (evaluationType == ItemEvaluationType.Keep)
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, trinityItemType, iMyScore);

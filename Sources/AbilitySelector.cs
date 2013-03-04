@@ -131,7 +131,7 @@ namespace GilesTrinity
 
         // Checking for buffs and caching the buff list
         // Cache all current buffs on character
-        public static void GilesRefreshBuffs()
+        public static void RefreshBuffs()
         {
             using (new PerformanceLogger("GilesRefreshBuffs"))
             {
@@ -155,17 +155,17 @@ namespace GilesTrinity
                 // Archon stuff
                 if (bThisArchonBuff)
                 {
-                    if (!bHasHadArchonbuff)
+                    if (!HasHadArchonbuff)
                         bRefreshHotbarAbilities = true;
-                    bHasHadArchonbuff = true;
+                    HasHadArchonbuff = true;
                 }
                 else
                 {
-                    if (bHasHadArchonbuff)
+                    if (HasHadArchonbuff)
                     {
                         Hotbar = new HashSet<SNOPower>(hashCachedPowerHotbarAbilities);
                     }
-                    bHasHadArchonbuff = false;
+                    HasHadArchonbuff = false;
                 }
                 //"g_killElitePack : 1, snoid=230745" <- Noting this here incase I ever want to monitor NV stacks, this is the SNO ID code for it!
             }

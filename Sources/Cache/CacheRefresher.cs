@@ -109,6 +109,21 @@ namespace GilesTrinity.Cache
         }
 
         /// <summary>
+        /// Refreshes and avoidance object
+        /// </summary>
+        /// <param name="avoidance"></param>
+        public static void RefreshAvoidance(CacheObject avoidance)
+        {
+            try
+            {
+            }
+            catch
+            {
+            }
+
+        }
+
+        /// <summary>
         /// Refresh all objects from ZetaDia.Actors.ACDList
         /// </summary>
         public static void RefreshAll()
@@ -121,7 +136,7 @@ namespace GilesTrinity.Cache
                     //ZetaDia.Actors.Update();
                     CacheManager.CacheObjectGetter = GetCache;
                     CacheManager.CacheObjectRefresher = RefreshCache;
-                    CacheManager.MaxRefreshRate = 100;
+                    CacheManager.MaxRefreshRate = GilesTrinity.Settings.Advanced.CacheRefreshRate;
                     CacheManager.DefineStaleFlag();
                     foreach (DiaObject obj in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Where(o => o.IsACDBased && o.CommonData != null))
                     {
@@ -145,7 +160,7 @@ namespace GilesTrinity.Cache
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine(ex);
-                } 
+                }
                 // Stash
                 try
                 {
@@ -173,6 +188,9 @@ namespace GilesTrinity.Cache
                     break;
                 case CacheType.Gizmo:
                     RefreshGizmo((CacheGizmo)cacheObject);
+                    break;
+                case CacheType.Avoidance:
+                    RefreshAvoidance((CacheAvoidance)cacheObject);
                     break;
                 case CacheType.Other:
                     RefreshOther((CacheOther)cacheObject);

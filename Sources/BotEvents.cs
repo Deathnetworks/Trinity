@@ -23,7 +23,7 @@ namespace GilesTrinity
                 case ItemBaseType.Misc:
                     break;
                 default:
-                    TownRun.LogGoodItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, GilesTrinity.ValueThisItem(cachedItem, cachedItem.TrinityItemType));
+                    TownRun.LogGoodItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, ItemValuation.ValueThisItem(cachedItem, cachedItem.TrinityItemType));
                     break;
             }
         }
@@ -41,7 +41,7 @@ namespace GilesTrinity
                 case ItemBaseType.Misc:
                     break;
                 default:
-                    TownRun.LogJunkItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, GilesTrinity.ValueThisItem(cachedItem, cachedItem.TrinityItemType));
+                    TownRun.LogJunkItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, ItemValuation.ValueThisItem(cachedItem, cachedItem.TrinityItemType));
                     break;
             }
         }
@@ -60,14 +60,14 @@ namespace GilesTrinity
                 case ItemBaseType.Misc:
                     break;
                 default:
-                    TownRun.LogJunkItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, GilesTrinity.ValueThisItem(cachedItem, cachedItem.TrinityItemType));
+                    TownRun.LogJunkItems(cachedItem, cachedItem.TrinityItemBaseType, cachedItem.TrinityItemType, ItemValuation.ValueThisItem(cachedItem, cachedItem.TrinityItemType));
                     break;
             }
         }
 
         private static void ResetTownRun()
         {
-            ResetValuationStatStrings();
+            ItemValuation.ResetValuationStatStrings();
             TownRun.TownRunCheckTimer.Reset();
             ForceVendorRunASAP = false;
             IsReadyToTownRun = false;

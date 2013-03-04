@@ -124,6 +124,7 @@ namespace GilesTrinity
                 GameEvents.OnItemSalvaged += TrinityOnItemSalvaged;
                 GameEvents.OnItemStashed += TrinityOnItemStashed;
 
+                GameEvents.OnGameChanged += GameEvents_OnGameChanged;
 
 
                 // enable or disable process exit events
@@ -161,6 +162,15 @@ namespace GilesTrinity
                 // reseting stash rules
                 StashRule.reset();
             }
+        }
+
+        void GameEvents_OnGameChanged(object sender, EventArgs e)
+        {
+            ClearCachesOnGameChange(sender, e);
+
+            // reload the profile juuuuuuuuuuuust in case Demonbuddy missed it... which it is known to do on disconnects
+            string currentProfilePath = ProfileManager.CurrentProfile.Path;
+            ProfileManager.Load(currentProfilePath);
         }
 
         internal static void SetBotTPS()

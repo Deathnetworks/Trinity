@@ -143,8 +143,8 @@ namespace GilesTrinity
         /// Contains ActorSNO of ranged units that should be attacked even if outside of kill radius
         /// </summary>
         internal static HashSet<int> hashActorSNORanged = new HashSet<int> {
-            365, 4100, 4304, 4300, 4738, 4299, 62736, 130794, 5508, 210120, 5388, 4286
-         };
+            365, 4100, 4304, 4300, 4738, 4299, 62736, 130794, 5508, 210120, 5388, 4286, 256015,256000,255996,
+       };
         // A list of bosses in the game, just to make CERTAIN they are treated as elites
         /// <summary>
         /// Contains ActorSNO of known Bosses
@@ -350,7 +350,7 @@ namespace GilesTrinity
                 {SNOPower.Monk_CripplingWave, 5},
                 {SNOPower.Monk_WayOfTheHundredFists, 5},
                 {SNOPower.Monk_LashingTailKick, 250},
-                {SNOPower.Monk_TempestRush, 20},
+                {SNOPower.Monk_TempestRush, 15},
                 {SNOPower.Monk_WaveOfLight, 750},
                 {SNOPower.Monk_BlindingFlash, 15200},
                 {SNOPower.Monk_BreathOfHeaven, 15200},
@@ -596,7 +596,7 @@ namespace GilesTrinity
         ///// <summary>
         ///// Same as above but for quality of item, we check this twice to make bloody sure we don't miss a legendary from a mis-read though (RactorGUID based)
         ///// </summary>
-        //private static Dictionary<int, ItemQuality> dictGilesQualityCache = new Dictionary<int, ItemQuality>();
+        private static Dictionary<int, ItemQuality> dictGilesQualityCache = new Dictionary<int, ItemQuality>();
         //private static Dictionary<int, bool> dictGilesQualityRechecked = new Dictionary<int, bool>();
         /// <summary>
         /// Same as above but for whether we want to pick it up or not (RactorGUID based)

@@ -239,6 +239,7 @@ namespace GilesTrinity
             using (var writer = new StreamWriter(aFilename))
             {
                 xml.Serialize(writer, updated);
+                writer.Flush();
             }
 
             return updated;

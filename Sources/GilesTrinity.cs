@@ -87,7 +87,7 @@ namespace GilesTrinity
                     iCurrentGameDifficulty = ZetaDia.Service.CurrentHero.CurrentDifficulty;
 
                     // Refresh player buffs (to check for archon)
-                    GilesRefreshBuffs();
+                    RefreshBuffs();
                 }
                 catch (Exception ex)
                 {
@@ -230,8 +230,7 @@ namespace GilesTrinity
             dictGilesDynamicIDCache = new Dictionary<int, int>();
             dictGilesVectorCache = new Dictionary<int, Vector3>();
             dictGilesGoldAmountCache = new Dictionary<int, int>();
-            //dictGilesQualityCache = new Dictionary<int, ItemQuality>();
-            //dictGilesQualityRechecked = new Dictionary<int, bool>();
+            dictGilesQualityCache = new Dictionary<int, ItemQuality>();
             dictGilesPickupItem = new Dictionary<int, bool>();
             dictSummonedByID = new Dictionary<int, int>();
             dictTotalInteractionAttempts = new Dictionary<int, int>();

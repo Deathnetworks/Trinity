@@ -190,10 +190,10 @@ namespace GilesTrinity
                                         // Starting weight of 5000 to beat a lot of crap weight stuff
                                         cacheObject.Weight = 5000;
 
-                                        // Distance as a percentage of max radius gives a value up to 1000 (1000 would be point-blank range)
+                                        // Distance as a percentage of max radius gives a value up to 1200 (1200 would be point-blank range)
                                         if (cacheObject.RadiusDistance < iCurrentMaxKillRadius)
-                                            cacheObject.Weight += (1200 * (1 - (cacheObject.RadiusDistance / iCurrentMaxKillRadius)));
-
+                                            cacheObject.Weight += (iCurrentMaxKillRadius * cacheObject.RadiusDistance + 5f) / iCurrentMaxKillRadius * 1200;
+                                        
                                         // Give extra weight to ranged enemies
                                         if ((PlayerStatus.ActorClass == ActorClass.Barbarian || PlayerStatus.ActorClass == ActorClass.Monk) &&
                                             (cacheObject.MonsterStyle == MonsterSize.Ranged || hashActorSNORanged.Contains(c_ActorSNO)))
@@ -395,7 +395,7 @@ namespace GilesTrinity
 
                                 // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
                                 if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
-                                    cacheObject.Weight = 1;
+                                    cacheObject.Weight = 250;
 
                                 // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
                                 if (CurrentTarget != null && bAnyMobsInCloseRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting && cacheObject.ItemQuality < ItemQuality.Legendary)
@@ -403,7 +403,7 @@ namespace GilesTrinity
 
                                 if (PlayerStatus.ActorClass == ActorClass.Monk && TimeSinceUse(SNOPower.Monk_TempestRush) < 1000 && cacheObject.ItemQuality < ItemQuality.Legendary)
                                 {
-                                    cacheObject.Weight = 1;
+                                    cacheObject.Weight = 500;
                                 }
 
                                 break;
@@ -493,17 +493,23 @@ namespace GilesTrinity
 
                                 if (cacheObject.Weight > 0)
                                 {
-
                                     // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                     if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                         cacheObject.Weight += 400;
 
-                                    // If there's a monster in the path-line to the item, reduce the weight by 25%
+                                    // If there's a monster in the path-line to the item
                                     if (hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
-                                        cacheObject.Weight *= 0.75;
+                                        cacheObject.Weight = 1;
 
                                     // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
                                     if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
+                                        cacheObject.Weight = 1;
+
+                                    // if there's any monsters nearby
+                                    if (TargetUtil.AnyMobsInRange(15f))
+                                        cacheObject.Weight = 1;
+
+                                    if (PrioritizeCloseRangeUnits)
                                         cacheObject.Weight = 1;
                                 }
                                 break;
@@ -619,8 +625,10 @@ namespace GilesTrinity
                         cacheObject.Weight = 0;
                         bStayPutDuringAvoidance = true;
                     }
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Weighting of {0} ({1}) found to be: {2:0} type: {3} mobsInCloseRange: {4} requireAvoidance: {5} PrioritizeCloseRangeUnits: {6}",
-                            cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance, PrioritizeCloseRangeUnits);
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight,
+                        "Weighting of {0} ({1}) is {2:0} type={3} mobsInCloseRange={4} requireAvoidance={5} PrioritizeCloseRangeUnits={6} IsElite={7}",
+                            cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance, PrioritizeCloseRangeUnits,
+                            cacheObject.IsElite);
 
                     // Prevent current target dynamic ranged weighting flip-flop 
                     if (CurrentTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)
@@ -696,7 +704,7 @@ namespace GilesTrinity
                 GilesObject cTarget = (GilesObject)GenericCache.GetObject(targetMd5Hash).Value;
                 if (!cTarget.IsBoss && cTarget.TimesBeenPrimaryTarget > 15 && !(cTarget.Type == GObjectType.Item && cTarget.ItemQuality >= ItemQuality.Legendary))
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Blacklisting target {0} ActorSNO={1} RActorGUID={2} due to possible stuck/flipflop!", 
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Blacklisting target {0} ActorSNO={1} RActorGUID={2} due to possible stuck/flipflop!",
                         CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid);
 
                     hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
@@ -705,9 +713,9 @@ namespace GilesTrinity
                     // So we can't use any ID's but rather have to use some data which never changes (actorSNO, position, type, worldID)
                     GenericBlacklist.AddToBlacklist(new GenericCacheObject()
                     {
-                         Key = CurrentTarget.ObjectHash,
-                         Value = null,
-                         Expires = DateTime.Now.AddSeconds(60)
+                        Key = CurrentTarget.ObjectHash,
+                        Value = null,
+                        Expires = DateTime.Now.AddSeconds(60)
                     });
                 }
                 else

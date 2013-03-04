@@ -41,7 +41,7 @@ namespace GilesTrinity
                 {
                     GenericCache.MaintainCache();
                     GenericBlacklist.MaintainBlacklist();
-                    
+
                     using (ZetaDia.Memory.AcquireFrame())
                     {
                         // Update player-data cache, including buffs
@@ -283,49 +283,6 @@ namespace GilesTrinity
                     NeedToClearBlacklist3 = false;
                     hashRGUIDBlacklist3 = new HashSet<int>();
                 }
-                // Clear certain cache dictionaries sequentially, spaced out over time, to force data updates
-                // keep data for up to 60 minutes
-                // run refresh every 3 seconds
-                if (DateTime.Now.Subtract(lastClearedCacheDictionary).TotalMilliseconds >= 3000)
-                {
-                    lastClearedCacheDictionary = DateTime.Now;
-                    iLastClearedCacheDictionary++;
-                    if (iLastClearedCacheDictionary > 50)
-                        iLastClearedCacheDictionary = 1;
-                    switch (iLastClearedCacheDictionary)
-                    {
-                        case 10: // every 30 seconds
-                            dictGilesVectorCache = new Dictionary<int, Vector3>();
-                            dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
-                            dictGilesActorSNOCache = new Dictionary<int, int>();
-                            dictGilesACDGUIDCache = new Dictionary<int, int>();
-                            dictGilesLastHealthCache = new Dictionary<int, double>();
-                            dictGilesLastHealthChecked = new Dictionary<int, int>();
-                            break;
-                        case 20: // every 60 seconds
-                            dictGilesMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
-                            dictGilesMaxHealthCache = new Dictionary<int, double>();
-                            dictionaryStoredMonsterTypes = new Dictionary<int, MonsterType>();
-                            dictionaryStoredMonsterSizes = new Dictionary<int, MonsterSize>();
-                            dictGilesBurrowedCache = new Dictionary<int, bool>();
-                            dictSummonedByID = new Dictionary<int, int>();
-                            break;
-                        case 30: // every 90 seconds
-                            dictGilesInternalNameCache = new Dictionary<int, string>();
-                            dictGilesGoldAmountCache = new Dictionary<int, int>();
-                            break;
-                        case 50: // every 150 seconds
-                            dictGilesGameBalanceIDCache = new Dictionary<int, int>();
-                            dictGilesDynamicIDCache = new Dictionary<int, int>();
-                            //dictGilesQualityCache = new Dictionary<int, ItemQuality>();
-                            //dictGilesQualityRechecked = new Dictionary<int, bool>();
-                            dictGilesPickupItem = new Dictionary<int, bool>();
-                            dictHasBeenRayCastedCache = new Dictionary<int, bool>();
-                            dictHasBeenNavigableCache = new Dictionary<int, bool>();
-                            dictHasBeenInLoSCache = new Dictionary<int, bool>();
-                            break;
-                    }
-                }
 
                 // Reset the counters for player-owned things
                 iPlayerOwnedMysticAlly = 0;
@@ -345,6 +302,31 @@ namespace GilesTrinity
                 GilesObjectCache = new List<GilesObject>();
                 hashDoneThisRactor = new HashSet<int>();
             }
+        }
+
+        private static void ClearCachesOnGameChange(object sender, EventArgs e)
+        {
+            dictGilesVectorCache = new Dictionary<int, Vector3>();
+            dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
+            dictGilesActorSNOCache = new Dictionary<int, int>();
+            dictGilesACDGUIDCache = new Dictionary<int, int>();
+            dictGilesLastHealthCache = new Dictionary<int, double>();
+            dictGilesLastHealthChecked = new Dictionary<int, int>();
+            dictGilesMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
+            dictGilesMaxHealthCache = new Dictionary<int, double>();
+            dictionaryStoredMonsterTypes = new Dictionary<int, MonsterType>();
+            dictionaryStoredMonsterSizes = new Dictionary<int, MonsterSize>();
+            dictGilesBurrowedCache = new Dictionary<int, bool>();
+            dictSummonedByID = new Dictionary<int, int>();
+            dictGilesInternalNameCache = new Dictionary<int, string>();
+            dictGilesGoldAmountCache = new Dictionary<int, int>();
+            dictGilesGameBalanceIDCache = new Dictionary<int, int>();
+            dictGilesDynamicIDCache = new Dictionary<int, int>();
+            dictGilesQualityCache = new Dictionary<int, ItemQuality>();
+            dictGilesPickupItem = new Dictionary<int, bool>();
+            dictHasBeenRayCastedCache = new Dictionary<int, bool>();
+            dictHasBeenNavigableCache = new Dictionary<int, bool>();
+            dictHasBeenInLoSCache = new Dictionary<int, bool>();
         }
 
         private static HashSet<string> ignoreNames = new HashSet<string>
@@ -403,6 +385,18 @@ namespace GilesTrinity
 
                             if ((Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && duration > 1 || !Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance)))
                             {
+                                string unitExtras = "";
+
+                                if (c_ObjectType == GObjectType.Unit)
+                                {
+                                    if (c_unit_IsElite)
+                                        unitExtras += "IsElite";
+
+                                    if (c_unit_IsShielded)
+                                        unitExtras += "IsShield";
+
+                                    
+                                }
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                     "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0}",
                                     duration,
@@ -524,7 +518,7 @@ namespace GilesTrinity
                 }
                 // See if we can raytrace to the final location and it's within 25 feet
                 if (iTotalBacktracks >= 2 && Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[1]) <= 25f &&
-                    GilesCanRayCast(PlayerStatus.CurrentPosition, vBacktrackList[1]))
+                    CanRayCast(PlayerStatus.CurrentPosition, vBacktrackList[1]))
                 {
                     vBacktrackList = new SortedList<int, Vector3>();
                     iTotalBacktracks = 0;

@@ -69,11 +69,15 @@
     <Compile Include="Cache\CacheAvoidance.cs" />
     <Compile Include="Cache\CacheGizmo.cs" />
     <Compile Include="Cache\CacheItem.cs" />
+    <Compile Include="Cache\CacheManager.cs" />
+    <Compile Include="Cache\CacheObject.cs" />
+    <Compile Include="Cache\CacheRefresher.cs" />
     <Compile Include="Cache\CacheUnit.cs" />
     <Compile Include="Cache\CacheUtils.cs" />
     <Compile Include="Cache\GenericBlacklist.cs" />
     <Compile Include="Cache\GenericCache.cs" />
     <Compile Include="Cache\PickupItem.cs" />
+    <Compile Include="Cache\RefreshCachedItem.cs" />
     <Compile Include="Cache\RefreshCachedUnit.cs" />
     <Compile Include="Cache\TrinityItemQuality.cs" />
     <Compile Include="Classes\GilesObjstacle.cs" />
@@ -107,9 +111,6 @@
     <Compile Include="TownRun.cs" />
     <Compile Include="TrinityPowerManager.cs" />
     <Compile Include="ScheduledPower.cs" />
-    <Compile Include="Cache\CacheManager.cs" />
-    <Compile Include="Cache\CacheObject.cs" />
-    <Compile Include="Cache\CacheRefresher.cs" />
     <Compile Include="Technicals\DbHelper.cs" />
     <Compile Include="Technicals\LogCategory.cs" />
     <Compile Include="Technicals\TrinitiyLogLevel.cs" />

@@ -316,7 +316,7 @@ namespace GilesTrinity
                         }
                         else if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade && CurrentTarget.Type != GObjectType.Destructible)
                         {
-                            CurrentTargetIsInLoS = (GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
+                            CurrentTargetIsInLoS = (CanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
                         }
                         else
                         {
@@ -521,11 +521,15 @@ namespace GilesTrinity
                                                 vAttackPoint.Z += 1.5f;
                                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "(NB: Attacking location of destructable)");
                                                 ZetaDia.Me.UsePower(CurrentPower.SNOPower, vAttackPoint, CurrentWorldDynamicId, -1);
+                                                if (CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
+                                                    LastTempestRushLocation = vAttackPoint;
                                             }
                                             else
                                             {
                                                 // Standard attack - attack the ACDGUID (equivalent of left-clicking the object in-game)
                                                 ZetaDia.Me.UsePower(CurrentPower.SNOPower, vNullLocation, -1, CurrentTarget.ACDGuid);
+                                                if (CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
+                                                    LastTempestRushLocation = CurrentTarget.Position;
                                             }
                                             // Count how many times we've tried interacting
                                             if (!dictTotalInteractionAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
@@ -611,10 +615,10 @@ namespace GilesTrinity
                                     {
                                         float fDirectionToTarget = GilesTrinity.FindDirectionDegree(PlayerStatus.CurrentPosition, vCurrentDestination);
                                         vCurrentDestination = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget - 50));
-                                        if (!GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination))
+                                        if (!CanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination))
                                         {
                                             vCurrentDestination = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget + 50));
-                                            if (!GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination))
+                                            if (!CanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination))
                                             {
                                                 vCurrentDestination = point;
                                             }
@@ -659,15 +663,17 @@ namespace GilesTrinity
                     using (new PerformanceLogger("HandleTarget.SpecialMovement"))
                     {
 
+                        bool Monk_SpecialMovement = ((CurrentTarget.Type == GObjectType.Gold ||
+                            CurrentTarget.Type == GObjectType.Unit ||
+                            CurrentTarget.Type == GObjectType.Barricade ||
+                            CurrentTarget.Type == GObjectType.Destructible) && (Monk_TempestRushReady()));
+
                         // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||
                             CurrentTarget.Type == GObjectType.Globe ||
-                            CurrentTarget.Type == GObjectType.Gold ||
-                            CurrentTarget.Type == GObjectType.Unit ||
-                            CurrentTarget.Type == GObjectType.Barricade ||
-                            CurrentTarget.Type == GObjectType.Destructible ||
+                            Monk_SpecialMovement ||
                             (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
-                            && GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination)
+                            && CanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination)
                             )
                         {
                             bool bFoundSpecialMovement = UsedSpecialMovement();
@@ -695,6 +701,7 @@ namespace GilesTrinity
                                     ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, CurrentWorldDynamicId, -1);
                                     dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
                                     LastPowerUsed = SNOPower.Monk_TempestRush;
+                                    LastTempestRushLocation = vCurrentDestination;
                                     // Store the current destination for comparison incase of changes next loop
                                     vLastMoveToTarget = vCurrentDestination;
                                     // Reset total body-block count, since we should have moved
@@ -868,7 +875,7 @@ namespace GilesTrinity
                     // So it won't blacklist a monster "on the edge of the screen" who isn't even being targetted
                     // Don't blacklist monsters on <= 50% health though, as they can't be in a stuck location... can they!? Maybe give them some extra time!
 
-                    bool isNavigable = GilesCanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination);
+                    bool isNavigable = CanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination);
 
                     bool addTargetToBlacklist = true;
 
@@ -1193,7 +1200,7 @@ namespace GilesTrinity
                             case GObjectType.Gold:
                             case GObjectType.Item:
                                 // No raycast available, try and force-ignore this for a little while, and blacklist for a few seconds
-                                if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position) && CurrentTarget.Unit.InLineOfSight)
+                                if (!CanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position) && CurrentTarget.Unit.InLineOfSight)
                                 {
                                     IgnoreRactorGUID = CurrentTarget.RActorGuid;
                                     IgnoreTargetForLoops = 6;
@@ -1540,6 +1547,8 @@ namespace GilesTrinity
                 }
                 if (bUsePowerSuccess)
                 {
+                    if (CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
+                        LastTempestRushLocation = CurrentPower.TargetPosition;
 
                     Monk_MaintainTempestRush();
 
@@ -1562,7 +1571,7 @@ namespace GilesTrinity
                 // if at full or nearly full health, see if we can raycast to it, if not, ignore it for 2000 ms
                 if (CurrentTarget.HitPointsPct >= 0.9d && AnythingWithinRange[RANGE_50] > 3)
                 {
-                    if (!GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
+                    if (!CanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
                     {
                         IgnoreRactorGUID = CurrentTarget.RActorGuid;
                         IgnoreTargetForLoops = 6;
