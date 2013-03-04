@@ -598,7 +598,7 @@ namespace GilesTrinity.ItemRules
             }
 
             // check for missing translations
-            if (item.ItemQualityLevel == ItemQuality.Legendary)
+            if (GilesTrinity.Settings.Loot.ItemRules.Debug && item.ItemQualityLevel == ItemQuality.Legendary)
                 checkItemForMissingTranslation(item);
 
             // add log unique key
