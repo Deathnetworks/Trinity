@@ -229,8 +229,10 @@
 // +------------------+---------------+-----------------------------+----------+
 // |  [BASETYPE]      |     YES       | ItemBaseType                | Weapon 
 // |  [QUALITY]       |     YES       | ItemQuality                 | Rare						 
+// |  [D3QUALITY]     |     YES       | D3 Quality                  | Rare6
+// |  [ROLL]          |     YES       | Attribute rolls             | 6
 // |  [TYPE]          |     YES       | ItemType                    | Axe							 
-// |  [LEVEL]         |     YES       | Level                       | 60								 
+// |  [LEVEL]         |     YES       | Level                       | 60
 // |  [ONEHAND]       |     YES       | OneHand                     | true							
 // |  [TWOHAND]       |     YES       | TwoHand                     | false							 
 // +------------------+---------------+-----------------------------+----------+
@@ -242,13 +244,15 @@
 // |  [REGEN]                         | HealthPerSecond             | 254					 
 // |  [LIFE%]                         | LifePercent                 | 12						 
 // |  [LS%]                           | LifeSteal                   | 3							 
-// |  [LOH]                           | LifeOnHit                   | 655							 
+// |  [LOH]                           | LifeOnHit                   | 655
+// |  [LOK]                           | LifeOnKill                  | 1256
 // |  [MS%]                           | MovementSpeed               | 12						 
 // |  [AS%]                           | AttackSpeedPercent          | 6				 
 // +----------------------------------+-----------------------------+----------+
 // |  [CRIT%]                         | CritPercent                 | 4.5						 
 // |  [CRITDMG%]                      | CritDamagePercent           | 59					 
-// |  [BLOCK%]                        | BlockChance                 | 8						 
+// |  [BLOCK%]                        | BlockChance                 | 8
+// |  [TOTBLOCK%]                     | Total BlockChance           | 23					 
 // +----------------------------------+-----------------------------+----------+
 // |  [ALLRES]                        | ResistAll                   | 80							 
 // |  [RESPHYSICAL]                   | ResistPhysical              | 60					 
@@ -271,7 +275,8 @@
 // |  [HOLYDMG%]                      | HolyDamagePercent           | 3					 
 // +----------------------------------+-----------------------------+----------+
 // |  [DPS]                           | WeaponDamagePerSecond       | 1100				 
-// |  [WEAPAS]                        | WeaponAttacksPerSecond      | 1.5			
+// |  [WEAPAS]                        | WeaponAttacksPerSecond      | 1.5
+// |  [WEAPDMG%]                      | WeaponDamagePer             | 48			
 // |  [WEAPMAXDMG]                    | WeaponMaxDamage             | 560					 
 // |  [WEAPMINDMG]                    | WeaponMinDamage             | 255
 // |  [WEAPDMGTYPE]                   | WeaponDamageType            | Fire					 
@@ -279,7 +284,9 @@
 // |  [MAXDMG]                        | MaxDamage                   | 200							 
 // +----------------------------------+-----------------------------+----------+
 // |  [THORNS]                        | Thorns                      | 2345							 
-// |  [DMGREDPHYSICAL]                | DamageReductionPhysicalPerc.| 2		 
+// |  [DMGVSELITE%]                   | Damage vs. Elite            | 5	
+// |  [DMGREDELITE%]                  | Damage Red. vs. Elite       | 2	
+// |  [DMGREDPHYSICAL]                | Damage Red. vs. Physicaldmg.| 2		 
 // +----------------------------------+-----------------------------+----------+
 // |  [MAXARCPOWER]                   | MaxArcanePower              | 15					 
 // |  [ARCONCRIT]                     | ArcaneOnCrit                | 10						 
@@ -294,10 +301,14 @@
 // +----------------------------------+-----------------------------+----------+
 // |  [GF%]                           | GoldFind                    | 25							 
 // |  [MF%]                           | MagicFind                   | 20							 
-// |  [PICKUP]                        | PickUpRadius                | 5						 
-// |  [GLOBEBONUS]                    | HealthGlobeBonus            | 5468					 
+// |  [PICKRAD]                       | PickUpRadius                | 5						 
+// |  [GLOBEBONUS]                    | HealthGlobeBonus            | 5468	
+// |  [EXPBONUS]                      | Experiencebonus             | 14
 // +----------------------------------+-----------------------------+----------+
-// |  [SOCKETS]                       | Sockets                     | 1							 
+// |  [LEVELRED]                      | Level Requirement Reduced   | 18	
+// |  [REQLEVEL]                      | Required Lev                | 60	
+// +----------------------------------+-----------------------------+----------+
+// |  [SOCKETS]                       | Sockets                     | 1	
 // +----------------------------------+-----------------------------+----------+
 // |  [MAXSTAT]                       | highest class specific stat | 200	
 // |                                  | (str,int,dex)		    |
@@ -355,7 +366,8 @@
 // |  - Mojo
 // |  - CeremonialDagger
 // |  - WizardHat
-// |  - Helm,Belt
+// |  - Helm
+// |  - Belt
 // |  - Bracer
 // |  - Orb
 // |  - MightyWeapon
@@ -457,6 +469,5 @@
 // ||__|\__||__|__|_____|________|__|__|      |______/|_____|___  |_____|
 // |                                                        |_____|      
 // +---------------------------------------------------------------------------+
-// | - [AS%] not working on weapons ... use [WEAPAS] to check for speed
-// | - [BLOCK%] not working on shields ... shows total blockChance 
+// | - no more bugs at the moment.
 // +---------------------------------------------------------------------------+
