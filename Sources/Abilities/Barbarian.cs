@@ -217,8 +217,8 @@ namespace GilesTrinity
                 int iPostDelay = 1;
                 if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && (LastPowerUsed == SNOPower.Barbarian_Whirlwind || LastPowerUsed == SNOPower.None))
                 {
-                    iPreDelay = 5;
-                    iPostDelay = 5;
+                    iPreDelay = 2;
+                    iPostDelay = 2;
                 }
                 return new TrinityPower(SNOPower.Barbarian_Rend, 0f, PlayerStatus.CurrentPosition, CurrentWorldDynamicId, -1, iPreDelay, iPostDelay, USE_SLOWLY);
             }

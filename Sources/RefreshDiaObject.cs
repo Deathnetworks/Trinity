@@ -163,6 +163,7 @@ namespace GilesTrinity
                         IsTreasureGoblin = c_unit_IsTreasureGoblin,
                         IsBoss = c_unit_IsBoss,
                         IsAttackable = c_unit_IsAttackable,
+                        HitPoints = c_HitPoints,
                         HitPointsPct = c_HitPointsPct,
                         Radius = c_Radius,
                         MonsterStyle = c_unit_MonsterSize,
@@ -170,7 +171,8 @@ namespace GilesTrinity
                         ForceLeapAgainst = c_ForceLeapAgainst,
                         HasDotDPS = c_HasDotDPS,
                         ObjectHash = c_ObjectHash,
-                        KillRange = c_KillRange
+                        KillRange = c_KillRange,
+                        IsShielded = c_unit_IsShielded
                     });
             }
             return true;
@@ -260,6 +262,7 @@ namespace GilesTrinity
             c_unit_IsTreasureGoblin = false;
             c_unit_IsBoss = false;
             c_unit_IsAttackable = false;
+            c_unit_IsShielded = false;
             c_IsEliteRareUnique = false;
             c_ForceLeapAgainst = false;
             c_IsObstacle = false;
@@ -1178,8 +1181,7 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a Monk with Serenity");
             }
             // Witch doctors with spirit walk available and not currently Spirit Walking will subtly ignore ice balls, arcane, desecrator & plague cloud
-            if (PlayerStatus.ActorClass == ActorClass.WitchDoctor && Hotbar.Contains(SNOPower.Witchdoctor_SpiritWalk) &&
-                (!GetHasBuff(SNOPower.Witchdoctor_SpiritWalk) && GilesUseTimer(SNOPower.Witchdoctor_SpiritWalk)) || GetHasBuff(SNOPower.Witchdoctor_SpiritWalk))
+            if (PlayerStatus.ActorClass == ActorClass.WitchDoctor && Hotbar.Contains(SNOPower.Witchdoctor_SpiritWalk) && GetHasBuff(SNOPower.Witchdoctor_SpiritWalk))
             {
                 if (c_ActorSNO == 223675 || c_ActorSNO == 402 || c_ActorSNO == 219702 || c_ActorSNO == 221225 || c_ActorSNO == 84608 || c_ActorSNO == 108869)
                 {

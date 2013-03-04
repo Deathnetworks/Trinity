@@ -138,21 +138,10 @@ namespace GilesTrinity
                 c_ForceLeapAgainst = false;
             }
             double dUseKillRadius;
-            using (new PerformanceLogger("RefreshUnit.9"))
-            {
 
-                dUseKillRadius = RefreshKillRadius();
+            dUseKillRadius = RefreshKillRadius();
 
-                c_KillRange = dUseKillRadius;
-                // Now ignore any unit not within our kill or extended kill radius
-                //if (c_RadiusDistance > dUseKillRadius && c_RActorGuid != CurrentTargetRactorGUID)
-                //{
-                //    AddToCache = false;
-                //    c_IgnoreSubStep = "OutsideofKillRadius";
-                //    // Return here
-                //    return AddToCache;
-                //}
-            }
+            c_KillRange = dUseKillRadius;
 
             if (monsterAffixes.HasFlag(MonsterAffixes.Shielding))
                 c_unit_IsShielded = true;
@@ -190,31 +179,31 @@ namespace GilesTrinity
                 dictGilesCollisionSphereCache.Add(c_ActorSNO, c_Radius);
             }
 
+            double dThisMaxHealth = RefreshMonsterHealth();
+
+            // And finally put the two together for a current health percentage
+            c_HitPointsPct = c_HitPoints / dThisMaxHealth;
+
+            // Unit is already dead
+            if (c_HitPoints <= 0d && !c_unit_IsBoss)
+            {
+                AddToCache = false;
+                c_IgnoreSubStep = "0HitPoints";
+
+                // return here immediately
+                return AddToCache;
+            }
             // only refresh active attributes if within killrange
             if (c_RadiusDistance <= c_KillRange)
             {
-                double dThisMaxHealth = RefreshMonsterHealth();
+                AddToCache = RefreshUnitAttributes(AddToCache, c_diaUnit);
 
-                // And finally put the two together for a current health percentage
-                c_HitPointsPct = c_HitPoints / dThisMaxHealth;
-
-                // Unit is already dead
-                if (c_HitPoints <= 0d && !c_unit_IsBoss)
-                {
-                    AddToCache = false;
-                    c_IgnoreSubStep = "0HitPoints";
-
-                    // return here immediately
+                if (!AddToCache)
                     return AddToCache;
-                }
+
+                c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
             }
 
-            AddToCache = RefreshUnitAttributes(AddToCache, c_diaUnit);
-
-            if (!AddToCache)
-                return AddToCache;
-
-            c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
 
             // A "fake distance" to account for the large-object size of monsters
             c_RadiusDistance -= (float)c_Radius;

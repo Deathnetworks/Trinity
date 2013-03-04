@@ -77,7 +77,8 @@ namespace GilesTrinity
                         case GObjectType.Unit:
                             {
                                 // Ignore Solitary Trash mobs (no elites present)
-                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && !cacheObject.HasBeenPrimaryTarget && cacheObject.RadiusDistance >= 2f &&
+                                // Except if has been primary target or if already low on health (<= 20%)
+                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && !cacheObject.HasBeenPrimaryTarget && cacheObject.RadiusDistance >= 2f && cacheObject.HitPointsPct > 0.20d && 
                                     !(GilesObjectCache.Count(u => u.IsTrashMob && Vector3.Distance(cacheObject.Position, u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius) >= Settings.Combat.Misc.TrashPackSize))
                                 {
                                     break;
@@ -91,6 +92,10 @@ namespace GilesTrinity
 
                                 // Monster is in cache but not within kill range
                                 if (cacheObject.RadiusDistance > cacheObject.KillRange)
+                                {
+                                    break;
+                                }
+                                if (cacheObject.HitPoints <= 0)
                                 {
                                     break;
                                 }

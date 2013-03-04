@@ -394,7 +394,8 @@ namespace GilesTrinity
 
                                     if (c_unit_IsShielded)
                                         unitExtras += " IsShielded";
-                                    
+
+                                    unitExtras += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";                                    
                                 }
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                     "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0} RAGuid: {13} {14}",
