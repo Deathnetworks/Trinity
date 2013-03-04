@@ -65,7 +65,7 @@ namespace GilesTrinity
                     PlayerMover.MovementSpeed > 0.5
                     );
 
-                foreach (GilesObject cacheObject in GilesObjectCache)
+                foreach (GilesObject cacheObject in GilesObjectCache.OrderBy(c => c.CentreDistance))
                 {
                     // Just to make sure each one starts at 0 weight...
                     cacheObject.Weight = 0d;
@@ -191,7 +191,7 @@ namespace GilesTrinity
 
                                         // Distance as a percentage of max radius gives a value up to 1200 (1200 would be point-blank range)
                                         if (cacheObject.RadiusDistance < iCurrentMaxKillRadius)
-                                            cacheObject.Weight += (iCurrentMaxKillRadius * cacheObject.RadiusDistance + 5f) / iCurrentMaxKillRadius * 1200;
+                                            cacheObject.Weight += (iCurrentMaxKillRadius - cacheObject.RadiusDistance) / iCurrentMaxKillRadius * 1200;
                                         
                                         // Give extra weight to ranged enemies
                                         if ((PlayerStatus.ActorClass == ActorClass.Barbarian || PlayerStatus.ActorClass == ActorClass.Monk) &&
@@ -625,9 +625,8 @@ namespace GilesTrinity
                         bStayPutDuringAvoidance = true;
                     }
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight,
-                        "Weighting of {0} ({1}) is {2:0} type={3} mobsInCloseRange={4} requireAvoidance={5} PrioritizeCloseRangeUnits={6} IsElite={7}",
-                            cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, bAnyMobsInCloseRange, StandingInAvoidance, PrioritizeCloseRangeUnits,
-                            cacheObject.IsElite);
+                        "Weight={2:0} target= {0} ({1}) type={3} R-Dist={4:0} IsElite={5} RAGuid={6}",
+                            cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsElite, cacheObject.RActorGuid);
 
                     // Prevent current target dynamic ranged weighting flip-flop 
                     if (CurrentTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)

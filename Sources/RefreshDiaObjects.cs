@@ -331,7 +331,7 @@ namespace GilesTrinity
 
         private static HashSet<string> ignoreNames = new HashSet<string>
         {
-            "MarkerLocation", "Generic_Proxy", "Hireling", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint",
+            "MarkerLocation", "Generic_Proxy", "Hireling", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint", "TriggerSphere", 
         };
 
         private static void RefreshCacheMainLoop()
@@ -390,15 +390,14 @@ namespace GilesTrinity
                                 if (c_ObjectType == GObjectType.Unit)
                                 {
                                     if (c_unit_IsElite)
-                                        unitExtras += "IsElite";
+                                        unitExtras += " IsElite";
 
                                     if (c_unit_IsShielded)
-                                        unitExtras += "IsShield";
-
+                                        unitExtras += " IsShielded";
                                     
                                 }
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                                    "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0}",
+                                    "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0} RAGuid: {13} {14}",
                                     duration,
                                     (AddToCache ? "Added " : "Ignored"),
                                     (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
@@ -411,7 +410,9 @@ namespace GilesTrinity
                                     c_CentreDistance,
                                     c_RadiusDistance,
                                     c_ZDiff,
-                                    c_Radius);
+                                    c_Radius,
+                                    c_RActorGuid,
+                                    unitExtras);
                             }
                         }
                     }

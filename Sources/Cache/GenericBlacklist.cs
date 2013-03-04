@@ -17,6 +17,9 @@ namespace GilesTrinity
 
         public static bool AddToBlacklist(GenericCacheObject obj)
         {
+            if (obj.Key.Trim() == String.Empty)
+                return false;
+
             lock (_Synchronizer)
             {
                 if (!ContainsKey(obj.Key))
@@ -30,6 +33,9 @@ namespace GilesTrinity
 
         public static bool UpdateObject(GenericCacheObject obj)
         {
+            if (obj.Key.Trim() == String.Empty)
+                return false;
+
             lock (_Synchronizer)
             {
                 if (Contains(obj))
@@ -51,6 +57,9 @@ namespace GilesTrinity
 
         public static bool ContainsKey(string key)
         {
+            if (key.Trim() == String.Empty)
+                return false;
+
             lock (_Synchronizer)
             {
                 return Blacklist.Contains(new GenericCacheObject()

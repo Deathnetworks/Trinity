@@ -17,6 +17,9 @@ namespace GilesTrinity
 
         public static bool AddToCache(GenericCacheObject obj)
         {
+            if (obj.Key.Trim() == String.Empty)
+                return false;
+
             lock (_Synchronizer)
             {
                 if (!ContainsKey(obj.Key))
@@ -30,6 +33,9 @@ namespace GilesTrinity
 
         public static bool UpdateObject(GenericCacheObject obj)
         {
+            if (obj.Key.Trim() == String.Empty)
+                return false;
+
             lock (_Synchronizer)
             {
                 if (ContainsKey(obj.Key))
@@ -43,6 +49,9 @@ namespace GilesTrinity
 
         public static bool ContainsKey(string key)
         {
+            if (key.Trim() == String.Empty)
+                return false;
+
             lock (_Synchronizer)
             {
                 return CacheList.Contains(new GenericCacheObject()
@@ -54,6 +63,9 @@ namespace GilesTrinity
 
         public static bool Contains(GenericCacheObject obj)
         {
+            if (obj.Key.Trim() == String.Empty)
+                return false;
+
             lock (_Synchronizer)
             {
                 return CacheList.Contains(obj);
@@ -145,6 +157,8 @@ namespace GilesTrinity
         {
             var other = obj as GenericCacheObject;
             if (other == null)
+                return false;
+            if (other.Key.Trim() == String.Empty)
                 return false;
 
             return this.Key == other.Key;

@@ -81,16 +81,17 @@ namespace GilesTrinity
 
             if (c_ObjectType == GObjectType.Item)
             {
-                /* Generic Blacklisting for shifting RActorGUID bug */
-                c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, c_Position, c_ObjectType.ToString(), GilesTrinity.CurrentWorldDynamicId);
-
                 if (GenericBlacklist.ContainsKey(c_ObjectHash))
                 {
                     AddToCache = false;
                     c_IgnoreReason = "GenericBlacklist";
                     return AddToCache;
                 }
+
+                /* Generic Blacklisting for shifting RActorGUID bug */
+                c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, c_Position, c_ObjectType.ToString(), GilesTrinity.CurrentWorldDynamicId);
             }
+
             // Always Refresh Distance for every object
             RefreshStepCalculateDistance();
 
@@ -106,7 +107,6 @@ namespace GilesTrinity
             AddToCache = RefreshStepCachedDynamicIds(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedDynamicIds"; return AddToCache; }
 
-
             using (new PerformanceLogger("RefreshDiaObject.MainObjectType"))
             {
                 /* 
@@ -116,16 +116,16 @@ namespace GilesTrinity
                 if (!AddToCache) { c_IgnoreReason = "MainObjectType"; return AddToCache; }
             }
 
+            // Ignore anything unknown
+            AddToCache = RefreshStepIgnoreUnknown(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "IgnoreUnknown"; return AddToCache; }
+
             using (new PerformanceLogger("RefreshDiaObject.LoS"))
             {
                 // Ignore all LoS
                 AddToCache = RefreshStepIgnoreLoS(AddToCache);
                 if (!AddToCache) { c_IgnoreReason = "IgnoreLoS"; return AddToCache; }
             }
-
-            // Ignore anything unknown
-            AddToCache = RefreshStepIgnoreUnknown(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "IgnoreUnknown"; return AddToCache; }
 
             // If it's a unit, add it to the monster cache
             AddUnitToMonsterObstacleCache(AddToCache);
@@ -633,6 +633,7 @@ namespace GilesTrinity
                 case GObjectType.Unknown:
                 default:
                     {
+                        AddToCache = false;
                         break;
                     }
             }
@@ -706,7 +707,15 @@ namespace GilesTrinity
             bool bDisabledByScript = false;
             try
             {
-                bDisabledByScript = ((GizmoShrine)c_diaObject).IsGizmoDisabledByScript;
+                switch (c_ObjectType)
+                {
+                    case GObjectType.Shrine:
+                    case GObjectType.Door:
+                    case GObjectType.Container:
+                    case GObjectType.Interactable:
+                        bDisabledByScript = ((DiaGizmo)c_diaObject).IsGizmoDisabledByScript;
+                        break;
+                }
             }
             catch
             {
@@ -1265,7 +1274,7 @@ namespace GilesTrinity
             try
             {
                 // Everything except items and the current target
-                if (c_ObjectType != GObjectType.Item && c_RActorGuid != CurrentTargetRactorGUID)
+                if (c_ObjectType != GObjectType.Item && c_RActorGuid != CurrentTargetRactorGUID && c_ObjectType != GObjectType.Unknown)
                 {
                     if (c_CentreDistance < 125)
                     {
@@ -1759,7 +1768,7 @@ namespace GilesTrinity
                     c_IgnoreSubStep = "hashRGUIDBlacklist15";
                     return AddToCache;
                 }
-                if (GenericBlacklist.ContainsKey(c_ObjectHash))
+                if (c_ObjectHash != String.Empty && GenericBlacklist.ContainsKey(c_ObjectHash))
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "GenericBlacklist";

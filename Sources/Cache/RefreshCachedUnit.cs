@@ -401,26 +401,28 @@ namespace GilesTrinity
             }
             return dUseKillRadius;
         }
-        private static MonsterAffixes RefreshAffixes(ACD tempCommonData)
+        private static MonsterAffixes RefreshAffixes(ACD acd)
         {
-            MonsterAffixes theseaffixes;
-            if (!dictGilesMonsterAffixCache.TryGetValue(c_RActorGuid, out theseaffixes))
+            MonsterAffixes affixFlags;
+            if (!dictGilesMonsterAffixCache.TryGetValue(c_RActorGuid, out affixFlags))
             {
                 try
                 {
-                    theseaffixes = tempCommonData.MonsterAffixes;
-                    dictGilesMonsterAffixCache.Add(c_RActorGuid, theseaffixes);
+                    affixFlags = acd.MonsterAffixes;
+                    dictGilesMonsterAffixCache.Add(c_RActorGuid, affixFlags);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    theseaffixes = MonsterAffixes.None;
+                    affixFlags = MonsterAffixes.None;
+                    DbHelper.Log(LogCategory.CacheManagement, "Handled Exception getting affixes for Monster SNO={0} Name={1} RAGuid={2}", c_ActorSNO, c_InternalName, c_RActorGuid);
+                    DbHelper.Log(LogCategory.CacheManagement, ex.ToString());
                 }
             }
-            c_unit_IsElite = theseaffixes.HasFlag(MonsterAffixes.Elite);
-            c_unit_IsRare = theseaffixes.HasFlag(MonsterAffixes.Rare);
-            c_unit_IsUnique = theseaffixes.HasFlag(MonsterAffixes.Unique);
-            c_unit_IsMinion = theseaffixes.HasFlag(MonsterAffixes.Minion);
-            return theseaffixes;
+            c_unit_IsElite = affixFlags.HasFlag(MonsterAffixes.Elite);
+            c_unit_IsRare = affixFlags.HasFlag(MonsterAffixes.Rare);
+            c_unit_IsUnique = affixFlags.HasFlag(MonsterAffixes.Unique);
+            c_unit_IsMinion = affixFlags.HasFlag(MonsterAffixes.Minion);
+            return affixFlags;
         }
         private static MonsterType RefreshMonsterType(ACD tempCommonData, MonsterType monsterType, bool bAddToDictionary)
         {
