@@ -22,7 +22,7 @@ namespace GilesTrinity
                 Vector3 bestClusterPoint = Vector3.Zero;
                 var clusterUnits =
                     (from u in GilesTrinity.GilesObjectCache
-                     where u.Type == GObjectType.Unit
+                     where u.Type == GObjectType.Unit && u.Weight > 0
                      orderby u.IsElite descending
                      orderby u.NearbyUnitsWithinDistance(radius) descending
                      orderby u.CentreDistance
@@ -46,6 +46,7 @@ namespace GilesTrinity
                 range = 5f;
             return (from o in GilesTrinity.GilesObjectCache
                     where o.Type == GObjectType.Unit &&
+                    o.Weight > 0 &&
                     o.RadiusDistance <= range
                     select o).Any();
         }
@@ -58,6 +59,7 @@ namespace GilesTrinity
                 minCount = 1;
             return (from o in GilesTrinity.GilesObjectCache
                     where o.Type == GObjectType.Unit &&
+                    o.Weight > 0 &&
                     o.RadiusDistance <= range
                     select o).Count() >= minCount; 
         }

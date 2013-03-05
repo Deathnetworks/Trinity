@@ -960,7 +960,7 @@ namespace GilesTrinity
                     }
                 case GObjectType.Destructible:
                     {
-                        AddToCache = true;
+                        AddToCache = false;
                         // Get the cached physics SNO of this object
                         if (!dictPhysicsSNO.TryGetValue(c_ActorSNO, out iThisPhysicsSNO))
                         {
@@ -972,7 +972,6 @@ namespace GilesTrinity
                             {
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
                                 AddToCache = false;
-                                //return bWantThis;
                             }
                             dictPhysicsSNO.Add(c_ActorSNO, iThisPhysicsSNO);
                         }
@@ -982,10 +981,6 @@ namespace GilesTrinity
                         if (ForceCloseRangeTarget)
                             iMinDistance += 6f;
 
-                        // Large objects, like logs - Give an extra xx feet of distance
-                        //if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out iExtendedRange))
-                        //    iMinDistance = Settings.WorldObject.DestructibleRange + iExtendedRange;
-
                         if (Settings.WorldObject.IgnoreNonBlocking)
                         {
                             AddToCache = false;
@@ -993,7 +988,7 @@ namespace GilesTrinity
                         }
 
                         // Only break destructables if we're stuck and using IgnoreNonBlocking
-                        if (PlayerMover.GetMovementSpeed() > 1 && !AddToCache && Settings.WorldObject.IgnoreNonBlocking)
+                        if (PlayerMover.GetMovementSpeed() >= 1 && !AddToCache && Settings.WorldObject.IgnoreNonBlocking)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "NotStuck";
@@ -1005,7 +1000,7 @@ namespace GilesTrinity
                         }
 
                         // This object isn't yet in our destructible desire range
-                        if (iMinDistance <= 0 || c_RadiusDistance > iMinDistance)
+                        if (!AddToCache && iMinDistance <= 1 || c_RadiusDistance > iMinDistance)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "NotInDestructableRange";

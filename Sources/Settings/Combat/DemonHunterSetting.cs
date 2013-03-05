@@ -619,7 +619,7 @@ namespace GilesTrinity.Settings.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(0.7f)]
+        [DefaultValue(0f)]
         public float AvoidSuccubusStarHealth
         {
             get

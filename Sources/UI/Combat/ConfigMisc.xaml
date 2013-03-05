@@ -74,7 +74,7 @@
             <TextBlock Text="Minimum Trash Mob Pack Size:" FontWeight="Bold" TextAlignment="Center"/>
             <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
                     Interval="100" IsSnapToTickEnabled="True"
-                    Maximum="5" Minimum="1" SmallChange="100" TickFrequency="1" TickPlacement="BottomRight" 
+                    Maximum="15" Minimum="1" SmallChange="100" TickFrequency="1" TickPlacement="BottomRight" 
                     Value="{Binding Path=Misc.TrashPackSize}" 
                     HorizontalAlignment="Stretch" Margin="0,0,0,0"
                     MinWidth="175"/>

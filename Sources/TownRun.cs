@@ -265,7 +265,7 @@ namespace GilesTrinity
             if (ProfileManager.CurrentProfileBehavior != null)
             {
                 Type profileBehaviortype = CurrentProfileBehavior.GetType();
-                if (profileBehaviortype != null && (profileBehaviortype == typeof(UseTownPortalTag) || profileBehaviortype == typeof(WaitTimerTag)))
+                if (profileBehaviortype != null && (profileBehaviortype == typeof(UseTownPortalTag) || profileBehaviortype == typeof(WaitTimerTag) || profileBehaviortype == typeof(XmlTags.TrinityTownRun)))
                 {
                     result = true;
                 }

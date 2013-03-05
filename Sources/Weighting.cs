@@ -48,11 +48,13 @@ namespace GilesTrinity
                 if (ProfileManager.CurrentProfileBehavior != null)
                 {
                     Type behaviorType = ProfileManager.CurrentProfileBehavior.GetType();
-                    if (behaviorType == typeof(WaitTimerTag) || behaviorType == typeof(UseTownPortalTag))
+                    if (behaviorType == typeof(WaitTimerTag) || behaviorType == typeof(UseTownPortalTag) || behaviorType == typeof(XmlTags.TrinityTownRun))
                     {
                         profileTagCheck = true;
                     }
                 }
+
+                double MovementSpeed = PlayerMover.GetMovementSpeed();
 
                 bool ShouldIgnoreTrashMobs =
                     (!TownRun.IsTryingToTownPortal() &&
@@ -62,11 +64,15 @@ namespace GilesTrinity
                     EliteCount == 0 &&
                     AvoidanceCount == 0 &&
                     PlayerStatus.Level >= 15 &&
-                    PlayerMover.MovementSpeed > 0.5
+                    MovementSpeed >= 1
                     );
+
+                string unitWeightInfo = "";
 
                 foreach (GilesObject cacheObject in GilesObjectCache.OrderBy(c => c.CentreDistance))
                 {
+                    unitWeightInfo = "";
+
                     // Just to make sure each one starts at 0 weight...
                     cacheObject.Weight = 0d;
 
@@ -76,12 +82,23 @@ namespace GilesTrinity
                         // Weight Units
                         case GObjectType.Unit:
                             {
+                                int nearbyMonsterCount = GilesObjectCache.Count(u => u.IsTrashMob && cacheObject.Position.Distance2D(u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius);
+
                                 // Ignore Solitary Trash mobs (no elites present)
                                 // Except if has been primary target or if already low on health (<= 20%)
-                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && !cacheObject.HasBeenPrimaryTarget && cacheObject.RadiusDistance >= 2f && cacheObject.HitPointsPct > 0.20d && 
-                                    !(GilesObjectCache.Count(u => u.IsTrashMob && Vector3.Distance(cacheObject.Position, u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius) >= Settings.Combat.Misc.TrashPackSize))
+                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && !cacheObject.HasBeenPrimaryTarget && cacheObject.RadiusDistance >= 2f &&
+                                    !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize))
                                 {
+                                    unitWeightInfo = String.Format("Ignoring trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9}",
+                                        cacheObject.InternalName, cacheObject.RActorGuid, nearbyMonsterCount, Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius, 
+                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount);
                                     break;
+                                }
+                                else
+                                {
+                                    unitWeightInfo = String.Format("Adding trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9}",
+                                        cacheObject.InternalName, cacheObject.RActorGuid, nearbyMonsterCount, Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius,
+                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount);
                                 }
 
                                 // No champions, no mobs nearby, no treasure goblins to prioritize, and not injured, so skip mobs
@@ -557,10 +574,6 @@ namespace GilesTrinity
                                 if (PrioritizeCloseRangeUnits)
                                     cacheObject.Weight = (200d - cacheObject.CentreDistance) / 200d * 19200d;
 
-                                //// Very close destructibles get a final weight increase
-                                //if (cacheObject.CentreDistance <= 12f)
-                                //    cacheObject.Weight += 10000d;
-
                                 //// We're standing on the damn thing... break it
                                 if (cacheObject.RadiusDistance <= 5f)
                                     cacheObject.Weight += 40000d;
@@ -630,8 +643,8 @@ namespace GilesTrinity
                         bStayPutDuringAvoidance = true;
                     }
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight,
-                        "Weight={2:0} target= {0} ({1}) type={3} R-Dist={4:0} IsElite={5} RAGuid={6}",
-                            cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsElite, cacheObject.RActorGuid);
+                        "Weight={2:0} target= {0} ({1}) type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
+                            cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsElite, cacheObject.RActorGuid, unitWeightInfo);
 
                     // Prevent current target dynamic ranged weighting flip-flop 
                     if (CurrentTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)

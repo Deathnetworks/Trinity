@@ -119,7 +119,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="Min. Wave of Light Trash Count" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
             <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
-                Interval="1" Maximum="5" Minimum="1"
+                Interval="1" Maximum="15" Minimum="1"
                 SmallChange="1" LargeChange="5"
                 TickPlacement="BottomRight" IsSnapToTickEnabled="True"
                 Value="{Binding Path=Monk.MinWoLTrashCount}" 

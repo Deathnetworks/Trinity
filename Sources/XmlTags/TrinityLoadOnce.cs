@@ -105,7 +105,7 @@ namespace GilesTrinity.XmlTags
                     ),
                     new Decorator(ret => AvailableProfiles.Length > 0,
                         new Sequence(
-                            new Action(ret => NextProfileName = AvailableProfiles[rand.Next(0, AvailableProfiles.Length - 1)]),
+                            new Action(ret => NextProfileName = AvailableProfiles[rand.Next(0, AvailableProfiles.Length)]),
                             new Action(ret => NextProfilePath = Path.Combine(CurrentProfilePath, NextProfileName)),
                             new PrioritySelector(
                                 new Decorator(ret => File.Exists(NextProfilePath),

@@ -297,6 +297,12 @@ namespace GilesTrinity.DbProvider
             if (DateTime.Now.Subtract(GilesTrinity.lastGlobalCooldownUse).TotalMilliseconds <= 1000)
                 return 1d;
 
+            if (DateTime.Now.Subtract(GilesTrinity.lastHadUnitInSights).TotalMilliseconds <= 1000)
+                return 1d;
+
+            if (DateTime.Now.Subtract(GilesTrinity.lastHadEliteUnitInSights).TotalMilliseconds <= 1000)
+                return 1d;
+
             // Minimum of 2 records to calculate speed
             if (!SpeedSensors.Any() || SpeedSensors.Count <= 1)
                 return 0d;
