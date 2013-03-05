@@ -179,6 +179,10 @@ namespace GilesTrinity
 
                                 float distanceToPoint = vThisZigZag.Distance2D(PlayerStatus.CurrentPosition);
                                 float distanceToTarget = vTargetLocation.Distance2D(PlayerStatus.CurrentPosition);
+                                float distanceFromTargetToPoint = vThisZigZag.Distance2D(vTargetLocation);
+
+                                if (distanceFromTargetToPoint > distanceToTarget)
+                                    continue;
 
                                 fThisWeight += (distanceToTarget * 10f);
 
