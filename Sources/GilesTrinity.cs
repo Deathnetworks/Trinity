@@ -214,7 +214,7 @@ namespace GilesTrinity
             PlayerMover.LastGeneratedStuckPosition = DateTime.Today;
             PlayerMover.iTimesReachedMaxUnstucks = 0;
             PlayerMover.iCancelUnstuckerForSeconds = 0;
-            PlayerMover.timeCancelledUnstuckerFor = DateTime.Today;
+            PlayerMover._lastCancelledUnstucker = DateTime.Today;
             GilesTrinity.UsedStuckSpots = new List<GilesTrinity.GridPoint>();
             // Reset all the caches
             dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();

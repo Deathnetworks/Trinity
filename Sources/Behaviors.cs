@@ -112,6 +112,11 @@ namespace GilesTrinity
                     {
                         return RunStatus.Failure;
                     }
+                    else if (GoldInactivity.GoldInactive())
+                    {
+                        BotMain.PauseWhile(GoldInactivity.GoldInactiveLeaveGame);
+                        return RunStatus.Failure;
+                    }
                     HandlerRunStatus runStatus = HandlerRunStatus.NotFinished;
 
                     // Make sure we reset unstucker stuff here
@@ -1019,7 +1024,7 @@ namespace GilesTrinity
                 if (!IsWholeNewTarget && !IsWaitingForPower && !IsWaitingForPotion)
                 {
                     // Update targets at least once every 80 milliseconds
-                    if (bForceTargetUpdate || IsAvoidingProjectiles)
+                    if (bForceTargetUpdate || IsAvoidingProjectiles || DateTime.Now.Subtract(LastRefreshedCache).TotalMilliseconds > Settings.Advanced.CacheRefreshRate)
                     {
                         StaleCache = true;
                     }
@@ -1070,6 +1075,9 @@ namespace GilesTrinity
                                     StaleCache = true;
                                 }
                             }
+
+                            // force update of cached player data
+                            UpdateCachedPlayerData();
                         }
                     }
                 }

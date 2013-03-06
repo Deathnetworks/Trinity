@@ -23,7 +23,7 @@ namespace GilesTrinity
                 for (int i = 0; i <= 5; i++)
                 {
                     Hotbar.Add(ZetaDia.CPlayer.GetPowerForSlot((HotbarSlot)i));
-                } 
+                }
                 bRefreshHotbarAbilities = false;
 
                 HotbarSkills.Update();
@@ -264,13 +264,18 @@ namespace GilesTrinity
                 case ItemType.Sword:
                     //if (rhItem.IsTwoHand)
                     //    return SNOPower.Weapon_Melee_Instant_BothHand;
-                   return SNOPower.Weapon_Melee_Instant;
+                    return SNOPower.Weapon_Melee_Instant;
                 case ItemType.Wand:
                     return SNOPower.Weapon_Ranged_Wand;
                 case ItemType.Bow:
                 case ItemType.Crossbow:
                 case ItemType.HandCrossbow:
-                  return SNOPower.Weapon_Ranged_Instant;
+                    {
+                        if (rhItem.IsTwoHand)
+                            return SNOPower.Weapon_Ranged_Projectile;
+                        else
+                            return SNOPower.Weapon_Ranged_Instant;
+                    }
             }
         }
         private static float GetDefaultWeaponDistance()

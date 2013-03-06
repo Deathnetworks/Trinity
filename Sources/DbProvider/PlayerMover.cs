@@ -47,8 +47,8 @@ namespace GilesTrinity.DbProvider
         internal static Vector3 vOldPosition = Vector3.Zero;
         internal static DateTime LastGeneratedStuckPosition = DateTime.Today;
         internal static int iTimesReachedMaxUnstucks = 0;
-        internal static DateTime timeCancelledUnstuckerFor = DateTime.Today;
-        internal static DateTime timeLastReportedAnyStuck = DateTime.Today;
+        internal static DateTime _lastCancelledUnstucker = DateTime.Today;
+        internal static DateTime _lastRecordedAnyStuck = DateTime.Today;
         internal static int iCancelUnstuckerForSeconds = 60;
         internal static DateTime timeLastRestartedGame = DateTime.Today;
         internal static bool UnStuckCheckerLastResult = false;
@@ -160,6 +160,8 @@ namespace GilesTrinity.DbProvider
         {
             // Update the last time we generated a path
             LastGeneratedStuckPosition = DateTime.Now;
+            Navigator.Clear();
+
             // If we got stuck on a 2nd/3rd/4th "chained" anti-stuck route, then return the old move to target to keep movement of some kind going
             if (iTimesReachedStuckPoint > 0)
             {
@@ -171,8 +173,7 @@ namespace GilesTrinity.DbProvider
                 iCancelUnstuckerForSeconds = (9 * iTotalAntiStuckAttempts);
                 if (iCancelUnstuckerForSeconds < 20)
                     iCancelUnstuckerForSeconds = 20;
-                timeCancelledUnstuckerFor = DateTime.Now;
-                Navigator.Clear();
+                _lastCancelledUnstucker = DateTime.Now;
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Clearing old route and trying new path find to: " + LastMoveToTarget.ToString());
                 Navigator.MoveTo(LastMoveToTarget, "original destination", false);
                 return vSafeMovementLocation;
@@ -217,6 +218,7 @@ namespace GilesTrinity.DbProvider
                 iTotalAntiStuckAttempts++;
                 return vSafeMovementLocation;
             }
+
             iTimesReachedMaxUnstucks++;
             iTotalAntiStuckAttempts = 1;
             vSafeMovementLocation = Vector3.Zero;
@@ -231,7 +233,7 @@ namespace GilesTrinity.DbProvider
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Anti-stuck measures now attempting to kickstart DB's path-finder into action.");
                 Navigator.MoveTo(vOriginalDestination, "original destination", false);
                 iCancelUnstuckerForSeconds = 40;
-                timeCancelledUnstuckerFor = DateTime.Now;
+                _lastCancelledUnstucker = DateTime.Now;
                 return vSafeMovementLocation;
             }
             if (iTimesReachedMaxUnstucks == 2)
@@ -270,7 +272,7 @@ namespace GilesTrinity.DbProvider
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Unstucking measures failed. Now stopping Trinity unstucker for 12 minutes to inactivity timers to kick in or DB to auto-fix.");
                 iCancelUnstuckerForSeconds = 720;
-                timeCancelledUnstuckerFor = DateTime.Now;
+                _lastCancelledUnstucker = DateTime.Now;
                 return vSafeMovementLocation;
             }
             return vSafeMovementLocation;
@@ -387,13 +389,9 @@ namespace GilesTrinity.DbProvider
             // Do unstuckery things
             if (GilesTrinity.Settings.Advanced.UnstuckerEnabled)
             {
-                //if (GoldInactivity.GoldInactive())
-                //{
-                //    GoldInactivity.GoldInactiveLeaveGame();
-                //    return;
-                //}
-                // Store the "real" (not anti-stuck) destination
+
                 // See if we can reset the 10-limit unstuck counter, if >120 seconds since we last generated an unstuck location
+                // this is used if we're NOT stuck...
                 if (iTotalAntiStuckAttempts > 1 && DateTime.Now.Subtract(LastGeneratedStuckPosition).TotalSeconds >= 120)
                 {
                     iTotalAntiStuckAttempts = 1;
@@ -402,11 +400,14 @@ namespace GilesTrinity.DbProvider
                     GilesTrinity.UsedStuckSpots = new List<GilesTrinity.GridPoint>();
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Resetting unstuck timers", true);
                 }
+
                 // See if we need to, and can, generate unstuck actions
-                if (DateTime.Now.Subtract(timeCancelledUnstuckerFor).TotalSeconds > iCancelUnstuckerForSeconds && UnstuckChecker(vMyCurrentPosition))
+                // check if we're stuck
+                bool isStuck = UnstuckChecker(vMyCurrentPosition);
+                if (DateTime.Now.Subtract(_lastCancelledUnstucker).TotalSeconds > iCancelUnstuckerForSeconds && isStuck)
                 {
                     // Record the time we last apparently couldn't move for a brief period of time
-                    timeLastReportedAnyStuck = DateTime.Now;
+                    _lastRecordedAnyStuck = DateTime.Now;
                     // See if there's any stuck position to try and navigate to generated by random mover
                     vSafeMovementLocation = UnstuckHandler(vMyCurrentPosition, LastMoveToTarget);
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "SafeMovement Location set to {0}", vSafeMovementLocation);
@@ -414,7 +415,7 @@ namespace GilesTrinity.DbProvider
                         return;
                 }
                 // See if we can clear the total unstuckattempts if we haven't been stuck in over 6 minutes.
-                if (DateTime.Now.Subtract(timeLastReportedAnyStuck).TotalSeconds >= 360)
+                if (DateTime.Now.Subtract(_lastRecordedAnyStuck).TotalSeconds >= 360)
                 {
                     iTimesReachedMaxUnstucks = 0;
                 }
@@ -448,7 +449,7 @@ namespace GilesTrinity.DbProvider
                         iCancelUnstuckerForSeconds = (9 * iTotalAntiStuckAttempts);
                         if (iCancelUnstuckerForSeconds < 20)
                             iCancelUnstuckerForSeconds = 20;
-                        timeCancelledUnstuckerFor = DateTime.Now;
+                        _lastCancelledUnstucker = DateTime.Now;
 
                         Navigator.Clear();
                         Navigator.MoveTo(LastMoveToTarget, "original destination", false);

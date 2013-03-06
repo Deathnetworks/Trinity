@@ -194,15 +194,12 @@ namespace GilesTrinity
                 return AddToCache;
             }
             // only refresh active attributes if within killrange
-            if (c_RadiusDistance <= c_KillRange)
-            {
-                AddToCache = RefreshUnitAttributes(AddToCache, c_diaUnit);
+            AddToCache = RefreshUnitAttributes(AddToCache, c_diaUnit);
 
-                if (!AddToCache)
-                    return AddToCache;
+            if (!AddToCache)
+                return AddToCache;
 
-                c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
-            }
+            c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
 
 
             // A "fake distance" to account for the large-object size of monsters

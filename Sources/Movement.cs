@@ -276,7 +276,7 @@ namespace GilesTrinity
                 {
                     return vlastSafeSpot;
                 }
-                else if (!IsAvoidingProjectiles && DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 800 && vlastSafeSpot != Vector3.Zero)
+                else if (DateTime.Now.Subtract(lastFoundSafeSpot).TotalMilliseconds <= 800 && vlastSafeSpot != Vector3.Zero)
                 {
                     return vlastSafeSpot;
                 }
@@ -357,18 +357,18 @@ namespace GilesTrinity
             int maxZDiff = 14;
 
             // special settings for Azmodan
-            if (ZetaDia.CurrentWorldId == 121214)
-            {
-                List<Vector3> AzmoKitePositions = new List<Vector3>()
-                {
-                    new Vector3(364f, 550f, 0f), // right
-                    new Vector3(533f, 536f, 0f), // bottom
-                    new Vector3(540f, 353f, 0f), // left
-                    new Vector3(368f, 369f, 0f), // top
-                };
+            //if (ZetaDia.CurrentWorldId == 121214)
+            //{
+            //    List<Vector3> AzmoKitePositions = new List<Vector3>()
+            //    {
+            //        new Vector3(364f, 550f, 0f), // right
+            //        new Vector3(533f, 536f, 0f), // bottom
+            //        new Vector3(540f, 353f, 0f), // left
+            //        new Vector3(368f, 369f, 0f), // top
+            //    };
 
-                return AzmoKitePositions.OrderByDescending(p => p.Distance2D(origin)).FirstOrDefault();
-            }
+            //    return AzmoKitePositions.OrderByDescending(p => p.Distance2D(origin)).FirstOrDefault();
+            //}
 
 
             int gridTotalSize = (int)(maxDistance / gridSquareSize) * 2;
@@ -533,6 +533,10 @@ namespace GilesTrinity
                         {
                             float distFromAvoidance = gridPoint.Position.Distance(avoidance.Location);
                             float distFromOrigin = gridPoint.Position.Distance(origin);
+                            float distFromOriginToAvoidance = origin.Distance(avoidance.Location);
+                            if (distFromOriginToAvoidance < distFromOrigin)
+                                continue;
+
                             if (distFromAvoidance < distFromOrigin)
                             {
                                 gridPoint.Weight -= distFromOrigin;

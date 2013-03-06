@@ -655,6 +655,15 @@ namespace GilesTrinity
                     Name = "Izual",
                     Radius = 120f
                 }
+            },
+            {
+                new UnSafeZone()
+                {
+                    WorldId = 121214,
+                    Position = new Vector3(579, 582, 21),
+                    Name = "Azmodan",
+                    Radius = 120f
+                }
             }
         };
 

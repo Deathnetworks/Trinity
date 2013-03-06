@@ -77,7 +77,7 @@ namespace GilesTrinity
                     if (StandingInAvoidance && (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
                         DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
                     {
-                        Vector3 vAnySafePoint = FindSafeZone(false, 1, vSafePointNear);
+                        Vector3 vAnySafePoint = FindSafeZone(false, 1, PlayerStatus.CurrentPosition, true);
                         // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
                         if (vAnySafePoint != vNullLocation)
                         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -67,13 +68,14 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.DemonHunter_Companion, 0f, vNullLocation, CurrentWorldDynamicId, -1, 2, 1, USE_SLOWLY);
             }
             // Sentry Turret
-            if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_Sentry) &&
-                (ElitesWithinRange[RANGE_50] >= 1 || AnythingWithinRange[RANGE_50] >= 2 ||
-                (CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss)) && CurrentTarget.RadiusDistance <= 50f &&
-                PlayerStatus.PrimaryResource >= 30 && GilesUseTimer(SNOPower.DemonHunter_Sentry))
-            {
-                return new TrinityPower(SNOPower.DemonHunter_Sentry, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, SIGNATURE_SPAM);
-            }
+            // Currently BROKEN in demonbuddy :(
+            //if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_Sentry) &&
+            //    (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50,2) || TargetUtil.IsEliteTargetInRange(50)) &&
+            //    PlayerStatus.PrimaryResource >= 30 && PowerManager.CanCast(SNOPower.DemonHunter_Sentry))
+            //{
+
+            //    return new TrinityPower(SNOPower.DemonHunter_Sentry, 50f, PlayerStatus.CurrentPosition, CurrentWorldDynamicId, CurrentTarget.ACDGuid, 1, 2, USE_SLOWLY);
+            //}
             // Marked for Death
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_MarkedForDeath) &&
                 PlayerStatus.SecondaryResource >= 3 && 
@@ -126,7 +128,7 @@ namespace GilesTrinity
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_FanOfKnives) && !PlayerStatus.IsIncapacitated &&
                 PlayerStatus.PrimaryResource >= 20 &&
                 (AnythingWithinRange[RANGE_15] >= 4 || ElitesWithinRange[RANGE_15] >= 1) &&
-                GilesUseTimer(SNOPower.DemonHunter_FanOfKnives))
+                PowerManager.CanCast(SNOPower.DemonHunter_FanOfKnives))
             {
                 return new TrinityPower(SNOPower.DemonHunter_FanOfKnives, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
             }
@@ -180,15 +182,30 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.DemonHunter_Caltrops, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
             }
+
+            //skillDict.Add("ElementalArrow", SNOPower.DemonHunter_ElementalArrow);
+            //runeDict.Add("BallLightning", 1);
+            //runeDict.Add("FrostArrow", 0);
+            //runeDict.Add("ScreamingSkull", 2);
+            //runeDict.Add("LightningBolts", 4);
+            //runeDict.Add("NetherTentacles", 3);
+
+            var hasBallLightning = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_ElementalArrow && s.RuneIndex == 1);
+            var hasFrostArrow = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_ElementalArrow && s.RuneIndex == 0);
+            var hasScreamingSkull = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_ElementalArrow && s.RuneIndex == 2);
+            var hasLightningBolts = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_ElementalArrow && s.RuneIndex == 4);
+            var hasNetherTentacles = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_ElementalArrow && s.RuneIndex == 3);                
+
             // Elemental Arrow
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && !PlayerStatus.IsIncapacitated &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && 
+                GilesUseTimer(SNOPower.DemonHunter_ElementalArrow) && !PlayerStatus.IsIncapacitated &&
                 ((PlayerStatus.PrimaryResource >= 10 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
                 // Players with grenades *AND* elemental arrow should spam grenades at close-range instead
                 if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)
                     return new TrinityPower(SNOPower.DemonHunter_Grenades, 18f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
                 // Now return elemental arrow, if not sending grenades instead
-                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 50f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
+                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
             }
             // Chakram
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !PlayerStatus.IsIncapacitated &&
@@ -240,7 +257,7 @@ namespace GilesTrinity
             // Default attacks
             if (!UseOOCBuff && !IsCurrentlyAvoiding)
             {
-                return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
+                return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, CurrentWorldDynamicId, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
             }
             return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
         }
