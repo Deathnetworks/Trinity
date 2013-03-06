@@ -29,18 +29,13 @@ namespace GilesTrinity
     {
         // Whether salvage/sell run should go to a middle-waypoint first to help prevent stucks
 
-        private static bool bGoToSafetyPointFirst = false;
-        private static bool bGoToSafetyPointSecond = false;
-        private static bool bReachedSafety = false;
         internal static bool bLastTownRunCheckResult = false;
         // Random variables used during item handling and town-runs
 
         private static int itemDelayLoopLimit = 0;
 
-        private static int currentItemLoops = 0;
         private static bool loggedAnythingThisStash = false;
 
-        private static bool updatedStashMap = false;
         private static bool loggedJunkThisStash = false;
         internal static string ValueItemStatString = "";
         internal static string junkItemStatString = "";

@@ -104,7 +104,6 @@ namespace GilesTrinity
                     case Constants.THORNS: TempStatistic = item.Thorns; break;
                     case Constants.ALLRESIST: TempStatistic = item.ResistAll; break;
                     case Constants.RANDOMRESIST:
-                        //intell -- sugerir
                         if (item.ResistArcane > TempStatistic) TempStatistic = item.ResistArcane;
                         if (item.ResistCold > TempStatistic) TempStatistic = 0;
                         //thisitem.ResistCold;

@@ -290,7 +290,7 @@ namespace GilesTrinity
                 if (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700)
                     OtherThanDeadlyReach = DateTime.Now;
                 if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
-                    SweepWindSpam = DateTime.Now; //intell -- inna
+                    SweepWindSpam = DateTime.Now; 
                 return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, SIGNATURE_SPAM);
             }
             // Crippling wave
@@ -300,7 +300,7 @@ namespace GilesTrinity
             {
                 OtherThanDeadlyReach = DateTime.Now;
                 if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
-                    SweepWindSpam = DateTime.Now; //intell -- inna
+                    SweepWindSpam = DateTime.Now; 
                 return new TrinityPower(SNOPower.Monk_CripplingWave, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
             }
             // Way of hundred fists
@@ -310,7 +310,7 @@ namespace GilesTrinity
             {
                 OtherThanDeadlyReach = DateTime.Now;
                 if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
-                    SweepWindSpam = DateTime.Now; //intell -- inna
+                    SweepWindSpam = DateTime.Now; 
                 return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, SIGNATURE_SPAM);
             }
             // Deadly reach
@@ -329,14 +329,14 @@ namespace GilesTrinity
                     ForeSight2 = DateTime.Now;
                 }
                 if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
-                    SweepWindSpam = DateTime.Now; //intell -- inna
+                    SweepWindSpam = DateTime.Now; 
                 return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
             }
             // Default attacks
             if (!UseOOCBuff && !IsCurrentlyAvoiding)
             {
                 if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
-                    SweepWindSpam = DateTime.Now; //intell -- inna
+                    SweepWindSpam = DateTime.Now; 
                 return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
             }
             return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
@@ -495,8 +495,8 @@ namespace GilesTrinity
                     // rrrix edit: we can't maintain here
                     return;
 
-                    locationSource = "ZigZag";
-                    target = FindZigZagTargetLocation(target, 23f);
+                    //locationSource = "ZigZag";
+                    //target = FindZigZagTargetLocation(target, 23f);
                 }
 
                 if (target == Vector3.Zero)

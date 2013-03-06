@@ -73,7 +73,7 @@ namespace GilesTrinity
         internal static Dictionary<int, int> dictActorSNOPriority = new Dictionary<int, int> {
             // Wood wraiths all this line (495 & 496 & 6572 & 139454 & 139456 & 170324 & 170325)
             {495, 901}, {496, 901}, {6572, 901}, {139454, 901}, {139456, 901}, {170324, 901}, {170325, 901},
-            //intell -- added 4099 (act 2 fallen shaman)
+            // -- added 4099 (act 2 fallen shaman)
             // Fallen Shaman prophets goblin Summoners (365 & 4100)
             {365, 1901}, {4099, 1901}, {4100, 1901},
             // The annoying grunts summoned by the above
@@ -90,7 +90,7 @@ namespace GilesTrinity
             {454, 1500},
             // Cydaea boss (95250)
             {95250, 1501},
-            //intell
+            
             //Cydaea Spiderlings (137139)
             {137139, -301},
             // GoatMutantshaman Elite (4304)
@@ -168,7 +168,7 @@ namespace GilesTrinity
             // Jondar, Chancellor, Queen Araneae (act 1 dungeons), Skeleton King, Butcher
             86624, 156353, 51341, 5350, 3526,
             215103, // Istaku            
-            //210120, // A4 Corrupt Growths            
+            210120, // A4 Corrupt Growths            
             // Rakanoth
             4630, 
             //Xah'Rith Keywarden

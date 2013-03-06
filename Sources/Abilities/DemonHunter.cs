@@ -11,6 +11,7 @@ namespace GilesTrinity
     {
         private static TrinityPower GetDemonHunterPower(bool IsCurrentlyAvoiding, bool UseOOCBuff, bool UseDestructiblePower)
         {
+            
             // Pick the best destructible power available
             if (UseDestructiblePower)
             {

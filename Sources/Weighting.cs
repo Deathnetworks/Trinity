@@ -121,8 +121,6 @@ namespace GilesTrinity
                                 if (cacheObject.RadiusDistance <= 50f)
                                 {
                                     bool bCountAsElite = (cacheObject.IsEliteRareUnique || cacheObject.IsBoss);
-                                    //intell -- removed thisgilesobject.bThisTreasureGoblin
-
 
                                     bool isRended = cacheObject.HasDotDPS;
 
@@ -224,7 +222,6 @@ namespace GilesTrinity
                                         }
 
                                         // Give more weight to elites and minions
-                                        //intell -- no weight for uber elites (key wardens), they already got 200 radius kill
                                         if ((cacheObject.IsEliteRareUnique || cacheObject.IsMinion) && c_ActorSNO != 256015 && c_ActorSNO != 256000 && c_ActorSNO != 255996)
                                             cacheObject.Weight += 2000;
 

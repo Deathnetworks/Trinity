@@ -559,9 +559,18 @@ namespace GilesTrinity
         private static double c_KillRange = 0f;
 
         // From main RefreshDiaobjects
-        private static Vector3 vSafePointNear;
+        /// <summary>
+        /// The position of the last CurrentTarget (Primary Target)
+        /// </summary>
+        private static Vector3 LastPrimaryTargetPosition;
         private static Vector3 vKitePointAvoid;
+        /// <summary>
+        /// The RActorGUID of the last CurrentTarget (PrimaryTarget)
+        /// </summary>
         private static int CurrentTargetRactorGUID;
+        /// <summary>
+        /// The number of monsters within melee range distance of the player
+        /// </summary>
         private static int iUnitsSurrounding;
         private static double w_HighestWeightFound;
         private static HashSet<int> hashDoneThisRactor;
@@ -576,7 +585,6 @@ namespace GilesTrinity
 
         // The following 2 variables are used to clear the dictionaries out - clearing one dictionary out per maximum every 2 seconds, working through in sequential order
         private static DateTime lastClearedCacheDictionary = DateTime.Today;
-        private static int iLastClearedCacheDictionary = 0;
 
         // Extra height added on for location-based-attacks on targets - may be needed for beam-spells etc. for wizards? (eg add 2 foot height from their feet)
         private const float iExtraHeight = 2f;

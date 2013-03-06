@@ -94,7 +94,6 @@ namespace GilesTrinity
                         return defaultValue;
                     }
             }
-            return defaultValue;
         }
 
         public static float GetAvoidanceRadiusBySNO(int snoId, float defaultValue)

@@ -513,13 +513,21 @@ namespace GilesTrinity
 
                     if (shouldKite)
                     {
+                        // make sure we can raycast to our target
+                        if (!CanRayCast(gridPoint.Position, LastPrimaryTargetPosition))
+                            continue;
+
                         /*
                         * We want to down-weight any grid points where monsters are closer to it than we are
                         */
                         foreach (GilesObstacle monster in hashMonsterObstacleCache)
                         {
-                            float distFromMonster = gridPoint.Position.Distance(monster.Location);
-                            float distFromOrigin = gridPoint.Position.Distance(origin);
+                            float distFromMonster = gridPoint.Position.Distance2D(monster.Location);
+                            float distFromOrigin = gridPoint.Position.Distance2D(origin);
+                            float distFromOriginToAvoidance = origin.Distance2D(monster.Location);
+                            if (distFromOriginToAvoidance < distFromOrigin)
+                                continue;
+                            
                             if (distFromMonster < distFromOrigin)
                             {
                                 gridPoint.Weight -= distFromOrigin;
@@ -531,9 +539,18 @@ namespace GilesTrinity
                         }
                         foreach (GilesObstacle avoidance in hashAvoidanceObstacleCache)
                         {
-                            float distFromAvoidance = gridPoint.Position.Distance(avoidance.Location);
-                            float distFromOrigin = gridPoint.Position.Distance(origin);
-                            float distFromOriginToAvoidance = origin.Distance(avoidance.Location);
+                            float distFromAvoidance = gridPoint.Position.Distance2D(avoidance.Location);
+                            float distFromOrigin = gridPoint.Position.Distance2D(origin);
+                            float distFromOriginToAvoidance = origin.Distance2D(avoidance.Location);
+
+                            float health = AvoidanceManager.GetAvoidanceHealthBySNO(avoidance.ActorSNO, 1f);
+                            float radius = AvoidanceManager.GetAvoidanceRadiusBySNO(avoidance.ActorSNO, 1f);
+
+                            // position is inside avoidance
+                            if (PlayerStatus.CurrentHealthPct < health && distFromAvoidance < radius)
+                                continue;
+
+                            // closer to avoidance than it is to player
                             if (distFromOriginToAvoidance < distFromOrigin)
                                 continue;
 

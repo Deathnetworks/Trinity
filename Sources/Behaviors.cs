@@ -130,7 +130,7 @@ namespace GilesTrinity
                     {
                         RefreshHotbar();
                     }
-                    if (CurrentPower == null)
+                    if (CurrentPower == null && CurrentTarget != null)
                         CurrentPower = AbilitySelector();
                     // Special pausing *AFTER* using certain powers
                     if (IsWaitingAfterPower && CurrentPower.WaitTicksAfterUse >= 1)
@@ -686,7 +686,7 @@ namespace GilesTrinity
                             if (CurrentTarget.Type != GObjectType.Backtrack)
                             {
                                 // Whirlwind for a barb
-                                //intell
+                                
                                 if (!IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource >= 10)
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, CurrentWorldDynamicId, -1);
@@ -740,7 +740,7 @@ namespace GilesTrinity
                     }
 
                     // Whirlwind against everything within range (except backtrack points)
-                    //intell
+                    
                     if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource >= 10 && AnythingWithinRange[RANGE_20] >= 1 && !IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
                         (!Hotbar.Contains(SNOPower.Barbarian_Sprint) || GetHasBuff(SNOPower.Barbarian_Sprint)) &&
                         CurrentTarget.Type != GObjectType.Backtrack &&

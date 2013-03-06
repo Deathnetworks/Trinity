@@ -552,14 +552,15 @@ namespace GilesTrinity.DbProvider
                 }
                 // Tempest rush for a monk
                 if (GilesTrinity.Hotbar.Contains(SNOPower.Monk_TempestRush) &&
-                    (GilesTrinity.Settings.Combat.Monk.TROption == TempestRushOption.MovementOnly || GilesTrinity.Settings.Combat.Monk.TROption == TempestRushOption.Always
-                    || (GilesTrinity.Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly && !TargetUtil.AnyElitesInRange(40f))))
+                    (GilesTrinity.Settings.Combat.Monk.TROption == TempestRushOption.MovementOnly || GilesTrinity.Settings.Combat.Monk.TROption == TempestRushOption.Always ||
+                    (GilesTrinity.Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly && !TargetUtil.AnyElitesInRange(40f))))
                 {
                     Vector3 vTargetAimPoint = vMoveToTarget;
                     //vTargetAimPoint = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, aimPointDistance);
                     //vTargetAimPoint = MathEx.CalculatePointFrom(vMyCurrentPosition, vMoveToTarget, aimPointDistance);
 
-                    bool canRayCastTarget = GilesTrinity.CanRayCast(vMyCurrentPosition, vTargetAimPoint);
+                    //bool canRayCastTarget = GilesTrinity.CanRayCast(vMyCurrentPosition, vTargetAimPoint);
+                    bool canRayCastTarget = true;
 
                     vTargetAimPoint = TargetUtil.FindTempestRushTarget();
 

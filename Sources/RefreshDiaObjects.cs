@@ -201,7 +201,7 @@ namespace GilesTrinity
                 LastRefreshedCache = DateTime.Now;
 
                 // Blank current/last/next targets
-                vSafePointNear = CurrentTarget != null ? CurrentTarget.Position : vNullLocation;
+                LastPrimaryTargetPosition = CurrentTarget != null ? CurrentTarget.Position : vNullLocation;
                 vKitePointAvoid = vNullLocation;
                 // store current target GUID
                 CurrentTargetRactorGUID = CurrentTarget != null ? CurrentTarget.RActorGuid : -1;
@@ -210,7 +210,7 @@ namespace GilesTrinity
                 // Reset all variables for target-weight finding
                 bAnyTreasureGoblinsPresent = false;
                 iCurrentMaxKillRadius = Math.Min((float)(Settings.Combat.Misc.NonEliteRange), Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius);
-                //intell
+                
                 iCurrentMaxLootRadius = Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius;
                 bStayPutDuringAvoidance = false;
                 // Set up the fake object for the target handler

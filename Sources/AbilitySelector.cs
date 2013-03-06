@@ -187,11 +187,6 @@ namespace GilesTrinity
         {
             using (new PerformanceLogger("GilesAbilitySelector"))
             {
-                // Refresh buffs once to save buff-check-spam
-                // rrrix: disabled this (it's called through other means)
-                //GilesRefreshBuffs();
-
-
                 // See if archon just appeared/disappeared, so update the hotbar
                 if (bRefreshHotbarAbilities)
                     RefreshHotbar();
@@ -249,8 +244,6 @@ namespace GilesTrinity
             switch (rhItem.ItemType)
             {
                 default:
-                    //if (rhItem.IsTwoHand)
-                    //    return SNOPower.Weapon_Melee_Instant_BothHand;
                     return SNOPower.Weapon_Melee_Instant;
                 case ItemType.Axe:
                 case ItemType.CeremonialDagger:
@@ -262,20 +255,13 @@ namespace GilesTrinity
                 case ItemType.Spear:
                 case ItemType.Staff:
                 case ItemType.Sword:
-                    //if (rhItem.IsTwoHand)
-                    //    return SNOPower.Weapon_Melee_Instant_BothHand;
                     return SNOPower.Weapon_Melee_Instant;
                 case ItemType.Wand:
                     return SNOPower.Weapon_Ranged_Wand;
                 case ItemType.Bow:
                 case ItemType.Crossbow:
                 case ItemType.HandCrossbow:
-                    {
-                        if (rhItem.IsTwoHand)
-                            return SNOPower.Weapon_Ranged_Projectile;
-                        else
-                            return SNOPower.Weapon_Ranged_Instant;
-                    }
+                    return SNOPower.Weapon_Ranged_Projectile;
             }
         }
         private static float GetDefaultWeaponDistance()
@@ -283,8 +269,10 @@ namespace GilesTrinity
             switch (GetDefaultWeaponPower())
             {
                 case SNOPower.Weapon_Ranged_Instant:
+                case SNOPower.Weapon_Ranged_Projectile:
+                    return 65f;
                 case SNOPower.Weapon_Ranged_Wand:
-                    return 40f;
+                    return 35f;
                 case SNOPower.Weapon_Melee_Instant:
                 case SNOPower.Weapon_Melee_Instant_BothHand:
                 default:
