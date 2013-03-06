@@ -1,4 +1,6 @@
-﻿using Zeta.Common;
+﻿using System;
+using System.Linq;
+using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
@@ -25,12 +27,24 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
             }
+
+            bool hasVengefulSpirit = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 4);
+
             // Soul Harvest Any Elites or 2+ Norms and baby it's harvest season
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_SoulHarvest) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 59 && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) < 4 &&
-                (TargetUtil.AnyMobsInRange(16f,2) || TargetUtil.IsEliteTargetInRange(16f)) && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_SoulHarvest) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 59 && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4 &&
+                !hasVengefulSpirit && (TargetUtil.AnyMobsInRange(16f,2) || TargetUtil.IsEliteTargetInRange(16f)) && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
             }
+
+            // Soul Harvest with VengefulSpirit
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Witchdoctor_SoulHarvest) && hasVengefulSpirit && PlayerStatus.PrimaryResource >= 59
+                && TargetUtil.ClusterExists(16f, 2) && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4 && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
+            {
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(16f);
+                return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest, 2f, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+            }
+
             // Sacrifice AKA Zombie Dog Jihad, use on Elites Only or to try and Save yourself
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) &&
                 (ElitesWithinRange[RANGE_15] > 0 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 15f)) &&

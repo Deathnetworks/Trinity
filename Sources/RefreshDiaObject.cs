@@ -1586,6 +1586,7 @@ namespace GilesTrinity
 
         private static bool RefreshStepNewObjectTypeZDiff(bool AddToCache)
         {
+            c_ZDiff = c_diaObject.ZDiff;
             // always take current target regardless if ZDiff changed
             if (c_RActorGuid == CurrentTargetRactorGUID)
             {
@@ -1603,7 +1604,6 @@ namespace GilesTrinity
             if (c_ObjectType != GObjectType.Avoidance)
             {
                 // Calculate the z-height difference between our current position, and this object's position
-                c_ZDiff = Math.Abs(PlayerStatus.CurrentPosition.Z - c_Position.Z);
                 switch (c_ObjectType)
                 {
                     case GObjectType.Door:

@@ -10,6 +10,50 @@ namespace GilesTrinity
 {
     public class TargetUtil
     {
+        /// <summary>
+        /// Checks to make sure there's at least one valid cluster with the minimum monster count
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <param name="minCount"></param>
+        /// <returns></returns>
+        public static bool ClusterExists(float radius = 15f, int minCount = 2, bool forceElites = true)
+        {
+            return ClusterExists(radius, 300f, minCount);
+        }
+        /// <summary>
+        /// Checks to make sure there's at least one valid cluster with the minimum monster count
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <param name="minCount"></param>
+        /// <returns></returns>
+        public static bool ClusterExists(float radius = 15f, float maxRange = 15f, int minCount = 2, bool forceElites = true)
+        {
+            if (radius < 5f)
+                radius = 5f;
+            if (maxRange > 300f)
+                maxRange = 300f;
+            if (minCount < 2)
+                minCount = 2;
+
+            if (forceElites && GilesTrinity.GilesObjectCache.Any(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique && u.RadiusDistance < maxRange))
+                return true;
+
+            var clusterCheck =
+                (from u in GilesTrinity.GilesObjectCache
+                 where u.Type == GObjectType.Unit &&
+                 u.Weight > 0 &&
+                 u.RadiusDistance <= maxRange &&
+                 u.NearbyUnitsWithinDistance(radius) >= minCount
+                 select u).Any();
+
+            return clusterCheck;
+        }
+        /// <summary>
+        /// Finds the optimal cluster position, works regardless if there is a cluster or not (will return single unit position if not)
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <param name="maxRange"></param>
+        /// <returns></returns>
         public static Vector3 GetBestClusterPoint(float radius = 15f, float maxRange = 15f)
         {
             if (radius < 5f)
@@ -23,7 +67,7 @@ namespace GilesTrinity
                 var clusterUnits =
                     (from u in GilesTrinity.GilesObjectCache
                      where u.Type == GObjectType.Unit && u.Weight > 0
-                     orderby u.IsElite
+                     orderby u.IsBossOrEliteRareUnique
                      orderby u.NearbyUnitsWithinDistance(radius) descending
                      orderby u.CentreDistance
                      orderby u.HitPointsPct descending
@@ -40,6 +84,11 @@ namespace GilesTrinity
             }
         }
 
+        /// <summary>
+        /// Fast check to see if there are any attackable units within a certain distance
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
         public static bool AnyMobsInRange(float range = 10f)
         {
             if (range < 5f)
@@ -51,6 +100,11 @@ namespace GilesTrinity
                     select o).Any();
         }
 
+        /// <summary>
+        /// Fast check to see if there are any attackable units within a certain distance
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
         public static bool AnyMobsInRange(float range = 10f, int minCount = 1)
         {
             if (range < 5f)
@@ -61,9 +115,14 @@ namespace GilesTrinity
                     where o.Type == GObjectType.Unit &&
                     o.Weight > 0 &&
                     o.RadiusDistance <= range
-                    select o).Count() >= minCount; 
+                    select o).Count() >= minCount;
         }
 
+        /// <summary>
+        /// Fast check to see if there are any attackable Elite units within a certain distance
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
         public static bool AnyElitesInRange(float range = 10f)
         {
             if (range < 5f)
@@ -75,6 +134,11 @@ namespace GilesTrinity
                     select o).Any();
         }
 
+        /// <summary>
+        /// Fast check to see if there are any attackable Elite units within a certain distance
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
         public static bool AnyElitesInRange(float range = 10f, int minCount = 1)
         {
             if (range < 5f)
