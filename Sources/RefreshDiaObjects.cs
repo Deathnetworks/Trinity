@@ -621,6 +621,7 @@ namespace GilesTrinity
 
                 var monsterList = from m in GilesObjectCache
                                   where m.Type == GObjectType.Unit &&
+                                  m.Weight > 0 &&
                                   m.RadiusDistance <= PlayerKiteDistance &&
                                   (m.IsBossOrEliteRareUnique ||
                                    ((m.HitPointsPct >= .15 || m.MonsterStyle != MonsterSize.Swarm) && !m.IsBossOrEliteRareUnique)

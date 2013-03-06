@@ -28,20 +28,28 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
             }
 
+            // Witch Doctor - Terror
+            //skillDict.Add("SoulHarvest", SNOPower.Witchdoctor_SoulHarvest);
+            //runeDict.Add("SwallowYourSoul", 3);
+            //runeDict.Add("Siphon", 0);
+            //runeDict.Add("Languish", 2);
+            //runeDict.Add("SoulToWaste", 1);
+            //runeDict.Add("VengefulSpirit", 4);
+
             bool hasVengefulSpirit = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 4);
 
             // Soul Harvest Any Elites or 2+ Norms and baby it's harvest season
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_SoulHarvest) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 59 && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4 &&
-                !hasVengefulSpirit && (TargetUtil.AnyMobsInRange(16f,2) || TargetUtil.IsEliteTargetInRange(16f)) && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
+                (TargetUtil.AnyMobsInRange(16f,2) || TargetUtil.IsEliteTargetInRange(16f)) && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
             }
 
             // Soul Harvest with VengefulSpirit
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Witchdoctor_SoulHarvest) && hasVengefulSpirit && PlayerStatus.PrimaryResource >= 59
-                && TargetUtil.ClusterExists(16f, 2) && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4 && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
+                && TargetUtil.ClusterExists(16f, 90f, 2, true) && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4 && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
             {
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(16f);
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(16f, 90f, false);
                 return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest, 2f, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
             }
 
@@ -156,18 +164,6 @@ namespace GilesTrinity
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_AcidCloud) && !PlayerStatus.IsIncapacitated &&
                 PlayerStatus.PrimaryResource >= 172 && PowerManager.CanCast(SNOPower.Witchdoctor_AcidCloud))
             {
-                // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
-                //float fExtraDistance = 0f;
-                //if (CurrentTarget.CentreDistance > 17f && !CurrentTarget.IsTreasureGoblin)
-                //{
-                //    fExtraDistance = CurrentTarget.CentreDistance - 17f;
-                //    if (fExtraDistance > 5f)
-                //        fExtraDistance = 5f;
-                //    if (CurrentTarget.CentreDistance - fExtraDistance < 15f)
-                //        fExtraDistance -= 2;
-                //}
-                //Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, PlayerStatus.CurrentPosition, CurrentTarget.CentreDistance - fExtraDistance);
-
                 var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 30f);
                 return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 30f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
             }

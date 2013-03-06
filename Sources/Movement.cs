@@ -22,7 +22,7 @@ namespace GilesTrinity
         {
             Vector3 vThisZigZag = vNullLocation;
             using (new PerformanceLogger("FindZigZagTargetLocation"))
-            {
+            {                
                 using (new PerformanceLogger("FindZigZagTargetLocation.CheckObjectCache"))
                 {
                     bool useTargetBasedZigZag = false;
@@ -53,6 +53,7 @@ namespace GilesTrinity
                         }
                     }
                 }
+                
                 using (new PerformanceLogger("FindZigZagTargetLocation.RandomZigZagPoint"))
                 {
 

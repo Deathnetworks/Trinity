@@ -14,9 +14,11 @@ namespace GilesTrinity
         /// Checks to make sure there's at least one valid cluster with the minimum monster count
         /// </summary>
         /// <param name="radius"></param>
+        /// <param name="maxRange"></param>
         /// <param name="minCount"></param>
+        /// <param name="forceElites"></param>
         /// <returns></returns>
-        public static bool ClusterExists(float radius = 15f, int minCount = 2, bool forceElites = true)
+        public static bool ClusterExists(float radius = 15f, int minCount = 2)
         {
             return ClusterExists(radius, 300f, minCount);
         }
@@ -24,9 +26,11 @@ namespace GilesTrinity
         /// Checks to make sure there's at least one valid cluster with the minimum monster count
         /// </summary>
         /// <param name="radius"></param>
+        /// <param name="maxRange"></param>
         /// <param name="minCount"></param>
+        /// <param name="forceElites"></param>
         /// <returns></returns>
-        public static bool ClusterExists(float radius = 15f, float maxRange = 15f, int minCount = 2, bool forceElites = true)
+        public static bool ClusterExists(float radius = 15f, float maxRange = 90f, int minCount = 2, bool forceElites = true)
         {
             if (radius < 5f)
                 radius = 5f;
@@ -41,7 +45,6 @@ namespace GilesTrinity
             var clusterCheck =
                 (from u in GilesTrinity.GilesObjectCache
                  where u.Type == GObjectType.Unit &&
-                 u.Weight > 0 &&
                  u.RadiusDistance <= maxRange &&
                  u.NearbyUnitsWithinDistance(radius) >= minCount
                  select u).Any();
@@ -49,12 +52,14 @@ namespace GilesTrinity
             return clusterCheck;
         }
         /// <summary>
-        /// Finds the optimal cluster position, works regardless if there is a cluster or not (will return single unit position if not)
+        /// Finds the optimal cluster position, works regardless if there is a cluster or not (will return single unit position if not). This is not a K-Means cluster, but rather a psuedo cluster based
+        /// on the number of other monsters within a radius of any given unit
         /// </summary>
-        /// <param name="radius"></param>
-        /// <param name="maxRange"></param>
-        /// <returns></returns>
-        public static Vector3 GetBestClusterPoint(float radius = 15f, float maxRange = 15f)
+        /// <param name="radius">The maximum distance between monsters to be considered part of a cluster</param>
+        /// <param name="maxRange">The maximum unit range to include, units further than this will not be checked as a cluster center but may be included in a cluster</param>
+        /// <param name="useWeights">Whether or not to included un-weighted (ignored) targets in the cluster finding</param>
+        /// <returns>The Vector3 position of the unit that is the ideal "center" of a cluster</returns>
+        public static Vector3 GetBestClusterPoint(float radius = 15f, float maxRange = 65f, bool useWeights = true)
         {
             if (radius < 5f)
                 radius = 5f;
@@ -66,7 +71,9 @@ namespace GilesTrinity
                 Vector3 bestClusterPoint = Vector3.Zero;
                 var clusterUnits =
                     (from u in GilesTrinity.GilesObjectCache
-                     where u.Type == GObjectType.Unit && u.Weight > 0
+                     where u.Type == GObjectType.Unit && 
+                     ((useWeights && u.Weight > 0) || !useWeights) && 
+                     u.RadiusDistance <= maxRange
                      orderby u.IsBossOrEliteRareUnique
                      orderby u.NearbyUnitsWithinDistance(radius) descending
                      orderby u.CentreDistance
