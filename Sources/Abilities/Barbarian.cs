@@ -313,7 +313,7 @@ namespace GilesTrinity
                 vPositionLastZigZagCheck = PlayerStatus.CurrentPosition;
                 if (bGenerateNewZigZag)
                 {
-                    var wwdist = Settings.Combat.Barbarian.TargetBasedZigZag ? 10f : 20f;
+                    var wwdist = Settings.Combat.Barbarian.TargetBasedZigZag ? 20f : 20f;
 
                     if (bCheckGround)
                         vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, wwdist, false, true, true);

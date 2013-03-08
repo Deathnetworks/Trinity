@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Zeta;
 using Zeta.Common;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
@@ -79,11 +80,9 @@ namespace GilesTrinity
         {
             get
             {
-                if (DiaObject is DiaUnit)
-                    return DiaObject as DiaUnit;
-                else
-                    return null;
+                return ZetaDia.Actors.GetActorsOfType<DiaUnit>(true, true).Where(u => u.RActorGuid == this.RActorGuid).FirstOrDefault();
             }
+
         }
         public DiaObject DiaObject { get; set; }
         public string ObjectHash { get; set; }

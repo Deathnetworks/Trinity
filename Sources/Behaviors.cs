@@ -210,19 +210,8 @@ namespace GilesTrinity
                                     ShouldPickNewAbilities = true;
                                 }
                             }
-                            // Ok we didn't want a new target list, should we at least update the position of the current target, if it's a monster?
-                            if (CurrentTarget.Unit != null && CurrentTarget.Type == GObjectType.Unit && CurrentTarget.Unit.IsValid)
-                            {
-                                try
-                                {
-                                    CurrentTarget.Position = CurrentTarget.Unit.Position;
-                                }
-                                catch
-                                {
-                                    // Keep going anyway if we failed to get a new position from DemonBuddy
-                                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "GSDEBUG: Caught position read failure in main target handler loop.");
-                                }
-                            }
+                            // Always Update the current target 
+                            UpdateCurrentTarget();
                         }
                     }
 
@@ -1367,6 +1356,8 @@ namespace GilesTrinity
             }
             statusText.Append("Weight=");
             statusText.Append(CurrentTarget.Weight.ToString("0"));
+            statusText.Append(" RAGuid=");
+            statusText.Append(CurrentTarget.RActorGuid);
 
             statusText.Append(String.Format(" Duration={0:0.0}", DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds));
 
@@ -1590,6 +1581,7 @@ namespace GilesTrinity
                 // Note that whirlwinds use an off-on-off-on to avoid spam
                 if (CurrentPower.SNOPower != SNOPower.Barbarian_Whirlwind && CurrentPower.SNOPower != SNOPower.DemonHunter_Strafe)
                 {
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Used Power {0} at {1} on {2}", CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetRActorGUID);
                     ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetDynamicWorldId, CurrentPower.TargetRActorGUID);
                     bUsePowerSuccess = true;
                     lastChangedZigZag = DateTime.Today;
@@ -1605,6 +1597,7 @@ namespace GilesTrinity
                     }
                     if (bUseThisLoop)
                     {
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Used Power {0} at {1} on {2}", CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetRActorGUID);
                         ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetDynamicWorldId, CurrentPower.TargetRActorGUID);
                         bUsePowerSuccess = true;
                     }
