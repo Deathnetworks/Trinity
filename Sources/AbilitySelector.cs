@@ -12,8 +12,9 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        // Refresh the skills in our hotbar
-        // Also caches the values after - but ONLY if we aren't in archon mode
+        /// <summary>
+        /// Re-reads the active assigned skills and runes from thoe hotbar
+        /// </summary>
         public static void RefreshHotbar()
         {
             using (new PerformanceLogger("RefreshHotbar"))
@@ -106,31 +107,9 @@ namespace GilesTrinity
             }
         }
 
-        // This function checks when the spell last failed (according to D3 memory, which isn't always reliable)
-        // To prevent Trinity getting stuck re-trying the same spell over and over and doing nothing else
-        // No longer used but keeping this here incase I re-use it
-        private static bool GilesCanRecastAfterFailure(SNOPower power, int maxRecheckTime = 250)
-        {
-            if (DateTime.Now.Subtract(dictAbilityLastFailed[power]).TotalMilliseconds <= maxRecheckTime)
-                return false;
-            return true;
-        }
-
-        // When last hit the power-manager for this - not currently used, saved here incase I use it again in the future!
-        // This is a safety function to prevent spam of the CPU and time-intensive "PowerManager.CanCast" function in DB
-        // No longer used but keeping this here incase I re-use it
-        private static bool GilesPowerManager(SNOPower power, int maxRecheckTime)
-        {
-            if (DateTime.Now.Subtract(dictAbilityLastPowerChecked[power]).TotalMilliseconds <= maxRecheckTime)
-                return false;
-            dictAbilityLastPowerChecked[power] = DateTime.Now;
-            if (PowerManager.CanCast(power))
-                return true;
-            return false;
-        }
-
-        // Checking for buffs and caching the buff list
-        // Cache all current buffs on character
+        /// <summary>
+        /// Refreshes all player buffs
+        /// </summary>
         public static void RefreshBuffs()
         {
             using (new PerformanceLogger("GilesRefreshBuffs"))
@@ -179,11 +158,11 @@ namespace GilesTrinity
         /// <summary>
         /// Returns an appropriately selected GilesPower and related information
         /// </summary>
-        /// <param name="bCurrentlyAvoiding">Are we currently avoiding?</param>
-        /// <param name="bOOCBuff">Buff Out Of Combat</param>
-        /// <param name="bDestructiblePower">Is this for breaking destructables?</param>
+        /// <param name="IsCurrentlyAvoiding">Are we currently avoiding?</param>
+        /// <param name="UseOOCBuff">Buff Out Of Combat</param>
+        /// <param name="UseDestructiblePower">Is this for breaking destructables?</param>
         /// <returns></returns>
-        internal static TrinityPower AbilitySelector(bool bCurrentlyAvoiding = false, bool bOOCBuff = false, bool bDestructiblePower = false)
+        internal static TrinityPower AbilitySelector(bool IsCurrentlyAvoiding = false, bool UseOOCBuff = false, bool UseDestructiblePower = false)
         {
             using (new PerformanceLogger("GilesAbilitySelector"))
             {
@@ -191,35 +170,42 @@ namespace GilesTrinity
                 if (bRefreshHotbarAbilities)
                     RefreshHotbar();
 
-                // Extra height thingy, not REALLY used as it was originally going to be, will probably get phased out...
-                float iThisHeight = iExtraHeight;
                 // Switch based on the cached character class
+
+                TrinityPower power = CurrentPower;
+
                 using (new PerformanceLogger("AbilitySelector.ClassAbility"))
                 {
                     switch (PlayerStatus.ActorClass)
                     {
                         // Barbs
                         case ActorClass.Barbarian:
-                            return GetBarbarianPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
-
+                            power = GetBarbarianPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            break;
                         // Monks
                         case ActorClass.Monk:
-                            return GetMonkPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
-
+                            power = GetMonkPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            break;
                         // Wizards
                         case ActorClass.Wizard:
-                            return GetWizardPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
-
+                            power = GetWizardPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            break;
                         // Witch Doctors
                         case ActorClass.WitchDoctor:
-                            return GetWitchDoctorPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower, iThisHeight);
-
+                            power = GetWitchDoctorPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            break;
                         // Demon Hunters
                         case ActorClass.DemonHunter:
-                            return GetDemonHunterPower(bCurrentlyAvoiding, bOOCBuff, bDestructiblePower);
+                            power = GetDemonHunterPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            break;
                     }
                 }
-                return defaultPower;
+                if (CurrentPower != null && power.SNOPower == CurrentPower.SNOPower)
+                    return CurrentPower;
+                else if (power != null)
+                    return power;
+                else
+                    return defaultPower;
             }
         }
 
@@ -235,6 +221,10 @@ namespace GilesTrinity
 
         }
 
+        /// <summary>
+        /// Gets the default weapon power based on the current equipped primary weapon
+        /// </summary>
+        /// <returns></returns>
         private static SNOPower GetDefaultWeaponPower()
         {
             ACDItem rhItem = ZetaDia.Me.Inventory.Equipped.Where(i => i.InventorySlot == InventorySlot.PlayerLeftHand).FirstOrDefault();
@@ -264,6 +254,10 @@ namespace GilesTrinity
                     return SNOPower.Weapon_Ranged_Projectile;
             }
         }
+        /// <summary>
+        /// Gets the default weapon distance based on the current equipped primary weapon
+        /// </summary>
+        /// <returns></returns>
         private static float GetDefaultWeaponDistance()
         {
             switch (GetDefaultWeaponPower())
@@ -280,7 +274,12 @@ namespace GilesTrinity
             }
         }
 
-        private static double TimeSinceUse(SNOPower power)
+        /// <summary>
+        /// Gets the time in Millseconds since we've used the specified power
+        /// </summary>
+        /// <param name="power"></param>
+        /// <returns></returns>
+        internal static double TimeSinceUse(SNOPower power)
         {
             if (dictAbilityLastUse.ContainsKey(power))
                 return DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds;

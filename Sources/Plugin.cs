@@ -126,6 +126,8 @@ namespace GilesTrinity
 
                 GameEvents.OnGameChanged += GameEvents_OnGameChanged;
 
+                if (NavProvider == null)
+                    NavProvider = new DefaultNavigationProvider();
 
                 // enable or disable process exit events
                 //ZetaDia.Memory.Process.EnableRaisingEvents = false;

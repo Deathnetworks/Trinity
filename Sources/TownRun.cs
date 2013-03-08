@@ -44,27 +44,6 @@ namespace GilesTrinity
 
         internal static bool bPreStashPauseDone = false;
 
-        internal static double iPreStashLoops = 0;
-
-        internal static bool PreStashPauseOverlord(object ret)
-        {
-            return (!bPreStashPauseDone);
-        }
-
-        internal static RunStatus StashRunPrePause(object ret)
-        {
-            bPreStashPauseDone = true;
-            iPreStashLoops = 0;
-            return RunStatus.Success;
-        }
-
-        internal static RunStatus StashPause(object ret)
-        {
-            iPreStashLoops++;
-            if (iPreStashLoops < 30)
-                return RunStatus.Running;
-            return RunStatus.Success;
-        }
 
         internal static HashSet<GilesCachedACDItem> hashGilesCachedKeepItems = new HashSet<GilesCachedACDItem>();
 

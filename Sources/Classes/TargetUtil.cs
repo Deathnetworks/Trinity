@@ -98,13 +98,16 @@ namespace GilesTrinity
         /// <returns></returns>
         public static bool AnyMobsInRange(float range = 10f)
         {
-            if (range < 5f)
-                range = 5f;
-            return (from o in GilesTrinity.GilesObjectCache
-                    where o.Type == GObjectType.Unit &&
-                    o.Weight > 0 &&
-                    o.RadiusDistance <= range
-                    select o).Any();
+            return AnyMobsInRange(range, 1, true);
+        }
+        /// <summary>
+        /// Fast check to see if there are any attackable units within a certain distance
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public static bool AnyMobsInRange(float range = 10f, bool useWeights = true)
+        {
+            return AnyMobsInRange(range, 1, useWeights);
         }
 
         /// <summary>
@@ -112,7 +115,7 @@ namespace GilesTrinity
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        public static bool AnyMobsInRange(float range = 10f, int minCount = 1)
+        public static bool AnyMobsInRange(float range = 10f, int minCount = 1, bool useWeights = true)
         {
             if (range < 5f)
                 range = 5f;
@@ -120,7 +123,7 @@ namespace GilesTrinity
                 minCount = 1;
             return (from o in GilesTrinity.GilesObjectCache
                     where o.Type == GObjectType.Unit &&
-                    o.Weight > 0 &&
+                     ((useWeights && o.Weight > 0) || !useWeights) &&
                     o.RadiusDistance <= range
                     select o).Count() >= minCount;
         }

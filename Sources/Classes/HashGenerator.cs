@@ -67,6 +67,19 @@ namespace GilesTrinity
             return String.Format("{0}{1}{2}{3}", actorSNO, position, type, dynanmicWorldId);
         }
 
+        /// <summary>
+        /// Gets an MD5 hash given a string input
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string GetGenericHash(string input)
+        {
+            using (MD5 md5 = MD5.Create())
+            {
+                return GetMd5Hash(md5, input);
+            }
+        }
+
         static string GetMd5Hash(MD5 md5Hash, string input)
         {
             // Convert the input string to a byte array and compute the hash. 

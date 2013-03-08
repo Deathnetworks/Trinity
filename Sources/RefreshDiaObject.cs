@@ -1290,7 +1290,7 @@ namespace GilesTrinity
                                         {
                                             if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
-                                                bool isNavigable = gp.CanStandAt(gp.WorldToGrid(c_Position.ToVector2()));
+                                                bool isNavigable = NavProvider.CanFullyClientPathTo(c_Position);
 
                                                 if (!isNavigable)
                                                 {

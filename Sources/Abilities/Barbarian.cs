@@ -203,24 +203,23 @@ namespace GilesTrinity
             // Rend spam for Non-WhirlWind users
             if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Rend) && 
                 TargetUtil.AnyMobsInRange(9) && !CurrentTarget.IsTreasureGoblin &&
-                PlayerStatus.PrimaryResource >= 20 &&
-                (!IsWaitingForSpecial || PlayerStatus.PrimaryResource >= 75) &&
-                (GilesUseTimer(SNOPower.Barbarian_Rend) || NonRendedTargets_9 > 1 || !CurrentTarget.HasDotDPS) &&
-                (TimeSinceUse(SNOPower.Barbarian_Rend) > 1000 || TargetUtil.AnyMobsInRange(10f, 6)) && LastPowerUsed != SNOPower.Barbarian_Rend
+                ((!IsWaitingForSpecial && PlayerStatus.PrimaryResource >= 20) || (IsWaitingForSpecial && PlayerStatus.PrimaryResource > MinEnergyReserve)) &&
+                (GilesUseTimer(SNOPower.Barbarian_Rend) && (NonRendedTargets_9 > 2 || !CurrentTarget.HasDotDPS)) &&
+                (TimeSinceUse(SNOPower.Barbarian_Rend) > 1500 || TargetUtil.AnyMobsInRange(10f, 6)) && LastPowerUsed != SNOPower.Barbarian_Rend
                 )
             {
                 iWithinRangeLastRend = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= 9f);
                 iACDGUIDLastRend = CurrentTarget.ACDGuid;
                 // Note - we have LONGER animation times for whirlwind-users
                 // Since whirlwind seems to interrupt rend so easily
-                int iPreDelay = 0;
-                int iPostDelay = 1;
+                int rendPreDelay = 0;
+                int rendPostDelay = 1;
                 if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && (LastPowerUsed == SNOPower.Barbarian_Whirlwind || LastPowerUsed == SNOPower.None))
                 {
-                    iPreDelay = 2;
-                    iPostDelay = 2;
+                    rendPreDelay = 2;
+                    rendPostDelay = 2;
                 }
-                return new TrinityPower(SNOPower.Barbarian_Rend, 0f, PlayerStatus.CurrentPosition, CurrentWorldDynamicId, -1, iPreDelay, iPostDelay, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Barbarian_Rend, 0f, PlayerStatus.CurrentPosition, CurrentWorldDynamicId, -1, rendPreDelay, rendPostDelay, USE_SLOWLY);
             }
 
             // Overpower used off-cooldown
@@ -314,15 +313,14 @@ namespace GilesTrinity
                 vPositionLastZigZagCheck = PlayerStatus.CurrentPosition;
                 if (bGenerateNewZigZag)
                 {
-                    //float fExtraDistance = targetCurrent.fCentreDistance+(targetCurrent.fCentreDistance <= 16f ? 16f : 8f);
-                    //vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, CurrentTarget.CentreDistance + 25f);
-                    // Resetting this to ensure the "no-spam" is reset since we changed our target location
+                    var wwdist = Settings.Combat.Barbarian.TargetBasedZigZag ? 10f : 20f;
+
                     if (bCheckGround)
-                        vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f, false, true, true);
+                        vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, wwdist, false, true, true);
                     else if (AnythingWithinRange[RANGE_30] >= 6 || ElitesWithinRange[RANGE_30] >= 3 || c_ActorSNO == 89690)
-                        vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f, false, true);
+                        vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, wwdist, false, true);
                     else
-                        vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, 20f);
+                        vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, wwdist);
                     LastPowerUsed = SNOPower.None;
                     iACDGUIDLastWhirlwind = CurrentTarget.ACDGuid;
                     lastChangedZigZag = DateTime.Now;

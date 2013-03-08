@@ -22,7 +22,7 @@ namespace GilesTrinity
         {
             Vector3 vThisZigZag = vNullLocation;
             using (new PerformanceLogger("FindZigZagTargetLocation"))
-            {                
+            {
                 using (new PerformanceLogger("FindZigZagTargetLocation.CheckObjectCache"))
                 {
                     bool useTargetBasedZigZag = false;
@@ -39,7 +39,11 @@ namespace GilesTrinity
                     {
                         useTargetBasedZigZag = (Settings.Combat.Barbarian.TargetBasedZigZag);
                     }
-                    if (useTargetBasedZigZag && !bAnyTreasureGoblinsPresent && GilesObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
+
+                    int eliteCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
+                    bool shouldZigZagElites = ((CurrentTarget.IsBossOrEliteRareUnique && eliteCount != 1) || eliteCount == 0);
+
+                    if (useTargetBasedZigZag && shouldZigZagElites && !bAnyTreasureGoblinsPresent && GilesObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
                     {
                         IEnumerable<GilesObject> zigZagTargets =
                             from u in GilesObjectCache
@@ -53,11 +57,26 @@ namespace GilesTrinity
                         }
                     }
                 }
-                
+
+                Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
+
+                // Simple single target, go straight across!
+                if (GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.Weight > 0 && u.RadiusDistance <= fDistanceOutreach) == 1)
+                {
+                    double directionRandom = rndNum.Next(25, 125) * 2 * Math.PI * 0.001d; // up to 45 degree randomization
+                    if (rndNum.Next(0, 1) == 1)
+                        directionRandom *= -1;
+                    double targetDirection = FindDirectionRadian(PlayerStatus.CurrentPosition, vTargetLocation) + directionRandom;
+                    if (targetDirection > 2 * Math.PI)
+                        targetDirection -= 2 * Math.PI;
+                    Vector3 newDestination = MathEx.GetPointAt(PlayerStatus.CurrentPosition, fDistanceOutreach, (float)targetDirection);
+                    return newDestination;
+                }
+
+
+
                 using (new PerformanceLogger("FindZigZagTargetLocation.RandomZigZagPoint"))
                 {
-
-                    Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
                     bool bCanRayCast;
                     float iFakeStart = 0;
                     //K: bRandomizeStart is for boss and elite, they usually jump around, make obstacles, let you Incapacitated. 
@@ -173,19 +192,15 @@ namespace GilesTrinity
                                     continue;
 
                                 // Give extra weight to areas we've been inside before
-                                bool bExtraSafetyWeight = hashSkipAheadAreaCache.Any(cp => cp.Location.Distance(vThisZigZag) <= cp.Radius);
-                                if (bExtraSafetyWeight)
-                                    fThisWeight += 100f;
-
+                                //bool bExtraSafetyWeight = hashSkipAheadAreaCache.Any(cp => cp.Location.Distance(vThisZigZag) <= cp.Radius);
+                                //if (bExtraSafetyWeight)
+                                //    fThisWeight += 100f;
 
                                 float distanceToPoint = vThisZigZag.Distance2D(PlayerStatus.CurrentPosition);
                                 float distanceToTarget = vTargetLocation.Distance2D(PlayerStatus.CurrentPosition);
                                 float distanceFromTargetToPoint = vThisZigZag.Distance2D(vTargetLocation);
 
-                                if (distanceFromTargetToPoint > distanceToTarget)
-                                    continue;
-
-                                fThisWeight += (distanceToTarget * 10f);
+                                fThisWeight += (distanceToPoint * 10f);
 
                                 // Use this one if it's more weight, or we haven't even found one yet, or if same weight as another with a random chance
                                 if (fThisWeight > fHighestWeight)
@@ -528,7 +543,7 @@ namespace GilesTrinity
                             float distFromOriginToAvoidance = origin.Distance2D(monster.Location);
                             if (distFromOriginToAvoidance < distFromOrigin)
                                 continue;
-                            
+
                             if (distFromMonster < distFromOrigin)
                             {
                                 gridPoint.Weight -= distFromOrigin;

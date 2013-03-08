@@ -87,7 +87,30 @@ namespace GilesTrinity
                 default:
                     throw new ApplicationException("Unable to return Non-TreeSharp RunStatus");
             }
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Handle Target returning {0} to tree", treeRunStatus);
+            string extras = "";
+            if (IsWaitingForPower)
+                extras += " IsWaitingForPower";
+            if (IsWaitingAfterPower)
+                extras += " IsWaitingAfterPower";
+            if (IsWaitingForPotion)
+                extras += " IsWaitingForPotion";
+            if (TownRun.IsTryingToTownPortal())
+                extras += " IsTryingToTownPortal";
+            if (TownRun.TownRunTimerRunning())
+                extras += " TownRunTimerRunning";
+            if (TownRun.TownRunTimerFinished())
+                extras += " TownRunTimerFinished";
+            if (ForceTargetUpdate)
+                extras += " ForceTargetUpdate";
+            if (CurrentTarget == null)
+                extras += " CurrentTargetIsNull";
+            if (CurrentPower != null && CurrentPower.ShouldWaitBeforeUse)
+                extras += " CPowerShouldWaitBefore=" + (CurrentPower.WaitBeforeUseDelay - CurrentPower.TimeSinceAssigned);
+            if (CurrentPower != null && CurrentPower.ShouldWaitAfterUse)
+                extras += " CPowerShouldWaitAfter=" + (CurrentPower.WaitAfterUseDelay - CurrentPower.TimeSinceUse);
+
+
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Handle Target returning {0} to tree" + extras, treeRunStatus);
             return treeRunStatus;
 
         }
@@ -132,21 +155,26 @@ namespace GilesTrinity
                     }
                     if (CurrentPower == null && CurrentTarget != null)
                         CurrentPower = AbilitySelector();
-                    // Special pausing *AFTER* using certain powers
-                    if (IsWaitingAfterPower && CurrentPower.WaitTicksAfterUse >= 1)
+
+                    // Time based wait delay for certain powers with animations
+                    if (IsWaitingAfterPower && CurrentPower.ShouldWaitAfterUse)
                     {
-                        if (CurrentPower.WaitTicksAfterUse >= 1)
-                            CurrentPower.WaitTicksAfterUse--;
-                        if (CurrentPower.WaitTicksAfterUse <= 0)
-                            IsWaitingAfterPower = false;
-                        return RunStatus.Running;
+                        runStatus = HandlerRunStatus.TreeRunning;
                     }
+                    else
+                    {
+                        IsWaitingAfterPower = false;
+                    }
+
+                    //check if we are returning to the tree
+                    if (runStatus != HandlerRunStatus.NotFinished)
+                        return GetTreeSharpRunStatus(runStatus);
 
                     // See if we have been "newly rooted", to force target updates
                     if (PlayerStatus.IsRooted && !wasRootedLastTick)
                     {
                         wasRootedLastTick = true;
-                        bForceTargetUpdate = true;
+                        ForceTargetUpdate = true;
                     }
                     if (!PlayerStatus.IsRooted)
                         wasRootedLastTick = false;
@@ -183,7 +211,7 @@ namespace GilesTrinity
                                 }
                             }
                             // Ok we didn't want a new target list, should we at least update the position of the current target, if it's a monster?
-                            else if (CurrentTarget.Type == GObjectType.Unit && CurrentTarget.Unit != null && CurrentTarget.Unit.BaseAddress != IntPtr.Zero)
+                            if (CurrentTarget.Unit != null && CurrentTarget.Type == GObjectType.Unit && CurrentTarget.Unit.IsValid)
                             {
                                 try
                                 {
@@ -208,11 +236,19 @@ namespace GilesTrinity
                     if (runStatus != HandlerRunStatus.NotFinished)
                         return GetTreeSharpRunStatus(runStatus);
 
-                    if (CurrentTarget == null && TownRun.IsTryingToTownPortal())
+                    if (CurrentTarget == null && TownRun.IsTryingToTownPortal() && TownRun.TownRunTimerRunning())
                     {
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Waiting for town run... ");
+                        runStatus = HandlerRunStatus.TreeRunning;
+                    }
+                    else if (CurrentTarget == null && TownRun.IsTryingToTownPortal() && TownRun.TownRunTimerFinished())
+                    {
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Town Run Ready!");
                         runStatus = HandlerRunStatus.TreeSuccess;
                     }
+                    //check if we are returning to the tree
+                    if (runStatus != HandlerRunStatus.NotFinished)
+                        return GetTreeSharpRunStatus(runStatus);
 
                     if (CurrentTarget == null)
                     {
@@ -338,7 +374,7 @@ namespace GilesTrinity
                             if (CurrentTarget.Type == GObjectType.Avoidance)
                             {
                                 //vlastSafeSpot = vNullLocation;
-                                bForceTargetUpdate = true;
+                                ForceTargetUpdate = true;
                                 //bAvoidDirectionBlacklisting = false;
                                 runStatus = HandlerRunStatus.TreeRunning;
                             }
@@ -357,19 +393,35 @@ namespace GilesTrinity
                                     {
                                         if (CurrentPower.SNOPower != SNOPower.None)
                                         {
-                                            // Force waiting for global cooldown timer or long-animation abilities
-                                            if (CurrentPower.WaitTicksBeforeUse >= 1 || (CurrentPower.WaitForAnimationFinished != SIGNATURE_SPAM && DateTime.Now.Subtract(lastGlobalCooldownUse).TotalMilliseconds <= 50))
+                                            if (IsWaitingForPower && CurrentPower.ShouldWaitBeforeUse)
                                             {
-                                                IsWaitingForPower = true;
-                                                if (CurrentPower.WaitTicksBeforeUse >= 1)
-                                                    CurrentPower.WaitTicksBeforeUse--;
                                                 runStatus = HandlerRunStatus.TreeRunning;
+                                            }
+                                            else if (!IsWaitingForPower && CurrentPower.ShouldWaitBeforeUse)
+                                            {
+                                                runStatus = HandlerRunStatus.TreeRunning;
+                                                IsWaitingForPower = false;
                                             }
                                             else
                                             {
+                                                IsWaitingForPower = false;
                                                 HandleUnitInRange();
                                                 runStatus = HandlerRunStatus.TreeRunning;
                                             }
+
+                                            // Force waiting for global cooldown timer or long-animation abilities
+                                            //if (IsWaitingForPower && !CurrentPower.ShouldWaitBeforeUse)
+                                            //{
+                                            //    IsWaitingForPower = false;
+                                            //    HandleUnitInRange();
+                                            //    runStatus = HandlerRunStatus.TreeRunning;
+                                            //}
+                                            //else if (CurrentPower.ShouldWaitBeforeUse || (CurrentPower.WaitForAnimationFinished != SIGNATURE_SPAM && CurrentPower.TimeSinceUse <= 50))
+                                            //{
+                                            //    IsWaitingForPower = true;
+                                            //    runStatus = HandlerRunStatus.TreeRunning;
+                                            //}
+
                                         }
                                         //check if we are returning to the tree
                                         if (runStatus != HandlerRunStatus.NotFinished)
@@ -422,7 +474,7 @@ namespace GilesTrinity
                                         // Now tell Trinity to get a new target!
                                         lastChangedZigZag = DateTime.Today;
                                         vPositionLastZigZagCheck = Vector3.Zero;
-                                        bForceTargetUpdate = true;
+                                        ForceTargetUpdate = true;
                                         runStatus = HandlerRunStatus.TreeRunning;
 
                                         //check if we are returning to the tree
@@ -470,7 +522,7 @@ namespace GilesTrinity
                                         // Now tell Trinity to get a new target!
                                         lastChangedZigZag = DateTime.Today;
                                         vPositionLastZigZagCheck = Vector3.Zero;
-                                        bForceTargetUpdate = true;
+                                        ForceTargetUpdate = true;
 
                                         runStatus = HandlerRunStatus.TreeRunning;
 
@@ -547,7 +599,7 @@ namespace GilesTrinity
                                             }
 
                                             dictAbilityLastUse[CurrentPower.SNOPower] = DateTime.Now;
-                                            CurrentPower.SNOPower = SNOPower.None;
+                                            //CurrentPower.SNOPower = SNOPower.None;
                                             WaitWhileAnimating(6, true);
                                             // Prevent this EXACT object being targetted again for a short while, just incase
                                             IgnoreRactorGUID = CurrentTarget.RActorGuid;
@@ -559,7 +611,7 @@ namespace GilesTrinity
                                             bNeedClearDestructibles = true;
                                         }
                                         // Now tell Trinity to get a new target!
-                                        bForceTargetUpdate = true;
+                                        ForceTargetUpdate = true;
                                         lastChangedZigZag = DateTime.Today;
                                         vPositionLastZigZagCheck = Vector3.Zero;
                                     }
@@ -575,7 +627,7 @@ namespace GilesTrinity
                                         iTotalBacktracks = 0;
                                         vBacktrackList = new SortedList<int, Vector3>();
                                     }
-                                    bForceTargetUpdate = true;
+                                    ForceTargetUpdate = true;
                                     return RunStatus.Running;
                             }
                             return RunStatus.Running;
@@ -686,7 +738,7 @@ namespace GilesTrinity
                             if (CurrentTarget.Type != GObjectType.Backtrack)
                             {
                                 // Whirlwind for a barb
-                                
+
                                 if (!IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource >= 10)
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, CurrentWorldDynamicId, -1);
@@ -740,7 +792,7 @@ namespace GilesTrinity
                     }
 
                     // Whirlwind against everything within range (except backtrack points)
-                    
+
                     if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource >= 10 && AnythingWithinRange[RANGE_20] >= 1 && !IsWaitingForSpecial && CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
                         (!Hotbar.Contains(SNOPower.Barbarian_Sprint) || GetHasBuff(SNOPower.Barbarian_Sprint)) &&
                         CurrentTarget.Type != GObjectType.Backtrack &&
@@ -800,7 +852,7 @@ namespace GilesTrinity
                         ForceCloseRangeTarget = true;
                         lastForcedKeepCloseRange = DateTime.Now;
                         // And tell Trinity to get a new target
-                        bForceTargetUpdate = true;
+                        ForceTargetUpdate = true;
                         // Blacklist an 80 degree direction for avoidance
                         if (CurrentTarget.Type == GObjectType.Avoidance)
                         {
@@ -809,7 +861,7 @@ namespace GilesTrinity
                         }
                         // Handle body blocking by blacklisting
                         //GilesHandleBodyBlocking();
-                        
+
                         // If we were backtracking and failed, remove the current backtrack and try and move to the next
                         if (CurrentTarget.Type == GObjectType.Backtrack && TimesBlockedMoving >= 2)
                         {
@@ -1024,7 +1076,7 @@ namespace GilesTrinity
                 if (!IsWholeNewTarget && !IsWaitingForPower && !IsWaitingForPotion)
                 {
                     // Update targets at least once every 80 milliseconds
-                    if (bForceTargetUpdate || IsAvoidingProjectiles || DateTime.Now.Subtract(LastRefreshedCache).TotalMilliseconds > Settings.Advanced.CacheRefreshRate)
+                    if (ForceTargetUpdate || IsAvoidingProjectiles || DateTime.Now.Subtract(LastRefreshedCache).TotalMilliseconds > Settings.Advanced.CacheRefreshRate)
                     {
                         StaleCache = true;
                     }
@@ -1405,7 +1457,7 @@ namespace GilesTrinity
                     // * Gold - need to get within pickup radius only
                     case GObjectType.Gold:
                         {
-                            TargetRangeRequired = PlayerStatus.GoldPickupRadius;
+                            TargetRangeRequired = PlayerStatus.GoldPickupRadius - 2f;
                             if (TargetRangeRequired < 2f)
                                 TargetRangeRequired = 2f;
                             break;
@@ -1530,7 +1582,6 @@ namespace GilesTrinity
         {
             using (new PerformanceLogger("HandleTarget.HandleUnitInRange"))
             {
-                IsWaitingForPower = false;
                 // Wait while animating before an attack
                 if (CurrentPower.WaitForAnimationFinished)
                     WaitWhileAnimating(5, false);
@@ -1548,11 +1599,9 @@ namespace GilesTrinity
                 {
                     // Special code to prevent whirlwind double-spam, this helps save fury
                     bool bUseThisLoop = CurrentPower.SNOPower != LastPowerUsed;
-                    if (!bUseThisLoop)
+                    if (!bUseThisLoop && TimeSinceUse(CurrentPower.SNOPower) >= 200)
                     {
-                        //powerLastSnoPowerUsed = SNOPower.None;
-                        if (DateTime.Now.Subtract(dictAbilityLastUse[CurrentPower.SNOPower]).TotalMilliseconds >= 200)
-                            bUseThisLoop = true;
+                        bUseThisLoop = true;
                     }
                     if (bUseThisLoop)
                     {
@@ -1570,7 +1619,7 @@ namespace GilesTrinity
                     dictAbilityLastUse[CurrentPower.SNOPower] = DateTime.Now;
                     lastGlobalCooldownUse = DateTime.Now;
                     LastPowerUsed = CurrentPower.SNOPower;
-                    CurrentPower.SNOPower = SNOPower.None;
+                    //CurrentPower.SNOPower = SNOPower.None;
                     // Wait for animating AFTER the attack
                     if (CurrentPower.WaitForAnimationFinished)
                         WaitWhileAnimating(3, false);
@@ -1603,7 +1652,7 @@ namespace GilesTrinity
                 // See if we should force a long wait AFTERWARDS, too
                 // Force waiting AFTER power use for certain abilities
                 IsWaitingAfterPower = false;
-                if (CurrentPower.WaitTicksAfterUse >= 1)
+                if (CurrentPower.ShouldWaitAfterUse)
                 {
                     IsWaitingAfterPower = true;
                 }
@@ -1719,7 +1768,7 @@ namespace GilesTrinity
                     hashRGUIDBlacklist90.Add(CurrentTarget.RActorGuid);
                 }
                 // Now tell Trinity to get a new target!
-                bForceTargetUpdate = true;
+                ForceTargetUpdate = true;
                 return iInteractAttempts;
             }
         }

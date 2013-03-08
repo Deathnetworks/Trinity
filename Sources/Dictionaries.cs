@@ -240,13 +240,14 @@ namespace GilesTrinity
         /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
         /// </summary>
         internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
-            174900, 104632, 194682, 81699, 3340, 123325, 
-        };
+            174900, // demonic forge
+            104632, 194682, 81699, 3340, 123325, 
+       };
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 25}, {104632, 20}, {194682, 20}, {81699, 20}, {3340, 12}, {123325, 25}, {185391, 15}, 
+            {174900, 25}, {104632, 20}, {194682, 20}, {81699, 20}, {3340, 12}, {123325, 25}, {185391, 15},
          };
         /// <summary>
         /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache
@@ -256,6 +257,11 @@ namespace GilesTrinity
             {195101, 10}, {195108, 25}, {170657, 5}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 4}, {193963, 5}, {159066, 12}, {160570, 12},
             {55325, 5}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 30}, {192867, 3.5f}, {155255, 8}, {54530, 6}, {157541, 6},
          };
+
+        internal static HashSet<int> NavigationBypassSNO = new HashSet<int> 
+        {
+        };
+
         /// <summary>
         /// Destructible things that need targeting by a location instead of an ACDGUID (stuff you can't "click on" to destroy in-game)
         /// </summary>
@@ -512,10 +518,7 @@ namespace GilesTrinity
         /// This is the ACTUAL dictionary used now (the above are used to quickly reset all timers back to defaults on death etc.)
         /// </summary>
         public static Dictionary<SNOPower, DateTime> dictAbilityLastUse = new Dictionary<SNOPower, DateTime>(dictAbilityLastUseDefaults);
-        /// <summary>
-        /// And this is to avoid using certain long-cooldown skills immediately after a fail
-        /// </summary>
-        public static Dictionary<SNOPower, DateTime> dictAbilityLastFailed = new Dictionary<SNOPower, DateTime>(dictAbilityLastUseDefaults);
+
         /// <summary>
         /// And a "global cooldown" to prevent non-signature-spells being used too fast
         /// </summary>
@@ -526,20 +529,6 @@ namespace GilesTrinity
          * Uses a little more ram - but for a massive CPU gain. And ram is cheap, CPU is not!
          */
 
-
-        /// <summary>
-        /// Used only for certain skills that spam the powermanager regularly, to limit their CPU hits
-        /// </summary>
-        private static Dictionary<SNOPower, DateTime> dictAbilityLastPowerChecked = new Dictionary<SNOPower, DateTime>
-            {
-                {SNOPower.Barbarian_Revenge, DateTime.Today},
-                {SNOPower.Barbarian_FuriousCharge, DateTime.Today},
-                {SNOPower.Wizard_DiamondSkin, DateTime.Today},
-                {SNOPower.Wizard_FrostNova, DateTime.Today},
-                {SNOPower.Wizard_ExplosiveBlast, DateTime.Today},
-                {SNOPower.Witchdoctor_Hex, DateTime.Today},
-                {SNOPower.Witchdoctor_SoulHarvest, DateTime.Today},
-            };
         /// <summary>
         /// Caches the GilesObjectType of each object as we find it (RactorGUID based)
         /// </summary>

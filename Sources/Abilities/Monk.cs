@@ -191,7 +191,7 @@ namespace GilesTrinity
                 MaintainTempestRush = true;
                 string trUse = "Starting Tempest Rush for Combat";
                 Monk_TempestRushStatus(trUse);
-                return new TrinityPower(SNOPower.Monk_TempestRush, 60f, vSideToSideTarget, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Monk_TempestRush, 23f, vSideToSideTarget, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
             }
 
             // 4 Mantra spam for the 4 second buff

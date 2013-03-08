@@ -33,8 +33,16 @@ namespace GilesTrinity
             using (new PerformanceLogger("RefreshDiaObjectCache"))
             {
                 if (DateTime.Now.Subtract(LastRefreshedCache).TotalMilliseconds < Settings.Advanced.CacheRefreshRate)
-                    return false;
+                {
+                    if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && CurrentTarget.Unit != null && CurrentTarget.Unit.IsValid)
+                    {
+                        CurrentTarget.Position = CurrentTarget.Unit.Position;
+                        CurrentTarget.HitPointsPct = CurrentTarget.Unit.HitpointsCurrentPct;
+                        CurrentTarget.HitPoints = CurrentTarget.Unit.HitpointsCurrent;
+                    }
 
+                    return false;
+                }
                 LastRefreshedCache = DateTime.Now;
 
                 using (new PerformanceLogger("RefreshDiaObjectCache.UpdateBlock"))
@@ -121,7 +129,7 @@ namespace GilesTrinity
                 }
                 // Not heading straight for a safe-spot?
                 // No valid targets but we were told to stay put?
-                if (CurrentTarget == null && bStayPutDuringAvoidance && !StandingInAvoidance)
+                if (CurrentTarget == null && ShouldStayPutDuringAvoidance && !StandingInAvoidance)
                 {
                     CurrentTarget = new GilesObject()
                                         {
@@ -210,9 +218,9 @@ namespace GilesTrinity
                 // Reset all variables for target-weight finding
                 bAnyTreasureGoblinsPresent = false;
                 iCurrentMaxKillRadius = Math.Min((float)(Settings.Combat.Misc.NonEliteRange), Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius);
-                
+
                 iCurrentMaxLootRadius = Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius;
-                bStayPutDuringAvoidance = false;
+                ShouldStayPutDuringAvoidance = false;
                 // Set up the fake object for the target handler
                 FakeObject = null;
 
@@ -395,7 +403,7 @@ namespace GilesTrinity
                                     if (c_unit_IsShielded)
                                         unitExtras += " IsShielded";
 
-                                    unitExtras += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";                                    
+                                    unitExtras += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
                                 }
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                     "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0} RAGuid: {13} {14}",

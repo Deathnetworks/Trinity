@@ -114,7 +114,7 @@ namespace GilesTrinity.Settings
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(600)]
+        [DefaultValue(300)]
         public int GoldInactivityTimer
         {
             get
@@ -150,7 +150,7 @@ namespace GilesTrinity.Settings
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(10)]
+        [DefaultValue(8)]
         public int TPSLimit
         {
             get
@@ -168,7 +168,7 @@ namespace GilesTrinity.Settings
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(100)]
+        [DefaultValue(300)]
         public int CacheRefreshRate
         {
             get

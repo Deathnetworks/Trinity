@@ -8,7 +8,7 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        private static TrinityPower GetWitchDoctorPower(bool IsCurrentlyAvoiding, bool UseOOCBuff, bool UseDestructiblePower, float iThisHeight)
+        private static TrinityPower GetWitchDoctorPower(bool IsCurrentlyAvoiding, bool UseOOCBuff, bool UseDestructiblePower)
         {
             // Pick the best destructible power available
             if (UseDestructiblePower)
@@ -47,10 +47,9 @@ namespace GilesTrinity
 
             // Soul Harvest with VengefulSpirit
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Witchdoctor_SoulHarvest) && hasVengefulSpirit && PlayerStatus.PrimaryResource >= 59
-                && TargetUtil.ClusterExists(16f, 90f, 2, true) && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4 && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
+                && TargetUtil.AnyMobsInRange(16,3) && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4 && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
             {
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(16f, 90f, false);
-                return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest, 2f, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
             }
 
             // Sacrifice AKA Zombie Dog Jihad, use on Elites Only or to try and Save yourself
@@ -128,21 +127,39 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.Witchdoctor_FetishArmy, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
             }
+
+            //skillDict.Add("SpiritBarage", SNOPower.Witchdoctor_SpiritBarrage);
+            //runeDict.Add("TheSpiritIsWilling", 3);
+            //runeDict.Add("WellOfSouls", 1);
+            //runeDict.Add("Phantasm", 2);
+            //runeDict.Add("Phlebotomize", 0);
+            //runeDict.Add("Manitou", 4);
+
+            bool hasManitou = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritBarrage && s.RuneIndex == 4);
+
             // Spirit Barrage
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_SpiritBarrage) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 108 &&
-                PowerManager.CanCast(SNOPower.Witchdoctor_SpiritBarrage))
+                PowerManager.CanCast(SNOPower.Witchdoctor_SpiritBarrage) && !hasManitou)
             {
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, vNullLocation, -1, CurrentTarget.ACDGuid, 2, 2, USE_SLOWLY);
             }
+
+            // Spirit Barrage Manitou
+            if (Hotbar.Contains(SNOPower.Witchdoctor_SpiritBarrage) && PlayerStatus.PrimaryResource >= 108 && TimeSinceUse(SNOPower.Witchdoctor_SpiritBarrage) > 18000 && hasManitou)
+            {
+                return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 0f, vNullLocation, CurrentWorldDynamicId, -1, 2, 2, USE_SLOWLY);
+            }
+
             // Haunt the shit out of monster and maybe they will give you treats
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Haunt) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 98 &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_Haunt))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Haunt, 21f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
+
             // Locust
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Locust_Swarm) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 196 &&
-                PowerManager.CanCast(SNOPower.Witchdoctor_Locust_Swarm))
+                PowerManager.CanCast(SNOPower.Witchdoctor_Locust_Swarm) && !CurrentTarget.HasDotDPS && LastPowerUsed != SNOPower.Witchdoctor_Locust_Swarm)
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, 12f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
             }
@@ -155,10 +172,10 @@ namespace GilesTrinity
             }
             // Zombie Charger aka Zombie bears Spams Bears @ Everything from 11feet away
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 134 &&
-                (ElitesWithinRange[RANGE_12] > 0 || AnythingWithinRange[RANGE_12] >= 1 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 11f)) &&
+                TargetUtil.AnyMobsInRange(11f) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_ZombieCharger))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, 11f, new Vector3(CurrentTarget.Position.X, CurrentTarget.Position.Y, CurrentTarget.Position.Z + iThisHeight), CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, 11f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
             }
             // Acid Cloud
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_AcidCloud) && !PlayerStatus.IsIncapacitated &&

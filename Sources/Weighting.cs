@@ -36,7 +36,7 @@ namespace GilesTrinity
                                         ) &&
                                         PlayerStatus.CurrentHealthPct >= 0.85d;
 
-                bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || PlayerStatus.IsRooted || PlayerMover.GetMovementSpeed() < 1);
+                bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || PlayerStatus.IsRooted || PlayerMover.GetMovementSpeed() < 1 || GilesObjectCache.Count(u => u .Type == GObjectType.Unit && u.RadiusDistance < 5f) >= 3);
 
                 bool bIsBerserked = GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
 
@@ -411,10 +411,6 @@ namespace GilesTrinity
                                 if (cacheObject.ItemQuality < ItemQuality.Legendary && hashMonsterObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius * 1.2f, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
-                                // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
-                                if (hashAvoidanceObstacleCache.Any(cp => GilesIntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
-                                    cacheObject.Weight = 250;
-
                                 // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
                                 if (CurrentTarget != null && bAnyMobsInCloseRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting && cacheObject.ItemQuality < ItemQuality.Legendary)
                                     cacheObject.Weight = 1;
@@ -423,6 +419,10 @@ namespace GilesTrinity
                                 {
                                     cacheObject.Weight = 500;
                                 }
+
+                                // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
+                                if (hashAvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
+                                    cacheObject.Weight = 1;
 
                                 break;
                             }
@@ -637,7 +637,7 @@ namespace GilesTrinity
                     if (cacheObject.Weight == 1 && !StandingInAvoidance && GilesObjectCache.Any(o => o.Type == GObjectType.Avoidance))
                     {
                         cacheObject.Weight = 0;
-                        bStayPutDuringAvoidance = true;
+                        ShouldStayPutDuringAvoidance = true;
                     }
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight,
                         "Weight={2:0} target= {0} ({1}) type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",

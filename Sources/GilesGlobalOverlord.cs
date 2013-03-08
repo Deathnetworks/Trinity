@@ -219,13 +219,17 @@ namespace GilesTrinity
 
                         powerBuff = AbilitySelector(false, true, false);
 
-                        if (powerBuff.SNOPower != SNOPower.None && powerBuff.SNOPower != SNOPower.Weapon_Melee_Instant)
+                        if (powerBuff.SNOPower != SNOPower.None)
                         {
                             WaitWhileAnimating(4, true);
                             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", powerBuff.SNOPower.ToString());
+                            if (powerBuff.WaitTicksBeforeUse > 0)
+                                BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitBeforeUseDelay));
                             ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetRActorGUID);
                             LastPowerUsed = powerBuff.SNOPower;
                             dictAbilityLastUse[powerBuff.SNOPower] = DateTime.Now;
+                            if (powerBuff.WaitTicksAfterUse > 0)
+                                BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitAfterUseDelay));
                             WaitWhileAnimating(3, true);
                         }
                     }

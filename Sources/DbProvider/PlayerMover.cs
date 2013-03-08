@@ -465,8 +465,7 @@ namespace GilesTrinity.DbProvider
             // }
             // See if there's an obstacle in our way, if so try to navigate around it
             Vector3 point = vMoveToTarget;
-            foreach (GilesObstacle obstacle in GilesTrinity.hashNavigationObstacleCache.Where(o =>
-                            GilesTrinity.GilesIntersectsPath(o.Location, o.Radius, vMyCurrentPosition, point)))
+            foreach (GilesObstacle obstacle in GilesTrinity.hashNavigationObstacleCache.Where(o => vMoveToTarget.Distance2D(o.Location) <= o.Radius))
             {
                 if (vShiftedPosition == Vector3.Zero)
                 {
@@ -489,6 +488,8 @@ namespace GilesTrinity.DbProvider
                     }
                 }
             }
+
+            
 
             // don't use special movement within 10 seconds of being stuck
             bool cancelSpecialMovementAfterStuck = DateTime.Now.Subtract(LastGeneratedStuckPosition).TotalMilliseconds > 10000;
@@ -703,25 +704,17 @@ namespace GilesTrinity.DbProvider
 
         private static void GetShiftedPosition(ref Vector3 vMoveToTarget, ref Vector3 point, float radius = 15f)
         {
-            try
-            {
-                if (ProfileManager.CurrentProfileBehavior.GetType() == typeof(TrinityExploreDungeon))
-                {
-                    return;
-                }
-            }
-            catch { }
-
-            float fDirectionToTarget = GilesTrinity.FindDirectionDegree(vMyCurrentPosition, vMoveToTarget);
-            vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, radius, MathEx.ToRadians(fDirectionToTarget - 65));
-            if (!GilesTrinity.CanRayCast(vMyCurrentPosition, vMoveToTarget))
-            {
-                vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, radius, MathEx.ToRadians(fDirectionToTarget + 65));
-                if (!GilesTrinity.CanRayCast(vMyCurrentPosition, vMoveToTarget))
-                {
-                    vMoveToTarget = point;
-                }
-            }
+            double moveDirection = GilesTrinity.FindDirectionRadian(vMyCurrentPosition, vMoveToTarget);
+            
+            vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, radius + 30f, (float)moveDirection);
+            //if (!GilesTrinity.CanRayCast(vMyCurrentPosition, vMoveToTarget))
+            //{
+            //    vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, radius, MathEx.ToRadians(fDirectionToTarget + 65));
+            //    if (!GilesTrinity.CanRayCast(vMyCurrentPosition, vMoveToTarget))
+            //    {
+            //        vMoveToTarget = point;
+            //    }
+            //}
             if (vMoveToTarget != point)
             {
                 vShiftedPosition = vMoveToTarget;

@@ -290,34 +290,70 @@ namespace GilesTrinity
 
         private static bool RefreshUnitAttributes(bool AddToCache = true, DiaUnit unit = null)
         {
-            try
+            /*
+             *  TeamID  - check once for all units except bosses (which can potentially change teams - Belial, Cydea)
+             */
+            string teamIdHash = HashGenerator.GetGenericHash("teamId.RActorGuid=" + c_RActorGuid + ".ActorSNO=" + c_ActorSNO + ".WorldId=" + PlayerStatus.WorldID);
+
+            int teamId = 0;
+            if (!c_unit_IsBoss && GenericCache.ContainsKey(teamIdHash))
             {
-                int isNPC = c_CommonData.GetAttribute<int>(ActorAttributeType.TeamID);
-                if (isNPC == 1)
-                {
-                    AddToCache = false;
-                    c_IgnoreSubStep += "IsTeam1+";
-                    return AddToCache;
-                }
+                teamId = (int)GenericCache.GetObject(teamIdHash).Value;
             }
-            catch
+            else
+            {
+                teamId = c_CommonData.GetAttribute<int>(ActorAttributeType.TeamID);
+
+                GenericCache.AddToCache(new GenericCacheObject()
+                {
+                    Key = teamIdHash,
+                    Value = teamId,
+                    Expires = DateTime.Now.AddMinutes(60)
+                });
+            }
+            if (teamId == 1)
             {
                 AddToCache = false;
-                c_IgnoreSubStep += "IsTeam1-";
+                c_IgnoreSubStep += "IsTeam1+";
                 return AddToCache;
             }
 
 
-            if (unit.IsUntargetable ||
-                unit.IsInvulnerable ||
-                unit.IsBurrowed)
+
+            if (unit.IsUntargetable)
             {
                 AddToCache = false;
-                c_IgnoreSubStep = "NotAttackable";
+                c_IgnoreSubStep = "IsUntargetable";
+                return AddToCache;
+            }
+
+            if (unit.IsInvulnerable)
+            {
+                AddToCache = false;
+                c_IgnoreSubStep = "IsInvulnerable";
+                return AddToCache;
+            }
+
+            bool isBurrowed = false;
+            if (!dictGilesBurrowedCache.TryGetValue(c_RActorGuid, out isBurrowed))
+            {
+                isBurrowed = unit.IsBurrowed;
+                // if the unit is NOT burrowed - we can attack them, add to cache (as IsAttackable)
+                if (!isBurrowed)
+                {
+                    dictGilesBurrowedCache.Add(c_RActorGuid, isBurrowed);
+                }
+            }
+
+            if (isBurrowed)
+            {
+                AddToCache = false;
+                c_IgnoreSubStep = "IsBurrowed";
+                return AddToCache;
             }
 
             // only check for DotDPS/Bleeding in certain conditions to save CPU for everyone else
-            if (AddToCache && PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_Rend))
+            if (AddToCache && ((PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_Rend)) || PlayerStatus.ActorClass == ActorClass.WitchDoctor))
             {
                 bool hasdotDPS = c_CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;
                 bool isBleeding = c_CommonData.GetAttribute<int>(ActorAttributeType.Bleeding) != 0;

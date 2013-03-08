@@ -202,6 +202,14 @@ namespace GilesTrinity
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotEnoughGold";
+                return AddToCache;
+            }
+
+            if (c_CentreDistance <= PlayerStatus.GoldPickupRadius)
+            {
+                AddToCache = false;
+                c_IgnoreSubStep = "WithinPickupRadius";
+                return AddToCache;
             }
 
             //if (!AddToCache)

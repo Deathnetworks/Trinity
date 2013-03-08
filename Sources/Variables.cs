@@ -226,7 +226,7 @@ namespace GilesTrinity
         public static int iDeathsThisRun = 0;
 
         // Force a target update after certain interactions
-        private static bool bForceTargetUpdate = false;
+        private static bool ForceTargetUpdate = false;
 
         /// <summary>
         /// This holds whether or not we want to prioritize a close-target, used when we might be body-blocked by monsters
@@ -324,7 +324,7 @@ namespace GilesTrinity
         /// <summary>
         /// This lets us know if there is a target but it's in avoidance so we can just "stay put" until avoidance goes
         /// </summary>
-        private static bool bStayPutDuringAvoidance = false;
+        private static bool ShouldStayPutDuringAvoidance = false;
 
         /// <summary>
         /// This force-prevents avoidance for XX loops incase we get stuck trying to avoid stuff
@@ -586,8 +586,6 @@ namespace GilesTrinity
         // The following 2 variables are used to clear the dictionaries out - clearing one dictionary out per maximum every 2 seconds, working through in sequential order
         private static DateTime lastClearedCacheDictionary = DateTime.Today;
 
-        // Extra height added on for location-based-attacks on targets - may be needed for beam-spells etc. for wizards? (eg add 2 foot height from their feet)
-        private const float iExtraHeight = 2f;
         private static Button btnPauseBot, btnTownRun;
 
         // On death, clear the timers for all abilities
@@ -669,5 +667,7 @@ namespace GilesTrinity
         // Gold counter
         private static int iTotalGold = 0;
         private static int iLastGold = 0;
+
+        private static DefaultNavigationProvider NavProvider;
     }
 }
