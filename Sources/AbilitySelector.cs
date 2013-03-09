@@ -156,7 +156,7 @@ namespace GilesTrinity
         /// <summary>
         /// A default power in case we can't use anything else
         /// </summary>
-        private static TrinityPower defaultPower = new TrinityPower(SNOPower.None, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+        private static TrinityPower defaultPower = new TrinityPower(SNOPower.None, 10f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
 
         /// <summary>
         /// Returns an appropriately selected GilesPower and related information

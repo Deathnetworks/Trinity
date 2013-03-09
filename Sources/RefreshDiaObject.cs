@@ -961,6 +961,21 @@ namespace GilesTrinity
                 case GObjectType.Destructible:
                     {
                         AddToCache = false;
+
+                        if (PlayerStatus.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_TempestRush) && TimeSinceUse(SNOPower.Monk_TempestRush) <= 150)
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "MonkTR";
+                            break;
+                        }
+
+                        if (PlayerStatus.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_SweepingWind) && GetHasBuff(SNOPower.Monk_SweepingWind))
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "MonkSW";
+                            break;
+                        }
+
                         // Get the cached physics SNO of this object
                         if (!dictPhysicsSNO.TryGetValue(c_ActorSNO, out iThisPhysicsSNO))
                         {

@@ -33,8 +33,8 @@ namespace GilesTrinity
                 else
                 {
                     if (CurrentTarget.RadiusDistance <= 10f)
-                        return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 20f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
-                    return new TrinityPower(SNOPower.Wizard_Archon_DisintegrationWave, 19f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
+                        return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 20f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_Archon_DisintegrationWave, 19f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
                 }
             }
             // Wizards want to save up to a reserve of 65+ energy
@@ -50,7 +50,7 @@ namespace GilesTrinity
                     (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 1 || PlayerStatus.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 35f)) &&
                     PowerManager.CanCast(SNOPower.Wizard_SlowTime))
                 {
-                    return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Wave of force
                 if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 25 &&
@@ -64,7 +64,7 @@ namespace GilesTrinity
                     Hotbar.Contains(SNOPower.Wizard_WaveOfForce) &&
                     GilesUseTimer(SNOPower.Wizard_WaveOfForce, true) && PowerManager.CanCast(SNOPower.Wizard_WaveOfForce))
                 {
-                    return new TrinityPower(SNOPower.Wizard_WaveOfForce, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_WaveOfForce, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
 
                 //SkillDict.Add("Blizzard", SNOPower.Wizard_Blizzard);
@@ -84,14 +84,14 @@ namespace GilesTrinity
                     Vector3 targetDirection = MathEx.CalculatePointFrom(PlayerStatus.CurrentPosition, CurrentTarget.Position, 1f);
 
                     ZetaDia.Me.UsePower(SNOPower.Walk, targetDirection);
-                    return new TrinityPower(SNOPower.Wizard_Blizzard, 40f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_Blizzard, 40f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Meteor
                 if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Meteor) &&
                     (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2 || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss || CurrentTarget.IsTreasureGoblin) &&
                     PlayerStatus.PrimaryResource >= 50 && PowerManager.CanCast(SNOPower.Wizard_Meteor))
                 {
-                    return new TrinityPower(SNOPower.Wizard_Meteor, 21f, new Vector3(CurrentTarget.Position.X, CurrentTarget.Position.Y, CurrentTarget.Position.Z), CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_Meteor, 21f, new Vector3(CurrentTarget.Position.X, CurrentTarget.Position.Y, CurrentTarget.Position.Z), CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
                 // Teleport in combat for critical-mass wizards
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Teleport) && hasCriticalMass &&
@@ -100,7 +100,7 @@ namespace GilesTrinity
                     PowerManager.CanCast(SNOPower.Wizard_Teleport))
                 {
                     vSideToSideTarget = TargetUtil.GetBestClusterPoint(15f, 35f);
-                    return new TrinityPower(SNOPower.Wizard_Teleport, 35f, vSideToSideTarget, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_Teleport, 35f, vSideToSideTarget, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
 
                 // Diamond Skin SPAM
@@ -109,13 +109,13 @@ namespace GilesTrinity
                     ((hasCriticalMass && !UseOOCBuff) || !GetHasBuff(SNOPower.Wizard_DiamondSkin)) &&
                     PowerManager.CanCast(SNOPower.Wizard_DiamondSkin))
                 {
-                    return new TrinityPower(SNOPower.Wizard_DiamondSkin, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 1, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_DiamondSkin, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
                 }
                 // Familiar
                 if (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Familiar) &&
                     PlayerStatus.PrimaryResource >= 20 && GilesUseTimer(SNOPower.Wizard_Familiar))
                 {
-                    return new TrinityPower(SNOPower.Wizard_Familiar, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_Familiar, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
 
                 // The three wizard armors, done in an else-if loop so it doesn't keep replacing one with the other
@@ -126,7 +126,7 @@ namespace GilesTrinity
                     {
                         if ((!GetHasBuff(SNOPower.Wizard_EnergyArmor) && PowerManager.CanCast(SNOPower.Wizard_EnergyArmor)) || (Hotbar.Contains(SNOPower.Wizard_Archon) && (!GetHasBuff(SNOPower.Wizard_EnergyArmor) || GilesUseTimer(SNOPower.Wizard_EnergyArmor))))
                         {
-                            return new TrinityPower(SNOPower.Wizard_EnergyArmor, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
+                            return new TrinityPower(SNOPower.Wizard_EnergyArmor, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                         }
                     }
                     // Ice Armor
@@ -134,7 +134,7 @@ namespace GilesTrinity
                     {
                         if (!GetHasBuff(SNOPower.Wizard_IceArmor) && PowerManager.CanCast(SNOPower.Wizard_IceArmor))
                         {
-                            return new TrinityPower(SNOPower.Wizard_IceArmor, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
+                            return new TrinityPower(SNOPower.Wizard_IceArmor, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                         }
                     }
                     // Storm Armor
@@ -142,7 +142,7 @@ namespace GilesTrinity
                     {
                         if (!GetHasBuff(SNOPower.Wizard_StormArmor) || ((DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_StormArmor]).TotalMilliseconds >= 15000) && PowerManager.CanCast(SNOPower.Wizard_Archon)))
                         {
-                            return new TrinityPower(SNOPower.Wizard_StormArmor, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
+                            return new TrinityPower(SNOPower.Wizard_StormArmor, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                         }
                     }
                 }
@@ -150,13 +150,13 @@ namespace GilesTrinity
                 if (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_MagicWeapon) && PowerManager.CanCast(SNOPower.Wizard_MagicWeapon) &&
                     (!GetHasBuff(SNOPower.Wizard_MagicWeapon) || ((DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_MagicWeapon]).TotalMilliseconds >= 10000) && PowerManager.CanCast(SNOPower.Wizard_Archon))))
                 {
-                    return new TrinityPower(SNOPower.Wizard_MagicWeapon, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_MagicWeapon, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
                 // Magic Weapon
                 if (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_MagicWeapon) &&
                     PlayerStatus.PrimaryResource >= 25 && (GilesUseTimer(SNOPower.Wizard_MagicWeapon) || !GetHasBuff(SNOPower.Wizard_MagicWeapon)))
                 {
-                    return new TrinityPower(SNOPower.Wizard_MagicWeapon, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_MagicWeapon, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
                 // Hydra
                 if (!UseOOCBuff && !PlayerStatus.IsIncapacitated &&
@@ -176,14 +176,14 @@ namespace GilesTrinity
                             fExtraDistance -= 2;
                     }
                     Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, PlayerStatus.CurrentPosition, CurrentTarget.CentreDistance - fExtraDistance);
-                    return new TrinityPower(SNOPower.Wizard_Hydra, 30f, vNewTarget, CurrentWorldDynamicId, -1, 1, 2, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_Hydra, 30f, vNewTarget, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
                 // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_MirrorImage) &&
                     (PlayerStatus.CurrentHealthPct <= 0.50 || AnythingWithinRange[RANGE_30] >= 5 || PlayerStatus.IsIncapacitated || PlayerStatus.IsRooted || (ElitesWithinRange[RANGE_30] == 1 && CurrentTarget.IsEliteRareUnique && !CurrentTarget.IsBoss && CurrentTarget.HitPointsPct <= 0.35)) &&
                     PowerManager.CanCast(SNOPower.Wizard_MirrorImage))
                 {
-                    return new TrinityPower(SNOPower.Wizard_MirrorImage, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_MirrorImage, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Archon
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_Archon) && Wizard_ShouldStartArchon() &&
@@ -213,7 +213,7 @@ namespace GilesTrinity
                     else
                     {
                         CanCastArchon = false;
-                        return new TrinityPower(SNOPower.Wizard_Archon, 0f, vNullLocation, CurrentWorldDynamicId, -1, 4, 5, USE_SLOWLY);
+                        return new TrinityPower(SNOPower.Wizard_Archon, 0f, vNullLocation, CurrentWorldDynamicId, -1, 4, 5, WAIT_FOR_ANIM);
                     }
                 }
 
@@ -232,14 +232,14 @@ namespace GilesTrinity
                     CurrentTarget.RadiusDistance <= 25f) &&
                     PowerManager.CanCast(SNOPower.Wizard_FrostNova))
                 {
-                    return new TrinityPower(SNOPower.Wizard_FrostNova, 20f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_FrostNova, 20f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
                 }
 
                 // Frost Nova for Critical Mass builds
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_FrostNova) && !PlayerStatus.IsIncapacitated &&
                     hasCriticalMass && TargetUtil.AnyMobsInRange(20, 1) && PowerManager.CanCast(SNOPower.Wizard_FrostNova))
                 {
-                    return new TrinityPower(SNOPower.Wizard_FrostNova, 15f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_FrostNova, 15f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
                 }
 
                 // Explosive Blast SPAM when enough AP, blow erry thing up, nah mean
@@ -250,7 +250,7 @@ namespace GilesTrinity
                     float fThisRange = 11f;
                     if (hasCriticalMass)
                         fThisRange = 9f;
-                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, fThisRange, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, fThisRange, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
                 }
 
                 // Check to see if we have a signature spell on our hotbar, for energy twister check
@@ -284,7 +284,7 @@ namespace GilesTrinity
                     float twisterRange = 28f;
                     if (hasCriticalMass)
                         twisterRange = 9f;
-                    return new TrinityPower(SNOPower.Wizard_EnergyTwister, twisterRange, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_EnergyTwister, twisterRange, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
                 }
 
                 // Disintegrate
@@ -294,7 +294,7 @@ namespace GilesTrinity
                     float fThisRange = 35f;
                     if (hasCriticalMass)
                         fThisRange = 20f;
-                    return new TrinityPower(SNOPower.Wizard_Disintegrate, fThisRange, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, SIGNATURE_SPAM);
+                    return new TrinityPower(SNOPower.Wizard_Disintegrate, fThisRange, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
                 }
                 // Arcane Orb
                 if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_ArcaneOrb) &&
@@ -304,7 +304,7 @@ namespace GilesTrinity
                     float fThisRange = 40f;
                     if (hasCriticalMass)
                         fThisRange = 20f;
-                    return new TrinityPower(SNOPower.Wizard_ArcaneOrb, fThisRange, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_ArcaneOrb, fThisRange, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Arcane Torrent
                 if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_ArcaneTorrent) &&
@@ -314,7 +314,7 @@ namespace GilesTrinity
                     float fThisRange = 40f;
                     /*if (hasCriticalMass)
                         fThisRange = 20f;*/
-                    return new TrinityPower(SNOPower.Wizard_ArcaneTorrent, fThisRange, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_ArcaneTorrent, fThisRange, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
                 }
                 // Ray of Frost
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_RayOfFrost) &&
@@ -323,7 +323,7 @@ namespace GilesTrinity
                     float fThisRange = 35f;
                     if (hasCriticalMass)
                         fThisRange = 20f;
-                    return new TrinityPower(SNOPower.Wizard_RayOfFrost, fThisRange, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, SIGNATURE_SPAM);
+                    return new TrinityPower(SNOPower.Wizard_RayOfFrost, fThisRange, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
                 }
                 // Magic Missile
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_MagicMissile))
@@ -331,29 +331,29 @@ namespace GilesTrinity
                     float fThisRange = 35f;
                     if (hasCriticalMass)
                         fThisRange = 20f;
-                    return new TrinityPower(SNOPower.Wizard_MagicMissile, fThisRange, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_MagicMissile, fThisRange, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
                 }
                 // Shock Pulse
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_ShockPulse))
                 {
-                    return new TrinityPower(SNOPower.Wizard_ShockPulse, 15f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_ShockPulse, 15f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
                 }
                 // Spectral Blade
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_SpectralBlade))
                 {
-                    return new TrinityPower(SNOPower.Wizard_SpectralBlade, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_SpectralBlade, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
                 }
                 // Electrocute
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_Electrocute))
                 {
-                    return new TrinityPower(SNOPower.Wizard_Electrocute, 40f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_Electrocute, 40f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
                 }
                 // Default attacks
                 if (!UseOOCBuff && !IsCurrentlyAvoiding)
                 {
-                    return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, USE_SLOWLY);
+                    return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
                 }
-                return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
             }
             else
             {
@@ -392,7 +392,7 @@ namespace GilesTrinity
                     Hotbar.Contains(SNOPower.Wizard_Archon_SlowTime) &&
                     GilesUseTimer(SNOPower.Wizard_Archon_SlowTime, true) && PowerManager.CanCast(SNOPower.Wizard_Archon_SlowTime))
                 {
-                    return new TrinityPower(SNOPower.Wizard_Archon_SlowTime, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_Archon_SlowTime, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Archon Teleport in combat
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
@@ -401,7 +401,7 @@ namespace GilesTrinity
                     GilesUseTimer(SNOPower.Wizard_Archon_Teleport) && PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
                 {
                     Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, PlayerStatus.CurrentPosition, -20f);
-                    return new TrinityPower(SNOPower.Wizard_Archon_Teleport, 35f, vNewTarget, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_Archon_Teleport, 35f, vNewTarget, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Arcane Blast
                 if (!UseOOCBuff && !PlayerStatus.IsIncapacitated &&
@@ -409,20 +409,20 @@ namespace GilesTrinity
                      (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) &&
                     GilesUseTimer(SNOPower.Wizard_Archon_ArcaneBlast) && PowerManager.CanCast(SNOPower.Wizard_Archon_ArcaneBlast))
                 {
-                    return new TrinityPower(SNOPower.Wizard_Archon_ArcaneBlast, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_Archon_ArcaneBlast, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Arcane Strike (Arcane Strike) Rapid Spam at close-range only
                 if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && CurrentTarget.RadiusDistance <= 5f && TargetUtil.AnyMobsInRange(7f, 2) &&
                     CurrentTarget.IsBossOrEliteRareUnique && !Settings.Combat.Wizard.NoArcaneStrike)
                 {
-                    return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 7f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, USE_SLOWLY);
+                    return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 7f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Disintegrate
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated)
                 {
-                    return new TrinityPower(SNOPower.Wizard_Archon_DisintegrationWave, 49f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, SIGNATURE_SPAM);
+                    return new TrinityPower(SNOPower.Wizard_Archon_DisintegrationWave, 49f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
                 }
-                return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
             }
         }
 
@@ -441,24 +441,24 @@ namespace GilesTrinity
         private static TrinityPower GetWizardDestructablePower()
         {
             if (Hotbar.Contains(SNOPower.Wizard_EnergyTwister) && PlayerStatus.PrimaryResource >= 35)
-                return new TrinityPower(SNOPower.Wizard_EnergyTwister, 9f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Wizard_EnergyTwister, 9f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
 
             if (Hotbar.Contains(SNOPower.Wizard_ArcaneOrb))
-                return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 40f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 40f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
 
             if (Hotbar.Contains(SNOPower.Wizard_MagicMissile))
-                return new TrinityPower(SNOPower.Wizard_MagicMissile, 15f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Wizard_MagicMissile, 15f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
 
             if (Hotbar.Contains(SNOPower.Wizard_ShockPulse))
-                return new TrinityPower(SNOPower.Wizard_ShockPulse, 10f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Wizard_ShockPulse, 10f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
 
             if (Hotbar.Contains(SNOPower.Wizard_SpectralBlade))
-                return new TrinityPower(SNOPower.Wizard_SpectralBlade, 9f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Wizard_SpectralBlade, 9f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
 
             if (Hotbar.Contains(SNOPower.Wizard_Electrocute))
-                return new TrinityPower(SNOPower.Wizard_Electrocute, 9f, vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Wizard_Electrocute, 9f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
 
-            return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, -1, 0, 0, USE_SLOWLY);
+            return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
         }
 
 
