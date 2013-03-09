@@ -34,12 +34,7 @@ namespace GilesTrinity
             {
                 if (DateTime.Now.Subtract(LastRefreshedCache).TotalMilliseconds < Settings.Advanced.CacheRefreshRate)
                 {
-                    if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && CurrentTarget.Unit != null && CurrentTarget.Unit.IsValid)
-                    {
-                        CurrentTarget.Position = CurrentTarget.Unit.Position;
-                        CurrentTarget.HitPointsPct = CurrentTarget.Unit.HitpointsCurrentPct;
-                        CurrentTarget.HitPoints = CurrentTarget.Unit.HitpointsCurrent;
-                    }
+                    UpdateCurrentTarget();
 
                     return false;
                 }
@@ -72,6 +67,7 @@ namespace GilesTrinity
                         RefreshCacheMainLoop();
                     }
                 }
+
                 // Reduce ignore-for-loops counter
                 if (IgnoreTargetForLoops > 0)
                     IgnoreTargetForLoops--;
@@ -144,7 +140,6 @@ namespace GilesTrinity
                 }
                 using (new PerformanceLogger("RefreshDiaObjectCache.FinalChecks"))
                 {
-
                     // force to stay put if we want to town run and there's no target
                     if (CurrentTarget == null && ForceVendorRunASAP)
                     {
@@ -186,8 +181,8 @@ namespace GilesTrinity
                             // Check if the health has changed, if so update the target-pick time before we blacklist them again
                             if (CurrentTarget.HitPointsPct != iTargetLastHealth)
                             {
-                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Keeping Target - CurrentTarget.iHitPoints: {1:0.00}  iTargetLastHealth: {2:0.00} ",
-                                                DateTime.Now, CurrentTarget.HitPointsPct, iTargetLastHealth);
+                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Keeping Target {0} - CurrentTarget.iHitPoints: {1:0.00}  iTargetLastHealth: {2:0.00} ",
+                                                CurrentTarget.RActorGuid, CurrentTarget.HitPointsPct, iTargetLastHealth);
                                 dateSincePickedTarget = DateTime.Now;
                             }
                             // Now store the target's last-known health
@@ -197,6 +192,33 @@ namespace GilesTrinity
                 }
                 // We have a target and the cached was refreshed
                 return true;
+            }
+        }
+
+        private static void UpdateCurrentTarget()
+        {
+            try
+            {
+                if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && CurrentTarget.Unit != null && CurrentTarget.Unit.IsValid)
+                {
+                    DiaUnit unit = CurrentTarget.Unit;
+                    if (unit.IsDead)
+                        CurrentTarget = null;
+
+                    CurrentTarget.Position = unit.Position;
+                    CurrentTarget.HitPointsPct = unit.HitpointsCurrentPct;
+                    CurrentTarget.HitPoints = unit.HitpointsCurrent;
+
+                }
+                else if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit)
+                {
+                    CurrentTarget = null;
+                }
+            }
+            catch
+            {
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Error updating current target information");
+                CurrentTarget = null;
             }
         }
         // Refresh object list from Diablo 3 memory RefreshDiaObjects()

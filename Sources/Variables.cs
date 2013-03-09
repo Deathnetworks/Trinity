@@ -434,20 +434,14 @@ namespace GilesTrinity
         public static int CurrentWorldDynamicId = -1;
         public static int cachedStaticWorldId = -1; // worldId from profiles, used in persistent stats
         public static GameDifficulty iCurrentGameDifficulty = GameDifficulty.Invalid;
+
+
         /// <summary>
-        /// Do not wait for animation
-        /// </summary>
-        private const bool USE_COMBAT_ONLY = false;
-        /// <summary>
-        /// Wait for animation
-        /// </summary>
-        private const bool USE_ANY_TIME = true;
-        /// <summary>
-        /// Do not wait for animation
+        /// Do not wait for animation after using, spam the power
         /// </summary>
         private const bool SIGNATURE_SPAM = false;
         /// <summary>
-        /// Wait for animation
+        /// Wait for animation after using, do not spam the power
         /// </summary>
         private const bool USE_SLOWLY = true;
 

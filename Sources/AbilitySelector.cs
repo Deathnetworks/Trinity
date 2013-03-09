@@ -84,6 +84,7 @@ namespace GilesTrinity
         {
             bool bKeepLooping = true;
             int iSafetyLoops = 0;
+            ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
             while (bKeepLooping)
             {
                 iSafetyLoops++;
@@ -92,7 +93,7 @@ namespace GilesTrinity
                 bool bIsAnimating = false;
                 try
                 {
-                    ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
+                    myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
                     if (myAnimationState == null || myAnimationState.State == AnimationState.Casting || myAnimationState.State == AnimationState.Channeling)
                         bIsAnimating = true;
                     if (waitForAttacking && (myAnimationState == null || myAnimationState.State == AnimationState.Attacking))
@@ -104,6 +105,8 @@ namespace GilesTrinity
                 }
                 if (!bIsAnimating)
                     bKeepLooping = false;
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Waiting for animation, maxLoops={0} waitForAttacking={1} anim={2}", maxSafetyLoops, waitForAttacking, myAnimationState.State);
+
             }
         }
 

@@ -176,7 +176,7 @@ namespace GilesTrinity
                 MaintainTempestRush = true;
                 string trUse = "Continuing Tempest Rush for Combat";
                 Monk_TempestRushStatus(trUse);
-                return new TrinityPower(SNOPower.Monk_TempestRush, 23f, vSideToSideTarget, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Monk_TempestRush, 23f, vSideToSideTarget, CurrentWorldDynamicId, -1, 0, 0, SIGNATURE_SPAM);
             }
 
             // Tempest rush at elites or groups of mobs
@@ -191,7 +191,7 @@ namespace GilesTrinity
                 MaintainTempestRush = true;
                 string trUse = "Starting Tempest Rush for Combat";
                 Monk_TempestRushStatus(trUse);
-                return new TrinityPower(SNOPower.Monk_TempestRush, 23f, vSideToSideTarget, CurrentWorldDynamicId, -1, 0, 0, USE_SLOWLY);
+                return new TrinityPower(SNOPower.Monk_TempestRush, 23f, vSideToSideTarget, CurrentWorldDynamicId, -1, 0, 0, SIGNATURE_SPAM);
             }
 
             // 4 Mantra spam for the 4 second buff
@@ -300,8 +300,8 @@ namespace GilesTrinity
             {
                 OtherThanDeadlyReach = DateTime.Now;
                 if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
-                    SweepWindSpam = DateTime.Now; 
-                return new TrinityPower(SNOPower.Monk_CripplingWave, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
+                    SweepWindSpam = DateTime.Now;
+                return new TrinityPower(SNOPower.Monk_CripplingWave, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, SIGNATURE_SPAM);
             }
             // Way of hundred fists
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Monk_WayOfTheHundredFists)
@@ -329,8 +329,8 @@ namespace GilesTrinity
                     ForeSight2 = DateTime.Now;
                 }
                 if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
-                    SweepWindSpam = DateTime.Now; 
-                return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, USE_SLOWLY);
+                    SweepWindSpam = DateTime.Now;
+                return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, SIGNATURE_SPAM);
             }
             // Default attacks
             if (!UseOOCBuff && !IsCurrentlyAvoiding)
@@ -344,17 +344,20 @@ namespace GilesTrinity
 
         private static void GenerateMonkZigZag()
         {
-            bool bGenerateNewZigZag = (DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 1500 ||
-                (vPositionLastZigZagCheck != vNullLocation && PlayerStatus.CurrentPosition == vPositionLastZigZagCheck && DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 200) ||
+            bool bGenerateNewZigZag = 
+                (vSideToSideTarget == vNullLocation || 
+                DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 750 ||
+                (vPositionLastZigZagCheck != vNullLocation && PlayerStatus.CurrentPosition.Distance2D(vPositionLastZigZagCheck) <= 4f && DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 1200) ||
                 Vector3.Distance(PlayerStatus.CurrentPosition, vSideToSideTarget) <= 4f ||
+                CurrentTarget.Position.Distance2D(vSideToSideTarget) >= 15f ||
                 CurrentTarget.ACDGuid != iACDGUIDLastWhirlwind);
             vPositionLastZigZagCheck = PlayerStatus.CurrentPosition;
             if (bGenerateNewZigZag)
             {
-                float fExtraDistance = CurrentTarget.CentreDistance <= 20f ? 15f : 5f;
+                float fExtraDistance = CurrentTarget.RadiusDistance <= 20f ? 15f : 20f;
                 vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, CurrentTarget.CentreDistance + fExtraDistance);
-                // Resetting this to ensure the "no-spam" is reset since we changed our target location
-                //powerLastSnoPowerUsed = SNOPower.None;
+                double direction = GilesTrinity.FindDirectionRadian(PlayerStatus.CurrentPosition, vSideToSideTarget);
+                vSideToSideTarget = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 40f, (float)direction);
                 iACDGUIDLastWhirlwind = CurrentTarget.ACDGuid;
                 lastChangedZigZag = DateTime.Now;
             }

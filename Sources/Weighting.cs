@@ -692,10 +692,11 @@ namespace GilesTrinity
 
                     DbHelper.Log(TrinityLogLevel.Verbose,
                                     LogCategory.Targetting,
-                                    "Target changed to {2} {0} ({1})",
+                                    "Target changed to name={2} sno={0} type={1} raGuid={3}",
                                     CurrentTarget.InternalName,
                                     CurrentTarget.ActorSNO,
-                                    CurrentTarget.Type);
+                                    CurrentTarget.Type,
+                                    CurrentTarget.RActorGuid);
                 }
             }
         }

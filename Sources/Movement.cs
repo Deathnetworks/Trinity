@@ -20,7 +20,7 @@ namespace GilesTrinity
         // Special Zig-Zag movement for whirlwind/tempest
         public static Vector3 FindZigZagTargetLocation(Vector3 vTargetLocation, float fDistanceOutreach, bool bRandomizeDistance = false, bool bRandomizeStart = false, bool bCheckGround = false)
         {
-            Vector3 vThisZigZag = vNullLocation;
+            Vector3 vThisZigZag = vTargetLocation;
             using (new PerformanceLogger("FindZigZagTargetLocation"))
             {
                 using (new PerformanceLogger("FindZigZagTargetLocation.CheckObjectCache"))
@@ -63,14 +63,15 @@ namespace GilesTrinity
                 // Simple single target, go straight across!
                 if (GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.Weight > 0 && u.RadiusDistance <= fDistanceOutreach) == 1)
                 {
-                    double directionRandom = rndNum.Next(25, 125) * 2 * Math.PI * 0.001d; // up to 45 degree randomization
+                    double directionRandom = rndNum.Next(25, 125) * Math.PI * 0.001d; // up to 45 degree randomization
                     if (rndNum.Next(0, 1) == 1)
                         directionRandom *= -1;
                     double targetDirection = FindDirectionRadian(PlayerStatus.CurrentPosition, vTargetLocation) + directionRandom;
                     if (targetDirection > 2 * Math.PI)
                         targetDirection -= 2 * Math.PI;
                     Vector3 newDestination = MathEx.GetPointAt(PlayerStatus.CurrentPosition, fDistanceOutreach, (float)targetDirection);
-                    return newDestination;
+                    if (newDestination != Vector3.Zero)
+                        return newDestination;
                 }
 
 
