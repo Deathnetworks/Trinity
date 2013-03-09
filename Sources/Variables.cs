@@ -439,11 +439,11 @@ namespace GilesTrinity
         /// <summary>
         /// Do not wait for animation after using, spam the power
         /// </summary>
-        private const bool SIGNATURE_SPAM = false;
+        private const bool NO_WAIT_ANIM = false;
         /// <summary>
         /// Wait for animation after using, do not spam the power
         /// </summary>
-        private const bool USE_SLOWLY = true;
+        private const bool WAIT_FOR_ANIM = true;
 
         // Constants and variables used by the item-stats stuff
         private const int QUALITYWHITE = 0;

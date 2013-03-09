@@ -53,7 +53,8 @@ namespace GilesTrinity
                         if (zigZagTargets.Count() >= minTargets)
                         {
                             vThisZigZag = zigZagTargets.OrderByDescending(u => u.CentreDistance).FirstOrDefault().Position;
-                            return vThisZigZag;
+                            if (CanRayCast(vThisZigZag))
+                                return vThisZigZag;
                         }
                     }
                 }
@@ -61,16 +62,16 @@ namespace GilesTrinity
                 Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
 
                 // Simple single target, go straight across!
-                if (GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.Weight > 0 && u.RadiusDistance <= fDistanceOutreach) == 1)
+                if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit &&
+                    GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.Weight > 0 && u.RadiusDistance <= fDistanceOutreach) == 1)
                 {
-                    double directionRandom = rndNum.Next(25, 125) * Math.PI * 0.001d; // up to 45 degree randomization
+                    double directionRandom = rndNum.Next(5, 125) * Math.PI * 0.001d; // up to 45 degree randomization
                     if (rndNum.Next(0, 1) == 1)
                         directionRandom *= -1;
-                    double targetDirection = FindDirectionRadian(PlayerStatus.CurrentPosition, vTargetLocation) + directionRandom;
-                    if (targetDirection > 2 * Math.PI)
-                        targetDirection -= 2 * Math.PI;
-                    Vector3 newDestination = MathEx.GetPointAt(PlayerStatus.CurrentPosition, fDistanceOutreach, (float)targetDirection);
-                    if (newDestination != Vector3.Zero)
+                    double targetDirection = NormalizeRadian((float)(FindDirectionRadian(PlayerStatus.CurrentPosition, vTargetLocation) + directionRandom));
+
+                    Vector3 newDestination = MathEx.GetPointAt(vTargetLocation, fDistanceOutreach, (float)targetDirection);
+                    if (newDestination != Vector3.Zero && CanRayCast(newDestination))
                         return newDestination;
                 }
 
@@ -229,6 +230,12 @@ namespace GilesTrinity
                 }
             }
         }
+
+        public static bool CanRayCast(Vector3 destination)
+        {
+            return CanRayCast(PlayerStatus.CurrentPosition, destination);
+        }
+
         // Quick Easy Raycast Function for quick changes
         public static bool CanRayCast(Vector3 vStartLocation, Vector3 vDestination, float ZDiff = 4f)
         {
@@ -455,7 +462,7 @@ namespace GilesTrinity
                         continue;
                     }
 
-                    if (isStuck && gridPoint.Distance > (PlayerMover.iTotalAntiStuckAttempts + 2) * 10)
+                    if (isStuck && gridPoint.Distance > (PlayerMover.iTotalAntiStuckAttempts + 2) * 5)
                     {
                         continue;
                     }

@@ -36,7 +36,7 @@ namespace GilesTrinity
                                         ) &&
                                         PlayerStatus.CurrentHealthPct >= 0.85d;
 
-                bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || PlayerStatus.IsRooted || PlayerMover.GetMovementSpeed() < 1 || GilesObjectCache.Count(u => u .Type == GObjectType.Unit && u.RadiusDistance < 5f) >= 3);
+                bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || PlayerStatus.IsRooted || PlayerMover.GetMovementSpeed() < 1 || GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 5f) >= 3);
 
                 bool bIsBerserked = GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
 
@@ -90,7 +90,7 @@ namespace GilesTrinity
                                     !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize))
                                 {
                                     unitWeightInfo = String.Format("Ignoring trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9}",
-                                        cacheObject.InternalName, cacheObject.RActorGuid, nearbyMonsterCount, Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius, 
+                                        cacheObject.InternalName, cacheObject.RActorGuid, nearbyMonsterCount, Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius,
                                         cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount);
                                     break;
                                 }
@@ -212,7 +212,7 @@ namespace GilesTrinity
                                         // Distance as a percentage of max radius gives a value up to 1200 (1200 would be point-blank range)
                                         if (cacheObject.RadiusDistance < iCurrentMaxKillRadius)
                                             cacheObject.Weight += (iCurrentMaxKillRadius - cacheObject.RadiusDistance) / iCurrentMaxKillRadius * 1200;
-                                        
+
                                         // Give extra weight to ranged enemies
                                         if ((PlayerStatus.ActorClass == ActorClass.Barbarian || PlayerStatus.ActorClass == ActorClass.Monk) &&
                                             (cacheObject.MonsterStyle == MonsterSize.Ranged || hashActorSNORanged.Contains(c_ActorSNO)))
@@ -301,16 +301,20 @@ namespace GilesTrinity
                                         cacheObject.Weight -= fWeightRemoval;
 
                                         // Lower the priority if there is AOE *UNDER* the target, by the HIGHEST weight there only
-                                        fWeightRemoval = 0;
-                                        foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => cp.Location.Distance(point) <= GetAvoidanceRadius(cp.ActorSNO) &&
-                                            cp.Location.Distance(PlayerStatus.CurrentPosition) <= (cacheObject.RadiusDistance - 4f)))
-                                        {
+                                        //fWeightRemoval = 0;
+                                        //foreach (GilesObstacle tempobstacle in hashAvoidanceObstacleCache.Where(cp => cp.Location.Distance(point) <= GetAvoidanceRadius(cp.ActorSNO) &&
+                                        //    cp.Location.Distance(PlayerStatus.CurrentPosition) <= (cacheObject.RadiusDistance - 4f)))
+                                        //{
 
-                                            // Up to 200 weight for a high-priority AOE - maximum 3400 weight reduction
-                                            if (tempobstacle.Weight > fWeightRemoval)
-                                                fWeightRemoval = (float)tempobstacle.Weight * 30;
-                                        }
-                                        cacheObject.Weight -= fWeightRemoval;
+                                        //    // Up to 200 weight for a high-priority AOE - maximum 3400 weight reduction
+                                        //    if (tempobstacle.Weight > fWeightRemoval)
+                                        //        fWeightRemoval = (float)tempobstacle.Weight * 30;
+                                        //}
+                                        //cacheObject.Weight -= fWeightRemoval;
+
+                                        // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
+                                        if (hashAvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
+                                            cacheObject.Weight = 1;
 
                                         // Prevent going less than 300 yet to prevent annoyances (should only lose this much weight from priority reductions in priority list?)
                                         if (cacheObject.Weight < 300)
@@ -342,6 +346,12 @@ namespace GilesTrinity
                                             {
                                                 if (DateTime.Now.Subtract(lastGoblinTime).TotalMilliseconds > 30000)
                                                     lastGoblinTime = DateTime.Today;
+                                            }
+
+                                            if (hashAvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius) && Settings.Combat.Misc.GoblinPriority != GoblinPriority.Kamikaze)
+                                            {
+                                                cacheObject.Weight = 1;
+                                                break;
                                             }
 
                                             // Original Trinity stuff for priority handling now
