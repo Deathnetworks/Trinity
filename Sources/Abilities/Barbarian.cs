@@ -321,11 +321,11 @@ namespace GilesTrinity
                         vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, wwdist, false, true);
                     else
                         vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, wwdist);
-                    LastPowerUsed = SNOPower.None;
+                    //LastPowerUsed = SNOPower.None;
                     iACDGUIDLastWhirlwind = CurrentTarget.ACDGuid;
                     lastChangedZigZag = DateTime.Now;
                 }
-                return new TrinityPower(SNOPower.Barbarian_Whirlwind, 10f, vSideToSideTarget, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Whirlwind, 10f, vSideToSideTarget, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
             }
             // Battle rage, constantly maintain
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_BattleRage) && !PlayerStatus.IsIncapacitated &&

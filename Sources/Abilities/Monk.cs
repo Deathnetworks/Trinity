@@ -355,8 +355,8 @@ namespace GilesTrinity
             {
                 float fExtraDistance = CurrentTarget.RadiusDistance <= 20f ? 15f : 20f;
                 vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, fExtraDistance);
-                double direction = GilesTrinity.FindDirectionRadian(PlayerStatus.CurrentPosition, vSideToSideTarget);
-                vSideToSideTarget = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 40f, (float)direction);
+                //double direction = GilesTrinity.FindDirectionRadian(PlayerStatus.CurrentPosition, vSideToSideTarget);
+                //vSideToSideTarget = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 40f, (float)direction);
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Generated ZigZag {0} distance {1:0}", vSideToSideTarget, vSideToSideTarget.Distance2D(PlayerStatus.CurrentPosition));
                 iACDGUIDLastWhirlwind = CurrentTarget.ACDGuid;
                 lastChangedZigZag = DateTime.Now;

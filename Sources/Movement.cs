@@ -20,6 +20,8 @@ namespace GilesTrinity
         // Special Zig-Zag movement for whirlwind/tempest
         public static Vector3 FindZigZagTargetLocation(Vector3 vTargetLocation, float fDistanceOutreach, bool bRandomizeDistance = false, bool bRandomizeStart = false, bool bCheckGround = false)
         {
+
+
             Vector3 vThisZigZag = vTargetLocation;
             using (new PerformanceLogger("FindZigZagTargetLocation"))
             {
@@ -45,17 +47,20 @@ namespace GilesTrinity
 
                     if (useTargetBasedZigZag && shouldZigZagElites && !bAnyTreasureGoblinsPresent && GilesObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
                     {
-                        IEnumerable<GilesObject> zigZagTargets =
-                            from u in GilesObjectCache
-                            where u.Type == GObjectType.Unit && u.RadiusDistance < maxDistance &&
-                            !hashAvoidanceObstacleCache.Any(a => Vector3.Distance(u.Position, a.Location) < GetAvoidanceRadius(a.ActorSNO) && PlayerStatus.CurrentHealthPct <= GetAvoidanceHealth(a.ActorSNO))
-                            select u;
-                        if (zigZagTargets.Count() >= minTargets)
-                        {
-                            vThisZigZag = zigZagTargets.OrderByDescending(u => u.CentreDistance).FirstOrDefault().Position;
-                            if (CanRayCast(vThisZigZag))
-                                return vThisZigZag;
-                        }
+
+                        return TargetUtil.GetBestClusterPoint(fDistanceOutreach, fDistanceOutreach, false);
+
+                        //IEnumerable<GilesObject> zigZagTargets =
+                        //    from u in GilesObjectCache
+                        //    where u.Type == GObjectType.Unit && u.RadiusDistance < maxDistance &&
+                        //    !hashAvoidanceObstacleCache.Any(a => Vector3.Distance(u.Position, a.Location) < GetAvoidanceRadius(a.ActorSNO) && PlayerStatus.CurrentHealthPct <= GetAvoidanceHealth(a.ActorSNO))
+                        //    select u;
+                        //if (zigZagTargets.Count() >= minTargets)
+                        //{
+                        //    vThisZigZag = zigZagTargets.OrderByDescending(u => u.CentreDistance).FirstOrDefault().Position;
+                        //    if (CanRayCast(vThisZigZag))
+                        //        return vThisZigZag;
+                        //}
                     }
                 }
 
