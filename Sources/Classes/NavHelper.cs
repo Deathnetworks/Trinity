@@ -397,6 +397,12 @@ namespace GilesTrinity
                             }
                         }
                     }
+                    else if (!shouldKite && !isStuck) // melee avoidance use only
+                    {
+                        var monsterCount = GilesTrinity.GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.Position.Distance2D(gridPoint.Position) <= gridSquareRadius);
+                        if (monsterCount > 0)
+                            gridPoint.Weight *= monsterCount;
+                    }
 
                     if (gridPoint.Weight > bestPoint.Weight && gridPoint.Distance > 1)
                     {

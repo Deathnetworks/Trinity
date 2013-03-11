@@ -689,8 +689,8 @@ namespace GilesTrinity
                     if (c_Radius <= 1f)
                         c_Radius = 1f;
                     // Maximum range clamp
-                    if (c_Radius >= 16f)
-                        c_Radius = 16f;
+                    //if (c_Radius >= 16f)
+                    //    c_Radius = 16f;
                 }
                 catch
                 {
@@ -1013,6 +1013,15 @@ namespace GilesTrinity
                             iMinDistance += 12f;
                             AddToCache = true;
                         }
+
+                        // Always add large destructibles witin ultra close range
+                        if (!AddToCache && c_Radius >= 10f && c_RadiusDistance < 2f)
+                        {
+                            AddToCache = true;
+                            c_IgnoreSubStep = "";
+                            break;
+                        }
+
 
                         // This object isn't yet in our destructible desire range
                         if (!AddToCache && (iMinDistance <= 1 || c_RadiusDistance > iMinDistance) && PlayerMover.GetMovementSpeed() >= 1)
