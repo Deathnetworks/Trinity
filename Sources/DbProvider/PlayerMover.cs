@@ -319,7 +319,7 @@ namespace GilesTrinity.DbProvider
             if (SpeedSensors.Any(s => s.WorldID != GilesTrinity.CurrentWorldDynamicId))
             {
                 SpeedSensors.Clear();
-                return 0d;
+                return 1d;
             }
 
             double AverageRecordingTime = SpeedSensors.Average(s => s.TimeSinceLastMove.TotalHours); ;

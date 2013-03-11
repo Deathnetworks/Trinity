@@ -7,71 +7,81 @@
 
 ### Changelog 1.7.2.7:
 
-* Destructibles are now ignored if monk is channling Tempest Rush  or has Sweeping Wind buff 
+Combat logic:
+
+* Very-large destructibles (e.g. that huge catapult in skycrown) will now be always attacked
+
+* Re-worked trash/elite/gold weighting/prioritization a little to better pick targets
 
 * Bot should be better about not attacking units that are standing directly in avoidance
 
 * Tweaked single target zig-zag a little, changed multi-target zig zag to use clusters
 
-* Updates to Barbarian Rend - is now used more when current target is not bleeding or 2 or more nearby targets are not bleeding - and fixed use timer bug
+* Trinity behavior tree will now wait for power/spell use based on time rather than ticks. This will help reduce CPU utilization slightly and strange behavior when using extremely low (<6) or high (>20) tick rates.
 
-* Barbarian WW and Tempest Rush ZigZag for single targets has been updated, it will now criss/cross the (single) target correctly with up to a 45 degree randomization from the target direction
+* Close Target prioritization now takes effect when 3 or more units are within close melee range (5f)
+
+* Kiting will now only kite monsters who are weighted (e.g. valid targets)
+
+* Fixed default ranged weapon attack distance
+
+* Improved Kiting logic some, should suck less
+
+* Increased Ignore Trash Mob max count UI slider to 15
+
+* Tweaked ignore trash mob logic slightly - should be better about REALLY ignoring trash mobs now, added some logging for helping me debug
+
+Combat classes:
+
+* Monk Sweeping Wind spell will no longer interrupt Tempest Rush channeling
+
+* Monk Wave of Light trash mob max count UI slider increased to 15
+
+* Monk Tempest Rush targetting optimized a little more Optimized - works better now except when navigating tight corners and with destructibles/barricades
+
+* Fixed monk TR Movement+TrashOnly bug being used on Elites
+
+* Fixed Monk Wave of Light spirit check (was attempting to cast even without enough spirit)
+
+* Destructibles are now ignored if monk is channling Tempest Rush or has Sweeping Wind buff 
+
+* Barbarian Rend is now used more when current target is not bleeding or 2 or more nearby targets are not bleeding - and fixed use timer bug
+
+* Barbarian Whirlwind and Tempest Rush ZigZag for single/sparse targets has been updated, it will now criss/cross the target better
 
 * WitchDoctor Manitou rune is now used correctly OOC (only when Manitou is not present), may help with other OOC buffs as well
 
 * WitchDoctor Locust Swarm is now used correctly (only when current target is not affected)
 
-* Trinity behavior tree will now wait for power/spell use based on time rather than ticks. This will help reduce CPU utilization slightly and strange behavior when using extremely low (<6) or high (>20) tick rates.
+* WitchDoctor Soul Harvest + VengeFul spirit works better
+
+* WitchDoctor Vengeful Spirit rune is now supported and has special logic
+
+* DemonHunter Range weapon default attacks should work correctly now
+
+Items and Looting:
+
+* Items should now be picked up when the current profile behavior is a UseTownPortal tag
 
 * Fixed bug standing around trying to pickup gold that we were already standing on
-
-* Added some optimizations and caching where appropriate for TeamID, IsBurrowed, IsUntargettable, IsInvulnerable - should help reduce CPU utilization slightly
-
-* Added additional TargetUtil overloads
-
-* Adjusted defaults for Gold Inactivity (300) TPS Limit when modified (8) and Cache Refresh Rate (300)
-
-* TownRunTimer will now keep BehaviorTree running while waiting (should no longer continue running profile)
 
 * Fixed bot acting confused when dropped items are sitting in AoE range
 
 * Added potential fix for Demonic Forges and other navigation obstacles... needs testing
 
+Core Logic:
+
+* Added some optimizations and caching where appropriate for TeamID, IsBurrowed, IsUntargettable, IsInvulnerable - should help reduce CPU utilization slightly
+
+* Adjusted defaults for Gold Inactivity (300) TPS Limit when modified (8) and Cache Refresh Rate (300)
+
+* TownRunTimer will now keep BehaviorTree running while waiting (should no longer continue running profile when bags are full)
+
 * Added client navigation check if we can actually move to attack a unit/pickup an item (replaces GridProvider.CanStandAt(Point v2))
-
-* Close Target prioritization now takes effect when 3 or more units are within close melee range (5f)
-
-* More tweaks and adjustments for clustering logic
-
-* WD Soul Harvest + VengeFul spirit works better
-
-* Kiting will now only kite monsters who are weighted (e.g. valid targets)
-
-* Added ClusterExists function to TargetUtil
-
-* Fixed ZDiff not always being read
-
-* Added SoulHarvest special logic for Vengeful Spirit rune
-
-* Fixed default ranged weapon attack distance
-
-* Fixed NullPointerException with avoidance/kiting
-
-* Improved Kiting logic (go DH go!!)
-
-* Misc. oldcode cleanup and documentation
-
-* Fixed DH Range weapon default attacks
 
 * Fixed GoldInactivity not triggering while Behavior tree is in running state for extended periods of time
 
 * Fixed Azmodan avoidance, it actuall works now
-
-* Increased WoL trash mob max count UI slider to 15
-
-* Increased Ignore Trash Mob max count UI slider to 15
-
-* Tweaked ignore trash mob logic slightly - should be better about REALLY ignoring trash mobs now, added some logging for helping me debug
 
 * Set default SuccubusStar avoidance health slider to 0 (disabled)
 
@@ -79,26 +89,19 @@
 
 * Added AWE's fix for TrinityLoadOnce random profile selector
 
-* Tweaked destructible AddToCache logic slightly to be less sensitive
-
 * Added AWE's TrinityLoadOnce multi-profile stuff
 
-* Lots of refactoring - moved ItemValuation and Constants into their own classes
+* Tweaked destructible AddToCache logic slightly to be less sensitive for smaller objects
 
-* Optimized Tempest Rush targetting a little more - works better now except when navigating tight corners and with destructibles/barricades
+* Lots of refactoring - moved ItemValuation and Constants into their own classes, created NavHelper/MathUtil, Improved TargetUtil, rebuilt several functions and reorganized a lot of old code
 
-* Fixed monk TR Movement+TrashOnly bug being used on Elites
+* Trinity will now force-reload the profile OnGameChanged since Demonbuddy forgets to do this sometimes (may cause double-reloads, but that's OK)
 
-* Trinity will now force-reload OnGameChanged since Demonbuddy forgets to do this sometimes (may cause double-reloads, but that's OK)
-
-* Fixed bug with persistent stats XML data not being flushed completely and causing XML document errors
+* Fixed bug with persistent stats XML data not being flushed completely and causing XML document errors in logs
 
 * Improved Unit attribute check order in hopes to reduce CPU utilization
 
 * Temporary caches are now reset on new games only, rather than periodically (was 5/10/30/150 seconds), should help reduce CPU utilization
-
-
-* Fixed Monk Wave of Light spirit check (was attempting to cast even without enough spirit)
 
 * Fixed RunStats Item Stats (IPH) counter / GenericObjectCache
 
