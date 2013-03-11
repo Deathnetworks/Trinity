@@ -77,7 +77,7 @@ namespace GilesTrinity
             // Fallen Shaman prophets goblin Summoners (365 & 4100)
             {365, 1901}, {4099, 1901}, {4100, 1901},
             // The annoying grunts summoned by the above
-            {4084, -401},
+            {4084, -250},
             // Wretched mothers that summon zombies in act 1 (6639)
             {6639, 951},
             // Fallen lunatic (4095)
@@ -614,47 +614,7 @@ namespace GilesTrinity
         ///// </summary>
         //private static Dictionary<int, GilesGameBalanceDataCache> dictGilesGameBalanceDataCache = new Dictionary<int, GilesGameBalanceDataCache>();
 
-        /// <summary>
-        /// Spots where we should not kite to (used during boss fights)
-        /// </summary>
-        internal static HashSet<UnSafeZone> UnsafeKiteAreas = new HashSet<UnSafeZone>()
-        {
-            { 
-                new UnSafeZone() {
-                    WorldId = 182976, 
-                    Position = (new Vector3(281.0147f,361.5885f,20.86533f)),
-                    Name = "Chamber of Queen Araneae",
-                    Radius = 90f
-                }
-            },
-            {
-                new UnSafeZone()
-                {
-                    WorldId = 78839,
-                    Position = (new Vector3(59.50927f,60.12386f,0.100002f)),
-                    Name = "Chamber of Suffering (Butcher)",
-                    Radius = 120f
-                }
-            },
-            {
-                new UnSafeZone()
-                {
-                    WorldId = 109143,
-                    Position = (new Vector3(355.8749f,424.0184f,-14.9f)),
-                    Name = "Izual",
-                    Radius = 120f
-                }
-            },
-            {
-                new UnSafeZone()
-                {
-                    WorldId = 121214,
-                    Position = new Vector3(579, 582, 21),
-                    Name = "Azmodan",
-                    Radius = 120f
-                }
-            }
-        };
+        
 
     }
 }

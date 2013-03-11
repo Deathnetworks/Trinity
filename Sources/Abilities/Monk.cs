@@ -344,23 +344,13 @@ namespace GilesTrinity
 
         private static void GenerateMonkZigZag()
         {
-            bool bGenerateNewZigZag =
-                (vSideToSideTarget == vNullLocation ||
-                DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 1500 ||
-                (vPositionLastZigZagCheck != vNullLocation && PlayerStatus.CurrentPosition.Distance2D(vPositionLastZigZagCheck) <= 4f && DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 1200) ||
-                Vector3.Distance(PlayerStatus.CurrentPosition, vSideToSideTarget) <= 4f ||
-                CurrentTarget.ACDGuid != iACDGUIDLastWhirlwind);
-            vPositionLastZigZagCheck = PlayerStatus.CurrentPosition;
-            if (bGenerateNewZigZag)
-            {
-                float fExtraDistance = CurrentTarget.RadiusDistance <= 20f ? 15f : 20f;
-                vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, fExtraDistance);
-                //double direction = GilesTrinity.FindDirectionRadian(PlayerStatus.CurrentPosition, vSideToSideTarget);
-                //vSideToSideTarget = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 40f, (float)direction);
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Generated ZigZag {0} distance {1:0}", vSideToSideTarget, vSideToSideTarget.Distance2D(PlayerStatus.CurrentPosition));
-                iACDGUIDLastWhirlwind = CurrentTarget.ACDGuid;
-                lastChangedZigZag = DateTime.Now;
-            }
+            float fExtraDistance = CurrentTarget.RadiusDistance <= 20f ? 15f : 20f;
+            vSideToSideTarget = TargetUtil.GetZigZagTarget(CurrentTarget.Position, fExtraDistance);
+            double direction = MathUtil.FindDirectionRadian(PlayerStatus.CurrentPosition, vSideToSideTarget);
+            vSideToSideTarget = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 40f, (float)direction);
+            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Generated ZigZag {0} distance {1:0}", vSideToSideTarget, vSideToSideTarget.Distance2D(PlayerStatus.CurrentPosition));
+            iACDGUIDLastWhirlwind = CurrentTarget.ACDGuid;
+            lastChangedZigZag = DateTime.Now;
         }
 
         private static TrinityPower GetMonkDestroyPower()
@@ -487,7 +477,7 @@ namespace GilesTrinity
 
                 string locationSource = "LastLocation";
 
-                //if (CurrentTarget != null && GilesCanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
+                //if (CurrentTarget != null && GilesNavHelper.CanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
                 //{
                 //    locationSource = "Current Target Position";
                 //    target = CurrentTarget.Position;
@@ -510,7 +500,7 @@ namespace GilesTrinity
                 //target = MathEx.CalculatePointFrom(target, PlayerStatus.CurrentPosition, aimPointDistance);
                 target = TargetUtil.FindTempestRushTarget();
 
-                if (DestinationDistance > 10f && CanRayCast(ZetaDia.Me.Position, target))
+                if (DestinationDistance > 10f && NavHelper.CanRayCast(ZetaDia.Me.Position, target))
                 {
                     Monk_TempestRushStatus(String.Format("Using Tempest Rush to maintain channeling, source={0}, V3={1} dist={2:0}", locationSource, target, DestinationDistance));
 

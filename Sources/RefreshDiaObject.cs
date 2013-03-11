@@ -378,7 +378,7 @@ namespace GilesTrinity
         private static void RefreshStepCalculateDistance()
         {
             // Calculate distance, don't rely on DB's internal method as this may hit Diablo 3 memory again
-            c_CentreDistance = Vector3.Distance(PlayerStatus.CurrentPosition, c_Position);
+            c_CentreDistance = PlayerStatus.CurrentPosition.Distance2D(c_Position);
             // Set radius-distance to centre distance at first
             c_RadiusDistance = c_CentreDistance;
         }
@@ -568,21 +568,22 @@ namespace GilesTrinity
                         //    c_IgnoreSubStep = "LootingDisabled";
                         //    break;
                         //}
-                        if (!ForceVendorRunASAP && !TownRun.IsTryingToTownPortal())
-                        {
-                            AddToCache = RefreshGilesItem();
-                            c_IgnoreReason = "RefreshGilesItem";
-                        }
-                        else
+
+                        if (ForceVendorRunASAP || TownRun.TownRunTimerRunning())
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "IsTryingToTownPortal";
                         }
+                        else
+                        {
+                            AddToCache = RefreshGilesItem();
+                            c_IgnoreReason = "RefreshGilesItem";
+                        }
+                   
                         break;
 
                     }
                 // Handle Gold
-                // NOTE: Only identified as gold after *FIRST* loop as an "item" by above code
                 case GObjectType.Gold:
                     {
                         // Not allowed to loot due to profile settings
@@ -600,11 +601,10 @@ namespace GilesTrinity
                         }
                     }
                 // Handle Globes
-                // NOTE: Only identified as globe after *FIRST* loop as an "item" by above code
                 case GObjectType.Globe:
                     {
                         // Ignore it if it's not in range yet
-                        if (c_CentreDistance > iCurrentMaxLootRadius || c_CentreDistance > 37f)
+                        if (c_CentreDistance > iCurrentMaxLootRadius || c_CentreDistance > 60f)
                         {
                             c_IgnoreSubStep = "GlobeOutOfRange";
                             AddToCache = false;
@@ -1015,10 +1015,15 @@ namespace GilesTrinity
                         }
 
                         // This object isn't yet in our destructible desire range
-                        if (!AddToCache && iMinDistance <= 1 || c_RadiusDistance > iMinDistance)
+                        if (!AddToCache && (iMinDistance <= 1 || c_RadiusDistance > iMinDistance) && PlayerMover.GetMovementSpeed() >= 1)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "NotInDestructableRange";
+                        }
+                        if (!AddToCache && c_RadiusDistance <= 2f && PlayerMover.GetMovementSpeed() < 1)
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "NotStuck2";
                         }
 
                         if (c_RActorGuid == CurrentTargetRactorGUID)
@@ -1798,7 +1803,7 @@ namespace GilesTrinity
         private static bool MosterObstacleInPathCacheObject(bool AddToCache)
         {
             // Don't add an item if a monster is blocking our path
-            if (hashMonsterObstacleCache.Any(o => GilesIntersectsPath(o.Location, o.Radius, PlayerStatus.CurrentPosition, c_Position)))
+            if (hashMonsterObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, PlayerStatus.CurrentPosition, c_Position)))
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "MonsterInPath";

@@ -142,7 +142,7 @@ namespace GilesTrinity
                 {
                     ItemManager.Current = new TrinityItemManager();
                 }
-                UpdateSearchGridProvider();
+                NavHelper.UpdateSearchGridProvider();
 
                 // Safety check incase DB "OnStart" event didn't fire properly
                 if (BotMain.IsRunning)

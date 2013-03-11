@@ -155,7 +155,7 @@ namespace GilesTrinity.XmlTags
                 new Sequence(
                     new Action(ret => mySceneId = GilesTrinity.PlayerStatus.SceneId),
                     new Action(ret => GPUpdatePosition = myPos),
-                    new Action(ret => GilesTrinity.UpdateSearchGridProvider(true)),
+                    new Action(ret => NavHelper.UpdateSearchGridProvider(true)),
                     new Action(ret => MiniMapMarker.UpdateFailedMarkers())
                 )
             );

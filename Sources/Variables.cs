@@ -29,19 +29,6 @@ namespace GilesTrinity
             }
         }
 
-        /* A few special variables, mainly for Giles use, just at the top for easy access
-         * Set the following to true, to disable file-logging for performance increase
-         * WARNING: IF YOU GET CRASHES, ISSUES, OR PROBLEMS AND HAVE LOG-FILES DISABLED...
-         * NOBODY CAN HELP YOU. Re-enable logging, wait for the issue/crash/problem, then report it with a log.
-         * DO NOT DISABLE LOGGING AND THEN POST BLANK LOGS EXPECTING HELP!
-         */
-        private const bool bDisableFileLogging = false;
-
-        /// <summary>
-        /// This will log item stat balancing data to special log files
-        /// </summary>
-        private const bool LogItemBalanceData = false;
-
 
         /* I create so many variables that it's a pain in the arse to categorize them
          * So I just throw them all here for quick searching, reference etc.
@@ -117,7 +104,7 @@ namespace GilesTrinity
         /// <summary>
         /// A flag to see if we need to refresh hot bar abilities
         /// </summary>
-        private static bool bRefreshHotbarAbilities = false;
+        private static bool ShouldRefreshHotbarAbilities = false;
 
         /// <summary>
         /// A "fake" object to send to target provider for stuck handlers etc.
@@ -247,7 +234,7 @@ namespace GilesTrinity
         private static double iTargetLastHealth = 0f;
 
         // This is used so we don't use certain skills until we "top up" our primary resource by enough
-        private static double MinEnergyReserve = 0d;
+        internal static double MinEnergyReserve = 0d;
 
         /// <summary>
         /// Store the date-time when we *FIRST* picked this target, so we can blacklist after X period of time targeting
@@ -317,9 +304,6 @@ namespace GilesTrinity
         /// </summary>
         private static bool IsAvoidingProjectiles = false;
 
-        // When we last FOUND a safe spot
-        private static DateTime lastFoundSafeSpot = DateTime.MinValue;
-        private static Vector3 vlastSafeSpot = Vector3.Zero;
 
         /// <summary>
         /// This lets us know if there is a target but it's in avoidance so we can just "stay put" until avoidance goes
@@ -337,9 +321,6 @@ namespace GilesTrinity
         /// </summary>
         private static DateTime timeCancelledKiteMove = DateTime.Now;
         private static int cancelledKiteMoveForMilliseconds = 0;
-
-        // For if we have emergency teleport abilities available right now or not
-        private static bool hasEmergencyTeleportUp = false;
 
         // How many follower items were ignored, purely for item stat tracking
         private static int totalFollowerItemsIgnored = 0;
@@ -368,16 +349,11 @@ namespace GilesTrinity
         /// <summary>
         /// Use Beserker Only with "Hard" elites (specific affixes)
         /// </summary>
-        private static bool bUseBerserker = false;
+        private static bool shouldUseBerserkerPower = false;
         /// <summary>
         /// Are we waiting for a special? Don't waste mana/rage/disc/hate etc.
         /// </summary>
         private static bool IsWaitingForSpecial = false;
-
-        /// <summary>
-        /// Check LoS if waller avoidance detected
-        /// </summary>
-        private static bool bCheckGround = false;
 
         // Goblinney things
         private static int iTotalNumberGoblins = 0;
@@ -388,7 +364,7 @@ namespace GilesTrinity
         // Variables relating to quick-reference of monsters within sepcific ranges (if anyone has suggestion for similar functionality with reduced CPU use, lemme know, but this is fast atm!)
         private static int[] ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
         private static int[] AnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
-        private static bool bAnyBossesInRange = false;
+        private static bool anyBossesInRange = false;
         private const int RANGE_50 = 0;
         private const int RANGE_40 = 1;
         private const int RANGE_30 = 2;
@@ -556,7 +532,7 @@ namespace GilesTrinity
         /// <summary>
         /// The position of the last CurrentTarget (Primary Target)
         /// </summary>
-        private static Vector3 LastPrimaryTargetPosition;
+        internal static Vector3 LastPrimaryTargetPosition;
         private static Vector3 vKitePointAvoid;
         /// <summary>
         /// The RActorGUID of the last CurrentTarget (PrimaryTarget)
@@ -565,7 +541,6 @@ namespace GilesTrinity
         /// <summary>
         /// The number of monsters within melee range distance of the player
         /// </summary>
-        private static int iUnitsSurrounding;
         private static double w_HighestWeightFound;
         private static HashSet<int> hashDoneThisRactor;
         private static bool NeedToKite = false;

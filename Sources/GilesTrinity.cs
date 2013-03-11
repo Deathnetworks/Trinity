@@ -74,7 +74,7 @@ namespace GilesTrinity
                         {
                             PlayerStatus.SceneId = CurrentSceneSNO;
                             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Updating Grid Provider", true);
-                            UpdateSearchGridProvider();
+                            NavHelper.UpdateSearchGridProvider();
                         }
                     }
 
@@ -121,7 +121,6 @@ namespace GilesTrinity
                 btnPauseBot.Content = "Pause Bot";
                 bMainBotPaused = false;
                 HasMappedPlayerAbilities = false;
-                lastChangedZigZag = DateTime.Today;
                 IsAlreadyMoving = false;
                 lastMovementCommand = DateTime.Today;
             }
@@ -215,7 +214,8 @@ namespace GilesTrinity
             PlayerMover.iTimesReachedMaxUnstucks = 0;
             PlayerMover.iCancelUnstuckerForSeconds = 0;
             PlayerMover._lastCancelledUnstucker = DateTime.Today;
-            GilesTrinity.UsedStuckSpots = new List<GilesTrinity.GridPoint>();
+            NavHelper.UsedStuckSpots = new List<GridPoint>();
+
             // Reset all the caches
             dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
             dictGilesMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
@@ -239,7 +239,7 @@ namespace GilesTrinity
             sFirstProfileSeen = "";
 
 
-            UpdateSearchGridProvider();
+            NavHelper.UpdateSearchGridProvider();
             GoldInactivity.ResetCheckGold();
 
             global::GilesTrinity.XmlTags.TrinityLoadOnce.UsedProfiles = new List<string>();

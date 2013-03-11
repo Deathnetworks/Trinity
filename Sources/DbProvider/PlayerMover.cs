@@ -201,7 +201,7 @@ namespace GilesTrinity.DbProvider
 
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
 
-                vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
+                vSafeMovementLocation = NavHelper.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
 
                 // Temporarily log stuff
                 if (iTotalAntiStuckAttempts == 1 && GilesTrinity.Settings.Advanced.LogStuckLocation)
@@ -397,7 +397,7 @@ namespace GilesTrinity.DbProvider
                     iTotalAntiStuckAttempts = 1;
                     iTimesReachedStuckPoint = 0;
                     vSafeMovementLocation = Vector3.Zero;
-                    GilesTrinity.UsedStuckSpots = new List<GilesTrinity.GridPoint>();
+                    NavHelper.UsedStuckSpots = new List<GridPoint>();
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Resetting unstuck timers", true);
                 }
 
@@ -436,7 +436,7 @@ namespace GilesTrinity.DbProvider
                     if (iTimesReachedStuckPoint <= iTotalAntiStuckAttempts)
                     {
                         //GilesTrinity.PlayerStatus.CurrentPosition = vMyCurrentPosition;
-                        vSafeMovementLocation = GilesTrinity.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
+                        vSafeMovementLocation = NavHelper.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
                         vMoveToTarget = vSafeMovementLocation;
                     }
                     else
@@ -560,7 +560,7 @@ namespace GilesTrinity.DbProvider
                     //vTargetAimPoint = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, aimPointDistance);
                     //vTargetAimPoint = MathEx.CalculatePointFrom(vMyCurrentPosition, vMoveToTarget, aimPointDistance);
 
-                    //bool canRayCastTarget = GilesTrinity.CanRayCast(vMyCurrentPosition, vTargetAimPoint);
+                    //bool canRayCastTarget = GilesTrinity.NavHelper.CanRayCast(vMyCurrentPosition, vTargetAimPoint);
                     bool canRayCastTarget = true;
 
                     vTargetAimPoint = TargetUtil.FindTempestRushTarget();
@@ -677,7 +677,7 @@ namespace GilesTrinity.DbProvider
 
                 if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Moved to:{0} dir: {1} Speed:{2:0.00} Dist:{3:0} ZDiff:{4:0} Nav:{5} LoS:{6}",
-                        vMoveToTarget, GilesTrinity.GetHeadingToPoint(vMoveToTarget), MovementSpeed, vMyCurrentPosition.Distance2D(vMoveToTarget),
+                        vMoveToTarget, MathUtil.GetHeadingToPoint(vMoveToTarget), MovementSpeed, vMyCurrentPosition.Distance2D(vMoveToTarget),
                         Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z),
                         GilesTrinity.gp.CanStandAt(GilesTrinity.gp.WorldToGrid(vMoveToTarget.ToVector2())),
                         !Navigator.Raycast(vMyCurrentPosition, vMoveToTarget)
@@ -704,13 +704,13 @@ namespace GilesTrinity.DbProvider
 
         private static void GetShiftedPosition(ref Vector3 vMoveToTarget, ref Vector3 point, float radius = 15f)
         {
-            double moveDirection = GilesTrinity.FindDirectionRadian(vMyCurrentPosition, vMoveToTarget);
+            double moveDirection = MathUtil.FindDirectionRadian(vMyCurrentPosition, vMoveToTarget);
             
             vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, radius + 30f, (float)moveDirection);
-            //if (!GilesTrinity.CanRayCast(vMyCurrentPosition, vMoveToTarget))
+            //if (!GilesTrinity.NavHelper.CanRayCast(vMyCurrentPosition, vMoveToTarget))
             //{
             //    vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, radius, MathEx.ToRadians(fDirectionToTarget + 65));
-            //    if (!GilesTrinity.CanRayCast(vMyCurrentPosition, vMoveToTarget))
+            //    if (!GilesTrinity.NavHelper.CanRayCast(vMyCurrentPosition, vMoveToTarget))
             //    {
             //        vMoveToTarget = point;
             //    }

@@ -35,8 +35,6 @@ namespace GilesTrinity
                 // If we aren't in the game or a world is loading, don't do anything yet
                 if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                 {
-                    lastChangedZigZag = DateTime.Today;
-                    vPositionLastZigZagCheck = Vector3.Zero;
                     return false;
                 }
 
@@ -53,7 +51,7 @@ namespace GilesTrinity
                 if (!HotbarRefreshTimer.IsRunning)
                     HotbarRefreshTimer.Start();
 
-                if (!HasMappedPlayerAbilities || HotbarRefreshTimer.ElapsedMilliseconds > 10000 || bRefreshHotbarAbilities)
+                if (!HasMappedPlayerAbilities || HotbarRefreshTimer.ElapsedMilliseconds > 10000 || ShouldRefreshHotbarAbilities)
                 {
                     // Update the cached player's cache
                     ActorClass tempClass = ActorClass.Invalid;
@@ -201,11 +199,7 @@ namespace GilesTrinity
                 if (DateTime.Now.Subtract(lastMaintenanceCheck).TotalMilliseconds > 150)
                 {
                     lastMaintenanceCheck = DateTime.Now;
-
-
-                    lastChangedZigZag = DateTime.Today;
-                    vPositionLastZigZagCheck = Vector3.Zero;
-
+                    
                     // Out of combat buffing etc. but only if we don't want to return to town etc.
                     ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
 

@@ -56,7 +56,7 @@ namespace GilesTrinity
             // Wrath of the berserker, elites only (wrath of berserker)
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
                 // If using WOTB on all elites, or if we should only use on "hard" affixes
-                (!Settings.Combat.Barbarian.WOTBHardOnly || (bUseBerserker && Settings.Combat.Barbarian.WOTBHardOnly)) &&
+                (!Settings.Combat.Barbarian.WOTBHardOnly || (shouldUseBerserkerPower && Settings.Combat.Barbarian.WOTBHardOnly)) &&
                 // Not on heart of sin after Cydaea
                 CurrentTarget.ActorSNO != 193077 &&
                 // Make sure we are allowed to use wrath on goblins, else make sure this isn't a goblin
@@ -65,7 +65,7 @@ namespace GilesTrinity
                 ((CurrentTarget.IsBoss && CurrentTarget.HitPointsPct <= 0.99 && !Hotbar.Contains(SNOPower.Barbarian_Whirlwind)) ||
                 // If *NOT* on a boss, and definitely no boss in range, then judge based on any elites at all within 30 feet
                  ((!CurrentTarget.IsBoss || Hotbar.Contains(SNOPower.Barbarian_Whirlwind)) &&
-                   (!bAnyBossesInRange || Hotbar.Contains(SNOPower.Barbarian_Whirlwind)) &&
+                   (!anyBossesInRange || Hotbar.Contains(SNOPower.Barbarian_Whirlwind)) &&
                    ((ElitesWithinRange[RANGE_20] >= 1 || CurrentTarget.IsEliteRareUnique) && (CurrentTarget.HitPointsPct >= 0.30 || PlayerStatus.CurrentHealthPct <= 0.60))
                  )) &&
                 //Do not activate too far from targets (for bosses / uber elites)
@@ -76,7 +76,7 @@ namespace GilesTrinity
                 if (PlayerStatus.PrimaryResource >= 50)
                 {
                     DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Berserk being used!({0})", CurrentTarget.InternalName);
-                    bUseBerserker = false;
+                    shouldUseBerserkerPower = false;
                     return new TrinityPower(SNOPower.Barbarian_WrathOfTheBerserker, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 else
@@ -122,7 +122,7 @@ namespace GilesTrinity
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_ThreateningShout) && !PlayerStatus.IsIncapacitated &&
               (
                   ElitesWithinRange[RANGE_20] >= 2 || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 20) ||
-                  (AnythingWithinRange[RANGE_20] >= 3 && !bAnyBossesInRange && (ElitesWithinRange[RANGE_50] == 0 || Hotbar.Contains(SNOPower.Barbarian_SeismicSlam))) ||
+                  (AnythingWithinRange[RANGE_20] >= 3 && !anyBossesInRange && (ElitesWithinRange[RANGE_50] == 0 || Hotbar.Contains(SNOPower.Barbarian_SeismicSlam))) ||
                   PlayerStatus.CurrentHealthPct <= 0.75 || (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource <= 10) ||
                   (IsWaitingForSpecial && PlayerStatus.PrimaryResource <= 50)
                   ) &&
@@ -201,7 +201,7 @@ namespace GilesTrinity
 
 
             // Rend spam for Non-WhirlWind users
-            if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Rend) && 
+            if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Rend) &&
                 TargetUtil.AnyMobsInRange(9) && !CurrentTarget.IsTreasureGoblin &&
                 ((!IsWaitingForSpecial && PlayerStatus.PrimaryResource >= 20) || (IsWaitingForSpecial && PlayerStatus.PrimaryResource > MinEnergyReserve)) &&
                 (GilesUseTimer(SNOPower.Barbarian_Rend) && (NonRendedTargets_9 > 2 || !CurrentTarget.HasDotDPS)) &&
@@ -303,29 +303,23 @@ namespace GilesTrinity
                 PlayerStatus.PrimaryResource >= 10 &&
                 // If they have battle-rage, make sure it's up
                 (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage))))
-            // If they have sprint, make sure it's up
-            // (!hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Sprint) || (hashPowerHotbarAbilities.Contains(SNOPower.Barbarian_Sprint) && GilesHasBuff(SNOPower.Barbarian_Sprint)))
             {
-                bool bGenerateNewZigZag = (DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 2000f ||
-                    (vPositionLastZigZagCheck != vNullLocation && PlayerStatus.CurrentPosition == vPositionLastZigZagCheck && DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 1200) ||
-                    Vector3.Distance(PlayerStatus.CurrentPosition, vSideToSideTarget) <= 5f ||
-                    CurrentTarget.ACDGuid != iACDGUIDLastWhirlwind);
+                bool shouldGetNewZigZag =
+                    (DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 1200 || 
+                    CurrentTarget.ACDGuid != iACDGUIDLastWhirlwind ||
+                    vSideToSideTarget.Distance2D(PlayerStatus.CurrentPosition) <= 5f);
                 vPositionLastZigZagCheck = PlayerStatus.CurrentPosition;
-                if (bGenerateNewZigZag)
+                if (shouldGetNewZigZag)
                 {
-                    var wwdist = Settings.Combat.Barbarian.TargetBasedZigZag ? 20f : 20f;
+                    var wwdist = 25f;
 
-                    if (bCheckGround)
-                        vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, wwdist, false, true, true);
-                    else if (AnythingWithinRange[RANGE_30] >= 6 || ElitesWithinRange[RANGE_30] >= 3 || c_ActorSNO == 89690)
-                        vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, wwdist, false, true);
-                    else
-                        vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.Position, wwdist);
-                    //LastPowerUsed = SNOPower.None;
+                    vSideToSideTarget = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
+
+                    LastPowerUsed = SNOPower.None;
                     iACDGUIDLastWhirlwind = CurrentTarget.ACDGuid;
                     lastChangedZigZag = DateTime.Now;
                 }
-                return new TrinityPower(SNOPower.Barbarian_Whirlwind, 10f, vSideToSideTarget, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Whirlwind, 10f, vSideToSideTarget, CurrentWorldDynamicId, -1, 0, 1, NO_WAIT_ANIM);
             }
             // Battle rage, constantly maintain
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_BattleRage) && !PlayerStatus.IsIncapacitated &&

@@ -149,7 +149,7 @@ namespace GilesTrinity
                 {
                     float fExtraDistance = CurrentTarget.CentreDistance <= 10f ? 10f : 5f;
                     //vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.vPosition, CurrentTarget.fCentreDist + fExtraDistance);
-                    vSideToSideTarget = FindSafeZone(false, 1, CurrentTarget.Position, false);
+                    vSideToSideTarget = NavHelper.FindSafeZone(false, 1, CurrentTarget.Position, false);
                     // Resetting this to ensure the "no-spam" is reset since we changed our target location
                     LastPowerUsed = SNOPower.None;
                     iACDGUIDLastWhirlwind = CurrentTarget.ACDGuid;

@@ -28,15 +28,14 @@ namespace GilesTrinity
         /// and the result is we will have a new target for the Target Handler. Returns true if the cache was refreshed.
         /// </summary>
         /// <returns>True if the cache was updated</returns>
-        public static bool RefreshDiaObjectCache()
+        public static bool RefreshDiaObjectCache(bool forceUpdate = false)
         {
             using (new PerformanceLogger("RefreshDiaObjectCache"))
             {
-                if (DateTime.Now.Subtract(LastRefreshedCache).TotalMilliseconds < Settings.Advanced.CacheRefreshRate)
+                if (DateTime.Now.Subtract(LastRefreshedCache).TotalMilliseconds < Settings.Advanced.CacheRefreshRate && !forceUpdate)
                 {
-                    UpdateCurrentTarget();
-
-                    return false;
+                    if (!UpdateCurrentTarget())
+                        return false;
                 }
                 LastRefreshedCache = DateTime.Now;
 
@@ -57,11 +56,12 @@ namespace GilesTrinity
 
                         if (Settings.Combat.Misc.UseNavMeshTargeting && !gp.CanStandAt(gp.WorldToGrid(PlayerStatus.CurrentPosition.ToVector2())))
                         {
-                            UpdateSearchGridProvider();
+                            NavHelper.UpdateSearchGridProvider();
                         }
 
-                        //RefreshInit(out vSafePointNear, out vKitePointAvoid, out iCurrentTargetRactorGUID, out iUnitsSurrounding, out iHighestWeightFound, out listGilesObjectCache, out hashDoneThisRactor);
+
                         RefreshCacheInit();
+
                         // Now pull up all the data and store anything we want to handle in the super special cache list
                         // Also use many cache dictionaries to minimize DB<->D3 memory hits, and speed everything up a lot
                         RefreshCacheMainLoop();
@@ -81,14 +81,14 @@ namespace GilesTrinity
                     if (StandingInAvoidance && (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
                         DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
                     {
-                        Vector3 vAnySafePoint = FindSafeZone(false, 1, PlayerStatus.CurrentPosition, true);
+                        Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, PlayerStatus.CurrentPosition, true);
                         // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
                         if (vAnySafePoint != vNullLocation)
                         {
                             if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                             {
                                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting Avoidance: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}",
-                                    vAnySafePoint, vAnySafePoint.Distance(Me.Position), GetHeading(FindDirectionDegree(Me.Position, vAnySafePoint)),
+                                    vAnySafePoint, vAnySafePoint.Distance(Me.Position), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
                                     PlayerStatus.CurrentHealthPct, PlayerKiteDistance);
                             }
 
@@ -195,31 +195,46 @@ namespace GilesTrinity
             }
         }
 
-        private static void UpdateCurrentTarget()
+        private static bool UpdateCurrentTarget()
         {
+            // Return true if we need to refresh objects and get a new target
+            bool forceUpdate = false;
             try
             {
+                PlayerStatus.CurrentPosition = ZetaDia.Me.Position;
+                PlayerStatus.CurrentHealthPct = ZetaDia.Me.HitpointsCurrentPct;
+
                 if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && CurrentTarget.Unit != null && CurrentTarget.Unit.IsValid)
                 {
                     DiaUnit unit = CurrentTarget.Unit;
                     if (unit.IsDead)
+                    {
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget is dead, setting null");
                         CurrentTarget = null;
-
-                    CurrentTarget.Position = unit.Position;
-                    CurrentTarget.HitPointsPct = unit.HitpointsCurrentPct;
-                    CurrentTarget.HitPoints = unit.HitpointsCurrent;
-
+                        forceUpdate = true;
+                    }
+                    else
+                    {
+                        CurrentTarget.Position = unit.Position;
+                        CurrentTarget.HitPointsPct = unit.HitpointsCurrentPct;
+                        CurrentTarget.HitPoints = unit.HitpointsCurrent;
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Updated CurrentTarget HitPoints={0:0.00} & Position={1}", CurrentTarget.HitPointsPct, CurrentTarget.Position);
+                    }
                 }
                 else if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit)
                 {
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget is invalid, setting null");
                     CurrentTarget = null;
+                    forceUpdate = true;
                 }
             }
             catch
             {
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Error updating current target information");
                 CurrentTarget = null;
+                forceUpdate = true;
             }
+            return forceUpdate;
         }
         // Refresh object list from Diablo 3 memory RefreshDiaObjects()
         private static void RefreshCacheInit()
@@ -287,7 +302,6 @@ namespace GilesTrinity
                     ForceCloseRangeTarget = false;
                 }
                 // Bunch of variables used throughout
-                iUnitsSurrounding = 0;
                 hashMonsterObstacleCache = new HashSet<GilesObstacle>();
                 hashAvoidanceObstacleCache = new HashSet<GilesObstacle>();
                 hashNavigationObstacleCache = new HashSet<GilesObstacle>();
@@ -323,7 +337,7 @@ namespace GilesTrinity
                 ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
                 AnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
                 NonRendedTargets_9 = 0;
-                bAnyBossesInRange = false;
+                anyBossesInRange = false;
                 // Flag for if we should search for an avoidance spot or not
                 StandingInAvoidance = false;
                 // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
@@ -550,7 +564,7 @@ namespace GilesTrinity
                 }
                 // See if we can raytrace to the final location and it's within 25 feet
                 if (iTotalBacktracks >= 2 && Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[1]) <= 25f &&
-                    CanRayCast(PlayerStatus.CurrentPosition, vBacktrackList[1]))
+                    NavHelper.CanRayCast(PlayerStatus.CurrentPosition, vBacktrackList[1]))
                 {
                     vBacktrackList = new SortedList<int, Vector3>();
                     iTotalBacktracks = 0;
@@ -681,7 +695,7 @@ namespace GilesTrinity
 
                 if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite))
                 {
-                    Vector3 vAnySafePoint = FindSafeZone(false, 1, vKitePointAvoid, true, monsterList);
+                    Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, vKitePointAvoid, true, monsterList);
 
                     if (LastKitePosition == null)
                     {
@@ -717,7 +731,7 @@ namespace GilesTrinity
                         if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         {
                             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
-                                vAnySafePoint, vAnySafePoint.Distance(PlayerStatus.CurrentPosition), GetHeading(FindDirectionDegree(Me.Position, vAnySafePoint)),
+                                vAnySafePoint, vAnySafePoint.Distance(PlayerStatus.CurrentPosition), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
                                 PlayerStatus.CurrentHealthPct, PlayerKiteDistance, monsterList.Count(),
                                 NeedToKite, TryToKite);
                         }

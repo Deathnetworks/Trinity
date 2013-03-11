@@ -126,14 +126,11 @@ namespace GilesTrinity
                         c_unit_IsBoss || c_ActorSNO == 256015 || c_ActorSNO == 256000 || c_ActorSNO == 255996 ||
                         //...or more than 4 elite mobs in range (only elites/rares/uniques, not minions!)
                         ElitesWithinRange[RANGE_50] > 4)
-                        bUseBerserker = true;
+                        shouldUseBerserkerPower = true;
                 }
                 else
-                    bUseBerserker = false;
-                if (monsterAffixes.HasFlag(MonsterAffixes.Waller))
-                    bCheckGround = true;
-                else
-                    bCheckGround = false;
+                    shouldUseBerserkerPower = false;
+
                 // Is this something we should try to force leap/other movement abilities against?
                 c_ForceLeapAgainst = false;
             }
@@ -327,7 +324,8 @@ namespace GilesTrinity
                 return AddToCache;
             }
 
-            if (unit.IsInvulnerable)
+            // don't check for invulnerability on shielded units, they are treated seperately
+            if (!c_unit_IsShielded && unit.IsInvulnerable)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "IsInvulnerable";

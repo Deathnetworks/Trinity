@@ -364,7 +364,7 @@ namespace GilesTrinity.XmlTags
                 new Sequence(
                     new Action(ret => mySceneId = GilesTrinity.PlayerStatus.SceneId),
                     new Action(ret => GPUpdatePosition = myPos),
-                    new Action(ret => GilesTrinity.UpdateSearchGridProvider(true)),
+                    new Action(ret => NavHelper.UpdateSearchGridProvider(true)),
                     new Action(ret => MiniMapMarker.UpdateFailedMarkers())
                 )
             );
@@ -828,6 +828,13 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => UpdateRoute())
                     )
                 ),
+                new Decorator(ret => BrainBehavior.DungeonExplorer.CurrentNode.Visited,
+                    new Sequence(
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Current node was already marked as visited!")),
+                        new Action(ret => BrainBehavior.DungeonExplorer.CurrentRoute.Dequeue()),
+                        new Action(ret => UpdateRoute())
+                    )
+                ), 
                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0 || !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Error - CheckIsNodeFinished() called while Route is empty!")),
@@ -874,7 +881,7 @@ namespace GilesTrinity.XmlTags
         /// </summary>
         private void UpdateRoute()
         {
-            GilesTrinity.UpdateSearchGridProvider();
+            NavHelper.UpdateSearchGridProvider();
 
             CheckResetDungeonExplorer();
 
@@ -895,6 +902,13 @@ namespace GilesTrinity.XmlTags
             BrainBehavior.DungeonExplorer.CurrentNode.Visited = true;
             BrainBehavior.DungeonExplorer.CurrentRoute.Dequeue();
 
+            MarkNearbyNodesVisited();
+
+            PrintNodeCounts("SetNodeVisited");
+        }
+
+        public void MarkNearbyNodesVisited()
+        {
             foreach (DungeonNode node in GridSegmentation.Nodes.Where(n => !n.Visited))
             {
                 float distance = node.NavigableCenter.Distance2D(myPos);
@@ -905,8 +919,6 @@ namespace GilesTrinity.XmlTags
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Marking unvisited nearby node as visited - {0}", reason2);
                 }
             }
-
-            PrintNodeCounts("SetNodeVisited");
         }
 
         /// <summary>
@@ -953,7 +965,7 @@ namespace GilesTrinity.XmlTags
                     gp.CanStandAt(gp.WorldToGrid(CurrentNavTarget.ToVector2())), // 8
                     !Navigator.Raycast(myPos, CurrentNavTarget),
                     PathPrecision,
-                    GilesTrinity.GetHeadingToPoint(CurrentNavTarget),
+                    MathUtil.GetHeadingToPoint(CurrentNavTarget),
                     Math.Abs(myPos.Z - CurrentNavTarget.Z)
                     );
 
@@ -1051,13 +1063,14 @@ namespace GilesTrinity.XmlTags
             Vector3 moveTarget = NextNode.NavigableCenter;
 
             string nodeName = String.Format("{0} Distance: {1:0} Direction: {2}",
-                NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition), GilesTrinity.GetHeadingToPoint(NextNode.NavigableCenter));
+                NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition), MathUtil.GetHeadingToPoint(NextNode.NavigableCenter));
 
             if (DateTime.Now.Subtract(GilesTrinity.lastAddedLocationCache).TotalMilliseconds >= 100)
             {
                 GilesTrinity.lastAddedLocationCache = DateTime.Now;
                 if (Vector3.Distance(myPos, GilesTrinity.vLastRecordedLocationCache) >= 5f)
                 {
+                    MarkNearbyNodesVisited();
                     GilesTrinity.hashSkipAheadAreaCache.Add(new GilesObstacle(myPos, 20f, 0));
                     GilesTrinity.vLastRecordedLocationCache = myPos;
                 }
@@ -1072,7 +1085,7 @@ namespace GilesTrinity.XmlTags
         {
             if (gp == null)
             {
-                GilesTrinity.UpdateSearchGridProvider();
+                NavHelper.UpdateSearchGridProvider();
             }
 
             if (BoxSize == 0)

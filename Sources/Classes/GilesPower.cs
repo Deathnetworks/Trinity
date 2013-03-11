@@ -7,12 +7,12 @@ namespace GilesTrinity
     /// <summary>
     /// TrinityPower - used when picking a power and where/how to use it
     /// </summary>
-    internal class TrinityPower
+    internal class TrinityPower : IEquatable<TrinityPower>
     {
         // 100 == 10 tps or 1/10th a second
         // 66 == 15 tps or 1/15th a second
         // 50 = 20 tps or 1/20th a second
-        private const int _tickTimeMs = 10;        
+        private const int _tickTimeMs = 20;        
 
         public SNOPower SNOPower { get; set; }
         /// <summary>
@@ -160,5 +160,14 @@ namespace GilesTrinity
             PowerAssignmentTime = DateTime.Now;
         }
 
+
+        public bool Equals(TrinityPower other)
+        {
+            return this.SNOPower == other.SNOPower &&
+                this.TargetPosition == other.TargetPosition &&
+                this.TargetRActorGUID == other.TargetRActorGUID &&
+                this.WaitAfterUseDelay == other.WaitAfterUseDelay &&
+                this.TargetDynamicWorldId == other.TargetDynamicWorldId;
+        }
     }
 }

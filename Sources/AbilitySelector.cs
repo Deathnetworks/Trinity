@@ -25,7 +25,7 @@ namespace GilesTrinity
                 {
                     Hotbar.Add(ZetaDia.CPlayer.GetPowerForSlot((HotbarSlot)i));
                 }
-                bRefreshHotbarAbilities = false;
+                ShouldRefreshHotbarAbilities = false;
 
                 HotbarSkills.Update();
 
@@ -138,7 +138,7 @@ namespace GilesTrinity
                 if (bThisArchonBuff)
                 {
                     if (!HasHadArchonbuff)
-                        bRefreshHotbarAbilities = true;
+                        ShouldRefreshHotbarAbilities = true;
                     HasHadArchonbuff = true;
                 }
                 else
@@ -170,7 +170,7 @@ namespace GilesTrinity
             using (new PerformanceLogger("GilesAbilitySelector"))
             {
                 // See if archon just appeared/disappeared, so update the hotbar
-                if (bRefreshHotbarAbilities)
+                if (ShouldRefreshHotbarAbilities)
                     RefreshHotbar();
 
                 // Switch based on the cached character class
@@ -203,7 +203,8 @@ namespace GilesTrinity
                             break;
                     }
                 }
-                if (CurrentPower != null && power.SNOPower == CurrentPower.SNOPower)
+                // use IEquatable to check if they're equal
+                if (CurrentPower == power)
                     return CurrentPower;
                 else if (power != null)
                     return power;
