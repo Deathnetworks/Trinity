@@ -996,25 +996,20 @@ namespace GilesTrinity
                         if (ForceCloseRangeTarget)
                             iMinDistance += 6f;
 
-                        if (Settings.WorldObject.IgnoreNonBlocking)
+                        // Only break destructables if we're stuck and using IgnoreNonBlocking
+                        if (!Settings.WorldObject.IgnoreNonBlocking)
+                        {
+                            iMinDistance += 12f;
+                            AddToCache = true;
+                            c_IgnoreSubStep = "";
+                        }
+                        else
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "IgnoringDestructables";
                         }
 
-                        // Only break destructables if we're stuck and using IgnoreNonBlocking
-                        if (PlayerMover.GetMovementSpeed() >= 1 && !AddToCache && Settings.WorldObject.IgnoreNonBlocking)
-                        {
-                            AddToCache = false;
-                            c_IgnoreSubStep = "NotStuck";
-                        }
-                        else
-                        {
-                            iMinDistance += 12f;
-                            AddToCache = true;
-                        }
-
-                        // Always add large destructibles witin ultra close range
+                        // Always add large destructibles within ultra close range
                         if (!AddToCache && c_Radius >= 10f && c_RadiusDistance < 2f)
                         {
                             AddToCache = true;
@@ -1022,17 +1017,23 @@ namespace GilesTrinity
                             break;
                         }
 
-
                         // This object isn't yet in our destructible desire range
-                        if (!AddToCache && (iMinDistance <= 1 || c_RadiusDistance > iMinDistance) && PlayerMover.GetMovementSpeed() >= 1)
+                        if (AddToCache && (iMinDistance <= 1 || c_RadiusDistance > iMinDistance) && PlayerMover.GetMovementSpeed() >= 1)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "NotInDestructableRange";
                         }
-                        if (!AddToCache && c_RadiusDistance <= 2f && PlayerMover.GetMovementSpeed() < 1)
+                        if (AddToCache && c_RadiusDistance <= 2f && PlayerMover.GetMovementSpeed() < 1)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "NotStuck2";
+                        }
+
+                        // Add if we're standing still and bumping into it
+                        if (c_RadiusDistance <= 2f && PlayerMover.GetMovementSpeed() <= 0)
+                        {
+                            AddToCache = true;
+                            c_IgnoreSubStep = "";
                         }
 
                         if (c_RActorGuid == CurrentTargetRactorGUID)
