@@ -146,7 +146,6 @@ namespace GilesTrinity
                 TimesBlockedMoving = 0;
                 IsAlreadyMoving = false;
                 lastMovementCommand = DateTime.Today;
-                //bAvoidDirectionBlacklisting = false;
                 IsWaitingForPower = false;
                 IsWaitingAfterPower = false;
                 IsWaitingForPotion = false;

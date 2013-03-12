@@ -83,7 +83,6 @@ namespace GilesTrinity
                 {
                     Vector3 targetDirection = MathEx.CalculatePointFrom(PlayerStatus.CurrentPosition, CurrentTarget.Position, 1f);
 
-                    ZetaDia.Me.UsePower(SNOPower.Walk, targetDirection);
                     return new TrinityPower(SNOPower.Wizard_Blizzard, 40f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Meteor
@@ -277,7 +276,6 @@ namespace GilesTrinity
                     ((hasCriticalMass && !bHasSignatureSpell) || !hasCriticalMass))
                 {
                     Vector3 targetDirection = MathEx.CalculatePointFrom(PlayerStatus.CurrentPosition, CurrentTarget.Position, 3f);
-                    ZetaDia.Me.UsePower(SNOPower.Walk, targetDirection);
 
                     Vector3 bestClusterPoint = TargetUtil.GetBestClusterPoint(10f, 15f);
 

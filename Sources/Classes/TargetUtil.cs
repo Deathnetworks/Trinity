@@ -326,9 +326,9 @@ namespace GilesTrinity
                     // We will do several "passes" to make sure we can get a point that we can least zig-zag to
                     // The total number of points tested will be piSlices * distancePasses.Count
                     List<float> distancePasses = new List<float>();
-                    distancePasses.Add(ringDistance * 2 / 3); // Do one loop at 2/3rds distance
+                    distancePasses.Add(ringDistance * 1 / 2); // Do one loop at 1/2 distance
+                    distancePasses.Add(ringDistance * 3 / 4); // Do one loop at 3/4 distance
                     distancePasses.Add(ringDistance);         // Do one loop at exact distance
-                    distancePasses.Add(ringDistance * 5 / 4); // Do one loop at 1+1/4 distance
 
                     foreach (float distance in distancePasses)
                     {

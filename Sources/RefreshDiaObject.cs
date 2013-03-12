@@ -675,19 +675,22 @@ namespace GilesTrinity
             {
                 try
                 {
-                    if (!dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out c_Radius))
-                    {
-                        c_Radius = c_diaObject.CollisionSphere.Radius;
+                    c_Radius = c_diaObject.CollisionSphere.Radius;
 
-                        if (c_ObjectType == GObjectType.Destructible && c_Radius >= 5f)
-                        {
-                            c_Radius = c_Radius / 2;
-                        }
+                    if (c_ObjectType == GObjectType.Destructible && c_Radius >= 5f)
+                    {
+                        c_Radius = c_Radius / 2;
                     }
+                    
+                    //if (!dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out c_Radius))
+                    //{
+
+                    //}
 
                     // Minimum range clamp
                     if (c_Radius <= 1f)
                         c_Radius = 1f;
+
                     // Maximum range clamp
                     //if (c_Radius >= 16f)
                     //    c_Radius = 16f;
@@ -816,7 +819,6 @@ namespace GilesTrinity
                             AddToCache = false;
                             return AddToCache;
                         }
-                        IsWaitingAfterPower = true;
                     }
                     break;
                 case GObjectType.Shrine:
@@ -939,6 +941,18 @@ namespace GilesTrinity
                             dictPhysicsSNO.Add(c_ActorSNO, iThisPhysicsSNO);
                         }
 
+                        float maxRadiusDistance = -1f;
+
+                        if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out maxRadiusDistance))
+                        {
+                            if (c_RadiusDistance < maxRadiusDistance) ;
+                            {
+                                AddToCache = true;
+                                c_IgnoreSubStep = "";
+                            }
+                        }
+
+
                         // Set min distance to user-defined setting
                         iMinDistance = Settings.WorldObject.DestructibleRange + c_Radius;
                         if (ForceCloseRangeTarget)
@@ -1009,6 +1023,16 @@ namespace GilesTrinity
                             c_IgnoreSubStep = "IgnoringDestructables";
                         }
 
+                        float maxRadiusDistance = -1f;
+
+                        if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out maxRadiusDistance))
+                        {
+                            if (c_RadiusDistance < maxRadiusDistance) ;
+                            {
+                                AddToCache = true;
+                                c_IgnoreSubStep = "";
+                            }
+                        }
                         // Always add large destructibles within ultra close range
                         if (!AddToCache && c_Radius >= 10f && c_RadiusDistance < 2f)
                         {
