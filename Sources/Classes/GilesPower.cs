@@ -167,7 +167,23 @@ namespace GilesTrinity
                 this.TargetPosition == other.TargetPosition &&
                 this.TargetRActorGUID == other.TargetRActorGUID &&
                 this.WaitAfterUseDelay == other.WaitAfterUseDelay &&
-                this.TargetDynamicWorldId == other.TargetDynamicWorldId;
+                this.TargetDynamicWorldId == other.TargetDynamicWorldId &&
+                this.MinimumRange == other.MinimumRange;
+        }
+
+        public override string ToString()
+        {
+            return
+            String.Format("power={0} pos={1} guid={2} preWait={3} postWait={4} animWait={5} timeSinceAssigned={6} timeSinceUse={7} range={8}",
+                    this.SNOPower,
+                    this.TargetPosition,
+                    this.TargetRActorGUID,
+                    this.WaitTicksBeforeUse,
+                    this.WaitTicksAfterUse,
+                    this.WaitForAnimationFinished,
+                    this.TimeSinceAssigned,
+                    this.TimeSinceUse,
+                    this.MinimumRange);
         }
     }
 }

@@ -105,7 +105,7 @@ namespace GilesTrinity
                 }
                 if (!bIsAnimating)
                     bKeepLooping = false;
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Waiting for animation, maxLoops={0} waitForAttacking={1} anim={2}", maxSafetyLoops, waitForAttacking, myAnimationState.State);
+                //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Waiting for animation, maxLoops={0} waitForAttacking={1} anim={2}", maxSafetyLoops, waitForAttacking, myAnimationState.State);
 
             }
         }
@@ -205,9 +205,15 @@ namespace GilesTrinity
                 }
                 // use IEquatable to check if they're equal
                 if (CurrentPower == power)
+                {
+                    DbHelper.Log(LogCategory.Behavior, "Keeping {0}", CurrentPower.ToString());
                     return CurrentPower;
+                }
                 else if (power != null)
+                {
+                    DbHelper.Log(LogCategory.Behavior, "Selected new {0}", power.ToString());
                     return power;
+                }
                 else
                     return defaultPower;
             }

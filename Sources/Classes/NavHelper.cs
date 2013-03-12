@@ -397,6 +397,11 @@ namespace GilesTrinity
                             }
                         }
                     }
+                    else if (isStuck)
+                    {
+                        // give weight to points nearer to our destination
+                        gridPoint.Weight *= (maxDistance - PlayerMover.LastMoveToTarget.Distance2D(gridPoint.Position)) / maxDistance * maxWeight;
+                    }
                     else if (!shouldKite && !isStuck) // melee avoidance use only
                     {
                         var monsterCount = GilesTrinity.GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.Position.Distance2D(gridPoint.Position) <= gridSquareRadius);

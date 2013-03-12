@@ -109,7 +109,8 @@ namespace GilesTrinity
                 extras += " CPowerShouldWaitBefore=" + (CurrentPower.WaitBeforeUseDelay - CurrentPower.TimeSinceAssigned);
             if (CurrentPower != null && CurrentPower.ShouldWaitAfterUse)
                 extras += " CPowerShouldWaitAfter=" + (CurrentPower.WaitAfterUseDelay - CurrentPower.TimeSinceUse);
-
+            if (CurrentPower != null && (CurrentPower.ShouldWaitBeforeUse || CurrentPower.ShouldWaitAfterUse))
+                extras += " " + CurrentPower.ToString();
 
             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Handle Target returning {0} to tree" + extras, treeRunStatus);
             return treeRunStatus;
@@ -123,6 +124,7 @@ namespace GilesTrinity
         /// <returns></returns>
         private static RunStatus HandleTarget(object ret)
         {
+            HandlerRunStatus runStatus = HandlerRunStatus.NotFinished;
             using (new PerformanceLogger("HandleTarget"))
             {
                 try
@@ -130,18 +132,22 @@ namespace GilesTrinity
                     if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                     {
                         DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
-                        return RunStatus.Failure;
+                        runStatus = HandlerRunStatus.TreeFailure;
+                        return GetTreeSharpRunStatus(runStatus);
                     }
                     if (ZetaDia.Me.IsDead)
                     {
-                        return RunStatus.Failure;
+                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Player is dead", true);
+                        runStatus = HandlerRunStatus.TreeFailure;
+                        return GetTreeSharpRunStatus(runStatus);
                     }
                     else if (GoldInactivity.GoldInactive())
                     {
                         BotMain.PauseWhile(GoldInactivity.GoldInactiveLeaveGame);
-                        return RunStatus.Failure;
+                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Gold Inactivity Tripped", true);
+                        runStatus = HandlerRunStatus.TreeFailure;
+                        return GetTreeSharpRunStatus(runStatus);
                     }
-                    HandlerRunStatus runStatus = HandlerRunStatus.NotFinished;
 
                     // Make sure we reset unstucker stuff here
                     PlayerMover.iTimesReachedStuckPoint = 0;
@@ -598,7 +604,11 @@ namespace GilesTrinity
                                         // Now tell Trinity to get a new target!
                                         ForceTargetUpdate = true;
                                     }
-                                    return RunStatus.Running;
+                                    runStatus = HandlerRunStatus.TreeRunning;
+                                    //check if we are returning to the tree
+                                    if (runStatus != HandlerRunStatus.NotFinished)
+                                        return GetTreeSharpRunStatus(runStatus);
+                                    break;
                                 // * Backtrack - clear this waypoint
                                 case GObjectType.Backtrack:
                                     // Remove the current backtrack location now we reached it
@@ -611,9 +621,16 @@ namespace GilesTrinity
                                         vBacktrackList = new SortedList<int, Vector3>();
                                     }
                                     ForceTargetUpdate = true;
-                                    return RunStatus.Running;
+                                    runStatus = HandlerRunStatus.TreeRunning;
+                                    //check if we are returning to the tree
+                                    if (runStatus != HandlerRunStatus.NotFinished)
+                                        return GetTreeSharpRunStatus(runStatus);
+                                    break;
                             }
-                            return RunStatus.Running;
+                            runStatus = HandlerRunStatus.TreeRunning;
+                            //check if we are returning to the tree
+                            if (runStatus != HandlerRunStatus.NotFinished)
+                                return GetTreeSharpRunStatus(runStatus);
                         }
                     }
                     using (new PerformanceLogger("HandleTarget.UpdateStatusText"))
@@ -625,7 +642,9 @@ namespace GilesTrinity
                     // Are we currently incapacitated? If so then wait...
                     if (PlayerStatus.IsIncapacitated || PlayerStatus.IsRooted)
                     {
-                        return RunStatus.Running;
+                        runStatus = HandlerRunStatus.TreeFailure;
+                        DbHelper.Log(LogCategory.Behavior, "Player is rooted or incapacitated!");
+                        return GetTreeSharpRunStatus(runStatus);
                     }
 
                     // Check to see if we're stuck in moving to the target
@@ -698,7 +717,10 @@ namespace GilesTrinity
                     // See if we want to ACTUALLY move, or are just waiting for the last move command...
                     if (!bForceNewMovement && IsAlreadyMoving && vCurrentDestination == vLastMoveToTarget && DateTime.Now.Subtract(lastMovementCommand).TotalMilliseconds <= 100)
                     {
-                        return RunStatus.Running;
+                        runStatus = HandlerRunStatus.TreeRunning;
+                        //check if we are returning to the tree
+                        if (runStatus != HandlerRunStatus.NotFinished)
+                            return GetTreeSharpRunStatus(runStatus);
                     }
                     using (new PerformanceLogger("HandleTarget.SpecialMovement"))
                     {
@@ -735,7 +757,10 @@ namespace GilesTrinity
                                     // Reset total body-block count, since we should have moved
                                     if (DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                         TimesBlockedMoving = 0;
-                                    return RunStatus.Running;
+                                    runStatus = HandlerRunStatus.TreeRunning;
+                                    //check if we are returning to the tree
+                                    if (runStatus != HandlerRunStatus.NotFinished)
+                                        return GetTreeSharpRunStatus(runStatus);
                                 }
                                 // Tempest rush for a monk
                                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && PlayerStatus.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
@@ -752,7 +777,10 @@ namespace GilesTrinity
                                     // Reset total body-block count, since we should have moved
                                     if (DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                         TimesBlockedMoving = 0;
-                                    return RunStatus.Running;
+                                    runStatus = HandlerRunStatus.TreeRunning;
+                                    //check if we are returning to the tree
+                                    if (runStatus != HandlerRunStatus.NotFinished)
+                                        return GetTreeSharpRunStatus(runStatus);
                                 }
                                 // Strafe for a Demon Hunter
                                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && PlayerStatus.PrimaryResource >= 15)
@@ -763,7 +791,10 @@ namespace GilesTrinity
                                     // Reset total body-block count, since we should have moved
                                     if (DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                         TimesBlockedMoving = 0;
-                                    return RunStatus.Running;
+                                    runStatus = HandlerRunStatus.TreeRunning;
+                                    //check if we are returning to the tree
+                                    if (runStatus != HandlerRunStatus.NotFinished)
+                                        return GetTreeSharpRunStatus(runStatus);
                                 }
                             }
                             if (bFoundSpecialMovement)
@@ -774,7 +805,10 @@ namespace GilesTrinity
                                 // Reset total body-block count, since we should have moved
                                 if (DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                                     TimesBlockedMoving = 0;
-                                return RunStatus.Running;
+                                runStatus = HandlerRunStatus.TreeRunning;
+                                //check if we are returning to the tree
+                                if (runStatus != HandlerRunStatus.NotFinished)
+                                    return GetTreeSharpRunStatus(runStatus);
                             }
                         }
                     }
@@ -809,18 +843,24 @@ namespace GilesTrinity
                         if ((!ForceCloseRangeTarget || DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds) &&
                             DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds >= 2000)
                             TimesBlockedMoving = 0;
-                        return RunStatus.Running;
+                        runStatus = HandlerRunStatus.TreeRunning;
+                        //check if we are returning to the tree
+                        if (runStatus != HandlerRunStatus.NotFinished)
+                            return GetTreeSharpRunStatus(runStatus);
                     }
                 }
                 catch (Exception ex)
                 {
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0}", ex);
-                    return RunStatus.Failure;
+                    runStatus = HandlerRunStatus.TreeFailure;
+                    return GetTreeSharpRunStatus(runStatus);
                 }
 
+                DbHelper.Log(LogCategory.Behavior, "Using Navigator to reach target");
                 HandleTargetBasicMovement(bForceNewMovement);
 
-                return RunStatus.Running;
+                runStatus = HandlerRunStatus.TreeRunning;
+                return GetTreeSharpRunStatus(runStatus);
             }
         }
 
@@ -1583,30 +1623,6 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Used Power {0} at {1} on {2} dist={3}", CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetRActorGUID, dist);
                 var usePowerResult = ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetDynamicWorldId, CurrentPower.TargetRActorGUID);
 
-                // Note that whirlwinds use an off-on-off-on to avoid spam
-                //if (CurrentPower.SNOPower != SNOPower.Barbarian_Whirlwind && CurrentPower.SNOPower != SNOPower.DemonHunter_Strafe)
-                //{
-                //    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Used Power {0} at {1} on {2}", CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetRActorGUID);
-                //    ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetDynamicWorldId, CurrentPower.TargetRActorGUID);
-                //    bUsePowerSuccess = true;
-                //    lastChangedZigZag = DateTime.Today;
-                //    vPositionLastZigZagCheck = Vector3.Zero;
-                //}
-                //else
-                //{
-                //    // Special code to prevent whirlwind double-spam, this helps save fury
-                //    bool bUseThisLoop = CurrentPower.SNOPower != LastPowerUsed;
-                //    if (!bUseThisLoop && TimeSinceUse(CurrentPower.SNOPower) >= 200)
-                //    {
-                //        bUseThisLoop = true;
-                //    }
-                //    if (bUseThisLoop)
-                //    {
-                //        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Used Power {0} at {1} on {2}", CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetRActorGUID);
-                //        ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetDynamicWorldId, CurrentPower.TargetRActorGUID);
-                //        bUsePowerSuccess = true;
-                //    }
-                //}
                 if (usePowerResult)
                 {
                     if (CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
@@ -1621,18 +1637,23 @@ namespace GilesTrinity
                     // Wait for animating AFTER the attack
                     if (CurrentPower.WaitForAnimationFinished)
                         WaitWhileAnimating(3, false);
+                    // See if we should force a long wait AFTERWARDS, too
+                    // Force waiting AFTER power use for certain abilities
+                    IsWaitingAfterPower = false;
+                    if (CurrentPower.ShouldWaitAfterUse)
+                    {
+                        IsWaitingAfterPower = true;
+                    }
                 }
 
-                // Wait for animating AFTER the attack
-                if (CurrentPower.WaitForAnimationFinished)
-                    WaitWhileAnimating(3, false);
                 ShouldPickNewAbilities = true;
+
                 // Keep looking for monsters at "normal kill range" a few moments after we successfully attack a monster incase we can pull them into range
                 iKeepKillRadiusExtendedFor = 8;
                 timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
                 iKeepLootRadiusExtendedFor = 8;
                 // if at full or nearly full health, see if we can raycast to it, if not, ignore it for 2000 ms
-                if (CurrentTarget.HitPointsPct >= 0.9d && AnythingWithinRange[RANGE_50] > 3)
+                if (CurrentTarget.HitPointsPct >= 0.9d)
                 {
                     if (!NavHelper.CanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
                     {
@@ -1648,13 +1669,7 @@ namespace GilesTrinity
                         }
                     }
                 }
-                // See if we should force a long wait AFTERWARDS, too
-                // Force waiting AFTER power use for certain abilities
-                IsWaitingAfterPower = false;
-                if (CurrentPower.ShouldWaitAfterUse)
-                {
-                    IsWaitingAfterPower = true;
-                }
+
             }
         }
 

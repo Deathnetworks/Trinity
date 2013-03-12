@@ -267,7 +267,7 @@ namespace GilesTrinity
                 using (new PerformanceLogger("FindZigZagTargetLocation.CheckObjectCache"))
                 {
                     bool useTargetBasedZigZag = false;
-                    float maxDistance = 30f;
+                    float maxDistance = 25f;
                     int minTargets = 2;
 
                     if (GilesTrinity.PlayerStatus.ActorClass == ActorClass.Monk)
