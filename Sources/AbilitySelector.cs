@@ -12,27 +12,8 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        /// <summary>
-        /// Re-reads the active assigned skills and runes from thoe hotbar
-        /// </summary>
-        public static void RefreshHotbar()
-        {
-            using (new PerformanceLogger("RefreshHotbar"))
-            {
-                HasMappedPlayerAbilities = true;
-                Hotbar = new HashSet<SNOPower>();
-                for (int i = 0; i <= 5; i++)
-                {
-                    Hotbar.Add(ZetaDia.CPlayer.GetPowerForSlot((HotbarSlot)i));
-                }
-                ShouldRefreshHotbarAbilities = false;
 
-                HotbarSkills.Update();
 
-                if (!GetHasBuff(SNOPower.Wizard_Archon))
-                    hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(Hotbar);
-            }
-        }
         /// <summary>
         /// Check if a particular buff is present
         /// </summary>
@@ -110,49 +91,7 @@ namespace GilesTrinity
             }
         }
 
-        /// <summary>
-        /// Refreshes all player buffs
-        /// </summary>
-        public static void RefreshBuffs()
-        {
-            using (new PerformanceLogger("GilesRefreshBuffs"))
-            {
-
-                listCachedBuffs = new List<Buff>();
-                dictCachedBuffs = new Dictionary<int, int>();
-                listCachedBuffs = ZetaDia.Me.GetAllBuffs().ToList();
-                // Special flag for detecting the activation and de-activation of archon
-                bool bThisArchonBuff = false;
-                int iTempStackCount;
-                // Store how many stacks of each buff we have
-                foreach (Buff thisbuff in listCachedBuffs)
-                {
-                    // Store the stack count of this buff
-                    if (!dictCachedBuffs.TryGetValue(thisbuff.SNOId, out iTempStackCount))
-                        dictCachedBuffs.Add(thisbuff.SNOId, thisbuff.StackCount);
-                    // Check for archon stuff
-                    if (thisbuff.SNOId == (int)SNOPower.Wizard_Archon)
-                        bThisArchonBuff = true;
-                }
-                // Archon stuff
-                if (bThisArchonBuff)
-                {
-                    if (!HasHadArchonbuff)
-                        ShouldRefreshHotbarAbilities = true;
-                    HasHadArchonbuff = true;
-                }
-                else
-                {
-                    if (HasHadArchonbuff)
-                    {
-                        Hotbar = new HashSet<SNOPower>(hashCachedPowerHotbarAbilities);
-                    }
-                    HasHadArchonbuff = false;
-                }
-                //"g_killElitePack : 1, snoid=230745" <- Noting this here incase I ever want to monitor NV stacks, this is the SNO ID code for it!
-            }
-        }
-
+       
         /// <summary>
         /// A default power in case we can't use anything else
         /// </summary>
@@ -171,7 +110,7 @@ namespace GilesTrinity
             {
                 // See if archon just appeared/disappeared, so update the hotbar
                 if (ShouldRefreshHotbarAbilities)
-                    RefreshHotbar();
+                    GilesPlayerCache.RefreshHotbar();
 
                 // Switch based on the cached character class
 

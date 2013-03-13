@@ -579,7 +579,7 @@ namespace GilesTrinity
                             AddToCache = RefreshGilesItem();
                             c_IgnoreReason = "RefreshGilesItem";
                         }
-                   
+
                         break;
 
                     }
@@ -681,7 +681,7 @@ namespace GilesTrinity
                     {
                         c_Radius = c_Radius / 2;
                     }
-                    
+
                     //if (!dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out c_Radius))
                     //{
 
@@ -945,7 +945,7 @@ namespace GilesTrinity
 
                         if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out maxRadiusDistance))
                         {
-                            if (c_RadiusDistance < maxRadiusDistance) ;
+                            if (c_RadiusDistance < maxRadiusDistance)
                             {
                                 AddToCache = true;
                                 c_IgnoreSubStep = "";
@@ -1027,7 +1027,7 @@ namespace GilesTrinity
 
                         if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out maxRadiusDistance))
                         {
-                            if (c_RadiusDistance < maxRadiusDistance) ;
+                            if (c_RadiusDistance < maxRadiusDistance)
                             {
                                 AddToCache = true;
                                 c_IgnoreSubStep = "";

@@ -64,7 +64,6 @@
             <UniformGrid Columns="2">
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.SelectiveWhirlwind}" ToolTip="eg goblins, occultists">Selective Whirlwind Target</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.WaitWOTB}">Wait WOTB cooldown at Azmo</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.BoonBulKathosPassive}">Boon of Bul-Kathos passive</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseWOTBGoblin}">Use WOTB on Goblins</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpWOTB}">Fury Dump in WOTB Mode</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpAlways}">Fury Dump always</CheckBox>

@@ -45,15 +45,19 @@ namespace GilesTrinity
         /// </summary>
         public static void Update()
         {
-            _assignedSkills.Clear();
-            foreach (SNOPower p in GilesTrinity.Hotbar)
+            if (GilesTrinity.PlayerStatus.ActorClass != ActorClass.Wizard && !GilesTrinity.GetHasBuff(SNOPower.Wizard_Archon) &&
+                GilesTrinity.PlayerStatus.ActorClass != ActorClass.WitchDoctor && !GilesTrinity.GetHasBuff(SNOPower.Witchdoctor_Hex))
             {
-                _assignedSkills.Add(new HotbarSkills()
+                _assignedSkills.Clear();
+                foreach (SNOPower p in GilesTrinity.Hotbar)
                 {
-                    Power = p,
-                    Slot = HotbarSkills.GetHotbarSlotFromPower(p),
-                    RuneIndex = HotbarSkills.GetRuneIndexFromPower(p)
-                });
+                    _assignedSkills.Add(new HotbarSkills()
+                    {
+                        Power = p,
+                        Slot = HotbarSkills.GetHotbarSlotFromPower(p),
+                        RuneIndex = HotbarSkills.GetRuneIndexFromPower(p)
+                    });
+                }
             }
         }
 

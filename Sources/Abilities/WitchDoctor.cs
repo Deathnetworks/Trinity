@@ -14,24 +14,25 @@ namespace GilesTrinity
             bool hasGraveInjustice = ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice);
 
             bool hasAngryChicken = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1);
-            bool isChicken = hasAngryChicken && GetHasBuff(SNOPower.Witchdoctor_Hex);
+            bool isChicken = PlayerStatus.IsHidden;
 
             // Hex with angry chicken, is chicken, explode!
-            if (!UseOOCBuff && isChicken && TargetUtil.AnyMobsInRange(12f, 1))
+            if (!UseOOCBuff && isChicken && (TargetUtil.AnyMobsInRange(12f, 1) || CurrentTarget.RadiusDistance <= 10f || UseDestructiblePower) && PowerManager.CanCast(SNOPower.Witchdoctor_Hex_Explode))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Hex_Explode, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                ShouldRefreshHotbarAbilities = true;
+                return new TrinityPower(SNOPower.Witchdoctor_Hex_Explode, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
             }
-            else if (isChicken) // we can't use any powers if we're a chicken
+            else if (isChicken)
             {
-                return new TrinityPower(SNOPower.None, 0f, vNullLocation, -1, -1, 0, 0, NO_WAIT_ANIM);
+                ShouldRefreshHotbarAbilities = true;
             }
-
 
             // Pick the best destructible power available
             if (UseDestructiblePower)
             {
                 return GetWitchDoctorDestroyPower();
             }
+
             // Witch doctors have no reserve requirements?
             MinEnergyReserve = 0;
             // Spirit Walk Cast on 65% health or while avoiding anything but molten core or incapacitated or Chasing Goblins
@@ -84,6 +85,7 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Gargantuan, 0f, vNullLocation, CurrentWorldDynamicId, -1, 2, 1, WAIT_FOR_ANIM);
             }
+
             // Zombie dogs Woof Woof, good for being blown up, cast when less than or equal to 2 Dogs or Not Blowing them up and cast when less than 4
             if (!IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && !PlayerStatus.IsIncapacitated &&
                 PlayerStatus.PrimaryResource >= 49 && (ElitesWithinRange[RANGE_20] >= 2 || AnythingWithinRange[RANGE_20] >= 5 ||
@@ -97,7 +99,8 @@ namespace GilesTrinity
             // Hex with angry chicken, check if we want to shape shift and explode
             if (Hotbar.Contains(SNOPower.Witchdoctor_Hex) && hasAngryChicken && PowerManager.CanCast(SNOPower.Witchdoctor_Hex) && PlayerStatus.PrimaryResource >= 49)
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Hex, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
+                ShouldRefreshHotbarAbilities = true;
+                return new TrinityPower(SNOPower.Witchdoctor_Hex, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
             }
 
             // Hex Spam Cast without angry chicken
@@ -132,7 +135,7 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.Witchdoctor_GraspOfTheDead, 25f, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
             // Horrify Buff When not in combat for movement speed
-            if (UseOOCBuff && Settings.Combat.WitchDoctor.GraveInjustice == true && Hotbar.Contains(SNOPower.Witchdoctor_Horrify) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 37 &&
+            if (UseOOCBuff && hasGraveInjustice && Hotbar.Contains(SNOPower.Witchdoctor_Horrify) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 37 &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_Horrify))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Horrify, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
@@ -194,19 +197,30 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.Witchdoctor_WallOfZombies, 25f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
+
+            var zombieChargerRange = hasGraveInjustice ? Math.Min(PlayerStatus.GoldPickupRadius + 8f, 11f) : 11f;
+
             // Zombie Charger aka Zombie bears Spams Bears @ Everything from 11feet away
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 134 &&
-                TargetUtil.AnyMobsInRange(11f) &&
+                TargetUtil.AnyMobsInRange(zombieChargerRange) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_ZombieCharger))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, 11f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, zombieChargerRange, CurrentTarget.Position, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
+
+            var acidCloudRange = hasGraveInjustice ? Math.Min(PlayerStatus.GoldPickupRadius + 8f, 30f) : 30f;
+
             // Acid Cloud
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_AcidCloud) && !PlayerStatus.IsIncapacitated &&
                 PlayerStatus.PrimaryResource >= 172 && PowerManager.CanCast(SNOPower.Witchdoctor_AcidCloud))
             {
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 30f);
-                return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 30f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                Vector3 bestClusterPoint;
+                if (hasGraveInjustice)
+                    bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, Math.Min(PlayerStatus.GoldPickupRadius + 8f, 30f));
+                else
+                    bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 30f);
+
+                return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, acidCloudRange, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Fire Bats fast-attack
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Firebats) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 98)
@@ -248,6 +262,7 @@ namespace GilesTrinity
             // Default attacks
             if (!UseOOCBuff && !IsCurrentlyAvoiding)
             {
+                ShouldRefreshHotbarAbilities = true;
                 return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
             }
             return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);

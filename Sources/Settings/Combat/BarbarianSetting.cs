@@ -38,7 +38,6 @@ namespace GilesTrinity.Settings.Combat
         private float _AvoidZoltTwisterHealth;
         private float _AvoidSuccubusStarHealth;
         private bool _SelectiveWirlwind;
-        private bool _BoonBulKathosPassive;
         private bool _WaitWOTB;
         private bool _UseWOTBGoblin;
         private bool _FuryDumpWOTB;
@@ -618,24 +617,6 @@ namespace GilesTrinity.Settings.Combat
                 {
                     _SelectiveWirlwind = value;
                     OnPropertyChanged("SelectiveWhirlwind");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool BoonBulKathosPassive
-        {
-            get
-            {
-                return _BoonBulKathosPassive;
-            }
-            set
-            {
-                if (_BoonBulKathosPassive != value)
-                {
-                    _BoonBulKathosPassive = value;
-                    OnPropertyChanged("BoonBulKathosPassive");
                 }
             }
         }

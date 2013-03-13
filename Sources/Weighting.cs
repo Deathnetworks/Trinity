@@ -498,13 +498,15 @@ namespace GilesTrinity
                             }
                         case GObjectType.Door:
                             {
-                                if (cacheObject.RadiusDistance <= 20f)
-                                    cacheObject.Weight += 15000d;
+                                if (!GilesObjectCache.Any(u => MathUtil.IntersectsPath(u.Position, u.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
+                                {
+                                    if (cacheObject.RadiusDistance <= 20f)
+                                        cacheObject.Weight += 15000d;
 
-                                // We're standing on the damn thing... open it!!
-                                if (cacheObject.RadiusDistance <= 12f)
-                                    cacheObject.Weight += 30000d;
-
+                                    // We're standing on the damn thing... open it!!
+                                    if (cacheObject.RadiusDistance <= 12f)
+                                        cacheObject.Weight += 30000d;
+                                }
                                 break;
                             }
                         case GObjectType.Destructible:

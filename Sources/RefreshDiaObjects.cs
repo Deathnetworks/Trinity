@@ -47,7 +47,7 @@ namespace GilesTrinity
                     using (ZetaDia.Memory.AcquireFrame())
                     {
                         // Update player-data cache, including buffs
-                        UpdateCachedPlayerData();
+                        GilesPlayerCache.UpdateCachedPlayerData();
 
                         if (PlayerStatus.CurrentHealthPct <= 0)
                         {

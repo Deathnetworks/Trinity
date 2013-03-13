@@ -77,13 +77,12 @@ namespace GilesTrinity
                 bool hasSnowBoundRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Blizzard && s.RuneIndex == 3);
 
                 // Blizzard
-                if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Blizzard) && CurrentTarget != null &&
-                    (TargetUtil.AnyElitesInRange(25) || TargetUtil.AnyMobsInRange(25,2) || TargetUtil.IsEliteTargetInRange(25)) &&
+                if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Blizzard) &&
+                    (TargetUtil.ClusterExists(45f, 2) || TargetUtil.AnyElitesInRange(40f) || TargetUtil.IsEliteTargetInRange(45f)) &&
                     (PlayerStatus.PrimaryResource >= 40 || (hasSnowBoundRune && PlayerStatus.PrimaryResource >= 20)) && GilesUseTimer(SNOPower.Wizard_Blizzard))
                 {
-                    Vector3 targetDirection = MathEx.CalculatePointFrom(PlayerStatus.CurrentPosition, CurrentTarget.Position, 1f);
-
-                    return new TrinityPower(SNOPower.Wizard_Blizzard, 40f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                    var bestClusterPoint = TargetUtil.GetBestClusterPoint(18f, 45f);
+                    return new TrinityPower(SNOPower.Wizard_Blizzard, 45f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Meteor
                 if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Meteor) &&

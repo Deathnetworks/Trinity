@@ -99,12 +99,12 @@ namespace GilesTrinity
         /// <summary>
         /// A flag to indicate if we just entered or just left archon form (and so to force-update the hotbar)
         /// </summary>
-        private static bool HasHadArchonbuff = false;
+        internal static bool HasHadArchonbuff = false;
 
         /// <summary>
         /// A flag to see if we need to refresh hot bar abilities
         /// </summary>
-        private static bool ShouldRefreshHotbarAbilities = false;
+        internal static bool ShouldRefreshHotbarAbilities = false;
 
         /// <summary>
         /// A "fake" object to send to target provider for stuck handlers etc.
@@ -387,17 +387,17 @@ namespace GilesTrinity
         private static DateTime lastMovementCommand = DateTime.Today;
 
         // Actual combat function variables
-        private static bool HasMappedPlayerAbilities = false;
+        internal static bool HasMappedPlayerAbilities = false;
 
         // Contains our apparent *CURRENT* hotbar abilities, cached in a fast hash
         public static HashSet<SNOPower> Hotbar = new HashSet<SNOPower>();
 
         // Contains a hash of our LAST hotbar abilities before we transformed into archon (for quick and safe hotbar restoration)
-        public static HashSet<SNOPower> hashCachedPowerHotbarAbilities = new HashSet<SNOPower>();
+        internal static HashSet<SNOPower> hashCachedPowerHotbarAbilities = new HashSet<SNOPower>();
 
         // A list and a dictionary for quick buff checking and buff references
-        private static List<Buff> listCachedBuffs = new List<Buff>();
-        private static Dictionary<int, int> dictCachedBuffs = new Dictionary<int, int>();
+        internal static List<Buff> listCachedBuffs = new List<Buff>();
+        internal static Dictionary<int, int> dictCachedBuffs = new Dictionary<int, int>();
 
         // For "position-shifting" to navigate around obstacle SNO's
         private static Vector3 vShiftedPosition = Vector3.Zero;

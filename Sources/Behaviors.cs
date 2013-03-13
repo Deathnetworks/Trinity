@@ -158,7 +158,7 @@ namespace GilesTrinity
                     // See if we should update hotbar abilities
                     if (ShouldRefreshHotbarAbilities)
                     {
-                        RefreshHotbar();
+                        GilesPlayerCache.RefreshHotbar();
                     }
                     if (!IsWaitingForPower && CurrentPower == null && CurrentTarget != null)
                         CurrentPower = AbilitySelector();
@@ -1152,7 +1152,7 @@ namespace GilesTrinity
                             }
 
                             // force update of cached player data
-                            UpdateCachedPlayerData();
+                            GilesPlayerCache.UpdateCachedPlayerData();
                         }
                     }
                 }

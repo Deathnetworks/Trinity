@@ -64,8 +64,7 @@ namespace GilesTrinity
                         DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.GlobalHandler, "Safely handled exception trying to get character class.");
                     }
 
-                    RefreshHotbar();
-                    HotbarRefreshTimer.Restart();
+                    GilesPlayerCache.RefreshHotbar();
 
                     dictAbilityRepeatDelay = new Dictionary<SNOPower, int>(dictAbilityRepeatDefaults);
                     if (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) && PlayerStatus.ActorClass == ActorClass.Wizard)
@@ -81,7 +80,7 @@ namespace GilesTrinity
                         dictAbilityRepeatDelay[SNOPower.Wizard_Archon_SlowTime] = 1500;
                         dictAbilityRepeatDelay[SNOPower.Wizard_Archon_Teleport] = 2700;
                     }
-                    if (Settings.Combat.WitchDoctor.GraveInjustice && PlayerStatus.ActorClass == ActorClass.WitchDoctor)
+                    if (PlayerStatus.ActorClass == ActorClass.WitchDoctor && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice))
                     {
                         dictAbilityRepeatDelay[SNOPower.Witchdoctor_SoulHarvest] = 1000;
                         dictAbilityRepeatDelay[SNOPower.Witchdoctor_SpiritWalk] = 1000;
@@ -97,7 +96,7 @@ namespace GilesTrinity
                         dictAbilityRepeatDelay[SNOPower.Witchdoctor_FetishArmy] = 20000;
                         dictAbilityRepeatDelay[SNOPower.Witchdoctor_BigBadVoodoo] = 20000;
                     }
-                    if (Settings.Combat.Barbarian.BoonBulKathosPassive && PlayerStatus.ActorClass == ActorClass.Barbarian)
+                    if (PlayerStatus.ActorClass == ActorClass.Barbarian && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Barbarian_Passive_BoonOfBulKathos))
                     {
                         dictAbilityRepeatDelay[SNOPower.Barbarian_Earthquake] = 90500;
                         dictAbilityRepeatDelay[SNOPower.Barbarian_CallOfTheAncients] = 90500;

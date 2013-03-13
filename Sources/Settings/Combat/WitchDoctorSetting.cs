@@ -37,7 +37,6 @@ namespace GilesTrinity.Settings.Combat
         private float _AvoidZoltBubbleHealth;
         private float _AvoidZoltTwisterHealth;
         private float _AvoidSuccubusStarHealth;
-        private bool _GraveInjustice;
         #endregion Fields
 
         #region Events
@@ -597,23 +596,7 @@ namespace GilesTrinity.Settings.Combat
                 }
             }
         }
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool GraveInjustice
-        {
-            get
-            {
-                return _GraveInjustice;
-            }
-            set
-            {
-                if (_GraveInjustice != value)
-                {
-                    _GraveInjustice = value;
-                    OnPropertyChanged("GraveInjustice");
-                }
-            }
-        }
+
         #endregion Properties
 
         #region Methods
