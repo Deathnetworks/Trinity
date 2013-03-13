@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
@@ -10,6 +11,22 @@ namespace GilesTrinity
     {
         private static TrinityPower GetWitchDoctorPower(bool IsCurrentlyAvoiding, bool UseOOCBuff, bool UseDestructiblePower)
         {
+            bool hasGraveInjustice = ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice);
+
+            bool hasAngryChicken = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1);
+            bool isChicken = hasAngryChicken && GetHasBuff(SNOPower.Witchdoctor_Hex);
+
+            // Hex with angry chicken, is chicken, explode!
+            if (!UseOOCBuff && isChicken && TargetUtil.AnyMobsInRange(12f, 1))
+            {
+                return new TrinityPower(SNOPower.Witchdoctor_Hex_Explode, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+            }
+            else if (isChicken) // we can't use any powers if we're a chicken
+            {
+                return new TrinityPower(SNOPower.None, 0f, vNullLocation, -1, -1, 0, 0, NO_WAIT_ANIM);
+            }
+
+
             // Pick the best destructible power available
             if (UseDestructiblePower)
             {
@@ -40,14 +57,14 @@ namespace GilesTrinity
 
             // Soul Harvest Any Elites or 2+ Norms and baby it's harvest season
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_SoulHarvest) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 59 && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4 &&
-                (TargetUtil.AnyMobsInRange(16f,2) || TargetUtil.IsEliteTargetInRange(16f)) && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
+                (TargetUtil.AnyMobsInRange(16f, 2) || TargetUtil.IsEliteTargetInRange(16f)) && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
 
             // Soul Harvest with VengefulSpirit
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Witchdoctor_SoulHarvest) && hasVengefulSpirit && PlayerStatus.PrimaryResource >= 59
-                && TargetUtil.AnyMobsInRange(16,3) && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4 && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
+                && TargetUtil.AnyMobsInRange(16, 3) && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4 && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
@@ -75,12 +92,19 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
-            // Hex Spam Cast on ANYTHING in range, mmm pork and chicken
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_Hex) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 49 &&
-               (ElitesWithinRange[RANGE_12] >= 1 || AnythingWithinRange[RANGE_12] >= 1 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 18f)) &&
-               PowerManager.CanCast(SNOPower.Witchdoctor_Hex))
+
+
+            // Hex with angry chicken, check if we want to shape shift and explode
+            if (Hotbar.Contains(SNOPower.Witchdoctor_Hex) && hasAngryChicken && PowerManager.CanCast(SNOPower.Witchdoctor_Hex) && PlayerStatus.PrimaryResource >= 49)
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Hex, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_Hex, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
+            }
+
+            // Hex Spam Cast without angry chicken
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_Hex) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 49 && !hasAngryChicken &&
+               (TargetUtil.AnyElitesInRange(12) || TargetUtil.AnyMobsInRange(12, 2) || TargetUtil.IsEliteTargetInRange(18f)) && PowerManager.CanCast(SNOPower.Witchdoctor_Hex))
+            {
+                return new TrinityPower(SNOPower.Witchdoctor_Hex, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
             }
             // Mass Confuse, elites only or big mobs or to escape on low health
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_MassConfusion) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 74 &&
@@ -100,7 +124,7 @@ namespace GilesTrinity
 
             // Grasp of the Dead, look below, droping globes and dogs when using it on elites and 3 norms
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_GraspOfTheDead) && !PlayerStatus.IsIncapacitated &&
-                (TargetUtil.AnyMobsInRange(30,2)) &&
+                (TargetUtil.AnyMobsInRange(30, 2)) &&
                 PlayerStatus.PrimaryResource >= 78 && PowerManager.CanCast(SNOPower.Witchdoctor_GraspOfTheDead))
             {
                 var bestClusterPoint = TargetUtil.GetBestClusterPoint(15);
