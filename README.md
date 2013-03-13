@@ -5,6 +5,36 @@
 
 * DH Sentry Turrent still does not work, appears to be DB bug
 
+### Changelog 1.7.2.9:
+
+* More fixes for not-attacking stuff after a single attack is used
+
+* Removed UI checkboxes for WD Grave Injustice and Barb Boon of Bull Kathos, as the passives are now auto-detected
+
+* Added Witch Doctor Hex: Angry Chicken support
+
+* Added improved support for WD Grave Injustice with acid cloud and zombie bears, taking into account pickup radius
+
+* Wizard Blizzard is now cast on the best cluster area instead of the primary target
+
+* Added more logging for main HandleTarget for debugging CM/WW problems...
+
+* Modified unstucker weighting for current destination position
+
+* Refactored/Moved UpdateCachedPlayerData, RefreshBuffs, RefreshHotbar methods into PlayerCache class
+
+### Changelog 1.7.2.8:
+
+* Fixed rogue IsWaitingForPower in Refresh HealthWell section, causing stucks
+
+* Removed SNOPower.Walk from Wizard ET/Blizzard spells
+
+* Tweaked RandomXY ZigZag from 2/3+1+5/4 to 1/2+3/4+1 distance
+
+* Destructible radius is now always forced to 50%, re-purposed dictSNOExtendedDestructRange to be used as a range when object should be 'added' to cache instea
+
+* More tweaks for destructible object range and detection
+
 ### Changelog 1.7.2.7:
 
 Combat logic:
