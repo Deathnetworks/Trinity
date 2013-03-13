@@ -498,7 +498,8 @@ namespace GilesTrinity
                             }
                         case GObjectType.Door:
                             {
-                                if (!GilesObjectCache.Any(u => MathUtil.IntersectsPath(u.Position, u.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
+                                if (!GilesObjectCache.Any(u => u.Type == GObjectType.Unit && u.HitPointsPct > 0 &&
+                                    MathUtil.IntersectsPath(u.Position, u.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                 {
                                     if (cacheObject.RadiusDistance <= 20f)
                                         cacheObject.Weight += 15000d;
