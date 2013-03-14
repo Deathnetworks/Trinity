@@ -61,23 +61,24 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="Stash/Keep Score Requirements :" FontWeight="Bold" TextAlignment="Center"/>
-            <StackPanel Grid.Row="1" Margin="50,0,50,0"  HorizontalAlignment="Center" Orientation="Vertical">
+            <StackPanel Grid.Row="1" Margin="0,0,0,0"  HorizontalAlignment="Center" Orientation="Vertical" MinWidth="400">
                 <TextBlock Text="Weapon Score : (70 000+ recommended)" Margin="5"/>
                 <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
-                    Interval="500" 
-                    Maximum="110000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="2000" TickPlacement="BottomRight" 
-                    Value="{Binding Path=TownRun.WeaponScore}" IsSnapToTickEnabled="True"
+                    Interval="500" SmallChange="1000" LargeChange="10000" 
+                    Maximum="110000" Minimum="0" TickPlacement="BottomRight" 
+                    Value="{Binding Path=TownRun.WeaponScore}" 
+                    IsSnapToTickEnabled="True" TickFrequency="1000"
                     HorizontalAlignment="Stretch" Margin="2"/>
                 <TextBlock Text="Armor Score : (16 000+ recommended)" Margin="5"/>
                 <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
-                    Interval="500" 
-                    Maximum="60000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" 
+                    Interval="500"  SmallChange="1000" LargeChange="5000" 
+                    Maximum="60000" Minimum="0" TickFrequency="1000" TickPlacement="BottomRight" 
                     Value="{Binding Path=TownRun.ArmorScore}"  IsSnapToTickEnabled="True"
                     HorizontalAlignment="Stretch" Margin="2"/>
                 <TextBlock Text="Jewelry Score : (15 000+ recommended)" Margin="5"/>
                 <Slider Grid.Row="1" Template="{DynamicResource SliderLTB}" 
-                    Interval="500" 
-                    Maximum="60000" Minimum="1" SmallChange="500" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" 
+                    Interval="500"  SmallChange="1000" LargeChange="5000" 
+                    Maximum="60000" Minimum="0" TickFrequency="1000" TickPlacement="BottomRight" 
                     Value="{Binding Path=TownRun.JewelryScore}"  IsSnapToTickEnabled="True"
                     HorizontalAlignment="Stretch" Margin="2"/>
             </StackPanel>

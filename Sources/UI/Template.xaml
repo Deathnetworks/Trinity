@@ -78,6 +78,7 @@
                     Delay="{TemplateBinding Delay}"
                     Interval="{TemplateBinding Interval}"
                     IsEnabled="{TemplateBinding IsEnabled}"
+                    IsSnapToTickEnabled="{TemplateBinding IsSnapToTickEnabled}"
                     LargeChange="{TemplateBinding LargeChange}"
                     Orientation="{TemplateBinding Orientation}"
                     SmallChange="{TemplateBinding SmallChange}"
