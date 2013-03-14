@@ -260,7 +260,7 @@ namespace GilesTrinity.DbProvider
                                         ? sUseProfile
                                         : Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
                 Thread.Sleep(1000);
-                GilesTrinity.GilesResetEverythingNewGame();
+                GilesTrinity.ResetEverythingNewGame();
                 ZetaDia.Service.Party.LeaveGame();
                 // Wait for 10 second log out timer if not in town
                 if (!ZetaDia.Me.IsInTown)
@@ -779,7 +779,7 @@ namespace GilesTrinity.DbProvider
                     GilesTrinity.TotalProfileRecycles++;
                     if (GilesTrinity.TotalProfileRecycles > GilesTrinity.iTotalJoinGames && GilesTrinity.TotalProfileRecycles > GilesTrinity.TotalLeaveGames)
                     {
-                        GilesTrinity.GilesResetEverythingNewGame();
+                        GilesTrinity.ResetEverythingNewGame();
                     }
                 }
                 GilesTrinity.listProfilesLoaded.Add(sThisProfile);

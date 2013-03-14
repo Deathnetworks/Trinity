@@ -9,7 +9,10 @@ namespace GilesTrinity
 {
     internal class GenericCache
     {
-        private static HashSet<GenericCacheObject> CacheList = new HashSet<GenericCacheObject>();
+        //private static HashSet<GenericCacheObject> CacheList = new HashSet<GenericCacheObject>();
+
+        private static Dictionary<string, GenericCacheObject> _dataCache = new Dictionary<string, GenericCacheObject>();
+        private static Dictionary<DateTime, string> _expireCache = new Dictionary<DateTime, string>();
 
         private static readonly object _Synchronizer = new object();
 
@@ -17,14 +20,15 @@ namespace GilesTrinity
 
         public static bool AddToCache(GenericCacheObject obj)
         {
-            if (obj.Key.Trim() == String.Empty)
+            if (obj.Key == "")
                 return false;
 
             lock (_Synchronizer)
             {
                 if (!ContainsKey(obj.Key))
                 {
-                    CacheList.Add(obj);
+                    _dataCache.Add(obj.Key, obj);
+                    _expireCache.Add(obj.Expires, obj.Key);
                     return true;
                 }
                 return false;
@@ -33,42 +37,57 @@ namespace GilesTrinity
 
         public static bool UpdateObject(GenericCacheObject obj)
         {
-            if (obj.Key.Trim() == String.Empty)
+            if (obj.Key == "")
                 return false;
 
             lock (_Synchronizer)
             {
-                if (ContainsKey(obj.Key))
-                {
-                    CacheList.RemoveWhere(o => o.Key == obj.Key);
-                }
-                CacheList.Add(obj);
+                RemoveObject(obj.Key);
+
+                _dataCache.Add(obj.Key, obj);
+                _expireCache.Add(obj.Expires, obj.Key);
+
                 return true;
+            }
+        }
+
+        public static bool RemoveObject(string key)
+        {
+            if (key == "")
+                return false;
+
+            lock (_Synchronizer)
+            {
+                if (ContainsKey(key))
+                {
+                    GenericCacheObject oldObj = _dataCache[key];
+                    _dataCache.Remove(key);
+                    _expireCache.Remove(oldObj.Expires);
+                    return true;
+                }
+                return false;
             }
         }
 
         public static bool ContainsKey(string key)
         {
-            if (key.Trim() == String.Empty)
+            if (key == "")
                 return false;
 
             lock (_Synchronizer)
             {
-                return CacheList.Contains(new GenericCacheObject()
-                {
-                    Key = key
-                });
+                return _dataCache.ContainsKey(key); 
             }
         }
 
         public static bool Contains(GenericCacheObject obj)
         {
-            if (obj.Key.Trim() == String.Empty)
+            if (obj.Key == "")
                 return false;
 
             lock (_Synchronizer)
             {
-                return CacheList.Contains(obj);
+                return ContainsKey(obj.Key);
             }
         }
 
@@ -77,7 +96,9 @@ namespace GilesTrinity
             lock (_Synchronizer)
             {
                 if (ContainsKey(key))
-                    return CacheList.AsParallel().FirstOrDefault(o => o.Key == key);
+                {
+                    return _dataCache[key];
+                }
                 else
                     return new GenericCacheObject();
             }
@@ -103,12 +124,18 @@ namespace GilesTrinity
             {
                 while (true)
                 {
-
                     long NowTicks = DateTime.Now.Ticks;
 
                     lock (_Synchronizer)
                     {
-                        CacheList.RemoveWhere(o => o.Expires.Ticks < NowTicks);
+                        foreach (KeyValuePair<DateTime, string> kv in _expireCache.Where(o => o.Key.Ticks < NowTicks).ToList())
+                        {
+                            if (kv.Key.Ticks < NowTicks)
+                            {
+                                _expireCache.Remove(kv.Key);
+                                _dataCache.Remove(kv.Value);
+                            }
+                        }
                     }
 
                     Thread.Sleep(100);
@@ -133,7 +160,8 @@ namespace GilesTrinity
         {
             lock (_Synchronizer)
             {
-                CacheList.Clear();
+                _dataCache.Clear();
+                _expireCache.Clear();
             }
         }
     }

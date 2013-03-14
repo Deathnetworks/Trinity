@@ -37,13 +37,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="30" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.Arcane, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidArcaneHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
@@ -58,13 +58,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="30" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.Desecrator, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidDesecratorHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
@@ -79,13 +79,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="30" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.MoltenCore, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidMoltenCoreHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
@@ -100,13 +100,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="30" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.MoltenTrail, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidMoltenTrailHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
@@ -121,13 +121,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="30" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.PoisonTree, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidPoisonTreeHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
@@ -142,13 +142,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="30" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.PlagueCloud, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidPlagueCloudHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
@@ -163,13 +163,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="30" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.PlagueHands, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidPlagueHandsHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
@@ -184,13 +184,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="30" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.IceBalls, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidIceBallsHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
@@ -206,13 +206,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="30" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.BeesWasps, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidBeesWaspsHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
@@ -227,13 +227,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="60" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.AzmoPools, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidAzmoPoolsHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
@@ -248,13 +248,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="60" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.AzmoBodies, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidAzmoBodiesHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
@@ -269,13 +269,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="30" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.ShamanFire, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidShamanFireHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
@@ -290,13 +290,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="30" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.GhomGas, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidGhomGasHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
@@ -311,13 +311,13 @@
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="30" Minimum="2" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=DataContext.Avoid.SuccubusStar, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
                 <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="100" Minimum="0" 
                             SmallChange="1" LargeChange="5"
-                            TickPlacement="None" 
+                            TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidSuccubusStarHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>

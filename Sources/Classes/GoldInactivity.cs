@@ -148,7 +148,7 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Gold Inactivity timer tripped - Anti-stuck measures exiting current game.");
                 // Reload this profile
                 ProfileManager.Load(Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
-                GilesTrinity.GilesResetEverythingNewGame();
+                GilesTrinity.ResetEverythingNewGame();
                 isLeavingGame = true;
                 return true;
             }

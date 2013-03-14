@@ -386,17 +386,13 @@ namespace GilesTrinity
 
                 if (Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
                 {
-                    refreshSource = from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                                    orderby o.Distance
-                                    select o;
+                    refreshSource = ReadDebugActorsFromMemory();
                 }
                 else
                 {
-                    refreshSource = from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                                    select o;
+                    refreshSource = ReadActorsFromMemory();
                 }
                 Stopwatch t1 = new Stopwatch();
-
 
                 foreach (DiaObject currentObject in refreshSource)
                 {
@@ -471,6 +467,19 @@ namespace GilesTrinity
                 }
 
             }
+        }
+
+        private static IOrderedEnumerable<DiaObject> ReadDebugActorsFromMemory()
+        {
+            return from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                   orderby o.Distance
+                   select o;
+        }
+
+        private static IEnumerable<DiaObject> ReadActorsFromMemory()
+        {
+            return from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                   select o;
         }
 
         private static bool RefreshItemStats(GItemBaseType tempbasetype)

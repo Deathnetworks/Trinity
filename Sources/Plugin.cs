@@ -173,6 +173,7 @@ namespace GilesTrinity
             // reload the profile juuuuuuuuuuuust in case Demonbuddy missed it... which it is known to do on disconnects
             string currentProfilePath = ProfileManager.CurrentProfile.Path;
             ProfileManager.Load(currentProfilePath);
+            ResetEverythingNewGame();
         }
 
         internal static void SetBotTPS()

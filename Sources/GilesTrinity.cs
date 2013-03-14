@@ -85,7 +85,7 @@ namespace GilesTrinity
                                                 ? sUseProfile
                                                 : Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
                         Thread.Sleep(1000);
-                        GilesResetEverythingNewGame();
+                        ResetEverythingNewGame();
                         ZetaDia.Service.Party.LeaveGame();
                         Thread.Sleep(10000);
                     }
@@ -104,15 +104,15 @@ namespace GilesTrinity
         private static void TrinityOnJoinGame(object src, EventArgs mea)
         {
             iTotalJoinGames++;
-            GilesResetEverythingNewGame();
+            ResetEverythingNewGame();
         }
         // Each time we join & leave a game, might as well clear the hashset of looked-at dropped items - just to keep it smaller
         private static void TrinityOnLeaveGame(object src, EventArgs mea)
         {
             TotalLeaveGames++;
-            GilesResetEverythingNewGame();
+            ResetEverythingNewGame();
         }
-        public static void GilesResetEverythingNewGame()
+        public static void ResetEverythingNewGame()
         {
             hashUseOnceID = new HashSet<int>();
             dictUseOnceID = new Dictionary<int, int>();
@@ -168,6 +168,7 @@ namespace GilesTrinity
             global::GilesTrinity.XmlTags.TrinityLoadOnce.UsedProfiles = new List<string>();
 
             GenericCache.ClearCache();
+            GenericBlacklist.ClearBlacklist();
 
         }
     }
