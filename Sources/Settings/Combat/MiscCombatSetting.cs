@@ -11,6 +11,7 @@ namespace GilesTrinity.Settings.Combat
         private int _NonEliteRange;
         private bool _ExtendedTrashKill;
         private bool _AvoidAOE;
+        private bool _KillMonstersInAoE;
         private bool _CollectHealthGlobe;
         private bool _AllowOOCMovement;
         private bool _AllowBacktracking;
@@ -18,6 +19,7 @@ namespace GilesTrinity.Settings.Combat
         private bool _UseNavMeshTargeting;
         private int _TrashPackSize;
         private float _TrashPackClusterRadius;
+        private bool _IgnoreElites;
         #endregion Fields
 
         #region Events
@@ -164,6 +166,24 @@ namespace GilesTrinity.Settings.Combat
 
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
+        public bool KillMonstersInAoE
+        {
+            get
+            {
+                return _KillMonstersInAoE;
+            }
+            set
+            {
+                if (_KillMonstersInAoE != value)
+                {
+                    _KillMonstersInAoE = value;
+                    OnPropertyChanged("KillMonstersInAoE");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
         public bool CollectHealthGlobe
         {
             get
@@ -233,6 +253,24 @@ namespace GilesTrinity.Settings.Combat
                 }
             }
         }
+ 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool IgnoreElites
+        {
+            get
+            {
+                return _IgnoreElites;
+            }
+            set
+            {
+                if (_IgnoreElites != value)
+                {
+                    _IgnoreElites = value;
+                    OnPropertyChanged("IgnoreElites");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -273,6 +311,7 @@ namespace GilesTrinity.Settings.Combat
             this.UseNavMeshTargeting = true;
             this.TrashPackClusterRadius = 40f;
             this.TrashPackSize = 2;
+            this.KillMonstersInAoE = true;
         }
         #endregion Methods
     }

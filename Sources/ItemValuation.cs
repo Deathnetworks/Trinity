@@ -1,5 +1,6 @@
 ﻿using GilesTrinity.Technicals;
 using System;
+using System.Linq;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
 namespace GilesTrinity
@@ -8,26 +9,9 @@ namespace GilesTrinity
     {
         private static double[] ItemMaxStats = new double[Constants.TOTALSTATS];
         private static double[] ItemMaxPoints = new double[Constants.TOTALSTATS];
-        private static bool IsInvalidItem = true;
-        private static double TotalItemPoints = 0;
-        private static GItemBaseType baseItemType = GItemBaseType.Unknown;
-
-        /// <summary>
-        /// This is a bonus applied at the end of valuation 
-        /// </summary>
-        private static double BestFinalBonus = 1d;
-
-        // Constants for convenient stat names
         private static double[] HadStat = new double[Constants.TOTALSTATS] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         private static double[] HadPoints = new double[Constants.TOTALSTATS] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        private static double SafeLifePercentage = 0;
-        private static bool SocketsCanReplacePrimaries = false;
-        private static double HighestScoringPrimary = 0;
-        private static int WhichPrimaryIsHighest = 0;
-        private static double AmountHighestScoringPrimary = 0;
-        // End of main 0-Constants.TOTALSTATS stat loop
-        private static int TotalRequirements;
-        private static double GlobalMultiplier = 1;
+        private static GItemBaseType baseItemType = GItemBaseType.Unknown;
 
         /// <summary>
         /// The bizarre mystery function to score your lovely items!
@@ -38,33 +22,17 @@ namespace GilesTrinity
         internal static double ValueThisItem(GilesCachedACDItem item, GItemType itemType)
         {
             // Reset static variables
-            TotalItemPoints = 0;
-            IsInvalidItem = true;
+            TownRun.ValueItemStatString = "";
+            TownRun.junkItemStatString = "";
+
             ItemMaxStats = new double[Constants.TOTALSTATS];
             ItemMaxPoints = new double[Constants.TOTALSTATS];
-            baseItemType = GilesTrinity.DetermineBaseType(itemType);
-            BestFinalBonus = 1d;
             HadStat = new double[Constants.TOTALSTATS] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             HadPoints = new double[Constants.TOTALSTATS] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            SafeLifePercentage = 0;
-            SocketsCanReplacePrimaries = false;
-            HighestScoringPrimary = 0;
-            WhichPrimaryIsHighest = 0;
-            AmountHighestScoringPrimary = 0;
-            TotalRequirements = 0;
-            GlobalMultiplier = 1;
-            TownRun.junkItemStatString = "";
-            TownRun.ValueItemStatString = "";
-
-            // Checks for Invalid Item Types
-            CheckForInvalidItemType(itemType);
-
-            // Double safety check for unidentified items
-            if (item.IsUnidentified)
-                IsInvalidItem = true;
+            baseItemType = GilesTrinity.DetermineBaseType(itemType);
 
             // Make sure we got a valid item here, otherwise score it a big fat 0
-            if (IsInvalidItem)
+            if (item.IsUnidentified || CheckForInvalidItemType(itemType))
             {
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "-- Invalid Item Type or Unidentified?");
                 return 0;
@@ -72,978 +40,445 @@ namespace GilesTrinity
 
             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "NEXT ITEM= " + item.RealName + " - " + item.InternalName + " [" + baseItemType.ToString() + " - " + itemType.ToString() + "]");
 
-            ResetValuationStatStrings();
-
-            // We loop through all of the stats, in a particular order. The order *IS* important, because it pulls up primary stats first, BEFORE other stats
-            for (int i = 0; i <= (Constants.TOTALSTATS - 1); i++)
+            #region CustomScoring
+            if ((itemType == GItemType.Quiver ||
+                    itemType == GItemType.SpiritStone ||
+                    itemType == GItemType.Orb ||
+                    itemType == GItemType.Shield ||
+                    itemType == GItemType.Mojo)
+                && item.CritPercent <= 0)
             {
-                double TempStatistic = 0;
-
-                // Now we lookup each stat on this item we are scoring, and store it in the variable "iTempStatistic" - which is used for calculations further down
-                switch (i)
-                {
-                    case Constants.DEXTERITY: TempStatistic = item.Dexterity; break;
-                    case Constants.INTELLIGENCE: TempStatistic = item.Intelligence; break;
-                    case Constants.STRENGTH: TempStatistic = item.Strength; break;
-                    case Constants.VITALITY: TempStatistic = item.Vitality; break;
-                    case Constants.LIFEPERCENT: TempStatistic = item.LifePercent; break;
-                    case Constants.LIFEONHIT: TempStatistic = item.LifeOnHit; break;
-                    case Constants.LIFESTEAL: TempStatistic = item.LifeSteal; break;
-                    case Constants.LIFEREGEN: TempStatistic = item.HealthPerSecond; break;
-                    case Constants.MAGICFIND: TempStatistic = item.MagicFind; break;
-                    case Constants.GOLDFIND: TempStatistic = item.GoldFind; break;
-                    case Constants.MOVEMENTSPEED: TempStatistic = item.MovementSpeed; break;
-                    case Constants.PICKUPRADIUS: TempStatistic = item.PickUpRadius; break;
-                    case Constants.SOCKETS: TempStatistic = item.Sockets; break;
-                    case Constants.CRITCHANCE: TempStatistic = item.CritPercent; break;
-                    case Constants.CRITDAMAGE: TempStatistic = item.CritDamagePercent; break;
-                    case Constants.ATTACKSPEED: TempStatistic = item.AttackSpeedPercent; break;
-                    case Constants.MINDAMAGE: TempStatistic = item.MinDamage; break;
-                    case Constants.MAXDAMAGE: TempStatistic = item.MaxDamage; break;
-                    case Constants.BLOCKCHANCE: TempStatistic = item.BlockChance; break;
-                    case Constants.THORNS: TempStatistic = item.Thorns; break;
-                    case Constants.ALLRESIST: TempStatistic = item.ResistAll; break;
-                    case Constants.RANDOMRESIST:
-                        if (item.ResistArcane > TempStatistic) TempStatistic = item.ResistArcane;
-                        if (item.ResistCold > TempStatistic) TempStatistic = 0;
-                        //thisitem.ResistCold;
-                        if (item.ResistFire > TempStatistic) TempStatistic = item.ResistFire;
-                        if (item.ResistHoly > TempStatistic) TempStatistic = item.ResistHoly;
-                        if (item.ResistLightning > TempStatistic) TempStatistic = 0;
-                        //thisitem.ResistLightning;
-                        if (item.ResistPhysical > TempStatistic) TempStatistic = item.ResistPhysical;
-                        if (item.ResistPoison > TempStatistic) TempStatistic = 0;
-                        //thisitem.ResistPoison;
-                        break;
-                    case Constants.TOTALDPS: TempStatistic = item.WeaponDamagePerSecond; break;
-                    case Constants.ARMOR: TempStatistic = item.ArmorBonus; break;
-                    case Constants.MAXDISCIPLINE: TempStatistic = item.MaxDiscipline; break;
-                    case Constants.MAXMANA: TempStatistic = item.MaxMana; break;
-                    case Constants.ARCANECRIT: TempStatistic = item.ArcaneOnCrit; break;
-                    case Constants.MANAREGEN: TempStatistic = item.ManaRegen; break;
-                    case Constants.GLOBEBONUS: TempStatistic = item.GlobeBonus; break;
-                }
-                HadStat[i] = TempStatistic;
-                HadPoints[i] = 0;
-
-                // Now we check that the current statistic in the "for" loop, actually exists on this item, and is a stat we are measuring (has >0 in the "max stats" array)
-                if (ItemMaxStats[i] > 0 && TempStatistic > 0)
-                {
-
-                    // Final bonus granted is an end-of-score multiplier. 1 = 100%, so all items start off with 100%, of course!
-                    double FinalBonusGranted = 1;
-
-                    // Item Stat Ratio is what PERCENTAGE of the *MAXIMUM POSSIBLE STAT*, this stat is at.
-                    // Note that stats OVER the max will get a natural score boost, since this value will be over 1!
-                    double itemStatRatio = TempStatistic / ItemMaxStats[i];
-
-                    // Now multiply the "max points" value, by that percentage, as the start/basis of the scoring for this statistic
-                    double iTempPoints = ItemMaxPoints[i] * itemStatRatio;
-
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "--- " + Constants.StatNames[i] + ": " + TempStatistic.ToString("0") + " out of " + ItemMaxStats[i].ToString() + " (" + ItemMaxPoints[i].ToString() + " * " + itemStatRatio.ToString("0.000") + " = " + iTempPoints.ToString("0") + ")");
-
-                    // Check if this statistic is over the "bonus threshold" array value for this stat - if it is, then it gets a score bonus when over a certain % of max-stat
-                    if (itemStatRatio > Constants.BonusThreshold[i] && Constants.BonusThreshold[i] > 0f)
-                    {
-                        FinalBonusGranted += ((itemStatRatio - Constants.BonusThreshold[i]) * 0.9);
-                    }
-
-                    // We're going to store the life % stat here for quick-calculations against other stats. Don't edit this bit!
-                    if (i == Constants.LIFEPERCENT)
-                    {
-                        if (ItemMaxStats[Constants.LIFEPERCENT] > 0)
-                        {
-                            SafeLifePercentage = (TempStatistic / ItemMaxStats[Constants.LIFEPERCENT]);
-                        }
-                        else
-                        {
-                            SafeLifePercentage = 0;
-                        }
-                    }
-
-                    // This *REMOVES* score from follower items for stats that followers don't care about
-                    if (baseItemType == GItemBaseType.FollowerItem && (i == Constants.CRITDAMAGE || i == Constants.LIFEONHIT || i == Constants.ALLRESIST))
-                        FinalBonusGranted -= 0.9;
-
-                    // Bonus 15% for being *at* the stat cap (ie - completely maxed out, or very very close to), but not for the socket stat (since sockets are usually 0 or 1!)
-                    if (i != Constants.SOCKETS)
-                    {
-                        if ((TempStatistic / ItemMaxStats[i]) >= 0.99)
-                            FinalBonusGranted += 0.15;
-
-                        // Else bonus 10% for being in final 95%
-                        else if ((TempStatistic / ItemMaxStats[i]) >= 0.95)
-                            FinalBonusGranted += 0.10;
-                    }
-
-                    // Socket handling
-
-                    // Sockets give special bonuses for certain items, depending how close to the max-socket-count it is for that item
-
-                    // It also enables bonus scoring for stats which usually rely on a high primary stat - since a socket can make up for a lack of a high primary (you can socket a +primary stat!)
-                    if (i == Constants.SOCKETS)
-                    {
-
-                        // Off-handers get less value from sockets
-                        if (baseItemType == GItemBaseType.Offhand)
-                        {
-                            FinalBonusGranted -= 0.35;
-                        }
-
-                        // Chest
-                        if (itemType == GItemType.Chest || itemType == GItemType.Cloak)
-                        {
-                            if (TempStatistic >= 2)
-                            {
-                                SocketsCanReplacePrimaries = true;
-                                if (TempStatistic >= 3)
-                                    FinalBonusGranted += 0.25;
-                            }
-                        }
-
-                        // Pants
-                        if (itemType == GItemType.Legs)
-                        {
-                            if (TempStatistic >= 2)
-                            {
-                                SocketsCanReplacePrimaries = true;
-                                FinalBonusGranted += 0.25;
-                            }
-                        }
-
-                        // Helmets can have a bonus for a socket since it gives amazing MF/GF
-                        if (TempStatistic >= 1 && (itemType == GItemType.Helm || itemType == GItemType.WizardHat || itemType == GItemType.VoodooMask ||
-                            itemType == GItemType.SpiritStone))
-                        {
-                            SocketsCanReplacePrimaries = true;
-                        }
-
-                        // And rings and amulets too
-                        if (TempStatistic >= 1 && (itemType == GItemType.Ring || itemType == GItemType.Amulet))
-                        {
-                            SocketsCanReplacePrimaries = true;
-                        }
-                    }
-
-                    // Right, here's quite a long bit of code, but this is basically all about granting all sorts of bonuses based on primary stat values of all different ranges
-
-                    // For all item types *EXCEPT* weapons
-                    if (baseItemType != GItemBaseType.WeaponRange && baseItemType != GItemBaseType.WeaponOneHand && baseItemType != GItemBaseType.WeaponTwoHand)
-                    {
-                        double SpecialBonus = 0;
-                        if (i > Constants.LIFEPERCENT)
-                        {
-
-                            // Knock off points for being particularly low
-                            if ((TempStatistic / ItemMaxStats[i]) < 0.2 && (Constants.BonusThreshold[i] <= 0f || Constants.BonusThreshold[i] >= 0.2))
-                                FinalBonusGranted -= 0.35;
-                            else if ((TempStatistic / ItemMaxStats[i]) < 0.4 && (Constants.BonusThreshold[i] <= 0f || Constants.BonusThreshold[i] >= 0.4))
-                                FinalBonusGranted -= 0.15;
-
-                            // Remove 80% if below minimum threshold
-                            if ((TempStatistic / ItemMaxStats[i]) < Constants.MinimumThreshold[i] && Constants.MinimumThreshold[i] > 0f)
-                                FinalBonusGranted -= 0.8;
-
-                            // Primary stat/vitality minimums or zero-check reductions on other stats
-                            if (Constants.StatMinimumPrimary[i] > 0)
-                            {
-
-                                // Remove 40% from all stats if there is no prime stat present or vitality/life present and this is below 90% of max
-                                if (((TempStatistic / ItemMaxStats[i]) < .90) && ((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) < Constants.StatMinimumPrimary[i]) &&
-                                    ((HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) < (Constants.StatMinimumPrimary[i] + 0.1)) && ((HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) < Constants.StatMinimumPrimary[i]) &&
-                                    ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) < Constants.StatMinimumPrimary[i]) && (SafeLifePercentage < (Constants.StatMinimumPrimary[i] * 2.5)) && !SocketsCanReplacePrimaries)
-                                {
-                                    if (itemType != GItemType.Ring && itemType != GItemType.Amulet)
-                                        FinalBonusGranted -= 0.4;
-                                    else
-                                        FinalBonusGranted -= 0.3;
-
-                                    // And another 25% off for armor and all resist which are more useful with primaries, as long as not jewelry
-                                    if ((i == Constants.ARMOR || i == Constants.ALLRESIST || i == Constants.RANDOMRESIST) && itemType != GItemType.Ring && itemType != GItemType.Amulet && !SocketsCanReplacePrimaries)
-                                        FinalBonusGranted -= 0.15;
-                                }
-                            }
-                            else
-                            {
-
-                                // Almost no primary stats or health at all
-                                if (HadStat[Constants.DEXTERITY] <= 60 && HadStat[Constants.STRENGTH] <= 60 && HadStat[Constants.INTELLIGENCE] <= 60 && HadStat[Constants.VITALITY] <= 60 && SafeLifePercentage < 0.9 && !SocketsCanReplacePrimaries)
-                                {
-
-                                    // So 35% off for all items except jewelry which is 20% off
-                                    if (itemType != GItemType.Ring && itemType != GItemType.Amulet)
-                                    {
-                                        FinalBonusGranted -= 0.35;
-
-                                        // And another 25% off for armor and all resist which are more useful with primaries
-                                        if (i == Constants.ARMOR || i == Constants.ALLRESIST)
-                                            FinalBonusGranted -= 0.15;
-                                    }
-                                    else
-                                    {
-                                        FinalBonusGranted -= 0.20;
-                                    }
-                                }
-                            }
-                            if (baseItemType == GItemBaseType.Armor || baseItemType == GItemBaseType.Jewelry)
-                            {
-
-                                // Grant a 50% bonus to stats if a primary is above 200 AND (vitality above 200 or life% within 90% max)
-                                if ((HadStat[Constants.DEXTERITY] > 200 || HadStat[Constants.STRENGTH] > 200 || HadStat[Constants.INTELLIGENCE] > 200) && (HadStat[Constants.VITALITY] > 200 || SafeLifePercentage > .97))
-                                {
-                                    if (0.5 > SpecialBonus) SpecialBonus = 0.5;
-                                }
-
-                                // Else grant a 40% bonus to stats if a primary is above 200
-                                if (HadStat[Constants.DEXTERITY] > 200 || HadStat[Constants.STRENGTH] > 200 || HadStat[Constants.INTELLIGENCE] > 200)
-                                {
-                                    if (0.4 > SpecialBonus) SpecialBonus = 0.4;
-                                }
-
-                                // Grant a 30% bonus if vitality > 200 or life percent within 90% of max
-                                if (HadStat[Constants.VITALITY] > 200 || SafeLifePercentage > .97)
-                                {
-                                    if (0.3 > SpecialBonus) SpecialBonus = 0.3;
-                                }
-                            }
-
-                            // Checks for various primary & health levels
-                            if ((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) > .85 || (HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > .85 || (HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > .85)
-                            {
-                                if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .6 || SafeLifePercentage > .90)
-                                {
-                                    if (0.5 > SpecialBonus) SpecialBonus = 0.5;
-                                }
-                                else if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .35 || SafeLifePercentage > .85)
-                                {
-                                    if (0.4 > SpecialBonus) SpecialBonus = 0.4;
-                                }
-                                else
-                                {
-                                    if (0.2 > SpecialBonus) SpecialBonus = 0.2;
-                                }
-                            }
-                            if ((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) > .75 || (HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > .75 || (HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > .75)
-                            {
-                                if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .6 || SafeLifePercentage > .90)
-                                {
-                                    if (0.35 > SpecialBonus) SpecialBonus = 0.35;
-                                }
-                                else if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .35 || SafeLifePercentage > .85)
-                                {
-                                    if (0.30 > SpecialBonus) SpecialBonus = 0.30;
-                                }
-                                else
-                                {
-                                    if (0.15 > SpecialBonus) SpecialBonus = 0.15;
-                                }
-                            }
-                            if ((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) > .65 || (HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > .65 || (HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > .65)
-                            {
-                                if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .6 || SafeLifePercentage > .90)
-                                {
-                                    if (0.26 > SpecialBonus) SpecialBonus = 0.26;
-                                }
-                                else if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .35 || SafeLifePercentage > .85)
-                                {
-                                    if (0.22 > SpecialBonus) SpecialBonus = 0.22;
-                                }
-                                else
-                                {
-                                    if (0.11 > SpecialBonus) SpecialBonus = 0.11;
-                                }
-                            }
-                            if ((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) > .55 || (HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > .55 || (HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > .55)
-                            {
-                                if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .6 || SafeLifePercentage > .90)
-                                {
-                                    if (0.18 > SpecialBonus) SpecialBonus = 0.18;
-                                }
-                                else if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .35 || SafeLifePercentage > .85)
-                                {
-                                    if (0.14 > SpecialBonus) SpecialBonus = 0.14;
-                                }
-                                else
-                                {
-                                    if (0.08 > SpecialBonus) SpecialBonus = 0.08;
-                                }
-                            }
-                            if ((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) > .5 || (HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > .5 || (HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > .5)
-                            {
-                                if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .6 || SafeLifePercentage > .90)
-                                {
-                                    if (0.12 > SpecialBonus) SpecialBonus = 0.12;
-                                }
-                                else if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .35 || SafeLifePercentage > .85)
-                                {
-                                    if (0.05 > SpecialBonus) SpecialBonus = 0.05;
-                                }
-                                else
-                                {
-                                    if (0.03 > SpecialBonus) SpecialBonus = 0.03;
-                                }
-                            }
-                            if (itemType == GItemType.Ring || itemType == GItemType.Amulet)
-                            {
-                                if ((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) > .4 || (HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > .4 || (HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > .4)
-                                {
-                                    if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .6 || SafeLifePercentage > .90)
-                                    {
-                                        if (0.10 > SpecialBonus) SpecialBonus = 0.10;
-                                    }
-                                    else if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .35 || SafeLifePercentage > .85)
-                                    {
-                                        if (0.08 > SpecialBonus) SpecialBonus = 0.08;
-                                    }
-                                    else
-                                    {
-                                        if (0.05 > SpecialBonus) SpecialBonus = 0.05;
-                                    }
-                                }
-                            }
-                            if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .8 || SafeLifePercentage > .98)
-                            {
-                                if (0.20 > SpecialBonus) SpecialBonus = 0.20;
-                            }
-                            if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .7 || SafeLifePercentage > .95)
-                            {
-                                if (0.16 > SpecialBonus) SpecialBonus = 0.16;
-                            }
-                            if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .6 || SafeLifePercentage > .92)
-                            {
-                                if (0.12 > SpecialBonus) SpecialBonus = 0.12;
-                            }
-                            if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .55 || SafeLifePercentage > .89)
-                            {
-                                if (0.07 > SpecialBonus) SpecialBonus = 0.07;
-                            }
-                            else if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .5 || SafeLifePercentage > .87)
-                            {
-                                if (0.05 > SpecialBonus) SpecialBonus = 0.05;
-                            }
-                            else if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > .45 || SafeLifePercentage > .86)
-                            {
-                                if (0.02 > SpecialBonus) SpecialBonus = 0.02;
-                            }
-                        }
-
-                        // This stat is one after life percent stat
-
-                        // Shields get less of a special bonus from high prime stats
-                        if (itemType == GItemType.Shield)
-                            SpecialBonus *= 0.7;
-
-                        if (SpecialBonus > 0)
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "------- special bonus =" + SpecialBonus.ToString(), true);
-
-                        FinalBonusGranted += SpecialBonus;
-                    }
-
-                    if (i == Constants.LIFESTEAL && itemType == GItemType.MightyBelt)
-                        FinalBonusGranted += 0.3;
-
-                    if (i == Constants.TOTALDPS)
-                    {
-                        // Knock off points for being particularly low
-                        if ((TempStatistic / ItemMaxStats[i]) < Constants.MinimumThreshold[i] && Constants.MinimumThreshold[i] > 0f)
-                            FinalBonusGranted -= 0.5;
-                    }
-                    else
-                    {
-                        // Knock off points for being particularly low
-                        if ((TempStatistic / ItemMaxStats[i]) < Constants.MinimumThreshold[i] && Constants.MinimumThreshold[i] > 0f)
-                            FinalBonusGranted -= 0.35;
-                    }
-                    // Grant a 20% bonus to vitality or Life%, for being paired with any prime stat above minimum threshold +.1
-                    if (((i == Constants.VITALITY && (TempStatistic / ItemMaxStats[Constants.VITALITY]) > Constants.MinimumThreshold[Constants.VITALITY]) ||
-                          i == Constants.LIFEPERCENT && (TempStatistic / ItemMaxStats[Constants.LIFEPERCENT]) > Constants.MinimumThreshold[Constants.LIFEPERCENT]) &&
-                        ((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) > (Constants.MinimumThreshold[Constants.DEXTERITY] + 0.1) || (HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > (Constants.MinimumThreshold[Constants.STRENGTH] + 0.1) ||
-                         (HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > (Constants.MinimumThreshold[Constants.INTELLIGENCE] + 0.1)))
-                        FinalBonusGranted += 0.2;
-
-                    // Blue item point reduction for non-weapons
-                    if (item.Quality < ItemQuality.Rare4 && (baseItemType == GItemBaseType.Armor || baseItemType == GItemBaseType.Offhand ||
-                        baseItemType == GItemBaseType.Jewelry || baseItemType == GItemBaseType.FollowerItem) && ((TempStatistic / ItemMaxStats[i]) < 0.88))
-                        FinalBonusGranted -= 0.9;
-
-                    // Special all-resist bonuses
-                    if (i == Constants.ALLRESIST)
-                    {
-
-                        // Shields with < 60% max all resist, lost some all resist score
-                        if (itemType == GItemType.Shield && (TempStatistic / ItemMaxStats[i]) <= 0.6)
-                            FinalBonusGranted -= 0.30;
-                        double iSpecialBonus = 0;
-
-                        // All resist gets a special bonus if paired with good strength and some vitality
-                        if ((HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > 0.7 && (HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > 0.3)
-                            if (0.45 > iSpecialBonus) iSpecialBonus = 0.45;
-
-                        // All resist gets a smaller special bonus if paired with good dexterity and some vitality
-                        if ((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) > 0.7 && (HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > 0.3)
-                            if (0.35 > iSpecialBonus) iSpecialBonus = 0.35;
-
-                        // All resist gets a slight special bonus if paired with good intelligence and some vitality
-                        if ((HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > 0.7 && (HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > 0.3)
-                            if (0.25 > iSpecialBonus) iSpecialBonus = 0.25;
-
-                        // Smaller bonuses for smaller stats
-
-                        // All resist gets a special bonus if paired with good strength and some vitality
-                        if ((HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > 0.55 && (HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > 0.3)
-                            if (0.45 > iSpecialBonus) iSpecialBonus = 0.20;
-
-                        // All resist gets a smaller special bonus if paired with good dexterity and some vitality
-                        if ((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) > 0.55 && (HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > 0.3)
-                            if (0.35 > iSpecialBonus) iSpecialBonus = 0.15;
-
-                        // All resist gets a slight special bonus if paired with good intelligence and some vitality
-                        if ((HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > 0.55 && (HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > 0.3)
-                            if (0.25 > iSpecialBonus) iSpecialBonus = 0.10;
-
-                        // This stat is one after life percent stat
-                        FinalBonusGranted += iSpecialBonus;
-
-                        // Global bonus to everything
-                        //if ((ItemMaxStats[i] - TempStatistic) < 10.2f)
-                        //    GlobalMultiplier += 0.05;
-                    }
-
-                    // All resist special bonuses
-                    if (itemType != GItemType.Ring && itemType != GItemType.Amulet)
-                    {
-
-                        // Shields get 10% less on everything
-                        if (itemType == GItemType.Shield)
-                            FinalBonusGranted -= 0.10;
-
-                        // Prime stat gets a 20% bonus if 50 from max possible
-                        if ((i == Constants.DEXTERITY || i == Constants.STRENGTH || i == Constants.INTELLIGENCE || i == Constants.VITALITY) && (ItemMaxStats[i] - TempStatistic) < 50.5f)
-                            FinalBonusGranted += 0.25;
-
-                        // Reduce a prime stat by 75% if less than 100 *OR* less than 50% max
-                        if ((i == Constants.DEXTERITY || i == Constants.STRENGTH || i == Constants.INTELLIGENCE) && (TempStatistic < 100 || ((TempStatistic / ItemMaxStats[i]) < 0.5)))
-                            FinalBonusGranted -= 0.75;
-
-                        // Reduce a vitality/life% stat by 60% if less than 80 vitality/less than 60% max possible life%
-                        if ((i == Constants.VITALITY && TempStatistic < 80) || (i == Constants.LIFEPERCENT && ((TempStatistic / ItemMaxStats[Constants.LIFEPERCENT]) < 0.6)))
-                            FinalBonusGranted -= 0.6;
-
-                        // Grant 10% to any 4 main stat above 200
-                        if ((i == Constants.DEXTERITY || i == Constants.STRENGTH || i == Constants.INTELLIGENCE || i == Constants.VITALITY) && TempStatistic > 200)
-                            FinalBonusGranted += 0.1;
-
-                        // Special stat handling stuff for non-jewelry types
-
-                        // Within 2 block chance
-                        if (i == Constants.BLOCKCHANCE && (ItemMaxStats[i] - TempStatistic) < 2.3f)
-                            FinalBonusGranted += 1;
-
-                        // Within final 5 gold find
-                        if (i == Constants.GOLDFIND && (ItemMaxStats[i] - TempStatistic) < 5.3f)
-                        {
-                            FinalBonusGranted += 0.04;
-
-                            // Even bigger bonus if got prime stat & vit
-                            if (((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) > Constants.MinimumThreshold[Constants.DEXTERITY] || (HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > Constants.MinimumThreshold[Constants.STRENGTH] ||
-                                (HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > Constants.MinimumThreshold[Constants.INTELLIGENCE]) && (HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > Constants.MinimumThreshold[Constants.VITALITY])
-                                FinalBonusGranted += 0.02;
-                        }
-
-                        // Within final 3 gold find
-                        if (i == Constants.GOLDFIND && (ItemMaxStats[i] - TempStatistic) < 3.3f)
-                        {
-                            FinalBonusGranted += 0.04;
-                        }
-
-                        // Within final 2 gold find
-                        if (i == Constants.GOLDFIND && (ItemMaxStats[i] - TempStatistic) < 2.3f)
-                        {
-                            FinalBonusGranted += 0.05;
-                        }
-
-                        // Within final 3 magic find
-                        if (i == Constants.MAGICFIND && (ItemMaxStats[i] - TempStatistic) < 3.3f)
-                            FinalBonusGranted += 0.08;
-
-                        // Within final 2 magic find
-                        if (i == Constants.MAGICFIND && (ItemMaxStats[i] - TempStatistic) < 2.3f)
-                        {
-                            FinalBonusGranted += 0.04;
-
-                            // Even bigger bonus if got prime stat & vit
-                            if (((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) > Constants.MinimumThreshold[Constants.DEXTERITY] || (HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > Constants.MinimumThreshold[Constants.STRENGTH] ||
-                                (HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > Constants.MinimumThreshold[Constants.INTELLIGENCE]) && (HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > Constants.MinimumThreshold[Constants.VITALITY])
-                                FinalBonusGranted += 0.03;
-                        }
-
-                        // Within final magic find
-                        if (i == Constants.MAGICFIND && (ItemMaxStats[i] - TempStatistic) < 1.3f)
-                        {
-                            FinalBonusGranted += 0.05;
-                        }
-
-                        // Within final 10 all resist
-                        if (i == Constants.ALLRESIST && (ItemMaxStats[i] - TempStatistic) < 10.2f)
-                        {
-                            FinalBonusGranted += 0.05;
-
-                            // Even bigger bonus if got prime stat & vit
-                            if (((HadStat[Constants.DEXTERITY] / ItemMaxStats[Constants.DEXTERITY]) > Constants.MinimumThreshold[Constants.DEXTERITY] || (HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > Constants.MinimumThreshold[Constants.STRENGTH] ||
-                                (HadStat[Constants.INTELLIGENCE] / ItemMaxStats[Constants.INTELLIGENCE]) > Constants.MinimumThreshold[Constants.INTELLIGENCE]) && (HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY]) > Constants.MinimumThreshold[Constants.VITALITY])
-                                FinalBonusGranted += 0.20;
-                        }
-
-                        // Within final 50 armor
-                        if (i == Constants.ARMOR && (ItemMaxStats[i] - TempStatistic) < 50.2f)
-                        {
-                            FinalBonusGranted += 0.10;
-                            if ((HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > Constants.MinimumThreshold[Constants.STRENGTH])
-                                FinalBonusGranted += 0.10;
-                        }
-
-                        // Within final 15 armor
-                        if (i == Constants.ARMOR && (ItemMaxStats[i] - TempStatistic) < 15.2f)
-                            FinalBonusGranted += 0.15;
-
-                        // Within final 5 critical hit damage
-                        if (i == Constants.CRITDAMAGE && (ItemMaxStats[i] - TempStatistic) < 5.2f)
-                            FinalBonusGranted += 0.25;
-
-                        // More than 2.5 crit chance out
-                        if (i == Constants.CRITCHANCE && (ItemMaxStats[i] - TempStatistic) > 2.45f)
-                            FinalBonusGranted -= 0.35;
-
-                        // More than 20 crit damage out
-                        if (i == Constants.CRITDAMAGE && (ItemMaxStats[i] - TempStatistic) > 19.95f)
-                            FinalBonusGranted -= 0.35;
-
-                        // More than 2 attack speed out
-                        if (i == Constants.ATTACKSPEED && (ItemMaxStats[i] - TempStatistic) > 1.95f)
-                            FinalBonusGranted -= 0.35;
-
-                        // More than 2 move speed
-                        if (i == Constants.MOVEMENTSPEED && (ItemMaxStats[i] - TempStatistic) > 1.95f)
-                            FinalBonusGranted -= 0.35;
-
-                        // More than 5 gold find out
-                        if (i == Constants.GOLDFIND && (ItemMaxStats[i] - TempStatistic) > 5.2f)
-                            FinalBonusGranted -= 0.40;
-
-                        // More than 8 gold find out
-                        if (i == Constants.GOLDFIND && (ItemMaxStats[i] - TempStatistic) > 8.2f)
-                            FinalBonusGranted -= 0.1;
-
-                        // More than 5 magic find out
-                        if (i == Constants.MAGICFIND && (ItemMaxStats[i] - TempStatistic) > 5.2f)
-                            FinalBonusGranted -= 0.40;
-
-                        // More than 7 magic find out
-                        if (i == Constants.MAGICFIND && (ItemMaxStats[i] - TempStatistic) > 7.2f)
-                            FinalBonusGranted -= 0.1;
-
-                        // More than 20 all resist out
-                        if (i == Constants.ALLRESIST && (ItemMaxStats[i] - TempStatistic) > 20.2f)
-                            FinalBonusGranted -= 0.50;
-
-                        // More than 30 all resist out
-                        if (i == Constants.ALLRESIST && (ItemMaxStats[i] - TempStatistic) > 30.2f)
-                            FinalBonusGranted -= 0.20;
-                    }
-
-                    // And now for jewelry checks...
-                    if (itemType == GItemType.Ring || itemType == GItemType.Amulet)
-                    {
-
-                        // Global bonus to everything if jewelry has an all resist above 50%
-                        if (i == Constants.ALLRESIST && (TempStatistic / ItemMaxStats[i]) > 0.5)
-                            GlobalMultiplier += 0.08;
-
-                        // Within final 10 all resist
-                        if (i == Constants.ALLRESIST && (ItemMaxStats[i] - TempStatistic) < 10.2f)
-                            FinalBonusGranted += 0.10;
-
-                        // Within final 5 critical hit damage
-                        if (i == Constants.CRITDAMAGE && (ItemMaxStats[i] - TempStatistic) < 5.2f)
-                            FinalBonusGranted += 0.25;
-
-                        // Within 3 block chance
-                        if (i == Constants.BLOCKCHANCE && (ItemMaxStats[i] - TempStatistic) < 3.3f)
-                            FinalBonusGranted += 0.15;
-
-                        // Reduce a prime stat by 60% if less than 60
-                        if ((i == Constants.DEXTERITY || i == Constants.STRENGTH || i == Constants.INTELLIGENCE) && (TempStatistic < 60 || ((TempStatistic / ItemMaxStats[i]) < 0.3)))
-                            FinalBonusGranted -= 0.6;
-
-                        // Reduce a vitality/life% stat by 50% if less than 50 vitality/less than 40% max possible life%
-                        if ((i == Constants.VITALITY && TempStatistic < 50) || (i == Constants.LIFEPERCENT && ((TempStatistic / ItemMaxStats[Constants.LIFEPERCENT]) < 0.4)))
-                            FinalBonusGranted -= 0.5;
-
-                        // Grant 20% to any 4 main stat above 150
-                        if ((i == Constants.DEXTERITY || i == Constants.STRENGTH || i == Constants.INTELLIGENCE || i == Constants.VITALITY) && TempStatistic > 150)
-                            FinalBonusGranted += 0.2;
-
-                        // Special stat handling stuff for jewelry
-                        if (itemType == GItemType.Ring)
-                        {
-
-                            // Prime stat gets a 25% bonus if 30 from max possible
-                            if ((i == Constants.DEXTERITY || i == Constants.STRENGTH || i == Constants.INTELLIGENCE || i == Constants.VITALITY) && (ItemMaxStats[i] - TempStatistic) < 30.5f)
-                                FinalBonusGranted += 0.25;
-
-                            // Within final 5 magic find
-                            if (i == Constants.MAGICFIND && (ItemMaxStats[i] - TempStatistic) < 5.2f)
-                                FinalBonusGranted += 0.4;
-
-                            // Within final 5 gold find
-                            if (i == Constants.GOLDFIND && (ItemMaxStats[i] - TempStatistic) < 5.2f)
-                                FinalBonusGranted += 0.35;
-
-                            // Within final 45 life on hit
-                            if (i == Constants.LIFEONHIT && (ItemMaxStats[i] - TempStatistic) < 45.2f)
-                                FinalBonusGranted += 1.2;
-
-                        }
-                        else
-                        {
-
-                            // Prime stat gets a 25% bonus if 60 from max possible
-                            if ((i == Constants.DEXTERITY || i == Constants.STRENGTH || i == Constants.INTELLIGENCE || i == Constants.VITALITY) && (ItemMaxStats[i] - TempStatistic) < 60.5f)
-                                FinalBonusGranted += 0.25;
-
-                            // Within final 10 magic find
-                            if (i == Constants.MAGICFIND && (ItemMaxStats[i] - TempStatistic) < 10.2f)
-                                FinalBonusGranted += 0.4;
-
-                            // Within final 10 gold find
-                            if (i == Constants.GOLDFIND && (ItemMaxStats[i] - TempStatistic) < 10.2f)
-                                FinalBonusGranted += 0.35;
-
-                            // Within final 40 life on hit
-                            if (i == Constants.LIFEONHIT && (ItemMaxStats[i] - TempStatistic) < 40.2f)
-                                FinalBonusGranted += 1.2;
-
-                        }
-
-                        // Within final 50 armor
-                        if (i == Constants.ARMOR && (ItemMaxStats[i] - TempStatistic) < 50.2f)
-                        {
-                            FinalBonusGranted += 0.30;
-                            if ((HadStat[Constants.STRENGTH] / ItemMaxStats[Constants.STRENGTH]) > Constants.MinimumThreshold[Constants.STRENGTH])
-                                FinalBonusGranted += 0.30;
-                        }
-
-                        // Within final 15 armor
-                        if (i == Constants.ARMOR && (ItemMaxStats[i] - TempStatistic) < 15.2f)
-                            FinalBonusGranted += 0.20;
-
-                        // More than 2.5 crit chance out
-                        if (i == Constants.CRITCHANCE && (ItemMaxStats[i] - TempStatistic) > 5.55f)
-                            FinalBonusGranted -= 0.20;
-
-                        // More than 20 crit damage out
-                        if (i == Constants.CRITDAMAGE && (ItemMaxStats[i] - TempStatistic) > 19.95f)
-                            FinalBonusGranted -= 0.20;
-
-                        // More than 2 attack speed out
-                        if (i == Constants.ATTACKSPEED && (ItemMaxStats[i] - TempStatistic) > 1.95f)
-                            FinalBonusGranted -= 0.20;
-
-                        // More than 15 gold find out
-                        if (i == Constants.GOLDFIND && (ItemMaxStats[i] - TempStatistic) > 15.2f)
-                            FinalBonusGranted -= 0.1;
-
-                        // More than 15 magic find out
-                        if (i == Constants.MAGICFIND && (ItemMaxStats[i] - TempStatistic) > 15.2f)
-                            FinalBonusGranted -= 0.1;
-
-                        // More than 30 all resist out
-                        if (i == Constants.ALLRESIST && (ItemMaxStats[i] - TempStatistic) > 20.2f)
-                            FinalBonusGranted -= 0.1;
-
-                        // More than 40 all resist out
-                        if (i == Constants.ALLRESIST && (ItemMaxStats[i] - TempStatistic) > 30.2f)
-                            FinalBonusGranted -= 0.1;
-                    }
-
-                    // All the "set to 0" checks now
-
-                    // Disable specific primary stat scoring for certain class-specific item types
-                    if ((itemType == GItemType.VoodooMask || itemType == GItemType.WizardHat || itemType == GItemType.Wand ||
-                        itemType == GItemType.CeremonialKnife || itemType == GItemType.Mojo || itemType == GItemType.Orb)
-                        && (i == Constants.STRENGTH || i == Constants.DEXTERITY))
-                        FinalBonusGranted = 0;
-                    if ((itemType == GItemType.Quiver || itemType == GItemType.HandCrossbow || itemType == GItemType.Cloak ||
-                        itemType == GItemType.SpiritStone || itemType == GItemType.TwoHandDaibo || itemType == GItemType.FistWeapon)
-                        && (i == Constants.STRENGTH || i == Constants.INTELLIGENCE))
-                        FinalBonusGranted = 0;
-                    if ((itemType == GItemType.MightyBelt || itemType == GItemType.MightyWeapon || itemType == GItemType.TwoHandMighty)
-                        && (i == Constants.DEXTERITY || i == Constants.INTELLIGENCE))
-                        FinalBonusGranted = 0;
-
-                    // Remove unwanted follower stats for specific follower types
-                    if (itemType == GItemType.FollowerEnchantress && (i == Constants.STRENGTH || i == Constants.DEXTERITY))
-                        FinalBonusGranted = 0;
-                    if (itemType == GItemType.FollowerEnchantress && (i == Constants.INTELLIGENCE || i == Constants.VITALITY))
-                        FinalBonusGranted -= 0.4;
-                    if (itemType == GItemType.FollowerScoundrel && (i == Constants.STRENGTH || i == Constants.INTELLIGENCE))
-                        FinalBonusGranted = 0;
-                    if (itemType == GItemType.FollowerScoundrel && (i == Constants.DEXTERITY || i == Constants.VITALITY))
-                        FinalBonusGranted -= 0.4;
-                    if (itemType == GItemType.FollowerTemplar && (i == Constants.DEXTERITY || i == Constants.INTELLIGENCE))
-                        FinalBonusGranted = 0;
-                    if (itemType == GItemType.FollowerTemplar && (i == Constants.STRENGTH || i == Constants.VITALITY))
-                        FinalBonusGranted -= 0.4;
-
-                    // Attack speed is always on a quiver so forget it
-                    if ((itemType == GItemType.Quiver) && (i == Constants.ATTACKSPEED))
-                        FinalBonusGranted = 0;
-
-                    // Single resists worth nothing without all-resist
-                    if (i == Constants.RANDOMRESIST && (HadStat[Constants.ALLRESIST] / ItemMaxStats[Constants.ALLRESIST]) < Constants.MinimumThreshold[Constants.ALLRESIST])
-                        FinalBonusGranted = 0;
-                    if (FinalBonusGranted < 0)
-                        FinalBonusGranted = 0;
-
-                    // Grant the final bonus total
-                    iTempPoints *= FinalBonusGranted;
-
-                    // If it's a primary stat, log the highest scoring primary... else add these points to the running total
-                    if (i == Constants.DEXTERITY || i == Constants.STRENGTH || i == Constants.INTELLIGENCE)
-                    {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "---- +" + iTempPoints.ToString("0") + " (*" + FinalBonusGranted.ToString("0.00") + " multiplier) [MUST BE MAX STAT SCORE TO COUNT]", true);
-
-                        if (iTempPoints > HighestScoringPrimary)
-                        {
-                            HighestScoringPrimary = iTempPoints;
-                            WhichPrimaryIsHighest = i;
-                            AmountHighestScoringPrimary = TempStatistic;
-                        }
-                    }
-                    else
-                    {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "---- +" + iTempPoints.ToString("0") + " score (*" + FinalBonusGranted.ToString("0.00") + " multiplier)", true);
-
-                        TotalItemPoints += iTempPoints;
-                    }
-                    HadPoints[i] = iTempPoints;
-
-                    // For item logs
-                    if (i != Constants.DEXTERITY && i != Constants.STRENGTH && i != Constants.INTELLIGENCE)
-                    {
-                        if (TownRun.ValueItemStatString != "")
-                            TownRun.ValueItemStatString += ". ";
-                        TownRun.ValueItemStatString += Constants.StatNames[i] + "=" + Math.Round(TempStatistic).ToString();
-                        if (TownRun.junkItemStatString != "")
-                            TownRun.junkItemStatString += ". ";
-                        TownRun.junkItemStatString += Constants.StatNames[i] + "=" + Math.Round(TempStatistic).ToString();
-                    }
-                }
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, string.Format("ItemType: {0}, has no crit so returning a score of 1000", itemType));
+                DisplayItemStats(item);
+                return 1000;
             }
 
-            // Now add on one of the three primary stat scores, whichever was higher
-            if (HighestScoringPrimary > 0)
+            if ((itemType == GItemType.Quiver || itemType == GItemType.SpiritStone) && item.Dexterity < 200)
             {
-
-                // Give a 30% of primary-stat-score-possible bonus to the primary scoring if paired with a good amount of life % or vitality
-                if ((HadStat[Constants.VITALITY] / ItemMaxStats[Constants.VITALITY] > (Constants.MinimumThreshold[Constants.VITALITY] + 0.1)) || SafeLifePercentage > 0.85)
-                    HighestScoringPrimary += ItemMaxPoints[WhichPrimaryIsHighest] * 0.3;
-
-                // Reduce a primary a little if there is no vitality or life
-                if ((HadStat[Constants.VITALITY] < 40) || SafeLifePercentage < 0.7)
-                    HighestScoringPrimary *= 0.8;
-                TotalItemPoints += HighestScoringPrimary;
-
-                TownRun.ValueItemStatString = Constants.StatNames[WhichPrimaryIsHighest] + "=" + Math.Round(AmountHighestScoringPrimary).ToString() + ". " + TownRun.ValueItemStatString;
-                TownRun.junkItemStatString = Constants.StatNames[WhichPrimaryIsHighest] + "=" + Math.Round(AmountHighestScoringPrimary).ToString() + ". " + TownRun.junkItemStatString;
-
-            }
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "--- +" + TotalItemPoints.ToString("0") + " total score pre-special reductions. (GlobalMultiplier=" + GlobalMultiplier.ToString("0.000") + ")", true);
-
-            // Global multiplier
-            TotalItemPoints *= GlobalMultiplier;
-
-            // 2 handed weapons and ranged weapons lose a large score for low DPS
-            if (baseItemType == GItemBaseType.WeaponRange || baseItemType == GItemBaseType.WeaponTwoHand)
-            {
-                if ((HadStat[Constants.TOTALDPS] / ItemMaxStats[Constants.TOTALDPS]) <= 0.7)
-                    TotalItemPoints *= 0.75;
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, string.Format("ItemType: {0}, doesn't have min 200 Dex", itemType));
+                DisplayItemStats(item);
+                return 1000;
             }
 
-            // Weapons should get a nice 15% bonus score for having very high primaries
-            if (baseItemType == GItemBaseType.WeaponRange || baseItemType == GItemBaseType.WeaponOneHand || baseItemType == GItemBaseType.WeaponTwoHand)
+            if ((itemType == GItemType.Orb || itemType == GItemType.Mojo) && item.Intelligence < 200)
             {
-                if (HighestScoringPrimary > 0 && (HighestScoringPrimary >= ItemMaxPoints[WhichPrimaryIsHighest] * 0.9))
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, string.Format("ItemType: {0}, doesn't have min 200 Int", itemType));
+                DisplayItemStats(item);
+                return 1000;
+            }
+            #endregion
+
+            int[] PossiblePrimarys = new int[] { System.Convert.ToInt32(item.Dexterity), System.Convert.ToInt32(item.Strength), System.Convert.ToInt32(item.Intelligence) };
+            int PrimaryStat = PossiblePrimarys.Max();
+            int itemScore = 1000;
+
+            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Type: =====: " + itemType);
+            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== baseItemType: =====: " + baseItemType);
+
+            //Calc Primary Stat
+            #region CalcPrimaryStat
+            if (PrimaryStat > 0)
+            {
+                float maxStat = 0;
+                if (System.Convert.ToInt32(item.Dexterity) > System.Convert.ToInt32(item.Strength) &&
+                    System.Convert.ToInt32(item.Dexterity) > System.Convert.ToInt32(item.Intelligence))
                 {
-                    TotalItemPoints *= 1.15;
+                    maxStat = item.Dexterity;
+                    TownRun.ValueItemStatString = "Dexterity:" + item.Dexterity.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
                 }
 
-                // And an extra 15% for a very high vitality
-                if (HadStat[Constants.VITALITY] > 0 && (HadStat[Constants.VITALITY] >= ItemMaxPoints[Constants.VITALITY] * 0.9))
+                if (System.Convert.ToInt32(item.Intelligence) > System.Convert.ToInt32(item.Strength) &&
+                    System.Convert.ToInt32(item.Intelligence) > System.Convert.ToInt32(item.Dexterity))
                 {
-                    TotalItemPoints *= 1.15;
+                    maxStat = item.Intelligence;
+                    TownRun.ValueItemStatString = "Intelligence:" + item.Intelligence.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
                 }
 
-                // And an extra 15% for a very high life-on-hit
-                if (HadStat[Constants.LIFEONHIT] > 0 && (HadStat[Constants.LIFEONHIT] >= ItemMaxPoints[Constants.LIFEONHIT] * 0.9))
+                if (System.Convert.ToInt32(item.Strength) > System.Convert.ToInt32(item.Dexterity) &&
+                    System.Convert.ToInt32(item.Strength) > System.Convert.ToInt32(item.Intelligence))
                 {
-                    TotalItemPoints *= 1.15;
+                    maxStat = item.Strength;
+                    TownRun.ValueItemStatString = "Strength:" + item.Strength.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
                 }
+
+                //Override primary stat
+                if (itemType == GItemType.Quiver ||
+                    itemType == GItemType.SpiritStone)
+                {
+                    PrimaryStat = System.Convert.ToInt32(item.Dexterity);
+                    maxStat = System.Convert.ToInt32(item.Dexterity);
+                    TownRun.ValueItemStatString = "Dexterity: " + item.Dexterity.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (itemType == GItemType.Orb ||
+                   itemType == GItemType.CeremonialKnife ||
+                   itemType == GItemType.WizardHat ||
+                   itemType == GItemType.VoodooMask)
+                {
+                    PrimaryStat = System.Convert.ToInt32(item.Intelligence);
+                    maxStat = item.Intelligence;
+                    TownRun.ValueItemStatString = "Intelligence: " + item.Intelligence.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (itemType == GItemType.MightyBelt ||
+                    itemType == GItemType.MightyWeapon)
+                {
+                    PrimaryStat = System.Convert.ToInt32(item.Strength);
+                    maxStat = item.Strength;
+                    TownRun.ValueItemStatString = "Strength: " + item.Strength.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                int imaxStat = int.Parse(maxStat.ToString());
+
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Primary Stat =====: " + PrimaryStat);
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max Primary Stat =====: " + ItemMaxStats[imaxStat]);
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Primary Stat Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(PrimaryStat / ItemMaxStats[imaxStat]) * 10000));
+                itemScore += System.Convert.ToInt32(System.Convert.ToDouble(PrimaryStat / ItemMaxStats[imaxStat]) * 10000);
+            }
+            #endregion
+
+
+            #region FollowerItems
+            if (itemType == GItemType.FollowerEnchantress && item.Intelligence > 310)
+            {
+                itemScore = 30000;
+                TownRun.ValueItemStatString += "Enchantress Follower Item has over 310 Intelligence, autoscore 30,000";
+                //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
             }
 
-            // Shields 
-            if (itemType == GItemType.Shield)
+            if (itemType == GItemType.FollowerScoundrel && item.Dexterity > 310)
+            {
+                itemScore = 30000;
+                TownRun.ValueItemStatString += "Scoundrel Follower Item has over 310 Dexterity, autoscore 30,000";
+                //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+            }
+
+            if (itemType == GItemType.FollowerTemplar && item.Strength > 310)
+            {
+                itemScore = 30000;
+                TownRun.ValueItemStatString += "Templar Follower Item has over 310 Strength, autoscore 30,000";
+                //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+            }
+            #endregion
+
+            #region WeaponScoring
+            if ((baseItemType == GItemBaseType.WeaponOneHand ||
+               baseItemType == GItemBaseType.WeaponRange) &&
+               item.WeaponDamagePerSecond > 950)
             {
 
-                // Strength/Dex based shield calculations
-                if (WhichPrimaryIsHighest == Constants.STRENGTH || WhichPrimaryIsHighest == Constants.DEXTERITY)
+                if (item.CritDamagePercent > 0)
+                    itemScore += 20000;
+
+                if (item.LifeOnHit > 0)
+                    itemScore += 20000;
+
+                if (item.LifeSteal > 0)
+                    itemScore += 20000;
+
+                if (item.Sockets > 0)
+                    itemScore += 20000;
+
+                TownRun.ValueItemStatString += "Bonus 40000 with 2 good stats for 1h and ranged weapons with over 950dps";
+            }
+
+            if (baseItemType == GItemBaseType.WeaponTwoHand && item.WeaponDamagePerSecond > 1350)
+            {
+
+                if (item.CritDamagePercent > 0)
+                    itemScore += 20000;
+
+                if (item.LifeOnHit > 0)
+                    itemScore += 20000;
+
+                if (item.LifeSteal > 0)
+                    itemScore += 20000;
+
+                if (item.Sockets > 0)
+                    itemScore += 20000;
+
+                TownRun.ValueItemStatString += "Bonus 40000 with 2 good stats for 2h weapons with over 1350dps";
+            }
+
+            if ((baseItemType == GItemBaseType.WeaponTwoHand ||
+               baseItemType == GItemBaseType.WeaponOneHand ||
+               baseItemType == GItemBaseType.WeaponRange) &&
+               item.WeaponDamagePerSecond > 0)
+            {
+                TownRun.ValueItemStatString += " -DPS:" + item.WeaponDamagePerSecond.ToString();
+                //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+            }
+            //Scoring Weapon
+            if ((baseItemType == GItemBaseType.WeaponTwoHand ||
+                 baseItemType == GItemBaseType.WeaponOneHand ||
+                 baseItemType == GItemBaseType.WeaponRange) &&
+                (item.WeaponDamagePerSecond > 0 &&
+                ((item.WeaponDamagePerSecond / ItemMaxStats[Constants.TOTALDPS]) * 100) > 75))
+            {
+                if (item.Sockets >= 1)
                 {
-                    if (HadStat[Constants.BLOCKCHANCE] < 20)
-                    {
-                        TotalItemPoints *= 0.7;
-                    }
-                    else if (HadStat[Constants.BLOCKCHANCE] < 25)
-                    {
-                        TotalItemPoints *= 0.9;
-                    }
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Number of SOCKETS =====: " + item.Sockets);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's SOCKETS points =====: " + item.Sockets * 10000);
+                    itemScore += System.Convert.ToInt32(item.Sockets * 10000);
+                    TownRun.ValueItemStatString += " -Sockets:" + item.Sockets.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
                 }
 
-                // Intelligence/no primary based shields
-                else
+
+                if (item.CritDamagePercent > 0 && ItemMaxStats[Constants.CRITDAMAGE] > 0)
                 {
-                    if (HadStat[Constants.BLOCKCHANCE] < 28)
-                        TotalItemPoints -= HadPoints[Constants.BLOCKCHANCE];
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's CRITDAMAGE =====: " + item.CritDamagePercent);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max CRITDAMAGE =====: " + ItemMaxStats[Constants.CRITDAMAGE]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's CRITDAMAGE Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.CritDamagePercent / ItemMaxStats[Constants.CRITDAMAGE]) * 10000));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.CritDamagePercent / ItemMaxStats[Constants.CRITDAMAGE]) * 10000);
+                    TownRun.ValueItemStatString += " -CritDamagePercent:" + item.CritDamagePercent.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.LifeOnHit > 0 && ItemMaxStats[Constants.LIFEONHIT] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's LIFEONHIT =====: " + item.LifeOnHit);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max LIFEONHIT =====: " + ItemMaxStats[Constants.LIFEONHIT]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's LIFEONHIT Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.LifeOnHit / ItemMaxStats[Constants.LIFEONHIT]) * 5000));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.LifeOnHit / ItemMaxStats[Constants.LIFEONHIT]) * 5000);
+                    TownRun.ValueItemStatString += " -LifeOnHit:" + item.LifeOnHit.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.LifeSteal > 0 && ItemMaxStats[Constants.LIFESTEAL] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's LIFESTEAL =====: " + item.LifeSteal);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max LIFESTEAL =====: " + ItemMaxStats[Constants.LIFESTEAL]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's LIFESTEAL Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.LifeSteal / ItemMaxStats[Constants.LIFESTEAL]) * 5000));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.LifeSteal / ItemMaxStats[Constants.LIFESTEAL]) * 5000);
+                    TownRun.ValueItemStatString += " -LifeSteal:" + item.LifeSteal.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's DPS =====: " + item.WeaponDamagePerSecond);
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max DPS =====: " + ItemMaxStats[Constants.TOTALDPS]);
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's DPS Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.WeaponDamagePerSecond / ItemMaxStats[Constants.TOTALDPS]) * 25000));
+                itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.WeaponDamagePerSecond / ItemMaxStats[Constants.TOTALDPS]) * 25000);
+            }
+            #endregion
+
+            #region ArmorJewelry
+            //Scoring Armor + Jewelry
+            if (baseItemType == GItemBaseType.Jewelry ||
+                baseItemType == GItemBaseType.Armor ||
+                baseItemType == GItemBaseType.Misc ||
+                baseItemType == GItemBaseType.Offhand ||
+                baseItemType == GItemBaseType.Unknown)
+            {
+                if (item.MinDamage > 0 && ItemMaxStats[Constants.MINDAMAGE] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's MINDAMAGE =====: " + item.MinDamage);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max MINDAMAGE =====: " + ItemMaxStats[Constants.MINDAMAGE]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's MINDAMAGE Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.MinDamage / ItemMaxStats[Constants.MINDAMAGE]) * 2500));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.MinDamage / ItemMaxStats[Constants.MINDAMAGE]) * 2500);
+                    TownRun.ValueItemStatString += " -MinDamage:" + item.MinDamage.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.MaxDamage > 0 && ItemMaxStats[Constants.MAXDAMAGE] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's MAXDAMAGE =====: " + item.MaxDamage);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max MAXDAMAGE =====: " + ItemMaxStats[Constants.MAXDAMAGE]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's MAXDAMAGE Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.MaxDamage / ItemMaxStats[Constants.MAXDAMAGE]) * 2500));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.MaxDamage / ItemMaxStats[Constants.MAXDAMAGE]) * 2500);
+                    TownRun.ValueItemStatString += " -MaxDamage:" + item.MaxDamage.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.CritPercent > 0 && ItemMaxStats[Constants.CRITCHANCE] > 0)
+                {
+                    //itemScore += 7500;
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's CRITCHANCE =====: " + item.CritPercent);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max CRITCHANCE =====: " + ItemMaxStats[Constants.CRITCHANCE]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's CRITCHANCE Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.CritPercent / ItemMaxStats[Constants.CRITCHANCE]) * 10000));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.CritPercent / ItemMaxStats[Constants.CRITCHANCE]) * 10000);
+                    TownRun.ValueItemStatString += " -CritPercent:" + item.CritPercent.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.CritDamagePercent > 0 && ItemMaxStats[Constants.CRITDAMAGE] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's CRITDAMAGE =====: " + item.CritDamagePercent);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max CRITDAMAGE =====: " + ItemMaxStats[Constants.CRITDAMAGE]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's CRITDAMAGE Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.CritDamagePercent / ItemMaxStats[Constants.CRITDAMAGE]) * 10000));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.CritDamagePercent / ItemMaxStats[Constants.CRITDAMAGE]) * 10000);
+                    TownRun.ValueItemStatString += " -CritDamagePercent:" + item.CritDamagePercent.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.AttackSpeedPercent > 0 && ItemMaxStats[Constants.ATTACKSPEED] > 0)
+                {
+                    //itemScore += 7500;
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ATTACKSPEED =====: " + item.AttackSpeedPercent);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max ATTACKSPEED =====: " + ItemMaxStats[Constants.ATTACKSPEED]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ATTACKSPEED Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.AttackSpeedPercent / ItemMaxStats[Constants.ATTACKSPEED]) * 10000));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.AttackSpeedPercent / ItemMaxStats[Constants.ATTACKSPEED]) * 10000);
+                    TownRun.ValueItemStatString += " -AttackSpeedPercent:" + item.AttackSpeedPercent.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"At VITALITY");
+                if (item.Vitality > 0 && ItemMaxStats[Constants.VITALITY] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's VITALITY =====: " + item.Vitality);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max VITALITY =====: " + ItemMaxStats[Constants.VITALITY]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's VITALITY Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.Vitality / ItemMaxStats[Constants.VITALITY]) * 10000));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.Vitality / ItemMaxStats[Constants.VITALITY]) * 10000);
+                    TownRun.ValueItemStatString += " -Vit:" + item.Vitality.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"At ALLRESIST");
+                if (item.ResistAll > 0 && ItemMaxStats[Constants.ALLRESIST] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ALLRESIST =====: " + item.ResistAll);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max ALLRESIST =====: " + ItemMaxStats[Constants.ALLRESIST]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ALLRESIST Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.ResistAll / ItemMaxStats[Constants.ALLRESIST]) * 10000));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.ResistAll / ItemMaxStats[Constants.ALLRESIST]) * 10000);
+                    TownRun.ValueItemStatString += " -RA:" + item.ResistAll.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"At MOVEMENTSPEED");
+                if (item.MovementSpeed > 0 && ItemMaxStats[Constants.MOVEMENTSPEED] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's MOVEMENTSPEED =====: " + item.MovementSpeed);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max MOVEMENTSPEED =====: " + ItemMaxStats[Constants.MOVEMENTSPEED]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's MOVEMENTSPEED Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.MovementSpeed / ItemMaxStats[Constants.MOVEMENTSPEED]) * 5000));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.MovementSpeed / ItemMaxStats[Constants.MOVEMENTSPEED]) * 5000);
+                    TownRun.ValueItemStatString += " -MS:" + item.MovementSpeed.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"At PICKUPRADIUS");
+                if (item.PickUpRadius > 0 && ItemMaxStats[Constants.PICKUPRADIUS] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's PICKUPRADIUS =====: " + item.PickUpRadius);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max PICKUPRADIUS =====: " + ItemMaxStats[Constants.PICKUPRADIUS]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's PICKUPRADIUS Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.PickUpRadius / ItemMaxStats[Constants.PICKUPRADIUS]) * 5000));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.PickUpRadius / ItemMaxStats[Constants.PICKUPRADIUS]) * 5000);
+                    TownRun.ValueItemStatString += " -PR:" + item.PickUpRadius.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.LifePercent > 0 && ItemMaxStats[Constants.LIFEPERCENT] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's LIFEPERCENT =====: " + item.LifePercent);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max LIFEPERCENT =====: " + ItemMaxStats[Constants.LIFEPERCENT]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's LIFEPERCENT Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.LifePercent / ItemMaxStats[Constants.LIFEPERCENT]) * 5000));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.LifePercent / ItemMaxStats[Constants.LIFEPERCENT]) * 5000);
+                    TownRun.ValueItemStatString += " -LP:" + item.LifePercent.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.ResistArcane > 0 && ItemMaxStats[Constants.RANDOMRESIST] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistArcane =====: " + item.ResistArcane);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max RANDOMRESIST =====: " + ItemMaxStats[Constants.RANDOMRESIST]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistArcane Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.ResistArcane / ItemMaxStats[Constants.RANDOMRESIST]) * 4000));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.ResistArcane / ItemMaxStats[Constants.RANDOMRESIST]) * 4000);
+                    TownRun.ValueItemStatString += " -AR:" + item.ResistArcane.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.ResistCold > 0 && ItemMaxStats[Constants.RANDOMRESIST] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistCold =====: " + item.ResistCold);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max RANDOMRESIST =====: " + ItemMaxStats[Constants.RANDOMRESIST]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistCold Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.ResistCold / ItemMaxStats[Constants.RANDOMRESIST]) * 2000));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.ResistCold / ItemMaxStats[Constants.RANDOMRESIST]) * 2000);
+                    TownRun.ValueItemStatString += " -CR:" + item.ResistCold.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.ResistFire > 0 && ItemMaxStats[Constants.RANDOMRESIST] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistFire =====: " + item.ResistFire);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max RANDOMRESIST =====: " + ItemMaxStats[Constants.RANDOMRESIST]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistFire Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.ResistFire / ItemMaxStats[Constants.RANDOMRESIST]) * 2500));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.ResistFire / ItemMaxStats[Constants.RANDOMRESIST]) * 2500);
+                    TownRun.ValueItemStatString += " -FR:" + item.ResistFire.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.ResistHoly > 0 && ItemMaxStats[Constants.RANDOMRESIST] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistHoly =====: " + item.ResistHoly);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max RANDOMRESIST =====: " + ItemMaxStats[Constants.RANDOMRESIST]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistHoly Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.ResistHoly / ItemMaxStats[Constants.RANDOMRESIST]) * 1500));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.ResistHoly / ItemMaxStats[Constants.RANDOMRESIST]) * 1500);
+                    TownRun.ValueItemStatString += " -HR:" + item.ResistHoly.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.ResistLightning > 0 && ItemMaxStats[Constants.RANDOMRESIST] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistLightning =====: " + item.ResistLightning);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max RANDOMRESIST =====: " + ItemMaxStats[Constants.RANDOMRESIST]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistLightning Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.ResistLightning / ItemMaxStats[Constants.RANDOMRESIST]) * 1500));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.ResistLightning / ItemMaxStats[Constants.RANDOMRESIST]) * 1500);
+                    TownRun.ValueItemStatString += " -LR:" + item.ResistLightning.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.ResistPhysical > 0 && ItemMaxStats[Constants.RANDOMRESIST] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistPhysical =====: " + item.ResistPhysical);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max RANDOMRESIST =====: " + ItemMaxStats[Constants.RANDOMRESIST]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistPhysical Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.ResistPhysical / ItemMaxStats[Constants.RANDOMRESIST]) * 3500));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.ResistPhysical / ItemMaxStats[Constants.RANDOMRESIST]) * 3500);
+                    TownRun.ValueItemStatString += " -PhR:" + item.ResistPhysical.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.ResistPoison > 0 && ItemMaxStats[Constants.RANDOMRESIST] > 0)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistPoison =====: " + item.ResistPoison);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Max RANDOMRESIST =====: " + ItemMaxStats[Constants.RANDOMRESIST]);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's ResistPoison Points =====: " + System.Convert.ToInt32(System.Convert.ToDouble(item.ResistPoison / ItemMaxStats[Constants.RANDOMRESIST]) * 3500));
+                    itemScore += System.Convert.ToInt32(System.Convert.ToDouble(item.ResistPoison / ItemMaxStats[Constants.RANDOMRESIST]) * 3500);
+                    TownRun.ValueItemStatString += " -PoR:" + item.ResistPoison.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
+                }
+
+                if (item.Sockets >= 1)
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's Number of SOCKETS =====: " + item.Sockets);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "===== Item's SOCKETS points =====: " + item.Sockets * 2500);
+                    itemScore += System.Convert.ToInt32(item.Sockets * 2500);
+                    TownRun.ValueItemStatString += " -Sockets:" + item.Sockets.ToString();
+                    //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation,"===== TownRun.ValueItemStatString: =====: " + TownRun.ValueItemStatString);
                 }
             }
+            #endregion
 
-            // Quivers
-            if (itemType == GItemType.Quiver)
+            #region FillMaxStats
+            //Give Amulets and Rings Bonus 2000 points
+            if (itemType == GItemType.Amulet ||
+                    itemType == GItemType.Ring)
             {
-                TotalRequirements = 0;
-                if (HadStat[Constants.DEXTERITY] >= 100)
-                    TotalRequirements++;
-                else
-                    TotalRequirements -= 3;
-                if (HadStat[Constants.DEXTERITY] >= 160)
-                    TotalRequirements++;
-                if (HadStat[Constants.DEXTERITY] >= 250)
-                    TotalRequirements++;
-                if (HadStat[Constants.ATTACKSPEED] < 14)
-                    TotalRequirements -= 2;
-                if (HadStat[Constants.VITALITY] >= 70 || SafeLifePercentage >= 0.85)
-                    TotalRequirements++;
-                else
-                    TotalRequirements--;
-                if (HadStat[Constants.VITALITY] >= 260)
-                    TotalRequirements++;
-                if (HadStat[Constants.MAXDISCIPLINE] >= 8)
-                    TotalRequirements++;
-                if (HadStat[Constants.MAXDISCIPLINE] >= 10)
-                    TotalRequirements++;
-                if (HadStat[Constants.SOCKETS] >= 1)
-                    TotalRequirements++;
-                if (HadStat[Constants.CRITCHANCE] >= 6)
-                    TotalRequirements++;
-                if (HadStat[Constants.CRITCHANCE] >= 8)
-                    TotalRequirements++;
-                if (HadStat[Constants.LIFEPERCENT] >= 8)
-                    TotalRequirements++;
-                if (HadStat[Constants.MAGICFIND] >= 18)
-                    TotalRequirements++;
-                if (TotalRequirements < 4)
-                    TotalItemPoints *= 0.4;
-                else if (TotalRequirements < 5)
-                    TotalItemPoints *= 0.5;
-                if (TotalRequirements >= 7)
-                    TotalItemPoints *= 1.2;
+                itemScore += 2000;
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, string.Format("Adding Bonus 2000 for Amulets and Rings, New item score", itemScore));
             }
+            #endregion
 
-            // Mojos and Sources
-            if (itemType == GItemType.Orb || itemType == GItemType.Mojo)
-            {
-                TotalRequirements = 0;
-                if (HadStat[Constants.INTELLIGENCE] >= 100)
-                    TotalRequirements++;
-                else if (HadStat[Constants.INTELLIGENCE] < 80)
-                    TotalRequirements -= 3;
-                else if (HadStat[Constants.INTELLIGENCE] < 100)
-                    TotalRequirements -= 1;
-                if (HadStat[Constants.INTELLIGENCE] >= 160)
-                    TotalRequirements++;
-                if (HadStat[Constants.MAXDAMAGE] >= 250)
-                    TotalRequirements++;
-                else
-                    TotalRequirements -= 2;
-                if (HadStat[Constants.MAXDAMAGE] >= 340)
-                    TotalRequirements++;
-                if (HadStat[Constants.MINDAMAGE] >= 50)
-                    TotalRequirements++;
-                else
-                    TotalRequirements--;
-                if (HadStat[Constants.MINDAMAGE] >= 85)
-                    TotalRequirements++;
-                if (HadStat[Constants.VITALITY] >= 70)
-                    TotalRequirements++;
-                if (HadStat[Constants.SOCKETS] >= 1)
-                    TotalRequirements++;
-                if (HadStat[Constants.CRITCHANCE] >= 6)
-                    TotalRequirements++;
-                if (HadStat[Constants.CRITCHANCE] >= 8)
-                    TotalRequirements++;
-                if (HadStat[Constants.LIFEPERCENT] >= 8)
-                    TotalRequirements++;
-                if (HadStat[Constants.MAGICFIND] >= 15)
-                    TotalRequirements++;
-                if (HadStat[Constants.MAXMANA] >= 60)
-                    TotalRequirements++;
-                if (HadStat[Constants.ARCANECRIT] >= 8)
-                    TotalRequirements++;
-                if (HadStat[Constants.ARCANECRIT] >= 10)
-                    TotalRequirements++;
-                if (TotalRequirements < 4)
-                    TotalItemPoints *= 0.4;
-                else if (TotalRequirements < 5)
-                    TotalItemPoints *= 0.5;
-                if (TotalRequirements >= 8)
-                    TotalItemPoints *= 1.2;
-            }
+            DisplayItemStats(item);
 
-            // Chests/cloaks/pants without a socket lose 17% of total score
-            if ((itemType == GItemType.Chest || itemType == GItemType.Cloak || itemType == GItemType.Legs) && HadStat[Constants.SOCKETS] == 0)
-                TotalItemPoints *= 0.83;
+            TownRun.junkItemStatString = TownRun.ValueItemStatString;
 
-            // Boots with no movement speed get reduced score
-            if ((itemType == GItemType.Boots) && HadStat[Constants.MOVEMENTSPEED] <= 6)
-                TotalItemPoints *= 0.75;
-
-            // Helmets
-            if (itemType == GItemType.Helm || itemType == GItemType.WizardHat || itemType == GItemType.VoodooMask || itemType == GItemType.SpiritStone)
-            {
-                // Helmets without a socket lose 20% of total score, and most of any MF/GF bonus
-                if (HadStat[Constants.SOCKETS] == 0)
-                {
-                    TotalItemPoints *= 0.8;
-                    if (HadStat[Constants.MAGICFIND] > 0 || HadStat[Constants.GOLDFIND] > 0)
-                    {
-                        if (HadStat[Constants.MAGICFIND] > 0 && HadStat[Constants.GOLDFIND] > 0)
-                            TotalItemPoints -= ((HadPoints[Constants.MAGICFIND] * 0.25) + (HadPoints[Constants.GOLDFIND] * 0.25));
-                        else
-                            TotalItemPoints -= ((HadPoints[Constants.MAGICFIND] * 0.65) + (HadPoints[Constants.GOLDFIND] * 0.65));
-                    }
-                }
-            }
-
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "--- +" + TotalItemPoints.ToString("0") + " total score after special reductions. (TotalRequirements=" + TotalRequirements + ")", true);
-
-            GetBestFinalPoints(itemType);
-
-            TotalItemPoints *= BestFinalBonus;
-
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "TOTAL: " + TotalItemPoints.ToString("0") + "(Final Bonus=" + BestFinalBonus.ToString("0.00") + ")");
-
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "");
-
-            return Math.Round(TotalItemPoints);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "===== Final Score =====: " + itemScore.ToString());
+            return itemScore;
         }
 
         internal static void ResetValuationStatStrings()
@@ -1052,7 +487,7 @@ namespace GilesTrinity
             TownRun.junkItemStatString = "";
         }
 
-        private static void CheckForInvalidItemType(GItemType itemType)
+        private static bool CheckForInvalidItemType(GItemType itemType)
         {
             // One Handed Weapons 
             if (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
@@ -1062,7 +497,7 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsWeaponOneHand, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.WeaponPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Two Handed Weapons
@@ -1073,8 +508,9 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsWeaponTwoHand, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.WeaponPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
+
             // Off-handed stuff
 
             // Mojo, Source, Quiver
@@ -1082,7 +518,7 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsOffHand, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Shields
@@ -1090,7 +526,7 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsShield, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Jewelry
@@ -1100,7 +536,7 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsAmulet, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.JewelryPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Ring
@@ -1108,7 +544,7 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsRing, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.JewelryPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Armor
@@ -1118,7 +554,7 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsBelt, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Boots
@@ -1126,7 +562,7 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsBoots, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Bracers
@@ -1134,7 +570,7 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsBracer, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Chest
@@ -1142,13 +578,13 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsChest, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
             if (itemType == GItemType.Cloak)
             {
                 Array.Copy(Constants.MaxPointsCloak, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Gloves
@@ -1156,7 +592,7 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsGloves, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Helm
@@ -1164,7 +600,7 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsHelm, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Pants
@@ -1172,13 +608,13 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsPants, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
             if (itemType == GItemType.MightyBelt)
             {
                 Array.Copy(Constants.MaxPointsMightyBelt, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Shoulders
@@ -1186,19 +622,19 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsShoulders, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
             if (itemType == GItemType.SpiritStone)
             {
                 Array.Copy(Constants.MaxPointsSpiritStone, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
             if (itemType == GItemType.VoodooMask)
             {
                 Array.Copy(Constants.MaxPointsVoodooMask, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Wizard Hat
@@ -1206,7 +642,7 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsWizardHat, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.ArmorPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
 
             // Follower Items
@@ -1214,105 +650,180 @@ namespace GilesTrinity
             {
                 Array.Copy(Constants.MaxPointsFollower, ItemMaxStats, Constants.TOTALSTATS);
                 Array.Copy(Constants.JewelryPointsAtMax, ItemMaxPoints, Constants.TOTALSTATS);
-                IsInvalidItem = false;
+                return false;
             }
+
+            return true;
         }
 
-        /// <summary>
-        /// Define Special Reductions
-        /// </summary>
-        /// <param name="itemType"></param>
-        private static void GetBestFinalPoints(GItemType itemType)
+        private static void DisplayItemStats(GilesCachedACDItem item)
         {
-            // Gold-find and pickup radius combined
-            if ((HadStat[Constants.GOLDFIND] / ItemMaxStats[Constants.GOLDFIND] > 0.55) && (HadStat[Constants.PICKUPRADIUS] / ItemMaxStats[Constants.PICKUPRADIUS] > 0.5))
-                TotalItemPoints += (((ItemMaxPoints[Constants.PICKUPRADIUS] + ItemMaxPoints[Constants.GOLDFIND]) / 2) * 0.25);
+            TownRun.ValueItemStatString += Environment.NewLine + "Complete List Of Item Stats:" + Environment.NewLine;
 
-            // All-resist and pickup radius combined
-            if ((HadStat[Constants.ALLRESIST] / ItemMaxStats[Constants.ALLRESIST] > 0.55) && (HadStat[Constants.PICKUPRADIUS] > 0))
-                TotalItemPoints += (((ItemMaxPoints[Constants.PICKUPRADIUS] + ItemMaxPoints[Constants.ALLRESIST]) / 2) * 0.65);
+            if (item.RealName != null)
+                TownRun.ValueItemStatString += "Real Name: " + item.RealName + Environment.NewLine;
 
-            // Special crit hit/crit chance/attack speed combos a.k.a Trifecta!
-            if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.8)) && (HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.8)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.8)))
-            {
-                if (BestFinalBonus < 3.2 && itemType != GItemType.Quiver)
-                    BestFinalBonus = 3.2;
-            }
+            if (item.InternalName != null)
+                TownRun.ValueItemStatString += "Internal Name: " + item.InternalName + Environment.NewLine;
 
-            /*
-             *  2.3 Bonus for 80% 2 of 3 CritDmg/Crit%/AttackSpd Combo
-             */
-            // 80% of crit chance, 80% crit damage of max for item
-            if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.8)) && (HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.8)))
-            {
-                if (BestFinalBonus < 2.3)
-                    BestFinalBonus = 2.3;
-            }
-            // 80% of crit chance, 80% of attack speed of max for item
-            if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.8)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.8)))
-            {
-                if (BestFinalBonus < 2.1 && itemType != GItemType.Quiver)
-                    BestFinalBonus = 2.1;
-            }
-            // 80% of crit damage, 80% of attack speed of max for item
-            if ((HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.8)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.8)))
-            {
-                if (BestFinalBonus < 1.8 && itemType != GItemType.Quiver)
-                    BestFinalBonus = 1.8;
-            }
-            /*
-             *  2.1 Bonus for 65% 2 of 3 CritDmg/Crit%/AttackSpd Combo
-             */
-            // 65% crit chance, 65% crit damage, 65% attack speed of max for item
-            if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.65)) && (HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.65)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.65)))
-            {
-                if (BestFinalBonus < 2.1 && itemType != GItemType.Quiver)
-                    BestFinalBonus = 2.1;
-            }
-            // 65% crit chance, 65% crit damage
-            if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.65)) && (HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.65)))
-            {
-                if (BestFinalBonus < 1.9) BestFinalBonus = 1.9;
-            }
-            // 65% crit chance, 65% attack speed of max for item
-            if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.65)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.65)))
-            {
-                if (BestFinalBonus < 1.7 && itemType != GItemType.Quiver)
-                    BestFinalBonus = 1.7;
-            }
-            // 65% crit damage, 65% attack speed of max for item
-            if ((HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.65)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.65)))
-            {
-                if (BestFinalBonus < 1.5 && itemType != GItemType.Quiver)
-                    BestFinalBonus = 1.5;
-            }
-            /*
-            *  1.7 Bonus for 45% 2 of 3 CritDmg/Crit%/AttackSpd Combo
-            */
-            // 45% crit chance, 45% crit damage, 45% attack speed of max for item
-            if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.45)) && (HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.45)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.45)))
-            {
-                if (BestFinalBonus < 1.7 && itemType != GItemType.Quiver)
-                    BestFinalBonus = 1.7;
-            }
-            // 45% crit chance, 45% crit damage, 45% attack speed of max for item
-            if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.45)) && (HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.45)))
-            {
-                if (BestFinalBonus < 1.4) BestFinalBonus = 1.4;
-            }
-            // 45% crit chance, 45% attack speed of max for item
-            if ((HadStat[Constants.CRITCHANCE] > (ItemMaxStats[Constants.CRITCHANCE] * 0.45)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.45)))
-            {
-                if (BestFinalBonus < 1.3 && itemType != GItemType.Quiver)
-                    BestFinalBonus = 1.3;
-            }
-            // 45% crit damage, 45% attack speed of max for item
-            if ((HadStat[Constants.CRITDAMAGE] > (ItemMaxStats[Constants.CRITDAMAGE] * 0.45)) && (HadStat[Constants.ATTACKSPEED] > (ItemMaxStats[Constants.ATTACKSPEED] * 0.45)))
-            {
-                if (BestFinalBonus < 1.1 && itemType != GItemType.Quiver)
-                    BestFinalBonus = 1.1;
-            }
+            if (item.Level > 0)
+                TownRun.ValueItemStatString += "Level: " + item.Level + Environment.NewLine;
+
+            if (item.ArcaneDamagePercent > 0)
+                TownRun.ValueItemStatString += "ArcaneDamagePercent: " + item.ArcaneDamagePercent + Environment.NewLine;
+
+            if (item.ArcaneOnCrit > 0)
+                TownRun.ValueItemStatString += "ArcaneOnCrit: " + item.ArcaneOnCrit + Environment.NewLine;
+
+            if (item.Armor > 0)
+                TownRun.ValueItemStatString += "Armor: " + item.Armor + Environment.NewLine;
+
+            if (item.ArmorBonus > 0)
+                TownRun.ValueItemStatString += "ArmorBonus: " + item.ArmorBonus + Environment.NewLine;
+
+            if (item.ArmorTotal > 0)
+                TownRun.ValueItemStatString += "ArmorTotal: " + item.ArmorTotal + Environment.NewLine;
+
+            if (item.AttackSpeedPercent > 0)
+                TownRun.ValueItemStatString += "AttackSpeedPercent: " + item.AttackSpeedPercent + Environment.NewLine;
+
+            if (item.BlockChance > 0)
+                TownRun.ValueItemStatString += "BlockChance: " + item.BlockChance + Environment.NewLine;
+
+            if (item.ColdDamagePercent > 0)
+                TownRun.ValueItemStatString += "ColdDamagePercent: " + item.ColdDamagePercent + Environment.NewLine;
+
+            if (item.CritDamagePercent > 0)
+                TownRun.ValueItemStatString += "CritDamagePercent: " + item.CritDamagePercent + Environment.NewLine;
+
+            if (item.CritPercent > 0)
+                TownRun.ValueItemStatString += "CritPercent: " + item.CritPercent + Environment.NewLine;
+
+            if (item.DamageReductionPhysicalPercent > 0)
+                TownRun.ValueItemStatString += "DamageReductionPhysicalPercent: " + item.DamageReductionPhysicalPercent + Environment.NewLine;
+
+            if (item.Dexterity > 0)
+                TownRun.ValueItemStatString += "Dexterity: " + item.Dexterity + Environment.NewLine;
+
+            if (item.FireDamagePercent > 0)
+                TownRun.ValueItemStatString += "FireDamagePercent: " + item.FireDamagePercent + Environment.NewLine;
+
+            if (item.GlobeBonus > 0)
+                TownRun.ValueItemStatString += "GlobeBonus: " + item.GlobeBonus + Environment.NewLine;
+
+            if (item.GoldAmount > 0)
+                TownRun.ValueItemStatString += "GoldAmount: " + item.GoldAmount + Environment.NewLine;
+
+            if (item.GoldFind > 0)
+                TownRun.ValueItemStatString += "GoldFind: " + item.GoldFind + Environment.NewLine;
+
+            if (item.HatredRegen > 0)
+                TownRun.ValueItemStatString += "HatredRegen: " + item.HatredRegen + Environment.NewLine;
+
+            if (item.HealthGlobeBonus > 0)
+                TownRun.ValueItemStatString += "HealthGlobeBonus: " + item.HealthGlobeBonus + Environment.NewLine;
+
+            if (item.HealthPerSecond > 0)
+                TownRun.ValueItemStatString += "HealthPerSecond: " + item.HealthPerSecond + Environment.NewLine;
+
+            if (item.HealthPerSpiritSpent > 0)
+                TownRun.ValueItemStatString += "HealthPerSpiritSpent: " + item.HealthPerSpiritSpent + Environment.NewLine;
+
+            if (item.HolyDamagePercent > 0)
+                TownRun.ValueItemStatString += "HolyDamagePercent: " + item.HolyDamagePercent + Environment.NewLine;
+
+            if (item.Intelligence > 0)
+                TownRun.ValueItemStatString += "Intelligence: " + item.Intelligence + Environment.NewLine;
+
+            if (item.LifeOnHit > 0)
+                TownRun.ValueItemStatString += "LifeOnHit: " + item.LifeOnHit + Environment.NewLine;
+
+            if (item.LifePercent > 0)
+                TownRun.ValueItemStatString += "LifePercent: " + item.LifePercent + Environment.NewLine;
+
+            if (item.LifeSteal > 0)
+                TownRun.ValueItemStatString += "LifeSteal: " + item.LifeSteal + Environment.NewLine;
+
+            if (item.LightningDamagePercent > 0)
+                TownRun.ValueItemStatString += "LightningDamagePercent: " + item.LightningDamagePercent + Environment.NewLine;
+
+            if (item.MagicFind > 0)
+                TownRun.ValueItemStatString += "MagicFind: " + item.MagicFind + Environment.NewLine;
+
+            if (item.ManaRegen > 0)
+                TownRun.ValueItemStatString += "ManaRegen: " + item.ManaRegen + Environment.NewLine;
+
+            if (item.MaxArcanePower > 0)
+                TownRun.ValueItemStatString += "MaxArcanePower: " + item.MaxArcanePower + Environment.NewLine;
+
+            if (item.MaxDamage > 0)
+                TownRun.ValueItemStatString += "MaxDamage: " + item.MaxDamage + Environment.NewLine;
+
+            if (item.MaxDiscipline > 0)
+                TownRun.ValueItemStatString += "MaxDiscipline: " + item.MaxDiscipline + Environment.NewLine;
+
+            if (item.MaxFury > 0)
+                TownRun.ValueItemStatString += "MaxFury: " + item.MaxFury + Environment.NewLine;
+
+            if (item.MaxMana > 0)
+                TownRun.ValueItemStatString += "MaxMana: " + item.MaxMana + Environment.NewLine;
+
+            if (item.MaxSpirit > 0)
+                TownRun.ValueItemStatString += "MaxSpirit: " + item.MaxSpirit + Environment.NewLine;
+
+            if (item.MinDamage > 0)
+                TownRun.ValueItemStatString += "MinDamage: " + item.MinDamage + Environment.NewLine;
+
+            if (item.MovementSpeed > 0)
+                TownRun.ValueItemStatString += "MovementSpeed: " + item.MovementSpeed + Environment.NewLine;
+
+            if (item.PickUpRadius > 0)
+                TownRun.ValueItemStatString += "PickUpRadius: " + item.PickUpRadius + Environment.NewLine;
+
+            if (item.PoisonDamagePercent > 0)
+                TownRun.ValueItemStatString += "PoisonDamagePercent: " + item.PoisonDamagePercent + Environment.NewLine;
+
+            if (item.ResistAll > 0)
+                TownRun.ValueItemStatString += "ResistAll: " + item.ResistAll + Environment.NewLine;
+
+            if (item.ResistArcane > 0)
+                TownRun.ValueItemStatString += "ResistArcane: " + item.ResistArcane + Environment.NewLine;
+
+            if (item.ResistCold > 0)
+                TownRun.ValueItemStatString += "ResistCold: " + item.ResistCold + Environment.NewLine;
+
+            if (item.ResistFire > 0)
+                TownRun.ValueItemStatString += "ResistFire: " + item.ResistFire + Environment.NewLine;
+
+            if (item.ResistHoly > 0)
+                TownRun.ValueItemStatString += "ResistHoly: " + item.ResistHoly + Environment.NewLine;
+
+            if (item.ResistLightning > 0)
+                TownRun.ValueItemStatString += "ResistLightning: " + item.ResistLightning + Environment.NewLine;
+
+            if (item.ResistPhysical > 0)
+                TownRun.ValueItemStatString += "ResistPhysical: " + item.ResistPhysical + Environment.NewLine;
+
+            if (item.ResistPoison > 0)
+                TownRun.ValueItemStatString += "ResistPoison: " + item.ResistPoison + Environment.NewLine;
+
+            if (item.Sockets > 0)
+                TownRun.ValueItemStatString += "Sockets: " + item.Sockets + Environment.NewLine;
+
+            if (item.SpiritRegen > 0)
+                TownRun.ValueItemStatString += "SpiritRegen: " + item.SpiritRegen + Environment.NewLine;
+
+            if (item.Strength > 0)
+                TownRun.ValueItemStatString += "Strength: " + item.Strength + Environment.NewLine;
+
+            if (item.Thorns > 0)
+                TownRun.ValueItemStatString += "Thorns: " + item.Thorns + Environment.NewLine;
+
+            if (item.Vitality > 0)
+                TownRun.ValueItemStatString += "Vitality: " + item.Vitality + Environment.NewLine;
+
+            if (item.WeaponDPS > 0)
+                TownRun.ValueItemStatString += "WeaponDPS: " + item.WeaponDPS + Environment.NewLine;
         }
-
     }
 }

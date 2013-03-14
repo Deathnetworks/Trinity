@@ -89,14 +89,16 @@
         </Grid>
         
         <!--All CheckBox-->
-        <StackPanel Grid.Row="4" Orientation="Vertical" HorizontalAlignment="Center" Margin="5">
+        <UniformGrid Grid.Row="4" Columns="2" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="5,0">
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.ExtendedTrashKill}" ToolTip="Extended range for ~ 2 seconds">Extend trash-kill range after combat</CheckBox>
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AvoidAOE}">Attempt to avoid AOE</CheckBox>
+            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AvoidAOE}">Attempt to avoid AoE</CheckBox>
+            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.KillMonstersInAoE}" ToolTip="Attack units standing in AoE">Attack Units in AoE</CheckBox>
+            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Use movement spells</CheckBox>
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.CollectHealthGlobe}">Attempt to collect health globes</CheckBox>
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Allow out-of-combat movement powers</CheckBox>
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AllowBacktracking}" ToolTip="currently experimental and buggy">Allow Backtracking path after combat</CheckBox>
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>
-        </StackPanel>
+            <!--<CheckBox Margin="2" IsChecked="{Binding Path=Misc.AllowBacktracking}" ToolTip="currently experimental and buggy">Allow Backtracking path after combat</CheckBox>-->
+            <!--<CheckBox Margin="2" IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>-->
+            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.IgnoreElites}" ToolTip="Attack trash mobs only">Ignore Elite/Rare/Unique</CheckBox>
+        </UniformGrid>
         <!--Reset Button-->
         <Button Grid.Row="5" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetMiscCommand}">Reset</Button>
     </Grid>

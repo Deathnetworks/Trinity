@@ -111,6 +111,7 @@ namespace GilesTrinity
                 }
                 // Pull up the Monster Affix cached data
                 monsterAffixes = RefreshAffixes(c_CommonData);
+
                 /*
                  * 
                  * This should be moved to HandleTarget

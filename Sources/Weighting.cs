@@ -101,6 +101,12 @@ namespace GilesTrinity
                                         cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount);
                                 }
 
+                                if (Settings.Combat.Misc.IgnoreElites && (cacheObject.IsEliteRareUnique))
+                                {
+                                    break;
+                                }
+
+
                                 // No champions, no mobs nearby, no treasure goblins to prioritize, and not injured, so skip mobs
                                 if (bIgnoreAllUnits)
                                 {
@@ -266,12 +272,12 @@ namespace GilesTrinity
                                         if (cacheObject.Weight < 300)
                                             cacheObject.Weight = 300;
 
-                                        // If any AoE between us and target, do not attack
-                                        if (hashAvoidanceObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
+                                        // If any AoE between us and target, do not attack, for non-ranged attacks only
+                                        if (!Settings.Combat.Misc.KillMonstersInAoE && PlayerKiteDistance <= 0 && hashAvoidanceObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                             cacheObject.Weight = 1;
 
-                                        // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
-                                        if (hashAvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
+                                        // See if there's any AOE avoidance in that spot, if so reduce the weight to 1, for non-ranged attacks only
+                                        if (!Settings.Combat.Misc.KillMonstersInAoE && PlayerKiteDistance <= 0 && hashAvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
                                             cacheObject.Weight = 1;
 
                                         if (PlayerKiteDistance > 0)
@@ -283,7 +289,6 @@ namespace GilesTrinity
                                                 cacheObject.Weight = 0;
                                             }
                                         }
-
 
                                         // Deal with treasure goblins - note, of priority is set to "0", then the is-a-goblin flag isn't even set for use here - the monster is ignored
                                         if (cacheObject.IsTreasureGoblin && !GilesObjectCache.Any(u => (u.Type == GObjectType.Door || u.Type == GObjectType.Barricade) && u.RadiusDistance <= 40f))
