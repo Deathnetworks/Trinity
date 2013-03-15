@@ -120,12 +120,12 @@ namespace GilesTrinity
             }
             // Threatening shout
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_ThreateningShout) && !PlayerStatus.IsIncapacitated &&
-              (
-                  ElitesWithinRange[RANGE_20] >= 2 || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 20) ||
-                  (AnythingWithinRange[RANGE_20] >= 3 && !anyBossesInRange && (ElitesWithinRange[RANGE_50] == 0 || Hotbar.Contains(SNOPower.Barbarian_SeismicSlam))) ||
-                  PlayerStatus.CurrentHealthPct <= 0.75 || (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource <= 10) ||
+                ((TargetUtil.AnyMobsInRange(25, Settings.Combat.Barbarian.MinThreatShoutMobCount)) || TargetUtil.IsEliteTargetInRange(25f)) &&
+                (
+                  PlayerStatus.CurrentHealthPct <= 0.75 || 
+                  (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource <= 10) ||
                   (IsWaitingForSpecial && PlayerStatus.PrimaryResource <= 50)
-                  ) &&
+                ) &&
               GilesUseTimer(SNOPower.Barbarian_ThreateningShout, true) && PowerManager.CanCast(SNOPower.Barbarian_ThreateningShout))
             {
                 return new TrinityPower(SNOPower.Barbarian_ThreateningShout, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
