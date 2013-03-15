@@ -17,8 +17,6 @@ namespace GilesTrinity
 {
     public partial class GilesTrinity : IPlugin
     {
-        
-
         // How many total leave games, for stat-tracking?
         public static int iTotalJoinGames = 0;
         // How many total leave games, for stat-tracking?

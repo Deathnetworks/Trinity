@@ -270,7 +270,7 @@ namespace GilesTrinity
             //bool hasEmpoweredWaveRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WaveOfLight && s.RuneIndex == 3);
 
             bool hasEmpoweredWaveRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WaveOfLight && s.RuneIndex == 3);
-            var minWoLSpirit = hasEmpoweredWaveRune ? 40 : 70;
+            var minWoLSpirit = hasEmpoweredWaveRune ? 40 : 75;
             // Wave of light
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_WaveOfLight) && GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
                 (TargetUtil.AnyMobsInRange(16f, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(20f)) &&
