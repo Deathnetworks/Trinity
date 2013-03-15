@@ -41,8 +41,8 @@ namespace GilesTrinity
                 bool hasWrathOfTheBerserker = PlayerStatus.ActorClass == ActorClass.Barbarian && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
 
                 int TrashMobCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsTrashMob);
-                int EliteCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
-                int AvoidanceCount = GilesObjectCache.Count(o => o.Type == GObjectType.Avoidance && o.CentreDistance <= 50f);
+                int EliteCount = Settings.Combat.Misc.IgnoreElites ? 0 : GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
+                int AvoidanceCount = Settings.Combat.Misc.AvoidAOE ? 0 : GilesObjectCache.Count(o => o.Type == GObjectType.Avoidance && o.CentreDistance <= 50f);
 
                 bool profileTagCheck = false;
                 if (ProfileManager.CurrentProfileBehavior != null)
@@ -101,7 +101,7 @@ namespace GilesTrinity
                                         cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount);
                                 }
 
-                                if (Settings.Combat.Misc.IgnoreElites && (cacheObject.IsEliteRareUnique))
+                                if (Settings.Combat.Misc.IgnoreElites && (cacheObject.IsEliteRareUnique) && !TownRun.IsTryingToTownPortal())
                                 {
                                     break;
                                 }

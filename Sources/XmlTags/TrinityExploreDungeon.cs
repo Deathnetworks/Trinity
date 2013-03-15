@@ -230,6 +230,18 @@ namespace GilesTrinity.XmlTags
         public bool TownPortalOnTimeout { get; set; }
 
         /// <summary>
+        /// Ignore last N nodes of dungeon explorer, when using endType=FullyExplored
+        /// </summary>
+        [XmlAttribute("ignoreLastNodes")]
+        public int IgnoreLastNodes { get; set; }
+
+        /// <summary>
+        /// Used with IgnoreLastNodes, minimum visited node coutn before tag can end
+        /// </summary>
+        [XmlAttribute("minVisitedNodes")]
+        public int MinVisistedNodes { get; set; }
+
+        /// <summary>
         /// The Position of the CurrentNode NavigableCenter
         /// </summary>
         private Vector3 CurrentNavTarget
@@ -507,9 +519,15 @@ namespace GilesTrinity.XmlTags
             return
             new PrioritySelector(
                 TimeoutCheck(),
+                new Decorator(ret => EndType == TrinityExploreEndType.FullyExplored && IgnoreLastNodes > 0 && GetRouteUnvisitedNodeCount() <= IgnoreLastNodes && GetGridSegmentationVisistedNodeCount() >= MinVisistedNodes,
+                    new Sequence(
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fully explored area! Ignoring {0} nodes. Tag Finished.", IgnoreLastNodes)),
+                        new Action(ret => isDone = true)
+                    )
+                ),
                 new Decorator(ret => EndType == TrinityExploreEndType.FullyExplored && GetRouteUnvisitedNodeCount() == 0,
                     new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fully explored area! Tag Finished.", ExitNameHash)),
+                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fully explored area! Tag Finished.", 0)),
                         new Action(ret => isDone = true)
                     )
                 ),

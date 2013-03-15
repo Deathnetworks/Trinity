@@ -61,15 +61,12 @@ namespace GilesTrinity
                 CurrentTarget.ActorSNO != 193077 &&
                 // Make sure we are allowed to use wrath on goblins, else make sure this isn't a goblin
                 (Settings.Combat.Barbarian.UseWOTBGoblin || !CurrentTarget.IsTreasureGoblin || ElitesWithinRange[RANGE_15] >= 1) &&
-                // If on a boss, only when injured
-                ((CurrentTarget.IsBoss && CurrentTarget.HitPointsPct <= 0.99 && !Hotbar.Contains(SNOPower.Barbarian_Whirlwind)) ||
-                // If *NOT* on a boss, and definitely no boss in range, then judge based on any elites at all within 30 feet
-                 ((!CurrentTarget.IsBoss || Hotbar.Contains(SNOPower.Barbarian_Whirlwind)) &&
-                   (!anyBossesInRange || Hotbar.Contains(SNOPower.Barbarian_Whirlwind)) &&
-                   ((ElitesWithinRange[RANGE_20] >= 1 || CurrentTarget.IsEliteRareUnique) && (CurrentTarget.HitPointsPct >= 0.30 || PlayerStatus.CurrentHealthPct <= 0.60))
-                 )) &&
-                //Do not activate too far from targets (for bosses / uber elites)
-                CurrentTarget.CentreDistance <= 35f &&
+                // If ignoring elites completely, trigger on 3 trash within 16 yards
+                ((Settings.Combat.Misc.IgnoreElites && TargetUtil.AnyMobsInRange(16,3) || !Settings.Combat.Misc.IgnoreElites) ||
+                // Otherwise use when Elite target is in 20 yards
+                (TargetUtil.AnyElitesInRange(20,1) || TargetUtil.IsEliteTargetInRange(20f)) ||
+                // Or if our health is low
+                PlayerStatus.CurrentHealthPct <= 60) &&
                 // Don't still have the buff
                 !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) && PowerManager.CanCast(SNOPower.Barbarian_WrathOfTheBerserker))
             {

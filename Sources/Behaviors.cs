@@ -436,6 +436,7 @@ namespace GilesTrinity
                                         else
                                         {
                                             iInteractAttempts = HandleItemInRange();
+                                            runStatus = HandlerRunStatus.TreeRunning;
                                         }
                                         //check if we are returning to the tree
                                         if (runStatus != HandlerRunStatus.NotFinished)
