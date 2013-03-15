@@ -5,6 +5,16 @@
 
 * DH Sentry Turrent still does not work, appears to be DB bug
 
+### Changelog 1.7.2.10:
+
+* Fixed CPU utilization increase bug, due to monster TeamID cache
+
+* Added GUI Combat>Misc option to Attack monsters standing in AoE
+
+* Added GUI Combat>Misc option to ignore all elite/rare/unique monsters
+
+* Fixed Monk WoL spirit, was attempting to use at 70 spirit instead of 75
+
 ### Changelog 1.7.2.9:
 
 * More fixes for not-attacking stuff after a single attack is used
