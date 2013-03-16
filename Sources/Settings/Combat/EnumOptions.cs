@@ -31,4 +31,11 @@ namespace GilesTrinity.Settings.Combat
         RebuffArmor,
         RebuffMagicWeaponFamiliar,
     }
+
+    public enum DestructibleIgnoreOption
+    {
+        ForceIgnore,
+        OnlyIfStuck,
+        DestroyAll
+    }
 }

@@ -24,19 +24,21 @@ namespace GilesTrinity
         {
             using (new PerformanceLogger("RefreshDiaObjectCache.Weighting"))
             {
+                double MovementSpeed = PlayerMover.GetMovementSpeed();
+
                 // Store if we are ignoring all units this cycle or not
-                bool bIgnoreAllUnits = !bAnyChampionsPresent &&
-                                        !bAnyMobsInCloseRange &&
+                bool bIgnoreAllUnits = !AnyElitesPresent &&
+                                        !AnyMobsInRange &&
                                         (
                                             (
-                                                !bAnyTreasureGoblinsPresent &&
+                                                !AnyTreasureGoblinsPresent &&
                                                 Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize
                                             ) ||
                                             Settings.Combat.Misc.GoblinPriority < GoblinPriority.Prioritize
                                         ) &&
                                         PlayerStatus.CurrentHealthPct >= 0.85d;
 
-                bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || PlayerStatus.IsRooted || PlayerMover.GetMovementSpeed() < 1 || GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 5f) >= 3);
+                bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || PlayerStatus.IsRooted || MovementSpeed < 1 || GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 5f) >= 3);
 
                 bool hasWrathOfTheBerserker = PlayerStatus.ActorClass == ActorClass.Barbarian && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
 
@@ -53,8 +55,6 @@ namespace GilesTrinity
                         profileTagCheck = true;
                     }
                 }
-
-                double MovementSpeed = PlayerMover.GetMovementSpeed();
 
                 bool ShouldIgnoreTrashMobs =
                     (!TownRun.IsTryingToTownPortal() &&
@@ -89,18 +89,19 @@ namespace GilesTrinity
                                 if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && !cacheObject.HasBeenPrimaryTarget && cacheObject.RadiusDistance >= 2f &&
                                     !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize))
                                 {
-                                    unitWeightInfo = String.Format("Ignoring trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9}",
+                                    unitWeightInfo = String.Format("Ignoring trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12}",
                                         cacheObject.InternalName, cacheObject.RActorGuid, nearbyMonsterCount, Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius,
-                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount);
+                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, PlayerStatus.Level, PrioritizeCloseRangeUnits);
                                     break;
                                 }
                                 else
                                 {
-                                    unitWeightInfo = String.Format("Adding trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9}",
+                                    unitWeightInfo = String.Format("Adding trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12}",
                                         cacheObject.InternalName, cacheObject.RActorGuid, nearbyMonsterCount, Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius,
-                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount);
+                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, PlayerStatus.Level, PrioritizeCloseRangeUnits);
                                 }
 
+                                // Ignore elite option, except if trying to town portal
                                 if (Settings.Combat.Misc.IgnoreElites && (cacheObject.IsEliteRareUnique) && !TownRun.IsTryingToTownPortal())
                                 {
                                     break;
@@ -118,6 +119,7 @@ namespace GilesTrinity
                                 {
                                     break;
                                 }
+
                                 if (cacheObject.HitPoints <= 0)
                                 {
                                     break;
@@ -221,7 +223,7 @@ namespace GilesTrinity
 
                                         // Starting weight of 5000
                                         if (cacheObject.IsTrashMob)
-                                            cacheObject.Weight = (iCurrentMaxKillRadius - cacheObject.RadiusDistance) / iCurrentMaxKillRadius * 5000;
+                                            cacheObject.Weight = (CurrentBotKillRange - cacheObject.RadiusDistance) / CurrentBotKillRange * 5000;
 
                                         // Starting weight of 8000 for elites
                                         if (cacheObject.IsBossOrEliteRareUnique)
@@ -386,7 +388,7 @@ namespace GilesTrinity
                                     cacheObject.Weight = 1;
 
                                 // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
-                                if (CurrentTarget != null && bAnyMobsInCloseRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting && cacheObject.ItemQuality < ItemQuality.Legendary)
+                                if (CurrentTarget != null && AnyMobsInRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting && cacheObject.ItemQuality < ItemQuality.Legendary)
                                     cacheObject.Weight = 1;
 
                                 // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1

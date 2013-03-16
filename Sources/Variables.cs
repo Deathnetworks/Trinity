@@ -339,11 +339,11 @@ namespace GilesTrinity
         public static bool bOnlyTarget = false;
 
         // Target provider and core routine variables
-        private static bool bAnyChampionsPresent = false;
-        private static bool bAnyTreasureGoblinsPresent = false;
-        private static bool bAnyMobsInCloseRange = false;
-        private static float iCurrentMaxKillRadius = 0f;
-        private static float iCurrentMaxLootRadius = 0f;
+        private static bool AnyElitesPresent = false;
+        private static bool AnyTreasureGoblinsPresent = false;
+        private static bool AnyMobsInRange = false;
+        private static float CurrentBotKillRange = 0f;
+        private static float CurrentBotLootRange = 0f;
         internal static bool MaintainTempestRush = false;
 
         /// <summary>

@@ -78,7 +78,7 @@ namespace GilesTrinity
                 using (new PerformanceLogger("RefreshDiaObjectCache.AvoidanceCheck"))
                 {
                     // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
-                    if (StandingInAvoidance && (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
+                    if (StandingInAvoidance && (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
                         DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
                     {
                         Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, PlayerStatus.CurrentPosition, true);
@@ -253,28 +253,28 @@ namespace GilesTrinity
                 //reset current target
                 CurrentTarget = null;
                 // Reset all variables for target-weight finding
-                bAnyTreasureGoblinsPresent = false;
-                iCurrentMaxKillRadius = Math.Min((float)(Settings.Combat.Misc.NonEliteRange), Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius);
+                AnyTreasureGoblinsPresent = false;
+                CurrentBotKillRange = Math.Min((float)(Settings.Combat.Misc.NonEliteRange), Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius);
 
-                iCurrentMaxLootRadius = Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius;
+                CurrentBotLootRange = Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius;
                 ShouldStayPutDuringAvoidance = false;
                 // Set up the fake object for the target handler
                 FakeObject = null;
 
                 // Always have a minimum kill radius, so we're never getting whacked without retaliating
-                if (iCurrentMaxKillRadius < 10)
-                    iCurrentMaxKillRadius = 10;
+                if (CurrentBotKillRange < 10)
+                    CurrentBotKillRange = 10;
 
                 // Not allowed to kill monsters due to profile/routine/combat targeting settings - just set the kill range to a third
                 if (!ProfileManager.CurrentProfile.KillMonsters || !CombatTargeting.Instance.AllowedToKillMonsters)
                 {
-                    iCurrentMaxKillRadius = 0;
+                    CurrentBotKillRange = 0;
                 }
 
                 // Not allowed to loots due to profile/routine/loot targeting settings - just set range to a quarter
                 if (!ProfileManager.CurrentProfile.PickupLoot || !LootTargeting.Instance.AllowedToLoot)
                 {
-                    iCurrentMaxLootRadius = 0;
+                    CurrentBotLootRange = 0;
                 }
 
                 if (PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
@@ -305,8 +305,8 @@ namespace GilesTrinity
                 hashMonsterObstacleCache = new HashSet<GilesObstacle>();
                 hashAvoidanceObstacleCache = new HashSet<GilesObstacle>();
                 hashNavigationObstacleCache = new HashSet<GilesObstacle>();
-                bAnyChampionsPresent = false;
-                bAnyMobsInCloseRange = false;
+                AnyElitesPresent = false;
+                AnyMobsInRange = false;
                 TownRun.lastDistance = 0f;
                 IsAvoidingProjectiles = false;
                 // Every 15 seconds, clear the "blackspots" where avoidance failed, so we can re-check them
@@ -376,6 +376,7 @@ namespace GilesTrinity
         private static HashSet<string> ignoreNames = new HashSet<string>
         {
             "MarkerLocation", "Generic_Proxy", "Hireling", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint", "TriggerSphere", 
+            "minimapicon",
         };
 
         private static void RefreshCacheMainLoop()
@@ -694,7 +695,7 @@ namespace GilesTrinity
                 }
 
                 // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
-                bool shouldKamikazeTreasureGoblins = (!bAnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize);
+                bool shouldKamikazeTreasureGoblins = (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize);
 
                 double msCancelledEmergency = DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds;
                 bool shouldEmergencyMove = msCancelledEmergency >= cancelledEmergencyMoveForMilliseconds && NeedToKite;

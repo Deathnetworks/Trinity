@@ -53,8 +53,6 @@ namespace GilesTrinity.XmlTags
         void TrinityLoadOnce_OnGameJoined(object sender, EventArgs e)
         {
             UsedProfiles = new List<string>();
-
-
         }
 
 
@@ -71,7 +69,7 @@ namespace GilesTrinity.XmlTags
 
             initialized = true;
 
-            
+
         }
 
         // Re-align filenames with A, B, n, etc

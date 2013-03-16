@@ -9,6 +9,7 @@ namespace GilesTrinity.Settings.Combat
         #region Fields
         private GoblinPriority _GoblinPriority;
         private int _NonEliteRange;
+        private int _EliteRange;
         private bool _ExtendedTrashKill;
         private bool _AvoidAOE;
         private bool _KillMonstersInAoE;
@@ -124,6 +125,24 @@ namespace GilesTrinity.Settings.Combat
                 {
                     _NonEliteRange = value;
                     OnPropertyChanged("NonEliteRange");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(150)]
+        public int EliteRange
+        {
+            get
+            {
+                return _EliteRange;
+            }
+            set
+            {
+                if (_EliteRange != value)
+                {
+                    _EliteRange = value;
+                    OnPropertyChanged("EliteRange");
                 }
             }
         }
@@ -312,6 +331,7 @@ namespace GilesTrinity.Settings.Combat
             this.TrashPackClusterRadius = 40f;
             this.TrashPackSize = 2;
             this.KillMonstersInAoE = true;
+            this.EliteRange = 150;
         }
         #endregion Methods
     }

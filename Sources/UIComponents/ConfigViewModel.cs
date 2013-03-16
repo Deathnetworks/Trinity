@@ -212,7 +212,7 @@ namespace GilesTrinity.UIComponents
         /// Gets the reset command for World Object Tab.
         /// </summary>
         /// <value>The reset command for World Object Tab.</value>
-        public ICommand ResetWorldObjetCommand
+        public ICommand ResetWorldObjectCommand
         {
             get;
             private set;
@@ -502,7 +502,7 @@ namespace GilesTrinity.UIComponents
                                         _Model.Combat.DemonHunter.Reset();
                                         _Model.Combat.AvoidanceRadius.Reset();
                                     });
-            ResetWorldObjetCommand = new RelayCommand(
+            ResetWorldObjectCommand = new RelayCommand(
                                     (parameter) =>
                                     {
                                         _Model.WorldObject.Reset();

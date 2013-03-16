@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
+using GilesTrinity.Settings.Combat;
 
 namespace GilesTrinity.Settings
 {
@@ -17,7 +18,7 @@ namespace GilesTrinity.Settings
         private bool _UseEmpoweredShrine;
         private bool _UseEnlightenedShrine;
         private bool _UseFleetingShrine;
-        private bool _IgnoreNonBlocking;
+        private DestructibleIgnoreOption _DestructibleOption;
         #endregion Fields
 
         #region Events
@@ -201,19 +202,19 @@ namespace GilesTrinity.Settings
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
-        public bool IgnoreNonBlocking
+        [DefaultValue(DestructibleIgnoreOption.OnlyIfStuck)]
+        public DestructibleIgnoreOption DestructibleOption
         {
             get
             {
-                return _IgnoreNonBlocking;
+                return _DestructibleOption;
             }
             set
             {
-                if (_IgnoreNonBlocking != value)
+                if (_DestructibleOption != value)
                 {
-                    _IgnoreNonBlocking = value;
-                    OnPropertyChanged("IgnoreNonBlocking");
+                    _DestructibleOption = value;
+                    OnPropertyChanged("DestructibleOption");
                 }
             }
         }
@@ -259,6 +260,7 @@ namespace GilesTrinity.Settings
             this.UseFortuneShrine = true;
             this.UseFrenzyShrine = true;
             this.UseProtectionShrine = true;
+            this.DestructibleOption = DestructibleIgnoreOption.OnlyIfStuck;
         }
         #endregion Methods
     }

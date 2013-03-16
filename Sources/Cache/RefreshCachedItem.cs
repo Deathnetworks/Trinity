@@ -41,7 +41,7 @@ namespace GilesTrinity
                 fExtraRange = 90f;
 
             if (c_ItemQuality >= ItemQuality.Rare4)
-                fExtraRange = iCurrentMaxLootRadius;
+                fExtraRange = CurrentBotLootRange;
 
             if (c_ItemQuality >= ItemQuality.Legendary)
             {
@@ -49,7 +49,7 @@ namespace GilesTrinity
                 AddToCache = true;
             }
 
-            if (c_CentreDistance > (iCurrentMaxLootRadius + fExtraRange) && c_ItemQuality <= ItemQuality.Legendary)
+            if (c_CentreDistance > (CurrentBotLootRange + fExtraRange) && c_ItemQuality <= ItemQuality.Legendary)
             {
                 c_IgnoreSubStep = "OutOfRange";
                 AddToCache = false;

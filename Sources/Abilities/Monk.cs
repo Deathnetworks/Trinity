@@ -159,7 +159,11 @@ namespace GilesTrinity
 
             // Cyclone Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_CycloneStrike) && GilesUseTimer(SNOPower.Monk_CycloneStrike) &&
-                (TargetUtil.AnyElitesInRange(cycloneStrikeRange) || TargetUtil.AnyMobsInRange(cycloneStrikeRange, Settings.Combat.Monk.MinCycloneTrashCount) || TargetUtil.IsEliteTargetInRange(cycloneStrikeRange - 4f)) &&
+                (
+                 TargetUtil.AnyElitesInRange(cycloneStrikeRange, 2) || 
+                 TargetUtil.AnyMobsInRange(cycloneStrikeRange, Settings.Combat.Monk.MinCycloneTrashCount) || 
+                 (CurrentTarget.RadiusDistance >= 15f && CurrentTarget.RadiusDistance <= cycloneStrikeRange) // pull the current target into attack range
+                ) &&
                 ((PlayerStatus.PrimaryResource >= cycloneStrikeSpirit && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                  PowerManager.CanCast(SNOPower.Monk_CycloneStrike))
             {

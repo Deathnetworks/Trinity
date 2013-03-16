@@ -135,11 +135,11 @@ namespace GilesTrinity
                 // Is this something we should try to force leap/other movement abilities against?
                 c_ForceLeapAgainst = false;
             }
-            double dUseKillRadius;
+            double killRange;
 
-            dUseKillRadius = RefreshKillRadius();
+            killRange = RefreshKillRadius();
 
-            c_KillRange = dUseKillRadius;
+            c_KillRange = killRange;
 
             if (monsterAffixes.HasFlag(MonsterAffixes.Shielding))
                 c_unit_IsShielded = true;
@@ -191,7 +191,7 @@ namespace GilesTrinity
                 // return here immediately
                 return AddToCache;
             }
-            // only refresh active attributes if within killrange
+
             AddToCache = RefreshUnitAttributes(AddToCache, c_diaUnit);
 
             if (!AddToCache)
@@ -204,38 +204,39 @@ namespace GilesTrinity
             c_RadiusDistance -= (float)c_Radius;
             if (c_RadiusDistance <= 1f)
                 c_RadiusDistance = 1f;
-            // All-in-one flag for quicker if checks throughout
-            c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion);
+
             // Special flags to decide whether to target anything at all
             if (c_IsEliteRareUnique || c_unit_IsBoss)
-                bAnyChampionsPresent = true;
+                AnyElitesPresent = true;
+
             // Extended kill radius after last fighting, or when we want to force a town run
             if ((Settings.Combat.Misc.ExtendedTrashKill && iKeepKillRadiusExtendedFor > 0) || ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
             {
-                if (c_RadiusDistance <= dUseKillRadius && AddToCache)
-                    bAnyMobsInCloseRange = true;
+                if (c_RadiusDistance <= killRange && AddToCache)
+                    AnyMobsInRange = true;
             }
             else
             {
                 if (c_RadiusDistance <= Settings.Combat.Misc.NonEliteRange && AddToCache)
-                    bAnyMobsInCloseRange = true;
+                    AnyMobsInRange = true;
             }
             if (c_unit_IsTreasureGoblin)
-                bAnyTreasureGoblinsPresent = true;
+                AnyTreasureGoblinsPresent = true;
+
             // Units with very high priority (1900+) allow an extra 50% on the non-elite kill slider range
-            if (!bAnyMobsInCloseRange && !bAnyChampionsPresent && !bAnyTreasureGoblinsPresent && c_RadiusDistance <= (Settings.Combat.Misc.NonEliteRange * 1.5))
+            if (!AnyMobsInRange && !AnyElitesPresent && !AnyTreasureGoblinsPresent && c_RadiusDistance <= (Settings.Combat.Misc.NonEliteRange * 1.5))
             {
                 int iExtraPriority;
                 // Enable extended kill radius for specific unit-types
                 if (hashActorSNORanged.Contains(c_ActorSNO))
                 {
-                    bAnyMobsInCloseRange = true;
+                    AnyMobsInRange = true;
                 }
-                if (!bAnyMobsInCloseRange && dictActorSNOPriority.TryGetValue(c_ActorSNO, out iExtraPriority))
+                if (!AnyMobsInRange && dictActorSNOPriority.TryGetValue(c_ActorSNO, out iExtraPriority))
                 {
                     if (iExtraPriority >= 1900)
                     {
-                        bAnyMobsInCloseRange = true;
+                        AnyMobsInRange = true;
                     }
                 }
             }
@@ -364,63 +365,60 @@ namespace GilesTrinity
         private static double RefreshKillRadius()
         {
             // Cancel altogether if it's not even in range, unless it's a boss or an injured treasure goblin
-            double dUseKillRadius = iCurrentMaxKillRadius;
+            double killRange = CurrentBotKillRange;
             // Bosses get extra radius
             if (c_unit_IsBoss)
             {
                 if (c_ActorSNO != 80509)
                     // Kulle Exception
-                    dUseKillRadius *= 1.5;
+                    killRange *= 1.5;
                 // And even more if they're already injured
                 if (c_HitPointsPct <= 0.98)
-                    dUseKillRadius *= 4;
-                // And make sure we have a MINIMUM range for bosses - incase they are at screen edge etc.
-                if (dUseKillRadius <= 200)
-                    if (c_ActorSNO != 80509)
-                        // Kulle Exception
-                        dUseKillRadius = 200;
+                    killRange *= 4;
+                // And make sure we have a MINIMUM range for bosses - incase they are at screen edge etc + Kulle exception
+                if (killRange <= 200 && c_ActorSNO != 80509)
+                    killRange = 200;
             }
             // Special short-range list to ignore weakling mobs
-            if (PlayerKiteDistance <= 0 && !GetHasBuff(SNOPower.Wizard_Archon))
+            if (PlayerKiteDistance <= 0 && !GetHasBuff(SNOPower.Wizard_Archon) && hashActorSNOShortRangeOnly.Contains(c_ActorSNO))
             {
-                if (hashActorSNOShortRangeOnly.Contains(c_ActorSNO))
-                    dUseKillRadius = 12;
+                killRange = 12;
             }
             // Prevent long-range mobs beign ignored while they may be pounding on us
-            if (dUseKillRadius <= 30 && hashActorSNORanged.Contains(c_ActorSNO))
-                dUseKillRadius = 120f;
+            if (killRange <= 30 && hashActorSNORanged.Contains(c_ActorSNO))
+                killRange = 120f;
 
             // Injured treasure goblins get a huge extra radius - since they don't stay on the map long if injured, anyway!
             if (c_unit_IsTreasureGoblin && (c_CentreDistance <= 60 || c_HitPointsPct <= 0.99))
             {
                 c_ForceLeapAgainst = true;
                 if (Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize)
-                    dUseKillRadius *= 2.5;
+                    killRange *= 2.5;
                 else
-                    dUseKillRadius *= 4;
+                    killRange *= 4;
                 // Minimum distance of 60
-                if (dUseKillRadius <= 60) dUseKillRadius = 60;
+                if (killRange <= 60) killRange = 60;
             }
             // Elitey type mobs and things
             else if ((c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion))
             {
                 c_ForceLeapAgainst = true;
-                if (c_HitPointsPct <= 0.99)
+
+                // using new GUI slider for elite kill range
+                killRange = Settings.Combat.Misc.EliteRange;
+
+                // if we've damaged an elite and its still on screen, keep it
+                if (c_HitPointsPct < 1 && killRange < 60)
                 {
-                    dUseKillRadius *= 2;
-                    if (dUseKillRadius <= 150) dUseKillRadius = 150;
-                }
-                else
-                {
-                    if (dUseKillRadius <= 120) dUseKillRadius = 120;
+                    killRange = 60;
                 }
             }
             // Safety for TownRun and UseTownPortalTag
             if (TownRun.IsTryingToTownPortal())
             {
-                if (dUseKillRadius <= 90) dUseKillRadius = 90;
+                if (killRange <= 90) killRange = 90;
             }
-            return dUseKillRadius;
+            return killRange;
         }
         private static MonsterAffixes RefreshAffixes(ACD acd)
         {
@@ -443,6 +441,9 @@ namespace GilesTrinity
             c_unit_IsRare = affixFlags.HasFlag(MonsterAffixes.Rare);
             c_unit_IsUnique = affixFlags.HasFlag(MonsterAffixes.Unique);
             c_unit_IsMinion = affixFlags.HasFlag(MonsterAffixes.Minion);
+            // All-in-one flag for quicker if checks throughout
+            c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion);
+
             return affixFlags;
         }
         private static MonsterType RefreshMonsterType(ACD tempCommonData, MonsterType monsterType, bool bAddToDictionary)

@@ -604,7 +604,7 @@ namespace GilesTrinity
                 case GObjectType.Globe:
                     {
                         // Ignore it if it's not in range yet
-                        if (c_CentreDistance > iCurrentMaxLootRadius || c_CentreDistance > 60f)
+                        if (c_CentreDistance > CurrentBotLootRange || c_CentreDistance > 60f)
                         {
                             c_IgnoreSubStep = "GlobeOutOfRange";
                             AddToCache = false;
@@ -650,7 +650,7 @@ namespace GilesTrinity
             bool openResplendentChests = Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_InternalName.ToLower().Contains("chest_rare");
 
             // Ignore it if it's not in range yet, except health wells and resplendent chests if we're opening chests
-            if ((c_RadiusDistance > iCurrentMaxLootRadius || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell && c_ObjectType != GObjectType.Shrine && c_RActorGuid != CurrentTargetRactorGUID)
+            if ((c_RadiusDistance > CurrentBotLootRange || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell && c_ObjectType != GObjectType.Shrine && c_RActorGuid != CurrentTargetRactorGUID)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "NotInRange";
@@ -662,14 +662,6 @@ namespace GilesTrinity
                 AddToCache = true;
             }
 
-            if (c_InternalName.ToLower().StartsWith("minimapicon"))
-            {
-                // Minimap icons caused a few problems in the past, so this force-blacklists them
-                hashRGUIDBlacklist60.Add(c_RActorGuid);
-                c_IgnoreSubStep = "minimapicon";
-                AddToCache = false;
-                return AddToCache;
-            }
             // Retrieve collision sphere radius, cached if possible
             if (!dictGilesCollisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
             {
@@ -677,23 +669,14 @@ namespace GilesTrinity
                 {
                     c_Radius = c_diaObject.CollisionSphere.Radius;
 
-                    if (c_ObjectType == GObjectType.Destructible && c_Radius >= 5f)
-                    {
-                        c_Radius = c_Radius / 2;
-                    }
-
-                    //if (!dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out c_Radius))
+                    //if (c_ObjectType == GObjectType.Destructible && c_Radius >= 5f)
                     //{
-
+                    //    c_Radius = c_Radius / 2;
                     //}
 
                     // Minimum range clamp
                     if (c_Radius <= 1f)
                         c_Radius = 1f;
-
-                    // Maximum range clamp
-                    //if (c_Radius >= 16f)
-                    //    c_Radius = 16f;
                 }
                 catch
                 {
@@ -990,6 +973,13 @@ namespace GilesTrinity
                             break;
                         }
 
+                        if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.ForceIgnore)
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "ForceIgnoreDestructibles";
+                            break;
+                        }
+
                         // Get the cached physics SNO of this object
                         if (!dictPhysicsSNO.TryGetValue(c_ActorSNO, out iThisPhysicsSNO))
                         {
@@ -1011,7 +1001,7 @@ namespace GilesTrinity
                             iMinDistance += 6f;
 
                         // Only break destructables if we're stuck and using IgnoreNonBlocking
-                        if (!Settings.WorldObject.IgnoreNonBlocking)
+                        if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.DestroyAll)
                         {
                             iMinDistance += 12f;
                             AddToCache = true;
@@ -1122,11 +1112,11 @@ namespace GilesTrinity
                             dictPhysicsSNO.Add(c_ActorSNO, iThisPhysicsSNO);
                         }
                         // Any physics mesh? Give a minimum distance of 5 feet
-                        if (c_InternalName.ToLower().Contains("corpse") && Settings.WorldObject.IgnoreNonBlocking)
+                        if (c_InternalName.ToLower().Contains("corpse") && Settings.WorldObject.DestructibleOption != DestructibleIgnoreOption.DestroyAll)
                         {
                             bBlacklistThis = true;
                         }
-                        else if (iThisPhysicsSNO > 0 || !Settings.WorldObject.IgnoreNonBlocking)
+                        else if (iThisPhysicsSNO > 0 || Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.DestroyAll)
                         {
                             //Logging.WriteDiagnostic("[Trinity] open container " + tmp_sThisInternalName + "[" + tmp_iThisActorSNO.ToString() + "]" + iThisPhysicsSNO);
                             bBlacklistThis = false;
