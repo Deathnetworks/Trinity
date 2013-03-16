@@ -395,6 +395,13 @@ namespace GilesTrinity
                                 if (hashAvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
                                     cacheObject.Weight = 1;
 
+                                // ignore non-legendaries and gold near elites if we're ignoring elites
+                                // not sure how we should safely determine this distance
+                                if (Settings.Combat.Misc.IgnoreElites && cacheObject.ItemQuality < ItemQuality.Legendary && GilesObjectCache.Any(u => u.Position.Distance2D(cacheObject.Position) <= 40f))
+                                {
+                                    cacheObject.Weight = 0;
+                                }
+
                                 break;
                             }
                         case GObjectType.Globe:

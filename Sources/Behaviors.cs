@@ -1621,11 +1621,11 @@ namespace GilesTrinity
                 else if (CurrentTarget != null)
                     dist = CurrentTarget.Position.Distance2D(PlayerStatus.CurrentPosition);
 
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Used Power {0} at {1} on {2} dist={3}", CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetRActorGUID, dist);
                 var usePowerResult = ZetaDia.Me.UsePower(CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetDynamicWorldId, CurrentPower.TargetRActorGUID);
 
                 if (usePowerResult)
                 {
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Used Power {0} at {1} on {2} dist={3}", CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetRActorGUID, dist);
                     if (CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
                         LastTempestRushLocation = CurrentPower.TargetPosition;
 
@@ -1645,6 +1645,10 @@ namespace GilesTrinity
                     {
                         IsWaitingAfterPower = true;
                     }
+                }
+                else
+                {
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower FAILED {0} at {1} on {2} dist={3}", CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetRActorGUID, dist);
                 }
 
                 ShouldPickNewAbilities = true;

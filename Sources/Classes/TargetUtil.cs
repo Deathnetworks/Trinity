@@ -184,6 +184,9 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool AnyElitesInRange(float range = 10f)
         {
+            if (GilesTrinity.Settings.Combat.Misc.IgnoreElites)
+                return false;
+
             if (range < 5f)
                 range = 5f;
             return (from o in ObjectCache
@@ -199,6 +202,9 @@ namespace GilesTrinity
         /// <returns></returns>
         internal static bool AnyElitesInRange(float range = 10f, int minCount = 1)
         {
+            if (GilesTrinity.Settings.Combat.Misc.IgnoreElites)
+                return false;
+
             if (range < 5f)
                 range = 5f;
             if (minCount < 1)

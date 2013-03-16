@@ -54,19 +54,21 @@ namespace GilesTrinity
                 IsWaitingForSpecial = true;
             }
             // Wrath of the berserker, elites only (wrath of berserker)
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && PlayerStatus.PrimaryResource > 50 &&
                 // If using WOTB on all elites, or if we should only use on "hard" affixes
                 (!Settings.Combat.Barbarian.WOTBHardOnly || (shouldUseBerserkerPower && Settings.Combat.Barbarian.WOTBHardOnly)) &&
                 // Not on heart of sin after Cydaea
                 CurrentTarget.ActorSNO != 193077 &&
                 // Make sure we are allowed to use wrath on goblins, else make sure this isn't a goblin
-                (Settings.Combat.Barbarian.UseWOTBGoblin || !CurrentTarget.IsTreasureGoblin || ElitesWithinRange[RANGE_15] >= 1) &&
-                // If ignoring elites completely, trigger on 3 trash within 16 yards
-                ((Settings.Combat.Misc.IgnoreElites && TargetUtil.AnyMobsInRange(16,3) || !Settings.Combat.Misc.IgnoreElites) ||
-                // Otherwise use when Elite target is in 20 yards
-                (TargetUtil.AnyElitesInRange(20,1) || TargetUtil.IsEliteTargetInRange(20f)) ||
-                // Or if our health is low
-                PlayerStatus.CurrentHealthPct <= 60) &&
+                (!Settings.Combat.Barbarian.UseWOTBGoblin || (Settings.Combat.Barbarian.UseWOTBGoblin && CurrentTarget.IsTreasureGoblin)) &&
+                (
+                 // If ignoring elites completely, trigger on 3 trash within 25 yards, or 10 trash in 50 yards
+                 (Settings.Combat.Misc.IgnoreElites && (TargetUtil.AnyMobsInRange(25,3) || TargetUtil.AnyMobsInRange(50,10)) || !Settings.Combat.Misc.IgnoreElites) ||
+                 // Otherwise use when Elite target is in 20 yards
+                 (TargetUtil.AnyElitesInRange(20,1) || TargetUtil.IsEliteTargetInRange(20f)) ||
+                 // Or if our health is low
+                 PlayerStatus.CurrentHealthPct <= 60
+                ) &&
                 // Don't still have the buff
                 !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) && PowerManager.CanCast(SNOPower.Barbarian_WrathOfTheBerserker))
             {

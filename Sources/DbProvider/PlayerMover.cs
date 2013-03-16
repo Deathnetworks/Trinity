@@ -70,7 +70,7 @@ namespace GilesTrinity.DbProvider
         /// <param name="vMyCurrentPosition"></param>
         /// <param name="checkDuration"></param>
         /// <returns></returns>
-        public static bool UnstuckChecker(Vector3 vMyCurrentPosition, int checkDuration = 5000)
+        public static bool UnstuckChecker(Vector3 vMyCurrentPosition, int checkDuration = 3000)
         {
             // set checkDuration to 30 sec while in town or vendoring, just to avoid annoyances
             if (ZetaDia.Me.IsInTown || GilesTrinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
@@ -87,7 +87,7 @@ namespace GilesTrinity.DbProvider
                     return UnStuckCheckerLastResult;
                 }
 
-                if (checkDuration >= 5000)
+                if (checkDuration >= 3000)
                 {
                     TimeLastRecordedPosition = DateTime.Now;
                 }
