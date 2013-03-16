@@ -499,6 +499,16 @@ namespace GilesTrinity.DbProvider
             {
                 bool bTooMuchZChange = (Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z) >= 4f);
 
+                // Whirlwind for a barb, special context only
+                if (GilesTrinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && GilesTrinity.GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= 10f) >= 1 &&
+                    GilesTrinity.PlayerStatus.PrimaryResource >= 10)
+                {
+                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vMoveToTarget, GilesTrinity.CurrentWorldDynamicId, -1);
+                    if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Whirlwind for OOC movement, distance={0}", DestinationDistance);
+                    return;
+                }
+
                 // Leap movement for a barb
                 if (GilesTrinity.Hotbar.Contains(SNOPower.Barbarian_Leap) &&
                     DateTime.Now.Subtract(GilesTrinity.dictAbilityLastUse[SNOPower.Barbarian_Leap]).TotalMilliseconds >= GilesTrinity.dictAbilityRepeatDelay[SNOPower.Barbarian_Leap] &&
