@@ -44,6 +44,7 @@ namespace GilesTrinity.Settings.Combat
         private bool _FuryDumpAlways;
         private bool _WOTBHardOnly;
         private bool _TargetBasedZigZag;
+        private bool _ThreatShoutOOC;
         private int _MinThreatShoutMobCount;
         #endregion Fields
 
@@ -731,6 +732,24 @@ namespace GilesTrinity.Settings.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool ThreatShoutOOC
+        {
+            get
+            {
+                return _ThreatShoutOOC;
+            }
+            set
+            {
+                if (_ThreatShoutOOC != value)
+                {
+                    _ThreatShoutOOC = value;
+                    OnPropertyChanged("ThreatShoutOOC");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(1)]
         public int MinThreatShoutMobCount
         {
@@ -787,6 +806,7 @@ namespace GilesTrinity.Settings.Combat
             this._TargetBasedZigZag = true;
             this._AvoidSuccubusStarHealth = 0.7f;
             this._MinThreatShoutMobCount = 1;
+            this._ThreatShoutOOC = true;
         }
 
         #endregion Methods

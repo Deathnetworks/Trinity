@@ -123,16 +123,15 @@ namespace GilesTrinity
                 (
                   PlayerStatus.CurrentHealthPct <= 0.75 || 
                   (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource <= 10) ||
-                  (IsWaitingForSpecial && PlayerStatus.PrimaryResource <= 50)
+                  (IsWaitingForSpecial && PlayerStatus.PrimaryResource <= MinEnergyReserve)
                 ) &&
               GilesUseTimer(SNOPower.Barbarian_ThreateningShout, true) && PowerManager.CanCast(SNOPower.Barbarian_ThreateningShout))
             {
                 return new TrinityPower(SNOPower.Barbarian_ThreateningShout, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
-            // Threatening shout out-of-combat: helps battle rage and sprint (5+15=20)
-            if (UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_ThreateningShout) &&
-                (Hotbar.Contains(SNOPower.Barbarian_Sprint) || Hotbar.Contains(SNOPower.Barbarian_BattleRage)) &&
-                !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 5 && PlayerStatus.PrimaryResource < 20 &&
+            // Threatening shout out-of-combat
+            if (UseOOCBuff && Settings.Combat.Barbarian.ThreatShoutOOC && Hotbar.Contains(SNOPower.Barbarian_ThreateningShout) &&
+                !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource < 25 &&
                 GilesUseTimer(SNOPower.Barbarian_ThreateningShout, true) && PowerManager.CanCast(SNOPower.Barbarian_ThreateningShout))
             {
                 return new TrinityPower(SNOPower.Barbarian_ThreateningShout, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);

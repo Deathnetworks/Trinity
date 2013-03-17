@@ -240,22 +240,24 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }
 
-            // Dashing Strike
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
-                ((CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.HitPointsPct <= 0.2) || CurrentTarget.CentreDistance >= 40f) &&
-                Hotbar.Contains(SNOPower.Monk_DashingStrike) && ((PlayerStatus.PrimaryResource >= 30 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
-            {
-                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, vNullLocation, -1, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
-            }
-
             //skillDict.Add("DashingStrike", SNOPower.Monk_DashingStrike);
             //runeDict.Add("WayOfTheFallingStar", 1);
             //runeDict.Add("FlyingSideKick", 4);
             //runeDict.Add("Quicksilver", 3);
             //runeDict.Add("SoaringSkull", 0);
             //runeDict.Add("BlindingSpeed", 2);
-
             bool hasWayOfTheFallingStar = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_DashingStrike && s.RuneIndex == 1);
+            bool hasQuicksilver = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_DashingStrike && s.RuneIndex == 3);
+            var dashingStrikeSpirit = hasQuicksilver ? 10 : 25;
+
+            // Dashing Strike, quick move to target out of range
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
+                CurrentTarget.CentreDistance >= 16f &&
+                Hotbar.Contains(SNOPower.Monk_DashingStrike) && ((PlayerStatus.PrimaryResource >= dashingStrikeSpirit && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
+            {
+                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, vNullLocation, -1, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
+            }
+
 
             // Dashing strike + way of the fallen Star
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_DashingStrike) &&
