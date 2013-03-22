@@ -1370,7 +1370,7 @@ namespace GilesTrinity
                                         // Get whether or not this RActor has ever been in a path line with AllowWalk. If it hasn't, don't add to cache and keep rechecking
                                         if (!dictHasBeenRayCastedCache.TryGetValue(c_RActorGuid, out c_HasBeenRaycastable))
                                         {
-                                            if (c_RadiusDistance <= 12f)
+                                            if (c_CentreDistance <= 5f)
                                             {
                                                 c_HasBeenRaycastable = true;
                                                 dictHasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);

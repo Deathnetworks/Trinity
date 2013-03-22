@@ -240,14 +240,14 @@ namespace GilesTrinity
         /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
         /// </summary>
         internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
-            174900, // demonic forge
+            174900, 185391, // demonic forge
             104632, 194682, 81699, 3340, 123325, 
        };
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
         internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 25}, {104632, 20}, {194682, 20}, {81699, 20}, {3340, 12}, {123325, 25}, {185391, 15},
+            {174900, 25}, {104632, 20}, {194682, 20}, {81699, 20}, {3340, 12}, {123325, 25}, {185391, 25},
          };
         /// <summary>
         /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache

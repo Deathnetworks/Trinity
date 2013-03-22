@@ -107,6 +107,7 @@
     <Compile Include="ItemRules\Core\Scanner.cs" />
     <Compile Include="ItemRules\Core\TextHighlighter.cs" />
     <Compile Include="PersistentStats.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\Loot\ItemEnumOptions.cs" />
     <Compile Include="Settings\Loot\ItemRuleSetting.cs" />
     <Compile Include="Technicals\Loader.cs" />

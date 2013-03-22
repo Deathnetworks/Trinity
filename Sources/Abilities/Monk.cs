@@ -25,6 +25,16 @@ namespace GilesTrinity
             // Monks need 80 for special spam like tempest rushing
             MinEnergyReserve = 80;
 
+            bool hasInfusedWithLight = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_BreathOfHeaven && s.RuneIndex == 3);
+            bool hasFistsOfFury = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WayOfTheHundredFists && s.RuneIndex == 0);
+
+            // apply fists of fury DoT if we have Infused with Light buff + WotHF:FoF
+            if (!UseOOCBuff && hasInfusedWithLight && hasFistsOfFury && GetHasBuff(SNOPower.Monk_BreathOfHeaven) && !CurrentTarget.HasDotDPS)
+            {
+                Monk_TickSweepingWindSpam();
+                return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, NO_WAIT_ANIM);
+            }
+
             // 4 Mantras for the initial buff (slow-use)
             if (Hotbar.Contains(SNOPower.Monk_MantraOfEvasion) && !GetHasBuff(SNOPower.Monk_MantraOfEvasion) &&
                 PlayerStatus.PrimaryResource >= 50 && GilesUseTimer(SNOPower.Monk_MantraOfEvasion, true))
@@ -66,13 +76,7 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.Monk_Serenity, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
-            // Breath of heaven when needing healing or the buff
-            if (!UseOOCBuff && (PlayerStatus.CurrentHealthPct <= 0.6 || !GetHasBuff(SNOPower.Monk_BreathOfHeaven)) && Hotbar.Contains(SNOPower.Monk_BreathOfHeaven) &&
-                (PlayerStatus.PrimaryResource >= 35 || (!Hotbar.Contains(SNOPower.Monk_Serenity) && PlayerStatus.PrimaryResource >= 25)) &&
-                GilesUseTimer(SNOPower.Monk_BreathOfHeaven) && PowerManager.CanCast(SNOPower.Monk_BreathOfHeaven))
-            {
-                return new TrinityPower(SNOPower.Monk_BreathOfHeaven, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
-            }
+
             // Blinding Flash
             if (!UseOOCBuff && PlayerStatus.PrimaryResource >= 20 && Hotbar.Contains(SNOPower.Monk_BlindingFlash) &&
                 (
@@ -125,6 +129,27 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
             }
 
+            //skillDict.Add("BreathOfHeaven", SNOPower.Monk_BreathOfHeaven);
+            //runeDict.Add("CircleOfScorn", 0);
+            //runeDict.Add("CircleOfLife", 1);
+            //runeDict.Add("BlazingWrath", 2);
+            //runeDict.Add("InfusedWithLight", 3);
+            //runeDict.Add("PenitentFlame", 4);
+
+            // Breath of Heaven when needing healing or the buff
+            if (!UseOOCBuff && (PlayerStatus.CurrentHealthPct <= 0.6 || !GetHasBuff(SNOPower.Monk_BreathOfHeaven)) && Hotbar.Contains(SNOPower.Monk_BreathOfHeaven) &&
+                (PlayerStatus.PrimaryResource >= 35 || (!Hotbar.Contains(SNOPower.Monk_Serenity) && PlayerStatus.PrimaryResource >= 25)) &&
+                GilesUseTimer(SNOPower.Monk_BreathOfHeaven) && PowerManager.CanCast(SNOPower.Monk_BreathOfHeaven))
+            {
+                return new TrinityPower(SNOPower.Monk_BreathOfHeaven, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+            }
+            // Breath of Heaven for spirit - Infused with Light
+            if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_BreathOfHeaven) && !GetHasBuff(SNOPower.Monk_BreathOfHeaven) && hasInfusedWithLight &&
+                (TargetUtil.AnyMobsInRange(3, 20) || TargetUtil.IsEliteTargetInRange(20)) && PlayerStatus.PrimaryResourcePct < 0.75 &&
+                PowerManager.CanCast(SNOPower.Monk_BreathOfHeaven))
+            {
+                return new TrinityPower(SNOPower.Monk_BreathOfHeaven, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+            }
 
             // Seven Sided Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated &&
@@ -132,6 +157,7 @@ namespace GilesTrinity
                 Hotbar.Contains(SNOPower.Monk_SevenSidedStrike) && ((PlayerStatus.PrimaryResource >= 50 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                 GilesUseTimer(SNOPower.Monk_SevenSidedStrike, true) && PowerManager.CanCast(SNOPower.Monk_SevenSidedStrike))
             {
+                Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_SevenSidedStrike, 16f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 2, 3, WAIT_FOR_ANIM);
             }
             // Exploding Palm
@@ -142,6 +168,28 @@ namespace GilesTrinity
                 GilesUseTimer(SNOPower.Monk_ExplodingPalm) && PowerManager.CanCast(SNOPower.Monk_ExplodingPalm))
             {
                 return new TrinityPower(SNOPower.Monk_ExplodingPalm, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
+            }
+
+            //SkillDict.Add("WaveOfLight", SNOPower.Monk_WaveOfLight);
+            //RuneDict.Add("WallOfLight", 0);
+            //RuneDict.Add("ExplosiveLight", 1);
+            //RuneDict.Add("EmpoweredWave", 3);
+            //RuneDict.Add("BlindingLight", 4);
+            //RuneDict.Add("PillarOfTheAncients", 2);
+            //bool hasEmpoweredWaveRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WaveOfLight && s.RuneIndex == 3);
+
+            bool hasEmpoweredWaveRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WaveOfLight && s.RuneIndex == 3);
+            var minWoLSpirit = hasEmpoweredWaveRune ? 40 : 75;
+            // Wave of light
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_WaveOfLight) && GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
+                (TargetUtil.AnyMobsInRange(16f, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(20f)) &&
+                (PlayerStatus.PrimaryResource >= minWoLSpirit && !IsWaitingForSpecial || PlayerStatus.PrimaryResource > MinEnergyReserve) &&
+                // (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) && // optional check for SW stacks
+                Monk_HasMantraAbilityAndBuff())
+            {
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 15f);
+                Monk_TickSweepingWindSpam();
+                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, bestClusterPoint, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
 
             //SkillDict.Add("CycloneStrike", SNOPower.Monk_CycloneStrike);
@@ -167,6 +215,7 @@ namespace GilesTrinity
                 ((PlayerStatus.PrimaryResource >= cycloneStrikeSpirit && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
                  PowerManager.CanCast(SNOPower.Monk_CycloneStrike))
             {
+                Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_CycloneStrike, 0f, vNullLocation, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
             }
 
@@ -237,6 +286,7 @@ namespace GilesTrinity
                 GilesUseTimer(SNOPower.Monk_LashingTailKick) &&
                 ((PlayerStatus.PrimaryResource >= 65 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
+                Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }
 
@@ -246,6 +296,7 @@ namespace GilesTrinity
             //runeDict.Add("Quicksilver", 3);
             //runeDict.Add("SoaringSkull", 0);
             //runeDict.Add("BlindingSpeed", 2);
+
             bool hasWayOfTheFallingStar = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_DashingStrike && s.RuneIndex == 1);
             bool hasQuicksilver = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_DashingStrike && s.RuneIndex == 3);
             var dashingStrikeSpirit = hasQuicksilver ? 10 : 25;
@@ -255,6 +306,7 @@ namespace GilesTrinity
                 CurrentTarget.CentreDistance >= 16f &&
                 Hotbar.Contains(SNOPower.Monk_DashingStrike) && ((PlayerStatus.PrimaryResource >= dashingStrikeSpirit && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
+                Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, vNullLocation, -1, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
             }
 
@@ -264,28 +316,8 @@ namespace GilesTrinity
                 (TimeSinceUse(SNOPower.Monk_DashingStrike) >= 2800) && hasWayOfTheFallingStar &&
                 ((PlayerStatus.PrimaryResource >= 25 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
             {
+                Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, vNullLocation, -1, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
-            }
-
-            //SkillDict.Add("WaveOfLight", SNOPower.Monk_WaveOfLight);
-            //RuneDict.Add("WallOfLight", 0);
-            //RuneDict.Add("ExplosiveLight", 1);
-            //RuneDict.Add("EmpoweredWave", 3);
-            //RuneDict.Add("BlindingLight", 4);
-            //RuneDict.Add("PillarOfTheAncients", 2);
-            //bool hasEmpoweredWaveRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WaveOfLight && s.RuneIndex == 3);
-
-            bool hasEmpoweredWaveRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WaveOfLight && s.RuneIndex == 3);
-            var minWoLSpirit = hasEmpoweredWaveRune ? 40 : 75;
-            // Wave of light
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_WaveOfLight) && GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
-                (TargetUtil.AnyMobsInRange(16f, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(20f)) &&
-                (PlayerStatus.PrimaryResource >= minWoLSpirit && !IsWaitingForSpecial || PlayerStatus.PrimaryResource > MinEnergyReserve) &&
-                // (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) && // optional check for SW stacks
-                Monk_HasMantraAbilityAndBuff())
-            {
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 15f);
-                return new TrinityPower(SNOPower.Monk_WaveOfLight, 16f, bestClusterPoint, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
 
             // Fists of thunder as the primary, repeatable attack
@@ -295,8 +327,7 @@ namespace GilesTrinity
             {
                 if (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700)
                     OtherThanDeadlyReach = DateTime.Now;
-                if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
-                    SweepWindSpam = DateTime.Now;
+                Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, NO_WAIT_ANIM);
             }
             // Crippling wave
@@ -305,8 +336,7 @@ namespace GilesTrinity
                 || AnythingWithinRange[RANGE_50] < 5 && ElitesWithinRange[RANGE_50] <= 0 && !WantToSwap))
             {
                 OtherThanDeadlyReach = DateTime.Now;
-                if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
-                    SweepWindSpam = DateTime.Now;
+                Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_CripplingWave, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, NO_WAIT_ANIM);
             }
             // Way of hundred fists
@@ -315,8 +345,7 @@ namespace GilesTrinity
                 || AnythingWithinRange[RANGE_50] < 5 && ElitesWithinRange[RANGE_50] <= 0 && !WantToSwap))
             {
                 OtherThanDeadlyReach = DateTime.Now;
-                if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
-                    SweepWindSpam = DateTime.Now;
+                Monk_TickSweepingWindSpam(); 
                 return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 14f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, NO_WAIT_ANIM);
             }
             // Deadly reach
@@ -334,18 +363,22 @@ namespace GilesTrinity
                 {
                     ForeSight2 = DateTime.Now;
                 }
-                if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
-                    SweepWindSpam = DateTime.Now;
+                Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, NO_WAIT_ANIM);
             }
             // Default attacks
             if (!UseOOCBuff && !IsCurrentlyAvoiding)
             {
-                if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
-                    SweepWindSpam = DateTime.Now;
+                Monk_TickSweepingWindSpam();
                 return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
             }
             return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
+        }
+
+        private static void Monk_TickSweepingWindSpam()
+        {
+            if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
+                SweepWindSpam = DateTime.Now;
         }
 
         private static void GenerateMonkZigZag()

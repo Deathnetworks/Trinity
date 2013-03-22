@@ -436,6 +436,12 @@ namespace GilesTrinity
                                     if (c_unit_IsShielded)
                                         unitExtras += " IsShielded";
 
+                                    if (c_HasDotDPS)
+                                        unitExtras += " HasDotDPS";
+
+                                    if (c_HasBeenInLoS)
+                                        unitExtras += " HasBeenInLoS";                                    
+
                                     unitExtras += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
                                 }
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,

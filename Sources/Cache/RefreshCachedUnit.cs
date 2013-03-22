@@ -353,11 +353,20 @@ namespace GilesTrinity
             }
 
             // only check for DotDPS/Bleeding in certain conditions to save CPU for everyone else
-            if (AddToCache && ((PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_Rend)) || PlayerStatus.ActorClass == ActorClass.WitchDoctor))
+            // barbs with rend
+            // All WD's
+            // Monks with Way of the Hundred Fists + Fists of Fury
+            if (AddToCache && 
+                ((PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_Rend)) || 
+                PlayerStatus.ActorClass == ActorClass.WitchDoctor || 
+                (PlayerStatus.ActorClass == ActorClass.Monk && HotbarSkills.AssignedSkills.Any(s=> s.Power == SNOPower.Monk_WayOfTheHundredFists && s.RuneIndex == 0)))
+                )
             {
+                ////bool hasdotDPS = c_CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;
+                //bool isBleeding = c_CommonData.GetAttribute<int>(ActorAttributeType.Bleeding) != 0;
+                //c_HasDotDPS = hasdotDPS && isBleeding;
                 bool hasdotDPS = c_CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;
-                bool isBleeding = c_CommonData.GetAttribute<int>(ActorAttributeType.Bleeding) != 0;
-                c_HasDotDPS = hasdotDPS && isBleeding;
+                c_HasDotDPS = hasdotDPS;
             }
             return AddToCache;
 
