@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
+using System.Text.RegularExpressions;
 
 namespace GilesTrinity.UI
 {
@@ -51,7 +52,7 @@ namespace GilesTrinity.UI
                 _ConfigWindow.MinHeight = 580;
                 _ConfigWindow.MinWidth = 480;
                 _ConfigWindow.Title = "Trinity";
-                
+
                 // Event handling for the config window loading up/closing
                 //configWindow.Loaded += configWindow_Loaded;
                 _ConfigWindow.Closed += WindowClosed;
@@ -61,7 +62,7 @@ namespace GilesTrinity.UI
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Put MainControl to Window");
                 // And finally put all of this content in effect
                 _ConfigWindow.Content = mainControl;
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window build finished."); 
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window build finished.");
             }
             catch (XamlParseException ex)
             {
@@ -87,13 +88,15 @@ namespace GilesTrinity.UI
         {
             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load XAML file : {0}", filename);
             string filecontent = File.ReadAllText(filename);
+
             // Change reference to custom Trinity class
             filecontent = filecontent.Replace("xmlns:ut=\"clr-namespace:GilesTrinity.UIComponents\"", "xmlns:ut=\"clr-namespace:GilesTrinity.UIComponents;assembly=" + Assembly.GetExecutingAssembly().GetName().Name + "\"");
+
             // Remove Template designer reference
             filecontent = filecontent.Replace("<ResourceDictionary.MergedDictionaries><ResourceDictionary Source=\"..\\Template.xaml\"/></ResourceDictionary.MergedDictionaries>", string.Empty);
             filecontent = filecontent.Replace("<ResourceDictionary.MergedDictionaries><ResourceDictionary Source=\"Template.xaml\"/></ResourceDictionary.MergedDictionaries>", string.Empty);
 
-            return (T)XamlReader.Load(new MemoryStream(Encoding.Default.GetBytes(filecontent)));
+            return (T)XamlReader.Load(new MemoryStream(Encoding.UTF8.GetBytes(filecontent)));
         }
 
         /// <summary>Call when Config Window is closed.</summary>
@@ -102,7 +105,7 @@ namespace GilesTrinity.UI
         /// <exception cref="System.NotImplementedException"></exception>
         static void WindowClosed(object sender, System.EventArgs e)
         {
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window closed."); 
+            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window closed.");
             _ConfigWindow = null;
         }
 
@@ -114,7 +117,7 @@ namespace GilesTrinity.UI
             // Loop in Children of parent control of type FrameworkElement 
             foreach (FrameworkElement ctrl in LogicalTreeHelper.GetChildren(parentControl).OfType<FrameworkElement>())
             {
-                string contentName  = ctrl.Tag as string;
+                string contentName = ctrl.Tag as string;
                 // Tag contains a string end with ".xaml" : It's dymanic content 
                 if (!string.IsNullOrWhiteSpace(contentName) && contentName.EndsWith(".xaml"))
                 {
@@ -138,7 +141,7 @@ namespace GilesTrinity.UI
             if (File.Exists(filename))
             {
                 UserControl xamlContent = LoadAndTransformXamlFile<UserControl>(filename);
-                
+
                 // Dynamic load of content is possible on Content control (UserControl, ...)
                 if (ctrl is ContentControl)
                 {

@@ -8,6 +8,7 @@ using GilesTrinity.DbProvider;
 using GilesTrinity.Technicals;
 using Zeta;
 using Zeta.CommonBot;
+using Zeta.CommonBot.Profile;
 using Zeta.CommonBot.Profile.Common;
 using Zeta.TreeSharp;
 
@@ -15,9 +16,9 @@ namespace GilesTrinity
 {
     public class GoldInactivity
     {
-        private static int lastKnowCoin;
-        private static DateTime lastCheckBag;
-        private static DateTime lastRefreshCoin;
+        private static int lastKnowCoin = 0;
+        private static DateTime lastCheckBag = DateTime.MinValue;
+        private static DateTime lastRefreshCoin = DateTime.MinValue;
 
         /// <summary>
         /// Resets the gold inactivity timer
@@ -46,35 +47,44 @@ namespace GilesTrinity
                 if (!ZetaDia.IsInGame)
                 {
                     ResetCheckGold(); //If not in game, reset the timer
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Not in game, gold inactivity reset", 0);
                     return false;
                 }
-                if (ZetaDia.IsLoadingWorld || lastCheckBag == null)
+                if (ZetaDia.IsLoadingWorld)
+                {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Loading world, gold inactivity reset", 0);
                     return false;
+                }
                 if ((DateTime.Now.Subtract(lastCheckBag).TotalSeconds < 5))
+                {
                     return false;
+                }
 
                 // sometimes bosses take a LONG time
                 if (GilesTrinity.CurrentTarget != null && GilesTrinity.CurrentTarget.IsBoss)
                 {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Current target is boss, gold inactivity reset", 0);
                     ResetCheckGold();
                     return false;
                 }
 
                 if (TownRun.IsTryingToTownPortal())
                 {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Trying to town portal, gold inactivity reset", 0);
                     ResetCheckGold();
                     return false;
                 }
                 // Don't go inactive on WaitTimer tags
-                Composite c = null;
+                ProfileBehavior c = null;
                 try
                 {
                     if (ProfileManager.CurrentProfileBehavior != null)
-                        c = ProfileManager.CurrentProfileBehavior.Behavior;
+                        c = ProfileManager.CurrentProfileBehavior;
                 }
                 catch { }
                 if (c != null && c.GetType() == typeof(WaitTimerTag))
                 {
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Wait timer tag, gold inactivity reset", 0);
                     ResetCheckGold();
                     return false;
                 }
@@ -105,8 +115,9 @@ namespace GilesTrinity
             }
             catch (Exception e)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, e.Message);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, e.Message);
             }
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Gold inactivity error - no result", 0);
             return false;
         }
 

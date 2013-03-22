@@ -43,14 +43,14 @@ namespace GilesTrinity.DbProvider
         internal static int iTimesReachedStuckPoint = 0;
         internal static int iTotalAntiStuckAttempts = 1;
         internal static Vector3 vSafeMovementLocation = Vector3.Zero;
-        internal static DateTime TimeLastRecordedPosition = DateTime.Today;
+        internal static DateTime TimeLastRecordedPosition = DateTime.MinValue;
         internal static Vector3 vOldPosition = Vector3.Zero;
-        internal static DateTime LastGeneratedStuckPosition = DateTime.Today;
+        internal static DateTime LastGeneratedStuckPosition = DateTime.MinValue;
         internal static int iTimesReachedMaxUnstucks = 0;
-        internal static DateTime _lastCancelledUnstucker = DateTime.Today;
-        internal static DateTime _lastRecordedAnyStuck = DateTime.Today;
+        internal static DateTime _lastCancelledUnstucker = DateTime.MinValue;
+        internal static DateTime _lastRecordedAnyStuck = DateTime.MinValue;
         internal static int iCancelUnstuckerForSeconds = 60;
-        internal static DateTime timeLastRestartedGame = DateTime.Today;
+        internal static DateTime timeLastRestartedGame = DateTime.MinValue;
         internal static bool UnStuckCheckerLastResult = false;
         internal static DateTime TimeLastUsedPlayerMover = DateTime.MinValue;
 
@@ -138,7 +138,7 @@ namespace GilesTrinity.DbProvider
                     return UnStuckCheckerLastResult;
                 }
 
-                if (checkDuration >= 5000)
+                if (checkDuration >= 3000)
                 {
                     vOldPosition = vMyCurrentPosition;
                 }
@@ -224,8 +224,8 @@ namespace GilesTrinity.DbProvider
             vSafeMovementLocation = Vector3.Zero;
             vOldPosition = Vector3.Zero;
             iTimesReachedStuckPoint = 0;
-            TimeLastRecordedPosition = DateTime.Today;
-            LastGeneratedStuckPosition = DateTime.Today;
+            TimeLastRecordedPosition = DateTime.MinValue;
+            LastGeneratedStuckPosition = DateTime.MinValue;
             // int iSafetyLoops = 0;
             if (iTimesReachedMaxUnstucks == 1)
             {
@@ -283,7 +283,7 @@ namespace GilesTrinity.DbProvider
         private static bool bLastWaypointWasTown = false;
         private static HashSet<Vector3> hashDoneThisVector = new HashSet<Vector3>();
         private static Vector3 vShiftedPosition = Vector3.Zero;
-        private static DateTime lastShiftedPosition = DateTime.Today;
+        private static DateTime lastShiftedPosition = DateTime.MinValue;
         private static int iShiftPositionFor = 0;
 
         private static Vector3 lastMovementPosition = Vector3.Zero;
