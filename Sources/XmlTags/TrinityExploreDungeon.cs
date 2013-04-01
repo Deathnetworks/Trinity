@@ -236,7 +236,11 @@ namespace GilesTrinity.XmlTags
         public int IgnoreLastNodes { get; set; }
 
         /// <summary>
-        /// Used with IgnoreLastNodes, minimum visited node coutn before tag can end
+        /// Used with IgnoreLastNodes, minimum visited node count before tag can end. 
+        /// The minVisistedNodes is purely, and only for use with ignoreLastNodes - it does not serve any other function like you expect. 
+        /// The reason this attribute exists, is to prevent prematurely exiting the dungeon exploration when used with ignoreLastNodes. 
+        /// For example, when the bot first starts exploring an area, it needs to navigate a few dungeon nodes first before other dungeon nodes even appear - otherwise with ignoreLastNodes > 2, 
+        /// the bot would immediately exit from navigation without exploring anything at all.
         /// </summary>
         [XmlAttribute("minVisitedNodes")]
         public int MinVisistedNodes { get; set; }

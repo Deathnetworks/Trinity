@@ -184,7 +184,8 @@ namespace GilesTrinity
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_WaveOfLight) && GilesUseTimer(SNOPower.Monk_WaveOfLight) &&
                 (TargetUtil.AnyMobsInRange(16f, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(20f)) &&
                 (PlayerStatus.PrimaryResource >= minWoLSpirit && !IsWaitingForSpecial || PlayerStatus.PrimaryResource > MinEnergyReserve) &&
-                // (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) && // optional check for SW stacks
+                // optional check for SW stacks
+                (Settings.Combat.Monk.SWBeforeWoL && (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) || !Settings.Combat.Monk.SWBeforeWoL) && 
                 Monk_HasMantraAbilityAndBuff())
             {
                 var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 15f);

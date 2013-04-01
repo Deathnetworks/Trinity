@@ -20,6 +20,11 @@ namespace GilesTrinity.UI
             _ConfigWindow.Close();
         }
 
+        public static Window GetDisplayWindow()
+        {
+            return UILoader.GetDisplayWindow(Path.Combine(FileManager.PluginPath, "UI"));
+        }
+
         public static Window GetDisplayWindow(string uiPath)
         {
             // Check we can actually find the .xaml file first - if not, report an error

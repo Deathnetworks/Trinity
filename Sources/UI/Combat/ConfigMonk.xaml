@@ -57,6 +57,7 @@
             </Grid.RowDefinitions>
             <UniformGrid Grid.Row="0" Columns="2" HorizontalAlignment="Center">
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.HasInnaSet}" ToolTip="Sweeping Wind for 5 Spirit">Inna's set</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.SWBeforeWoL}" ToolTip="Always use Sweeping Wind before Wave of Light">Always use SW before WoL</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.DisableMantraSpam}" ToolTip="Disable Spamming Mantras (for the 3-sec. buff)">Disable Mantra Spam</CheckBox>
             </UniformGrid>
             <TextBlock Grid.Row="1" Text="Tempest Rush Options:" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center" />

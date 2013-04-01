@@ -40,6 +40,7 @@ namespace GilesTrinity.Settings.Combat
         private int _TR_MinSpirit;
         private int _TR_MinDist;
         private bool _HasInnaSet;
+        private bool _SWBeforeWoL;
         private bool _DisableMantraSpam;
         private bool _TargetBasedZigZag;
         private int _MinCycloneTrashCount;
@@ -653,6 +654,24 @@ namespace GilesTrinity.Settings.Combat
                 {
                     _HasInnaSet = value;
                     OnPropertyChanged("HasInnaSet");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SWBeforeWoL
+        {
+            get
+            {
+                return _SWBeforeWoL;
+            }
+            set
+            {
+                if (_SWBeforeWoL != value)
+                {
+                    _SWBeforeWoL = value;
+                    OnPropertyChanged("SWBeforeWoL");
                 }
             }
         }

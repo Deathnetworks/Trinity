@@ -289,6 +289,23 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.Barbarian_Sprint, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
+
+            //skillDict.Add("Frenzy", SNOPower.Barbarian_Frenzy);
+            //runeDict.Add("Sidearm", 1);
+            //runeDict.Add("Triumph", 4);
+            //runeDict.Add("Vanguard", 2);
+            //runeDict.Add("Smite", 3);
+            //runeDict.Add("Maniac", 0);
+
+            bool hasManiacRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Frenzy && s.RuneIndex == 0);
+
+            // Frenzy to 5 stacks
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsRooted && Hotbar.Contains(SNOPower.Barbarian_Frenzy) &&
+                GetBuffStacks(SNOPower.Barbarian_Frenzy) < 5)
+            {
+                return new TrinityPower(SNOPower.Barbarian_Frenzy, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
+            }
+
             // Whirlwind spam as long as necessary pre-buffs are up
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && !PlayerStatus.IsIncapacitated && !PlayerStatus.IsRooted &&
                 // Don't WW against goblins, units in the special SNO list
