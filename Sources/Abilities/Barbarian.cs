@@ -300,8 +300,8 @@ namespace GilesTrinity
             bool hasManiacRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Frenzy && s.RuneIndex == 0);
 
             // Frenzy to 5 stacks
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsRooted && Hotbar.Contains(SNOPower.Barbarian_Frenzy) &&
-                GetBuffStacks(SNOPower.Barbarian_Frenzy) < 5)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsRooted && Hotbar.Contains(SNOPower.Barbarian_Frenzy) && 
+                !TargetUtil.AnyMobsInRange(15f,3) && GetBuffStacks(SNOPower.Barbarian_Frenzy) < 5)
             {
                 return new TrinityPower(SNOPower.Barbarian_Frenzy, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
             }

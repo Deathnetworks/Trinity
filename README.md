@@ -5,6 +5,77 @@
 
 * DH Sentry Turrent still does not work, appears to be DB bug
 
+* Users still reporting "missing loot" - please enable all trinity advanced logs and attach your log file to the Trinity release thread
+
+* Users still reporting crashes - this is likely a System-specific or Demonbuddy related problem.
+
+### Changelog 1.7.2.11:
+
+* Added support for Barbarian Maniac Rune
+
+* Updated Barbarian "Use WOTB on hard elites only" tooltip, to include the affixes which are used
+
+* Added Minimum Threating Shout Mob Count to Barbarian settings
+
+* Barbarian Whirlwind will now be used for OOC movement if there are any non-primary target units within whirlwind range (~10 yards)
+
+* Added GUI option for using Barbarian Threating Shout OOC
+
+* Added support for Monk Dashing Strike: Quicksilver rune
+
+* Added GUI option for for force casting Monk Sweeping Wind before using Wave of Light
+
+* Added Monk Breath of Heaven:Infused With Light + Way of the Hundred Fists:Fists of Fury support
+
+* Monk Cyclone strike will no longer be spammed on single-target elites when other abilities can be used
+
+* Increased Monk Wave of Light priority
+
+* Fixed 12 yard radius distance LoS bug (now is 5 yard from CenterDistance force LoS)
+
+* Added extra navigation obstacle SNOId for Demonic Forges - thanks Gardettos for the find
+
+* Changed XAML ui loader encoding to UTF8 to support chinese clients translate
+
+* Fixed persistent stats percentage output format (now only 2 decimal places)
+
+* Ignore gold/non-leg items near Elites actually works now
+
+* Unstuck checker moved to 3sec since it works much better recently
+
+* Added Elite Kill range GUI slider
+
+* Added Force Ignore Destructible GUI option
+
+* Handle target logic will now correctly return TreeRunning after pickup up an item (should help with picking up items with a UseTownPortal tag)
+
+* Updated Ignore trash mob logic to account for IgnoreElites settings
+
+* Added IgnoreLastNodes / MinVisistedNodes to TrinityExploreDungeon, for use with until="FullyExplored", allows Trinity to end the tag prematurely to reduce/eliminate the backtracking at the end of exploring large dungeons (like keeps 2)
+
+##### Notes on minVisistedNodes:
+Used with ignoreLastNodes, minimum visited node count before tag can end.   
+The minVisistedNodes is purely, and only for use with ignoreLastNodes and with until="FullyExplored" - it does not serve any other function like you expect.   
+The reason this attribute exists, is to prevent prematurely exiting the dungeon exploration when used with ignoreLastNodes.   
+For example, when the bot first starts exploring an area, it needs to navigate a few dungeon nodes first before other dungeon nodes even appear - otherwise with ignoreLastNodes > 2,   
+the bot would immediately exit from navigation without exploring anything at all.  
+
+Example Keeps 2 tag:
+      <TrinityExploreDungeon questId="101758" stepId="1" 
+        until="FullyExplored" boxSize="80" boxTolerance="0.01" 
+        timeoutType="GoldInactivity" townPortalOnTimeout="True" timeoutValue="60" 
+        ignoreMarkers="True" ignoreLastNodes="3" minVisitedNodes="10">
+        <IgnoreScenes>
+          <IgnoreScene sceneName="_N_" />
+          <IgnoreScene sceneName="_S_" />
+          <IgnoreScene sceneName="_E_" />
+          <IgnoreScene sceneName="_W_" />
+        </IgnoreScenes>
+      </TrinityExploreDungeon>
+
+
+
+
 ### Changelog 1.7.2.10:
 
 * Fixed CPU utilization increase bug, due to monster TeamID cache
