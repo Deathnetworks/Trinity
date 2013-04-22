@@ -39,15 +39,29 @@ namespace GilesTrinity
         {
             if (obj.Key == "")
                 return false;
-
-            lock (_Synchronizer)
+            try
             {
-                RemoveObject(obj.Key);
+                lock (_Synchronizer)
+                {
+                    if (RemoveObject(obj.Key))
+                    {
+                        _dataCache.Add(obj.Key, obj);
+                        _expireCache.Add(obj.Expires, obj.Key);
 
-                _dataCache.Add(obj.Key, obj);
-                _expireCache.Add(obj.Expires, obj.Key);
-
-                return true;
+                        return true;
+                    }
+                    else
+                    {
+                        DbHelper.LogDebug("Unable to update Generic Cache Object {0}", obj);
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                DbHelper.LogDebug("Unable to update Generic Cache Object {0}", obj);
+                DbHelper.LogDebug(ex.ToString(), false);
+                return false;
             }
         }
 
@@ -195,6 +209,11 @@ namespace GilesTrinity
         public override int GetHashCode()
         {
             return this.Key.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return String.Format("Key={0} Value={1} Expires={2}", Key, Value, Expires);
         }
     }
 }

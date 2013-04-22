@@ -29,7 +29,7 @@ namespace GilesTrinity
         {
             get
             {
-                return new Version(1, 7, 2, 11);
+                return new Version(1, 7, 2, 12);
             }
         }
 
@@ -330,6 +330,19 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "\tIgnore this message if you are not currently using Trinity.");
                 return;
             }
+
+            if (!Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("trinity") || !Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("gilesplugin"))
+            {
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "######################################");
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "ERROR: You are not using the Trinity Combat Routine!");
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "You MUST download and select the Trinity Combat Routine");
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "http://www.thebuddyforum.com/demonbuddy-forum/plugins/trinity/93720-trinity-download-here.html");
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "");
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Trinity will NOT work with any other combat routine");
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "######################################");
+                BotMain.Stop();
+            }
+
         }
 
 

@@ -26,47 +26,64 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.Barbarian_IgnorePain, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
-            // Flag up a variable to see if we should reserve 50 fury for special abilities
+            
             IsWaitingForSpecial = false;
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Earthquake) &&
-                ElitesWithinRange[RANGE_25] >= 1 && GilesUseTimer(SNOPower.Barbarian_Earthquake))
+
+            if (PlayerStatus.PrimaryResource < MinEnergyReserve)
             {
-                IsWaitingForSpecial = true;
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Earthquake) &&
+                    ElitesWithinRange[RANGE_25] >= 1 && GilesUseTimer(SNOPower.Barbarian_Earthquake) && !GetHasBuff(SNOPower.Barbarian_Earthquake))
+                {
+                    DbHelper.LogNormal("Waiting for Barbarian_Earthquake 1!");
+                    IsWaitingForSpecial = true;
+                }
+                // Earthquake, elites close-range only
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Earthquake) && !PlayerStatus.IsIncapacitated &&
+                    (ElitesWithinRange[RANGE_15] > 0 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 13f)) &&
+                    GilesUseTimer(SNOPower.Barbarian_Earthquake, true) && !GetHasBuff(SNOPower.Barbarian_Earthquake) &&
+                    PowerManager.CanCast(SNOPower.Barbarian_Earthquake))
+                {
+                    if (PlayerStatus.PrimaryResource >= 50)
+                        return new TrinityPower(SNOPower.Barbarian_Earthquake, 13f, vNullLocation, CurrentWorldDynamicId, -1, 4, 4, WAIT_FOR_ANIM);
+                    DbHelper.LogNormal("Waiting for Barbarian_Earthquake 2!");
+                    IsWaitingForSpecial = true;
+                }
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                    ElitesWithinRange[RANGE_25] >= 1 && GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) && !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+                {
+                    DbHelper.LogNormal("Waiting for Barbarian_WrathOfTheBerserker 1!");
+                    IsWaitingForSpecial = true;
+                }
+                // Berserker special for ignore elites
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Misc.IgnoreElites &&
+                    (TargetUtil.AnyMobsInRange(25, 3) || TargetUtil.AnyMobsInRange(50, 10) || TargetUtil.AnyMobsInRange(Settings.Combat.Misc.TrashPackClusterRadius, Settings.Combat.Misc.TrashPackSize)) &&
+                    GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) && !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+                {
+                    DbHelper.LogNormal("Waiting for Barbarian_WrathOfTheBerserker 2!");
+                    IsWaitingForSpecial = true;
+                }
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_CallOfTheAncients) &&
+                    ElitesWithinRange[RANGE_25] >= 1 && GilesUseTimer(SNOPower.Barbarian_CallOfTheAncients) && !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients))
+                {
+                    DbHelper.LogNormal("Waiting for Barbarian_CallOfTheAncients!");
+                    IsWaitingForSpecial = true;
+                }
             }
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                ElitesWithinRange[RANGE_25] >= 1 && GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker))
-            {
-                IsWaitingForSpecial = true;
-            }
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_CallOfTheAncients) &&
-                ElitesWithinRange[RANGE_25] >= 1 && GilesUseTimer(SNOPower.Barbarian_CallOfTheAncients))
-            {
-                IsWaitingForSpecial = true;
-            }
-            // Earthquake, elites close-range only
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Earthquake) && !PlayerStatus.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_15] > 0 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 13f)) &&
-                GilesUseTimer(SNOPower.Barbarian_Earthquake, true) &&
-                PowerManager.CanCast(SNOPower.Barbarian_Earthquake))
-            {
-                if (PlayerStatus.PrimaryResource >= 50)
-                    return new TrinityPower(SNOPower.Barbarian_Earthquake, 13f, vNullLocation, CurrentWorldDynamicId, -1, 4, 4, WAIT_FOR_ANIM);
-                IsWaitingForSpecial = true;
-            }
+
             // Wrath of the berserker, elites only (wrath of berserker)
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && PlayerStatus.PrimaryResource > 50 &&
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
                 // If using WOTB on all elites, or if we should only use on "hard" affixes
                 (!Settings.Combat.Barbarian.WOTBHardOnly || (shouldUseBerserkerPower && Settings.Combat.Barbarian.WOTBHardOnly)) &&
                 // Not on heart of sin after Cydaea
                 CurrentTarget.ActorSNO != 193077 &&
                 // Make sure we are allowed to use wrath on goblins, else make sure this isn't a goblin
-                (!Settings.Combat.Barbarian.UseWOTBGoblin || (Settings.Combat.Barbarian.UseWOTBGoblin && CurrentTarget.IsTreasureGoblin)) &&
                 (
-                 // If ignoring elites completely, trigger on 3 trash within 25 yards, or 10 trash in 50 yards
-                 (Settings.Combat.Misc.IgnoreElites && (TargetUtil.AnyMobsInRange(25,3) || TargetUtil.AnyMobsInRange(50,10)) || !Settings.Combat.Misc.IgnoreElites) ||
-                 // Otherwise use when Elite target is in 20 yards
-                 (TargetUtil.AnyElitesInRange(20,1) || TargetUtil.IsEliteTargetInRange(20f)) ||
-                 // Or if our health is low
+                 (!Settings.Combat.Barbarian.UseWOTBGoblin || (Settings.Combat.Barbarian.UseWOTBGoblin && CurrentTarget.IsTreasureGoblin)) ||
+                // If ignoring elites completely, trigger on 3 trash within 25 yards, or 10 trash in 50 yards
+                 (Settings.Combat.Misc.IgnoreElites && (TargetUtil.AnyMobsInRange(25, 3) || TargetUtil.AnyMobsInRange(50, 10)) || !Settings.Combat.Misc.IgnoreElites) ||
+                // Otherwise use when Elite target is in 20 yards
+                 (TargetUtil.AnyElitesInRange(20, 1) || TargetUtil.IsEliteTargetInRange(20f)) ||
+                // Or if our health is low
                  PlayerStatus.CurrentHealthPct <= 60
                 ) &&
                 // Don't still have the buff
@@ -74,13 +91,14 @@ namespace GilesTrinity
             {
                 if (PlayerStatus.PrimaryResource >= 50)
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Berserk being used!({0})", CurrentTarget.InternalName);
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker being used!({0})", CurrentTarget.InternalName);
                     shouldUseBerserkerPower = false;
+                    IsWaitingForSpecial = false;
                     return new TrinityPower(SNOPower.Barbarian_WrathOfTheBerserker, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 else
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Berserk ready, waiting for fury...");
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker ready, waiting for fury...");
                     IsWaitingForSpecial = true;
                 }
             }
@@ -91,8 +109,15 @@ namespace GilesTrinity
                 PowerManager.CanCast(SNOPower.Barbarian_CallOfTheAncients))
             {
                 if (PlayerStatus.PrimaryResource >= 50)
+                {
+                    IsWaitingForSpecial = false;
                     return new TrinityPower(SNOPower.Barbarian_CallOfTheAncients, 0f, vNullLocation, CurrentWorldDynamicId, -1, 4, 4, WAIT_FOR_ANIM);
-                IsWaitingForSpecial = true;
+                }
+                else
+                {
+                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Call of the Ancients ready, waiting for fury...");
+                    IsWaitingForSpecial = true;
+                }
             }
             // Battle rage, for if being followed and before we do sprint
             if (UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_BattleRage) &&
@@ -121,7 +146,7 @@ namespace GilesTrinity
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_ThreateningShout) && !PlayerStatus.IsIncapacitated &&
                 ((TargetUtil.AnyMobsInRange(25, Settings.Combat.Barbarian.MinThreatShoutMobCount)) || TargetUtil.IsEliteTargetInRange(25f)) &&
                 (
-                  PlayerStatus.CurrentHealthPct <= 0.75 || 
+                  PlayerStatus.CurrentHealthPct <= 0.75 ||
                   (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource <= 10) ||
                   (IsWaitingForSpecial && PlayerStatus.PrimaryResource <= MinEnergyReserve)
                 ) &&
@@ -300,14 +325,15 @@ namespace GilesTrinity
             bool hasManiacRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Frenzy && s.RuneIndex == 0);
 
             // Frenzy to 5 stacks
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsRooted && Hotbar.Contains(SNOPower.Barbarian_Frenzy) && 
-                !TargetUtil.AnyMobsInRange(15f,3) && GetBuffStacks(SNOPower.Barbarian_Frenzy) < 5)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsRooted && Hotbar.Contains(SNOPower.Barbarian_Frenzy) &&
+                !TargetUtil.AnyMobsInRange(15f, 3) && GetBuffStacks(SNOPower.Barbarian_Frenzy) < 5)
             {
                 return new TrinityPower(SNOPower.Barbarian_Frenzy, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
             }
 
             // Whirlwind spam as long as necessary pre-buffs are up
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && !PlayerStatus.IsIncapacitated && !PlayerStatus.IsRooted &&
+                (!IsWaitingForSpecial || (IsWaitingForSpecial && !(TargetUtil.AnyMobsInRange(3, 15) || ForceCloseRangeTarget))) && // make sure we're not surrounded if waiting for special
                 // Don't WW against goblins, units in the special SNO list
                 (!Settings.Combat.Barbarian.SelectiveWhirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)) &&
                 // Only if within 15 foot of main target
@@ -320,7 +346,7 @@ namespace GilesTrinity
                 (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage))))
             {
                 bool shouldGetNewZigZag =
-                    (DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 1200 || 
+                    (DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 1200 ||
                     CurrentTarget.ACDGuid != iACDGUIDLastWhirlwind ||
                     vSideToSideTarget.Distance2D(PlayerStatus.CurrentPosition) <= 5f);
                 vPositionLastZigZagCheck = PlayerStatus.CurrentPosition;
