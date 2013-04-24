@@ -72,11 +72,12 @@ namespace GilesTrinity
 
             // Sacrifice AKA Zombie Dog Jihad, use on Elites Only or to try and Save yourself
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) &&
-                (ElitesWithinRange[RANGE_15] > 0 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 15f)) &&
+                (TargetUtil.AnyElitesInRange(15, 1) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_Sacrifice))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 0, WAIT_FOR_ANIM);
             }
+
             // Gargantuan, Recast on 1+ Elites or Bosses to trigger Restless Giant
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Gargantuan) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 147 &&
                 (ElitesWithinRange[RANGE_15] >= 1 ||
@@ -190,6 +191,15 @@ namespace GilesTrinity
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, 12f, vNullLocation, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }
+
+            // Sacrifice for 0 Dogs
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) &&
+                Settings.Combat.WitchDoctor.ZeroDogs && TargetUtil.AnyMobsInRange(25f) &&
+                PowerManager.CanCast(SNOPower.Witchdoctor_Sacrifice))
+            {
+                return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 0, WAIT_FOR_ANIM);
+            }
+
             // Wall of Zombies
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_WallOfZombies) && !PlayerStatus.IsIncapacitated &&
                 (ElitesWithinRange[RANGE_15] > 0 || AnythingWithinRange[RANGE_15] > 3 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 25f)) &&
@@ -222,6 +232,7 @@ namespace GilesTrinity
 
                 return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, acidCloudRange, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
+
             // Fire Bats fast-attack
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Firebats) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 98)
             {

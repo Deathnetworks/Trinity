@@ -335,10 +335,10 @@ namespace GilesTrinity
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && !PlayerStatus.IsIncapacitated && !PlayerStatus.IsRooted &&
                 (!IsWaitingForSpecial || (IsWaitingForSpecial && !(TargetUtil.AnyMobsInRange(3, 15) || ForceCloseRangeTarget))) && // make sure we're not surrounded if waiting for special
                 // Don't WW against goblins, units in the special SNO list
-                (!Settings.Combat.Barbarian.SelectiveWhirlwind || bAnyNonWWIgnoreMobsInRange || !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO)) &&
+                (!Settings.Combat.Barbarian.SelectiveWhirlwind || (Settings.Combat.Barbarian.SelectiveWhirlwind && bAnyNonWWIgnoreMobsInRange && !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO))) &&
                 // Only if within 15 foot of main target
                 ((CurrentTarget.RadiusDistance <= 25f || AnythingWithinRange[RANGE_25] >= 1)) &&
-                (AnythingWithinRange[RANGE_50] >= 2 || CurrentTarget.HitPointsPct >= 0.30 || CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || PlayerStatus.CurrentHealthPct <= 0.60) &&
+                (AnythingWithinRange[RANGE_50] >= 2 || CurrentTarget.HitPointsPct >= 0.30 || CurrentTarget.IsBossOrEliteRareUnique || PlayerStatus.CurrentHealthPct <= 0.60) &&
                 // Check for energy reservation amounts
                 //((playerStatus.dCurrentEnergy >= 20 && !playerStatus.bWaitingForReserveEnergy) || playerStatus.dCurrentEnergy >= iWaitingReservedAmount) &&
                 PlayerStatus.PrimaryResource >= 10 &&

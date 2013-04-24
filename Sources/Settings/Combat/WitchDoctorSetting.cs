@@ -7,6 +7,7 @@ namespace GilesTrinity.Settings.Combat
     public class WitchDoctorSetting : ITrinitySetting<WitchDoctorSetting>, IAvoidanceHealth, INotifyPropertyChanged
     {
         #region Fields
+        private bool _ZeroDogs;
         private float _PotionLevel;
         private float _HealthGlobeLevel;
         private int _KiteLimit;
@@ -57,6 +58,25 @@ namespace GilesTrinity.Settings.Combat
         #endregion Constructors
 
         #region Properties
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool ZeroDogs
+        {
+            get
+            {
+                return _ZeroDogs;
+            }
+            set
+            {
+                if (_ZeroDogs != value)
+                {
+                    _ZeroDogs = value;
+                    OnPropertyChanged("ZeroDogs");
+                }
+            }
+        }
+
         [DataMember(IsRequired = false)]
         [DefaultValue(0.7f)]
         public float PotionLevel

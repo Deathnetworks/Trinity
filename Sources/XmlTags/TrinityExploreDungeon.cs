@@ -312,6 +312,9 @@ namespace GilesTrinity.XmlTags
         /// </summary>
         private void CheckResetDungeonExplorer()
         {
+            if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld || !ZetaDia.WorldInfo.IsValid || !ZetaDia.Scenes.IsValid || !ZetaDia.Service.IsValid)
+                return;
+
             // I added this because GridSegmentation may (rarely) reset itself without us doing it to 15/.55.
             if ((BoxSize != 0 && BoxTolerance != 0) && (GridSegmentation.BoxSize != BoxSize || GridSegmentation.BoxTolerance != BoxTolerance) || (GetGridSegmentationNodeCount() == 0))
             {
@@ -398,7 +401,7 @@ namespace GilesTrinity.XmlTags
                     new Sequence(
                         new DecoratorContinue(ret => TownPortalOnTimeout && !GilesTrinity.PlayerStatus.IsInTown,
                             new Sequence(
-                                new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, 
+                                new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
                                     "TrinityExploreDungeon inactivity timer tripped ({0}), tag Using Town Portal!", TimeoutValue)),
                                 Zeta.CommonBot.CommonBehaviors.CreateUseTownPortal(),
                                 new Action(ret => isDone = true)
@@ -694,6 +697,15 @@ namespace GilesTrinity.XmlTags
 
             foreach (Scene scene in PScenes)
             {
+                if (!scene.IsValid)
+                    continue;
+                if (!scene.SceneInfo.IsValid)
+                    continue;
+                if (!scene.Mesh.Zone.IsValid)
+                    continue;
+                if (!scene.Mesh.Zone.NavZoneDef.IsValid)
+                    continue;
+
                 if (PriorityScenesInvestigated.Contains(scene.SceneInfo.SNOId))
                     continue;
 
@@ -707,7 +719,7 @@ namespace GilesTrinity.XmlTags
 
                 Vector3 zoneCenter = GetNavZoneCenter(navZone);
 
-                List<NavCell> NavCells = zoneDef.NavCells.Where(c => c.Flags.HasFlag(NavCellFlags.AllowWalk)).ToList();
+                List<NavCell> NavCells = zoneDef.NavCells.Where(c => c.IsValid && c.Flags.HasFlag(NavCellFlags.AllowWalk)).ToList();
 
                 if (!NavCells.Any())
                     continue;
@@ -815,10 +827,10 @@ namespace GilesTrinity.XmlTags
         private bool PositionInsideIgnoredScene(Vector3 position)
         {
             List<Scene> ignoredScenes = ZetaDia.Scenes.GetScenes()
-                .Where(scn => IgnoreScenes.Any(igscn => igscn.SceneName != String.Empty && scn.Name.ToLower().Contains(igscn.SceneName.ToLower())) ||
+                .Where(scn => scn.IsValid && (IgnoreScenes.Any(igscn => igscn.SceneName != String.Empty && scn.Name.ToLower().Contains(igscn.SceneName.ToLower())) ||
                     IgnoreScenes.Any(igscn => scn.SceneInfo.SNOId == igscn.SceneId) &&
                     !PriorityScenes.Any(psc => psc.SceneName.Trim() != String.Empty && scn.Name.ToLower().Contains(psc.SceneName)) &&
-                    !PriorityScenes.Any(psc => psc.SceneId != -1 && scn.SceneInfo.SNOId != psc.SceneId)).ToList();
+                    !PriorityScenes.Any(psc => psc.SceneId != -1 && scn.SceneInfo.SNOId != psc.SceneId))).ToList();
 
             foreach (Scene scene in ignoredScenes)
             {
@@ -856,7 +868,7 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => BrainBehavior.DungeonExplorer.CurrentRoute.Dequeue()),
                         new Action(ret => UpdateRoute())
                     )
-                ), 
+                ),
                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0 || !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Error - CheckIsNodeFinished() called while Route is empty!")),

@@ -13,6 +13,9 @@ namespace GilesTrinity
         {
             ACDItem i = e.Item;
 
+            if (!i.IsValid)
+                return;
+
             var cachedItem = GilesCachedACDItem.GetCachedItem(i);
 
             ResetTownRun();

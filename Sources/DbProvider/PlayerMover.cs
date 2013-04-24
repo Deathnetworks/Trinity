@@ -328,12 +328,49 @@ namespace GilesTrinity.DbProvider
             return averageMovementSpeed / AverageRecordingTime;
         }
 
+        /// <summary>
+        /// Returns true if there's a blocking UIElement that we should NOT be moving!
+        /// </summary>
+        /// <returns></returns>
+        public bool UISafetyCheck()
+        {
+            if (ElementIsVisible(UIElements.ConfirmationDialog))
+                return true;
+            if (ElementIsVisible(UIElements.ConfirmationDialogCancelButton))
+                return true;
+            if (ElementIsVisible(UIElements.ConfirmationDialogOkButton))
+                return true;
+            if (ElementIsVisible(UIElements.ReviveAtLastCheckpointButton))
+                return true;
+
+            return false;
+        }
+
+        private bool ElementIsVisible(UIElement element)
+        {
+            if (element == null)
+                return false;
+            if (!UIElement.IsValidElement(element.Hash))
+                return false;            
+            if (!element.IsValid)
+                return false;
+            if (!element.IsVisible)
+                return false;
+
+            return true;
+        }
+
         public void MoveTowards(Vector3 vMoveToTarget)
         {
             if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.Me.IsDead || ZetaDia.IsLoadingWorld)
             {
                 return;
             }
+
+            if (UISafetyCheck())
+            {
+                return;
+            }           
 
             TimeLastUsedPlayerMover = DateTime.Now;
             vMyCurrentPosition = GilesTrinity.PlayerStatus.CurrentPosition;
