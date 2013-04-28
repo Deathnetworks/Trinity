@@ -8,7 +8,7 @@ DemonBuddy.exe
 *.suo
 
 *.suo
-
+/Sources/ItemRules/rules/custom/*
 /Sources/*.txt
 
 /Sources/log/

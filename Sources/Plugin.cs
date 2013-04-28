@@ -331,8 +331,10 @@ namespace GilesTrinity
                 return;
             }
 
-            if (!Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("trinity") || !Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("gilesplugin"))
+            if (BotMain.IsRunning && 
+                (!Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("trinity") || !Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("gilesplugin")))
             {
+                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Found Routine: {0}", Zeta.CommonBot.RoutineManager.Current.Name);
                 DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "######################################");
                 DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "ERROR: You are not using the Trinity Combat Routine!");
                 DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "You MUST download and select the Trinity Combat Routine");

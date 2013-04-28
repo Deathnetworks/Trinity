@@ -70,13 +70,13 @@ namespace GilesTrinity
             }
             // Sentry Turret
             // Currently BROKEN in demonbuddy :(
-            //if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_Sentry) &&
-            //    (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50,2) || TargetUtil.IsEliteTargetInRange(50)) &&
-            //    PlayerStatus.PrimaryResource >= 30 && PowerManager.CanCast(SNOPower.DemonHunter_Sentry))
-            //{
+            if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_Sentry) &&
+                (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50, 2) || TargetUtil.IsEliteTargetInRange(50)) &&
+                PlayerStatus.PrimaryResource >= 30 && PowerManager.CanCast(SNOPower.DemonHunter_Sentry))
+            {
 
-            //    return new TrinityPower(SNOPower.DemonHunter_Sentry, 50f, PlayerStatus.CurrentPosition, CurrentWorldDynamicId, CurrentTarget.ACDGuid, 1, 2, USE_SLOWLY);
-            //}
+                return new TrinityPower(SNOPower.DemonHunter_Sentry, 50f, PlayerStatus.CurrentPosition, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
+            }
             // Marked for Death
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_MarkedForDeath) &&
                 PlayerStatus.SecondaryResource >= 3 && 

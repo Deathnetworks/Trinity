@@ -87,15 +87,26 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.Witchdoctor_Gargantuan, 0f, vNullLocation, CurrentWorldDynamicId, -1, 2, 1, WAIT_FOR_ANIM);
             }
 
-            // Zombie dogs Woof Woof, good for being blown up, cast when less than or equal to 2 Dogs or Not Blowing them up and cast when less than 4
+            // Zombie Dogs non-sacrifice build
             if (!IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && !PlayerStatus.IsIncapacitated &&
                 PlayerStatus.PrimaryResource >= 49 && (ElitesWithinRange[RANGE_20] >= 2 || AnythingWithinRange[RANGE_20] >= 5 ||
                  (CurrentTarget != null && ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 30f)) || iPlayerOwnedZombieDog <= 2) &&
-                PowerManager.CanCast(SNOPower.Witchdoctor_SummonZombieDog))
+                !Settings.Combat.WitchDoctor.ZeroDogs &&
+                 PowerManager.CanCast(SNOPower.Witchdoctor_SummonZombieDog))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
 
+            // Zombie Dogs for Sacrifice
+            if (Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) &&
+                PlayerStatus.PrimaryResource >= 49 &&
+                (LastPowerUsed == SNOPower.Witchdoctor_Sacrifice || iPlayerOwnedZombieDog <= 2) &&
+                TimeSinceUse(SNOPower.Witchdoctor_SummonZombieDog) > 1000 &&
+                Settings.Combat.WitchDoctor.ZeroDogs &&
+                PowerManager.CanCast(SNOPower.Witchdoctor_SummonZombieDog))
+            {
+                return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+            }
 
             // Hex with angry chicken, check if we want to shape shift and explode
             if (Hotbar.Contains(SNOPower.Witchdoctor_Hex) && hasAngryChicken && PowerManager.CanCast(SNOPower.Witchdoctor_Hex) && PlayerStatus.PrimaryResource >= 49)
@@ -194,10 +205,10 @@ namespace GilesTrinity
 
             // Sacrifice for 0 Dogs
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) &&
-                Settings.Combat.WitchDoctor.ZeroDogs && TargetUtil.AnyMobsInRange(25f) &&
+                Settings.Combat.WitchDoctor.ZeroDogs &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_Sacrifice))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 15f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
             }
 
             // Wall of Zombies
@@ -281,6 +292,8 @@ namespace GilesTrinity
 
         private static TrinityPower GetWitchDoctorDestroyPower()
         {
+            if (Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) && Settings.Combat.WitchDoctor.ZeroDogs)
+                return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 12f, vNullLocation, -1, -1, 1, 2, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Witchdoctor_Firebats))
                 return new TrinityPower(SNOPower.Witchdoctor_Firebats, 12f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Witchdoctor_Firebomb))

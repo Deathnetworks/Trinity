@@ -168,11 +168,10 @@ namespace GilesTrinity
             // Jondar, Chancellor, Queen Araneae (act 1 dungeons), Skeleton King, Butcher
             86624, 156353, 51341, 5350, 3526,
             215103, // Istaku            
-            210120, // A4 Corrupt Growths            
-            // Rakanoth
-            4630, 
-            //Xah'Rith Keywarden
-            256015, 
+            210120, // A4 Corrupt Growths                 
+            4630, // Rakanoth
+            256015, //Xah'Rith Keywarden
+            115403, // A1 Cain Skeleton boss
          };
         // IGNORE LIST / BLACKLIST - for units / monsters / npcs
         // Special blacklist for things like ravens, templar/scoundrel/enchantress in town, witch-doctor summons, tornado-animations etc. etc. that should never be attacked

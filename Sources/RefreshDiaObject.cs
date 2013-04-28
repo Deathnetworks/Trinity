@@ -1483,10 +1483,11 @@ namespace GilesTrinity
                 }
 
             }
-            catch
+            catch (Exception ex)
             {
-                AddToCache = false;
+                AddToCache = true;
                 c_IgnoreSubStep = "IgnoreLoSException";
+                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
             }
             return AddToCache;
         }
