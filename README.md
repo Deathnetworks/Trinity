@@ -9,7 +9,7 @@
 
 * Users still reporting crashes - this is likely a System-specific or Demonbuddy related problem.
 
-### Changelog 1.7.1.12:
+### Changelog 1.7.2.12:
 
 * Tuned combat for WD Zero Dogs
 
