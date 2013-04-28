@@ -9,6 +9,29 @@
 
 * Users still reporting crashes - this is likely a System-specific or Demonbuddy related problem.
 
+### Changelog 1.7.1.12:
+
+* Tuned combat for WD Zero Dogs
+
+* Fixed bot start non-Trinity routine warning
+
+* Fixed LoS exception bug
+
+* Added a few more boss SNO's
+
+* Added a shit ton of safety checks to help prevent crashes
+
+* Hopefully fixed Barbarian Bash (e.g. Non-WW) specific targets
+
+* Added Zero Dogs GUI option/logic for WD
+
+* Small tweaks for Barbarian IsWaitingForSpecial + WW
+
+* Fixed error in removing object from generic cache
+
+* Added N00b check for running Trinity with any other non-trinity combat routine
+
+
 ### Changelog 1.7.2.11:
 
 * Added support for Barbarian Maniac Rune
