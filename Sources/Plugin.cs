@@ -29,7 +29,7 @@ namespace GilesTrinity
         {
             get
             {
-                return new Version(1, 7, 2, 12);
+                return new Version(1, 7, 2, 13);
             }
         }
 

@@ -1774,6 +1774,9 @@ namespace GilesTrinity
                 if (!dictTotalInteractionAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                 {
                     dictTotalInteractionAttempts.Add(CurrentTarget.RActorGuid, 1);
+
+                    // Fire item looted for Demonbuddy Item stats
+                    GameEvents.FireItemLooted(CurrentTarget.ACDGuid);
                 }
                 else
                 {
