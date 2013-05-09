@@ -1319,6 +1319,10 @@ namespace GilesTrinity
                 {
                     if (c_CentreDistance < 125)
                     {
+                        /*
+                         * Per Nesox, spamming NavProvider.CanFullyClientPathTo "is really bad"
+                         * We need to come up with another way of doing this that doesnt lag the client
+                         * 
                         switch (c_ObjectType)
                         {
                             case GObjectType.Destructible:
@@ -1335,6 +1339,7 @@ namespace GilesTrinity
                                             if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
                                                 bool isNavigable = NavProvider.CanFullyClientPathTo(c_Position);
+                                                
 
                                                 if (!isNavigable)
                                                 {
@@ -1358,6 +1363,7 @@ namespace GilesTrinity
                                 break;
 
                         }
+                        */
                         switch (c_ObjectType)
                         {
                             case GObjectType.Destructible:

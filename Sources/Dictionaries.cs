@@ -205,7 +205,7 @@ namespace GilesTrinity
             220114, 3011, 3205, 3539, 3582, 3584, 3595, 3600, 4580, 52693, 5466, 55005, 5509, 62522, 
             205756, 5509, 200371, 167185, 181195, 217346,
             // rrrix act 3
-            60108,
+            60108, 182443,
             // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
             263014, 
          };

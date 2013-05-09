@@ -103,13 +103,13 @@ namespace GilesTrinity
                                     InternalName = "GilesSafePoint"
                                 }; ;
                         }
-                        else
-                        {
-                            // Didn't find any safe spot we could reach, so don't look for any more safe spots for at least 2.8 seconds
-                            cancelledEmergencyMoveForMilliseconds = 2800;
-                            timeCancelledEmergencyMove = DateTime.Now;
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Unable to find kite location, canceling emergency movement for {0}ms", cancelledEmergencyMoveForMilliseconds);
-                        }
+                        //else
+                        //{
+                        //    // Didn't find any safe spot we could reach, so don't look for any more safe spots for at least 2.8 seconds
+                        //    cancelledEmergencyMoveForMilliseconds = 2800;
+                        //    timeCancelledEmergencyMove = DateTime.Now;
+                        //    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Unable to find kite location, canceling emergency movement for {0}ms", cancelledEmergencyMoveForMilliseconds);
+                        //}
                     }
                 }
                 /*
@@ -761,18 +761,18 @@ namespace GilesTrinity
                                                 InternalName = "KitePoint"
                                             };
 
-                        timeCancelledKiteMove = DateTime.Now;
-                        cancelledKiteMoveForMilliseconds = 100;
+                        //timeCancelledKiteMove = DateTime.Now;
+                        //cancelledKiteMoveForMilliseconds = 100;
 
                         // Try forcing a target update with each kiting
                         //bForceTargetUpdate = true;
                     }
-                    else
-                    {
-                        // Didn't find any kiting we could reach, so don't look for any more kite spots for at least 1.5 seconds
-                        timeCancelledKiteMove = DateTime.Now;
-                        cancelledKiteMoveForMilliseconds = 500;
-                    }
+                    //else
+                    //{
+                    //    // Didn't find any kiting we could reach, so don't look for any more kite spots for at least 1.5 seconds
+                    //    timeCancelledKiteMove = DateTime.Now;
+                    //    cancelledKiteMoveForMilliseconds = 500;
+                    //}
                 }
                 else if (!shouldEmergencyMove && NeedToKite)
                 {
