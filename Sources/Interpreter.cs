@@ -49,7 +49,7 @@ namespace GilesTrinity.ItemRules
         };
 
         // final variables
-        readonly string version = "2.2.1.5";
+        readonly string version = "2.2.1.6";
         readonly string translationFile = "translation.dis";
         readonly string pickupFile = "pickup.dis";
         readonly string logFile = "ItemRules.log";
@@ -96,7 +96,8 @@ namespace GilesTrinity.ItemRules
         {
             string actualLog = Path.Combine(FileManager.LoggingPath, logFile);
             string archivePath = Path.Combine(FileManager.LoggingPath, "Archive");
-            string archiveLog = Path.Combine(archivePath, DateTime.Now.ToString("ddMMyyyyHHmmss") + "_log.txt");
+            //string archiveLog = Path.Combine(archivePath, DateTime.Now.ToString("ddMMyyyyHHmmss") + "_log.txt");
+            string archiveLog = Path.Combine(archivePath, "itemRulesArchive.log");
 
             if (!File.Exists(actualLog))
                 return;
@@ -104,7 +105,11 @@ namespace GilesTrinity.ItemRules
             if (!Directory.Exists(archivePath))
                 Directory.CreateDirectory(archivePath);
 
-            File.Copy(actualLog, archiveLog, true);
+            using (Stream input = File.OpenRead(actualLog))
+            using (Stream output = new FileStream(archiveLog, FileMode.Append, FileAccess.Write, FileShare.None))
+                input.CopyTo(output);
+
+            //File.Copy(actualLog, archiveLog, true);
 
             File.Delete(actualLog);
         }
