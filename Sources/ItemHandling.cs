@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using GilesTrinity.Cache;
 using GilesTrinity.ItemRules;
 using GilesTrinity.Settings.Loot;
@@ -466,7 +463,7 @@ namespace GilesTrinity
             if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "===== Outputting Test Scores =====");
-                foreach (ACDItem item in ZetaDia.Actors.Me.Inventory.Backpack)
+                foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
                 {
                     if (item.BaseAddress == IntPtr.Zero)
                     {
@@ -667,37 +664,37 @@ namespace GilesTrinity
              * If lv 60 use Paragon
              * If not lv 60 use normal xp/hr
              */
-            if (ZetaDia.Actors.Me.Level < 60)
+            if (ZetaDia.Me.Level < 60)
             {
                 if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
                 {
-                    if (iLastXp > ZetaDia.Actors.Me.CurrentExperience)
+                    if (iLastXp > ZetaDia.Me.CurrentExperience)
                     {
                         iTotalXp += iNextLvXp;
                     }
                     else
                     {
-                        iTotalXp += ZetaDia.Actors.Me.CurrentExperience - iLastXp;
+                        iTotalXp += ZetaDia.Me.CurrentExperience - iLastXp;
                     }
                 }
-                iLastXp = ZetaDia.Actors.Me.CurrentExperience;
-                iNextLvXp = ZetaDia.Actors.Me.ExperienceNextLevel;
+                iLastXp = ZetaDia.Me.CurrentExperience;
+                iNextLvXp = ZetaDia.Me.ExperienceNextLevel;
             }
             else
             {
                 if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
                 {
-                    if (iLastXp > ZetaDia.Actors.Me.ParagonCurrentExperience)
+                    if (iLastXp > ZetaDia.Me.ParagonCurrentExperience)
                     {
                         iTotalXp += iNextLvXp;
                     }
                     else
                     {
-                        iTotalXp += ZetaDia.Actors.Me.ParagonCurrentExperience - iLastXp;
+                        iTotalXp += ZetaDia.Me.ParagonCurrentExperience - iLastXp;
                     }
                 }
-                iLastXp = ZetaDia.Actors.Me.ParagonCurrentExperience;
-                iNextLvXp = ZetaDia.Actors.Me.ParagonExperienceNextLevel;
+                iLastXp = ZetaDia.Me.ParagonCurrentExperience;
+                iNextLvXp = ZetaDia.Me.ParagonExperienceNextLevel;
             }
 
 

@@ -1,23 +1,19 @@
-﻿using GilesTrinity.Technicals;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using GilesTrinity.Settings.Combat;
+using GilesTrinity.Technicals;
+using GilesTrinity.XmlTags;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot;
-using Zeta.CommonBot.Profile.Common;
-using Zeta.Internals.Actors;
-using Zeta.Internals.SNO;
-using Zeta.Navigation;
-using Zeta.TreeSharp;
-using GilesTrinity.XmlTags;
-using Zeta.Pathfinding;
-using System.Drawing;
-using GilesTrinity.Settings.Combat;
-using Zeta.Internals;
 using Zeta.CommonBot.Profile;
+using Zeta.CommonBot.Profile.Common;
+using Zeta.Internals;
+using Zeta.Internals.Actors;
+using Zeta.Navigation;
 
 namespace GilesTrinity.DbProvider
 {
@@ -788,7 +784,7 @@ namespace GilesTrinity.DbProvider
                         if (!hashDoneThisVector.Contains(vMoveToTarget))
                         {
                             // Log it
-                            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "LongPaths - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
+                            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "LongPaths - " + ZetaDia.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                             using (StreamWriter LogWriter = new StreamWriter(LogStream))
                             {
                                 LogWriter.WriteLine(DateTime.Now.ToString() + ":");

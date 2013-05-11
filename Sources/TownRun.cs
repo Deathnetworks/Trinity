@@ -1,27 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using GilesTrinity.Settings.Loot;
-using Zeta.Internals.Actors;
-using GilesTrinity;
-using GilesTrinity.Technicals;
-using Zeta.TreeSharp;
-using Zeta.Common;
-using Zeta;
-using Zeta.CommonBot;
-using System.IO;
-using System.Globalization;
-using GilesTrinity.Notifications;
-using Zeta.Internals.Actors.Gizmos;
-using Zeta.Internals;
-using Action = Zeta.TreeSharp.Action;
-using System.Threading;
 using System.Diagnostics;
-using Zeta.CommonBot.Profile.Common;
-using GilesTrinity.DbProvider;
-using NotificationManager = GilesTrinity.Notifications.NotificationManager;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using GilesTrinity.Notifications;
+using GilesTrinity.Settings.Loot;
+using GilesTrinity.Technicals;
+using Zeta;
+using Zeta.Common;
+using Zeta.CommonBot;
 using Zeta.CommonBot.Profile;
+using Zeta.CommonBot.Profile.Common;
+using Zeta.Internals.Actors;
+using NotificationManager = GilesTrinity.Notifications.NotificationManager;
 
 namespace GilesTrinity
 {
@@ -474,7 +467,7 @@ namespace GilesTrinity
             FileStream LogStream = null;
             try
             {
-                LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "StashLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
+                LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "StashLog - " + ZetaDia.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
 
                 //TODO : Change File Log writing
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
@@ -546,7 +539,7 @@ namespace GilesTrinity
             FileStream LogStream = null;
             try
             {
-                LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "JunkLog - " + ZetaDia.Actors.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
+                LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "JunkLog - " + ZetaDia.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
                 {
                     if (!loggedJunkThisStash)
