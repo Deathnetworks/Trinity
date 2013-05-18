@@ -20,9 +20,10 @@ namespace GilesTrinity
     {
         public class PersistentStats
         {
-            public bool     IsReset;            // true between reset and next report output
+            public bool IsReset;            // true between reset and next report output
             public DateTime WhenStartedSession; // when did current session start, helps identify item increments
-            [XmlIgnore] public TimeSpan TotalRunningTime;
+            [XmlIgnore]
+            public TimeSpan TotalRunningTime;
             public int TotalDeaths;
             public int TotalLeaveGames;
             public int TotalJoinGames;
@@ -35,13 +36,13 @@ namespace GilesTrinity
             public long TotalRunningTimeTicks
             {
                 get { return TotalRunningTime.Ticks; }
-                set { TotalRunningTime = new TimeSpan(value);  }
+                set { TotalRunningTime = new TimeSpan(value); }
             }
 
             public PersistentStats()
             {
                 ItemsDropped = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
-                ItemsPicked  = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
+                ItemsPicked = new GItemStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
 
                 Reset();
             }
@@ -186,7 +187,7 @@ namespace GilesTrinity
 
         private static PersistentStats PersistentTotalStats = new PersistentStats();
         private static PersistentStats PersistentLastSaved = new PersistentStats();
-        private static Dictionary<int, PersistentStats> worldStatsDictionary = 
+        private static Dictionary<int, PersistentStats> worldStatsDictionary =
             new Dictionary<int, PersistentStats>();
 
         private static PersistentStats PersistentUpdateOne(String aFilename)
@@ -294,17 +295,23 @@ namespace GilesTrinity
                 }
             }
 
-            FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("FullStats - {0}.log", PlayerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read);
-            LogStats(LogStream, PersistentTotalStats);
-            LogStream.Close();
+            using (FileStream LogStream =
+                File.Open(Path.Combine(FileManager.LoggingPath, String.Format("FullStats - {0}.log", PlayerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read))
+            {
+                LogStats(LogStream, PersistentTotalStats);
+                LogStream.Flush();
+            }
+            using (FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("WorldStats {1} - {0}.log", PlayerStatus.ActorClass, cachedStaticWorldId)), FileMode.Create, FileAccess.Write, FileShare.Read))
+            {
+                LogStats(LogStream, worldStatsDictionary[cachedStaticWorldId]);
+                LogStream.Flush();
+            }
 
-            LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("WorldStats {1} - {0}.log", PlayerStatus.ActorClass, cachedStaticWorldId)), FileMode.Create, FileAccess.Write, FileShare.Read);
-            LogStats(LogStream, worldStatsDictionary[cachedStaticWorldId]);
-            LogStream.Close();
-
-            LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("AgregateWorldStats - {0}.log", PlayerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read);
-            LogWorldStats(LogStream, worldStatsDictionary);
-            LogStream.Close();
+            using (FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("AgregateWorldStats - {0}.log", PlayerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read))
+            {
+                LogWorldStats(LogStream, worldStatsDictionary);
+                LogStream.Flush();
+            }
         }
 
         internal static void LogWorldStats(FileStream oLogStream, Dictionary<int, PersistentStats> aWorldStats)
@@ -337,6 +344,8 @@ namespace GilesTrinity
                 LogWriter.WriteLine("=== Total items + iph picked per WorldID ===");
                 foreach (var v in aWorldStats)
                     LogWriter.WriteLine(v.Key + "\t" + v.Value.ItemsPicked.Total + "\t" + Math.Round(v.Value.ItemsPicked.Total / v.Value.TotalRunningTime.TotalHours, 2).ToString("0.00"));
+
+                LogWriter.Flush();
             }
         }
 
@@ -463,10 +472,10 @@ namespace GilesTrinity
                     {
                         if (ts.ItemsPicked.TotalPerQuality[iThisQuality] > 0)
                         {
-                            LogWriter.WriteLine("- " + sQualityString[iThisQuality] + ": " + ts.ItemsPicked.TotalPerQuality[iThisQuality].ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPerQuality[iThisQuality] /ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.TotalPerQuality[iThisQuality] / ts.ItemsPicked.Total) * 100, 2).ToString("0.00") + " %}");
+                            LogWriter.WriteLine("- " + sQualityString[iThisQuality] + ": " + ts.ItemsPicked.TotalPerQuality[iThisQuality].ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPerQuality[iThisQuality] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.TotalPerQuality[iThisQuality] / ts.ItemsPicked.Total) * 100, 2).ToString("0.00") + " %}");
                             for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
                                 if (ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel] > 0)
-                                    LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sQualityString[iThisQuality] + ": " + ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel].ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel] /ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel] / ts.ItemsPicked.Total) * 100, 2).ToString("0.00") + " %}");
+                                    LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sQualityString[iThisQuality] + ": " + ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel].ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel] / ts.ItemsPicked.Total) * 100, 2).ToString("0.00") + " %}");
                         }
 
                         // Any at all this quality?
@@ -486,9 +495,9 @@ namespace GilesTrinity
                 if (ts.ItemsPicked.TotalPotions > 0)
                 {
                     LogWriter.WriteLine("Potion Pickups:");
-                    LogWriter.WriteLine("Total potions: " + ts.ItemsPicked.TotalPotions.ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPotions /ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
+                    LogWriter.WriteLine("Total potions: " + ts.ItemsPicked.TotalPotions.ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPotions / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
                     for (int itemLevel = 1; itemLevel <= 63; itemLevel++) if (ts.ItemsPicked.PotionsPerLevel[itemLevel] > 0)
-                            LogWriter.WriteLine("- ilvl " + itemLevel.ToString() + ": " + ts.ItemsPicked.PotionsPerLevel[itemLevel].ToString() + " [" + Math.Round(ts.ItemsPicked.PotionsPerLevel[itemLevel] /ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.PotionsPerLevel[itemLevel] / ts.ItemsPicked.TotalPotions) * 100, 2).ToString("0.00") + " %}");
+                            LogWriter.WriteLine("- ilvl " + itemLevel.ToString() + ": " + ts.ItemsPicked.PotionsPerLevel[itemLevel].ToString() + " [" + Math.Round(ts.ItemsPicked.PotionsPerLevel[itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.PotionsPerLevel[itemLevel] / ts.ItemsPicked.TotalPotions) * 100, 2).ToString("0.00") + " %}");
                     LogWriter.WriteLine("");
                 }
 
@@ -498,15 +507,15 @@ namespace GilesTrinity
                 if (ts.ItemsPicked.TotalGems > 0)
                 {
                     LogWriter.WriteLine("Gem Pickups:");
-                    LogWriter.WriteLine("Total gems: " + ts.ItemsPicked.TotalGems.ToString() + " [" + Math.Round(ts.ItemsPicked.TotalGems /ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
+                    LogWriter.WriteLine("Total gems: " + ts.ItemsPicked.TotalGems.ToString() + " [" + Math.Round(ts.ItemsPicked.TotalGems / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
                     for (int iThisGemType = 0; iThisGemType <= 3; iThisGemType++)
                     {
                         if (ts.ItemsPicked.GemsPerType[iThisGemType] > 0)
                         {
-                            LogWriter.WriteLine("- " + sGemString[iThisGemType] + ": " + ts.ItemsPicked.GemsPerType[iThisGemType].ToString() + " [" + Math.Round(ts.ItemsPicked.GemsPerType[iThisGemType] /ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.GemsPerType[iThisGemType] / ts.ItemsPicked.TotalGems) * 100, 2).ToString("0.00") + " %}");
+                            LogWriter.WriteLine("- " + sGemString[iThisGemType] + ": " + ts.ItemsPicked.GemsPerType[iThisGemType].ToString() + " [" + Math.Round(ts.ItemsPicked.GemsPerType[iThisGemType] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.GemsPerType[iThisGemType] / ts.ItemsPicked.TotalGems) * 100, 2).ToString("0.00") + " %}");
                             for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
                                 if (ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel] > 0)
-                                    LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sGemString[iThisGemType] + ": " + ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel].ToString() + " [" + Math.Round(ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel] /ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel] / ts.ItemsPicked.TotalGems) * 100, 2).ToString("0.00") + " %}");
+                                    LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sGemString[iThisGemType] + ": " + ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel].ToString() + " [" + Math.Round(ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel] / ts.ItemsPicked.TotalGems) * 100, 2).ToString("0.00") + " %}");
                         }
 
                         // Any at all this quality?
@@ -521,11 +530,12 @@ namespace GilesTrinity
                 if (ts.ItemsPicked.TotalInfernalKeys > 0)
                 {
                     LogWriter.WriteLine("Infernal Key Pickups:");
-                    LogWriter.WriteLine("Total Keys: " + ts.ItemsPicked.TotalInfernalKeys.ToString() + " [" + Math.Round(ts.ItemsPicked.TotalInfernalKeys /ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
+                    LogWriter.WriteLine("Total Keys: " + ts.ItemsPicked.TotalInfernalKeys.ToString() + " [" + Math.Round(ts.ItemsPicked.TotalInfernalKeys / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
                 }
 
                 // End of key stats
                 LogWriter.WriteLine("===== End Of Report =====");
+                LogWriter.Flush();
             }
         }
     }

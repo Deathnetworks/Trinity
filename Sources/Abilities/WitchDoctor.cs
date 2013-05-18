@@ -72,7 +72,7 @@ namespace GilesTrinity
 
             // Sacrifice AKA Zombie Dog Jihad, use on Elites Only or to try and Save yourself
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) &&
-                (TargetUtil.AnyElitesInRange(15, 1) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) &&
+                (TargetUtil.AnyElitesInRange(15, 1) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 9f)) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_Sacrifice))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 0, WAIT_FOR_ANIM);
@@ -208,7 +208,7 @@ namespace GilesTrinity
                 Settings.Combat.WitchDoctor.ZeroDogs &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_Sacrifice))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 15f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 9f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
             }
 
             // Wall of Zombies

@@ -24,12 +24,12 @@ namespace GilesTrinity
             try
             {
                 string sThisProfile = Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile;
-                if (sThisProfile != sLastProfileSeen)
+                if (sThisProfile != CurrentProfile)
                 {
                     listProfilesLoaded.Add(sThisProfile);
-                    sLastProfileSeen = sThisProfile;
-                    if (sFirstProfileSeen == "")
-                        sFirstProfileSeen = sThisProfile;
+                    CurrentProfile = sThisProfile;
+                    if (FirstProfile == "")
+                        FirstProfile = sThisProfile;
                 }
             }
             catch { }

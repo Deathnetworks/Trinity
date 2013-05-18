@@ -23,6 +23,8 @@ namespace GilesTrinity
 
         internal static Stopwatch HotbarRefreshTimer = new Stopwatch();
 
+        private static int lastWorldId = -1;
+
         /// <summary>
         /// Find fresh targets, start main BehaviorTree if needed, cast any buffs needed etc.
         /// </summary>
@@ -46,6 +48,13 @@ namespace GilesTrinity
                 {
                     BotMain.PauseWhile(GoldInactivity.GoldInactiveLeaveGame);
                     return false;
+                }
+
+                if (lastWorldId != PlayerStatus.WorldID)
+                {
+                    ISearchAreaProvider mgp = Navigator.SearchGridProvider;
+                    
+
                 }
 
                 if (!HotbarRefreshTimer.IsRunning)
@@ -296,7 +305,7 @@ namespace GilesTrinity
         /// <summary>
         /// Adds profile blacklist entries to the Giles Blacklist
         /// </summary>
-        private static void RefreshProfileBlacklists()
+        internal static void RefreshProfileBlacklists()
         {
             foreach (TargetBlacklist b in Zeta.CommonBot.ProfileManager.CurrentProfile.TargetBlacklists)
             {

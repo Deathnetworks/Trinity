@@ -155,8 +155,8 @@ namespace GilesTrinity
 
         // Also storing a list of all profiles, for experimental reasons/incase I want to use them down the line
         public static List<string> listProfilesLoaded = new List<string>();
-        public static string sLastProfileSeen = "";
-        public static string sFirstProfileSeen = "";
+        public static string CurrentProfile = "";
+        public static string FirstProfile = "";
 
         // A list of small areas covering zones we move through while fighting to help our custom move-handler skip ahead waypoints
         internal static HashSet<GilesObstacle> hashSkipAheadAreaCache = new HashSet<GilesObstacle>();
@@ -413,11 +413,11 @@ namespace GilesTrinity
 
 
         /// <summary>
-        /// Do not wait for animation after using, spam the power
+        /// Do not wait for animation after using, spam the power (false)
         /// </summary>
         private const bool NO_WAIT_ANIM = false;
         /// <summary>
-        /// Wait for animation after using, do not spam the power
+        /// Wait for animation after using, do not spam the power (true)
         /// </summary>
         private const bool WAIT_FOR_ANIM = true;
 

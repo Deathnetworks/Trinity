@@ -6,6 +6,7 @@ using Zeta.CommonBot.Profile;
 using Zeta.Internals.Actors;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
+using System;
 
 namespace GilesTrinity.XmlTags
 {
@@ -13,60 +14,61 @@ namespace GilesTrinity.XmlTags
     [XmlElement("TrinityInteract")]
     public class TrinityInteract : ProfileBehavior
     {
-        private bool m_IsDone = false;
-        private int iSNOID;
+        private bool isDone = false;
 
         public override bool IsDone
         {
-            get { return m_IsDone; }
+            get { return isDone; }
+        }
+
+        public override void OnStart()
+        {
+            DbHelper.Log(LogCategory.UserInformation, "[TrinityInteract] Started Tag; snoid=\"{0}\" name=\"{1}\" questId=\"{2}\" stepId=\"{3}\" worldId=\"{4}\" levelAreaId=\"{5}\"",
+                this.ActorId, this.Name, this.QuestId, this.StepId, ZetaDia.CurrentWorldId, ZetaDia.CurrentLevelAreaId);
         }
 
         protected override Composite CreateBehavior()
         {
-            return new Zeta.TreeSharp.Action(ret =>
+            return
+            new Zeta.TreeSharp.Action(ret => DoInteract());
+        }
+
+        private RunStatus DoInteract()
+        {
+            if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld || !ZetaDia.Me.IsValid)
             {
-                float fClosestRange = -1;
-                int iACDGuid = -1;
-                Vector3 vMyLocation = GilesTrinity.PlayerStatus.CurrentPosition;
-                foreach (DiaObject thisobject in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Where<DiaObject>(a => a.ActorSNO == SNOID))
-                {
-                    if (fClosestRange == -1 || thisobject.Position.Distance(vMyLocation) <= fClosestRange)
-                    {
-                        fClosestRange = thisobject.Position.Distance(vMyLocation);
-                        iACDGuid = thisobject.ACDGuid;
-                    }
-                }
-                if (iACDGuid != -1)
-                {
-                    try
-                    {
-                        ZetaDia.Me.UsePower(SNOPower.Axe_Operate_Gizmo, Vector3.Zero, 0, iACDGuid);
-                    }
-                    catch
-                    {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, "There was a memory/DB failure trying to follow the TrinityInteract XML tag on SNO {0}", SNOID);
-                    }
-                }
-                m_IsDone = true;
-            });
+                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "TrinityInteract called during invalid bot state");
+                return RunStatus.Success;
+            }
+
+            Vector3 myPos = GilesTrinity.PlayerStatus.CurrentPosition;
+
+            var interactTarget = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                .Where(a => a.ActorSNO == ActorId)
+                .OrderBy(a => a.Position.Distance2D(myPos)).FirstOrDefault();
+
+            if (interactTarget != null && interactTarget.IsValid)
+            {
+                Zeta.CommonBot.GameEvents.FireWorldTransferStart();
+                interactTarget.Interact();
+            }
+
+            isDone = true;
+
+            return RunStatus.Success;
         }
 
         [XmlAttribute("snoid")]
-        public int SNOID
-        {
-            get
-            {
-                return iSNOID;
-            }
-            set
-            {
-                iSNOID = value;
-            }
-        }
+        [XmlAttribute("actorId")]
+        public int ActorId { get; set; }
+
+        [XmlAttribute("name")]
+        public string Name { get; set; }
+
 
         public override void ResetCachedDone()
         {
-            m_IsDone = false;
+            isDone = false;
             base.ResetCachedDone();
         }
     }

@@ -69,13 +69,12 @@ namespace GilesTrinity
                 return new TrinityPower(SNOPower.DemonHunter_Companion, 0f, vNullLocation, CurrentWorldDynamicId, -1, 2, 1, WAIT_FOR_ANIM);
             }
             // Sentry Turret
-            // Currently BROKEN in demonbuddy :(
             if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_Sentry) &&
                 (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50, 2) || TargetUtil.IsEliteTargetInRange(50)) &&
                 PlayerStatus.PrimaryResource >= 30 && PowerManager.CanCast(SNOPower.DemonHunter_Sentry))
             {
 
-                return new TrinityPower(SNOPower.DemonHunter_Sentry, 50f, PlayerStatus.CurrentPosition, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_Sentry, 0f, PlayerStatus.CurrentPosition, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
             }
             // Marked for Death
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_MarkedForDeath) &&

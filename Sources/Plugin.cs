@@ -72,6 +72,9 @@ namespace GilesTrinity
         /// </summary>
         public void OnPulse()
         {
+            if (ZetaDia.Me == null)
+                return;
+
             if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                 return;
 

@@ -1322,7 +1322,7 @@ namespace GilesTrinity
                         /*
                          * Per Nesox, spamming NavProvider.CanFullyClientPathTo "is really bad"
                          * We need to come up with another way of doing this that doesnt lag the client
-                         * 
+                         */ 
                         switch (c_ObjectType)
                         {
                             case GObjectType.Destructible:
@@ -1363,7 +1363,7 @@ namespace GilesTrinity
                                 break;
 
                         }
-                        */
+
                         switch (c_ObjectType)
                         {
                             case GObjectType.Destructible:

@@ -9,6 +9,7 @@ using GilesTrinity.XmlTags;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot;
+using Zeta.CommonBot.Dungeons;
 using Zeta.CommonBot.Profile;
 using Zeta.CommonBot.Profile.Common;
 using Zeta.Internals;
@@ -249,7 +250,7 @@ namespace GilesTrinity.DbProvider
             if (GilesTrinity.Settings.Advanced.AllowRestartGame && DateTime.Now.Subtract(timeLastRestartedGame).TotalMinutes >= 15)
             {
                 timeLastRestartedGame = DateTime.Now;
-                string sUseProfile = GilesTrinity.sFirstProfileSeen;
+                string sUseProfile = GilesTrinity.FirstProfile;
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck measures exiting current game.");
                 // Load the first profile seen last run
                 ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
@@ -347,7 +348,7 @@ namespace GilesTrinity.DbProvider
             if (element == null)
                 return false;
             if (!UIElement.IsValidElement(element.Hash))
-                return false;            
+                return false;
             if (!element.IsValid)
                 return false;
             if (!element.IsVisible)
@@ -366,7 +367,7 @@ namespace GilesTrinity.DbProvider
             if (UISafetyCheck())
             {
                 return;
-            }           
+            }
 
             TimeLastUsedPlayerMover = DateTime.Now;
             vMyCurrentPosition = GilesTrinity.PlayerStatus.CurrentPosition;
@@ -522,7 +523,7 @@ namespace GilesTrinity.DbProvider
                 }
             }
 
-            
+
 
             // don't use special movement within 10 seconds of being stuck
             bool cancelSpecialMovementAfterStuck = DateTime.Now.Subtract(LastGeneratedStuckPosition).TotalMilliseconds > 10000;
@@ -687,9 +688,11 @@ namespace GilesTrinity.DbProvider
                     // increment the teleport count for wormhole rune
                     WizardTeleportCount++;
 
+                    var maxTeleportRange = 75f;
+
                     Vector3 vThisTarget = vMoveToTarget;
-                    if (DestinationDistance > 35f)
-                        vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
+                    if (DestinationDistance > maxTeleportRange)
+                        vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, maxTeleportRange);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vThisTarget, GilesTrinity.CurrentWorldDynamicId, -1);
                     GilesTrinity.dictAbilityLastUse[SNOPower.Wizard_Teleport] = DateTime.Now;
                     if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
@@ -748,7 +751,7 @@ namespace GilesTrinity.DbProvider
         private static void GetShiftedPosition(ref Vector3 vMoveToTarget, ref Vector3 point, float radius = 15f)
         {
             double moveDirection = MathUtil.FindDirectionRadian(vMyCurrentPosition, vMoveToTarget);
-            
+
             vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, radius + 30f, (float)moveDirection);
             //if (!GilesTrinity.NavHelper.CanRayCast(vMyCurrentPosition, vMoveToTarget))
             //{
@@ -812,12 +815,13 @@ namespace GilesTrinity.DbProvider
                 TrinityLoadOnce.UsedProfiles.Add(currentProfileFileName);
             }
 
-
-            string sThisProfile = Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile;
-            if (sThisProfile != GilesTrinity.sLastProfileSeen)
+            string runningProfile = Zeta.CommonBot.ProfileManager.CurrentProfile.Path;
+            if (runningProfile != GilesTrinity.CurrentProfile)
             {
+                GilesTrinity.RefreshProfileBlacklists();
+                
                 // See if we appear to have started a new game
-                if (GilesTrinity.sFirstProfileSeen != "" && sThisProfile == GilesTrinity.sFirstProfileSeen)
+                if (GilesTrinity.FirstProfile != "" && runningProfile == GilesTrinity.FirstProfile)
                 {
                     GilesTrinity.TotalProfileRecycles++;
                     if (GilesTrinity.TotalProfileRecycles > GilesTrinity.iTotalJoinGames && GilesTrinity.TotalProfileRecycles > GilesTrinity.TotalLeaveGames)
@@ -825,15 +829,15 @@ namespace GilesTrinity.DbProvider
                         GilesTrinity.ResetEverythingNewGame();
                     }
                 }
-                GilesTrinity.listProfilesLoaded.Add(sThisProfile);
-                GilesTrinity.sLastProfileSeen = sThisProfile;
+                GilesTrinity.listProfilesLoaded.Add(runningProfile);
+                GilesTrinity.CurrentProfile = runningProfile;
 
                 if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.Name != null)
                 {
                     GilesTrinity.SetWindowTitle(ProfileManager.CurrentProfile.Name);
                 }
-                if (GilesTrinity.sFirstProfileSeen == "")
-                    GilesTrinity.sFirstProfileSeen = sThisProfile;
+                if (GilesTrinity.FirstProfile == "")
+                    GilesTrinity.FirstProfile = runningProfile;
             }
         }
 
@@ -861,7 +865,17 @@ namespace GilesTrinity.DbProvider
                     return MoveResult.Moved;
                 }
 
-                return Navigator.MoveTo(moveTarget, destinationName, true);
+                try
+                {
+                    return Navigator.MoveTo(moveTarget, destinationName, true);
+                }
+                catch (Exception ex)
+                {
+                    Logging.Write("{0}", ex);
+                    GridSegmentation.Reset();
+
+                    return MoveResult.Failed;
+                }
             }
         }
 

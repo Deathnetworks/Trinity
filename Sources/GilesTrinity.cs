@@ -78,7 +78,7 @@ namespace GilesTrinity
                     if (iDeathsThisRun >= iMaxDeathsAllowed)
                     {
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "You have died too many times. Now restarting the game.");
-                        string sUseProfile = GilesTrinity.sFirstProfileSeen;
+                        string sUseProfile = GilesTrinity.FirstProfile;
                         ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
                                                 ? sUseProfile
                                                 : Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
@@ -156,8 +156,8 @@ namespace GilesTrinity
             dictSummonedByID = new Dictionary<int, int>();
             dictTotalInteractionAttempts = new Dictionary<int, int>();
             listProfilesLoaded = new List<string>();
-            sLastProfileSeen = "";
-            sFirstProfileSeen = "";
+            CurrentProfile = "";
+            FirstProfile = "";
 
 
             NavHelper.UpdateSearchGridProvider();

@@ -41,6 +41,17 @@ namespace GilesTrinity.XmlTags
             return new PrioritySelector(children);
         }
 
+        public override void OnStart()
+        {
+            DbHelper.Log(LogCategory.UserInformation, "[TrinityMoveTo] Started Tag; {0} name=\"{1}\" questId=\"{2}\" stepId=\"{3}\" worldId=\"{4}\" levelAreaId=\"{5}\"",
+                getPosition(), this.Name, this.QuestId, this.StepId, ZetaDia.CurrentWorldId, ZetaDia.CurrentLevelAreaId);
+        }
+
+        private string getPosition()
+        {
+            return String.Format("x=\"{0}\" y=\"{1}\" z=\"{2}\" ", this.X, this.Y, this.Z);
+        }
+
         private RunStatus GilesMoveToLocation(object ret)
         {
 
@@ -82,7 +93,8 @@ namespace GilesTrinity.XmlTags
             }
             else
             {
-                Navigator.MoveTo(NavTarget);
+                var positionName = this.getPosition() + " (" + this.Name + ")";
+                Navigator.MoveTo(NavTarget, positionName, true);
             }
 
             return RunStatus.Success;
@@ -152,17 +164,7 @@ namespace GilesTrinity.XmlTags
         }
 
         [XmlAttribute("name")]
-        public string Name
-        {
-            get
-            {
-                return sDestinationName;
-            }
-            set
-            {
-                sDestinationName = value;
-            }
-        }
+        public string Name { get; set; }
 
         [XmlAttribute("pathPrecision")]
         public float PathPrecision

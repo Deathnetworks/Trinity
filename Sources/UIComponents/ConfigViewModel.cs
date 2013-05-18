@@ -43,14 +43,29 @@ namespace GilesTrinity.UIComponents
             TestScoreCommand = new RelayCommand(
                                     (parameter) =>
                                     {
-                                        GilesTrinity.TestScoring();
-                                        UILoader.CloseWindow();
+                                        try
+                                        {
+                                            GilesTrinity.TestScoring();
+                                            UILoader.CloseWindow();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            DbHelper.Log(LogCategory.UserInformation, "{0}", ex);
+                                        }
                                     });
             OrderStashCommand = new RelayCommand(
                                     (parameter) =>
                                     {
-                                        global::GilesTrinity.TownRun.SortStash();
-                                        UILoader.CloseWindow();
+                                        try
+                                        {
+                                            global::GilesTrinity.TownRun.SortStash();
+                                            UILoader.CloseWindow();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            DbHelper.Log(LogCategory.UserInformation, "{0}", ex);
+                                        }
+
                                     });
             HelpLinkCommand = new RelayCommand(
                                     (parameter) =>
