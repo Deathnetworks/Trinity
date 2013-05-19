@@ -1,11 +1,39 @@
 ﻿
 # Unified Trinity Community Edition
 
-### Known issues:
+### Changelog 1.7.2.13:
 
-* DH Sentry Turrent still does not work, appears to be DB bug
+* Added FireWorldTransferStart() to TrinityInteract - this wil help prevent TrinityInteract from crashing DB. We need to depreciate this tag...
 
-* Users still reporting "missing loot" - please enable all trinity advanced logs and attach your log file to the Trinity release thread
+* Added FireItemLooted event, Demonbuddy Item Stats in UI now shows items looted counters when using Trinity
+
+* ItemRules.log archive into one file now, better to use for itemViewer
+
+* Corrected default Cache Refresh Rate in UI
+
+* Completely disabled Avoidance cancellation timers ("fixes" avoidance, but maybe it breaks it somewhere else.. )
+
+* Disabled ClientNav LoS check (Performance per Nesox)
+
+* Changed WD Sacrifice range to 9f
+
+* Added additional OnStart/Nav logic to TrinityMoveTo and TrinityInteract
+
+* Fixed exceptions flushing Persistent Stats streams
+
+* Added UseProfileManager class - helper class to record and manage profiles and profile blacklists
+
+* Moving a few "maintenance" tasks (UsedProfileManager.RecordProfile and output item stats report) into Plugin Pulse
+
+* Fixed Demonhunter Sentry (I think) [herbfunk/Nazair]
+
+* Added additional safety check on Plugin Pulse
+
+* Added try/catch around Test Scoring and Order Stash commands, hopefully prevents DB from crashing
+
+* Fixed incorrect ZetaDia.Actors.Me references (should be ZetaDia.Me)
+
+* Added un-openable FoS gate to blacklist
 
 ### Changelog 1.7.2.12:
 

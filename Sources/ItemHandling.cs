@@ -654,7 +654,7 @@ namespace GilesTrinity
         /// </summary>
         internal static void OutputReport()
         {
-            if (ZetaDia.Me == null)
+            if (ZetaDia.Me == null || !ZetaDia.Me.IsValid)
                 return;
 
             if (!Settings.Advanced.OutputReports)
@@ -669,7 +669,7 @@ namespace GilesTrinity
              */
             try
             {
-                if (ZetaDia.Me.Level < 60)
+                if (PlayerStatus.Level < 60)
                 {
                     if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
                     {
@@ -914,6 +914,10 @@ namespace GilesTrinity
                         LogStream.Flush();
                     }
                 }
+            }
+            catch (AccessViolationException)
+            {
+                // do nothing... db read error. 
             }
             catch (Exception ex)
             {
