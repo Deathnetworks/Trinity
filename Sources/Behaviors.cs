@@ -1762,12 +1762,6 @@ namespace GilesTrinity
                     {
                         ItemsPickedStats.TotalInfernalKeys++;
                     }
-                    // See if we should update the stats file
-                    if (DateTime.Now.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
-                    {
-                        ItemStatsLastPostedReport = DateTime.Now;
-                        OutputReport();
-                    }
                 }
                 WaitWhileAnimating(5, true);
                 // Count how many times we've tried interacting

@@ -72,20 +72,37 @@ namespace GilesTrinity
         /// </summary>
         public void OnPulse()
         {
-            if (ZetaDia.Me == null)
-                return;
-
-            if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
-                return;
-
-            // hax for sending notifications after a town run
-            if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !PlayerStatus.IsInTown)
+            try
             {
-                TownRun.SendEmailNotification();
-                TownRun.SendMobileNotifications();
-            }
+                if (ZetaDia.Me == null)
+                    return;
 
-            Monk_MaintainTempestRush();
+                if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
+                    return;
+
+                // hax for sending notifications after a town run
+                if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !PlayerStatus.IsInTown)
+                {
+                    TownRun.SendEmailNotification();
+                    TownRun.SendMobileNotifications();
+                }
+
+                // See if we should update the stats file
+                if (DateTime.Now.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
+                {
+                    ItemStatsLastPostedReport = DateTime.Now;
+                    OutputReport();
+                }
+
+                // Recording of all the XML's in use this run
+                UsedProfileManager.RecordProfile();
+
+                Monk_MaintainTempestRush();
+            }
+            catch (Exception ex)
+            {
+                DbHelper.Log(LogCategory.UserInformation, "Exception in Pulse: {0}", ex.ToString());
+            }
         }
 
         /// <summary>

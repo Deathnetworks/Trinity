@@ -96,6 +96,7 @@
     <Compile Include="Classes\SpeedSensor.cs" />
     <Compile Include="Classes\TargetUtil.cs" />
     <Compile Include="Classes\TrinityItemManager.cs" />
+    <Compile Include="Classes\UsedProfileManager.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Behaviors.cs" />

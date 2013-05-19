@@ -404,11 +404,6 @@ namespace GilesTrinity.DbProvider
             // Set the public variable
             MovementSpeed = GetMovementSpeed();
 
-            // rrrix-note: This really shouldn't be here... 
-            // Recording of all the XML's in use this run
-            RecordLastProfile();
-
-
             vMoveToTarget = WarnAndLogLongPath(vMoveToTarget);
 
             // Make sure GilesTrinity doesn't want us to avoid routine-movement
@@ -807,39 +802,6 @@ namespace GilesTrinity.DbProvider
             return vMoveToTarget;
         }
 
-        private static void RecordLastProfile()
-        {
-            string currentProfileFileName = Path.GetFileName(ProfileManager.CurrentProfile.Path);
-            if (!TrinityLoadOnce.UsedProfiles.Contains(currentProfileFileName))
-            {
-                TrinityLoadOnce.UsedProfiles.Add(currentProfileFileName);
-            }
-
-            string runningProfile = Zeta.CommonBot.ProfileManager.CurrentProfile.Path;
-            if (runningProfile != GilesTrinity.CurrentProfile)
-            {
-                GilesTrinity.RefreshProfileBlacklists();
-                
-                // See if we appear to have started a new game
-                if (GilesTrinity.FirstProfile != "" && runningProfile == GilesTrinity.FirstProfile)
-                {
-                    GilesTrinity.TotalProfileRecycles++;
-                    if (GilesTrinity.TotalProfileRecycles > GilesTrinity.iTotalJoinGames && GilesTrinity.TotalProfileRecycles > GilesTrinity.TotalLeaveGames)
-                    {
-                        GilesTrinity.ResetEverythingNewGame();
-                    }
-                }
-                GilesTrinity.listProfilesLoaded.Add(runningProfile);
-                GilesTrinity.CurrentProfile = runningProfile;
-
-                if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.Name != null)
-                {
-                    GilesTrinity.SetWindowTitle(ProfileManager.CurrentProfile.Name);
-                }
-                if (GilesTrinity.FirstProfile == "")
-                    GilesTrinity.FirstProfile = runningProfile;
-            }
-        }
 
         private static GilesObject CurrentTarget { get { return GilesTrinity.CurrentTarget; } }
 

@@ -51,7 +51,7 @@ namespace GilesTrinity
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: Maintaining item stats from previous run. To reset stats fully, please restart DB.");
             }
 
-            RefreshProfileBlacklists();
+            UsedProfileManager.RefreshProfileBlacklists();
 
             ReplaceTreeHooks();
 

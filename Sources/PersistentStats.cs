@@ -282,41 +282,63 @@ namespace GilesTrinity
             {
                 PersistentUpdateStats();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                // Write the whole exception stack
-                System.Exception tmp = ex;
-                int exLevel = 0;
-                while (tmp != null)
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "PersistentOutputReport exception: {0}", ex.ToString());
+            }
+
+            // Full Stats
+            try
+            {
+                var fullStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("FullStats - {0}.log", PlayerStatus.ActorClass));
+
+                using (FileStream LogStream =
+                    File.Open(fullStatsPath, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Exception {1}: {0}", tmp.Message, exLevel);
-                    tmp = tmp.InnerException;
-                    exLevel++;
+                    LogStats(LogStream, PersistentTotalStats);
                 }
             }
-
-            using (FileStream LogStream =
-                File.Open(Path.Combine(FileManager.LoggingPath, String.Format("FullStats - {0}.log", PlayerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read))
+            catch (Exception ex)
             {
-                LogStats(LogStream, PersistentTotalStats);
-                LogStream.Flush();
-            }
-            using (FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("WorldStats {1} - {0}.log", PlayerStatus.ActorClass, cachedStaticWorldId)), FileMode.Create, FileAccess.Write, FileShare.Read))
-            {
-                LogStats(LogStream, worldStatsDictionary[cachedStaticWorldId]);
-                LogStream.Flush();
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "FullStats exception: {0}", ex.ToString());
             }
 
-            using (FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, String.Format("AgregateWorldStats - {0}.log", PlayerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read))
+            // Current World Stats
+
+            try
             {
-                LogWorldStats(LogStream, worldStatsDictionary);
-                LogStream.Flush();
+                var worldStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("WorldStats {1} - {0}.log", PlayerStatus.ActorClass, cachedStaticWorldId));
+
+                using (FileStream LogStream = File.Open(worldStatsPath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                {
+                    LogStats(LogStream, worldStatsDictionary[cachedStaticWorldId]);
+                }
             }
+            catch (Exception ex)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WorldStats exception: {0}", ex.ToString());
+            }
+
+            // AggregateWorldStats
+            try
+            {
+                var aggregateWorldStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("AgregateWorldStats - {0}.log", PlayerStatus.ActorClass));
+
+                using (FileStream LogStream = File.Open(aggregateWorldStatsPath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                {
+                    LogWorldStats(LogStream, worldStatsDictionary);
+                }
+            }
+            catch (Exception ex)
+            {
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "AggregateWorldStats exception: {0}", ex.ToString());
+            }
+
         }
 
-        internal static void LogWorldStats(FileStream oLogStream, Dictionary<int, PersistentStats> aWorldStats)
+        internal static void LogWorldStats(FileStream LogStream, Dictionary<int, PersistentStats> aWorldStats)
         {
-            using (StreamWriter LogWriter = new StreamWriter(oLogStream))
+            using (StreamWriter LogWriter = new StreamWriter(LogStream))
             {
                 LogWriter.WriteLine("=== Per World agregate stats ===");
                 LogWriter.WriteLine("The format is: worldid <tab> stat");
@@ -346,14 +368,15 @@ namespace GilesTrinity
                     LogWriter.WriteLine(v.Key + "\t" + v.Value.ItemsPicked.Total + "\t" + Math.Round(v.Value.ItemsPicked.Total / v.Value.TotalRunningTime.TotalHours, 2).ToString("0.00"));
 
                 LogWriter.Flush();
+                LogStream.Flush();
             }
         }
 
-        internal static void LogStats(FileStream aLogStream, PersistentStats aPersistentStats)
+        internal static void LogStats(FileStream LogStream, PersistentStats aPersistentStats)
         {
             var ts = aPersistentStats;
             // Create whole new file
-            using (StreamWriter LogWriter = new StreamWriter(aLogStream))
+            using (StreamWriter LogWriter = new StreamWriter(LogStream))
             {
                 LogWriter.WriteLine("===== Misc Statistics =====");
                 LogWriter.WriteLine("Total tracking time: " + ((int)ts.TotalRunningTime.TotalHours).ToString() + "h " + ts.TotalRunningTime.Minutes.ToString("0.00") +
@@ -536,6 +559,7 @@ namespace GilesTrinity
                 // End of key stats
                 LogWriter.WriteLine("===== End Of Report =====");
                 LogWriter.Flush();
+                LogStream.Flush();
             }
         }
     }

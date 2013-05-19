@@ -706,9 +706,11 @@ namespace GilesTrinity
                 PersistentOutputReport();
                 TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
 
+                var runStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("RunStats - {0}.log", PlayerStatus.ActorClass));
+
                 // Create whole new file
                 using (FileStream LogStream =
-                    File.Open(Path.Combine(FileManager.LoggingPath, String.Format("RunStats - {0}.log", PlayerStatus.ActorClass)), FileMode.Create, FileAccess.Write, FileShare.Read))
+                    File.Open(runStatsPath, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
                     {
@@ -909,8 +911,8 @@ namespace GilesTrinity
                         LogWriter.WriteLine("===== End Of Report =====");
 
                         LogWriter.Flush();
+                        LogStream.Flush();
                     }
-                    LogStream.Flush();
                 }
             }
             catch (Exception ex)

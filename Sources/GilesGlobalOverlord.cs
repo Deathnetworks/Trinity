@@ -279,13 +279,15 @@ namespace GilesTrinity
             {
                 dateSinceBlacklist90Clear = DateTime.Now;
                 hashRGUIDBlacklist90 = new HashSet<int>();
+
+                // Refresh profile blacklists now, just in case
+                UsedProfileManager.RefreshProfileBlacklists();
             }
             // Clear the full blacklist every 60 seconds (default was 60)
             if (DateTime.Now.Subtract(dateSinceBlacklist60Clear).TotalSeconds > 60)
             {
                 dateSinceBlacklist60Clear = DateTime.Now;
                 hashRGUIDBlacklist60 = new HashSet<int>();
-                RefreshProfileBlacklists();
             }
             // Clear the temporary blacklist every 15 seconds (default was 15)
             if (DateTime.Now.Subtract(dateSinceBlacklist15Clear).TotalSeconds > 15)
@@ -301,24 +303,6 @@ namespace GilesTrinity
                 hashRGUIDBlacklist3 = new HashSet<int>();
             }
 
-        }
-        /// <summary>
-        /// Adds profile blacklist entries to the Giles Blacklist
-        /// </summary>
-        internal static void RefreshProfileBlacklists()
-        {
-            foreach (TargetBlacklist b in Zeta.CommonBot.ProfileManager.CurrentProfile.TargetBlacklists)
-            {
-                if (!hashSNOIgnoreBlacklist.Contains(b.ActorId))
-                {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.GlobalHandler, "Adding Profile TargetBlacklist {0} to Giles Blacklists", b.ActorId);
-                    hashSNOIgnoreBlacklist.Add(b.ActorId);
-                }
-                if (!hashActorSNOIgnoreBlacklist.Contains(b.ActorId))
-                {
-                    hashActorSNOIgnoreBlacklist.Add(b.ActorId);
-                }
-            }
         }
     }
 }
