@@ -116,7 +116,14 @@ namespace GilesTrinity.ItemRules
 
         public bool reloadFromUI()
         {
-            readConfiguration();
+            try
+            {
+                readConfiguration();
+            }
+            catch (Exception ex)
+            {
+                DbHelper.Log(LogCategory.UserInformation, "{0}", ex.ToString());
+            }
             return false;
         }
 

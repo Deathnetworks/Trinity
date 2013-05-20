@@ -535,6 +535,8 @@ namespace GilesTrinity.UIComponents
             ReloadScriptRulesCommand = new RelayCommand(
                                     (parameter) =>
                                     {
+                                        _Model.CopyTo(_OriginalModel);
+                                        _OriginalModel.Save();
                                         BotMain.PauseWhile(GilesTrinity.StashRule.reloadFromUI);
                                     }
                                     );
