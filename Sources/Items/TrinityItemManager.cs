@@ -194,12 +194,8 @@ namespace Trinity
                 Interpreter.InterpreterAction action = Trinity.StashRule.checkItem(item, evaluationType);
                 
                 if (evaluationType == ItemEvaluationType.Keep)
-<<<<<<< HEAD
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
-                
-=======
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
->>>>>>> 65e7489b29184d1015c85f976a8013dc47132493
+
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
                 switch (action)
                 {
                     case Interpreter.InterpreterAction.KEEP:
@@ -249,7 +245,7 @@ namespace Trinity
 
         private bool ItemRulesSalvageSell(ACDItem item, ItemEvaluationType evaluationType)
         {
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
                 "Incoming {0} Request: {1}, {2}, {3}, {4}, {5}",
                 evaluationType, item.ItemQualityLevel, item.Level, item.ItemBaseType,
                 item.ItemType, item.IsOneHand ? "1H" : item.IsTwoHand ? "2H" : "NH");
@@ -258,13 +254,13 @@ namespace Trinity
             switch (action)
             {
                 case Interpreter.InterpreterAction.SALVAGE:
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0}: {1}", evaluationType, (evaluationType == ItemEvaluationType.Salvage));
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0}: {1}", evaluationType, (evaluationType == ItemEvaluationType.Salvage));
                     return (evaluationType == ItemEvaluationType.Salvage);
                 case Interpreter.InterpreterAction.SELL:
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0}: {1}", evaluationType, (evaluationType == ItemEvaluationType.Sell));
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0}: {1}", evaluationType, (evaluationType == ItemEvaluationType.Sell));
                     return (evaluationType == ItemEvaluationType.Sell);
                 default:
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Trinity, item is unhandled by ItemRules (SalvageSell)!");
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Trinity, item is unhandled by ItemRules (SalvageSell)!");
                     switch (evaluationType)
                     {
                         case ItemEvaluationType.Salvage:

@@ -126,18 +126,7 @@ namespace Trinity
 
         public bool reloadFromUI()
         {
-<<<<<<< HEAD
             readConfiguration();
-=======
-            try
-            {
-                readConfiguration();
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(LogCategory.UserInformation, "{0}", ex.ToString());
-            }
->>>>>>> 65e7489b29184d1015c85f976a8013dc47132493
             return false;
         }
 
@@ -159,14 +148,9 @@ namespace Trinity
 
             // use Trinity setting
             if (Trinity.Settings.Loot.ItemRules.Debug)
-<<<<<<< HEAD
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is running in debug mode!", logPickQuality);
-
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is using the {0} rule set.", Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
-=======
                 Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is running in debug mode!", logPickQuality);
+
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is using the {0} rule set.", Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
->>>>>>> 65e7489b29184d1015c85f976a8013dc47132493
             logPickQuality = getTrinityItemQualityFromString(Trinity.Settings.Loot.ItemRules.PickupLogLevel.ToString());
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "PICKLOG = {0} ", logPickQuality);
             logKeepQuality = getTrinityItemQualityFromString(Trinity.Settings.Loot.ItemRules.KeepLogLevel.ToString());
@@ -193,15 +177,15 @@ namespace Trinity
 
             // parse pickup file
             pickUpRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, pickupFile)), pickUpRuleSet);
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Pickup rules",pickUpRuleSet.Count);
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Pickup rules", pickUpRuleSet.Count);
 
             // parse identify file
             identifyRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, identifyFile)), identifyRuleSet);
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Identify rules", identifyRuleSet.Count);
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Identify rules", identifyRuleSet.Count);
 
             // parse salvage file
             salvageSellRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, salvageSellFile)), salvageSellRuleSet);
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Salvage rules", salvageSellRuleSet.Count);
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Salvage rules", salvageSellRuleSet.Count);
 
             // parse all keep files
             foreach (TrinityItemQuality itemQuality in Enum.GetValues(typeof(TrinityItemQuality)))
@@ -211,23 +195,13 @@ namespace Trinity
                 int oldValue = keepRuleSet.Count;
                 if (File.Exists(filePath))
                 {
-<<<<<<< HEAD
                     keepRuleSet = readLinesToArray(new StreamReader(filePath), keepRuleSet);
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} {1} Keep rules", (keepRuleSet.Count - oldValue), itemQuality.ToString());
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} {1} Keep rules", (keepRuleSet.Count - oldValue), itemQuality.ToString());
                 }
             }
-            
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Macros", macroDic.Count);
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules loaded a total of {0} {1} rules!", keepRuleSet.Count, Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString());
-=======
-                    ruleSet = readLinesToArray(new StreamReader(filePath), ruleSet);
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} {1} rules", (ruleSet.Count - oldValue), itemQuality.ToString());
-                }
-            }
-            
+
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Macros", macroDic.Count);
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules loaded a total of {0} {1} rules!", ruleSet.Count, Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString());
->>>>>>> 65e7489b29184d1015c85f976a8013dc47132493
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules loaded a total of {0} {1} rules!", keepRuleSet.Count, Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString());
         }
 
         /// <summary>

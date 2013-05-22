@@ -177,7 +177,7 @@ namespace Trinity
                                        item.FollowerSpecialType,
                                        item.DynamicId);
 
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
                 "Incoming Identification Request: {0}, {1}, {2}, {3}, {4}",
                 pickupItem.Quality, pickupItem.Level, pickupItem.DBBaseType,
                 pickupItem.DBItemType, pickupItem.IsOneHand ? "1H" : pickupItem.IsTwoHand ? "2H" : "NH");
@@ -185,7 +185,7 @@ namespace Trinity
             // using ItemEvaluationType.Identify isn't available so we are abusing Sell for that manner
             Interpreter.InterpreterAction action = Trinity.StashRule.checkPickUpItem(pickupItem, ItemEvaluationType.Sell);
 
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Action is: {0}", action);
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Action is: {0}", action);
 
             switch (action)
             {
@@ -194,7 +194,7 @@ namespace Trinity
                 case Interpreter.InterpreterAction.UNIDENT:
                     return false;
                 default:
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Trinity, item is unhandled by ItemRules (Identification)!");
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Trinity, item is unhandled by ItemRules (Identification)!");
                     return IdentifyItemValidation(pickupItem);
             }
 
