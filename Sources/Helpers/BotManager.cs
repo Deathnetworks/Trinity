@@ -32,30 +32,7 @@ namespace Trinity
             
         }
 
-        void PluginCheck(IBot bot)
-        {
-            if (!IsPluginEnabled && bot != null)
-            {
-                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "\tWARNING: Trinity Plugin is NOT YET ENABLED. Bot start detected");
-                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "\tIgnore this message if you are not currently using Trinity.");
-                return;
-            }
-
-            if (BotMain.IsRunning &&
-                (!Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("trinity"))) 
-            {
-                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Found Routine: {0}", Zeta.CommonBot.RoutineManager.Current.Name);
-                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "######################################");
-                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "ERROR: You are not using the Trinity Combat Routine!");
-                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "You MUST download and select the Trinity Combat Routine");
-                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "http://www.thebuddyforum.com/demonbuddy-forum/plugins/trinity/93720-trinity-download-here.html");
-                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "");
-                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Trinity will NOT work with any other combat routine");
-                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "######################################");
-                BotMain.Stop();
-            }
-
-        }
+        
 
 
         internal static void SetBotTPS()

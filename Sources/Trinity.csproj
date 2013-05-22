@@ -70,6 +70,7 @@
     <Compile Include="Combat\AvoidanceManager.cs" />
     <Compile Include="Combat\AvoidanceType.cs" />
     <Compile Include="Helpers\GameEvents.cs" />
+    <Compile Include="Helpers\PluginCheck.cs" />
     <Compile Include="Items\ItemEvents.cs" />
     <Compile Include="Cache\CacheAvoidance.cs" />
     <Compile Include="Cache\CacheGizmo.cs" />
