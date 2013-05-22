@@ -4,12 +4,12 @@ using Zeta;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
 using Zeta.TreeSharp;
-using GilesTrinity;
+using Trinity;
 using Zeta.Common.Plugins;
 
-namespace GilesTrinity
+namespace Trinity
 {
-    public class GilesRoutine : CombatRoutine
+    public class TrinityRoutine : CombatRoutine
     {
         public override void Initialize()
         {
