@@ -1,5 +1,5 @@
-﻿using GilesTrinity.Technicals;
-using GilesTrinity.UIComponents;
+﻿using Trinity.Technicals;
+using Trinity.UIComponents;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -9,7 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Markup;
 using System.Text.RegularExpressions;
 
-namespace GilesTrinity.UI
+namespace Trinity.UI
 {
     public class UILoader
     {
@@ -41,7 +41,7 @@ namespace GilesTrinity.UI
                     _ConfigWindow = new Window();
                 }
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Context");
-                _ConfigWindow.DataContext = new ConfigViewModel(GilesTrinity.Settings);
+                _ConfigWindow.DataContext = new ConfigViewModel(Trinity.Settings);
 
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load MainView.xaml");
                 UserControl mainControl = LoadAndTransformXamlFile<UserControl>(Path.Combine(uiPath, "MainView.xaml"));

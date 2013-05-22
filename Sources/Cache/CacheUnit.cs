@@ -6,7 +6,7 @@ using Zeta.Internals.SNO;
 using System.Text.RegularExpressions;
 
 
-namespace GilesTrinity.Cache
+namespace Trinity.Cache
 {
     internal class CacheUnit : CacheObject
     {

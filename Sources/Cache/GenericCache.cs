@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using GilesTrinity.Technicals;
+using Trinity.Technicals;
 
-namespace GilesTrinity
+namespace Trinity
 {
     internal class GenericCache
     {

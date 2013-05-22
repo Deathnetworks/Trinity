@@ -1,10 +1,10 @@
-﻿using GilesTrinity.Technicals;
+﻿using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.CommonBot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // Trinity Log lets profiles send log messages to DB
     [XmlElement("TrinityLog")]

@@ -2,7 +2,7 @@
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // * TrinityUseReset - Resets a UseOnce tag as if it has never been used
     [XmlElement("TrinityUseReset")]
@@ -24,10 +24,10 @@ namespace GilesTrinity.XmlTags
                 // See if we've EVER hit this ID before
 
                 // If so, delete it, if not, do nothing
-                if (GilesTrinity.hashUseOnceID.Contains(ID))
+                if (Trinity.hashUseOnceID.Contains(ID))
                 {
-                    GilesTrinity.hashUseOnceID.Remove(ID);
-                    GilesTrinity.dictUseOnceID.Remove(ID);
+                    Trinity.hashUseOnceID.Remove(ID);
+                    Trinity.dictUseOnceID.Remove(ID);
                 }
                 m_IsDone = true;
             });

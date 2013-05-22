@@ -1,4 +1,4 @@
-﻿using GilesTrinity.Technicals;
+﻿using Trinity.Technicals;
 using System;
 using System.Globalization;
 using System.IO;
@@ -12,7 +12,7 @@ using Zeta.Internals.Actors;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // TrinityLoadProfile will load the specified XML profile up
     [XmlElement("TrinityLoadProfile")]
@@ -69,19 +69,19 @@ namespace GilesTrinity.XmlTags
                     while (!ZetaDia.Me.IsInTown)
                     {
                         iSafetyLoops++;
-                        GilesTrinity.WaitWhileAnimating(5, true);
-                        ZetaDia.Me.UsePower(SNOPower.UseStoneOfRecall, GilesTrinity.PlayerStatus.CurrentPosition, ZetaDia.Me.WorldDynamicId, -1);
+                        Trinity.WaitWhileAnimating(5, true);
+                        ZetaDia.Me.UsePower(SNOPower.UseStoneOfRecall, Trinity.PlayerStatus.CurrentPosition, ZetaDia.Me.WorldDynamicId, -1);
                         Thread.Sleep(1000);
-                        GilesTrinity.WaitWhileAnimating(1000, true);
+                        Trinity.WaitWhileAnimating(1000, true);
                         if (iSafetyLoops > 5)
                             break;
                     }
                     Thread.Sleep(1000);
                     ZetaDia.Service.Party.LeaveGame();
-                    GilesTrinity.ResetEverythingNewGame();
+                    Trinity.ResetEverythingNewGame();
 
                     // Wait for 10 second log out timer if not in town, else wait for 3 seconds instead
-                    Thread.Sleep(!GilesTrinity.PlayerStatus.IsInTown ? 10000 : 3000);
+                    Thread.Sleep(!Trinity.PlayerStatus.IsInTown ? 10000 : 3000);
                 }
 
                 // Check if we want to restart the game

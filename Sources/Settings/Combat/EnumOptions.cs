@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GilesTrinity.Settings.Combat
+namespace Trinity.Settings.Combat
 {
     public enum GoblinPriority
     {

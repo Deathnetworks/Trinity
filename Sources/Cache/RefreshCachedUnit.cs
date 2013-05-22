@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using GilesTrinity.Settings.Combat;
-using GilesTrinity.Technicals;
+using Trinity.Settings.Combat;
+using Trinity.Technicals;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
 
-namespace GilesTrinity
+namespace Trinity
 {
-    public partial class GilesTrinity
+    public partial class Trinity
     {
         private static bool RefreshGilesUnit(bool AddToCache)
         {

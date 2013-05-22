@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace GilesTrinity.Settings
+namespace Trinity.Settings
 {
     [DataContract]
     public class NotificationSetting : ITrinitySetting<NotificationSetting>, INotifyPropertyChanged

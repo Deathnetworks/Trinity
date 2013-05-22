@@ -1,5 +1,5 @@
-﻿using GilesTrinity.DbProvider;
-using GilesTrinity.Technicals;
+﻿using Trinity.DbProvider;
+using Trinity.Technicals;
 using System;
 using System.IO;
 using System.Linq;
@@ -11,13 +11,13 @@ using Zeta.Internals.Actors;
 using Zeta.Internals.Actors.Gizmos;
 using Zeta.Internals.SNO;
 using System.Text;
-using GilesTrinity.Cache;
-using GilesTrinity.Settings.Combat;
+using Trinity.Cache;
+using Trinity.Settings.Combat;
 using Zeta.Navigation;
 
-namespace GilesTrinity
+namespace Trinity
 {
-    public partial class GilesTrinity
+    public partial class Trinity
     {
         private static bool RefreshGilesItem()
         {
@@ -105,17 +105,17 @@ namespace GilesTrinity
             // Get whether or not we want this item, cached if possible
             if (!dictGilesPickupItem.TryGetValue(c_RActorGuid, out AddToCache))
             {
-                if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+                if (Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.DemonBuddy)
                 {
                     AddToCache = ItemManager.Current.ShouldPickUpItem((ACDItem)c_CommonData);
                 }
-                else if (Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
+                else if (Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
                 {
                     AddToCache = ItemRulesPickupValidation(pickupItem);
                 }
                 else
                 {
-                    AddToCache = GilesPickupItemValidation(pickupItem);
+                    AddToCache = PickupItemValidation(pickupItem);
                 }
 
                 dictGilesPickupItem.Add(c_RActorGuid, AddToCache);

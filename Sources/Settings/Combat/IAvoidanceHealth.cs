@@ -1,5 +1,5 @@
 ﻿
-namespace GilesTrinity.Settings.Combat
+namespace Trinity.Settings.Combat
 {
     public interface IAvoidanceHealth
     {

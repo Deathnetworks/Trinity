@@ -2,7 +2,7 @@
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     //  TrinityUseStop - prevents a useonce tag ID ever being used again                     
     [XmlElement("TrinityUseStop")]
@@ -24,14 +24,14 @@ namespace GilesTrinity.XmlTags
                 // See if we've EVER hit this ID before
 
                 // If so, set it disabled - if not, add it and prevent it
-                if (GilesTrinity.hashUseOnceID.Contains(ID))
+                if (Trinity.hashUseOnceID.Contains(ID))
                 {
-                    GilesTrinity.dictUseOnceID[ID] = -1;
+                    Trinity.dictUseOnceID[ID] = -1;
                 }
                 else
                 {
-                    GilesTrinity.hashUseOnceID.Add(ID);
-                    GilesTrinity.dictUseOnceID.Add(ID, -1);
+                    Trinity.hashUseOnceID.Add(ID);
+                    Trinity.dictUseOnceID.Add(ID, -1);
                 }
                 m_IsDone = true;
             });

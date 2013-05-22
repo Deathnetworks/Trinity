@@ -1,4 +1,4 @@
-﻿using GilesTrinity.Technicals;
+﻿using Trinity.Technicals;
 using System;
 using System.Globalization;
 using Zeta.Common;
@@ -6,7 +6,7 @@ using Zeta.CommonBot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // TrinityRandom assigns a random value between min and max to a specified id
     [XmlElement("TrinityRandomRoll")]
@@ -32,13 +32,13 @@ namespace GilesTrinity.XmlTags
                 Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
                 int iNewRandomValue = (rndNum.Next((Max - Min) + 1)) + Min;
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, "Generating RNG for profile between {0} and {1}, result={2}", Min, Max, iNewRandomValue);
-                if (!GilesTrinity.dictRandomID.TryGetValue(ID, out iOldValue))
+                if (!Trinity.dictRandomID.TryGetValue(ID, out iOldValue))
                 {
-                    GilesTrinity.dictRandomID.Add(ID, iNewRandomValue);
+                    Trinity.dictRandomID.Add(ID, iNewRandomValue);
                 }
                 else
                 {
-                    GilesTrinity.dictRandomID[ID] = iNewRandomValue;
+                    Trinity.dictRandomID[ID] = iNewRandomValue;
                 }
                 m_IsDone = true;
             });

@@ -1,5 +1,5 @@
 ﻿
-namespace GilesTrinity.Notifications
+namespace Trinity.Notifications
 {
     public enum ProwlNotificationPriority : sbyte
     {

@@ -1,4 +1,4 @@
-﻿using GilesTrinity.Technicals;
+﻿using Trinity.Technicals;
 using System;
 using Zeta.Common;
 using Zeta.CommonBot;
@@ -6,7 +6,7 @@ using Zeta.CommonBot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // Trinity If perfectly mimics DB If - this is just for experimenting
     [XmlElement("TrinityIf")]

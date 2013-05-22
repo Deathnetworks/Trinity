@@ -6,7 +6,7 @@ using Zeta;
 using Zeta.Internals.Actors;
 using Zeta.Internals;
 
-namespace GilesTrinity.ItemRules.Core
+namespace Trinity.ItemRules.Core
 {
 
     public class MaxStats

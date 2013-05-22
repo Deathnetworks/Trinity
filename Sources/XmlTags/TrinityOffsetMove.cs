@@ -1,5 +1,5 @@
-﻿using GilesTrinity.DbProvider;
-using GilesTrinity.Technicals;
+﻿using Trinity.DbProvider;
+using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot.Profile;
@@ -9,7 +9,7 @@ using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     /// <summary>
     /// This profile tag will move the player a a direction given by the offsets x, y. Examples:
@@ -82,17 +82,15 @@ namespace GilesTrinity.XmlTags
             }
         }
 
-
-        public Vector3 MyPos { get { return GilesTrinity.PlayerStatus.CurrentPosition; } }
-        private ISearchAreaProvider gp { get { return GilesTrinity.gp; } }
-        //private PathFinder pf { get { return GilesTrinity.pf; } }
+        public Vector3 MyPos { get { return Trinity.PlayerStatus.CurrentPosition; } }
+        private ISearchAreaProvider MainGridProvider { get { return Trinity.MainGridProvider; } }
 
         public override void OnStart()
         {
             float x = MyPos.X + OffsetX;
             float y = MyPos.Y + OffsetY;
 
-            Position = new Vector3(x, y, gp.GetHeight(new Vector2(x, y)));
+            Position = new Vector3(x, y, MainGridProvider.GetHeight(new Vector2(x, y)));
 
             if (PathPrecision == 0)
                 PathPrecision = 10f;

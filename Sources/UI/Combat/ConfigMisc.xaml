@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:ut="clr-namespace:GilesTrinity.UIComponents"
+             xmlns:ut="clr-namespace:Trinity.UIComponents"
              mc:Ignorable="d"  Foreground="{DynamicResource TextBrush}"
              d:DesignHeight="350" d:DesignWidth="390">
     <UserControl.Resources>
@@ -111,7 +111,7 @@
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Use movement spells</CheckBox>
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.CollectHealthGlobe}">Attempt to collect health globes</CheckBox>
             <!--<CheckBox Margin="2" IsChecked="{Binding Path=Misc.AllowBacktracking}" ToolTip="currently experimental and buggy">Allow Backtracking path after combat</CheckBox>-->
-            <!--<CheckBox Margin="2" IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>-->
+            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.IgnoreElites}" ToolTip="Attack trash mobs only">Ignore Elite/Rare/Unique</CheckBox>
         </UniformGrid>
         <!--Reset Button-->

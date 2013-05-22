@@ -1,0 +1,308 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{997F24E1-4CD7-42C7-A5B5-4983636D5F2B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>GilesTrinity</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>x86</PlatformTarget>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>Trinity</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Demonbuddy, Version=1.0.1327.152, Culture=neutral, PublicKeyToken=eff32ccf253d66d4, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\db\Demonbuddy.exe</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Combat\Abilities\Barbarian.cs" />
+    <Compile Include="Combat\Abilities\CombatAbilities.cs" />
+    <Compile Include="Combat\Abilities\Monk.cs" />
+    <Compile Include="Combat\Abilities\Wizard.cs" />
+    <Compile Include="Combat\Abilities\DemonHunter.cs" />
+    <Compile Include="Combat\Abilities\WitchDoctor.cs" />
+    <Compile Include="Combat\AvoidanceManager.cs" />
+    <Compile Include="Combat\AvoidanceType.cs" />
+    <Compile Include="Helpers\GameEvents.cs" />
+    <Compile Include="Items\ItemEvents.cs" />
+    <Compile Include="Cache\CacheAvoidance.cs" />
+    <Compile Include="Cache\CacheGizmo.cs" />
+    <Compile Include="Cache\CacheItem.cs" />
+    <Compile Include="Cache\CacheManager.cs" />
+    <Compile Include="Cache\CacheObject.cs" />
+    <Compile Include="Cache\CacheRefresher.cs" />
+    <Compile Include="Cache\CacheUnit.cs" />
+    <Compile Include="Cache\CacheUtils.cs" />
+    <Compile Include="Cache\GenericBlacklist.cs" />
+    <Compile Include="Cache\GenericCache.cs" />
+    <Compile Include="Cache\PickupItem.cs" />
+    <Compile Include="Cache\RefreshCachedItem.cs" />
+    <Compile Include="Cache\RefreshCachedUnit.cs" />
+    <Compile Include="Cache\TrinityItemQuality.cs" />
+    <Compile Include="Cache\CacheObstacleObject.cs" />
+    <Compile Include="Combat\GilesPower.cs" />
+    <Compile Include="Items\CachedACDItem.cs" />
+    <Compile Include="Cache\GameBalanceDataCache.cs" />
+    <Compile Include="Items\ItemDropStats.cs" />
+    <Compile Include="Items\GilesStashSort.cs" />
+    <Compile Include="Helpers\GoldInactivity.cs" />
+    <Compile Include="Cache\HashGenerator.cs" />
+    <Compile Include="Combat\HotbarSkills.cs" />
+    <Compile Include="Helpers\MathUtil.cs" />
+    <Compile Include="Movement\MiniMapMarker.cs" />
+    <Compile Include="Movement\NavHelper.cs" />
+    <Compile Include="Movement\PositionCache.cs" />
+    <Compile Include="Movement\SpeedSensor.cs" />
+    <Compile Include="Helpers\TargetUtil.cs" />
+    <Compile Include="Items\TrinityItemManager.cs" />
+    <Compile Include="Helpers\UsedProfileManager.cs" />
+    <Compile Include="Configuration\Constants.cs" />
+    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Combat\Behaviors.cs" />
+    <Compile Include="Combat\AbilitySelector.cs" />
+    <Compile Include="Helpers\BotManager.cs" />
+    <Compile Include="ItemRules\Core\MaxStats.cs" />
+    <Compile Include="ItemRules\Core\Parser.cs" />
+    <Compile Include="ItemRules\Core\ParseTree.cs" />
+    <Compile Include="ItemRules\Core\Scanner.cs" />
+    <Compile Include="ItemRules\Core\TextHighlighter.cs" />
+    <Compile Include="Items\PersistentStats.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\Loot\ItemEnumOptions.cs" />
+    <Compile Include="Settings\Loot\ItemRuleSetting.cs" />
+    <Compile Include="Helpers\Loader.cs" />
+    <Compile Include="DbProvider\TownRun.cs" />
+    <Compile Include="Combat\TrinityPowerManager.cs" />
+    <Compile Include="Combat\ScheduledPower.cs" />
+    <Compile Include="Helpers\DbHelper.cs" />
+    <Compile Include="Helpers\LogCategory.cs" />
+    <Compile Include="Helpers\TrinitiyLogLevel.cs" />
+    <Compile Include="Items\ItemValuation.cs" />
+    <Compile Include="DbProvider\BlankCombatProvider.cs" />
+    <Compile Include="DbProvider\BlankLootProvider.cs" />
+    <Compile Include="DbProvider\BlankObstacleProvider.cs" />
+    <Compile Include="Cache\TrinityCacheObject.cs" />
+    <Compile Include="Items\Interpreter.cs" />
+    <Compile Include="Notifications\NotificationManager.cs" />
+    <Compile Include="Notifications\ProwlNotification.cs" />
+    <Compile Include="Notifications\ProwlNotificationPriority.cs" />
+    <Compile Include="Settings\AdvancedSetting.cs" />
+    <Compile Include="Settings\Combat\AvoidanceRadiusSetting.cs" />
+    <Compile Include="Settings\Combat\BarbarianSetting.cs" />
+    <Compile Include="Settings\Combat\CombatSetting.cs" />
+    <Compile Include="Settings\Combat\DemonHunterSetting.cs" />
+    <Compile Include="Settings\Combat\EnumOptions.cs" />
+    <Compile Include="Settings\Combat\IAvoidanceHealth.cs" />
+    <Compile Include="Settings\Combat\MiscCombatSetting.cs" />
+    <Compile Include="Settings\Combat\MonkSetting.cs" />
+    <Compile Include="Settings\Combat\WitchDoctorSetting.cs" />
+    <Compile Include="Settings\Combat\WizardSetting.cs" />
+    <Compile Include="Settings\ITrinitySetting.cs" />
+    <Compile Include="Settings\Loot\ItemSetting.cs" />
+    <Compile Include="Settings\Loot\PickupSetting.cs" />
+    <Compile Include="Settings\Loot\TownRunSetting.cs" />
+    <Compile Include="Settings\MailServerSetting.cs" />
+    <Compile Include="Settings\NotificationSetting.cs" />
+    <Compile Include="Settings\TrinitySetting.cs" />
+    <Compile Include="Settings\WorldObjectSetting.cs" />
+    <Compile Include="Helpers\PerformanceLogger.cs" />
+    <Compile Include="UI\UIComponents\BoolInverterConverter.cs" />
+    <Compile Include="UI\UIComponents\ConfigViewModel.cs" />
+    <Compile Include="UI\UIComponents\EnumVisibilityConverter.cs" />
+    <Compile Include="UI\UIComponents\IntToStringConverter.cs" />
+    <Compile Include="UI\UIComponents\FlagEnumValueConverter.cs" />
+    <Compile Include="UI\UIComponents\PercentConverter.cs" />
+    <Compile Include="UI\UIComponents\EnumBooleanConverter.cs" />
+    <Compile Include="UI\UIComponents\RelayCommand.cs" />
+    <Compile Include="UI\UILoader.cs" />
+    <Compile Include="Combat\Weighting.cs" />
+    <Compile Include="Combat\GilesGlobalOverlord.cs" />
+    <Compile Include="Items\ItemHandling.cs" />
+    <Compile Include="Plugin.cs" />
+    <Compile Include="Configuration\Variables.cs" />
+    <Compile Include="Configuration\Enums.cs" />
+    <Compile Include="Cache\GilesPlayerCache.cs" />
+    <Compile Include="Configuration\Dictionaries.cs" />
+    <Compile Include="Movement\StuckHandler.cs" />
+    <Compile Include="Movement\PlayerMover.cs" />
+    <Compile Include="Cache\RefreshDiaObject.cs" />
+    <Compile Include="Cache\RefreshDiaObjects.cs" />
+    <Compile Include="XmlTags\BaseComplexNodeTag.cs" />
+    <Compile Include="XmlTags\TrinityMoveToScene.cs" />
+    <Compile Include="XmlTags\TrinityCastSweepingWinds.cs" />
+    <Compile Include="XmlTags\TrinityExploreDungeon.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="XmlTags\TrinityIfRandom.cs" />
+    <Compile Include="XmlTags\TrinityIfSNOInRange.cs" />
+    <Compile Include="XmlTags\TrinityIf.cs" />
+    <Compile Include="XmlTags\TrinityInteract.cs" />
+    <Compile Include="XmlTags\TrinityLoadOnce.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="XmlTags\TrinityLoadProfile.cs" />
+    <Compile Include="XmlTags\TrinityLog.cs" />
+    <Compile Include="XmlTags\TrinityMaxDeaths.cs" />
+    <Compile Include="XmlTags\TrinityMoveToSNO.cs" />
+    <Compile Include="XmlTags\TrinityMoveTo.cs" />
+    <Compile Include="XmlTags\TrinityOffsetMove.cs" />
+    <Compile Include="XmlTags\TrinityRandomRoll.cs" />
+    <Compile Include="XmlTags\TrinityRandomWait.cs" />
+    <Compile Include="XmlTags\TrinityTownRun.cs" />
+    <Compile Include="XmlTags\TrinityUseOnce.cs" />
+    <Compile Include="XmlTags\TrinityUseReset.cs" />
+    <Compile Include="XmlTags\TrinityUseStop.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="UI\Combat\ConfigMisc.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Combat\ConfigBarb.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Combat\ConfigMonk.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Combat\ConfigDH.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Combat\ConfigWiz.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Combat\ConfigWD.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Combat\Avoidance.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\ConfigItems.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Items\ConfigItemRules.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Items\ConfigNotification.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\ConfigAdvanced.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Items\ConfigScoring.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Items\ConfigPickup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\ConfigObjects.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\ConfigCombat.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\MainView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Template.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ItemRules\Rules\custom\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Configuration\Dictionaries.xml" />
+    <Content Include="ItemRules\ItemRules2.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Configuration\Dictionaries.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ItemRules\Rules\hard\common.dis" />
+    <None Include="ItemRules\Rules\hard\legendary.dis" />
+    <None Include="ItemRules\Rules\hard\magic.dis" />
+    <None Include="ItemRules\Rules\hard\pickup.dis" />
+    <None Include="ItemRules\Rules\hard\rare.dis" />
+    <None Include="ItemRules\Rules\hard\set.dis" />
+    <None Include="ItemRules\Rules\soft\common.dis" />
+    <None Include="ItemRules\Rules\soft\legendary.dis" />
+    <None Include="ItemRules\Rules\soft\magic.dis" />
+    <None Include="ItemRules\Rules\soft\pickup.dis" />
+    <None Include="ItemRules\Rules\soft\rare.dis" />
+    <None Include="ItemRules\Rules\soft\set.dis" />
+    <None Include="ItemRules\translation.dis" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+  <PropertyGroup>
+    <PreBuildEvent>rd /Q /S $(ProjectDir)Log\
+
+</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>rd /S /Q "$(ProjectDir)obj\"
+rem rd /S /Q "$(ProjectDir)bin\"
+</PostBuildEvent>
+  </PropertyGroup>
+</Project>

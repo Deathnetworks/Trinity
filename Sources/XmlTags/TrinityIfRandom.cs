@@ -3,7 +3,7 @@ using Zeta.CommonBot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // TrinityIfRandom only runs the container stuff if the given id is the given value
     [XmlElement("TrinityIfRandom")]
@@ -28,7 +28,7 @@ namespace GilesTrinity.XmlTags
             int iOldValue;
 
             // If the dictionary value doesn't even exist, FAIL!
-            if (!GilesTrinity.dictRandomID.TryGetValue(ID, out iOldValue))
+            if (!Trinity.dictRandomID.TryGetValue(ID, out iOldValue))
                 return false;
 
             // Ok, do the results match up what we want? then SUCCESS!

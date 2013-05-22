@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GilesTrinity.Technicals;
+using Trinity.Technicals;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // Thanks Nesox for the XML loading tricks!
     [XmlElement("TrinityLoadOnce")]

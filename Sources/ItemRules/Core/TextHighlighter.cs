@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Threading;
 
-namespace GilesTrinity.ItemRules.Core
+namespace Trinity.ItemRules.Core
 {
 
     // Summary:

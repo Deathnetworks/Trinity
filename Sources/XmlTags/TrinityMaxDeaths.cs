@@ -1,10 +1,10 @@
-﻿using GilesTrinity.Technicals;
+﻿using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.CommonBot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // TrinityMaxDeaths tells Trinity to handle deaths and exit game after X deaths
     [XmlElement("TrinityMaxDeaths")]
@@ -23,13 +23,13 @@ namespace GilesTrinity.XmlTags
         {
             return new Zeta.TreeSharp.Action(ret =>
             {
-                if (MaxDeaths != GilesTrinity.iMaxDeathsAllowed)
+                if (MaxDeaths != Trinity.iMaxDeathsAllowed)
                 {
                     DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, "Max deaths set by profile. Trinity now handling deaths, and will restart the game after {0}", MaxDeaths); 
                 }
-                GilesTrinity.iMaxDeathsAllowed = MaxDeaths;
+                Trinity.iMaxDeathsAllowed = MaxDeaths;
                 if (Reset != null && Reset.ToLower() == "true")
-                    GilesTrinity.iDeathsThisRun = 0;
+                    Trinity.iDeathsThisRun = 0;
                 m_IsDone = true;
             });
         }

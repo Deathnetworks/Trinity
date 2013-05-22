@@ -2,29 +2,20 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using GilesTrinity.DbProvider;
-using GilesTrinity.Technicals;
+using Trinity.DbProvider;
+using Trinity.Technicals;
 using Zeta;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Navigation;
 
-namespace GilesTrinity
+namespace Trinity
 {
     /// <summary>
     /// Trinity DemonBuddy Plugin 
     /// </summary>
-    public partial class GilesTrinity : IPlugin
+    public partial class Trinity : IPlugin
     {
-        /// <summary>
-        /// Gets the version of plugin.
-        /// </summary>
-        /// <remarks>
-        /// This is used by DemonBuddy on plugin tab 
-        /// </remarks>
-        /// <value>
-        /// The version of plugin.
-        /// </value>
         public Version Version
         {
             get
@@ -33,15 +24,6 @@ namespace GilesTrinity
             }
         }
 
-        /// <summary>
-        /// Gets the author of plugin.
-        /// </summary>
-        /// <remarks>
-        /// This is used by DemonBuddy on plugin tab 
-        /// </remarks>
-        /// <value>
-        /// The author of plugin.
-        /// </value>
         public string Author
         {
             get
@@ -50,15 +32,6 @@ namespace GilesTrinity
             }
         }
 
-        /// <summary>
-        /// Gets the description of plugin.
-        /// </summary>
-        /// <remarks>
-        /// This is used by DemonBuddy on plugin tab 
-        /// </remarks>
-        /// <value>
-        /// The description of plugin.
-        /// </value>
         public string Description
         {
             get
@@ -140,29 +113,20 @@ namespace GilesTrinity
                 GameEvents.OnGameJoined += TrinityOnJoinGame;
                 GameEvents.OnGameLeft += TrinityOnLeaveGame;
 
-                GameEvents.OnItemSold += TrinityOnItemSold;
-                GameEvents.OnItemSalvaged += TrinityOnItemSalvaged;
-                GameEvents.OnItemStashed += TrinityOnItemStashed;
+                GameEvents.OnItemSold += ItemEvents.TrinityOnItemSold;
+                GameEvents.OnItemSalvaged += ItemEvents.TrinityOnItemSalvaged;
+                GameEvents.OnItemStashed += ItemEvents.TrinityOnItemStashed;
 
                 GameEvents.OnGameChanged += GameEvents_OnGameChanged;
-
-                if (NavProvider == null)
-                    NavProvider = new DefaultNavigationProvider();
-
-                // enable or disable process exit events
-                //ZetaDia.Memory.Process.EnableRaisingEvents = false;
-
-
 
                 CombatTargeting.Instance.Provider = new BlankCombatProvider();
                 LootTargeting.Instance.Provider = new BlankLootProvider();
                 ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
 
-                if (Settings.Loot.ItemFilterMode != global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+                if (Settings.Loot.ItemFilterMode != global::Trinity.Settings.Loot.ItemFilterMode.DemonBuddy)
                 {
                     ItemManager.Current = new TrinityItemManager();
                 }
-                NavHelper.UpdateSearchGridProvider();
 
                 // Safety check incase DB "OnStart" event didn't fire properly
                 if (BotMain.IsRunning)
@@ -185,122 +149,7 @@ namespace GilesTrinity
                 StashRule.reset();
             }
         }
-
-        void GameEvents_OnGameChanged(object sender, EventArgs e)
-        {
-            ClearCachesOnGameChange(sender, e);
-
-            // reload the profile juuuuuuuuuuuust in case Demonbuddy missed it... which it is known to do on disconnects
-            string currentProfilePath = ProfileManager.CurrentProfile.Path;
-            ProfileManager.Load(currentProfilePath);
-            ResetEverythingNewGame();
-        }
-
-        internal static void SetBotTPS()
-        {
-            // Carguy's ticks-per-second feature
-            if (Settings.Advanced.TPSEnabled)
-            {
-                BotMain.TicksPerSecond = (int)Settings.Advanced.TPSLimit;
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Bot TPS set to {0}", (int)Settings.Advanced.TPSLimit);
-            }
-            else
-            {
-                BotMain.TicksPerSecond = 10;
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Reset bot TPS to default", (int)Settings.Advanced.TPSLimit);
-            }
-        }
-
-        internal static void SetItemManagerProvider()
-        {
-            if (Settings.Loot.ItemFilterMode != global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy)
-            {
-                ItemManager.Current = new TrinityItemManager();
-            }
-            else
-            {
-                ItemManager.Current = new LootRuleItemManager();
-            }
-        }
-
-        internal static void SetUnstuckProvider()
-        {
-            if (Settings.Advanced.UnstuckerEnabled)
-            {
-                Navigator.StuckHandler = new StuckHandler();
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Trinity Unstucker", true);
-            }
-            else
-            {
-                Navigator.StuckHandler = new Zeta.Navigation.DefaultStuckHandler();
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Default Demonbuddy Unstucker", true);
-            }
-        }
-
-        internal static void SetWindowTitle(string profileName = "")
-        {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                string battleTagName = "";
-                try
-                {
-                    battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
-                }
-                catch { }
-                Window mainWindow = Application.Current.MainWindow;
-
-                string windowTitle = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
-
-                if (profileName.Trim() != String.Empty)
-                {
-                    windowTitle += " - " + profileName;
-                }
-
-                mainWindow.Title = windowTitle;
-            }));
-        }
-
-        /// <summary>
-        /// Adds the Pause and Town Run buttons to Demonbuddy's main window. Sets Window Title.
-        /// </summary>
-        /// <param name="battleTagName"></param>
-        /// <returns></returns>
-        [Obsolete("This has been removed in the latest DemonbuddyBETA")]
-        private static Action PaintMainWindowButtons()
-        {
-            return new System.Action(
-                        () =>
-                        {
-                            Window mainWindow = Application.Current.MainWindow;
-                            var tab = mainWindow.FindName("tabControlMain") as TabControl;
-                            if (tab == null) return;
-                            var infoDumpTab = tab.Items[0] as TabItem;
-                            if (infoDumpTab == null) return;
-                            btnPauseBot = new Button
-                            {
-                                Width = 100,
-                                HorizontalAlignment = HorizontalAlignment.Left,
-                                VerticalAlignment = VerticalAlignment.Top,
-                                Margin = new Thickness(232, 6, 0, 0),
-                                Content = "Pause Bot"
-                            };
-                            btnPauseBot.Click += buttonPause_Click;
-                            btnTownRun = new Button
-                            {
-                                Width = 100,
-                                HorizontalAlignment = HorizontalAlignment.Left,
-                                VerticalAlignment = VerticalAlignment.Top,
-                                Margin = new Thickness(232, 32, 0, 0),
-                                Content = "Force Town Run"
-                            };
-                            btnTownRun.Click += buttonTownRun_Click;
-                            var grid = infoDumpTab.Content as Grid;
-                            if (grid == null) return;
-                            grid.Children.Add(btnPauseBot);
-                            grid.Children.Add(btnTownRun);
-                        });
-        }
-
+        
         /// <summary>
         /// Called when user disable the plugin.
         /// </summary>
@@ -342,40 +191,6 @@ namespace GilesTrinity
             Zeta.CommonBot.BotMain.OnStart += PluginCheck;
         }
 
-        void PluginCheck(IBot bot)
-        {
-            if (!IsPluginEnabled && bot != null)
-            {
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "\tWARNING: Trinity Plugin is NOT YET ENABLED. Bot start detected");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "\tIgnore this message if you are not currently using Trinity.");
-                return;
-            }
-
-            if (BotMain.IsRunning && 
-                (!Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("trinity") || !Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("gilesplugin")))
-            {
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Found Routine: {0}", Zeta.CommonBot.RoutineManager.Current.Name);
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "######################################");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "ERROR: You are not using the Trinity Combat Routine!");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "You MUST download and select the Trinity Combat Routine");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "http://www.thebuddyforum.com/demonbuddy-forum/plugins/trinity/93720-trinity-download-here.html");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Trinity will NOT work with any other combat routine");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "######################################");
-                BotMain.Stop();
-            }
-
-        }
-
-
-
-        /// <summary>
-        /// Gets the displayed name of plugin.
-        /// </summary>
-        /// <remarks>
-        /// This is used by DemonBuddy on plugin tab 
-        /// </remarks>
-        /// <value>The name.</value>
         public string Name
         {
             get
@@ -384,34 +199,52 @@ namespace GilesTrinity
             }
         }
 
-        /// <summary>
-        /// Check if this instance of plugin is equals to the specified other.
-        /// </summary>
-        /// <param name="other">The other plugin to compare.</param>
-        /// <returns>
-        /// <c>true</c> if this instance is equals to the specified other; otherwise <c>false</c>
-        /// </returns>
         public bool Equals(IPlugin other)
         {
             return (other.Name == Name) && (other.Version == Version);
         }
 
-        private static GilesTrinity _instance;
-        public static GilesTrinity Instance
+        private static Trinity _instance;
+        public static Trinity Instance
         {
             get
             {
                 if (_instance == null)
                 {
-                    _instance = new GilesTrinity();
+                    _instance = new Trinity();
                 }
                 return _instance;
             }
         }
 
-        public GilesTrinity()
+        public Trinity()
         {
             _instance = this;
         }
+
+
+        internal static void SetWindowTitle(string profileName = "")
+        {
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                string battleTagName = "";
+                try
+                {
+                    battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
+                }
+                catch { }
+                Window mainWindow = Application.Current.MainWindow;
+
+                string windowTitle = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
+
+                if (profileName.Trim() != String.Empty)
+                {
+                    windowTitle += " - " + profileName;
+                }
+
+                mainWindow.Title = windowTitle;
+            }));
+        }
+
     }
 }

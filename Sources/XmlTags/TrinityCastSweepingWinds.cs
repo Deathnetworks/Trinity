@@ -1,11 +1,11 @@
 ﻿using System;
-using GilesTrinity.Technicals;
+using Trinity.Technicals;
 using Zeta;
 using Zeta.CommonBot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // * TrinityUseReset - Resets a UseOnce tag as if it has never been used
     [XmlElement("TrinityCastSweepingWinds")]
@@ -22,15 +22,15 @@ namespace GilesTrinity.XmlTags
         {
             return new Zeta.TreeSharp.Action(ret =>
             {
-                if (ZetaDia.Me.ActorClass == Zeta.Internals.Actors.ActorClass.Monk && GilesTrinity.Hotbar.Contains(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind)
-                    && GilesTrinity.Settings.Combat.Monk.HasInnaSet && GilesTrinity.PlayerStatus.PrimaryResource > 10)
+                if (ZetaDia.Me.ActorClass == Zeta.Internals.Actors.ActorClass.Monk && Trinity.Hotbar.Contains(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind)
+                    && Trinity.Settings.Combat.Monk.HasInnaSet && Trinity.PlayerStatus.PrimaryResource > 10)
                 {
-                    if (DateTime.Now.Subtract(GilesTrinity.SweepWindSpam).TotalMilliseconds >= 1500)
+                    if (DateTime.Now.Subtract(Trinity.SweepWindSpam).TotalMilliseconds >= 1500)
                     {
-                        if (GilesTrinity.GetHasBuff(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind))
+                        if (Trinity.GetHasBuff(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind))
                         {
-                            ZetaDia.Me.UsePower(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind, GilesTrinity.PlayerStatus.CurrentPosition, GilesTrinity.CurrentWorldDynamicId, -1);
-                            GilesTrinity.SweepWindSpam = DateTime.Now;
+                            ZetaDia.Me.UsePower(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind, Trinity.PlayerStatus.CurrentPosition, Trinity.CurrentWorldDynamicId, -1);
+                            Trinity.SweepWindSpam = DateTime.Now;
                             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Cast Sweeping Winds.");
                         }
                         else

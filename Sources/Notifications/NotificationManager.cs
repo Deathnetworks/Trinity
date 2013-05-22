@@ -1,4 +1,4 @@
-﻿using GilesTrinity.Technicals;
+﻿using Trinity.Technicals;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -6,7 +6,7 @@ using System.Net.Mail;
 using System.Web;
 using System.Text;
 
-namespace GilesTrinity.Notifications
+namespace Trinity.Notifications
 {
     //TODO: Add mail management here 
 
@@ -37,7 +37,7 @@ namespace GilesTrinity.Notifications
         }
         public static void SendNotification(ProwlNotification notification)
         {
-            if (GilesTrinity.Settings.Notification.IPhoneEnabled && !string.IsNullOrWhiteSpace(GilesTrinity.Settings.Notification.IPhoneKey))
+            if (Trinity.Settings.Notification.IPhoneEnabled && !string.IsNullOrWhiteSpace(Trinity.Settings.Notification.IPhoneKey))
             {
                 var newNotification =
                         new ProwlNotification
@@ -54,7 +54,7 @@ namespace GilesTrinity.Notifications
                 {
                 }
             }
-            if (GilesTrinity.Settings.Notification.AndroidEnabled && !string.IsNullOrWhiteSpace(GilesTrinity.Settings.Notification.AndroidKey))
+            if (Trinity.Settings.Notification.AndroidEnabled && !string.IsNullOrWhiteSpace(Trinity.Settings.Notification.AndroidKey))
             {
                 var newNotification =
                         new ProwlNotification
@@ -77,7 +77,7 @@ namespace GilesTrinity.Notifications
             string prowlUrlSb = !android ?
                                     @"https://prowl.weks.net/publicapi/add" :
                                     @"https://www.notifymyandroid.com/publicapi/notify";
-            string sThisAPIKey = !android ? GilesTrinity.Settings.Notification.IPhoneKey : GilesTrinity.Settings.Notification.AndroidKey;
+            string sThisAPIKey = !android ? Trinity.Settings.Notification.IPhoneKey : Trinity.Settings.Notification.AndroidKey;
             prowlUrlSb += "?apikey=" + HttpUtility.UrlEncode(sThisAPIKey.Trim()) +
                           "&application=" + HttpUtility.UrlEncode("GilesTrinity") +
                           "&description=" + HttpUtility.UrlEncode(notification_.Description) +

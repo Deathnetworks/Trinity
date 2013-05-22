@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
-namespace GilesTrinity.ItemRules.Core
+namespace Trinity.ItemRules.Core
 {
     #region Scanner
 

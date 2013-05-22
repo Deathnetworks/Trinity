@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace GilesTrinity.Settings.Combat
+namespace Trinity.Settings.Combat
 {
     [DataContract]
     public class WizardSetting : ITrinitySetting<WizardSetting>, IAvoidanceHealth, INotifyPropertyChanged

@@ -7,7 +7,7 @@ using Zeta.Navigation;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // * TrinityMoveTo moves in a straight line without any navigation hits, and allows tag-skips
     [XmlElement("TrinityMoveToSNO")]
@@ -48,7 +48,7 @@ namespace GilesTrinity.XmlTags
             DiaObject tempObject = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).FirstOrDefault<DiaObject>(a => a.ActorSNO == SNOID);
             if (tempObject != null)
             {
-                return (GilesTrinity.PlayerStatus.CurrentPosition.Distance(tempObject.Position) <= Math.Max(PathPrecision, Navigator.PathPrecision));
+                return (Trinity.PlayerStatus.CurrentPosition.Distance(tempObject.Position) <= Math.Max(PathPrecision, Navigator.PathPrecision));
             }
             return false;
         }

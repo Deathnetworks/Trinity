@@ -7,7 +7,7 @@ using Zeta.Internals.Actors;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // TrinityIfWithinRange checks an SNO is in range and processes child nodes
     [XmlElement("TrinityIfSNOInRange")]
@@ -31,7 +31,7 @@ namespace GilesTrinity.XmlTags
         public override bool GetConditionExec()
         {
             bool flag;
-            Vector3 vMyLocation = GilesTrinity.PlayerStatus.CurrentPosition;
+            Vector3 vMyLocation = Trinity.PlayerStatus.CurrentPosition;
             if (sType != null && sType == "reverse")
                 flag = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).FirstOrDefault<DiaObject>(a => a.ActorSNO == SNOID && a.Position.Distance(vMyLocation) <= Range) == null;
             else

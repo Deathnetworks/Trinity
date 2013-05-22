@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace GilesTrinity.Cache
+namespace Trinity.Cache
 {
     public enum TrinityItemQuality
     {

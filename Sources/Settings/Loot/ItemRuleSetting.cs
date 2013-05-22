@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace GilesTrinity.Settings.Loot
+namespace Trinity.Settings.Loot
 {
     [DataContract]
     public class ItemRuleSetting : ITrinitySetting<ItemRuleSetting>, INotifyPropertyChanged

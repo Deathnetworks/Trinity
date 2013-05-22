@@ -4,7 +4,7 @@ using System.Text;
 using System.Xml.Serialization;
 using System.Globalization;
 
-namespace GilesTrinity.ItemRules.Core
+namespace Trinity.ItemRules.Core
 {
     #region ParseTree
 

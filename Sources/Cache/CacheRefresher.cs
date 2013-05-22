@@ -6,13 +6,13 @@ using Zeta;
 using Zeta.Internals;
 using Zeta.Internals.Actors;
 using Zeta.Internals.Actors.Gizmos;
-using GilesTrinity;
+using Trinity;
 using Zeta.CommonBot;
 using Zeta.Internals.SNO;
 using Zeta.Common;
-using GilesTrinity.Technicals;
+using Trinity.Technicals;
 
-namespace GilesTrinity.Cache
+namespace Trinity.Cache
 {
     internal static class CacheRefresher
     {
@@ -31,7 +31,7 @@ namespace GilesTrinity.Cache
                     ACD acd = unit.CommonData;
 
                     unit.Position = acd.Position;
-                    unit.CentreDistance = Vector3.Distance(GilesTrinity.PlayerStatus.CurrentPosition, acd.Position);
+                    unit.CentreDistance = Vector3.Distance(Trinity.PlayerStatus.CurrentPosition, acd.Position);
 
                     if (unit.InternalUnit != null)
                     {
@@ -67,7 +67,7 @@ namespace GilesTrinity.Cache
             try
             {
                 ACDItem acd = (ACDItem)item.CommonData;
-                item.Distance = acd.Position.Distance(GilesTrinity.PlayerStatus.CurrentPosition);
+                item.Distance = acd.Position.Distance(Trinity.PlayerStatus.CurrentPosition);
                 if (acd.IsUnidentified != item.IsUnidentified || item.Gold > 0)
                 {
                     CacheItem.ComputeItemProperty(item);
@@ -136,7 +136,7 @@ namespace GilesTrinity.Cache
                     //ZetaDia.Actors.Update();
                     CacheManager.CacheObjectGetter = GetCache;
                     CacheManager.CacheObjectRefresher = RefreshCache;
-                    CacheManager.MaxRefreshRate = GilesTrinity.Settings.Advanced.CacheRefreshRate;
+                    CacheManager.MaxRefreshRate = Trinity.Settings.Advanced.CacheRefreshRate;
                     CacheManager.DefineStaleFlag();
                     foreach (DiaObject obj in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Where(o => o.IsACDBased && o.CommonData != null))
                     {

@@ -3,7 +3,7 @@ using System.Linq;
 using Zeta.CommonBot.Profile;
 using Zeta.CommonBot.Profile.Composites;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     public abstract class BaseComplexNodeTag : ComplexNodeTag
     {

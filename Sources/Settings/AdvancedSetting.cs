@@ -1,8 +1,8 @@
-﻿using GilesTrinity.Technicals;
+﻿using Trinity.Technicals;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace GilesTrinity.Settings
+namespace Trinity.Settings
 {
     [DataContract]
     public class AdvancedSetting : ITrinitySetting<AdvancedSetting>, INotifyPropertyChanged

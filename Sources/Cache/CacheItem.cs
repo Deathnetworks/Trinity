@@ -6,11 +6,11 @@ using System.Text.RegularExpressions;
 using Zeta;
 using Zeta.Common;
 using Db = Zeta.Internals.Actors;
-using GilesTrinity;
+using Trinity;
 using Zeta.Internals.Actors;
 using Zeta.CommonBot;
 
-namespace GilesTrinity.Cache
+namespace Trinity.Cache
 {
     internal class CacheItem : CacheObject
     {
@@ -718,17 +718,17 @@ namespace GilesTrinity.Cache
 
         internal static bool ShouldPickupGold(int GoldStackSize, float distance)
         {
-            return GilesTrinity.Settings.Loot.Pickup.MinimumGoldStack == 0 || (GoldStackSize * 100f / GilesTrinity.Settings.Loot.Pickup.MinimumGoldStack) / (distance * 100 / 2000) >= 1;
+            return Trinity.Settings.Loot.Pickup.MinimumGoldStack == 0 || (GoldStackSize * 100f / Trinity.Settings.Loot.Pickup.MinimumGoldStack) / (distance * 100 / 2000) >= 1;
             //return GoldStackSize >= GilesTrinity.Settings.Loot.Pickup.MinimumGoldStack;
         }
 
         internal static bool ShouldPickupItem(CacheItem item)
         {
-            if (GilesTrinity.Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.DemonBuddy && item.BaseType != GItemBaseType.HealthGlobe)
+            if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.DemonBuddy && item.BaseType != GItemBaseType.HealthGlobe)
             {
                 return ItemManager.Current.ShouldPickUpItem(item.ACDItem);
             }
-            else if (GilesTrinity.Settings.Loot.ItemFilterMode == global::GilesTrinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
+            else if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
             {
                 PickupItem pickupItem = new PickupItem(
                     item.ACDItem.Name,
@@ -745,7 +745,7 @@ namespace GilesTrinity.Cache
 
                 ACDItem acdItem = item.ACDItem;
 
-                return GilesTrinity.ItemRulesPickupValidation(pickupItem);
+                return Trinity.ItemRulesPickupValidation(pickupItem);
             }
             else
             {
@@ -762,7 +762,7 @@ namespace GilesTrinity.Cache
                   item.ACDItem.FollowerSpecialType,
                   item.ACDItem.DynamicId);
 
-                return GilesTrinity.GilesPickupItemValidation(pickupItem);
+                return Trinity.PickupItemValidation(pickupItem);
             }
         }
 
@@ -838,7 +838,7 @@ namespace GilesTrinity.Cache
                 item.Name = acd.Name;
                 item.Position = acd.Position;
                 item.Level = acd.Stats.Level;
-                item.Distance = acd.Position.Distance(GilesTrinity.PlayerStatus.CurrentPosition);
+                item.Distance = acd.Position.Distance(Trinity.PlayerStatus.CurrentPosition);
 
                 if (item.Gold > 0)
                     item.ShouldPickup = ShouldPickupGold(item.Gold, item.Distance);

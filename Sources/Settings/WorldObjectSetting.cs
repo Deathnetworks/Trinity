@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
-using GilesTrinity.Settings.Combat;
+using Trinity.Settings.Combat;
 
-namespace GilesTrinity.Settings
+namespace Trinity.Settings
 {
     [DataContract]
     public class WorldObjectSetting : ITrinitySetting<WorldObjectSetting>, INotifyPropertyChanged

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using GilesTrinity.DbProvider;
-using GilesTrinity.Technicals;
+using Trinity.DbProvider;
+using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot.Dungeons;
@@ -18,7 +18,7 @@ using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     [XmlElement("TrinityMoveToScene")]
     public class TrinityMoveToScene : ProfileBehavior
@@ -44,9 +44,8 @@ namespace GilesTrinity.XmlTags
         /// <summary>
         /// The current player position
         /// </summary>
-        private Vector3 myPos { get { return GilesTrinity.PlayerStatus.CurrentPosition; } }
-        private static ISearchAreaProvider gp { get { return GilesTrinity.gp; } }
-        //private static PathFinder pf { get { return GilesTrinity.pf; } }
+        private Vector3 myPos { get { return Trinity.PlayerStatus.CurrentPosition; } }
+
         /// <summary>
         /// The last scene SNOId we entered
         /// </summary>
@@ -151,11 +150,10 @@ namespace GilesTrinity.XmlTags
         private Composite UpdateSearchGridProvider()
         {
             return
-            new DecoratorContinue(ret => mySceneId != GilesTrinity.PlayerStatus.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
+            new DecoratorContinue(ret => mySceneId != Trinity.PlayerStatus.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
                 new Sequence(
-                    new Action(ret => mySceneId = GilesTrinity.PlayerStatus.SceneId),
+                    new Action(ret => mySceneId = Trinity.PlayerStatus.SceneId),
                     new Action(ret => GPUpdatePosition = myPos),
-                    new Action(ret => NavHelper.UpdateSearchGridProvider(true)),
                     new Action(ret => MiniMapMarker.UpdateFailedMarkers())
                 )
             );
@@ -177,7 +175,7 @@ namespace GilesTrinity.XmlTags
             if (SceneId == 0 && SceneName == String.Empty)
                 return;
 
-            gp.Update();
+            //gp.Update();
 
             if (PrioritySceneTarget != Vector3.Zero)
                 return;

@@ -1,4 +1,4 @@
-﻿using GilesTrinity.Technicals;
+﻿using Trinity.Technicals;
 using System.Linq;
 using Zeta;
 using Zeta.Common;
@@ -8,7 +8,7 @@ using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using System;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // TrinityInteract attempts a blind object-use of an SNO without movement
     [XmlElement("TrinityInteract")]
@@ -41,7 +41,7 @@ namespace GilesTrinity.XmlTags
                 return RunStatus.Success;
             }
 
-            Vector3 myPos = GilesTrinity.PlayerStatus.CurrentPosition;
+            Vector3 myPos = Trinity.PlayerStatus.CurrentPosition;
 
             var interactTarget = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
                 .Where(a => a.ActorSNO == ActorId)

@@ -5,7 +5,7 @@ using System.Text;
 using Zeta.Common;
 using Zeta.Internals.Actors;
 
-namespace GilesTrinity.Cache
+namespace Trinity.Cache
 {
     internal class PickupItem
     {

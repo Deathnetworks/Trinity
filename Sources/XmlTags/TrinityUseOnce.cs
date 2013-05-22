@@ -3,7 +3,7 @@ using Zeta.CommonBot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // * TrinityUseOnce ensures a sequence of tags is only ever used once during this profile
     [XmlElement("TrinityUseOnce")]
@@ -27,15 +27,15 @@ namespace GilesTrinity.XmlTags
         public override bool GetConditionExec()
         {
             // See if we've EVER hit this ID before
-            if (GilesTrinity.hashUseOnceID.Contains(ID))
+            if (Trinity.hashUseOnceID.Contains(ID))
             {
 
                 // See if we've hit it more than or equal to the max times before
-                if (GilesTrinity.dictUseOnceID[ID] >= Max || GilesTrinity.dictUseOnceID[ID] < 0)
+                if (Trinity.dictUseOnceID[ID] >= Max || Trinity.dictUseOnceID[ID] < 0)
                     return false;
 
                 // Add 1 to our hit count, and let it run this time
-                GilesTrinity.dictUseOnceID[ID]++;
+                Trinity.dictUseOnceID[ID]++;
                 return true;
             }
 
@@ -44,18 +44,18 @@ namespace GilesTrinity.XmlTags
             // First see if we should disable all other ID's currently hit to prevent them ever being run again this run
             if (DisablePrevious != null && DisablePrevious.ToLower() == "true")
             {
-                foreach (int thisid in GilesTrinity.hashUseOnceID)
+                foreach (int thisid in Trinity.hashUseOnceID)
                 {
                     if (thisid != ID)
                     {
-                        GilesTrinity.dictUseOnceID[thisid] = -1;
+                        Trinity.dictUseOnceID[thisid] = -1;
                     }
                 }
             }
 
             // Now store the fact we have hit this ID and set up the dictionary entry for it
-            GilesTrinity.hashUseOnceID.Add(ID);
-            GilesTrinity.dictUseOnceID.Add(ID, 1);
+            Trinity.hashUseOnceID.Add(ID);
+            Trinity.dictUseOnceID.Add(ID, 1);
             return true;
         }
 

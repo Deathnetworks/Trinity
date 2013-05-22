@@ -1,7 +1,7 @@
-﻿using GilesTrinity.DbProvider;
-using GilesTrinity.Settings.Combat;
-using GilesTrinity.Settings.Loot;
-using GilesTrinity.Technicals;
+﻿using Trinity.DbProvider;
+using Trinity.Settings.Combat;
+using Trinity.Settings.Loot;
+using Trinity.Technicals;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 using Zeta;
 using System.Xml;
 
-namespace GilesTrinity.Settings
+namespace Trinity.Settings
 {
     [DataContract]
     public class TrinitySetting : ITrinitySetting<TrinitySetting>, INotifyPropertyChanged

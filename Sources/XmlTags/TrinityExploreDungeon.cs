@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using GilesTrinity.DbProvider;
-using GilesTrinity.Technicals;
+using Trinity.DbProvider;
+using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot.Dungeons;
@@ -18,7 +18,7 @@ using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     /// <summary>
     /// TrinityExploreDungeon is fuly backwards compatible with the built-in Demonbuddy ExploreArea tag. It provides additional features such as:
@@ -268,12 +268,12 @@ namespace GilesTrinity.XmlTags
         /// <summary>
         /// The current player position
         /// </summary>
-        private Vector3 myPos { get { return GilesTrinity.PlayerStatus.CurrentPosition; } }
-        private static ISearchAreaProvider gp
+        private Vector3 myPos { get { return Trinity.PlayerStatus.CurrentPosition; } }
+        private static ISearchAreaProvider MainGridProvider
         {
             get
             {
-                return GilesTrinity.gp;
+                return Trinity.MainGridProvider;
             }
         }
 
@@ -379,11 +379,10 @@ namespace GilesTrinity.XmlTags
         private Composite UpdateSearchGridProvider()
         {
             return
-            new DecoratorContinue(ret => mySceneId != GilesTrinity.PlayerStatus.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
+            new DecoratorContinue(ret => mySceneId != Trinity.PlayerStatus.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
                 new Sequence(
-                    new Action(ret => mySceneId = GilesTrinity.PlayerStatus.SceneId),
+                    new Action(ret => mySceneId = Trinity.PlayerStatus.SceneId),
                     new Action(ret => GPUpdatePosition = myPos),
-                    new Action(ret => NavHelper.UpdateSearchGridProvider(true)),
                     new Action(ret => MiniMapMarker.UpdateFailedMarkers())
                 )
             );
@@ -399,7 +398,7 @@ namespace GilesTrinity.XmlTags
             new PrioritySelector(
                 new Decorator(ret => timeoutBreached,
                     new Sequence(
-                        new DecoratorContinue(ret => TownPortalOnTimeout && !GilesTrinity.PlayerStatus.IsInTown,
+                        new DecoratorContinue(ret => TownPortalOnTimeout && !Trinity.PlayerStatus.IsInTown,
                             new Sequence(
                                 new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
                                     "TrinityExploreDungeon inactivity timer tripped ({0}), tag Using Town Portal!", TimeoutValue)),
@@ -455,15 +454,15 @@ namespace GilesTrinity.XmlTags
             CheckSetTimer(ctx);
             if (lastCoinage == -1)
             {
-                lastCoinage = GilesTrinity.PlayerStatus.Coinage;
+                lastCoinage = Trinity.PlayerStatus.Coinage;
                 return RunStatus.Failure;
             }
-            else if (lastCoinage != GilesTrinity.PlayerStatus.Coinage)
+            else if (lastCoinage != Trinity.PlayerStatus.Coinage)
             {
                 TagTimer.Restart();
                 return RunStatus.Failure;
             }
-            else if (lastCoinage == GilesTrinity.PlayerStatus.Coinage && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
+            else if (lastCoinage == Trinity.PlayerStatus.Coinage && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityExploreDungeon gold inactivity timer tripped ({0}), tag finished!", TimeoutValue);
                 timeoutBreached = true;
@@ -496,7 +495,7 @@ namespace GilesTrinity.XmlTags
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Visited all nodes but objective not complete, forcing grid reset!")),
                         new Action(ret => timesForcedReset++),
-                        new Action(ret => GilesTrinity.hashSkipAheadAreaCache.Clear()),
+                        new Action(ret => Trinity.hashSkipAheadAreaCache.Clear()),
                         new Action(ret => MiniMapMarker.KnownMarkers.Clear()),
                         new Action(ret => ForceUpdateScenes()),
                         new Action(ret => GridSegmentation.Reset()),
@@ -557,7 +556,7 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => isDone = true)
                     )
                 ),
-                new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && GilesTrinity.PlayerStatus.SceneId == SceneId,
+                new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && Trinity.PlayerStatus.SceneId == SceneId,
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found SceneId {0}!", SceneId)),
                         new Action(ret => isDone = true)
@@ -569,7 +568,7 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => isDone = true)
                     )
                 ),
-                new Decorator(ret => GilesTrinity.PlayerStatus.IsInTown,
+                new Decorator(ret => Trinity.PlayerStatus.IsInTown,
                     new Sequence(
                         new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Cannot use TrinityExploreDungeon in town - tag finished!", SceneName)),
                         new Action(ret => isDone = true)
@@ -677,7 +676,7 @@ namespace GilesTrinity.XmlTags
             if (!PriorityScenes.Any())
                 return;
 
-            gp.Update();
+            //gp.Update();
 
             if (PrioritySceneTarget != Vector3.Zero)
                 return;
@@ -882,13 +881,13 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => UpdateRoute())
                     )
                 ),
-                new Decorator(ret => CurrentNavTarget.Distance2D(myPos) <= 90f && !gp.CanStandAt(gp.WorldToGrid(CurrentNavTarget.ToVector2())),
+                new Decorator(ret => CurrentNavTarget.Distance2D(myPos) <= 90f && !MainGridProvider.CanStandAt(MainGridProvider.WorldToGrid(CurrentNavTarget.ToVector2())),
                     new Sequence(
                         new Action(ret => SetNodeVisited("Center Not Navigable")),
                         new Action(ret => UpdateRoute())
                     )
                 ),
-                new Decorator(ret => GilesTrinity.hashNavigationObstacleCache.Any(o => o.Location.Distance2D(CurrentNavTarget) <= o.Radius * 2),
+                new Decorator(ret => Trinity.hashNavigationObstacleCache.Any(o => o.Location.Distance2D(CurrentNavTarget) <= o.Radius * 2),
                     new Sequence(
                         new Action(ret => SetNodeVisited("Navigation obstacle detected at node point")),
                         new Action(ret => UpdateRoute())
@@ -900,7 +899,7 @@ namespace GilesTrinity.XmlTags
                         new Action(ret => UpdateRoute())
                     )
                 ),
-                new Decorator(ret => GilesTrinity.hashSkipAheadAreaCache.Any(p => p.Location.Distance2D(CurrentNavTarget) <= PathPrecision),
+                new Decorator(ret => Trinity.hashSkipAheadAreaCache.Any(p => p.Location.Distance2D(CurrentNavTarget) <= PathPrecision),
                     new Sequence(
                         new Action(ret => SetNodeVisited("Found node to be in skip ahead cache, marking done")),
                         new Action(ret => UpdateRoute())
@@ -915,8 +914,6 @@ namespace GilesTrinity.XmlTags
         /// </summary>
         private void UpdateRoute()
         {
-            NavHelper.UpdateSearchGridProvider();
-
             CheckResetDungeonExplorer();
 
             BrainBehavior.DungeonExplorer.Update();
@@ -972,7 +969,7 @@ namespace GilesTrinity.XmlTags
         /// <param name="step"></param>
         private void PrintNodeCounts(string step = "")
         {
-            if (GilesTrinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.ProfileTag))
+            if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.ProfileTag))
             {
                 string nodeDistance = String.Empty;
                 if (GetRouteUnvisitedNodeCount() > 0)
@@ -996,7 +993,7 @@ namespace GilesTrinity.XmlTags
                     GridSegmentation.BoxTolerance,                               // 5
                     step,                                                        // 6
                     nodeDistance,                                                // 7
-                    gp.CanStandAt(gp.WorldToGrid(CurrentNavTarget.ToVector2())), // 8
+                    MainGridProvider.CanStandAt(MainGridProvider.WorldToGrid(CurrentNavTarget.ToVector2())), // 8
                     !Navigator.Raycast(myPos, CurrentNavTarget),
                     PathPrecision,
                     MathUtil.GetHeadingToPoint(CurrentNavTarget),
@@ -1097,16 +1094,16 @@ namespace GilesTrinity.XmlTags
             Vector3 moveTarget = NextNode.NavigableCenter;
 
             string nodeName = String.Format("{0} Distance: {1:0} Direction: {2}",
-                NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(GilesTrinity.PlayerStatus.CurrentPosition), MathUtil.GetHeadingToPoint(NextNode.NavigableCenter));
+                NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(Trinity.PlayerStatus.CurrentPosition), MathUtil.GetHeadingToPoint(NextNode.NavigableCenter));
 
-            if (DateTime.Now.Subtract(GilesTrinity.lastAddedLocationCache).TotalMilliseconds >= 100)
+            if (DateTime.Now.Subtract(Trinity.lastAddedLocationCache).TotalMilliseconds >= 100)
             {
-                GilesTrinity.lastAddedLocationCache = DateTime.Now;
-                if (Vector3.Distance(myPos, GilesTrinity.vLastRecordedLocationCache) >= 5f)
+                Trinity.lastAddedLocationCache = DateTime.Now;
+                if (Vector3.Distance(myPos, Trinity.vLastRecordedLocationCache) >= 5f)
                 {
                     MarkNearbyNodesVisited();
-                    GilesTrinity.hashSkipAheadAreaCache.Add(new GilesObstacle(myPos, 20f, 0));
-                    GilesTrinity.vLastRecordedLocationCache = myPos;
+                    Trinity.hashSkipAheadAreaCache.Add(new CacheObstacleObject(myPos, 20f, 0));
+                    Trinity.vLastRecordedLocationCache = myPos;
                 }
             }
 
@@ -1117,11 +1114,6 @@ namespace GilesTrinity.XmlTags
         /// </summary>
         private void Init(bool forced = false)
         {
-            if (gp == null)
-            {
-                NavHelper.UpdateSearchGridProvider();
-            }
-
             if (BoxSize == 0)
                 BoxSize = 15;
 
@@ -1145,7 +1137,7 @@ namespace GilesTrinity.XmlTags
             if (TimeoutValue == 0)
                 TimeoutValue = 900;
 
-            GilesTrinity.hashSkipAheadAreaCache.Clear();
+            Trinity.hashSkipAheadAreaCache.Clear();
             PriorityScenesInvestigated.Clear();
             MiniMapMarker.KnownMarkers.Clear();
             if (PriorityScenes == null)

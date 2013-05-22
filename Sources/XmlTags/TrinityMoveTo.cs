@@ -1,4 +1,4 @@
-﻿using GilesTrinity.Technicals;
+﻿using Trinity.Technicals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +8,9 @@ using Zeta.CommonBot.Profile;
 using Zeta.Navigation;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
-using GilesTrinity.DbProvider;
+using Trinity.DbProvider;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // * TrinityMoveTo moves in a straight line without any navigation hits, and allows tag-skips
     [XmlElement("TrinityMoveTo")]
@@ -56,32 +56,32 @@ namespace GilesTrinity.XmlTags
         {
 
             // First check if we can skip ahead because we recently moved here
-            if (!GilesTrinity.Settings.Combat.Misc.AllowBacktracking && (NoSkip == null || NoSkip.ToLower() != "true"))
+            if (!Trinity.Settings.Combat.Misc.AllowBacktracking && (NoSkip == null || NoSkip.ToLower() != "true"))
             {
-                if (GilesTrinity.hashSkipAheadAreaCache.Any())
+                if (Trinity.hashSkipAheadAreaCache.Any())
                 {
 
                     // Loop through all the skip ahead zones and see if one of them is within radius of our intended destination to skip ahead
-                    foreach (GilesObstacle thisObject in GilesTrinity.hashSkipAheadAreaCache)
+                    foreach (CacheObstacleObject thisObject in Trinity.hashSkipAheadAreaCache)
                     {
                         if (thisObject.Location.Distance(Position) <= thisObject.Radius)
                         {
                             DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, "Skipping ahead from moveto {0} to next moveto.", Position);
-                            GilesTrinity.bSkipAheadAGo = true;
+                            Trinity.bSkipAheadAGo = true;
                             return RunStatus.Success;
                         }
                     }
-                    GilesTrinity.hashSkipAheadAreaCache = new HashSet<GilesObstacle>();
+                    Trinity.hashSkipAheadAreaCache = new HashSet<CacheObstacleObject>();
                 }
             }
             else
             {
-                GilesTrinity.hashSkipAheadAreaCache = new HashSet<GilesObstacle>();
+                Trinity.hashSkipAheadAreaCache = new HashSet<CacheObstacleObject>();
             }
 
             // Now use Trinity movement to try a direct movement towards that location
             Vector3 NavTarget = Position;
-            Vector3 MyPos = GilesTrinity.PlayerStatus.CurrentPosition;
+            Vector3 MyPos = Trinity.PlayerStatus.CurrentPosition;
             if (!ZetaDia.WorldInfo.IsGenerated && Vector3.Distance(MyPos, NavTarget) > 250)
             {
                 NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
@@ -104,14 +104,14 @@ namespace GilesTrinity.XmlTags
         {
 
             // First see if we should skip ahead one move because we were already at that location
-            if (GilesTrinity.bSkipAheadAGo)
+            if (Trinity.bSkipAheadAGo)
             {
-                GilesTrinity.bSkipAheadAGo = false;
+                Trinity.bSkipAheadAGo = false;
                 return true;
             }
 
             // Ok not skipping, now see if we are already within pathprecision range of that location
-            return (GilesTrinity.PlayerStatus.CurrentPosition.Distance(Position) <= Math.Max(PathPrecision, Navigator.PathPrecision));
+            return (Trinity.PlayerStatus.CurrentPosition.Distance(Position) <= Math.Max(PathPrecision, Navigator.PathPrecision));
         }
 
         private void FlagTagAsCompleted(object object_0)

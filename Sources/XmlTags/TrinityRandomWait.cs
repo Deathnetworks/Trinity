@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
-using GilesTrinity.Technicals;
+using Trinity.Technicals;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;
 
-namespace GilesTrinity.XmlTags
+namespace Trinity.XmlTags
 {
     // * TrinityUseReset - Resets a UseOnce tag as if it has never been used
     [XmlElement("TrinityRandomWait")]

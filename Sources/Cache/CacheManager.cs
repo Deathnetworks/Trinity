@@ -1,4 +1,4 @@
-﻿using GilesTrinity.Technicals;
+﻿using Trinity.Technicals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using Zeta.Internals.Actors;
 
-namespace GilesTrinity.Cache
+namespace Trinity.Cache
 {
     internal static class CacheManager
     {

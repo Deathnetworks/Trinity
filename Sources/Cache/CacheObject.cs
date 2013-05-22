@@ -5,7 +5,7 @@ using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
 using System.Text.RegularExpressions;
 
-namespace GilesTrinity.Cache
+namespace Trinity.Cache
 {
     [Flags]
     public enum CacheType

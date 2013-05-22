@@ -1,5 +1,5 @@
 ﻿
-namespace GilesTrinity.Settings
+namespace Trinity.Settings
 {
     public interface ITrinitySetting<T> where T : ITrinitySetting<T>
     {
