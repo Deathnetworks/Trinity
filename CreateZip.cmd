@@ -13,19 +13,19 @@ rd /S /Q "Sources\Logs"
 del /F /S /Q "Sources\ItemRules\Log\*"
 
 REM Clean Old Zip file
-del Latest-GilesTrinity.zip
+del Latest-Trinity.zip
 
 REM Create Temp Directory and pull source inside
-md GilesTrinity
-xcopy /E /Y "Sources\*.cs" "GilesTrinity\"
-xcopy /E /Y "Sources\*.dis" "GilesTrinity\"
-xcopy /E /Y "Sources\*.xaml" "GilesTrinity\"
-xcopy /E /Y "Sources\*.xml" "GilesTrinity\"
-xcopy /E /Y "Sources\*.xsd" "GilesTrinity\"
-xcopy /E /Y "Sources\*.txt" "GilesTrinity\"
+md Trinity
+xcopy /E /Y "Sources\*.cs" "Trinity\"
+xcopy /E /Y "Sources\*.dis" "Trinity\"
+xcopy /E /Y "Sources\*.xaml" "Trinity\"
+xcopy /E /Y "Sources\*.xml" "Trinity\"
+xcopy /E /Y "Sources\*.xsd" "Trinity\"
+xcopy /E /Y "Sources\*.txt" "Trinity\"
 
 REM Zip fresh directory
-7za.exe a Latest-GilesTrinity.zip GilesTrinity\ -mx9
+7za.exe a Latest-Trinity.zip Trinity\ -mx9
 
 REM Clean Temp directory
-rd /S /Q GilesTrinity 
+rd /S /Q Trinity 
