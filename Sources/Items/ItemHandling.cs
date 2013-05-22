@@ -16,18 +16,9 @@ namespace Trinity
     public partial class Trinity : IPlugin
     {
         /// <summary>
-        /// Pickup Validation - Determines what should or should not be picked up (Item Rules)
+        /// 
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="level"></param>
-        /// <param name="quality"></param>
-        /// <param name="balanceId"></param>
-        /// <param name="dbItemBaseType"></param>
-        /// <param name="dbItemType"></param>
-        /// <param name="isOneHand"></param>
-        /// <param name="isTwoHand"></param>
-        /// <param name="followerType"></param>
-        /// <param name="dynamicID"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
         internal static bool ItemRulesPickupValidation(PickupItem item)
         {
@@ -49,15 +40,9 @@ namespace Trinity
             return PickupItemValidation(item);
         }
         /// <summary>
-        /// Pickup Validation - Determines what should or should not be picked up (Scoring)
+        /// 
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="level"></param>
-        /// <param name="quality"></param>
-        /// <param name="gameBalanceId"></param>
-        /// <param name="dbItemType"></param>
-        /// <param name="followerType"></param>
-        /// <param name="dynamicID"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
         internal static bool PickupItemValidation(PickupItem item)
         {
@@ -174,6 +159,53 @@ namespace Trinity
             }
 
             // Didn't cancel it, so default to true!
+            return true;
+        }
+
+        internal static bool ItemRulesIdentifyValidation(ACDItem item)
+        {
+            PickupItem pickupItem = new PickupItem(
+                                       item.Name,
+                                       item.InternalName,
+                                       item.Level,
+                                       item.ItemQualityLevel,
+                                       item.GameBalanceId,
+                                       item.ItemBaseType,
+                                       item.ItemType,
+                                       item.IsOneHand,
+                                       item.IsTwoHand,
+                                       item.FollowerSpecialType,
+                                       item.DynamicId);
+
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                "Incoming Identification Request: {0}, {1}, {2}, {3}, {4}",
+                pickupItem.Quality, pickupItem.Level, pickupItem.DBBaseType,
+                pickupItem.DBItemType, pickupItem.IsOneHand ? "1H" : pickupItem.IsTwoHand ? "2H" : "NH");
+
+            // using ItemEvaluationType.Identify isn't available so we are abusing Sell for that manner
+            Interpreter.InterpreterAction action = Trinity.StashRule.checkPickUpItem(pickupItem, ItemEvaluationType.Sell);
+
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Action is: {0}", action);
+
+            switch (action)
+            {
+                case Interpreter.InterpreterAction.IDENTIFY:
+                    return true;
+                case Interpreter.InterpreterAction.UNIDENT:
+                    return false;
+                default:
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Trinity, item is unhandled by ItemRules (Identification)!");
+                    return IdentifyItemValidation(pickupItem);
+            }
+
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        internal static bool IdentifyItemValidation(PickupItem item)
+        {
             return true;
         }
 

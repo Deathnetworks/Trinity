@@ -4,16 +4,14 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Collections;
-using Zeta.Internals.Actors;
-using Zeta.Common;
+using Trinity.Cache;
 using Trinity.ItemRules.Core;
 using Trinity.Technicals;
-using Zeta;
-using Trinity.Cache;
+using Zeta.Internals.Actors;
 using Zeta.CommonBot.Items;
 using Zeta.CommonBot;
 
-namespace Trinity.ItemRules
+namespace Trinity
 {
     #region Interpreter
 
@@ -42,25 +40,39 @@ namespace Trinity.ItemRules
         {
             PICKUP,
             IGNORE,
+            IDENTIFY,
+            UNIDENT,
             KEEP,
-            TRASH,
             SCORE,
+            TRASH,
+            SALVAGE,
+            SELL,
             NULL
         };
 
         // final variables
-        readonly string version = "2.2.1.6";
-        readonly string translationFile = "translation.dis";
-        readonly string pickupFile = "pickup.dis";
-        readonly string logFile = "ItemRules.log";
-        readonly string transFixFile = "TranslationFix.log";
-        readonly string assign = "->", SEP = ";";
-        readonly Regex macroPattern = new Regex(@"(@[A-Z]+)[ ]*:=[ ]*(.+)", RegexOptions.Compiled);
+        readonly string version         = "2.2.3.0";
 
-        TrinityItemQuality logPickQuality,logKeepQuality;
+        // dis files
+        readonly string translationFile = "translation.dis";
+        readonly string pickupFile      = "pickup.dis";
+        readonly string identifyFile    = "identify.dis";
+        readonly string salvageSellFile = "salvageSell.dis";
+
+        // log files
+        readonly string KeepLogFile     = "IR2Keep.log"; // Keep & Trash
+        readonly string PickLogFile     = "IR2Pick.log"; // Pick & Ignore
+        readonly string RestLogFile     = "IR2Rest.log"; // Unident, Identify, Salvage & Sell
+        readonly string BugsLogFile     = "IR2Bugs.log"; // Bugs
+        readonly string tranLogFile     = "IR2Tran.log"; // Transation fixes
+        
+        readonly Regex macroPattern     = new Regex(@"(@[A-Z]+)[ ]*:=[ ]*(.+)", RegexOptions.Compiled);
+        readonly string assign = "->", SEP = ";";
+        
+        TrinityItemQuality logPickQuality, logKeepQuality;
 
         // objects
-        ArrayList ruleSet, pickUpRuleSet;
+        ArrayList pickUpRuleSet, identifyRuleSet, keepRuleSet, salvageSellRuleSet;
         TextWriter log;
         Scanner scanner;
         Parser parser;
@@ -94,28 +106,29 @@ namespace Trinity.ItemRules
 
         public void reset()
         {
-            string actualLog = Path.Combine(FileManager.LoggingPath, logFile);
-            string archivePath = Path.Combine(FileManager.LoggingPath, "Archive");
-            //string archiveLog = Path.Combine(archivePath, DateTime.Now.ToString("ddMMyyyyHHmmss") + "_log.txt");
-            string archiveLog = Path.Combine(archivePath, "itemRulesArchive.log");
+            string actualKeepLog = Path.Combine(FileManager.LoggingPath, KeepLogFile);
+            string archivePath = Path.Combine(FileManager.LoggingPath, "IR2Archive");
+            string archiveKeepLog = Path.Combine(archivePath, "IR2KeepArchive.log");
+            string archivePickLog = Path.Combine(archivePath, "IR2PickArchive.log");
 
-            if (!File.Exists(actualLog))
+            if (!File.Exists(actualKeepLog))
                 return;
 
             if (!Directory.Exists(archivePath))
                 Directory.CreateDirectory(archivePath);
 
-            using (Stream input = File.OpenRead(actualLog))
-            using (Stream output = new FileStream(archiveLog, FileMode.Append, FileAccess.Write, FileShare.None))
+            using (Stream input = File.OpenRead(actualKeepLog))
+            using (Stream output = new FileStream(archiveKeepLog, FileMode.Append, FileAccess.Write, FileShare.None))
                 input.CopyTo(output);
 
-            //File.Copy(actualLog, archiveLog, true);
-
-            File.Delete(actualLog);
+            File.Delete(actualKeepLog);
         }
 
         public bool reloadFromUI()
         {
+<<<<<<< HEAD
+            readConfiguration();
+=======
             try
             {
                 readConfiguration();
@@ -124,6 +137,7 @@ namespace Trinity.ItemRules
             {
                 Logger.Log(LogCategory.UserInformation, "{0}", ex.ToString());
             }
+>>>>>>> 65e7489b29184d1015c85f976a8013dc47132493
             return false;
         }
 
@@ -135,16 +149,24 @@ namespace Trinity.ItemRules
             reset();
 
             // initialize or reset ruleSet array
-            ruleSet = new ArrayList();
-            pickUpRuleSet = new ArrayList();
+            pickUpRuleSet   = new ArrayList();
+            identifyRuleSet = new ArrayList();
+            keepRuleSet     = new ArrayList();
+            salvageSellRuleSet  = new ArrayList();
 
             // instantiating our macro dictonary
             macroDic = new Dictionary<string, string>();
 
             // use Trinity setting
             if (Trinity.Settings.Loot.ItemRules.Debug)
+<<<<<<< HEAD
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is running in debug mode!", logPickQuality);
+
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is using the {0} rule set.", Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
+=======
                 Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is running in debug mode!", logPickQuality);
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is using the {0} rule set.", Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
+>>>>>>> 65e7489b29184d1015c85f976a8013dc47132493
             logPickQuality = getTrinityItemQualityFromString(Trinity.Settings.Loot.ItemRules.PickupLogLevel.ToString());
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "PICKLOG = {0} ", logPickQuality);
             logKeepQuality = getTrinityItemQualityFromString(Trinity.Settings.Loot.ItemRules.KeepLogLevel.ToString());
@@ -173,14 +195,31 @@ namespace Trinity.ItemRules
             pickUpRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, pickupFile)), pickUpRuleSet);
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Pickup rules",pickUpRuleSet.Count);
 
-            // parse all item files
+            // parse identify file
+            identifyRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, identifyFile)), identifyRuleSet);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Identify rules", identifyRuleSet.Count);
+
+            // parse salvage file
+            salvageSellRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, salvageSellFile)), salvageSellRuleSet);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Salvage rules", salvageSellRuleSet.Count);
+
+            // parse all keep files
             foreach (TrinityItemQuality itemQuality in Enum.GetValues(typeof(TrinityItemQuality)))
             {
                 string fileName = itemQuality.ToString().ToLower() + ".dis";
                 string filePath = Path.Combine(rulesPath, fileName);
-                int oldValue = ruleSet.Count;
+                int oldValue = keepRuleSet.Count;
                 if (File.Exists(filePath))
                 {
+<<<<<<< HEAD
+                    keepRuleSet = readLinesToArray(new StreamReader(filePath), keepRuleSet);
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} {1} Keep rules", (keepRuleSet.Count - oldValue), itemQuality.ToString());
+                }
+            }
+            
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Macros", macroDic.Count);
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules loaded a total of {0} {1} rules!", keepRuleSet.Count, Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString());
+=======
                     ruleSet = readLinesToArray(new StreamReader(filePath), ruleSet);
                     Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} {1} rules", (ruleSet.Count - oldValue), itemQuality.ToString());
                 }
@@ -188,6 +227,7 @@ namespace Trinity.ItemRules
             
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Macros", macroDic.Count);
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules loaded a total of {0} {1} rules!", ruleSet.Count, Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString());
+>>>>>>> 65e7489b29184d1015c85f976a8013dc47132493
         }
 
         /// <summary>
@@ -276,26 +316,45 @@ namespace Trinity.ItemRules
         {
 
             InterpreterAction action = InterpreterAction.NULL;
+            InterpreterAction defaultAction = InterpreterAction.NULL;
 
             string validRule = "";
 
-            ArrayList rules;
-            if (evaluationType == ItemEvaluationType.PickUp) rules = pickUpRuleSet;
-            else rules = ruleSet;
+            ArrayList rules = null;
+
+            switch (evaluationType)
+            {
+                case ItemEvaluationType.PickUp:
+                    defaultAction = InterpreterAction.PICKUP;
+                    rules = pickUpRuleSet;
+                    break;
+                case ItemEvaluationType.Sell:
+                    defaultAction = InterpreterAction.IDENTIFY;
+                    rules = identifyRuleSet;
+                    break;
+                case ItemEvaluationType.Keep:
+                    defaultAction = InterpreterAction.KEEP;
+                    rules = keepRuleSet;
+                    break;
+                case ItemEvaluationType.Salvage:
+                    defaultAction = InterpreterAction.SALVAGE;
+                    rules = salvageSellRuleSet;
+                    break;
+                default:
+                    defaultAction = InterpreterAction.NULL;
+                    rules = null;
+                    break;
+            }
 
             foreach (string str in rules)
             {
                 ParseErrors parseErrors = null;
 
-                // default configuration for positive rules is pickup and keep
-                InterpreterAction tempAction;
-                if (evaluationType == ItemEvaluationType.PickUp) tempAction = InterpreterAction.PICKUP;
-                else tempAction = InterpreterAction.KEEP;
+                InterpreterAction tempAction = defaultAction;
 
                 string[] strings = str.Split(new string[] { assign }, StringSplitOptions.None);
                 if (strings.Count() > 1)
                     tempAction = getInterpreterAction(strings[1]);
-
                 try
                 {
                     if (evaluate(strings[0], out parseErrors))
@@ -332,9 +391,6 @@ namespace Trinity.ItemRules
         /// <param name="action"></param>
         private void logOut(ItemEvaluationType evaluationType, string validRule, InterpreterAction action)
         {
-            // return if we have a evaluationtype sell or salvage
-            if (evaluationType == ItemEvaluationType.Salvage || evaluationType == ItemEvaluationType.Sell)
-                return;
 
             string logString = getFullItem() + validRule;
 
@@ -350,6 +406,14 @@ namespace Trinity.ItemRules
                     if (quality >= logPickQuality)
                         logOut(logString, action, LogType.LOG);
                     break;
+                case InterpreterAction.IDENTIFY:
+                    //if (quality >= logPickQuality)
+                    //    logOut(logString, action, LogType.LOG);
+                    break;
+                case InterpreterAction.UNIDENT:
+                    if (quality >= logPickQuality)
+                        logOut(logString, action, LogType.LOG);
+                    break;
                 case InterpreterAction.KEEP:
                     if (quality >= logKeepQuality)
                         logOut(logString, action, LogType.LOG);
@@ -361,6 +425,14 @@ namespace Trinity.ItemRules
                 case InterpreterAction.SCORE:
                     if (quality >= logKeepQuality)
                         logOut(logString, action, LogType.LOG);
+                    break;
+                case InterpreterAction.SALVAGE:
+                    //if (quality >= logKeepQuality)
+                    //    logOut(logString, action, LogType.LOG);
+                    break;
+                case InterpreterAction.SELL:
+                    //if (quality >= logKeepQuality)
+                    //    logOut(logString, action, LogType.LOG);
                     break;
                 case InterpreterAction.NULL:
                     if (quality >= logPickQuality)
@@ -439,6 +511,7 @@ namespace Trinity.ItemRules
             foreach (InterpreterAction action in Enum.GetValues(typeof(InterpreterAction)))
                 if (str.IndexOf(action.ToString()) != -1)
                     return action;
+
             return InterpreterAction.NULL;
         }
 
@@ -456,7 +529,30 @@ namespace Trinity.ItemRules
             if (!Trinity.Settings.Advanced.ItemRulesLogs)
                 return;
 
-            log = new StreamWriter(Path.Combine(FileManager.LoggingPath, logFile), true);
+            switch (action)
+            {
+                case InterpreterAction.PICKUP:
+                case InterpreterAction.IGNORE:
+                    log = new StreamWriter(Path.Combine(FileManager.LoggingPath, PickLogFile), true);
+                    break;
+                case InterpreterAction.IDENTIFY:
+                case InterpreterAction.UNIDENT:
+                    log = new StreamWriter(Path.Combine(FileManager.LoggingPath, RestLogFile), true);
+                    break;
+                case InterpreterAction.KEEP:
+                case InterpreterAction.TRASH:
+                case InterpreterAction.SCORE:
+                    log = new StreamWriter(Path.Combine(FileManager.LoggingPath, KeepLogFile), true);
+                    break;
+                case InterpreterAction.SALVAGE:
+                case InterpreterAction.SELL:
+                    log = new StreamWriter(Path.Combine(FileManager.LoggingPath, RestLogFile), true);
+                    break;
+                case InterpreterAction.NULL:
+                    log = new StreamWriter(Path.Combine(FileManager.LoggingPath, BugsLogFile), true);
+                    break;
+            }
+
             log.WriteLine(DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".Hero" + SEP + logType + SEP + action + SEP + str);
             log.Close();
         }
@@ -790,7 +886,7 @@ namespace Trinity.ItemRules
             {
                 Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Translation: Missing: " + item.GameBalanceId.ToString() + ";" + item.Name + " (ID is missing report)");
                 // not found missing name
-                StreamWriter transFix = new StreamWriter(Path.Combine(FileManager.LoggingPath, transFixFile), true);
+                StreamWriter transFix = new StreamWriter(Path.Combine(FileManager.LoggingPath, tranLogFile), true);
                 transFix.WriteLine("Missing: " + item.GameBalanceId.ToString() + ";" + item.Name);
                 transFix.Close();
             }
@@ -798,7 +894,7 @@ namespace Trinity.ItemRules
             {
                 Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Translation: Wrong(" + balanceIDstr + "): " + item.GameBalanceId.ToString() + ";" + item.Name);
                 // wrong reference
-                StreamWriter transFix = new StreamWriter(Path.Combine(FileManager.LoggingPath, transFixFile), true);
+                StreamWriter transFix = new StreamWriter(Path.Combine(FileManager.LoggingPath, tranLogFile), true);
                 transFix.WriteLine("Wrong(" + balanceIDstr + "): " + item.GameBalanceId.ToString() + ";" + item.Name);
                 transFix.Close();
             }

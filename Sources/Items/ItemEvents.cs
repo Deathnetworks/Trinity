@@ -68,6 +68,11 @@ namespace Trinity
             }
         }
 
+        internal static void TrinityOnOnItemIdentificationRequest(object sender, ItemIdentifyRequestEventArgs e)
+        {
+            e.IgnoreIdentification = !Trinity.ItemRulesIdentifyValidation(e.Item);
+        }
+
         internal static void ResetTownRun()
         {
             ItemValuation.ResetValuationStatStrings();

@@ -60,42 +60,21 @@ namespace Trinity
 
         public bool ShouldSalvageItem(ACDItem item, ItemEvaluationType evaluationType)
         {
-
+            
             if (ItemManager.Current.ItemIsProtected(item))
                 return false;
 
-            //if (ShouldStashItem(item, evaluationType))
-            //    return false;
-
-            CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
-
-            GItemType trinityItemType = Trinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
-            GItemBaseType trinityItemBaseType = Trinity.DetermineBaseType(trinityItemType);
-
-            // Take Salvage Option corresponding to ItemLevel
-            SalvageOption salvageOption = GetSalvageOption(cItem.Quality);
-
-            if (cItem.Quality >= ItemQuality.Legendary && salvageOption == SalvageOption.InfernoOnly && cItem.Level >= 60)
-                return true;
-
-            switch (trinityItemBaseType)
+            if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.DemonBuddy)
             {
-                case GItemBaseType.WeaponRange:
-                case GItemBaseType.WeaponOneHand:
-                case GItemBaseType.WeaponTwoHand:
-                case GItemBaseType.Armor:
-                case GItemBaseType.Offhand:
-                    return ((cItem.Level >= 61 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
-                case GItemBaseType.Jewelry:
-                    return ((cItem.Level >= 59 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
-                case GItemBaseType.FollowerItem:
-                    return ((cItem.Level >= 60 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
-                case GItemBaseType.Gem:
-                case GItemBaseType.Misc:
-                case GItemBaseType.Unknown:
-                    return false;
-                default:
-                    return false;
+                return ItemManager.Current.ShouldSalvageItem(item);
+            }
+            else if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
+            {
+                return ItemRulesSalvageSell(item, evaluationType);
+            }
+            else
+            {
+                return TrinitySalvage(item);
             }
 
         }
@@ -110,38 +89,22 @@ namespace Trinity
 
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
 
-            //if (ShouldStashItem(item, evaluationType))
-            //    return false;
-
-            //if (ShouldSalvageItem(item, evaluationType))
-            //    return false;
-
             if (ItemManager.Current.ItemIsProtected(cItem.AcdItem))
-            {
                 return false;
-            }
 
-            switch (cItem.TrinityItemBaseType)
+            if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.DemonBuddy)
             {
-                case GItemBaseType.WeaponRange:
-                case GItemBaseType.WeaponOneHand:
-                case GItemBaseType.WeaponTwoHand:
-                case GItemBaseType.Armor:
-                case GItemBaseType.Offhand:
-                case GItemBaseType.Jewelry:
-                case GItemBaseType.FollowerItem:
-                    return true;
-                case GItemBaseType.Gem:
-                case GItemBaseType.Misc:
-                    if (cItem.TrinityItemType == GItemType.CraftingPlan)
-                        return true;
-                    else
-                        return false;
-                case GItemBaseType.Unknown:
-                    return false;
+                return ItemManager.Current.ShouldSellItem(item);
+            }
+            else if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
+            {
+                return ItemRulesSalvageSell(item, evaluationType);
+            }
+            else
+            {
+                return TrinitySell(item);
             }
 
-            return false;
         }
 
         public override bool ShouldStashItem(ACDItem item)
@@ -210,6 +173,7 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
+
             if (trinityItemType == GItemType.HealthPotion)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
@@ -228,8 +192,14 @@ namespace Trinity
             if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
                 Interpreter.InterpreterAction action = Trinity.StashRule.checkItem(item, evaluationType);
+                
                 if (evaluationType == ItemEvaluationType.Keep)
+<<<<<<< HEAD
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
+                
+=======
                     Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
+>>>>>>> 65e7489b29184d1015c85f976a8013dc47132493
                 switch (action)
                 {
                     case Interpreter.InterpreterAction.KEEP:
@@ -277,7 +247,96 @@ namespace Trinity
 
         }
 
-        internal static SalvageOption GetSalvageOption(ItemQuality quality)
+        private bool ItemRulesSalvageSell(ACDItem item, ItemEvaluationType evaluationType)
+        {
+            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                "Incoming {0} Request: {1}, {2}, {3}, {4}, {5}",
+                evaluationType, item.ItemQualityLevel, item.Level, item.ItemBaseType,
+                item.ItemType, item.IsOneHand ? "1H" : item.IsTwoHand ? "2H" : "NH");
+            
+            Interpreter.InterpreterAction action = Trinity.StashRule.checkItem(item, ItemEvaluationType.Salvage);
+            switch (action)
+            {
+                case Interpreter.InterpreterAction.SALVAGE:
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0}: {1}", evaluationType, (evaluationType == ItemEvaluationType.Salvage));
+                    return (evaluationType == ItemEvaluationType.Salvage);
+                case Interpreter.InterpreterAction.SELL:
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0}: {1}", evaluationType, (evaluationType == ItemEvaluationType.Sell));
+                    return (evaluationType == ItemEvaluationType.Sell);
+                default:
+                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Trinity, item is unhandled by ItemRules (SalvageSell)!");
+                    switch (evaluationType)
+                    {
+                        case ItemEvaluationType.Salvage:
+                            return TrinitySalvage(item);
+                        default:
+                            return TrinitySell(item);
+                    }
+            }
+        }
+
+        private bool TrinitySalvage(ACDItem item)
+        {
+            CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
+
+            GItemType trinityItemType = Trinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
+            GItemBaseType trinityItemBaseType = Trinity.DetermineBaseType(trinityItemType);
+
+            // Take Salvage Option corresponding to ItemLevel
+            SalvageOption salvageOption = GetSalvageOption(cItem.Quality);
+
+            if (cItem.Quality >= ItemQuality.Legendary && salvageOption == SalvageOption.InfernoOnly && cItem.Level >= 60)
+                return true;
+
+            switch (trinityItemBaseType)
+            {
+                case GItemBaseType.WeaponRange:
+                case GItemBaseType.WeaponOneHand:
+                case GItemBaseType.WeaponTwoHand:
+                case GItemBaseType.Armor:
+                case GItemBaseType.Offhand:
+                    return ((cItem.Level >= 61 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
+                case GItemBaseType.Jewelry:
+                    return ((cItem.Level >= 59 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
+                case GItemBaseType.FollowerItem:
+                    return ((cItem.Level >= 60 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
+                case GItemBaseType.Gem:
+                case GItemBaseType.Misc:
+                case GItemBaseType.Unknown:
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
+        private bool TrinitySell(ACDItem item)
+        {
+            CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
+
+            switch (cItem.TrinityItemBaseType)
+            {
+                case GItemBaseType.WeaponRange:
+                case GItemBaseType.WeaponOneHand:
+                case GItemBaseType.WeaponTwoHand:
+                case GItemBaseType.Armor:
+                case GItemBaseType.Offhand:
+                case GItemBaseType.Jewelry:
+                case GItemBaseType.FollowerItem:
+                    return true;
+                case GItemBaseType.Gem:
+                case GItemBaseType.Misc:
+                    if (cItem.TrinityItemType == GItemType.CraftingPlan)
+                        return true;
+                    else
+                        return false;
+                case GItemBaseType.Unknown:
+                    return false;
+            }
+
+            return false;
+        }
+
+        private SalvageOption GetSalvageOption(ItemQuality quality)
         {
             if (quality >= ItemQuality.Magic1 && quality <= ItemQuality.Magic3)
             {
@@ -293,7 +352,6 @@ namespace Trinity
             }
             return SalvageOption.None;
         }
-
 
     }
 }
