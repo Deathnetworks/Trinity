@@ -60,14 +60,14 @@ namespace Trinity.XmlTags
         /// </summary>
         public override void OnStart()
         {
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "TrinityMoveToScene OnStart() called");
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "TrinityMoveToScene OnStart() called");
 
             if (PathPrecision == 0)
                 PathPrecision = 15f;
 
             if (SceneId == 0 && SceneName.Trim() == String.Empty)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityMoveToScene: No sceneId or sceneName specified!");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityMoveToScene: No sceneId or sceneName specified!");
                 isDone = true;
             }
 
@@ -103,7 +103,7 @@ namespace Trinity.XmlTags
                         new PrioritySelector(
                             new Decorator(ret => PrioritySceneTarget.Distance2D(myPos) <= PathPrecision,
                                 new Sequence(
-                                    new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Successfully navigated to priority scene {0} {1} center {2} Distance {3:0}",
+                                    new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Successfully navigated to priority scene {0} {1} center {2} Distance {3:0}",
                                         CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos))),
                                     new Action(ret => isDone = true)
                                 )
@@ -119,14 +119,14 @@ namespace Trinity.XmlTags
         /// </summary>
         private void MoveToPriorityScene()
         {
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Moving to Priority Scene {0} - {1} Center {2} Distance {3:0}",
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Moving to Priority Scene {0} - {1} Center {2} Distance {3:0}",
                 CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
 
             MoveResult moveResult = PlayerMover.NavigateTo(PrioritySceneTarget);
 
             if (moveResult == MoveResult.PathGenerationFailed)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Unable to navigate to Scene {0} - {1} Center {2} Distance {3:0}, cancelling!",
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Unable to navigate to Scene {0} - {1} Center {2} Distance {3:0}, cancelling!",
                     CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
                 PrioritySceneMoveToFinished();
             }
@@ -222,7 +222,7 @@ namespace Trinity.XmlTags
                 }
                 else
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene but could not find a navigable point!", true);
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene but could not find a navigable point!", true);
                 }
             }
 
@@ -234,7 +234,7 @@ namespace Trinity.XmlTags
                 PrioritySceneTarget = nearestPriorityScene.Value;
                 CurrentPriorityScene = foundPriorityScenes.FirstOrDefault(s => s.SceneInfo.SNOId == PrioritySceneSNOId);
 
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene {0} - {1} Center {2} Distance {3:0}",
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene {0} - {1} Center {2} Distance {3:0}",
                     CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
             }
 

@@ -110,18 +110,6 @@ namespace Trinity
         /// </summary>
         private static DateTime lastMovedDuringCombat = DateTime.Today;
 
-        // The following three dictionaries are special caches - they start empty but fill up with data that gets re-used while the bot runs, saving on D3 memory hits
-
-        /// <summary>
-        /// Special cache for monster types {ActorSNO, MonsterType}
-        /// </summary>
-        private static Dictionary<int, MonsterType> dictionaryStoredMonsterTypes = new Dictionary<int, MonsterType>();
-
-        /// <summary>
-        /// Special cache for Monster sizes {ActorSNO, MonsterSize}
-        /// </summary>
-        private static Dictionary<int, MonsterSize> dictionaryStoredMonsterSizes = new Dictionary<int, MonsterSize>();
-
         /// <summary>
         /// Used to ignore a specific RActor for <see cref="IgnoreTargetForLoops"/> ticks
         /// </summary>
@@ -136,9 +124,6 @@ namespace Trinity
         /// Holds all of the player's current info handily cached, updated once per loop with a minimum timer on updates to save D3 memory hits
         /// </summary>
         public static PlayerInfoCache PlayerStatus = new PlayerInfoCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, Vector3.Zero, false, 0, 1, ActorClass.Invalid, String.Empty);
-
-        [Obsolete("This property is obsolete; use PlayerStatus instead")]
-        public static PlayerInfoCache playerStatus { get { return PlayerStatus; } }
 
         /// <summary>
         /// Obstacle cache, things we can't or shouldn't move through

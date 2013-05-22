@@ -30,27 +30,27 @@ namespace Trinity.UI
             // Check we can actually find the .xaml file first - if not, report an error
             if (!File.Exists(Path.Combine(uiPath, "MainView.xaml")))
             {
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "MainView.xaml not found {0}", Path.Combine(uiPath, "MainView.xaml"));
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "MainView.xaml not found {0}", Path.Combine(uiPath, "MainView.xaml"));
                 return null;
             }
             try
             {
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "MainView.xaml found");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "MainView.xaml found");
                 if (_ConfigWindow == null)
                 {
                     _ConfigWindow = new Window();
                 }
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Context");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Context");
                 _ConfigWindow.DataContext = new ConfigViewModel(Trinity.Settings);
 
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load MainView.xaml");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load MainView.xaml");
                 UserControl mainControl = LoadAndTransformXamlFile<UserControl>(Path.Combine(uiPath, "MainView.xaml"));
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Children");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Children");
                 LoadChild(mainControl, uiPath);
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Resources");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Resources");
                 LoadResourceForWindow(Path.Combine(uiPath, "Template.xaml"), mainControl);
 
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Configure Window");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Configure Window");
                 _ConfigWindow.Content = mainControl;
                 _ConfigWindow.Height = 620;
                 _ConfigWindow.Width = 480;
@@ -64,14 +64,14 @@ namespace Trinity.UI
 
                 Demonbuddy.App.Current.Exit += WindowClosed;
 
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Put MainControl to Window");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Put MainControl to Window");
                 // And finally put all of this content in effect
                 _ConfigWindow.Content = mainControl;
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window build finished.");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window build finished.");
             }
             catch (XamlParseException ex)
             {
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UI, "{0}", ex);
+                Logger.Log(TrinityLogLevel.Error, LogCategory.UI, "{0}", ex);
                 return _ConfigWindow;
             }
             return _ConfigWindow;
@@ -91,7 +91,7 @@ namespace Trinity.UI
         /// <returns><see cref="Stream"/> which contains transformed XAML file.</returns>
         private static T LoadAndTransformXamlFile<T>(string filename)
         {
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load XAML file : {0}", filename);
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load XAML file : {0}", filename);
             string filecontent = File.ReadAllText(filename);
 
             // Change reference to custom Trinity class
@@ -110,7 +110,7 @@ namespace Trinity.UI
         /// <exception cref="System.NotImplementedException"></exception>
         static void WindowClosed(object sender, System.EventArgs e)
         {
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window closed.");
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window closed.");
             _ConfigWindow = null;
         }
 
@@ -160,7 +160,7 @@ namespace Trinity.UI
                 // Otherwise, log control where you try to put dynamic tag
                 else
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Control of type '{0}' can't be used for dynamic loading.", ctrl.GetType().FullName);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Control of type '{0}' can't be used for dynamic loading.", ctrl.GetType().FullName);
                     return;
                 }
                 // Content added to parent control, try to search dynamic control in children
@@ -168,7 +168,7 @@ namespace Trinity.UI
             }
             else
             {
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UI, "Error XAML file not found : '{0}'", filename);
+                Logger.Log(TrinityLogLevel.Error, LogCategory.UI, "Error XAML file not found : '{0}'", filename);
             }
         }
     }

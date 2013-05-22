@@ -112,7 +112,7 @@ namespace Trinity
             if (CurrentPower != null && (CurrentPower.ShouldWaitBeforeUse || CurrentPower.ShouldWaitAfterUse))
                 extras += " " + CurrentPower.ToString();
 
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Handle Target returning {0} to tree" + extras, treeRunStatus);
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Handle Target returning {0} to tree" + extras, treeRunStatus);
             return treeRunStatus;
 
         }
@@ -131,20 +131,20 @@ namespace Trinity
                 {
                     if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                     {
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
+                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "No longer in game world", true);
                         runStatus = HandlerRunStatus.TreeFailure;
                         return GetTreeSharpRunStatus(runStatus);
                     }
                     if (ZetaDia.Me.IsDead)
                     {
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Player is dead", true);
+                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Player is dead", true);
                         runStatus = HandlerRunStatus.TreeFailure;
                         return GetTreeSharpRunStatus(runStatus);
                     }
                     else if (GoldInactivity.GoldInactive())
                     {
                         BotMain.PauseWhile(GoldInactivity.GoldInactiveLeaveGame);
-                        DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Gold Inactivity Tripped", true);
+                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Gold Inactivity Tripped", true);
                         runStatus = HandlerRunStatus.TreeFailure;
                         return GetTreeSharpRunStatus(runStatus);
                     }
@@ -187,7 +187,7 @@ namespace Trinity
                         wasRootedLastTick = false;
                     if (CurrentTarget == null)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget was passed as null! Continuing...");
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget was passed as null! Continuing...");
                     }
 
                     Monk_MaintainTempestRush();
@@ -224,7 +224,7 @@ namespace Trinity
 
                     if (CurrentTarget == null && (ForceVendorRunASAP || IsReadyToTownRun) && !Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && TownRun.TownRunTimerRunning())
                     {
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget is null but we are ready to to Town Run, waiting... ");
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget is null but we are ready to to Town Run, waiting... ");
                         runStatus = HandlerRunStatus.TreeRunning;
                     }
 
@@ -234,12 +234,12 @@ namespace Trinity
 
                     if (CurrentTarget == null && TownRun.IsTryingToTownPortal() && TownRun.TownRunTimerRunning())
                     {
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Waiting for town run... ");
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Waiting for town run... ");
                         runStatus = HandlerRunStatus.TreeRunning;
                     }
                     else if (CurrentTarget == null && TownRun.IsTryingToTownPortal() && TownRun.TownRunTimerFinished())
                     {
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Town Run Ready!");
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Town Run Ready!");
                         runStatus = HandlerRunStatus.TreeSuccess;
                     }
                     //check if we are returning to the tree
@@ -248,7 +248,7 @@ namespace Trinity
 
                     if (CurrentTarget == null)
                     {
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2");
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2");
                         runStatus = HandlerRunStatus.TreeFailure;
                     }
 
@@ -428,7 +428,7 @@ namespace Trinity
                                         Vector2 ValidLocation = FindValidBackpackLocation(true);
                                         if (ValidLocation.X < 0 || ValidLocation.Y < 0)
                                         {
-                                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, town-run requested at next free moment.");
+                                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, town-run requested at next free moment.");
                                             ForceVendorRunASAP = true;
                                             //runStatus = HandlerRunStatus.TreeRunning;
                                             runStatus = HandlerRunStatus.TreeSuccess;
@@ -531,7 +531,7 @@ namespace Trinity
                                         {
                                             if (CurrentTarget.Type == GObjectType.Barricade)
                                             {
-                                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior,
+                                                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior,
                                                     "Barricade: Name={0}. SNO={1}, Range={2}. Needed range={3}. Radius={4}. Type={5}. Using power={6}",
                                                     CurrentTarget.InternalName,     // 0
                                                     CurrentTarget.ActorSNO,         // 1
@@ -544,7 +544,7 @@ namespace Trinity
                                             }
                                             else
                                             {
-                                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior,
+                                                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior,
                                                     "Destructible: Name={0}. SNO={1}, Range={2}. Needed range={3}. Radius={4}. Type={5}. Using power={6}",
                                                     CurrentTarget.InternalName,     // 0
                                                     CurrentTarget.ActorSNO,         // 1
@@ -568,7 +568,7 @@ namespace Trinity
                                                     vAttackPoint = CurrentTarget.Position;
 
                                                 vAttackPoint.Z += 1.5f;
-                                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "(NB: Attacking location of destructable)");
+                                                Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "(NB: Attacking location of destructable)");
                                                 ZetaDia.Me.UsePower(CurrentPower.SNOPower, vAttackPoint, CurrentWorldDynamicId, -1);
                                                 if (CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
                                                     LastTempestRushLocation = vAttackPoint;
@@ -598,7 +598,7 @@ namespace Trinity
                                             IgnoreTargetForLoops = 3;
                                             // Add this destructible/barricade to our very short-term ignore list
                                             hashRGUIDDestructible3SecBlacklist.Add(CurrentTarget.RActorGuid);
-                                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 3 seconds for Destrucable attack", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
+                                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 3 seconds for Destrucable attack", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
                                             lastDestroyedDestructible = DateTime.Now;
                                             bNeedClearDestructibles = true;
                                         }
@@ -644,7 +644,7 @@ namespace Trinity
                     if (PlayerStatus.IsIncapacitated || PlayerStatus.IsRooted)
                     {
                         runStatus = HandlerRunStatus.TreeFailure;
-                        DbHelper.Log(LogCategory.Behavior, "Player is rooted or incapacitated!");
+                        Logger.Log(LogCategory.Behavior, "Player is rooted or incapacitated!");
                         return GetTreeSharpRunStatus(runStatus);
                     }
 
@@ -688,7 +688,7 @@ namespace Trinity
                                             vShiftedPosition = vCurrentDestination;
                                             iShiftPositionFor = 1000;
                                             lastShiftedPosition = DateTime.Now;
-                                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Mid-Target-Handle position shift location to: {0} (was {1})", vCurrentDestination, point);
+                                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Mid-Target-Handle position shift location to: {0} (was {1})", vCurrentDestination, point);
                                         }
                                     }
                                     // Make sure we only shift max once every 10 seconds
@@ -852,12 +852,12 @@ namespace Trinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0}", ex);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0}", ex);
                     runStatus = HandlerRunStatus.TreeFailure;
                     return GetTreeSharpRunStatus(runStatus);
                 }
 
-                DbHelper.Log(LogCategory.Behavior, "Using Navigator to reach target");
+                Logger.Log(LogCategory.Behavior, "Using Navigator to reach target");
                 HandleTargetBasicMovement(bForceNewMovement);
 
                 runStatus = HandlerRunStatus.TreeRunning;
@@ -967,7 +967,7 @@ namespace Trinity
                     {
                         if (CurrentTarget.Type == GObjectType.Unit)
                         {
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior,
+                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior,
                                 "Blacklisting a monster because of possible stuck issues. Monster={0} [{1}] Range={2:0} health %={3:0} RActorGUID={4}",
                                 CurrentTarget.InternalName,         // 0
                                 CurrentTarget.ActorSNO,             // 1
@@ -978,7 +978,7 @@ namespace Trinity
                         }
                         else
                         {
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior,
+                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior,
                                 "Blacklisting an object because of possible stuck issues. Object={0} [{1}]. Range={2:0} RActorGUID={3}",
                                 CurrentTarget.InternalName,         // 0
                                 CurrentTarget.ActorSNO,             // 1 
@@ -1033,9 +1033,9 @@ namespace Trinity
                             if (DateTime.Now.Subtract(lastRemindedAboutAbilities).TotalSeconds > 60 && iNoAbilitiesAvailableInARow >= 4)
                             {
                                 lastRemindedAboutAbilities = DateTime.Now;
-                                DbHelper.Log(TrinityLogLevel.Error, LogCategory.Behavior, "Fatal Error: Couldn't find a valid attack ability. Not enough resource for any abilities or all on cooldown");
-                                DbHelper.Log(TrinityLogLevel.Error, LogCategory.Behavior, "If you get this message frequently, you should consider changing your build");
-                                DbHelper.Log(TrinityLogLevel.Error, LogCategory.Behavior, "Perhaps you don't have enough critical hit chance % for your current build, or just have a bad skill setup?");
+                                Logger.Log(TrinityLogLevel.Error, LogCategory.Behavior, "Fatal Error: Couldn't find a valid attack ability. Not enough resource for any abilities or all on cooldown");
+                                Logger.Log(TrinityLogLevel.Error, LogCategory.Behavior, "If you get this message frequently, you should consider changing your build");
+                                Logger.Log(TrinityLogLevel.Error, LogCategory.Behavior, "Perhaps you don't have enough critical hit chance % for your current build, or just have a bad skill setup?");
                             }
                         }
                         else
@@ -1112,7 +1112,7 @@ namespace Trinity
                                 }
                                 catch
                                 {
-                                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit {0} [{1}]", c_InternalName, c_ActorSNO);
+                                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Safely handled exception getting attribute max health #2 for unit {0} [{1}]", c_InternalName, c_ActorSNO);
                                     StaleCache = true;
                                 }
                             }
@@ -1323,7 +1323,7 @@ namespace Trinity
                 sStatusText = "[Trinity] " + statusText.ToString();
                 BotMain.StatusText = sStatusText;
             }
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "{0}", statusText.ToString());
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "{0}", statusText.ToString());
             bResetStatusText = true;
         }
 
@@ -1543,7 +1543,7 @@ namespace Trinity
 
                 if (usePowerResult)
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Used Power {0} at {1} on {2} dist={3}", CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetRActorGUID, dist);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Used Power {0} at {1} on {2} dist={3}", CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetRActorGUID, dist);
                     if (CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
                         LastTempestRushLocation = CurrentPower.TargetPosition;
 
@@ -1566,7 +1566,7 @@ namespace Trinity
                 }
                 else
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower FAILED {0} at {1} on {2} dist={3}", CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetRActorGUID, dist);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower FAILED {0} at {1} on {2} dist={3}", CurrentPower.SNOPower, CurrentPower.TargetPosition, CurrentPower.TargetRActorGUID, dist);
                 }
 
                 ShouldPickNewAbilities = true;
@@ -1586,7 +1586,7 @@ namespace Trinity
                         if (!CurrentTarget.IsBoss)
                         {
                             hashRGUIDBlacklist3.Add(CurrentTarget.RActorGuid);
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 3 seconds due to Raycast failure", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 3 seconds due to Raycast failure", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
                             dateSinceBlacklist3Clear = DateTime.Now;
                             NeedToClearBlacklist3 = true;
                         }
@@ -1631,11 +1631,11 @@ namespace Trinity
                         //asserts	
                         if (iQuality > QUALITYORANGE)
                         {
-                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Item type (" + iQuality + ") out of range");
+                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Item type (" + iQuality + ") out of range");
                         }
                         if ((CurrentTarget.ItemLevel < 0) || (CurrentTarget.ItemLevel >= 64))
                         {
-                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Item level (" + CurrentTarget.ItemLevel + ") out of range");
+                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Item level (" + CurrentTarget.ItemLevel + ") out of range");
                         }
                         ItemsPickedStats.TotalPerQuality[iQuality]++;
                         ItemsPickedStats.TotalPerLevel[CurrentTarget.ItemLevel]++;
@@ -1656,11 +1656,11 @@ namespace Trinity
                         // !sp - asserts	
                         if (iGemType > GEMEMERALD)
                         {
-                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Gem type ({0}) out of range", iGemType);
+                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Gem type ({0}) out of range", iGemType);
                         }
                         if ((CurrentTarget.ItemLevel < 0) || (CurrentTarget.ItemLevel > 63))
                         {
-                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Gem level ({0}) out of range", CurrentTarget.ItemLevel);
+                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Gem level ({0}) out of range", CurrentTarget.ItemLevel);
                         }
 
                         ItemsPickedStats.GemsPerType[iGemType]++;
@@ -1672,7 +1672,7 @@ namespace Trinity
                         ItemsPickedStats.TotalPotions++;
                         if ((CurrentTarget.ItemLevel < 0) || (CurrentTarget.ItemLevel > 63))
                         {
-                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Potion level ({0}) out of range", CurrentTarget.ItemLevel);
+                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Potion level ({0}) out of range", CurrentTarget.ItemLevel);
                         }
                         ItemsPickedStats.PotionsPerLevel[CurrentTarget.ItemLevel]++;
                     }

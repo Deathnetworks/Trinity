@@ -60,7 +60,9 @@
   <ItemGroup>
     <Compile Include="Cache\CacheDictionaries.cs" />
     <Compile Include="Combat\Abilities\Barbarian.cs" />
-    <Compile Include="Combat\Abilities\CombatAbilities.cs" />
+    <Compile Include="Combat\Abilities\BarbarianCombat.cs" />
+    <Compile Include="Combat\Abilities\CombatBase.cs" />
+    <Compile Include="Combat\Abilities\CombatContext.cs" />
     <Compile Include="Combat\Abilities\Monk.cs" />
     <Compile Include="Combat\Abilities\Wizard.cs" />
     <Compile Include="Combat\Abilities\DemonHunter.cs" />
@@ -102,7 +104,7 @@
     <Compile Include="Helpers\UsedProfileManager.cs" />
     <Compile Include="Configuration\Constants.cs" />
     <Compile Include="Settings\Settings.cs" />
-    <Compile Include="Combat\Behaviors.cs" />
+    <Compile Include="Combat\HandleTarget.cs" />
     <Compile Include="Combat\AbilitySelector.cs" />
     <Compile Include="Helpers\BotManager.cs" />
     <Compile Include="ItemRules\Core\MaxStats.cs" />
@@ -118,7 +120,7 @@
     <Compile Include="DbProvider\TownRun.cs" />
     <Compile Include="Combat\TrinityPowerManager.cs" />
     <Compile Include="Combat\ScheduledPower.cs" />
-    <Compile Include="Helpers\DbHelper.cs" />
+    <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Helpers\LogCategory.cs" />
     <Compile Include="Helpers\TrinitiyLogLevel.cs" />
     <Compile Include="Items\ItemValuation.cs" />
@@ -161,7 +163,7 @@
     <Compile Include="UI\UIComponents\RelayCommand.cs" />
     <Compile Include="UI\UILoader.cs" />
     <Compile Include="Combat\Weighting.cs" />
-    <Compile Include="Combat\GlobalOverlord.cs" />
+    <Compile Include="Combat\TargetCheck.cs" />
     <Compile Include="Items\ItemHandling.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\Variables.cs" />

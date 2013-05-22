@@ -127,7 +127,7 @@ namespace Trinity.Notifications
             }
             catch (Exception e)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error sending email.{0}{1}", Environment.NewLine, e.ToString());
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error sending email.{0}{1}", Environment.NewLine, e.ToString());
             }
         }
     }

@@ -55,7 +55,7 @@ namespace Trinity
             }
             else
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: Maintaining item stats from previous run. To reset stats fully, please restart DB.");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: Maintaining item stats from previous run. To reset stats fully, please restart DB.");
             }
 
             UsedProfileManager.RefreshProfileBlacklists();
@@ -68,13 +68,13 @@ namespace Trinity
 
             if (Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius < 20)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: Low Kill Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: Low Kill Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
                     Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius);
             }
 
             if (Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius < 50)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: Low Gold Loot Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: Low Gold Loot Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
                     Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius);
             }
 
@@ -118,8 +118,8 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Error Destroying CacheManager");
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Error Destroying CacheManager");
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
             }
         }
         
@@ -140,7 +140,7 @@ namespace Trinity
                 {
                     if (iDeathsThisRun >= iMaxDeathsAllowed)
                     {
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "You have died too many times. Now restarting the game.");
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "You have died too many times. Now restarting the game.");
                         string sUseProfile = Trinity.FirstProfile;
                         ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
                                                 ? sUseProfile
@@ -152,7 +152,7 @@ namespace Trinity
                     }
                     else
                     {
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "I'm sorry, but I seem to have let you die :( Now restarting the current profile.");
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "I'm sorry, but I seem to have let you die :( Now restarting the current profile.");
                         ProfileManager.Load(Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
                         Thread.Sleep(2000);
                     }
@@ -222,6 +222,7 @@ namespace Trinity
             CurrentProfile = "";
             FirstProfile = "";
 
+            AbilityLastUsedCache = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
 
             GoldInactivity.ResetCheckGold();
 

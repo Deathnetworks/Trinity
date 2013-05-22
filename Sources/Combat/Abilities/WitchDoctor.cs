@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Trinity.Combat.Abilities;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -281,13 +282,9 @@ namespace Trinity
                     fUseThisRange = 30f;
                 return new TrinityPower(SNOPower.Witchdoctor_Firebomb, fUseThisRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
+
             // Default attacks
-            if (!UseOOCBuff && !IsCurrentlyAvoiding)
-            {
-                ShouldRefreshHotbarAbilities = true;
-                return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
-            }
-            return new TrinityPower(SNOPower.None, -1, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            return CombatBase.GetDefaultPower();
         }
 
         private static TrinityPower GetWitchDoctorDestroyPower()
@@ -308,7 +305,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_PlagueOfToads, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Witchdoctor_AcidCloud) && PlayerStatus.PrimaryResource >= 172)
                 return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            return new TrinityPower(SNOPower.Weapon_Melee_Instant, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            return CombatBase.GetDefaultPower();
         }
 
     }

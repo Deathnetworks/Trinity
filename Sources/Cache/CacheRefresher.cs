@@ -145,8 +145,8 @@ namespace Trinity.Cache
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Exception occured refreshing cache: {0}", ex.Message);
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex.StackTrace);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Exception occured refreshing cache: {0}", ex.Message);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex.StackTrace);
                 }
 
                 // Backpack

@@ -110,7 +110,7 @@ namespace Trinity
             {
                 if (Manager == null || (Manager != null && !Manager.IsAlive))
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Starting up Generic Blacklist Manager thread");
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Starting up Generic Blacklist Manager thread");
                     Manager = new Thread(Manage)
                     {
                         IsBackground = true,
@@ -121,8 +121,8 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Exception in Generic Blacklist Manager");
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, ex.ToString());
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Exception in Generic Blacklist Manager");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, ex.ToString());
             }
         }
 

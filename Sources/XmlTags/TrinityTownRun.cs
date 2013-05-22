@@ -21,7 +21,7 @@ namespace Trinity.XmlTags
         {
             return new Zeta.TreeSharp.Action(ret =>
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Town-run request received, will town-run at next possible moment.");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Town-run request received, will town-run at next possible moment.");
                 Trinity.ForceVendorRunASAP = true;
                 m_IsDone = true;
             });

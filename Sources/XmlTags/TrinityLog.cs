@@ -23,7 +23,7 @@ namespace Trinity.XmlTags
         {
             return new Zeta.TreeSharp.Action(ret =>
             {
-                DbHelper.Log((Level != null && Level.ToLower() == "diagnostic") ? TrinityLogLevel.Debug : TrinityLogLevel.Normal, LogCategory.UserInformation, Output);
+                Logger.Log((Level != null && Level.ToLower() == "diagnostic") ? TrinityLogLevel.Debug : TrinityLogLevel.Normal, LogCategory.UserInformation, Output);
                 m_IsDone = true;
             });
         }

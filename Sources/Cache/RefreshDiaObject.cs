@@ -300,8 +300,8 @@ namespace Trinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting ActorSNO for an object.");
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting ActorSNO for an object.");
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                 }
                 actorSNOCache.Add(c_RActorGuid, c_ActorSNO);
@@ -320,8 +320,8 @@ namespace Trinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting InternalName for an object [{0}]", c_ActorSNO);
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting InternalName for an object [{0}]", c_ActorSNO);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                 }
                 nameCache.Add(c_RActorGuid, c_InternalName);
@@ -695,7 +695,7 @@ namespace Trinity
                 }
                 catch
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for object {0} [{1}]", c_InternalName, c_ActorSNO);
                     AddToCache = false;
                     //return bWantThis;
                 }
@@ -723,7 +723,7 @@ namespace Trinity
             }
             catch
             {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                     "Safely handled exception getting Gizmo-Disabled-By-Script attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
                 AddToCache = false;
             }
@@ -807,7 +807,7 @@ namespace Trinity
                         }
                         catch
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
                             AddToCache = true;
                             //return bWantThis;
                         }
@@ -906,7 +906,7 @@ namespace Trinity
                         }
                         catch
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
                             AddToCache = false;
                             //return bWantThis;
                         }
@@ -933,7 +933,7 @@ namespace Trinity
                             }
                             catch
                             {
-                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
                                 AddToCache = false;
                             }
                             physicsSNOCache.Add(c_ActorSNO, iThisPhysicsSNO);
@@ -1004,7 +1004,7 @@ namespace Trinity
                             }
                             catch
                             {
-                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
                                 AddToCache = false;
                             }
                             physicsSNOCache.Add(c_ActorSNO, iThisPhysicsSNO);
@@ -1095,7 +1095,7 @@ namespace Trinity
                         }
                         catch
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting container-been-opened attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting container-been-opened attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
                             AddToCache = false;
                         }
                         if (bThisOpen)
@@ -1121,7 +1121,7 @@ namespace Trinity
                             }
                             catch
                             {
-                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
                                 AddToCache = false;
                             }
                             physicsSNOCache.Add(c_ActorSNO, iThisPhysicsSNO);
@@ -1150,7 +1150,7 @@ namespace Trinity
                         }
                         else if (c_InternalName.ToLower().Contains("chest") && !c_InternalName.ToLower().Contains("chest_rare"))
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "GSDebug: Possible Chest SNO: {0}, SNO={1}", c_InternalName, c_ActorSNO);
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "GSDebug: Possible Chest SNO: {0}, SNO={1}", c_InternalName, c_ActorSNO);
                         }
                         // Superlist for rare chests etc.
                         if (DataDictionary.ResplendentChestIds.Contains(c_ActorSNO))
@@ -1163,7 +1163,7 @@ namespace Trinity
                         }
                         else if (c_InternalName.Contains("chest_rare"))
                         {
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "GSDebug: Possible Resplendant Chest SNO: {0}, SNO={1}", c_InternalName, c_ActorSNO);
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "GSDebug: Possible Resplendant Chest SNO: {0}, SNO={1}", c_InternalName, c_ActorSNO);
                         }
                         // Blacklist this if it's something we should never bother looking at again
                         if (bBlacklistThis)
@@ -1201,8 +1201,8 @@ namespace Trinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for Avoidance {0} [{1}]", c_InternalName, c_ActorSNO);
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for Avoidance {0} [{1}]", c_InternalName, c_ActorSNO);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                     return AddToCache;
                 }
@@ -1224,7 +1224,7 @@ namespace Trinity
             {
                 // Monks with serenity are immune
                 ignoreAvoidance = true;
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a Monk with Serenity");
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a Monk with Serenity");
             }
             // Witch doctors with spirit walk available and not currently Spirit Walking will subtly ignore ice balls, arcane, desecrator & plague cloud
             if (PlayerStatus.ActorClass == ActorClass.WitchDoctor && Hotbar.Contains(SNOPower.Witchdoctor_SpiritWalk) && GetHasBuff(SNOPower.Witchdoctor_SpiritWalk))
@@ -1233,7 +1233,7 @@ namespace Trinity
                 {
                     // Ignore ICE/Arcane/Desc/PlagueCloud altogether with spirit walk up or available
                     ignoreAvoidance = true;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a WitchDoctor with Spirit Walk");
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a WitchDoctor with Spirit Walk");
                 }
             }
             // Remove ice balls if the barbarian has wrath of the berserker up, and reduce health from most other SNO avoidances
@@ -1243,7 +1243,7 @@ namespace Trinity
                 {
                     // Ignore ice-balls altogether with wrath up
                     ignoreAvoidance = true;
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a Barbarian with WOTB");
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a Barbarian with WOTB");
                 }
                 else
                 {
@@ -1252,7 +1252,7 @@ namespace Trinity
                     {
                         // Arcane
                         ignoreAvoidance = true;
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a Barbarian with WOTB");
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a Barbarian with WOTB");
                     }
                     else if (c_ActorSNO == 84608)
                         // Desecrator
@@ -1265,7 +1265,7 @@ namespace Trinity
             if (ignoreAvoidance)
             {
                 AddToCache = false;
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Ignoring Avoidance! Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Ignoring Avoidance! Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
                        c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
                 return AddToCache;
 
@@ -1288,24 +1288,24 @@ namespace Trinity
                     if (DataDictionary.AvoidanceProjectiles.Contains(c_ActorSNO))
                     {
                         IsAvoidingProjectiles = true;
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Is standing in avoidance for projectile Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Is standing in avoidance for projectile Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
                            c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
                     }
                     else
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Is standing in avoidance Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Is standing in avoidance Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
                        c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
                     }
                 }
                 else
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "NOT standing in Avoidance Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "NOT standing in Avoidance Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
                    c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
                 }
             }
             else
             {
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Enough health for avoidance, ignoring Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Enough health for avoidance, ignoring Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
                c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
             }
 
@@ -1499,7 +1499,7 @@ namespace Trinity
             {
                 AddToCache = true;
                 c_IgnoreSubStep = "IgnoreLoSException";
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
             }
             return AddToCache;
         }
@@ -1527,8 +1527,8 @@ namespace Trinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting ACDGUID for an object [{0}]", c_ActorSNO);
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting ACDGUID for an object [{0}]", c_ActorSNO);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                     }
                     ACDGUIDCache.Add(c_RActorGuid, c_ACDGUID);
@@ -1571,8 +1571,8 @@ namespace Trinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting position for a static object [{0}]", c_ActorSNO);
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting position for a static object [{0}]", c_ActorSNO);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                     }
                     // Now cache it
@@ -1588,8 +1588,8 @@ namespace Trinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting position for a unit or avoidance object [{0}]", c_ActorSNO);
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting position for a unit or avoidance object [{0}]", c_ActorSNO);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                 }
             }
             return AddToCache;
@@ -1609,8 +1609,8 @@ namespace Trinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting DynamicID for item {0} [{1}]", c_InternalName, c_ActorSNO);
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting DynamicID for item {0} [{1}]", c_InternalName, c_ActorSNO);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                         //return bWantThis;
                     }
@@ -1625,8 +1625,8 @@ namespace Trinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting GameBalanceID for item {0} [{1}]", c_InternalName, c_ActorSNO);
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting GameBalanceID for item {0} [{1}]", c_InternalName, c_ActorSNO);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                         //return bWantThis;
                     }
@@ -1865,8 +1865,8 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0} radius={1}", actorSNO, radius);
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, ex.ToString());
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0} radius={1}", actorSNO, radius);
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, ex.ToString());
                 return radius;
             }
 
@@ -1886,8 +1886,8 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0}", actorSNO);
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, ex.ToString());
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0}", actorSNO);
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, ex.ToString());
                 // 100% unless specified
                 return 1;
             }

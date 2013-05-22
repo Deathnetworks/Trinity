@@ -171,21 +171,21 @@ namespace Trinity.DbProvider
                 if (iCancelUnstuckerForSeconds < 20)
                     iCancelUnstuckerForSeconds = 20;
                 _lastCancelledUnstucker = DateTime.Now;
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Clearing old route and trying new path find to: " + LastMoveToTarget.ToString());
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Clearing old route and trying new path find to: " + LastMoveToTarget.ToString());
                 Navigator.MoveTo(LastMoveToTarget, "original destination", false);
                 return vSafeMovementLocation;
             }
             // Only try an unstuck 10 times maximum in XXX period of time
             if (Vector3.Distance(vOriginalDestination, vMyCurrentPosition) >= 700f)
             {
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "You are " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away from your destination.");
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "This is too far for the unstucker, and is likely a sign of ending up in the wrong map zone.");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "You are " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away from your destination.");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "This is too far for the unstucker, and is likely a sign of ending up in the wrong map zone.");
                 iTotalAntiStuckAttempts = 20;
             }
             // intell
             if (iTotalAntiStuckAttempts <= 15)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Your bot got stuck! Trying to unstuck (attempt #{0} of 15 attempts) {1} {2} {3} {4}",
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Your bot got stuck! Trying to unstuck (attempt #{0} of 15 attempts) {1} {2} {3} {4}",
                     iTotalAntiStuckAttempts.ToString(),
                     "Act=\"" + ZetaDia.CurrentAct + "\"",
                     "questId=\"" + ZetaDia.CurrentQuest.QuestSNO + "\"",
@@ -196,7 +196,7 @@ namespace Trinity.DbProvider
                 // check failed minimap markers
                 MiniMapMarker.UpdateFailedMarkers();
 
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
 
                 vSafeMovementLocation = NavHelper.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
 
@@ -227,7 +227,7 @@ namespace Trinity.DbProvider
             if (iTimesReachedMaxUnstucks == 1)
             {
                 Navigator.Clear();
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Anti-stuck measures now attempting to kickstart DB's path-finder into action.");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Anti-stuck measures now attempting to kickstart DB's path-finder into action.");
                 Navigator.MoveTo(vOriginalDestination, "original destination", false);
                 iCancelUnstuckerForSeconds = 40;
                 _lastCancelledUnstucker = DateTime.Now;
@@ -235,12 +235,12 @@ namespace Trinity.DbProvider
             }
             if (iTimesReachedMaxUnstucks == 2)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Anti-stuck measures failed. Now attempting to reload current profile.");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Anti-stuck measures failed. Now attempting to reload current profile.");
 
                 Navigator.Clear();
 
                 ProfileManager.Load(Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck successfully reloaded current profile, DemonBuddy now navigating again.");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck successfully reloaded current profile, DemonBuddy now navigating again.");
                 return vSafeMovementLocation;
 
                 // Didn't make it to town, so skip instantly to the exit game system
@@ -251,7 +251,7 @@ namespace Trinity.DbProvider
             {
                 timeLastRestartedGame = DateTime.Now;
                 string sUseProfile = Trinity.FirstProfile;
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck measures exiting current game.");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck measures exiting current game.");
                 // Load the first profile seen last run
                 ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
                                         ? sUseProfile
@@ -267,7 +267,7 @@ namespace Trinity.DbProvider
             }
             else
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Unstucking measures failed. Now stopping Trinity unstucker for 12 minutes to inactivity timers to kick in or DB to auto-fix.");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Unstucking measures failed. Now stopping Trinity unstucker for 12 minutes to inactivity timers to kick in or DB to auto-fix.");
                 iCancelUnstuckerForSeconds = 720;
                 _lastCancelledUnstucker = DateTime.Now;
                 return vSafeMovementLocation;
@@ -424,7 +424,7 @@ namespace Trinity.DbProvider
                     iTimesReachedStuckPoint = 0;
                     vSafeMovementLocation = Vector3.Zero;
                     NavHelper.UsedStuckSpots = new List<GridPoint>();
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Resetting unstuck timers", true);
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Resetting unstuck timers", true);
                 }
 
                 // See if we need to, and can, generate unstuck actions
@@ -436,7 +436,7 @@ namespace Trinity.DbProvider
                     _lastRecordedAnyStuck = DateTime.Now;
                     // See if there's any stuck position to try and navigate to generated by random mover
                     vSafeMovementLocation = UnstuckHandler(vMyCurrentPosition, LastMoveToTarget);
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Movement, "SafeMovement Location set to {0}", vSafeMovementLocation);
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.Movement, "SafeMovement Location set to {0}", vSafeMovementLocation);
                     if (vSafeMovementLocation == Vector3.Zero)
                         return;
                 }
@@ -467,7 +467,7 @@ namespace Trinity.DbProvider
                     else
                     {
                         if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Clearing old route and trying new path find to: " + LastMoveToTarget.ToString());
+                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Clearing old route and trying new path find to: " + LastMoveToTarget.ToString());
                         // Reset the path and allow a whole "New" unstuck generation next cycle
                         iTimesReachedStuckPoint = 0;
                         // And cancel unstucking for 9 seconds so DB can try to navigate
@@ -493,7 +493,7 @@ namespace Trinity.DbProvider
                     // Make sure we only shift max once every 6 seconds
                     if (DateTime.Now.Subtract(lastShiftedPosition).TotalMilliseconds >= 6000)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Shifting position for Navigation Obstacle {0} {1} at {2}", obstacle.ActorSNO, obstacle.Name, obstacle.Location);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Shifting position for Navigation Obstacle {0} {1} at {2}", obstacle.ActorSNO, obstacle.Name, obstacle.Location);
                         GetShiftedPosition(ref vMoveToTarget, ref point, obstacle.Radius + 5f);
                     }
                 }
@@ -526,7 +526,7 @@ namespace Trinity.DbProvider
                 {
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Whirlwind for OOC movement, distance={0}", DestinationDistance);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Whirlwind for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
 
@@ -542,7 +542,7 @@ namespace Trinity.DbProvider
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
                     Trinity.AbilityLastUsedCache[SNOPower.Barbarian_Leap] = DateTime.Now;
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Leap for OOC movement, distance={0}", DestinationDistance);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Leap for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
                 // Furious Charge movement for a barb
@@ -557,7 +557,7 @@ namespace Trinity.DbProvider
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
                     Trinity.AbilityLastUsedCache[SNOPower.Barbarian_FuriousCharge] = DateTime.Now;
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Furious Charge for OOC movement, distance={0}", DestinationDistance);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Furious Charge for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
                 // Vault for a DH - maximum set by user-defined setting
@@ -579,7 +579,7 @@ namespace Trinity.DbProvider
                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
                     Trinity.AbilityLastUsedCache[SNOPower.DemonHunter_Vault] = DateTime.Now;
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Vault for OOC movement, distance={0}", DestinationDistance);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Vault for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
                 // Tempest rush for a monk
@@ -629,7 +629,7 @@ namespace Trinity.DbProvider
                             });
 
                             if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Tempest Rush for OOC movement, distance={0:0} spirit={1:0} cd={2} lastUse={3:0} V3={4} vAim={5}",
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Tempest Rush for OOC movement, distance={0:0} spirit={1:0} cd={2} lastUse={3:0} V3={4} vAim={5}",
                                     DestinationDistance, Trinity.PlayerStatus.PrimaryResource, PowerManager.CanCast(SNOPower.Monk_TempestRush), lastUse, vMoveToTarget, vTargetAimPoint);
                             return;
                         }
@@ -639,7 +639,7 @@ namespace Trinity.DbProvider
                     else
                     {
                         if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement,
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement,
                             "Tempest rush failed!: {0:00.0} / {1} distance: {2:00.0} / {3} Raycast: {4} MS: {5:0.0} lastUse={6:0}",
                             Trinity.PlayerStatus.PrimaryResource,
                             Trinity.Settings.Combat.Monk.TR_MinSpirit,
@@ -680,7 +680,7 @@ namespace Trinity.DbProvider
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
                     Trinity.AbilityLastUsedCache[SNOPower.Wizard_Teleport] = DateTime.Now;
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Teleport for OOC movement, distance={0}", DestinationDistance);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Teleport for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
                 // Archon Teleport for a wizard 
@@ -695,7 +695,7 @@ namespace Trinity.DbProvider
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
                     Trinity.AbilityLastUsedCache[SNOPower.Wizard_Archon_Teleport] = DateTime.Now;
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Archon Teleport for OOC movement, distance={0}", DestinationDistance);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Archon Teleport for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
             }
@@ -706,7 +706,7 @@ namespace Trinity.DbProvider
                 ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
 
                 if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Moved to:{0} dir: {1} Speed:{2:0.00} Dist:{3:0} ZDiff:{4:0} Nav:{5} LoS:{6}",
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Moved to:{0} dir: {1} Speed:{2:0.00} Dist:{3:0} ZDiff:{4:0} Nav:{5} LoS:{6}",
                         vMoveToTarget, MathUtil.GetHeadingToPoint(vMoveToTarget), MovementSpeed, vMyCurrentPosition.Distance2D(vMoveToTarget),
                         Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z),
                         Trinity.MainGridProvider.CanStandAt(Trinity.MainGridProvider.WorldToGrid(vMoveToTarget.ToVector2())),
@@ -717,7 +717,7 @@ namespace Trinity.DbProvider
             else
             {
                 if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Reached MoveTowards Destination {0} Current Speed: {1:0.0}", vMoveToTarget, MovementSpeed);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Reached MoveTowards Destination {0} Current Speed: {1:0.0}", vMoveToTarget, MovementSpeed);
             }
 
 
@@ -743,7 +743,7 @@ namespace Trinity.DbProvider
                 vShiftedPosition = vMoveToTarget;
                 iShiftPositionFor = 3000;
                 lastShiftedPosition = DateTime.Now;
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Navigation handler position shift to: " + vMoveToTarget.ToString() + " (was " + point.ToString() + ")");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Navigation handler position shift to: " + vMoveToTarget.ToString() + " (was " + point.ToString() + ")");
             }
         }
 
@@ -802,9 +802,9 @@ namespace Trinity.DbProvider
                 if (distanceToTarget <= 5f || MoveTargetIsInLoS)
                 {
                     if (distanceToTarget <= 5f)
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Destination within 5f, using MoveTowards", true);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Destination within 5f, using MoveTowards", true);
                     else
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Destination within LoS, using MoveTowards", true);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Destination within LoS, using MoveTowards", true);
                     Navigator.PlayerMover.MoveTowards(moveTarget);
                     return MoveResult.Moved;
                 }

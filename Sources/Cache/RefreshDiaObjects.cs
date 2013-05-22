@@ -81,7 +81,7 @@ namespace Trinity
                         {
                             if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                             {
-                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting Avoidance: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}",
+                                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting Avoidance: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}",
                                     vAnySafePoint, vAnySafePoint.Distance(Me.Position), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
                                     PlayerStatus.CurrentHealthPct, PlayerKiteDistance);
                             }
@@ -130,7 +130,7 @@ namespace Trinity
                                             RadiusDistance = 2f,
                                             InternalName = "StayPutPoint"
                                         };
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Staying Put During Avoidance");
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Staying Put During Avoidance");
                 }
                 using (new PerformanceLogger("RefreshDiaObjectCache.FinalChecks"))
                 {
@@ -162,7 +162,7 @@ namespace Trinity
                     if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
                     {
                         RecordTargetHistory();
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Found New Target - {0} CurrentTargetRactorGUID: {1} CurrentTarget.RActorGuid: {2}",
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Found New Target - {0} CurrentTargetRactorGUID: {1} CurrentTarget.RActorGuid: {2}",
                                         DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
                         dateSincePickedTarget = DateTime.Now;
                         iTargetLastHealth = 0f;
@@ -175,7 +175,7 @@ namespace Trinity
                             // Check if the health has changed, if so update the target-pick time before we blacklist them again
                             if (CurrentTarget.HitPointsPct != iTargetLastHealth)
                             {
-                                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Keeping Target {0} - CurrentTarget.iHitPoints: {1:0.00}  iTargetLastHealth: {2:0.00} ",
+                                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Keeping Target {0} - CurrentTarget.iHitPoints: {1:0.00}  iTargetLastHealth: {2:0.00} ",
                                                 CurrentTarget.RActorGuid, CurrentTarget.HitPointsPct, iTargetLastHealth);
                                 dateSincePickedTarget = DateTime.Now;
                             }
@@ -203,7 +203,7 @@ namespace Trinity
                     DiaUnit unit = CurrentTarget.Unit;
                     if (unit.IsDead)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget is dead, setting null");
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget is dead, setting null");
                         CurrentTarget = null;
                         forceUpdate = true;
                     }
@@ -212,19 +212,19 @@ namespace Trinity
                         CurrentTarget.Position = unit.Position;
                         CurrentTarget.HitPointsPct = unit.HitpointsCurrentPct;
                         CurrentTarget.HitPoints = unit.HitpointsCurrent;
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Updated CurrentTarget HitPoints={0:0.00} & Position={1}", CurrentTarget.HitPointsPct, CurrentTarget.Position);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Updated CurrentTarget HitPoints={0:0.00} & Position={1}", CurrentTarget.HitPointsPct, CurrentTarget.Position);
                     }
                 }
                 else if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit)
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget is invalid, setting null");
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget is invalid, setting null");
                     CurrentTarget = null;
                     forceUpdate = true;
                 }
             }
             catch
             {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Error updating current target information");
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Error updating current target information");
                 CurrentTarget = null;
                 forceUpdate = true;
             }
@@ -438,7 +438,7 @@ namespace Trinity
 
                                     unitExtras += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
                                 }
-                                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                     "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0} RAGuid: {13} {14}",
                                     duration,
                                     (AddToCache ? "Added " : "Ignored"),
@@ -460,9 +460,9 @@ namespace Trinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
                                 currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance);
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
 
                     }
                 }
@@ -560,7 +560,7 @@ namespace Trinity
                                         RadiusDistance = 2f,
                                         InternalName = "WaitForLootDrops"
                                     };
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Waiting for loot to drop, delay: {0}ms", Settings.Combat.Misc.DelayAfterKill);
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Waiting for loot to drop, delay: {0}ms", Settings.Combat.Misc.DelayAfterKill);
             }
             // Now see if we need to do any backtracking
             if (CurrentTarget == null && iTotalBacktracks >= 2 && Settings.Combat.Misc.AllowBacktracking && !PlayerStatus.IsInTown)
@@ -629,7 +629,7 @@ namespace Trinity
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Wizard_Archon) && !SNOPowerUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && ZetaDia.CurrentWorldId == 121214 &&
                 (Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for Wizard Archon cooldown before continuing to Azmodan.");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for Wizard Archon cooldown before continuing to Azmodan.");
                 CurrentTarget = new TrinityCacheObject()
                                     {
                                         Position = PlayerStatus.CurrentPosition,
@@ -644,7 +644,7 @@ namespace Trinity
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Witchdoctor_BigBadVoodoo) && !PowerManager.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && ZetaDia.CurrentWorldId == 121214 &&
                 (Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for WD BigBadVoodoo cooldown before continuing to Azmodan.");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for WD BigBadVoodoo cooldown before continuing to Azmodan.");
                 CurrentTarget = new TrinityCacheObject()
                                     {
                                         Position = PlayerStatus.CurrentPosition,
@@ -725,7 +725,7 @@ namespace Trinity
                         {
                             timeCancelledKiteMove = DateTime.Now;
                             cancelledKiteMoveForMilliseconds = 1500;
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kite movement failed, cancelling for {0:0}ms", cancelledKiteMoveForMilliseconds);
+                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kite movement failed, cancelling for {0:0}ms", cancelledKiteMoveForMilliseconds);
                             return;
                         }
                         else
@@ -740,7 +740,7 @@ namespace Trinity
 
                         if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         {
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
+                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
                                 vAnySafePoint, vAnySafePoint.Distance(PlayerStatus.CurrentPosition), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
                                 PlayerStatus.CurrentHealthPct, PlayerKiteDistance, monsterList.Count(),
                                 NeedToKite, TryToKite);
@@ -770,11 +770,11 @@ namespace Trinity
                 }
                 else if (!shouldEmergencyMove && NeedToKite)
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Emergency movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Emergency movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
                 }
                 else if (!shouldKite && TryToKite)
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kite movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kite movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
                 }
             }
         }

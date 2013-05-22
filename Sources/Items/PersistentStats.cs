@@ -284,7 +284,7 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "PersistentOutputReport exception: {0}", ex.ToString());
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "PersistentOutputReport exception: {0}", ex.ToString());
             }
 
             // Full Stats
@@ -300,7 +300,7 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "FullStats exception: {0}", ex.ToString());
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "FullStats exception: {0}", ex.ToString());
             }
 
             // Current World Stats
@@ -316,7 +316,7 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WorldStats exception: {0}", ex.ToString());
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WorldStats exception: {0}", ex.ToString());
             }
 
             // AggregateWorldStats
@@ -331,7 +331,7 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "AggregateWorldStats exception: {0}", ex.ToString());
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "AggregateWorldStats exception: {0}", ex.ToString());
             }
 
         }

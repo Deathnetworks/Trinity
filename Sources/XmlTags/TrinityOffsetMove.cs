@@ -58,7 +58,7 @@ namespace Trinity.XmlTags
             new PrioritySelector(
                 new Decorator(ret => Position.Distance2D(MyPos) <= PathPrecision || lastMoveResult == MoveResult.ReachedDestination,
                     new Sequence(
-                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Finished Offset Move x={0} y={1} position={3}", 
+                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Finished Offset Move x={0} y={1} position={3}", 
                             OffsetX, OffsetY, Position.Distance2D(MyPos), Position)),
                         new Action(ret => isDone = true)
                     )
@@ -69,14 +69,14 @@ namespace Trinity.XmlTags
 
         private void MoveToPostion()
         {
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Moving to offset x={0} y={1} distance={2:0} position={3}",
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Moving to offset x={0} y={1} distance={2:0} position={3}",
                         OffsetX, OffsetY, Position.Distance2D(MyPos), Position);
 
             lastMoveResult = PlayerMover.NavigateTo(Position);
 
             if (lastMoveResult == MoveResult.PathGenerationFailed)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error moving to offset x={0} y={1} distance={2:0} position={3}",
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error moving to offset x={0} y={1} distance={2:0} position={3}",
                            OffsetX, OffsetY, Position.Distance2D(MyPos), Position);
                 isDone = true;
             }
@@ -94,7 +94,7 @@ namespace Trinity.XmlTags
 
             if (PathPrecision == 0)
                 PathPrecision = 10f;
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "OffsetMove Initialized offset x={0} y={1} distance={2:0} position={3}",
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "OffsetMove Initialized offset x={0} y={1} distance={2:0} position={3}",
                        OffsetX, OffsetY, Position.Distance2D(MyPos), Position);
 
         }

@@ -191,7 +191,7 @@ namespace Trinity
                 }
                 catch
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", c_InternalName, c_ActorSNO);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting gold pile amount for item {0} [{1}]", c_InternalName, c_ActorSNO);
                     AddToCache = false;
                     c_IgnoreSubStep = "GetAttributeException";
                 }

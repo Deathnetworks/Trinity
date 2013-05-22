@@ -64,9 +64,9 @@ namespace Trinity
                     }
                     catch (Exception ex)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monsterinfo and monstertype for unit {0} [{1}]", c_InternalName, c_ActorSNO);
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "ActorTypeAttempt={0}", c_diaUnit.ActorType);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monsterinfo and monstertype for unit {0} [{1}]", c_InternalName, c_ActorSNO);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "ActorTypeAttempt={0}", c_diaUnit.ActorType);
                         AddToCache = false;
                     }
                 }
@@ -154,8 +154,8 @@ namespace Trinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monstersize info for unit {0} [{1}]", c_InternalName, c_ActorSNO);
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monstersize info for unit {0} [{1}]", c_InternalName, c_ActorSNO);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                     return AddToCache;
                 }
@@ -169,8 +169,8 @@ namespace Trinity
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for unit {0} [{1}]", c_InternalName, c_ActorSNO);
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for unit {0} [{1}]", c_InternalName, c_ActorSNO);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                     return AddToCache;
                 }
@@ -442,8 +442,8 @@ namespace Trinity
                 catch (Exception ex)
                 {
                     affixFlags = MonsterAffixes.None;
-                    DbHelper.Log(LogCategory.CacheManagement, "Handled Exception getting affixes for Monster SNO={0} Name={1} RAGuid={2}", c_ActorSNO, c_InternalName, c_RActorGuid);
-                    DbHelper.Log(LogCategory.CacheManagement, ex.ToString());
+                    Logger.Log(LogCategory.CacheManagement, "Handled Exception getting affixes for Monster SNO={0} Name={1} RAGuid={2}", c_ActorSNO, c_InternalName, c_RActorGuid);
+                    Logger.Log(LogCategory.CacheManagement, ex.ToString());
                 }
             }
             c_unit_IsElite = affixFlags.HasFlag(MonsterAffixes.Elite);

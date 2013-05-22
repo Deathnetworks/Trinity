@@ -89,7 +89,7 @@ namespace Trinity
         /// <summary>
         /// Dictionary of Actor SNO's and cooresponding weighting/Priority 
         /// </summary>
-        public static Dictionary<int, int> MonsterCustomWeights { get { return MonsterCustomWeights; } }
+        public static Dictionary<int, int> MonsterCustomWeights { get { return monsterCustomWeights; } }
         private static Dictionary<int, int> monsterCustomWeights = new Dictionary<int, int> {
             // Wood wraiths all this line (495 & 496 & 6572 & 139454 & 139456 & 170324 & 170325)
             {495, 901}, {496, 901}, {6572, 901}, {139454, 901}, {139456, 901}, {170324, 901}, {170325, 901},

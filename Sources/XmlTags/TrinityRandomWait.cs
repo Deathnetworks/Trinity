@@ -30,7 +30,7 @@ namespace Trinity.XmlTags
             Sequence RandomWaitSequence = new Sequence(
                 new Action(ret => delay = new Random().Next(minDelay, maxDelay)),
                 new Action(ret => statusText = String.Format("[XML Tag] Trinity Random Wait - Taking a break for {0:3} seconds.", delay)),
-                new Action(ret => DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, statusText)),
+                new Action(ret => Logger.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, statusText)),
                 new Action(ctx => DoRandomWait(ctx)),
                 new Action(ret => isDone = true)
             );

@@ -91,7 +91,7 @@ namespace Trinity
                         bPreStashPauseDone = false;
                         if (Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
                         {
-                            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
+                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
                         }
                     }
                     Trinity.IsReadyToTownRun = true;
@@ -106,7 +106,7 @@ namespace Trinity
                     Vector2 ValidLocation = Trinity.FindValidBackpackLocation(true);
                     if (ValidLocation.X < 0 || ValidLocation.Y < 0)
                     {
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, now running town-run routine.");
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, now running town-run routine.");
                         if (!bLastTownRunCheckResult)
                         {
                             bPreStashPauseDone = false;
@@ -122,7 +122,7 @@ namespace Trinity
                         {
                             if (tempitem.DurabilityPercent <= Zeta.CommonBot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow)
                             {
-                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Items may need repair, now running town-run routine.");
+                                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Items may need repair, now running town-run routine.");
                                 if (!bLastTownRunCheckResult)
                                 {
                                     bPreStashPauseDone = false;
@@ -166,7 +166,7 @@ namespace Trinity
                     string cantUseTPreason = String.Empty;
                     if (!ZetaDia.Me.CanUseTownPortal(out cantUseTPreason))
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "It appears we need to town run but can't: {0}", cantUseTPreason);
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "It appears we need to town run but can't: {0}", cantUseTPreason);
                         Trinity.IsReadyToTownRun = false;
                     }
                 }
@@ -226,8 +226,8 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(LogCategory.UserInformation, "Exception while checking for TownPortal!");
-                DbHelper.Log(LogCategory.GlobalHandler, ex.ToString());
+                Logger.Log(LogCategory.UserInformation, "Exception while checking for TownPortal!");
+                Logger.Log(LogCategory.GlobalHandler, ex.ToString());
             }
             if (ProfileManager.CurrentProfileBehavior != null)
             {
@@ -488,11 +488,11 @@ namespace Trinity
                         sLegendaryString = " {legendary item}";
 
                         // Change made by bombastic
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+=+=+=+=+=+=+=+=+ LEGENDARY FOUND +=+=+=+=+=+=+=+=+");
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Name:       {0} ({1})", acdItem.RealName, itemType);
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Score:       {0:0}", itemValue);
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Attributes: {0}", ValueItemStatString);
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+=+=+=+=+=+=+=+=+ LEGENDARY FOUND +=+=+=+=+=+=+=+=+");
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Name:       {0} ({1})", acdItem.RealName, itemType);
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Score:       {0:0}", itemValue);
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Attributes: {0}", ValueItemStatString);
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
                     }
                     else
                     {
@@ -516,7 +516,7 @@ namespace Trinity
             }
             catch (IOException)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error: File access error for stash log file.");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error: File access error for stash log file.");
                 if (LogStream != null)
                     LogStream.Close();
             }
@@ -554,7 +554,7 @@ namespace Trinity
             }
             catch (IOException)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error: File access error for junk log file.");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error: File access error for junk log file.");
                 if (LogStream != null)
                     LogStream.Close();
             }
@@ -616,12 +616,12 @@ namespace Trinity
             }
             catch
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure getting your player data from DemonBuddy, abandoning the sort!");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure getting your player data from DemonBuddy, abandoning the sort!");
                 return;
             }
             if (iPlayerDynamicID == -1)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure getting your player data, abandoning the sort!");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure getting your player data, abandoning the sort!");
                 return;
             }
 
@@ -682,8 +682,8 @@ namespace Trinity
                 }
                 else if (item.IsTwoSquareItem && (inventoryRow == 19 || inventoryRow == 9 || inventoryRow == 29))
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: There was an error reading your stash, abandoning the process.");
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Always make sure you empty your backpack, open the stash, then RESTART DEMONBUDDY before sorting!");
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: There was an error reading your stash, abandoning the process.");
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Always make sure you empty your backpack, open the stash, then RESTART DEMONBUDDY before sorting!");
                     return;
                 }
                 CachedACDItem thiscacheditem = new CachedACDItem(item, item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId,
@@ -760,7 +760,7 @@ namespace Trinity
                 vFreeSlot = SortingFindLocationStash(thisstashsort.IsTwoSlot, false);
                 if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure trying to put things back into stash, no stash slots free? Abandoning...");
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure trying to put things back into stash, no stash slots free? Abandoning...");
                     return;
                 }
                 ZetaDia.Me.Inventory.MoveItem(thisstashsort.DynamicID, iPlayerDynamicID, InventorySlot.PlayerSharedStash, (int)vFreeSlot.X, (int)vFreeSlot.Y);
@@ -784,7 +784,7 @@ namespace Trinity
                 thisstashsort.InventoryColumn = (int)vFreeSlot.X;
                 Thread.Sleep(150);
             }
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Stash sorted!");
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Stash sorted!");
         }
 
     }

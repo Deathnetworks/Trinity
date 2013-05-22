@@ -6,7 +6,7 @@ namespace Trinity.Technicals
     /// <summary>
     /// Utilities help developer interact with DemonBuddy
     /// </summary>
-    internal static class DbHelper
+    internal static class Logger
     {
         /// <summary>Logs the specified level.</summary>
         /// <param name="level">The logging level.</param>
@@ -17,7 +17,7 @@ namespace Trinity.Technicals
         {
             if (category == LogCategory.UserInformation || level >= TrinityLogLevel.Error || (Trinity.Settings != null && Trinity.Settings.Advanced.LogCategories.HasFlag(category)))
             {
-                string msg = string.Format("[Trinity]{0}{1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
+                string msg = string.Format("[Trinity] {0} {1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
                 if (level == TrinityLogLevel.Critical)
                 {
                     Logging.Write(ConvertToLogLevel(level), Colors.Red, msg, args);

@@ -102,7 +102,7 @@ namespace Trinity.Cache
                 if (MaxRefreshRate != value)
                 {
                     _MaxRefreshRate = value;
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "Your refresh rate on cache have been set to {0}.", value);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "Your refresh rate on cache have been set to {0}.", value);
                 }
             }
         }
@@ -174,7 +174,7 @@ namespace Trinity.Cache
                         cacheObject = _Cache[acdGuid];
                         if (CacheObjectRefresher == null)
                         {
-                            DbHelper.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "You haven't defined CacheObjectRefresher before calling GetObject");
+                            Logger.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "You haven't defined CacheObjectRefresher before calling GetObject");
                         }
                         else
                         {
@@ -254,7 +254,7 @@ namespace Trinity.Cache
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "An error occured in Cache Maintenance system: {0}", ex);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "An error occured in Cache Maintenance system: {0}", ex);
                 }
             }
         }

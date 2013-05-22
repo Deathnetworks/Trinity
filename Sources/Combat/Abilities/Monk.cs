@@ -9,6 +9,7 @@ using Trinity.Settings.Combat;
 using Zeta;
 using Trinity.DbProvider;
 using Zeta.CommonBot.Profile.Common;
+using Trinity.Combat.Abilities;
 
 namespace Trinity
 {
@@ -368,15 +369,10 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, NO_WAIT_ANIM);
             }
             // Default attacks
-            if (!UseOOCBuff && !IsCurrentlyAvoiding)
-            {
-                Monk_TickSweepingWindSpam();
-                return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
-            }
-            return new TrinityPower(SNOPower.None, -1, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            return CombatBase.GetDefaultPower();
         }
 
-        private static void Monk_TickSweepingWindSpam()
+        internal static void Monk_TickSweepingWindSpam()
         {
             if (GetHasBuff(SNOPower.Monk_SweepingWind) && DateTime.Now.Subtract(SweepWindSpam).TotalMilliseconds < 5500)
                 SweepWindSpam = DateTime.Now;
@@ -388,7 +384,7 @@ namespace Trinity
             vSideToSideTarget = TargetUtil.GetZigZagTarget(CurrentTarget.Position, fExtraDistance);
             double direction = MathUtil.FindDirectionRadian(PlayerStatus.CurrentPosition, vSideToSideTarget);
             vSideToSideTarget = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 40f, (float)direction);
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Generated ZigZag {0} distance {1:0}", vSideToSideTarget, vSideToSideTarget.Distance2D(PlayerStatus.CurrentPosition));
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Generated ZigZag {0} distance {1:0}", vSideToSideTarget, vSideToSideTarget.Distance2D(PlayerStatus.CurrentPosition));
             iACDGUIDLastWhirlwind = CurrentTarget.ACDGuid;
             lastChangedZigZag = DateTime.Now;
         }
@@ -407,7 +403,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Monk_CripplingWave, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Monk_WayOfTheHundredFists))
                 return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            return new TrinityPower(SNOPower.Weapon_Melee_Instant, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            return CombatBase.GetDefaultPower();
         }
         /// <summary>
         /// Returns true if we have a mantra and it's up, or if we don't have a Mantra at all
@@ -543,7 +539,7 @@ namespace Trinity
         private static void Monk_TempestRushStatus(string trUse)
         {
 
-            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0}, xyz={4} spirit={1:0} cd={2} lastUse={3:0}",
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0}, xyz={4} spirit={1:0} cd={2} lastUse={3:0}",
                 trUse,
                 Trinity.PlayerStatus.PrimaryResource, PowerManager.CanCast(SNOPower.Monk_TempestRush),
                 TimeSinceUse(SNOPower.Monk_TempestRush), vSideToSideTarget);

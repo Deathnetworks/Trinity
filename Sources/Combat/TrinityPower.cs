@@ -7,7 +7,7 @@ namespace Trinity
     /// <summary>
     /// TrinityPower - used when picking a power and where/how to use it
     /// </summary>
-    internal class TrinityPower : IEquatable<TrinityPower>
+    public class TrinityPower : IEquatable<TrinityPower>
     {
         // 100 == 10 tps or 1/10th a second
         // 66 == 15 tps or 1/15th a second
@@ -134,6 +134,16 @@ namespace Trinity
         public TrinityPower()
         {
             this.PowerAssignmentTime = DateTime.Now;
+
+            // default values
+            SNOPower = SNOPower.None;
+            MinimumRange = 0f;
+            TargetPosition = Vector3.Zero;
+            TargetDynamicWorldId = -1;
+            TargetRActorGUID = -1;
+            WaitTicksBeforeUse = 0;
+            WaitTicksAfterUse = 0;
+            WaitForAnimationFinished = false;
         }
 
         /// <summary>

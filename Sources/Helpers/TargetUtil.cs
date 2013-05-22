@@ -289,7 +289,7 @@ namespace Trinity
                         var clusterPoint = TargetUtil.GetBestClusterPoint(ringDistance, ringDistance, false);
                         if (clusterPoint.Distance2D(PlayerStatus.CurrentPosition) >= minDistance)
                         {
-                            DbHelper.Log(LogCategory.Movement, "Returning ZigZag: BestClusterPoint {0} r-dist={1} t-dist={2}", clusterPoint, ringDistance, clusterPoint.Distance2D(PlayerStatus.CurrentPosition));
+                            Logger.Log(LogCategory.Movement, "Returning ZigZag: BestClusterPoint {0} r-dist={1} t-dist={2}", clusterPoint, ringDistance, clusterPoint.Distance2D(PlayerStatus.CurrentPosition));
                             return clusterPoint;
                         }
                         IEnumerable<TrinityCacheObject> zigZagTargets =
@@ -302,7 +302,7 @@ namespace Trinity
                             zigZagPoint = zigZagTargets.OrderByDescending(u => u.CentreDistance).FirstOrDefault().Position;
                             if (NavHelper.CanRayCast(zigZagPoint) && zigZagPoint.Distance2D(PlayerStatus.CurrentPosition) >= minDistance)
                             {
-                                DbHelper.Log(LogCategory.Movement, "Returning ZigZag: TargetBased {0} r-dist={1} t-dist={2}", zigZagPoint, ringDistance, zigZagPoint.Distance2D(PlayerStatus.CurrentPosition));
+                                Logger.Log(LogCategory.Movement, "Returning ZigZag: TargetBased {0} r-dist={1} t-dist={2}", zigZagPoint, ringDistance, zigZagPoint.Distance2D(PlayerStatus.CurrentPosition));
                                 return zigZagPoint;
                             }
                         }
@@ -371,7 +371,7 @@ namespace Trinity
                             if (monsterCount > 0)
                                 pointWeight *= monsterCount;
 
-                            DbHelper.Log(LogCategory.Movement, "ZigZag Point: {0} distance={1:0} distaceFromTarget={2:0} intersectsPath={3} weight={4:0} monsterCount={5}",
+                            Logger.Log(LogCategory.Movement, "ZigZag Point: {0} distance={1:0} distaceFromTarget={2:0} intersectsPath={3} weight={4:0} monsterCount={5}",
                                 zigZagPoint, distanceToPoint, distanceFromTargetToPoint, intersectsPath, pointWeight, monsterCount);
 
                             // Use this one if it's more weight, or we haven't even found one yet, or if same weight as another with a random chance
@@ -390,7 +390,7 @@ namespace Trinity
                             }
                         }
                     }
-                    DbHelper.Log(LogCategory.Movement, "Returning ZigZag: RandomXY {0} r-dist={1} t-dist={2}", bestLocation, ringDistance, bestLocation.Distance2D(PlayerStatus.CurrentPosition));
+                    Logger.Log(LogCategory.Movement, "Returning ZigZag: RandomXY {0} r-dist={1} t-dist={2}", bestLocation, ringDistance, bestLocation.Distance2D(PlayerStatus.CurrentPosition));
                     return bestLocation;
                 }
             }

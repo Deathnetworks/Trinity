@@ -28,7 +28,7 @@ namespace Trinity
         /// </summary>
         /// <param name="ret"></param>
         /// <returns></returns>
-        internal static bool CheckHasTarget(object ret)
+        internal static bool TargetCheck(object ret)
         {
             using (new PerformanceLogger("Trinity.CheckHasTarget"))
             {
@@ -61,7 +61,7 @@ namespace Trinity
                     }
                     catch
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.GlobalHandler, "Safely handled exception trying to get character class.");
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.GlobalHandler, "Safely handled exception trying to get character class.");
                     }
 
                     PlayerInfoCache.RefreshHotbar();
@@ -214,7 +214,7 @@ namespace Trinity
                         if (powerBuff.SNOPower != SNOPower.None)
                         {
                             WaitWhileAnimating(4, true);
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", powerBuff.SNOPower.ToString());
+                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", powerBuff.SNOPower.ToString());
                             if (powerBuff.WaitTicksBeforeUse > 0)
                                 BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitBeforeUseDelay));
                             ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetRActorGUID);
@@ -251,7 +251,7 @@ namespace Trinity
 
                 if ((Trinity.ForceVendorRunASAP || Trinity.IsReadyToTownRun) && TownRun.TownRunTimerRunning())
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for town run timer", true);
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for town run timer", true);
                     return true;
                 }
 

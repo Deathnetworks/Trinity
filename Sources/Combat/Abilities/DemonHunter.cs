@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Trinity.Combat.Abilities;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -252,12 +253,9 @@ namespace Trinity
             {
                 return new TrinityPower(SNOPower.DemonHunter_Grenades, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
+
             // Default attacks
-            if (!UseOOCBuff && !IsCurrentlyAvoiding)
-            {
-                return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), Vector3.Zero, CurrentWorldDynamicId, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
-            }
-            return new TrinityPower(SNOPower.None, -1, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            return CombatBase.GetDefaultPower();
         }
 
         private static bool DHHasNoPrimary()
@@ -286,7 +284,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 15f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.DemonHunter_EvasiveFire) && PlayerStatus.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.DemonHunter_EvasiveFire, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            return new TrinityPower(SNOPower.Weapon_Ranged_Instant, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
+            return CombatBase.GetDefaultPower();
         }
     }
 }

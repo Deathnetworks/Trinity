@@ -21,7 +21,7 @@ namespace Trinity
         private static void ReplaceTreeHooks()
         {
             // This is the do-all-be-all god-head all encompasing piece of trinity
-            TreeHooks.Instance.ReplaceHook("Combat", new Decorator(ctx => CheckHasTarget(ctx), HandleTargetAction()));
+            TreeHooks.Instance.ReplaceHook("Combat", new Decorator(ctx => TargetCheck(ctx), HandleTargetAction()));
 
             // We still want the main VendorRun logic, we're just going to take control of *when* this logic kicks in
             PrioritySelector VendorRunPrioritySelector = (TreeHooks.Instance.Hooks["VendorRun"][0] as Decorator).Children[0] as PrioritySelector;
@@ -36,22 +36,22 @@ namespace Trinity
         {
             if (!IsPluginEnabled && bot != null)
             {
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "\tWARNING: Trinity Plugin is NOT YET ENABLED. Bot start detected");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "\tIgnore this message if you are not currently using Trinity.");
+                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "\tWARNING: Trinity Plugin is NOT YET ENABLED. Bot start detected");
+                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "\tIgnore this message if you are not currently using Trinity.");
                 return;
             }
 
             if (BotMain.IsRunning &&
                 (!Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("trinity"))) 
             {
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Found Routine: {0}", Zeta.CommonBot.RoutineManager.Current.Name);
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "######################################");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "ERROR: You are not using the Trinity Combat Routine!");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "You MUST download and select the Trinity Combat Routine");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "http://www.thebuddyforum.com/demonbuddy-forum/plugins/trinity/93720-trinity-download-here.html");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Trinity will NOT work with any other combat routine");
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "######################################");
+                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Found Routine: {0}", Zeta.CommonBot.RoutineManager.Current.Name);
+                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "######################################");
+                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "ERROR: You are not using the Trinity Combat Routine!");
+                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "You MUST download and select the Trinity Combat Routine");
+                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "http://www.thebuddyforum.com/demonbuddy-forum/plugins/trinity/93720-trinity-download-here.html");
+                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "");
+                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Trinity will NOT work with any other combat routine");
+                Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "######################################");
                 BotMain.Stop();
             }
 
@@ -64,12 +64,12 @@ namespace Trinity
             if (Settings.Advanced.TPSEnabled)
             {
                 BotMain.TicksPerSecond = (int)Settings.Advanced.TPSLimit;
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Bot TPS set to {0}", (int)Settings.Advanced.TPSLimit);
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Bot TPS set to {0}", (int)Settings.Advanced.TPSLimit);
             }
             else
             {
                 BotMain.TicksPerSecond = 10;
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Reset bot TPS to default", (int)Settings.Advanced.TPSLimit);
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Reset bot TPS to default", (int)Settings.Advanced.TPSLimit);
             }
         }
 
@@ -90,12 +90,12 @@ namespace Trinity
             if (Settings.Advanced.UnstuckerEnabled)
             {
                 Navigator.StuckHandler = new StuckHandler();
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Trinity Unstucker", true);
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Trinity Unstucker", true);
             }
             else
             {
                 Navigator.StuckHandler = new Zeta.Navigation.DefaultStuckHandler();
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Default Demonbuddy Unstucker", true);
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Default Demonbuddy Unstucker", true);
             }
         }
 

@@ -43,7 +43,7 @@ namespace Trinity.XmlTags
             }
             catch (Exception exception)
             {
-                DbHelper.Log(TrinityLogLevel.Error, LogCategory.ProfileTag, ScriptManager.FormatSyntaxErrorException(exception)); 
+                Logger.Log(TrinityLogLevel.Error, LogCategory.ProfileTag, ScriptManager.FormatSyntaxErrorException(exception)); 
                 BotMain.Stop(false, "");
                 throw;
             }

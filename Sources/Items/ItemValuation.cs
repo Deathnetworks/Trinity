@@ -66,11 +66,11 @@ namespace Trinity
             // Make sure we got a valid item here, otherwise score it a big fat 0
             if (IsInvalidItem)
             {
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "-- Invalid Item Type or Unidentified?");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "-- Invalid Item Type or Unidentified?");
                 return 0;
             }
 
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "NEXT ITEM= " + item.RealName + " - " + item.InternalName + " [" + baseItemType.ToString() + " - " + itemType.ToString() + "]");
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "NEXT ITEM= " + item.RealName + " - " + item.InternalName + " [" + baseItemType.ToString() + " - " + itemType.ToString() + "]");
 
             ResetValuationStatStrings();
 
@@ -140,7 +140,7 @@ namespace Trinity
                     // Now multiply the "max points" value, by that percentage, as the start/basis of the scoring for this statistic
                     double iTempPoints = ItemMaxPoints[i] * itemStatRatio;
 
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "--- " + Constants.StatNames[i] + ": " + TempStatistic.ToString("0") + " out of " + ItemMaxStats[i].ToString() + " (" + ItemMaxPoints[i].ToString() + " * " + itemStatRatio.ToString("0.000") + " = " + iTempPoints.ToString("0") + ")");
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "--- " + Constants.StatNames[i] + ": " + TempStatistic.ToString("0") + " out of " + ItemMaxStats[i].ToString() + " (" + ItemMaxPoints[i].ToString() + " * " + itemStatRatio.ToString("0.000") + " = " + iTempPoints.ToString("0") + ")");
 
                     // Check if this statistic is over the "bonus threshold" array value for this stat - if it is, then it gets a score bonus when over a certain % of max-stat
                     if (itemStatRatio > Constants.BonusThreshold[i] && Constants.BonusThreshold[i] > 0f)
@@ -434,7 +434,7 @@ namespace Trinity
                             SpecialBonus *= 0.7;
 
                         if (SpecialBonus > 0)
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "------- special bonus =" + SpecialBonus.ToString(), true);
+                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "------- special bonus =" + SpecialBonus.ToString(), true);
 
                         FinalBonusGranted += SpecialBonus;
                     }
@@ -811,7 +811,7 @@ namespace Trinity
                     // If it's a primary stat, log the highest scoring primary... else add these points to the running total
                     if (i == Constants.DEXTERITY || i == Constants.STRENGTH || i == Constants.INTELLIGENCE)
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "---- +" + iTempPoints.ToString("0") + " (*" + FinalBonusGranted.ToString("0.00") + " multiplier) [MUST BE MAX STAT SCORE TO COUNT]", true);
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "---- +" + iTempPoints.ToString("0") + " (*" + FinalBonusGranted.ToString("0.00") + " multiplier) [MUST BE MAX STAT SCORE TO COUNT]", true);
 
                         if (iTempPoints > HighestScoringPrimary)
                         {
@@ -822,7 +822,7 @@ namespace Trinity
                     }
                     else
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "---- +" + iTempPoints.ToString("0") + " score (*" + FinalBonusGranted.ToString("0.00") + " multiplier)", true);
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "---- +" + iTempPoints.ToString("0") + " score (*" + FinalBonusGranted.ToString("0.00") + " multiplier)", true);
 
                         TotalItemPoints += iTempPoints;
                     }
@@ -858,7 +858,7 @@ namespace Trinity
                 TownRun.junkItemStatString = Constants.StatNames[WhichPrimaryIsHighest] + "=" + Math.Round(AmountHighestScoringPrimary).ToString() + ". " + TownRun.junkItemStatString;
 
             }
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "--- +" + TotalItemPoints.ToString("0") + " total score pre-special reductions. (GlobalMultiplier=" + GlobalMultiplier.ToString("0.000") + ")", true);
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "--- +" + TotalItemPoints.ToString("0") + " total score pre-special reductions. (GlobalMultiplier=" + GlobalMultiplier.ToString("0.000") + ")", true);
 
             // Global multiplier
             TotalItemPoints *= GlobalMultiplier;
@@ -1033,15 +1033,15 @@ namespace Trinity
                 }
             }
 
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "--- +" + TotalItemPoints.ToString("0") + " total score after special reductions. (TotalRequirements=" + TotalRequirements + ")", true);
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "--- +" + TotalItemPoints.ToString("0") + " total score after special reductions. (TotalRequirements=" + TotalRequirements + ")", true);
 
             GetBestFinalPoints(itemType);
 
             TotalItemPoints *= BestFinalBonus;
 
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "TOTAL: " + TotalItemPoints.ToString("0") + "(Final Bonus=" + BestFinalBonus.ToString("0.00") + ")");
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "TOTAL: " + TotalItemPoints.ToString("0") + "(Final Bonus=" + BestFinalBonus.ToString("0.00") + ")");
 
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "");
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "");
 
             return Math.Round(TotalItemPoints);
         }

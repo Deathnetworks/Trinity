@@ -26,7 +26,7 @@ namespace Trinity
 
             if (!UsedProfiles.Contains(currentProfile))
             {
-                DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "New profile found - updating TargetBlacklists");
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "New profile found - updating TargetBlacklists");
                 RefreshProfileBlacklists();
                 UsedProfiles.Add(currentProfile);
             }
@@ -61,7 +61,7 @@ namespace Trinity
             {
                 if (!DataDictionary.BlackListIds.Contains(b.ActorId))
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Adding Profile TargetBlacklist {0} to Trinity Blacklist", b.ActorId);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Adding Profile TargetBlacklist {0} to Trinity Blacklist", b.ActorId);
                     DataDictionary.AddToBlacklist(b.ActorId);
                 }
             }

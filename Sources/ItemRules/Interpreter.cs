@@ -87,9 +87,9 @@ namespace Trinity.ItemRules
 
             // read configuration file and item files now
             readConfiguration();
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " _______________________________________");
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ___-|: Darkfriend's Item Rules 2 :|-___");
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ___________________Rel.-v {0}_______", version);
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " _______________________________________");
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ___-|: Darkfriend's Item Rules 2 :|-___");
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, " ___________________Rel.-v {0}_______", version);
         }
 
         public void reset()
@@ -122,7 +122,7 @@ namespace Trinity.ItemRules
             }
             catch (Exception ex)
             {
-                DbHelper.Log(LogCategory.UserInformation, "{0}", ex.ToString());
+                Logger.Log(LogCategory.UserInformation, "{0}", ex.ToString());
             }
             return false;
         }
@@ -143,12 +143,12 @@ namespace Trinity.ItemRules
 
             // use Trinity setting
             if (Trinity.Settings.Loot.ItemRules.Debug)
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is running in debug mode!", logPickQuality);
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is using the {0} rule set.", Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is running in debug mode!", logPickQuality);
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is using the {0} rule set.", Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
             logPickQuality = getTrinityItemQualityFromString(Trinity.Settings.Loot.ItemRules.PickupLogLevel.ToString());
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "PICKLOG = {0} ", logPickQuality);
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "PICKLOG = {0} ", logPickQuality);
             logKeepQuality = getTrinityItemQualityFromString(Trinity.Settings.Loot.ItemRules.KeepLogLevel.ToString());
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "KEEPLOG = {0} ", logKeepQuality);
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "KEEPLOG = {0} ", logKeepQuality);
             
             string rulesPath;
             if (Trinity.Settings.Loot.ItemRules.ItemRuleSetPath.ToString() != String.Empty)
@@ -156,7 +156,7 @@ namespace Trinity.ItemRules
             else
                 rulesPath = Path.Combine(FileManager.ItemRulePath, "Rules", Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
 
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "RULEPATH = {0} ", rulesPath);
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "RULEPATH = {0} ", rulesPath);
 
             // fill translation dictionary
             nameToBalanceId = new Dictionary<string, string>();
@@ -171,7 +171,7 @@ namespace Trinity.ItemRules
 
             // parse pickup file
             pickUpRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, pickupFile)), pickUpRuleSet);
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Pickup rules",pickUpRuleSet.Count);
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Pickup rules",pickUpRuleSet.Count);
 
             // parse all item files
             foreach (TrinityItemQuality itemQuality in Enum.GetValues(typeof(TrinityItemQuality)))
@@ -182,12 +182,12 @@ namespace Trinity.ItemRules
                 if (File.Exists(filePath))
                 {
                     ruleSet = readLinesToArray(new StreamReader(filePath), ruleSet);
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} {1} rules", (ruleSet.Count - oldValue), itemQuality.ToString());
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} {1} rules", (ruleSet.Count - oldValue), itemQuality.ToString());
                 }
             }
             
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Macros", macroDic.Count);
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules loaded a total of {0} {1} rules!", ruleSet.Count, Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString());
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} Macros", macroDic.Count);
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules loaded a total of {0} {1} rules!", ruleSet.Count, Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString());
         }
 
         /// <summary>
@@ -235,7 +235,7 @@ namespace Trinity.ItemRules
                         }
                     }
                     if (!foundTranslation && Trinity.Settings.Loot.ItemRules.Debug)
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No translation found for rule: {0}", str);
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No translation found for rule: {0}", str);
                 }
 
                 array.Add(str);
@@ -564,7 +564,7 @@ namespace Trinity.ItemRules
             /// TODO remove this check if it isnt necessary anymore
             if (item.DBItemType == ItemType.Unknown && (item.Name.Contains("Plan") || item.Name.Contains("Design")))
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "There are still buggy itemType infos for craftingPlan around {0} has itemType = {1}", item.Name, item.DBItemType);
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "There are still buggy itemType infos for craftingPlan around {0} has itemType = {1}", item.Name, item.DBItemType);
                 result = ItemType.CraftingPlan.ToString();
             }
             else result = item.DBItemType.ToString();
@@ -623,7 +623,7 @@ namespace Trinity.ItemRules
             /// TODO remove this check if it isnt necessary anymore
             if (item.ItemType == ItemType.Unknown && item.Name.Contains("Plan"))
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "There are still buggy itemType infos for craftingPlan around {0} has itemType = {1}", item.Name, item.ItemType);
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "There are still buggy itemType infos for craftingPlan around {0} has itemType = {1}", item.Name, item.ItemType);
                 result = ItemType.CraftingPlan.ToString();
             }
             else result = item.ItemType.ToString();
@@ -788,7 +788,7 @@ namespace Trinity.ItemRules
             string balanceIDstr;
             if (!nameToBalanceId.TryGetValue(item.Name.Replace(" ", ""), out balanceIDstr) && !nameToBalanceId.ContainsValue(item.GameBalanceId.ToString()))
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Translation: Missing: " + item.GameBalanceId.ToString() + ";" + item.Name + " (ID is missing report)");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Translation: Missing: " + item.GameBalanceId.ToString() + ";" + item.Name + " (ID is missing report)");
                 // not found missing name
                 StreamWriter transFix = new StreamWriter(Path.Combine(FileManager.LoggingPath, transFixFile), true);
                 transFix.WriteLine("Missing: " + item.GameBalanceId.ToString() + ";" + item.Name);
@@ -796,7 +796,7 @@ namespace Trinity.ItemRules
             }
             else if (balanceIDstr != item.GameBalanceId.ToString())
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Translation: Wrong(" + balanceIDstr + "): " + item.GameBalanceId.ToString() + ";" + item.Name);
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Translation: Wrong(" + balanceIDstr + "): " + item.GameBalanceId.ToString() + ";" + item.Name);
                 // wrong reference
                 StreamWriter transFix = new StreamWriter(Path.Combine(FileManager.LoggingPath, transFixFile), true);
                 transFix.WriteLine("Wrong(" + balanceIDstr + "): " + item.GameBalanceId.ToString() + ";" + item.Name);

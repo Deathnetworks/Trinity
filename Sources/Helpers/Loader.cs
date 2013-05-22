@@ -82,7 +82,7 @@ namespace Trinity.Technicals
         /// <returns></returns>
         private static IDictionary<K, T> Load<K, T>(string filename, string name, string keyName, string valueName)
         {
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loading Dictionary file={0} name={1} keys={2} values={3}",filename, name, keyName, valueName);
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loading Dictionary file={0} name={1} keys={2} values={3}",filename, name, keyName, valueName);
             IDictionary<K, T> ret = new Dictionary<K, T>();
             if (File.Exists(filename))
             {
@@ -100,18 +100,18 @@ namespace Trinity.Technicals
                     
                     foreach (KeyValuePair<K, T> item in lst)
                     {
-                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Configuration, "Found dictionary item {0} = {1}", item.Key, item.Value);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Configuration, "Found dictionary item {0} = {1}", item.Key, item.Value);
                         ret.Add(item);
                     }
                 }
             }
             if (ret.Count > 0)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loaded Dictionary name={0} key={1} value={2} with {3} values", name, keyName, valueName, ret.Count);
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loaded Dictionary name={0} key={1} value={2} with {3} values", name, keyName, valueName, ret.Count);
             }
             else
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Attempted to load Dictionary name={0} key={1} value={2} but 0 values found!", name, keyName, valueName, ret.Count);
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Attempted to load Dictionary name={0} key={1} value={2} but 0 values found!", name, keyName, valueName, ret.Count);
             }
             return ret;
         }

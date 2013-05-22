@@ -52,15 +52,15 @@ namespace Trinity
                     }
                     else
                     {
-                        DbHelper.LogDebug("Unable to update Generic Cache Object {0}", obj);
+                        Logger.LogDebug("Unable to update Generic Cache Object {0}", obj);
                         return false;
                     }
                 }
             }
             catch (Exception ex)
             {
-                DbHelper.LogDebug("Unable to update Generic Cache Object {0}", obj);
-                DbHelper.LogDebug(ex.ToString(), false);
+                Logger.LogDebug("Unable to update Generic Cache Object {0}", obj);
+                Logger.LogDebug(ex.ToString(), false);
                 return false;
             }
         }
@@ -122,7 +122,7 @@ namespace Trinity
         {
             if (Manager == null || (Manager != null && !Manager.IsAlive))
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Starting up Generic Cache Manage thread");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Starting up Generic Cache Manage thread");
                 Manager = new Thread(Manage)
                 {
                     IsBackground = true,
@@ -157,8 +157,8 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Exception in Generic Cache Manager");
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, ex.ToString());
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Exception in Generic Cache Manager");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, ex.ToString());
             }
         }
 

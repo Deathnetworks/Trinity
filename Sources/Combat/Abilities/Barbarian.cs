@@ -6,6 +6,7 @@ using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
+using Trinity.Combat.Abilities;
 
 namespace Trinity
 {
@@ -27,7 +28,7 @@ namespace Trinity
             {
                 return new TrinityPower(SNOPower.Barbarian_IgnorePain, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
-            
+
             IsWaitingForSpecial = false;
 
             if (PlayerStatus.PrimaryResource < MinEnergyReserve)
@@ -35,7 +36,7 @@ namespace Trinity
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Earthquake) &&
                     ElitesWithinRange[RANGE_25] >= 1 && SNOPowerUseTimer(SNOPower.Barbarian_Earthquake) && !GetHasBuff(SNOPower.Barbarian_Earthquake))
                 {
-                    DbHelper.LogNormal("Waiting for Barbarian_Earthquake 1!");
+                    Logger.LogNormal("Waiting for Barbarian_Earthquake 1!");
                     IsWaitingForSpecial = true;
                 }
                 // Earthquake, elites close-range only
@@ -46,13 +47,13 @@ namespace Trinity
                 {
                     if (PlayerStatus.PrimaryResource >= 50)
                         return new TrinityPower(SNOPower.Barbarian_Earthquake, 13f, Vector3.Zero, CurrentWorldDynamicId, -1, 4, 4, WAIT_FOR_ANIM);
-                    DbHelper.LogNormal("Waiting for Barbarian_Earthquake 2!");
+                    Logger.LogNormal("Waiting for Barbarian_Earthquake 2!");
                     IsWaitingForSpecial = true;
                 }
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
                     ElitesWithinRange[RANGE_25] >= 1 && SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) && !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
                 {
-                    DbHelper.LogNormal("Waiting for Barbarian_WrathOfTheBerserker 1!");
+                    Logger.LogNormal("Waiting for Barbarian_WrathOfTheBerserker 1!");
                     IsWaitingForSpecial = true;
                 }
                 // Berserker special for ignore elites
@@ -60,13 +61,13 @@ namespace Trinity
                     (TargetUtil.AnyMobsInRange(25, 3) || TargetUtil.AnyMobsInRange(50, 10) || TargetUtil.AnyMobsInRange(Settings.Combat.Misc.TrashPackClusterRadius, Settings.Combat.Misc.TrashPackSize)) &&
                     SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) && !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
                 {
-                    DbHelper.LogNormal("Waiting for Barbarian_WrathOfTheBerserker 2!");
+                    Logger.LogNormal("Waiting for Barbarian_WrathOfTheBerserker 2!");
                     IsWaitingForSpecial = true;
                 }
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_CallOfTheAncients) &&
                     ElitesWithinRange[RANGE_25] >= 1 && SNOPowerUseTimer(SNOPower.Barbarian_CallOfTheAncients) && !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients))
                 {
-                    DbHelper.LogNormal("Waiting for Barbarian_CallOfTheAncients!");
+                    Logger.LogNormal("Waiting for Barbarian_CallOfTheAncients!");
                     IsWaitingForSpecial = true;
                 }
             }
@@ -92,14 +93,14 @@ namespace Trinity
             {
                 if (PlayerStatus.PrimaryResource >= 50)
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker being used!({0})", CurrentTarget.InternalName);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker being used!({0})", CurrentTarget.InternalName);
                     shouldUseBerserkerPower = false;
                     IsWaitingForSpecial = false;
                     return new TrinityPower(SNOPower.Barbarian_WrathOfTheBerserker, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 else
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker ready, waiting for fury...");
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker ready, waiting for fury...");
                     IsWaitingForSpecial = true;
                 }
             }
@@ -116,7 +117,7 @@ namespace Trinity
                 }
                 else
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Call of the Ancients ready, waiting for fury...");
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Call of the Ancients ready, waiting for fury...");
                     IsWaitingForSpecial = true;
                 }
             }
@@ -402,12 +403,9 @@ namespace Trinity
             {
                 return new TrinityPower(SNOPower.Barbarian_Cleave, 10f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 2, WAIT_FOR_ANIM);
             }
+
             // Default attacks
-            if (!UseOOCBuff && !IsCurrentlyAvoiding)
-            {
-                return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
-            }
-            return new TrinityPower(SNOPower.None, -1, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            return CombatBase.GetDefaultPower();
         }
 
         private static bool BarbHasNoPrimary()
@@ -431,7 +429,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Barbarian_Rend, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Barbarian_WeaponThrow) && PlayerStatus.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.Barbarian_WeaponThrow, 15f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            return new TrinityPower(SNOPower.Weapon_Melee_Instant, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            return CombatBase.GetDefaultPower();
         }
 
     }

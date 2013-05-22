@@ -301,7 +301,7 @@ namespace Trinity
                                             {
                                                 iTotalNumberGoblins++;
                                                 lastGoblinTime = DateTime.Now;
-                                                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Goblin #{0} in sight. Distance={1:0}", iTotalNumberGoblins, cacheObject.CentreDistance);
+                                                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Goblin #{0} in sight. Distance={1:0}", iTotalNumberGoblins, cacheObject.CentreDistance);
                                             }
                                             else
                                             {
@@ -616,7 +616,7 @@ namespace Trinity
                         cacheObject.Weight = 0;
                         ShouldStayPutDuringAvoidance = true;
                     }
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Weight,
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
                         "Weight={2:0} target= {0} ({1}) type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
                             cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsElite, cacheObject.RActorGuid, unitWeightInfo);
 
@@ -652,7 +652,7 @@ namespace Trinity
                             {
                                 foreach (CacheObstacleObject o in AvoidanceList)
                                 {
-                                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Avoidance: Id={0} Weight={1} Loc={2} Radius={3} Name={4}", o.ActorSNO, o.Weight, o.Location, o.Radius, o.Name);
+                                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Avoidance: Id={0} Weight={1} Loc={2} Radius={3} Name={4}", o.ActorSNO, o.Weight, o.Location, o.Radius, o.Name);
                                 }
 
                                 vKitePointAvoid = CurrentTarget.Position;
@@ -667,7 +667,7 @@ namespace Trinity
                 {
                     RecordTargetHistory();
 
-                    DbHelper.Log(TrinityLogLevel.Verbose,
+                    Logger.Log(TrinityLogLevel.Verbose,
                                     LogCategory.Targetting,
                                     "Target changed to name={2} sno={0} type={1} raGuid={3}",
                                     CurrentTarget.InternalName,
@@ -695,7 +695,7 @@ namespace Trinity
                 TrinityCacheObject cTarget = (TrinityCacheObject)GenericCache.GetObject(targetMd5Hash).Value;
                 if (!cTarget.IsBoss && cTarget.TimesBeenPrimaryTarget > 15 && !(cTarget.Type == GObjectType.Item && cTarget.ItemQuality >= ItemQuality.Legendary))
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Blacklisting target {0} ActorSNO={1} RActorGUID={2} due to possible stuck/flipflop!",
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Blacklisting target {0} ActorSNO={1} RActorGUID={2} due to possible stuck/flipflop!",
                         CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid);
 
                     hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);

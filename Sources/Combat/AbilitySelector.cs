@@ -146,12 +146,12 @@ namespace Trinity
                 // use IEquatable to check if they're equal
                 if (CurrentPower == power)
                 {
-                    DbHelper.Log(LogCategory.Behavior, "Keeping {0}", CurrentPower.ToString());
+                    Logger.Log(LogCategory.Behavior, "Keeping {0}", CurrentPower.ToString());
                     return CurrentPower;
                 }
                 else if (power != null)
                 {
-                    DbHelper.Log(LogCategory.Behavior, "Selected new {0}", power.ToString());
+                    Logger.Log(LogCategory.Behavior, "Selected new {0}", power.ToString());
                     return power;
                 }
                 else
@@ -171,58 +171,7 @@ namespace Trinity
 
         }
 
-        /// <summary>
-        /// Gets the default weapon power based on the current equipped primary weapon
-        /// </summary>
-        /// <returns></returns>
-        private static SNOPower GetDefaultWeaponPower()
-        {
-            ACDItem rhItem = ZetaDia.Me.Inventory.Equipped.Where(i => i.InventorySlot == InventorySlot.PlayerLeftHand).FirstOrDefault();
-            if (rhItem == null)
-                return SNOPower.None;
-
-            switch (rhItem.ItemType)
-            {
-                default:
-                    return SNOPower.Weapon_Melee_Instant;
-                case ItemType.Axe:
-                case ItemType.CeremonialDagger:
-                case ItemType.Dagger:
-                case ItemType.Daibo:
-                case ItemType.FistWeapon:
-                case ItemType.Mace:
-                case ItemType.Polearm:
-                case ItemType.Spear:
-                case ItemType.Staff:
-                case ItemType.Sword:
-                    return SNOPower.Weapon_Melee_Instant;
-                case ItemType.Wand:
-                    return SNOPower.Weapon_Ranged_Wand;
-                case ItemType.Bow:
-                case ItemType.Crossbow:
-                case ItemType.HandCrossbow:
-                    return SNOPower.Weapon_Ranged_Projectile;
-            }
-        }
-        /// <summary>
-        /// Gets the default weapon distance based on the current equipped primary weapon
-        /// </summary>
-        /// <returns></returns>
-        private static float GetDefaultWeaponDistance()
-        {
-            switch (GetDefaultWeaponPower())
-            {
-                case SNOPower.Weapon_Ranged_Instant:
-                case SNOPower.Weapon_Ranged_Projectile:
-                    return 65f;
-                case SNOPower.Weapon_Ranged_Wand:
-                    return 35f;
-                case SNOPower.Weapon_Melee_Instant:
-                case SNOPower.Weapon_Melee_Instant_BothHand:
-                default:
-                    return 10f;
-            }
-        }
+        
 
         /// <summary>
         /// Gets the time in Millseconds since we've used the specified power

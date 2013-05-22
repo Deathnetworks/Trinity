@@ -73,7 +73,7 @@ namespace Trinity
                 }
                 else
                 {
-                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0} don't have usage delay.", power);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0} don't have usage delay.", power);
                 }
             }
             return Zeta.CommonBot.PowerManager.CanCast(power);
@@ -118,7 +118,7 @@ namespace Trinity
                 }
                 else if (_ScheduledPowers.Any(sp => sp.Power == power))
                 {
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "You try to schedule 2 times same Power.");
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "You try to schedule 2 times same Power.");
                     return;
                 }
                 _ScheduledPowers.Add(new ScheduledPower()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
+using Zeta.Internals.SNO;
 
 namespace Trinity
 {
@@ -17,8 +18,18 @@ namespace Trinity
         /// Contains the time we last used a spell
         /// </summary>
         public static Dictionary<SNOPower, DateTime> AbilityLastUsedCache { get { return abilityLastUsedCache; } internal set { abilityLastUsedCache = value; } }
-        private static Dictionary<SNOPower, DateTime> abilityLastUsedCache = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
-        
+        private static Dictionary<SNOPower, DateTime> abilityLastUsedCache = new Dictionary<SNOPower, DateTime>();
+
+        /// <summary>
+        /// Special cache for monster types {ActorSNO, MonsterType}
+        /// </summary>
+        private static Dictionary<int, MonsterType> dictionaryStoredMonsterTypes = new Dictionary<int, MonsterType>();
+
+        /// <summary>
+        /// Special cache for Monster sizes {ActorSNO, MonsterSize}
+        /// </summary>
+        private static Dictionary<int, MonsterSize> dictionaryStoredMonsterSizes = new Dictionary<int, MonsterSize>();
+      
         /// <summary>
         /// Caches the ObjectType of each object as we find it (RactorGUID based)
         /// </summary>

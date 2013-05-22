@@ -90,13 +90,13 @@ namespace Trinity.XmlTags
             return new Sequence(
                 new Action(ret => Initialize()),
                 new Action(ret => RealignFileNames()),
-                new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: Found {0} Total Profiles, {1} Used Profiles, {2} Unused Profiles",
+                new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: Found {0} Total Profiles, {1} Used Profiles, {2} Unused Profiles",
                     Profiles.Count(), UsedProfiles.Count(), Profiles.Where(p => !UsedProfiles.Contains(p.FileName)).Count())),
                 new Action(ret => AvailableProfiles = (from p in Profiles where !UsedProfiles.Contains(p.FileName) && p.FileName != CurrentProfileName select p.FileName).ToArray()),
                 new PrioritySelector(
                     new Decorator(ret => AvailableProfiles.Length == 0,
                         new Sequence(
-                            new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: All available profiles have been used!", true)),
+                            new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: All available profiles have been used!", true)),
                             new Action(ret => lastUpdate = DateTime.Now.Ticks.GetHashCode()),
                             new Action(ret => isDone = true)
                         )
@@ -108,16 +108,16 @@ namespace Trinity.XmlTags
                             new PrioritySelector(
                                 new Decorator(ret => File.Exists(NextProfilePath),
                                     new Sequence(
-                                        new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: Loading next random profile: {0}", NextProfileName)),
+                                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: Loading next random profile: {0}", NextProfileName)),
                                         new Action(ret => UsedProfiles.Add(NextProfileName)),
                                         new Action(ret => ProfileManager.Load(NextProfilePath))
                                     )
                                 ),
-                                new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: ERROR: Profile {0} does not exist!", NextProfilePath))
+                                new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: ERROR: Profile {0} does not exist!", NextProfilePath))
                             )
                         )
                     ),
-                    new Action(ret => DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: Unkown error", true))
+                    new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: Unkown error", true))
                 )
            );
         }

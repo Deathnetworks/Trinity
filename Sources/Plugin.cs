@@ -74,7 +74,7 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                DbHelper.Log(LogCategory.UserInformation, "Exception in Pulse: {0}", ex.ToString());
+                Logger.Log(LogCategory.UserInformation, "Exception in Pulse: {0}", ex.ToString());
             }
         }
 
@@ -95,9 +95,9 @@ namespace Trinity
 
             if (!Directory.Exists(FileManager.PluginPath))
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error - cannot enable plugin. Invalid path: {0}", FileManager.PluginPath);
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Please check you have installed the plugin to the correct location, and then restart DemonBuddy and re-enable the plugin.");
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, @"Plugin should be installed to \<DemonBuddyFolder>\Plugins\Trinity\");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error - cannot enable plugin. Invalid path: {0}", FileManager.PluginPath);
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Please check you have installed the plugin to the correct location, and then restart DemonBuddy and re-enable the plugin.");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, @"Plugin should be installed to \<DemonBuddyFolder>\Plugins\Trinity\");
             }
             else
             {
@@ -140,7 +140,7 @@ namespace Trinity
 
                 TrinityPowerManager.LoadLegacyDelays();
 
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
             }
 
             if (StashRule != null)
@@ -167,9 +167,9 @@ namespace Trinity
             BotMain.OnStop -= PluginCheck;
             GameEvents.OnGameJoined -= TrinityOnJoinGame;
             GameEvents.OnGameLeft -= TrinityOnLeaveGame;
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DISABLED: Trinity is now shut down...");
-            DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DISABLED: Trinity is now shut down...");
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
             GenericCache.Shutdown();
             GenericBlacklist.Shutdown();
         }

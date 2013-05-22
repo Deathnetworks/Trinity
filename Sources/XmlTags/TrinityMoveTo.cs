@@ -39,7 +39,7 @@ namespace Trinity.XmlTags
 
         public override void OnStart()
         {
-            DbHelper.Log(LogCategory.UserInformation, "[TrinityMoveTo] Started Tag; {0} name=\"{1}\" questId=\"{2}\" stepId=\"{3}\" worldId=\"{4}\" levelAreaId=\"{5}\"",
+            Logger.Log(LogCategory.UserInformation, "[TrinityMoveTo] Started Tag; {0} name=\"{1}\" questId=\"{2}\" stepId=\"{3}\" worldId=\"{4}\" levelAreaId=\"{5}\"",
                 getPosition(), this.Name, this.QuestId, this.StepId, ZetaDia.CurrentWorldId, ZetaDia.CurrentLevelAreaId);
         }
 
@@ -62,7 +62,7 @@ namespace Trinity.XmlTags
                     {
                         if (thisObject.Location.Distance(Position) <= thisObject.Radius)
                         {
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, "Skipping ahead from moveto {0} to next moveto.", Position);
+                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, "Skipping ahead from moveto {0} to next moveto.", Position);
                             Trinity.bSkipAheadAGo = true;
                             return RunStatus.Success;
                         }

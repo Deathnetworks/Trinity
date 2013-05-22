@@ -23,7 +23,7 @@ namespace Trinity.XmlTags
 
         public override void OnStart()
         {
-            DbHelper.Log(LogCategory.UserInformation, "[TrinityInteract] Started Tag; snoid=\"{0}\" name=\"{1}\" questId=\"{2}\" stepId=\"{3}\" worldId=\"{4}\" levelAreaId=\"{5}\"",
+            Logger.Log(LogCategory.UserInformation, "[TrinityInteract] Started Tag; snoid=\"{0}\" name=\"{1}\" questId=\"{2}\" stepId=\"{3}\" worldId=\"{4}\" levelAreaId=\"{5}\"",
                 this.ActorId, this.Name, this.QuestId, this.StepId, ZetaDia.CurrentWorldId, ZetaDia.CurrentLevelAreaId);
         }
 
@@ -37,7 +37,7 @@ namespace Trinity.XmlTags
         {
             if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld || !ZetaDia.Me.IsValid)
             {
-                DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "TrinityInteract called during invalid bot state");
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "TrinityInteract called during invalid bot state");
                 return RunStatus.Success;
             }
 

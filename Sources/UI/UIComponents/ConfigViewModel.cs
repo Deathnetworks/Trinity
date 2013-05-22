@@ -50,7 +50,7 @@ namespace Trinity.UIComponents
                                         }
                                         catch (Exception ex)
                                         {
-                                            DbHelper.Log(LogCategory.UserInformation, "{0}", ex);
+                                            Logger.Log(LogCategory.UserInformation, "{0}", ex);
                                         }
                                     });
             OrderStashCommand = new RelayCommand(
@@ -63,7 +63,7 @@ namespace Trinity.UIComponents
                                         }
                                         catch (Exception ex)
                                         {
-                                            DbHelper.Log(LogCategory.UserInformation, "{0}", ex);
+                                            Logger.Log(LogCategory.UserInformation, "{0}", ex);
                                         }
 
                                     });
@@ -624,7 +624,7 @@ namespace Trinity.UIComponents
                 {
                     ItemRules.ItemRuleSetPath = directory;
 
-                    DbHelper.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loaded ItemRule Set {0}", ItemRules.ItemRuleSetPath);
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loaded ItemRule Set {0}", ItemRules.ItemRuleSetPath);
                 }
             }
         }
