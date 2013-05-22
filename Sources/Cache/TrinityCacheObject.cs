@@ -35,7 +35,7 @@ namespace Trinity
         public ItemBaseType DBItemBaseType { get; set; }
         public ItemType DBItemType { get; set; }
         public FollowerType FollowerType { get; set; }
-        public GItemType GilesItemType { get; set; }
+        public GItemType TrinityItemType { get; set; }
         // Monster/unit stuff
         public bool IsElite { get; set; }
         public bool IsRare { get; set; }
@@ -96,7 +96,7 @@ namespace Trinity
         // For cloning the object (and not simply referencing it)
         public TrinityCacheObject Clone()
         {
-            TrinityCacheObject newGilesObject = new TrinityCacheObject(Unit)
+            TrinityCacheObject clone = new TrinityCacheObject(Unit)
             {
                 Position = Position,
                 Type = Type,
@@ -117,7 +117,7 @@ namespace Trinity
                 DBItemBaseType = DBItemBaseType,
                 DBItemType = DBItemType,
                 FollowerType = FollowerType,
-                GilesItemType = GilesItemType,
+                TrinityItemType = TrinityItemType,
                 IsElite = IsElite,
                 IsRare = IsRare,
                 IsUnique = IsUnique,
@@ -133,7 +133,7 @@ namespace Trinity
                 ForceLeapAgainst = ForceLeapAgainst,
                 ObjectHash = ObjectHash
             };
-            return newGilesObject;
+            return clone;
         }
 
         public int NearbyUnitsWithinDistance(float range = 5f)
@@ -143,7 +143,7 @@ namespace Trinity
                 if (this.Type != GObjectType.Unit)
                     return 0;
 
-                return Trinity.GilesObjectCache
+                return Trinity.ObjectCache
                     .Count(u => u.Type == GObjectType.Unit && u.Position.Distance2D(this.Position) <= range && u.HasBeenInLoS && u.RActorGuid != Trinity.CurrentTarget.RActorGuid);
             }
         }

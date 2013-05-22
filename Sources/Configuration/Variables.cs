@@ -45,11 +45,6 @@ namespace Trinity
         private static bool bAnyNonWWIgnoreMobsInRange = false;
 
         /// <summary>
-        /// A null location, may shave off the tiniest fraction of CPU time, but probably not. Still, Giles liked using this variable apparently.
-        /// </summary>
-        private static readonly Vector3 vNullLocation = Vector3.Zero;
-
-        /// <summary>
         /// Used for a global bot-pause
         /// </summary>
         private static bool bMainBotPaused = false;
@@ -140,7 +135,7 @@ namespace Trinity
         /// <summary>
         /// Holds all of the player's current info handily cached, updated once per loop with a minimum timer on updates to save D3 memory hits
         /// </summary>
-        public static PlayerInfoCache PlayerStatus = new PlayerInfoCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, vNullLocation, false, 0, 1, ActorClass.Invalid, String.Empty);
+        public static PlayerInfoCache PlayerStatus = new PlayerInfoCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, Vector3.Zero, false, 0, 1, ActorClass.Invalid, String.Empty);
 
         [Obsolete("This property is obsolete; use PlayerStatus instead")]
         public static PlayerInfoCache playerStatus { get { return PlayerStatus; } }
@@ -464,12 +459,12 @@ namespace Trinity
         /// <summary>
         /// This contains the active cache of DiaObjects
         /// </summary>
-        internal static List<TrinityCacheObject> GilesObjectCache;
+        internal static List<TrinityCacheObject> ObjectCache;
 
         /// <summary>
         /// This will eventually be come our single source of truth and we can get rid of most/all of the below "c_" variables
         /// </summary>
-        // private static GilesObject cacheEntry = null;
+        private static TrinityCacheObject cacheEntry = null;
 
         private static Vector3 c_Position = Vector3.Zero;
         private static GObjectType c_ObjectType = GObjectType.Unknown;
@@ -627,6 +622,12 @@ namespace Trinity
         private static DateTime OtherThanDeadlyReach = DateTime.Now;
         // Set by sweeping winds or by blinding flash if the time is right for a swap.
         private static bool WantToSwap = false;
+
+        /// <summary>
+        /// And a "global cooldown" to prevent non-signature-spells being used too fast
+        /// </summary>
+        public static DateTime lastGlobalCooldownUse = DateTime.Today;
+
 
         // Xp Counter
         private static int iTotalXp = 0;

@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace Trinity.Settings
 {
-    [DataContract]
+    [DataContract(Namespace = "")]
     public class AdvancedSetting : ITrinitySetting<AdvancedSetting>, INotifyPropertyChanged
     {
         #region Fields

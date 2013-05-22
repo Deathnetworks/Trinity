@@ -141,7 +141,7 @@ namespace Trinity.ItemRules
             // instantiating our macro dictonary
             macroDic = new Dictionary<string, string>();
 
-            // use giles setting
+            // use Trinity setting
             if (Trinity.Settings.Loot.ItemRules.Debug)
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is running in debug mode!", logPickQuality);
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ItemRules is using the {0} rule set.", Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());

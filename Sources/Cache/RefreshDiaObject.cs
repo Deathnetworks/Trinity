@@ -50,7 +50,7 @@ namespace Trinity
             if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
 
             // Have ActorSNO Check for SNO based navigation obstacle hashlist
-            c_IsObstacle = hashSNONavigationObstacles.Contains(c_ActorSNO);
+            c_IsObstacle = DataDictionary.NavigationObstacleIds.Contains(c_ActorSNO);
 
             // Get Internal Name
             AddToCache = RefreshInternalName(AddToCache);
@@ -70,7 +70,7 @@ namespace Trinity
                 /*
                  * Begin main refresh routine
                  */
-                // Set Giles Object Type
+                // Set Object Type
                 AddToCache = RefreshStepCachedObjectType(AddToCache);
                 if (!AddToCache) { c_IgnoreReason = "CachedObjectType"; return AddToCache; }
             }
@@ -133,7 +133,7 @@ namespace Trinity
             if (AddToCache)
             {
                 c_IgnoreReason = "None";
-                GilesObjectCache.Add(
+                ObjectCache.Add(
                     new TrinityCacheObject(c_diaObject)
                     {
                         Position = c_Position,
@@ -155,7 +155,7 @@ namespace Trinity
                         DBItemBaseType = c_DBItemBaseType,
                         DBItemType = c_DBItemType,
                         FollowerType = c_item_tFollowerType,
-                        GilesItemType = c_item_GItemType,
+                        TrinityItemType = c_item_GItemType,
                         IsElite = c_unit_IsElite,
                         IsRare = c_unit_IsRare,
                         IsUnique = c_unit_IsUnique,
@@ -284,7 +284,7 @@ namespace Trinity
             c_KillRange = 0f;
         }
         /// <summary>
-        /// Inserts the ActorSNO <see cref="dictGilesActorSNOCache"/> and sets <see cref="c_ActorSNO"/>
+        /// Inserts the ActorSNO <see cref="actorSNOCache"/> and sets <see cref="c_ActorSNO"/>
         /// </summary>
         /// <param name="AddToCache"></param>
         /// <param name="c_diaObject"></param>
@@ -292,7 +292,7 @@ namespace Trinity
         private static bool RefreshStepCachedActorSNO(bool AddToCache)
         {
             // Get the Actor SNO, cached if possible
-            if (!dictGilesActorSNOCache.TryGetValue(c_RActorGuid, out c_ActorSNO))
+            if (!actorSNOCache.TryGetValue(c_RActorGuid, out c_ActorSNO))
             {
                 try
                 {
@@ -304,7 +304,7 @@ namespace Trinity
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                 }
-                dictGilesActorSNOCache.Add(c_RActorGuid, c_ActorSNO);
+                actorSNOCache.Add(c_RActorGuid, c_ActorSNO);
             }
             return AddToCache;
         }
@@ -312,7 +312,7 @@ namespace Trinity
         private static bool RefreshInternalName(bool AddToCache)
         {
             // This is "internalname" for items, and just a "generic" name for objects and units - cached if possible
-            if (!dictGilesInternalNameCache.TryGetValue(c_RActorGuid, out c_InternalName))
+            if (!nameCache.TryGetValue(c_RActorGuid, out c_InternalName))
             {
                 try
                 {
@@ -324,7 +324,7 @@ namespace Trinity
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                 }
-                dictGilesInternalNameCache.Add(c_RActorGuid, c_InternalName);
+                nameCache.Add(c_RActorGuid, c_InternalName);
             }
             return AddToCache;
         }
@@ -368,7 +368,7 @@ namespace Trinity
             // Have Position, Now store the location etc. of this obstacle and continue
             if (c_IsObstacle)
             {
-                hashNavigationObstacleCache.Add(new CacheObstacleObject(c_Position, dictSNONavigationSize[c_ActorSNO], c_ActorSNO));
+                hashNavigationObstacleCache.Add(new CacheObstacleObject(c_Position, DataDictionary.ObstacleCustomRadius[c_ActorSNO], c_ActorSNO));
                 AddToCache = false;
 
             }
@@ -410,17 +410,17 @@ namespace Trinity
                 c_IgnoreSubStep = "IgnoreNames";
                 return AddToCache;
             }
-            // Either get the cached Giles object type, or calculate it fresh
-            if (!c_IsObstacle && !dictGilesObjectTypeCache.TryGetValue(c_RActorGuid, out c_ObjectType))
+            // Either get the cached object type, or calculate it fresh
+            if (!c_IsObstacle && !objectTypeCache.TryGetValue(c_RActorGuid, out c_ObjectType))
             {
-                bool isAvoidanceSNO = (hashAvoidanceSNOList.Contains(c_ActorSNO) || hashAvoidanceBuffSNOList.Contains(c_ActorSNO) || hashAvoidanceSNOProjectiles.Contains(c_ActorSNO));
+                bool isAvoidanceSNO = (DataDictionary.Avoidances.Contains(c_ActorSNO) || DataDictionary.AvoidanceBuffs.Contains(c_ActorSNO) || DataDictionary.AvoidanceProjectiles.Contains(c_ActorSNO));
                 // See if it's an avoidance first from the SNO
                 if (Settings.Combat.Misc.AvoidAOE && isAvoidanceSNO)
                 {
                     using (new PerformanceLogger("RefreshCachedType.0"))
                     {
                         // Checking for BuffVisualEffect - for Butcher, maybe useful other places?
-                        if (hashAvoidanceBuffSNOList.Contains(c_ActorSNO))
+                        if (DataDictionary.AvoidanceBuffs.Contains(c_ActorSNO))
                         {
                             bool hasBuff = false;
                             try
@@ -430,7 +430,7 @@ namespace Trinity
                             catch
                             {
                                 // Remove on exception, otherwise it may get stuck in the cache
-                                dictGilesObjectTypeCache.Remove(c_RActorGuid);
+                                objectTypeCache.Remove(c_RActorGuid);
                             }
                             if (hasBuff)
                             {
@@ -439,7 +439,7 @@ namespace Trinity
                             }
                             else
                             {
-                                dictGilesObjectTypeCache.Remove(c_RActorGuid);
+                                objectTypeCache.Remove(c_RActorGuid);
                                 AddToCache = false;
                                 c_IgnoreSubStep = "NoBuffVisualEffect";
                             }
@@ -483,7 +483,7 @@ namespace Trinity
                             }
                         }
                     }
-                    else if (hashForceSNOToItemList.Contains(c_ActorSNO) || (c_diaObject is DiaItem))
+                    else if (DataDictionary.ForceToItemOverrideIds.Contains(c_ActorSNO) || (c_diaObject is DiaItem))
                     {
                         using (new PerformanceLogger("RefreshCachedType.2"))
                         {
@@ -529,7 +529,7 @@ namespace Trinity
                                 c_ObjectType = GObjectType.Barricade;
                             else if (c_diaObject is GizmoDestructible)
                                 c_ObjectType = GObjectType.Destructible;
-                            else if (hashSNOInteractWhitelist.Contains(c_ActorSNO))
+                            else if (DataDictionary.InteractWhiteListIds.Contains(c_ActorSNO))
                                 c_ObjectType = GObjectType.Interactable;
                             else if (c_diaObject.ActorInfo.GizmoType == GizmoType.WeirdGroup57)
                                 c_ObjectType = GObjectType.Interactable;
@@ -541,7 +541,7 @@ namespace Trinity
                         c_ObjectType = GObjectType.Unknown;
                 }
                 // Now cache the object type
-                dictGilesObjectTypeCache.Add(c_RActorGuid, c_ObjectType);
+                objectTypeCache.Add(c_RActorGuid, c_ObjectType);
             }
             return AddToCache;
         }
@@ -553,7 +553,7 @@ namespace Trinity
             {
                 case GObjectType.Player:
                     {
-                        AddToCache = RefreshGilesUnit(AddToCache);
+                        AddToCache = RefreshUnit(AddToCache);
                         break;
                     }
                 // Handle Unit-type Objects
@@ -568,7 +568,7 @@ namespace Trinity
                         }
                         else
                         {
-                            AddToCache = RefreshGilesUnit(AddToCache);
+                            AddToCache = RefreshUnit(AddToCache);
                         }
                         break;
                     }
@@ -591,8 +591,8 @@ namespace Trinity
                         }
                         else
                         {
-                            AddToCache = RefreshGilesItem();
-                            c_IgnoreReason = "RefreshGilesItem";
+                            AddToCache = RefreshItem();
+                            c_IgnoreReason = "RefreshItem";
                         }
 
                         break;
@@ -610,8 +610,8 @@ namespace Trinity
                         }
                         else
                         {
-                            AddToCache = RefreshGilesGold(AddToCache);
-                            c_IgnoreSubStep = "RefreshGilesGold";
+                            AddToCache = RefreshGold(AddToCache);
+                            c_IgnoreSubStep = "RefreshGold";
                             break;
                         }
                     }
@@ -630,8 +630,8 @@ namespace Trinity
                 // Handle Avoidance Objects
                 case GObjectType.Avoidance:
                     {
-                        AddToCache = RefreshGilesAvoidance(AddToCache);
-                        if (!AddToCache) { c_IgnoreSubStep = "RefreshGilesAvoidance"; }
+                        AddToCache = RefreshAvoidance(AddToCache);
+                        if (!AddToCache) { c_IgnoreSubStep = "RefreshAvoidance"; }
 
                         break;
                     }
@@ -644,7 +644,7 @@ namespace Trinity
                 case GObjectType.Interactable:
                 case GObjectType.HealthWell:
                     {
-                        AddToCache = RefreshGilesGizmo(AddToCache);
+                        AddToCache = RefreshGizmo(AddToCache);
                         break;
                     }
                 // Object switch on type (to seperate shrines, destructibles, barricades etc.)
@@ -657,7 +657,7 @@ namespace Trinity
             }
         }
 
-        private static bool RefreshGilesGizmo(bool AddToCache)
+        private static bool RefreshGizmo(bool AddToCache)
         {
             // start as true, then set as false as we go. If nothing matches below, it will return true.
             AddToCache = true;
@@ -678,7 +678,7 @@ namespace Trinity
             }
 
             // Retrieve collision sphere radius, cached if possible
-            if (!dictGilesCollisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
+            if (!collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
             {
                 try
                 {
@@ -699,7 +699,7 @@ namespace Trinity
                     AddToCache = false;
                     //return bWantThis;
                 }
-                dictGilesCollisionSphereCache.Add(c_ActorSNO, c_Radius);
+                collisionSphereCache.Add(c_ActorSNO, c_Radius);
             }
 
             // A "fake distance" to account for the large-object size of monsters
@@ -925,7 +925,7 @@ namespace Trinity
                     {
                         AddToCache = true;
                         // Get the cached physics SNO of this object
-                        if (!dictPhysicsSNO.TryGetValue(c_ActorSNO, out iThisPhysicsSNO))
+                        if (!physicsSNOCache.TryGetValue(c_ActorSNO, out iThisPhysicsSNO))
                         {
                             try
                             {
@@ -936,12 +936,12 @@ namespace Trinity
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
                                 AddToCache = false;
                             }
-                            dictPhysicsSNO.Add(c_ActorSNO, iThisPhysicsSNO);
+                            physicsSNOCache.Add(c_ActorSNO, iThisPhysicsSNO);
                         }
 
                         float maxRadiusDistance = -1f;
 
-                        if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out maxRadiusDistance))
+                        if (DataDictionary.DestructableObjectRadius.TryGetValue(c_ActorSNO, out maxRadiusDistance))
                         {
                             if (c_RadiusDistance < maxRadiusDistance)
                             {
@@ -996,7 +996,7 @@ namespace Trinity
                         }
 
                         // Get the cached physics SNO of this object
-                        if (!dictPhysicsSNO.TryGetValue(c_ActorSNO, out iThisPhysicsSNO))
+                        if (!physicsSNOCache.TryGetValue(c_ActorSNO, out iThisPhysicsSNO))
                         {
                             try
                             {
@@ -1007,7 +1007,7 @@ namespace Trinity
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
                                 AddToCache = false;
                             }
-                            dictPhysicsSNO.Add(c_ActorSNO, iThisPhysicsSNO);
+                            physicsSNOCache.Add(c_ActorSNO, iThisPhysicsSNO);
                         }
 
                         // Set min distance to user-defined setting
@@ -1030,7 +1030,7 @@ namespace Trinity
 
                         float maxRadiusDistance = -1f;
 
-                        if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out maxRadiusDistance))
+                        if (DataDictionary.DestructableObjectRadius.TryGetValue(c_ActorSNO, out maxRadiusDistance))
                         {
                             if (c_RadiusDistance < maxRadiusDistance)
                             {
@@ -1072,10 +1072,10 @@ namespace Trinity
                         }
 
                         // special mojo for whitelists
-                        if (hashSNOInteractWhitelist.Contains(c_ActorSNO))
+                        if (DataDictionary.InteractWhiteListIds.Contains(c_ActorSNO))
                             AddToCache = true;
 
-                        if (hashSNOContainerResplendant.Contains(c_ActorSNO))
+                        if (DataDictionary.ResplendentChestIds.Contains(c_ActorSNO))
                             AddToCache = true;
                         break;
                     }
@@ -1113,7 +1113,7 @@ namespace Trinity
                         bool bBlacklistThis = true;
                         iMinDistance = 0f;
                         // Get the cached physics SNO of this object
-                        if (!dictPhysicsSNO.TryGetValue(c_ActorSNO, out iThisPhysicsSNO))
+                        if (!physicsSNOCache.TryGetValue(c_ActorSNO, out iThisPhysicsSNO))
                         {
                             try
                             {
@@ -1124,7 +1124,7 @@ namespace Trinity
                                 DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
                                 AddToCache = false;
                             }
-                            dictPhysicsSNO.Add(c_ActorSNO, iThisPhysicsSNO);
+                            physicsSNOCache.Add(c_ActorSNO, iThisPhysicsSNO);
                         }
                         // Any physics mesh? Give a minimum distance of 5 feet
                         if (c_InternalName.ToLower().Contains("corpse") && Settings.WorldObject.DestructibleOption != DestructibleIgnoreOption.DestroyAll)
@@ -1142,7 +1142,7 @@ namespace Trinity
                             bBlacklistThis = true;
                         }
                         // Whitelist for chests we want to open if we ever get close enough to them
-                        if (hashSNOContainerWhitelist.Contains(c_ActorSNO))
+                        if (DataDictionary.ContainerWhiteListIds.Contains(c_ActorSNO))
                         {
                             bBlacklistThis = false;
                             if (Settings.WorldObject.ContainerOpenRange > 0)
@@ -1153,7 +1153,7 @@ namespace Trinity
                             DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "GSDebug: Possible Chest SNO: {0}, SNO={1}", c_InternalName, c_ActorSNO);
                         }
                         // Superlist for rare chests etc.
-                        if (hashSNOContainerResplendant.Contains(c_ActorSNO))
+                        if (DataDictionary.ResplendentChestIds.Contains(c_ActorSNO))
                         {
                             bBlacklistThis = false;
                             if (Settings.WorldObject.ContainerOpenRange > 0)
@@ -1186,20 +1186,12 @@ namespace Trinity
             return AddToCache;
         }
 
-        private static bool RefreshGilesAvoidance(bool AddToCache)
+        private static bool RefreshAvoidance(bool AddToCache)
         {
             AddToCache = true;
-            // Note if you are looking here - an AOE object won't even appear at this stage if you have Settings.Combat.Misc.AvoidAOE switched off!
-            //if (!hashAvoidanceSNOList.Contains(tmp_iThisActorSNO))
-            //{
-            //    Logging.WriteDiagnostic("GSDebug: Invalid avoidance detected, SNO=" + tmp_iThisActorSNO.ToString() + ", name=" + tmp_sThisInternalName + ", object type=" +
-            //        tmp_ThisGilesObjectType.ToString());
-            //    bWantThis = false;
-            //    
-            //return bWantThis;
-            //}
+
             // Retrieve collision sphere radius, cached if possible
-            if (!dictGilesCollisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
+            if (!collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
             {
                 try
                 {
@@ -1214,7 +1206,7 @@ namespace Trinity
                     AddToCache = false;
                     return AddToCache;
                 }
-                dictGilesCollisionSphereCache.Add(c_ActorSNO, c_Radius);
+                collisionSphereCache.Add(c_ActorSNO, c_Radius);
             }
 
             try
@@ -1293,7 +1285,7 @@ namespace Trinity
                     StandingInAvoidance = true;
 
                     // Note if this is a travelling projectile or not so we can constantly update our safe points
-                    if (hashAvoidanceSNOProjectiles.Contains(c_ActorSNO))
+                    if (DataDictionary.AvoidanceProjectiles.Contains(c_ActorSNO))
                     {
                         IsAvoidingProjectiles = true;
                         DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Is standing in avoidance for projectile Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
@@ -1388,12 +1380,12 @@ namespace Trinity
                                     using (new PerformanceLogger("RefreshLoS.2"))
                                     {
                                         // Get whether or not this RActor has ever been in a path line with AllowWalk. If it hasn't, don't add to cache and keep rechecking
-                                        if (!dictHasBeenRayCastedCache.TryGetValue(c_RActorGuid, out c_HasBeenRaycastable))
+                                        if (!hasBeenRayCastedCache.TryGetValue(c_RActorGuid, out c_HasBeenRaycastable))
                                         {
                                             if (c_CentreDistance <= 5f)
                                             {
                                                 c_HasBeenRaycastable = true;
-                                                dictHasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                hasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);
                                             }
                                             else if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
@@ -1410,7 +1402,7 @@ namespace Trinity
                                                 else
                                                 {
                                                     c_HasBeenRaycastable = true;
-                                                    dictHasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                    hasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);
                                                 }
 
                                             }
@@ -1424,7 +1416,7 @@ namespace Trinity
                                                 else
                                                 {
                                                     c_HasBeenRaycastable = true;
-                                                    dictHasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                    hasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);
                                                 }
 
                                             }
@@ -1441,7 +1433,7 @@ namespace Trinity
                                     using (new PerformanceLogger("RefreshLoS.3"))
                                     {
                                         // Get whether or not this RActor has ever been in "Line of Sight" (as determined by Demonbuddy). If it hasn't, don't add to cache and keep rechecking
-                                        if (!dictHasBeenInLoSCache.TryGetValue(c_RActorGuid, out c_HasBeenInLoS))
+                                        if (!hasBeenInLoSCache.TryGetValue(c_RActorGuid, out c_HasBeenInLoS))
                                         {
                                             if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
@@ -1454,13 +1446,13 @@ namespace Trinity
                                                 else
                                                 {
                                                     c_HasBeenInLoS = true;
-                                                    dictHasBeenInLoSCache.Add(c_RActorGuid, c_HasBeenInLoS);
+                                                    hasBeenInLoSCache.Add(c_RActorGuid, c_HasBeenInLoS);
                                                 }
                                             }
                                             else
                                             {
                                                 c_HasBeenInLoS = true;
-                                                dictHasBeenInLoSCache.Add(c_RActorGuid, c_HasBeenInLoS);
+                                                hasBeenInLoSCache.Add(c_RActorGuid, c_HasBeenInLoS);
                                             }
                                         }
                                     }
@@ -1490,13 +1482,13 @@ namespace Trinity
                 }
 
                 // Simple whitelist for LoS 
-                if (LineOfSightWhitelist.Contains(c_ActorSNO))
+                if (DataDictionary.LineOfSightWhitelist.Contains(c_ActorSNO))
                 {
                     AddToCache = true;
                     c_IgnoreSubStep = "";
                 }
                 // Always pickup Infernal Keys whether or not in LoS
-                if (hashForceSNOToItemList.Contains(c_ActorSNO))
+                if (DataDictionary.ForceToItemOverrideIds.Contains(c_ActorSNO))
                 {
                     AddToCache = true;
                     c_IgnoreSubStep = "";
@@ -1527,7 +1519,7 @@ namespace Trinity
             // Get the ACDGUID, cached if possible, only for non-avoidance stuff
             if (!c_IsObstacle && c_ObjectType != GObjectType.Avoidance)
             {
-                if (!dictGilesACDGUIDCache.TryGetValue(c_RActorGuid, out c_ACDGUID))
+                if (!ACDGUIDCache.TryGetValue(c_RActorGuid, out c_ACDGUID))
                 {
                     try
                     {
@@ -1539,7 +1531,7 @@ namespace Trinity
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                     }
-                    dictGilesACDGUIDCache.Add(c_RActorGuid, c_ACDGUID);
+                    ACDGUIDCache.Add(c_RActorGuid, c_ACDGUID);
                 }
                 // No ACDGUID, so shouldn't be anything we want to deal with
                 if (c_ACDGUID == -1)
@@ -1561,7 +1553,7 @@ namespace Trinity
             if (c_ObjectType != GObjectType.Avoidance && c_ObjectType != GObjectType.Unit)
             {
                 // Get the position, cached if possible
-                if (!dictGilesVectorCache.TryGetValue(c_RActorGuid, out c_Position))
+                if (!positionCache.TryGetValue(c_RActorGuid, out c_Position))
                 {
                     try
                     {
@@ -1584,7 +1576,7 @@ namespace Trinity
                         AddToCache = false;
                     }
                     // Now cache it
-                    dictGilesVectorCache.Add(c_RActorGuid, c_Position);
+                    positionCache.Add(c_RActorGuid, c_Position);
                 }
             }
             // Ok pull up live-position data for units/avoidance now...
@@ -1609,7 +1601,7 @@ namespace Trinity
             if (c_ObjectType == GObjectType.Item)
             {
                 // Get the Dynamic ID, cached if possible
-                if (!dictGilesDynamicIDCache.TryGetValue(c_RActorGuid, out c_GameDynamicID))
+                if (!dynamicIDCache.TryGetValue(c_RActorGuid, out c_GameDynamicID))
                 {
                     try
                     {
@@ -1622,10 +1614,10 @@ namespace Trinity
                         AddToCache = false;
                         //return bWantThis;
                     }
-                    dictGilesDynamicIDCache.Add(c_RActorGuid, c_GameDynamicID);
+                    dynamicIDCache.Add(c_RActorGuid, c_GameDynamicID);
                 }
                 // Get the Game Balance ID, cached if possible
-                if (!dictGilesGameBalanceIDCache.TryGetValue(c_RActorGuid, out c_BalanceID))
+                if (!gameBalanceIDCache.TryGetValue(c_RActorGuid, out c_BalanceID))
                 {
                     try
                     {
@@ -1638,7 +1630,7 @@ namespace Trinity
                         AddToCache = false;
                         //return bWantThis;
                     }
-                    dictGilesGameBalanceIDCache.Add(c_RActorGuid, c_BalanceID);
+                    gameBalanceIDCache.Add(c_RActorGuid, c_BalanceID);
                 }
             }
             else
@@ -1660,7 +1652,7 @@ namespace Trinity
             }
 
             // Special whitelist for always getting stuff regardless of ZDiff or LoS
-            if (LineOfSightWhitelist.Contains(c_ActorSNO))
+            if (DataDictionary.LineOfSightWhitelist.Contains(c_ActorSNO))
             {
                 AddToCache = true;
                 return AddToCache;
@@ -1734,7 +1726,7 @@ namespace Trinity
                 // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
                 if (PlayerStatus.ActorClass == ActorClass.Monk)
                 {
-                    if (Hotbar.Contains(SNOPower.Monk_MysticAlly) && hashMysticAlly.Contains(c_ActorSNO))
+                    if (Hotbar.Contains(SNOPower.Monk_MysticAlly) && DataDictionary.MysticAllyIds.Contains(c_ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == PlayerStatus.MyDynamicID)
                             iPlayerOwnedMysticAlly++;
@@ -1744,7 +1736,7 @@ namespace Trinity
                 // Count up Demon Hunter pets
                 if (PlayerStatus.ActorClass == ActorClass.DemonHunter)
                 {
-                    if (Hotbar.Contains(SNOPower.DemonHunter_Companion) && hashDHPets.Contains(c_ActorSNO))
+                    if (Hotbar.Contains(SNOPower.DemonHunter_Companion) && DataDictionary.DemonHunterPetIds.Contains(c_ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == PlayerStatus.MyDynamicID)
                             iPlayerOwnedDHPets++;
@@ -1754,13 +1746,13 @@ namespace Trinity
                 // Count up zombie dogs and gargantuans next
                 if (PlayerStatus.ActorClass == ActorClass.WitchDoctor)
                 {
-                    if (Hotbar.Contains(SNOPower.Witchdoctor_Gargantuan) && hashGargantuan.Contains(c_ActorSNO))
+                    if (Hotbar.Contains(SNOPower.Witchdoctor_Gargantuan) && DataDictionary.GargantuanIds.Contains(c_ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == PlayerStatus.MyDynamicID)
                             iPlayerOwnedGargantuan++;
                         AddToCache = false;
                     }
-                    if (Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && hashZombie.Contains(c_ActorSNO))
+                    if (Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && DataDictionary.ZombieDogIds.Contains(c_ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == PlayerStatus.MyDynamicID)
                             iPlayerOwnedZombieDog++;
@@ -1773,26 +1765,20 @@ namespace Trinity
 
         private static bool RefreshStepCheckBlacklists(bool AddToCache)
         {
-            if (!hashAvoidanceSNOList.Contains(c_ActorSNO) && !hashAvoidanceBuffSNOList.Contains(c_ActorSNO))
+            if (!DataDictionary.Avoidances.Contains(c_ActorSNO) && !DataDictionary.AvoidanceBuffs.Contains(c_ActorSNO))
             {
                 // See if it's something we should always ignore like ravens etc.
-                if (!c_IsObstacle && hashActorSNOIgnoreBlacklist.Contains(c_ActorSNO))
+                if (!c_IsObstacle && DataDictionary.BlackListIds.Contains(c_ActorSNO))
                 {
                     AddToCache = false;
-                    c_IgnoreSubStep = "hashActorSNOIgnoreBlacklist";
-                    return AddToCache;
-                }
-                if (!c_IsObstacle && hashSNOIgnoreBlacklist.Contains(c_ActorSNO))
-                {
-                    AddToCache = false;
-                    c_IgnoreSubStep = "hashSNOIgnoreBlacklist";
+                    c_IgnoreSubStep = "Blacklist";
                     return AddToCache;
                 }
                 // Temporary ractor GUID ignoring, to prevent 2 interactions in a very short time which can cause stucks
                 if (IgnoreTargetForLoops > 0 && IgnoreRactorGUID == c_RActorGuid)
                 {
                     AddToCache = false;
-                    c_IgnoreSubStep = "iIgnoreThisRactorGUID";
+                    c_IgnoreSubStep = "IgnoreRactorGUID";
                     return AddToCache;
                 }
                 // Check our extremely short-term destructible-blacklist
@@ -1910,13 +1896,13 @@ namespace Trinity
         {
             if (!bHasCachedHealth)
             {
-                dictGilesLastHealthCache.Add(c_RActorGuid, dThisCurrentHealth);
-                dictGilesLastHealthChecked.Add(c_RActorGuid, iLastCheckedHealth);
+                currentHealthCache.Add(c_RActorGuid, dThisCurrentHealth);
+                currentHealthCheckTimeCache.Add(c_RActorGuid, iLastCheckedHealth);
             }
             else
             {
-                dictGilesLastHealthCache[c_RActorGuid] = dThisCurrentHealth;
-                dictGilesLastHealthChecked[c_RActorGuid] = iLastCheckedHealth;
+                currentHealthCache[c_RActorGuid] = dThisCurrentHealth;
+                currentHealthCheckTimeCache[c_RActorGuid] = iLastCheckedHealth;
             }
         }
 

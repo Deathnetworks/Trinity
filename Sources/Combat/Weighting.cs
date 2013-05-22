@@ -38,13 +38,13 @@ namespace Trinity
                                         ) &&
                                         PlayerStatus.CurrentHealthPct >= 0.85d;
 
-                bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || PlayerStatus.IsRooted || MovementSpeed < 1 || GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 5f) >= 3);
+                bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || PlayerStatus.IsRooted || MovementSpeed < 1 || ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 5f) >= 3);
 
                 bool hasWrathOfTheBerserker = PlayerStatus.ActorClass == ActorClass.Barbarian && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
 
-                int TrashMobCount = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsTrashMob);
-                int EliteCount = Settings.Combat.Misc.IgnoreElites ? 0 : GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
-                int AvoidanceCount = Settings.Combat.Misc.AvoidAOE ? 0 : GilesObjectCache.Count(o => o.Type == GObjectType.Avoidance && o.CentreDistance <= 50f);
+                int TrashMobCount = ObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsTrashMob);
+                int EliteCount = Settings.Combat.Misc.IgnoreElites ? 0 : ObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
+                int AvoidanceCount = Settings.Combat.Misc.AvoidAOE ? 0 : ObjectCache.Count(o => o.Type == GObjectType.Avoidance && o.CentreDistance <= 50f);
 
                 bool profileTagCheck = false;
                 if (ProfileManager.CurrentProfileBehavior != null)
@@ -69,7 +69,7 @@ namespace Trinity
 
                 string unitWeightInfo = "";
 
-                foreach (TrinityCacheObject cacheObject in GilesObjectCache.OrderBy(c => c.CentreDistance))
+                foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.CentreDistance))
                 {
                     unitWeightInfo = "";
 
@@ -82,7 +82,7 @@ namespace Trinity
                         // Weight Units
                         case GObjectType.Unit:
                             {
-                                int nearbyMonsterCount = GilesObjectCache.Count(u => u.IsTrashMob && cacheObject.Position.Distance2D(u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius);
+                                int nearbyMonsterCount = ObjectCache.Count(u => u.IsTrashMob && cacheObject.Position.Distance2D(u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius);
 
                                 // Ignore Solitary Trash mobs (no elites present)
                                 // Except if has been primary target or if already low on health (<= 20%)
@@ -165,7 +165,7 @@ namespace Trinity
                                     }
                                     if (cacheObject.RadiusDistance <= 25f)
                                     {
-                                        if (!bAnyNonWWIgnoreMobsInRange && !hashActorSNOWhirlwindIgnore.Contains(cacheObject.ActorSNO))
+                                        if (!bAnyNonWWIgnoreMobsInRange && !DataDictionary.WhirlwindIgnoreSNOIds.Contains(cacheObject.ActorSNO))
                                             bAnyNonWWIgnoreMobsInRange = true;
                                         AnythingWithinRange[RANGE_25]++;
                                         if (isElite)
@@ -231,7 +231,7 @@ namespace Trinity
 
                                         // Give extra weight to ranged enemies
                                         if ((PlayerStatus.ActorClass == ActorClass.Barbarian || PlayerStatus.ActorClass == ActorClass.Monk) &&
-                                            (cacheObject.MonsterStyle == MonsterSize.Ranged || hashActorSNORanged.Contains(c_ActorSNO)))
+                                            (cacheObject.MonsterStyle == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(c_ActorSNO)))
                                         {
                                             cacheObject.Weight += 1100;
                                             cacheObject.ForceLeapAgainst = true;
@@ -251,7 +251,7 @@ namespace Trinity
 
                                         // Bonuses to priority type monsters from the dictionary/hashlist set at the top of the code
                                         int iExtraPriority;
-                                        if (dictActorSNOPriority.TryGetValue(cacheObject.ActorSNO, out iExtraPriority))
+                                        if (DataDictionary.MonsterCustomWeights.TryGetValue(cacheObject.ActorSNO, out iExtraPriority))
                                         {
                                             cacheObject.Weight += iExtraPriority;
                                         }
@@ -284,7 +284,7 @@ namespace Trinity
 
                                         if (PlayerKiteDistance > 0)
                                         {
-                                            if (GilesObjectCache.Any(m => m.Type == GObjectType.Unit &&
+                                            if (ObjectCache.Any(m => m.Type == GObjectType.Unit &&
                                                 MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, PlayerStatus.CurrentPosition, m.Position) &&
                                                 m.RActorGuid != cacheObject.RActorGuid))
                                             {
@@ -293,7 +293,7 @@ namespace Trinity
                                         }
 
                                         // Deal with treasure goblins - note, of priority is set to "0", then the is-a-goblin flag isn't even set for use here - the monster is ignored
-                                        if (cacheObject.IsTreasureGoblin && !GilesObjectCache.Any(u => (u.Type == GObjectType.Door || u.Type == GObjectType.Barricade) && u.RadiusDistance <= 40f))
+                                        if (cacheObject.IsTreasureGoblin && !ObjectCache.Any(u => (u.Type == GObjectType.Door || u.Type == GObjectType.Barricade) && u.RadiusDistance <= 40f))
                                         {
 
                                             // Logging goblin sightings
@@ -398,7 +398,7 @@ namespace Trinity
                                 // ignore non-legendaries and gold near elites if we're ignoring elites
                                 // not sure how we should safely determine this distance
                                 if (Settings.Combat.Misc.IgnoreElites && cacheObject.ItemQuality < ItemQuality.Legendary && 
-                                    GilesObjectCache.Any(u => u.Type == GObjectType.Unit && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 40f))
+                                    ObjectCache.Any(u => u.Type == GObjectType.Unit && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 40f))
                                 {
                                     cacheObject.Weight = 0;
                                 }
@@ -431,11 +431,6 @@ namespace Trinity
                                     // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                     if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                         cacheObject.Weight += 800;
-
-                                    // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
-                                    //if (bPrioritizeCloseRange)
-
-                                    //    thisgilesobject.dThisWeight = 22000 - (Math.Floor(thisgilesobject.fCentreDistance) * 200);
 
                                     // If there's a monster in the path-line to the item, reduce the weight by 15% for each
                                     Vector3 point = cacheObject.Position;
@@ -513,7 +508,7 @@ namespace Trinity
                             }
                         case GObjectType.Door:
                             {
-                                if (!GilesObjectCache.Any(u => u.Type == GObjectType.Unit && u.HitPointsPct > 0 &&
+                                if (!ObjectCache.Any(u => u.Type == GObjectType.Unit && u.HitPointsPct > 0 &&
                                     MathUtil.IntersectsPath(u.Position, u.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                 {
                                     if (cacheObject.RadiusDistance <= 20f)
@@ -558,7 +553,7 @@ namespace Trinity
                                     cacheObject.Weight += 40000d;
 
                                 //// Fix for WhimsyShire Pinata
-                                if (hashSNOContainerResplendant.Contains(cacheObject.ActorSNO))
+                                if (DataDictionary.ResplendentChestIds.Contains(cacheObject.ActorSNO))
                                     cacheObject.Weight = 100 + cacheObject.RadiusDistance;
                                 break;
                             }
@@ -616,7 +611,7 @@ namespace Trinity
                     // Switch on object type
 
                     // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
-                    if (cacheObject.Weight == 1 && !StandingInAvoidance && GilesObjectCache.Any(o => o.Type == GObjectType.Avoidance))
+                    if (cacheObject.Weight == 1 && !StandingInAvoidance && ObjectCache.Any(o => o.Type == GObjectType.Avoidance))
                     {
                         cacheObject.Weight = 0;
                         ShouldStayPutDuringAvoidance = true;
@@ -634,13 +629,13 @@ namespace Trinity
                     // Is the weight of this one higher than the current-highest weight? Then make this the new primary target!
                     if (cacheObject.Weight > w_HighestWeightFound && cacheObject.Weight > 0)
                     {
-                        // Clone the current Giles-cache object
+                        // Clone the current CacheObject
                         CurrentTarget = cacheObject.Clone();
                         w_HighestWeightFound = cacheObject.Weight;
 
                         // See if we can try attempting kiting later
                         NeedToKite = false;
-                        vKitePointAvoid = vNullLocation;
+                        vKitePointAvoid = Vector3.Zero;
 
                         // Kiting and Avoidance
                         if (CurrentTarget.Type == GObjectType.Unit)

@@ -28,11 +28,11 @@ namespace Trinity
         }
 
         /// <summary>
-        /// Loads delays from GilesTrinity.dictAbilityRepeatDelay dictionary
+        /// Loads delays from Trinity.AbilityRepeatDelay dictionary
         /// </summary>
         public static void LoadLegacyDelays()
         {
-            foreach (KeyValuePair<SNOPower, int> kv in Trinity.dictAbilityRepeatDelay)
+            foreach (KeyValuePair<SNOPower, int> kv in DataDictionary.AbilityRepeatDelays)
             {
                 DefineDelay(kv.Key, kv.Value);
             }

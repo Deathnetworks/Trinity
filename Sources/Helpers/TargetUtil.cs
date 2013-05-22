@@ -19,7 +19,7 @@ namespace Trinity
         {
             get
             {
-                return Trinity.GilesObjectCache;
+                return Trinity.ObjectCache;
             }
         }
         private static PlayerInfoCache PlayerStatus

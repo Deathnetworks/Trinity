@@ -38,11 +38,11 @@ namespace Trinity
         internal static bool bPreStashPauseDone = false;
 
 
-        internal static HashSet<CachedACDItem> hashGilesCachedKeepItems = new HashSet<CachedACDItem>();
+        internal static HashSet<CachedACDItem> itemStashCache = new HashSet<CachedACDItem>();
 
-        internal static HashSet<CachedACDItem> hashGilesCachedSalvageItems = new HashSet<CachedACDItem>();
+        internal static HashSet<CachedACDItem> itemSalvageCache = new HashSet<CachedACDItem>();
 
-        internal static HashSet<CachedACDItem> hashGilesCachedSellItems = new HashSet<CachedACDItem>();
+        internal static HashSet<CachedACDItem> itemSellCache = new HashSet<CachedACDItem>();
         // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
 
         private static bool[,] StashSlotBlocked = new bool[7, 30];
@@ -74,7 +74,7 @@ namespace Trinity
             {
                 Trinity.IsReadyToTownRun = false;
 
-                if (Trinity.BossLevelAreaIDs.Contains(Trinity.PlayerStatus.LevelAreaId))
+                if (DataDictionary.BossLevelAreaIDs.Contains(Trinity.PlayerStatus.LevelAreaId))
                     return false;
 
                 if (Trinity.IsReadyToTownRun && Trinity.CurrentTarget != null)
@@ -309,9 +309,9 @@ namespace Trinity
                 return false;
             }
 
-            GItemType thisGilesItemType = Trinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
-            GItemBaseType thisGilesBaseType = Trinity.DetermineBaseType(thisGilesItemType);
-            switch (thisGilesBaseType)
+            GItemType itemType = Trinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
+            GItemBaseType itemBaseType = Trinity.DetermineBaseType(itemType);
+            switch (itemBaseType)
             {
                 case GItemBaseType.WeaponRange:
                 case GItemBaseType.WeaponOneHand:
@@ -323,7 +323,7 @@ namespace Trinity
                     return true;
                 case GItemBaseType.Gem:
                 case GItemBaseType.Misc:
-                    if (thisGilesItemType == GItemType.CraftingPlan)
+                    if (itemType == GItemType.CraftingPlan)
                         return true;
                     else
                         return false;
@@ -331,7 +331,6 @@ namespace Trinity
                     return false;
             }
 
-            // Switch giles base item type
             return false;
         }
 
@@ -347,8 +346,8 @@ namespace Trinity
 
         internal static bool SalvageValidation(CachedACDItem cItem)
         {
-            GItemType thisGilesItemType = Trinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
-            GItemBaseType thisGilesBaseType = Trinity.DetermineBaseType(thisGilesItemType);
+            GItemType itemType = Trinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
+            GItemBaseType itemBaseType = Trinity.DetermineBaseType(itemType);
 
             // Take Salvage Option corresponding to ItemLevel
             SalvageOption salvageOption = GetSalvageOption(cItem.Quality);
@@ -361,7 +360,7 @@ namespace Trinity
             if (cItem.Quality >= ItemQuality.Legendary && salvageOption == SalvageOption.InfernoOnly && cItem.Level >= 60)
                 return true;
 
-            switch (thisGilesBaseType)
+            switch (itemBaseType)
             {
                 case GItemBaseType.WeaponRange:
                 case GItemBaseType.WeaponOneHand:
@@ -379,7 +378,6 @@ namespace Trinity
                     return false;
             }
 
-            // Switch giles base item type
             return false;
         }
 
@@ -458,16 +456,13 @@ namespace Trinity
         /// <summary>
         /// Log the nice items we found and stashed
         /// </summary>
-        /// <param name="thisgooditem"></param>
-        /// <param name="thisgilesbaseitemtype"></param>
-        /// <param name="thisgilesitemtype"></param>
-        /// <param name="ithisitemvalue"></param>
-        internal static void LogGoodItems(CachedACDItem thisgooditem, GItemBaseType thisgilesbaseitemtype, GItemType thisgilesitemtype, double ithisitemvalue)
+        internal static void LogGoodItems(CachedACDItem acdItem, GItemBaseType itemBaseType, GItemType itemType, double itemValue)
         {
             FileStream LogStream = null;
             try
             {
-                LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "StashLog - " + ZetaDia.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
+                string filePath = Path.Combine(FileManager.LoggingPath, "StashLog - " + Trinity.PlayerStatus.ActorClass.ToString() + ".log");
+                LogStream = File.Open(filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
 
                 //TODO : Change File Log writing
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
@@ -479,23 +474,23 @@ namespace Trinity
                         LogWriter.WriteLine("====================");
                     }
                     string sLegendaryString = "";
-                    bool bShouldNotify = false;
-                    if (thisgooditem.Quality >= ItemQuality.Legendary)
+                    bool shouldSendNotifications = false;
+                    if (acdItem.Quality >= ItemQuality.Legendary)
                     {
                         if (!Trinity.Settings.Notification.LegendaryScoring)
-                            bShouldNotify = true;
-                        else if (Trinity.Settings.Notification.LegendaryScoring && Trinity.CheckScoreForNotification(thisgilesbaseitemtype, ithisitemvalue))
-                            bShouldNotify = true;
-                        if (bShouldNotify)
-                            NotificationManager.AddNotificationToQueue(thisgooditem.RealName + " [" + thisgilesitemtype.ToString() +
-                                "] (Score=" + ithisitemvalue.ToString() + ". " + ValueItemStatString + ")",
+                            shouldSendNotifications = true;
+                        else if (Trinity.Settings.Notification.LegendaryScoring && Trinity.CheckScoreForNotification(itemBaseType, itemValue))
+                            shouldSendNotifications = true;
+                        if (shouldSendNotifications)
+                            NotificationManager.AddNotificationToQueue(acdItem.RealName + " [" + itemType.ToString() +
+                                "] (Score=" + itemValue.ToString() + ". " + ValueItemStatString + ")",
                                 ZetaDia.Service.CurrentHero.Name + " new legendary!", ProwlNotificationPriority.Emergency);
                         sLegendaryString = " {legendary item}";
 
                         // Change made by bombastic
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+=+=+=+=+=+=+=+=+ LEGENDARY FOUND +=+=+=+=+=+=+=+=+");
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Name:       {0} ({1})", thisgooditem.RealName, thisgilesitemtype);
-                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Score:       {0:0}", ithisitemvalue);
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Name:       {0} ({1})", acdItem.RealName, itemType);
+                        DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Score:       {0:0}", itemValue);
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+  Attributes: {0}", ValueItemStatString);
                         DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
                     }
@@ -503,17 +498,17 @@ namespace Trinity
                     {
 
                         // Check for non-legendary notifications
-                        bShouldNotify = Trinity.CheckScoreForNotification(thisgilesbaseitemtype, ithisitemvalue);
-                        if (bShouldNotify)
-                            NotificationManager.AddNotificationToQueue(thisgooditem.RealName + " [" + thisgilesitemtype.ToString() + "] (Score=" + ithisitemvalue.ToString() + ". " + ValueItemStatString + ")", ZetaDia.Service.CurrentHero.Name + " new item!", ProwlNotificationPriority.Emergency);
+                        shouldSendNotifications = Trinity.CheckScoreForNotification(itemBaseType, itemValue);
+                        if (shouldSendNotifications)
+                            NotificationManager.AddNotificationToQueue(acdItem.RealName + " [" + itemType.ToString() + "] (Score=" + itemValue.ToString() + ". " + ValueItemStatString + ")", ZetaDia.Service.CurrentHero.Name + " new item!", ProwlNotificationPriority.Emergency);
                     }
-                    if (bShouldNotify)
+                    if (shouldSendNotifications)
                     {
-                        NotificationManager.EmailMessage.AppendLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.RealName + "'. Score = " + Math.Round(ithisitemvalue).ToString() + sLegendaryString)
+                        NotificationManager.EmailMessage.AppendLine(itemBaseType.ToString() + " - " + itemType.ToString() + " '" + acdItem.RealName + "'. Score = " + Math.Round(itemValue).ToString() + sLegendaryString)
                             .AppendLine("  " + ValueItemStatString)
                             .AppendLine();
                     }
-                    LogWriter.WriteLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.RealName + "'. Score = " + Math.Round(ithisitemvalue).ToString() + sLegendaryString);
+                    LogWriter.WriteLine(itemBaseType.ToString() + " - " + itemType.ToString() + " '" + acdItem.RealName + "'. Score = " + Math.Round(itemValue).ToString() + sLegendaryString);
                     LogWriter.WriteLine("  " + ValueItemStatString);
                     LogWriter.WriteLine("");
                 }
@@ -530,16 +525,13 @@ namespace Trinity
         /// <summary>
         /// Log the rubbish junk items we salvaged or sold
         /// </summary>
-        /// <param name="thisgooditem"></param>
-        /// <param name="thisgilesbaseitemtype"></param>
-        /// <param name="thisgilesitemtype"></param>
-        /// <param name="ithisitemvalue"></param>
-        internal static void LogJunkItems(CachedACDItem thisgooditem, GItemBaseType thisgilesbaseitemtype, GItemType thisgilesitemtype, double ithisitemvalue)
+        internal static void LogJunkItems(CachedACDItem acdItem, GItemBaseType itemBaseType, GItemType itemType, double itemValue)
         {
             FileStream LogStream = null;
             try
             {
-                LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "JunkLog - " + ZetaDia.Me.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
+                string filePath = Path.Combine(FileManager.LoggingPath, "JunkLog - " + Trinity.PlayerStatus.ActorClass.ToString() + ".log");
+                LogStream = File.Open(filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
                 {
                     if (!loggedJunkThisStash)
@@ -548,10 +540,10 @@ namespace Trinity
                         LogWriter.WriteLine(DateTime.Now.ToString() + ":");
                         LogWriter.WriteLine("====================");
                     }
-                    string sLegendaryString = "";
-                    if (thisgooditem.Quality >= ItemQuality.Legendary)
-                        sLegendaryString = " {legendary item}";
-                    LogWriter.WriteLine(thisgilesbaseitemtype.ToString() + " - " + thisgilesitemtype.ToString() + " '" + thisgooditem.RealName + "'. Score = " + ithisitemvalue.ToString("0") + sLegendaryString);
+                    string isLegendaryItem = "";
+                    if (acdItem.Quality >= ItemQuality.Legendary)
+                        isLegendaryItem = " {legendary item}";
+                    LogWriter.WriteLine(itemBaseType.ToString() + " - " + itemType.ToString() + " '" + acdItem.RealName + "'. Score = " + itemValue.ToString("0") + isLegendaryItem);
                     if (junkItemStatString != "")
                         LogWriter.WriteLine("  " + junkItemStatString);
                     else
@@ -634,12 +626,12 @@ namespace Trinity
             }
 
             // List used for all the sorting
-            List<GilesStashSort> listSortMyStash = new List<GilesStashSort>();
+            List<StashSortItem> listSortMyStash = new List<StashSortItem>();
 
             // Map out the backpack free slots
-            for (int iRow = 0; iRow <= 5; iRow++)
-                for (int iColumn = 0; iColumn <= 9; iColumn++)
-                    Trinity.BackpackSlotBlocked[iColumn, iRow] = false;
+            for (int row = 0; row <= 5; row++)
+                for (int col = 0; col <= 9; col++)
+                    Trinity.BackpackSlotBlocked[col, row] = false;
 
             foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
             {
@@ -706,7 +698,7 @@ namespace Trinity
                 // TODO check if item.MaxStackCount is 0 on non stackable items or 1
                 if (!(item.MaxStackCount > 1) && itemType != GItemType.StaffOfHerding)
                 {
-                    listSortMyStash.Add(new GilesStashSort(((ItemValue / NeedScore) * 1000), 1, inventoryColumn, inventoryRow, item.DynamicId, item.IsTwoSquareItem));
+                    listSortMyStash.Add(new StashSortItem(((ItemValue / NeedScore) * 1000), 1, inventoryColumn, inventoryRow, item.DynamicId, item.IsTwoSquareItem));
                 }
             }
 
@@ -718,78 +710,78 @@ namespace Trinity
             Vector2 vFreeSlot;
 
             // Loop through all stash items
-            foreach (GilesStashSort thisstashsort in listSortMyStash)
+            foreach (StashSortItem thisstashsort in listSortMyStash)
             {
-                vFreeSlot = Trinity.SortingFindLocationBackpack(thisstashsort.bIsTwoSlot);
+                vFreeSlot = Trinity.SortingFindLocationBackpack(thisstashsort.IsTwoSlot);
                 int iStashOrPack = 1;
                 if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
                 {
-                    vFreeSlot = SortingFindLocationStash(thisstashsort.bIsTwoSlot, true);
+                    vFreeSlot = SortingFindLocationStash(thisstashsort.IsTwoSlot, true);
                     if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
                         continue;
                     iStashOrPack = 2;
                 }
                 if (iStashOrPack == 1)
                 {
-                    ZetaDia.Me.Inventory.MoveItem(thisstashsort.iDynamicID, iPlayerDynamicID, InventorySlot.PlayerBackpack, (int)vFreeSlot.X, (int)vFreeSlot.Y);
-                    StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow] = false;
-                    if (thisstashsort.bIsTwoSlot)
-                        StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow + 1] = false;
+                    ZetaDia.Me.Inventory.MoveItem(thisstashsort.DynamicID, iPlayerDynamicID, InventorySlot.PlayerBackpack, (int)vFreeSlot.X, (int)vFreeSlot.Y);
+                    StashSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow] = false;
+                    if (thisstashsort.IsTwoSlot)
+                        StashSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow + 1] = false;
                     Trinity.BackpackSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y] = true;
-                    if (thisstashsort.bIsTwoSlot)
+                    if (thisstashsort.IsTwoSlot)
                         Trinity.BackpackSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y + 1] = true;
-                    thisstashsort.iInventoryColumn = (int)vFreeSlot.X;
+                    thisstashsort.InventoryColumn = (int)vFreeSlot.X;
                     thisstashsort.InventoryRow = (int)vFreeSlot.Y;
-                    thisstashsort.iStashOrPack = 2;
+                    thisstashsort.StashOrPack = 2;
                 }
                 else
                 {
-                    ZetaDia.Me.Inventory.MoveItem(thisstashsort.iDynamicID, iPlayerDynamicID, InventorySlot.PlayerSharedStash, (int)vFreeSlot.X, (int)vFreeSlot.Y);
-                    StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow] = false;
-                    if (thisstashsort.bIsTwoSlot)
-                        StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow + 1] = false;
+                    ZetaDia.Me.Inventory.MoveItem(thisstashsort.DynamicID, iPlayerDynamicID, InventorySlot.PlayerSharedStash, (int)vFreeSlot.X, (int)vFreeSlot.Y);
+                    StashSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow] = false;
+                    if (thisstashsort.IsTwoSlot)
+                        StashSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow + 1] = false;
                     StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y] = true;
-                    if (thisstashsort.bIsTwoSlot)
+                    if (thisstashsort.IsTwoSlot)
                         StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y + 1] = true;
-                    thisstashsort.iInventoryColumn = (int)vFreeSlot.X;
+                    thisstashsort.InventoryColumn = (int)vFreeSlot.X;
                     thisstashsort.InventoryRow = (int)vFreeSlot.Y;
-                    thisstashsort.iStashOrPack = 1;
+                    thisstashsort.StashOrPack = 1;
                 }
                 Thread.Sleep(150);
             }
 
             // Now sort the items by their score, highest to lowest
-            listSortMyStash.Sort((p1, p2) => p1.dStashScore.CompareTo(p2.dStashScore));
+            listSortMyStash.Sort((p1, p2) => p1.Score.CompareTo(p2.Score));
             listSortMyStash.Reverse();
 
             // Now fill the stash in ordered-order
-            foreach (GilesStashSort thisstashsort in listSortMyStash)
+            foreach (StashSortItem thisstashsort in listSortMyStash)
             {
-                vFreeSlot = SortingFindLocationStash(thisstashsort.bIsTwoSlot, false);
+                vFreeSlot = SortingFindLocationStash(thisstashsort.IsTwoSlot, false);
                 if (vFreeSlot.X == -1 || vFreeSlot.Y == -1)
                 {
                     DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Failure trying to put things back into stash, no stash slots free? Abandoning...");
                     return;
                 }
-                ZetaDia.Me.Inventory.MoveItem(thisstashsort.iDynamicID, iPlayerDynamicID, InventorySlot.PlayerSharedStash, (int)vFreeSlot.X, (int)vFreeSlot.Y);
-                if (thisstashsort.iStashOrPack == 1)
+                ZetaDia.Me.Inventory.MoveItem(thisstashsort.DynamicID, iPlayerDynamicID, InventorySlot.PlayerSharedStash, (int)vFreeSlot.X, (int)vFreeSlot.Y);
+                if (thisstashsort.StashOrPack == 1)
                 {
-                    StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow] = false;
-                    if (thisstashsort.bIsTwoSlot)
-                        StashSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow + 1] = false;
+                    StashSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow] = false;
+                    if (thisstashsort.IsTwoSlot)
+                        StashSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow + 1] = false;
                 }
                 else
                 {
-                    Trinity.BackpackSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow] = false;
-                    if (thisstashsort.bIsTwoSlot)
-                        Trinity.BackpackSlotBlocked[thisstashsort.iInventoryColumn, thisstashsort.InventoryRow + 1] = false;
+                    Trinity.BackpackSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow] = false;
+                    if (thisstashsort.IsTwoSlot)
+                        Trinity.BackpackSlotBlocked[thisstashsort.InventoryColumn, thisstashsort.InventoryRow + 1] = false;
                 }
                 StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y] = true;
-                if (thisstashsort.bIsTwoSlot)
+                if (thisstashsort.IsTwoSlot)
                     StashSlotBlocked[(int)vFreeSlot.X, (int)vFreeSlot.Y + 1] = true;
-                thisstashsort.iStashOrPack = 1;
+                thisstashsort.StashOrPack = 1;
                 thisstashsort.InventoryRow = (int)vFreeSlot.Y;
-                thisstashsort.iInventoryColumn = (int)vFreeSlot.X;
+                thisstashsort.InventoryColumn = (int)vFreeSlot.X;
                 Thread.Sleep(150);
             }
             DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Stash sorted!");

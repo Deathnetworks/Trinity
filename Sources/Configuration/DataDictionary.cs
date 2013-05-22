@@ -3,16 +3,28 @@ using System.Collections.Generic;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
+
 namespace Trinity
 {
-    public partial class Trinity : IPlugin
+    /// <summary>
+    /// Contains hard-coded meta-lists of ActorSNO's, Spells and other non-dynamic info
+    /// </summary>
+    internal class DataDictionary
     {
-        public static readonly HashSet<int> BossLevelAreaIDs = new HashSet<int> { 109457, 185228, 60194, 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, };
+        /// <summary>
+        /// Contains the list of Boss Level Area ID's
+        /// </summary>
+        public static HashSet<int> BossLevelAreaIDs { get { return bossLevelAreaIDs; } }
+        private static readonly HashSet<int> bossLevelAreaIDs = new HashSet<int> { 
+            109457, 185228, 60194, 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 
+            119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, 
+        };
 
         /// <summary>
         /// This list is used when an actor has an attribute BuffVisualEffect=1, e.g. fire floors in The Butcher arena
         /// </summary>
-        internal static HashSet<int> hashAvoidanceBuffSNOList = new HashSet<int>
+        public static HashSet<int> AvoidanceBuffs { get { return avoidanceBuffs; } }
+        private static HashSet<int> avoidanceBuffs = new HashSet<int>
         {
             // Butcher Floor Panels
             201454, 201464, 201426, 201438, 200969, 201423, 201242,
@@ -21,7 +33,8 @@ namespace Trinity
         /// <summary>
         /// A list of all the SNO's to avoid - you could add
         /// </summary>
-        internal static HashSet<int> hashAvoidanceSNOList = new HashSet<int>
+        public static HashSet<int> Avoidances { get { return avoidances; } }
+        private static HashSet<int> avoidances = new HashSet<int>
         {
             // Arcane        Arcane 2      Desecrator   Poison Tree    Molten Core   Molten Core 2   Molten Trail   Plague Cloud   Ice Balls
             219702,          221225,       84608,       5482,6578,     4803, 4804,   224225, 247987, 95868,         108869,        402, 223675,
@@ -38,7 +51,8 @@ namespace Trinity
         /// <summary>
         /// A list of SNO's that are projectiles (so constantly look for new locations while avoiding)
         /// </summary>
-        internal static HashSet<int> hashAvoidanceSNOProjectiles = new HashSet<int>
+        public static HashSet<int> AvoidanceProjectiles { get { return avoidanceProjectiles; } }
+        private static HashSet<int> avoidanceProjectiles = new HashSet<int>
             {
                 // Bees-Wasps  Sha-Ball   Mol Ball   Azmo fireball	Zolt Twister	Maghda Projectile   Succubus Stars  Diablo Expanding Fire           Diablo Lightning Breath
                 5212,          4103,      160154,    123842,		139741,			166686,             164829,         185999, 196526, 136533
@@ -51,26 +65,32 @@ namespace Trinity
         /// <summary>
         /// A special list of things *NOT* to use whirlwind on (eg because they move too quick/WW is ineffective on)
         /// </summary>
-        internal static HashSet<int> hashActorSNOWhirlwindIgnore = new HashSet<int> {
+        public static HashSet<int> WhirlwindIgnoreSNOIds { get { return whirlwindIgnoreIds; } }
+        internal static HashSet<int> whirlwindIgnoreIds = new HashSet<int> {
             4304, 5984, 5985, 5987, 5988,
          };
 
         /// <summary>
-        /// Very fast moving mobs (eg wasps), for special skill-selection decisions
+        /// ActorSNO's of Very fast moving mobs (eg wasps), for special skill-selection decisions
         /// </summary>
-        internal static HashSet<int> hashActorSNOFastMobs = new HashSet<int> {
+        public static HashSet<int> FastMovingMonsterIds { get { return fastMovementMonsterIds; } }
+        private static HashSet<int> fastMovementMonsterIds = new HashSet<int> {
             5212
          };
+
         /// <summary>
         /// A list of crappy "summoned mobs" we should always ignore unless they are very close to us, eg "grunts", summoned skeletons etc.
         /// </summary>
-        internal static HashSet<int> hashActorSNOShortRangeOnly = new HashSet<int> {
+        public static HashSet<int> ShortRangeAttackMonsterIds { get { return shortRangeAttackMonsterIds; } }
+        private static HashSet<int> shortRangeAttackMonsterIds = new HashSet<int> {
             4084, 4085, 5395, 144315,
          };
+
         /// <summary>
-        /// Dictionary for priorities, like the skeleton summoner cos it keeps bringing new stuff
+        /// Dictionary of Actor SNO's and cooresponding weighting/Priority 
         /// </summary>
-        internal static Dictionary<int, int> dictActorSNOPriority = new Dictionary<int, int> {
+        public static Dictionary<int, int> MonsterCustomWeights { get { return MonsterCustomWeights; } }
+        private static Dictionary<int, int> monsterCustomWeights = new Dictionary<int, int> {
             // Wood wraiths all this line (495 & 496 & 6572 & 139454 & 139456 & 170324 & 170325)
             {495, 901}, {496, 901}, {6572, 901}, {139454, 901}, {139456, 901}, {170324, 901}, {170325, 901},
             // -- added 4099 (act 2 fallen shaman)
@@ -130,26 +150,36 @@ namespace Trinity
             // Uber Bosses - Ghom {256709} & Rakanot {256711}
             {256709, 2999}, {256711, 1899},
          };
+
+
         /// <summary>
         /// A list of all known SNO's of treasure goblins/bandits etc.
         /// </summary>
-        internal static HashSet<int> hashActorSNOGoblins = new HashSet<int> {
+        public static HashSet<int> GoblinIds { get { return goblinIds; } }
+        private static HashSet<int> goblinIds = new HashSet<int> {
             5984, 5985, 5987, 5988
          };
-        // A list of ranged mobs that should be attacked even if they are outside of the routines current kill radius
-        //365, 4100 = fallen; 4300, 4304 = goat shaman; 4738 = pestilence; 4299 = goat ranged; 62736, 130794 = demon flyer; 5508 = succubus
-        // 210120 = corrupt growths, act 4
+
         /// <summary>
         /// Contains ActorSNO of ranged units that should be attacked even if outside of kill radius
         /// </summary>
-        internal static HashSet<int> hashActorSNORanged = new HashSet<int> {
-            365, 4100, 4304, 4300, 4738, 4299, 62736, 130794, 5508, 210120, 5388, 4286, 256015,256000,255996,
+        public static HashSet<int> RangedMonsterIds { get { return rangedMonsterIds; } }
+        private static HashSet<int> rangedMonsterIds = new HashSet<int> {
+            365, 4100, // fallen
+            4304, 4300, // goat shaman 
+            4738, // pestilence 
+            4299, // goat ranged
+            62736, 130794, // demon flyer
+            5508, // succubus 
+            210120, // corrupt growths, act 4
+            5388, 4286, 256015, 256000, 255996,
        };
         // A list of bosses in the game, just to make CERTAIN they are treated as elites
         /// <summary>
         /// Contains ActorSNO of known Bosses
         /// </summary>
-        internal static HashSet<int> hashBossSNO = new HashSet<int>
+        public static HashSet<int> BossIds { get { return bossIds; } }
+        private static HashSet<int> bossIds = new HashSet<int>
         {
             // Siegebreaker (96192), Azmodan (89690), Cydea (95250), Heart-thing (193077), 
             96192,                   89690,           95250,         193077, 
@@ -173,14 +203,144 @@ namespace Trinity
             256015, //Xah'Rith Keywarden
             115403, // A1 Cain Skeleton boss
          };
-        // IGNORE LIST / BLACKLIST - for units / monsters / npcs
-        // Special blacklist for things like ravens, templar/scoundrel/enchantress in town, witch-doctor summons, tornado-animations etc. etc. that should never be attacked
-        // Note: This is a MONSTER blacklist - so only stuff that needs to be ignored by the combat-engine. An "object" blacklist is further down!
+
+
+        // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
+
+        public static HashSet<int> MysticAllyIds { get { return mysticAllyIds; } }
+        private static HashSet<int> mysticAllyIds = new HashSet<int> { 
+            169123, 123885, 169890, 168878, 169891, 169077, 169904, 169907, 169906, 169908, 169905, 169909 
+        };
+
+        public static HashSet<int> GargantuanIds { get { return gargantuanIds; } }
+        private static HashSet<int> gargantuanIds = new HashSet<int> { 
+            179780, 179778, 179772, 179779, 179776, 122305 };
+
+        public static HashSet<int> ZombieDogIds { get { return zombieDogIds; } } 
+        private static HashSet<int> zombieDogIds = new HashSet<int> { 
+            110959, 103235, 103215, 105763, 103217, 51353 
+        };
+
+        public static HashSet<int> DemonHunterPetIds { get { return demonHunterPetIds; } }
+        private static HashSet<int> demonHunterPetIds = new HashSet<int> { 
+            178664, 173827, 133741, 159144, 181748, 159098 
+        };
+
         /// <summary>
-        /// Contains ActorSNO of Units that should be blacklisted
+        /// World-object dictionaries eg large object lists, ignore lists etc.
+        /// A list of SNO's to *FORCE* to type: Item. (BE CAREFUL WITH THIS!).
         /// </summary>
-        internal static HashSet<int> hashActorSNOIgnoreBlacklist = new HashSet<int>
+        public static HashSet<int> ForceToItemOverrideIds { get { return forceToItemOverrideIds; } }
+        private static HashSet<int> forceToItemOverrideIds = new HashSet<int> {
+            166943, // infernal key
+        };
+
+        /// <summary>
+        /// Interactable whitelist - things that need interacting with like special wheels, levers - they will be blacklisted for 30 seconds after one-use
+        /// </summary>
+        public static HashSet<int> InteractWhiteListIds { get { return interactWhiteListIds; } }
+        private static HashSet<int> interactWhiteListIds = new HashSet<int> {
+            56686, 211999, 52685, 54882, 180575, 105478, 
+        };
+
+        /// <summary>
+        /// NOTE: you don't NEED interactable SNO's listed here. But if they are listed here, *THIS* is the range at which your character will try to walk to within the object
+        /// BEFORE trying to actually "click it". Certain objects need you to get very close, so it's worth having them listed with low interact ranges
+        /// </summary>
+        public static Dictionary<int, int> InteractAtCustomRange { get { return interactAtCustomRange; } }
+        private static Dictionary<int, int> interactAtCustomRange = new Dictionary<int, int> {
+            {56686, 4}, {52685, 4}, {54882, 40}, {3349, 25}, {225270, 35}, {180575, 10}
+        };
+
+        /// <summary>
+        /// Navigation obstacles for standard navigation down dungeons etc. to help DB movement
+        /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
+        /// </summary>
+        public static HashSet<int> NavigationObstacleIds { get { return navigationObstacleIds; } }
+        private static HashSet<int> navigationObstacleIds = new HashSet<int> {
+            174900, 185391, // demonic forge
+            104632, 194682, 81699, 3340, 123325, 
+        };
+
+        /// <summary>
+        /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
+        /// </summary>
+        public static Dictionary<int, int> ObstacleCustomRadius { get { return obstacleCustomRadius; } }
+        private static Dictionary<int, int> obstacleCustomRadius = new Dictionary<int, int> {
+            {174900, 25}, {104632, 20}, {194682, 20}, {81699, 20}, {3340, 12}, {123325, 25}, {185391, 25},
+         };
+
+        /// <summary>
+        /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache
+        /// </summary>
+        public static Dictionary<int, float> DestructableObjectRadius { get { return destructableObjectRadius; } }
+        private static Dictionary<int, float> destructableObjectRadius = new Dictionary<int, float> {
+            {2972, 10}, {80357, 16}, {116508, 10}, {113932, 8}, {197514, 18}, {108587, 8}, {108618, 8}, {108612, 8}, {116409, 18}, {121586, 22},
+            {195101, 10}, {195108, 25}, {170657, 5}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 4}, {193963, 5}, {159066, 12}, {160570, 12},
+            {55325, 5}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 30}, {192867, 3.5f}, {155255, 8}, {54530, 6}, {157541, 6},
+         };
+
+        /// <summary>
+        /// Destructible things that need targeting by a location instead of an ACDGUID (stuff you can't "click on" to destroy in-game)
+        /// </summary>
+        public static HashSet<int> DestroyAtLocationIds { get { return destroyAtLocationIds; } }
+        private static HashSet<int> destroyAtLocationIds = new HashSet<int> {
+            170657, 116409, 121586, 155255, 104596,
+         };
+
+        /// <summary>
+        /// Resplendent chest SNO list
+        /// </summary>
+        public static HashSet<int> ResplendentChestIds { get { return resplendentChestIds; } }
+        private static HashSet<int> resplendentChestIds = new HashSet<int> {
+            62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866, 109264,
+            // Magi
+			112182,
+         };
+        /// <summary>
+        /// Objects that should never be ignored due to no Line of Sight (LoS) or ZDiff
+        /// </summary>
+        public static HashSet<int> LineOfSightWhitelist { get { return lineOfSightWhitelist; } }
+        private static HashSet<int> lineOfSightWhitelist = new HashSet<int>
         {
+            116807, // Butcher Health Well
+            180575, // Diablo arena Health Well
+            129031, // A3 Skycrown Catapults
+            220160, // Small Belial (220160), 
+            3349,   // Big Belial (3349),    
+            210268, // Corrupt Growths 2nd Tier
+            193077, // a3dun_Crater_ST_GiantDemonHeart_Mob
+        };
+
+        /// <summary>
+        /// Chests/average-level containers that deserve a bit of extra radius (ie - they are more worthwhile to loot than "random" misc/junk containers)
+        /// </summary>
+        public static HashSet<int> ContainerWhiteListIds { get { return containerWhiteListIds; } }
+        private static HashSet<int> containerWhiteListIds = new HashSet<int> {
+            62859, 62865, 62872, 78790, 79016, 94708, 96522, 130170, 108122, 111870, 111947, 213447, 213446, 51300, 179865, 109264, 212491, 210422, 211861,
+            // Magi
+			196945, 70534,
+         };
+
+        /// <summary>
+        /// Contains ActorSNO's of world objects that should be blacklisted
+        /// </summary>
+        public static HashSet<int> BlackListIds { get { return blacklistIds; } }
+        private static HashSet<int> blacklistIds = new HashSet<int> {
+            
+            // World Objects
+            163449, 78030, 2909, 58283, 58321, 87809, 90150, 91600, 97023, 97350, 97381, 72689, 121327, 54515, 3340, 122076, 123640,
+            60665, 60844, 78554, 86400, 86428, 81699, 86266, 86400, 192466, 6190, 80002, 104596, 58836, 104827, 74909, 6155, 6156, 6158, 6159, 75132,
+            181504, 91688, 3007, 3011, 3014, 130858, 131573, 214396, 182730, 226087, 141639, 206569, 15119, 54413, 54926, 2979, 5776, 3949,
+            108490, 52833, 200371, 153752, 2972, 206527, 3628,
+            //a3dun_crater_st_Demo_ChainPylon_Fire_Azmodan, a3dun_crater_st_Demon_ChainPylon_Fire_MistressOfPain
+            198977, 201680,
+            //trOut_Leor_painting
+            217285,
+            // uber fire chains in Realm of Turmoil  
+            263014,
+
+            // Units below here
             111456, 5013, 5014, 205756, 205746, 4182, 4183, 4644, 4062, 4538, 52693, 162575, 2928, 51291, 51292,
             96132, 90958, 90959, 80980, 51292, 51291, 2928, 3546, 129345, 81857, 138428, 81857, 60583, 170038, 174854, 190390,
             194263, 87189, 90072, 107031, 106584, 186130, 187265,
@@ -206,116 +366,38 @@ namespace Trinity
             60108, 182443,
             // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
             263014, 
-         };
-        // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
-        internal static HashSet<int> hashMysticAlly = new HashSet<int> { 169123, 123885, 169890, 168878, 169891, 169077, 169904, 169907, 169906, 169908, 169905, 169909 };
-        internal static HashSet<int> hashGargantuan = new HashSet<int> { 179780, 179778, 179772, 179779, 179776, 122305 };
-        internal static HashSet<int> hashZombie = new HashSet<int> { 110959, 103235, 103215, 105763, 103217, 51353 };
-        internal static HashSet<int> hashDHPets = new HashSet<int> { 178664, 173827, 133741, 159144, 181748, 159098 };
-
-        /// <summary>
-        /// World-object dictionaries eg large object lists, ignore lists etc.
-        /// A list of SNO's to *FORCE* to type: Item. (BE CAREFUL WITH THIS!).
-        /// 166943 = infernal key
-        /// </summary>
-        internal static HashSet<int> hashForceSNOToItemList = new HashSet<int> {
-            166943,
-         };
-        // Interactable whitelist - things that need interacting with like special wheels, levers - they will be blacklisted for 30 seconds after one-use
-        internal static HashSet<int> hashSNOInteractWhitelist = new HashSet<int> {
-            56686, 211999, 52685, 54882, 180575, 105478, 
-         };
-        /// <summary>
-        /// NOTE: you don't NEED interactable SNO's listed here. But if they are listed here, *THIS* is the range at which your character will try to walk to within the object
-        /// BEFORE trying to actually "click it". Certain objects need you to get very close, so it's worth having them listed with low interact ranges
-        /// </summary>
-        internal static Dictionary<int, int> dictInteractableRange = new Dictionary<int, int> {
-            {56686, 4}, {52685, 4}, {54882, 40}, {3349, 25}, {225270, 35}, {180575, 10}
-         };
-        /// <summary>
-        /// Navigation obstacles for standard navigation down dungeons etc. to help DB movement
-        /// MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
-        /// </summary>
-        internal static HashSet<int> hashSNONavigationObstacles = new HashSet<int> {
-            174900, 185391, // demonic forge
-            104632, 194682, 81699, 3340, 123325, 
-       };
-        /// <summary>
-        /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
-        /// </summary>
-        internal static Dictionary<int, int> dictSNONavigationSize = new Dictionary<int, int> {
-            {174900, 25}, {104632, 20}, {194682, 20}, {81699, 20}, {3340, 12}, {123325, 25}, {185391, 25},
-         };
-        /// <summary>
-        /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache
-        /// </summary>
-        internal static Dictionary<int, float> dictSNOExtendedDestructRange = new Dictionary<int, float> {
-            {2972, 10}, {80357, 16}, {116508, 10}, {113932, 8}, {197514, 18}, {108587, 8}, {108618, 8}, {108612, 8}, {116409, 18}, {121586, 22},
-            {195101, 10}, {195108, 25}, {170657, 5}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 4}, {193963, 5}, {159066, 12}, {160570, 12},
-            {55325, 5}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 30}, {192867, 3.5f}, {155255, 8}, {54530, 6}, {157541, 6},
-         };
-
-        internal static HashSet<int> NavigationBypassSNO = new HashSet<int> 
-        {
         };
 
         /// <summary>
-        /// Destructible things that need targeting by a location instead of an ACDGUID (stuff you can't "click on" to destroy in-game)
+        /// Add an ActorSNO to the blacklist. Returns false if the blacklist already contains the ActorSNO
         /// </summary>
-        internal static HashSet<int> hashDestructableLocationTarget = new HashSet<int> {
-            170657, 116409, 121586, 155255, 104596,
-         };
-        /// <summary>
-        /// Resplendent chest SNO list
-        /// </summary>
-        internal static HashSet<int> hashSNOContainerResplendant = new HashSet<int> {
-            62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866, 109264,
-            // Magi
-			112182,
-         };
-        /// <summary>
-        /// Objects that should never be ignored due to no Line of Sight (LoS) or ZDiff
-        /// </summary>
-        internal static HashSet<int> LineOfSightWhitelist = new HashSet<int>
+        /// <param name="actorId"></param>
+        /// <returns></returns>
+        public static bool AddToBlacklist(int actorId)
         {
-            116807, // Butcher Health Well
-            180575, // Diablo arena Health Well
-            129031, // A3 Skycrown Catapults
-            220160, // Small Belial (220160), 
-            3349,   // Big Belial (3349),    
-            210268, // Corrupt Growths 2nd Tier
-            193077, // a3dun_Crater_ST_GiantDemonHeart_Mob
-        };
-        /// <summary>
-        /// Chests/average-level containers that deserve a bit of extra radius (ie - they are more worthwhile to loot than "random" misc/junk containers)
-        /// </summary>
-        internal static HashSet<int> hashSNOContainerWhitelist = new HashSet<int> {
-            62859, 62865, 62872, 78790, 79016, 94708, 96522, 130170, 108122, 111870, 111947, 213447, 213446, 51300, 179865, 109264, 212491, 210422, 211861,
-            // Magi
-			196945, 70534,
-         };
-        // IGNORE LIST / BLACKLIST - for world objects
-        // World objects that should always be ignored - eg certain destructables, certain containers, etc. - anything handled as a "world object" rather than a monster
-        /// <summary>
-        /// Contains ActorSNO's of world objects that should be blacklisted
-        /// </summary>
-        internal static HashSet<int> hashSNOIgnoreBlacklist = new HashSet<int> {
-            163449, 78030, 2909, 58283, 58321, 87809, 90150, 91600, 97023, 97350, 97381, 72689, 121327, 54515, 3340, 122076, 123640,
-            60665, 60844, 78554, 86400, 86428, 81699, 86266, 86400, 192466, 6190, 80002, 104596, 58836, 104827, 74909, 6155, 6156, 6158, 6159, 75132,
-            181504, 91688, 3007, 3011, 3014, 130858, 131573, 214396, 182730, 226087, 141639, 206569, 15119, 54413, 54926, 2979, 5776, 3949,
-            108490, 52833, 200371, 153752, 2972, 206527, 3628,
-            //a3dun_crater_st_Demo_ChainPylon_Fire_Azmodan, a3dun_crater_st_Demon_ChainPylon_Fire_MistressOfPain
-            198977, 201680,
-            //trOut_Leor_painting
-            217285,
-            // uber fire chains in Realm of Turmoil  
-            263014,
-      };
+            if (!blacklistIds.Contains(actorId))
+            {
+                blacklistIds.Add(actorId);
+                return true;
+            }
+            else
+                return false;
+        }
 
         /// <summary>
         /// Timers for abilities and selection of best ability etc.
         /// </summary>
-        private static Dictionary<SNOPower, int> dictAbilityRepeatDefaults = new Dictionary<SNOPower, int>
+        public static Dictionary<SNOPower, int> AbilityRepeatDelays { 
+            get { return abilityRepeatDelays; } 
+            internal set { abilityRepeatDelays = value; }
+        }
+        private static Dictionary<SNOPower, int> abilityRepeatDelays = new Dictionary<SNOPower, int>();
+
+        /// <summary>
+        /// Default Values for AbilityRepeatDelays
+        /// </summary>
+        public static Dictionary<SNOPower, int> AbilityRepeatDelayDefaults { get { return abilityRepeatDelayDefaults; } }
+        private static Dictionary<SNOPower, int> abilityRepeatDelayDefaults = new Dictionary<SNOPower, int>
             {
                 {SNOPower.DrinkHealthPotion, 30000},
                 {SNOPower.Weapon_Melee_Instant, 5},
@@ -453,15 +535,14 @@ namespace Trinity
                 {SNOPower.DemonHunter_ClusterArrow, 150},
                 {SNOPower.DemonHunter_RainOfVengeance, 10000},
             };
-        // Actual delays copy the defaults
-        public static Dictionary<SNOPower, int> dictAbilityRepeatDelay = new Dictionary<SNOPower, int>(dictAbilityRepeatDefaults);
 
         /// <summary>
         /// Last used-timers for all abilities to prevent spamming D3 memory for cancast checks too often
         /// These should NEVER need manually editing
         /// But you do need to make sure every skill used by Trinity is listed in here once!
         /// </summary>
-        private static Dictionary<SNOPower, DateTime> dictAbilityLastUseDefaults = new Dictionary<SNOPower, DateTime>
+        public static Dictionary<SNOPower, DateTime> LastUseAbilityTimeDefaults { get { return lastUseAbilityTimeDefaults; } }
+        private static Dictionary<SNOPower, DateTime> lastUseAbilityTimeDefaults = new Dictionary<SNOPower, DateTime>
             {
                 {SNOPower.DrinkHealthPotion, DateTime.Today},{SNOPower.Weapon_Melee_Instant, DateTime.Today},{SNOPower.Weapon_Ranged_Instant, DateTime.Today},
                 // Barbarian last-used timers
@@ -511,107 +592,5 @@ namespace Trinity
                 {SNOPower.DemonHunter_Sentry, DateTime.Today},{SNOPower.DemonHunter_Strafe, DateTime.Today},{SNOPower.DemonHunter_Multishot, DateTime.Today},
                 {SNOPower.DemonHunter_ClusterArrow, DateTime.Today},{SNOPower.DemonHunter_RainOfVengeance, DateTime.Today},
             };
-        /// <summary>
-        /// This is the ACTUAL dictionary used now (the above are used to quickly reset all timers back to defaults on death etc.)
-        /// </summary>
-        public static Dictionary<SNOPower, DateTime> dictAbilityLastUse = new Dictionary<SNOPower, DateTime>(dictAbilityLastUseDefaults);
-
-        /// <summary>
-        /// And a "global cooldown" to prevent non-signature-spells being used too fast
-        /// </summary>
-        public static DateTime lastGlobalCooldownUse = DateTime.Today;
-
-        /* 
-         * This set of dictionaries are used for performance increases throughout, and a minimization of DB mis-read/null exception errors
-         * Uses a little more ram - but for a massive CPU gain. And ram is cheap, CPU is not!
-         */
-
-        /// <summary>
-        /// Caches the GilesObjectType of each object as we find it (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, GObjectType> dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
-        /// <summary>
-        /// Caches monster affixes for the monster ID, as this value can be a pain to get and slow (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, MonsterAffixes> dictGilesMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
-        /// <summary>
-        /// Caches each monster's max-health, since this never changes (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, double> dictGilesMaxHealthCache = new Dictionary<int, double>();
-        /// <summary>
-        /// Caches each monster's current health for brief periods  (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, double> dictGilesLastHealthCache = new Dictionary<int, double>();
-        private static Dictionary<int, int> dictGilesLastHealthChecked = new Dictionary<int, int>();
-        /// <summary>
-        /// Store a "not-burrowed" value for monsters that we have already checked a burrowed-status of and found false (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, bool> dictGilesBurrowedCache = new Dictionary<int, bool>();
-        /// <summary>
-        /// Store Actor SNO for each object (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, int> dictGilesActorSNOCache = new Dictionary<int, int>();
-        /// <summary>
-        /// Store ACDGUID for each object (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, int> dictGilesACDGUIDCache = new Dictionary<int, int>();
-        /// <summary>
-        /// Store internal name for each object (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, string> dictGilesInternalNameCache = new Dictionary<int, string>();
-        /// <summary>
-        /// Store Collision-sphere radius for each object (SNO based)
-        /// </summary>
-        private static Dictionary<int, float> dictGilesCollisionSphereCache = new Dictionary<int, float>();
-        /// <summary>
-        /// Caches the game balance ID for each object, which can then be used to pull up the appropriate entry from within dictGilesGameBalanceDataCache (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, int> dictGilesGameBalanceIDCache = new Dictionary<int, int>();
-        /// <summary>
-        /// Caches the Dynamic ID for each object (only used for non-units) (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, int> dictGilesDynamicIDCache = new Dictionary<int, int>();
-        /// <summary>
-        /// Caches the position for each object (only used for non-units, as this data is static so can be cached) (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, Vector3> dictGilesVectorCache = new Dictionary<int, Vector3>();
-        /// <summary>
-        /// Same as above but for gold-amount of pile (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, int> dictGilesGoldAmountCache = new Dictionary<int, int>();
-        ///// <summary>
-        ///// Same as above but for quality of item, we check this twice to make bloody sure we don't miss a legendary from a mis-read though (RactorGUID based)
-        ///// </summary>
-        private static Dictionary<int, ItemQuality> dictGilesQualityCache = new Dictionary<int, ItemQuality>();
-        //private static Dictionary<int, bool> dictGilesQualityRechecked = new Dictionary<int, bool>();
-        /// <summary>
-        /// Same as above but for whether we want to pick it up or not (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, bool> dictGilesPickupItem = new Dictionary<int, bool>();
-        /// <summary>
-        /// How many times the player tried to interact with this object in total
-        /// </summary>
-        private static Dictionary<int, int> dictTotalInteractionAttempts = new Dictionary<int, int>();
-        /// <summary>
-        /// Physics SNO for certain objects (SNO based)
-        /// </summary>
-        private static Dictionary<int, int> dictPhysicsSNO = new Dictionary<int, int>();
-        /// <summary>
-        /// Summoned-by ID for units (RactorGUID based)
-        /// </summary>
-        private static Dictionary<int, int> dictSummonedByID = new Dictionary<int, int>();
-
-
-        private static Dictionary<int, bool> dictHasBeenNavigableCache = new Dictionary<int, bool>();
-        private static Dictionary<int, bool> dictHasBeenRayCastedCache = new Dictionary<int, bool>();
-        private static Dictionary<int, bool> dictHasBeenInLoSCache = new Dictionary<int, bool>();
-
-        ///// <summary>
-        ///// Do we actually need this?
-        ///// </summary>
-        //private static Dictionary<int, GilesGameBalanceDataCache> dictGilesGameBalanceDataCache = new Dictionary<int, GilesGameBalanceDataCache>();
-
-        
-
     }
 }

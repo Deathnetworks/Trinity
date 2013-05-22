@@ -1,14 +1,14 @@
-﻿using Trinity.Technicals;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot.Profile;
 using Zeta.Navigation;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
-using Trinity.DbProvider;
+using Action = Zeta.TreeSharp.Action;
 
 namespace Trinity.XmlTags
 {
@@ -22,23 +22,19 @@ namespace Trinity.XmlTags
         private float fPosZ;
         private float fPathPrecision;
         private float fRandomizedDistance;
-        private string sDestinationName;
         private string sNoSkip;
         private string useNavigator;
         private Vector3? vMainVector;
 
         protected override Composite CreateBehavior()
         {
-            Composite[] children = new Composite[2];
-            Composite[] compositeArray = new Composite[2];
-            compositeArray[0] = new Zeta.TreeSharp.Action(new ActionSucceedDelegate(FlagTagAsCompleted));
-            children[0] = new Zeta.TreeSharp.Decorator(new CanRunDecoratorDelegate(CheckDistanceWithinPathPrecision), new Sequence(compositeArray));
-            ActionDelegate actionDelegateMove = new ActionDelegate(GilesMoveToLocation);
-            Sequence sequenceblank = new Sequence(
-                new Zeta.TreeSharp.Action(actionDelegateMove)
-                );
-            children[1] = sequenceblank;
-            return new PrioritySelector(children);
+            return
+            new PrioritySelector(
+                new Decorator(ret => CheckDistanceWithinPathPrecision(),
+                    new Action(ret => FlagTagAsCompleted())
+                ),
+                new Action(ret => MoveTo())
+            );
         }
 
         public override void OnStart()
@@ -52,7 +48,7 @@ namespace Trinity.XmlTags
             return String.Format("x=\"{0}\" y=\"{1}\" z=\"{2}\" ", this.X, this.Y, this.Z);
         }
 
-        private RunStatus GilesMoveToLocation(object ret)
+        private RunStatus MoveTo()
         {
 
             // First check if we can skip ahead because we recently moved here
@@ -100,7 +96,7 @@ namespace Trinity.XmlTags
             return RunStatus.Success;
         }
 
-        private bool CheckDistanceWithinPathPrecision(object object_0)
+        private bool CheckDistanceWithinPathPrecision()
         {
 
             // First see if we should skip ahead one move because we were already at that location
@@ -114,7 +110,7 @@ namespace Trinity.XmlTags
             return (Trinity.PlayerStatus.CurrentPosition.Distance(Position) <= Math.Max(PathPrecision, Navigator.PathPrecision));
         }
 
-        private void FlagTagAsCompleted(object object_0)
+        private void FlagTagAsCompleted()
         {
             m_IsDone = true;
         }

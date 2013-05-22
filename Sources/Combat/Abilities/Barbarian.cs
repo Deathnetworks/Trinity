@@ -23,9 +23,9 @@ namespace Trinity
             MinEnergyReserve = 56;
             // Ignore Pain when low on health
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_IgnorePain) && PlayerStatus.CurrentHealthPct <= 0.45 &&
-                GilesUseTimer(SNOPower.Barbarian_IgnorePain, true) && PowerManager.CanCast(SNOPower.Barbarian_IgnorePain))
+                SNOPowerUseTimer(SNOPower.Barbarian_IgnorePain, true) && PowerManager.CanCast(SNOPower.Barbarian_IgnorePain))
             {
-                return new TrinityPower(SNOPower.Barbarian_IgnorePain, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_IgnorePain, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
             
             IsWaitingForSpecial = false;
@@ -33,7 +33,7 @@ namespace Trinity
             if (PlayerStatus.PrimaryResource < MinEnergyReserve)
             {
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Earthquake) &&
-                    ElitesWithinRange[RANGE_25] >= 1 && GilesUseTimer(SNOPower.Barbarian_Earthquake) && !GetHasBuff(SNOPower.Barbarian_Earthquake))
+                    ElitesWithinRange[RANGE_25] >= 1 && SNOPowerUseTimer(SNOPower.Barbarian_Earthquake) && !GetHasBuff(SNOPower.Barbarian_Earthquake))
                 {
                     DbHelper.LogNormal("Waiting for Barbarian_Earthquake 1!");
                     IsWaitingForSpecial = true;
@@ -41,16 +41,16 @@ namespace Trinity
                 // Earthquake, elites close-range only
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Earthquake) && !PlayerStatus.IsIncapacitated &&
                     (ElitesWithinRange[RANGE_15] > 0 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 13f)) &&
-                    GilesUseTimer(SNOPower.Barbarian_Earthquake, true) && !GetHasBuff(SNOPower.Barbarian_Earthquake) &&
+                    SNOPowerUseTimer(SNOPower.Barbarian_Earthquake, true) && !GetHasBuff(SNOPower.Barbarian_Earthquake) &&
                     PowerManager.CanCast(SNOPower.Barbarian_Earthquake))
                 {
                     if (PlayerStatus.PrimaryResource >= 50)
-                        return new TrinityPower(SNOPower.Barbarian_Earthquake, 13f, vNullLocation, CurrentWorldDynamicId, -1, 4, 4, WAIT_FOR_ANIM);
+                        return new TrinityPower(SNOPower.Barbarian_Earthquake, 13f, Vector3.Zero, CurrentWorldDynamicId, -1, 4, 4, WAIT_FOR_ANIM);
                     DbHelper.LogNormal("Waiting for Barbarian_Earthquake 2!");
                     IsWaitingForSpecial = true;
                 }
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    ElitesWithinRange[RANGE_25] >= 1 && GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) && !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+                    ElitesWithinRange[RANGE_25] >= 1 && SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) && !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
                 {
                     DbHelper.LogNormal("Waiting for Barbarian_WrathOfTheBerserker 1!");
                     IsWaitingForSpecial = true;
@@ -58,13 +58,13 @@ namespace Trinity
                 // Berserker special for ignore elites
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Misc.IgnoreElites &&
                     (TargetUtil.AnyMobsInRange(25, 3) || TargetUtil.AnyMobsInRange(50, 10) || TargetUtil.AnyMobsInRange(Settings.Combat.Misc.TrashPackClusterRadius, Settings.Combat.Misc.TrashPackSize)) &&
-                    GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) && !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+                    SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) && !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
                 {
                     DbHelper.LogNormal("Waiting for Barbarian_WrathOfTheBerserker 2!");
                     IsWaitingForSpecial = true;
                 }
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_CallOfTheAncients) &&
-                    ElitesWithinRange[RANGE_25] >= 1 && GilesUseTimer(SNOPower.Barbarian_CallOfTheAncients) && !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients))
+                    ElitesWithinRange[RANGE_25] >= 1 && SNOPowerUseTimer(SNOPower.Barbarian_CallOfTheAncients) && !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients))
                 {
                     DbHelper.LogNormal("Waiting for Barbarian_CallOfTheAncients!");
                     IsWaitingForSpecial = true;
@@ -95,7 +95,7 @@ namespace Trinity
                     DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker being used!({0})", CurrentTarget.InternalName);
                     shouldUseBerserkerPower = false;
                     IsWaitingForSpecial = false;
-                    return new TrinityPower(SNOPower.Barbarian_WrathOfTheBerserker, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Barbarian_WrathOfTheBerserker, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 else
                 {
@@ -106,13 +106,13 @@ namespace Trinity
             // Call of the ancients, elites only
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_CallOfTheAncients) && !PlayerStatus.IsIncapacitated &&
                 (ElitesWithinRange[RANGE_25] > 0 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 25f)) &&
-                GilesUseTimer(SNOPower.Barbarian_CallOfTheAncients, true) &&
+                SNOPowerUseTimer(SNOPower.Barbarian_CallOfTheAncients, true) &&
                 PowerManager.CanCast(SNOPower.Barbarian_CallOfTheAncients))
             {
                 if (PlayerStatus.PrimaryResource >= 50)
                 {
                     IsWaitingForSpecial = false;
-                    return new TrinityPower(SNOPower.Barbarian_CallOfTheAncients, 0f, vNullLocation, CurrentWorldDynamicId, -1, 4, 4, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Barbarian_CallOfTheAncients, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 4, 4, WAIT_FOR_ANIM);
                 }
                 else
                 {
@@ -122,26 +122,26 @@ namespace Trinity
             }
             // Battle rage, for if being followed and before we do sprint
             if (UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_BattleRage) &&
-                (GilesUseTimer(SNOPower.Barbarian_BattleRage) || !GetHasBuff(SNOPower.Barbarian_BattleRage)) &&
+                (SNOPowerUseTimer(SNOPower.Barbarian_BattleRage) || !GetHasBuff(SNOPower.Barbarian_BattleRage)) &&
                 PlayerStatus.PrimaryResource >= 20 && PowerManager.CanCast(SNOPower.Barbarian_BattleRage))
             {
-                return new TrinityPower(SNOPower.Barbarian_BattleRage, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_BattleRage, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Special segment for sprint as an out-of-combat only
             if (UseOOCBuff && !bDontSpamOutofCombat &&
                 (Settings.Combat.Misc.AllowOOCMovement || GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) &&
                 !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Sprint) &&
                 !GetHasBuff(SNOPower.Barbarian_Sprint) &&
-                PlayerStatus.PrimaryResource >= 20 && GilesUseTimer(SNOPower.Barbarian_Sprint) && PowerManager.CanCast(SNOPower.Barbarian_Sprint))
+                PlayerStatus.PrimaryResource >= 20 && SNOPowerUseTimer(SNOPower.Barbarian_Sprint) && PowerManager.CanCast(SNOPower.Barbarian_Sprint))
             {
-                return new TrinityPower(SNOPower.Barbarian_Sprint, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Sprint, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
             // War cry, constantly maintain
             if (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_WarCry) &&
                 (PlayerStatus.PrimaryResource <= 60 || !GetHasBuff(SNOPower.Barbarian_WarCry)) &&
-                GilesUseTimer(SNOPower.Barbarian_WarCry, true) && (!GetHasBuff(SNOPower.Barbarian_WarCry) || PowerManager.CanCast(SNOPower.Barbarian_WarCry)))
+                SNOPowerUseTimer(SNOPower.Barbarian_WarCry, true) && (!GetHasBuff(SNOPower.Barbarian_WarCry) || PowerManager.CanCast(SNOPower.Barbarian_WarCry)))
             {
-                return new TrinityPower(SNOPower.Barbarian_WarCry, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_WarCry, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Threatening shout
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_ThreateningShout) && !PlayerStatus.IsIncapacitated &&
@@ -151,24 +151,24 @@ namespace Trinity
                   (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource <= 10) ||
                   (IsWaitingForSpecial && PlayerStatus.PrimaryResource <= MinEnergyReserve)
                 ) &&
-              GilesUseTimer(SNOPower.Barbarian_ThreateningShout, true) && PowerManager.CanCast(SNOPower.Barbarian_ThreateningShout))
+              SNOPowerUseTimer(SNOPower.Barbarian_ThreateningShout, true) && PowerManager.CanCast(SNOPower.Barbarian_ThreateningShout))
             {
-                return new TrinityPower(SNOPower.Barbarian_ThreateningShout, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_ThreateningShout, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Threatening shout out-of-combat
             if (UseOOCBuff && Settings.Combat.Barbarian.ThreatShoutOOC && Hotbar.Contains(SNOPower.Barbarian_ThreateningShout) &&
                 !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource < 25 &&
-                GilesUseTimer(SNOPower.Barbarian_ThreateningShout, true) && PowerManager.CanCast(SNOPower.Barbarian_ThreateningShout))
+                SNOPowerUseTimer(SNOPower.Barbarian_ThreateningShout, true) && PowerManager.CanCast(SNOPower.Barbarian_ThreateningShout))
             {
-                return new TrinityPower(SNOPower.Barbarian_ThreateningShout, 0f, vNullLocation, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_ThreateningShout, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Ground Stomp
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_GroundStomp) && !PlayerStatus.IsIncapacitated &&
                 (ElitesWithinRange[RANGE_15] > 0 || AnythingWithinRange[RANGE_15] > 4 || PlayerStatus.CurrentHealthPct <= 0.7) &&
-                GilesUseTimer(SNOPower.Barbarian_GroundStomp, true) &&
+                SNOPowerUseTimer(SNOPower.Barbarian_GroundStomp, true) &&
                 PowerManager.CanCast(SNOPower.Barbarian_GroundStomp))
             {
-                return new TrinityPower(SNOPower.Barbarian_GroundStomp, 16f, vNullLocation, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_GroundStomp, 16f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
             }
             // Revenge used off-cooldown
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_Revenge) && !PlayerStatus.IsIncapacitated &&
@@ -176,7 +176,7 @@ namespace Trinity
                 (!CurrentTarget.IsTreasureGoblin || AnythingWithinRange[RANGE_12] >= 5) &&
                 // Doesn't need CURRENT target to be in range, just needs ANYTHING to be within 9 foot, since it's an AOE!
                 (AnythingWithinRange[RANGE_6] > 0 || CurrentTarget.RadiusDistance <= 6f) &&
-                GilesUseTimer(SNOPower.Barbarian_Revenge) && PowerManager.CanCast(SNOPower.Barbarian_Revenge))
+                SNOPowerUseTimer(SNOPower.Barbarian_Revenge) && PowerManager.CanCast(SNOPower.Barbarian_Revenge))
             {
                 // Note - we have LONGER animation times for whirlwind-users
                 // Since whirlwind seems to interrupt rend so easily
@@ -195,7 +195,7 @@ namespace Trinity
             // Furious charge
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) &&
                 (ElitesWithinRange[RANGE_12] > 3 &&
-                GilesUseTimer(SNOPower.Barbarian_FuriousCharge) &&
+                SNOPowerUseTimer(SNOPower.Barbarian_FuriousCharge) &&
                 PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge)))
             {
                 float fExtraDistance;
@@ -210,7 +210,7 @@ namespace Trinity
             }
             // Leap used when off-cooldown, or when out-of-range
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_Leap) && !PlayerStatus.IsIncapacitated &&
-                (AnythingWithinRange[RANGE_20] > 1 || ElitesWithinRange[RANGE_20] > 0) && GilesUseTimer(SNOPower.Barbarian_Leap, true) &&
+                (AnythingWithinRange[RANGE_20] > 1 || ElitesWithinRange[RANGE_20] > 0) && SNOPowerUseTimer(SNOPower.Barbarian_Leap, true) &&
                 PowerManager.CanCast(SNOPower.Barbarian_Leap))
             {
                 // For close-by monsters, try to leap a little further than their centre-point
@@ -228,11 +228,11 @@ namespace Trinity
             if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Rend) &&
                 TargetUtil.AnyMobsInRange(9) && !CurrentTarget.IsTreasureGoblin &&
                 ((!IsWaitingForSpecial && PlayerStatus.PrimaryResource >= 20) || (IsWaitingForSpecial && PlayerStatus.PrimaryResource > MinEnergyReserve)) &&
-                (GilesUseTimer(SNOPower.Barbarian_Rend) && (NonRendedTargets_9 > 2 || !CurrentTarget.HasDotDPS)) &&
+                (SNOPowerUseTimer(SNOPower.Barbarian_Rend) && (NonRendedTargets_9 > 2 || !CurrentTarget.HasDotDPS)) &&
                 (TimeSinceUse(SNOPower.Barbarian_Rend) > 1500 || TargetUtil.AnyMobsInRange(10f, 6)) && LastPowerUsed != SNOPower.Barbarian_Rend
                 )
             {
-                iWithinRangeLastRend = GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= 9f);
+                iWithinRangeLastRend = ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= 9f);
                 iACDGUIDLastRend = CurrentTarget.ACDGuid;
                 // Note - we have LONGER animation times for whirlwind-users
                 // Since whirlwind seems to interrupt rend so easily
@@ -255,7 +255,7 @@ namespace Trinity
                         (CurrentTarget.IsTreasureGoblin && CurrentTarget.CentreDistance <= 6f) || Hotbar.Contains(SNOPower.Barbarian_SeismicSlam))
                     )
                 ) &&
-                GilesUseTimer(SNOPower.Barbarian_Overpower) && PowerManager.CanCast(SNOPower.Barbarian_Overpower))
+                SNOPowerUseTimer(SNOPower.Barbarian_Overpower) && PowerManager.CanCast(SNOPower.Barbarian_Overpower))
             {
                 int iPreDelay = 0;
                 int iPostDelay = 0;
@@ -278,11 +278,11 @@ namespace Trinity
                 (AnythingWithinRange[RANGE_50] > 0 && PlayerStatus.PrimaryResourcePct >= 0.85 && CurrentTarget.HitPointsPct >= 0.30) ||
                 (CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || (CurrentTarget.IsTreasureGoblin && CurrentTarget.CentreDistance <= 20f))))
             {
-                return new TrinityPower(SNOPower.Barbarian_SeismicSlam, 40f, vNullLocation, -1, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_SeismicSlam, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
             }
             // Ancient spear 
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_AncientSpear) &&
-                GilesUseTimer(SNOPower.Barbarian_AncientSpear) && PowerManager.CanCast(SNOPower.Barbarian_AncientSpear) &&
+                SNOPowerUseTimer(SNOPower.Barbarian_AncientSpear) && PowerManager.CanCast(SNOPower.Barbarian_AncientSpear) &&
                 CurrentTarget.HitPointsPct >= 0.20)
             {
                 // For close-by monsters, try to leap a little further than their centre-point
@@ -299,12 +299,12 @@ namespace Trinity
             // Sprint buff, if same suitable targets as elites, keep maintained for WW users
             if (!UseOOCBuff && !bDontSpamOutofCombat && Hotbar.Contains(SNOPower.Barbarian_Sprint) && !PlayerStatus.IsIncapacitated &&
                 // Let's check if is not spaming too much
-                DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Sprint]).TotalMilliseconds >= 200 &&
+                DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Barbarian_Sprint]).TotalMilliseconds >= 200 &&
                 // Fury Dump Options for sprint: use at max energy constantly, or on a timer
                 (
                     (Settings.Combat.Barbarian.FuryDumpWOTB && PlayerStatus.PrimaryResourcePct >= 0.95 && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
                     (Settings.Combat.Barbarian.FuryDumpAlways && PlayerStatus.PrimaryResourcePct >= 0.95) ||
-                    ((GilesUseTimer(SNOPower.Barbarian_Sprint) && !GetHasBuff(SNOPower.Barbarian_Sprint)) &&
+                    ((SNOPowerUseTimer(SNOPower.Barbarian_Sprint) && !GetHasBuff(SNOPower.Barbarian_Sprint)) &&
                 // Always keep up if we are whirlwinding, if the target is a goblin, or if we are 16 feet away from the target
                     (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) || CurrentTarget.IsTreasureGoblin || (CurrentTarget.CentreDistance >= 16f && PlayerStatus.PrimaryResource >= 40)))
                 ) &&
@@ -313,7 +313,7 @@ namespace Trinity
                 // Check for minimum energy
                 PlayerStatus.PrimaryResource >= 20)
             {
-                return new TrinityPower(SNOPower.Barbarian_Sprint, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Sprint, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
 
             //skillDict.Add("Frenzy", SNOPower.Barbarian_Frenzy);
@@ -329,14 +329,14 @@ namespace Trinity
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsRooted && Hotbar.Contains(SNOPower.Barbarian_Frenzy) &&
                 !TargetUtil.AnyMobsInRange(15f, 3) && GetBuffStacks(SNOPower.Barbarian_Frenzy) < 5)
             {
-                return new TrinityPower(SNOPower.Barbarian_Frenzy, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Frenzy, 10f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
             }
 
             // Whirlwind spam as long as necessary pre-buffs are up
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && !PlayerStatus.IsIncapacitated && !PlayerStatus.IsRooted &&
                 (!IsWaitingForSpecial || (IsWaitingForSpecial && !(TargetUtil.AnyMobsInRange(3, 15) || ForceCloseRangeTarget))) && // make sure we're not surrounded if waiting for special
                 // Don't WW against goblins, units in the special SNO list
-                (!Settings.Combat.Barbarian.SelectiveWhirlwind || (Settings.Combat.Barbarian.SelectiveWhirlwind && bAnyNonWWIgnoreMobsInRange && !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO))) &&
+                (!Settings.Combat.Barbarian.SelectiveWhirlwind || (Settings.Combat.Barbarian.SelectiveWhirlwind && bAnyNonWWIgnoreMobsInRange && !DataDictionary.WhirlwindIgnoreSNOIds.Contains(CurrentTarget.ActorSNO))) &&
                 // Only if within 15 foot of main target
                 ((CurrentTarget.RadiusDistance <= 25f || AnythingWithinRange[RANGE_25] >= 1)) &&
                 (AnythingWithinRange[RANGE_50] >= 2 || CurrentTarget.HitPointsPct >= 0.30 || CurrentTarget.IsBossOrEliteRareUnique || PlayerStatus.CurrentHealthPct <= 0.60) &&
@@ -372,42 +372,42 @@ namespace Trinity
                 ) &&
                 PlayerStatus.PrimaryResource >= 20 && PowerManager.CanCast(SNOPower.Barbarian_BattleRage))
             {
-                return new TrinityPower(SNOPower.Barbarian_BattleRage, 0f, vNullLocation, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_BattleRage, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
             // Hammer of the ancients spam-attacks - never use if waiting for special
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !PlayerStatus.IsIncapacitated && !IsWaitingForSpecial && Hotbar.Contains(SNOPower.Barbarian_HammerOfTheAncients) &&
                 PlayerStatus.PrimaryResource >= 20)
             {
-                //return new TrinityPower(SNOPower.Barbarian_HammerOfTheAncients, 12f, vNullLocation, -1, CurrentTarget.ACDGuid, 2, 2, USE_SLOWLY);
+                //return new TrinityPower(SNOPower.Barbarian_HammerOfTheAncients, 12f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 2, 2, USE_SLOWLY);
                 return new TrinityPower(SNOPower.Barbarian_HammerOfTheAncients, 18f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
             }
             // Weapon throw
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WeaponThrow)
                 && (PlayerStatus.PrimaryResource >= 10 && (CurrentTarget.RadiusDistance >= 5f || BarbHasNoPrimary())))
             {
-                return new TrinityPower(SNOPower.Barbarian_WeaponThrow, 80f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_WeaponThrow, 80f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
             }
             // Frenzy rapid-attacks
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Frenzy))
             {
-                return new TrinityPower(SNOPower.Barbarian_Frenzy, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Frenzy, 10f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
             }
             // Bash fast-attacks
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Bash))
             {
-                return new TrinityPower(SNOPower.Barbarian_Bash, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Bash, 10f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
             // Cleave fast-attacks
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Cleave))
             {
-                return new TrinityPower(SNOPower.Barbarian_Cleave, 10f, vNullLocation, -1, CurrentTarget.ACDGuid, 0, 2, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Cleave, 10f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 2, WAIT_FOR_ANIM);
             }
             // Default attacks
             if (!UseOOCBuff && !IsCurrentlyAvoiding)
             {
-                return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), vNullLocation, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(GetDefaultWeaponPower(), GetDefaultWeaponDistance(), Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
             }
-            return new TrinityPower(SNOPower.None, -1, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            return new TrinityPower(SNOPower.None, -1, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
         }
 
         private static bool BarbHasNoPrimary()
@@ -422,16 +422,16 @@ namespace Trinity
             if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource > MinEnergyReserve)
                 return new TrinityPower(SNOPower.Barbarian_Whirlwind, 10f, vSideToSideTarget, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Barbarian_Frenzy))
-                return new TrinityPower(SNOPower.Barbarian_Frenzy, 10f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Frenzy, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Barbarian_Bash))
-                return new TrinityPower(SNOPower.Barbarian_Bash, 6f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Bash, 6f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Barbarian_Cleave))
-                return new TrinityPower(SNOPower.Barbarian_Cleave, 6f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Cleave, 6f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Barbarian_Rend) && PlayerStatus.PrimaryResourcePct >= 0.65)
-                return new TrinityPower(SNOPower.Barbarian_Rend, 10f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Rend, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Barbarian_WeaponThrow) && PlayerStatus.PrimaryResource >= 20)
-                return new TrinityPower(SNOPower.Barbarian_WeaponThrow, 15f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            return new TrinityPower(SNOPower.Weapon_Melee_Instant, 10f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_WeaponThrow, 15f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            return new TrinityPower(SNOPower.Weapon_Melee_Instant, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
         }
 
     }

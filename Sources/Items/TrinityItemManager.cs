@@ -141,7 +141,6 @@ namespace Trinity
                     return false;
             }
 
-            // Switch giles base item type
             return false;
         }
 
@@ -277,11 +276,6 @@ namespace Trinity
             return false;
 
         }
-
-        //internal static bool IsWeaponArmorJewlery(GilesCachedACDItem thisitem)
-        //{
-        //    return (thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Armor || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Jewelry || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Weapon);
-        //}
 
         internal static SalvageOption GetSalvageOption(ItemQuality quality)
         {

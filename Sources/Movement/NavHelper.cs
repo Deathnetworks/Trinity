@@ -27,7 +27,7 @@ namespace Trinity
         {
             get
             {
-                return Trinity.GilesObjectCache;
+                return Trinity.ObjectCache;
             }
         }
         private static PlayerInfoCache PlayerStatus
@@ -126,7 +126,7 @@ namespace Trinity
                 hasEmergencyTeleportUp = (
                     // Leap is available
                     (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Leap) &&
-                        DateTime.Now.Subtract(Trinity.dictAbilityLastUse[SNOPower.Barbarian_Leap]).TotalMilliseconds >= Trinity.dictAbilityRepeatDelay[SNOPower.Barbarian_Leap]) ||
+                        DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Barbarian_Leap]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_Leap]) ||
                     // Whirlwind is available
                     (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
                         ((PlayerStatus.PrimaryResource >= 10 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= Trinity.MinEnergyReserve)) ||
@@ -143,7 +143,7 @@ namespace Trinity
                     );
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
                 if (!shouldKite && PlayerStatus.ActorClass == ActorClass.Wizard && Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && PlayerStatus.PrimaryResource >= 25 &&
-                    DateTime.Now.Subtract(Trinity.dictAbilityLastUse[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= Trinity.dictAbilityRepeatDelay[SNOPower.Wizard_WaveOfForce] &&
+                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_WaveOfForce] &&
                     !PlayerStatus.IsIncapacitated && Trinity.hashAvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(PlayerStatus.CurrentPosition) <= 15f) >= 2 &&
                     (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {
@@ -389,7 +389,7 @@ namespace Trinity
                     }
                     else if (!shouldKite && !isStuck) // melee avoidance use only
                     {
-                        var monsterCount = Trinity.GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.Position.Distance2D(gridPoint.Position) <= gridSquareRadius);
+                        var monsterCount = Trinity.ObjectCache.Count(u => u.Type == GObjectType.Unit && u.Position.Distance2D(gridPoint.Position) <= gridSquareRadius);
                         if (monsterCount > 0)
                             gridPoint.Weight *= monsterCount;
                     }

@@ -11,12 +11,12 @@ namespace Trinity
 {
     public partial class Trinity
     {
-        private static bool RefreshGilesUnit(bool AddToCache)
+        private static bool RefreshUnit(bool AddToCache)
         {
             AddToCache = true;
 
             // See if this is a boss
-            c_unit_IsBoss = hashBossSNO.Contains(c_ActorSNO);
+            c_unit_IsBoss = DataDictionary.BossIds.Contains(c_ActorSNO);
 
             // hax for Diablo_shadowClone
             c_unit_IsAttackable = c_InternalName.StartsWith("Diablo_shadowClone");
@@ -96,7 +96,7 @@ namespace Trinity
                 // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
                 c_unit_IsTreasureGoblin = false;
                 // Flag this as a treasure goblin *OR* ignore this object altogether if treasure goblins are set to ignore
-                if (hashActorSNOGoblins.Contains(c_ActorSNO))
+                if (DataDictionary.GoblinIds.Contains(c_ActorSNO))
                 {
                     if (Settings.Combat.Misc.GoblinPriority != 0)
                     {
@@ -117,7 +117,7 @@ namespace Trinity
                  * This should be moved to HandleTarget
                  * 
                  */
-                if (PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker, true))
+                if (PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker, true))
                 {
                     //WotB only used on Arcane, Frozen, Jailer, Molten and Electrified+Reflect Damage elites
                     if (monsterAffixes.HasFlag(MonsterAffixes.ArcaneEnchanted) || monsterAffixes.HasFlag(MonsterAffixes.Frozen) ||
@@ -161,7 +161,7 @@ namespace Trinity
                 }
             }
             // Retrieve collision sphere radius, cached if possible
-            if (!dictGilesCollisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
+            if (!collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
             {
                 try
                 {
@@ -174,7 +174,7 @@ namespace Trinity
                     AddToCache = false;
                     return AddToCache;
                 }
-                dictGilesCollisionSphereCache.Add(c_ActorSNO, c_Radius);
+                collisionSphereCache.Add(c_ActorSNO, c_Radius);
             }
 
             double dThisMaxHealth = RefreshMonsterHealth();
@@ -226,15 +226,15 @@ namespace Trinity
             // Units with very high priority (1900+) allow an extra 50% on the non-elite kill slider range
             if (!AnyMobsInRange && !AnyElitesPresent && !AnyTreasureGoblinsPresent && c_RadiusDistance <= (Settings.Combat.Misc.NonEliteRange * 1.5))
             {
-                int iExtraPriority;
+                int extraPriority;
                 // Enable extended kill radius for specific unit-types
-                if (hashActorSNORanged.Contains(c_ActorSNO))
+                if (DataDictionary.RangedMonsterIds.Contains(c_ActorSNO))
                 {
                     AnyMobsInRange = true;
                 }
-                if (!AnyMobsInRange && dictActorSNOPriority.TryGetValue(c_ActorSNO, out iExtraPriority))
+                if (!AnyMobsInRange && DataDictionary.MonsterCustomWeights.TryGetValue(c_ActorSNO, out extraPriority))
                 {
-                    if (iExtraPriority >= 1900)
+                    if (extraPriority >= 1900)
                     {
                         AnyMobsInRange = true;
                     }
@@ -276,10 +276,10 @@ namespace Trinity
             // health calculations
             double dThisMaxHealth;
             // Get the max health of this unit, a cached version if available, if not cache it
-            if (!dictGilesMaxHealthCache.TryGetValue(c_RActorGuid, out dThisMaxHealth))
+            if (!unitMaxHealthCache.TryGetValue(c_RActorGuid, out dThisMaxHealth))
             {
                 dThisMaxHealth = c_diaUnit.HitpointsMax;
-                dictGilesMaxHealthCache.Add(c_RActorGuid, dThisMaxHealth);
+                unitMaxHealthCache.Add(c_RActorGuid, dThisMaxHealth);
             }
             // Now try to get the current health - using temporary and intelligent caching
             // Health calculations
@@ -335,13 +335,13 @@ namespace Trinity
             }
 
             bool isBurrowed = false;
-            if (!dictGilesBurrowedCache.TryGetValue(c_RActorGuid, out isBurrowed))
+            if (!unitBurrowedCache.TryGetValue(c_RActorGuid, out isBurrowed))
             {
                 isBurrowed = unit.IsBurrowed;
                 // if the unit is NOT burrowed - we can attack them, add to cache (as IsAttackable)
                 if (!isBurrowed)
                 {
-                    dictGilesBurrowedCache.Add(c_RActorGuid, isBurrowed);
+                    unitBurrowedCache.Add(c_RActorGuid, isBurrowed);
                 }
             }
 
@@ -389,12 +389,12 @@ namespace Trinity
                     killRange = 200;
             }
             // Special short-range list to ignore weakling mobs
-            if (PlayerKiteDistance <= 0 && !GetHasBuff(SNOPower.Wizard_Archon) && hashActorSNOShortRangeOnly.Contains(c_ActorSNO))
+            if (PlayerKiteDistance <= 0 && !GetHasBuff(SNOPower.Wizard_Archon) && DataDictionary.ShortRangeAttackMonsterIds.Contains(c_ActorSNO))
             {
                 killRange = 12;
             }
             // Prevent long-range mobs beign ignored while they may be pounding on us
-            if (killRange <= 30 && hashActorSNORanged.Contains(c_ActorSNO))
+            if (killRange <= 30 && DataDictionary.RangedMonsterIds.Contains(c_ActorSNO))
                 killRange = 120f;
 
             // Injured treasure goblins get a huge extra radius - since they don't stay on the map long if injured, anyway!
@@ -432,12 +432,12 @@ namespace Trinity
         private static MonsterAffixes RefreshAffixes(ACD acd)
         {
             MonsterAffixes affixFlags;
-            if (!dictGilesMonsterAffixCache.TryGetValue(c_RActorGuid, out affixFlags))
+            if (!unitMonsterAffixCache.TryGetValue(c_RActorGuid, out affixFlags))
             {
                 try
                 {
                     affixFlags = acd.MonsterAffixes;
-                    dictGilesMonsterAffixCache.Add(c_RActorGuid, affixFlags);
+                    unitMonsterAffixCache.Add(c_RActorGuid, affixFlags);
                 }
                 catch (Exception ex)
                 {

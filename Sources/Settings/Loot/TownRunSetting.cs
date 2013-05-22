@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Trinity.Settings.Loot
 {
-    [DataContract]
+    [DataContract(Namespace = "")]
     public class TownRunSetting : ITrinitySetting<TownRunSetting>, INotifyPropertyChanged, IExtensibleDataObject
     {
         #region Fields

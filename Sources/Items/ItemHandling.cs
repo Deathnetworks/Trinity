@@ -68,7 +68,7 @@ namespace Trinity
                 return (Settings.Loot.Pickup.LegendaryLevel > 0 && (item.Level >= Settings.Loot.Pickup.LegendaryLevel || Settings.Loot.Pickup.LegendaryLevel == 1));
             }
 
-            // Calculate giles item types and base types etc.
+            // Calculate item types and base types etc.
             GItemType itemType = DetermineItemType(item.InternalName, item.DBItemType, item.ItemFollowerType);
             GItemBaseType baseType = DetermineBaseType(itemType);
 
@@ -172,8 +172,6 @@ namespace Trinity
                 default:
                     return false;
             }
-
-            // Switch giles base item type
 
             // Didn't cancel it, so default to true!
             return true;
@@ -349,27 +347,27 @@ namespace Trinity
         /// <returns></returns>
         internal static GItemBaseType DetermineBaseType(GItemType itemType)
         {
-            GItemBaseType thisGilesBaseType = GItemBaseType.Unknown;
+            GItemBaseType itemBaseType = GItemBaseType.Unknown;
             if (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
                 itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
                 itemType == GItemType.Spear || itemType == GItemType.Sword || itemType == GItemType.Wand)
             {
-                thisGilesBaseType = GItemBaseType.WeaponOneHand;
+                itemBaseType = GItemBaseType.WeaponOneHand;
             }
             else if (itemType == GItemType.TwoHandDaibo || itemType == GItemType.TwoHandMace ||
                 itemType == GItemType.TwoHandMighty || itemType == GItemType.TwoHandPolearm || itemType == GItemType.TwoHandStaff ||
                 itemType == GItemType.TwoHandSword || itemType == GItemType.TwoHandAxe)
             {
-                thisGilesBaseType = GItemBaseType.WeaponTwoHand;
+                itemBaseType = GItemBaseType.WeaponTwoHand;
             }
             else if (itemType == GItemType.TwoHandCrossbow || itemType == GItemType.HandCrossbow || itemType == GItemType.TwoHandBow)
             {
-                thisGilesBaseType = GItemBaseType.WeaponRange;
+                itemBaseType = GItemBaseType.WeaponRange;
             }
             else if (itemType == GItemType.Mojo || itemType == GItemType.Orb ||
                 itemType == GItemType.Quiver || itemType == GItemType.Shield)
             {
-                thisGilesBaseType = GItemBaseType.Offhand;
+                itemBaseType = GItemBaseType.Offhand;
             }
             else if (itemType == GItemType.Boots || itemType == GItemType.Bracer || itemType == GItemType.Chest ||
                 itemType == GItemType.Cloak || itemType == GItemType.Gloves || itemType == GItemType.Helm ||
@@ -377,33 +375,33 @@ namespace Trinity
                 itemType == GItemType.VoodooMask || itemType == GItemType.WizardHat || itemType == GItemType.Belt ||
                 itemType == GItemType.MightyBelt)
             {
-                thisGilesBaseType = GItemBaseType.Armor;
+                itemBaseType = GItemBaseType.Armor;
             }
             else if (itemType == GItemType.Amulet || itemType == GItemType.Ring)
             {
-                thisGilesBaseType = GItemBaseType.Jewelry;
+                itemBaseType = GItemBaseType.Jewelry;
             }
             else if (itemType == GItemType.FollowerEnchantress || itemType == GItemType.FollowerScoundrel ||
                 itemType == GItemType.FollowerTemplar)
             {
-                thisGilesBaseType = GItemBaseType.FollowerItem;
+                itemBaseType = GItemBaseType.FollowerItem;
             }
             else if (itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome ||
                 itemType == GItemType.SpecialItem || itemType == GItemType.CraftingPlan || itemType == GItemType.HealthPotion ||
                 itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey)
             {
-                thisGilesBaseType = GItemBaseType.Misc;
+                itemBaseType = GItemBaseType.Misc;
             }
             else if (itemType == GItemType.Ruby || itemType == GItemType.Emerald || itemType == GItemType.Topaz ||
                 itemType == GItemType.Amethyst)
             {
-                thisGilesBaseType = GItemBaseType.Gem;
+                itemBaseType = GItemBaseType.Gem;
             }
             else if (itemType == GItemType.HealthGlobe)
             {
-                thisGilesBaseType = GItemBaseType.HealthGlobe;
+                itemBaseType = GItemBaseType.HealthGlobe;
             }
-            return thisGilesBaseType;
+            return itemBaseType;
         }
 
         /// <summary>
@@ -496,53 +494,53 @@ namespace Trinity
         internal static bool ShouldWeStashThis(CachedACDItem cItem, ACDItem acdItem = null)
         {
             // Now look for Misc items we might want to keep
-            GItemType TrueItemType = DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
-            GItemBaseType thisGilesBaseType = DetermineBaseType(TrueItemType);
+            GItemType itemType = DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
+            GItemBaseType itemBaseType = DetermineBaseType(itemType);
 
-            if (TrueItemType == GItemType.StaffOfHerding)
+            if (itemType == GItemType.StaffOfHerding)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, itemType);
                 return true;
             }
-            if (TrueItemType == GItemType.CraftingMaterial)
+            if (itemType == GItemType.CraftingMaterial)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, itemType);
                 return true;
             }
 
-            if (TrueItemType == GItemType.Emerald)
+            if (itemType == GItemType.Emerald)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
                 return true;
             }
-            if (TrueItemType == GItemType.Amethyst)
+            if (itemType == GItemType.Amethyst)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
                 return true;
             }
-            if (TrueItemType == GItemType.Topaz)
+            if (itemType == GItemType.Topaz)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
                 return true;
             }
-            if (TrueItemType == GItemType.Ruby)
+            if (itemType == GItemType.Ruby)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
                 return true;
             }
-            if (TrueItemType == GItemType.CraftTome)
+            if (itemType == GItemType.CraftTome)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, itemType);
                 return true;
             }
-            if (TrueItemType == GItemType.InfernalKey)
+            if (itemType == GItemType.InfernalKey)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, itemType);
                 return true;
             }
-            if (TrueItemType == GItemType.HealthPotion)
+            if (itemType == GItemType.HealthPotion)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, itemType);
                 return false;
             }
 
@@ -580,21 +578,21 @@ namespace Trinity
 
             if (cItem.Quality >= ItemQuality.Legendary)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, itemType);
                 return true;
             }
 
-            if (TrueItemType == GItemType.CraftingPlan)
+            if (itemType == GItemType.CraftingPlan)
             {
-                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, TrueItemType);
+                DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, itemType);
                 return true;
             }
 
             // Ok now try to do some decent item scoring based on item types
             double iNeedScore = ScoreNeeded(acdItem.ItemBaseType);
-            double iMyScore = ItemValuation.ValueThisItem(cItem, TrueItemType);
+            double iMyScore = ItemValuation.ValueThisItem(cItem, itemType);
 
-            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, TrueItemType, iMyScore);
+            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, itemType, iMyScore);
             if (iMyScore >= iNeedScore) return true;
 
             // If we reached this point, then we found no reason to keep the item!
@@ -606,11 +604,7 @@ namespace Trinity
             return (thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Armor || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Jewelry || thisitem.DBBaseType == Zeta.Internals.Actors.ItemBaseType.Weapon);
         }
 
-        /// <summary>
-        /// Return the score needed to keep something by the item type
-        /// </summary>
-        /// <param name="thisGilesItemType"></param>
-        /// <returns></returns>
+        /// <summary>Return the score needed to keep something by the item type</summary>
         internal static double ScoreNeeded(ItemBaseType itemBaseType)
         {
             switch (itemBaseType)
@@ -629,22 +623,19 @@ namespace Trinity
         /// <summary>
         /// Checks if score of item is suffisant for throw notification.
         /// </summary>
-        /// <param name="thisgilesbaseitemtype">The thisgilesbaseitemtype.</param>
-        /// <param name="ithisitemvalue">The ithisitemvalue.</param>
-        /// <returns></returns>
-        public static bool CheckScoreForNotification(GItemBaseType thisgilesbaseitemtype, double ithisitemvalue)
+        public static bool CheckScoreForNotification(GItemBaseType itemBaseType, double itemValue)
         {
-            switch (thisgilesbaseitemtype)
+            switch (itemBaseType)
             {
                 case GItemBaseType.WeaponOneHand:
                 case GItemBaseType.WeaponRange:
                 case GItemBaseType.WeaponTwoHand:
-                    return (ithisitemvalue >= Settings.Notification.WeaponScore);
+                    return (itemValue >= Settings.Notification.WeaponScore);
                 case GItemBaseType.Armor:
                 case GItemBaseType.Offhand:
-                    return (ithisitemvalue >= Settings.Notification.ArmorScore);
+                    return (itemValue >= Settings.Notification.ArmorScore);
                 case GItemBaseType.Jewelry:
-                    return (ithisitemvalue >= Settings.Notification.JewelryScore);
+                    return (itemValue >= Settings.Notification.JewelryScore);
             }
             return false;
         }

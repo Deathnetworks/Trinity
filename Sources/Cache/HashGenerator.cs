@@ -34,7 +34,7 @@ namespace Trinity
         }
 
         /// <summary>
-        /// Generates an SHA1 hash of a particular GilesObject
+        /// Generates an SHA1 hash of a particular CacheObject
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>

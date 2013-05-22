@@ -271,7 +271,7 @@ namespace Trinity
                     // Pop a potion when necessary
                     // Note that we force a single-loop pause first, to help potion popping "go off"
                     if (PlayerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !IsWaitingForPower && !IsWaitingForPotion
-                        && !PlayerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
+                        && !PlayerStatus.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         IsWaitingForPotion = true;
                         runStatus = HandlerRunStatus.TreeRunning;
@@ -294,7 +294,7 @@ namespace Trinity
                             {
                                 ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetRActorGUID);
                                 LastPowerUsed = powerBuff.SNOPower;
-                                dictAbilityLastUse[powerBuff.SNOPower] = DateTime.Now;
+                                AbilityLastUsedCache[powerBuff.SNOPower] = DateTime.Now;
                             }
                         }
                     }
@@ -364,7 +364,7 @@ namespace Trinity
                         }
                         else if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade && CurrentTarget.Type != GObjectType.Destructible)
                         {
-                            CurrentTargetIsInLoS = (NavHelper.CanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination) || LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
+                            CurrentTargetIsInLoS = (NavHelper.CanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination) || DataDictionary.LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
                         }
                         else
                         {
@@ -380,7 +380,7 @@ namespace Trinity
                             // If avoidance, instantly skip
                             if (CurrentTarget.Type == GObjectType.Avoidance)
                             {
-                                //vlastSafeSpot = vNullLocation;
+                                //vlastSafeSpot = Vector3.Zero;
                                 ForceTargetUpdate = true;
                                 //bAvoidDirectionBlacklisting = false;
                                 runStatus = HandlerRunStatus.TreeRunning;
@@ -448,13 +448,13 @@ namespace Trinity
                                 case GObjectType.Globe:
                                     {
                                         // Count how many times we've tried interacting
-                                        if (!dictTotalInteractionAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                                        if (!interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                                         {
-                                            dictTotalInteractionAttempts.Add(CurrentTarget.RActorGuid, 1);
+                                            interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
                                         }
                                         else
                                         {
-                                            dictTotalInteractionAttempts[CurrentTarget.RActorGuid]++;
+                                            interactAttemptsCache[CurrentTarget.RActorGuid]++;
                                         }
                                         // If we've tried interacting too many times, blacklist this for a while
                                         if (iInteractAttempts > 3)
@@ -497,13 +497,13 @@ namespace Trinity
                                             hashRGUIDDestructible3SecBlacklist.Add(CurrentTarget.RActorGuid);
                                         }
                                         // Count how many times we've tried interacting
-                                        if (!dictTotalInteractionAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                                        if (!interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                                         {
-                                            dictTotalInteractionAttempts.Add(CurrentTarget.RActorGuid, 1);
+                                            interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
                                         }
                                         else
                                         {
-                                            dictTotalInteractionAttempts[CurrentTarget.RActorGuid]++;
+                                            interactAttemptsCache[CurrentTarget.RActorGuid]++;
                                         }
                                         // If we've tried interacting too many times, blacklist this for a while
                                         if ((iInteractAttempts > 5 || (CurrentTarget.Type == GObjectType.Interactable && iInteractAttempts > 3)) &&
@@ -558,7 +558,7 @@ namespace Trinity
 
                                             WaitWhileAnimating(12, true);
 
-                                            if (CurrentTarget.RActorGuid == IgnoreRactorGUID || hashDestructableLocationTarget.Contains(CurrentTarget.ActorSNO))
+                                            if (CurrentTarget.RActorGuid == IgnoreRactorGUID || DataDictionary.DestroyAtLocationIds.Contains(CurrentTarget.ActorSNO))
                                             {
                                                 // Location attack - attack the Vector3/map-area (equivalent of holding shift and left-clicking the object in-game to "force-attack")
                                                 Vector3 vAttackPoint;
@@ -576,21 +576,21 @@ namespace Trinity
                                             else
                                             {
                                                 // Standard attack - attack the ACDGUID (equivalent of left-clicking the object in-game)
-                                                ZetaDia.Me.UsePower(CurrentPower.SNOPower, vNullLocation, -1, CurrentTarget.ACDGuid);
+                                                ZetaDia.Me.UsePower(CurrentPower.SNOPower, Vector3.Zero, -1, CurrentTarget.ACDGuid);
                                                 if (CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
                                                     LastTempestRushLocation = CurrentTarget.Position;
                                             }
                                             // Count how many times we've tried interacting
-                                            if (!dictTotalInteractionAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                                            if (!interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                                             {
-                                                dictTotalInteractionAttempts.Add(CurrentTarget.RActorGuid, 1);
+                                                interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
                                             }
                                             else
                                             {
-                                                dictTotalInteractionAttempts[CurrentTarget.RActorGuid]++;
+                                                interactAttemptsCache[CurrentTarget.RActorGuid]++;
                                             }
 
-                                            dictAbilityLastUse[CurrentPower.SNOPower] = DateTime.Now;
+                                            AbilityLastUsedCache[CurrentPower.SNOPower] = DateTime.Now;
                                             //CurrentPower.SNOPower = SNOPower.None;
                                             WaitWhileAnimating(6, true);
                                             // Prevent this EXACT object being targetted again for a short while, just incase
@@ -732,7 +732,7 @@ namespace Trinity
                             CurrentTarget.Type == GObjectType.Destructible) && (Monk_TempestRushReady()));
 
                         bool Barbarian_SpecialMovement = ((CurrentTarget.Type == GObjectType.Avoidance &&
-                            GilesObjectCache.Any(u => (u.Type == GObjectType.Unit || u.Type == GObjectType.Destructible || u.Type == GObjectType.Barricade) &&
+                            ObjectCache.Any(u => (u.Type == GObjectType.Unit || u.Type == GObjectType.Destructible || u.Type == GObjectType.Barricade) &&
                                 MathUtil.IntersectsPath(u.Position, u.Radius, PlayerStatus.CurrentPosition, CurrentTarget.Position))) ||
                                 CurrentTarget.Type == GObjectType.Globe);
 
@@ -770,7 +770,7 @@ namespace Trinity
                                     Monk_TempestRushReady())
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, CurrentWorldDynamicId, -1);
-                                    dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
+                                    AbilityLastUsedCache[SNOPower.Monk_TempestRush] = DateTime.Now;
                                     LastPowerUsed = SNOPower.Monk_TempestRush;
                                     LastTempestRushLocation = vCurrentDestination;
                                     // Store the current destination for comparison incase of changes next loop
@@ -822,21 +822,21 @@ namespace Trinity
                         (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && TargetCurrentDistance >= 6f) &&
                         (CurrentTarget.Type != GObjectType.Unit ||
                         (CurrentTarget.Type == GObjectType.Unit && !CurrentTarget.IsTreasureGoblin &&
-                        (!Settings.Combat.Barbarian.SelectiveWhirlwind || (Settings.Combat.Barbarian.SelectiveWhirlwind && bAnyNonWWIgnoreMobsInRange && !hashActorSNOWhirlwindIgnore.Contains(CurrentTarget.ActorSNO))))))
+                        (!Settings.Combat.Barbarian.SelectiveWhirlwind || (Settings.Combat.Barbarian.SelectiveWhirlwind && bAnyNonWWIgnoreMobsInRange && !DataDictionary.WhirlwindIgnoreSNOIds.Contains(CurrentTarget.ActorSNO))))))
                     {
                         // Special code to prevent whirlwind double-spam, this helps save fury
                         bool bUseThisLoop = SNOPower.Barbarian_Whirlwind != LastPowerUsed;
                         if (!bUseThisLoop)
                         {
                             LastPowerUsed = SNOPower.None;
-                            if (DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Whirlwind]).TotalMilliseconds >= 200)
+                            if (DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Barbarian_Whirlwind]).TotalMilliseconds >= 200)
                                 bUseThisLoop = true;
                         }
                         if (bUseThisLoop)
                         {
                             ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, CurrentWorldDynamicId, -1);
                             LastPowerUsed = SNOPower.Barbarian_Whirlwind;
-                            dictAbilityLastUse[SNOPower.Barbarian_Whirlwind] = DateTime.Now;
+                            AbilityLastUsedCache[SNOPower.Barbarian_Whirlwind] = DateTime.Now;
                         }
                         // Store the current destination for comparison incase of changes next loop
                         vLastMoveToTarget = vCurrentDestination;
@@ -882,9 +882,6 @@ namespace Trinity
                         lastForcedKeepCloseRange = DateTime.Now;
                         // And tell Trinity to get a new target
                         ForceTargetUpdate = true;
-
-                        // Handle body blocking by blacklisting
-                        //GilesHandleBodyBlocking();
 
                         // If we were backtracking and failed, remove the current backtrack and try and move to the next
                         if (CurrentTarget.Type == GObjectType.Backtrack && TimesBlockedMoving >= 2)
@@ -965,17 +962,6 @@ namespace Trinity
                     {
                         addTargetToBlacklist = false;
                     }
-
-                    // Check if we can Raycast to a trash mob
-                    //if (CurrentTarget.IsTrashMob &&
-                    //    GetSecondsSinceTargetUpdate() > 4 &&
-                    //    CurrentTarget.HitPoints > 0.90)
-                    //{
-                    //    if (GilesNavHelper.CanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
-                    //    {
-                    //        addTargetToBlacklist = false;
-                    //    }
-                    //}
 
                     if (addTargetToBlacklist)
                     {
@@ -1074,7 +1060,7 @@ namespace Trinity
                 if (IsWaitingForPotion)
                 {
                     IsWaitingForPotion = false;
-                    if (!PlayerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
+                    if (!PlayerStatus.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).ThenBy(p => p.ItemStackQuantity).FirstOrDefault();
                         if (thisBestPotion != null)
@@ -1082,7 +1068,7 @@ namespace Trinity
                             WaitWhileAnimating(3, true);
                             ZetaDia.Me.Inventory.UseItem((thisBestPotion.DynamicId));
                         }
-                        dictAbilityLastUse[SNOPower.DrinkHealthPotion] = DateTime.Now;
+                        AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
                         WaitWhileAnimating(2, true);
                     }
                 }
@@ -1116,13 +1102,13 @@ namespace Trinity
                             // health calculations
                             double dThisMaxHealth;
                             // Get the max health of this unit, a cached version if available, if not cache it
-                            if (!dictGilesMaxHealthCache.TryGetValue(c_RActorGuid, out dThisMaxHealth))
+                            if (!unitMaxHealthCache.TryGetValue(c_RActorGuid, out dThisMaxHealth))
                             {
                                 try
                                 {
 
                                     dThisMaxHealth = CurrentTarget.Unit.HitpointsMax;
-                                    dictGilesMaxHealthCache.Add(c_RActorGuid, CurrentTarget.Unit.HitpointsMax);
+                                    unitMaxHealthCache.Add(c_RActorGuid, CurrentTarget.Unit.HitpointsMax);
                                 }
                                 catch
                                 {
@@ -1172,28 +1158,28 @@ namespace Trinity
                 bool bFoundSpecialMovement = false;
                 // Leap movement for a barb
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Leap) &&
-                    DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_Leap]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Barbarian_Leap] &&
+                    DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Barbarian_Leap]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_Leap] &&
                     PowerManager.CanCast(SNOPower.Barbarian_Leap))
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    dictAbilityLastUse[SNOPower.Barbarian_Leap] = DateTime.Now;
+                    AbilityLastUsedCache[SNOPower.Barbarian_Leap] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
                 // Furious Charge movement for a barb
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) &&
-                    DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Barbarian_FuriousCharge]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Barbarian_FuriousCharge] &&
+                    DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Barbarian_FuriousCharge]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_FuriousCharge] &&
                     PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge))
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    dictAbilityLastUse[SNOPower.Barbarian_FuriousCharge] = DateTime.Now;
+                    AbilityLastUsedCache[SNOPower.Barbarian_FuriousCharge] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
                 // Vault for a Demon Hunter
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Vault) &&
-                    //DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.DemonHunter_Vault] &&
-                    DateTime.Now.Subtract(Trinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
+                    //DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.DemonHunter_Vault] &&
+                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
                     (PlayerKiteDistance <= 0 || (!hashMonsterObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
                     !hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance))) &&
@@ -1202,28 +1188,28 @@ namespace Trinity
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    dictAbilityLastUse[SNOPower.DemonHunter_Vault] = DateTime.Now;
+                    AbilityLastUsedCache[SNOPower.DemonHunter_Vault] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Wizard_Teleport) &&
-                    DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_Teleport] &&
+                    DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Wizard_Teleport]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Teleport] &&
                     PlayerStatus.PrimaryResource >= 15 &&
                     PowerManager.CanCast(SNOPower.Wizard_Teleport))
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    dictAbilityLastUse[SNOPower.Wizard_Teleport] = DateTime.Now;
+                    AbilityLastUsedCache[SNOPower.Wizard_Teleport] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
                 // Archon Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
-                    DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Wizard_Archon_Teleport]).TotalMilliseconds >= dictAbilityRepeatDelay[SNOPower.Wizard_Archon_Teleport] &&
+                    DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Wizard_Archon_Teleport]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Archon_Teleport] &&
                     PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    dictAbilityLastUse[SNOPower.Wizard_Archon_Teleport] = DateTime.Now;
+                    AbilityLastUsedCache[SNOPower.Wizard_Archon_Teleport] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
                 return bFoundSpecialMovement;
@@ -1252,75 +1238,7 @@ namespace Trinity
         private static double GetSecondsSinceTargetUpdate()
         {
             return DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds;
-        }
-
-        /// <summary>
-        /// Will identify if we have been body blocked from moving during any movement, and add avoidance if needed. Can cancel movement altogether to clear nearby mobs.
-        /// </summary>
-        private static void GilesHandleBodyBlocking()
-        {
-            using (new PerformanceLogger("HandleTarget.HandleBodyBlocking"))
-            {
-                // Tell target finder to prioritize close-combat targets incase we were bodyblocked
-                switch (TimesBlockedMoving)
-                {
-                    case 0:
-                    case 1:
-                        ForceCloseRangeForMilliseconds = 850;
-                        break;
-                    case 2:
-                        ForceCloseRangeForMilliseconds = 1300;
-                        // Cancel avoidance attempts for 500ms
-                        cancelledEmergencyMoveForMilliseconds = 1500;
-                        DbHelper.Log(LogCategory.Movement, "Canceling emergency movement for {0} ms", cancelledEmergencyMoveForMilliseconds);
-                        timeCancelledEmergencyMove = DateTime.Now;
-
-                        // Check for raycastability against objects
-                        switch (CurrentTarget.Type)
-                        {
-                            case GObjectType.Container:
-                            case GObjectType.Shrine:
-                            case GObjectType.Globe:
-                            case GObjectType.Gold:
-                            case GObjectType.Item:
-                                // No raycast available, try and force-ignore this for a little while, and blacklist for a few seconds
-                                if (!NavHelper.CanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position) && CurrentTarget.Unit.InLineOfSight)
-                                {
-                                    IgnoreRactorGUID = CurrentTarget.RActorGuid;
-                                    IgnoreTargetForLoops = 6;
-                                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 60 seconds due to BodyBlocking", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
-                                    if (!(CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary)) // don't blacklist legendaries
-                                        hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
-                                    //dateSinceBlacklist90Clear = DateTime.Now;
-                                }
-                                break;
-                        }
-                        break;
-                    case 3:
-                        ForceCloseRangeForMilliseconds = 2000;
-                        // Cancel avoidance attempts for 1.5 seconds
-                        cancelledEmergencyMoveForMilliseconds = 2000;
-                        DbHelper.Log(LogCategory.Movement, "Canceling emergency movement for {0} ms", cancelledEmergencyMoveForMilliseconds);
-                        timeCancelledEmergencyMove = DateTime.Now;
-
-                        // Blacklist the current avoidance target area for the next avoidance-spot find
-                        if (CurrentTarget.Type == GObjectType.Avoidance)
-                            hashAvoidanceBlackspot.Add(new CacheObstacleObject(CurrentTarget.Position, 12f, -1, 0));
-                        break;
-                    default:
-                        ForceCloseRangeForMilliseconds = 4000;
-                        // Cancel avoidance attempts for 3.5 seconds
-                        cancelledEmergencyMoveForMilliseconds = 4000;
-                        DbHelper.Log(LogCategory.Movement, "Canceling emergency movement for {0} ms", cancelledEmergencyMoveForMilliseconds);
-                        timeCancelledEmergencyMove = DateTime.Now;
-
-                        // Blacklist the current avoidance target area for the next avoidance-spot find
-                        if (TimesBlockedMoving == 4 && CurrentTarget.Type == GObjectType.Avoidance)
-                            hashAvoidanceBlackspot.Add(new CacheObstacleObject(CurrentTarget.Position, 16f, -1, 0));
-                        break;
-                }
-            }
-        }
+        }               
 
         /// <summary>
         /// Updates bot status text with appropriate information if we are moving into range of our <see cref="CurrentTarget"/>
@@ -1506,7 +1424,7 @@ namespace Trinity
                             TargetRangeRequired = CurrentTarget.Radius + 5f;
                             //TargetRangeRequired = 5f;
                             int _range;
-                            if (dictInteractableRange.TryGetValue(CurrentTarget.ActorSNO, out _range))
+                            if (DataDictionary.InteractAtCustomRange.TryGetValue(CurrentTarget.ActorSNO, out _range))
                             {
                                 TargetRangeRequired = (float)_range;
                             }
@@ -1524,7 +1442,7 @@ namespace Trinity
                             if (fDistanceToDestination <= 1.5f)
                                 TargetDistanceReduction += 1f;
                             int iTempRange;
-                            if (dictInteractableRange.TryGetValue(CurrentTarget.ActorSNO, out iTempRange))
+                            if (DataDictionary.InteractAtCustomRange.TryGetValue(CurrentTarget.ActorSNO, out iTempRange))
                             {
                                 TargetRangeRequired = (float)iTempRange;
                             }
@@ -1539,7 +1457,7 @@ namespace Trinity
                                 TargetRangeRequired -= 2f;
                             // Check if it's in our interactable range dictionary or not
                             int iTempRange;
-                            if (dictInteractableRange.TryGetValue(CurrentTarget.ActorSNO, out iTempRange))
+                            if (DataDictionary.InteractAtCustomRange.TryGetValue(CurrentTarget.ActorSNO, out iTempRange))
                             {
                                 TargetRangeRequired = (float)iTempRange;
                             }
@@ -1631,7 +1549,7 @@ namespace Trinity
 
                     Monk_MaintainTempestRush();
 
-                    dictAbilityLastUse[CurrentPower.SNOPower] = DateTime.Now;
+                    AbilityLastUsedCache[CurrentPower.SNOPower] = DateTime.Now;
                     lastGlobalCooldownUse = DateTime.Now;
                     LastPowerUsed = CurrentPower.SNOPower;
                     //CurrentPower.SNOPower = SNOPower.None;
@@ -1694,11 +1612,11 @@ namespace Trinity
                 if (!_hashsetItemPicksLookedAt.Contains(itemSha1Hash))
                 {
                     _hashsetItemPicksLookedAt.Add(itemSha1Hash);
-                    GItemType thisgilesitemtype = DetermineItemType(CurrentTarget.InternalName, CurrentTarget.DBItemType, CurrentTarget.FollowerType);
-                    GItemBaseType thisgilesbasetype = DetermineBaseType(thisgilesitemtype);
-                    if (thisgilesbasetype == GItemBaseType.Armor || thisgilesbasetype == GItemBaseType.WeaponOneHand || thisgilesbasetype == GItemBaseType.WeaponTwoHand ||
-                        thisgilesbasetype == GItemBaseType.WeaponRange || thisgilesbasetype == GItemBaseType.Jewelry || thisgilesbasetype == GItemBaseType.FollowerItem ||
-                        thisgilesbasetype == GItemBaseType.Offhand)
+                    GItemType itemType = DetermineItemType(CurrentTarget.InternalName, CurrentTarget.DBItemType, CurrentTarget.FollowerType);
+                    GItemBaseType itemBaseType = DetermineBaseType(itemType);
+                    if (itemBaseType == GItemBaseType.Armor || itemBaseType == GItemBaseType.WeaponOneHand || itemBaseType == GItemBaseType.WeaponTwoHand ||
+                        itemBaseType == GItemBaseType.WeaponRange || itemBaseType == GItemBaseType.Jewelry || itemBaseType == GItemBaseType.FollowerItem ||
+                        itemBaseType == GItemBaseType.Offhand)
                     {
                         int iQuality;
                         ItemsPickedStats.Total++;
@@ -1723,17 +1641,17 @@ namespace Trinity
                         ItemsPickedStats.TotalPerLevel[CurrentTarget.ItemLevel]++;
                         ItemsPickedStats.TotalPerQPerL[iQuality, CurrentTarget.ItemLevel]++;
                     }
-                    else if (thisgilesbasetype == GItemBaseType.Gem)
+                    else if (itemBaseType == GItemBaseType.Gem)
                     {
                         int iGemType = 0;
                         ItemsPickedStats.TotalGems++;
-                        if (thisgilesitemtype == GItemType.Topaz)
+                        if (itemType == GItemType.Topaz)
                             iGemType = GEMTOPAZ;
-                        if (thisgilesitemtype == GItemType.Ruby)
+                        if (itemType == GItemType.Ruby)
                             iGemType = GEMRUBY;
-                        if (thisgilesitemtype == GItemType.Emerald)
+                        if (itemType == GItemType.Emerald)
                             iGemType = GEMEMERALD;
-                        if (thisgilesitemtype == GItemType.Amethyst)
+                        if (itemType == GItemType.Amethyst)
                             iGemType = GEMAMETHYST;
                         // !sp - asserts	
                         if (iGemType > GEMEMERALD)
@@ -1749,7 +1667,7 @@ namespace Trinity
                         ItemsPickedStats.GemsPerLevel[CurrentTarget.ItemLevel]++;
                         ItemsPickedStats.GemsPerTPerL[iGemType, CurrentTarget.ItemLevel]++;
                     }
-                    else if (thisgilesitemtype == GItemType.HealthPotion)
+                    else if (itemType == GItemType.HealthPotion)
                     {
                         ItemsPickedStats.TotalPotions++;
                         if ((CurrentTarget.ItemLevel < 0) || (CurrentTarget.ItemLevel > 63))
@@ -1765,16 +1683,16 @@ namespace Trinity
                 }
                 WaitWhileAnimating(5, true);
                 // Count how many times we've tried interacting
-                if (!dictTotalInteractionAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                if (!interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                 {
-                    dictTotalInteractionAttempts.Add(CurrentTarget.RActorGuid, 1);
+                    interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
 
                     // Fire item looted for Demonbuddy Item stats
                     GameEvents.FireItemLooted(CurrentTarget.ACDGuid);
                 }
                 else
                 {
-                    dictTotalInteractionAttempts[CurrentTarget.RActorGuid]++;
+                    interactAttemptsCache[CurrentTarget.RActorGuid]++;
                 }
                 // If we've tried interacting too many times, blacklist this for a while
                 if (iInteractAttempts > 20 && CurrentTarget.ItemQuality < ItemQuality.Legendary)

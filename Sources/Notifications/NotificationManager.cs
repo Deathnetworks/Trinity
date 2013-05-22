@@ -79,7 +79,7 @@ namespace Trinity.Notifications
                                     @"https://www.notifymyandroid.com/publicapi/notify";
             string sThisAPIKey = !android ? Trinity.Settings.Notification.IPhoneKey : Trinity.Settings.Notification.AndroidKey;
             prowlUrlSb += "?apikey=" + HttpUtility.UrlEncode(sThisAPIKey.Trim()) +
-                          "&application=" + HttpUtility.UrlEncode("GilesTrinity") +
+                          "&application=" + HttpUtility.UrlEncode("Trinity") +
                           "&description=" + HttpUtility.UrlEncode(notification_.Description) +
                           "&event=" + HttpUtility.UrlEncode(notification_.Event) +
                           "&priority=" + HttpUtility.UrlEncode(notification_.Priority.ToString());

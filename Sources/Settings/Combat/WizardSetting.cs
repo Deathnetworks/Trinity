@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Trinity.Settings.Combat
 {
-    [DataContract]
+    [DataContract(Namespace = "")]
     public class WizardSetting : ITrinitySetting<WizardSetting>, IAvoidanceHealth, INotifyPropertyChanged
     {
         #region Fields

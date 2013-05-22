@@ -48,14 +48,14 @@ namespace Trinity
         /// </summary>
         public DateTime PowerAssignmentTime { get; set; }
         /// <summary>
-        /// Returns the DateTime the power was last used <seealso cref="Trinity.dictAbilityLastUse"/>
+        /// Returns the DateTime the power was last used <seealso cref="Trinity.AbilityLastUsedCache"/>
         /// </summary>
         public DateTime PowerLastUsedTime
         {
             get
             {
-                if (Trinity.dictAbilityLastUse.ContainsKey(this.SNOPower))
-                    return Trinity.dictAbilityLastUse[this.SNOPower];
+                if (Trinity.AbilityLastUsedCache.ContainsKey(this.SNOPower))
+                    return Trinity.AbilityLastUsedCache[this.SNOPower];
                 else
                     return DateTime.MinValue;
             }

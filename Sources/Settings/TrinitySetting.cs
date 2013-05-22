@@ -12,7 +12,7 @@ using System.Xml;
 
 namespace Trinity.Settings
 {
-    [DataContract]
+    [DataContract(Namespace = "")]
     public class TrinitySetting : ITrinitySetting<TrinitySetting>, INotifyPropertyChanged
     {
         #region Fields
@@ -20,7 +20,7 @@ namespace Trinity.Settings
         private WorldObjectSetting _WorldObject;
         private ItemSetting _Loot;
         private AdvancedSetting _Advanced;
-        private NotificationSetting _Notification; 
+        private NotificationSetting _Notification;
         #endregion Fields
 
         #region Events
@@ -149,41 +149,76 @@ namespace Trinity.Settings
 
         public void Load()
         {
-            string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "GilesTrinity.xml");
+            TrinitySetting loadedSetting = null;
+            bool loadSuccessful = false;
+            bool migrateConfig = false;
+
+            string battleTagFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "Trinity.xml");
+            string oldBattleTagFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "GilesTrinity.xml");
+            string globalFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", "Trinity.xml");
+
+            string filename = battleTagFile;
             lock (this)
             {
                 try
                 {
                     if (!File.Exists(filename))
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "No Config file for BattleTag, General file is considered.");
-                        filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", "GilesTrinity.xml");
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "No Config file for BattleTag, Trying Old Trinity Settings");
+                        filename = oldBattleTagFile;
+
+                        if (File.Exists(oldBattleTagFile))
+                        {
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Old configuration file found, need to migrate!");
+                            migrateConfig = true;
+                        }
+                    }
+                    if (!File.Exists(filename))
+                    {
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "No Old Config file for BattleTag, Trying Global file");
+                        filename = globalFile;
                     }
 
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Load Config file : {0}", filename);
                     if (File.Exists(filename))
                     {
                         using (Stream stream = File.Open(filename, FileMode.Open))
                         {
-
                             DataContractSerializer serializer = new DataContractSerializer(typeof(TrinitySetting));
 
-                            TrinitySetting loadedSetting = (TrinitySetting)serializer.ReadObject(stream);
-                            stream.Close();
+                            XmlReader reader = XmlReader.Create(stream);
+                            XmlReader migrator = new SettingsMigrator(reader);
+                            loadedSetting = (TrinitySetting)serializer.ReadObject(migrator);
+
                             loadedSetting.CopyTo(this);
-                            DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Configuration file loaded");
+                            stream.Close();
+                            DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Configuration file loaded");
+
+                            // this tests to make sure we didn't load anything null, and our load was succesful
+                            if (this.Advanced != null && this.Combat != null && this.Combat.Misc != null)
+                                loadSuccessful = true;
                         }
+
                     }
                     else
                     {
-                        DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Configuration file not found.");
+                        DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Configuration file not found.");
                         Reset();
                     }
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Critical, LogCategory.UserInformation, "Error while loading Config file:{0}{1}", Environment.NewLine, ex);
+                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while loading Config file: {0}", ex);
+                    loadSuccessful = false;
+                    migrateConfig = false;
                 }
+
+                if (migrateConfig && loadSuccessful)
+                {
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Migrating configuration to new Trinity.xml");
+                    this.Save();
+                    File.Delete(oldBattleTagFile);
+                }
+
             }
         }
 
@@ -191,13 +226,13 @@ namespace Trinity.Settings
         {
             lock (this)
             {
-                string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "GilesTrinity.xml");
+                string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "Trinity.xml");
                 try
                 {
-                    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Saving Config file");
+                    DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Saving Config file");
                     using (Stream stream = File.Open(filename, FileMode.Create))
                     {
-                        DataContractSerializer serializer = new DataContractSerializer(typeof(TrinitySetting));
+                        DataContractSerializer serializer = new DataContractSerializer(typeof(TrinitySetting), "TrinitySetting", "");
 
                         var xmlWriterSettings = new XmlWriterSettings { Indent = true };
                         using (var xmlWriter = XmlWriter.Create(stream, xmlWriterSettings))
@@ -209,7 +244,7 @@ namespace Trinity.Settings
                 }
                 catch (Exception ex)
                 {
-                    DbHelper.Log(TrinityLogLevel.Critical, LogCategory.UserInformation, "Error while saving Config file '{0}' :{1}{2}", filename, Environment.NewLine, ex);
+                    DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while saving Config file: {0}", ex);
                 }
             }
         }

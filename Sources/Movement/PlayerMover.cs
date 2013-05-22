@@ -27,7 +27,7 @@ namespace Trinity.DbProvider
 
         private static bool ShrinesInArea(Vector3 targetpos)
         {
-            return Trinity.GilesObjectCache.Any(o => hashAvoidLeapingToSNO.Contains(o.ActorSNO) && Vector3.Distance(o.Position, targetpos) <= 10f);
+            return Trinity.ObjectCache.Any(o => hashAvoidLeapingToSNO.Contains(o.ActorSNO) && Vector3.Distance(o.Position, targetpos) <= 10f);
         }
 
         public void MoveStop()
@@ -406,9 +406,6 @@ namespace Trinity.DbProvider
 
             vMoveToTarget = WarnAndLogLongPath(vMoveToTarget);
 
-            // Make sure GilesTrinity doesn't want us to avoid routine-movement
-            //if (GilesTrinity.bDontMoveMeIAmDoingShit)
-            //    return;
             // Store player current position
 
             // Store distance to current moveto target
@@ -464,7 +461,6 @@ namespace Trinity.DbProvider
                     // Do we want to immediately generate a 2nd waypoint to "chain" anti-stucks in an ever-increasing path-length?
                     if (iTimesReachedStuckPoint <= iTotalAntiStuckAttempts)
                     {
-                        //GilesTrinity.PlayerStatus.CurrentPosition = vMyCurrentPosition;
                         vSafeMovementLocation = NavHelper.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
                         vMoveToTarget = vSafeMovementLocation;
                     }
@@ -487,11 +483,7 @@ namespace Trinity.DbProvider
                     }
                 }
             }
-            // Is the built-in unstucker enabled or not?
-            // if (GilesTrinity.Settings.Advanced.DebugInStatusBar)
-            // {
-            //    Logging.WriteDiagnostic("[Trinity] Moving toward <{0:0},{1:0},{2:0}> distance: {3:0}", vMoveToTarget.X, vMoveToTarget.Y, vMoveToTarget.Z, fDistanceFromTarget);
-            // }
+
             // See if there's an obstacle in our way, if so try to navigate around it
             Vector3 point = vMoveToTarget;
             foreach (CacheObstacleObject obstacle in Trinity.hashNavigationObstacleCache.Where(o => vMoveToTarget.Distance2D(o.Location) <= o.Radius))
@@ -529,7 +521,7 @@ namespace Trinity.DbProvider
                 bool bTooMuchZChange = (Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z) >= 4f);
 
                 // Whirlwind for a barb, special context only
-                if (Trinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Trinity.GilesObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= 10f) >= 1 &&
+                if (Trinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Trinity.ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= 10f) >= 1 &&
                     Trinity.PlayerStatus.PrimaryResource >= 10)
                 {
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
@@ -540,7 +532,7 @@ namespace Trinity.DbProvider
 
                 // Leap movement for a barb
                 if (Trinity.Hotbar.Contains(SNOPower.Barbarian_Leap) &&
-                    DateTime.Now.Subtract(Trinity.dictAbilityLastUse[SNOPower.Barbarian_Leap]).TotalMilliseconds >= Trinity.dictAbilityRepeatDelay[SNOPower.Barbarian_Leap] &&
+                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Barbarian_Leap]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_Leap] &&
                     DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Barbarian_Leap) && !ShrinesInArea(vMoveToTarget))
                 {
@@ -548,14 +540,14 @@ namespace Trinity.DbProvider
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
-                    Trinity.dictAbilityLastUse[SNOPower.Barbarian_Leap] = DateTime.Now;
+                    Trinity.AbilityLastUsedCache[SNOPower.Barbarian_Leap] = DateTime.Now;
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Leap for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
                 // Furious Charge movement for a barb
                 if (Trinity.Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) && !bTooMuchZChange &&
-                    DateTime.Now.Subtract(Trinity.dictAbilityLastUse[SNOPower.Barbarian_FuriousCharge]).TotalMilliseconds >= Trinity.dictAbilityRepeatDelay[SNOPower.Barbarian_FuriousCharge] &&
+                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Barbarian_FuriousCharge]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_FuriousCharge] &&
                     DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge) && !ShrinesInArea(vMoveToTarget))
                 {
@@ -563,14 +555,14 @@ namespace Trinity.DbProvider
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
-                    Trinity.dictAbilityLastUse[SNOPower.Barbarian_FuriousCharge] = DateTime.Now;
+                    Trinity.AbilityLastUsedCache[SNOPower.Barbarian_FuriousCharge] = DateTime.Now;
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Furious Charge for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
                 // Vault for a DH - maximum set by user-defined setting
                 if (Trinity.Hotbar.Contains(SNOPower.DemonHunter_Vault) && !bTooMuchZChange &&
-                    DateTime.Now.Subtract(Trinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
+                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     DestinationDistance >= 18f &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) && !ShrinesInArea(vMoveToTarget) &&
                     // Don't Vault into avoidance/monsters if we're kiting
@@ -585,7 +577,7 @@ namespace Trinity.DbProvider
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
-                    Trinity.dictAbilityLastUse[SNOPower.DemonHunter_Vault] = DateTime.Now;
+                    Trinity.AbilityLastUsedCache[SNOPower.DemonHunter_Vault] = DateTime.Now;
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Vault for OOC movement, distance={0}", DestinationDistance);
                     return;
@@ -596,10 +588,7 @@ namespace Trinity.DbProvider
                     (Trinity.Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly && !TargetUtil.AnyElitesInRange(40f))))
                 {
                     Vector3 vTargetAimPoint = vMoveToTarget;
-                    //vTargetAimPoint = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, aimPointDistance);
-                    //vTargetAimPoint = MathEx.CalculatePointFrom(vMyCurrentPosition, vMoveToTarget, aimPointDistance);
 
-                    //bool canRayCastTarget = GilesTrinity.NavHelper.CanRayCast(vMyCurrentPosition, vTargetAimPoint);
                     bool canRayCastTarget = true;
 
                     vTargetAimPoint = TargetUtil.FindTempestRushTarget();
@@ -607,7 +596,7 @@ namespace Trinity.DbProvider
                     if (!CanChannelTempestRush &&
                         ((Trinity.PlayerStatus.PrimaryResource >= Trinity.Settings.Combat.Monk.TR_MinSpirit &&
                         DestinationDistance >= Trinity.Settings.Combat.Monk.TR_MinDist) ||
-                         DateTime.Now.Subtract(Trinity.dictAbilityLastUse[SNOPower.Monk_TempestRush]).TotalMilliseconds <= 150) &&
+                         DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Monk_TempestRush]).TotalMilliseconds <= 150) &&
                         canRayCastTarget && PowerManager.CanCast(SNOPower.Monk_TempestRush))
                     {
                         CanChannelTempestRush = true;
@@ -617,16 +606,16 @@ namespace Trinity.DbProvider
                         CanChannelTempestRush = false;
                     }
 
-                    double lastUse = DateTime.Now.Subtract(Trinity.dictAbilityLastUse[SNOPower.Monk_TempestRush]).TotalMilliseconds;
+                    double lastUse = DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Monk_TempestRush]).TotalMilliseconds;
 
                     if (CanChannelTempestRush)
                     {
-                        if (Trinity.GilesUseTimer(SNOPower.Monk_TempestRush))
+                        if (Trinity.SNOPowerUseTimer(SNOPower.Monk_TempestRush))
                         {
                             LastTempestRushPosition = vTargetAimPoint;
 
                             ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vTargetAimPoint, Trinity.CurrentWorldDynamicId, -1);
-                            Trinity.dictAbilityLastUse[SNOPower.Monk_TempestRush] = DateTime.Now;
+                            Trinity.AbilityLastUsedCache[SNOPower.Monk_TempestRush] = DateTime.Now;
                             Trinity.LastPowerUsed = SNOPower.Monk_TempestRush;
 
                             // simulate movement speed of 30
@@ -672,8 +661,8 @@ namespace Trinity.DbProvider
 
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (Trinity.Hotbar.Contains(SNOPower.Wizard_Teleport) &&
-                    ((PowerManager.CanCast(SNOPower.Wizard_Teleport) && DateTime.Now.Subtract(Trinity.dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= Trinity.dictAbilityRepeatDelay[SNOPower.Wizard_Teleport]) ||
-                    (hasWormHole && WizardTeleportCount < 3 && DateTime.Now.Subtract(Trinity.dictAbilityLastUse[SNOPower.Wizard_Teleport]).TotalMilliseconds >= 250)) &&
+                    ((PowerManager.CanCast(SNOPower.Wizard_Teleport) && DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_Teleport]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Teleport]) ||
+                    (hasWormHole && WizardTeleportCount < 3 && DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_Teleport]).TotalMilliseconds >= 250)) &&
                     DestinationDistance >= 10f && !ShrinesInArea(vMoveToTarget))
                 {
                     // Reset teleport count if we've already hit the max
@@ -689,14 +678,14 @@ namespace Trinity.DbProvider
                     if (DestinationDistance > maxTeleportRange)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, maxTeleportRange);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
-                    Trinity.dictAbilityLastUse[SNOPower.Wizard_Teleport] = DateTime.Now;
+                    Trinity.AbilityLastUsedCache[SNOPower.Wizard_Teleport] = DateTime.Now;
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Teleport for OOC movement, distance={0}", DestinationDistance);
                     return;
                 }
                 // Archon Teleport for a wizard 
                 if (Trinity.Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
-                    DateTime.Now.Subtract(Trinity.dictAbilityLastUse[SNOPower.Wizard_Archon_Teleport]).TotalMilliseconds >= Trinity.dictAbilityRepeatDelay[SNOPower.Wizard_Archon_Teleport] &&
+                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_Archon_Teleport]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Archon_Teleport] &&
                     DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport) && !ShrinesInArea(vMoveToTarget))
                 {
@@ -704,7 +693,7 @@ namespace Trinity.DbProvider
                     if (DestinationDistance > 35f)
                         vThisTarget = MathEx.CalculatePointFrom(vMoveToTarget, vMyCurrentPosition, 35f);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vThisTarget, Trinity.CurrentWorldDynamicId, -1);
-                    Trinity.dictAbilityLastUse[SNOPower.Wizard_Archon_Teleport] = DateTime.Now;
+                    Trinity.AbilityLastUsedCache[SNOPower.Wizard_Archon_Teleport] = DateTime.Now;
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Archon Teleport for OOC movement, distance={0}", DestinationDistance);
                     return;
@@ -737,8 +726,8 @@ namespace Trinity.DbProvider
 
         internal static int GetObstacleNavigationSize(CacheObstacleObject obstacle)
         {
-            if (Trinity.dictSNONavigationSize.ContainsKey(obstacle.ActorSNO))
-                return Trinity.dictSNONavigationSize[obstacle.ActorSNO];
+            if (DataDictionary.ObstacleCustomRadius.ContainsKey(obstacle.ActorSNO))
+                return DataDictionary.ObstacleCustomRadius[obstacle.ActorSNO];
             else
                 return (int)Math.Ceiling(obstacle.Radius);
         }
@@ -748,14 +737,7 @@ namespace Trinity.DbProvider
             double moveDirection = MathUtil.FindDirectionRadian(vMyCurrentPosition, vMoveToTarget);
 
             vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, radius + 30f, (float)moveDirection);
-            //if (!GilesTrinity.NavHelper.CanRayCast(vMyCurrentPosition, vMoveToTarget))
-            //{
-            //    vMoveToTarget = MathEx.GetPointAt(vMyCurrentPosition, radius, MathEx.ToRadians(fDirectionToTarget + 65));
-            //    if (!GilesTrinity.NavHelper.CanRayCast(vMyCurrentPosition, vMoveToTarget))
-            //    {
-            //        vMoveToTarget = point;
-            //    }
-            //}
+
             if (vMoveToTarget != point)
             {
                 vShiftedPosition = vMoveToTarget;

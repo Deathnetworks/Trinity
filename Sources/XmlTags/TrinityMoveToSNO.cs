@@ -6,6 +6,7 @@ using Zeta.Internals.Actors;
 using Zeta.Navigation;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
+using Action = Zeta.TreeSharp.Action;
 
 namespace Trinity.XmlTags
 {
@@ -20,19 +21,16 @@ namespace Trinity.XmlTags
 
         protected override Composite CreateBehavior()
         {
-            Composite[] children = new Composite[2];
-            Composite[] compositeArray = new Composite[2];
-            compositeArray[0] = new Zeta.TreeSharp.Action(new ActionSucceedDelegate(FlagTagAsCompleted));
-            children[0] = new Zeta.TreeSharp.Decorator(new CanRunDecoratorDelegate(CheckDistanceWithinPathPrecision), new Sequence(compositeArray));
-            ActionDelegate actionDelegateMove = new ActionDelegate(GilesMoveToLocation);
-            Sequence sequenceblank = new Sequence(
-                new Zeta.TreeSharp.Action(actionDelegateMove)
-                );
-            children[1] = sequenceblank;
-            return new PrioritySelector(children);
+            return
+            new PrioritySelector(
+                new Decorator(ret => CheckDistanceWithinPathPrecision(),
+                    new Action(ret => FlagTagAsCompleted())
+                ),
+                new Action(ret => MoveTo())
+            );
         }
 
-        private RunStatus GilesMoveToLocation(object ret)
+        private RunStatus MoveTo()
         {
             DiaObject tempObject = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).FirstOrDefault<DiaObject>(a => a.ActorSNO == SNOID);
             if (tempObject != null)
@@ -43,7 +41,7 @@ namespace Trinity.XmlTags
             return RunStatus.Success;
         }
 
-        private bool CheckDistanceWithinPathPrecision(object object_0)
+        private bool CheckDistanceWithinPathPrecision()
         {
             DiaObject tempObject = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).FirstOrDefault<DiaObject>(a => a.ActorSNO == SNOID);
             if (tempObject != null)
@@ -53,7 +51,7 @@ namespace Trinity.XmlTags
             return false;
         }
 
-        private void FlagTagAsCompleted(object object_0)
+        private void FlagTagAsCompleted()
         {
             m_IsDone = true;
         }

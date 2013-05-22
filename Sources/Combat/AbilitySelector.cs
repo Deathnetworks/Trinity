@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Technicals;
 using Zeta;
+using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals;
@@ -47,11 +48,11 @@ namespace Trinity
         /// <returns>
         /// Returns whether or not we can use a skill, or if it's on our own internal Trinity cooldown timer
         /// </returns>
-        public static bool GilesUseTimer(SNOPower power, bool recheck = false)
+        public static bool SNOPowerUseTimer(SNOPower power, bool recheck = false)
         {
-            if (DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds >= dictAbilityRepeatDelay[power])
+            if (DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[power])
                 return true;
-            if (recheck && DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds >= 150 && DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds <= 600)
+            if (recheck && DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds >= 150 && DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds <= 600)
                 return true;
             return false;
         }
@@ -95,10 +96,10 @@ namespace Trinity
         /// <summary>
         /// A default power in case we can't use anything else
         /// </summary>
-        private static TrinityPower defaultPower = new TrinityPower(SNOPower.None, 10f, vNullLocation, -1, -1, 0, 0, WAIT_FOR_ANIM);
+        private static TrinityPower defaultPower = new TrinityPower(SNOPower.None, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
 
         /// <summary>
-        /// Returns an appropriately selected GilesPower and related information
+        /// Returns an appropriately selected TrinityPower and related information
         /// </summary>
         /// <param name="IsCurrentlyAvoiding">Are we currently avoiding?</param>
         /// <param name="UseOOCBuff">Buff Out Of Combat</param>
@@ -106,7 +107,7 @@ namespace Trinity
         /// <returns></returns>
         internal static TrinityPower AbilitySelector(bool IsCurrentlyAvoiding = false, bool UseOOCBuff = false, bool UseDestructiblePower = false)
         {
-            using (new PerformanceLogger("GilesAbilitySelector"))
+            using (new PerformanceLogger("AbilitySelector"))
             {
                 // See if archon just appeared/disappeared, so update the hotbar
                 if (ShouldRefreshHotbarAbilities)
@@ -230,8 +231,8 @@ namespace Trinity
         /// <returns></returns>
         internal static double TimeSinceUse(SNOPower power)
         {
-            if (dictAbilityLastUse.ContainsKey(power))
-                return DateTime.Now.Subtract(dictAbilityLastUse[power]).TotalMilliseconds;
+            if (AbilityLastUsedCache.ContainsKey(power))
+                return DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds;
             else
                 return -1;
         }

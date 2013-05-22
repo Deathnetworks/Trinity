@@ -4,7 +4,7 @@ using Trinity.Settings.Combat;
 
 namespace Trinity.Settings
 {
-    [DataContract]
+    [DataContract(Namespace = "")]
     public class WorldObjectSetting : ITrinitySetting<WorldObjectSetting>, INotifyPropertyChanged
     {
 

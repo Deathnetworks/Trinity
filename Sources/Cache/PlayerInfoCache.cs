@@ -182,7 +182,7 @@ namespace Trinity
         /// </summary>
         internal static void RefreshBuffs()
         {
-            using (new PerformanceLogger("GilesRefreshBuffs"))
+            using (new PerformanceLogger("RefreshBuffs"))
             {
 
                 Trinity.dictCachedBuffs = new Dictionary<int, int>();

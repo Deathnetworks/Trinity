@@ -10,12 +10,12 @@ namespace Trinity.Cache
     {
         internal static bool IsBossSNO(int actorSNO)
         {
-            return Trinity.hashBossSNO.Contains(actorSNO);
+            return DataDictionary.BossIds.Contains(actorSNO);
         }
 
         internal static bool IsAvoidanceSNO(int actorSNO)
         {
-            return Trinity.hashAvoidanceSNOList.Contains(actorSNO) || Trinity.hashAvoidanceBuffSNOList.Contains(actorSNO) || Trinity.hashAvoidanceSNOProjectiles.Contains(actorSNO);
+            return DataDictionary.Avoidances.Contains(actorSNO) || DataDictionary.AvoidanceBuffs.Contains(actorSNO) || DataDictionary.AvoidanceProjectiles.Contains(actorSNO);
         }
 
         internal static float GetZDiff(Vector3 Position)

@@ -719,7 +719,6 @@ namespace Trinity.Cache
         internal static bool ShouldPickupGold(int GoldStackSize, float distance)
         {
             return Trinity.Settings.Loot.Pickup.MinimumGoldStack == 0 || (GoldStackSize * 100f / Trinity.Settings.Loot.Pickup.MinimumGoldStack) / (distance * 100 / 2000) >= 1;
-            //return GoldStackSize >= GilesTrinity.Settings.Loot.Pickup.MinimumGoldStack;
         }
 
         internal static bool ShouldPickupItem(CacheItem item)

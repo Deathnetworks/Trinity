@@ -19,7 +19,7 @@ namespace Trinity
 {
     public partial class Trinity
     {
-        private static bool RefreshGilesItem()
+        private static bool RefreshItem()
         {
             bool logNewItem = false;
             bool AddToCache = false;
@@ -84,7 +84,7 @@ namespace Trinity
                 ActorSNO = c_ActorSNO
             };
 
-            // Calculate custom Giles item type
+            // Calculate item type
             c_item_GItemType = DetermineItemType(c_InternalName, c_DBItemType, c_item_tFollowerType);
 
             // And temporarily store the base type
@@ -95,7 +95,7 @@ namespace Trinity
             {
                 c_ObjectType = GObjectType.Globe;
                 // Create or alter this cached object type
-                dictGilesObjectTypeCache[c_RActorGuid] = c_ObjectType;
+                objectTypeCache[c_RActorGuid] = c_ObjectType;
                 AddToCache = true;
             }
 
@@ -103,7 +103,7 @@ namespace Trinity
             logNewItem = RefreshItemStats(itemBaseType);
 
             // Get whether or not we want this item, cached if possible
-            if (!dictGilesPickupItem.TryGetValue(c_RActorGuid, out AddToCache))
+            if (!pickupItemCache.TryGetValue(c_RActorGuid, out AddToCache))
             {
                 if (Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.DemonBuddy)
                 {
@@ -118,7 +118,7 @@ namespace Trinity
                     AddToCache = PickupItemValidation(pickupItem);
                 }
 
-                dictGilesPickupItem.Add(c_RActorGuid, AddToCache);
+                pickupItemCache.Add(c_RActorGuid, AddToCache);
             }
 
             // Using DB built-in item rules
@@ -145,7 +145,7 @@ namespace Trinity
             string droppedItemLogPath = Path.Combine(FileManager.TrinityLogsPath, String.Format("ItemsDropped.csv"));
 
             bool pickupItem = false;
-            dictGilesPickupItem.TryGetValue(c_RActorGuid, out pickupItem);
+            pickupItemCache.TryGetValue(c_RActorGuid, out pickupItem);
 
             bool writeHeader = !File.Exists(droppedItemLogPath);
             using (StreamWriter LogWriter = new StreamWriter(droppedItemLogPath, true))
@@ -177,13 +177,13 @@ namespace Trinity
             }
 
         }
-        private static bool RefreshGilesGold(bool AddToCache)
+        private static bool RefreshGold(bool AddToCache)
         {
             //int rangedMinimumStackSize = 0;
             AddToCache = true;
 
             // Get the gold amount of this pile, cached if possible
-            if (!dictGilesGoldAmountCache.TryGetValue(c_RActorGuid, out c_GoldStackSize))
+            if (!goldAmountCache.TryGetValue(c_RActorGuid, out c_GoldStackSize))
             {
                 try
                 {
@@ -195,7 +195,7 @@ namespace Trinity
                     AddToCache = false;
                     c_IgnoreSubStep = "GetAttributeException";
                 }
-                dictGilesGoldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
+                goldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
             }
 
             if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)

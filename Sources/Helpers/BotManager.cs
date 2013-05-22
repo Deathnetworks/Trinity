@@ -42,7 +42,7 @@ namespace Trinity
             }
 
             if (BotMain.IsRunning &&
-                (!Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("trinity") || !Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("gilesplugin")))
+                (!Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("trinity"))) 
             {
                 DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Found Routine: {0}", Zeta.CommonBot.RoutineManager.Current.Name);
                 DbHelper.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "######################################");

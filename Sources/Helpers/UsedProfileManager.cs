@@ -53,20 +53,16 @@ namespace Trinity
         }
 
         /// <summary>
-        /// Adds profile blacklist entries to the Giles Blacklist
+        /// Adds profile blacklist entries to the Trinity Blacklist
         /// </summary>
         internal static void RefreshProfileBlacklists()
         {
             foreach (TargetBlacklist b in ProfileManager.CurrentProfile.TargetBlacklists)
             {
-                if (!Trinity.hashSNOIgnoreBlacklist.Contains(b.ActorId))
+                if (!DataDictionary.BlackListIds.Contains(b.ActorId))
                 {
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Adding Profile TargetBlacklist {0} to Trinity Blacklist", b.ActorId);
-                    Trinity.hashSNOIgnoreBlacklist.Add(b.ActorId);
-                }
-                if (!Trinity.hashActorSNOIgnoreBlacklist.Contains(b.ActorId))
-                {
-                    Trinity.hashActorSNOIgnoreBlacklist.Add(b.ActorId);
+                    DataDictionary.AddToBlacklist(b.ActorId);
                 }
             }
         }

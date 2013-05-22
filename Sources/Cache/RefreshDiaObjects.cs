@@ -24,7 +24,7 @@ namespace Trinity
         }
 
         /// <summary>
-        /// This method will add and update necessary information about all available actors. Determines GilesObjectType, sets ranges, updates blacklists, determines avoidance, kiting, target weighting
+        /// This method will add and update necessary information about all available actors. Determines ObjectType, sets ranges, updates blacklists, determines avoidance, kiting, target weighting
         /// and the result is we will have a new target for the Target Handler. Returns true if the cache was refreshed.
         /// </summary>
         /// <returns>True if the cache was updated</returns>
@@ -77,7 +77,7 @@ namespace Trinity
                     {
                         Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, PlayerStatus.CurrentPosition, true);
                         // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
-                        if (vAnySafePoint != vNullLocation)
+                        if (vAnySafePoint != Vector3.Zero)
                         {
                             if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                             {
@@ -94,7 +94,7 @@ namespace Trinity
                                     Weight = 20000,
                                     CentreDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vAnySafePoint),
                                     RadiusDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vAnySafePoint),
-                                    InternalName = "GilesSafePoint"
+                                    InternalName = "SafePoint"
                                 }; ;
                         }
                         //else
@@ -128,7 +128,7 @@ namespace Trinity
                                             Weight = 20000,
                                             CentreDistance = 2f,
                                             RadiusDistance = 2f,
-                                            InternalName = "GilesStayPutPoint"
+                                            InternalName = "StayPutPoint"
                                         };
                     DbHelper.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Staying Put During Avoidance");
                 }
@@ -240,8 +240,8 @@ namespace Trinity
                 LastRefreshedCache = DateTime.Now;
 
                 // Blank current/last/next targets
-                LastPrimaryTargetPosition = CurrentTarget != null ? CurrentTarget.Position : vNullLocation;
-                vKitePointAvoid = vNullLocation;
+                LastPrimaryTargetPosition = CurrentTarget != null ? CurrentTarget.Position : Vector3.Zero;
+                vKitePointAvoid = Vector3.Zero;
                 // store current target GUID
                 CurrentTargetRactorGUID = CurrentTarget != null ? CurrentTarget.RActorGuid : -1;
                 //reset current target
@@ -337,34 +337,34 @@ namespace Trinity
                 // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
                 w_HighestWeightFound = 0;
                 // Here's the list we'll use to store each object
-                GilesObjectCache = new List<TrinityCacheObject>();
+                ObjectCache = new List<TrinityCacheObject>();
                 hashDoneThisRactor = new HashSet<int>();
             }
         }
 
         private static void ClearCachesOnGameChange(object sender, EventArgs e)
         {
-            dictGilesVectorCache = new Dictionary<int, Vector3>();
-            dictGilesObjectTypeCache = new Dictionary<int, GObjectType>();
-            dictGilesActorSNOCache = new Dictionary<int, int>();
-            dictGilesACDGUIDCache = new Dictionary<int, int>();
-            dictGilesLastHealthCache = new Dictionary<int, double>();
-            dictGilesLastHealthChecked = new Dictionary<int, int>();
-            dictGilesMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
-            dictGilesMaxHealthCache = new Dictionary<int, double>();
+            positionCache = new Dictionary<int, Vector3>();
+            objectTypeCache = new Dictionary<int, GObjectType>();
+            actorSNOCache = new Dictionary<int, int>();
+            ACDGUIDCache = new Dictionary<int, int>();
+            currentHealthCache = new Dictionary<int, double>();
+            currentHealthCheckTimeCache = new Dictionary<int, int>();
+            unitMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
+            unitMaxHealthCache = new Dictionary<int, double>();
             dictionaryStoredMonsterTypes = new Dictionary<int, MonsterType>();
             dictionaryStoredMonsterSizes = new Dictionary<int, MonsterSize>();
-            dictGilesBurrowedCache = new Dictionary<int, bool>();
-            dictSummonedByID = new Dictionary<int, int>();
-            dictGilesInternalNameCache = new Dictionary<int, string>();
-            dictGilesGoldAmountCache = new Dictionary<int, int>();
-            dictGilesGameBalanceIDCache = new Dictionary<int, int>();
-            dictGilesDynamicIDCache = new Dictionary<int, int>();
-            dictGilesQualityCache = new Dictionary<int, ItemQuality>();
-            dictGilesPickupItem = new Dictionary<int, bool>();
-            dictHasBeenRayCastedCache = new Dictionary<int, bool>();
-            dictHasBeenNavigableCache = new Dictionary<int, bool>();
-            dictHasBeenInLoSCache = new Dictionary<int, bool>();
+            unitBurrowedCache = new Dictionary<int, bool>();
+            summonedByIdCache = new Dictionary<int, int>();
+            nameCache = new Dictionary<int, string>();
+            goldAmountCache = new Dictionary<int, int>();
+            gameBalanceIDCache = new Dictionary<int, int>();
+            dynamicIDCache = new Dictionary<int, int>();
+            itemQualityCache = new Dictionary<int, ItemQuality>();
+            pickupItemCache = new Dictionary<int, bool>();
+            hasBeenRayCastedCache = new Dictionary<int, bool>();
+            hasBeenNavigableCache = new Dictionary<int, bool>();
+            hasBeenInLoSCache = new Dictionary<int, bool>();
         }
 
         private static HashSet<string> ignoreNames = new HashSet<string>
@@ -558,7 +558,7 @@ namespace Trinity
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
-                                        InternalName = "GilesWaitForLootDrops"
+                                        InternalName = "WaitForLootDrops"
                                     };
                 DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Waiting for loot to drop, delay: {0}ms", Settings.Combat.Misc.DelayAfterKill);
             }
@@ -597,7 +597,7 @@ namespace Trinity
                                             Weight = 20000,
                                             CentreDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
                                             RadiusDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
-                                            InternalName = "GilesBacktrack"
+                                            InternalName = "Backtrack"
                                         };
                 }
             }
@@ -609,7 +609,7 @@ namespace Trinity
             // End of backtracking check
             //TODO : If this code is obselete remove it (Check that) 
             // Finally, a special check for waiting for wrath of the berserker cooldown before engaging Azmodan
-            if (CurrentTarget == null && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Barbarian.WaitWOTB && !GilesUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
+            if (CurrentTarget == null && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Barbarian.WaitWOTB && !SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
                 ZetaDia.CurrentWorldId == 121214 &&
                 (Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
@@ -622,11 +622,11 @@ namespace Trinity
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
-                                        InternalName = "GilesWaitForWrath"
+                                        InternalName = "WaitForWrath"
                                     };
             }
             // And a special check for wizard archon
-            if (CurrentTarget == null && Hotbar.Contains(SNOPower.Wizard_Archon) && !GilesUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && ZetaDia.CurrentWorldId == 121214 &&
+            if (CurrentTarget == null && Hotbar.Contains(SNOPower.Wizard_Archon) && !SNOPowerUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && ZetaDia.CurrentWorldId == 121214 &&
                 (Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for Wizard Archon cooldown before continuing to Azmodan.");
@@ -637,7 +637,7 @@ namespace Trinity
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
-                                        InternalName = "GilesWaitForArchon"
+                                        InternalName = "WaitForArchon"
                                     };
             }
             // And a very sexy special check for WD BigBadVoodoo
@@ -652,7 +652,7 @@ namespace Trinity
                                         Weight = 20000,
                                         CentreDistance = 2f,
                                         RadiusDistance = 2f,
-                                        InternalName = "GilesWaitForVoodooo"
+                                        InternalName = "WaitForVoodooo"
                                     };
             }
         }
@@ -673,7 +673,7 @@ namespace Trinity
 
                 TryToKite = false;
 
-                var monsterList = from m in GilesObjectCache
+                var monsterList = from m in ObjectCache
                                   where m.Type == GObjectType.Unit &&
                                   m.Weight > 0 &&
                                   m.RadiusDistance <= PlayerKiteDistance &&

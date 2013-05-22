@@ -23,8 +23,6 @@ namespace Trinity
 
         internal static Stopwatch HotbarRefreshTimer = new Stopwatch();
 
-        private static int lastWorldId = -1;
-
         /// <summary>
         /// Find fresh targets, start main BehaviorTree if needed, cast any buffs needed etc.
         /// </summary>
@@ -68,41 +66,41 @@ namespace Trinity
 
                     PlayerInfoCache.RefreshHotbar();
 
-                    dictAbilityRepeatDelay = new Dictionary<SNOPower, int>(dictAbilityRepeatDefaults);
+                    DataDictionary.AbilityRepeatDelays = new Dictionary<SNOPower, int>(DataDictionary.AbilityRepeatDelayDefaults);
                     if (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) && PlayerStatus.ActorClass == ActorClass.Wizard)
                     {
-                        dictAbilityRepeatDelay[SNOPower.Wizard_FrostNova] = 25;
-                        dictAbilityRepeatDelay[SNOPower.Wizard_ExplosiveBlast] = 25;
-                        dictAbilityRepeatDelay[SNOPower.Wizard_DiamondSkin] = 100;
-                        dictAbilityRepeatDelay[SNOPower.Wizard_SlowTime] = 6000;
-                        dictAbilityRepeatDelay[SNOPower.Wizard_WaveOfForce] = 1500;
-                        dictAbilityRepeatDelay[SNOPower.Wizard_MirrorImage] = 1500;
-                        dictAbilityRepeatDelay[SNOPower.Wizard_Archon_ArcaneBlast] = 1500;
-                        dictAbilityRepeatDelay[SNOPower.Wizard_Teleport] = 2700;
-                        dictAbilityRepeatDelay[SNOPower.Wizard_Archon_SlowTime] = 1500;
-                        dictAbilityRepeatDelay[SNOPower.Wizard_Archon_Teleport] = 2700;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_FrostNova] = 25;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_ExplosiveBlast] = 25;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_DiamondSkin] = 100;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_SlowTime] = 6000;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_WaveOfForce] = 1500;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_MirrorImage] = 1500;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Archon_ArcaneBlast] = 1500;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Teleport] = 2700;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Archon_SlowTime] = 1500;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Archon_Teleport] = 2700;
                     }
                     if (PlayerStatus.ActorClass == ActorClass.WitchDoctor && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice))
                     {
-                        dictAbilityRepeatDelay[SNOPower.Witchdoctor_SoulHarvest] = 1000;
-                        dictAbilityRepeatDelay[SNOPower.Witchdoctor_SpiritWalk] = 1000;
-                        dictAbilityRepeatDelay[SNOPower.Witchdoctor_Horrify] = 1000;
-                        dictAbilityRepeatDelay[SNOPower.Witchdoctor_Gargantuan] = 20000;
-                        dictAbilityRepeatDelay[SNOPower.Witchdoctor_SummonZombieDog] = 20000;
-                        dictAbilityRepeatDelay[SNOPower.Witchdoctor_GraspOfTheDead] = 500;
-                        dictAbilityRepeatDelay[SNOPower.Witchdoctor_SpiritBarrage] = 2000;
-                        dictAbilityRepeatDelay[SNOPower.Witchdoctor_Locust_Swarm] = 2000;
-                        dictAbilityRepeatDelay[SNOPower.Witchdoctor_Haunt] = 2000;
-                        dictAbilityRepeatDelay[SNOPower.Witchdoctor_Hex] = 3000;
-                        dictAbilityRepeatDelay[SNOPower.Witchdoctor_MassConfusion] = 15000;
-                        dictAbilityRepeatDelay[SNOPower.Witchdoctor_FetishArmy] = 20000;
-                        dictAbilityRepeatDelay[SNOPower.Witchdoctor_BigBadVoodoo] = 20000;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_SoulHarvest] = 1000;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_SpiritWalk] = 1000;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_Horrify] = 1000;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_Gargantuan] = 20000;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_SummonZombieDog] = 20000;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_GraspOfTheDead] = 500;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_SpiritBarrage] = 2000;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_Locust_Swarm] = 2000;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_Haunt] = 2000;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_Hex] = 3000;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_MassConfusion] = 15000;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_FetishArmy] = 20000;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_BigBadVoodoo] = 20000;
                     }
                     if (PlayerStatus.ActorClass == ActorClass.Barbarian && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Barbarian_Passive_BoonOfBulKathos))
                     {
-                        dictAbilityRepeatDelay[SNOPower.Barbarian_Earthquake] = 90500;
-                        dictAbilityRepeatDelay[SNOPower.Barbarian_CallOfTheAncients] = 90500;
-                        dictAbilityRepeatDelay[SNOPower.Barbarian_WrathOfTheBerserker] = 90500;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_Earthquake] = 90500;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_CallOfTheAncients] = 90500;
+                        DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_WrathOfTheBerserker] = 90500;
                     }
                     // Pick an appropriate health set etc. based on class
                     switch (PlayerStatus.ActorClass)
@@ -174,7 +172,7 @@ namespace Trinity
                 // Pop a potion when necessary
                 if (PlayerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
                 {
-                    if (!PlayerStatus.IsIncapacitated && GilesUseTimer(SNOPower.DrinkHealthPotion))
+                    if (!PlayerStatus.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).ThenBy(p => p.ItemStackQuantity).FirstOrDefault();
                         if (thisBestPotion != null)
@@ -182,7 +180,7 @@ namespace Trinity
                             WaitWhileAnimating(4, true);
                             ZetaDia.Me.Inventory.UseItem((thisBestPotion.DynamicId));
                         }
-                        dictAbilityLastUse[SNOPower.DrinkHealthPotion] = DateTime.Now;
+                        AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
                         WaitWhileAnimating(3, true);
                     }
                 }
@@ -221,7 +219,7 @@ namespace Trinity
                                 BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitBeforeUseDelay));
                             ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetRActorGUID);
                             LastPowerUsed = powerBuff.SNOPower;
-                            dictAbilityLastUse[powerBuff.SNOPower] = DateTime.Now;
+                            AbilityLastUsedCache[powerBuff.SNOPower] = DateTime.Now;
                             if (powerBuff.WaitTicksAfterUse > 0)
                                 BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitAfterUseDelay));
                             WaitWhileAnimating(3, true);
