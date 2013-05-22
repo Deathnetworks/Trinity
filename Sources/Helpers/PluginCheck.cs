@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using Trinity.Technicals;
 using Zeta.CommonBot;
@@ -68,31 +66,28 @@ namespace Trinity.Helpers
                     Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "WARNING: Trinity Plugin is NOT YET ENABLED. Bot start detected");
                     Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Ignore this message if you are not currently using Trinity.");
                     Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "#################################################################");
-                    return;
+                    break;
                 }
 
-                bool trinityRoutineSelected = Zeta.CommonBot.RoutineManager.Current.Name.ToLower().Contains("trinity");
-
-                if (!trinityRoutineSelected)
+                lock (RoutineManager.Current)
                 {
-                    BotMain.Stop();
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "WARNING: Trinity Plugin is enabled, incorrect routine found. Bot start detected");
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "#################################################################");
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "");
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Found Routine: {0}", Zeta.CommonBot.RoutineManager.Current.Name);
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "");
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "#################################################################");
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "ERROR: You are not using the Trinity Combat Routine!");
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "You MUST download and select the Trinity Combat Routine");
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "http://www.thebuddyforum.com/demonbuddy-forum/plugins/trinity/93720-trinity-download-here.html");
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "");
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Trinity will NOT work with any other combat routine");
-                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "#################################################################");
-                }
+                    bool latestTrinityRoutineSelected = RoutineManager.Current.Name.Equals(FileManager.TrinityName);
 
-                if (Trinity.IsPluginEnabled && trinityRoutineSelected && BotMain.IsRunning)
-                {
-                    PassedAllChecks = true;
+                    if (!IsLatestRoutineInstalled)
+                    {
+                        latestTrinityRoutineSelected = false;
+                        InstallTrinityRoutine();
+                    }
+
+                    if (!latestTrinityRoutineSelected)
+                    {
+                        SelectTrinityRoutine();
+                    }
+
+                    if (Trinity.IsPluginEnabled && latestTrinityRoutineSelected && BotMain.IsRunning)
+                    {
+                        PassedAllChecks = true;
+                    }
                 }
 
                 Thread.Sleep(250);
@@ -101,6 +96,69 @@ namespace Trinity.Helpers
             Logger.LogDebug("Plugin and Routine checks passed!");
         }
 
+        /// <summary>
+        /// Check for the latest routine and install if if needed
+        /// </summary>
+        public static void CheckAndInstallTrinityRoutine()
+        {
+            if (!IsLatestRoutineInstalled)
+            {
+                InstallTrinityRoutine();
+            }
+        }
+
+        /// <summary>
+        /// Installs the latest version of the Trinity routine 
+        /// </summary>
+        private static void InstallTrinityRoutine()
+        {
+            FileManager.CleanupOldRoutines();
+
+            Logger.LogNormal("Combat routine is not installed or is not latest version, installing! {0}", FileManager.GetFileHeader(FileManager.CombatRoutineSourcePath));
+            FileManager.CopyFile(FileManager.CombatRoutineSourcePath, FileManager.CombatRoutineDestinationPath);
+
+            RoutineManager.Reload();
+        }
+
+        /// <summary>
+        /// Selects the Trinity routine in the RoutineManager
+        /// </summary>
+        private static void SelectTrinityRoutine()
+        {
+            if (!IsLatestRoutineInstalled)
+            {
+                return;
+            }
+
+            Logger.LogNormal("Stopping bot to install latest routine");
+            BotMain.Stop();
+
+            CombatRoutine trinityRoutine = (CombatRoutine)RoutineManager.Routines.FirstOrDefault(r => r.Name == "Trinity");
+            RoutineManager.Current = trinityRoutine;
+
+            Logger.LogNormal("Routine installed, starting bot");
+            BotMain.Start();
+        }
+
+        /// <summary>
+        /// Checks if the latest Trinity Routine is installed
+        /// </summary>
+        public static bool IsLatestRoutineInstalled
+        {
+            get
+            {
+                if (!File.Exists(FileManager.CombatRoutineSourcePath))
+                {
+                    return false;
+                }
+                if (!File.Exists(FileManager.CombatRoutineDestinationPath))
+                {
+                    return false;
+                }
+
+                return FileManager.CompareFileHeader(FileManager.CombatRoutineSourcePath, FileManager.CombatRoutineDestinationPath);
+            }
+        }
 
     }
 }

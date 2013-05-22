@@ -82,7 +82,7 @@ namespace Trinity.Technicals
         /// <returns></returns>
         private static IDictionary<K, T> Load<K, T>(string filename, string name, string keyName, string valueName)
         {
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loading Dictionary file={0} name={1} keys={2} values={3}",filename, name, keyName, valueName);
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loading Dictionary file={0} name={1} keys={2} values={3}", filename, name, keyName, valueName);
             IDictionary<K, T> ret = new Dictionary<K, T>();
             if (File.Exists(filename))
             {
@@ -97,7 +97,7 @@ namespace Trinity.Technicals
                                                         typeof(K).IsEnum ? (K)Enum.Parse(typeof(K), e.Attribute(keyName).Value, true) : (K)Convert.ChangeType(e.Attribute(keyName).Value, typeof(K), CultureInfo.InvariantCulture),
                                                         typeof(T).IsEnum ? (T)Enum.Parse(typeof(T), e.Attribute(valueName).Value, true) : (T)Convert.ChangeType(e.Attribute(valueName).Value, typeof(T), CultureInfo.InvariantCulture))
                                                     ).ToList();
-                    
+
                     foreach (KeyValuePair<K, T> item in lst)
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Configuration, "Found dictionary item {0} = {1}", item.Key, item.Value);
@@ -136,7 +136,51 @@ namespace Trinity.Technicals
         {
             get
             {
-                return Path.Combine(DemonBuddyPath, "Plugins", "Trinity");
+                return Path.Combine(DemonBuddyPath, "Plugins", TrinityName);
+            }
+        }
+
+        /// <summary>
+        /// The full path to the built-in Trinity combat routine, for auto-installation
+        /// </summary>
+        public static string CombatRoutineSourcePath
+        {
+            get
+            {
+                return Path.Combine(PluginPath, "Combat", "Routine", CombatRoutineFileName);
+            }
+        }
+
+        /// <summary>
+        /// The full path to the Demonbuddy combat routine for Trinity
+        /// </summary>
+        public static string CombatRoutineDestinationPath
+        {
+            get
+            {
+                return Path.Combine(DemonBuddyPath, "Routines", TrinityName, CombatRoutineFileName);
+            }
+        }
+
+        /// <summary>
+        /// The string name of Trinity
+        /// </summary>
+        public static string TrinityName
+        {
+            get
+            {
+                return "Trinity";
+            }
+        }
+
+        /// <summary>
+        /// The file name of the Trinity Combat Routine
+        /// </summary>
+        public static string CombatRoutineFileName
+        {
+            get
+            {
+                return "Trinity.cs";
             }
         }
 
@@ -231,6 +275,101 @@ namespace Trinity.Technicals
                 }
                 Directory.CreateDirectory(path);
             }
+        }
+
+        /// <summary>
+        /// Copies a file and if necessary creates destination directory
+        /// </summary>
+        /// <param name="sourcePath"></param>
+        /// <param name="destPath"></param>
+        public static void CopyFile(string sourcePath, string destPath)
+        {
+            if (!File.Exists(sourcePath))
+            {
+                throw new FileNotFoundException("Unable to copy source file", sourcePath);
+            }
+            var destDirectory = Path.GetDirectoryName(destPath);
+            if (!Directory.Exists(destDirectory))
+            {
+                CreateDirectory(destDirectory);
+            }
+            Logger.LogDebug("Copying file {0} to {1}", sourcePath, destPath);
+            File.Copy(sourcePath, destPath);
+        }
+
+        /// <summary>
+        /// Will delete old Trinity routines from the Demonbuddy Routines directory
+        /// </summary>
+        public static void CleanupOldRoutines()
+        {
+            List<string> oldRoutines = new List<string>()
+            {
+                Path.Combine(DemonBuddyPath, "Routines", "GilesPlugin"),
+                Path.Combine(DemonBuddyPath, "Routines", "GilesBlankCombatRoutine"),
+                Path.Combine(DemonBuddyPath, "Routines", "TrinityRoutine")
+                
+            };
+
+            foreach (string routinePath in oldRoutines)
+            {
+                if (Directory.Exists(routinePath))
+                {
+                    Logger.LogDebug("Deleting old routine: {0}", routinePath);
+                    Directory.Delete(routinePath, true);
+                }
+            }
+
+            string oldTrinityRoutine = Path.Combine(DemonBuddyPath, "Routines", "Trinity", "TrinityRoutine.cs");
+
+            if (File.Exists(oldTrinityRoutine))
+            {
+                Logger.LogDebug("Deleting old routine: {0}", oldTrinityRoutine);
+                File.Delete(oldTrinityRoutine);
+            }
+        }
+
+        /// <summary>
+        /// Compares the first line of two files to see if they are the same (e.g. for Routine version check)
+        /// </summary>
+        /// <param name="file1"></param>
+        /// <param name="file2"></param>
+        /// <returns></returns>
+        public static bool CompareFileHeader(string file1, string file2)
+        {
+            if (!File.Exists(file1))
+            {
+                throw new FileNotFoundException("File not found", file1);
+            }
+            if (!File.Exists(file2))
+            {
+                throw new FileNotFoundException("File not found", file2);
+            }
+
+            string header1, header2 = "";
+            using (StreamReader reader = new StreamReader(file1))
+            {
+                header1 = reader.ReadLine();
+            }
+            using (StreamReader reader = new StreamReader(file2))
+            {
+                header2 = reader.ReadLine();
+            }
+
+            return header1.Equals(header2);
+        }
+
+        public static string GetFileHeader(string file)
+        {
+            string header = null;
+            if (!File.Exists(file))
+            {
+                return header;
+            }
+            using (StreamReader reader = new StreamReader(file))
+            {
+                header = reader.ReadLine();
+            }
+            return header;
         }
     }
 }

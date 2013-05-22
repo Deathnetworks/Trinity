@@ -191,7 +191,7 @@ namespace Trinity
         /// </summary>
         public void OnInitialize()
         {
-
+            Helpers.PluginCheck.CheckAndInstallTrinityRoutine();
         }
 
         public string Name

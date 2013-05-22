@@ -198,11 +198,18 @@ namespace Trinity
 
             if (File.Exists(aFilename))
             {
-                using (var reader = new StreamReader(aFilename))
+                try
                 {
-                    updated = xml.Deserialize(reader) as PersistentStats;
-                    if (updated.IsReset)
-                        updated.Reset();
+                    using (var reader = new StreamReader(aFilename))
+                    {
+                        updated = xml.Deserialize(reader) as PersistentStats;
+                        if (updated.IsReset)
+                            updated.Reset();
+                    }
+                }
+                catch
+                {
+                    File.Delete(aFilename);
                 }
             }
             else
