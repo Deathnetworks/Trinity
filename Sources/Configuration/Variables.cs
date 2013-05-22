@@ -512,6 +512,7 @@ namespace Trinity
         private static bool c_HasDotDPS = false;
         private static string c_ObjectHash = String.Empty;
         private static double c_KillRange = 0f;
+        private static AvoidanceType c_AvoidanceType = AvoidanceType.None;
 
         // From main RefreshDiaobjects
         /// <summary>

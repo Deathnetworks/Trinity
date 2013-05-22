@@ -294,7 +294,7 @@ namespace Trinity
                         }
                         IEnumerable<TrinityCacheObject> zigZagTargets =
                             from u in ObjectCache
-                            where u.Type == GObjectType.Unit && u.RadiusDistance < maxDistance &&
+                            where u.Type == GObjectType.Unit && u.CentreDistance < maxDistance &&
                             !Trinity.hashAvoidanceObstacleCache.Any(a => Vector3.Distance(u.Position, a.Location) < AvoidanceManager.GetAvoidanceRadiusBySNO(a.ActorSNO, a.Radius) && PlayerStatus.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(a.ActorSNO, 1))
                             select u;
                         if (zigZagTargets.Count() >= minTargets)
@@ -314,7 +314,7 @@ namespace Trinity
                 using (new PerformanceLogger("FindZigZagTargetLocation.RandomZigZagPoint"))
                 {
                     float highestWeightFound = float.NegativeInfinity;
-                    Vector3 bestLocation = Vector3.Zero;
+                    Vector3 bestLocation = origin;
 
                     // the unit circle always starts at 0 :)
                     double min = 0;
@@ -343,7 +343,14 @@ namespace Trinity
                             zigZagPoint.Z = Trinity.MainGridProvider.GetHeight(zigZagPoint.ToVector2());
 
                             // Make sure we're actually zig-zagging our target, except if we're kiting
-                            bool intersectsPath = MathUtil.IntersectsPath(CurrentTarget.Position, CurrentTarget.Radius, myPos, zigZagPoint);
+
+                            float targetCircle = CurrentTarget.Radius;
+                            if (targetCircle <= 5f)
+                                targetCircle = 5f;
+                            if (targetCircle > 10f)
+                                targetCircle = 10f;
+
+                            bool intersectsPath = MathUtil.IntersectsPath(CurrentTarget.Position, targetCircle, myPos, zigZagPoint);
                             if (Trinity.PlayerKiteDistance <= 0 && !intersectsPath)
                                 continue;
 

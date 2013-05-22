@@ -275,11 +275,17 @@ namespace Trinity
                                             cacheObject.Weight = 300;
 
                                         // If any AoE between us and target, do not attack, for non-ranged attacks only
-                                        if (!Settings.Combat.Misc.KillMonstersInAoE && PlayerKiteDistance <= 0 && hashAvoidanceObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
+                                        if (!Settings.Combat.Misc.KillMonstersInAoE &&
+                                            PlayerKiteDistance <= 0 &&
+                                            cacheObject.AvoidanceType != AvoidanceType.PlagueCloud &&
+                                            hashAvoidanceObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, PlayerStatus.CurrentPosition, cacheObject.Position)))
                                             cacheObject.Weight = 1;
 
                                         // See if there's any AOE avoidance in that spot, if so reduce the weight to 1, for non-ranged attacks only
-                                        if (!Settings.Combat.Misc.KillMonstersInAoE && PlayerKiteDistance <= 0 && hashAvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
+                                        if (!Settings.Combat.Misc.KillMonstersInAoE &&
+                                            PlayerKiteDistance <= 0 &&
+                                            cacheObject.AvoidanceType != AvoidanceType.PlagueCloud &&
+                                            hashAvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
                                             cacheObject.Weight = 1;
 
                                         if (PlayerKiteDistance > 0)
@@ -397,7 +403,7 @@ namespace Trinity
 
                                 // ignore non-legendaries and gold near elites if we're ignoring elites
                                 // not sure how we should safely determine this distance
-                                if (Settings.Combat.Misc.IgnoreElites && cacheObject.ItemQuality < ItemQuality.Legendary && 
+                                if (Settings.Combat.Misc.IgnoreElites && cacheObject.ItemQuality < ItemQuality.Legendary &&
                                     ObjectCache.Any(u => u.Type == GObjectType.Unit && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 40f))
                                 {
                                     cacheObject.Weight = 0;
