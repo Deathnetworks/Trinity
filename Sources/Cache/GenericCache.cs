@@ -28,7 +28,8 @@ namespace Trinity
                 if (!ContainsKey(obj.Key))
                 {
                     _dataCache.Add(obj.Key, obj);
-                    _expireCache.Add(obj.Expires, obj.Key);
+                    if (!_expireCache.ContainsKey(obj.Expires))
+                        _expireCache.Add(obj.Expires, obj.Key);
                     return true;
                 }
                 return false;
@@ -46,7 +47,8 @@ namespace Trinity
                     if (RemoveObject(obj.Key))
                     {
                         _dataCache.Add(obj.Key, obj);
-                        _expireCache.Add(obj.Expires, obj.Key);
+                        if (!_expireCache.ContainsKey(obj.Expires))
+                            _expireCache.Add(obj.Expires, obj.Key);
 
                         return true;
                     }
@@ -90,7 +92,7 @@ namespace Trinity
 
             lock (_Synchronizer)
             {
-                return _dataCache.ContainsKey(key); 
+                return _dataCache.ContainsKey(key);
             }
         }
 
@@ -180,7 +182,7 @@ namespace Trinity
         }
     }
 
-    internal class GenericCacheObject 
+    internal class GenericCacheObject
     {
         public string Key { get; set; }
         public object Value { get; set; }

@@ -358,6 +358,11 @@ namespace Trinity.Technicals
             return header1.Equals(header2);
         }
 
+        /// <summary>
+        /// Returns the first line of a file
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         public static string GetFileHeader(string file)
         {
             string header = null;

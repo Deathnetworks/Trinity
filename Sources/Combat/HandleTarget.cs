@@ -934,7 +934,7 @@ namespace Trinity
                     return HandlerRunStatus.NotFinished;
 
                 // don't timeout if we're actively moving
-                if (PlayerMover.GetMovementSpeed() >= 1)
+                if (PlayerMover.GetMovementSpeed() > 1)
                     return HandlerRunStatus.NotFinished;
 
                 if (CurrentTargetIsNonUnit() && GetSecondsSinceTargetUpdate() > 6)

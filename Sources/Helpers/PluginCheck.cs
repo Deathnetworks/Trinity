@@ -44,13 +44,19 @@ namespace Trinity.Helpers
 
         private static bool passedAllChecks = false;
 
+        /// <summary>
+        /// Whether or not we have passed all checks - set by PluginChecker()
+        /// </summary>
         public static bool PassedAllChecks
         {
             get { return PluginCheck.passedAllChecks; }
             private set { PluginCheck.passedAllChecks = value; }
         }
 
-        internal static void PluginChecker()
+        /// <summary>
+        /// Used to check and fix the status of the Plugin (Enabled/Disabled) and the Combat Routine (and routine version)
+        /// </summary>
+        private static void PluginChecker()
         {
             while (!PassedAllChecks)
             {
