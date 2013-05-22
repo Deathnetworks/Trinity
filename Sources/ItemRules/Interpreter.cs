@@ -11,7 +11,7 @@ using Zeta.Internals.Actors;
 using Zeta.CommonBot.Items;
 using Zeta.CommonBot;
 
-namespace Trinity
+namespace Trinity.ItemRules
 {
     #region Interpreter
 
