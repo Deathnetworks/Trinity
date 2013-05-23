@@ -177,13 +177,6 @@ namespace Trinity
 
             bool hasManitou = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritBarrage && s.RuneIndex == 4);
 
-            // Spirit Barrage
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_SpiritBarrage) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 108 &&
-                PowerManager.CanCast(SNOPower.Witchdoctor_SpiritBarrage) && !hasManitou)
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
-            }
-
             // Spirit Barrage Manitou
             if (Hotbar.Contains(SNOPower.Witchdoctor_SpiritBarrage) && PlayerStatus.PrimaryResource >= 108 && TimeSinceUse(SNOPower.Witchdoctor_SpiritBarrage) > 18000 && hasManitou)
             {
@@ -230,6 +223,35 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, zombieChargerRange, CurrentTarget.Position, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
 
+            //skillDict.Add("Firebats", SNOPower.Witchdoctor_Firebats);
+            //runeDict.Add("DireBats", 0);
+            //runeDict.Add("VampireBats", 3);
+            //runeDict.Add("PlagueBats", 2);
+            //runeDict.Add("HungryBats", 1);
+            //runeDict.Add("CloudOfBats", 4);
+
+            bool hasDireBats = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 0);
+            bool hasVampireBats = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 3);
+            bool hasPlagueBats = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 2);
+            bool hasHungryBats = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 1);
+            bool hasCloudOfBats = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Firebats && s.RuneIndex == 4);
+
+            int fireBatsMana = TimeSinceUse(SNOPower.Witchdoctor_Firebats) < 125 ? 66 : 220;
+
+            // Fire Bats:Cloud of bats 
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && hasCloudOfBats &&
+                Hotbar.Contains(SNOPower.Witchdoctor_Firebats) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= fireBatsMana)
+            {
+                return new TrinityPower(SNOPower.Witchdoctor_Firebats, 5f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
+            }
+
+            // Fire Bats fast-attack
+            if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Firebats) && PlayerStatus.PrimaryResource >= fireBatsMana &&
+                 TargetUtil.AnyMobsInRange(Settings.Combat.WitchDoctor.FirebatsRange))
+            {
+                return new TrinityPower(SNOPower.Witchdoctor_Firebats, Settings.Combat.WitchDoctor.FirebatsRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
+            }
+
             var acidCloudRange = hasGraveInjustice ? Math.Min(PlayerStatus.GoldPickupRadius + 8f, 30f) : 30f;
 
             // Acid Cloud
@@ -245,11 +267,13 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, acidCloudRange, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
 
-            // Fire Bats fast-attack
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Firebats) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 98)
+            // Spirit Barrage
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_SpiritBarrage) && !PlayerStatus.IsIncapacitated && PlayerStatus.PrimaryResource >= 108 &&
+                PowerManager.CanCast(SNOPower.Witchdoctor_SpiritBarrage) && !hasManitou)
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Firebats, 20f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
             }
+
             // Poison Darts fast-attack Spams Darts when mana is too low (to cast bears) @12yds or @10yds if Bears avialable
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_PoisonDart) && !PlayerStatus.IsIncapacitated)
             {
