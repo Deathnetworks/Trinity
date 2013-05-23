@@ -8,6 +8,7 @@ namespace Trinity.Settings.Combat
     {
         #region Fields
         private bool _ZeroDogs;
+        private float _FirebatsRange;
         private float _PotionLevel;
         private float _HealthGlobeLevel;
         private int _KiteLimit;
@@ -74,6 +75,19 @@ namespace Trinity.Settings.Combat
                     _ZeroDogs = value;
                     OnPropertyChanged("ZeroDogs");
                 }
+            }
+        }
+
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(20f)]
+        public float FirebatsRange
+        {
+            get { return _FirebatsRange; }
+            set
+            {
+                _FirebatsRange = value;
+                OnPropertyChanged("FirebatsRange");
             }
         }
 
@@ -653,8 +667,8 @@ namespace Trinity.Settings.Combat
         [OnDeserializing()]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-
             this._AvoidSuccubusStarHealth = 0.7f;
+            this._FirebatsRange = 20f;
         }
         #endregion Methods
     }

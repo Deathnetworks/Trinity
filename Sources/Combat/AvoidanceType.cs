@@ -3,6 +3,7 @@ namespace Trinity
 {
     public enum AvoidanceType
     {
+        None,
         Arcane,
         AzmodanBody,
         AzmodanPool,

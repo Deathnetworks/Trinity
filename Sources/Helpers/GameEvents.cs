@@ -41,11 +41,7 @@ namespace Trinity
                 }
             }
             catch { }
-            // Update actors if possible (if already in-game)
-            if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld && ZetaDia.Actors != null)
-            {
-                ZetaDia.Actors.Update();
-            }
+
             HasMappedPlayerAbilities = false;
             if (!bMaintainStatTracking)
             {

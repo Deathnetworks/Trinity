@@ -88,6 +88,14 @@ namespace Trinity
         public string ObjectHash { get; set; }
         public double KillRange { get; set; }
 
+        public AvoidanceType AvoidanceType
+        {
+            get
+            {
+                return AvoidanceManager.GetAvoidanceType(this.ActorSNO);
+            }
+        }
+
         public TrinityCacheObject(DiaObject _DiaObject = null)
         {
             DiaObject = _DiaObject;

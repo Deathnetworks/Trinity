@@ -119,7 +119,7 @@ namespace Trinity
                  */
                 if (PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker, true))
                 {
-                    //WotB only used on Arcane, Frozen, Jailer, Molten and Electrified+Reflect Damage elites
+                    //WotB only used on Arcane, Frozen, Jailer, Molten, Electrified+Reflect Damage elites
                     if (monsterAffixes.HasFlag(MonsterAffixes.ArcaneEnchanted) || monsterAffixes.HasFlag(MonsterAffixes.Frozen) ||
                         monsterAffixes.HasFlag(MonsterAffixes.Jailer) || monsterAffixes.HasFlag(MonsterAffixes.Molten) ||
                        (monsterAffixes.HasFlag(MonsterAffixes.Electrified) && monsterAffixes.HasFlag(MonsterAffixes.ReflectsDamage)) ||

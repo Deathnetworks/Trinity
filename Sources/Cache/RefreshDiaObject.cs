@@ -832,6 +832,23 @@ namespace Trinity
                             return AddToCache;
                         }
 
+                        // Already used, blacklist it and don't look at it again
+                        try
+                        {
+                            GizmoUsed = (c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoHasBeenOperated) > 0);
+                        }
+                        catch
+                        {
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                            AddToCache = false;
+                        }
+                        if (GizmoUsed)
+                        {
+                            // It's already open!
+                            c_IgnoreSubStep = "GizmoHasBeenOperated";
+                            AddToCache = false;
+                            return AddToCache;
+                        }
                         // Determine what shrine type it is, and blacklist if the user has disabled it
                         switch (c_ActorSNO)
                         {
@@ -839,6 +856,7 @@ namespace Trinity
                                 if (!Settings.WorldObject.UseFrenzyShrine)
                                 {
                                     hashRGUIDBlacklist60.Add(c_RActorGuid);
+                                    c_IgnoreSubStep = "IgnoreShrineOption";
                                     AddToCache = false;
                                 }
                                 if (PlayerStatus.ActorClass == ActorClass.Monk && Settings.Combat.Monk.TROption.HasFlag(TempestRushOption.MovementOnly) && Hotbar.Contains(SNOPower.Monk_TempestRush))
@@ -899,24 +917,6 @@ namespace Trinity
                                 break;
                         }  //end switch
 
-                        // Already used, blacklist it and don't look at it again
-                        try
-                        {
-                            GizmoUsed = (c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoHasBeenOperated) > 0);
-                        }
-                        catch
-                        {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
-                            AddToCache = false;
-                            //return bWantThis;
-                        }
-                        if (GizmoUsed)
-                        {
-                            // It's already open!
-                            c_IgnoreSubStep = "GizmoHasBeenOperated";
-                            AddToCache = false;
-                            return AddToCache;
-                        }
                         // Bag it!
                         c_Radius = 4f;
                         break;

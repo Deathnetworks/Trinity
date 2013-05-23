@@ -34,10 +34,16 @@ namespace Trinity
          * I've tried to make most variable names be pretty damned obvious what they are for!
          * I've also commented a lot of variables/sections of variables to explain what they are for, incase you are trying to work them all out!
          */
+
         /// <summary>
         /// Used for letting noobs know they started the bot without Trinity enabled in the plugins tab.
         /// </summary>
-        private static bool IsPluginEnabled = false;
+        public static bool IsPluginEnabled
+        {
+            get { return Trinity.isPluginEnabled; }
+            set { Trinity.isPluginEnabled = value; }
+        }
+        private static bool isPluginEnabled = false;
 
         /// <summary>
         /// A flag to say whether any NON-hashActorSNOWhirlwindIgnore things are around
@@ -506,6 +512,7 @@ namespace Trinity
         private static bool c_HasDotDPS = false;
         private static string c_ObjectHash = String.Empty;
         private static double c_KillRange = 0f;
+        private static AvoidanceType c_AvoidanceType = AvoidanceType.None;
 
         // From main RefreshDiaobjects
         /// <summary>

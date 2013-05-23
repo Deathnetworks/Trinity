@@ -20,7 +20,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(1, 7, 2, 14);
+                return new Version(1, 7, 3, 30);
             }
         }
 
@@ -101,8 +101,10 @@ namespace Trinity
             }
             else
             {
+                Helpers.PluginCheck.Start();
+
                 HasMappedPlayerAbilities = false;
-                IsPluginEnabled = true;
+                isPluginEnabled = true;
 
                 // Settings are available after this... 
                 LoadConfiguration();
@@ -156,7 +158,7 @@ namespace Trinity
         /// </summary>
         public void OnDisabled()
         {
-            IsPluginEnabled = false;
+            isPluginEnabled = false;
             Navigator.PlayerMover = new DefaultPlayerMover();
             Navigator.StuckHandler = new DefaultStuckHandler();
             CombatTargeting.Instance.Provider = new DefaultCombatTargetingProvider();
@@ -165,7 +167,7 @@ namespace Trinity
 
             GameEvents.OnPlayerDied -= TrinityOnDeath;
             BotMain.OnStop -= TrinityBotStop;
-            BotMain.OnStop -= PluginCheck;
+
             GameEvents.OnGameJoined -= TrinityOnJoinGame;
             GameEvents.OnGameLeft -= TrinityOnLeaveGame;
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
@@ -182,6 +184,7 @@ namespace Trinity
         {
             GenericCache.Shutdown();
             GenericBlacklist.Shutdown();
+            Helpers.PluginCheck.Shutdown();
         }
 
         /// <summary>
@@ -189,7 +192,7 @@ namespace Trinity
         /// </summary>
         public void OnInitialize()
         {
-            Zeta.CommonBot.BotMain.OnStart += PluginCheck;
+            Helpers.PluginCheck.CheckAndInstallTrinityRoutine();
         }
 
         public string Name

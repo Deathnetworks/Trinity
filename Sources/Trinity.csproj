@@ -68,7 +68,9 @@
     <Compile Include="Combat\Abilities\WitchDoctor.cs" />
     <Compile Include="Combat\AvoidanceManager.cs" />
     <Compile Include="Combat\AvoidanceType.cs" />
+    <Compile Include="Combat\Routine\Trinity.cs" />
     <Compile Include="Helpers\GameEvents.cs" />
+    <Compile Include="Helpers\PluginCheck.cs" />
     <Compile Include="Items\ItemEvents.cs" />
     <Compile Include="Cache\CacheAvoidance.cs" />
     <Compile Include="Cache\CacheGizmo.cs" />
@@ -115,7 +117,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\Loot\ItemEnumOptions.cs" />
     <Compile Include="Settings\Loot\ItemRuleSetting.cs" />
-    <Compile Include="Helpers\Loader.cs" />
+    <Compile Include="Helpers\FileManager.cs" />
     <Compile Include="DbProvider\TownRun.cs" />
     <Compile Include="Combat\TrinityPowerManager.cs" />
     <Compile Include="Combat\ScheduledPower.cs" />

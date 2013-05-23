@@ -354,7 +354,7 @@ namespace Trinity
                 vPositionLastZigZagCheck = PlayerStatus.CurrentPosition;
                 if (shouldGetNewZigZag)
                 {
-                    var wwdist = 25f;
+                    var wwdist = 15f;
 
                     vSideToSideTarget = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
 

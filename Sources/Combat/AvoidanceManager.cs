@@ -30,6 +30,15 @@ namespace Trinity
             set;
         }
 
+        public static AvoidanceType GetAvoidanceType(int actorSno)
+        {
+            LoadAvoidanceDictionary(false);
+            if (SNOAvoidanceType.ContainsKey(actorSno))
+                return SNOAvoidanceType[actorSno];
+            else
+                return AvoidanceType.None;
+        }
+
         public static float GetAvoidanceRadius(AvoidanceType type, float defaultValue)
         {
             LoadAvoidanceDictionary(false);

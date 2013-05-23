@@ -157,7 +157,7 @@ namespace Trinity
             if (monsterList == null)
                 monsterList = new List<TrinityCacheObject>();
 
-            vBestLocation = newFindSafeZone(dangerPoint, shouldKite, isStuck);
+            vBestLocation = FindSafeZone(dangerPoint, shouldKite, isStuck);
             fHighestWeight = 1;
 
             // Loop through distance-range steps
@@ -169,7 +169,7 @@ namespace Trinity
             return vBestLocation;
         }
 
-        internal static Vector3 newFindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<TrinityCacheObject> monsterList = null)
+        internal static Vector3 FindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<TrinityCacheObject> monsterList = null)
         {
             /*
             generate 50x50 grid of 5x5 squares within max 100 distance from origin to edge of grid
@@ -280,8 +280,15 @@ namespace Trinity
                     // Monsters
                     if (shouldKite)
                     {
+                        double checkRadius = gridSquareRadius;
+
+                        if (Trinity.PlayerKiteDistance > 0)
+                        {
+                            checkRadius = gridSquareSize + Trinity.PlayerKiteDistance;
+                        }
+
                         // Any monster standing in this GridPoint
-                        if (Trinity.hashMonsterObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= (shouldKite ? gridSquareRadius : gridSquareSize + Trinity.PlayerKiteDistance)))
+                        if (Trinity.hashMonsterObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) + a.Radius <= checkRadius))
                         {
                             nodesMonsters++;
                             continue;

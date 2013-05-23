@@ -11,6 +11,13 @@ namespace Trinity
         public string Name { get; set; }
         public int HitPointsCurPct { get; set; }
         public int HitPointsCur { get; set; }
+        public AvoidanceType AvoidanceType
+        {
+            get
+            {
+                return AvoidanceManager.GetAvoidanceType(this.ActorSNO);
+            }
+        }
 
         public CacheObstacleObject()
         {

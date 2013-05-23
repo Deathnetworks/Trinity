@@ -18,6 +18,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -57,19 +58,34 @@
                     SmallChange="1" LargeChange="5" 
                     TickPlacement="BottomRight" TickFrequency="1"
                     Value="{Binding Path=WD.KiteLimit}" 
+                    IsSnapToTickEnabled="True"
                     HorizontalAlignment="Stretch" Margin="2"/>
         </Grid>
         <!--CheckBox-->
         <Grid Grid.Row="2" Margin="2">
             <UniformGrid Columns="2">
                 <CheckBox Margin="2" IsChecked="{Binding Path=WD.ZeroDogs}" ToolTip="Spam Sacrifice">Zero Dogs/Spam Sacrifice</CheckBox>
-
             </UniformGrid>
         </Grid>
+
         <Grid Grid.Row="3" Margin="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Firebats range" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                    Interval="500" Maximum="40" Minimum="5" 
+                    SmallChange="1" LargeChange="35" 
+                    TickPlacement="BottomRight" TickFrequency="1"
+                    Value="{Binding Path=WD.FirebatsRange}" 
+                    IsSnapToTickEnabled="True"
+                    HorizontalAlignment="Stretch" Margin="2"/>
+        </Grid>
+        <Grid Grid.Row="4" Margin="2">
             <ScrollViewer Tag="Combat\Avoidance.xaml" DataContext="{Binding Path=WD}"/>
         </Grid>
         <!--Reset Button-->
-        <Button Grid.Row="4" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetWitchDoctorCommand}">Reset</Button>
+        <Button Grid.Row="5" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetWitchDoctorCommand}">Reset</Button>
     </Grid>
 </UserControl>
