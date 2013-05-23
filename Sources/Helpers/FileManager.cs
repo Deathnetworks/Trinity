@@ -288,6 +288,12 @@ namespace Trinity.Technicals
             {
                 throw new FileNotFoundException("Unable to copy source file", sourcePath);
             }
+
+            if (File.Exists(destPath))
+            {
+                File.Delete(destPath);
+            }
+
             var destDirectory = Path.GetDirectoryName(destPath);
             if (!Directory.Exists(destDirectory))
             {
