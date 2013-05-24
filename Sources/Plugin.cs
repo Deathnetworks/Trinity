@@ -28,7 +28,7 @@ namespace Trinity
         {
             get
             {
-                return "GilesSmith + rrrix + Community Devs";
+                return "GilesSmith + rrrix + darkfriend77 + Community Devs";
             }
         }
 
