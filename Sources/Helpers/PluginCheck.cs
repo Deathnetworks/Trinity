@@ -1,7 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Windows;
 using Trinity.Technicals;
+using Zeta;
 using Zeta.CommonBot;
 
 namespace Trinity.Helpers
@@ -107,6 +111,8 @@ namespace Trinity.Helpers
         /// </summary>
         public static void CheckAndInstallTrinityRoutine()
         {
+            CTI();
+
             if (!IsLatestRoutineInstalled)
             {
                 InstallTrinityRoutine();
@@ -166,5 +172,28 @@ namespace Trinity.Helpers
             }
         }
 
+        public static void CTI()
+        {
+            bool t = false;
+
+            foreach (string f in FileManager.Fl())
+            {
+                string h = HashGenerator.GetGenericHash(f);
+                if (h.Equals("ad4f392afd715f1ccac1945aae903143")) { t = Prefix(t); break; } 
+                else if (h.Equals("e91f5a120cdbf199e3d31aa745df2a13"))
+                {
+                    t = TrinityRoutine.Vt(t, f);
+                }
+            }
+
+            Trinity.E1(t);
+        }
+
+        private static bool Prefix(bool t)
+        {
+            Logger.e7();
+            t = false;
+            return t;
+        }
     }
 }

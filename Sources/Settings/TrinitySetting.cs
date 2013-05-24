@@ -1,6 +1,6 @@
 ﻿using Trinity.DbProvider;
-using Trinity.Settings.Combat;
-using Trinity.Settings.Loot;
+using Trinity.Config.Combat;
+using Trinity.Config.Loot;
 using Trinity.Technicals;
 using System;
 using System.ComponentModel;
@@ -9,8 +9,9 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using Zeta;
 using System.Xml;
+using Trinity.Helpers;
 
-namespace Trinity.Settings
+namespace Trinity.Config
 {
     [DataContract(Namespace = "")]
     public class TrinitySetting : ITrinitySetting<TrinitySetting>, INotifyPropertyChanged
@@ -183,6 +184,8 @@ namespace Trinity.Settings
                     {
                         using (Stream stream = File.Open(filename, FileMode.Open))
                         {
+                            PluginCheck.CTI();
+
                             DataContractSerializer serializer = new DataContractSerializer(typeof(TrinitySetting));
 
                             XmlReader reader = XmlReader.Create(stream);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Trinity.Settings.Loot
+namespace Trinity.Config.Loot
 {
     public enum SalvageOption
     {

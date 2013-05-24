@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 
-namespace Trinity.Settings
+namespace Trinity.Config
 {
     //http://stackoverflow.com/questions/11092274/datacontractserializer-change-namespace-and-deserialize-file-bound-to-old-name
     public class SettingsMigrator : XmlReader

@@ -14,6 +14,7 @@ using Trinity.Cache;
 using Zeta.Internals;
 using Trinity.DbProvider;
 using System.Diagnostics;
+using Trinity.Combat.Abilities;
 
 namespace Trinity
 {
@@ -206,8 +207,8 @@ namespace Trinity
                         && myAnimationState.State != AnimationState.Casting
                         && myAnimationState.State != AnimationState.Channeling)
                     {
-
-                        bDontSpamOutofCombat = false;
+                        BarbarianCombat.AllowSprintOOC = true;
+                        DisableOutofCombatSprint = false;
 
                         powerBuff = AbilitySelector(false, true, false);
 

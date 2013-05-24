@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace Trinity.Settings
+namespace Trinity.Config
 {
     [DataContract(Namespace = "")]
     public class NotificationSetting : ITrinitySetting<NotificationSetting>, INotifyPropertyChanged

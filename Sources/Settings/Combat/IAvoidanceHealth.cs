@@ -1,5 +1,5 @@
 ﻿
-namespace Trinity.Settings.Combat
+namespace Trinity.Config.Combat
 {
     public interface IAvoidanceHealth
     {

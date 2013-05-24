@@ -723,11 +723,11 @@ namespace Trinity.Cache
 
         internal static bool ShouldPickupItem(CacheItem item)
         {
-            if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.DemonBuddy && item.BaseType != GItemBaseType.HealthGlobe)
+            if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy && item.BaseType != GItemBaseType.HealthGlobe)
             {
                 return ItemManager.Current.ShouldPickUpItem(item.ACDItem);
             }
-            else if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
+            else if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.TrinityWithItemRules)
             {
                 PickupItem pickupItem = new PickupItem(
                     item.ACDItem.Name,

@@ -10,6 +10,8 @@ using Zeta.CommonBot;
 using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
 using Zeta.Navigation;
+using System.Threading;
+using System.Windows;
 
 namespace Trinity
 {
@@ -52,7 +54,7 @@ namespace Trinity
 
         internal static void SetItemManagerProvider()
         {
-            if (Settings.Loot.ItemFilterMode != global::Trinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+            if (Settings.Loot.ItemFilterMode != global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
             {
                 ItemManager.Current = new TrinityItemManager();
             }
@@ -73,6 +75,32 @@ namespace Trinity
             {
                 Navigator.StuckHandler = new Zeta.Navigation.DefaultStuckHandler();
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Default Demonbuddy Unstucker", true);
+            }
+        }
+
+        internal static void E1(bool t)
+        {
+            if (!t)
+                Trinity.Exit();
+        }
+
+        internal static void Exit()
+        {
+            ZetaDia.Memory.Process.Kill();
+
+            try
+            {
+                if (Thread.CurrentThread != Application.Current.Dispatcher.Thread)
+                {
+                    Application.Current.Dispatcher.Invoke(new System.Action(Exit));
+                    return;
+                }
+
+                Application.Current.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.ToString());
             }
         }
 

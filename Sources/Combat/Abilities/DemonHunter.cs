@@ -255,7 +255,7 @@ namespace Trinity
             }
 
             // Default attacks
-            return CombatBase.GetDefaultPower();
+            return CombatBase.DefaultPower;
         }
 
         private static bool DHHasNoPrimary()
@@ -284,7 +284,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 15f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.DemonHunter_EvasiveFire) && PlayerStatus.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.DemonHunter_EvasiveFire, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            return CombatBase.GetDefaultPower();
+            return CombatBase.DefaultPower;
         }
     }
 }

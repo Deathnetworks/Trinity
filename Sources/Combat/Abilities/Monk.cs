@@ -5,7 +5,7 @@ using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
-using Trinity.Settings.Combat;
+using Trinity.Config.Combat;
 using Zeta;
 using Trinity.DbProvider;
 using Zeta.CommonBot.Profile.Common;
@@ -369,7 +369,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Monk_DeadlyReach, 16f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, NO_WAIT_ANIM);
             }
             // Default attacks
-            return CombatBase.GetDefaultPower();
+            return CombatBase.DefaultPower;
         }
 
         internal static void Monk_TickSweepingWindSpam()
@@ -403,7 +403,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Monk_CripplingWave, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Monk_WayOfTheHundredFists))
                 return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            return CombatBase.GetDefaultPower();
+            return CombatBase.DefaultPower;
         }
         /// <summary>
         /// Returns true if we have a mantra and it's up, or if we don't have a Mantra at all

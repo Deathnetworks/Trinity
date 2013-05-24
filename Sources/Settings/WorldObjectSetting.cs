@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
-using Trinity.Settings.Combat;
+using Trinity.Config.Combat;
 
-namespace Trinity.Settings
+namespace Trinity.Config
 {
     [DataContract(Namespace = "")]
     public class WorldObjectSetting : ITrinitySetting<WorldObjectSetting>, INotifyPropertyChanged

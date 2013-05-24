@@ -95,6 +95,7 @@ namespace Trinity
                 return AvoidanceManager.GetAvoidanceType(this.ActorSNO);
             }
         }
+        public MonsterAffixes MonsterAffixes { get; set; }
 
         public TrinityCacheObject(DiaObject _DiaObject = null)
         {

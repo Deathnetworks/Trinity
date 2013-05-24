@@ -1,4 +1,4 @@
-using Trinity.Settings.Combat;
+using Trinity.Config.Combat;
 using Trinity.Technicals;
 using System;
 using System.Linq;

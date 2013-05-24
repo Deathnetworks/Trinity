@@ -62,7 +62,6 @@
     <Compile Include="Combat\Abilities\Barbarian.cs" />
     <Compile Include="Combat\Abilities\BarbarianCombat.cs" />
     <Compile Include="Combat\Abilities\CombatBase.cs" />
-    <Compile Include="Combat\Abilities\CombatContext.cs" />
     <Compile Include="Combat\Abilities\Monk.cs" />
     <Compile Include="Combat\Abilities\Wizard.cs" />
     <Compile Include="Combat\Abilities\DemonHunter.cs" />

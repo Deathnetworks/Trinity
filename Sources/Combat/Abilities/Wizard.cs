@@ -8,7 +8,7 @@ using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals;
 using Zeta.Internals.Actors;
-using Trinity.Settings.Combat;
+using Trinity.Config.Combat;
 using Trinity.Combat.Abilities;
 
 namespace Trinity
@@ -347,7 +347,7 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_Electrocute, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
                 }
                 // Default attacks
-                return CombatBase.GetDefaultPower();
+                return CombatBase.DefaultPower;
 
             }
             else
@@ -453,7 +453,7 @@ namespace Trinity
             if (Hotbar.Contains(SNOPower.Wizard_Electrocute))
                 return new TrinityPower(SNOPower.Wizard_Electrocute, 9f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
 
-            return CombatBase.GetDefaultPower();
+            return CombatBase.DefaultPower;
         }
 
 

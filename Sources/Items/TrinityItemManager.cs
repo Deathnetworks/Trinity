@@ -1,5 +1,5 @@
 ﻿using Trinity.ItemRules;
-using Trinity.Settings.Loot;
+using Trinity.Config.Loot;
 using Trinity.Technicals;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Items;
@@ -34,7 +34,7 @@ namespace Trinity
 
         public override bool EvaluateItem(ACDItem item, ItemEvaluationType evaluationType)
         {
-            if (Trinity.Settings.Loot.ItemFilterMode != global::Trinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+            if (Trinity.Settings.Loot.ItemFilterMode != global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
             {
                 LootRuleItemManager.Current.EvaluateItem(item, evaluationType);
             }

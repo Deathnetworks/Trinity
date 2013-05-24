@@ -75,7 +75,7 @@ namespace Trinity
             // Wrath of the berserker, elites only (wrath of berserker)
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
                 // If using WOTB on all elites, or if we should only use on "hard" affixes
-                (!Settings.Combat.Barbarian.WOTBHardOnly || (shouldUseBerserkerPower && Settings.Combat.Barbarian.WOTBHardOnly)) &&
+                (!Settings.Combat.Barbarian.WOTBHardOnly || (CombatBase.HardElitesPresent && Settings.Combat.Barbarian.WOTBHardOnly)) &&
                 // Not on heart of sin after Cydaea
                 CurrentTarget.ActorSNO != 193077 &&
                 // Make sure we are allowed to use wrath on goblins, else make sure this isn't a goblin
@@ -94,7 +94,6 @@ namespace Trinity
                 if (PlayerStatus.PrimaryResource >= 50)
                 {
                     Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker being used!({0})", CurrentTarget.InternalName);
-                    shouldUseBerserkerPower = false;
                     IsWaitingForSpecial = false;
                     return new TrinityPower(SNOPower.Barbarian_WrathOfTheBerserker, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
@@ -129,7 +128,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Barbarian_BattleRage, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Special segment for sprint as an out-of-combat only
-            if (UseOOCBuff && !bDontSpamOutofCombat &&
+            if (UseOOCBuff && !DisableOutofCombatSprint &&
                 (Settings.Combat.Misc.AllowOOCMovement || GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) &&
                 !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Sprint) &&
                 !GetHasBuff(SNOPower.Barbarian_Sprint) &&
@@ -298,7 +297,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Barbarian_AncientSpear, 55f, vNewTarget, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
             }
             // Sprint buff, if same suitable targets as elites, keep maintained for WW users
-            if (!UseOOCBuff && !bDontSpamOutofCombat && Hotbar.Contains(SNOPower.Barbarian_Sprint) && !PlayerStatus.IsIncapacitated &&
+            if (!UseOOCBuff && !DisableOutofCombatSprint && Hotbar.Contains(SNOPower.Barbarian_Sprint) && !PlayerStatus.IsIncapacitated &&
                 // Let's check if is not spaming too much
                 DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Barbarian_Sprint]).TotalMilliseconds >= 200 &&
                 // Fury Dump Options for sprint: use at max energy constantly, or on a timer
@@ -405,7 +404,7 @@ namespace Trinity
             }
 
             // Default attacks
-            return CombatBase.GetDefaultPower();
+            return CombatBase.DefaultPower;
         }
 
         private static bool BarbHasNoPrimary()
@@ -429,7 +428,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Barbarian_Rend, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Barbarian_WeaponThrow) && PlayerStatus.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.Barbarian_WeaponThrow, 15f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            return CombatBase.GetDefaultPower();
+            return CombatBase.DefaultPower;
         }
 
     }
