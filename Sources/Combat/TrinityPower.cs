@@ -1,4 +1,6 @@
 ﻿using System;
+using Trinity.Combat;
+using Trinity.Combat.Abilities;
 using Zeta.Common;
 using Zeta.Internals.Actors;
 
@@ -144,6 +146,124 @@ namespace Trinity
             WaitTicksBeforeUse = 0;
             WaitTicksAfterUse = 0;
             WaitForAnimationFinished = false;
+        }
+
+        /// <summary>
+        /// Create a TrinityPower for self cast
+        /// </summary>
+        /// <param name="snoPower"></param>
+        /// <param name="minimumRange"></param>
+        /// <param name="targetRActorGUID"></param>
+        public TrinityPower(SNOPower snoPower)
+        {
+            SNOPower = snoPower;
+            MinimumRange = 0f;
+            TargetPosition = Vector3.Zero;
+            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
+            TargetRActorGUID = -1;
+            WaitTicksBeforeUse = 0;
+            WaitTicksAfterUse = 0;
+            WaitForAnimationFinished = true;
+            PowerAssignmentTime = DateTime.Now;
+        }
+
+        /// <summary>
+        /// Create a TrinityPower for self cast
+        /// </summary>
+        /// <param name="snoPower"></param>
+        /// <param name="minimumRange"></param>
+        /// <param name="targetRActorGUID"></param>
+        public TrinityPower(SNOPower snoPower, int waitTicksBeforeuse, int waitTicksAfterUse)
+        {
+            SNOPower = snoPower;
+            MinimumRange = 0f;
+            TargetPosition = Vector3.Zero;
+            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
+            TargetRActorGUID = -1;
+            WaitTicksBeforeUse = 0;
+            WaitTicksAfterUse = 0;
+            WaitForAnimationFinished = true;
+            PowerAssignmentTime = DateTime.Now;
+        }
+
+        /// <summary>
+        /// Create a TrinityPower for use on a specific target
+        /// </summary>
+        /// <param name="snoPower"></param>
+        /// <param name="minimumRange"></param>
+        /// <param name="targetRActorGUID"></param>
+        public TrinityPower(SNOPower snoPower, float minimumRange, int targetRActorGUID)
+        {
+            SNOPower = snoPower;
+            MinimumRange = minimumRange;
+            TargetPosition = Vector3.Zero;
+            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
+            TargetRActorGUID = targetRActorGUID;
+            WaitTicksBeforeUse = 0;
+            WaitTicksAfterUse = 0;
+            WaitForAnimationFinished = true;
+            PowerAssignmentTime = DateTime.Now;
+        }
+
+        /// <summary>
+        /// Create a TrinityPower for generic use with a range
+        /// </summary>
+        /// <param name="snoPower"></param>
+        /// <param name="minimumRange"></param>
+        /// <param name="targetRActorGUID"></param>
+        public TrinityPower(SNOPower snoPower, float minimumRange)
+        {
+            SNOPower = snoPower;
+            MinimumRange = minimumRange;
+            TargetPosition = Vector3.Zero;
+            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
+            TargetRActorGUID = -1;
+            WaitTicksBeforeUse = 0;
+            WaitTicksAfterUse = 0;
+            WaitForAnimationFinished = true;
+            PowerAssignmentTime = DateTime.Now;
+        }
+
+        /// <summary>
+        /// Create a TrinityPower for use at a specific location
+        /// </summary>
+        /// <param name="snoPower"></param>
+        /// <param name="minimumRange"></param>
+        /// <param name="targetRActorGUID"></param>
+        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position)
+        {
+            SNOPower = snoPower;
+            MinimumRange = minimumRange;
+            TargetPosition = position;
+            TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
+            TargetRActorGUID = -1;
+            WaitTicksBeforeUse = 0;
+            WaitTicksAfterUse = 0;
+            WaitForAnimationFinished = true;
+            PowerAssignmentTime = DateTime.Now;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TrinityPower" /> class.
+        /// </summary>
+        /// <param name="snoPower">The SNOPower to be used</param>
+        /// <param name="minimumRange">The minimum range required from the Position or Target to be used</param>
+        /// <param name="position">The Position to use the power at</param>
+        /// <param name="targetDynamicWorldId">Usually the CurrentDynamicWorlID</param>
+        /// <param name="targetRActorGUID">The Unit we are targetting</param>
+        /// <param name="waitTicksBeforeUse">The number of "ticks" to wait before using a power - logically 1/10th of a second</param>
+        /// <param name="waitTicksAfterUse">The number of "ticks" to wait after using a power - logically 1/10th of a second</param>
+        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position, int targetDynamicWorldId, int targetRActorGUID, float waitTicksBeforeUse, float waitTicksAfterUse)
+        {
+            SNOPower = snoPower;
+            MinimumRange = minimumRange;
+            TargetPosition = position;
+            TargetDynamicWorldId = targetDynamicWorldId;
+            TargetRActorGUID = targetRActorGUID;
+            WaitTicksBeforeUse = waitTicksBeforeUse;
+            WaitTicksAfterUse = waitTicksAfterUse;
+            WaitForAnimationFinished = true;
+            PowerAssignmentTime = DateTime.Now;
         }
 
         /// <summary>

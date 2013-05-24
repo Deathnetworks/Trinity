@@ -1,5 +1,5 @@
 ﻿
-namespace Trinity.Settings
+namespace Trinity.Config
 {
     public interface ITrinitySetting<T> where T : ITrinitySetting<T>
     {

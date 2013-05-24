@@ -1,4 +1,4 @@
-﻿using Trinity.Settings.Combat;
+﻿using Trinity.Config.Combat;
 using Trinity.Technicals;
 using System;
 using System.Collections.Generic;
@@ -10,6 +10,7 @@ using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
+using Trinity.Combat.Abilities;
 namespace Trinity
 {
     public partial class Trinity : IPlugin
@@ -613,7 +614,8 @@ namespace Trinity
                 ZetaDia.CurrentWorldId == 121214 &&
                 (Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
-                bDontSpamOutofCombat = true;
+                DisableOutofCombatSprint = true;
+                BarbarianCombat.AllowSprintOOC = false;
                 Logging.Write("[Trinity] Waiting for Wrath Of The Berserker cooldown before continuing to Azmodan.");
                 CurrentTarget = new TrinityCacheObject()
                                     {

@@ -12,7 +12,7 @@ using Zeta.Internals.Actors.Gizmos;
 using Zeta.Internals.SNO;
 using System.Text;
 using Trinity.Cache;
-using Trinity.Settings.Combat;
+using Trinity.Config.Combat;
 using Zeta.Navigation;
 
 namespace Trinity
@@ -105,11 +105,11 @@ namespace Trinity
             // Get whether or not we want this item, cached if possible
             if (!pickupItemCache.TryGetValue(c_RActorGuid, out AddToCache))
             {
-                if (Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+                if (Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
                 {
                     AddToCache = ItemManager.Current.ShouldPickUpItem((ACDItem)c_CommonData);
                 }
-                else if (Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
+                else if (Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.TrinityWithItemRules)
                 {
                     AddToCache = ItemRulesPickupValidation(pickupItem);
                 }

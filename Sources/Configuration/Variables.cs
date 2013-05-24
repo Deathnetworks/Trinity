@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using Trinity.ItemRules;
-using Trinity.Settings;
+using Trinity.Config;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -315,12 +315,11 @@ namespace Trinity
 
         // Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
         private static TrinityPower powerBuff;
-        private static TrinityPower CurrentPower;
         internal static SNOPower LastPowerUsed = SNOPower.None;
 
         // Two variables to stop DB from attempting any navigator movement mid-combat/mid-backtrack
         public static bool bDontMoveMeIAmDoingShit = false;
-        public static bool bDontSpamOutofCombat = false;
+        public static bool DisableOutofCombatSprint = false;
         public static bool bOnlyTarget = false;
 
         // Target provider and core routine variables
@@ -331,10 +330,6 @@ namespace Trinity
         private static float CurrentBotLootRange = 0f;
         internal static bool MaintainTempestRush = false;
 
-        /// <summary>
-        /// Use Beserker Only with "Hard" elites (specific affixes)
-        /// </summary>
-        private static bool shouldUseBerserkerPower = false;
         /// <summary>
         /// Are we waiting for a special? Don't waste mana/rage/disc/hate etc.
         /// </summary>
@@ -452,68 +447,7 @@ namespace Trinity
         /// </summary>
         internal static List<TrinityCacheObject> ObjectCache;
 
-        /// <summary>
-        /// This will eventually be come our single source of truth and we can get rid of most/all of the below "c_" variables
-        /// </summary>
-        private static TrinityCacheObject cacheEntry = null;
-
-        private static Vector3 c_Position = Vector3.Zero;
-        private static GObjectType c_ObjectType = GObjectType.Unknown;
-        private static double c_Weight = 0d;
-        /// <summary>
-        /// Percent of total health remaining on unit
-        /// </summary>
-        private static double c_HitPointsPct = 0d;
-        private static double c_HitPoints = 0d;
-        private static float c_CentreDistance = 0f;
-        private static float c_RadiusDistance = 0f;
-        private static float c_Radius = 0f;
-        private static float c_ZDiff = 0f;
-        private static string c_ItemDisplayName = "";
-        private static int c_GameBalanceID = 0;
-        private static string c_InternalName = "";
-        private static string c_IgnoreReason = "";
-        private static string c_IgnoreSubStep = "";
-        private static int c_ACDGUID = 0;
-        private static int c_RActorGuid = 0;
-        private static int c_GameDynamicID = 0;
-        private static int c_BalanceID = 0;
-        private static int c_ActorSNO = 0;
-        private static int c_ItemLevel = 0;
-        private static string c_ItemLink = String.Empty;
-        private static int c_GoldStackSize = 0;
-        private static bool c_IsOneHandedItem = false;
-        private static bool c_IsTwoHandedItem = false;
-        private static ItemQuality c_ItemQuality = ItemQuality.Invalid;
-        private static ItemType c_DBItemType = ItemType.Unknown;
-        private static ItemBaseType c_DBItemBaseType = ItemBaseType.None;
-        private static FollowerType c_item_tFollowerType = FollowerType.None;
-        private static GItemType c_item_GItemType = GItemType.Unknown;
-        private static MonsterSize c_unit_MonsterSize = MonsterSize.Unknown;
-        private static DiaObject c_diaObject = null;
-        private static DiaUnit c_diaUnit = null;
-        private static ACD c_CommonData = null;
-        private static SNOAnim c_CurrentAnimation = SNOAnim.Invalid;
-        private static bool c_unit_IsElite = false;
-        private static bool c_unit_IsRare = false;
-        private static bool c_unit_IsUnique = false;
-        private static bool c_unit_IsMinion = false;
-        private static bool c_unit_IsTreasureGoblin = false;
-        private static bool c_IsEliteRareUnique = false;
-        private static bool c_unit_IsBoss = false;
-        private static bool c_unit_IsAttackable = false;
-        private static bool c_unit_IsShielded = false;
-        private static bool c_ForceLeapAgainst = false;
-        private static bool c_IsObstacle = false;
-        private static bool c_HasBeenNavigable = false;
-        private static bool c_HasBeenRaycastable = false;
-        private static bool c_HasBeenInLoS = false;
-        private static string c_ItemMd5Hash = string.Empty;
-        private static bool c_HasDotDPS = false;
-        private static string c_ObjectHash = String.Empty;
-        private static double c_KillRange = 0f;
-        private static AvoidanceType c_AvoidanceType = AvoidanceType.None;
-
+ 
         // From main RefreshDiaobjects
         /// <summary>
         /// The position of the last CurrentTarget (Primary Target)

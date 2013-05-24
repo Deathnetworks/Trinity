@@ -308,7 +308,7 @@ namespace Trinity
             }
 
             // Default attacks
-            return CombatBase.GetDefaultPower();
+            return CombatBase.DefaultPower;
         }
 
         private static TrinityPower GetWitchDoctorDestroyPower()
@@ -329,7 +329,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_PlagueOfToads, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Witchdoctor_AcidCloud) && PlayerStatus.PrimaryResource >= 172)
                 return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            return CombatBase.GetDefaultPower();
+            return CombatBase.DefaultPower;
         }
 
     }

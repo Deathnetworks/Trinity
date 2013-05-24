@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using Trinity.Cache;
 using Trinity.ItemRules;
-using Trinity.Settings.Loot;
+using Trinity.Config.Loot;
 using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;

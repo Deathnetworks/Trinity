@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace Trinity.Settings.Combat
+namespace Trinity.Config.Combat
 {
     [DataContract(Namespace = "")]
     public class DemonHunterSetting : ITrinitySetting<DemonHunterSetting>, IAvoidanceHealth, INotifyPropertyChanged

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Trinity.Settings.Combat;
+using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
@@ -90,7 +90,6 @@ namespace Trinity
             if (!AddToCache)
                 return AddToCache;
 
-            MonsterAffixes monsterAffixes;
             using (new PerformanceLogger("RefreshUnit.8"))
             {
                 // Only set treasure goblins to true *IF* they haven't disabled goblins! Then check the SNO in the goblin hash list!
@@ -110,27 +109,7 @@ namespace Trinity
                     }
                 }
                 // Pull up the Monster Affix cached data
-                monsterAffixes = RefreshAffixes(c_CommonData);
-
-                /*
-                 * 
-                 * This should be moved to HandleTarget
-                 * 
-                 */
-                if (PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker, true))
-                {
-                    //WotB only used on Arcane, Frozen, Jailer, Molten, Electrified+Reflect Damage elites
-                    if (monsterAffixes.HasFlag(MonsterAffixes.ArcaneEnchanted) || monsterAffixes.HasFlag(MonsterAffixes.Frozen) ||
-                        monsterAffixes.HasFlag(MonsterAffixes.Jailer) || monsterAffixes.HasFlag(MonsterAffixes.Molten) ||
-                       (monsterAffixes.HasFlag(MonsterAffixes.Electrified) && monsterAffixes.HasFlag(MonsterAffixes.ReflectsDamage)) ||
-                        //Bosses and uber elites
-                        c_unit_IsBoss || c_ActorSNO == 256015 || c_ActorSNO == 256000 || c_ActorSNO == 255996 ||
-                        //...or more than 4 elite mobs in range (only elites/rares/uniques, not minions!)
-                        ElitesWithinRange[RANGE_50] > 4)
-                        shouldUseBerserkerPower = true;
-                }
-                else
-                    shouldUseBerserkerPower = false;
+                c_MonsterAffixes = RefreshAffixes(c_CommonData);
 
                 // Is this something we should try to force leap/other movement abilities against?
                 c_ForceLeapAgainst = false;
@@ -141,7 +120,7 @@ namespace Trinity
 
             c_KillRange = killRange;
 
-            if (monsterAffixes.HasFlag(MonsterAffixes.Shielding))
+            if (c_MonsterAffixes.HasFlag(MonsterAffixes.Shielding))
                 c_unit_IsShielded = true;
 
             // Only if at full health, else don't bother checking each loop

@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Trinity.ItemRules;
-using Trinity.Settings.Loot;
+using Trinity.Config.Loot;
 using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;

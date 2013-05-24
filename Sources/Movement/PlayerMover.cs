@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Trinity.Settings.Combat;
+using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Trinity.XmlTags;
 using Zeta;

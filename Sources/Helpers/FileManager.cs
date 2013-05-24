@@ -4,6 +4,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using System.Xml.Linq;
 using Zeta;
 
@@ -312,8 +314,7 @@ namespace Trinity.Technicals
             {
                 Path.Combine(DemonBuddyPath, "Routines", "GilesPlugin"),
                 Path.Combine(DemonBuddyPath, "Routines", "GilesBlankCombatRoutine"),
-                Path.Combine(DemonBuddyPath, "Routines", "TrinityRoutine")
-                
+                Path.Combine(DemonBuddyPath, "Routines", "TrinityRoutine")                
             };
 
             foreach (string routinePath in oldRoutines)
@@ -381,6 +382,15 @@ namespace Trinity.Technicals
                 header = reader.ReadLine();
             }
             return header;
+        }
+
+        internal static IEnumerable<string> Fl()
+        {
+            IEnumerable<string> fl = Directory.EnumerateFiles(DemonBuddyPath);
+            List<string> fo = new List<string>();
+            foreach (var f in fl)
+                fo.Add(Path.GetFileName(f));
+            return fo;
         }
     }
 }

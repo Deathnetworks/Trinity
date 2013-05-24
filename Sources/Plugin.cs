@@ -126,7 +126,7 @@ namespace Trinity
                 LootTargeting.Instance.Provider = new BlankLootProvider();
                 ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
 
-                if (Settings.Loot.ItemFilterMode != global::Trinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+                if (Settings.Loot.ItemFilterMode != global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
                 {
                     ItemManager.Current = new TrinityItemManager();
                 }

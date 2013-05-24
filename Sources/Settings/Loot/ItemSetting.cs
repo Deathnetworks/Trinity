@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace Trinity.Settings.Loot
+namespace Trinity.Config.Loot
 {
     [DataContract(Namespace = "")]
     public class ItemSetting : ITrinitySetting<ItemSetting>, INotifyPropertyChanged

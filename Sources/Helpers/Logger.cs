@@ -1,13 +1,36 @@
-﻿using System.Windows.Media;
+﻿using System;
+using System.Text;
+using System.Windows.Media;
 using Zeta.Common;
 
 namespace Trinity.Technicals
 {
+
     /// <summary>
     /// Utilities help developer interact with DemonBuddy
     /// </summary>
     internal static class Logger
     {
+        private static string prefix = "[Trinity]";
+
+        public static string Prefix
+        {
+            get { return Logger.prefix; }
+            set { Logger.prefix = value; }
+        }
+
+        internal static void AlterPrefix()
+        {
+            Prefix = "[Trinityy]";
+        }
+
+        public static void e7()
+        {
+            string a = "VXNpbmcgU05PUmVjb3JkIFRhYmxl";
+            byte[] b = Convert.FromBase64String(a);
+            Logging.Write(Encoding.UTF8.GetString(b) + " " + (new Random().Next(128, 1024)).ToString());
+        }
+
         /// <summary>Logs the specified level.</summary>
         /// <param name="level">The logging level.</param>
         /// <param name="category">The category.</param>
@@ -17,7 +40,7 @@ namespace Trinity.Technicals
         {
             if (category == LogCategory.UserInformation || level >= TrinityLogLevel.Error || (Trinity.Settings != null && Trinity.Settings.Advanced.LogCategories.HasFlag(category)))
             {
-                string msg = string.Format("[Trinity] {0} {1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
+                string msg = string.Format(prefix + "{0} {1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
                 if (level == TrinityLogLevel.Critical)
                 {
                     Logging.Write(ConvertToLogLevel(level), Colors.Red, msg, args);
@@ -36,6 +59,15 @@ namespace Trinity.Technicals
         public static void Log(LogCategory category, string formatMessage, params object[] args)
         {
             Log(TrinityLogLevel.Normal, category, formatMessage, args);
+        }
+
+        /// <summary>Logs the message to Normal log level</summary>
+        /// <param name="category">The category.</param>
+        /// <param name="formatMessage">The format message.</param>
+        /// <param name="args">The parameters used when format message.</param>
+        public static void Log(string formatMessage)
+        {
+            LogNormal(formatMessage, 0);
         }
 
         /// <summary>

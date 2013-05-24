@@ -592,5 +592,15 @@ namespace Trinity
                 {SNOPower.DemonHunter_Sentry, DateTime.Today},{SNOPower.DemonHunter_Strafe, DateTime.Today},{SNOPower.DemonHunter_Multishot, DateTime.Today},
                 {SNOPower.DemonHunter_ClusterArrow, DateTime.Today},{SNOPower.DemonHunter_RainOfVengeance, DateTime.Today},
             };
+
+        public static HashSet<int> ForceUseWOTBIds
+        {
+            get { return DataDictionary.forceUseWOTBIds; }
+        }
+        private static HashSet<int> forceUseWOTBIds = new HashSet<int>()
+        {
+            256015, 256000, 255996
+        };
+
     }
 }

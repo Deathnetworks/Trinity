@@ -1,7 +1,7 @@
 ﻿using Trinity.DbProvider;
-using Trinity.Settings;
-using Trinity.Settings.Combat;
-using Trinity.Settings.Loot;
+using Trinity.Config;
+using Trinity.Config.Combat;
+using Trinity.Config.Loot;
 using Trinity.UI;
 using System.Diagnostics;
 using System.Windows.Input;

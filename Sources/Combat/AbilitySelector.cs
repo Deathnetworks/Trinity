@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trinity.Combat.Abilities;
 using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
@@ -40,6 +41,7 @@ namespace Trinity
             }
             return 0;
         }
+
         /// <summary>
         /// Check re-use timers on skills
         /// </summary>
@@ -115,7 +117,7 @@ namespace Trinity
 
                 // Switch based on the cached character class
 
-                TrinityPower power = CurrentPower;
+                TrinityPower power = CombatBase.CurrentPower;
 
                 using (new PerformanceLogger("AbilitySelector.ClassAbility"))
                 {
@@ -144,10 +146,10 @@ namespace Trinity
                     }
                 }
                 // use IEquatable to check if they're equal
-                if (CurrentPower == power)
+                if (CombatBase.CurrentPower == power)
                 {
-                    Logger.Log(LogCategory.Behavior, "Keeping {0}", CurrentPower.ToString());
-                    return CurrentPower;
+                    Logger.Log(LogCategory.Behavior, "Keeping {0}", CombatBase.CurrentPower.ToString());
+                    return CombatBase.CurrentPower;
                 }
                 else if (power != null)
                 {

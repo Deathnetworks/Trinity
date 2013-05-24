@@ -8,6 +8,7 @@ using Zeta.TreeSharp;
 using Trinity;
 using Zeta.Common.Plugins;
 using Action = Zeta.TreeSharp.Action;
+using System.Diagnostics;
 
 namespace Trinity
 {
@@ -72,5 +73,15 @@ namespace Trinity
         public override Composite Combat { get { return new Action(); } }
         public override Composite Buff { get { return new Action(); } }
 
+        public static bool Vt(bool t, string f)
+        {
+            var v1 = FileVersionInfo.GetVersionInfo(f);
+            string[] v2 = v1.FileVersion.Split('.');
+            int v = 0;
+            Int32.TryParse(v2[v2.Length - 2], out v);
+            if (v >= 1425)
+                t = true;
+            return t;
+        }
     }
 }
