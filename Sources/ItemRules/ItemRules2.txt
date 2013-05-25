@@ -21,40 +21,17 @@
 // | 4. Check pickup.dis to fit your needs.
 // | 5. That's it. Have fun.
 // | 
-// | actualLog.txt - contains all logs from itemrules
-// | config.dis    - contains configuration like rule sets and debug stuff
-// | pickup.dis    - contains pickup rules
-// | legendary.dis - contains legendary rules
-// | magic.dis     - contains legendary rule set
-// | rare.dis      - contains legendary rule set
-// | special.dis   - contains legendary rule set
+// | actualLog.txt   - contains all logs from itemrules
+// | config.dis      - contains configuration like rule sets and debug stuff
+// | pickup.dis      - contains pickup rules
+// | identify.dis    - contains which items to identify and which not to
+// | salvageSell.dis - contains salvage or sell rules
+// | legendary.dis   - contains legendary rules
+// | set.dis         - contains set rules
+// | magic.dis       - contains magic rules
+// | rare.dis        - contains rare rules
+// | common.dis      - contains common rules
 // | 
-// | structure of ItemRules:
-// |
-// | Plugin\Trinity\ItemRules
-// |  +- Log
-// |     +- actualLog.txt
-// |  +- Core
-// |  +- Rules
-// |     +- custom
-// |     +- hard 
-// |        +- legendary.dis    
-// |        +- magic.dis
-// |        +- rare.dis
-// |        +- special.dis
-// |     +- medium 
-// |        +- legendary.dis
-// |        +- magic.dis
-// |        +- rare.dis
-// |        +- special.dis
-// |     +- soft 
-// |        +- legendary.dis
-// |        +- magic.dis
-// |        +- rare.dis
-// |        +- special.dis
-// |     +- config.dis
-// |     +- pickup.dis
-// |
 // +---------------------------------------------------------------------------+
 // +---------------------------------------------------------------------------+
 // | _______ __                    __                    
@@ -148,11 +125,20 @@
 // | Actions for pickup rules:
 // |  -> [PICKUP] pickup item  
 // |  -> [IGNORE] ignore item
+// | 
+// | Actions for identify rules:
+// |  -> [IDENTIFY] identify item  
+// |  -> [UNIDENT]  unidentify item
 // |
 // | Actions for stashing rules:
 // |  -> [KEEP]   keep item  
 // |  -> [TRASH]  trash item
 // |  -> [SCORE]  use score to evaluate item
+// |
+// | Actions for salvage rules:
+// |  -> [SALVAGE] salvage item  
+// |  -> [SELL]    sell item
+// |
 // +---------------------------------------------------------------------------+
 // | _______                          __                    
 // ||       |.-----.-----.----.---.-.|  |_.-----.----.-----.

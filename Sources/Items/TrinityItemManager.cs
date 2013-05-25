@@ -64,11 +64,11 @@ namespace Trinity
             if (ItemManager.Current.ItemIsProtected(item))
                 return false;
 
-            if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+            if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
             {
                 return ItemManager.Current.ShouldSalvageItem(item);
             }
-            else if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
+            else if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.TrinityWithItemRules)
             {
                 return ItemRulesSalvageSell(item, evaluationType);
             }
@@ -92,11 +92,11 @@ namespace Trinity
             if (ItemManager.Current.ItemIsProtected(cItem.AcdItem))
                 return false;
 
-            if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.DemonBuddy)
+            if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
             {
                 return ItemManager.Current.ShouldSellItem(item);
             }
-            else if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Settings.Loot.ItemFilterMode.TrinityWithItemRules)
+            else if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.TrinityWithItemRules)
             {
                 return ItemRulesSalvageSell(item, evaluationType);
             }
