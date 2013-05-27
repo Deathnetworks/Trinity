@@ -699,7 +699,9 @@ namespace Trinity
             else if (GenericCache.ContainsKey(targetMd5Hash))
             {
                 TrinityCacheObject cTarget = (TrinityCacheObject)GenericCache.GetObject(targetMd5Hash).Value;
-                if (!cTarget.IsBoss && cTarget.TimesBeenPrimaryTarget > 15 && !(cTarget.Type == GObjectType.Item && cTarget.ItemQuality >= ItemQuality.Legendary))
+                bool isEliteLowHealth = cTarget.HitPointsPct <= 0.75 && cTarget.IsBossOrEliteRareUnique;
+                bool isLegendaryItem = cTarget.Type == GObjectType.Item && cTarget.ItemQuality >= ItemQuality.Legendary;
+                if (!cTarget.IsBoss && cTarget.TimesBeenPrimaryTarget > 15 && !isEliteLowHealth && !isLegendaryItem)
                 {
                     Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Blacklisting target {0} ActorSNO={1} RActorGUID={2} due to possible stuck/flipflop!",
                         CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid);

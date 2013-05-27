@@ -1239,7 +1239,9 @@ namespace Trinity
         private static double GetSecondsSinceTargetUpdate()
         {
             return DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds;
-        }               
+        }
+
+        private static string lastStatusText = "";
 
         /// <summary>
         /// Updates bot status text with appropriate information if we are moving into range of our <see cref="CurrentTarget"/>
@@ -1292,9 +1294,9 @@ namespace Trinity
             statusText.Append(" RangeReq'd=");
             statusText.Append(TargetRangeRequired.ToString("0.0"));
             statusText.Append(" DistfromTrgt=");
+            statusText.Append(TargetCurrentDistance.ToString("0"));
             statusText.Append(" tHP=");
-            statusText.Append(CurrentTarget.HitPointsPct.ToString("0.00"));
-            statusText.Append(TargetCurrentDistance.ToString("0.0"));
+            statusText.Append((CurrentTarget.HitPointsPct*100).ToString("0"));
             statusText.Append(" MyHP=");
             statusText.Append((PlayerStatus.CurrentHealthPct * 100).ToString("0"));
             statusText.Append(" MyMana=");
@@ -1315,7 +1317,7 @@ namespace Trinity
             statusText.Append(" RAGuid=");
             statusText.Append(CurrentTarget.RActorGuid);
 
-            statusText.Append(String.Format(" Duration={0:0.0}", DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds));
+            statusText.Append(String.Format(" Duration={0:0}", DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds));
 
             if (!targetIsInRange)
                 statusText.Append(" MOVING INTO RANGE");
@@ -1324,8 +1326,13 @@ namespace Trinity
                 sStatusText = "[Trinity] " + statusText.ToString();
                 BotMain.StatusText = sStatusText;
             }
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "{0}", statusText.ToString());
-            bResetStatusText = true;
+            if (lastStatusText != statusText.ToString())
+            {
+                // prevent spam
+                lastStatusText = statusText.ToString();
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "{0}", statusText.ToString());
+                bResetStatusText = true;
+            }
         }
 
         /// <summary>
