@@ -522,7 +522,7 @@ namespace Trinity.DbProvider
 
                 // Whirlwind for a barb, special context only
                 if (Trinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Trinity.ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= 10f) >= 1 &&
-                    Trinity.PlayerStatus.PrimaryResource >= 10)
+                    Trinity.PlayerStatus.PrimaryResource >= 10 && !Trinity.IsWaitingForSpecial)
                 {
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))

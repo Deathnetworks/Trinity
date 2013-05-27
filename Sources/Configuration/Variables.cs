@@ -333,7 +333,12 @@ namespace Trinity
         /// <summary>
         /// Are we waiting for a special? Don't waste mana/rage/disc/hate etc.
         /// </summary>
-        private static bool IsWaitingForSpecial = false;
+        internal static bool IsWaitingForSpecial
+        {
+            get { return Trinity.isWaitingForSpecial; }
+            set { Trinity.isWaitingForSpecial = value; }
+        }
+        private static bool isWaitingForSpecial = false;
 
         // Goblinney things
         private static int iTotalNumberGoblins = 0;
@@ -447,7 +452,7 @@ namespace Trinity
         /// </summary>
         internal static List<TrinityCacheObject> ObjectCache;
 
- 
+
         // From main RefreshDiaobjects
         /// <summary>
         /// The position of the last CurrentTarget (Primary Target)

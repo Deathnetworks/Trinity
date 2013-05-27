@@ -12,7 +12,7 @@ namespace Trinity.Combat.Abilities
     class BarbarianCombat : CombatBase
     {
         private static bool allowSprintOOC = true;
-        
+
         public static TrinityPower GetPower()
         {
             TrinityPower power = null;
@@ -53,38 +53,20 @@ namespace Trinity.Combat.Abilities
             // WOTB
             if (IsNull(power) && CanCastWrathOfTheBerserker)
             {
-                if (Player.PrimaryResource >= 50)
-                {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker being used!({0})", CurrentTarget.InternalName);
-                    IsWaitingForSpecial = false;
-                    power = PowerWrathOfTheBerserker;
-                }
-                else
-                {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker ready, waiting for fury...");
-                    IsWaitingForSpecial = true;
-                }
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker being used!({0})", CurrentTarget.InternalName);
+                power = PowerWrathOfTheBerserker;
             }
+
             // Call of the Ancients
             if (IsNull(power) && CanCastCallOfTheAncients)
-            {
-                if (Player.PrimaryResource >= 50)
-                {
-                    IsWaitingForSpecial = false;
-                    power = PowerCallOfTheAncients;
-                }
-                else
-                {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Call of the Ancients ready, waiting for fury...");
-                    IsWaitingForSpecial = true;
-                }
-            }
+                power = PowerCallOfTheAncients;
 
             // Battle Rage
             if (IsNull(power) && CanCastBattleRage)
                 power = PowerBattleRage;
 
             if (IsNull(power) && CanCastSprintOOC)
+                power = PowerSprint;
 
             // Default Attacks
             if (IsNull(power))
@@ -113,7 +95,8 @@ namespace Trinity.Combat.Abilities
                     !IsCurrentlyAvoiding &&
                     CanCast(SNOPower.Barbarian_Earthquake) &&
                     TargetUtil.AnyElitesInRange(25) &&
-                    !GetHasBuff(SNOPower.Barbarian_Earthquake);
+                    !GetHasBuff(SNOPower.Barbarian_Earthquake) &&
+                    Player.PrimaryResource <= 50; ;
             }
         }
         public static bool CanCastEarthquake
@@ -134,57 +117,86 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                // WOTB with ignore elites
-                bool test1 =
-                    !UseOOCBuff &&
-                    !IsCurrentlyAvoiding &&
-                    CanCast(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    Settings.Combat.Misc.IgnoreElites &&
-                    (TargetUtil.AnyMobsInRange(25, 3) ||
-                    TargetUtil.AnyMobsInRange(50, 10) ||
-                    TargetUtil.AnyMobsInRange(Settings.Combat.Misc.TrashPackClusterRadius, Settings.Combat.Misc.TrashPackSize)) &&
-                    !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
-
                 // WOTB with elites
-                bool test2 =
+                bool wotbElites =
+                    (WOTBGoblins || WOTBElitesPresent);
+
+                return
                     !UseOOCBuff &&
                     !IsCurrentlyAvoiding &&
+                    Player.PrimaryResource <= 50 &&
                     CanCast(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    TargetUtil.AnyElitesInRange(1) &&
                     !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    Player.PrimaryResource >= 50;
-
-                return test1 || test2;
+                    (WOTBIgnoreElites || wotbElites);
             }
         }
+
+        /// <summary>
+        /// If using WOTB on all elites, or if we should only use on "hard" affixes
+        /// </summary>
+        public static bool WOTBElitesPresent
+        {
+            get
+            {
+                // WotB only used on Arcane, Frozen, Jailer, Molten, Electrified+Reflect Damage elites, or bosses and ubers, or when more than 4 elites are present
+                bool wotbHardElitesPresent = HardElitesPresent ||
+                    Trinity.ObjectCache.Any(o => DataDictionary.ForceUseWOTBIds.Contains(o.ActorSNO)) ||
+                        TargetUtil.AnyElitesInRange(50, 4);
+
+                return
+                    (!Settings.Combat.Barbarian.WOTBHardOnly && TargetUtil.AnyElitesInRange(20, 1))
+                    || (wotbHardElitesPresent && Settings.Combat.Barbarian.WOTBHardOnly);
+            }
+        }
+
+        /// <summary>
+        /// Make sure we are allowed to use wrath on goblins, else make sure this isn't a goblin
+        /// </summary>
+        public static bool WOTBGoblins
+        {
+            get
+            {
+                return !Settings.Combat.Barbarian.UseWOTBGoblin || (Settings.Combat.Barbarian.UseWOTBGoblin && CurrentTarget.IsTreasureGoblin);
+            }
+        }
+
+        /// <summary>
+        /// If ignoring elites completely, trigger on 3 trash within 25 yards, or 10 trash in 50 yards
+        /// </summary>
+        public static bool WOTBIgnoreElites
+        {
+            get
+            {
+                return
+                    Settings.Combat.Misc.IgnoreElites &&
+                    (TargetUtil.AnyMobsInRange(25, 3) || TargetUtil.AnyMobsInRange(50, 10) || TargetUtil.AnyMobsInRange(Settings.Combat.Misc.TrashPackClusterRadius, Settings.Combat.Misc.TrashPackSize)) ||
+                    !Settings.Combat.Misc.IgnoreElites;
+            }
+        }
+
         public static bool CanCastWrathOfTheBerserker
         {
             get
             {
-                //WotB only used on Arcane, Frozen, Jailer, Molten, Electrified+Reflect Damage elites, or bosses and ubers, or when more than 4 elites are present
-                bool hardElitesPresent = HardElitesPresent ||
-                    Trinity.ObjectCache.Any(o => DataDictionary.ForceUseWOTBIds.Contains(o.ActorSNO)) ||
-                        TargetUtil.AnyElitesInRange(50, 4);
-
-                // If using WOTB on all elites, or if we should only use on "hard" affixes
-                bool wotbHardCheck = (!Settings.Combat.Barbarian.WOTBHardOnly || (hardElitesPresent && Settings.Combat.Barbarian.WOTBHardOnly));
-                // Make sure we are allowed to use wrath on goblins, else make sure this isn't a goblin
-                bool wotbGoblins = (!Settings.Combat.Barbarian.UseWOTBGoblin || (Settings.Combat.Barbarian.UseWOTBGoblin && CurrentTarget.IsTreasureGoblin));
-                // If ignoring elites completely, trigger on 3 trash within 25 yards, or 10 trash in 50 yards
-                bool wotbIgnoreElites = (Settings.Combat.Misc.IgnoreElites && (TargetUtil.AnyMobsInRange(25, 3) || TargetUtil.AnyMobsInRange(50, 10)) || !Settings.Combat.Misc.IgnoreElites);
-                // Otherwise use when Elite target is in 20 yards
-                bool wotbEliteCheck = (TargetUtil.AnyElitesInRange(20, 1) || TargetUtil.IsEliteTargetInRange(20f));
+                /* WOTB should be used when the following conditions are met:
+                 * If ignoring elites, when 3 monsters in 25 yards or 10 monsters in 50 yards are present, OR
+                 * If using on hard elites only, when an elite with the required affix is present, OR
+                 * If normal mode, when any elite is within 20 yards, OR
+                 * If we have low health (use potion health)
+                 * And not on the Heart of sin
+                 */
 
                 return
                     !UseOOCBuff &&
+                    Player.PrimaryResource >= 50 &&
+                    // Don't still have the buff
+                    !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
                     CanCast(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    wotbHardCheck &&
                     // Not on heart of sin after Cydaea
                     CurrentTarget.ActorSNO != 193077 &&
-                    (wotbGoblins || wotbIgnoreElites || wotbEliteCheck || //Or if our health is low
-                     Player.CurrentHealthPct <= 60) &&
-                    // Don't still have the buff
-                    !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
+                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent ||
+                    //Or if our health is low
+                    Player.CurrentHealthPct <= Settings.Combat.Barbarian.PotionLevel);
             }
         }
         public static bool ShouldWaitForCallOfTheAncients
@@ -196,7 +208,8 @@ namespace Trinity.Combat.Abilities
                     !IsCurrentlyAvoiding &&
                     CanCast(SNOPower.Barbarian_CallOfTheAncients) &&
                     TargetUtil.AnyElitesInRange(25) &&
-                    !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients);
+                    !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients) &&
+                    Player.PrimaryResource <= 50; ;
             }
         }
         public static bool CanCastCallOfTheAncients
@@ -217,7 +230,7 @@ namespace Trinity.Combat.Abilities
             {
                 return
                     !UseOOCBuff &&
-                    !Player.IsIncapacitated && 
+                    !Player.IsIncapacitated &&
                     CanCast(SNOPower.Barbarian_BattleRage, CanCastFlags.NoTimer) &&
                     (SNOPowerUseTimer(SNOPower.Barbarian_BattleRage) || !GetHasBuff(SNOPower.Barbarian_BattleRage)) &&
                     Player.PrimaryResource >= 20;
@@ -228,9 +241,9 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return
-                UseOOCBuff && 
+                UseOOCBuff &&
                 AllowSprintOOC &&
-                !Player.IsIncapacitated && 
+                !Player.IsIncapacitated &&
                 CanCast(SNOPower.Barbarian_Sprint) &&
                 (Settings.Combat.Misc.AllowOOCMovement || GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) &&
                 !GetHasBuff(SNOPower.Barbarian_Sprint) &&
