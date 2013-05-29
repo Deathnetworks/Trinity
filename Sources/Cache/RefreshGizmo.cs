@@ -14,7 +14,7 @@ namespace Trinity
             // start as true, then set as false as we go. If nothing matches below, it will return true.
             AddToCache = true;
 
-            bool openResplendentChests = Zeta.CommonBot.Settings.CharacterSettings.Instance.OpenChests && c_InternalName.ToLower().Contains("chest_rare");
+            bool openResplendentChest = c_InternalName.ToLower().Contains("chest_rare");
 
             // Ignore it if it's not in range yet, except health wells and resplendent chests if we're opening chests
             if ((c_RadiusDistance > CurrentBotLootRange || c_RadiusDistance > 50) && c_ObjectType != GObjectType.HealthWell && c_ObjectType != GObjectType.Shrine && c_RActorGuid != CurrentTargetRactorGUID)
@@ -24,9 +24,10 @@ namespace Trinity
             }
 
             // re-add resplendent chests
-            if (openResplendentChests)
+            if (openResplendentChest)
             {
                 AddToCache = true;
+                c_IgnoreSubStep = "";
             }
 
             // Retrieve collision sphere radius, cached if possible
@@ -43,7 +44,6 @@ namespace Trinity
                 {
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for object {0} [{1}]", c_InternalName, c_ActorSNO);
                     AddToCache = false;
-                    //return bWantThis;
                 }
                 collisionSphereCache.Add(c_ActorSNO, c_Radius);
             }
@@ -81,32 +81,15 @@ namespace Trinity
             }
 
             // Anything that's not operatable
-            bool operatable = false;
-            try
-            {
-                switch (c_ObjectType)
-                {
-                    case GObjectType.Shrine:
-                    case GObjectType.Door:
-                    case GObjectType.Container:
-                    case GObjectType.Interactable:
-                        isGizmoDisabledByScript = ((DiaGizmo)c_diaObject).Operatable;
-                        break;
-                }
-            }
-            catch
-            {
-                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                    "Safely handled exception getting Operatable attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
-                AddToCache = false;
-            }
-            if (operatable)
-            {
-                AddToCache = false;
-                c_IgnoreSubStep = "NonOperatable";
-                return AddToCache;
-            }
+            bool operatable = ((DiaGizmo)c_diaObject).Operatable;
 
+            // rrrix: i'm not sure if this is used anywhere?
+            //if (!operatable)
+            //{
+            //    AddToCache = false;
+            //    c_IgnoreSubStep = "NonOperatable";
+            //    return AddToCache;
+            //}
 
             // Now for the specifics
             int physicsSno;
@@ -117,6 +100,14 @@ namespace Trinity
                 case GObjectType.Door:
                     {
                         AddToCache = true;
+
+                        if (((GizmoDoor)c_diaObject).HasBeenOperated)
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "Door has been operated";
+                            return AddToCache;
+                        }
+
                         try
                         {
                             string currentAnimation = c_CommonData.CurrentAnimation.ToString().ToLower();
@@ -210,7 +201,7 @@ namespace Trinity
                         // Already used, blacklist it and don't look at it again
                         try
                         {
-                            gizmoUsed = (c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoHasBeenOperated) > 0);
+                            gizmoUsed = ((GizmoShrine)c_diaObject).HasBeenOperated;
                         }
                         catch
                         {

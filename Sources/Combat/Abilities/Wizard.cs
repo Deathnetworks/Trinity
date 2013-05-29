@@ -190,20 +190,20 @@ namespace Trinity
                 {
                     // Familiar has been removed for now. Uncomment the three comments below relating to familiars to force re-buffing them
                     bool bHasBuffAbilities = (Hotbar.Contains(SNOPower.Wizard_MagicWeapon) ||
-                        //hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Familiar) ||
+                        Hotbar.Contains(SNOPower.Wizard_Familiar) ||
                         Hotbar.Contains(SNOPower.Wizard_EnergyArmor) || Hotbar.Contains(SNOPower.Wizard_IceArmor) ||
                         Hotbar.Contains(SNOPower.Wizard_StormArmor));
-                    int iExtraEnergyNeeded = 25;
-                    if (Hotbar.Contains(SNOPower.Wizard_MagicWeapon)) iExtraEnergyNeeded += 25;
-                    //if (hashPowerHotbarAbilities.Contains(SNOPower.Wizard_Familiar)) iExtraEnergyNeeded += 25;
+                    int reserveArcanePower = 25;
+                    if (Hotbar.Contains(SNOPower.Wizard_MagicWeapon)) reserveArcanePower += 25;
+                    if (Hotbar.Contains(SNOPower.Wizard_Familiar)) reserveArcanePower += 25;
                     if (Hotbar.Contains(SNOPower.Wizard_EnergyArmor) || Hotbar.Contains(SNOPower.Wizard_IceArmor) ||
-                        Hotbar.Contains(SNOPower.Wizard_StormArmor)) iExtraEnergyNeeded += 25;
-                    if (!bHasBuffAbilities || Player.PrimaryResource <= iExtraEnergyNeeded)
+                        Hotbar.Contains(SNOPower.Wizard_StormArmor)) reserveArcanePower += 25;
+                    if (!bHasBuffAbilities || Player.PrimaryResource <= reserveArcanePower)
                         CanCastArchon = true;
                     if (!CanCastArchon)
                     {
                         AbilityLastUsedCache[SNOPower.Wizard_MagicWeapon] = DateTime.Today;
-                        //dictAbilityLastUse[SNOPower.Wizard_Familiar] = DateTime.Today;
+                        AbilityLastUsedCache[SNOPower.Wizard_Familiar] = DateTime.Today;
                         AbilityLastUsedCache[SNOPower.Wizard_EnergyArmor] = DateTime.Today;
                         AbilityLastUsedCache[SNOPower.Wizard_IceArmor] = DateTime.Today;
                         AbilityLastUsedCache[SNOPower.Wizard_StormArmor] = DateTime.Today;
@@ -238,7 +238,7 @@ namespace Trinity
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_FrostNova) && !Player.IsIncapacitated &&
                     hasCriticalMass && TargetUtil.AnyMobsInRange(20, 1) && PowerManager.CanCast(SNOPower.Wizard_FrostNova))
                 {
-                    return new TrinityPower(SNOPower.Wizard_FrostNova, 15f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_FrostNova, 10f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
                 }
 
                 // Explosive Blast SPAM when enough AP, blow erry thing up, nah mean
@@ -246,10 +246,10 @@ namespace Trinity
                     (TargetUtil.AnyMobsInRange(25) && CurrentTarget.RadiusDistance <= 25f) &&
                     PowerManager.CanCast(SNOPower.Wizard_ExplosiveBlast))
                 {
-                    float fThisRange = 11f;
+                    float blastRange = 11f;
                     if (hasCriticalMass)
-                        fThisRange = 9f;
-                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, fThisRange, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                        blastRange = 5f;
+                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, blastRange, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
                 }
 
                 // Check to see if we have a signature spell on our hotbar, for energy twister check
@@ -332,9 +332,9 @@ namespace Trinity
                     if (hasCriticalMass)
                         range = 20f;
                     if (hasSleetStorm)
-                        range = 15f;
+                        range = 5f;
 
-                    return new TrinityPower(SNOPower.Wizard_RayOfFrost, range, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_RayOfFrost, range, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, NO_WAIT_ANIM);
                 }
                 // Magic Missile
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_MagicMissile))

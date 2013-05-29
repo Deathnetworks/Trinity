@@ -16,22 +16,33 @@ namespace Trinity.XmlTags
     [XmlElement("TrinityMoveTo")]
     public class TrinityMoveTo : ProfileBehavior
     {
-        private bool m_IsDone;
-        private float fPosX;
-        private float fPosY;
-        private float fPosZ;
-        private float fPathPrecision;
-        private float fRandomizedDistance;
-        private string sNoSkip;
+        private bool isDone;
+        private float posX;
+        private float posY;
+        private float posZ;
+        private float pathPrecision;
+        private float unsafeRandomDistance;
+        private string noSkip;
         private string useNavigator;
-        private Vector3? vMainVector;
+        private Vector3? mainVector;
+        private MoveResult lastMoveResult = MoveResult.Moved;
 
         protected override Composite CreateBehavior()
         {
             return
             new PrioritySelector(
-                new Decorator(ret => CheckDistanceWithinPathPrecision(),
-                    new Action(ret => FlagTagAsCompleted())
+                new Decorator(ret => lastMoveResult == MoveResult.ReachedDestination,
+                    new Sequence(
+                        new Action(ret => SetTagDone("Reached Destination"))
+                    )
+                ),
+                new Decorator(ret => lastMoveResult != MoveResult.Moved,
+                    new Sequence(
+                        new Action(ret => SetTagDone("Movement failed"))
+                    )
+                ),
+                new Decorator(ret => IsDistanceWithinPathPrecision,
+                    new Action(ret => SetTagDone("Within path precision"))
                 ),
                 new Action(ret => MoveTo())
             );
@@ -39,6 +50,8 @@ namespace Trinity.XmlTags
 
         public override void OnStart()
         {
+            lastMoveResult = MoveResult.Moved;
+
             Logger.Log(LogCategory.UserInformation, "[TrinityMoveTo] Started Tag; {0} name=\"{1}\" questId=\"{2}\" stepId=\"{3}\" worldId=\"{4}\" levelAreaId=\"{5}\"",
                 getPosition(), this.Name, this.QuestId, this.StepId, ZetaDia.CurrentWorldId, ZetaDia.CurrentLevelAreaId);
         }
@@ -50,7 +63,6 @@ namespace Trinity.XmlTags
 
         private RunStatus MoveTo()
         {
-
             // First check if we can skip ahead because we recently moved here
             if (!Trinity.Settings.Combat.Misc.AllowBacktracking && (NoSkip == null || NoSkip.ToLower() != "true"))
             {
@@ -96,28 +108,36 @@ namespace Trinity.XmlTags
             return RunStatus.Success;
         }
 
-        private bool CheckDistanceWithinPathPrecision()
+        private bool IsDistanceWithinPathPrecision
         {
-
-            // First see if we should skip ahead one move because we were already at that location
-            if (Trinity.bSkipAheadAGo)
+            get
             {
-                Trinity.bSkipAheadAGo = false;
-                return true;
-            }
+                // First see if we should skip ahead one move because we were already at that location
+                if (Trinity.bSkipAheadAGo)
+                {
+                    Trinity.bSkipAheadAGo = false;
+                    return true;
+                }
 
-            // Ok not skipping, now see if we are already within pathprecision range of that location
-            return (Trinity.Player.CurrentPosition.Distance(Position) <= Math.Max(PathPrecision, Navigator.PathPrecision));
+                // Ok not skipping, now see if we are already within pathprecision range of that location
+                return (Trinity.Player.CurrentPosition.Distance(Position) <= Math.Max(PathPrecision, Navigator.PathPrecision));
+            }
         }
 
-        private void FlagTagAsCompleted()
+        private void SetTagDone(string reason = "")
         {
-            m_IsDone = true;
+            isDone = true;
+
+            if (reason != string.Empty)
+            {
+                Logger.LogNormal("[TrinityMoveTo] tag finished: {0} {1}", reason, getPosition());
+            }
+
         }
 
         public override void ResetCachedDone()
         {
-            m_IsDone = false;
+            isDone = false;
             base.ResetCachedDone();
         }
 
@@ -127,7 +147,7 @@ namespace Trinity.XmlTags
             {
                 if (IsActiveQuestStep)
                 {
-                    return m_IsDone;
+                    return isDone;
                 }
                 return true;
             }
@@ -151,11 +171,11 @@ namespace Trinity.XmlTags
         {
             get
             {
-                return sNoSkip;
+                return noSkip;
             }
             set
             {
-                sNoSkip = value;
+                noSkip = value;
             }
         }
 
@@ -167,11 +187,11 @@ namespace Trinity.XmlTags
         {
             get
             {
-                return fPathPrecision;
+                return pathPrecision;
             }
             set
             {
-                fPathPrecision = value;
+                pathPrecision = value;
             }
         }
 
@@ -179,19 +199,19 @@ namespace Trinity.XmlTags
         {
             get
             {
-                if (!vMainVector.HasValue)
+                if (!mainVector.HasValue)
                 {
                     if (UnsafeRandomDistance == 0f)
                     {
-                        vMainVector = new Vector3(X, Y, Z);
+                        mainVector = new Vector3(X, Y, Z);
                     }
                     else
                     {
                         float degrees = new Random().Next(0, 360);
-                        vMainVector = new Vector3?(MathEx.GetPointAt(new Vector3(X, Y, Z), (float)(new Random().NextDouble() * UnsafeRandomDistance), MathEx.ToRadians(degrees)));
+                        mainVector = new Vector3?(MathEx.GetPointAt(new Vector3(X, Y, Z), (float)(new Random().NextDouble() * UnsafeRandomDistance), MathEx.ToRadians(degrees)));
                     }
                 }
-                return vMainVector.Value;
+                return mainVector.Value;
             }
         }
 
@@ -200,11 +220,11 @@ namespace Trinity.XmlTags
         {
             get
             {
-                return fRandomizedDistance;
+                return unsafeRandomDistance;
             }
             set
             {
-                fRandomizedDistance = value;
+                unsafeRandomDistance = value;
             }
         }
 
@@ -213,11 +233,11 @@ namespace Trinity.XmlTags
         {
             get
             {
-                return fPosX;
+                return posX;
             }
             set
             {
-                fPosX = value;
+                posX = value;
             }
         }
 
@@ -226,11 +246,11 @@ namespace Trinity.XmlTags
         {
             get
             {
-                return fPosY;
+                return posY;
             }
             set
             {
-                fPosY = value;
+                posY = value;
             }
         }
 
@@ -239,11 +259,11 @@ namespace Trinity.XmlTags
         {
             get
             {
-                return fPosZ;
+                return posZ;
             }
             set
             {
-                fPosZ = value;
+                posZ = value;
             }
         }
 

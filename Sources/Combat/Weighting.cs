@@ -415,16 +415,25 @@ namespace Trinity
                             {
                                 // Weight Health Globes
 
+                                bool witchDoctorManaLow =
+                                    (Player.ActorClass == ActorClass.WitchDoctor &&
+                                    Player.PrimaryResourcePct <= 0.15 &&
+                                    ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast)) ||
+                                    Player.ActorClass != ActorClass.WitchDoctor;
+
                                 // Give all globes 0 weight (so never gone-to), unless we have low health, then go for them
-                                if (Player.CurrentHealthPct > PlayerEmergencyHealthGlobeLimit || !Settings.Combat.Misc.CollectHealthGlobe)
+                                if (!witchDoctorManaLow && (Player.CurrentHealthPct > PlayerEmergencyHealthGlobeLimit || !Settings.Combat.Misc.CollectHealthGlobe))
                                 {
                                     cacheObject.Weight = 0;
                                 }
                                 else
                                 {
 
-                                    // Ok we have globes enabled, and our health is low...!
+                                    // Ok we have globes enabled, and our health is low
                                     cacheObject.Weight = (300f - cacheObject.RadiusDistance) / 300f * 17000d;
+
+                                    if (witchDoctorManaLow)
+                                        cacheObject.Weight += 10000d; // 10k for WD's!
 
                                     // Point-blank items get a weight increase
                                     if (cacheObject.CentreDistance <= 15f)
