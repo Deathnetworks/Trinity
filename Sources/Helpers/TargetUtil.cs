@@ -66,7 +66,7 @@ namespace Trinity
         /// <returns></returns>
         internal static bool ClusterExists(float radius = 15f, int minCount = 2)
         {
-            return ClusterExists(radius, 300f, minCount);
+            return ClusterExists(radius, 300f, minCount, false);
         }
         /// <summary>
         /// Checks to make sure there's at least one valid cluster with the minimum monster count
@@ -92,7 +92,7 @@ namespace Trinity
                 (from u in ObjectCache
                  where u.Type == GObjectType.Unit &&
                  u.RadiusDistance <= maxRange &&
-                 u.NearbyUnitsWithinDistance(radius) >= minCount
+                 u.NearbyUnitsWithinDistance(radius) >= minCount 
                  select u).Any();
 
             return clusterCheck;

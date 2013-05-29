@@ -79,10 +79,10 @@ namespace Trinity
 
                 // Blizzard
                 if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Blizzard) &&
-                    (TargetUtil.ClusterExists(45f, 2) || TargetUtil.AnyElitesInRange(40f) || TargetUtil.IsEliteTargetInRange(45f)) &&
+                    (TargetUtil.ClusterExists(18f, 90f, 2, false) || TargetUtil.AnyElitesInRange(40f) || TargetUtil.IsEliteTargetInRange(45f)) &&
                     (Player.PrimaryResource >= 40 || (hasSnowBoundRune && Player.PrimaryResource >= 20)) && SNOPowerUseTimer(SNOPower.Wizard_Blizzard))
                 {
-                    var bestClusterPoint = TargetUtil.GetBestClusterPoint(18f, 45f);
+                    var bestClusterPoint = TargetUtil.GetBestClusterPoint(18f, 45f, false);
                     return new TrinityPower(SNOPower.Wizard_Blizzard, 45f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Meteor
@@ -314,14 +314,27 @@ namespace Trinity
                         fThisRange = 20f;*/
                     return new TrinityPower(SNOPower.Wizard_ArcaneTorrent, fThisRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
                 }
+
+                //skillDict.Add("RayOfFrost", SNOPower.Wizard_RayOfFrost);
+                //runeDict.Add("Numb", 2);
+                //runeDict.Add("SnowBlast", 0);
+                //runeDict.Add("ColdBlood", 3);
+                //runeDict.Add("SleetStorm", 1);
+                //runeDict.Add("BlackIce", 4);
+
+                bool hasSleetStorm = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_RayOfFrost && s.RuneIndex == 1);
+
                 // Ray of Frost
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_RayOfFrost) &&
                     Player.PrimaryResource >= 12)
                 {
-                    float fThisRange = 35f;
+                    float range = 35f;
                     if (hasCriticalMass)
-                        fThisRange = 20f;
-                    return new TrinityPower(SNOPower.Wizard_RayOfFrost, fThisRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
+                        range = 20f;
+                    if (hasSleetStorm)
+                        range = 15f;
+
+                    return new TrinityPower(SNOPower.Wizard_RayOfFrost, range, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
                 }
                 // Magic Missile
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_MagicMissile))

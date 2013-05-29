@@ -235,7 +235,12 @@ namespace Trinity
                         ObjectHash = c_ObjectHash,
                         KillRange = c_KillRange,
                         IsShielded = c_unit_IsShielded,
-                        MonsterAffixes = c_MonsterAffixes
+                        MonsterAffixes = c_MonsterAffixes,
+                        DiaObject = c_diaObject,
+                        HasBeenInLoS = c_HasBeenInLoS,
+                        HasBeenNavigable = c_HasBeenNavigable,
+                        HasBeenRaycastable = c_HasBeenRaycastable,
+                        ItemLink = c_ItemLink
                     });
             }
             return true;
@@ -740,7 +745,7 @@ namespace Trinity
                         /*
                          * Per Nesox, spamming NavProvider.CanFullyClientPathTo "is really bad"
                          * We need to come up with another way of doing this that doesnt lag the client
-                         */ 
+                         */
                         //switch (c_ObjectType)
                         //{
                         //    case GObjectType.Destructible:
