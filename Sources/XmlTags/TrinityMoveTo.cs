@@ -77,7 +77,7 @@ namespace Trinity.XmlTags
 
             // Now use Trinity movement to try a direct movement towards that location
             Vector3 NavTarget = Position;
-            Vector3 MyPos = Trinity.PlayerStatus.CurrentPosition;
+            Vector3 MyPos = Trinity.Player.CurrentPosition;
             if (!ZetaDia.WorldInfo.IsGenerated && Vector3.Distance(MyPos, NavTarget) > 250)
             {
                 NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
@@ -107,7 +107,7 @@ namespace Trinity.XmlTags
             }
 
             // Ok not skipping, now see if we are already within pathprecision range of that location
-            return (Trinity.PlayerStatus.CurrentPosition.Distance(Position) <= Math.Max(PathPrecision, Navigator.PathPrecision));
+            return (Trinity.Player.CurrentPosition.Distance(Position) <= Math.Max(PathPrecision, Navigator.PathPrecision));
         }
 
         private void FlagTagAsCompleted()

@@ -442,7 +442,7 @@ namespace Trinity
         private static void RefreshStepCalculateDistance()
         {
             // Calculate distance, don't rely on DB's internal method as this may hit Diablo 3 memory again
-            c_CentreDistance = PlayerStatus.CurrentPosition.Distance2D(c_Position);
+            c_CentreDistance = Player.CurrentPosition.Distance2D(c_Position);
             // Set radius-distance to centre distance at first
             c_RadiusDistance = c_CentreDistance;
         }
@@ -800,7 +800,7 @@ namespace Trinity
                                             }
                                             else if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
-                                                Vector3 myPos = new Vector3(PlayerStatus.CurrentPosition.X, PlayerStatus.CurrentPosition.Y, PlayerStatus.CurrentPosition.Z + 8f);
+                                                Vector3 myPos = new Vector3(Player.CurrentPosition.X, Player.CurrentPosition.Y, Player.CurrentPosition.Z + 8f);
                                                 Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 8f);
 
                                                 //cPos = MathEx.CalculatePointFrom(myPos, cPos, c_CentreDistance - PlayerStatus.GoldPickupRadius);
@@ -1135,37 +1135,37 @@ namespace Trinity
             if (c_diaUnit != null)
             {
                 // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
-                if (PlayerStatus.ActorClass == ActorClass.Monk)
+                if (Player.ActorClass == ActorClass.Monk)
                 {
                     if (Hotbar.Contains(SNOPower.Monk_MysticAlly) && DataDictionary.MysticAllyIds.Contains(c_ActorSNO))
                     {
-                        if (c_diaUnit.SummonedByACDId == PlayerStatus.MyDynamicID)
+                        if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             iPlayerOwnedMysticAlly++;
                         AddToCache = false;
                     }
                 }
                 // Count up Demon Hunter pets
-                if (PlayerStatus.ActorClass == ActorClass.DemonHunter)
+                if (Player.ActorClass == ActorClass.DemonHunter)
                 {
                     if (Hotbar.Contains(SNOPower.DemonHunter_Companion) && DataDictionary.DemonHunterPetIds.Contains(c_ActorSNO))
                     {
-                        if (c_diaUnit.SummonedByACDId == PlayerStatus.MyDynamicID)
+                        if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             iPlayerOwnedDHPets++;
                         AddToCache = false;
                     }
                 }
                 // Count up zombie dogs and gargantuans next
-                if (PlayerStatus.ActorClass == ActorClass.WitchDoctor)
+                if (Player.ActorClass == ActorClass.WitchDoctor)
                 {
                     if (Hotbar.Contains(SNOPower.Witchdoctor_Gargantuan) && DataDictionary.GargantuanIds.Contains(c_ActorSNO))
                     {
-                        if (c_diaUnit.SummonedByACDId == PlayerStatus.MyDynamicID)
+                        if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             iPlayerOwnedGargantuan++;
                         AddToCache = false;
                     }
                     if (Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && DataDictionary.ZombieDogIds.Contains(c_ActorSNO))
                     {
-                        if (c_diaUnit.SummonedByACDId == PlayerStatus.MyDynamicID)
+                        if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             iPlayerOwnedZombieDog++;
                         AddToCache = false;
                     }
@@ -1245,7 +1245,7 @@ namespace Trinity
         private static bool MosterObstacleInPathCacheObject(bool AddToCache)
         {
             // Don't add an item if a monster is blocking our path
-            if (hashMonsterObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, PlayerStatus.CurrentPosition, c_Position)))
+            if (hashMonsterObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, Player.CurrentPosition, c_Position)))
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "MonsterInPath";

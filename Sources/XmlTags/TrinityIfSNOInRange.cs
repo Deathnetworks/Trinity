@@ -31,7 +31,7 @@ namespace Trinity.XmlTags
         public override bool GetConditionExec()
         {
             bool flag;
-            Vector3 vMyLocation = Trinity.PlayerStatus.CurrentPosition;
+            Vector3 vMyLocation = Trinity.Player.CurrentPosition;
             if (sType != null && sType == "reverse")
                 flag = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).FirstOrDefault<DiaObject>(a => a.ActorSNO == SNOID && a.Position.Distance(vMyLocation) <= Range) == null;
             else

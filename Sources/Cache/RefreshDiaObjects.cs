@@ -50,7 +50,7 @@ namespace Trinity
                         // Update player-data cache, including buffs
                         PlayerInfoCache.UpdateCachedPlayerData();
 
-                        if (PlayerStatus.CurrentHealthPct <= 0)
+                        if (Player.CurrentHealthPct <= 0)
                         {
                             return false;
                         }
@@ -76,7 +76,7 @@ namespace Trinity
                     if (StandingInAvoidance && (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
                         DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
                     {
-                        Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, PlayerStatus.CurrentPosition, true);
+                        Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, Player.CurrentPosition, true);
                         // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
                         if (vAnySafePoint != Vector3.Zero)
                         {
@@ -84,7 +84,7 @@ namespace Trinity
                             {
                                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting Avoidance: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}",
                                     vAnySafePoint, vAnySafePoint.Distance(Me.Position), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
-                                    PlayerStatus.CurrentHealthPct, PlayerKiteDistance);
+                                    Player.CurrentHealthPct, PlayerKiteDistance);
                             }
 
                             bFoundSafeSpot = true;
@@ -93,8 +93,8 @@ namespace Trinity
                                     Position = vAnySafePoint,
                                     Type = GObjectType.Avoidance,
                                     Weight = 20000,
-                                    CentreDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vAnySafePoint),
-                                    RadiusDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vAnySafePoint),
+                                    CentreDistance = Vector3.Distance(Player.CurrentPosition, vAnySafePoint),
+                                    RadiusDistance = Vector3.Distance(Player.CurrentPosition, vAnySafePoint),
                                     InternalName = "SafePoint"
                                 }; ;
                         }
@@ -124,7 +124,7 @@ namespace Trinity
                 {
                     CurrentTarget = new TrinityCacheObject()
                                         {
-                                            Position = PlayerStatus.CurrentPosition,
+                                            Position = Player.CurrentPosition,
                                             Type = GObjectType.Avoidance,
                                             Weight = 20000,
                                             CentreDistance = 2f,
@@ -196,8 +196,8 @@ namespace Trinity
             bool forceUpdate = false;
             try
             {
-                PlayerStatus.CurrentPosition = ZetaDia.Me.Position;
-                PlayerStatus.CurrentHealthPct = ZetaDia.Me.HitpointsCurrentPct;
+                Player.CurrentPosition = ZetaDia.Me.Position;
+                Player.CurrentHealthPct = ZetaDia.Me.HitpointsCurrentPct;
 
                 if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && CurrentTarget.Unit != null && CurrentTarget.Unit.IsValid)
                 {
@@ -253,8 +253,6 @@ namespace Trinity
 
                 CurrentBotLootRange = Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius;
                 ShouldStayPutDuringAvoidance = false;
-                // Set up the fake object for the target handler
-                FakeObject = null;
 
                 // Always have a minimum kill radius, so we're never getting whacked without retaliating
                 if (CurrentBotKillRange < 10)
@@ -272,7 +270,7 @@ namespace Trinity
                     CurrentBotLootRange = 0;
                 }
 
-                if (PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+                if (Player.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
                 { //!sp - keep looking for kills while WOTB is up
                     iKeepKillRadiusExtendedFor = Math.Max(3, iKeepKillRadiusExtendedFor);
                     timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
@@ -554,7 +552,7 @@ namespace Trinity
             {
                 CurrentTarget = new TrinityCacheObject()
                                     {
-                                        Position = PlayerStatus.CurrentPosition,
+                                        Position = Player.CurrentPosition,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
@@ -564,18 +562,18 @@ namespace Trinity
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Waiting for loot to drop, delay: {0}ms", Settings.Combat.Misc.DelayAfterKill);
             }
             // Now see if we need to do any backtracking
-            if (CurrentTarget == null && iTotalBacktracks >= 2 && Settings.Combat.Misc.AllowBacktracking && !PlayerStatus.IsInTown)
+            if (CurrentTarget == null && iTotalBacktracks >= 2 && Settings.Combat.Misc.AllowBacktracking && !Player.IsInTown)
             // Never bother with the 1st backtrack position nor if we are in town
             {
                 // See if we're already within 18 feet of our start position first
-                if (Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[1]) <= 18f)
+                if (Vector3.Distance(Player.CurrentPosition, vBacktrackList[1]) <= 18f)
                 {
                     vBacktrackList = new SortedList<int, Vector3>();
                     iTotalBacktracks = 0;
                 }
                 // See if we can raytrace to the final location and it's within 25 feet
-                if (iTotalBacktracks >= 2 && Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[1]) <= 25f &&
-                    NavHelper.CanRayCast(PlayerStatus.CurrentPosition, vBacktrackList[1]))
+                if (iTotalBacktracks >= 2 && Vector3.Distance(Player.CurrentPosition, vBacktrackList[1]) <= 25f &&
+                    NavHelper.CanRayCast(Player.CurrentPosition, vBacktrackList[1]))
                 {
                     vBacktrackList = new SortedList<int, Vector3>();
                     iTotalBacktracks = 0;
@@ -585,7 +583,7 @@ namespace Trinity
                     // See if we can skip to the next backtracker location first
                     if (iTotalBacktracks >= 3)
                     {
-                        if (Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks - 1]) <= 10f)
+                        if (Vector3.Distance(Player.CurrentPosition, vBacktrackList[iTotalBacktracks - 1]) <= 10f)
                         {
                             vBacktrackList.Remove(iTotalBacktracks);
                             iTotalBacktracks--;
@@ -596,8 +594,8 @@ namespace Trinity
                                             Position = vBacktrackList[iTotalBacktracks],
                                             Type = GObjectType.Backtrack,
                                             Weight = 20000,
-                                            CentreDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
-                                            RadiusDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]),
+                                            CentreDistance = Vector3.Distance(Player.CurrentPosition, vBacktrackList[iTotalBacktracks]),
+                                            RadiusDistance = Vector3.Distance(Player.CurrentPosition, vBacktrackList[iTotalBacktracks]),
                                             InternalName = "Backtrack"
                                         };
                 }
@@ -612,14 +610,14 @@ namespace Trinity
             // Finally, a special check for waiting for wrath of the berserker cooldown before engaging Azmodan
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Barbarian.WaitWOTB && !SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
                 ZetaDia.CurrentWorldId == 121214 &&
-                (Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+                (Vector3.Distance(Player.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(Player.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 DisableOutofCombatSprint = true;
                 BarbarianCombat.AllowSprintOOC = false;
                 Logging.Write("[Trinity] Waiting for Wrath Of The Berserker cooldown before continuing to Azmodan.");
                 CurrentTarget = new TrinityCacheObject()
                                     {
-                                        Position = PlayerStatus.CurrentPosition,
+                                        Position = Player.CurrentPosition,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
@@ -629,12 +627,12 @@ namespace Trinity
             }
             // And a special check for wizard archon
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Wizard_Archon) && !SNOPowerUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && ZetaDia.CurrentWorldId == 121214 &&
-                (Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+                (Vector3.Distance(Player.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(Player.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for Wizard Archon cooldown before continuing to Azmodan.");
                 CurrentTarget = new TrinityCacheObject()
                                     {
-                                        Position = PlayerStatus.CurrentPosition,
+                                        Position = Player.CurrentPosition,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
@@ -644,12 +642,12 @@ namespace Trinity
             }
             // And a very sexy special check for WD BigBadVoodoo
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Witchdoctor_BigBadVoodoo) && !PowerManager.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && ZetaDia.CurrentWorldId == 121214 &&
-                (Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(PlayerStatus.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+                (Vector3.Distance(Player.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(Player.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for WD BigBadVoodoo cooldown before continuing to Azmodan.");
                 CurrentTarget = new TrinityCacheObject()
                                     {
-                                        Position = PlayerStatus.CurrentPosition,
+                                        Position = Player.CurrentPosition,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
@@ -687,13 +685,13 @@ namespace Trinity
                 if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
                 {
                     TryToKite = true;
-                    vKitePointAvoid = PlayerStatus.CurrentPosition;
+                    vKitePointAvoid = Player.CurrentPosition;
                 }
 
-                if (monsterList.Count() > 0 && (PlayerStatus.ActorClass != ActorClass.Wizard || IsWizardShouldKite()))
+                if (monsterList.Count() > 0 && (Player.ActorClass != ActorClass.Wizard || IsWizardShouldKite()))
                 {
                     TryToKite = true;
-                    vKitePointAvoid = PlayerStatus.CurrentPosition;
+                    vKitePointAvoid = Player.CurrentPosition;
                 }
 
                 // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
@@ -715,11 +713,11 @@ namespace Trinity
                         {
                             PositionFoundTime = DateTime.Now,
                             Position = vAnySafePoint,
-                            Distance = vAnySafePoint.Distance(PlayerStatus.CurrentPosition)
+                            Distance = vAnySafePoint.Distance(Player.CurrentPosition)
                         };
                     }
 
-                    if (vAnySafePoint != Vector3.Zero && vAnySafePoint.Distance(PlayerStatus.CurrentPosition) >= 1)
+                    if (vAnySafePoint != Vector3.Zero && vAnySafePoint.Distance(Player.CurrentPosition) >= 1)
                     {
 
                         if ((DateTime.Now.Subtract(LastKitePosition.PositionFoundTime).TotalMilliseconds > 3000 && LastKitePosition.Position == vAnySafePoint) ||
@@ -736,15 +734,15 @@ namespace Trinity
                             {
                                 PositionFoundTime = DateTime.Now,
                                 Position = vAnySafePoint,
-                                Distance = vAnySafePoint.Distance(PlayerStatus.CurrentPosition)
+                                Distance = vAnySafePoint.Distance(Player.CurrentPosition)
                             };
                         }
 
                         if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         {
                             Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
-                                vAnySafePoint, vAnySafePoint.Distance(PlayerStatus.CurrentPosition), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
-                                PlayerStatus.CurrentHealthPct, PlayerKiteDistance, monsterList.Count(),
+                                vAnySafePoint, vAnySafePoint.Distance(Player.CurrentPosition), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
+                                Player.CurrentHealthPct, PlayerKiteDistance, monsterList.Count(),
                                 NeedToKite, TryToKite);
                         }
                         CurrentTarget = new TrinityCacheObject()
@@ -752,8 +750,8 @@ namespace Trinity
                                                 Position = vAnySafePoint,
                                                 Type = GObjectType.Avoidance,
                                                 Weight = 90000,
-                                                CentreDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vAnySafePoint),
-                                                RadiusDistance = Vector3.Distance(PlayerStatus.CurrentPosition, vAnySafePoint),
+                                                CentreDistance = Vector3.Distance(Player.CurrentPosition, vAnySafePoint),
+                                                RadiusDistance = Vector3.Distance(Player.CurrentPosition, vAnySafePoint),
                                                 InternalName = "KitePoint"
                                             };
 
@@ -783,7 +781,7 @@ namespace Trinity
 
         private static bool IsWizardShouldKite()
         {
-            if (PlayerStatus.ActorClass == ActorClass.Wizard)
+            if (Player.ActorClass == ActorClass.Wizard)
             {
                 if (Settings.Combat.Wizard.KiteOption == WizardKiteOption.Anytime)
                     return true;

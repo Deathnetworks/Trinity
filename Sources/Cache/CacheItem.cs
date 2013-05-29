@@ -837,7 +837,7 @@ namespace Trinity.Cache
                 item.Name = acd.Name;
                 item.Position = acd.Position;
                 item.Level = acd.Stats.Level;
-                item.Distance = acd.Position.Distance(Trinity.PlayerStatus.CurrentPosition);
+                item.Distance = acd.Position.Distance(Trinity.Player.CurrentPosition);
 
                 if (item.Gold > 0)
                     item.ShouldPickup = ShouldPickupGold(item.Gold, item.Distance);

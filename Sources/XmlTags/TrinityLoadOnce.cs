@@ -17,7 +17,35 @@ namespace Trinity.XmlTags
     {
         internal static int lastUpdate = DateTime.Now.Ticks.GetHashCode();
         internal static List<string> UsedProfiles = new List<string>();
-        string[] AvailableProfiles = { };
+        internal string[] AvailableProfiles
+        {
+            get
+            {
+                return
+                    (from p in Profiles
+                     where !UsedProfiles.Contains(p.FileName) && !p.FileName.Contains(CurrentProfileName)
+                     select p.FileName).ToArray();
+            }
+
+        }
+        internal int UsedProfileCount
+        {
+            get
+            {
+                return (from p in Profiles
+                        where UsedProfiles.Contains(Path.GetFileName(p.FileName))
+                        select p).Count();
+            }
+        }
+
+        internal int UnusedProfileCount
+        {
+            get
+            {
+                return AvailableProfiles.Count();
+            }
+        }
+
         string NextProfileName = String.Empty;
         string NextProfilePath = String.Empty;
         string CurrentProfilePath = String.Empty;
@@ -55,6 +83,10 @@ namespace Trinity.XmlTags
             UsedProfiles = new List<string>();
         }
 
+        public override void OnStart()
+        {
+            Initialize();
+        }
 
         private void Initialize()
         {
@@ -63,6 +95,8 @@ namespace Trinity.XmlTags
 
             if (Profiles == null)
                 Profiles = new List<LoadProfileOnce>();
+
+            RealignFileNames();
 
             CurrentProfilePath = Path.GetDirectoryName(ProfileManager.CurrentProfile.Path);
             CurrentProfileName = Path.GetFileName(ProfileManager.CurrentProfile.Path);
@@ -91,8 +125,7 @@ namespace Trinity.XmlTags
                 new Action(ret => Initialize()),
                 new Action(ret => RealignFileNames()),
                 new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: Found {0} Total Profiles, {1} Used Profiles, {2} Unused Profiles",
-                    Profiles.Count(), UsedProfiles.Count(), Profiles.Where(p => !UsedProfiles.Contains(p.FileName)).Count())),
-                new Action(ret => AvailableProfiles = (from p in Profiles where !UsedProfiles.Contains(p.FileName) && p.FileName != CurrentProfileName select p.FileName).ToArray()),
+                    Profiles.Count(), UsedProfileCount, UnusedProfileCount)),
                 new PrioritySelector(
                     new Decorator(ret => AvailableProfiles.Length == 0,
                         new Sequence(

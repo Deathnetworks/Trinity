@@ -31,7 +31,7 @@ namespace Trinity.Cache
                     ACD acd = unit.CommonData;
 
                     unit.Position = acd.Position;
-                    unit.CentreDistance = Vector3.Distance(Trinity.PlayerStatus.CurrentPosition, acd.Position);
+                    unit.CentreDistance = Vector3.Distance(Trinity.Player.CurrentPosition, acd.Position);
 
                     if (unit.InternalUnit != null)
                     {
@@ -67,7 +67,7 @@ namespace Trinity.Cache
             try
             {
                 ACDItem acd = (ACDItem)item.CommonData;
-                item.Distance = acd.Position.Distance(Trinity.PlayerStatus.CurrentPosition);
+                item.Distance = acd.Position.Distance(Trinity.Player.CurrentPosition);
                 if (acd.IsUnidentified != item.IsUnidentified || item.Gold > 0)
                 {
                     CacheItem.ComputeItemProperty(item);

@@ -149,7 +149,7 @@ namespace Trinity
                     else
                     {
                         Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "I'm sorry, but I seem to have let you die :( Now restarting the current profile.");
-                        ProfileManager.Load(Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
+                        ProfileManager.Load(ProfileManager.CurrentProfile.Path);
                         Thread.Sleep(2000);
                     }
                 }

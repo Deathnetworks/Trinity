@@ -17,7 +17,7 @@ namespace Trinity
         {
             if (ZetaDia.Me != null && ZetaDia.Me.IsValid)
             {
-                Position = Trinity.PlayerStatus.CurrentPosition;
+                Position = Trinity.Player.CurrentPosition;
                 RecordedAt = DateTime.Now;
                 WorldId = ZetaDia.CurrentWorldId;
             }
@@ -36,7 +36,7 @@ namespace Trinity
             if (Cache.Any(p => DateTime.Now.Subtract(p.RecordedAt).TotalMilliseconds < 100))
                 return;
 
-            foreach (PositionCache p in Cache.Where(p => p.Position.Distance2D(Trinity.PlayerStatus.CurrentPosition) < distance).ToList())
+            foreach (PositionCache p in Cache.Where(p => p.Position.Distance2D(Trinity.Player.CurrentPosition) < distance).ToList())
             {
                 Cache.Remove(p);
             }

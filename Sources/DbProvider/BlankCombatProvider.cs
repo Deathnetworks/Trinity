@@ -13,13 +13,10 @@ namespace Trinity.DbProvider
         /// <returns>Blank list of target, Trinity don't use this Db process.</returns>
         public List<DiaObject> GetObjectsByWeight()
         {
-            if (!Trinity.bDontMoveMeIAmDoingShit || Trinity.FakeObject == null)
-                return listEmptyList;
-
-            return new List<DiaObject>() 
-                        { 
-                            Trinity.FakeObject 
-                        };
+            var list = new List<DiaObject>();
+            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.DiaObject != null && Trinity.CurrentTarget.DiaObject.IsValid)
+                list.Add(Trinity.CurrentTarget.DiaObject);
+            return list;
         }
     }
 }

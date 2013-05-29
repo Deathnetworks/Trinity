@@ -252,6 +252,11 @@ namespace Trinity.XmlTags
         {
             get
             {
+                if (PrioritySceneTarget != Vector3.Zero)
+                {
+                    return PrioritySceneTarget;
+                }
+
                 if (GetRouteUnvisitedNodeCount() > 0)
                 {
                     return BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter;
@@ -262,13 +267,19 @@ namespace Trinity.XmlTags
                 }
             }
         }
+
+        // Adding these for SimpleFollow compatability
+        public float X { get { return CurrentNavTarget.X; } }
+        public float Y { get { return CurrentNavTarget.Y; } }
+        public float Z { get { return CurrentNavTarget.Z; } }
+
         private bool InitDone = false;
         private DungeonNode NextNode;
 
         /// <summary>
         /// The current player position
         /// </summary>
-        private Vector3 myPos { get { return Trinity.PlayerStatus.CurrentPosition; } }
+        private Vector3 myPos { get { return Trinity.Player.CurrentPosition; } }
         private static ISearchAreaProvider MainGridProvider
         {
             get
@@ -379,9 +390,9 @@ namespace Trinity.XmlTags
         private Composite UpdateSearchGridProvider()
         {
             return
-            new DecoratorContinue(ret => mySceneId != Trinity.PlayerStatus.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
+            new DecoratorContinue(ret => mySceneId != Trinity.Player.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
                 new Sequence(
-                    new Action(ret => mySceneId = Trinity.PlayerStatus.SceneId),
+                    new Action(ret => mySceneId = Trinity.Player.SceneId),
                     new Action(ret => GPUpdatePosition = myPos),
                     new Action(ret => MiniMapMarker.UpdateFailedMarkers())
                 )
@@ -398,7 +409,7 @@ namespace Trinity.XmlTags
             new PrioritySelector(
                 new Decorator(ret => timeoutBreached,
                     new Sequence(
-                        new DecoratorContinue(ret => TownPortalOnTimeout && !Trinity.PlayerStatus.IsInTown,
+                        new DecoratorContinue(ret => TownPortalOnTimeout && !Trinity.Player.IsInTown,
                             new Sequence(
                                 new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
                                     "TrinityExploreDungeon inactivity timer tripped ({0}), tag Using Town Portal!", TimeoutValue)),
@@ -454,15 +465,15 @@ namespace Trinity.XmlTags
             CheckSetTimer(ctx);
             if (lastCoinage == -1)
             {
-                lastCoinage = Trinity.PlayerStatus.Coinage;
+                lastCoinage = Trinity.Player.Coinage;
                 return RunStatus.Failure;
             }
-            else if (lastCoinage != Trinity.PlayerStatus.Coinage)
+            else if (lastCoinage != Trinity.Player.Coinage)
             {
                 TagTimer.Restart();
                 return RunStatus.Failure;
             }
-            else if (lastCoinage == Trinity.PlayerStatus.Coinage && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
+            else if (lastCoinage == Trinity.Player.Coinage && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
             {
                 Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityExploreDungeon gold inactivity timer tripped ({0}), tag finished!", TimeoutValue);
                 timeoutBreached = true;
@@ -556,7 +567,7 @@ namespace Trinity.XmlTags
                         new Action(ret => isDone = true)
                     )
                 ),
-                new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && Trinity.PlayerStatus.SceneId == SceneId,
+                new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && Trinity.Player.SceneId == SceneId,
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found SceneId {0}!", SceneId)),
                         new Action(ret => isDone = true)
@@ -568,7 +579,7 @@ namespace Trinity.XmlTags
                         new Action(ret => isDone = true)
                     )
                 ),
-                new Decorator(ret => Trinity.PlayerStatus.IsInTown,
+                new Decorator(ret => Trinity.Player.IsInTown,
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Cannot use TrinityExploreDungeon in town - tag finished!", SceneName)),
                         new Action(ret => isDone = true)
@@ -1094,7 +1105,7 @@ namespace Trinity.XmlTags
             Vector3 moveTarget = NextNode.NavigableCenter;
 
             string nodeName = String.Format("{0} Distance: {1:0} Direction: {2}",
-                NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(Trinity.PlayerStatus.CurrentPosition), MathUtil.GetHeadingToPoint(NextNode.NavigableCenter));
+                NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(Trinity.Player.CurrentPosition), MathUtil.GetHeadingToPoint(NextNode.NavigableCenter));
 
             if (DateTime.Now.Subtract(Trinity.lastAddedLocationCache).TotalMilliseconds >= 100)
             {

@@ -126,8 +126,8 @@ namespace Trinity
             return
             new Decorator(ret => MiniMapMarker.AnyUnvisitedMarkers(),
                 new Sequence(
-                    new Action(ret => MiniMapMarker.SetNearbyMarkersVisited(Trinity.PlayerStatus.CurrentPosition, markerDistance)),
-                    new Decorator(ret => MiniMapMarker.GetNearestUnvisitedMarker(Trinity.PlayerStatus.CurrentPosition) != null,
+                    new Action(ret => MiniMapMarker.SetNearbyMarkersVisited(Trinity.Player.CurrentPosition, markerDistance)),
+                    new Decorator(ret => MiniMapMarker.GetNearestUnvisitedMarker(Trinity.Player.CurrentPosition) != null,
                         new Action(ret => MoveToNearestMarker(near))
                     )
                 )
@@ -142,7 +142,7 @@ namespace Trinity
             lastMoveResult = Navigator.MoveTo(MiniMapMarker.GetNearestUnvisitedMarker(near).Position);
 
             Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Moving to inspect nameHash {0} at {1} distance {2:0} mr: {3}",
-                m.MarkerNameHash, m.Position, Trinity.PlayerStatus.CurrentPosition.Distance2D(m.Position), lastMoveResult);
+                m.MarkerNameHash, m.Position, Trinity.Player.CurrentPosition.Distance2D(m.Position), lastMoveResult);
 
 
             return RunStatus.Success;

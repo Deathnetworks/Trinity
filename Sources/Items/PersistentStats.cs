@@ -256,11 +256,11 @@ namespace Trinity
         private static void PersistentUpdateStats()
         {
             // Total stats
-            string filename = Path.Combine(FileManager.LoggingPath, String.Format("FullStats - {0}.xml", PlayerStatus.ActorClass));
+            string filename = Path.Combine(FileManager.LoggingPath, String.Format("FullStats - {0}.xml", Player.ActorClass));
             PersistentTotalStats = PersistentUpdateOne(filename);
 
             // World ID stats
-            filename = Path.Combine(FileManager.LoggingPath, String.Format("WorldStats {1} - {0}.xml", PlayerStatus.ActorClass, cachedStaticWorldId));
+            filename = Path.Combine(FileManager.LoggingPath, String.Format("WorldStats {1} - {0}.xml", Player.ActorClass, cachedStaticWorldId));
             if (!worldStatsDictionary.ContainsKey(cachedStaticWorldId))
                 worldStatsDictionary.Add(cachedStaticWorldId, new PersistentStats());
             worldStatsDictionary[cachedStaticWorldId] = PersistentUpdateOne(filename);
@@ -297,7 +297,7 @@ namespace Trinity
             // Full Stats
             try
             {
-                var fullStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("FullStats - {0}.log", PlayerStatus.ActorClass));
+                var fullStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("FullStats - {0}.log", Player.ActorClass));
 
                 using (FileStream LogStream =
                     File.Open(fullStatsPath, FileMode.Create, FileAccess.Write, FileShare.Read))
@@ -314,7 +314,7 @@ namespace Trinity
 
             try
             {
-                var worldStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("WorldStats {1} - {0}.log", PlayerStatus.ActorClass, cachedStaticWorldId));
+                var worldStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("WorldStats {1} - {0}.log", Player.ActorClass, cachedStaticWorldId));
 
                 using (FileStream LogStream = File.Open(worldStatsPath, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
@@ -329,7 +329,7 @@ namespace Trinity
             // AggregateWorldStats
             try
             {
-                var aggregateWorldStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("AgregateWorldStats - {0}.log", PlayerStatus.ActorClass));
+                var aggregateWorldStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("AgregateWorldStats - {0}.log", Player.ActorClass));
 
                 using (FileStream LogStream = File.Open(aggregateWorldStatsPath, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {

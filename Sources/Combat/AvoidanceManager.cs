@@ -125,7 +125,7 @@ namespace Trinity
             //TODO : Make mapping between Type and Config
             LoadAvoidanceDictionary(false);
             IAvoidanceHealth avoidanceHealth = null;
-            switch (Trinity.PlayerStatus.ActorClass)
+            switch (Trinity.Player.ActorClass)
             {
                 case ActorClass.Barbarian:
                     avoidanceHealth = Trinity.Settings.Combat.Barbarian;

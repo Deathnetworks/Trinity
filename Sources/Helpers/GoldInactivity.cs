@@ -92,7 +92,7 @@ namespace Trinity
 
 
                 lastCheckBag = DateTime.Now;
-                int currentcoin = Trinity.PlayerStatus.Coinage;
+                int currentcoin = Trinity.Player.Coinage;
 
                 if (currentcoin != lastKnowCoin && currentcoin != 0)
                 {

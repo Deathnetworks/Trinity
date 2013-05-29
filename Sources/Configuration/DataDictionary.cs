@@ -293,7 +293,7 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> ResplendentChestIds { get { return resplendentChestIds; } }
         private static HashSet<int> resplendentChestIds = new HashSet<int> {
-            62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866, 109264,
+            62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866, 109264, 62866, 62860, 96993,
             // Magi
 			112182,
          };

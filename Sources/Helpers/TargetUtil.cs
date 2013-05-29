@@ -26,7 +26,7 @@ namespace Trinity
         {
             get
             {
-                return Trinity.PlayerStatus;
+                return Trinity.Player;
             }
         }
         private static bool AnyTreasureGoblinsPresent
@@ -131,7 +131,7 @@ namespace Trinity
                 else if (Trinity.CurrentTarget != null)
                     bestClusterPoint = Trinity.CurrentTarget.Position;
                 else
-                    bestClusterPoint = Trinity.PlayerStatus.CurrentPosition;
+                    bestClusterPoint = Trinity.Player.CurrentPosition;
 
                 return bestClusterPoint;
             }
@@ -270,13 +270,13 @@ namespace Trinity
                     float maxDistance = 25f;
                     int minTargets = 2;
 
-                    if (Trinity.PlayerStatus.ActorClass == ActorClass.Monk)
+                    if (Trinity.Player.ActorClass == ActorClass.Monk)
                     {
                         maxDistance = 20f;
                         minTargets = 3;
                         useTargetBasedZigZag = (Trinity.Settings.Combat.Monk.TargetBasedZigZag);
                     }
-                    if (Trinity.PlayerStatus.ActorClass == ActorClass.Barbarian)
+                    if (Trinity.Player.ActorClass == ActorClass.Barbarian)
                     {
                         useTargetBasedZigZag = (Trinity.Settings.Combat.Barbarian.TargetBasedZigZag);
                     }

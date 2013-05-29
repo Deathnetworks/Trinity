@@ -16,11 +16,7 @@ namespace Trinity
 
         internal static void RecordProfile()
         {
-            string currentProfileFileName = Path.GetFileName(ProfileManager.CurrentProfile.Path);
-            if (!TrinityLoadOnce.UsedProfiles.Contains(currentProfileFileName))
-            {
-                TrinityLoadOnce.UsedProfiles.Add(currentProfileFileName);
-            }
+            RecordTrinityLoadOnceProfile();
 
             string currentProfile = ProfileManager.CurrentProfile.Path;
 
@@ -49,6 +45,15 @@ namespace Trinity
 
                 if (Trinity.FirstProfile == "")
                     Trinity.FirstProfile = currentProfile;
+            }
+        }
+
+        private static void RecordTrinityLoadOnceProfile()
+        {
+            string currentProfileFileName = Path.GetFileName(ProfileManager.CurrentProfile.Path);
+            if (!TrinityLoadOnce.UsedProfiles.Contains(currentProfileFileName))
+            {
+                TrinityLoadOnce.UsedProfiles.Add(currentProfileFileName);
             }
         }
 

@@ -74,7 +74,7 @@ namespace Trinity
             {
                 Trinity.IsReadyToTownRun = false;
 
-                if (DataDictionary.BossLevelAreaIDs.Contains(Trinity.PlayerStatus.LevelAreaId))
+                if (DataDictionary.BossLevelAreaIDs.Contains(Trinity.Player.LevelAreaId))
                     return false;
 
                 if (Trinity.IsReadyToTownRun && Trinity.CurrentTarget != null)
@@ -150,18 +150,18 @@ namespace Trinity
                 }
 
                 // Fix for A1 new game with bags full
-                if (Trinity.PlayerStatus.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700 && (ZetaDia.CurrentQuest.StepId == -1 || ZetaDia.CurrentQuest.StepId == 42))
+                if (Trinity.Player.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700 && (ZetaDia.CurrentQuest.StepId == -1 || ZetaDia.CurrentQuest.StepId == 42))
                 {
                     Trinity.IsReadyToTownRun = false;
                 }
 
                 // check for navigation obstacles (never TP near demonic forges, etc)
-                if (Trinity.hashNavigationObstacleCache.Any(o => Vector3.Distance(o.Location, Trinity.PlayerStatus.CurrentPosition) < 90f))
+                if (Trinity.hashNavigationObstacleCache.Any(o => Vector3.Distance(o.Location, Trinity.Player.CurrentPosition) < 90f))
                 {
                     Trinity.IsReadyToTownRun = false;
                 }
 
-                if (Trinity.IsReadyToTownRun && !(Zeta.CommonBot.Logic.BrainBehavior.IsVendoring || Trinity.PlayerStatus.IsInTown))
+                if (Trinity.IsReadyToTownRun && !(Zeta.CommonBot.Logic.BrainBehavior.IsVendoring || Trinity.Player.IsInTown))
                 {
                     string cantUseTPreason = String.Empty;
                     if (!ZetaDia.Me.CanUseTownPortal(out cantUseTPreason))
@@ -461,7 +461,7 @@ namespace Trinity
             FileStream LogStream = null;
             try
             {
-                string filePath = Path.Combine(FileManager.LoggingPath, "StashLog - " + Trinity.PlayerStatus.ActorClass.ToString() + ".log");
+                string filePath = Path.Combine(FileManager.LoggingPath, "StashLog - " + Trinity.Player.ActorClass.ToString() + ".log");
                 LogStream = File.Open(filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
 
                 //TODO : Change File Log writing
@@ -530,7 +530,7 @@ namespace Trinity
             FileStream LogStream = null;
             try
             {
-                string filePath = Path.Combine(FileManager.LoggingPath, "JunkLog - " + Trinity.PlayerStatus.ActorClass.ToString() + ".log");
+                string filePath = Path.Combine(FileManager.LoggingPath, "JunkLog - " + Trinity.Player.ActorClass.ToString() + ".log");
                 LogStream = File.Open(filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
                 {
@@ -612,7 +612,7 @@ namespace Trinity
             int iPlayerDynamicID = -1;
             try
             {
-                iPlayerDynamicID = Trinity.PlayerStatus.MyDynamicID;
+                iPlayerDynamicID = Trinity.Player.MyDynamicID;
             }
             catch
             {

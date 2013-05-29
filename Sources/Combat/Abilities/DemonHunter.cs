@@ -20,18 +20,18 @@ namespace Trinity
             }
             MinEnergyReserve = 25;
             // Shadow Power
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && !PlayerStatus.IsIncapacitated &&
-                PlayerStatus.SecondaryResource >= 14 &&
-                (PlayerStatus.CurrentHealthPct <= 0.99 || PlayerStatus.IsRooted || ElitesWithinRange[RANGE_25] >= 1 || AnythingWithinRange[RANGE_15] >= 3) &&
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
+                Player.SecondaryResource >= 14 &&
+                (Player.CurrentHealthPct <= 0.99 || Player.IsRooted || ElitesWithinRange[RANGE_25] >= 1 || AnythingWithinRange[RANGE_15] >= 3) &&
                 SNOPowerUseTimer(SNOPower.DemonHunter_ShadowPower))
             {
                 return new TrinityPower(SNOPower.DemonHunter_ShadowPower, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Smoke Screen
             if ((!UseOOCBuff || Settings.Combat.DemonHunter.SpamSmokeScreen) && Hotbar.Contains(SNOPower.DemonHunter_SmokeScreen) &&
-                !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && PlayerStatus.SecondaryResource >= 14 &&
+                !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14 &&
                 (
-                 ( PlayerStatus.CurrentHealthPct <= 0.90 || PlayerStatus.IsRooted || ElitesWithinRange[RANGE_20] >= 1 || AnythingWithinRange[RANGE_15] >= 3 || PlayerStatus.IsIncapacitated ) ||
+                 ( Player.CurrentHealthPct <= 0.90 || Player.IsRooted || ElitesWithinRange[RANGE_20] >= 1 || AnythingWithinRange[RANGE_15] >= 3 || Player.IsIncapacitated ) ||
                  Settings.Combat.DemonHunter.SpamSmokeScreen 
                 ) &&
                 SNOPowerUseTimer(SNOPower.DemonHunter_SmokeScreen))
@@ -42,11 +42,11 @@ namespace Trinity
 
             if (
                 (
-                (( !UseOOCBuff && !PlayerStatus.IsIncapacitated && AnythingWithinRange[RANGE_40] >= 1 ) 
+                (( !UseOOCBuff && !Player.IsIncapacitated && AnythingWithinRange[RANGE_40] >= 1 ) 
                  || Settings.Combat.DemonHunter.SpamPreparation ) 
                 ) && 
                 Hotbar.Contains(SNOPower.DemonHunter_Preparation) &&
-                PlayerStatus.SecondaryResource <= 10 &&
+                Player.SecondaryResource <= 10 &&
 
                 TrinityPowerManager.CanUse(SNOPower.DemonHunter_Preparation)
                 )
@@ -54,7 +54,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_Preparation, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Evasive Fire
-            if ( !UseOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_EvasiveFire) && !PlayerStatus.IsIncapacitated &&
+            if ( !UseOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_EvasiveFire) && !Player.IsIncapacitated &&
                   (((AnythingWithinRange[RANGE_20] >= 1 || CurrentTarget.RadiusDistance <= 20f) && SNOPowerUseTimer(SNOPower.DemonHunter_EvasiveFire)) ||
                 DHHasNoPrimary()))
             {
@@ -63,22 +63,22 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_EvasiveFire, range, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }
             // Companion
-            if (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_Companion) && iPlayerOwnedDHPets == 0 &&
-                PlayerStatus.SecondaryResource >= 10 && SNOPowerUseTimer(SNOPower.DemonHunter_Companion))
+            if (!Player.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_Companion) && iPlayerOwnedDHPets == 0 &&
+                Player.SecondaryResource >= 10 && SNOPowerUseTimer(SNOPower.DemonHunter_Companion))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Companion, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 1, WAIT_FOR_ANIM);
             }
             // Sentry Turret
-            if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_Sentry) &&
+            if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_Sentry) &&
                 (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50, 2) || TargetUtil.IsEliteTargetInRange(50)) &&
-                PlayerStatus.PrimaryResource >= 30 && PowerManager.CanCast(SNOPower.DemonHunter_Sentry))
+                Player.PrimaryResource >= 30 && PowerManager.CanCast(SNOPower.DemonHunter_Sentry))
             {
 
-                return new TrinityPower(SNOPower.DemonHunter_Sentry, 0f, PlayerStatus.CurrentPosition, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_Sentry, 0f, Player.CurrentPosition, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
             }
             // Marked for Death
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_MarkedForDeath) &&
-                PlayerStatus.SecondaryResource >= 3 && 
+                Player.SecondaryResource >= 3 && 
                 (ElitesWithinRange[RANGE_40] >= 1 || AnythingWithinRange[RANGE_40] >= 3 ||
                 
                 ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) &&
@@ -88,78 +88,78 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_MarkedForDeath, 40f, Vector3.Zero, CurrentWorldDynamicId, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }
             // Vault
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Vault) && !PlayerStatus.IsRooted && !PlayerStatus.IsIncapacitated &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Vault) && !Player.IsRooted && !Player.IsIncapacitated &&
                 // Only use vault to retreat if < level 60, or if in inferno difficulty for level 60's
-                (PlayerStatus.Level < 60 || iCurrentGameDifficulty == GameDifficulty.Inferno) &&
+                (Player.Level < 60 || iCurrentGameDifficulty == GameDifficulty.Inferno) &&
                 (CurrentTarget.RadiusDistance <= 10f || AnythingWithinRange[RANGE_6] >= 1) &&
-                ((!Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && PlayerStatus.SecondaryResource >= 16) ||
-                 (Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && PlayerStatus.SecondaryResource >= 22)) && 
+                ((!Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 16) ||
+                 (Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 22)) && 
                     DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault))
             {
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, PlayerStatus.CurrentPosition, -15f);
+                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, -15f);
                 return new TrinityPower(SNOPower.DemonHunter_Vault, 20f, vNewTarget, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
             }
             // Rain of Vengeance
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_RainOfVengeance) && !PlayerStatus.IsIncapacitated &&
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_RainOfVengeance) && !Player.IsIncapacitated &&
                 (AnythingWithinRange[RANGE_25] >= 3 || ElitesWithinRange[RANGE_25] >= 1) &&
                 SNOPowerUseTimer(SNOPower.DemonHunter_RainOfVengeance) && PowerManager.CanCast(SNOPower.DemonHunter_RainOfVengeance))
             {
                 return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Cluster Arrow
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_ClusterArrow) && !PlayerStatus.IsIncapacitated &&
-                PlayerStatus.PrimaryResource >= 50 &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_ClusterArrow) && !Player.IsIncapacitated &&
+                Player.PrimaryResource >= 50 &&
                (ElitesWithinRange[RANGE_50] >= 1 || AnythingWithinRange[RANGE_50] >= 5 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 69f)) &&
                 SNOPowerUseTimer(SNOPower.DemonHunter_ClusterArrow))
             {
                 return new TrinityPower(SNOPower.DemonHunter_ClusterArrow, 69f, Vector3.Zero, CurrentWorldDynamicId, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }
             // Multi Shot
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Multishot) && !PlayerStatus.IsIncapacitated &&
-                PlayerStatus.PrimaryResource >= 30 &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Multishot) && !Player.IsIncapacitated &&
+                Player.PrimaryResource >= 30 &&
                 (ElitesWithinRange[RANGE_40] >= 1 || AnythingWithinRange[RANGE_40] >= 2 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && 
                 CurrentTarget.RadiusDistance <= 30f)))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Multishot, 40f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Fan of Knives
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_FanOfKnives) && !PlayerStatus.IsIncapacitated &&
-                PlayerStatus.PrimaryResource >= 20 &&
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_FanOfKnives) && !Player.IsIncapacitated &&
+                Player.PrimaryResource >= 20 &&
                 (AnythingWithinRange[RANGE_15] >= 4 || ElitesWithinRange[RANGE_15] >= 1) &&
                 PowerManager.CanCast(SNOPower.DemonHunter_FanOfKnives))
             {
                 return new TrinityPower(SNOPower.DemonHunter_FanOfKnives, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Strafe spam - similar to barbarian whirlwind routine
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && !PlayerStatus.IsIncapacitated && !PlayerStatus.IsRooted &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && !Player.IsIncapacitated && !Player.IsRooted &&
                 // Only if there's 3 guys in 25 yds
                 AnythingWithinRange[RANGE_25] >= 3 &&
                 // Check for energy reservation amounts
-                ((PlayerStatus.PrimaryResource >= 15 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
+                ((Player.PrimaryResource >= 15 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
-                bool bGenerateNewZigZag = (DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 1500 ||
-                    (vPositionLastZigZagCheck != Vector3.Zero && PlayerStatus.CurrentPosition == vPositionLastZigZagCheck && DateTime.Now.Subtract(lastChangedZigZag).TotalMilliseconds >= 200) ||
-                    Vector3.Distance(PlayerStatus.CurrentPosition, vSideToSideTarget) <= 4f ||
-                    CurrentTarget.ACDGuid != iACDGUIDLastWhirlwind);
-                vPositionLastZigZagCheck = PlayerStatus.CurrentPosition;
+                bool bGenerateNewZigZag = (DateTime.Now.Subtract(LastChangedZigZag).TotalMilliseconds >= 1500 ||
+                    (vPositionLastZigZagCheck != Vector3.Zero && Player.CurrentPosition == vPositionLastZigZagCheck && DateTime.Now.Subtract(LastChangedZigZag).TotalMilliseconds >= 200) ||
+                    Vector3.Distance(Player.CurrentPosition, CombatBase.ZigZagPosition) <= 4f ||
+                    CurrentTarget.ACDGuid != LastZigZagUnitAcdGuid);
+                vPositionLastZigZagCheck = Player.CurrentPosition;
                 if (bGenerateNewZigZag)
                 {
                     float fExtraDistance = CurrentTarget.CentreDistance <= 10f ? 10f : 5f;
                     //vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.vPosition, CurrentTarget.fCentreDist + fExtraDistance);
-                    vSideToSideTarget = NavHelper.FindSafeZone(false, 1, CurrentTarget.Position, false);
+                    CombatBase.ZigZagPosition = NavHelper.FindSafeZone(false, 1, CurrentTarget.Position, false);
                     // Resetting this to ensure the "no-spam" is reset since we changed our target location
                     LastPowerUsed = SNOPower.None;
-                    iACDGUIDLastWhirlwind = CurrentTarget.ACDGuid;
-                    lastChangedZigZag = DateTime.Now;
+                    LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
+                    LastChangedZigZag = DateTime.Now;
                 }
-                return new TrinityPower(SNOPower.DemonHunter_Strafe, 25f, vSideToSideTarget, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_Strafe, 25f, CombatBase.ZigZagPosition, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
             // Spike Trap
-            if (!UseOOCBuff && !PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_SpikeTrap) &&
+            if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_SpikeTrap) &&
                 LastPowerUsed != SNOPower.DemonHunter_SpikeTrap &&
                 (ElitesWithinRange[RANGE_30] >= 1 || AnythingWithinRange[RANGE_25] > 4 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 35f)) &&
-                PlayerStatus.PrimaryResource >= 30 && SNOPowerUseTimer(SNOPower.DemonHunter_SpikeTrap))
+                Player.PrimaryResource >= 30 && SNOPowerUseTimer(SNOPower.DemonHunter_SpikeTrap))
             {
                 // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
                 float fExtraDistance = 0f;
@@ -171,12 +171,12 @@ namespace Trinity
                     if (CurrentTarget.CentreDistance - fExtraDistance < 15f)
                         fExtraDistance -= 2;
                 }
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, PlayerStatus.CurrentPosition, CurrentTarget.CentreDistance - fExtraDistance);
+                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, CurrentTarget.CentreDistance - fExtraDistance);
                 return new TrinityPower(SNOPower.DemonHunter_SpikeTrap, 40f, vNewTarget, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Caltrops
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_Caltrops) && !PlayerStatus.IsIncapacitated &&
-                PlayerStatus.SecondaryResource >= 6 && (AnythingWithinRange[RANGE_30] >= 2 || ElitesWithinRange[RANGE_40] >= 1) &&
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_Caltrops) && !Player.IsIncapacitated &&
+                Player.SecondaryResource >= 6 && (AnythingWithinRange[RANGE_30] >= 2 || ElitesWithinRange[RANGE_40] >= 1) &&
                 SNOPowerUseTimer(SNOPower.DemonHunter_Caltrops))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Caltrops, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
@@ -197,8 +197,8 @@ namespace Trinity
 
             // Elemental Arrow
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && 
-                SNOPowerUseTimer(SNOPower.DemonHunter_ElementalArrow) && !PlayerStatus.IsIncapacitated &&
-                ((PlayerStatus.PrimaryResource >= 10 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
+                SNOPowerUseTimer(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated &&
+                ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 // Players with grenades *AND* elemental arrow should spam grenades at close-range instead
                 if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)
@@ -207,17 +207,17 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
             // Chakram
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !PlayerStatus.IsIncapacitated &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
                 // If we have elemental arrow or rapid fire, then use chakram as a 110 second buff, instead
                 ((!Hotbar.Contains(SNOPower.DemonHunter_ClusterArrow)) ||
                 DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.DemonHunter_Chakram]).TotalMilliseconds >= 110000) &&
-                ((PlayerStatus.PrimaryResource >= 10 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
+                ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
             // Rapid Fire
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && !PlayerStatus.IsIncapacitated &&
-                ((PlayerStatus.PrimaryResource >= 20 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve))
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && !Player.IsIncapacitated &&
+                ((Player.PrimaryResource >= 20 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 // Players with grenades *AND* rapid fire should spam grenades at close-range instead
                 if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)
@@ -226,30 +226,30 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_RapidFire, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
             }
             // Impale
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Impale) && !PlayerStatus.IsIncapacitated &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Impale) && !Player.IsIncapacitated &&
                 (AnythingWithinRange[RANGE_12] <= 3) &&
-                ((PlayerStatus.PrimaryResource >= 25 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= MinEnergyReserve) &&
+                ((Player.PrimaryResource >= 25 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
                 CurrentTarget.RadiusDistance <= 50f)
             {
                 return new TrinityPower(SNOPower.DemonHunter_Impale, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
             // Hungering Arrow
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow) && !PlayerStatus.IsIncapacitated)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow) && !Player.IsIncapacitated)
             {
                 return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
             }
             // Entangling shot
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_EntanglingShot) && !PlayerStatus.IsIncapacitated)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_EntanglingShot) && !Player.IsIncapacitated)
             {
                 return new TrinityPower(SNOPower.DemonHunter_EntanglingShot, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
             }
             // Bola Shot
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_BolaShot) && !PlayerStatus.IsIncapacitated)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_BolaShot) && !Player.IsIncapacitated)
             {
                 return new TrinityPower(SNOPower.DemonHunter_BolaShot, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
             // Grenades
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Grenades) && !PlayerStatus.IsIncapacitated)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Grenades) && !Player.IsIncapacitated)
             {
                 return new TrinityPower(SNOPower.DemonHunter_Grenades, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
@@ -276,13 +276,13 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_BolaShot, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.DemonHunter_Grenades))
                 return new TrinityPower(SNOPower.DemonHunter_Grenades, 15f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            if (Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && PlayerStatus.PrimaryResource >= 10)
+            if (Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && Player.PrimaryResource >= 10)
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            if (Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && PlayerStatus.PrimaryResource >= 10)
+            if (Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && Player.PrimaryResource >= 10)
                 return new TrinityPower(SNOPower.DemonHunter_RapidFire, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && PlayerStatus.PrimaryResource >= 20)
+            if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && Player.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 15f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            if (Hotbar.Contains(SNOPower.DemonHunter_EvasiveFire) && PlayerStatus.PrimaryResource >= 20)
+            if (Hotbar.Contains(SNOPower.DemonHunter_EvasiveFire) && Player.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.DemonHunter_EvasiveFire, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             return CombatBase.DefaultPower;
         }

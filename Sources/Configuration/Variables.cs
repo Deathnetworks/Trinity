@@ -107,11 +107,6 @@ namespace Trinity
         internal static bool ShouldRefreshHotbarAbilities = false;
 
         /// <summary>
-        /// A "fake" object to send to target provider for stuck handlers etc.
-        /// </summary>
-        public static DiaObject FakeObject;
-
-        /// <summary>
         /// Timestamp of when our position was last measured as changed
         /// </summary>
         private static DateTime lastMovedDuringCombat = DateTime.Today;
@@ -129,7 +124,7 @@ namespace Trinity
         /// <summary>
         /// Holds all of the player's current info handily cached, updated once per loop with a minimum timer on updates to save D3 memory hits
         /// </summary>
-        public static PlayerInfoCache PlayerStatus = new PlayerInfoCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, Vector3.Zero, false, 0, 1, ActorClass.Invalid, String.Empty);
+        public static PlayerInfoCache Player = new PlayerInfoCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, Vector3.Zero, false, 0, 1, ActorClass.Invalid, String.Empty);
 
         /// <summary>
         /// Obstacle cache, things we can't or shouldn't move through
@@ -365,7 +360,7 @@ namespace Trinity
         private static int iACDGUIDLastRend = 0;
 
         // Unique ID of mob last targetting when using whirlwind
-        private static int iACDGUIDLastWhirlwind = 0;
+        internal static int LastZigZagUnitAcdGuid = 0;
         private static bool IsAlreadyMoving = false;
         private static Vector3 vLastMoveToTarget;
         private static float fLastDistanceFromTarget;
@@ -385,13 +380,13 @@ namespace Trinity
         internal static Dictionary<int, int> dictCachedBuffs = new Dictionary<int, int>();
 
         // For "position-shifting" to navigate around obstacle SNO's
-        private static Vector3 vShiftedPosition = Vector3.Zero;
-        private static DateTime lastShiftedPosition = DateTime.Today;
-        private static int iShiftPositionFor = 0;
-        private static Vector3 vCurrentDestination;
-        private static Vector3 vSideToSideTarget;
-        private static DateTime lastChangedZigZag = DateTime.Today;
-        private static Vector3 vPositionLastZigZagCheck = Vector3.Zero;
+        internal static Vector3 vShiftedPosition = Vector3.Zero;
+        internal static DateTime lastShiftedPosition = DateTime.Today;
+        internal static int iShiftPositionFor = 0;
+        internal static Vector3 vCurrentDestination;
+        //internal static Vector3 ZigZagPosition;
+        internal static DateTime LastChangedZigZag = DateTime.Today;
+        internal static Vector3 vPositionLastZigZagCheck = Vector3.Zero;
         public static int CurrentWorldDynamicId = -1;
         public static int cachedStaticWorldId = -1; // worldId from profiles, used in persistent stats
         public static GameDifficulty iCurrentGameDifficulty = GameDifficulty.Invalid;

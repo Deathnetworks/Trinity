@@ -20,7 +20,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(1, 7, 3, 30);
+                return new Version(1, 7, 3, 0);
             }
         }
 
@@ -54,7 +54,7 @@ namespace Trinity
                     return;
 
                 // hax for sending notifications after a town run
-                if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !PlayerStatus.IsInTown)
+                if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !Player.IsInTown)
                 {
                     TownRun.SendEmailNotification();
                     TownRun.SendMobileNotifications();
