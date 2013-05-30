@@ -68,18 +68,20 @@ namespace Trinity
                 }
 
                 // Make sure it's a valid monster type
-                switch (monsterType)
+                if (c_ObjectType != GObjectType.Player)
                 {
-                    case MonsterType.Ally:
-                    case MonsterType.Scenery:
-                    case MonsterType.Helper:
-                    case MonsterType.Team:
-                        {
-                            AddToCache = false;
-                            c_IgnoreSubStep = "AllySceneryHelperTeam";
-                            return AddToCache;
-                        }
-                    //break;
+                    switch (monsterType)
+                    {
+                        case MonsterType.Ally:
+                        case MonsterType.Scenery:
+                        case MonsterType.Helper:
+                        case MonsterType.Team:
+                            {
+                                AddToCache = false;
+                                c_IgnoreSubStep = "AllySceneryHelperTeam";
+                                return AddToCache;
+                            }
+                    }
                 }
             }
             // Force return here for un-attackable allies

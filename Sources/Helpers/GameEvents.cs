@@ -175,6 +175,7 @@ namespace Trinity
         }
         public static void ResetEverythingNewGame()
         {
+            Logger.Log("New Game - resetting everything");
             hashUseOnceID = new HashSet<int>();
             dictUseOnceID = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;

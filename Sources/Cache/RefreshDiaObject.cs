@@ -966,7 +966,7 @@ namespace Trinity
         private static bool RefreshStepCachedPosition(bool AddToCache)
         {
             // Try and get a cached position for anything that isn't avoidance or units (avoidance and units can move, sadly, so we risk DB mis-reads for those things!
-            if (c_ObjectType != GObjectType.Avoidance && c_ObjectType != GObjectType.Unit)
+            if (c_ObjectType != GObjectType.Avoidance && c_ObjectType != GObjectType.Unit && c_ObjectType != GObjectType.Player)
             {
                 // Get the position, cached if possible
                 if (!positionCache.TryGetValue(c_RActorGuid, out c_Position))
