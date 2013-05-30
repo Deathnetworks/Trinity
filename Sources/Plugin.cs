@@ -120,10 +120,13 @@ namespace Trinity
                 GameEvents.OnItemStashed += ItemEvents.TrinityOnItemStashed;
 
                 GameEvents.OnGameChanged += GameEvents_OnGameChanged;
+                GameEvents.OnWorldChanged += GameEvents_OnWorldChanged;
 
                 CombatTargeting.Instance.Provider = new BlankCombatProvider();
                 LootTargeting.Instance.Provider = new BlankLootProvider();
                 ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
+                
+                Navigator.SearchGridProvider = new SearchAreaProvider();
 
                 if (Settings.Loot.ItemFilterMode != global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
                 {
@@ -151,6 +154,11 @@ namespace Trinity
                 StashRule.reset();
             }
         }
+
+        void GameEvents_OnWorldChanged(object sender, EventArgs e)
+        {
+            Navigator.SearchGridProvider.Update();
+        }
         
         /// <summary>
         /// Called when user disable the plugin.
@@ -163,12 +171,14 @@ namespace Trinity
             CombatTargeting.Instance.Provider = new DefaultCombatTargetingProvider();
             LootTargeting.Instance.Provider = new DefaultLootTargetingProvider();
             ObstacleTargeting.Instance.Provider = new DefaultObstacleTargetingProvider();
+            Navigator.SearchGridProvider = new Zeta.Navigation.MainGridProvider();
 
             GameEvents.OnPlayerDied -= TrinityOnDeath;
             BotMain.OnStop -= TrinityBotStop;
 
             GameEvents.OnGameJoined -= TrinityOnJoinGame;
             GameEvents.OnGameLeft -= TrinityOnLeaveGame;
+            
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DISABLED: Trinity is now shut down...");
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");

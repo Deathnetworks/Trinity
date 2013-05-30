@@ -10,6 +10,7 @@ using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
+using Zeta.Navigation;
 
 
 namespace Trinity
@@ -79,6 +80,8 @@ namespace Trinity
 
             StashRule.readConfiguration();
 
+            Navigator.SearchGridProvider.Update();
+
         }
 
         void GameEvents_OnGameChanged(object sender, EventArgs e)
@@ -88,6 +91,7 @@ namespace Trinity
             // reload the profile juuuuuuuuuuuust in case Demonbuddy missed it... which it is known to do on disconnects
             string currentProfilePath = ProfileManager.CurrentProfile.Path;
             ProfileManager.Load(currentProfilePath);
+            Navigator.SearchGridProvider.Update();
             ResetEverythingNewGame();
         }
         // When the bot stops, output a final item-stats report so it is as up-to-date as can be

@@ -734,8 +734,7 @@ namespace Trinity
 
                         bool Barbarian_SpecialMovement = ((CurrentTarget.Type == GObjectType.Avoidance &&
                             ObjectCache.Any(u => (u.Type == GObjectType.Unit || u.Type == GObjectType.Destructible || u.Type == GObjectType.Barricade) &&
-                                MathUtil.IntersectsPath(u.Position, u.Radius, Player.CurrentPosition, CurrentTarget.Position))) ||
-                                CurrentTarget.Type == GObjectType.Globe);
+                                MathUtil.IntersectsPath(u.Position, u.Radius, Player.CurrentPosition, CurrentTarget.Position))));
 
                         // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||

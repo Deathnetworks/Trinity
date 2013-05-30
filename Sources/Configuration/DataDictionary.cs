@@ -216,7 +216,7 @@ namespace Trinity
         private static HashSet<int> gargantuanIds = new HashSet<int> { 
             179780, 179778, 179772, 179779, 179776, 122305 };
 
-        public static HashSet<int> ZombieDogIds { get { return zombieDogIds; } } 
+        public static HashSet<int> ZombieDogIds { get { return zombieDogIds; } }
         private static HashSet<int> zombieDogIds = new HashSet<int> { 
             110959, 103235, 103215, 105763, 103217, 51353 
         };
@@ -387,8 +387,9 @@ namespace Trinity
         /// <summary>
         /// Timers for abilities and selection of best ability etc.
         /// </summary>
-        public static Dictionary<SNOPower, int> AbilityRepeatDelays { 
-            get { return abilityRepeatDelays; } 
+        public static Dictionary<SNOPower, int> AbilityRepeatDelays
+        {
+            get { return abilityRepeatDelays; }
             internal set { abilityRepeatDelays = value; }
         }
         private static Dictionary<SNOPower, int> abilityRepeatDelays = new Dictionary<SNOPower, int>();
@@ -601,6 +602,5 @@ namespace Trinity
         {
             256015, 256000, 255996
         };
-
     }
 }

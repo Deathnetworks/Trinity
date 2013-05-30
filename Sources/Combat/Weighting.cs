@@ -27,7 +27,7 @@ namespace Trinity
                 double MovementSpeed = PlayerMover.GetMovementSpeed();
 
                 // Store if we are ignoring all units this cycle or not
-                bool bIgnoreAllUnits = !AnyElitesPresent &&
+                bool ignoreAllUnits = !AnyElitesPresent &&
                                         !AnyMobsInRange &&
                                         (
                                             (
@@ -38,7 +38,7 @@ namespace Trinity
                                         ) &&
                                         Player.CurrentHealthPct >= 0.85d;
 
-                bool PrioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || MovementSpeed < 1 || ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 5f) >= 3);
+                bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || MovementSpeed < 1 || ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 5f) >= 3);
 
                 bool hasWrathOfTheBerserker = Player.ActorClass == ActorClass.Barbarian && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
 
@@ -59,7 +59,7 @@ namespace Trinity
                 bool ShouldIgnoreTrashMobs =
                     (!TownRun.IsTryingToTownPortal() &&
                     !profileTagCheck &&
-                    !PrioritizeCloseRangeUnits &&
+                    !prioritizeCloseRangeUnits &&
                     Settings.Combat.Misc.TrashPackSize > 1 &&
                     EliteCount == 0 &&
                     AvoidanceCount == 0 &&
@@ -91,14 +91,14 @@ namespace Trinity
                                 {
                                     unitWeightInfo = String.Format("Ignoring trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12}",
                                         cacheObject.InternalName, cacheObject.RActorGuid, nearbyMonsterCount, Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius,
-                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, Player.Level, PrioritizeCloseRangeUnits);
+                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, Player.Level, prioritizeCloseRangeUnits);
                                     break;
                                 }
                                 else
                                 {
                                     unitWeightInfo = String.Format("Adding trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12}",
                                         cacheObject.InternalName, cacheObject.RActorGuid, nearbyMonsterCount, Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius,
-                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, Player.Level, PrioritizeCloseRangeUnits);
+                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, Player.Level, prioritizeCloseRangeUnits);
                                 }
 
                                 // Ignore elite option, except if trying to town portal
@@ -109,7 +109,7 @@ namespace Trinity
 
 
                                 // No champions, no mobs nearby, no treasure goblins to prioritize, and not injured, so skip mobs
-                                if (bIgnoreAllUnits)
+                                if (ignoreAllUnits)
                                 {
                                     break;
                                 }
@@ -192,7 +192,7 @@ namespace Trinity
                                 }
 
                                 // Force a close range target because we seem to be stuck *OR* if not ranged and currently rooted
-                                if (PrioritizeCloseRangeUnits)
+                                if (prioritizeCloseRangeUnits)
                                 {
                                     cacheObject.Weight = (50 - cacheObject.RadiusDistance) / 50 * 20000d;
 
@@ -275,7 +275,8 @@ namespace Trinity
                                             cacheObject.Weight = 300;
 
                                         // If any AoE between us and target, do not attack, for non-ranged attacks only
-                                        if (!Settings.Combat.Misc.KillMonstersInAoE &&
+                                        if (Zeta.Navigation.Navigator.SearchGridProvider.GetType() != typeof(SearchAreaProvider) && // not using Trinity SearchAreaProvider
+                                            !Settings.Combat.Misc.KillMonstersInAoE &&
                                             PlayerKiteDistance <= 0 &&
                                             cacheObject.AvoidanceType != AvoidanceType.PlagueCloud &&
                                             hashAvoidanceObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, Player.CurrentPosition, cacheObject.Position)))
@@ -330,7 +331,7 @@ namespace Trinity
                                                     break;
                                                 case GoblinPriority.Prioritize:
                                                     // Super-high priority option below... 
-                                                    cacheObject.Weight += 20000;
+                                                    cacheObject.Weight += 25000;
                                                     break;
                                                 case GoblinPriority.Kamikaze:
                                                     // KAMIKAZE SUICIDAL TREASURE GOBLIN RAPE AHOY!
@@ -390,7 +391,8 @@ namespace Trinity
                                 }
 
                                 // If there's a monster in the path-line to the item, reduce the weight to 1, except legendaries
-                                if (cacheObject.ItemQuality < ItemQuality.Legendary && hashMonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius * 1.2f, Player.CurrentPosition, cacheObject.Position)))
+                                if (//cacheObject.ItemQuality < ItemQuality.Legendary && 
+                                    hashMonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius * 1.2f, Player.CurrentPosition, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
                                 // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
@@ -516,7 +518,7 @@ namespace Trinity
                                     if (TargetUtil.AnyMobsInRange(15f))
                                         cacheObject.Weight = 1;
 
-                                    if (PrioritizeCloseRangeUnits)
+                                    if (prioritizeCloseRangeUnits)
                                         cacheObject.Weight = 1;
                                 }
                                 break;
@@ -560,7 +562,7 @@ namespace Trinity
                                     cacheObject.Weight = 1;
 
                                 // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
-                                if (PrioritizeCloseRangeUnits)
+                                if (prioritizeCloseRangeUnits)
                                     cacheObject.Weight = (200d - cacheObject.CentreDistance) / 200d * 19200d;
 
                                 //// We're standing on the damn thing... break it

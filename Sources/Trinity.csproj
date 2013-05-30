@@ -73,6 +73,7 @@
     <Compile Include="Combat\Routine\Trinity.cs" />
     <Compile Include="Configuration\TVar.cs" />
     <Compile Include="Configuration\TVars.cs" />
+    <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\GameEvents.cs" />
     <Compile Include="Helpers\PluginCheck.cs" />
     <Compile Include="Items\ItemEvents.cs" />
@@ -100,11 +101,12 @@
     <Compile Include="Cache\HashGenerator.cs" />
     <Compile Include="Combat\HotbarSkills.cs" />
     <Compile Include="Helpers\MathUtil.cs" />
+    <Compile Include="Movement\Kite.cs" />
     <Compile Include="Movement\MiniMapMarker.cs" />
     <Compile Include="Movement\NavHelper.cs" />
     <Compile Include="Movement\PositionCache.cs" />
     <Compile Include="Movement\SpeedSensor.cs" />
-    <Compile Include="Helpers\TargetUtil.cs" />
+    <Compile Include="Combat\TargetUtil.cs" />
     <Compile Include="Items\TrinityItemManager.cs" />
     <Compile Include="Helpers\UsedProfileManager.cs" />
     <Compile Include="Configuration\Constants.cs" />

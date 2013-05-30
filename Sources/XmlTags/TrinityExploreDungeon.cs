@@ -363,7 +363,7 @@ namespace Trinity.XmlTags
                         MiniMapMarker.VisitMiniMapMarkers(myPos, MarkerDistance)
                     ),
                     new Sequence(
-                        new DecoratorContinue(ret => !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
+                        new DecoratorContinue(ret => BrainBehavior.DungeonExplorer != null && !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
                             new Action(ret => UpdateRoute())
                         ),
                         CheckIsExplorerFinished()
@@ -393,6 +393,7 @@ namespace Trinity.XmlTags
             new DecoratorContinue(ret => mySceneId != Trinity.Player.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
                 new Sequence(
                     new Action(ret => mySceneId = Trinity.Player.SceneId),
+                    new Action(ret => Navigator.SearchGridProvider.Update()),
                     new Action(ret => GPUpdatePosition = myPos),
                     new Action(ret => MiniMapMarker.UpdateFailedMarkers())
                 )

@@ -7,6 +7,7 @@ using Zeta.Common;
 
 namespace Trinity.Technicals
 {
+    [DebuggerStepThrough]
     public class PerformanceLogger : IDisposable
     {
         private readonly string _BlockName;

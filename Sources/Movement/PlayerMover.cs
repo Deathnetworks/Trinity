@@ -306,6 +306,10 @@ namespace Trinity.DbProvider
             if (!SpeedSensors.Any() || SpeedSensors.Count <= 1)
                 return 0d;
 
+            // If we haven't "moved" in over a second, then we're standing still
+            if (DateTime.Now.Subtract(TimeLastUsedPlayerMover).TotalMilliseconds > 1000)
+                return 0d;
+
             // Check if we have enough recorded positions, remove one if so
             while (SpeedSensors.Count > MaxSpeedSensors - 1)
             {
