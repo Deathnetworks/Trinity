@@ -801,6 +801,7 @@ namespace Trinity.DbProvider
 
                 float distanceToTarget = moveTarget.Distance2D(Trinity.Player.CurrentPosition);
 
+
                 bool MoveTargetIsInLoS = distanceToTarget <= 90f && !Navigator.Raycast(MyPos, moveTarget);
 
                 if (distanceToTarget <= 5f || MoveTargetIsInLoS)

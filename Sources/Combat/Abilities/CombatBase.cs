@@ -18,6 +18,21 @@ namespace Trinity.Combat.Abilities
         private static TrinityPower currentPower = new TrinityPower();
         private static Vector3 lastZigZagLocation = Vector3.Zero;
         private static Vector3 zigZagPosition = Vector3.Zero;
+        private static bool isCombatAllowed = true;
+
+        /// <summary>
+        /// Allows for completely disabling combat. Settable through API only. 
+        /// </summary>
+        public static bool IsCombatAllowed
+        {
+            get
+            {
+                if (!CombatTargeting.Instance.AllowedToKillMonsters || !isCombatAllowed)
+                    return false;
+                return true;
+            }
+            set { CombatBase.isCombatAllowed = value; }
+        }
 
         public static Vector3 ZigZagPosition
         {
@@ -319,7 +334,7 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         public static bool CanCast(SNOPower power, CanCastFlags flags = CanCastFlags.All)
         {
-            return Hotbar.Contains(power) && 
+            return Hotbar.Contains(power) &&
                 flags.HasFlag(CanCastFlags.NoTimer) ? SNOPowerUseTimer(power) : true &&
                 flags.HasFlag(CanCastFlags.NoPowerManager) ? PowerManager.CanCast(power) : true;
         }

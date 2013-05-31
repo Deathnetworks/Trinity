@@ -7,6 +7,7 @@ using Zeta;
 using Zeta.Common;
 using Zeta.Common.Helpers;
 using Zeta.Internals.Actors;
+using Zeta.Internals.SNO;
 using Zeta.Navigation;
 using Zeta.Pathfinding;
 
@@ -20,114 +21,106 @@ namespace Trinity.DbProvider
         private static HashSet<string> highWeightNames = new HashSet<string>()
         {
             "fence", "woodfence",
-
-            //GizmoType: Destructible Name: Fence_A_caOut_Mining_Interactive-6219 ActorSNO: 130858 Distance: 8.252635 Position: <2335.882, 1101.166, 207.4862> Barracade: False Radius: 17.71989 Health0/1
-            //GizmoType: Destructible Name: Fence_D_caOut_Mining_Interactive-8215 ActorSNO: 131494 Distance: 35.71106 Position: <2654.634, 1572.245, 184.3415> Barracade: False Radius: 7.795304 Health0.00100000004749745/1
-            //Type: ServerProp Name: WoodFenceE_Fields_trOut_Btm-22162 ActorSNO: 60671, Distance: 5.688499
-            //Type: ServerProp Name: WoodFenceC_Fields_trOut_btm-21394 ActorSNO: 60870, Distance: 8.161202
-            //Type: ServerProp Name: Fence_C_caOut_Mining_Interactive_Stump-8311 ActorSNO: 131583, Distance: 4.568571
-            //Type: ServerProp Name: Fence_D_caOut_Mining_Interactive_Stump-8312 ActorSNO: 131497, Distance: 5.477604
-            //Type: ServerProp Name: Fence_A_caOut_Mining_Interactive_Stump-9415 ActorSNO: 130862, Distance: 3.631254
         };
 
         public new float[] GetCellWeights()
         {
-            //return base.GetCellWeights();
-
             Logger.Log(LogCategory.Navigator, "Enter GetCellWeights");
 
-            try
+            using (new PerformanceLogger("SearchAreaProvider.GetCellWeights"))
             {
-                // only run every if timer is done, or if this is the first time we've run
-                if (waitTimer == null || (waitTimer != null && waitTimer.IsFinished))
+                try
                 {
-                    // refresh the DB weights before we alter them
-                    weights = base.GetCellWeights();
-
-                    // if there aren't any, then lets just skip this whole activity
-                    if (weights == null)
-                        return weights;
-
-                    // read the objects once from the actor manager
-                    var diaObjects = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Select(o =>
-                        new
-                        {
-                            Name = o.Name,
-                            ActorSNO = o.ActorSNO,
-                            Position = o.Position,
-                            Radius = o.CollisionSphere.Radius,
-                            Weight = 1f,
-                            Dia = o
-                        }).ToList();
-
-                    // custom list of objects with names we know we should be walking around
-                    var objectList =
-                        (from o in diaObjects
-                         where (highWeightNames.Any(n => o.Name.ToLower().Contains(n))) // object name match
-                         select new
-                         {
-                             Name = o.Name,
-                             ActorSNO = o.ActorSNO,
-                             Position = o.Position,
-                             Radius = o.Radius,
-                             Weight = 5f,
-                             Dia = o
-                         }).ToList();
-
-                    // Trinity avoidances (should allow path finding around AoE)
-                    objectList.AddRange(
-                        (from o in diaObjects
-                         where AvoidanceManager.GetAvoidanceType(o.ActorSNO) != AvoidanceType.None
-                         select new
-                         {
-                             Name = o.Name,
-                             ActorSNO = o.ActorSNO,
-                             Position = o.Position,
-                             Radius = AvoidanceManager.GetAvoidanceRadiusBySNO(o.ActorSNO, o.Radius),
-                             Weight = 2f,
-                             Dia = o
-                         }).ToList());
-                                       
-                    foreach (var obj in objectList)
+                    // only run every if timer is done, or if this is the first time we've run
+                    if (waitTimer == null || (waitTimer != null && waitTimer.IsFinished))
                     {
-                        Logger.Log(LogCategory.Navigator, "Multiplying cell weight by {0} for {1} ({2}) at {3} radius={4}", obj.Weight, obj.Name, obj.ActorSNO, obj.Position, obj.Radius);
-                        var position = obj.Position;
-                        float radius = obj.Radius;
-                        Vector3 vector = new Vector3(position.X - radius, position.Y - radius, position.Z);
-                        Vector3 vector2 = new Vector3(position.X + radius, position.Y + radius, position.Z);
-                        for (float num2 = vector.Y; num2 < vector2.Y; num2 += 2.5f)
-                        {
-                            for (float num3 = vector.X; num3 < vector2.X; num3 += 2.5f)
+                        // refresh the DB weights before we alter them
+                        weights = base.GetCellWeights();
+
+                        // if there aren't any, then lets just skip this whole activity
+                        if (weights == null)
+                            return weights;
+
+                        // read the objects once from the actor manager
+                        var diaObjects = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).Select(o =>
+                            new
                             {
-                                Point cell = MathHelper.IngameToCell(num3, num2, base.BoundsMin, base.BoundsMax, base.Width, base.Height);
+                                Name = o.Name,
+                                ActorSNO = o.ActorSNO,
+                                Position = o.Position,
+                                Radius = o.CollisionSphere.Radius,
+                                Weight = 1f,
+                                Dia = o
+                            }).ToList();
 
-                                int cellIndex = cell.Y * base.Width + cell.X;
-                                base.SearchArea[cellIndex] = false;
-                                weights[cellIndex] *= obj.Weight;
+                        // custom list of objects with names we know we should be walking around
+                        var objectList =
+                            (from o in diaObjects
+                             where (highWeightNames.Any(n => o.Name.ToLower().Contains(n))) // object name match
+                             select new
+                             {
+                                 Name = o.Name,
+                                 ActorSNO = o.ActorSNO,
+                                 Position = o.Position,
+                                 Radius = o.Radius,
+                                 Weight = 5f,
+                                 Dia = o
+                             }).ToList();
+
+                        // Trinity avoidances (should allow path finding around AoE)
+                        objectList.AddRange(
+                            (from o in diaObjects
+                             where AvoidanceManager.GetAvoidanceType(o.ActorSNO) != AvoidanceType.None
+                             select new
+                             {
+                                 Name = o.Name,
+                                 ActorSNO = o.ActorSNO,
+                                 Position = o.Position,
+                                 Radius = AvoidanceManager.GetAvoidanceRadiusBySNO(o.ActorSNO, o.Radius),
+                                 Weight = 2f,
+                                 Dia = o
+                             }).ToList());
+
+                        foreach (var obj in objectList)
+                        {
+                            Logger.Log(LogCategory.Navigator, "Multiplying cell weight by {0} for {1} ({2}) at {3} radius={4}", obj.Weight, obj.Name, obj.ActorSNO, obj.Position, obj.Radius);
+                            var position = obj.Position;
+                            float radius = obj.Radius;
+                            Vector3 vector = new Vector3(position.X - radius, position.Y - radius, position.Z);
+                            Vector3 vector2 = new Vector3(position.X + radius, position.Y + radius, position.Z);
+                            for (float num2 = vector.Y; num2 < vector2.Y; num2 += 2.5f)
+                            {
+                                for (float num3 = vector.X; num3 < vector2.X; num3 += 2.5f)
+                                {
+                                    Point cell = MathHelper.IngameToCell(num3, num2, base.BoundsMin, base.BoundsMax, base.Width, base.Height);
+
+                                    int cellIndex = cell.Y * base.Width + cell.X;
+                                    base.SearchArea[cellIndex] = false;
+                                    weights[cellIndex] *= obj.Weight;
+                                }
                             }
+
                         }
-
+                        // if this is our first run, set a new wait timer
+                        if (waitTimer == null)
+                        {
+                            waitTimer = new WaitTimer(TimeSpan.FromMilliseconds(750));
+                        }
+                        else // reset the wait timer
+                            waitTimer.Reset();
                     }
-                    // if this is our first run, set a new wait timer
-                    if (waitTimer == null)
+                    else // wasn't time to refresh yet, use previously generated weights
                     {
-                        waitTimer = new WaitTimer(TimeSpan.FromMilliseconds(750));
+                        Logger.Log(LogCategory.Navigator, "Using existing weights ({0})", weights.Length);
                     }
-                    else // reset the wait timer
-                        waitTimer.Reset();
                 }
-                else // wasn't time to refresh yet, use previously generated weights
+                catch
                 {
-                    Logger.Log(LogCategory.Navigator, "Using existing weights ({0})", weights.Length);
+                    base.Update();
                 }
+                Logger.Log(LogCategory.Navigator, "Exit GetCellWeights");
+                return weights;
             }
-            catch
-            {
-                base.Update();
-            }
-            Logger.Log(LogCategory.Navigator, "Exit GetCellWeights");
-            return weights;
-
         }
     }
 }

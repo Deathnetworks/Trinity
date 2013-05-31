@@ -212,7 +212,6 @@ namespace Trinity
                                     // Not forcing close-ranged targets from being stuck, so let's calculate a weight!
                                     else
                                     {
-
                                         // Elites/Bosses that are killed should have weight erased so we don't keep attacking
                                         if ((cacheObject.IsEliteRareUnique || cacheObject.IsBoss) && cacheObject.HitPointsPct <= 0)
                                         {
@@ -220,34 +219,39 @@ namespace Trinity
                                             break;
                                         }
 
-
                                         // Starting weight of 5000
                                         if (cacheObject.IsTrashMob)
-                                            cacheObject.Weight = (CurrentBotKillRange - cacheObject.RadiusDistance) / CurrentBotKillRange * 5000;
+                                            cacheObject.Weight = (CurrentBotKillRange - cacheObject.RadiusDistance) / CurrentBotKillRange * 5000d;
 
                                         // Starting weight of 8000 for elites
                                         if (cacheObject.IsBossOrEliteRareUnique)
-                                            cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 8000;
+                                            cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 8000d;
+
+                                        // monsters near players given higher weight
+                                        foreach (var player in ObjectCache.Where(p => p.Type == GObjectType.Player))
+                                        {
+                                            cacheObject.Weight += (55f - cacheObject.Position.Distance2D(player.Position) / 55f * 5000d);
+                                        }
 
                                         // Give extra weight to ranged enemies
                                         if ((Player.ActorClass == ActorClass.Barbarian || Player.ActorClass == ActorClass.Monk) &&
                                             (cacheObject.MonsterStyle == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(c_ActorSNO)))
                                         {
-                                            cacheObject.Weight += 1100;
+                                            cacheObject.Weight += 1100d;
                                             cacheObject.ForceLeapAgainst = true;
                                         }
 
                                         // Lower health gives higher weight - health is worth up to 1000ish extra weight
                                         if (cacheObject.IsTrashMob && cacheObject.HitPointsPct < 0.20)
-                                            cacheObject.Weight += (100 - cacheObject.HitPointsPct) / 100 * 1000;
+                                            cacheObject.Weight += (100 - cacheObject.HitPointsPct) / 100 * 1000d;
 
                                         // Elites on low health get extra priority - up to 2500ish
                                         if (cacheObject.IsBossOrEliteRareUnique && cacheObject.HitPointsPct < 0.20)
-                                            cacheObject.Weight += (100 - cacheObject.HitPointsPct) / 100 * 2500;
+                                            cacheObject.Weight += (100 - cacheObject.HitPointsPct) / 100 * 2500d;
 
                                         // Goblins on low health get extra priority - up to 4000ish
                                         if (Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize && cacheObject.IsTreasureGoblin && cacheObject.HitPointsPct <= 0.98)
-                                            cacheObject.Weight += (100 - cacheObject.HitPointsPct) / 100 * 4000;
+                                            cacheObject.Weight += (100 - cacheObject.HitPointsPct) / 100 * 4000d;
 
                                         // Bonuses to priority type monsters from the dictionary/hashlist set at the top of the code
                                         int iExtraPriority;
@@ -259,20 +263,20 @@ namespace Trinity
                                         // Close range get higher weights the more of them there are, to prevent body-blocking
                                         if (cacheObject.RadiusDistance <= 5f)
                                         {
-                                            cacheObject.Weight += (2000 * cacheObject.Radius);
+                                            cacheObject.Weight += (2000d * cacheObject.Radius);
                                         }
 
                                         // Special additional weight for corrupt growths in act 4 ONLY if they are at close range (not a standard priority thing)
                                         if ((cacheObject.ActorSNO == 210120 || cacheObject.ActorSNO == 210268) && cacheObject.CentreDistance <= 25f)
-                                            cacheObject.Weight += 2000;
+                                            cacheObject.Weight += 2000d;
 
                                         // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                         if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
-                                            cacheObject.Weight += 1000;
+                                            cacheObject.Weight += 1000d;
 
                                         // Prevent going less than 300 yet to prevent annoyances (should only lose this much weight from priority reductions in priority list?)
                                         if (cacheObject.Weight < 300)
-                                            cacheObject.Weight = 300;
+                                            cacheObject.Weight = 300d;
 
                                         // If any AoE between us and target, do not attack, for non-ranged attacks only
                                         if (Zeta.Navigation.Navigator.SearchGridProvider.GetType() != typeof(SearchAreaProvider) && // not using Trinity SearchAreaProvider
@@ -280,14 +284,14 @@ namespace Trinity
                                             PlayerKiteDistance <= 0 &&
                                             cacheObject.AvoidanceType != AvoidanceType.PlagueCloud &&
                                             hashAvoidanceObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, Player.CurrentPosition, cacheObject.Position)))
-                                            cacheObject.Weight = 1;
+                                            cacheObject.Weight = 1d;
 
                                         // See if there's any AOE avoidance in that spot, if so reduce the weight to 1, for non-ranged attacks only
                                         if (!Settings.Combat.Misc.KillMonstersInAoE &&
                                             PlayerKiteDistance <= 0 &&
                                             cacheObject.AvoidanceType != AvoidanceType.PlagueCloud &&
                                             hashAvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
-                                            cacheObject.Weight = 1;
+                                            cacheObject.Weight = 1d;
 
                                         if (PlayerKiteDistance > 0)
                                         {
@@ -295,7 +299,7 @@ namespace Trinity
                                                 MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.CurrentPosition, m.Position) &&
                                                 m.RActorGuid != cacheObject.RActorGuid))
                                             {
-                                                cacheObject.Weight = 0;
+                                                cacheObject.Weight = 0d;
                                             }
                                         }
 

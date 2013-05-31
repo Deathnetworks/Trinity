@@ -98,11 +98,12 @@ namespace Trinity.XmlTags
             if (useNavigator != null && useNavigator.ToLower() == "false")
             {
                 Navigator.PlayerMover.MoveTowards(NavTarget);
+                lastMoveResult = MoveResult.Moved;
             }
             else
             {
                 var positionName = this.getPosition() + " (" + this.Name + ")";
-                Navigator.MoveTo(NavTarget, positionName, true);
+                lastMoveResult = Navigator.MoveTo(NavTarget, positionName, true);
             }
 
             return RunStatus.Success;

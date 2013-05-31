@@ -629,7 +629,7 @@ namespace Trinity
                 case GObjectType.Unit:
                     {
                         // Not allowed to kill monsters due to profile settings
-                        if (!CombatTargeting.Instance.AllowedToKillMonsters)
+                        if (!Combat.Abilities.CombatBase.IsCombatAllowed)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "CombatDisabled";

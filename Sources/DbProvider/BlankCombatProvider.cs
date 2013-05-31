@@ -18,5 +18,6 @@ namespace Trinity.DbProvider
                 list.Add(Trinity.CurrentTarget.DiaObject);
             return list;
         }
+
     }
 }
