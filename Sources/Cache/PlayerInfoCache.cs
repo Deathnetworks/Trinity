@@ -223,11 +223,11 @@ namespace Trinity
         {
             get
             {
-                return Trinity.PlayerStatus;
+                return Trinity.Player;
             }
             set
             {
-                Trinity.PlayerStatus = value;
+                Trinity.Player = value;
             }
         }
 

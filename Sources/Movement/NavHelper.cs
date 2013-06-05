@@ -34,7 +34,7 @@ namespace Trinity
         {
             get
             {
-                return Trinity.PlayerStatus;
+                return Trinity.Player;
             }
         }
         private static bool AnyTreasureGoblinsPresent

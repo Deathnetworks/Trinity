@@ -121,7 +121,7 @@ namespace Trinity
 
                 using (new PerformanceLogger("AbilitySelector.ClassAbility"))
                 {
-                    switch (PlayerStatus.ActorClass)
+                    switch (Player.ActorClass)
                     {
                         // Barbs
                         case ActorClass.Barbarian:

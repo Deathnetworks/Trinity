@@ -58,7 +58,7 @@ namespace Trinity
                     ActorClass tempClass = ActorClass.Invalid;
                     try
                     {
-                        tempClass = PlayerStatus.ActorClass;
+                        tempClass = Player.ActorClass;
                     }
                     catch
                     {
@@ -68,7 +68,7 @@ namespace Trinity
                     PlayerInfoCache.RefreshHotbar();
 
                     DataDictionary.AbilityRepeatDelays = new Dictionary<SNOPower, int>(DataDictionary.AbilityRepeatDelayDefaults);
-                    if (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) && PlayerStatus.ActorClass == ActorClass.Wizard)
+                    if (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) && Player.ActorClass == ActorClass.Wizard)
                     {
                         DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_FrostNova] = 25;
                         DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_ExplosiveBlast] = 25;
@@ -81,7 +81,7 @@ namespace Trinity
                         DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Archon_SlowTime] = 1500;
                         DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Archon_Teleport] = 2700;
                     }
-                    if (PlayerStatus.ActorClass == ActorClass.WitchDoctor && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice))
+                    if (Player.ActorClass == ActorClass.WitchDoctor && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice))
                     {
                         DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_SoulHarvest] = 1000;
                         DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_SpiritWalk] = 1000;
@@ -97,14 +97,14 @@ namespace Trinity
                         DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_FetishArmy] = 20000;
                         DataDictionary.AbilityRepeatDelays[SNOPower.Witchdoctor_BigBadVoodoo] = 20000;
                     }
-                    if (PlayerStatus.ActorClass == ActorClass.Barbarian && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Barbarian_Passive_BoonOfBulKathos))
+                    if (Player.ActorClass == ActorClass.Barbarian && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Barbarian_Passive_BoonOfBulKathos))
                     {
                         DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_Earthquake] = 90500;
                         DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_CallOfTheAncients] = 90500;
                         DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_WrathOfTheBerserker] = 90500;
                     }
                     // Pick an appropriate health set etc. based on class
-                    switch (PlayerStatus.ActorClass)
+                    switch (Player.ActorClass)
                     {
                         case ActorClass.Barbarian:
                             // What health % should we use a potion, or look for a globe
@@ -171,9 +171,9 @@ namespace Trinity
 
 
                 // Pop a potion when necessary
-                if (PlayerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
+                if (Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
                 {
-                    if (!PlayerStatus.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
+                    if (!Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).ThenBy(p => p.ItemStackQuantity).FirstOrDefault();
                         if (thisBestPotion != null)
@@ -202,7 +202,7 @@ namespace Trinity
                     // Out of combat buffing etc. but only if we don't want to return to town etc.
                     ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
 
-                    if (!PlayerStatus.IsInTown && !IsReadyToTownRun && !ForceVendorRunASAP && myAnimationState != null
+                    if (!Player.IsInTown && !IsReadyToTownRun && !ForceVendorRunASAP && myAnimationState != null
                         && myAnimationState.State != AnimationState.Attacking
                         && myAnimationState.State != AnimationState.Casting
                         && myAnimationState.State != AnimationState.Channeling)

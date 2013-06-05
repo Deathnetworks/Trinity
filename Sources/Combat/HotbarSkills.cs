@@ -45,8 +45,8 @@ namespace Trinity
         /// </summary>
         public static void Update()
         {
-            if (Trinity.PlayerStatus.ActorClass != ActorClass.Wizard && !Trinity.GetHasBuff(SNOPower.Wizard_Archon) &&
-                Trinity.PlayerStatus.ActorClass != ActorClass.WitchDoctor && !Trinity.GetHasBuff(SNOPower.Witchdoctor_Hex))
+            if (Trinity.Player.ActorClass != ActorClass.Wizard && !Trinity.GetHasBuff(SNOPower.Wizard_Archon) &&
+                Trinity.Player.ActorClass != ActorClass.WitchDoctor && !Trinity.GetHasBuff(SNOPower.Witchdoctor_Hex))
             {
                 _assignedSkills.Clear();
                 foreach (SNOPower p in Trinity.Hotbar)

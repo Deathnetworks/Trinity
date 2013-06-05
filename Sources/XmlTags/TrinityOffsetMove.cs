@@ -13,7 +13,7 @@ namespace Trinity.XmlTags
 {
     /// <summary>
     /// This profile tag will move the player a a direction given by the offsets x, y. Examples:
-    ///       <TrinityOffsetMove questId="101758" stepId="1" offsetX="-1000" offsetY="1000" />
+    ///       <TrinityOffsetMove questId="101758" stepId="1" offsetX="-1000" offsetY="1000" /> 
     ///       <TrinityOffsetMove questId="101758" stepId="1" offsetX="1000" offsetY="-1000" />
     ///       <TrinityOffsetMove questId="101758" stepId="1" offsetX="-1000" offsetY="-1000" />
     ///       <TrinityOffsetMove questId="101758" stepId="1" offsetX="1000" offsetY="1000" />
@@ -82,11 +82,13 @@ namespace Trinity.XmlTags
             }
         }
 
-        public Vector3 MyPos { get { return Trinity.PlayerStatus.CurrentPosition; } }
+        public Vector3 MyPos { get { return Trinity.Player.CurrentPosition; } }
         private ISearchAreaProvider MainGridProvider { get { return Trinity.MainGridProvider; } }
 
         public override void OnStart()
         {
+            lastMoveResult = MoveResult.Moved;
+
             float x = MyPos.X + OffsetX;
             float y = MyPos.Y + OffsetY;
 

@@ -21,10 +21,6 @@ namespace Trinity
             // hax for Diablo_shadowClone
             c_unit_IsAttackable = c_InternalName.StartsWith("Diablo_shadowClone");
 
-            // Prepare the fake object for target handler
-            if (FakeObject == null)
-                FakeObject = c_diaUnit;
-
             if (c_CommonData.ACDGuid == -1)
             {
                 AddToCache = false;
@@ -72,18 +68,20 @@ namespace Trinity
                 }
 
                 // Make sure it's a valid monster type
-                switch (monsterType)
+                if (c_ObjectType != GObjectType.Player)
                 {
-                    case MonsterType.Ally:
-                    case MonsterType.Scenery:
-                    case MonsterType.Helper:
-                    case MonsterType.Team:
-                        {
-                            AddToCache = false;
-                            c_IgnoreSubStep = "AllySceneryHelperTeam";
-                            return AddToCache;
-                        }
-                    //break;
+                    switch (monsterType)
+                    {
+                        case MonsterType.Ally:
+                        case MonsterType.Scenery:
+                        case MonsterType.Helper:
+                        case MonsterType.Team:
+                            {
+                                AddToCache = false;
+                                c_IgnoreSubStep = "AllySceneryHelperTeam";
+                                return AddToCache;
+                            }
+                    }
                 }
             }
             // Force return here for un-attackable allies
@@ -271,7 +269,7 @@ namespace Trinity
             /*
              *  TeamID  - check once for all units except bosses (which can potentially change teams - Belial, Cydea)
              */
-            string teamIdHash = HashGenerator.GetGenericHash("teamId.RActorGuid=" + c_RActorGuid + ".ActorSNO=" + c_ActorSNO + ".WorldId=" + PlayerStatus.WorldID);
+            string teamIdHash = HashGenerator.GetGenericHash("teamId.RActorGuid=" + c_RActorGuid + ".ActorSNO=" + c_ActorSNO + ".WorldId=" + Player.WorldID);
 
             int teamId = 0;
             if (!c_unit_IsBoss && GenericCache.ContainsKey(teamIdHash))
@@ -336,9 +334,9 @@ namespace Trinity
             // All WD's
             // Monks with Way of the Hundred Fists + Fists of Fury
             if (AddToCache && 
-                ((PlayerStatus.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_Rend)) || 
-                PlayerStatus.ActorClass == ActorClass.WitchDoctor || 
-                (PlayerStatus.ActorClass == ActorClass.Monk && HotbarSkills.AssignedSkills.Any(s=> s.Power == SNOPower.Monk_WayOfTheHundredFists && s.RuneIndex == 0)))
+                ((Player.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_Rend)) || 
+                Player.ActorClass == ActorClass.WitchDoctor || 
+                (Player.ActorClass == ActorClass.Monk && HotbarSkills.AssignedSkills.Any(s=> s.Power == SNOPower.Monk_WayOfTheHundredFists && s.RuneIndex == 0)))
                 )
             {
                 ////bool hasdotDPS = c_CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;

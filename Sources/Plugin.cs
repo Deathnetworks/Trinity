@@ -20,7 +20,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(1, 7, 3, 30);
+                return new Version(1, 7, 3, 0);
             }
         }
 
@@ -54,7 +54,7 @@ namespace Trinity
                     return;
 
                 // hax for sending notifications after a town run
-                if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !PlayerStatus.IsInTown)
+                if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !Player.IsInTown)
                 {
                     TownRun.SendEmailNotification();
                     TownRun.SendMobileNotifications();
@@ -85,11 +85,6 @@ namespace Trinity
         {
             BotMain.OnStart += TrinityBotStart;
             BotMain.OnStop += TrinityBotStop;
-
-            // Set up the pause button
-
-            // rrrix: removing for next DB beta... 
-            //Application.Current.Dispatcher.Invoke(PaintMainWindowButtons());
 
             SetWindowTitle();
 
@@ -126,6 +121,8 @@ namespace Trinity
                 LootTargeting.Instance.Provider = new BlankLootProvider();
                 ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
 
+                //Navigator.SearchGridProvider = new SearchAreaProvider();
+
                 if (Settings.Loot.ItemFilterMode != global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
                 {
                     ItemManager.Current = new TrinityItemManager();
@@ -152,7 +149,7 @@ namespace Trinity
                 StashRule.reset();
             }
         }
-        
+
         /// <summary>
         /// Called when user disable the plugin.
         /// </summary>
@@ -164,12 +161,14 @@ namespace Trinity
             CombatTargeting.Instance.Provider = new DefaultCombatTargetingProvider();
             LootTargeting.Instance.Provider = new DefaultLootTargetingProvider();
             ObstacleTargeting.Instance.Provider = new DefaultObstacleTargetingProvider();
+            Navigator.SearchGridProvider = new Zeta.Navigation.MainGridProvider();
 
             GameEvents.OnPlayerDied -= TrinityOnDeath;
             BotMain.OnStop -= TrinityBotStop;
 
             GameEvents.OnGameJoined -= TrinityOnJoinGame;
             GameEvents.OnGameLeft -= TrinityOnLeaveGame;
+
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DISABLED: Trinity is now shut down...");
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
@@ -229,23 +228,23 @@ namespace Trinity
 
         internal static void SetWindowTitle(string profileName = "")
         {
+            string battleTagName = "";
+            try
+            {
+                battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
+            }
+            catch { }
+
+            string windowTitle = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
+
+            if (profileName.Trim() != String.Empty)
+            {
+                windowTitle += " - " + profileName;
+            }
+           
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                string battleTagName = "";
-                try
-                {
-                    battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
-                }
-                catch { }
                 Window mainWindow = Application.Current.MainWindow;
-
-                string windowTitle = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
-
-                if (profileName.Trim() != String.Empty)
-                {
-                    windowTitle += " - " + profileName;
-                }
-
                 mainWindow.Title = windowTitle;
             }));
         }

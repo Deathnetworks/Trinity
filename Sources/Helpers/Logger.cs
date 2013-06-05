@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text;
 using System.Windows.Media;
 using Zeta.Common;
@@ -9,6 +10,7 @@ namespace Trinity.Technicals
     /// <summary>
     /// Utilities help developer interact with DemonBuddy
     /// </summary>
+    [DebuggerStepThrough]
     internal static class Logger
     {
         private static string prefix = "[Trinity]";

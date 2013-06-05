@@ -179,12 +179,12 @@ namespace Trinity
                         return GetTreeSharpRunStatus(runStatus);
 
                     // See if we have been "newly rooted", to force target updates
-                    if (PlayerStatus.IsRooted && !wasRootedLastTick)
+                    if (Player.IsRooted && !wasRootedLastTick)
                     {
                         wasRootedLastTick = true;
                         ForceTargetUpdate = true;
                     }
-                    if (!PlayerStatus.IsRooted)
+                    if (!Player.IsRooted)
                         wasRootedLastTick = false;
                     if (CurrentTarget == null)
                     {
@@ -271,8 +271,8 @@ namespace Trinity
 
                     // Pop a potion when necessary
                     // Note that we force a single-loop pause first, to help potion popping "go off"
-                    if (PlayerStatus.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !IsWaitingForPower && !IsWaitingForPotion
-                        && !PlayerStatus.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
+                    if (Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !IsWaitingForPower && !IsWaitingForPotion
+                        && !Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         IsWaitingForPotion = true;
                         runStatus = HandlerRunStatus.TreeRunning;
@@ -316,10 +316,10 @@ namespace Trinity
                         if (DateTime.Now.Subtract(lastAddedLocationCache).TotalMilliseconds >= 100)
                         {
                             lastAddedLocationCache = DateTime.Now;
-                            if (Vector3.Distance(PlayerStatus.CurrentPosition, vLastRecordedLocationCache) >= 5f)
+                            if (Vector3.Distance(Player.CurrentPosition, vLastRecordedLocationCache) >= 5f)
                             {
-                                hashSkipAheadAreaCache.Add(new CacheObstacleObject(PlayerStatus.CurrentPosition, 20f, 0));
-                                vLastRecordedLocationCache = PlayerStatus.CurrentPosition;
+                                hashSkipAheadAreaCache.Add(new CacheObstacleObject(Player.CurrentPosition, 20f, 0));
+                                vLastRecordedLocationCache = Player.CurrentPosition;
 
                                 // Mark Dungeon Explorer nodes as Visited if combat pulls us into it
                                 if (ProfileManager.CurrentProfileBehavior != null)
@@ -335,19 +335,19 @@ namespace Trinity
                         }
                         // Maintain a backtrack list only while fighting monsters
                         if (CurrentTarget.Type == GObjectType.Unit && Settings.Combat.Misc.AllowBacktracking &&
-                            (iTotalBacktracks == 0 || Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks]) >= 10f))
+                            (iTotalBacktracks == 0 || Vector3.Distance(Player.CurrentPosition, vBacktrackList[iTotalBacktracks]) >= 10f))
                         {
                             bool bAddThisBacktrack = true;
                             // Check we aren't within 12 feet of 2 backtracks again (eg darting back & forth)
                             if (iTotalBacktracks >= 2)
                             {
-                                if (Vector3.Distance(PlayerStatus.CurrentPosition, vBacktrackList[iTotalBacktracks - 1]) < 12f)
+                                if (Vector3.Distance(Player.CurrentPosition, vBacktrackList[iTotalBacktracks - 1]) < 12f)
                                     bAddThisBacktrack = false;
                             }
                             if (bAddThisBacktrack)
                             {
                                 iTotalBacktracks++;
-                                vBacktrackList.Add(iTotalBacktracks, PlayerStatus.CurrentPosition);
+                                vBacktrackList.Add(iTotalBacktracks, Player.CurrentPosition);
                             }
                         }
                     }
@@ -355,7 +355,7 @@ namespace Trinity
 
                     using (new PerformanceLogger("HandleTarget.LoSCheck"))
                     {
-                        TargetCurrentDistance = PlayerStatus.CurrentPosition.Distance2D(vCurrentDestination) - TargetDistanceReduction;
+                        TargetCurrentDistance = Player.CurrentPosition.Distance2D(vCurrentDestination) - TargetDistanceReduction;
                         if (TargetCurrentDistance < 0f)
                             TargetCurrentDistance = 0f;
 
@@ -365,7 +365,7 @@ namespace Trinity
                         }
                         else if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade && CurrentTarget.Type != GObjectType.Destructible)
                         {
-                            CurrentTargetIsInLoS = (NavHelper.CanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination) || DataDictionary.LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
+                            CurrentTargetIsInLoS = (NavHelper.CanRayCast(Player.CurrentPosition, vCurrentDestination) || DataDictionary.LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
                         }
                         else
                         {
@@ -564,7 +564,7 @@ namespace Trinity
                                                 // Location attack - attack the Vector3/map-area (equivalent of holding shift and left-clicking the object in-game to "force-attack")
                                                 Vector3 vAttackPoint;
                                                 if (CurrentTarget.CentreDistance >= 6f)
-                                                    vAttackPoint = MathEx.CalculatePointFrom(CurrentTarget.Position, PlayerStatus.CurrentPosition, 6f);
+                                                    vAttackPoint = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, 6f);
                                                 else
                                                     vAttackPoint = CurrentTarget.Position;
 
@@ -642,7 +642,7 @@ namespace Trinity
                     }
 
                     // Are we currently incapacitated? If so then wait...
-                    if (PlayerStatus.IsIncapacitated || PlayerStatus.IsRooted)
+                    if (Player.IsIncapacitated || Player.IsRooted)
                     {
                         runStatus = HandlerRunStatus.TreeFailure;
                         Logger.Log(LogCategory.Behavior, "Player is rooted or incapacitated!");
@@ -667,19 +667,19 @@ namespace Trinity
                         {
                             Vector3 point = vCurrentDestination;
                             foreach (CacheObstacleObject tempobstacle in Trinity.hashNavigationObstacleCache.Where(cp =>
-                                            MathUtil.IntersectsPath(cp.Location, cp.Radius, PlayerStatus.CurrentPosition, point) &&
-                                            cp.Location.Distance2D(PlayerStatus.CurrentPosition) > PlayerMover.GetObstacleNavigationSize(cp)))
+                                            MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.CurrentPosition, point) &&
+                                            cp.Location.Distance2D(Player.CurrentPosition) > PlayerMover.GetObstacleNavigationSize(cp)))
                             {
                                 if (vShiftedPosition == Vector3.Zero)
                                 {
                                     if (DateTime.Now.Subtract(lastShiftedPosition).TotalSeconds >= 10)
                                     {
-                                        float fDirectionToTarget = MathUtil.FindDirectionDegree(PlayerStatus.CurrentPosition, vCurrentDestination);
-                                        vCurrentDestination = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget - 50));
-                                        if (!NavHelper.CanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination))
+                                        float fDirectionToTarget = MathUtil.FindDirectionDegree(Player.CurrentPosition, vCurrentDestination);
+                                        vCurrentDestination = MathEx.GetPointAt(Player.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget - 50));
+                                        if (!NavHelper.CanRayCast(Player.CurrentPosition, vCurrentDestination))
                                         {
-                                            vCurrentDestination = MathEx.GetPointAt(PlayerStatus.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget + 50));
-                                            if (!NavHelper.CanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination))
+                                            vCurrentDestination = MathEx.GetPointAt(Player.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget + 50));
+                                            if (!NavHelper.CanRayCast(Player.CurrentPosition, vCurrentDestination))
                                             {
                                                 vCurrentDestination = point;
                                             }
@@ -734,15 +734,14 @@ namespace Trinity
 
                         bool Barbarian_SpecialMovement = ((CurrentTarget.Type == GObjectType.Avoidance &&
                             ObjectCache.Any(u => (u.Type == GObjectType.Unit || u.Type == GObjectType.Destructible || u.Type == GObjectType.Barricade) &&
-                                MathUtil.IntersectsPath(u.Position, u.Radius, PlayerStatus.CurrentPosition, CurrentTarget.Position))) ||
-                                CurrentTarget.Type == GObjectType.Globe);
+                                MathUtil.IntersectsPath(u.Position, u.Radius, Player.CurrentPosition, CurrentTarget.Position))));
 
                         // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||
                             CurrentTarget.Type == GObjectType.Globe ||
                             Monk_SpecialMovement ||
                             (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
-                            && NavHelper.CanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination)
+                            && NavHelper.CanRayCast(Player.CurrentPosition, vCurrentDestination)
                             )
                         {
                             bool bFoundSpecialMovement = UsedSpecialMovement();
@@ -751,7 +750,7 @@ namespace Trinity
                             {
                                 // Whirlwind for a barb
 
-                                if (Barbarian_SpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource >= 10)
+                                if (Barbarian_SpecialMovement && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && !bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10)
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, CurrentWorldDynamicId, -1);
                                     // Store the current destination for comparison incase of changes next loop
@@ -765,7 +764,7 @@ namespace Trinity
                                         return GetTreeSharpRunStatus(runStatus);
                                 }
                                 // Tempest rush for a monk
-                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && PlayerStatus.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
+                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Monk_TempestRush) && Player.PrimaryResource >= Settings.Combat.Monk.TR_MinSpirit &&
                                     ((CurrentTarget.Type == GObjectType.Item && CurrentTarget.CentreDistance > 20f) || CurrentTarget.Type != GObjectType.Item) &&
                                     Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly &&
                                     Monk_TempestRushReady())
@@ -785,7 +784,7 @@ namespace Trinity
                                         return GetTreeSharpRunStatus(runStatus);
                                 }
                                 // Strafe for a Demon Hunter
-                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && PlayerStatus.PrimaryResource >= 15)
+                                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && Player.PrimaryResource >= 15)
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Strafe, vCurrentDestination, CurrentWorldDynamicId, -1);
                                     // Store the current destination for comparison incase of changes next loop
@@ -817,7 +816,7 @@ namespace Trinity
 
                     // Whirlwind against everything within range (except backtrack points)
 
-                    if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && PlayerStatus.PrimaryResource >= 10 && AnythingWithinRange[RANGE_20] >= 1 && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
+                    if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource >= 10 && AnythingWithinRange[RANGE_20] >= 1 && !IsWaitingForSpecial && CombatBase.CurrentPower.SNOPower != SNOPower.Barbarian_WrathOfTheBerserker && TargetCurrentDistance <= 12f && CurrentTarget.Type != GObjectType.Container && CurrentTarget.Type != GObjectType.Backtrack &&
                         (!Hotbar.Contains(SNOPower.Barbarian_Sprint) || GetHasBuff(SNOPower.Barbarian_Sprint)) &&
                         CurrentTarget.Type != GObjectType.Backtrack &&
                         (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && TargetCurrentDistance >= 6f) &&
@@ -954,7 +953,7 @@ namespace Trinity
                     // So it won't blacklist a monster "on the edge of the screen" who isn't even being targetted
                     // Don't blacklist monsters on <= 50% health though, as they can't be in a stuck location... can they!? Maybe give them some extra time!
 
-                    bool isNavigable = NavHelper.CanRayCast(PlayerStatus.CurrentPosition, vCurrentDestination);
+                    bool isNavigable = NavHelper.CanRayCast(Player.CurrentPosition, vCurrentDestination);
 
                     bool addTargetToBlacklist = true;
 
@@ -1028,7 +1027,7 @@ namespace Trinity
                     {
                         // Pick a suitable ability
                         CombatBase.CurrentPower = AbilitySelector(false, false, false);
-                        if (CombatBase.CurrentPower.SNOPower == SNOPower.None && !PlayerStatus.IsIncapacitated)
+                        if (CombatBase.CurrentPower.SNOPower == SNOPower.None && !Player.IsIncapacitated)
                         {
                             iNoAbilitiesAvailableInARow++;
                             if (DateTime.Now.Subtract(lastRemindedAboutAbilities).TotalSeconds > 60 && iNoAbilitiesAvailableInARow >= 4)
@@ -1061,7 +1060,7 @@ namespace Trinity
                 if (IsWaitingForPotion)
                 {
                     IsWaitingForPotion = false;
-                    if (!PlayerStatus.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
+                    if (!Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).ThenBy(p => p.ItemStackQuantity).FirstOrDefault();
                         if (thisBestPotion != null)
@@ -1184,7 +1183,7 @@ namespace Trinity
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
                     (PlayerKiteDistance <= 0 || (!hashMonsterObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
                     !hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance))) &&
-                    (!Trinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, Trinity.PlayerStatus.CurrentPosition, vCurrentDestination)))
+                    (!Trinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, Trinity.Player.CurrentPosition, vCurrentDestination)))
                     )
                 {
                     WaitWhileAnimating(3, true);
@@ -1195,7 +1194,7 @@ namespace Trinity
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Wizard_Teleport) &&
                     DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Wizard_Teleport]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Teleport] &&
-                    PlayerStatus.PrimaryResource >= 15 &&
+                    Player.PrimaryResource >= 15 &&
                     PowerManager.CanCast(SNOPower.Wizard_Teleport))
                 {
                     WaitWhileAnimating(3, true);
@@ -1239,7 +1238,9 @@ namespace Trinity
         private static double GetSecondsSinceTargetUpdate()
         {
             return DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds;
-        }               
+        }
+
+        private static string lastStatusText = "";
 
         /// <summary>
         /// Updates bot status text with appropriate information if we are moving into range of our <see cref="CurrentTarget"/>
@@ -1292,13 +1293,13 @@ namespace Trinity
             statusText.Append(" RangeReq'd=");
             statusText.Append(TargetRangeRequired.ToString("0.0"));
             statusText.Append(" DistfromTrgt=");
+            statusText.Append(TargetCurrentDistance.ToString("0"));
             statusText.Append(" tHP=");
-            statusText.Append(CurrentTarget.HitPointsPct.ToString("0.00"));
-            statusText.Append(TargetCurrentDistance.ToString("0.0"));
+            statusText.Append((CurrentTarget.HitPointsPct*100).ToString("0"));
             statusText.Append(" MyHP=");
-            statusText.Append((PlayerStatus.CurrentHealthPct * 100).ToString("0"));
+            statusText.Append((Player.CurrentHealthPct * 100).ToString("0"));
             statusText.Append(" MyMana=");
-            statusText.Append((PlayerStatus.PrimaryResource).ToString("0"));
+            statusText.Append((Player.PrimaryResource).ToString("0"));
             statusText.Append(" InLoS=");
             statusText.Append(CurrentTargetIsInLoS);
             statusText.Append(" ");
@@ -1315,7 +1316,7 @@ namespace Trinity
             statusText.Append(" RAGuid=");
             statusText.Append(CurrentTarget.RActorGuid);
 
-            statusText.Append(String.Format(" Duration={0:0.0}", DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds));
+            statusText.Append(String.Format(" Duration={0:0}", DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds));
 
             if (!targetIsInRange)
                 statusText.Append(" MOVING INTO RANGE");
@@ -1324,8 +1325,13 @@ namespace Trinity
                 sStatusText = "[Trinity] " + statusText.ToString();
                 BotMain.StatusText = sStatusText;
             }
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "{0}", statusText.ToString());
-            bResetStatusText = true;
+            if (lastStatusText != statusText.ToString())
+            {
+                // prevent spam
+                lastStatusText = statusText.ToString();
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "{0}", statusText.ToString());
+                bResetStatusText = true;
+            }
         }
 
         /// <summary>
@@ -1378,7 +1384,7 @@ namespace Trinity
                 TargetDistanceReduction = 0f;
                 // Set current destination to our current target's destination
                 vCurrentDestination = CurrentTarget.Position;
-                float fDistanceToDestination = PlayerStatus.CurrentPosition.Distance(vCurrentDestination);
+                float fDistanceToDestination = Player.CurrentPosition.Distance(vCurrentDestination);
                 switch (CurrentTarget.Type)
                 {
                     // * Unit, we need to pick an ability to use and get within range
@@ -1404,7 +1410,7 @@ namespace Trinity
                     // * Gold - need to get within pickup radius only
                     case GObjectType.Gold:
                         {
-                            TargetRangeRequired = PlayerStatus.GoldPickupRadius - 2f;
+                            TargetRangeRequired = Player.GoldPickupRadius - 2f;
                             if (TargetRangeRequired < 2f)
                                 TargetRangeRequired = 2f;
                             break;
@@ -1412,7 +1418,7 @@ namespace Trinity
                     // * Globes - need to get within pickup radius only
                     case GObjectType.Globe:
                         {
-                            TargetRangeRequired = PlayerStatus.GoldPickupRadius;
+                            TargetRangeRequired = Player.GoldPickupRadius;
                             if (TargetRangeRequired < 2f)
                                 TargetRangeRequired = 2f;
                             if (TargetRangeRequired > 5f)
@@ -1536,9 +1542,9 @@ namespace Trinity
                 // try WW every tick if we want - we should use other methods to avoid this garbage code... 
                 float dist = 0;
                 if (CombatBase.CurrentPower.TargetPosition != Vector3.Zero)
-                    dist = CombatBase.CurrentPower.TargetPosition.Distance2D(PlayerStatus.CurrentPosition);
+                    dist = CombatBase.CurrentPower.TargetPosition.Distance2D(Player.CurrentPosition);
                 else if (CurrentTarget != null)
-                    dist = CurrentTarget.Position.Distance2D(PlayerStatus.CurrentPosition);
+                    dist = CurrentTarget.Position.Distance2D(Player.CurrentPosition);
 
                 var usePowerResult = ZetaDia.Me.UsePower(CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetDynamicWorldId, CombatBase.CurrentPower.TargetRActorGUID);
 
@@ -1579,7 +1585,7 @@ namespace Trinity
                 // if at full or nearly full health, see if we can raycast to it, if not, ignore it for 2000 ms
                 if (CurrentTarget.HitPointsPct >= 0.9d)
                 {
-                    if (!NavHelper.CanRayCast(PlayerStatus.CurrentPosition, CurrentTarget.Position))
+                    if (!NavHelper.CanRayCast(Player.CurrentPosition, CurrentTarget.Position))
                     {
                         IgnoreRactorGUID = CurrentTarget.RActorGuid;
                         IgnoreTargetForLoops = 6;

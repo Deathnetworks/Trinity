@@ -10,6 +10,7 @@ using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
+using Zeta.Navigation;
 
 
 namespace Trinity
@@ -79,6 +80,8 @@ namespace Trinity
 
             StashRule.readConfiguration();
 
+            Navigator.SearchGridProvider.Update();
+
         }
 
         void GameEvents_OnGameChanged(object sender, EventArgs e)
@@ -88,6 +91,7 @@ namespace Trinity
             // reload the profile juuuuuuuuuuuust in case Demonbuddy missed it... which it is known to do on disconnects
             string currentProfilePath = ProfileManager.CurrentProfile.Path;
             ProfileManager.Load(currentProfilePath);
+            Navigator.SearchGridProvider.Update();
             ResetEverythingNewGame();
         }
         // When the bot stops, output a final item-stats report so it is as up-to-date as can be
@@ -149,7 +153,7 @@ namespace Trinity
                     else
                     {
                         Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "I'm sorry, but I seem to have let you die :( Now restarting the current profile.");
-                        ProfileManager.Load(Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
+                        ProfileManager.Load(ProfileManager.CurrentProfile.Path);
                         Thread.Sleep(2000);
                     }
                 }
@@ -171,6 +175,7 @@ namespace Trinity
         }
         public static void ResetEverythingNewGame()
         {
+            Logger.Log("New Game - resetting everything");
             hashUseOnceID = new HashSet<int>();
             dictUseOnceID = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;

@@ -17,6 +17,28 @@ namespace Trinity.Combat.Abilities
         private static bool isWaitingForSpecial = false;
         private static TrinityPower currentPower = new TrinityPower();
         private static Vector3 lastZigZagLocation = Vector3.Zero;
+        private static Vector3 zigZagPosition = Vector3.Zero;
+        private static bool isCombatAllowed = true;
+
+        /// <summary>
+        /// Allows for completely disabling combat. Settable through API only. 
+        /// </summary>
+        public static bool IsCombatAllowed
+        {
+            get
+            {
+                if (!CombatTargeting.Instance.AllowedToKillMonsters || !isCombatAllowed)
+                    return false;
+                return true;
+            }
+            set { CombatBase.isCombatAllowed = value; }
+        }
+
+        public static Vector3 ZigZagPosition
+        {
+            get { return CombatBase.zigZagPosition; }
+            internal set { CombatBase.zigZagPosition = value; }
+        }
 
         public enum AnimWait
         {
@@ -116,15 +138,15 @@ namespace Trinity.Combat.Abilities
                 switch (Player.ActorClass)
                 {
                     case ActorClass.Barbarian:
-                        return 56;
+                        return V.I("Barbarian.MinEnergyReserve");
                     case ActorClass.DemonHunter:
-                        return 0;
+                        return V.I("DemonHunter.MinEnergyReserve");
                     case ActorClass.Monk:
-                        return 0;
+                        return V.I("Monk.MinEnergyReserve");
                     case ActorClass.WitchDoctor:
-                        return 0;
+                        return V.I("WitchDoctor.MinEnergyReserve");
                     case ActorClass.Wizard:
-                        return 0;
+                        return V.I("Wizard.MinEnergyReserve");
                     default:
                         return 0;
                 }
@@ -211,7 +233,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return Trinity.PlayerStatus;
+                return Trinity.Player;
             }
         }
 
@@ -229,7 +251,7 @@ namespace Trinity.Combat.Abilities
                 // Default attacks
                 if (!UseOOCBuff && !IsCurrentlyAvoiding)
                 {
-                    if (Trinity.PlayerStatus.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_SweepingWind))
+                    if (Trinity.Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_SweepingWind))
                     {
                         Trinity.Monk_TickSweepingWindSpam();
                     }
@@ -312,7 +334,7 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         public static bool CanCast(SNOPower power, CanCastFlags flags = CanCastFlags.All)
         {
-            return Hotbar.Contains(power) && 
+            return Hotbar.Contains(power) &&
                 flags.HasFlag(CanCastFlags.NoTimer) ? SNOPowerUseTimer(power) : true &&
                 flags.HasFlag(CanCastFlags.NoPowerManager) ? PowerManager.CanCast(power) : true;
         }

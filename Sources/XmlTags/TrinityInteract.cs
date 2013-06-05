@@ -41,7 +41,7 @@ namespace Trinity.XmlTags
                 return RunStatus.Success;
             }
 
-            Vector3 myPos = Trinity.PlayerStatus.CurrentPosition;
+            Vector3 myPos = Trinity.Player.CurrentPosition;
 
             var interactTarget = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
                 .Where(a => a.ActorSNO == ActorId)

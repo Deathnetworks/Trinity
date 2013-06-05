@@ -23,13 +23,13 @@ namespace Trinity.XmlTags
             return new Zeta.TreeSharp.Action(ret =>
             {
                 if (ZetaDia.Me.ActorClass == Zeta.Internals.Actors.ActorClass.Monk && Trinity.Hotbar.Contains(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind)
-                    && Trinity.Settings.Combat.Monk.HasInnaSet && Trinity.PlayerStatus.PrimaryResource > 10)
+                    && Trinity.Settings.Combat.Monk.HasInnaSet && Trinity.Player.PrimaryResource > 10)
                 {
                     if (DateTime.Now.Subtract(Trinity.SweepWindSpam).TotalMilliseconds >= 1500)
                     {
                         if (Trinity.GetHasBuff(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind))
                         {
-                            ZetaDia.Me.UsePower(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind, Trinity.PlayerStatus.CurrentPosition, Trinity.CurrentWorldDynamicId, -1);
+                            ZetaDia.Me.UsePower(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind, Trinity.Player.CurrentPosition, Trinity.CurrentWorldDynamicId, -1);
                             Trinity.SweepWindSpam = DateTime.Now;
                             Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Cast Sweeping Winds.");
                         }

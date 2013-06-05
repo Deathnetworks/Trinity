@@ -216,7 +216,7 @@ namespace Trinity
         private static HashSet<int> gargantuanIds = new HashSet<int> { 
             179780, 179778, 179772, 179779, 179776, 122305 };
 
-        public static HashSet<int> ZombieDogIds { get { return zombieDogIds; } } 
+        public static HashSet<int> ZombieDogIds { get { return zombieDogIds; } }
         private static HashSet<int> zombieDogIds = new HashSet<int> { 
             110959, 103235, 103215, 105763, 103217, 51353 
         };
@@ -293,7 +293,7 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> ResplendentChestIds { get { return resplendentChestIds; } }
         private static HashSet<int> resplendentChestIds = new HashSet<int> {
-            62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866, 109264,
+            62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866, 109264, 62866, 62860, 96993,
             // Magi
 			112182,
          };
@@ -355,13 +355,13 @@ namespace Trinity
             //bone pile
             218951,245838,
             // rrrix act 1
-            108882, 245919, 5944, 165475, 199998, 168875, 105323, 
+            108882, 245919, 5944, 165475, 199998, 168875, 105323, 85690, 105321,
             // rrrix act 2
             213907, 92519, 61544, 105681, 113983, 114527, 114642, 139933, 144405, 156890, 164057, 164195, 180254, 180802, 180809, 181173, 181174, 181177, 181181,
             181182, 181185, 181290, 181292, 181306, 181309, 181313, 181326, 181563, 181857, 181858, 187265, 191433, 191462, 191641, 192880, 192881, 196413, 196435,
             197280, 199191, 199264, 199274, 199597, 199664, 200979, 200982, 201236, 201580, 201581, 201583, 204183, 205746, 205756, 210087, 213907, 218228, 219223,
             220114, 3011, 3205, 3539, 3582, 3584, 3595, 3600, 4580, 52693, 5466, 55005, 5509, 62522, 
-            205756, 5509, 200371, 167185, 181195, 217346,
+            205756, 5509, 200371, 167185, 181195, 217346, 178161,
             // rrrix act 3
             60108, 182443,
             // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
@@ -387,8 +387,9 @@ namespace Trinity
         /// <summary>
         /// Timers for abilities and selection of best ability etc.
         /// </summary>
-        public static Dictionary<SNOPower, int> AbilityRepeatDelays { 
-            get { return abilityRepeatDelays; } 
+        public static Dictionary<SNOPower, int> AbilityRepeatDelays
+        {
+            get { return abilityRepeatDelays; }
             internal set { abilityRepeatDelays = value; }
         }
         private static Dictionary<SNOPower, int> abilityRepeatDelays = new Dictionary<SNOPower, int>();
@@ -601,6 +602,5 @@ namespace Trinity
         {
             256015, 256000, 255996
         };
-
     }
 }

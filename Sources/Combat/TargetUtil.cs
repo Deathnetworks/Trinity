@@ -22,11 +22,11 @@ namespace Trinity
                 return Trinity.ObjectCache;
             }
         }
-        private static PlayerInfoCache PlayerStatus
+        private static PlayerInfoCache Player
         {
             get
             {
-                return Trinity.PlayerStatus;
+                return Trinity.Player;
             }
         }
         private static bool AnyTreasureGoblinsPresent
@@ -66,7 +66,7 @@ namespace Trinity
         /// <returns></returns>
         internal static bool ClusterExists(float radius = 15f, int minCount = 2)
         {
-            return ClusterExists(radius, 300f, minCount);
+            return ClusterExists(radius, 300f, minCount, false);
         }
         /// <summary>
         /// Checks to make sure there's at least one valid cluster with the minimum monster count
@@ -92,7 +92,7 @@ namespace Trinity
                 (from u in ObjectCache
                  where u.Type == GObjectType.Unit &&
                  u.RadiusDistance <= maxRange &&
-                 u.NearbyUnitsWithinDistance(radius) >= minCount
+                 u.NearbyUnitsWithinDistance(radius) >= minCount 
                  select u).Any();
 
             return clusterCheck;
@@ -131,7 +131,7 @@ namespace Trinity
                 else if (Trinity.CurrentTarget != null)
                     bestClusterPoint = Trinity.CurrentTarget.Position;
                 else
-                    bestClusterPoint = Trinity.PlayerStatus.CurrentPosition;
+                    bestClusterPoint = Trinity.Player.CurrentPosition;
 
                 return bestClusterPoint;
             }
@@ -257,7 +257,7 @@ namespace Trinity
         internal static Vector3 GetZigZagTarget(Vector3 origin, float ringDistance, bool randomizeDistance = false)
         {
             var minDistance = 9f;
-            Vector3 myPos = PlayerStatus.CurrentPosition;
+            Vector3 myPos = Player.CurrentPosition;
             float distanceToTarget = origin.Distance2D(myPos);
 
             Vector3 zigZagPoint = origin;
@@ -270,13 +270,13 @@ namespace Trinity
                     float maxDistance = 25f;
                     int minTargets = 2;
 
-                    if (Trinity.PlayerStatus.ActorClass == ActorClass.Monk)
+                    if (Trinity.Player.ActorClass == ActorClass.Monk)
                     {
                         maxDistance = 20f;
                         minTargets = 3;
                         useTargetBasedZigZag = (Trinity.Settings.Combat.Monk.TargetBasedZigZag);
                     }
-                    if (Trinity.PlayerStatus.ActorClass == ActorClass.Barbarian)
+                    if (Trinity.Player.ActorClass == ActorClass.Barbarian)
                     {
                         useTargetBasedZigZag = (Trinity.Settings.Combat.Barbarian.TargetBasedZigZag);
                     }
@@ -287,22 +287,26 @@ namespace Trinity
                     if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
                     {
                         var clusterPoint = TargetUtil.GetBestClusterPoint(ringDistance, ringDistance, false);
-                        if (clusterPoint.Distance2D(PlayerStatus.CurrentPosition) >= minDistance)
+                        if (clusterPoint.Distance2D(Player.CurrentPosition) >= minDistance)
                         {
-                            Logger.Log(LogCategory.Movement, "Returning ZigZag: BestClusterPoint {0} r-dist={1} t-dist={2}", clusterPoint, ringDistance, clusterPoint.Distance2D(PlayerStatus.CurrentPosition));
+                            Logger.Log(LogCategory.Movement, "Returning ZigZag: BestClusterPoint {0} r-dist={1} t-dist={2}", clusterPoint, ringDistance, clusterPoint.Distance2D(Player.CurrentPosition));
                             return clusterPoint;
                         }
+
+                        bool attackInAoe = Trinity.Settings.Combat.Misc.KillMonstersInAoE;                        
+
                         IEnumerable<TrinityCacheObject> zigZagTargets =
                             from u in ObjectCache
                             where u.Type == GObjectType.Unit && u.CentreDistance < maxDistance &&
-                            !Trinity.hashAvoidanceObstacleCache.Any(a => Vector3.Distance(u.Position, a.Location) < AvoidanceManager.GetAvoidanceRadiusBySNO(a.ActorSNO, a.Radius) && PlayerStatus.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(a.ActorSNO, 1))
+                            ((attackInAoe && ShouldZigZagUnitInAoe(u)) || !attackInAoe)
                             select u;
+
                         if (zigZagTargets.Count() >= minTargets)
                         {
                             zigZagPoint = zigZagTargets.OrderByDescending(u => u.CentreDistance).FirstOrDefault().Position;
-                            if (NavHelper.CanRayCast(zigZagPoint) && zigZagPoint.Distance2D(PlayerStatus.CurrentPosition) >= minDistance)
+                            if (NavHelper.CanRayCast(zigZagPoint) && zigZagPoint.Distance2D(Player.CurrentPosition) >= minDistance)
                             {
-                                Logger.Log(LogCategory.Movement, "Returning ZigZag: TargetBased {0} r-dist={1} t-dist={2}", zigZagPoint, ringDistance, zigZagPoint.Distance2D(PlayerStatus.CurrentPosition));
+                                Logger.Log(LogCategory.Movement, "Returning ZigZag: TargetBased {0} r-dist={1} t-dist={2}", zigZagPoint, ringDistance, zigZagPoint.Distance2D(Player.CurrentPosition));
                                 return zigZagPoint;
                             }
                         }
@@ -359,11 +363,11 @@ namespace Trinity
                                 continue;
 
                             // Ignore point if any AoE in this point position
-                            if (Trinity.hashAvoidanceObstacleCache.Any(m => m.Location.Distance(zigZagPoint) <= m.Radius && PlayerStatus.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(m.ActorSNO, 1)))
+                            if (Trinity.hashAvoidanceObstacleCache.Any(m => m.Location.Distance(zigZagPoint) <= m.Radius && Player.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(m.ActorSNO, 1)))
                                 continue;
 
                             // Make sure this point is in LoS/walkable (not around corners or into a wall)
-                            bool canRayCast = !Navigator.Raycast(PlayerStatus.CurrentPosition, zigZagPoint);
+                            bool canRayCast = !Navigator.Raycast(Player.CurrentPosition, zigZagPoint);
                             if (!canRayCast)
                                 continue;
 
@@ -397,10 +401,32 @@ namespace Trinity
                             }
                         }
                     }
-                    Logger.Log(LogCategory.Movement, "Returning ZigZag: RandomXY {0} r-dist={1} t-dist={2}", bestLocation, ringDistance, bestLocation.Distance2D(PlayerStatus.CurrentPosition));
+                    Logger.Log(LogCategory.Movement, "Returning ZigZag: RandomXY {0} r-dist={1} t-dist={2}", bestLocation, ringDistance, bestLocation.Distance2D(Player.CurrentPosition));
                     return bestLocation;
                 }
             }
         }
+
+        //!Trinity.hashAvoidanceObstacleCache.Any(a => Vector3.Distance(u.Position, a.Location) < AvoidanceManager.GetAvoidanceRadiusBySNO(a.ActorSNO, a.Radius) && PlayerStatus.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(a.ActorSNO, 1)) &&
+        //!Trinity.hashAvoidanceObstacleCache.Any(a => MathUtil.IntersectsPath(a.Location, a.Radius, PlayerStatus.CurrentPosition, u.Position))
+
+        internal static bool ShouldZigZagUnitInAoe(TrinityCacheObject u)
+        {
+            return UnitInAoe(u) && PathToUnitIntersectsAoe(u);
+        }
+
+        internal static bool UnitInAoe(TrinityCacheObject u)
+        {
+            return Trinity.hashAvoidanceObstacleCache.Any(a => 
+                MathUtil.IntersectsPath(a.Location, a.Radius, Player.CurrentPosition, u.Position));
+        }
+
+        internal static bool PathToUnitIntersectsAoe(TrinityCacheObject u)
+        {
+            return Trinity.hashAvoidanceObstacleCache.Any(a => 
+                Vector3.Distance(u.Position, a.Location) < AvoidanceManager.GetAvoidanceRadiusBySNO(a.ActorSNO, a.Radius) && 
+                Player.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(a.ActorSNO, 1));
+        }
+
     }
 }

@@ -140,7 +140,19 @@ namespace Trinity
                 Radius = Radius,
                 MonsterStyle = MonsterStyle,
                 ForceLeapAgainst = ForceLeapAgainst,
-                ObjectHash = ObjectHash
+                ObjectHash = ObjectHash,
+                HasBeenInLoS = HasBeenInLoS,
+                HasBeenNavigable = HasBeenNavigable,
+                HasBeenPrimaryTarget = HasBeenPrimaryTarget,
+                HasBeenRaycastable = HasBeenRaycastable,
+                HasDotDPS = HasDotDPS,
+                DiaObject = DiaObject,
+                FirstTargetAssignmentTime = FirstTargetAssignmentTime,
+                IsShielded = IsShielded,
+                ItemLink = ItemLink,
+                KillRange = KillRange,
+                MonsterAffixes = MonsterAffixes,
+                TimesBeenPrimaryTarget = TimesBeenPrimaryTarget
             };
             return clone;
         }
@@ -153,7 +165,7 @@ namespace Trinity
                     return 0;
 
                 return Trinity.ObjectCache
-                    .Count(u => u.Type == GObjectType.Unit && u.Position.Distance2D(this.Position) <= range && u.HasBeenInLoS && u.RActorGuid != Trinity.CurrentTarget.RActorGuid);
+                    .Count(u => u.Type == GObjectType.Unit && u.Position.Distance2D(this.Position) <= range && u.HasBeenInLoS);
             }
         }
     }

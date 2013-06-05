@@ -44,7 +44,7 @@ namespace Trinity.XmlTags
         /// <summary>
         /// The current player position
         /// </summary>
-        private Vector3 myPos { get { return Trinity.PlayerStatus.CurrentPosition; } }
+        private Vector3 myPos { get { return Trinity.Player.CurrentPosition; } }
 
         /// <summary>
         /// The last scene SNOId we entered
@@ -150,9 +150,9 @@ namespace Trinity.XmlTags
         private Composite UpdateSearchGridProvider()
         {
             return
-            new DecoratorContinue(ret => mySceneId != Trinity.PlayerStatus.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
+            new DecoratorContinue(ret => mySceneId != Trinity.Player.SceneId || Vector3.Distance(myPos, GPUpdatePosition) > 150,
                 new Sequence(
-                    new Action(ret => mySceneId = Trinity.PlayerStatus.SceneId),
+                    new Action(ret => mySceneId = Trinity.Player.SceneId),
                     new Action(ret => GPUpdatePosition = myPos),
                     new Action(ret => MiniMapMarker.UpdateFailedMarkers())
                 )

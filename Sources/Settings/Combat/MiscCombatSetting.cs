@@ -21,6 +21,7 @@ namespace Trinity.Config.Combat
         private int _TrashPackSize;
         private float _TrashPackClusterRadius;
         private bool _IgnoreElites;
+        private bool _AvoidDeath;
         #endregion Fields
 
         #region Events
@@ -272,7 +273,7 @@ namespace Trinity.Config.Combat
                 }
             }
         }
- 
+
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool IgnoreElites
@@ -287,6 +288,23 @@ namespace Trinity.Config.Combat
                 {
                     _IgnoreElites = value;
                     OnPropertyChanged("IgnoreElites");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool AvoidDeath
+        {
+            get
+            {
+                return _AvoidDeath;
+            }
+            set
+            {
+                if (_AvoidDeath != value)
+                {
+                    _AvoidDeath = value;
+                    OnPropertyChanged("AvoidDeath");
                 }
             }
         }

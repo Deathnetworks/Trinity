@@ -205,7 +205,7 @@ namespace Trinity
                 return AddToCache;
             }
 
-            if (c_CentreDistance <= PlayerStatus.GoldPickupRadius)
+            if (c_CentreDistance <= Player.GoldPickupRadius)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "WithinPickupRadius";
@@ -223,7 +223,7 @@ namespace Trinity
 
         private static void LogSkippedGold()
         {
-            string skippedItemsPath = Path.Combine(FileManager.LoggingPath, String.Format("SkippedGoldStacks_{0}_{1}.csv", PlayerStatus.ActorClass, DateTime.Now.ToString("yyyy-MM-dd")));
+            string skippedItemsPath = Path.Combine(FileManager.LoggingPath, String.Format("SkippedGoldStacks_{0}_{1}.csv", Player.ActorClass, DateTime.Now.ToString("yyyy-MM-dd")));
 
             bool writeHeader = !File.Exists(skippedItemsPath);
             using (StreamWriter LogWriter = new StreamWriter(skippedItemsPath, true))

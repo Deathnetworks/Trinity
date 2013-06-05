@@ -70,7 +70,7 @@ namespace Trinity.XmlTags
                     {
                         iSafetyLoops++;
                         Trinity.WaitWhileAnimating(5, true);
-                        ZetaDia.Me.UsePower(SNOPower.UseStoneOfRecall, Trinity.PlayerStatus.CurrentPosition, ZetaDia.Me.WorldDynamicId, -1);
+                        ZetaDia.Me.UsePower(SNOPower.UseStoneOfRecall, Trinity.Player.CurrentPosition, ZetaDia.Me.WorldDynamicId, -1);
                         Thread.Sleep(1000);
                         Trinity.WaitWhileAnimating(1000, true);
                         if (iSafetyLoops > 5)
@@ -81,7 +81,7 @@ namespace Trinity.XmlTags
                     Trinity.ResetEverythingNewGame();
 
                     // Wait for 10 second log out timer if not in town, else wait for 3 seconds instead
-                    Thread.Sleep(!Trinity.PlayerStatus.IsInTown ? 10000 : 3000);
+                    Thread.Sleep(!Trinity.Player.IsInTown ? 10000 : 3000);
                 }
 
                 // Check if we want to restart the game
