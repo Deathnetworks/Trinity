@@ -5,6 +5,7 @@ using Trinity.Technicals;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
 using Zeta.Internals.Actors.Gizmos;
+using Zeta.Navigation;
 
 namespace Trinity
 {
@@ -41,6 +42,8 @@ namespace Trinity
 
             double minAvoidanceHealth = GetAvoidanceHealth(c_ActorSNO);
             double minAvoidanceRadius = GetAvoidanceRadius(c_ActorSNO, c_Radius);
+
+            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, (float)minAvoidanceRadius);
 
             AvoidanceType avoidanceType = AvoidanceManager.GetAvoidanceType(c_ActorSNO);
 
@@ -93,8 +96,10 @@ namespace Trinity
             {
                 // Generate a "weight" for how badly we want to avoid this obstacle, based on a percentage of 100% the avoidance health is, multiplied into a max of 200 weight
                 double dThisWeight = (200 * minAvoidanceHealth);
+               
+                float avoidanceRadius = (float)GetAvoidanceRadius();
 
-                hashAvoidanceObstacleCache.Add(new CacheObstacleObject(c_Position, (float)GetAvoidanceRadius(), c_ActorSNO, dThisWeight, c_InternalName));
+                hashAvoidanceObstacleCache.Add(new CacheObstacleObject(c_Position, avoidanceRadius, c_ActorSNO, dThisWeight, c_InternalName));
 
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
                 if (c_CentreDistance <= minAvoidanceRadius)

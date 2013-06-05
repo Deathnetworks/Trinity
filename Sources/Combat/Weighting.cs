@@ -117,7 +117,13 @@ namespace Trinity
                                 // Monster is in cache but not within kill range
                                 if (cacheObject.RadiusDistance > cacheObject.KillRange)
                                 {
-                                    break;
+                                    // monsters near players given higher weight
+                                    foreach (var player in ObjectCache.Where(p => p.Type == GObjectType.Player))
+                                    {
+                                        cacheObject.Weight += (15f - cacheObject.Position.Distance2D(player.Position) / 15f * 5000d);
+                                    }
+                                    if (cacheObject.Weight <= 0)
+                                        break;
                                 }
 
                                 if (cacheObject.HitPoints <= 0)
@@ -279,8 +285,7 @@ namespace Trinity
                                             cacheObject.Weight = 300d;
 
                                         // If any AoE between us and target, do not attack, for non-ranged attacks only
-                                        if (Zeta.Navigation.Navigator.SearchGridProvider.GetType() != typeof(SearchAreaProvider) && // not using Trinity SearchAreaProvider
-                                            !Settings.Combat.Misc.KillMonstersInAoE &&
+                                        if (!Settings.Combat.Misc.KillMonstersInAoE &&
                                             PlayerKiteDistance <= 0 &&
                                             cacheObject.AvoidanceType != AvoidanceType.PlagueCloud &&
                                             hashAvoidanceObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, Player.CurrentPosition, cacheObject.Position)))

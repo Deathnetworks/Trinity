@@ -86,11 +86,6 @@ namespace Trinity
             BotMain.OnStart += TrinityBotStart;
             BotMain.OnStop += TrinityBotStop;
 
-            // Set up the pause button
-
-            // rrrix: removing for next DB beta... 
-            //Application.Current.Dispatcher.Invoke(PaintMainWindowButtons());
-
             SetWindowTitle();
 
             if (!Directory.Exists(FileManager.PluginPath))
@@ -120,13 +115,12 @@ namespace Trinity
                 GameEvents.OnItemStashed += ItemEvents.TrinityOnItemStashed;
 
                 GameEvents.OnGameChanged += GameEvents_OnGameChanged;
-                GameEvents.OnWorldChanged += GameEvents_OnWorldChanged;
 
                 CombatTargeting.Instance.Provider = new BlankCombatProvider();
                 LootTargeting.Instance.Provider = new BlankLootProvider();
                 ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
-                
-                Navigator.SearchGridProvider = new SearchAreaProvider();
+
+                //Navigator.SearchGridProvider = new SearchAreaProvider();
 
                 if (Settings.Loot.ItemFilterMode != global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
                 {
@@ -155,11 +149,6 @@ namespace Trinity
             }
         }
 
-        void GameEvents_OnWorldChanged(object sender, EventArgs e)
-        {
-            Navigator.SearchGridProvider.Update();
-        }
-        
         /// <summary>
         /// Called when user disable the plugin.
         /// </summary>
@@ -178,7 +167,7 @@ namespace Trinity
 
             GameEvents.OnGameJoined -= TrinityOnJoinGame;
             GameEvents.OnGameLeft -= TrinityOnLeaveGame;
-            
+
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DISABLED: Trinity is now shut down...");
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
@@ -238,23 +227,23 @@ namespace Trinity
 
         internal static void SetWindowTitle(string profileName = "")
         {
+            string battleTagName = "";
+            try
+            {
+                battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
+            }
+            catch { }
+
+            string windowTitle = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
+
+            if (profileName.Trim() != String.Empty)
+            {
+                windowTitle += " - " + profileName;
+            }
+           
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                string battleTagName = "";
-                try
-                {
-                    battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
-                }
-                catch { }
                 Window mainWindow = Application.Current.MainWindow;
-
-                string windowTitle = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
-
-                if (profileName.Trim() != String.Empty)
-                {
-                    windowTitle += " - " + profileName;
-                }
-
                 mainWindow.Title = windowTitle;
             }));
         }

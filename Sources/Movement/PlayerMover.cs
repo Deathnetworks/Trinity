@@ -799,20 +799,20 @@ namespace Trinity.DbProvider
 
                 PositionCache.AddPosition();
 
-                float distanceToTarget = moveTarget.Distance2D(Trinity.Player.CurrentPosition);
+                //float distanceToTarget = moveTarget.Distance2D(Trinity.Player.CurrentPosition);
 
 
-                bool MoveTargetIsInLoS = distanceToTarget <= 90f && !Navigator.Raycast(MyPos, moveTarget);
+                //bool MoveTargetIsInLoS = distanceToTarget <= 90f && !Navigator.Raycast(MyPos, moveTarget);
 
-                if (distanceToTarget <= 5f || MoveTargetIsInLoS)
-                {
-                    if (distanceToTarget <= 5f)
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Destination within 5f, using MoveTowards", true);
-                    else
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Destination within LoS, using MoveTowards", true);
-                    Navigator.PlayerMover.MoveTowards(moveTarget);
-                    return MoveResult.Moved;
-                }
+                //if (distanceToTarget <= 5f || MoveTargetIsInLoS)
+                //{
+                //    if (distanceToTarget <= 5f)
+                //        Logger.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Destination within 5f, using MoveTowards", true);
+                //    else
+                //        Logger.Log(TrinityLogLevel.Debug, LogCategory.Navigator, "Destination within LoS, using MoveTowards", true);
+                //    Navigator.PlayerMover.MoveTowards(moveTarget);
+                //    return MoveResult.Moved;
+                //}
 
                 try
                 {

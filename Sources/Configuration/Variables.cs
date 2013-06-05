@@ -503,12 +503,14 @@ namespace Trinity
         {
             get
             {
-                if (Navigator.SearchGridProvider.GetType() == typeof(MainGridProvider))
-                    return (MainGridProvider)Navigator.SearchGridProvider;
-                else if (Navigator.SearchGridProvider.GetType() == typeof(DbProvider.SearchAreaProvider))
-                    return (DbProvider.SearchAreaProvider)Navigator.SearchGridProvider;
-                else
-                    return Navigator.SearchGridProvider;
+                return Navigator.SearchGridProvider;
+
+                //if (Navigator.SearchGridProvider.GetType() == typeof(MainGridProvider))
+                //    return (MainGridProvider)Navigator.SearchGridProvider;
+                //else if (Navigator.SearchGridProvider.GetType() == typeof(DbProvider.SearchAreaProvider))
+                //    return (DbProvider.SearchAreaProvider)Navigator.SearchGridProvider;
+                //else
+                //    return Navigator.SearchGridProvider;
             }
         }
         /// <summary>

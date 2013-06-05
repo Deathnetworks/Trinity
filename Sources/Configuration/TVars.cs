@@ -36,17 +36,19 @@ namespace Trinity
             Set(new TVar("Barbarian.WOTB.HardEliteRangeOverride", 50f, "Range check distance for WOTB Hard elite override"));
             Set(new TVar("Barbarian.CallOfTheAncients.MinFury", 50, "Minimum Fury to try cast Call of the Ancients"));
             Set(new TVar("Barbarian.CallOfTheAncients.MinEliteRange", 25f, "Minimum range elites must be in to use COTA"));
+            Set(new TVar("Barbarian.CallOfTheAncients.TickDelay", 4, "Pre and Post use Tick Delay"));
             Set(new TVar("Barbarian.Leap.UseRange", 35f, "Power Use Range"));
             Set(new TVar("Barbarian.SeismicSlam.UseRange", 40f, "Power Use Range"));
             Set(new TVar("Barbarian.AncientSpear.UseRange", 55f, "Power Use Range"));
             Set(new TVar("Barbarian.Whirlwind.UseRange", 10f, "Power Use Range"));
+            Set(new TVar("Barbarian.Whirlwind.MinFury", 10, "Minimum Fury"));
             Set(new TVar("Barbarian.Whirlwind.ZigZagDistance", 15f, "Whirlwind ZigZag Range"));
             Set(new TVar("Barbarian.Whirlwind.ZigZagMaxTime", 1200, "Maximum time to keep a zig zag point before forcing a new point (millseconds)"));
             Set(new TVar("Barbarian.Bash.UseRange", 6f, "Power Use Range"));
             Set(new TVar("Barbarian.Frenzy.UseRange", 10f, "Power Use Range"));
             Set(new TVar("Barbarian.Cleave.UseRange", 6f, "Power Use Range"));
             Set(new TVar("Barbarian.Rend.UseRange", 10f, "Power Use Range"));
-            Set(new TVar("Barbarian.WeaponThrow.UseRange", 15f, "Power Use Range"));
+            Set(new TVar("Barbarian.WeaponThrow.UseRange", 25f, "Power Use Range"));
             Set(new TVar("Barbarian.GroundStomp.UseBelowHealthPct", 0.70f, "Use Ground Stomp below this health % (regardless of unit count)"));
             Set(new TVar("Barbarian.GroundStomp.EliteRange", 15f, "Use Ground Stomp Elites check Range"));
             Set(new TVar("Barbarian.GroundStomp.EliteCount", 1, "Use Ground Stomp when this many Elites in Range"));
@@ -58,14 +60,25 @@ namespace Trinity
             Set(new TVar("Barbarian.FuriousCharge.EliteCount", 1, "Minimum Furious Charge Elite Count"));
             Set(new TVar("Barbarian.FuriousCharge.TrashRange", 15f, "Furious Charge Trash Check Range"));
             Set(new TVar("Barbarian.FuriousCharge.TrashCount", 3, "Minimum Furious Charge Trash Count"));
+            Set(new TVar("Barbarian.FuriousCharge.UseRange", 32f, "Use Range"));
+            Set(new TVar("Barbarian.FuriousCharge.MinExtraTargetDistance", 5f, "Extra distance added to target for Furious Charge direction"));
             Set(new TVar("Barbarian.Leap.EliteRange", 20f, "Leap Elite Check Range"));
             Set(new TVar("Barbarian.Leap.EliteCount", 1, "Minimum Leap Elite Count"));
             Set(new TVar("Barbarian.Leap.TrashRange", 20f, "Leap Trash Check Range"));
             Set(new TVar("Barbarian.Leap.TrashCount", 1, "Minimum Leap Trash Count"));
+            Set(new TVar("Barbarian.Leap.MinExtraDistance", 4f, "Extra distance added to target for Leap direction"));
+            Set(new TVar("Barbarian.Rend.MinNonBleedMobCount", 3, "Cast rend when this many mobs surrounding are not bleeding"));
+            Set(new TVar("Barbarian.Rend.MinUseIntervalMillseconds", 1500, "Cast rend when this many mobs surrounding are not bleeding"));
+            Set(new TVar("Barbarian.Rend.MaxRange", 10f, "Maximum Range for targets to be Rended"));
+            Set(new TVar("Barbarian.Rend.MinFury", 20, "Minimum Fury"));
+            Set(new TVar("Barbarian.Rend.TickDelay", 4, "Rend Pre and Post Tick Delay"));
+            Set(new TVar("Barbarian.OverPower.MaxRange", 9f, "Maximum Range Overpower is triggered"));
+            Set(new TVar("Barbarian.SeismicSlam.CurrentTargetRange", 40f, "Maximum Current Target range"));
+            Set(new TVar("Barbarian.SeismicSlam.MinFury", 15, "Minimum Fury for Seismic Slam"));
+            Set(new TVar("Barbarian.HammerOfTheAncients.UseRange", 10f, "Use Range"));              
 
             // Demon Hunter
             Set(new TVar("DemonHunter.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));
-
 
             // Monk
             Set(new TVar("Monk.Avoidance.Serenity", 0f, "Monk Serenity buff Avoidance health multiplier"));

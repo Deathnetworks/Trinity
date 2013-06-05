@@ -357,7 +357,7 @@ namespace Trinity.Combat.Abilities
                     !Player.IsIncapacitated &&
                     ((TargetUtil.AnyMobsInRange(range, Settings.Combat.Barbarian.MinThreatShoutMobCount)) || TargetUtil.IsEliteTargetInRange(range)) &&
                     (
-                        (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource <= 10) ||
+                        (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource <= V.I("Barbarian.Whirlwind.MinFury")) ||
                         (IsWaitingForSpecial && Player.PrimaryResource <= MinEnergyReserve)
                     );
 
@@ -374,13 +374,13 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return 
-                    !UseOOCBuff && 
+                return
+                    !UseOOCBuff &&
                     !Player.IsIncapacitated &&
                     CanCast(SNOPower.Barbarian_GroundStomp) &&
                     (
                         TargetUtil.AnyElitesInRange(V.F("Barbarian.GroundStomp.EliteRange"), V.I("Barbarian.GroundStomp.EliteCount")) ||
-                        TargetUtil.AnyMobsInRange(V.F("Barbarian.GroundStomp.TrashRange"), V.I("Barbarian.GroundStomp.TrashCount")) || 
+                        TargetUtil.AnyMobsInRange(V.F("Barbarian.GroundStomp.TrashRange"), V.I("Barbarian.GroundStomp.TrashCount")) ||
                         Player.CurrentHealthPct <= V.F("Barbarian.GroundStomp.UseBelowHealthPct")
                     );
             }
@@ -389,9 +389,9 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return 
-                    !UseOOCBuff && 
-                    CanCast(SNOPower.Barbarian_Revenge) && 
+                return
+                    !UseOOCBuff &&
+                    CanCast(SNOPower.Barbarian_Revenge) &&
                     !Player.IsIncapacitated &&
                     // Don't use revenge on goblins, too slow!
                     (!CurrentTarget.IsTreasureGoblin || TargetUtil.AnyMobsInRange(V.F("Barbarian.Revenge.TrashRange"), V.I("Barbarian.Revenge.TrashCount")));
@@ -401,8 +401,8 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return 
-                    !UseOOCBuff && 
+                return
+                    !UseOOCBuff &&
                     CanCast(SNOPower.Barbarian_FuriousCharge) &&
                     (TargetUtil.AnyElitesInRange(V.F("Barbarian.FuriousCharge.EliteRange"), V.I("Barbarian.FuriousCharge.EliteCount")) ||
                     TargetUtil.AnyElitesInRange(V.F("Barbarian.FuriousCharge.TrashRange"), V.I("Barbarian.FuriousCharge.TrashCount")));
@@ -412,18 +412,62 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return 
+                return
                     !UseOOCBuff &&
-                    !Player.IsIncapacitated && 
-                    CanCast(SNOPower.Barbarian_Leap) && 
+                    !Player.IsIncapacitated &&
+                    CanCast(SNOPower.Barbarian_Leap) &&
                     (TargetUtil.AnyMobsInRange(V.F("Barbarian.Leap.TrashRange"), V.I("Barbarian.Leap.TrashCount")) ||
                     TargetUtil.AnyElitesInRange(V.F("Barbarian.Leap.EliteRange"), V.I("Barbarian.Leap.EliteCount")));
             }
         }
-        public static bool CanUseRend { get { return false; } }
-        public static bool CanUseOverPower { get { return false; } }
-        public static bool CanUseSeismicSlam { get { return false; } }
-        public static bool CanUseAncientSpear { get { return false; } }
+        public static bool CanUseRend
+        {
+            get
+            {
+                return
+                    !UseOOCBuff &&
+                    !Player.IsIncapacitated &&
+                    CanCast(SNOPower.Barbarian_Rend) &&
+                    TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange")) && !CurrentTarget.IsTreasureGoblin &&
+                    ((!IsWaitingForSpecial && Player.PrimaryResource >= V.I("Barbarian.Rend.MinFury")) || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve)) &&
+                    (Trinity.ObjectCache.Count(o => o.Type == GObjectType.Unit && !o.HasDotDPS && o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount") || !CurrentTarget.HasDotDPS) &&
+                    (TimeSinceUse(SNOPower.Barbarian_Rend) > V.I("Barbarian.Rend.MinUseIntervalMillseconds")) &&
+                    Trinity.LastPowerUsed != SNOPower.Barbarian_Rend;
+            }
+        }
+        public static bool CanUseOverPower
+        {
+            get
+            {
+                return !UseOOCBuff && CanCast(SNOPower.Barbarian_Overpower) && !Player.IsIncapacitated &&
+                    (CurrentTarget.RadiusDistance <= V.F("Barbarian.OverPower.MaxRange") || 
+                        (
+                        TargetUtil.AnyMobsInRange(V.F("Barbarian.OverPower.MaxRange")) &&
+                        (CurrentTarget.IsEliteRareUnique || CurrentTarget.IsMinion || CurrentTarget.IsBoss || GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) ||
+                        (CurrentTarget.IsTreasureGoblin && CurrentTarget.CentreDistance <= V.F("Barbarian.OverPower.MaxRange")) || Hotbar.Contains(SNOPower.Barbarian_SeismicSlam))
+                        )
+                    );
+            }
+        }
+        public static bool CanUseSeismicSlam
+        {
+            get
+            {
+                return !UseOOCBuff && !IsWaitingForSpecial && CanCast(SNOPower.Barbarian_SeismicSlam) && !Player.IsIncapacitated &&
+                    (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage))) &&
+                    Player.PrimaryResource >= V.I("Barbarian.SeismicSlam.MinFury") && CurrentTarget.CentreDistance <= V.F("Barbarian.SeismicSlam.CurrentTargetRange") && (TargetUtil.AnyMobsInRange(50) ||
+                    (TargetUtil.AnyMobsInRange(50) && Player.PrimaryResourcePct >= 0.85 && CurrentTarget.HitPointsPct >= 0.30) ||
+                    TargetUtil.IsEliteTargetInRange(20f));
+            }
+        }
+        public static bool CanUseAncientSpear
+        {
+            get
+            {
+                return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Barbarian_AncientSpear) &&
+                    CurrentTarget.HitPointsPct >= 0.20;
+            }
+        }
         public static bool CanUseSprint { get { return false; } }
         public static bool CanUseFrenzyTo5 { get { return false; } }
         public static bool CanUseWhirlwind { get { return false; } }
@@ -437,7 +481,7 @@ namespace Trinity.Combat.Abilities
         public static TrinityPower PowerIgnorePain { get { return new TrinityPower(SNOPower.Barbarian_IgnorePain); } }
         public static TrinityPower PowerEarthquake { get { return new TrinityPower(SNOPower.Barbarian_Earthquake); } }
         public static TrinityPower PowerWrathOfTheBerserker { get { return new TrinityPower(SNOPower.Barbarian_WrathOfTheBerserker); } }
-        public static TrinityPower PowerCallOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_CallOfTheAncients, 4, 4); } }
+        public static TrinityPower PowerCallOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_CallOfTheAncients, V.I("Barbarian.CallOfTheAncients.TickDelay"), V.I("Barbarian.CallOfTheAncients.TickDelay")); } }
         public static TrinityPower PowerBattleRage { get { return new TrinityPower(SNOPower.Barbarian_BattleRage); } }
         public static TrinityPower PowerSprint { get { return new TrinityPower(SNOPower.Barbarian_Sprint); } }
         public static TrinityPower PowerWarCry { get { return new TrinityPower(SNOPower.Barbarian_WarCry); } }
@@ -453,10 +497,10 @@ namespace Trinity.Combat.Abilities
                     extraDistance = 30;
                 else
                     extraDistance = (25 - CurrentTarget.CentreDistance);
-                if (extraDistance < 5f)
-                    extraDistance = 5f;
+                if (extraDistance < V.F("Barbarian.FuriousCharge.MinExtraTargetDistance"))
+                    extraDistance = V.F("Barbarian.FuriousCharge.MinExtraTargetDistance");
                 Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, CurrentTarget.CentreDistance + extraDistance);
-                return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 32f, vNewTarget);
+                return new TrinityPower(SNOPower.Barbarian_FuriousCharge, V.F("Barbarian.FuriousCharge.UseRange"), vNewTarget);
             }
         }
         public static TrinityPower PowerLeap
@@ -464,8 +508,8 @@ namespace Trinity.Combat.Abilities
             get
             {
                 float extraDistance = CurrentTarget.Radius;
-                if (extraDistance <= 4f)
-                    extraDistance = 4f;
+                if (extraDistance <= V.F("Barbarian.Leap.MinExtraDistance"))
+                    extraDistance = V.F("Barbarian.Leap.MinExtraDistance");
                 if (CurrentTarget.CentreDistance + extraDistance > 35f)
                     extraDistance = 35 - CurrentTarget.CentreDistance;
 
@@ -473,7 +517,7 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Barbarian_Leap, V.F("Barbarian.Leap.UseRange"), vNewTarget);
             }
         }
-        public static TrinityPower PowerRend { get { return new TrinityPower(SNOPower.Barbarian_Rend, 2, 2); } }
+        public static TrinityPower PowerRend { get { return new TrinityPower(SNOPower.Barbarian_Rend, V.I("Barbarian.Rend.TickDelay"), V.I("Barbarian.Rend.TickDelay")); } }
         public static TrinityPower PowerOverpower { get { return new TrinityPower(SNOPower.Barbarian_Overpower); } }
         public static TrinityPower PowerSeismicSlam { get { return new TrinityPower(SNOPower.Barbarian_SeismicSlam, V.F("Barbarian.SeismicSlam.UseRange"), CurrentTarget.ACDGuid); } }
         public static TrinityPower PowerAncientSpear { get { return new TrinityPower(SNOPower.Barbarian_AncientSpear, V.F("Barbarian.AncientSpear.UseRange"), CurrentTarget.Position); } }
@@ -498,11 +542,11 @@ namespace Trinity.Combat.Abilities
                 return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1, false);
             }
         }
-        public static TrinityPower PowerHammerOfTheAncients { get { return new TrinityPower(SNOPower.None); } }
-        public static TrinityPower PowerWeaponThrow { get { return new TrinityPower(SNOPower.None); } }
-        public static TrinityPower PowerFrenzy { get { return new TrinityPower(SNOPower.None); } }
-        public static TrinityPower PowerBash { get { return new TrinityPower(SNOPower.None); } }
-        public static TrinityPower PowerCleave { get { return new TrinityPower(SNOPower.None); } }
+        public static TrinityPower PowerHammerOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_HammerOfTheAncients, V.F("Barbarian.HammerOfTheAncients.UseRange"), CurrentTarget.ACDGuid); } }
+        public static TrinityPower PowerWeaponThrow { get { return new TrinityPower(SNOPower.Barbarian_WeaponThrow, V.F("Barbarian.WeaponThrow.UseRange"), CurrentTarget.ACDGuid); } }
+        public static TrinityPower PowerFrenzy { get { return new TrinityPower(SNOPower.Barbarian_Frenzy, V.F("Barbarian.Frenzy.UseRange"), CurrentTarget.ACDGuid); } }
+        public static TrinityPower PowerBash { get { return new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"), CurrentTarget.ACDGuid); } }
+        public static TrinityPower PowerCleave { get { return new TrinityPower(SNOPower.Barbarian_Cleave, V.F("Barbarian.Cleave.UseRange"), CurrentTarget.ACDGuid); } }
 
         private static TrinityPower DestroyObjectPower
         {

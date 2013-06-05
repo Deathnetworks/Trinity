@@ -233,8 +233,6 @@ namespace Trinity
                 (TimeSinceUse(SNOPower.Barbarian_Rend) > 1500 || TargetUtil.AnyMobsInRange(10f, 6)) && LastPowerUsed != SNOPower.Barbarian_Rend
                 )
             {
-                iWithinRangeLastRend = ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= 9f);
-                iACDGUIDLastRend = CurrentTarget.ACDGuid;
                 // Note - we have LONGER animation times for whirlwind-users
                 // Since whirlwind seems to interrupt rend so easily
                 int rendPreDelay = 0;

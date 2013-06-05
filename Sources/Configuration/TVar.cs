@@ -31,6 +31,8 @@ namespace Trinity
             DefaultValue = value;
             ProfileValue = value;
             Type = value.GetType();
+            AllowProfileSet = false;
+            UserAllowProfileSet = false;
         }
 
         public TVar(string name, object value, object defaultValue, string description = "")
@@ -40,6 +42,8 @@ namespace Trinity
             DefaultValue = defaultValue;
             ProfileValue = value;
             Type = value.GetType();
+            AllowProfileSet = false;
+            UserAllowProfileSet = false;
         }
 
         public TVar(string name, object value, object defaultValue, object profileValue, string description = "")
@@ -49,6 +53,19 @@ namespace Trinity
             DefaultValue = defaultValue;
             ProfileValue = profileValue;
             Type = value.GetType();
+            AllowProfileSet = false;
+            UserAllowProfileSet = false;
+        }
+
+        public TVar(string name, object value, object defaultValue, object profileValue, string description, bool allowProfileSet, bool userAllowProfileSet)
+        {
+            Name = name;
+            Value = value;
+            DefaultValue = defaultValue;
+            ProfileValue = profileValue;
+            Type = value.GetType();
+            AllowProfileSet = allowProfileSet;
+            UserAllowProfileSet = userAllowProfileSet;
         }
 
         public bool Equals(TVar other)

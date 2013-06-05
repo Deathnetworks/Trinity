@@ -13,9 +13,16 @@ using Zeta.Pathfinding;
 
 namespace Trinity.DbProvider
 {
+    [Obsolete("No longer used, use ((MainGridProvider)Navigation.SearchAreaProvider).AddCellWeightingObstacle()")]
     internal sealed class SearchAreaProvider : MainGridProvider, ISearchAreaProvider
     {
         float[] weights = null;
+
+        public float[] Weights
+        {
+            get { return weights; }
+            set { weights = value; }
+        }
         WaitTimer waitTimer = null;
 
         private static HashSet<string> highWeightNames = new HashSet<string>()
@@ -25,6 +32,9 @@ namespace Trinity.DbProvider
 
         public new float[] GetCellWeights()
         {
+            return base.GetCellWeights();
+
+
             Logger.Log(LogCategory.Navigator, "Enter GetCellWeights");
 
             using (new PerformanceLogger("SearchAreaProvider.GetCellWeights"))
