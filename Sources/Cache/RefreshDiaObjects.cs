@@ -134,6 +134,16 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Staying Put During Avoidance");
                 }
 
+                // Reached pre-townrun position
+                if (!Player.IsInTown && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP
+                    && TownRun.PreTownRunPosition.Distance2D(Player.Position) <= 15f)
+                {
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Successfully returned to Pre-TownRun Position");
+                    TownRun.PreTownRunPosition = Vector3.Zero;
+                    TownRun.PreTownRunWorldId = -1;
+
+                }
+
                 // After a townrun, make sure to return to original TownRun Location
                 if (!Player.IsInTown && CurrentTarget == null && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP)
                 {
@@ -149,12 +159,6 @@ namespace Trinity
                             InternalName = "PreTownRunPosition"
                         };
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Returning to Pre-TownRun Position");
-                    }
-                    else
-                    {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Successfully returned to Pre-TownRun Position");
-                        TownRun.PreTownRunPosition = Vector3.Zero;
-                        TownRun.PreTownRunWorldId = -1;
                     }
                 }
 
