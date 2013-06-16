@@ -191,7 +191,7 @@ namespace Trinity
                         iPostDelay = 3;
                     }
                 }
-                return new TrinityPower(SNOPower.Barbarian_Revenge, 0f, Player.CurrentPosition, CurrentWorldDynamicId, -1, iPreDelay, iPostDelay, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Revenge, 0f, Player.Position, CurrentWorldDynamicId, -1, iPreDelay, iPostDelay, WAIT_FOR_ANIM);
             }
             // Furious charge
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) &&
@@ -206,7 +206,7 @@ namespace Trinity
                     fExtraDistance = (25 - CurrentTarget.CentreDistance);
                 if (fExtraDistance < 5f)
                     fExtraDistance = 5f;
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, CurrentTarget.CentreDistance + fExtraDistance);
+                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance + fExtraDistance);
                 return new TrinityPower(SNOPower.Barbarian_FuriousCharge, 32f, vNewTarget, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
             }
             // Leap used when off-cooldown, or when out-of-range
@@ -220,7 +220,7 @@ namespace Trinity
                     fExtraDistance = 4f;
                 if (CurrentTarget.CentreDistance + fExtraDistance > 35f)
                     fExtraDistance = 35 - CurrentTarget.CentreDistance;
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, CurrentTarget.CentreDistance + fExtraDistance);
+                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance + fExtraDistance);
                 return new TrinityPower(SNOPower.Barbarian_Leap, 35f, vNewTarget, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
             }
 
@@ -242,7 +242,7 @@ namespace Trinity
                     rendPreDelay = 2;
                     rendPostDelay = 2;
                 }
-                return new TrinityPower(SNOPower.Barbarian_Rend, 0f, Player.CurrentPosition, CurrentWorldDynamicId, -1, rendPreDelay, rendPostDelay, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Rend, 0f, Player.Position, CurrentWorldDynamicId, -1, rendPreDelay, rendPostDelay, WAIT_FOR_ANIM);
             }
 
             // Overpower used off-cooldown
@@ -258,7 +258,7 @@ namespace Trinity
             {
                 int iPreDelay = 0;
                 int iPostDelay = 0;
-                return new TrinityPower(SNOPower.Barbarian_Overpower, 0f, Player.CurrentPosition, CurrentWorldDynamicId, -1, iPreDelay, iPostDelay, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Barbarian_Overpower, 0f, Player.Position, CurrentWorldDynamicId, -1, iPreDelay, iPostDelay, WAIT_FOR_ANIM);
             }
             // Seismic slam enemies within close range
             if (!UseOOCBuff && !IsWaitingForSpecial && Hotbar.Contains(SNOPower.Barbarian_SeismicSlam) && !Player.IsIncapacitated &&
@@ -282,7 +282,7 @@ namespace Trinity
                     fExtraDistance = 60 - CurrentTarget.CentreDistance;
                 if (fExtraDistance < 30)
                     fExtraDistance = 30f;
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, CurrentTarget.CentreDistance + fExtraDistance);
+                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance + fExtraDistance);
                 return new TrinityPower(SNOPower.Barbarian_AncientSpear, 55f, vNewTarget, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
             }
             // Sprint buff, if same suitable targets as elites, keep maintained for WW users
@@ -339,7 +339,7 @@ namespace Trinity
                 bool shouldGetNewZigZag =
                     (DateTime.Now.Subtract(LastChangedZigZag).TotalMilliseconds >= 1200 ||
                     CurrentTarget.ACDGuid != LastZigZagUnitAcdGuid ||
-                    CombatBase.ZigZagPosition.Distance2D(Player.CurrentPosition) <= 5f);
+                    CombatBase.ZigZagPosition.Distance2D(Player.Position) <= 5f);
 
                 if (shouldGetNewZigZag)
                 {

@@ -15,11 +15,19 @@ using Zeta.CommonBot.Profile;
 using Zeta.CommonBot.Profile.Common;
 using Zeta.Internals.Actors;
 using NotificationManager = Trinity.Notifications.NotificationManager;
+using Zeta.CommonBot.Logic;
 
 namespace Trinity
 {
     internal class TownRun
     {
+        static TownRun()
+        {
+            PreTownRunWorldId = -1;
+            PreTownRunPosition = Vector3.Zero;
+            WasVendoring = false;
+        }
+
         // Whether salvage/sell run should go to a middle-waypoint first to help prevent stucks
 
         internal static bool bLastTownRunCheckResult = false;
@@ -63,6 +71,40 @@ namespace Trinity
 
         internal static Dictionary<int, int> _dictItemStashAttempted = new Dictionary<int, int>();
 
+
+        internal static Vector3 PreTownRunPosition { get; set; }
+        internal static int PreTownRunWorldId { get; set; }
+        internal static bool WasVendoring { get; set; }
+
+        /// <summary>
+        /// Called from Plugin.Pulse
+        /// </summary>
+        internal static void VendorRunPulseCheck()
+        {
+            // If we're in town and vendoring
+            if (ZetaDia.Me.IsInTown && BrainBehavior.IsVendoring)
+            {
+                WasVendoring = true;
+                Trinity.ForceVendorRunASAP = true;
+            }
+            if (!ZetaDia.Me.IsInTown && !BrainBehavior.IsVendoring && WasVendoring)
+            {
+                
+            }
+        }
+
+        /// <summary>
+        /// Records the position when we first run out of bag space, so we can return to that same position after a town run
+        /// </summary>
+        internal static void SetPreTownRunPosition()
+        {
+            if (PreTownRunPosition == Vector3.Zero && PreTownRunWorldId == -1)
+            {
+                PreTownRunPosition = Trinity.Player.Position;
+                PreTownRunWorldId = Trinity.Player.WorldID;
+            }
+        }
+
         /// <summary>
         /// TownRunCheckOverlord - determine if we should do a town-run or not
         /// </summary>
@@ -94,6 +136,7 @@ namespace Trinity
                             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
                         }
                     }
+                    TownRun.SetPreTownRunPosition();
                     Trinity.IsReadyToTownRun = true;
                 }
 
@@ -113,6 +156,10 @@ namespace Trinity
                             bLastTownRunCheckResult = true;
                         }
                         Trinity.IsReadyToTownRun = true;
+
+                        Trinity.ForceVendorRunASAP = true;
+                        // Record the first position when we run out of bag space, so we can return later
+                        TownRun.SetPreTownRunPosition();
                     }
 
                     // Check durability percentages
@@ -128,6 +175,8 @@ namespace Trinity
                                     bPreStashPauseDone = false;
                                 }
                                 Trinity.IsReadyToTownRun = true;
+                                Trinity.ForceVendorRunASAP = true;
+                                TownRun.SetPreTownRunPosition();
                             }
                         }
                     }
@@ -156,7 +205,7 @@ namespace Trinity
                 }
 
                 // check for navigation obstacles (never TP near demonic forges, etc)
-                if (Trinity.hashNavigationObstacleCache.Any(o => Vector3.Distance(o.Location, Trinity.Player.CurrentPosition) < 90f))
+                if (Trinity.hashNavigationObstacleCache.Any(o => Vector3.Distance(o.Location, Trinity.Player.Position) < 90f))
                 {
                     Trinity.IsReadyToTownRun = false;
                 }

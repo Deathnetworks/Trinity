@@ -21,7 +21,7 @@ namespace Trinity
         public double PrimaryResourcePct { get; set; }
         public double SecondaryResource { get; set; }
         public double SecondaryResourcePct { get; set; }
-        public Vector3 CurrentPosition { get; set; }
+        public Vector3 Position { get; set; }
         public bool WaitingForReserveEnergy { get; set; }
         public int MyDynamicID { get; set; }
         public int Level { get; set; }
@@ -51,7 +51,7 @@ namespace Trinity
             PrimaryResourcePct = 0;
             SecondaryResource = 0;
             SecondaryResourcePct = 0;
-            CurrentPosition = Vector3.Zero;
+            Position = Vector3.Zero;
             WaitingForReserveEnergy = false;
             MyDynamicID = -1;
             Level = -1;
@@ -74,7 +74,7 @@ namespace Trinity
             PrimaryResourcePct = currentEnergyPct;
             SecondaryResource = discipline;
             SecondaryResourcePct = disciplinePct;
-            CurrentPosition = currentPosition;
+            Position = currentPosition;
             WaitingForReserveEnergy = waitingReserve;
             MyDynamicID = dynamicId;
             Level = level;
@@ -127,7 +127,7 @@ namespace Trinity
                     PlayerStatus.PrimaryResourcePct = PlayerStatus.PrimaryResource / me.MaxPrimaryResource;
                     PlayerStatus.SecondaryResource = me.CurrentSecondaryResource;
                     PlayerStatus.SecondaryResourcePct = PlayerStatus.SecondaryResource / me.MaxSecondaryResource;
-                    PlayerStatus.CurrentPosition = me.Position;
+                    PlayerStatus.Position = me.Position;
 
                     PlayerStatus.GoldPickupRadius = me.GoldPickupRadius;
                     PlayerStatus.Coinage = me.Inventory.Coinage;

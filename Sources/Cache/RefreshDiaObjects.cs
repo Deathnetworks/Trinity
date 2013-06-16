@@ -76,7 +76,7 @@ namespace Trinity
                     if (StandingInAvoidance && (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
                         DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
                     {
-                        Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, Player.CurrentPosition, true);
+                        Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, Player.Position, true);
                         // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
                         if (vAnySafePoint != Vector3.Zero)
                         {
@@ -93,8 +93,8 @@ namespace Trinity
                                     Position = vAnySafePoint,
                                     Type = GObjectType.Avoidance,
                                     Weight = 20000,
-                                    CentreDistance = Vector3.Distance(Player.CurrentPosition, vAnySafePoint),
-                                    RadiusDistance = Vector3.Distance(Player.CurrentPosition, vAnySafePoint),
+                                    CentreDistance = Vector3.Distance(Player.Position, vAnySafePoint),
+                                    RadiusDistance = Vector3.Distance(Player.Position, vAnySafePoint),
                                     InternalName = "SafePoint"
                                 }; ;
                         }
@@ -124,7 +124,7 @@ namespace Trinity
                 {
                     CurrentTarget = new TrinityCacheObject()
                                         {
-                                            Position = Player.CurrentPosition,
+                                            Position = Player.Position,
                                             Type = GObjectType.Avoidance,
                                             Weight = 20000,
                                             CentreDistance = 2f,
@@ -133,6 +133,31 @@ namespace Trinity
                                         };
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Staying Put During Avoidance");
                 }
+
+                // After a townrun, make sure to return to original TownRun Location
+                if (!Player.IsInTown && CurrentTarget == null && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP)
+                {
+                    if (TownRun.PreTownRunPosition.Distance2D(Player.Position) > 10f)
+                    {
+                        CurrentTarget = new TrinityCacheObject()
+                        {
+                            Position = TownRun.PreTownRunPosition,
+                            Type = GObjectType.Avoidance,
+                            Weight = 20000,
+                            CentreDistance = 2f,
+                            RadiusDistance = 2f,
+                            InternalName = "PreTownRunPosition"
+                        };
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Returning to Pre-TownRun Position");
+                    }
+                    else
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Successfully returned to Pre-TownRun Position");
+                        TownRun.PreTownRunPosition = Vector3.Zero;
+                        TownRun.PreTownRunWorldId = -1;
+                    }
+                }
+
                 using (new PerformanceLogger("RefreshDiaObjectCache.FinalChecks"))
                 {
                     // force to stay put if we want to town run and there's no target
@@ -196,7 +221,7 @@ namespace Trinity
             bool forceUpdate = false;
             try
             {
-                Player.CurrentPosition = ZetaDia.Me.Position;
+                Player.Position = ZetaDia.Me.Position;
                 Player.CurrentHealthPct = ZetaDia.Me.HitpointsCurrentPct;
 
                 if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && CurrentTarget.Unit != null && CurrentTarget.Unit.IsValid)
@@ -552,7 +577,7 @@ namespace Trinity
             {
                 CurrentTarget = new TrinityCacheObject()
                                     {
-                                        Position = Player.CurrentPosition,
+                                        Position = Player.Position,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
@@ -566,14 +591,14 @@ namespace Trinity
             // Never bother with the 1st backtrack position nor if we are in town
             {
                 // See if we're already within 18 feet of our start position first
-                if (Vector3.Distance(Player.CurrentPosition, vBacktrackList[1]) <= 18f)
+                if (Vector3.Distance(Player.Position, vBacktrackList[1]) <= 18f)
                 {
                     vBacktrackList = new SortedList<int, Vector3>();
                     iTotalBacktracks = 0;
                 }
                 // See if we can raytrace to the final location and it's within 25 feet
-                if (iTotalBacktracks >= 2 && Vector3.Distance(Player.CurrentPosition, vBacktrackList[1]) <= 25f &&
-                    NavHelper.CanRayCast(Player.CurrentPosition, vBacktrackList[1]))
+                if (iTotalBacktracks >= 2 && Vector3.Distance(Player.Position, vBacktrackList[1]) <= 25f &&
+                    NavHelper.CanRayCast(Player.Position, vBacktrackList[1]))
                 {
                     vBacktrackList = new SortedList<int, Vector3>();
                     iTotalBacktracks = 0;
@@ -583,7 +608,7 @@ namespace Trinity
                     // See if we can skip to the next backtracker location first
                     if (iTotalBacktracks >= 3)
                     {
-                        if (Vector3.Distance(Player.CurrentPosition, vBacktrackList[iTotalBacktracks - 1]) <= 10f)
+                        if (Vector3.Distance(Player.Position, vBacktrackList[iTotalBacktracks - 1]) <= 10f)
                         {
                             vBacktrackList.Remove(iTotalBacktracks);
                             iTotalBacktracks--;
@@ -594,8 +619,8 @@ namespace Trinity
                                             Position = vBacktrackList[iTotalBacktracks],
                                             Type = GObjectType.Backtrack,
                                             Weight = 20000,
-                                            CentreDistance = Vector3.Distance(Player.CurrentPosition, vBacktrackList[iTotalBacktracks]),
-                                            RadiusDistance = Vector3.Distance(Player.CurrentPosition, vBacktrackList[iTotalBacktracks]),
+                                            CentreDistance = Vector3.Distance(Player.Position, vBacktrackList[iTotalBacktracks]),
+                                            RadiusDistance = Vector3.Distance(Player.Position, vBacktrackList[iTotalBacktracks]),
                                             InternalName = "Backtrack"
                                         };
                 }
@@ -610,14 +635,14 @@ namespace Trinity
             // Finally, a special check for waiting for wrath of the berserker cooldown before engaging Azmodan
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Barbarian.WaitWOTB && !SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) &&
                 ZetaDia.CurrentWorldId == 121214 &&
-                (Vector3.Distance(Player.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(Player.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+                (Vector3.Distance(Player.Position, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(Player.Position, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 DisableOutofCombatSprint = true;
                 BarbarianCombat.AllowSprintOOC = false;
                 Logging.Write("[Trinity] Waiting for Wrath Of The Berserker cooldown before continuing to Azmodan.");
                 CurrentTarget = new TrinityCacheObject()
                                     {
-                                        Position = Player.CurrentPosition,
+                                        Position = Player.Position,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
@@ -627,12 +652,12 @@ namespace Trinity
             }
             // And a special check for wizard archon
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Wizard_Archon) && !SNOPowerUseTimer(SNOPower.Wizard_Archon) && Settings.Combat.Wizard.WaitArchon && ZetaDia.CurrentWorldId == 121214 &&
-                (Vector3.Distance(Player.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(Player.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+                (Vector3.Distance(Player.Position, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(Player.Position, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for Wizard Archon cooldown before continuing to Azmodan.");
                 CurrentTarget = new TrinityCacheObject()
                                     {
-                                        Position = Player.CurrentPosition,
+                                        Position = Player.Position,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,
@@ -642,12 +667,12 @@ namespace Trinity
             }
             // And a very sexy special check for WD BigBadVoodoo
             if (CurrentTarget == null && Hotbar.Contains(SNOPower.Witchdoctor_BigBadVoodoo) && !PowerManager.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && ZetaDia.CurrentWorldId == 121214 &&
-                (Vector3.Distance(Player.CurrentPosition, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(Player.CurrentPosition, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
+                (Vector3.Distance(Player.Position, new Vector3(711.25f, 716.25f, 80.13903f)) <= 40f || Vector3.Distance(Player.Position, new Vector3(546.8467f, 551.7733f, 1.576313f)) <= 40f))
             {
                 Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for WD BigBadVoodoo cooldown before continuing to Azmodan.");
                 CurrentTarget = new TrinityCacheObject()
                                     {
-                                        Position = Player.CurrentPosition,
+                                        Position = Player.Position,
                                         Type = GObjectType.Avoidance,
                                         Weight = 20000,
                                         CentreDistance = 2f,

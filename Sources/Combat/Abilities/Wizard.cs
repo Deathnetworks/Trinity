@@ -174,7 +174,7 @@ namespace Trinity
                         if (CurrentTarget.CentreDistance - fExtraDistance < 15f)
                             fExtraDistance -= 2;
                     }
-                    Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, CurrentTarget.CentreDistance - fExtraDistance);
+                    Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance - fExtraDistance);
                     return new TrinityPower(SNOPower.Wizard_Hydra, 30f, vNewTarget, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
                 // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
@@ -275,7 +275,7 @@ namespace Trinity
                     (!Hotbar.Contains(SNOPower.Wizard_Electrocute) || !DataDictionary.FastMovingMonsterIds.Contains(CurrentTarget.ActorSNO)) &&
                     ((hasCriticalMass && !bHasSignatureSpell) || !hasCriticalMass))
                 {
-                    Vector3 targetDirection = MathEx.CalculatePointFrom(Player.CurrentPosition, CurrentTarget.Position, 3f);
+                    Vector3 targetDirection = MathEx.CalculatePointFrom(Player.Position, CurrentTarget.Position, 3f);
 
                     Vector3 bestClusterPoint = TargetUtil.GetBestClusterPoint(10f, 15f);
 
@@ -408,7 +408,7 @@ namespace Trinity
                     (ElitesWithinRange[RANGE_15] >= 1 || AnythingWithinRange[RANGE_15] >= 3 || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 15f)) &&
                     SNOPowerUseTimer(SNOPower.Wizard_Archon_Teleport) && PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
                 {
-                    Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, -20f);
+                    Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -20f);
                     return new TrinityPower(SNOPower.Wizard_Archon_Teleport, 35f, vNewTarget, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Arcane Blast

@@ -139,7 +139,7 @@ namespace Trinity
         #region Human Readable Headings
         public static string GetHeadingToPoint(Vector3 TargetPoint)
         {
-            return GetHeading(FindDirectionDegree(Trinity.Player.CurrentPosition, TargetPoint));
+            return GetHeading(FindDirectionDegree(Trinity.Player.Position, TargetPoint));
         }
         public static string GetHeading(float heading)
         {

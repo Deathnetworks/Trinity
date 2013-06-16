@@ -70,7 +70,7 @@ namespace Trinity.XmlTags
                     {
                         iSafetyLoops++;
                         Trinity.WaitWhileAnimating(5, true);
-                        ZetaDia.Me.UsePower(SNOPower.UseStoneOfRecall, Trinity.Player.CurrentPosition, ZetaDia.Me.WorldDynamicId, -1);
+                        ZetaDia.Me.UsePower(SNOPower.UseStoneOfRecall, Trinity.Player.Position, ZetaDia.Me.WorldDynamicId, -1);
                         Thread.Sleep(1000);
                         Trinity.WaitWhileAnimating(1000, true);
                         if (iSafetyLoops > 5)

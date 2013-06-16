@@ -316,10 +316,10 @@ namespace Trinity
                         if (DateTime.Now.Subtract(lastAddedLocationCache).TotalMilliseconds >= 100)
                         {
                             lastAddedLocationCache = DateTime.Now;
-                            if (Vector3.Distance(Player.CurrentPosition, vLastRecordedLocationCache) >= 5f)
+                            if (Vector3.Distance(Player.Position, vLastRecordedLocationCache) >= 5f)
                             {
-                                hashSkipAheadAreaCache.Add(new CacheObstacleObject(Player.CurrentPosition, 20f, 0));
-                                vLastRecordedLocationCache = Player.CurrentPosition;
+                                hashSkipAheadAreaCache.Add(new CacheObstacleObject(Player.Position, 20f, 0));
+                                vLastRecordedLocationCache = Player.Position;
 
                                 // Mark Dungeon Explorer nodes as Visited if combat pulls us into it
                                 if (ProfileManager.CurrentProfileBehavior != null)
@@ -335,19 +335,19 @@ namespace Trinity
                         }
                         // Maintain a backtrack list only while fighting monsters
                         if (CurrentTarget.Type == GObjectType.Unit && Settings.Combat.Misc.AllowBacktracking &&
-                            (iTotalBacktracks == 0 || Vector3.Distance(Player.CurrentPosition, vBacktrackList[iTotalBacktracks]) >= 10f))
+                            (iTotalBacktracks == 0 || Vector3.Distance(Player.Position, vBacktrackList[iTotalBacktracks]) >= 10f))
                         {
                             bool bAddThisBacktrack = true;
                             // Check we aren't within 12 feet of 2 backtracks again (eg darting back & forth)
                             if (iTotalBacktracks >= 2)
                             {
-                                if (Vector3.Distance(Player.CurrentPosition, vBacktrackList[iTotalBacktracks - 1]) < 12f)
+                                if (Vector3.Distance(Player.Position, vBacktrackList[iTotalBacktracks - 1]) < 12f)
                                     bAddThisBacktrack = false;
                             }
                             if (bAddThisBacktrack)
                             {
                                 iTotalBacktracks++;
-                                vBacktrackList.Add(iTotalBacktracks, Player.CurrentPosition);
+                                vBacktrackList.Add(iTotalBacktracks, Player.Position);
                             }
                         }
                     }
@@ -355,7 +355,7 @@ namespace Trinity
 
                     using (new PerformanceLogger("HandleTarget.LoSCheck"))
                     {
-                        TargetCurrentDistance = Player.CurrentPosition.Distance2D(vCurrentDestination) - TargetDistanceReduction;
+                        TargetCurrentDistance = Player.Position.Distance2D(vCurrentDestination) - TargetDistanceReduction;
                         if (TargetCurrentDistance < 0f)
                             TargetCurrentDistance = 0f;
 
@@ -365,7 +365,7 @@ namespace Trinity
                         }
                         else if (Settings.Combat.Misc.UseNavMeshTargeting && CurrentTarget.Type != GObjectType.Barricade && CurrentTarget.Type != GObjectType.Destructible)
                         {
-                            CurrentTargetIsInLoS = (NavHelper.CanRayCast(Player.CurrentPosition, vCurrentDestination) || DataDictionary.LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
+                            CurrentTargetIsInLoS = (NavHelper.CanRayCast(Player.Position, vCurrentDestination) || DataDictionary.LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO));
                         }
                         else
                         {
@@ -431,6 +431,9 @@ namespace Trinity
                                         {
                                             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, town-run requested at next free moment.");
                                             ForceVendorRunASAP = true;
+
+                                            // Record the first position when we run out of bag space, so we can return later
+                                            TownRun.SetPreTownRunPosition();
                                             //runStatus = HandlerRunStatus.TreeRunning;
                                             runStatus = HandlerRunStatus.TreeSuccess;
                                         }
@@ -564,7 +567,7 @@ namespace Trinity
                                                 // Location attack - attack the Vector3/map-area (equivalent of holding shift and left-clicking the object in-game to "force-attack")
                                                 Vector3 vAttackPoint;
                                                 if (CurrentTarget.CentreDistance >= 6f)
-                                                    vAttackPoint = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, 6f);
+                                                    vAttackPoint = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, 6f);
                                                 else
                                                     vAttackPoint = CurrentTarget.Position;
 
@@ -667,19 +670,19 @@ namespace Trinity
                         {
                             Vector3 point = vCurrentDestination;
                             foreach (CacheObstacleObject tempobstacle in Trinity.hashNavigationObstacleCache.Where(cp =>
-                                            MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.CurrentPosition, point) &&
-                                            cp.Location.Distance2D(Player.CurrentPosition) > PlayerMover.GetObstacleNavigationSize(cp)))
+                                            MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, point) &&
+                                            cp.Location.Distance2D(Player.Position) > PlayerMover.GetObstacleNavigationSize(cp)))
                             {
                                 if (vShiftedPosition == Vector3.Zero)
                                 {
                                     if (DateTime.Now.Subtract(lastShiftedPosition).TotalSeconds >= 10)
                                     {
-                                        float fDirectionToTarget = MathUtil.FindDirectionDegree(Player.CurrentPosition, vCurrentDestination);
-                                        vCurrentDestination = MathEx.GetPointAt(Player.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget - 50));
-                                        if (!NavHelper.CanRayCast(Player.CurrentPosition, vCurrentDestination))
+                                        float fDirectionToTarget = MathUtil.FindDirectionDegree(Player.Position, vCurrentDestination);
+                                        vCurrentDestination = MathEx.GetPointAt(Player.Position, 15f, MathEx.ToRadians(fDirectionToTarget - 50));
+                                        if (!NavHelper.CanRayCast(Player.Position, vCurrentDestination))
                                         {
-                                            vCurrentDestination = MathEx.GetPointAt(Player.CurrentPosition, 15f, MathEx.ToRadians(fDirectionToTarget + 50));
-                                            if (!NavHelper.CanRayCast(Player.CurrentPosition, vCurrentDestination))
+                                            vCurrentDestination = MathEx.GetPointAt(Player.Position, 15f, MathEx.ToRadians(fDirectionToTarget + 50));
+                                            if (!NavHelper.CanRayCast(Player.Position, vCurrentDestination))
                                             {
                                                 vCurrentDestination = point;
                                             }
@@ -734,14 +737,14 @@ namespace Trinity
 
                         bool Barbarian_SpecialMovement = ((CurrentTarget.Type == GObjectType.Avoidance &&
                             ObjectCache.Any(u => (u.Type == GObjectType.Unit || u.Type == GObjectType.Destructible || u.Type == GObjectType.Barricade) &&
-                                MathUtil.IntersectsPath(u.Position, u.Radius, Player.CurrentPosition, CurrentTarget.Position))));
+                                MathUtil.IntersectsPath(u.Position, u.Radius, Player.Position, CurrentTarget.Position))));
 
                         // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||
                             CurrentTarget.Type == GObjectType.Globe ||
                             Monk_SpecialMovement ||
                             (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
-                            && NavHelper.CanRayCast(Player.CurrentPosition, vCurrentDestination)
+                            && NavHelper.CanRayCast(Player.Position, vCurrentDestination)
                             )
                         {
                             bool bFoundSpecialMovement = UsedSpecialMovement();
@@ -953,7 +956,7 @@ namespace Trinity
                     // So it won't blacklist a monster "on the edge of the screen" who isn't even being targetted
                     // Don't blacklist monsters on <= 50% health though, as they can't be in a stuck location... can they!? Maybe give them some extra time!
 
-                    bool isNavigable = NavHelper.CanRayCast(Player.CurrentPosition, vCurrentDestination);
+                    bool isNavigable = NavHelper.CanRayCast(Player.Position, vCurrentDestination);
 
                     bool addTargetToBlacklist = true;
 
@@ -1183,7 +1186,7 @@ namespace Trinity
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
                     (PlayerKiteDistance <= 0 || (!hashMonsterObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
                     !hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance))) &&
-                    (!Trinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, Trinity.Player.CurrentPosition, vCurrentDestination)))
+                    (!Trinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, Trinity.Player.Position, vCurrentDestination)))
                     )
                 {
                     WaitWhileAnimating(3, true);
@@ -1384,7 +1387,7 @@ namespace Trinity
                 TargetDistanceReduction = 0f;
                 // Set current destination to our current target's destination
                 vCurrentDestination = CurrentTarget.Position;
-                float fDistanceToDestination = Player.CurrentPosition.Distance(vCurrentDestination);
+                float fDistanceToDestination = Player.Position.Distance(vCurrentDestination);
                 switch (CurrentTarget.Type)
                 {
                     // * Unit, we need to pick an ability to use and get within range
@@ -1542,9 +1545,9 @@ namespace Trinity
                 // try WW every tick if we want - we should use other methods to avoid this garbage code... 
                 float dist = 0;
                 if (CombatBase.CurrentPower.TargetPosition != Vector3.Zero)
-                    dist = CombatBase.CurrentPower.TargetPosition.Distance2D(Player.CurrentPosition);
+                    dist = CombatBase.CurrentPower.TargetPosition.Distance2D(Player.Position);
                 else if (CurrentTarget != null)
-                    dist = CurrentTarget.Position.Distance2D(Player.CurrentPosition);
+                    dist = CurrentTarget.Position.Distance2D(Player.Position);
 
                 var usePowerResult = ZetaDia.Me.UsePower(CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetDynamicWorldId, CombatBase.CurrentPower.TargetRActorGUID);
 
@@ -1585,7 +1588,7 @@ namespace Trinity
                 // if at full or nearly full health, see if we can raycast to it, if not, ignore it for 2000 ms
                 if (CurrentTarget.HitPointsPct >= 0.9d)
                 {
-                    if (!NavHelper.CanRayCast(Player.CurrentPosition, CurrentTarget.Position))
+                    if (!NavHelper.CanRayCast(Player.Position, CurrentTarget.Position))
                     {
                         IgnoreRactorGUID = CurrentTarget.RActorGuid;
                         IgnoreTargetForLoops = 6;

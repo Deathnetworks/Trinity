@@ -32,7 +32,7 @@ namespace Trinity.DbProvider
 
         public void MoveStop()
         {
-            ZetaDia.Me.UsePower(SNOPower.Walk, Trinity.Player.CurrentPosition, Trinity.CurrentWorldDynamicId, -1);
+            ZetaDia.Me.UsePower(SNOPower.Walk, Trinity.Player.Position, Trinity.CurrentWorldDynamicId, -1);
         }
 
         // Anti-stuck variables
@@ -374,7 +374,7 @@ namespace Trinity.DbProvider
             }
 
             TimeLastUsedPlayerMover = DateTime.Now;
-            vMyCurrentPosition = Trinity.Player.CurrentPosition;
+            vMyCurrentPosition = Trinity.Player.Position;
             LastMoveToTarget = vMoveToTarget;
 
             // record speed once per second
@@ -572,7 +572,7 @@ namespace Trinity.DbProvider
                     // Don't Vault into avoidance/monsters if we're kiting
                     (Trinity.PlayerKiteDistance <= 0 || (Trinity.PlayerKiteDistance > 0 &&
                      (!Trinity.hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= Trinity.PlayerKiteDistance) ||
-                     (!Trinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, Trinity.Player.CurrentPosition, vMoveToTarget))) ||
+                     (!Trinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, Trinity.Player.Position, vMoveToTarget))) ||
                      !Trinity.hashMonsterObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= Trinity.PlayerKiteDistance))))
                     )
                 {
@@ -795,7 +795,7 @@ namespace Trinity.DbProvider
         {
             using (new PerformanceLogger("NavigateTo"))
             {
-                Vector3 MyPos = Trinity.Player.CurrentPosition;
+                Vector3 MyPos = Trinity.Player.Position;
 
                 PositionCache.AddPosition();
 
@@ -834,9 +834,9 @@ namespace Trinity.DbProvider
 
             lastRecordedSkipAheadCache = DateTime.Now;
 
-            if (!Trinity.hashSkipAheadAreaCache.Any(p => p.Location.Distance2D(Trinity.Player.CurrentPosition) <= 5f))
+            if (!Trinity.hashSkipAheadAreaCache.Any(p => p.Location.Distance2D(Trinity.Player.Position) <= 5f))
             {
-                Trinity.hashSkipAheadAreaCache.Add(new CacheObstacleObject() { Location = Trinity.Player.CurrentPosition, Radius = 20f });
+                Trinity.hashSkipAheadAreaCache.Add(new CacheObstacleObject() { Location = Trinity.Player.Position, Radius = 20f });
             }
         }
 

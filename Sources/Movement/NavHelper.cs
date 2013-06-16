@@ -72,7 +72,7 @@ namespace Trinity
 
         internal static bool CanRayCast(Vector3 destination)
         {
-            return CanRayCast(PlayerStatus.CurrentPosition, destination);
+            return CanRayCast(PlayerStatus.Position, destination);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace Trinity
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
                 if (!shouldKite && PlayerStatus.ActorClass == ActorClass.Wizard && Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && PlayerStatus.PrimaryResource >= 25 &&
                     DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_WaveOfForce] &&
-                    !PlayerStatus.IsIncapacitated && Trinity.hashAvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(PlayerStatus.CurrentPosition) <= 15f) >= 2 &&
+                    !PlayerStatus.IsIncapacitated && Trinity.hashAvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(PlayerStatus.Position) <= 15f) >= 2 &&
                     (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, Vector3.Zero, PlayerStatus.WorldDynamicID, -1);

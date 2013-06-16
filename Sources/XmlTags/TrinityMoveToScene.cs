@@ -44,7 +44,7 @@ namespace Trinity.XmlTags
         /// <summary>
         /// The current player position
         /// </summary>
-        private Vector3 myPos { get { return Trinity.Player.CurrentPosition; } }
+        private Vector3 myPos { get { return Trinity.Player.Position; } }
 
         /// <summary>
         /// The last scene SNOId we entered

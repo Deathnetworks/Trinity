@@ -131,7 +131,7 @@ namespace Trinity
                 else if (Trinity.CurrentTarget != null)
                     bestClusterPoint = Trinity.CurrentTarget.Position;
                 else
-                    bestClusterPoint = Trinity.Player.CurrentPosition;
+                    bestClusterPoint = Trinity.Player.Position;
 
                 return bestClusterPoint;
             }
@@ -257,7 +257,7 @@ namespace Trinity
         internal static Vector3 GetZigZagTarget(Vector3 origin, float ringDistance, bool randomizeDistance = false)
         {
             var minDistance = 9f;
-            Vector3 myPos = Player.CurrentPosition;
+            Vector3 myPos = Player.Position;
             float distanceToTarget = origin.Distance2D(myPos);
 
             Vector3 zigZagPoint = origin;
@@ -287,9 +287,9 @@ namespace Trinity
                     if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
                     {
                         var clusterPoint = TargetUtil.GetBestClusterPoint(ringDistance, ringDistance, false);
-                        if (clusterPoint.Distance2D(Player.CurrentPosition) >= minDistance)
+                        if (clusterPoint.Distance2D(Player.Position) >= minDistance)
                         {
-                            Logger.Log(LogCategory.Movement, "Returning ZigZag: BestClusterPoint {0} r-dist={1} t-dist={2}", clusterPoint, ringDistance, clusterPoint.Distance2D(Player.CurrentPosition));
+                            Logger.Log(LogCategory.Movement, "Returning ZigZag: BestClusterPoint {0} r-dist={1} t-dist={2}", clusterPoint, ringDistance, clusterPoint.Distance2D(Player.Position));
                             return clusterPoint;
                         }
 
@@ -304,9 +304,9 @@ namespace Trinity
                         if (zigZagTargets.Count() >= minTargets)
                         {
                             zigZagPoint = zigZagTargets.OrderByDescending(u => u.CentreDistance).FirstOrDefault().Position;
-                            if (NavHelper.CanRayCast(zigZagPoint) && zigZagPoint.Distance2D(Player.CurrentPosition) >= minDistance)
+                            if (NavHelper.CanRayCast(zigZagPoint) && zigZagPoint.Distance2D(Player.Position) >= minDistance)
                             {
-                                Logger.Log(LogCategory.Movement, "Returning ZigZag: TargetBased {0} r-dist={1} t-dist={2}", zigZagPoint, ringDistance, zigZagPoint.Distance2D(Player.CurrentPosition));
+                                Logger.Log(LogCategory.Movement, "Returning ZigZag: TargetBased {0} r-dist={1} t-dist={2}", zigZagPoint, ringDistance, zigZagPoint.Distance2D(Player.Position));
                                 return zigZagPoint;
                             }
                         }
@@ -367,7 +367,7 @@ namespace Trinity
                                 continue;
 
                             // Make sure this point is in LoS/walkable (not around corners or into a wall)
-                            bool canRayCast = !Navigator.Raycast(Player.CurrentPosition, zigZagPoint);
+                            bool canRayCast = !Navigator.Raycast(Player.Position, zigZagPoint);
                             if (!canRayCast)
                                 continue;
 
@@ -401,7 +401,7 @@ namespace Trinity
                             }
                         }
                     }
-                    Logger.Log(LogCategory.Movement, "Returning ZigZag: RandomXY {0} r-dist={1} t-dist={2}", bestLocation, ringDistance, bestLocation.Distance2D(Player.CurrentPosition));
+                    Logger.Log(LogCategory.Movement, "Returning ZigZag: RandomXY {0} r-dist={1} t-dist={2}", bestLocation, ringDistance, bestLocation.Distance2D(Player.Position));
                     return bestLocation;
                 }
             }
@@ -418,7 +418,7 @@ namespace Trinity
         internal static bool UnitInAoe(TrinityCacheObject u)
         {
             return Trinity.hashAvoidanceObstacleCache.Any(a => 
-                MathUtil.IntersectsPath(a.Location, a.Radius, Player.CurrentPosition, u.Position));
+                MathUtil.IntersectsPath(a.Location, a.Radius, Player.Position, u.Position));
         }
 
         internal static bool PathToUnitIntersectsAoe(TrinityCacheObject u)

@@ -279,7 +279,7 @@ namespace Trinity.XmlTags
         /// <summary>
         /// The current player position
         /// </summary>
-        private Vector3 myPos { get { return Trinity.Player.CurrentPosition; } }
+        private Vector3 myPos { get { return Trinity.Player.Position; } }
         private static ISearchAreaProvider MainGridProvider
         {
             get
@@ -1106,7 +1106,7 @@ namespace Trinity.XmlTags
             Vector3 moveTarget = NextNode.NavigableCenter;
 
             string nodeName = String.Format("{0} Distance: {1:0} Direction: {2}",
-                NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(Trinity.Player.CurrentPosition), MathUtil.GetHeadingToPoint(NextNode.NavigableCenter));
+                NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(Trinity.Player.Position), MathUtil.GetHeadingToPoint(NextNode.NavigableCenter));
 
             if (DateTime.Now.Subtract(Trinity.lastAddedLocationCache).TotalMilliseconds >= 100)
             {

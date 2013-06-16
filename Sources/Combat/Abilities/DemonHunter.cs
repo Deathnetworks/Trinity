@@ -74,7 +74,7 @@ namespace Trinity
                 Player.PrimaryResource >= 30 && PowerManager.CanCast(SNOPower.DemonHunter_Sentry))
             {
 
-                return new TrinityPower(SNOPower.DemonHunter_Sentry, 0f, Player.CurrentPosition, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_Sentry, 0f, Player.Position, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
             }
             // Marked for Death
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_MarkedForDeath) &&
@@ -97,7 +97,7 @@ namespace Trinity
                     DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault))
             {
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, -15f);
+                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -15f);
                 return new TrinityPower(SNOPower.DemonHunter_Vault, 20f, vNewTarget, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
             }
             // Rain of Vengeance
@@ -139,10 +139,10 @@ namespace Trinity
                 ((Player.PrimaryResource >= 15 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 bool bGenerateNewZigZag = (DateTime.Now.Subtract(LastChangedZigZag).TotalMilliseconds >= 1500 ||
-                    (vPositionLastZigZagCheck != Vector3.Zero && Player.CurrentPosition == vPositionLastZigZagCheck && DateTime.Now.Subtract(LastChangedZigZag).TotalMilliseconds >= 200) ||
-                    Vector3.Distance(Player.CurrentPosition, CombatBase.ZigZagPosition) <= 4f ||
+                    (vPositionLastZigZagCheck != Vector3.Zero && Player.Position == vPositionLastZigZagCheck && DateTime.Now.Subtract(LastChangedZigZag).TotalMilliseconds >= 200) ||
+                    Vector3.Distance(Player.Position, CombatBase.ZigZagPosition) <= 4f ||
                     CurrentTarget.ACDGuid != LastZigZagUnitAcdGuid);
-                vPositionLastZigZagCheck = Player.CurrentPosition;
+                vPositionLastZigZagCheck = Player.Position;
                 if (bGenerateNewZigZag)
                 {
                     float fExtraDistance = CurrentTarget.CentreDistance <= 10f ? 10f : 5f;
@@ -171,7 +171,7 @@ namespace Trinity
                     if (CurrentTarget.CentreDistance - fExtraDistance < 15f)
                         fExtraDistance -= 2;
                 }
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, CurrentTarget.CentreDistance - fExtraDistance);
+                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance - fExtraDistance);
                 return new TrinityPower(SNOPower.DemonHunter_SpikeTrap, 40f, vNewTarget, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Caltrops

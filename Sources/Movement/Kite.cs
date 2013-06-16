@@ -43,13 +43,13 @@ namespace Trinity
                 if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
                 {
                     TryToKite = true;
-                    vKitePointAvoid = Player.CurrentPosition;
+                    vKitePointAvoid = Player.Position;
                 }
 
                 if (monsterList.Count() > 0 && (Player.ActorClass != ActorClass.Wizard || IsWizardShouldKite()))
                 {
                     TryToKite = true;
-                    vKitePointAvoid = Player.CurrentPosition;
+                    vKitePointAvoid = Player.Position;
                 }
 
                 if (Settings.Combat.Misc.AvoidDeath && 
@@ -80,11 +80,11 @@ namespace Trinity
                         {
                             PositionFoundTime = DateTime.Now,
                             Position = vAnySafePoint,
-                            Distance = vAnySafePoint.Distance(Player.CurrentPosition)
+                            Distance = vAnySafePoint.Distance(Player.Position)
                         };
                     }
 
-                    if (vAnySafePoint != Vector3.Zero && vAnySafePoint.Distance(Player.CurrentPosition) >= 1)
+                    if (vAnySafePoint != Vector3.Zero && vAnySafePoint.Distance(Player.Position) >= 1)
                     {
 
                         if ((DateTime.Now.Subtract(LastKitePosition.PositionFoundTime).TotalMilliseconds > 3000 && LastKitePosition.Position == vAnySafePoint) ||
@@ -101,14 +101,14 @@ namespace Trinity
                             {
                                 PositionFoundTime = DateTime.Now,
                                 Position = vAnySafePoint,
-                                Distance = vAnySafePoint.Distance(Player.CurrentPosition)
+                                Distance = vAnySafePoint.Distance(Player.Position)
                             };
                         }
 
                         if (Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         {
                             Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting to: {0} Distance: {1:0} Direction: {2:0}, Health%={3:0.00}, KiteDistance: {4:0}, Nearby Monsters: {5:0} NeedToKite: {6} TryToKite: {7}",
-                                vAnySafePoint, vAnySafePoint.Distance(Player.CurrentPosition), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
+                                vAnySafePoint, vAnySafePoint.Distance(Player.Position), MathUtil.GetHeading(MathUtil.FindDirectionDegree(Me.Position, vAnySafePoint)),
                                 Player.CurrentHealthPct, PlayerKiteDistance, monsterList.Count(),
                                 NeedToKite, TryToKite);
                         }
@@ -117,8 +117,8 @@ namespace Trinity
                             Position = vAnySafePoint,
                             Type = GObjectType.Avoidance,
                             Weight = 90000,
-                            CentreDistance = Vector3.Distance(Player.CurrentPosition, vAnySafePoint),
-                            RadiusDistance = Vector3.Distance(Player.CurrentPosition, vAnySafePoint),
+                            CentreDistance = Vector3.Distance(Player.Position, vAnySafePoint),
+                            RadiusDistance = Vector3.Distance(Player.Position, vAnySafePoint),
                             InternalName = "KitePoint"
                         };
 

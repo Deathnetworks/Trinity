@@ -499,7 +499,7 @@ namespace Trinity.Combat.Abilities
                     extraDistance = (25 - CurrentTarget.CentreDistance);
                 if (extraDistance < V.F("Barbarian.FuriousCharge.MinExtraTargetDistance"))
                     extraDistance = V.F("Barbarian.FuriousCharge.MinExtraTargetDistance");
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, CurrentTarget.CentreDistance + extraDistance);
+                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance + extraDistance);
                 return new TrinityPower(SNOPower.Barbarian_FuriousCharge, V.F("Barbarian.FuriousCharge.UseRange"), vNewTarget);
             }
         }
@@ -513,7 +513,7 @@ namespace Trinity.Combat.Abilities
                 if (CurrentTarget.CentreDistance + extraDistance > 35f)
                     extraDistance = 35 - CurrentTarget.CentreDistance;
 
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.CurrentPosition, CurrentTarget.CentreDistance + extraDistance);
+                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance + extraDistance);
                 return new TrinityPower(SNOPower.Barbarian_Leap, V.F("Barbarian.Leap.UseRange"), vNewTarget);
             }
         }
@@ -528,7 +528,7 @@ namespace Trinity.Combat.Abilities
                 bool shouldGetNewZigZag =
                     (DateTime.Now.Subtract(Trinity.LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
                     CurrentTarget.ACDGuid != Trinity.LastZigZagUnitAcdGuid ||
-                    ZigZagPosition.Distance2D(Player.CurrentPosition) <= 5f);
+                    ZigZagPosition.Distance2D(Player.Position) <= 5f);
 
                 if (shouldGetNewZigZag)
                 {

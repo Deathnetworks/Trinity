@@ -82,7 +82,7 @@ namespace Trinity.XmlTags
             }
         }
 
-        public Vector3 MyPos { get { return Trinity.Player.CurrentPosition; } }
+        public Vector3 MyPos { get { return Trinity.Player.Position; } }
         private ISearchAreaProvider MainGridProvider { get { return Trinity.MainGridProvider; } }
 
         public override void OnStart()

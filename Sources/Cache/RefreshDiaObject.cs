@@ -447,7 +447,7 @@ namespace Trinity
         private static void RefreshStepCalculateDistance()
         {
             // Calculate distance, don't rely on DB's internal method as this may hit Diablo 3 memory again
-            c_CentreDistance = Player.CurrentPosition.Distance2D(c_Position);
+            c_CentreDistance = Player.Position.Distance2D(c_Position);
             // Set radius-distance to centre distance at first
             c_RadiusDistance = c_CentreDistance;
         }
@@ -805,7 +805,7 @@ namespace Trinity
                                             }
                                             else if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
-                                                Vector3 myPos = new Vector3(Player.CurrentPosition.X, Player.CurrentPosition.Y, Player.CurrentPosition.Z + 8f);
+                                                Vector3 myPos = new Vector3(Player.Position.X, Player.Position.Y, Player.Position.Z + 8f);
                                                 Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 8f);
 
                                                 //cPos = MathEx.CalculatePointFrom(myPos, cPos, c_CentreDistance - PlayerStatus.GoldPickupRadius);
@@ -1250,7 +1250,7 @@ namespace Trinity
         private static bool MosterObstacleInPathCacheObject(bool AddToCache)
         {
             // Don't add an item if a monster is blocking our path
-            if (hashMonsterObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, Player.CurrentPosition, c_Position)))
+            if (hashMonsterObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, Player.Position, c_Position)))
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "MonsterInPath";
