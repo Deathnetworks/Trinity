@@ -526,8 +526,8 @@ namespace Trinity.DbProvider
                 bool bTooMuchZChange = (Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z) >= 4f);
 
                 // Whirlwind for a barb, special context only
-                if (Trinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Trinity.ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= 10f) >= 1 &&
-                    Trinity.Player.PrimaryResource >= 10 && !Trinity.IsWaitingForSpecial)
+                if (Trinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Trinity.ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= V.F("Barbarian.Whirlwind.UseRange")) >= 1 &&
+                    Trinity.Player.PrimaryResource >= V.F("Barbarian.WhirlWind.MinFury") && !Trinity.IsWaitingForSpecial && V.B("Barbarian.Whirlwind.UseForMovement"))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))

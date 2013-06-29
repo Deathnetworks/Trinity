@@ -278,6 +278,8 @@ namespace Trinity.Combat.Abilities
                     // Don't still have the buff
                     !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
                     CanCast(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                    // Only with Battle Rage
+                    (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage) || !Hotbar.Contains(SNOPower.Barbarian_BattleRage)) &&
                     // Not on heart of sin after Cydaea
                     CurrentTarget.ActorSNO != 193077 &&
                     (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent ||
@@ -440,6 +442,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return !UseOOCBuff && CanCast(SNOPower.Barbarian_Overpower) && !Player.IsIncapacitated &&
+                    (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage) || !Hotbar.Contains(SNOPower.Barbarian_BattleRage)) &&
                     (CurrentTarget.RadiusDistance <= V.F("Barbarian.OverPower.MaxRange") || 
                         (
                         TargetUtil.AnyMobsInRange(V.F("Barbarian.OverPower.MaxRange")) &&

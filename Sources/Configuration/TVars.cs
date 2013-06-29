@@ -60,6 +60,7 @@ namespace Trinity
             Set(new TVar("Barbarian.Whirlwind.TrashCount", 1, "Minimum Fury"));
             Set(new TVar("Barbarian.Whirlwind.EliteRange", 25f, "Minimum Fury"));
             Set(new TVar("Barbarian.Whirlwind.EliteCount", 1, "Minimum Fury"));
+            Set(new TVar("Barbarian.Whirlwind.UseForMovement", true, "Use Whirlwind when moving near ignored mobs"));
             Set(new TVar("Barbarian.Whirlwind.ZigZagDistance", 15f, "Whirlwind ZigZag Range"));
             Set(new TVar("Barbarian.Whirlwind.ZigZagMaxTime", 1200, "Maximum time to keep a zig zag point before forcing a new point (millseconds)"));
             Set(new TVar("Barbarian.Bash.UseRange", 6f, "Power Use Range"));

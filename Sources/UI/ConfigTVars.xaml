@@ -15,10 +15,26 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button Content="Open Trinity Variable Configuration" Width="Auto" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Center" 
-                Command="{Binding OpenTVarsCommand}" />
+        <TextBlock Grid.Row="1" Text="WARNING" Foreground="Red" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10" />
+        <TextBlock Grid.Row="2" MaxWidth="4750" HorizontalAlignment="Center" TextWrapping="Wrap" Margin="10">
+            This section is for advanced users only. 
+            <LineBreak />
+            Incorrectly setting values through this interface may cause undesirable bot behavior or completely break your bot. 
+            <LineBreak />
+            In order to understand what each variables does and how it affects the bot behavior, you may need to read through the program code.  
+            <LineBreak />
+            <LineBreak />
+            Do not expect support if your bot stops working after you've started editing Trinity Variables without knowing their purpose, function, limits and the consequences of changing them.
+        </TextBlock>
+
+        <Button Grid.Row="3" Content="Open Trinity Variable Configuration" Width="Auto" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                Command="{Binding OpenTVarsCommand}" Padding="5" Margin="10" />
         
     </Grid>
 </UserControl>
