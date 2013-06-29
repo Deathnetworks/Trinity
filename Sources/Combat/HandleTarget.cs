@@ -1161,7 +1161,7 @@ namespace Trinity
                 bool bFoundSpecialMovement = false;
                 // Leap movement for a barb
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_Leap) &&
-                    DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Barbarian_Leap]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_Leap] &&
+                    DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Barbarian_Leap]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_Leap) &&
                     PowerManager.CanCast(SNOPower.Barbarian_Leap))
                 {
                     WaitWhileAnimating(3, true);
@@ -1171,7 +1171,7 @@ namespace Trinity
                 }
                 // Furious Charge movement for a barb
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) &&
-                    DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Barbarian_FuriousCharge]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_FuriousCharge] &&
+                    DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Barbarian_FuriousCharge]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_FuriousCharge) &&
                     PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge))
                 {
                     WaitWhileAnimating(3, true);
@@ -1181,7 +1181,7 @@ namespace Trinity
                 }
                 // Vault for a Demon Hunter
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Vault) &&
-                    //DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.DemonHunter_Vault] &&
+                    //DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= CombatBase.SetSNOPowerUseDelay(SNOPower.DemonHunter_Vault] &&
                     DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
                     (PlayerKiteDistance <= 0 || (!hashMonsterObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
@@ -1196,7 +1196,7 @@ namespace Trinity
                 }
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Wizard_Teleport) &&
-                    DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Wizard_Teleport]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Teleport] &&
+                    DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Wizard_Teleport]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_Teleport) &&
                     Player.PrimaryResource >= 15 &&
                     PowerManager.CanCast(SNOPower.Wizard_Teleport))
                 {
@@ -1207,7 +1207,7 @@ namespace Trinity
                 }
                 // Archon Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
-                    DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Wizard_Archon_Teleport]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Archon_Teleport] &&
+                    DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Wizard_Archon_Teleport]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_Archon_Teleport) &&
                     PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
                 {
                     WaitWhileAnimating(3, true);

@@ -89,7 +89,7 @@ namespace Trinity.UI
         /// <summary>Loads the and transform xaml file.</summary>
         /// <param name="filename">The filename to load.</param>
         /// <returns><see cref="Stream"/> which contains transformed XAML file.</returns>
-        private static T LoadAndTransformXamlFile<T>(string filename)
+        internal static T LoadAndTransformXamlFile<T>(string filename)
         {
             Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load XAML file : {0}", filename);
             string filecontent = File.ReadAllText(filename);

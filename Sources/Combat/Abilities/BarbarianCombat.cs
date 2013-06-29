@@ -455,9 +455,9 @@ namespace Trinity.Combat.Abilities
             {
                 return !UseOOCBuff && !IsWaitingForSpecial && CanCast(SNOPower.Barbarian_SeismicSlam) && !Player.IsIncapacitated &&
                     (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage))) &&
-                    Player.PrimaryResource >= V.I("Barbarian.SeismicSlam.MinFury") && CurrentTarget.CentreDistance <= V.F("Barbarian.SeismicSlam.CurrentTargetRange") && (TargetUtil.AnyMobsInRange(50) ||
-                    (TargetUtil.AnyMobsInRange(50) && Player.PrimaryResourcePct >= 0.85 && CurrentTarget.HitPointsPct >= 0.30) ||
-                    TargetUtil.IsEliteTargetInRange(20f));
+                    Player.PrimaryResource >= V.I("Barbarian.SeismicSlam.MinFury") && CurrentTarget.CentreDistance <= V.F("Barbarian.SeismicSlam.CurrentTargetRange") && 
+                    (TargetUtil.AnyMobsInRange(V.F("Barbarian.SeismicSlam.TrashRange")) ||
+                     TargetUtil.IsEliteTargetInRange(V.F("Barbarian.SeismicSlam.EliteRange")));
             }
         }
         public static bool CanUseAncientSpear
@@ -465,18 +465,87 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Barbarian_AncientSpear) &&
-                    CurrentTarget.HitPointsPct >= 0.20;
+                    CurrentTarget.HitPointsPct >= V.F("Barbarian.AncientSpear.MinHealthPct");
             }
         }
-        public static bool CanUseSprint { get { return false; } }
-        public static bool CanUseFrenzyTo5 { get { return false; } }
-        public static bool CanUseWhirlwind { get { return false; } }
-        public static bool CanUseBattleRage { get { return false; } }
-        public static bool CanUseHammerOfTheAncients { get { return false; } }
-        public static bool CanUseWeaponThrow { get { return false; } }
-        public static bool CanUseFrenzy { get { return false; } }
-        public static bool CanUseBash { get { return false; } }
-        public static bool CanUseCleave { get { return false; } }
+        public static bool CanUseSprint
+        {
+            get
+            {
+                return !UseOOCBuff && !AllowSprintOOC && CanCast(SNOPower.Barbarian_Sprint) && !Player.IsIncapacitated &&
+                    // Fury Dump Options for sprint: use at max energy constantly, or on a timer
+                    (
+                        (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= 0.95 && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                        (Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= 0.95) ||
+                        ((SNOPowerUseTimer(SNOPower.Barbarian_Sprint) && !GetHasBuff(SNOPower.Barbarian_Sprint)) &&
+                        // Always keep up if we are whirlwinding, if the target is a goblin, or if we are more than 16 feet away from the target
+                        (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) || CurrentTarget.IsTreasureGoblin || (CurrentTarget.CentreDistance >= 16f && Player.PrimaryResource >= 40)))
+                    ) &&
+                    // If they have battle-rage, make sure it's up
+                    (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage))) &&
+                    // Check for minimum energy
+                    Player.PrimaryResource >= 20;
+            }
+        }
+        public static bool CanUseFrenzyTo5
+        {
+            get
+            {
+                return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsRooted && Hotbar.Contains(SNOPower.Barbarian_Frenzy) &&
+                    !TargetUtil.AnyMobsInRange(15f, 3) && GetBuffStacks(SNOPower.Barbarian_Frenzy) < 5;
+            }
+        }
+        public static bool CanUseWhirlwind
+        {
+            get
+            {
+                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && !Player.IsIncapacitated && !Player.IsRooted &&
+                    (!IsWaitingForSpecial || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve)) &&
+                    //(!IsWaitingForSpecial || (IsWaitingForSpecial && !(TargetUtil.AnyMobsInRange(3, 15) || ForceCloseRangeTarget))) && // make sure we're not surrounded if waiting for special
+                    // Don't WW against goblins, units in the special SNO list
+                    (!Settings.Combat.Barbarian.SelectiveWhirlwind || (Settings.Combat.Barbarian.SelectiveWhirlwind && !DataDictionary.WhirlwindIgnoreSNOIds.Contains(CurrentTarget.ActorSNO))) &&
+                    // Only if within 25 yards of main target
+                    ((CurrentTarget.RadiusDistance <= 25f || TargetUtil.AnyMobsInRange(V.F("Barbarian.Whirlwind.TrashRange"), V.I("Barbarian.Whirlwind.TrashCount")))) &&
+                    (TargetUtil.AnyMobsInRange(50, 2) || CurrentTarget.HitPointsPct >= 0.30 || CurrentTarget.IsBossOrEliteRareUnique || Player.CurrentHealthPct <= 0.60) &&
+                    // Check for energy reservation amounts
+                    //((playerStatus.dCurrentEnergy >= 20 && !playerStatus.bWaitingForReserveEnergy) || playerStatus.dCurrentEnergy >= iWaitingReservedAmount) &&
+                    Player.PrimaryResource >= V.D("Barbarian.Whirlwind.MinFury") &&
+                    // If they have battle-rage, make sure it's up
+                    (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage)));
+            }
+        }
+        public static bool CanUseBattleRage
+        {
+            get
+            {
+                return !UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_BattleRage) && !Player.IsIncapacitated &&
+                    // Fury Dump Options for battle rage IF they don't have sprint 
+                    (
+                    (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= 0.99 && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                    (Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= 0.99) || !GetHasBuff(SNOPower.Barbarian_BattleRage)
+                    ) &&
+                    Player.PrimaryResource >= 20 && PowerManager.CanCast(SNOPower.Barbarian_BattleRage);
+            }
+        }
+        public static bool CanUseHammerOfTheAncients
+        {
+            get
+            {
+                return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !IsWaitingForSpecial && Hotbar.Contains(SNOPower.Barbarian_HammerOfTheAncients) &&
+                    Player.PrimaryResource >= 20;
+            }
+        }
+        public static bool CanUseWeaponThrow
+        {
+            get
+            {
+                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WeaponThrow)
+                    && (Player.PrimaryResource >= 10 && (CurrentTarget.RadiusDistance >= 5f || BarbHasNoPrimary()));
+            }
+        }
+        public static bool CanUseFrenzy { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Frenzy); } }
+        public static bool CanUseBash { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Bash); } }
+        public static bool CanUseCleave { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Cleave); } }
 
         public static TrinityPower PowerIgnorePain { get { return new TrinityPower(SNOPower.Barbarian_IgnorePain); } }
         public static TrinityPower PowerEarthquake { get { return new TrinityPower(SNOPower.Barbarian_Earthquake); } }
@@ -578,6 +647,12 @@ namespace Trinity.Combat.Abilities
         {
             get { return allowSprintOOC; }
             set { allowSprintOOC = value; }
+        }
+        private static bool BarbHasNoPrimary()
+        {
+            return !(Hotbar.Contains(SNOPower.Barbarian_Frenzy) ||
+                Hotbar.Contains(SNOPower.Barbarian_Bash) ||
+                Hotbar.Contains(SNOPower.Barbarian_Cleave));
         }
 
     }

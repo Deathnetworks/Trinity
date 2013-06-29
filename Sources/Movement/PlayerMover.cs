@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Trinity.XmlTags;
@@ -536,7 +537,7 @@ namespace Trinity.DbProvider
 
                 // Leap movement for a barb
                 if (Trinity.Hotbar.Contains(SNOPower.Barbarian_Leap) &&
-                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Barbarian_Leap]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_Leap] &&
+                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Barbarian_Leap]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_Leap) &&
                     DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Barbarian_Leap) && !ShrinesInArea(vMoveToTarget))
                 {
@@ -551,7 +552,7 @@ namespace Trinity.DbProvider
                 }
                 // Furious Charge movement for a barb
                 if (Trinity.Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) && !bTooMuchZChange &&
-                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Barbarian_FuriousCharge]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_FuriousCharge] &&
+                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Barbarian_FuriousCharge]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_FuriousCharge) &&
                     DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge) && !ShrinesInArea(vMoveToTarget))
                 {
@@ -665,7 +666,8 @@ namespace Trinity.DbProvider
 
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (Trinity.Hotbar.Contains(SNOPower.Wizard_Teleport) &&
-                    ((PowerManager.CanCast(SNOPower.Wizard_Teleport) && DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_Teleport]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Teleport]) ||
+                    ((PowerManager.CanCast(SNOPower.Wizard_Teleport) && 
+                    CombatBase.SNOPowerUseTimer(SNOPower.Wizard_Teleport)) ||
                     (hasWormHole && WizardTeleportCount < 3 && DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_Teleport]).TotalMilliseconds >= 250)) &&
                     DestinationDistance >= 10f && !ShrinesInArea(vMoveToTarget))
                 {
@@ -689,7 +691,7 @@ namespace Trinity.DbProvider
                 }
                 // Archon Teleport for a wizard 
                 if (Trinity.Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
-                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_Archon_Teleport]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_Archon_Teleport] &&
+                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_Archon_Teleport]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_Archon_Teleport) &&
                     DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport) && !ShrinesInArea(vMoveToTarget))
                 {

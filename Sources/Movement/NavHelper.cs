@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta;
@@ -126,7 +127,7 @@ namespace Trinity
                 hasEmergencyTeleportUp = (
                     // Leap is available
                     (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Leap) &&
-                        DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Barbarian_Leap]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Barbarian_Leap]) ||
+                        DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Barbarian_Leap]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_Leap)) ||
                     // Whirlwind is available
                     (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
                         ((PlayerStatus.PrimaryResource >= 10 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= Trinity.MinEnergyReserve)) ||
@@ -143,7 +144,7 @@ namespace Trinity
                     );
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
                 if (!shouldKite && PlayerStatus.ActorClass == ActorClass.Wizard && Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && PlayerStatus.PrimaryResource >= 25 &&
-                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[SNOPower.Wizard_WaveOfForce] &&
+                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_WaveOfForce) &&
                     !PlayerStatus.IsIncapacitated && Trinity.hashAvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(PlayerStatus.Position) <= 15f) >= 2 &&
                     (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {

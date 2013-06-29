@@ -188,6 +188,9 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
+                if (CurrentTarget == null)
+                    return false;
+
                 if (CurrentTarget.Type == GObjectType.Avoidance)
                     return true;
                 else
@@ -199,6 +202,9 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
+                if (CurrentTarget == null)
+                    return false;
+
                 switch (CurrentTarget.Type)
                 {
                     case GObjectType.Destructible:
@@ -334,9 +340,11 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         public static bool CanCast(SNOPower power, CanCastFlags flags = CanCastFlags.All)
         {
-            return Hotbar.Contains(power) &&
-                flags.HasFlag(CanCastFlags.NoTimer) ? SNOPowerUseTimer(power) : true &&
-                flags.HasFlag(CanCastFlags.NoPowerManager) ? PowerManager.CanCast(power) : true;
+            bool hasPower = Hotbar.Contains(power);
+            bool timer = flags.HasFlag(CanCastFlags.NoTimer) ? true : SNOPowerUseTimer(power);
+            bool powerManager = flags.HasFlag(CanCastFlags.NoPowerManager) ? true : PowerManager.CanCast(power);
+
+            return hasPower && timer && powerManager;
         }
 
         /// <summary>
@@ -375,11 +383,30 @@ namespace Trinity.Combat.Abilities
         /// </returns>
         public static bool SNOPowerUseTimer(SNOPower power, bool recheck = false)
         {
-            if (TimeSinceUse(power) >= DataDictionary.AbilityRepeatDelays[power])
+            if (TimeSinceUse(power) >= GetSNOPowerUseDelay(power))
                 return true;
             if (recheck && TimeSinceUse(power) >= 150 && TimeSinceUse(power) <= 600)
                 return true;
             return false;
+        }
+
+        public static void SetSNOPowerUseDelay(SNOPower power, double delay)
+        {
+            string key = "SpellDelay." + power.ToString();
+            TVar v = V.Data[key];
+            
+            bool hasDefaultValue = v.Value == v.DefaultValue;
+
+            if (hasDefaultValue)
+            {
+                // Create a new TVar (changes the default value)
+                V.Set(new TVar(v.Name, delay, v.Description));
+            }
+        }
+
+        public static double GetSNOPowerUseDelay(SNOPower power)
+        {
+            return V.D("SpellDelay." + power.ToString());
         }
 
         /// <summary>
@@ -413,7 +440,7 @@ namespace Trinity.Combat.Abilities
         /// <param name="power"></param>
         protected static bool IsNull(TrinityPower power)
         {
-            return power.Equals(null);
+            return power == null;
         }
     }
 }

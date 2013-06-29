@@ -143,8 +143,8 @@ namespace Trinity
             TargetPosition = Vector3.Zero;
             TargetDynamicWorldId = -1;
             TargetRActorGUID = -1;
-            WaitTicksBeforeUse = 0;
-            WaitTicksAfterUse = 0;
+            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
+            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = false;
         }
 
@@ -161,8 +161,8 @@ namespace Trinity
             TargetPosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
             TargetRActorGUID = -1;
-            WaitTicksBeforeUse = 0;
-            WaitTicksAfterUse = 0;
+            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
+            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
             PowerAssignmentTime = DateTime.Now;
         }
@@ -180,8 +180,8 @@ namespace Trinity
             TargetPosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
             TargetRActorGUID = -1;
-            WaitTicksBeforeUse = 0;
-            WaitTicksAfterUse = 0;
+            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
+            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
             PowerAssignmentTime = DateTime.Now;
         }
@@ -199,8 +199,8 @@ namespace Trinity
             TargetPosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
             TargetRActorGUID = targetRActorGUID;
-            WaitTicksBeforeUse = 0;
-            WaitTicksAfterUse = 0;
+            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
+            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
             PowerAssignmentTime = DateTime.Now;
         }
@@ -218,8 +218,8 @@ namespace Trinity
             TargetPosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
             TargetRActorGUID = -1;
-            WaitTicksBeforeUse = 0;
-            WaitTicksAfterUse = 0;
+            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
+            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
             PowerAssignmentTime = DateTime.Now;
         }
@@ -237,8 +237,8 @@ namespace Trinity
             TargetPosition = position;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
             TargetRActorGUID = -1;
-            WaitTicksBeforeUse = 0;
-            WaitTicksAfterUse = 0;
+            WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
+            WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
             PowerAssignmentTime = DateTime.Now;
         }

@@ -242,7 +242,16 @@ namespace Trinity
                 Trinity.Hotbar = new HashSet<SNOPower>();
                 for (int i = 0; i <= 5; i++)
                 {
-                    Trinity.Hotbar.Add(ZetaDia.CPlayer.GetPowerForSlot((HotbarSlot)i));
+                    SNOPower power = ZetaDia.CPlayer.GetPowerForSlot((HotbarSlot)i);
+                    Trinity.Hotbar.Add(power);
+                    if (!DataDictionary.LastUseAbilityTimeDefaults.ContainsKey(power))
+                    {
+                        DataDictionary.LastUseAbilityTimeDefaults.Add(power, DateTime.Now);                        
+                    }
+                    if (!Trinity.AbilityLastUsedCache.ContainsKey(power))
+                    {
+                        Trinity.AbilityLastUsedCache.Add(power, DateTime.MinValue);
+                    }
                 }
                 Trinity.HasMappedPlayerAbilities = true;
                 Trinity.ShouldRefreshHotbarAbilities = false;

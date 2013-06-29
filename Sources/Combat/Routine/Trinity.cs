@@ -1,14 +1,14 @@
-﻿// VERSION 1.1.2
+﻿// VERSION 1.1.3a
 using System;
+using System.Diagnostics;
 using System.Windows;
 using Zeta;
+using Zeta.Common;
+using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
 using Zeta.TreeSharp;
-using Trinity;
-using Zeta.Common.Plugins;
 using Action = Zeta.TreeSharp.Action;
-using System.Diagnostics;
 
 namespace Trinity
 {
@@ -42,6 +42,7 @@ namespace Trinity
                         return plugin.Plugin.DisplayWindow;
                     }
                 }
+                Logging.Write("[Trinity] Unable to open Plugin Config window!");
                 return null;
             }
         }

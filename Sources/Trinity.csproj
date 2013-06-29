@@ -75,6 +75,7 @@
     <Compile Include="Configuration\TVars.cs" />
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\GameEvents.cs" />
+    <Compile Include="Helpers\ObservableDictionary.cs" />
     <Compile Include="Helpers\PluginCheck.cs" />
     <Compile Include="Items\ItemEvents.cs" />
     <Compile Include="Cache\CacheAvoidance.cs" />
@@ -168,6 +169,8 @@
     <Compile Include="UI\UIComponents\PercentConverter.cs" />
     <Compile Include="UI\UIComponents\EnumBooleanConverter.cs" />
     <Compile Include="UI\UIComponents\RelayCommand.cs" />
+    <Compile Include="UI\UIComponents\TVarsViewModel.cs" />
+    <Compile Include="UI\UIComponents\TVarValidationRule.cs" />
     <Compile Include="UI\UILoader.cs" />
     <Compile Include="Combat\Weighting.cs" />
     <Compile Include="Combat\TargetCheck.cs" />
@@ -237,6 +240,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\ConfigItems.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\ConfigTVars.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

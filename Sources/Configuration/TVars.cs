@@ -1,18 +1,33 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Xml;
+using Trinity.Config;
+using Trinity.Helpers;
+using Trinity.Technicals;
+using Zeta;
 
 namespace Trinity
 {
     /// <summary>
-    /// Trinity Variables
+    /// Trinity Dynamic Variables
     /// </summary>
+    [KnownType(typeof(TVar))]
+    [DataContract(Namespace = "")]
     public static class V
     {
         public static void SetDefaults()
         {
+            // Disable file save on variable modification/insert
+            batch = true;
+
             // Barbarian 
             Set(new TVar("Barbarian.MinEnergyReserve", 56, "Ignore Pain Emergency Use Minimum Health Percent"));
             Set(new TVar("Barbarian.IgnorePain.MinHealth", 0.45f, "Ignore Pain Emergency Use Minimum Health Percent"));
@@ -38,10 +53,13 @@ namespace Trinity
             Set(new TVar("Barbarian.CallOfTheAncients.MinEliteRange", 25f, "Minimum range elites must be in to use COTA"));
             Set(new TVar("Barbarian.CallOfTheAncients.TickDelay", 4, "Pre and Post use Tick Delay"));
             Set(new TVar("Barbarian.Leap.UseRange", 35f, "Power Use Range"));
-            Set(new TVar("Barbarian.SeismicSlam.UseRange", 40f, "Power Use Range"));
             Set(new TVar("Barbarian.AncientSpear.UseRange", 55f, "Power Use Range"));
             Set(new TVar("Barbarian.Whirlwind.UseRange", 10f, "Power Use Range"));
-            Set(new TVar("Barbarian.Whirlwind.MinFury", 10, "Minimum Fury"));
+            Set(new TVar("Barbarian.Whirlwind.MinFury", 10d, "Minimum Fury"));
+            Set(new TVar("Barbarian.Whirlwind.TrashRange", 25f, "Minimum Fury"));
+            Set(new TVar("Barbarian.Whirlwind.TrashCount", 1, "Minimum Fury"));
+            Set(new TVar("Barbarian.Whirlwind.EliteRange", 25f, "Minimum Fury"));
+            Set(new TVar("Barbarian.Whirlwind.EliteCount", 1, "Minimum Fury"));
             Set(new TVar("Barbarian.Whirlwind.ZigZagDistance", 15f, "Whirlwind ZigZag Range"));
             Set(new TVar("Barbarian.Whirlwind.ZigZagMaxTime", 1200, "Maximum time to keep a zig zag point before forcing a new point (millseconds)"));
             Set(new TVar("Barbarian.Bash.UseRange", 6f, "Power Use Range"));
@@ -75,7 +93,145 @@ namespace Trinity
             Set(new TVar("Barbarian.OverPower.MaxRange", 9f, "Maximum Range Overpower is triggered"));
             Set(new TVar("Barbarian.SeismicSlam.CurrentTargetRange", 40f, "Maximum Current Target range"));
             Set(new TVar("Barbarian.SeismicSlam.MinFury", 15, "Minimum Fury for Seismic Slam"));
-            Set(new TVar("Barbarian.HammerOfTheAncients.UseRange", 10f, "Use Range"));              
+            Set(new TVar("Barbarian.SeismicSlam.TrashRange", 20f, "Seismic Slam Trash Check Range"));
+            Set(new TVar("Barbarian.SeismicSlam.EliteRange", 20f, "Elite Target Range"));
+            Set(new TVar("Barbarian.SeismicSlam.UseRange", 40f, "Power Use Range"));
+            Set(new TVar("Barbarian.HammerOfTheAncients.UseRange", 10f, "Use Range"));
+            Set(new TVar("Barbarian.AncientSpear.MinHealthPct", 0.2, "Minimum Target Health Percent for Ancient Spear"));
+
+            // Misc Spells
+            Set(new TVar("SpellDelay.DrinkHealthPotion", 30000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Weapon_Melee_Instant", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Weapon_Ranged_Instant", 5, "Spell Use Delay/Interval, milliseconds"));
+
+            // Barbarian Spells
+            Set(new TVar("SpellDelay.Barbarian_Bash", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_Cleave", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_Frenzy", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_HammerOfTheAncients", 150, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_Rend", 2650, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_SeismicSlam", 200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_Whirlwind", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_GroundStomp", 12200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_Leap", 10200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_Sprint", 2900, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_IgnorePain", 30200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_AncientSpear", 300, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_Revenge", 600, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_FuriousCharge", 500, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_Overpower", 200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_WeaponThrow", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_ThreateningShout", 10200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_BattleRage", 118000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_WarCry", 20500, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_Earthquake", 120500, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_CallOfTheAncients", 120500, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_WrathOfTheBerserker", 120500, "Spell Use Delay/Interval, milliseconds"));
+
+            // Monk skills
+            Set(new TVar("SpellDelay.Monk_FistsofThunder", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_DeadlyReach", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_CripplingWave", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_WayOfTheHundredFists", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_LashingTailKick", 250, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_TempestRush", 15, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_WaveOfLight", 750, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_BlindingFlash", 15200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_BreathOfHeaven", 15200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_Serenity", 20200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_InnerSanctuary", 20200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_DashingStrike", 1000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_ExplodingPalm", 5000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_SweepingWind", 1500, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_CycloneStrike", 900, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_SevenSidedStrike", 30200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_MysticAlly", 30000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_MantraOfEvasion", 3300, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_MantraOfRetribution", 3300, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_MantraOfHealing", 3300, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_MantraOfConviction", 3300, "Spell Use Delay/Interval, milliseconds"));
+
+            // Wizard skills
+            Set(new TVar("SpellDelay.Wizard_MagicMissile", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_ShockPulse", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_SpectralBlade", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Electrocute", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_RayOfFrost", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_ArcaneOrb", 500, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_ArcaneTorrent", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Disintegrate", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_FrostNova", 9000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_DiamondSkin", 15000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_SlowTime", 16000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Teleport", 16000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_WaveOfForce", 12000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_EnergyTwister", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Hydra", 12000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Meteor", 1000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Blizzard", 4000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_IceArmor", 60000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_StormArmor", 60000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_EnergyArmor", 60000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_MagicWeapon", 60000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Familiar", 60000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_ExplosiveBlast", 6000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_MirrorImage", 5000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Archon", 100000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Archon_ArcaneBlast", 5000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Archon_ArcaneStrike", 200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Archon_DisintegrationWave", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Archon_SlowTime", 16000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Archon_Teleport", 10000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Archon_Cancel", 1500, "Spell Use Delay/Interval, milliseconds"));
+
+            // Witch Doctor skills
+            Set(new TVar("SpellDelay.Witchdoctor_PoisonDart", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_CorpseSpider", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_PlagueOfToads", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_Firebomb", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_GraspOfTheDead", 6000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_Firebats", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_Haunt", 12000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_Locust_Swarm", 8000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_SummonZombieDog", 25000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_Horrify", 16200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_SpiritWalk", 15200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_Hex", 15200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_SoulHarvest", 15000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_Sacrifice", 1000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_MassConfusion", 45200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_ZombieCharger", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_SpiritBarrage", 15000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_AcidCloud", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_WallOfZombies", 25200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_Gargantuan", 25000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_BigBadVoodoo", 120000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Witchdoctor_FetishArmy", 90000, "Spell Use Delay/Interval, milliseconds"));
+
+            // Demon Hunter skills
+            Set(new TVar("SpellDelay.DemonHunter_HungeringArrow", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_EntanglingShot", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_BolaShot", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Grenades", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Impale", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_RapidFire", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Chakram", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_ElementalArrow", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Caltrops", 3000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_SmokeScreen", 3000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_ShadowPower", 5000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Vault", 400, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Preparation", 5000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Companion", 30000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_MarkedForDeath", 3000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_EvasiveFire", 300, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_FanOfKnives", 10000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_SpikeTrap", 1000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Sentry", 8000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Strafe", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Multishot", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_ClusterArrow", 150, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_RainOfVengeance", 10000, "Spell Use Delay/Interval, milliseconds"));
 
             // Demon Hunter
             Set(new TVar("DemonHunter.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));
@@ -91,6 +247,143 @@ namespace Trinity
             // Wizard
             Set(new TVar("Wizard.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));
 
+            // Global
+            Set(new TVar("Combat.DefaultTickPreDelay", 1, "Default Combat Power Pre-use Delay (in ticks)"));
+            Set(new TVar("Combat.DefaultTickPostDelay", 1, "Default Combat Power Post-use Delay (in ticks)"));
+
+            batch = false;
+        }
+
+        internal static void Save()
+        {
+            if (!ZetaDia.Service.Platform.IsConnected || !ZetaDia.Service.CurrentHero.IsValid)
+                return;
+
+            string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "TVars.xml");
+            lock (sync)
+            {
+                try
+                {
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Saving Variable Setting file");
+                    using (Stream stream = File.Open(filename, FileMode.Create))
+                    {
+                        List<Type> knownTypes = new List<Type>()
+                        {
+                            typeof(int),
+                            typeof(string),
+                            typeof(float),
+                            typeof(double),
+                            typeof(bool),
+                            typeof(TVar),
+                            typeof(DictionaryEntry),
+                            typeof(KeyValuePair<string, TVar>),
+                            typeof(Dictionary<string,TVar>),
+                        };
+                        DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableDictionary<string, TVar>), "TVars", "", knownTypes);
+
+                        var xmlWriterSettings = new XmlWriterSettings { Indent = true };
+                        using (var xmlWriter = XmlWriter.Create(stream, xmlWriterSettings))
+                        {
+                            serializer.WriteObject(xmlWriter, V.Data);
+                        }
+                        stream.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while saving Variable Setting file: {0}", ex);
+                }
+            }
+        }
+
+        private static bool loaded = false;
+        internal static void Load()
+        {
+            if (!ZetaDia.Service.Platform.IsConnected || !ZetaDia.Service.CurrentHero.IsValid)
+                return;
+
+            string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "TVars.xml");
+
+            lock (sync)
+            {
+                try
+                {
+                    batch = true;
+
+                    if (File.Exists(filename))
+                    {
+                        using (Stream stream = File.Open(filename, FileMode.Open))
+                        {
+                            PluginCheck.CTI();
+
+                            DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableDictionary<string, TVar>), "TVars", "");
+
+                            XmlReader reader = XmlReader.Create(stream);
+                            var loadedData = (ObservableDictionary<string, TVar>)serializer.ReadObject(reader);
+
+                            if (loadedData.Count > 0)
+                            {
+                                //V.Data = loadedData;
+                                foreach (KeyValuePair<string, TVar> kvp in loadedData)
+                                {
+                                    Set(kvp.Value);
+                                }
+                            }
+
+                            stream.Close();
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Variable Setting file loaded");
+                        }
+                    }
+                    else
+                    {
+                        Save();
+                    }
+                    loaded = true;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while loading Variable Setting file: {0}", ex);
+                }
+                finally
+                {
+                    batch = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reload variables every time a game is started
+        /// </summary>
+        internal static void ValidateLoad()
+        {
+            if (loaded)
+                return;
+
+            if (Data == null)
+                Data = new ObservableDictionary<string, TVar>();
+
+            SetDefaults();
+            Load();
+        }
+
+        /// <summary>
+        /// Static Constructor
+        /// </summary>
+        private static void TVars()
+        {
+            ValidateLoad();
+            Data.CollectionChanged += Data_CollectionChanged;
+        }
+
+        /// <summary>
+        /// Saves the Data into the XML file each time a variable is modified
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void Data_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (!batch)
+                Save();
         }
 
         /// <summary>
@@ -99,9 +392,16 @@ namespace Trinity
         private static object sync = new object();
 
         /// <summary>
+        /// Allow CollectionChanged file save
+        /// </summary>
+        private static bool batch = false;
+
+        /// <summary>
         /// Contains all of our configuration data
         /// </summary>
-        private static Dictionary<string, TVar> data = new Dictionary<string, TVar>();
+        //private static Dictionary<string, TVar> data = new Dictionary<string, TVar>();
+        [DataMember(IsRequired = true)]
+        internal static ObservableDictionary<string, TVar> Data = new ObservableDictionary<string, TVar>();
 
         /// <summary>
         /// Check if we have the given key in our dictionary
@@ -111,7 +411,9 @@ namespace Trinity
         public static bool ContainsKey(string key)
         {
             lock (sync)
-                return data.ContainsKey(key);
+            {
+                return Data.ContainsKey(key);
+            }
         }
 
         /// <summary>
@@ -128,11 +430,7 @@ namespace Trinity
 
                 try
                 {
-                    if (data[key].Value is string)
-                        return (string)data[key].Value;
-
-                    string cast = (string)data[key].Value;
-                    return cast;
+                    return Convert.ToString(Data[key].Value);
                 }
                 catch (InvalidCastException)
                 {
@@ -155,11 +453,7 @@ namespace Trinity
 
                 try
                 {
-                    if (data[key].Value is int)
-                        return (int)data[key].Value;
-
-                    int cast = (int)data[key].Value;
-                    return cast;
+                    return Convert.ToInt32(Data[key].Value);
                 }
                 catch (InvalidCastException)
                 {
@@ -182,11 +476,7 @@ namespace Trinity
 
                 try
                 {
-                    if (data[key].Value is float)
-                        return (float)data[key].Value;
-
-                    float cast = (float)data[key].Value;
-                    return cast;
+                    return Convert.ToSingle(Data[key].Value);
                 }
                 catch (InvalidCastException)
                 {
@@ -210,11 +500,7 @@ namespace Trinity
 
                 try
                 {
-                    if (data[key].Value is double)
-                        return (double)data[key].Value;
-
-                    double cast = (double)data[key].Value;
-                    return cast;
+                    return Convert.ToDouble(Data[key].Value);
                 }
                 catch (InvalidCastException)
                 {
@@ -237,11 +523,7 @@ namespace Trinity
             {
                 try
                 {
-                    if (data[key].Value is bool)
-                        return (bool)data[key].Value;
-
-                    bool cast = (bool)data[key].Value;
-                    return cast;
+                    return Convert.ToBoolean(Data[key].Value);
                 }
                 catch (InvalidCastException)
                 {
@@ -310,7 +592,7 @@ namespace Trinity
             lock (sync)
             {
                 if (ContainsKey(key))
-                    return data[key].Value.GetType();
+                    return Data[key].Value.GetType();
             }
             return null;
         }
@@ -324,9 +606,9 @@ namespace Trinity
             lock (sync)
             {
                 if (ContainsKey(var.Name))
-                    data[var.Name] = var;
+                    Data[var.Name] = var;
                 else
-                    data.Add(var.Name, var);
+                    Data.Add(var.Name, var);
             }
         }
 
@@ -340,7 +622,7 @@ namespace Trinity
             lock (sync)
             {
                 if (ContainsKey(key))
-                    return data[key].Value;
+                    return Data[key].Value;
             }
             return null;
         }
@@ -355,11 +637,32 @@ namespace Trinity
             {
                 if (ContainsKey(key))
                 {
-                    TVar v = data[key];
+                    TVar v = Data[key];
                     v.Value = v.DefaultValue;
-                    data[key] = v;
+                    Data[key] = v;
                 }
             }
+        }
+
+        /// <summary>
+        /// Resets all variables to default values
+        /// </summary>
+        public static void ResetAll()
+        {
+            Data.Clear();
+            SetDefaults();
+            Save();
+            Logger.LogNormal("Reset all Trinity Variables to default.");
+        }
+
+        public static void Dump()
+        {
+            Logger.LogNormal("Found {0} TVars", Data.Count);
+            foreach (KeyValuePair<string, TVar> item in Data)
+            {
+                Logger.LogNormal(item.Value.ToString());
+            }
+            Logger.LogNormal("\n");
         }
     }
 }

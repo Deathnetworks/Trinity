@@ -29,6 +29,8 @@ namespace Trinity
         /// <param name="bot"></param>
         private static void TrinityBotStart(IBot bot)
         {
+            V.ValidateLoad();
+
             // Recording of all the XML's in use this run
             try
             {
@@ -176,6 +178,9 @@ namespace Trinity
         public static void ResetEverythingNewGame()
         {
             Logger.Log("New Game - resetting everything");
+
+            V.ValidateLoad();
+
             hashUseOnceID = new HashSet<int>();
             dictUseOnceID = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;

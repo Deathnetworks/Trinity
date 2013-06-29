@@ -91,11 +91,25 @@ namespace Trinity.UIComponents
                                     {
                                         LoadItemRulesPath();
                                     });
-
+            OpenTVarsCommand = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        V.ValidateLoad();
+                                        TVarsViewModel.CreateWindow().Show();
+                                    });
         }
 
         /// <summary>
-        /// Gets the HelpLink command.
+        /// Opens the TVars config window
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand OpenTVarsCommand
+        {
+            get;
+            private set;
+        }
+        /// <summary>
+        /// Reloads item rules
         /// </summary>
         /// <value>The save command.</value>
         public ICommand LoadItemRuleSetCommand

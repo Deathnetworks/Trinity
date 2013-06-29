@@ -31,6 +31,9 @@
             <TabItem Header="Advanced" Foreground="{DynamicResource TextBrush}">
                 <Border Tag="ConfigAdvanced.xaml"/>
             </TabItem>
+            <TabItem Header="Variables" Foreground="{DynamicResource TextBrush}">
+                <Border Tag="ConfigTVars.xaml"/>
+            </TabItem>
         </TabControl>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

@@ -52,7 +52,7 @@ namespace Trinity
         /// </returns>
         public static bool SNOPowerUseTimer(SNOPower power, bool recheck = false)
         {
-            if (DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds >= DataDictionary.AbilityRepeatDelays[power])
+            if (DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(power))
                 return true;
             if (recheck && DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds >= 150 && DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds <= 600)
                 return true;
@@ -125,7 +125,8 @@ namespace Trinity
                     {
                         // Barbs
                         case ActorClass.Barbarian:
-                            power = GetBarbarianPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            //power = GetBarbarianPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            power = BarbarianCombat.GetPower();
                             break;
                         // Monks
                         case ActorClass.Monk:
@@ -151,7 +152,7 @@ namespace Trinity
                     Logger.Log(LogCategory.Behavior, "Keeping {0}", CombatBase.CurrentPower.ToString());
                     return CombatBase.CurrentPower;
                 }
-                else if (power != null)
+                else if (power != null && power.SNOPower != SNOPower.None)
                 {
                     Logger.Log(LogCategory.Behavior, "Selected new {0}", power.ToString());
                     return power;

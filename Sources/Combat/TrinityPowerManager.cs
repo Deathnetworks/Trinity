@@ -32,9 +32,11 @@ namespace Trinity
         /// </summary>
         public static void LoadLegacyDelays()
         {
-            foreach (KeyValuePair<SNOPower, int> kv in DataDictionary.AbilityRepeatDelays)
+            foreach (TVar v in V.Data.Where(v => v.Key.StartsWith("SpellPower.")).Select(v => v.Value))
             {
-                DefineDelay(kv.Key, kv.Value);
+                SNOPower p = (SNOPower)Enum.Parse(typeof(SNOPower), v.Name);
+
+                DefineDelay(p, Convert.ToInt32(v.Value));
             }
         }
 

@@ -22,8 +22,9 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <!--Unstucker-->
+        <!--Unstucker-->        
         <Grid Grid.Row="0" Margin="2">
             <Grid.RowDefinitions>
                 <RowDefinition/>
