@@ -349,10 +349,20 @@ namespace Trinity.Combat.Abilities
         public static bool CanCast(SNOPower power, CanCastFlags flags = CanCastFlags.All)
         {
             bool hasPower = Hotbar.Contains(power);
+            if (!hasPower)
+                return false;
+
             bool timer = flags.HasFlag(CanCastFlags.NoTimer) ? true : SNOPowerUseTimer(power);
+
+            if (!timer)
+                return false;
+
             bool powerManager = flags.HasFlag(CanCastFlags.NoPowerManager) ? true : PowerManager.CanCast(power);
 
-            return hasPower && timer && powerManager;
+            if (!powerManager)
+                return false;
+
+            return true;
         }
 
         /// <summary>
