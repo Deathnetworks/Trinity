@@ -1,5 +1,133 @@
 ﻿
-# Unified Trinity Community Edition
+# Trinity
+
+### Changelog 1.7.3.0 - FRESH INSTALL REQUIRED:
+
+Highlights:
+
+* New feature: Trinity Variables. This allows you to control many internal numbers used inside Trinity. Currently implimented for Barbarian Combat and general spell delays only. More variables will be implimented in future versions.
+
+* Implimented new BarbarianCombat and CombatBase classes for (hopefully) easier editing and customization.
+
+* After a town run, Trinity will now return to the location where the bot requested a town run (bags full, repairs needed). This will help make sure no loot is missed if the bot is distracted while bags are full.
+
+* Bot will now path around avoidance.
+
+* ItemRules now supports Unidentify, Salvage rules
+
+Barbarian: 
+
+* Barbarian will no longer senselessly WW to health globes out of combat
+
+* Fixed Barbarian logic not correctly waiting for WOTB
+
+* Barbarian will now wait for BattleRage before using WOTB or Overpower.
+
+* Tightened up Whirlwind a bit, works better on single targets and units that are spread too far apart
+
+* Tuned Sprint to work better with Whirlwind
+
+Witch Doctor:
+
+* Added WitchDoctor Gruesome Feast passive support for health globes when on full health and low mana
+
+* Added WD GUI slider for WD Firebats range setting
+
+* Improved support for WD Firebats, added support for Cloud of Bats rune
+
+* Moved Spirit Barage priority lower than acid cloud
+
+* Increased Firebats priority higher than acid cloud
+
+Wizard:
+
+* Fixed Wizard Blizzard (Cluster on trash was not working)
+
+* Re-added Familiar to Archon pre-buffs
+
+* Added enhanced support and tuned Ray Of Frost : Sleet Storm for super-melee mode
+
+Profile Tags:
+
+* Fixed missing lastMoveResult stuff in TrinityMoveTo
+
+* Fixed TrinityMoveTo to finish when the Navigator fails or finishes (rather than a nice ugly perma-stuck!)
+
+* Fixed bug with TrinityLoadOnce showing more profiles completed than available
+
+* Added SimpleFollow profile compatability to TrinityExploreDungeon
+
+* Fixed bug in TrinityOffsetMove only being used once (lastMoveResult was never reset)
+
+* Refactored TrinityUseOnce a little
+
+General:
+
+* Trinity will now automatically install the latest Combat routine 
+
+* Trinity will now automatically select the Trinity Combat routine if it's not selected
+
+* Removed A2 birds from blacklist
+
+* Disabled LoS/Navigator raycast checks (force use navigator now) - will fix pathing through stuff we can't path through.
+
+* Monsters near other players will now receive a higher targetting weight
+
+* Monsters now get weight when near other players
+
+* Added API'able IsCombatAllowed - for later use maybe in SimpleFollow
+
+* Fixed ignoring and Increased resplendent chest distance, Added additional Resplendent chest SNO's
+
+* Should no longer attempt to run through monsters to get to a legendary (and die)
+
+* Fixed interacting with pretty much all Gizmos...
+
+* Fixed blacklist flipflop for elites with low health
+
+* Bot will now always attack monsters regardless if they are standing in plague or not (overrides "Attack monsters in AoE" setting)
+
+* FindSafeZone (Avoidance) takes into better consideration where monsters are standing (won't stand next to them and get beat on all day)
+
+* Fixed Plugin/Routine checks. Trinity will no longer allow a user to start the bot with Trinity enabled and the wrong routine selected.
+
+* Fixed "ignore avoidance" adding avoidance SNO's as Units
+
+Technical/Developer:
+
+* Removed ALL references to "Giles" except for Plugin Credits and Settings Migration
+
+* Renamed Namespace and GodClass to Trinity
+
+* Refactored all static dictionaries into DataDictionary class
+
+* Reorganized all directories
+
+* Removed old commented code in various parts.
+
+* Re-added UseNavMeshTargeting UI option for testing purposes
+
+* Removed all unnecessary references and usage of MainGridProvider
+
+* Added Settings Migration capability (now uses Trinity.xml, will automatically read, migrate, and delete old file). New file does not use Namespaces for easier editing/parsing.
+
+* PersistentStats will now automatically reset/delete itself if it encounters an exception
+
+* Fixed duplicate expirecache key exception
+
+* Renamed Settings namespace to Config (was conflicting between Trinity.Settings property and Trinity.Settings namespace)
+
+* Added Lots of new TrinityPower constructors for various purposes
+
+* Added Lots of utility methods in Combat Base
+
+* Rebuilt Targeting Provider to actually give the DiaObject of our Current Target
+
+* Added exception handling around Item Rules Reload (for catching FileNotFound and IO exceptions and such)
+
+* Fixed exceptions when attempting to load missing identify/salvage itemrules .dis files
+
+
 
 ### Changelog 1.7.2.13:
 
