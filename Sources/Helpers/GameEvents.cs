@@ -137,6 +137,11 @@ namespace Trinity
                 iTotalBacktracks = 0;
                 PlayerMover.iTotalAntiStuckAttempts = 1;
                 PlayerMover.vSafeMovementLocation = Vector3.Zero;
+
+                // Reset pre-townrun position if we die
+                TownRun.PreTownRunPosition = Vector3.Zero;
+                TownRun.PreTownRunWorldId = -1;
+
                 // Does Trinity need to handle deaths?
                 if (iMaxDeathsAllowed > 0)
                 {
