@@ -475,19 +475,26 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !UseOOCBuff && !AllowSprintOOC && CanCast(SNOPower.Barbarian_Sprint) && !Player.IsIncapacitated &&
-                    // Fury Dump Options for sprint: use at max energy constantly, or on a timer
+                return !UseOOCBuff && CanCast(SNOPower.Barbarian_Sprint) && !Player.IsIncapacitated &&
                     (
+                        // last power used was whirlwind and we don't have sprint up
+                        (LastPowerUsed == SNOPower.Barbarian_Whirlwind && !GetHasBuff(SNOPower.Barbarian_Sprint)) ||
+                        // Fury Dump Options for sprint: use at max energy constantly
                         (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= 0.95 && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
                         (Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= 0.95) ||
-                        ((SNOPowerUseTimer(SNOPower.Barbarian_Sprint) && !GetHasBuff(SNOPower.Barbarian_Sprint)) &&
-                        // Always keep up if we are whirlwinding, if the target is a goblin, or if we are more than 16 feet away from the target
-                        (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) || CurrentTarget.IsTreasureGoblin || (CurrentTarget.CentreDistance >= 16f && Player.PrimaryResource >= 40)))
+                        // or on a timer
+                        (
+                         (SNOPowerUseTimer(SNOPower.Barbarian_Sprint) && !GetHasBuff(SNOPower.Barbarian_Sprint)) &&
+                         // Always keep up if we are whirlwinding, if the target is a goblin, or if we are more than 16 feet away from the target
+                         (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) || CurrentTarget.IsTreasureGoblin || 
+                          (CurrentTarget.CentreDistance >= V.F("Barbarian.Sprint.SingleTargetRange") && Player.PrimaryResource >= V.F("Barbarian.Sprint.SingleTargetMinFury"))
+                         )
+                        )
                     ) &&
                     // If they have battle-rage, make sure it's up
                     (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage))) &&
                     // Check for minimum energy
-                    Player.PrimaryResource >= 20;
+                    Player.PrimaryResource >= V.F("Barbarian.Sprint.MinFury");
             }
         }
         public static bool CanUseFrenzyTo5
@@ -555,7 +562,7 @@ namespace Trinity.Combat.Abilities
         public static TrinityPower PowerWrathOfTheBerserker { get { return new TrinityPower(SNOPower.Barbarian_WrathOfTheBerserker); } }
         public static TrinityPower PowerCallOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_CallOfTheAncients, V.I("Barbarian.CallOfTheAncients.TickDelay"), V.I("Barbarian.CallOfTheAncients.TickDelay")); } }
         public static TrinityPower PowerBattleRage { get { return new TrinityPower(SNOPower.Barbarian_BattleRage); } }
-        public static TrinityPower PowerSprint { get { return new TrinityPower(SNOPower.Barbarian_Sprint); } }
+        public static TrinityPower PowerSprint { get { return new TrinityPower(SNOPower.Barbarian_Sprint, 0, 0); } }
         public static TrinityPower PowerWarCry { get { return new TrinityPower(SNOPower.Barbarian_WarCry); } }
         public static TrinityPower PowerThreateningShout { get { return new TrinityPower(SNOPower.Barbarian_ThreateningShout); } }
         public static TrinityPower PowerGroundStomp { get { return new TrinityPower(SNOPower.Barbarian_GroundStomp); } }

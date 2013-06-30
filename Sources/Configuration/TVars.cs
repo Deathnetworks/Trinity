@@ -38,7 +38,9 @@ namespace Trinity
             Set(new TVar("Barbarian.ThreatShout.Range", 25f, "Threating Shout Mob Range distance"));
             Set(new TVar("Barbarian.ThreatShout.OOCMaxFury", 25, "Threating Shout Out of Combat Max Fury"));
             Set(new TVar("Barbarian.WarCry.MaxFury", 60, "Maximum Fury to cast WarCry (with buff)"));
-            Set(new TVar("Barbarian.Sprint.MinFury", 20, "Minimum Fury to try cast Sprint"));
+            Set(new TVar("Barbarian.Sprint.MinFury", 20f, "Minimum Fury to try cast Sprint"));
+            Set(new TVar("Barbarian.Sprint.SingleTargetRange", 16f, "Minimum Fury to try cast Sprint"));
+            Set(new TVar("Barbarian.Sprint.SingleTargetMinFury", 20f, "Minimum Fury to try cast Sprint"));
             Set(new TVar("Barbarian.BattleRage.MinFury", 20, "Minimum Fury to try cast Battle Rage"));
             Set(new TVar("Barbarian.WOTB.MinFury", 50, "Minimum Fury to try cast WOTB"));
             Set(new TVar("Barbarian.WOTB.MinRange", 20f, "Elites in Range to try cast WOTB (with WOTB.MinCount) non-hard elites, non ignore elites"));
@@ -52,7 +54,6 @@ namespace Trinity
             Set(new TVar("Barbarian.CallOfTheAncients.MinFury", 50, "Minimum Fury to try cast Call of the Ancients"));
             Set(new TVar("Barbarian.CallOfTheAncients.MinEliteRange", 25f, "Minimum range elites must be in to use COTA"));
             Set(new TVar("Barbarian.CallOfTheAncients.TickDelay", 4, "Pre and Post use Tick Delay"));
-            Set(new TVar("Barbarian.Leap.UseRange", 35f, "Power Use Range"));
             Set(new TVar("Barbarian.AncientSpear.UseRange", 55f, "Power Use Range"));
             Set(new TVar("Barbarian.Whirlwind.UseRange", 10f, "Power Use Range"));
             Set(new TVar("Barbarian.Whirlwind.MinFury", 10d, "Minimum Fury"));
@@ -81,6 +82,7 @@ namespace Trinity
             Set(new TVar("Barbarian.FuriousCharge.TrashCount", 3, "Minimum Furious Charge Trash Count"));
             Set(new TVar("Barbarian.FuriousCharge.UseRange", 32f, "Use Range"));
             Set(new TVar("Barbarian.FuriousCharge.MinExtraTargetDistance", 5f, "Extra distance added to target for Furious Charge direction"));
+            Set(new TVar("Barbarian.Leap.UseRange", 35f, "Power Use Range"));
             Set(new TVar("Barbarian.Leap.EliteRange", 20f, "Leap Elite Check Range"));
             Set(new TVar("Barbarian.Leap.EliteCount", 1, "Minimum Leap Elite Count"));
             Set(new TVar("Barbarian.Leap.TrashRange", 20f, "Leap Trash Check Range"));
@@ -115,7 +117,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.Barbarian_Whirlwind", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_GroundStomp", 12200, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_Leap", 10200, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Barbarian_Sprint", 2900, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_Sprint", 2800, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_IgnorePain", 30200, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_AncientSpear", 300, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_Revenge", 600, "Spell Use Delay/Interval, milliseconds"));

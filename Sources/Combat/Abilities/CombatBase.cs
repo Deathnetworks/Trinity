@@ -125,6 +125,14 @@ namespace Trinity.Combat.Abilities
             }
         }
 
+        public static SNOPower LastPowerUsed
+        {
+            get
+            {
+                return Trinity.LastPowerUsed;
+            }
+        }
+
         public static bool IsWaitingForSpecial
         {
             get { return CombatBase.isWaitingForSpecial; }
@@ -264,8 +272,8 @@ namespace Trinity.Combat.Abilities
 
                     return new TrinityPower()
                     {
-                        SNOPower = GetDefaultWeaponPower,
-                        MinimumRange = GetDefaultWeaponDistance,
+                        SNOPower = DefaultWeaponPower,
+                        MinimumRange = DefaultWeaponDistance,
                         TargetRActorGUID = CurrentTarget.ACDGuid,
                         WaitForAnimationFinished = true
                     };
@@ -278,7 +286,7 @@ namespace Trinity.Combat.Abilities
         /// Gets the default weapon power based on the current equipped primary weapon
         /// </summary>
         /// <returns></returns>
-        public static SNOPower GetDefaultWeaponPower
+        public static SNOPower DefaultWeaponPower
         {
             get
             {
@@ -314,11 +322,11 @@ namespace Trinity.Combat.Abilities
         /// Gets the default weapon distance based on the current equipped primary weapon
         /// </summary>
         /// <returns></returns>
-        public static float GetDefaultWeaponDistance
+        public static float DefaultWeaponDistance
         {
             get
             {
-                switch (GetDefaultWeaponPower)
+                switch (DefaultWeaponPower)
                 {
                     case SNOPower.Weapon_Ranged_Instant:
                     case SNOPower.Weapon_Ranged_Projectile:
