@@ -219,13 +219,13 @@ namespace Trinity
         /// <returns></returns>
         internal static bool CheckLevelRequirements(int level, ItemQuality quality, int requiredBlueLevel, int requiredYellowLevel)
         {
-            if (quality < ItemQuality.Normal && Player.Level > 5)
+            if (quality < ItemQuality.Normal && Player.Level > 5 && Settings.Loot.Pickup.PickupLowLevel)
             {
                 // Grey item, ignore if we're over level 5
                 return false;
             }
 
-            if (quality < ItemQuality.Magic1 && Player.Level > 10)
+            if (quality < ItemQuality.Magic1 && Player.Level > 10 && Settings.Loot.Pickup.PickupLowLevel)
             {
                 // White item, ignore if we're over level 10
                 return false;

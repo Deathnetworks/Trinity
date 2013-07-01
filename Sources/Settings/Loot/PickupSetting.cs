@@ -27,6 +27,7 @@ namespace Trinity.Config.Loot
         private int _MiscItemLevel;
         private bool _CraftMaterials;
         private bool _InfernalKeys;
+        private bool _PickupLowLevel;
         #endregion Fields
 
         #region Events
@@ -402,7 +403,24 @@ namespace Trinity.Config.Loot
                     OnPropertyChanged("InfernalKeys");
                 }
             }
-        }      
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool PickupLowLevel
+        {
+            get
+            {
+                return _PickupLowLevel;
+            }
+            set
+            {
+                if (_PickupLowLevel != value)
+                {
+                    _PickupLowLevel = value;
+                    OnPropertyChanged("PickupLowLevel");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -441,6 +459,7 @@ namespace Trinity.Config.Loot
             this.Designs = true;
             this.Plans = true;
             this.LegendaryPlans = true;
+            this.PickupLowLevel = true;
         }
         #endregion Methods
     }
