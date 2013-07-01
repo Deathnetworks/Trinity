@@ -222,7 +222,9 @@ namespace Trinity
 
 
                 if ((Trinity.IsReadyToTownRun && TownRunTimerFinished()) || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+                {
                     return true;
+                }
                 else if (Trinity.IsReadyToTownRun && !TownRunCheckTimer.IsRunning)
                 {
                     TownRunCheckTimer.Start();

@@ -164,6 +164,7 @@ namespace Trinity
 
         internal static bool ItemRulesIdentifyValidation(ACDItem item)
         {
+            ItemEvents.ResetTownRun();
             PickupItem pickupItem = new PickupItem(
                                        item.Name,
                                        item.InternalName,
@@ -194,7 +195,7 @@ namespace Trinity
                 case Interpreter.InterpreterAction.UNIDENT:
                     return false;
                 default:
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Trinity, item is unhandled by ItemRules (Identification)!");
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "Trinity, item is unhandled by ItemRules (Identification)!");
                     return IdentifyItemValidation(pickupItem);
             }
 

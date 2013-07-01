@@ -60,7 +60,8 @@ namespace Trinity
 
         public bool ShouldSalvageItem(ACDItem item, ItemEvaluationType evaluationType)
         {
-            
+            ItemEvents.ResetTownRun();
+           
             if (ItemManager.Current.ItemIsProtected(item))
                 return false;
 
@@ -86,6 +87,7 @@ namespace Trinity
 
         public bool ShouldSellItem(ACDItem item, ItemEvaluationType evaluationType)
         {
+            ItemEvents.ResetTownRun();
 
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
 
@@ -114,6 +116,7 @@ namespace Trinity
 
         public bool ShouldStashItem(ACDItem item, ItemEvaluationType evaluationType)
         {
+            ItemEvents.ResetTownRun();
 
             if (ItemManager.Current.ItemIsProtected(item))
                 return false;
@@ -245,6 +248,7 @@ namespace Trinity
 
         private bool ItemRulesSalvageSell(ACDItem item, ItemEvaluationType evaluationType)
         {
+            ItemEvents.ResetTownRun();
             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
                 "Incoming {0} Request: {1}, {2}, {3}, {4}, {5}",
                 evaluationType, item.ItemQualityLevel, item.Level, item.ItemBaseType,
@@ -260,7 +264,7 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0}: {1}", evaluationType, (evaluationType == ItemEvaluationType.Sell));
                     return (evaluationType == ItemEvaluationType.Sell);
                 default:
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Trinity, item is unhandled by ItemRules (SalvageSell)!");
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "Trinity, item is unhandled by ItemRules (SalvageSell)!");
                     switch (evaluationType)
                     {
                         case ItemEvaluationType.Salvage:
