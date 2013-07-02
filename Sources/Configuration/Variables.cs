@@ -569,5 +569,8 @@ namespace Trinity
         // Gold counter
         private static int iTotalGold = 0;
         private static int iLastGold = 0;
+        // Level and ParagonLevel
+        private static int iLevel = 0;
+        private static int iParagonLevel = 0;
     }
 }

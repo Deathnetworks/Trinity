@@ -693,6 +693,8 @@ namespace Trinity
              */
             try
             {
+                iLevel = Player.Level;
+                iParagonLevel = ZetaDia.Me.ParagonLevel;
                 if (Player.Level < 60)
                 {
                     if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
