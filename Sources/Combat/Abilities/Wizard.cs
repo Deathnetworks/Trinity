@@ -139,7 +139,7 @@ namespace Trinity
                     // Storm Armor
                     else if (Hotbar.Contains(SNOPower.Wizard_StormArmor))
                     {
-                        if (!GetHasBuff(SNOPower.Wizard_StormArmor) || ((DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Wizard_StormArmor]).TotalMilliseconds >= 15000) && PowerManager.CanCast(SNOPower.Wizard_Archon)))
+                        if (!GetHasBuff(SNOPower.Wizard_StormArmor) || ((TimeSinceUse(SNOPower.Wizard_StormArmor) >= 15000) && PowerManager.CanCast(SNOPower.Wizard_Archon)))
                         {
                             return new TrinityPower(SNOPower.Wizard_StormArmor, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                         }
@@ -147,7 +147,7 @@ namespace Trinity
                 }
                 // Magic Weapon                        
                 if (!Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_MagicWeapon) && PowerManager.CanCast(SNOPower.Wizard_MagicWeapon) &&
-                    (!GetHasBuff(SNOPower.Wizard_MagicWeapon) || ((DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Wizard_MagicWeapon]).TotalMilliseconds >= 10000) && PowerManager.CanCast(SNOPower.Wizard_Archon))))
+                    (!GetHasBuff(SNOPower.Wizard_MagicWeapon) || ((TimeSinceUse(SNOPower.Wizard_MagicWeapon) >= 10000) && PowerManager.CanCast(SNOPower.Wizard_Archon))))
                 {
                     return new TrinityPower(SNOPower.Wizard_MagicWeapon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
@@ -202,11 +202,21 @@ namespace Trinity
                         CanCastArchon = true;
                     if (!CanCastArchon)
                     {
-                        AbilityLastUsedCache[SNOPower.Wizard_MagicWeapon] = DateTime.Today;
-                        AbilityLastUsedCache[SNOPower.Wizard_Familiar] = DateTime.Today;
-                        AbilityLastUsedCache[SNOPower.Wizard_EnergyArmor] = DateTime.Today;
-                        AbilityLastUsedCache[SNOPower.Wizard_IceArmor] = DateTime.Today;
-                        AbilityLastUsedCache[SNOPower.Wizard_StormArmor] = DateTime.Today;
+                        if (Hotbar.Contains(SNOPower.Wizard_MagicWeapon))
+                            AbilityLastUsedCache[SNOPower.Wizard_MagicWeapon] = DateTime.Today;
+
+                        if (Hotbar.Contains(SNOPower.Wizard_Familiar))
+                            AbilityLastUsedCache[SNOPower.Wizard_Familiar] = DateTime.Today;
+
+                        if (Hotbar.Contains(SNOPower.Wizard_EnergyArmor))
+                            AbilityLastUsedCache[SNOPower.Wizard_EnergyArmor] = DateTime.Today;
+
+                        if (Hotbar.Contains(SNOPower.Wizard_IceArmor))
+                            AbilityLastUsedCache[SNOPower.Wizard_IceArmor] = DateTime.Today;
+
+                        if (Hotbar.Contains(SNOPower.Wizard_StormArmor))
+                            AbilityLastUsedCache[SNOPower.Wizard_StormArmor] = DateTime.Today;
+
                         CanCastArchon = true;
                     }
                     else
