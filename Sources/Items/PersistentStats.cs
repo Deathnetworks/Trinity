@@ -28,10 +28,11 @@ namespace Trinity
             public int TotalLeaveGames;
             public int TotalJoinGames;
             public int TotalProfileRecycles;
-            public int TotalGold;
             public int TotalXp;
             public int LastXp;
             public int NextLvXp;
+            public int TotalGold;
+            public int LastGold;
             public int Level;
             public int ParagonLevel;
             public ItemDropStats ItemsDropped;
@@ -62,6 +63,7 @@ namespace Trinity
                 LastXp = 0;
                 NextLvXp = 0;
                 TotalGold = 0;
+                LastGold = 0;
                 Level = 0;
                 ParagonLevel = 0;
                 ItemsDropped.Total = 0;
@@ -246,6 +248,8 @@ namespace Trinity
             updated.NextLvXp += iNextLvXp - PersistentLastSaved.NextLvXp;
 
             updated.TotalGold = iTotalGold;
+            updated.LastGold = iLastGold;
+
             updated.Level = iLevel;
             updated.ParagonLevel = iParagonLevel;
 
@@ -286,6 +290,7 @@ namespace Trinity
             PersistentLastSaved.LastXp = iLastXp;
             PersistentLastSaved.NextLvXp = iNextLvXp;
             PersistentLastSaved.TotalGold = iTotalGold;
+            PersistentLastSaved.LastGold = iLastGold;
             PersistentLastSaved.Level = iLevel;
             PersistentLastSaved.ParagonLevel = iParagonLevel;
 
