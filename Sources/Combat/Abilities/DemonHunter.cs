@@ -94,7 +94,7 @@ namespace Trinity
                 (CurrentTarget.RadiusDistance <= 10f || AnythingWithinRange[RANGE_6] >= 1) &&
                 ((!Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 16) ||
                  (Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 22)) && 
-                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
+                    TimeSinceUse(SNOPower.DemonHunter_Vault) >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault))
             {
                 Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -15f);
@@ -210,7 +210,7 @@ namespace Trinity
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
                 // If we have elemental arrow or rapid fire, then use chakram as a 110 second buff, instead
                 ((!Hotbar.Contains(SNOPower.DemonHunter_ClusterArrow)) ||
-                DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.DemonHunter_Chakram]).TotalMilliseconds >= 110000) &&
+                TimeSinceUse(SNOPower.DemonHunter_Chakram) >= 110000) &&
                 ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);

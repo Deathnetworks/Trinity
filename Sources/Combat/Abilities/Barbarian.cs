@@ -288,7 +288,7 @@ namespace Trinity
             // Sprint buff, if same suitable targets as elites, keep maintained for WW users
             if (!UseOOCBuff && !DisableOutofCombatSprint && Hotbar.Contains(SNOPower.Barbarian_Sprint) && !Player.IsIncapacitated &&
                 // Let's check if is not spaming too much
-                DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Barbarian_Sprint]).TotalMilliseconds >= 200 &&
+                TimeSinceUse(SNOPower.Barbarian_Sprint) >= 200 &&
                 // Fury Dump Options for sprint: use at max energy constantly, or on a timer
                 (
                     (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= 0.95 && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||

@@ -121,8 +121,8 @@ namespace Trinity
                 // Check our mantras, if we have them, are up first
                 Monk_HasMantraAbilityAndBuff() &&
                 // Check if either we don't have blinding flash, or we do and it's been cast in the last 8000ms
-                (DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 8000 || CheckAbilityAndBuff(SNOPower.Monk_BlindingFlash) ||
-                ElitesWithinRange[RANGE_25] > 0 && DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 12500) &&
+                (TimeSinceUse(SNOPower.Monk_BlindingFlash) <= 8000 || CheckAbilityAndBuff(SNOPower.Monk_BlindingFlash) ||
+                ElitesWithinRange[RANGE_25] > 0 && TimeSinceUse(SNOPower.Monk_BlindingFlash) <= 12500) &&
                 // Check the re-use timer and energy costs
                 (Player.PrimaryResource >= 75 || (Settings.Combat.Monk.HasInnaSet && Player.PrimaryResource >= 5)))
             {
@@ -222,8 +222,8 @@ namespace Trinity
             }
 
             // For tempest rush re-use
-            if (!UseOOCBuff && Player.PrimaryResource >= 15 &&
-                DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Monk_TempestRush]).TotalMilliseconds <= 150 &&
+            if (!UseOOCBuff && Player.PrimaryResource >= 15 && Hotbar.Contains(SNOPower.Monk_TempestRush) &&
+                TimeSinceUse(SNOPower.Monk_TempestRush) <= 150 &&
                 ((Settings.Combat.Monk.TROption != TempestRushOption.MovementOnly) &&
                 !(Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly && TargetUtil.AnyElitesInRange(40f))))
             {
@@ -532,7 +532,9 @@ namespace Trinity
 
                     var usePowerResult = ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, target, CurrentWorldDynamicId, -1);
                     if (usePowerResult)
+                    {
                         AbilityLastUsedCache[SNOPower.Monk_TempestRush] = DateTime.Now;
+                    }
                 }
             }
         }

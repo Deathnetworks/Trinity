@@ -52,9 +52,9 @@ namespace Trinity
         /// </returns>
         public static bool SNOPowerUseTimer(SNOPower power, bool recheck = false)
         {
-            if (DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(power))
+            if (TimeSinceUse(power) >= CombatBase.GetSNOPowerUseDelay(power))
                 return true;
-            if (recheck && DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds >= 150 && DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds <= 600)
+            if (recheck && TimeSinceUse(power) >= 150 && TimeSinceUse(power) <= 600)
                 return true;
             return false;
         }
