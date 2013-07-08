@@ -31,6 +31,10 @@ namespace Trinity
             public int TotalXp;
             public int LastXp;
             public int NextLvXp;
+            public int TotalGold;
+            public int LastGold;
+            public int Level;
+            public int ParagonLevel;
             public ItemDropStats ItemsDropped;
             public ItemDropStats ItemsPicked;
             public long TotalRunningTimeTicks
@@ -58,7 +62,10 @@ namespace Trinity
                 TotalXp = 0;
                 LastXp = 0;
                 NextLvXp = 0;
-
+                TotalGold = 0;
+                LastGold = 0;
+                Level = 0;
+                ParagonLevel = 0;
                 ItemsDropped.Total = 0;
                 Array.Clear(ItemsDropped.TotalPerQuality, 0, ItemsDropped.TotalPerQuality.Length);
                 Array.Clear(ItemsDropped.TotalPerLevel, 0, ItemsDropped.TotalPerLevel.Length);
@@ -239,6 +246,13 @@ namespace Trinity
             updated.TotalXp += iTotalXp - PersistentLastSaved.TotalXp;
             updated.LastXp += iLastXp - PersistentLastSaved.LastXp;
             updated.NextLvXp += iNextLvXp - PersistentLastSaved.NextLvXp;
+
+            updated.TotalGold = iTotalGold;
+            updated.LastGold = iLastGold;
+
+            updated.Level = iLevel;
+            updated.ParagonLevel = iParagonLevel;
+
             // Adds difference between now and LastSaved, and set LastSaved to now
             updated.AddItemsDroppedStats(PersistentLastSaved.ItemsDropped, ItemsDroppedStats);
             updated.AddItemsPickedStats(PersistentLastSaved.ItemsPicked, ItemsPickedStats);
@@ -275,6 +289,10 @@ namespace Trinity
             PersistentLastSaved.TotalXp = iTotalXp;
             PersistentLastSaved.LastXp = iLastXp;
             PersistentLastSaved.NextLvXp = iNextLvXp;
+            PersistentLastSaved.TotalGold = iTotalGold;
+            PersistentLastSaved.LastGold = iLastGold;
+            PersistentLastSaved.Level = iLevel;
+            PersistentLastSaved.ParagonLevel = iParagonLevel;
 
             PersistentStats.UpdateItemsDroppedStats(PersistentLastSaved.ItemsDropped, ItemsDroppedStats);
             PersistentStats.UpdateItemsPickedStats(PersistentLastSaved.ItemsPicked, ItemsPickedStats);
