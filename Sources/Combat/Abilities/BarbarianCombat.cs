@@ -475,13 +475,13 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !UseOOCBuff && CanCast(SNOPower.Barbarian_Sprint) && !Player.IsIncapacitated &&
+                return !UseOOCBuff && CanCast(SNOPower.Barbarian_Sprint, CanCastFlags.NoTimer) && !Player.IsIncapacitated &&
                     (
                         // last power used was whirlwind and we don't have sprint up
                         (LastPowerUsed == SNOPower.Barbarian_Whirlwind && !GetHasBuff(SNOPower.Barbarian_Sprint)) ||
                         // Fury Dump Options for sprint: use at max energy constantly
-                        (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= 0.95 && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
-                        (Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= 0.95) ||
+                        (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin") && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                        (Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")) ||
                         // or on a timer
                         (
                          (SNOPowerUseTimer(SNOPower.Barbarian_Sprint) && !GetHasBuff(SNOPower.Barbarian_Sprint)) &&

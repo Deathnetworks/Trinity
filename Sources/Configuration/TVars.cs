@@ -51,6 +51,7 @@ namespace Trinity
             Set(new TVar("Barbarian.WOTB.CountFar", 10, "Extended mob count check to use WOTB with Ignore Elites"));
             Set(new TVar("Barbarian.WOTB.HardEliteCountOverride", 4, "Will over-ride WOTB hard elite check when this many elites are present"));
             Set(new TVar("Barbarian.WOTB.HardEliteRangeOverride", 50f, "Range check distance for WOTB Hard elite override"));
+            Set(new TVar("Barbarian.WOTB.FuryDumpMin", 0.95, "Percentage Fury to start dumping"));
             Set(new TVar("Barbarian.CallOfTheAncients.MinFury", 50, "Minimum Fury to try cast Call of the Ancients"));
             Set(new TVar("Barbarian.CallOfTheAncients.MinEliteRange", 25f, "Minimum range elites must be in to use COTA"));
             Set(new TVar("Barbarian.CallOfTheAncients.TickDelay", 4, "Pre and Post use Tick Delay"));

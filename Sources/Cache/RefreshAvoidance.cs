@@ -65,7 +65,10 @@ namespace Trinity
                 }
             }
             // Remove ice balls if the barbarian has wrath of the berserker up, and reduce health from most other SNO avoidances
-            if (Player.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+            if (Player.ActorClass == ActorClass.Barbarian &&
+                Settings.Combat.Barbarian.IgnoreAvoidanceInWOTB &&
+                Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
             {
                 if (avoidanceType == AvoidanceType.IceBall)
                 {
@@ -82,6 +85,7 @@ namespace Trinity
                     minAvoidanceHealth *= V.F("Barbarian.Avoidance.WOTB.Other");
 
             }
+
             if (minAvoidanceHealth == 0)
             {
                 AddToCache = false;
@@ -96,7 +100,7 @@ namespace Trinity
             {
                 // Generate a "weight" for how badly we want to avoid this obstacle, based on a percentage of 100% the avoidance health is, multiplied into a max of 200 weight
                 double dThisWeight = (200 * minAvoidanceHealth);
-               
+
                 float avoidanceRadius = (float)GetAvoidanceRadius();
 
                 hashAvoidanceObstacleCache.Add(new CacheObstacleObject(c_Position, avoidanceRadius, c_ActorSNO, dThisWeight, c_InternalName));

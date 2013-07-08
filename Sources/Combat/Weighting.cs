@@ -233,12 +233,6 @@ namespace Trinity
                                         if (cacheObject.IsBossOrEliteRareUnique)
                                             cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 8000d;
 
-                                        // monsters near players given higher weight
-                                        foreach (var player in ObjectCache.Where(p => p.Type == GObjectType.Player))
-                                        {
-                                            cacheObject.Weight += (55f - cacheObject.Position.Distance2D(player.Position) / 55f * 5000d);
-                                        }
-
                                         // Give extra weight to ranged enemies
                                         if ((Player.ActorClass == ActorClass.Barbarian || Player.ActorClass == ActorClass.Monk) &&
                                             (cacheObject.MonsterStyle == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(c_ActorSNO)))
@@ -305,6 +299,15 @@ namespace Trinity
                                                 m.RActorGuid != cacheObject.RActorGuid))
                                             {
                                                 cacheObject.Weight = 0d;
+                                            }
+                                        }
+
+                                        // Monsters near players given higher weight
+                                        if (cacheObject.Weight > 0)
+                                        {
+                                            foreach (var player in ObjectCache.Where(p => p.Type == GObjectType.Player && p.ACDGuid != Player.ACDGuid))
+                                            {
+                                                cacheObject.Weight += ((55f - cacheObject.Position.Distance2D(player.Position)) / 55f * 5000d);
                                             }
                                         }
 

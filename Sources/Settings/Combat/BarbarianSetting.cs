@@ -46,6 +46,8 @@ namespace Trinity.Config.Combat
         private bool _TargetBasedZigZag;
         private bool _ThreatShoutOOC;
         private int _MinThreatShoutMobCount;
+        private bool _IgnoreAvoidanceInWOTB;
+        private bool _IgnoreGoldInWOTB;
         #endregion Fields
 
         #region Events
@@ -766,6 +768,40 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool IgnoreAvoidanceInWOTB
+        {
+            get
+            {
+                return _IgnoreAvoidanceInWOTB;
+            }
+            set
+            {
+                if (_IgnoreAvoidanceInWOTB != value)
+                {
+                    _IgnoreAvoidanceInWOTB = value;
+                    OnPropertyChanged("IgnoreAvoidanceInWOTB");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool IgnoreGoldInWOTB
+        {
+            get
+            {
+                return _IgnoreGoldInWOTB;
+            }
+            set
+            {
+                if (_IgnoreGoldInWOTB != value)
+                {
+                    _IgnoreGoldInWOTB = value;
+                    OnPropertyChanged("IgnoreGoldInWOTB");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -807,6 +843,8 @@ namespace Trinity.Config.Combat
             this._AvoidSuccubusStarHealth = 0.7f;
             this._MinThreatShoutMobCount = 1;
             this._ThreatShoutOOC = true;
+            this._IgnoreAvoidanceInWOTB = true;
+            this._IgnoreGoldInWOTB = true;
         }
 
         #endregion Methods

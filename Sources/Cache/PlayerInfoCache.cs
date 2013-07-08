@@ -12,6 +12,8 @@ namespace Trinity
     // Just stores the data on YOU, well, your character's current status - for readability of those variables more than anything, but also caching
     public class PlayerInfoCache
     {
+        public int ACDGuid { get; set; }
+        public int RActorGuid { get; set; }
         public DateTime LastUpdated { get; set; }
         public bool IsIncapacitated { get; set; }
         public bool IsRooted { get; set; }
@@ -102,7 +104,7 @@ namespace Trinity
         {
             using (new PerformanceLogger("UpdateCachedPlayerData"))
             {
-                if (DateTime.Now.Subtract(PlayerStatus.LastUpdated).TotalMilliseconds <= 100)
+                if (DateTime.Now.Subtract(Player.LastUpdated).TotalMilliseconds <= 100)
                     return;
                 // If we aren't in the game of a world is loading, don't do anything yet
                 if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
@@ -113,56 +115,58 @@ namespace Trinity
 
                 try
                 {
-                    PlayerStatus.LastUpdated = DateTime.Now;
-                    PlayerStatus.IsInTown = me.IsInTown;
-                    PlayerStatus.IsDead = me.IsDead;
-                    PlayerStatus.IsInGame = ZetaDia.IsInGame;
-                    PlayerStatus.IsLoadingWorld = ZetaDia.IsLoadingWorld;
+                    Player.ACDGuid = me.ACDGuid;
+                    Player.RActorGuid = me.RActorGuid;
+                    Player.LastUpdated = DateTime.Now;
+                    Player.IsInTown = me.IsInTown;
+                    Player.IsDead = me.IsDead;
+                    Player.IsInGame = ZetaDia.IsInGame;
+                    Player.IsLoadingWorld = ZetaDia.IsLoadingWorld;
 
-                    PlayerStatus.IsIncapacitated = (me.IsFeared || me.IsStunned || me.IsFrozen || me.IsBlind);
-                    PlayerStatus.IsRooted = me.IsRooted;
+                    Player.IsIncapacitated = (me.IsFeared || me.IsStunned || me.IsFrozen || me.IsBlind);
+                    Player.IsRooted = me.IsRooted;
 
-                    PlayerStatus.CurrentHealthPct = me.HitpointsCurrentPct;
-                    PlayerStatus.PrimaryResource = me.CurrentPrimaryResource;
-                    PlayerStatus.PrimaryResourcePct = PlayerStatus.PrimaryResource / me.MaxPrimaryResource;
-                    PlayerStatus.SecondaryResource = me.CurrentSecondaryResource;
-                    PlayerStatus.SecondaryResourcePct = PlayerStatus.SecondaryResource / me.MaxSecondaryResource;
-                    PlayerStatus.Position = me.Position;
+                    Player.CurrentHealthPct = me.HitpointsCurrentPct;
+                    Player.PrimaryResource = me.CurrentPrimaryResource;
+                    Player.PrimaryResourcePct = Player.PrimaryResource / me.MaxPrimaryResource;
+                    Player.SecondaryResource = me.CurrentSecondaryResource;
+                    Player.SecondaryResourcePct = Player.SecondaryResource / me.MaxSecondaryResource;
+                    Player.Position = me.Position;
 
-                    PlayerStatus.GoldPickupRadius = me.GoldPickupRadius;
-                    PlayerStatus.Coinage = me.Inventory.Coinage;
+                    Player.GoldPickupRadius = me.GoldPickupRadius;
+                    Player.Coinage = me.Inventory.Coinage;
 
-                    if (PlayerStatus.PrimaryResource >= Trinity.MinEnergyReserve)
-                        PlayerStatus.WaitingForReserveEnergy = false;
-                    if (PlayerStatus.PrimaryResource < 20)
-                        PlayerStatus.WaitingForReserveEnergy = true;
+                    if (Player.PrimaryResource >= Trinity.MinEnergyReserve)
+                        Player.WaitingForReserveEnergy = false;
+                    if (Player.PrimaryResource < 20)
+                        Player.WaitingForReserveEnergy = true;
 
 
-                    PlayerStatus.MyDynamicID = me.CommonData.DynamicId;
-                    PlayerStatus.Level = me.Level;
-                    PlayerStatus.ActorClass = me.ActorClass;
-                    PlayerStatus.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
-                    PlayerStatus.LevelAreaId = ZetaDia.CurrentLevelAreaId;
+                    Player.MyDynamicID = me.CommonData.DynamicId;
+                    Player.Level = me.Level;
+                    Player.ActorClass = me.ActorClass;
+                    Player.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
+                    Player.LevelAreaId = ZetaDia.CurrentLevelAreaId;
 
-                    if (PlayerStatus.ActorClass == ActorClass.WitchDoctor && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1))
-                        PlayerStatus.IsHidden = me.IsHidden;
+                    if (Player.ActorClass == ActorClass.WitchDoctor && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1))
+                        Player.IsHidden = me.IsHidden;
                     else
-                        PlayerStatus.IsHidden = false;
+                        Player.IsHidden = false;
 
-                    if (DateTime.Now.Subtract(PlayerStatus.Scene.LastUpdate).TotalMilliseconds > 1000 && Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
+                    if (DateTime.Now.Subtract(Player.Scene.LastUpdate).TotalMilliseconds > 1000 && Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
                     {
                         int CurrentSceneSNO = -1;
                         CurrentSceneSNO = (int)ZetaDia.Me.SceneId;
-                        if (PlayerStatus.SceneId != CurrentSceneSNO)
+                        if (Player.SceneId != CurrentSceneSNO)
                         {
-                            PlayerStatus.SceneId = CurrentSceneSNO;
+                            Player.SceneId = CurrentSceneSNO;
                         }
                     }
 
                     // World ID safety caching incase it's ever unavailable
                     Trinity.CurrentWorldDynamicId = ZetaDia.CurrentWorldDynamicId;
-                    PlayerStatus.WorldDynamicID = ZetaDia.CurrentWorldDynamicId;
-                    PlayerStatus.WorldID = ZetaDia.CurrentWorldId;
+                    Player.WorldDynamicID = ZetaDia.CurrentWorldDynamicId;
+                    Player.WorldID = ZetaDia.CurrentWorldId;
                     Trinity.cachedStaticWorldId = ZetaDia.CurrentWorldId;
                     // Game difficulty, used really for vault on DH's
                     Trinity.iCurrentGameDifficulty = ZetaDia.Service.CurrentHero.CurrentDifficulty;
@@ -219,7 +223,7 @@ namespace Trinity
         }
 
 
-        private static PlayerInfoCache PlayerStatus
+        private static PlayerInfoCache Player
         {
             get
             {
@@ -259,7 +263,7 @@ namespace Trinity
 
                 HotbarSkills.Update();
 
-                if (!Trinity.GetHasBuff(SNOPower.Wizard_Archon) && !PlayerStatus.IsHidden)
+                if (!Trinity.GetHasBuff(SNOPower.Wizard_Archon) && !Player.IsHidden)
                     Trinity.hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(Trinity.Hotbar);
             }
         }

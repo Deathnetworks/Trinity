@@ -71,6 +71,8 @@
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.WOTBHardOnly}" ToolTip="Saves WOTB for use on elites with Arcane, Frozen, Jailer, Molten, Electrified and Reflects Damage">Use WOTB on hard elites only</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.TargetBasedZigZag}" ToolTip="Uses Monster positions as WW points instead of random XYZ">Multi-Target Based ZigZag</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.ThreatShoutOOC}" ToolTip="Use Threating Shout Out of Combat to generate Fury">Use Threating Shout OOC</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.IgnoreAvoidanceInWOTB}" ToolTip="Avoidance Health Triggers Reduced">Modify Avoidance in WOTB</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.IgnoreGoldInWOTB}" ToolTip="Ignores gold when WOTB is up">Ignore Gold Stacks in WOTB</CheckBox>
             </UniformGrid>
         </Grid>
         <Grid Grid.Row="3" Margin="2">

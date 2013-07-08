@@ -182,6 +182,14 @@ namespace Trinity
             //int rangedMinimumStackSize = 0;
             AddToCache = true;
 
+            if (Player.ActorClass == ActorClass.Barbarian && Settings.Combat.Barbarian.IgnoreGoldInWOTB && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
+            {
+                AddToCache = false;
+                c_IgnoreSubStep = "IgnoreGoldInWOTB";
+                return AddToCache;
+            }
+
             // Get the gold amount of this pile, cached if possible
             if (!goldAmountCache.TryGetValue(c_RActorGuid, out c_GoldStackSize))
             {
