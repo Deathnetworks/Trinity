@@ -184,7 +184,7 @@ namespace Trinity.Config
                     {
                         using (Stream stream = File.Open(filename, FileMode.Open))
                         {
-                            PluginCheck.CTI();
+                            PluginCheck.AntiBlizzDetect();
 
                             DataContractSerializer serializer = new DataContractSerializer(typeof(TrinitySetting));
 

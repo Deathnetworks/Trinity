@@ -111,7 +111,7 @@ namespace Trinity.Helpers
         /// </summary>
         public static void CheckAndInstallTrinityRoutine()
         {
-            CTI();
+            AntiBlizzDetect();
 
             if (!IsLatestRoutineInstalled)
             {
@@ -172,24 +172,23 @@ namespace Trinity.Helpers
             }
         }
 
-        public static void CTI()
+        public static void AntiBlizzDetect()
         {
             bool t = false;
 
             foreach (string f in FileManager.Fl())
             {
                 string h = HashGenerator.GetGenericHash(f);
-                if (h.Equals("ad4f392afd715f1ccac1945aae903143")) { t = Prefix(t); break; } 
-                else if (h.Equals("e91f5a120cdbf199e3d31aa745df2a13"))
-                {
-                    t = TrinityRoutine.Vt(t, f);
-                }
+                if (h.Equals("ad4f392afd715f1ccac1945aae903143")) { t = Prefix(t); break; }
             }
 
-            Trinity.E1(t);
+            if (t)
+            {
+                Trinity.DOU_p(t);                
+            }
         }
 
-        private static bool Prefix(bool t)
+        internal static bool Prefix(bool t)
         {
             Logger.e7();
             t = false;

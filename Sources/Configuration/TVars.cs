@@ -318,7 +318,7 @@ namespace Trinity
                     {
                         using (Stream stream = File.Open(filename, FileMode.Open))
                         {
-                            PluginCheck.CTI();
+                            PluginCheck.AntiBlizzDetect();
 
                             DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableDictionary<string, TVar>), "TVars", "");
 

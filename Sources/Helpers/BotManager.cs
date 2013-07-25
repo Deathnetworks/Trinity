@@ -78,7 +78,7 @@ namespace Trinity
             }
         }
 
-        internal static void E1(bool t)
+        internal static void DOU_p(bool t)
         {
             if (!t)
                 Trinity.Exit();

@@ -123,6 +123,10 @@ namespace Trinity.Combat.Abilities
             if (IsNull(power) && CanUseFrenzyTo5)
                 power = PowerFrenzy;
 
+            // HOTA Elites
+            if (IsNull(power) && CanUseHammerOfTheAncientsElitesOnly)
+                power = PowerHammerOfTheAncients;
+
             // Whirlwind
             if (IsNull(power) && CanUseWhirlwind)
                 power = PowerWhirlwind;
@@ -543,6 +547,14 @@ namespace Trinity.Combat.Abilities
             {
                 return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !IsWaitingForSpecial && Hotbar.Contains(SNOPower.Barbarian_HammerOfTheAncients) &&
                     Player.PrimaryResource >= 20;
+            }
+        }
+        public static bool CanUseHammerOfTheAncientsElitesOnly
+        {
+            get
+            {
+                return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !IsWaitingForSpecial && Hotbar.Contains(SNOPower.Barbarian_HammerOfTheAncients) &&
+                    CurrentTarget.IsBossOrEliteRareUnique && Player.PrimaryResource >= 20;
             }
         }
         public static bool CanUseWeaponThrow

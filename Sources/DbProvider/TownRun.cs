@@ -98,7 +98,7 @@ namespace Trinity
         /// </summary>
         internal static void SetPreTownRunPosition()
         {
-            if (PreTownRunPosition == Vector3.Zero && PreTownRunWorldId == -1)
+            if (PreTownRunPosition == Vector3.Zero && PreTownRunWorldId == -1 && !Trinity.Player.IsInTown)
             {
                 PreTownRunPosition = Trinity.Player.Position;
                 PreTownRunWorldId = Trinity.Player.WorldID;
