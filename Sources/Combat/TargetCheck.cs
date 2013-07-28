@@ -217,7 +217,7 @@ namespace Trinity
                             Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", powerBuff.SNOPower.ToString());
                             if (powerBuff.WaitTicksBeforeUse > 0)
                                 BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitBeforeUseDelay));
-                            ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetRActorGUID);
+                            ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
                             LastPowerUsed = powerBuff.SNOPower;
                             AbilityLastUsedCache[powerBuff.SNOPower] = DateTime.Now;
                             if (powerBuff.WaitTicksAfterUse > 0)

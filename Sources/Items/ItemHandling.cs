@@ -178,7 +178,7 @@ namespace Trinity
                                        item.FollowerSpecialType,
                                        item.DynamicId);
 
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation,
                 "Incoming Identification Request: {0}, {1}, {2}, {3}, {4}",
                 pickupItem.Quality, pickupItem.Level, pickupItem.DBBaseType,
                 pickupItem.DBItemType, pickupItem.IsOneHand ? "1H" : pickupItem.IsTwoHand ? "2H" : "NH");

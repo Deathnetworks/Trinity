@@ -250,7 +250,7 @@ namespace Trinity
                     Trinity.Hotbar.Add(power);
                     if (!DataDictionary.LastUseAbilityTimeDefaults.ContainsKey(power))
                     {
-                        DataDictionary.LastUseAbilityTimeDefaults.Add(power, DateTime.Now);                        
+                        DataDictionary.LastUseAbilityTimeDefaults.Add(power, DateTime.Now);
                     }
                     if (!Trinity.AbilityLastUsedCache.ContainsKey(power))
                     {
@@ -262,6 +262,8 @@ namespace Trinity
                 Trinity.HotbarRefreshTimer.Restart();
 
                 HotbarSkills.Update();
+
+                SpellTracker.RefreshCachedSpells();
 
                 if (!Trinity.GetHasBuff(SNOPower.Wizard_Archon) && !Player.IsHidden)
                     Trinity.hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(Trinity.Hotbar);

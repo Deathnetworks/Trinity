@@ -249,7 +249,8 @@ namespace Trinity
         private bool ItemRulesSalvageSell(ACDItem item, ItemEvaluationType evaluationType)
         {
             ItemEvents.ResetTownRun();
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+            if (!item.IsPotion)
+            Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation,
                 "Incoming {0} Request: {1}, {2}, {3}, {4}, {5}",
                 evaluationType, item.ItemQualityLevel, item.Level, item.ItemBaseType,
                 item.ItemType, item.IsOneHand ? "1H" : item.IsTwoHand ? "2H" : "NH");

@@ -274,7 +274,7 @@ namespace Trinity.Combat.Abilities
                     {
                         SNOPower = DefaultWeaponPower,
                         MinimumRange = DefaultWeaponDistance,
-                        TargetRActorGUID = CurrentTarget.ACDGuid,
+                        TargetACDGUID = CurrentTarget.ACDGuid,
                         WaitForAnimationFinished = true
                     };
                 }

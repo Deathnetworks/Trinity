@@ -183,16 +183,30 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
             }
 
+            //skillDict.Add("Haunt", SNOPower.Witchdoctor_Haunt);
+            //runeDict.Add("ConsumingSpirit", 0);
+            //runeDict.Add("ResentfulSpirit", 4);
+            //runeDict.Add("LingeringSpirit", 1);
+            //runeDict.Add("GraspingSpirit", 2);
+            //runeDict.Add("DrainingSpirit", 3);
+
+            bool hasResentfulSpirit = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Haunt && s.RuneIndex == 4);
+
             // Haunt the shit out of monster and maybe they will give you treats
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Haunt) && !Player.IsIncapacitated && Player.PrimaryResource >= 98 &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Haunt) && 
+                !Player.IsIncapacitated && Player.PrimaryResource >= 98 &&
+                !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Witchdoctor_Haunt) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_Haunt))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Haunt, 21f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }
 
+            //skillDict.Add("LocustSwarm", SNOPower.Witchdoctor_Locust_Swarm);
+
             // Locust
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Locust_Swarm) && !Player.IsIncapacitated && Player.PrimaryResource >= 196 &&
-                PowerManager.CanCast(SNOPower.Witchdoctor_Locust_Swarm) && !CurrentTarget.HasDotDPS && LastPowerUsed != SNOPower.Witchdoctor_Locust_Swarm)
+                !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Witchdoctor_Locust_Swarm) &&
+                PowerManager.CanCast(SNOPower.Witchdoctor_Locust_Swarm) && LastPowerUsed != SNOPower.Witchdoctor_Locust_Swarm)
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, 12f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }

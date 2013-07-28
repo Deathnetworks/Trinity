@@ -293,7 +293,7 @@ namespace Trinity
                             powerBuff = AbilitySelector(true, false, false);
                             if (powerBuff.SNOPower != SNOPower.None)
                             {
-                                ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetRActorGUID);
+                                ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
                                 LastPowerUsed = powerBuff.SNOPower;
                                 AbilityLastUsedCache[powerBuff.SNOPower] = DateTime.Now;
                             }
@@ -1298,7 +1298,7 @@ namespace Trinity
             statusText.Append(" DistfromTrgt=");
             statusText.Append(TargetCurrentDistance.ToString("0"));
             statusText.Append(" tHP=");
-            statusText.Append((CurrentTarget.HitPointsPct*100).ToString("0"));
+            statusText.Append((CurrentTarget.HitPointsPct * 100).ToString("0"));
             statusText.Append(" MyHP=");
             statusText.Append((Player.CurrentHealthPct * 100).ToString("0"));
             statusText.Append(" MyMana=");
@@ -1549,15 +1549,16 @@ namespace Trinity
                 else if (CurrentTarget != null)
                     dist = CurrentTarget.Position.Distance2D(Player.Position);
 
-                var usePowerResult = ZetaDia.Me.UsePower(CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetDynamicWorldId, CombatBase.CurrentPower.TargetRActorGUID);
+                var usePowerResult = ZetaDia.Me.UsePower(CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetDynamicWorldId, CombatBase.CurrentPower.TargetACDGUID);
 
                 if (usePowerResult)
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Used Power {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetRActorGUID, dist);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Used Power {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
                     if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
                         LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
 
                     Monk_MaintainTempestRush();
+                    SpellTracker.TrackSpellOnUnit(CombatBase.CurrentPower.TargetACDGUID, CombatBase.CurrentPower.SNOPower);
 
                     AbilityLastUsedCache[CombatBase.CurrentPower.SNOPower] = DateTime.Now;
                     lastGlobalCooldownUse = DateTime.Now;
@@ -1576,7 +1577,7 @@ namespace Trinity
                 }
                 else
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower FAILED {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetRActorGUID, dist);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower FAILED {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
                 }
 
                 ShouldPickNewAbilities = true;

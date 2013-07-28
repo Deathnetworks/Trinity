@@ -53,6 +53,7 @@ namespace Trinity
                 return Trinity.Hotbar;
             }
         }
+        
 
         #endregion
 

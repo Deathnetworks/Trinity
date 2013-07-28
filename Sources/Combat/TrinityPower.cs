@@ -32,7 +32,7 @@ namespace Trinity
         /// <summary>
         /// The Unit RActorGUID that we want to target
         /// </summary>
-        public int TargetRActorGUID { get; set; }
+        public int TargetACDGUID { get; set; }
         /// <summary>
         /// The number of 1/10th second intervals we should wait before casting this power
         /// </summary>
@@ -142,7 +142,7 @@ namespace Trinity
             MinimumRange = 0f;
             TargetPosition = Vector3.Zero;
             TargetDynamicWorldId = -1;
-            TargetRActorGUID = -1;
+            TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = false;
@@ -160,7 +160,7 @@ namespace Trinity
             MinimumRange = 0f;
             TargetPosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
-            TargetRActorGUID = -1;
+            TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
@@ -179,7 +179,7 @@ namespace Trinity
             MinimumRange = 0f;
             TargetPosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
-            TargetRActorGUID = -1;
+            TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
@@ -198,7 +198,7 @@ namespace Trinity
             MinimumRange = minimumRange;
             TargetPosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
-            TargetRActorGUID = targetRActorGUID;
+            TargetACDGUID = targetRActorGUID;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
@@ -217,7 +217,7 @@ namespace Trinity
             MinimumRange = minimumRange;
             TargetPosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
-            TargetRActorGUID = -1;
+            TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
@@ -236,7 +236,7 @@ namespace Trinity
             MinimumRange = minimumRange;
             TargetPosition = position;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
-            TargetRActorGUID = -1;
+            TargetACDGUID = -1;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
@@ -250,16 +250,16 @@ namespace Trinity
         /// <param name="minimumRange">The minimum range required from the Position or Target to be used</param>
         /// <param name="position">The Position to use the power at</param>
         /// <param name="targetDynamicWorldId">Usually the CurrentDynamicWorlID</param>
-        /// <param name="targetRActorGUID">The Unit we are targetting</param>
+        /// <param name="targetACDGUID">The Unit we are targetting</param>
         /// <param name="waitTicksBeforeUse">The number of "ticks" to wait before using a power - logically 1/10th of a second</param>
         /// <param name="waitTicksAfterUse">The number of "ticks" to wait after using a power - logically 1/10th of a second</param>
-        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position, int targetDynamicWorldId, int targetRActorGUID, float waitTicksBeforeUse, float waitTicksAfterUse)
+        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position, int targetDynamicWorldId, int targetACDGUID, float waitTicksBeforeUse, float waitTicksAfterUse)
         {
             SNOPower = snoPower;
             MinimumRange = minimumRange;
             TargetPosition = position;
             TargetDynamicWorldId = targetDynamicWorldId;
-            TargetRActorGUID = targetRActorGUID;
+            TargetACDGUID = targetACDGUID;
             WaitTicksBeforeUse = waitTicksBeforeUse;
             WaitTicksAfterUse = waitTicksAfterUse;
             WaitForAnimationFinished = true;
@@ -273,17 +273,17 @@ namespace Trinity
         /// <param name="minimumRange">The minimum range required from the Position or Target to be used</param>
         /// <param name="position">The Position to use the power at</param>
         /// <param name="targetDynamicWorldId">Usually the CurrentDynamicWorlID</param>
-        /// <param name="targetRActorGUID">The Unit we are targetting</param>
+        /// <param name="targetACDGUID">The Unit we are targetting</param>
         /// <param name="waitTicksBeforeUse">The number of "ticks" to wait before using a power - logically 1/10th of a second</param>
         /// <param name="waitTicksAfterUse">The number of "ticks" to wait after using a power - logically 1/10th of a second</param>
         /// <param name="waitForAnimationFinished">Force the bot to wait for casting animation to complete after using</param>
-        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position, int targetDynamicWorldId, int targetRActorGUID, float waitTicksBeforeUse, float waitTicksAfterUse, bool waitForAnimationFinished)
+        public TrinityPower(SNOPower snoPower, float minimumRange, Vector3 position, int targetDynamicWorldId, int targetACDGUID, float waitTicksBeforeUse, float waitTicksAfterUse, bool waitForAnimationFinished)
         {
             SNOPower = snoPower;
             MinimumRange = minimumRange;
             TargetPosition = position;
             TargetDynamicWorldId = targetDynamicWorldId;
-            TargetRActorGUID = targetRActorGUID;
+            TargetACDGUID = targetACDGUID;
             WaitTicksBeforeUse = waitTicksBeforeUse;
             WaitTicksAfterUse = waitTicksAfterUse;
             WaitForAnimationFinished = waitForAnimationFinished;
@@ -295,7 +295,7 @@ namespace Trinity
         {
             return this.SNOPower == other.SNOPower &&
                 this.TargetPosition == other.TargetPosition &&
-                this.TargetRActorGUID == other.TargetRActorGUID &&
+                this.TargetACDGUID == other.TargetACDGUID &&
                 this.WaitAfterUseDelay == other.WaitAfterUseDelay &&
                 this.TargetDynamicWorldId == other.TargetDynamicWorldId &&
                 this.MinimumRange == other.MinimumRange;
@@ -307,7 +307,7 @@ namespace Trinity
             String.Format("power={0} pos={1} guid={2} preWait={3} postWait={4} animWait={5} timeSinceAssigned={6} timeSinceUse={7} range={8}",
                     this.SNOPower,
                     this.TargetPosition,
-                    this.TargetRActorGUID,
+                    this.TargetACDGUID,
                     this.WaitTicksBeforeUse,
                     this.WaitTicksAfterUse,
                     this.WaitForAnimationFinished,
