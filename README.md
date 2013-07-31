@@ -1,6 +1,36 @@
 ﻿
 # Trinity
 
+### Changelog 1.7.3.3
+
+* Added SpellTracker class - this can be used to track timed spells (like DoT's) without having to use DOTDPS Actor Attribute. This as added as the WitchDoctor
+
+* WitchDoctor Haunt is no longer spammed, but used after the duration of the DoT spell has expired
+
+* Cleaned up ItemRules Identification logging
+
+* Fixed incorrect reference to Target ACDGuid (Was RActorGUID)
+
+* Removed Demonbuddy Version check
+
+* Barbarian will now use HOTA on elites when available
+
+* PreTownRunPosition now checks to make sure we're not in town
+
+### Changelog 1.7.3.2
+
+* Removed 2f distance check for ignoring trash mobs
+
+* Fixed WOTB Fury Dump
+
+* Added Barbarian options for Ignore Avoidance in WOTB, and Ignore Gold stacks in WOTB
+
+### Changelog 1.7.3.1
+
+* Fixed all references to AbilityLastUsedCache (Monk combat works again)
+
+* Fixed picking up white items
+
 ### Changelog 1.7.3.0 - FRESH INSTALL REQUIRED:
 
 Highlights:
