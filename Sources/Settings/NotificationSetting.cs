@@ -11,6 +11,8 @@ namespace Trinity.Config
         private string _IPhoneKey;
         private bool _AndroidEnabled;
         private string _AndroidKey;
+		private bool _PushoverEnabled;
+        private string _PushoverKey;
         private bool _MailEnabled;
         private string _EmailAddress;
         private string _EmailPassword;
@@ -107,6 +109,42 @@ namespace Trinity.Config
                 {
                     _AndroidKey = value.Trim();
                     OnPropertyChanged("AndroidKey");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]		
+		 public bool PushoverEnabled
+        {
+            get
+            {
+                return _PushoverEnabled;
+            }
+            set
+            {
+                if (_PushoverEnabled != value)
+                {
+                    _PushoverEnabled = value;
+                    OnPropertyChanged("PushoverEnabled");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue("")]
+        public string PushoverKey
+        {
+            get
+            {
+                return _PushoverKey;
+            }
+            set
+            {
+                if (_PushoverKey != value)
+                {
+                    _PushoverKey = value.Trim();
+                    OnPropertyChanged("PushoverKey");
                 }
             }
         }

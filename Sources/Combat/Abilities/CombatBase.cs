@@ -169,7 +169,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return
-                   Trinity.ObjectCache.Any(o =>
+                   Trinity.ObjectCache.Any(o => o.IsEliteRareUnique &&
                           o.MonsterAffixes.HasFlag(MonsterAffixes.ArcaneEnchanted | MonsterAffixes.Frozen | MonsterAffixes.Jailer | MonsterAffixes.Molten) ||
                           (o.MonsterAffixes.HasFlag(MonsterAffixes.Electrified) && o.MonsterAffixes.HasFlag(MonsterAffixes.ReflectsDamage))) ||
                         Trinity.ObjectCache.Any(o => o.IsBoss);

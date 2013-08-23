@@ -458,6 +458,7 @@ namespace Trinity
         /// The RActorGUID of the last CurrentTarget (PrimaryTarget)
         /// </summary>
         private static int CurrentTargetRactorGUID;
+        private static int CurrentTargetACDGuid;
         /// <summary>
         /// The number of monsters within melee range distance of the player
         /// </summary>

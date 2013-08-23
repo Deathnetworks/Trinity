@@ -63,7 +63,7 @@ namespace Trinity.Combat.Abilities
             // WOTB
             if (IsNull(power) && CanCastWrathOfTheBerserker)
             {
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker being used!({0})", CurrentTarget.InternalName);
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker being used! ({0})", CurrentTarget.InternalName);
                 power = PowerWrathOfTheBerserker;
             }
 
@@ -119,7 +119,11 @@ namespace Trinity.Combat.Abilities
             if (IsNull(power) && CanUseSprint)
                 power = PowerSprint;
 
-            // Frenzy to 5 stacks
+            // Bash to 3 stacks (Punish)
+            if (IsNull(power) && CanUseBashTo3)
+                power = PowerBash;
+
+            // Frenzy to 5 stacks (Maniac)
             if (IsNull(power) && CanUseFrenzyTo5)
                 power = PowerFrenzy;
 
@@ -143,13 +147,13 @@ namespace Trinity.Combat.Abilities
             if (IsNull(power) && CanUseWeaponThrow)
                 power = PowerWeaponThrow;
 
-            // Frenzy Fury Generator
-            if (IsNull(power) && CanUseFrenzy)
-                power = PowerFrenzy;
-
             // Bash Fury Generator
             if (IsNull(power) && CanUseBash)
                 power = PowerBash;
+
+            // Frenzy Fury Generator
+            if (IsNull(power) && CanUseFrenzy)
+                power = PowerFrenzy;
 
             // Cleave Fury Generator
             if (IsNull(power) && CanUseCleave)
@@ -205,6 +209,9 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
+                if (UseOOCBuff || IsCurrentlyAvoiding)
+                    return false;
+
                 // WOTB with elites
                 bool wotbElites =
                     (WOTBGoblins || WOTBElitesPresent);
@@ -226,14 +233,15 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                // WotB only used on Arcane, Frozen, Jailer, Molten, Electrified+Reflect Damage elites, or bosses and ubers, or when more than 4 elites are present
-                bool wotbHardElitesPresent = HardElitesPresent ||
-                    Trinity.ObjectCache.Any(o => DataDictionary.ForceUseWOTBIds.Contains(o.ActorSNO)) ||
-                        TargetUtil.AnyElitesInRange(V.F("Barbarian.WOTB.HardEliteRangeOverride"), V.I("Barbarian.WOTB.HardEliteCountOverride"));
+                //bool hardEliteOverride = Trinity.ObjectCache.Any(o => DataDictionary.ForceUseWOTBIds.Contains(o.ActorSNO)) ||
+                //        TargetUtil.AnyElitesInRange(V.F("Barbarian.WOTB.HardEliteRangeOverride"), V.I("Barbarian.WOTB.HardEliteCountOverride"));
+
+                //// WotB only used on Arcane, Frozen, Jailer, Molten, Electrified+Reflect Damage elites, or bosses and ubers, or when more than 4 elites are present
+                //bool wotbHardElitesPresent = HardElitesPresent || hardEliteOverride;
 
                 return
                     (!Settings.Combat.Barbarian.WOTBHardOnly && TargetUtil.AnyElitesInRange(V.F("Barbarian.WOTB.MinRange"), V.I("Barbarian.WOTB.MinCount")))
-                    || (wotbHardElitesPresent && Settings.Combat.Barbarian.WOTBHardOnly);
+                    || (HardElitesPresent && Settings.Combat.Barbarian.WOTBHardOnly);
             }
         }
 
@@ -244,7 +252,9 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !Settings.Combat.Barbarian.UseWOTBGoblin || (Settings.Combat.Barbarian.UseWOTBGoblin && CurrentTarget.IsTreasureGoblin);
+                if (CurrentTarget == null)
+                    return false;
+                return CurrentTarget.IsTreasureGoblin && Settings.Combat.Barbarian.UseWOTBGoblin;
             }
         }
 
@@ -259,8 +269,7 @@ namespace Trinity.Combat.Abilities
                     Settings.Combat.Misc.IgnoreElites &&
                     (TargetUtil.AnyMobsInRange(V.F("Barbarian.WOTB.RangeNear"), V.I("Barbarian.WOTB.CountNear")) ||
                     TargetUtil.AnyMobsInRange(V.F("Barbarian.WOTB.RangeFar"), V.I("Barbarian.WOTB.CountFar")) ||
-                    TargetUtil.AnyMobsInRange(Settings.Combat.Misc.TrashPackClusterRadius, Settings.Combat.Misc.TrashPackSize)) ||
-                    !Settings.Combat.Misc.IgnoreElites;
+                    TargetUtil.AnyMobsInRange(Settings.Combat.Misc.TrashPackClusterRadius, Settings.Combat.Misc.TrashPackSize));
             }
         }
 
@@ -387,7 +396,7 @@ namespace Trinity.Combat.Abilities
                     (
                         TargetUtil.AnyElitesInRange(V.F("Barbarian.GroundStomp.EliteRange"), V.I("Barbarian.GroundStomp.EliteCount")) ||
                         TargetUtil.AnyMobsInRange(V.F("Barbarian.GroundStomp.TrashRange"), V.I("Barbarian.GroundStomp.TrashCount")) ||
-                        Player.CurrentHealthPct <= V.F("Barbarian.GroundStomp.UseBelowHealthPct")
+                        (Player.CurrentHealthPct <= V.F("Barbarian.GroundStomp.UseBelowHealthPct") && TargetUtil.AnyMobsInRange(V.F("Barbarian.GroundStomp.TrashRange")))
                     );
             }
         }
@@ -447,7 +456,7 @@ namespace Trinity.Combat.Abilities
             {
                 return !UseOOCBuff && CanCast(SNOPower.Barbarian_Overpower) && !Player.IsIncapacitated &&
                     (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage) || !Hotbar.Contains(SNOPower.Barbarian_BattleRage)) &&
-                    (CurrentTarget.RadiusDistance <= V.F("Barbarian.OverPower.MaxRange") || 
+                    (CurrentTarget.RadiusDistance <= V.F("Barbarian.OverPower.MaxRange") ||
                         (
                         TargetUtil.AnyMobsInRange(V.F("Barbarian.OverPower.MaxRange")) &&
                         (CurrentTarget.IsEliteRareUnique || CurrentTarget.IsMinion || CurrentTarget.IsBoss || GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) ||
@@ -462,7 +471,7 @@ namespace Trinity.Combat.Abilities
             {
                 return !UseOOCBuff && !IsWaitingForSpecial && CanCast(SNOPower.Barbarian_SeismicSlam) && !Player.IsIncapacitated &&
                     (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage))) &&
-                    Player.PrimaryResource >= V.I("Barbarian.SeismicSlam.MinFury") && CurrentTarget.CentreDistance <= V.F("Barbarian.SeismicSlam.CurrentTargetRange") && 
+                    Player.PrimaryResource >= V.I("Barbarian.SeismicSlam.MinFury") && CurrentTarget.CentreDistance <= V.F("Barbarian.SeismicSlam.CurrentTargetRange") &&
                     (TargetUtil.AnyMobsInRange(V.F("Barbarian.SeismicSlam.TrashRange")) ||
                      TargetUtil.IsEliteTargetInRange(V.F("Barbarian.SeismicSlam.EliteRange")));
             }
@@ -481,16 +490,16 @@ namespace Trinity.Combat.Abilities
             {
                 return !UseOOCBuff && CanCast(SNOPower.Barbarian_Sprint, CanCastFlags.NoTimer) && !Player.IsIncapacitated &&
                     (
-                        // last power used was whirlwind and we don't have sprint up
+                    // last power used was whirlwind and we don't have sprint up
                         (LastPowerUsed == SNOPower.Barbarian_Whirlwind && !GetHasBuff(SNOPower.Barbarian_Sprint)) ||
-                        // Fury Dump Options for sprint: use at max energy constantly
+                    // Fury Dump Options for sprint: use at max energy constantly
                         (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin") && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
                         (Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")) ||
-                        // or on a timer
+                    // or on a timer
                         (
                          (SNOPowerUseTimer(SNOPower.Barbarian_Sprint) && !GetHasBuff(SNOPower.Barbarian_Sprint)) &&
-                         // Always keep up if we are whirlwinding, if the target is a goblin, or if we are more than 16 feet away from the target
-                         (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) || CurrentTarget.IsTreasureGoblin || 
+                    // Always keep up if we are whirlwinding, if the target is a goblin, or if we are more than 16 feet away from the target
+                         (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) || CurrentTarget.IsTreasureGoblin ||
                           (CurrentTarget.CentreDistance >= V.F("Barbarian.Sprint.SingleTargetRange") && Player.PrimaryResource >= V.F("Barbarian.Sprint.SingleTargetMinFury"))
                          )
                         )
@@ -507,6 +516,52 @@ namespace Trinity.Combat.Abilities
             {
                 return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsRooted && Hotbar.Contains(SNOPower.Barbarian_Frenzy) &&
                     !TargetUtil.AnyMobsInRange(15f, 3) && GetBuffStacks(SNOPower.Barbarian_Frenzy) < 5;
+            }
+        }
+        public static bool CanUseBashTo3
+        {
+            get
+            {
+                // minimum checks
+                if (UseOOCBuff)
+                    return false;
+                if (IsCurrentlyAvoiding)
+                    return false;
+                if (!Hotbar.Contains(SNOPower.Barbarian_Bash))
+                    return false;
+
+                //skillDict.Add("Bash", SNOPower.Barbarian_Bash);
+                //runeDict.Add("Clobber", 2);
+                //runeDict.Add("Onslaught", 0);
+                //runeDict.Add("Punish", 1);
+                //runeDict.Add("Instigation", 3);
+                //runeDict.Add("Pulverize", 4);
+
+                bool hasPunish = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Bash && s.RuneIndex == 1);
+
+                // for combo use with Frenzy or Cleave
+                if (hasPunish)
+                {
+                    // haven't bashed, ever
+                    if (!SpellHistory.HasUsedSpell(SNOPower.Barbarian_Bash))
+                        return true;
+
+                    int timeSinceUse = SpellHistory.TimeSinceUse(SNOPower.Barbarian_Bash).Milliseconds;
+
+                    // been almost 5 seconds since our last bash (keep the Punish buff up)
+                    if (timeSinceUse >= 4600)
+                        return true;
+
+                    // if it's been less than 5 seconds, check if we have used 2 in 10 seconds
+                    if (SpellHistory.HistoryQueue.Count(i => i.TimeSinceUse.TotalMilliseconds < 9600) <= 2)
+                        return true;
+
+                    // if it's been less than 5 seconds, check if we have used 3 in 15 seconds (for full stack)
+                    if (SpellHistory.HistoryQueue.Count(i => i.TimeSinceUse.TotalSeconds < 14600) <= 3)
+                        return true;
+                }
+
+                return false;
             }
         }
         public static bool CanUseWhirlwind
@@ -562,7 +617,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WeaponThrow)
-                    && (Player.PrimaryResource >= 10 && (CurrentTarget.RadiusDistance >= 5f || BarbHasNoPrimary()));
+                    && (Player.PrimaryResource >= 10 && (CurrentTarget.RadiusDistance >= 5f || BarbHasNoPrimary));
             }
         }
         public static bool CanUseFrenzy { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Frenzy); } }
@@ -636,7 +691,7 @@ namespace Trinity.Combat.Abilities
         public static TrinityPower PowerHammerOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_HammerOfTheAncients, V.F("Barbarian.HammerOfTheAncients.UseRange"), CurrentTarget.ACDGuid); } }
         public static TrinityPower PowerWeaponThrow { get { return new TrinityPower(SNOPower.Barbarian_WeaponThrow, V.F("Barbarian.WeaponThrow.UseRange"), CurrentTarget.ACDGuid); } }
         public static TrinityPower PowerFrenzy { get { return new TrinityPower(SNOPower.Barbarian_Frenzy, V.F("Barbarian.Frenzy.UseRange"), CurrentTarget.ACDGuid); } }
-        public static TrinityPower PowerBash { get { return new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"), CurrentTarget.ACDGuid); } }
+        public static TrinityPower PowerBash { get { return new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"), Vector3.Zero, -1, CurrentTarget.ACDGuid, 2, 2, true); } }
         public static TrinityPower PowerCleave { get { return new TrinityPower(SNOPower.Barbarian_Cleave, V.F("Barbarian.Cleave.UseRange"), CurrentTarget.ACDGuid); } }
 
         private static TrinityPower DestroyObjectPower
@@ -670,11 +725,23 @@ namespace Trinity.Combat.Abilities
             get { return allowSprintOOC; }
             set { allowSprintOOC = value; }
         }
-        private static bool BarbHasNoPrimary()
+
+        private static bool BarbHasNoPrimary
         {
-            return !(Hotbar.Contains(SNOPower.Barbarian_Frenzy) ||
-                Hotbar.Contains(SNOPower.Barbarian_Bash) ||
-                Hotbar.Contains(SNOPower.Barbarian_Cleave));
+            get
+            {
+                return !(Hotbar.Contains(SNOPower.Barbarian_Frenzy) ||
+                    Hotbar.Contains(SNOPower.Barbarian_Bash) ||
+                    Hotbar.Contains(SNOPower.Barbarian_Cleave));
+            }
+        }
+
+        private static bool HasMoreThanOnePrimary
+        {
+            get
+            {
+                return Hotbar.Count(i => i == SNOPower.Barbarian_Frenzy || i == SNOPower.Barbarian_Bash || i == SNOPower.Barbarian_Cleave) > 1;
+            }
         }
 
     }

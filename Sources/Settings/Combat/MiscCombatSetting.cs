@@ -22,6 +22,7 @@ namespace Trinity.Config.Combat
         private float _TrashPackClusterRadius;
         private bool _IgnoreElites;
         private bool _AvoidDeath;
+        private bool _SkipElitesOn5NV;
         #endregion Fields
 
         #region Events
@@ -308,6 +309,23 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SkipElitesOn5NV
+        {
+            get
+            {
+                return _SkipElitesOn5NV;
+            }
+            set
+            {
+                if (_SkipElitesOn5NV != value)
+                {
+                    _SkipElitesOn5NV = value;
+                    OnPropertyChanged("SkipElitesOn5NV");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -350,6 +368,7 @@ namespace Trinity.Config.Combat
             this.TrashPackSize = 2;
             this.KillMonstersInAoE = true;
             this.EliteRange = 150;
+            this.SkipElitesOn5NV = false;
         }
         #endregion Methods
     }

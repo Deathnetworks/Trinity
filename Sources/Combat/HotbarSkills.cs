@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Trinity.Technicals;
 using Zeta;
 using Zeta.Internals;
 using Zeta.Internals.Actors;
@@ -58,6 +59,13 @@ namespace Trinity
                         RuneIndex = HotbarSkills.GetRuneIndexFromPower(p)
                     });
                 }
+
+                string skillList = "";
+                foreach (HotbarSkills skill in HotbarSkills.AssignedSkills)
+                {
+                    skillList += " " + skill.Power.ToString() + "/" + skill.RuneIndex + "/" + skill.Slot; 
+                }
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, " Hotbar Skills (Skill/RuneIndex/Slot): " + skillList);
             }
         }
 

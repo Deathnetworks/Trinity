@@ -364,7 +364,6 @@
                         <ComboBoxItem Content="Radiant+" Tag="48" />
                         <ComboBoxItem Content="Square+" Tag="54" />
                         <ComboBoxItem Content="Flawless Square+" IsSelected="True" Tag="60" />
-                        <ComboBoxItem Content="Perfect Square+" Tag="61" />
                     </ComboBox>
                     <CheckBox Grid.Row="0" Grid.Column="2" Content="Emerald" 
                               IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Emerald'}" 

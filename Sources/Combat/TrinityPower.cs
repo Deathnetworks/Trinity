@@ -304,7 +304,7 @@ namespace Trinity
         public override string ToString()
         {
             return
-            String.Format("power={0} pos={1} guid={2} preWait={3} postWait={4} animWait={5} timeSinceAssigned={6} timeSinceUse={7} range={8}",
+            String.Format("power={0} pos={1} acdGuid={2} preWait={3} postWait={4} animWait={5} timeSinceAssigned={6} timeSinceUse={7} range={8}",
                     this.SNOPower,
                     this.TargetPosition,
                     this.TargetACDGUID,

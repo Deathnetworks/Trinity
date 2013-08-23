@@ -192,8 +192,8 @@ namespace Trinity
                     if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
                     {
                         RecordTargetHistory();
-                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Found New Target - {0} CurrentTargetRactorGUID: {1} CurrentTarget.RActorGuid: {2}",
-                                        DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid);
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Found New Target - {0} CurrentTargetRactorGUID: {1} (ACDGuid: {3}) / CurrentTarget.RActorGuid: {2} (ACDGuid: {4})",
+                                        DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid, CurrentTargetACDGuid, CurrentTarget.ACDGuid);
                         dateSincePickedTarget = DateTime.Now;
                         iTargetLastHealth = 0f;
                     }
@@ -274,6 +274,7 @@ namespace Trinity
                 vKitePointAvoid = Vector3.Zero;
                 // store current target GUID
                 CurrentTargetRactorGUID = CurrentTarget != null ? CurrentTarget.RActorGuid : -1;
+                CurrentTargetACDGuid = CurrentTarget != null ? CurrentTarget.ACDGuid : -1;
                 //reset current target
                 CurrentTarget = null;
                 // Reset all variables for target-weight finding

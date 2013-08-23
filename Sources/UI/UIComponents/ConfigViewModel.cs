@@ -595,26 +595,30 @@ namespace Trinity.UIComponents
             _Model.Loot.Pickup.PotionMode = PotionMode.Cap;
             _Model.Loot.Pickup.Plans = true;
             _Model.Loot.Pickup.CraftTomes = true;
+            _Model.Loot.Pickup.PickupLowLevel = true;
         }
 
         private void ConfigHuntingLoot()
         {
+            _Model.Loot.ItemFilterMode = ItemFilterMode.TrinityWithItemRules;
+            _Model.Loot.ItemRules.ItemRuleType = ItemRuleType.Hard;
             _Model.Loot.Pickup.ArmorBlueLevel = 0;
-            _Model.Loot.Pickup.ArmorYellowLevel = 63;
+            _Model.Loot.Pickup.ArmorYellowLevel = 0;
             _Model.Loot.Pickup.WeaponBlueLevel = 0;
-            _Model.Loot.Pickup.WeaponYellowLevel = 63;
+            _Model.Loot.Pickup.WeaponYellowLevel = 0;
             _Model.Loot.Pickup.JewelryBlueLevel = 0;
-            _Model.Loot.Pickup.JewelryYellowLevel = 58;
-            _Model.Loot.Pickup.LegendaryLevel = 55;
+            _Model.Loot.Pickup.JewelryYellowLevel = 0;
+            _Model.Loot.Pickup.LegendaryLevel = 62;
             _Model.Loot.Pickup.GemLevel = 60;
-            _Model.Loot.Pickup.GemType = TrinityGemType.All;
-            _Model.Loot.Pickup.FollowerItem = true;
-            _Model.Loot.Pickup.MinimumGoldStack = 300;
+            _Model.Loot.Pickup.GemType = TrinityGemType.None;
+            _Model.Loot.Pickup.FollowerItem = false;
+            _Model.Loot.Pickup.MinimumGoldStack = 1500;
             _Model.Loot.Pickup.MiscItemLevel = 60;
             _Model.Loot.Pickup.PotionLevel = 60;
             _Model.Loot.Pickup.PotionMode = PotionMode.Cap;
-            _Model.Loot.Pickup.Plans = true;
-            _Model.Loot.Pickup.CraftTomes = true;
+            _Model.Loot.Pickup.Plans = false;
+            _Model.Loot.Pickup.CraftTomes = false;
+            _Model.Loot.Pickup.PickupLowLevel = false;
         }
 
         private void LoadItemRulesPath()

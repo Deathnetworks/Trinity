@@ -20,7 +20,7 @@ namespace Trinity.Notifications
         /// Email Notification Message
         /// </summary>
         public static StringBuilder EmailMessage = new StringBuilder();
-        
+
         public static Queue<ProwlNotification> pushQueue = new Queue<ProwlNotification>();
 
         public static void AddNotificationToQueue(string description, string eventName, ProwlNotificationPriority priority)
@@ -37,6 +37,9 @@ namespace Trinity.Notifications
         }
         public static void SendNotification(ProwlNotification notification)
         {
+            //New string to pass in notification type
+            string notificationType = "";
+
             if (Trinity.Settings.Notification.IPhoneEnabled && !string.IsNullOrWhiteSpace(Trinity.Settings.Notification.IPhoneKey))
             {
                 var newNotification =
@@ -46,9 +49,10 @@ namespace Trinity.Notifications
                             Event = notification.Event,
                             Priority = notification.Priority
                         };
+                notificationType = "iphone";
                 try
                 {
-                    PostNotification(newNotification);
+                    PostNotification(newNotification, notificationType);
                 }
                 catch
                 {
@@ -63,42 +67,130 @@ namespace Trinity.Notifications
                             Event = notification.Event,
                             Priority = notification.Priority
                         };
+                notificationType = "android";
                 try
                 {
-                    PostNotification(newNotification, true);
+                    PostNotification(newNotification, notificationType);
                 }
                 catch
                 {
                 }
             }
+
+            //Adding in Pushover Stuffs. 
+            if (Trinity.Settings.Notification.PushoverEnabled && !string.IsNullOrWhiteSpace(Trinity.Settings.Notification.PushoverKey))
+            {
+                var newNotification =
+                        new ProwlNotification
+                        {
+                            Description = notification.Description,
+                            Event = notification.Event,
+                            Priority = notification.Priority
+                        };
+                notificationType = "pushover";
+                try
+                {
+                    PostNotification(newNotification, notificationType);
+                }
+                catch
+                {
+                }
+            }
+
+
+
         }
-        public static void PostNotification(ProwlNotification notification_, bool android = false)
+        //No longer takes in a bool, rather takes in actual type since there are three options
+        public static void PostNotification(ProwlNotification notification_, string notType)
         {
-            string prowlUrlSb = !android ?
-                                    @"https://prowl.weks.net/publicapi/add" :
-                                    @"https://www.notifymyandroid.com/publicapi/notify";
-            string sThisAPIKey = !android ? Trinity.Settings.Notification.IPhoneKey : Trinity.Settings.Notification.AndroidKey;
-            prowlUrlSb += "?apikey=" + HttpUtility.UrlEncode(sThisAPIKey.Trim()) +
-                          "&application=" + HttpUtility.UrlEncode("Trinity") +
-                          "&description=" + HttpUtility.UrlEncode(notification_.Description) +
-                          "&event=" + HttpUtility.UrlEncode(notification_.Event) +
-                          "&priority=" + HttpUtility.UrlEncode(notification_.Priority.ToString());
-            var updateRequest =
+            //
+            if (notType == "pushover")
+            {
+                string prowlUrlSb = "https://api.pushover.net/1/messages.json";
+                string sThisAPIKey = Trinity.Settings.Notification.PushoverKey;
+                //The registered token for Trinity I set up on pushover.net
+                prowlUrlSb += "?token=aBf5s4BGSCkRHkneWq3VcGQMX2GjgP" + // Created "Trinity" application in Pushover.net
+                              "&user=" + HttpUtility.UrlEncode(sThisAPIKey.Trim()) +
+                              "&message=" + HttpUtility.UrlEncode(notification_.Description) +
+                              "&title=" + HttpUtility.UrlEncode(notification_.Event) +
+                              "&priority=" + HttpUtility.UrlEncode(notification_.Priority.ToString());
+
+                var updateRequest =
                 (HttpWebRequest)WebRequest.Create(prowlUrlSb.ToString());
-            updateRequest.ContentLength = 0;
-            updateRequest.ContentType = "application/x-www-form-urlencoded";
-            updateRequest.Method = "POST";
-            //updateRequest.Timeout = 5000;
-            var postResponse = default(WebResponse);
-            try
-            {
-                postResponse = updateRequest.GetResponse();
+                updateRequest.ContentLength = 0;
+                updateRequest.ContentType = "application/x-www-form-urlencoded";
+                updateRequest.Method = "POST";
+                //updateRequest.Timeout = 5000;
+                var postResponse = default(WebResponse);
+                try
+                {
+                    postResponse = updateRequest.GetResponse();
+                }
+                finally
+                {
+                    if (postResponse != null)
+                        postResponse.Close();
+                }
             }
-            finally
+
+            if (notType == "iphone")
             {
-                if (postResponse != null)
-                    postResponse.Close();
+                string prowlUrlSb = "https://prowl.weks.net/publicapi/add";
+                string sThisAPIKey = Trinity.Settings.Notification.IPhoneKey;
+                prowlUrlSb += "?apikey=" + HttpUtility.UrlEncode(sThisAPIKey.Trim()) +
+                             "&application=" + HttpUtility.UrlEncode("Trinity") +
+                             "&description=" + HttpUtility.UrlEncode(notification_.Description) +
+                             "&event=" + HttpUtility.UrlEncode(notification_.Event) +
+                             "&priority=" + HttpUtility.UrlEncode(notification_.Priority.ToString());
+
+                var updateRequest =
+                (HttpWebRequest)WebRequest.Create(prowlUrlSb.ToString());
+                updateRequest.ContentLength = 0;
+                updateRequest.ContentType = "application/x-www-form-urlencoded";
+                updateRequest.Method = "POST";
+                //updateRequest.Timeout = 5000;
+                var postResponse = default(WebResponse);
+                try
+                {
+                    postResponse = updateRequest.GetResponse();
+                }
+                finally
+                {
+                    if (postResponse != null)
+                        postResponse.Close();
+                }
             }
+
+            if (notType == "android")
+            {
+                string prowlUrlSb = "https://www.notifymyandroid.com/publicapi/notify";
+                string sThisAPIKey = Trinity.Settings.Notification.AndroidKey;
+                prowlUrlSb += "?apikey=" + HttpUtility.UrlEncode(sThisAPIKey.Trim()) +
+                              "&application=" + HttpUtility.UrlEncode("Trinity") +
+                              "&description=" + HttpUtility.UrlEncode(notification_.Description) +
+                              "&event=" + HttpUtility.UrlEncode(notification_.Event) +
+                              "&priority=" + HttpUtility.UrlEncode(notification_.Priority.ToString());
+
+                var updateRequest =
+                    (HttpWebRequest)WebRequest.Create(prowlUrlSb.ToString());
+                updateRequest.ContentLength = 0;
+                updateRequest.ContentType = "application/x-www-form-urlencoded";
+                updateRequest.Method = "POST";
+                //updateRequest.Timeout = 5000;
+                var postResponse = default(WebResponse);
+                try
+                {
+                    postResponse = updateRequest.GetResponse();
+                }
+                finally
+                {
+                    if (postResponse != null)
+                        postResponse.Close();
+                }
+            }
+
+
+
         }
 
         public static void SendEmail(string to, string from, string subject, string body, string server, string password)

@@ -41,6 +41,7 @@ namespace Trinity.Config.Loot
         Topaz = 2,
         Amethyst = 4,
         Ruby = 8,
+        None = 16,
         All = Emerald | Topaz | Amethyst | Ruby
     }
 

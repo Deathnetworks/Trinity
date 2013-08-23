@@ -860,7 +860,6 @@ namespace Trinity
                     return GetTreeSharpRunStatus(runStatus);
                 }
 
-                Logger.Log(LogCategory.Behavior, "Using Navigator to reach target");
                 HandleTargetBasicMovement(bForceNewMovement);
 
                 runStatus = HandlerRunStatus.TreeRunning;
@@ -1351,6 +1350,8 @@ namespace Trinity
 
                 if (DateTime.Now.Subtract(lastSentMovePower).TotalMilliseconds >= 250 || Vector3.Distance(vLastMoveToTarget, vCurrentDestination) >= 2f || bForceNewMovement)
                 {
+                    bool straightLinePathing = DataDictionary.StraightLinePathingLevelAreaIds.Contains(Player.LevelAreaId);
+
                     string destname = String.Format("Name={0} Dist={1} IsElite={2} HasBeenInLoS={3} HitPointsPct={4}",
                         CurrentTarget.InternalName,
                         CurrentTarget.RadiusDistance,
@@ -1358,7 +1359,21 @@ namespace Trinity
                         CurrentTarget.HasBeenInLoS,
                         CurrentTarget.HitPointsPct);
 
-                    MoveResult lastMoveResult = PlayerMover.NavigateTo(vCurrentDestination, destname);
+                    MoveResult lastMoveResult;
+                    if (straightLinePathing)
+                    {
+                        lastMoveResult = MoveResult.Moved;
+                        // just "Click" 
+                        Navigator.PlayerMover.MoveTowards(vCurrentDestination);
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Straight line pathing to {0}", destname);
+                    }
+                    else
+                    {
+                        Logger.Log(LogCategory.Behavior, "Using Navigator to reach target");
+                        lastMoveResult = PlayerMover.NavigateTo(vCurrentDestination, destname);
+                    }
+
+
                     lastSentMovePower = DateTime.Now;
 
                     //if (lastMoveResult == MoveResult.ReachedDestination && vCurrentDestination.Distance2D(PlayerStatus.CurrentPosition) > 40f)
@@ -1549,16 +1564,18 @@ namespace Trinity
                 else if (CurrentTarget != null)
                     dist = CurrentTarget.Position.Distance2D(Player.Position);
 
+
                 var usePowerResult = ZetaDia.Me.UsePower(CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetDynamicWorldId, CombatBase.CurrentPower.TargetACDGUID);
 
                 if (usePowerResult)
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Used Power {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower SUCCESS {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
                     if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
                         LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
 
                     Monk_MaintainTempestRush();
                     SpellTracker.TrackSpellOnUnit(CombatBase.CurrentPower.TargetACDGUID, CombatBase.CurrentPower.SNOPower);
+                    SpellHistory.RecordSpell(CombatBase.CurrentPower);
 
                     AbilityLastUsedCache[CombatBase.CurrentPower.SNOPower] = DateTime.Now;
                     lastGlobalCooldownUse = DateTime.Now;
@@ -1577,7 +1594,9 @@ namespace Trinity
                 }
                 else
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower FAILED {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
+                    PowerManager.CanCastFlags failFlags;
+                    PowerManager.CanCast(CombatBase.CurrentPower.SNOPower, out failFlags);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower FAILED {0} ({1}) at {2} on {3} dist={4}", CombatBase.CurrentPower.SNOPower, failFlags, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
                 }
 
                 ShouldPickNewAbilities = true;

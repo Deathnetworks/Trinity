@@ -102,7 +102,7 @@ namespace Trinity
                                 }
 
                                 // Ignore elite option, except if trying to town portal
-                                if (Settings.Combat.Misc.IgnoreElites && (cacheObject.IsEliteRareUnique) && !TownRun.IsTryingToTownPortal())
+                                if ((Settings.Combat.Misc.IgnoreElites || (Settings.Combat.Misc.SkipElitesOn5NV && GetBuffStacks(SNOPower.g_killElitePack) >= 5)) && (cacheObject.IsEliteRareUnique) && !TownRun.IsTryingToTownPortal())
                                 {
                                     break;
                                 }
