@@ -79,7 +79,13 @@ namespace Trinity
                     minAvoidanceHealth *= V.F("Barbarian.Avoidance.WOTB.Arcane");
                 }
                 else if (avoidanceType == AvoidanceType.Desecrator)
+                {
                     minAvoidanceHealth *= V.F("Barbarian.Avoidance.WOTB.Desecrator");
+                }
+                else if (avoidanceType == AvoidanceType.Belial)
+                {
+                    minAvoidanceHealth = 1;
+                }
                 else
                     // Anything else
                     minAvoidanceHealth *= V.F("Barbarian.Avoidance.WOTB.Other");

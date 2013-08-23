@@ -39,7 +39,7 @@ namespace Trinity.DbProvider
         // Anti-stuck variables
         internal static Vector3 LastMoveToTarget = Vector3.Zero;
         internal static int iTimesReachedStuckPoint = 0;
-        internal static int iTotalAntiStuckAttempts = 1;
+        internal static int TotalAntiStuckAttempts = 1;
         internal static Vector3 vSafeMovementLocation = Vector3.Zero;
         internal static DateTime TimeLastRecordedPosition = DateTime.MinValue;
         internal static Vector3 vOldPosition = Vector3.Zero;
@@ -168,7 +168,7 @@ namespace Trinity.DbProvider
                 // Reset the path and allow a whole "New" unstuck generation next cycle
                 iTimesReachedStuckPoint = 0;
                 // And cancel unstucking for 9 seconds so DB can try to navigate
-                iCancelUnstuckerForSeconds = (9 * iTotalAntiStuckAttempts);
+                iCancelUnstuckerForSeconds = (9 * TotalAntiStuckAttempts);
                 if (iCancelUnstuckerForSeconds < 20)
                     iCancelUnstuckerForSeconds = 20;
                 _lastCancelledUnstucker = DateTime.Now;
@@ -181,13 +181,13 @@ namespace Trinity.DbProvider
             {
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "You are " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away from your destination.");
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "This is too far for the unstucker, and is likely a sign of ending up in the wrong map zone.");
-                iTotalAntiStuckAttempts = 20;
+                TotalAntiStuckAttempts = 20;
             }
             // intell
-            if (iTotalAntiStuckAttempts <= 15)
+            if (TotalAntiStuckAttempts <= 15)
             {
                 Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Your bot got stuck! Trying to unstuck (attempt #{0} of 15 attempts) {1} {2} {3} {4}",
-                    iTotalAntiStuckAttempts.ToString(),
+                    TotalAntiStuckAttempts.ToString(),
                     "Act=\"" + ZetaDia.CurrentAct + "\"",
                     "questId=\"" + ZetaDia.CurrentQuest.QuestSNO + "\"",
                     "stepId=\"" + ZetaDia.CurrentQuest.StepId + "\"",
@@ -199,10 +199,10 @@ namespace Trinity.DbProvider
 
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "(destination=" + vOriginalDestination.ToString() + ", which is " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away)");
 
-                vSafeMovementLocation = NavHelper.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
+                vSafeMovementLocation = NavHelper.FindSafeZone(true, TotalAntiStuckAttempts, vMyCurrentPosition);
 
                 // Temporarily log stuff
-                if (iTotalAntiStuckAttempts == 1 && Trinity.Settings.Advanced.LogStuckLocation)
+                if (TotalAntiStuckAttempts == 1 && Trinity.Settings.Advanced.LogStuckLocation)
                 {
                     FileStream LogStream = File.Open(Path.Combine(FileManager.LoggingPath, "Stucks - " + Trinity.Player.ActorClass.ToString() + ".log"), FileMode.Append, FileAccess.Write, FileShare.Read);
                     using (StreamWriter LogWriter = new StreamWriter(LogStream))
@@ -213,12 +213,12 @@ namespace Trinity.DbProvider
                     LogStream.Close();
                 }
                 // Now count up our stuck attempt generations
-                iTotalAntiStuckAttempts++;
+                TotalAntiStuckAttempts++;
                 return vSafeMovementLocation;
             }
 
             iTimesReachedMaxUnstucks++;
-            iTotalAntiStuckAttempts = 1;
+            TotalAntiStuckAttempts = 1;
             vSafeMovementLocation = Vector3.Zero;
             vOldPosition = Vector3.Zero;
             iTimesReachedStuckPoint = 0;
@@ -423,9 +423,9 @@ namespace Trinity.DbProvider
 
                 // See if we can reset the 10-limit unstuck counter, if >120 seconds since we last generated an unstuck location
                 // this is used if we're NOT stuck...
-                if (iTotalAntiStuckAttempts > 1 && DateTime.Now.Subtract(LastGeneratedStuckPosition).TotalSeconds >= 120)
+                if (TotalAntiStuckAttempts > 1 && DateTime.Now.Subtract(LastGeneratedStuckPosition).TotalSeconds >= 120)
                 {
-                    iTotalAntiStuckAttempts = 1;
+                    TotalAntiStuckAttempts = 1;
                     iTimesReachedStuckPoint = 0;
                     vSafeMovementLocation = Vector3.Zero;
                     NavHelper.UsedStuckSpots = new List<GridPoint>();
@@ -464,9 +464,9 @@ namespace Trinity.DbProvider
                     vSafeMovementLocation = Vector3.Zero;
                     iTimesReachedStuckPoint++;
                     // Do we want to immediately generate a 2nd waypoint to "chain" anti-stucks in an ever-increasing path-length?
-                    if (iTimesReachedStuckPoint <= iTotalAntiStuckAttempts)
+                    if (iTimesReachedStuckPoint <= TotalAntiStuckAttempts)
                     {
-                        vSafeMovementLocation = NavHelper.FindSafeZone(true, iTotalAntiStuckAttempts, vMyCurrentPosition);
+                        vSafeMovementLocation = NavHelper.FindSafeZone(true, TotalAntiStuckAttempts, vMyCurrentPosition);
                         vMoveToTarget = vSafeMovementLocation;
                     }
                     else
@@ -476,7 +476,7 @@ namespace Trinity.DbProvider
                         // Reset the path and allow a whole "New" unstuck generation next cycle
                         iTimesReachedStuckPoint = 0;
                         // And cancel unstucking for 9 seconds so DB can try to navigate
-                        iCancelUnstuckerForSeconds = (9 * iTotalAntiStuckAttempts);
+                        iCancelUnstuckerForSeconds = (9 * TotalAntiStuckAttempts);
                         if (iCancelUnstuckerForSeconds < 20)
                             iCancelUnstuckerForSeconds = 20;
                         _lastCancelledUnstucker = DateTime.Now;

@@ -1331,7 +1331,7 @@ namespace Trinity
             {
                 // prevent spam
                 lastStatusText = statusText.ToString();
-                Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "{0}", statusText.ToString());
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "{0}", statusText.ToString());
                 bResetStatusText = true;
             }
         }
@@ -1365,11 +1365,11 @@ namespace Trinity
                         lastMoveResult = MoveResult.Moved;
                         // just "Click" 
                         Navigator.PlayerMover.MoveTowards(vCurrentDestination);
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Straight line pathing to {0}", destname);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Straight line pathing to {0}", destname);
                     }
                     else
                     {
-                        Logger.Log(LogCategory.Behavior, "Using Navigator to reach target");
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Using Navigator to reach target");
                         lastMoveResult = PlayerMover.NavigateTo(vCurrentDestination, destname);
                     }
 
@@ -1448,10 +1448,10 @@ namespace Trinity
                         {
                             TargetRangeRequired = CurrentTarget.Radius + 5f;
                             //TargetRangeRequired = 5f;
-                            int _range;
+                            float _range;
                             if (DataDictionary.InteractAtCustomRange.TryGetValue(CurrentTarget.ActorSNO, out _range))
                             {
-                                TargetRangeRequired = (float)_range;
+                                TargetRangeRequired = _range;
                             }
                             break;
                         }
@@ -1466,10 +1466,10 @@ namespace Trinity
                             // Treat the distance as closer if the X & Y distance are almost point-blank, for objects
                             if (fDistanceToDestination <= 1.5f)
                                 TargetDistanceReduction += 1f;
-                            int iTempRange;
-                            if (DataDictionary.InteractAtCustomRange.TryGetValue(CurrentTarget.ActorSNO, out iTempRange))
+                            float range;
+                            if (DataDictionary.InteractAtCustomRange.TryGetValue(CurrentTarget.ActorSNO, out range))
                             {
-                                TargetRangeRequired = (float)iTempRange;
+                                TargetRangeRequired = range;
                             }
                             break;
                         }
@@ -1481,10 +1481,10 @@ namespace Trinity
                             if (ForceCloseRangeTarget)
                                 TargetRangeRequired -= 2f;
                             // Check if it's in our interactable range dictionary or not
-                            int iTempRange;
-                            if (DataDictionary.InteractAtCustomRange.TryGetValue(CurrentTarget.ActorSNO, out iTempRange))
+                            float range;
+                            if (DataDictionary.InteractAtCustomRange.TryGetValue(CurrentTarget.ActorSNO, out range))
                             {
-                                TargetRangeRequired = (float)iTempRange;
+                                TargetRangeRequired = range;
                             }
                             // Treat the distance as closer if the X & Y distance are almost point-blank, for objects
                             if (fDistanceToDestination <= 1.5f)
@@ -1569,7 +1569,7 @@ namespace Trinity
 
                 if (usePowerResult)
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower SUCCESS {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "UsePower SUCCESS {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
                     if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
                         LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
 
@@ -1596,7 +1596,7 @@ namespace Trinity
                 {
                     PowerManager.CanCastFlags failFlags;
                     PowerManager.CanCast(CombatBase.CurrentPower.SNOPower, out failFlags);
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower FAILED {0} ({1}) at {2} on {3} dist={4}", CombatBase.CurrentPower.SNOPower, failFlags, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "UsePower FAILED {0} ({1}) at {2} on {3} dist={4}", CombatBase.CurrentPower.SNOPower, failFlags, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
                 }
 
                 ShouldPickNewAbilities = true;
@@ -1606,21 +1606,18 @@ namespace Trinity
                 timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
                 iKeepLootRadiusExtendedFor = 8;
                 // if at full or nearly full health, see if we can raycast to it, if not, ignore it for 2000 ms
-                if (CurrentTarget.HitPointsPct >= 0.9d)
+                if (CurrentTarget.HitPointsPct >= 0.9d &&
+                    !NavHelper.CanRayCast(Player.Position, CurrentTarget.Position) &&
+                    !CurrentTarget.IsBoss &&
+                    !(DataDictionary.StraightLinePathingLevelAreaIds.Contains(Player.LevelAreaId) || DataDictionary.LineOfSightWhitelist.Contains(CurrentTarget.ActorSNO)))
                 {
-                    if (!NavHelper.CanRayCast(Player.Position, CurrentTarget.Position))
-                    {
-                        IgnoreRactorGUID = CurrentTarget.RActorGuid;
-                        IgnoreTargetForLoops = 6;
-                        // Add this monster to our very short-term ignore list
-                        if (!CurrentTarget.IsBoss)
-                        {
-                            hashRGUIDBlacklist3.Add(CurrentTarget.RActorGuid);
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 3 seconds due to Raycast failure", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
-                            dateSinceBlacklist3Clear = DateTime.Now;
-                            NeedToClearBlacklist3 = true;
-                        }
-                    }
+                    IgnoreRactorGUID = CurrentTarget.RActorGuid;
+                    IgnoreTargetForLoops = 6;
+                    // Add this monster to our very short-term ignore list
+                    hashRGUIDBlacklist3.Add(CurrentTarget.RActorGuid);
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Blacklisting {0} {1} {2} for 3 seconds due to Raycast failure", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
+                    dateSinceBlacklist3Clear = DateTime.Now;
+                    NeedToClearBlacklist3 = true;
                 }
 
             }

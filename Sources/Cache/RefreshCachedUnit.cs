@@ -137,21 +137,24 @@ namespace Trinity
                     return AddToCache;
                 }
             }
-            // Retrieve collision sphere radius, cached if possible
-            if (!collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
+            if (!DataDictionary.InteractAtCustomRange.TryGetValue(c_ActorSNO, out c_Radius))
             {
-                try
+                // Retrieve collision sphere radius, cached if possible
+                if (!collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
                 {
-                    RefreshMonsterRadius();
+                    try
+                    {
+                        RefreshMonsterRadius();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for unit {0} [{1}]", c_InternalName, c_ActorSNO);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                        AddToCache = false;
+                        return AddToCache;
+                    }
+                    collisionSphereCache.Add(c_ActorSNO, c_Radius);
                 }
-                catch (Exception ex)
-                {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for unit {0} [{1}]", c_InternalName, c_ActorSNO);
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                    AddToCache = false;
-                    return AddToCache;
-                }
-                collisionSphereCache.Add(c_ActorSNO, c_Radius);
             }
 
             double dThisMaxHealth = RefreshMonsterHealth();
@@ -303,7 +306,7 @@ namespace Trinity
                 return AddToCache;
             }
 
-            // don't check for invulnerability on shielded units, they are treated seperately
+            // don't check for invulnerability on shielded and boss units, they are treated seperately
             if (!c_unit_IsShielded && unit.IsInvulnerable)
             {
                 AddToCache = false;
@@ -333,10 +336,10 @@ namespace Trinity
             // barbs with rend
             // All WD's
             // Monks with Way of the Hundred Fists + Fists of Fury
-            if (AddToCache && 
-                ((Player.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_Rend)) || 
-                Player.ActorClass == ActorClass.WitchDoctor || 
-                (Player.ActorClass == ActorClass.Monk && HotbarSkills.AssignedSkills.Any(s=> s.Power == SNOPower.Monk_WayOfTheHundredFists && s.RuneIndex == 0)))
+            if (AddToCache &&
+                ((Player.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_Rend)) ||
+                Player.ActorClass == ActorClass.WitchDoctor ||
+                (Player.ActorClass == ActorClass.Monk && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WayOfTheHundredFists && s.RuneIndex == 0)))
                 )
             {
                 ////bool hasdotDPS = c_CommonData.GetAttribute<int>(ActorAttributeType.DOTDPS) != 0;

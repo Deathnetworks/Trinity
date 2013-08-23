@@ -103,7 +103,7 @@ namespace Trinity
             OutputReport();
             vBacktrackList = new SortedList<int, Vector3>();
             iTotalBacktracks = 0;
-            PlayerMover.iTotalAntiStuckAttempts = 1;
+            PlayerMover.TotalAntiStuckAttempts = 1;
             PlayerMover.vSafeMovementLocation = Vector3.Zero;
             PlayerMover.vOldPosition = Vector3.Zero;
             PlayerMover.iTimesReachedStuckPoint = 0;
@@ -135,7 +135,7 @@ namespace Trinity
                 AbilityLastUsedCache = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
                 vBacktrackList = new SortedList<int, Vector3>();
                 iTotalBacktracks = 0;
-                PlayerMover.iTotalAntiStuckAttempts = 1;
+                PlayerMover.TotalAntiStuckAttempts = 1;
                 PlayerMover.vSafeMovementLocation = Vector3.Zero;
 
                 // Reset pre-townrun position if we die
@@ -200,7 +200,7 @@ namespace Trinity
             vBacktrackList = new SortedList<int, Vector3>();
             iTotalBacktracks = 0;
             HasMappedPlayerAbilities = false;
-            PlayerMover.iTotalAntiStuckAttempts = 1;
+            PlayerMover.TotalAntiStuckAttempts = 1;
             PlayerMover.vSafeMovementLocation = Vector3.Zero;
             PlayerMover.vOldPosition = Vector3.Zero;
             PlayerMover.iTimesReachedStuckPoint = 0;

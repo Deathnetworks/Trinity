@@ -76,7 +76,7 @@ namespace Trinity
                     if (StandingInAvoidance && (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
                         DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
                     {
-                        Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, Player.Position, true);
+                        Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, Player.Position, true, null, true);
                         // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
                         if (vAnySafePoint != Vector3.Zero)
                         {

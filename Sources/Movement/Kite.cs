@@ -52,13 +52,18 @@ namespace Trinity
                     vKitePointAvoid = Player.Position;
                 }
 
+                // Avoid Death
                 if (Settings.Combat.Misc.AvoidDeath && 
-                    Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && // h ealth is lower than potion limit
+                    Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && // health is lower than potion limit
                     !SNOPowerUseTimer(SNOPower.DrinkHealthPotion) && // we can't use a potion anymore
                     TargetUtil.AnyMobsInRange(90f, false))
                 {
                     Logger.LogNormal("Attempting to avoid death!");
                     NeedToKite = true;
+
+                    monsterList = from m in ObjectCache
+                                  where m.Type == GObjectType.Unit
+                                  select m;
                 }
 
                 // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
@@ -72,7 +77,7 @@ namespace Trinity
 
                 if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite))
                 {
-                    Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, vKitePointAvoid, true, monsterList);
+                    Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, vKitePointAvoid, true, monsterList, shouldEmergencyMove);
 
                     if (LastKitePosition == null)
                     {

@@ -43,7 +43,7 @@ namespace Trinity
         }
 
         /// <summary>
-        /// Check re-use timers on skills
+        /// Check re-use timers on skills, returns true if we can use the power
         /// </summary>
         /// <param name="power">The power.</param>
         /// <param name="recheck">if set to <c>true</c> check again.</param>

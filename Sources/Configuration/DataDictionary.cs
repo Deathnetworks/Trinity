@@ -48,8 +48,8 @@ namespace Trinity
         {
             // Arcane        Arcane 2      Desecrator   Poison Tree    Molten Core   Molten Core 2   Molten Trail   Plague Cloud   Ice Balls
             219702,          221225,       84608,       5482,6578,     4803, 4804,   224225, 247987, 95868,         108869,        402, 223675,
-            // Bees-Wasps    Plague-Hands  Azmo Pools   Azmo fireball  Azmo bodies   Belial 1       Belial 2
-            5212,            3865,         123124,      123842,        123839,       161822,        161833,
+            // Bees-Wasps    Plague-Hands  Azmo Pools   Azmo fireball  Azmo bodies   Belial 1       Belial 2    Belial 3
+            5212,            3865,         123124,      123842,        123839,       161822,        161833,     60108,
             // Sha-Ball      Mol Ball      Mage Fire    Diablo Prison  Diablo Meteor Ice-trail
             4103,            160154,       432,         168031,        214845,       260377,
             // Zolt Bubble	 Zolt Twister  Ghom Gas 	Maghda Proj
@@ -195,6 +195,7 @@ namespace Trinity
             96192,                   89690,           95250,         193077, 
             //Kulle (80509), Small Belial (220160), Big Belial (3349), Diablo 1 (114917), terror Diablo (133562)
             80509,           220160,                3349,              114917,            133562, 
+            62975, // Belial TrueForm
             //Maghda, Kamyr (MiniBoss before Belial)
             6031, 51298,
             // Ghom
@@ -210,9 +211,10 @@ namespace Trinity
             215103, // Istaku            
             210120, // A4 Corrupt Growths                 
             4630, // Rakanoth
-            256015, //Xah'Rith Keywarden
+            256015, // Xah'Rith Keywarden
             115403, // A1 Cain Skeleton boss
             4373, 4376, 177539, // A1 Robbers
+            168240, // A2 Jewler quest
          };
 
 
@@ -258,8 +260,8 @@ namespace Trinity
         /// NOTE: you don't NEED interactable SNO's listed here. But if they are listed here, *THIS* is the range at which your character will try to walk to within the object
         /// BEFORE trying to actually "click it". Certain objects need you to get very close, so it's worth having them listed with low interact ranges
         /// </summary>
-        public static Dictionary<int, int> InteractAtCustomRange { get { return interactAtCustomRange; } }
-        private static Dictionary<int, int> interactAtCustomRange = new Dictionary<int, int> {
+        public static Dictionary<int, float> InteractAtCustomRange { get { return interactAtCustomRange; } }
+        private static Dictionary<int, float> interactAtCustomRange = new Dictionary<int, float> {
             {56686, 4}, {52685, 4}, {54882, 40}, {3349, 25}, {225270, 35}, {180575, 10}
         };
 
@@ -372,9 +374,9 @@ namespace Trinity
             181182, 181185, 181290, 181292, 181306, 181309, 181313, 181326, 181563, 181857, 181858, 187265, 191433, 191462, 191641, 192880, 192881, 196413, 196435,
             197280, 199191, 199264, 199274, 199597, 199664, 200979, 200982, 201236, 201580, 201581, 201583, 204183, 205746, 205756, 210087, 213907, 218228, 219223,
             220114, 3011, 3205, 3539, 3582, 3584, 3595, 3600, 4580, 52693, 5466, 55005, 5509, 62522, 
-            205756, 5509, 200371, 167185, 181195, 217346, 178161,
+            205756, 5509, 200371, 167185, 181195, 217346, 178161, 60108, 
             // rrrix act 3
-            60108, 182443,
+            182443,
             // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
             263014, 
         };

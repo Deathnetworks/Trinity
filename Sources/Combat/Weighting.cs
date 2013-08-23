@@ -96,13 +96,14 @@ namespace Trinity
                                 }
                                 else
                                 {
-                                    unitWeightInfo = String.Format("Adding trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12}",
+                                    unitWeightInfo = String.Format("Adding mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12}",
                                         cacheObject.InternalName, cacheObject.RActorGuid, nearbyMonsterCount, Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius,
                                         cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, Player.Level, prioritizeCloseRangeUnits);
                                 }
 
                                 // Ignore elite option, except if trying to town portal
-                                if ((Settings.Combat.Misc.IgnoreElites || (Settings.Combat.Misc.SkipElitesOn5NV && GetBuffStacks(SNOPower.g_killElitePack) >= 5)) && (cacheObject.IsEliteRareUnique) && !TownRun.IsTryingToTownPortal())
+                                if (!cacheObject.IsBoss && (Settings.Combat.Misc.IgnoreElites || (Settings.Combat.Misc.SkipElitesOn5NV && GetBuffStacks(SNOPower.g_killElitePack) >= 5)) &&
+                                    cacheObject.IsEliteRareUnique && !profileTagCheck && !TownRun.IsTryingToTownPortal())
                                 {
                                     break;
                                 }
@@ -115,7 +116,7 @@ namespace Trinity
                                 }
 
                                 // Monster is in cache but not within kill range
-                                if (cacheObject.RadiusDistance > cacheObject.KillRange)
+                                if (!cacheObject.IsBoss && cacheObject.RadiusDistance > cacheObject.KillRange)
                                 {
                                     // monsters near players given higher weight
                                     foreach (var player in ObjectCache.Where(p => p.Type == GObjectType.Player))
@@ -261,7 +262,7 @@ namespace Trinity
                                         }
 
                                         // Close range get higher weights the more of them there are, to prevent body-blocking
-                                        if (cacheObject.RadiusDistance <= 5f)
+                                        if (!cacheObject.IsBoss && cacheObject.RadiusDistance <= 5f)
                                         {
                                             cacheObject.Weight += (2000d * cacheObject.Radius);
                                         }
@@ -468,13 +469,16 @@ namespace Trinity
                                         cacheObject.Weight *= 0.85;
                                     }
 
-                                    // See if there's any AOE avoidance in that spot, if so reduce the weight by 10%
-                                    if (hashAvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
-                                        cacheObject.Weight *= 0.9;
+                                    if (cacheObject.CentreDistance > 10f)
+                                    {
+                                        // See if there's any AOE avoidance in that spot, if so reduce the weight by 10%
+                                        if (hashAvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
+                                            cacheObject.Weight *= 0.9;
 
-                                    // Calculate a spot reaching a little bit further out from the globe, to help globe-movements
-                                    if (cacheObject.Weight > 0)
-                                        cacheObject.Position = MathEx.CalculatePointFrom(cacheObject.Position, Player.Position, cacheObject.CentreDistance + 3f);
+                                        // Calculate a spot reaching a little bit further out from the globe, to help globe-movements
+                                        if (cacheObject.Weight > 0)
+                                            cacheObject.Position = MathEx.CalculatePointFrom(cacheObject.Position, Player.Position, cacheObject.CentreDistance + 3f);
+                                    }
 
                                     // do not collect health globes if we are kiting and health globe is too close to monster or avoidance
                                     if (PlayerKiteDistance > 0)
@@ -635,8 +639,6 @@ namespace Trinity
                                 break;
                             }
                     }
-
-                    // Switch on object type
 
                     // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
                     if (cacheObject.Weight == 1 && !StandingInAvoidance && ObjectCache.Any(o => o.Type == GObjectType.Avoidance))
