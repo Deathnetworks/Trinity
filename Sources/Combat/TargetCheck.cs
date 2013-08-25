@@ -151,6 +151,7 @@ namespace Trinity
                 wasRootedLastTick = false;
 
                 ClearBlacklists();
+
                 using (new PerformanceLogger("CheckHasTarget.RefreshCache"))
                 {
                     // Refresh Cache if needed

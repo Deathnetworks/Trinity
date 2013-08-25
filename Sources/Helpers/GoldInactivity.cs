@@ -70,7 +70,7 @@ namespace Trinity
 
                 if (TownRun.IsTryingToTownPortal())
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Trying to town portal, gold inactivity reset", 0);
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Trying to town portal or WaitTimer tag, gold inactivity reset", 0);
                     ResetCheckGold();
                     return false;
                 }

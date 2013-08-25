@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta;
@@ -179,7 +180,7 @@ namespace Trinity
         /// <returns></returns>
         internal static bool AnyElitesInRange(float range = 10f)
         {
-            if (Trinity.Settings.Combat.Misc.IgnoreElites)
+            if (CombatBase.IgnoringElites)
                 return false;
 
             if (range < 5f)
@@ -197,7 +198,7 @@ namespace Trinity
         /// <returns></returns>
         internal static bool AnyElitesInRange(float range = 10f, int minCount = 1)
         {
-            if (Trinity.Settings.Combat.Misc.IgnoreElites)
+            if (CombatBase.IgnoringElites)
                 return false;
 
             if (range < 5f)

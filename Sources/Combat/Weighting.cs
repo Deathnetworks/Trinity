@@ -11,6 +11,7 @@ using Zeta.CommonBot;
 using Zeta.CommonBot.Profile.Common;
 using Zeta;
 using Trinity.DbProvider;
+using Trinity.Combat.Abilities;
 namespace Trinity
 {
     public partial class Trinity : IPlugin
@@ -43,7 +44,7 @@ namespace Trinity
                 bool hasWrathOfTheBerserker = Player.ActorClass == ActorClass.Barbarian && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
 
                 int TrashMobCount = ObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsTrashMob);
-                int EliteCount = Settings.Combat.Misc.IgnoreElites ? 0 : ObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
+                int EliteCount = CombatBase.IgnoringElites ? 0 : ObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
                 int AvoidanceCount = Settings.Combat.Misc.AvoidAOE ? 0 : ObjectCache.Count(o => o.Type == GObjectType.Avoidance && o.CentreDistance <= 50f);
 
                 bool profileTagCheck = false;
@@ -57,7 +58,8 @@ namespace Trinity
                 }
 
                 bool ShouldIgnoreTrashMobs =
-                    (!TownRun.IsTryingToTownPortal() &&
+                    (!DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
+                    !TownRun.IsTryingToTownPortal() &&
                     !profileTagCheck &&
                     !prioritizeCloseRangeUnits &&
                     Settings.Combat.Misc.TrashPackSize > 1 &&
@@ -66,6 +68,12 @@ namespace Trinity
                     Player.Level >= 15 &&
                     MovementSpeed >= 1
                     );
+
+                bool ShouldIgnoreElites =
+                    !DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
+                     !profileTagCheck &&
+                     !TownRun.IsTryingToTownPortal() &&
+                    CombatBase.IgnoringElites;
 
                 string unitWeightInfo = "";
 
@@ -102,8 +110,7 @@ namespace Trinity
                                 }
 
                                 // Ignore elite option, except if trying to town portal
-                                if (!cacheObject.IsBoss && (Settings.Combat.Misc.IgnoreElites || (Settings.Combat.Misc.SkipElitesOn5NV && GetBuffStacks(SNOPower.g_killElitePack) >= 5)) &&
-                                    cacheObject.IsEliteRareUnique && !profileTagCheck && !TownRun.IsTryingToTownPortal())
+                                if (!cacheObject.IsBoss && ShouldIgnoreElites && cacheObject.IsEliteRareUnique)
                                 {
                                     break;
                                 }
@@ -418,7 +425,7 @@ namespace Trinity
 
                                 // ignore non-legendaries and gold near elites if we're ignoring elites
                                 // not sure how we should safely determine this distance
-                                if (Settings.Combat.Misc.IgnoreElites && cacheObject.ItemQuality < ItemQuality.Legendary &&
+                                if (CombatBase.IgnoringElites && cacheObject.ItemQuality < ItemQuality.Legendary &&
                                     ObjectCache.Any(u => u.Type == GObjectType.Unit && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 40f))
                                 {
                                     cacheObject.Weight = 0;

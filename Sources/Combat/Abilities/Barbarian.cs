@@ -57,7 +57,7 @@ namespace Trinity
                     IsWaitingForSpecial = true;
                 }
                 // Berserker special for ignore elites
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && Settings.Combat.Misc.IgnoreElites &&
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && CombatBase.IgnoringElites &&
                     (TargetUtil.AnyMobsInRange(25, 3) || TargetUtil.AnyMobsInRange(50, 10) || TargetUtil.AnyMobsInRange(Settings.Combat.Misc.TrashPackClusterRadius, Settings.Combat.Misc.TrashPackSize)) &&
                     SNOPowerUseTimer(SNOPower.Barbarian_WrathOfTheBerserker) && !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
                 {
@@ -82,7 +82,7 @@ namespace Trinity
                 (
                  (!Settings.Combat.Barbarian.UseWOTBGoblin || (Settings.Combat.Barbarian.UseWOTBGoblin && CurrentTarget.IsTreasureGoblin)) ||
                 // If ignoring elites completely, trigger on 3 trash within 25 yards, or 10 trash in 50 yards
-                 (Settings.Combat.Misc.IgnoreElites && (TargetUtil.AnyMobsInRange(25, 3) || TargetUtil.AnyMobsInRange(50, 10)) || !Settings.Combat.Misc.IgnoreElites) ||
+                 (CombatBase.IgnoringElites && (TargetUtil.AnyMobsInRange(25, 3) || TargetUtil.AnyMobsInRange(50, 10)) || !CombatBase.IgnoringElites) ||
                 // Otherwise use when Elite target is in 20 yards
                  (TargetUtil.AnyElitesInRange(20, 1) || TargetUtil.IsEliteTargetInRange(20f)) ||
                 // Or if our health is low

@@ -26,9 +26,18 @@ namespace Trinity
         public static HashSet<int> StraightLinePathingLevelAreaIds { get { return DataDictionary.straightLinePathingLevelAreaIds; } }
         private static readonly HashSet<int> straightLinePathingLevelAreaIds = new HashSet<int>
         {
-            60757, // belial's chambers
+            60757, // Belial's chambers
 
         };
+
+        public static HashSet<int> QuestLevelAreaIds { get { return DataDictionary.questLevelAreaIds; } }
+        private static readonly HashSet<int> questLevelAreaIds = new HashSet<int>
+        {
+            19935, // Wortham
+            60757, // Belial's chambers
+            55313, // A2 Caldeum Bazaar
+        };
+
 
         /// <summary>
         /// This list is used when an actor has an attribute BuffVisualEffect=1, e.g. fire floors in The Butcher arena
@@ -376,7 +385,7 @@ namespace Trinity
             220114, 3011, 3205, 3539, 3582, 3584, 3595, 3600, 4580, 52693, 5466, 55005, 5509, 62522, 
             205756, 5509, 200371, 167185, 181195, 217346, 178161, 60108, 
             // rrrix act 3
-            182443,
+            182443, 211456,
             // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
             263014, 
         };

@@ -48,6 +48,7 @@ namespace Trinity.Config.Combat
         private int _MinThreatShoutMobCount;
         private bool _IgnoreAvoidanceInWOTB;
         private bool _IgnoreGoldInWOTB;
+        private float _MinHotaHealth;
         #endregion Fields
 
         #region Events
@@ -802,6 +803,24 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.40f)]
+        public float MinHotaHealth
+        {
+            get
+            {
+                return _MinHotaHealth;
+            }
+            set
+            {
+                if (_MinHotaHealth != value)
+                {
+                    _MinHotaHealth = value;
+                    OnPropertyChanged("MinHotaHealth");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -845,6 +864,7 @@ namespace Trinity.Config.Combat
             this._ThreatShoutOOC = true;
             this._IgnoreAvoidanceInWOTB = true;
             this._IgnoreGoldInWOTB = true;
+            this._MinHotaHealth = 0.40f;
         }
 
         #endregion Methods

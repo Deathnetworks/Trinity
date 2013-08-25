@@ -23,33 +23,48 @@ namespace Trinity.UIComponents
 
         public TVarsViewModel()
         {
-            V.ValidateLoad();
-            TVars = CollectionViewSource.GetDefaultView(V.Data);
+            try
+            {
+                V.ValidateLoad();
+                TVars = CollectionViewSource.GetDefaultView(V.Data);
 
-            InitializeButtons();
+                InitializeButtons();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogNormal("Exception in TVarsViewModel constructor {0}", ex.ToString());
+            }
         }
 
         private void InitializeButtons()
         {
-            ResetTVarsCommand = new RelayCommand(
-                                    (parameter) =>
-                                    {
-                                        if (MessageBox.Show("Are you sure you want to reset all Trinity Variables?", "Confirm Reset All",
-                                            MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            try
+            {
+                ResetTVarsCommand = new RelayCommand(
+                                        (parameter) =>
                                         {
-                                            V.ResetAll();
-                                        }
-                                    });
-            SaveTVarsCommand = new RelayCommand(
-                                    (parameter) =>
-                                    {
-                                        V.Save();
-                                    });
-            DumpTVarsCommand = new RelayCommand(
-                                    (parameter) =>
-                                    {
-                                        V.Dump();
-                                    });
+                                            if (MessageBox.Show("Are you sure you want to reset all Trinity Variables?", "Confirm Reset All",
+                                                MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                                            {
+                                                V.ResetAll();
+                                            }
+                                        });
+                SaveTVarsCommand = new RelayCommand(
+                                        (parameter) =>
+                                        {
+                                            V.Save();
+                                        });
+                DumpTVarsCommand = new RelayCommand(
+                                        (parameter) =>
+                                        {
+                                            V.Dump();
+                                        });
+            }
+            catch (Exception ex)
+            {
+                Logger.LogNormal("Exception in InitializeButtons: {0}", ex.ToString());
+
+            }
         }
 
         private static Window _window;
@@ -89,21 +104,36 @@ namespace Trinity.UIComponents
 
         static void Window_Closed(object sender, EventArgs e)
         {
-            CancelDataGridEdit(_window.Content);
-            _window = null;
+            try
+            {
+                CancelDataGridEdit(_window.Content);
+                _window = null;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogNormal("Exception in Window_Closed: {0}", ex.ToString());
+
+            }
         }
 
         static void CancelDataGridEdit(object elem)
         {
-            if (elem is DataGrid)
+            try
             {
-                ((DataGrid)elem).CancelEdit();
+                if (elem is DataGrid)
+                {
+                    ((DataGrid)elem).CancelEdit();
+                }
+                else if (elem is ContentControl)
+                {
+                    var cc = (ContentControl)elem;
+                    if (cc.HasContent)
+                        CancelDataGridEdit(cc.Content);
+                }
             }
-            else if (elem is ContentControl)
+            catch (Exception ex)
             {
-                var cc = (ContentControl)elem;
-                if (cc.HasContent)
-                    CancelDataGridEdit(cc.Content);
+                Logger.LogNormal("Exception in CancelDataGridEdit: {0}", ex.ToString());
             }
 
         }

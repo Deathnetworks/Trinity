@@ -266,7 +266,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return
-                    Settings.Combat.Misc.IgnoreElites &&
+                    CombatBase.IgnoringElites &&
                     (TargetUtil.AnyMobsInRange(V.F("Barbarian.WOTB.RangeNear"), V.I("Barbarian.WOTB.CountNear")) ||
                     TargetUtil.AnyMobsInRange(V.F("Barbarian.WOTB.RangeFar"), V.I("Barbarian.WOTB.CountFar")) ||
                     TargetUtil.AnyMobsInRange(Settings.Combat.Misc.TrashPackClusterRadius, Settings.Combat.Misc.TrashPackSize));
@@ -446,7 +446,7 @@ namespace Trinity.Combat.Abilities
                     TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange")) && !CurrentTarget.IsTreasureGoblin &&
                     ((!IsWaitingForSpecial && Player.PrimaryResource >= V.I("Barbarian.Rend.MinFury")) || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve)) &&
                     (Trinity.ObjectCache.Count(o => o.Type == GObjectType.Unit && !o.HasDotDPS && o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount") || !CurrentTarget.HasDotDPS) &&
-                    (TimeSinceUse(SNOPower.Barbarian_Rend) > V.I("Barbarian.Rend.MinUseIntervalMillseconds")) &&
+                    (TimeSincePowerUse(SNOPower.Barbarian_Rend) > V.I("Barbarian.Rend.MinUseIntervalMillseconds")) &&
                     Trinity.LastPowerUsed != SNOPower.Barbarian_Rend;
             }
         }
@@ -504,6 +504,8 @@ namespace Trinity.Combat.Abilities
                          )
                         )
                     ) &&
+                    // minimum time between uses
+                    TimeSincePowerUse(SNOPower.Barbarian_Whirlwind) >= 200 &&
                     // If they have battle-rage, make sure it's up
                     (!Hotbar.Contains(SNOPower.Barbarian_BattleRage) || (Hotbar.Contains(SNOPower.Barbarian_BattleRage) && GetHasBuff(SNOPower.Barbarian_BattleRage))) &&
                     // Check for minimum energy
@@ -601,15 +603,21 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !IsWaitingForSpecial && Hotbar.Contains(SNOPower.Barbarian_HammerOfTheAncients) &&
-                    Player.PrimaryResource >= 20;
+                    Player.PrimaryResource >= 20 && Player.CurrentHealthPct >= Settings.Combat.Barbarian.MinHotaHealth;
             }
         }
         public static bool CanUseHammerOfTheAncientsElitesOnly
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !IsWaitingForSpecial && Hotbar.Contains(SNOPower.Barbarian_HammerOfTheAncients) &&
-                    CurrentTarget.IsBossOrEliteRareUnique && Player.PrimaryResource >= 20;
+                bool canUseHota = CanUseHammerOfTheAncients;
+
+                bool hotaElites = CurrentTarget.IsBossOrEliteRareUnique;
+
+                bool hotaTrash = CombatBase.IgnoringElites && CurrentTarget.IsTrashMob && 
+                    (Trinity.ObjectCache.Count(u => u.Position.Distance(CurrentTarget.Position) <= 6f) >= 3 || CurrentTarget.MonsterStyle == Zeta.Internals.SNO.MonsterSize.Big);
+
+                return canUseHota && (hotaElites || hotaTrash);
             }
         }
         public static bool CanUseWeaponThrow

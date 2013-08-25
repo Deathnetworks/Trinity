@@ -78,6 +78,7 @@
     <Compile Include="Configuration\TVars.cs" />
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\GameEvents.cs" />
+    <Compile Include="Helpers\GameUI.cs" />
     <Compile Include="Helpers\ObservableDictionary.cs" />
     <Compile Include="Helpers\PluginCheck.cs" />
     <Compile Include="Items\ItemEvents.cs" />

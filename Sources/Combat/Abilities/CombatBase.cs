@@ -20,6 +20,19 @@ namespace Trinity.Combat.Abilities
         private static Vector3 zigZagPosition = Vector3.Zero;
         private static bool isCombatAllowed = true;
 
+        public enum AnimWait
+        {
+            NO_WAIT = 0,
+            WAIT = 1
+        }
+
+        public enum CanCastFlags
+        {
+            All = 2,
+            NoTimer = 4,
+            NoPowerManager = 8
+        }
+
         /// <summary>
         /// Allows for completely disabling combat. Settable through API only. 
         /// </summary>
@@ -34,22 +47,13 @@ namespace Trinity.Combat.Abilities
             set { CombatBase.isCombatAllowed = value; }
         }
 
+        /// <summary>
+        /// The last "ZigZag" position, used with Barb Whirlwind, Monk Tempest Rush, etc.
+        /// </summary>
         public static Vector3 ZigZagPosition
         {
             get { return CombatBase.zigZagPosition; }
             internal set { CombatBase.zigZagPosition = value; }
-        }
-
-        public enum AnimWait
-        {
-            NO_WAIT = 0,
-            WAIT = 1
-        }
-        public enum CanCastFlags
-        {
-            All = 2,
-            NoTimer = 4,
-            NoPowerManager = 8
         }
 
         /// <summary>
@@ -113,6 +117,9 @@ namespace Trinity.Combat.Abilities
             }
         }
 
+        /// <summary>
+        /// A dictionary containing the date time we last used a specific spell
+        /// </summary>
         public static Dictionary<SNOPower, DateTime> AbilityLastUsedCache
         {
             get
@@ -125,6 +132,9 @@ namespace Trinity.Combat.Abilities
             }
         }
 
+        /// <summary>
+        /// Always contains the last power used
+        /// </summary>
         public static SNOPower LastPowerUsed
         {
             get
@@ -133,12 +143,18 @@ namespace Trinity.Combat.Abilities
             }
         }
 
+        /// <summary>
+        /// Gets/sets whether we are building up energy for a big spell
+        /// </summary>
         public static bool IsWaitingForSpecial
         {
             get { return CombatBase.isWaitingForSpecial; }
             set { CombatBase.isWaitingForSpecial = value; }
         }
 
+        /// <summary>
+        /// Minimum energy reserve for using "Big" spells/powers
+        /// </summary>
         public static int MinEnergyReserve
         {
             get
@@ -173,6 +189,15 @@ namespace Trinity.Combat.Abilities
                           o.MonsterAffixes.HasFlag(MonsterAffixes.ArcaneEnchanted | MonsterAffixes.Frozen | MonsterAffixes.Jailer | MonsterAffixes.Molten) ||
                           (o.MonsterAffixes.HasFlag(MonsterAffixes.Electrified) && o.MonsterAffixes.HasFlag(MonsterAffixes.ReflectsDamage))) ||
                         Trinity.ObjectCache.Any(o => o.IsBoss);
+            }
+        }
+
+        public static bool IgnoringElites
+        {
+            get
+            {
+                return Settings.Combat.Misc.IgnoreElites ||
+                     (Settings.Combat.Misc.SkipElitesOn5NV && GetBuffStacks(SNOPower.g_killElitePack) >= 5);
             }
         }
 
@@ -401,9 +426,9 @@ namespace Trinity.Combat.Abilities
         /// </returns>
         public static bool SNOPowerUseTimer(SNOPower power, bool recheck = false)
         {
-            if (TimeSinceUse(power) >= GetSNOPowerUseDelay(power))
+            if (TimeSincePowerUse(power) >= GetSNOPowerUseDelay(power))
                 return true;
-            if (recheck && TimeSinceUse(power) >= 150 && TimeSinceUse(power) <= 600)
+            if (recheck && TimeSincePowerUse(power) >= 150 && TimeSincePowerUse(power) <= 600)
                 return true;
             return false;
         }
@@ -412,7 +437,7 @@ namespace Trinity.Combat.Abilities
         {
             string key = "SpellDelay." + power.ToString();
             TVar v = V.Data[key];
-            
+
             bool hasDefaultValue = v.Value == v.DefaultValue;
 
             if (hasDefaultValue)
@@ -444,7 +469,7 @@ namespace Trinity.Combat.Abilities
         /// </summary>
         /// <param name="power"></param>
         /// <returns></returns>
-        internal static double TimeSinceUse(SNOPower power)
+        internal static double TimeSincePowerUse(SNOPower power)
         {
             if (AbilityLastUsedCache.ContainsKey(power))
                 return DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds;
