@@ -612,12 +612,16 @@ namespace Trinity.Combat.Abilities
             {
                 bool canUseHota = CanUseHammerOfTheAncients;
 
-                bool hotaElites = CurrentTarget.IsBossOrEliteRareUnique;
+                if (canUseHota)
+                {
+                    bool hotaElites = CurrentTarget.IsBossOrEliteRareUnique;
 
-                bool hotaTrash = CombatBase.IgnoringElites && CurrentTarget.IsTrashMob && 
-                    (Trinity.ObjectCache.Count(u => u.Position.Distance(CurrentTarget.Position) <= 6f) >= 3 || CurrentTarget.MonsterStyle == Zeta.Internals.SNO.MonsterSize.Big);
+                    bool hotaTrash = CombatBase.IgnoringElites && CurrentTarget.IsTrashMob &&
+                        (Trinity.ObjectCache.Count(u => u.Position.Distance(CurrentTarget.Position) <= 6f) >= 3 || CurrentTarget.MonsterStyle == Zeta.Internals.SNO.MonsterSize.Big);
 
-                return canUseHota && (hotaElites || hotaTrash);
+                    return canUseHota && (hotaElites || hotaTrash);
+                }
+                return false;
             }
         }
         public static bool CanUseWeaponThrow
