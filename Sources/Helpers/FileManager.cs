@@ -403,5 +403,58 @@ namespace Trinity.Technicals
                 fo.Add(Path.GetFileName(f));
             return fo;
         }
+
+        public static bool IsFileWriteLocked(FileInfo file)
+        {
+            //http://stackoverflow.com/questions/876473/is-there-a-way-to-check-if-a-file-is-in-use
+            FileStream stream = null;
+
+            try
+            {
+                stream = file.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
+            }
+            catch (IOException)
+            {
+                //the file is unavailable because it is:
+                //still being written to
+                //or being processed by another thread
+                //or does not exist (has already been processed)
+                return true;
+            }
+            finally
+            {
+                if (stream != null)
+                    stream.Close();
+            }
+
+            //file is not locked
+            return false;
+        }
+        public static bool IsFileReadLocked(FileInfo file)
+        {
+            //http://stackoverflow.com/questions/876473/is-there-a-way-to-check-if-a-file-is-in-use
+            FileStream stream = null;
+
+            try
+            {
+                stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+            }
+            catch (IOException)
+            {
+                //the file is unavailable because it is:
+                //still being written to
+                //or being processed by another thread
+                //or does not exist (has already been processed)
+                return true;
+            }
+            finally
+            {
+                if (stream != null)
+                    stream.Close();
+            }
+
+            //file is not locked
+            return false;
+        }
     }
 }

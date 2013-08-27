@@ -126,7 +126,11 @@
                 <CheckBox Margin="1,1" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Avoidance}">Log Avoidance System</CheckBox>
             </UniformGrid>
         </Grid>
-        <!--Reset Button-->
-        <Button Grid.Row="5" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetAdvancedCommand}">Reset</Button>
+        
+        <WrapPanel Grid.Row="5" VerticalAlignment="Stretch" HorizontalAlignment="Center">
+            <!--Reset Button-->
+            <Button Margin="5,0" HorizontalAlignment="Center" Command="{Binding ResetAdvancedCommand}">Reset</Button>
+            <Button Margin="5,0" HorizontalAlignment="Center" Command="{Binding UseGlobalConfigFileCommand}">Use Global Configuration File</Button>
+        </WrapPanel>
     </Grid>
 </UserControl>

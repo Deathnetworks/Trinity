@@ -97,6 +97,20 @@ namespace Trinity.UIComponents
                                         V.ValidateLoad();
                                         TVarsViewModel.CreateWindow().Show();
                                     });
+            UseGlobalConfigFileCommand = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        DialogResult rusure = MessageBox.Show("This will force all bots running under this Demonbuddy directory to use a shared configuration file.\n"
+                                            + "You can undo this by removing the Trinity.xml file under your Demonbuddy settings directory. \n"
+                                            + "Are you sure?",
+                                        "Confirm global settings",
+                                        MessageBoxButtons.OKCancel);
+
+                                        if (rusure == DialogResult.OK)
+                                        {
+                                            Trinity.Settings.Save(true);
+                                        }
+                                    });
         }
 
         /// <summary>
@@ -321,6 +335,16 @@ namespace Trinity.UIComponents
         /// </summary>
         /// <value>The reset command for all settings.</value>
         public ICommand ResetAllCommand
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Makes Trinity use a "Global" configuration file
+        /// </summary>
+        /// <value>The reset command for all settings.</value>
+        public ICommand UseGlobalConfigFileCommand
         {
             get;
             private set;
