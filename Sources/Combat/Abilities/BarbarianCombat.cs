@@ -570,7 +570,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && !Player.IsIncapacitated && !Player.IsRooted &&
+                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && !Player.IsIncapacitated && !Player.IsRooted && Player.PrimaryResource >= 10 &&                     
                     (!IsWaitingForSpecial || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve)) &&
                     //(!IsWaitingForSpecial || (IsWaitingForSpecial && !(TargetUtil.AnyMobsInRange(3, 15) || ForceCloseRangeTarget))) && // make sure we're not surrounded if waiting for special
                     // Don't WW against goblins, units in the special SNO list
@@ -632,9 +632,9 @@ namespace Trinity.Combat.Abilities
                     && (Player.PrimaryResource >= 10 && (CurrentTarget.RadiusDistance >= 5f || BarbHasNoPrimary));
             }
         }
-        public static bool CanUseFrenzy { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Frenzy); } }
-        public static bool CanUseBash { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Bash); } }
-        public static bool CanUseCleave { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Cleave); } }
+        public static bool CanUseFrenzy { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Frenzy) && PowerManager.CanCast(SNOPower.Barbarian_Frenzy); } }
+        public static bool CanUseBash { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Bash) && PowerManager.CanCast(SNOPower.Barbarian_Bash); } }
+        public static bool CanUseCleave { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Cleave) && PowerManager.CanCast(SNOPower.Barbarian_Cleave); } }
 
         public static TrinityPower PowerIgnorePain { get { return new TrinityPower(SNOPower.Barbarian_IgnorePain); } }
         public static TrinityPower PowerEarthquake { get { return new TrinityPower(SNOPower.Barbarian_Earthquake); } }
