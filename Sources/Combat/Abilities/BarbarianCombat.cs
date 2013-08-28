@@ -370,8 +370,8 @@ namespace Trinity.Combat.Abilities
                 bool inCombat = !UseOOCBuff &&
                     CanCast(SNOPower.Barbarian_ThreateningShout) &&
                     !Player.IsIncapacitated &&
-                    ((TargetUtil.AnyMobsInRange(range, Settings.Combat.Barbarian.MinThreatShoutMobCount)) || TargetUtil.IsEliteTargetInRange(range)) &&
-                    (
+                    ((TargetUtil.AnyMobsInRange(range, Settings.Combat.Barbarian.MinThreatShoutMobCount, false)) || TargetUtil.IsEliteTargetInRange(range) ||
+                    
                         (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource <= V.I("Barbarian.Whirlwind.MinFury")) ||
                         (IsWaitingForSpecial && Player.PrimaryResource <= MinEnergyReserve)
                     );
@@ -602,7 +602,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !IsWaitingForSpecial && Hotbar.Contains(SNOPower.Barbarian_HammerOfTheAncients) &&
+                return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !IsWaitingForSpecial && CanCast(SNOPower.Barbarian_HammerOfTheAncients) &&
                     Player.PrimaryResource >= 20 && Player.CurrentHealthPct >= Settings.Combat.Barbarian.MinHotaHealth;
             }
         }
@@ -614,7 +614,7 @@ namespace Trinity.Combat.Abilities
 
                 if (canUseHota)
                 {
-                    bool hotaElites = CurrentTarget.IsBossOrEliteRareUnique;
+                    bool hotaElites = CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin;
 
                     bool hotaTrash = CombatBase.IgnoringElites && CurrentTarget.IsTrashMob &&
                         (Trinity.ObjectCache.Count(u => u.Position.Distance(CurrentTarget.Position) <= 6f) >= 3 || CurrentTarget.MonsterStyle == Zeta.Internals.SNO.MonsterSize.Big);

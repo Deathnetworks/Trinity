@@ -25,6 +25,7 @@ namespace Trinity.Config
         private NotificationSetting _Notification;
         private bool _Loaded;
         private FileSystemWatcher _FSWatcher;
+        private DateTime _LastLoadedSettings;
         #endregion Fields
 
         #region Events
@@ -54,6 +55,7 @@ namespace Trinity.Config
                 EnableRaisingEvents = true
             };
             _FSWatcher.Changed += _FSWatcher_Changed;
+            _LastLoadedSettings = DateTime.Now;
         }
 
         #endregion Constructors
@@ -202,6 +204,12 @@ namespace Trinity.Config
             bool loadSuccessful = false;
             bool migrateConfig = false;
 
+            // Only load once every 500ms (prevents duplicate Load calls)
+            if (DateTime.Now.Subtract(_LastLoadedSettings).TotalMilliseconds <= 500)
+                return;
+
+            _LastLoadedSettings = DateTime.Now;
+
             string filename = GlobalSettingsFile;
             lock (this)
             {
@@ -214,13 +222,12 @@ namespace Trinity.Config
                     else if (File.Exists(BattleTagSettingsFile))
                     {
                         Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Loading BattleTag Settings");
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "No Config file for BattleTag, Trying Old Trinity Settings");
-                        filename = OldBattleTagSettingsFile;
-
+                        filename = BattleTagSettingsFile;
                     }
                     else if (File.Exists(OldBattleTagSettingsFile))
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Old configuration file found, need to migrate!");
+                        filename = OldBattleTagSettingsFile;
                         migrateConfig = true;
                     }
 
@@ -230,7 +237,7 @@ namespace Trinity.Config
                         while (FileManager.IsFileReadLocked(new FileInfo(GlobalSettingsFile)))
                         {
                             Thread.Sleep(10);
-                            if (DateTime.Now.Subtract(fsChangeStart).Seconds > 5)
+                            if (DateTime.Now.Subtract(fsChangeStart).TotalMilliseconds > 5000)
                                 break;
                         }
                         using (Stream stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))

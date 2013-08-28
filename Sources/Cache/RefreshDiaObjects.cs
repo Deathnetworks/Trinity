@@ -134,6 +134,15 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Staying Put During Avoidance");
                 }
 
+                // Pre-townrun is too far away
+                if (!Player.IsInTown && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP
+                    && TownRun.PreTownRunPosition.Distance2D(Player.Position) <= V.F("Cache.PretownRun.MaxDistance")) 
+                {
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Pre-TownRun position is more than {0} yards away, canceling", V.I("Cache.PretownRun.MaxDistance"));
+                    TownRun.PreTownRunPosition = Vector3.Zero;
+                    TownRun.PreTownRunWorldId = -1;
+                }
+
                 // Reached pre-townrun position
                 if (!Player.IsInTown && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP
                     && TownRun.PreTownRunPosition.Distance2D(Player.Position) <= 15f)
@@ -141,13 +150,12 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Successfully returned to Pre-TownRun Position");
                     TownRun.PreTownRunPosition = Vector3.Zero;
                     TownRun.PreTownRunWorldId = -1;
-
                 }
 
                 // After a townrun, make sure to return to original TownRun Location
                 if (!Player.IsInTown && CurrentTarget == null && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP)
                 {
-                    if (TownRun.PreTownRunPosition.Distance2D(Player.Position) > 10f)
+                    if (TownRun.PreTownRunPosition.Distance2D(Player.Position) > 10f && TownRun.PreTownRunPosition.Distance2D(Player.Position) <= V.F("Cache.PretownRun.MaxDistance"))
                     {
                         CurrentTarget = new TrinityCacheObject()
                         {
@@ -231,7 +239,7 @@ namespace Trinity
                 if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && CurrentTarget.Unit != null && CurrentTarget.Unit.IsValid)
                 {
                     DiaUnit unit = CurrentTarget.Unit;
-                    if (unit.IsDead)
+                    if (unit.HitpointsCurrent <= 0d)
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget is dead, setting null");
                         CurrentTarget = null;

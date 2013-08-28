@@ -116,6 +116,9 @@ namespace Trinity
             {
                 Trinity.IsReadyToTownRun = false;
 
+                if (Trinity.Player.IsDead)
+                    return false;
+
                 if (DataDictionary.BossLevelAreaIDs.Contains(Trinity.Player.LevelAreaId))
                     return false;
 

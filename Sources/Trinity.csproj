@@ -61,7 +61,6 @@
     <Compile Include="Cache\CacheDictionaries.cs" />
     <Compile Include="Cache\RefreshAvoidance.cs" />
     <Compile Include="Cache\RefreshGizmo.cs" />
-    <Compile Include="Combat\Abilities\Barbarian.cs" />
     <Compile Include="Combat\Abilities\BarbarianCombat.cs" />
     <Compile Include="Combat\Abilities\CombatBase.cs" />
     <Compile Include="Combat\Abilities\Monk.cs" />

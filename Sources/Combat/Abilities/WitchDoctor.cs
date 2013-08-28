@@ -15,13 +15,15 @@ namespace Trinity
             bool hasGraveInjustice = ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice);
 
             bool hasAngryChicken = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1);
-            bool isChicken = Player.IsHidden;
+            bool isChicken = hasAngryChicken && 
+                SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Hex).TotalSeconds <= 12 && 
+                SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Hex_Explode).TotalSeconds >= SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Hex).TotalSeconds;
 
             // Hex with angry chicken, is chicken, explode!
-            if (!UseOOCBuff && isChicken && (TargetUtil.AnyMobsInRange(12f, 1) || CurrentTarget.RadiusDistance <= 10f || UseDestructiblePower) && PowerManager.CanCast(SNOPower.Witchdoctor_Hex_Explode))
+            if (!UseOOCBuff && isChicken && (TargetUtil.AnyMobsInRange(12f, 1, false) || CurrentTarget.RadiusDistance <= 10f || UseDestructiblePower) && PowerManager.CanCast(SNOPower.Witchdoctor_Hex_Explode))
             {
                 ShouldRefreshHotbarAbilities = true;
-                return new TrinityPower(SNOPower.Witchdoctor_Hex_Explode, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_Hex_Explode, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
             }
             else if (isChicken)
             {

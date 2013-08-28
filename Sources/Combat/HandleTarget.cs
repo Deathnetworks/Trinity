@@ -218,7 +218,7 @@ namespace Trinity
                                     ShouldPickNewAbilities = true;
                                 }
                             }
-                            // Always Update the current target 
+
                             UpdateCurrentTarget();
                         }
                     }

@@ -254,7 +254,7 @@ namespace Trinity
             // Global
             Set(new TVar("Combat.DefaultTickPreDelay", 1, "Default Combat Power Pre-use Delay (in ticks)"));
             Set(new TVar("Combat.DefaultTickPostDelay", 1, "Default Combat Power Post-use Delay (in ticks)"));
-
+            Set(new TVar("Cache.PretownRun.MaxDistance", 1500, "Default PreTownrun max distance"));
             batch = false;
         }
 
@@ -416,7 +416,10 @@ namespace Trinity
         {
             lock (sync)
             {
-                return Data.ContainsKey(key);
+                bool containsKey = Data.ContainsKey(key);
+                if (loaded && !containsKey)
+                    Logger.LogDebug("Warning: unknown Trinity Variable requested: {0}", key);
+                return containsKey;
             }
         }
 

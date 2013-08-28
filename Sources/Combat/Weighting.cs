@@ -442,16 +442,24 @@ namespace Trinity
                                     Player.PrimaryResourcePct <= 0.15 &&
                                     ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast);
 
-                                // Give all globes 0 weight (so never gone-to), unless we have low health, then go for them
-                                if (!witchDoctorManaLow && (Player.CurrentHealthPct > PlayerEmergencyHealthGlobeLimit || !Settings.Combat.Misc.CollectHealthGlobe))
+                                if ((Player.CurrentHealthPct >= 1 || !Settings.Combat.Misc.CollectHealthGlobe) && ObjectCache.Any(p => p.Type == GObjectType.Player && p.HitPointsPct < 1))
                                 {
                                     cacheObject.Weight = 0;
+                                }
+                                // Give all globes super low weight (so never gone-to), unless we have low health, then go for them
+                                else if (!witchDoctorManaLow && (Player.CurrentHealthPct > PlayerEmergencyHealthGlobeLimit))
+                                {
+                                    cacheObject.Weight = ((1 - Player.CurrentHealthPct) * 1000);
+
+                                    // Added weight for lowest health of party member
+                                    cacheObject.Weight = ((1 - ObjectCache.Min(p => p.HitPointsPct)) * 2500);
                                 }
                                 else
                                 {
 
                                     // Ok we have globes enabled, and our health is low
-                                    cacheObject.Weight = (300f - cacheObject.RadiusDistance) / 300f * 17000d;
+                                    cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 17000d;
+
 
                                     if (witchDoctorManaLow)
                                         cacheObject.Weight += 10000d; // 10k for WD's!

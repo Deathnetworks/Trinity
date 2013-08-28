@@ -213,7 +213,10 @@ namespace Trinity
                         // Already used, blacklist it and don't look at it again
                         try
                         {
-                            gizmoUsed = ((GizmoShrine)c_diaObject).HasBeenOperated;
+                            int gizmoUsedAttrib = ((GizmoShrine)c_diaObject).CommonData.GetAttribute<int>(ActorAttributeType.GizmoHasBeenOperated);
+                            int gizmoOperatorAcdId = ((GizmoShrine)c_diaObject).CommonData.GetAttribute<int>(ActorAttributeType.GizmoOperatorACDID);
+
+                            gizmoUsed = (gizmoUsedAttrib >= 1 || gizmoOperatorAcdId > 0);
                         }
                         catch
                         {
@@ -228,6 +231,7 @@ namespace Trinity
                             AddToCache = false;
                             return AddToCache;
                         }
+
                         // Determine what shrine type it is, and blacklist if the user has disabled it
                         switch (c_ActorSNO)
                         {

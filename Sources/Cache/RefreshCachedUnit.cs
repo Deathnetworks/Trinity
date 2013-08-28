@@ -30,13 +30,13 @@ namespace Trinity
             // Dictionary based caching of monster types based on the SNO codes
             MonsterType monsterType;
             // See if we need to refresh the monster type or not
-            bool bAddToDictionary = !dictionaryStoredMonsterTypes.TryGetValue(c_ActorSNO, out monsterType);
-            bool bRefreshMonsterType = bAddToDictionary;
+            bool notInCache = !dictionaryStoredMonsterTypes.TryGetValue(c_ActorSNO, out monsterType);
+            bool refreshMonsterType = notInCache;
             using (new PerformanceLogger("RefreshUnit.5"))
             {
                 // If it's a boss and it was an ally, keep refreshing until it's not an ally
                 // Because some bosses START as allied for cutscenes etc. until they become hostile
-                if (c_unit_IsBoss && !bRefreshMonsterType)
+                if (c_unit_IsBoss && !refreshMonsterType)
                 {
                     switch (monsterType)
                     {
@@ -44,7 +44,7 @@ namespace Trinity
                         case MonsterType.Scenery:
                         case MonsterType.Helper:
                         case MonsterType.Team:
-                            bRefreshMonsterType = true;
+                            refreshMonsterType = true;
                             break;
                     }
                 }
@@ -52,11 +52,11 @@ namespace Trinity
             using (new PerformanceLogger("RefreshUnit.6"))
             {
                 // Now see if we do need to get new data for this boss or not
-                if (bRefreshMonsterType)
+                if (refreshMonsterType)
                 {
                     try
                     {
-                        monsterType = RefreshMonsterType(c_CommonData, monsterType, bAddToDictionary);
+                        monsterType = RefreshMonsterType(c_CommonData, monsterType, notInCache);
                     }
                     catch (Exception ex)
                     {
@@ -167,8 +167,13 @@ namespace Trinity
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "0HitPoints";
+                return AddToCache;
+            }
 
-                // return here immediately
+            if (c_diaUnit.IsDead)
+            {
+                AddToCache = false;
+                c_IgnoreSubStep = "IsDead";
                 return AddToCache;
             }
 
