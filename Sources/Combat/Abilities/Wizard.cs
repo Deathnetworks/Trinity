@@ -20,9 +20,6 @@ namespace Trinity
         {
             // TODO
             //- AI so Trinity knows that it is already in the densest monster area and not to teleport.
-            //- AI to use teleport when ranged attacks are approaching (succubus slow moving torpedo-orb)
-            //- AI to avoid AoE's (plague, molten, desecrator)
-            //- For Trinity to cast one or two Twisters before moving into melee range or teleporting closer. 
 
             // Pick the best destructible power available
             if (UseDestructiblePower)
@@ -179,7 +176,8 @@ namespace Trinity
                 }
                 // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_MirrorImage) &&
-                    (Player.CurrentHealthPct <= 0.50 || AnythingWithinRange[RANGE_30] >= 5 || Player.IsIncapacitated || Player.IsRooted || (ElitesWithinRange[RANGE_30] == 1 && CurrentTarget.IsEliteRareUnique && !CurrentTarget.IsBoss && CurrentTarget.HitPointsPct <= 0.35)) &&
+                    (Player.CurrentHealthPct <= 0.50 || AnythingWithinRange[RANGE_30] >= 5 || Player.IsIncapacitated || Player.IsRooted || (ElitesWithinRange[RANGE_30] == 1 && CurrentTarget.IsEliteRareUnique &&
+                    !CurrentTarget.IsBoss && CurrentTarget.HitPointsPct <= 0.35)) &&
                     PowerManager.CanCast(SNOPower.Wizard_MirrorImage))
                 {
                     return new TrinityPower(SNOPower.Wizard_MirrorImage, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
@@ -189,37 +187,28 @@ namespace Trinity
                     PowerManager.CanCast(SNOPower.Wizard_Archon))
                 {
                     // Familiar has been removed for now. Uncomment the three comments below relating to familiars to force re-buffing them
-                    bool bHasBuffAbilities = (Hotbar.Contains(SNOPower.Wizard_MagicWeapon) ||
-                        Hotbar.Contains(SNOPower.Wizard_Familiar) ||
-                        Hotbar.Contains(SNOPower.Wizard_EnergyArmor) || Hotbar.Contains(SNOPower.Wizard_IceArmor) ||
-                        Hotbar.Contains(SNOPower.Wizard_StormArmor));
                     int reserveArcanePower = 25;
                     if (Hotbar.Contains(SNOPower.Wizard_MagicWeapon)) reserveArcanePower += 25;
                     if (Hotbar.Contains(SNOPower.Wizard_Familiar)) reserveArcanePower += 25;
                     if (Hotbar.Contains(SNOPower.Wizard_EnergyArmor) || Hotbar.Contains(SNOPower.Wizard_IceArmor) ||
                         Hotbar.Contains(SNOPower.Wizard_StormArmor)) reserveArcanePower += 25;
-                    if (!bHasBuffAbilities || Player.PrimaryResource <= reserveArcanePower)
-                        CanCastArchon = true;
-                    if (!CanCastArchon)
-                    {
-                        if (Hotbar.Contains(SNOPower.Wizard_MagicWeapon))
-                            AbilityLastUsedCache[SNOPower.Wizard_MagicWeapon] = DateTime.Today;
 
-                        if (Hotbar.Contains(SNOPower.Wizard_Familiar))
-                            AbilityLastUsedCache[SNOPower.Wizard_Familiar] = DateTime.Today;
+                    bool hasBuffSpells =
+                        (Hotbar.Contains(SNOPower.Wizard_MagicWeapon) ||
+                        Hotbar.Contains(SNOPower.Wizard_Familiar) ||
+                        Hotbar.Contains(SNOPower.Wizard_EnergyArmor) ||
+                        Hotbar.Contains(SNOPower.Wizard_IceArmor) ||
+                        Hotbar.Contains(SNOPower.Wizard_StormArmor));
 
-                        if (Hotbar.Contains(SNOPower.Wizard_EnergyArmor))
-                            AbilityLastUsedCache[SNOPower.Wizard_EnergyArmor] = DateTime.Today;
+                    CanCastArchon =  Player.PrimaryResource >= reserveArcanePower || (
+                        hasBuffSpells &&
+                        CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon) &&
+                        Wizard_HasFamiliar() &&
+                        CheckAbilityAndBuff(SNOPower.Wizard_EnergyArmor) &&
+                        CheckAbilityAndBuff(SNOPower.Wizard_IceArmor) &&
+                        CheckAbilityAndBuff(SNOPower.Wizard_StormArmor));
 
-                        if (Hotbar.Contains(SNOPower.Wizard_IceArmor))
-                            AbilityLastUsedCache[SNOPower.Wizard_IceArmor] = DateTime.Today;
-
-                        if (Hotbar.Contains(SNOPower.Wizard_StormArmor))
-                            AbilityLastUsedCache[SNOPower.Wizard_StormArmor] = DateTime.Today;
-
-                        CanCastArchon = true;
-                    }
-                    else
+                    if (CanCastArchon)
                     {
                         CanCastArchon = false;
                         return new TrinityPower(SNOPower.Wizard_Archon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 4, 5, WAIT_FOR_ANIM);
@@ -241,14 +230,14 @@ namespace Trinity
                     CurrentTarget.RadiusDistance <= 25f) &&
                     PowerManager.CanCast(SNOPower.Wizard_FrostNova))
                 {
-                    return new TrinityPower(SNOPower.Wizard_FrostNova, 20f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_FrostNova, 20f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
                 }
 
                 // Frost Nova for Critical Mass builds
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_FrostNova) && !Player.IsIncapacitated &&
                     hasCriticalMass && TargetUtil.AnyMobsInRange(20, 1) && PowerManager.CanCast(SNOPower.Wizard_FrostNova))
                 {
-                    return new TrinityPower(SNOPower.Wizard_FrostNova, 10f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_FrostNova, 10f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
                 }
 
                 // Explosive Blast SPAM when enough AP, blow erry thing up, nah mean
@@ -259,7 +248,7 @@ namespace Trinity
                     float blastRange = 11f;
                     if (hasCriticalMass)
                         blastRange = 5f;
-                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, blastRange, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, blastRange, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
                 }
 
                 // Check to see if we have a signature spell on our hotbar, for energy twister check
@@ -376,25 +365,36 @@ namespace Trinity
             else
             {
                 bool cancelArchon = false;
+                string reason = "";
 
                 if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.RebuffArmor && !Wizard_HasWizardArmor())
+                {
+                    reason += "Rebuff Armor ";
                     cancelArchon = true;
-
+                }
                 if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.RebuffMagicWeaponFamiliar &&
-                    (!CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon) || !CheckAbilityAndBuff(SNOPower.Wizard_Familiar)))
+                    (!CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon) || !Wizard_HasFamiliar()))
+                {
+                    if (!CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon))
+                        reason += "Rebuff Magic Weapon ";
+                    if (!Wizard_HasFamiliar())
+                        reason += "Rebuff Familiar ";
                     cancelArchon = true;
+                }
 
                 if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.Timer &&
                     DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Wizard_Archon]).TotalSeconds >= Settings.Combat.Wizard.ArchonCancelSeconds)
+                {
+                    reason += "Timer";
                     cancelArchon = true;
+                }
 
                 if (cancelArchon && Wizard_ShouldStartArchon())
                 {
-
-
                     var archonBuff = ZetaDia.Me.GetBuff(SNOPower.Wizard_Archon);
                     if (archonBuff != null && archonBuff.IsCancelable)
                     {
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Canceling Archon: {0}", reason);
                         // this actually cancels Archon
                         archonBuff.Cancel();
 
@@ -454,6 +454,21 @@ namespace Trinity
         private static bool Wizard_HasWizardArmor()
         {
             return (GetHasBuff(SNOPower.Wizard_EnergyArmor) || GetHasBuff(SNOPower.Wizard_IceArmor) || GetHasBuff(SNOPower.Wizard_StormArmor));
+        }
+
+        private static bool Wizard_HasFamiliar()
+        {
+            double timeSinceDeath = DateTime.Now.Subtract(Trinity.LastDeathTime).TotalMilliseconds;
+
+            // We've died, no longer have familiar
+            if (timeSinceDeath < CombatBase.TimeSincePowerUse(SNOPower.Wizard_Familiar))
+                return false;
+
+            // we've used it within the last 5 minutes, we should still have it
+            if (CombatBase.TimeSincePowerUse(SNOPower.Wizard_Familiar) < (5 * 60 * 1000))
+                return true;
+
+            return false;
         }
 
         private static TrinityPower GetWizardDestructablePower()

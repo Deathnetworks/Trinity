@@ -94,7 +94,7 @@ namespace Trinity
 
                                 // Ignore Solitary Trash mobs (no elites present)
                                 // Except if has been primary target or if already low on health (<= 20%)
-                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && !cacheObject.HasBeenPrimaryTarget &&
+                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && //!cacheObject.HasBeenPrimaryTarget &&
                                     !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize))
                                 {
                                     unitWeightInfo = String.Format("Ignoring trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12}",
@@ -435,6 +435,10 @@ namespace Trinity
                             }
                         case GObjectType.Globe:
                             {
+                                // Calculate a spot reaching a little bit further out from the globe, to help globe-movements
+                                if (cacheObject.Weight > 0)
+                                    cacheObject.Position = MathEx.CalculatePointFrom(cacheObject.Position, Player.Position, cacheObject.CentreDistance + 3f);
+
                                 // Weight Health Globes
 
                                 bool witchDoctorManaLow =
@@ -452,7 +456,7 @@ namespace Trinity
                                     var myHealth = Player.CurrentHealthPct;
 
                                     double minPartyHealth = 0d;
-                                    if (ObjectCache.Any(p => p.Type == GObjectType.Player))
+                                    if (ObjectCache.Any(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid))
                                         minPartyHealth = ObjectCache.Where(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid).Min(p => p.HitPointsPct);
 
                                     if (myHealth < V.D("Weight.Globe.MinPlayerHealthPct"))
@@ -464,7 +468,6 @@ namespace Trinity
                                 }
                                 else
                                 {
-
                                     // Ok we have globes enabled, and our health is low
                                     cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 17000d;
 
@@ -483,36 +486,32 @@ namespace Trinity
                                     // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                     if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                         cacheObject.Weight += 800;
+                                }
 
-                                    // If there's a monster in the path-line to the item, reduce the weight by 15% for each
-                                    Vector3 point = cacheObject.Position;
-                                    foreach (CacheObstacleObject tempobstacle in hashMonsterObstacleCache.Where(cp =>
-                                        MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, point)))
-                                    {
-                                        cacheObject.Weight *= 0.85;
-                                    }
+                                // If there's a monster in the path-line to the item, reduce the weight by 15% for each
+                                Vector3 point = cacheObject.Position;
+                                foreach (CacheObstacleObject tempobstacle in hashMonsterObstacleCache.Where(cp =>
+                                    MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, point)))
+                                {
+                                    cacheObject.Weight *= 0.85;
+                                }
 
-                                    if (cacheObject.CentreDistance > 10f)
-                                    {
-                                        // See if there's any AOE avoidance in that spot, if so reduce the weight by 10%
-                                        if (hashAvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
-                                            cacheObject.Weight *= 0.9;
-
-                                        // Calculate a spot reaching a little bit further out from the globe, to help globe-movements
-                                        if (cacheObject.Weight > 0)
-                                            cacheObject.Position = MathEx.CalculatePointFrom(cacheObject.Position, Player.Position, cacheObject.CentreDistance + 3f);
-                                    }
-
-                                    // do not collect health globes if we are kiting and health globe is too close to monster or avoidance
-                                    if (PlayerKiteDistance > 0)
-                                    {
-                                        if (hashMonsterObstacleCache.Any(m => m.Location.Distance(cacheObject.Position) < PlayerKiteDistance))
-                                            cacheObject.Weight = 0;
-                                        if (hashAvoidanceObstacleCache.Any(m => m.Location.Distance(cacheObject.Position) < PlayerKiteDistance))
-                                            cacheObject.Weight = 0;
-                                    }
+                                if (cacheObject.CentreDistance > 10f)
+                                {
+                                    // See if there's any AOE avoidance in that spot, if so reduce the weight by 10%
+                                    if (hashAvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
+                                        cacheObject.Weight *= 0.9;
 
                                 }
+
+                                // do not collect health globes if we are kiting and health globe is too close to monster or avoidance
+                                if (PlayerKiteDistance > 0)
+                                {
+                                    if (hashMonsterObstacleCache.Any(m => m.Location.Distance(cacheObject.Position) < PlayerKiteDistance))
+                                        cacheObject.Weight = 0;
+                                    if (hashAvoidanceObstacleCache.Any(m => m.Location.Distance(cacheObject.Position) < PlayerKiteDistance))
+                                        cacheObject.Weight = 0;
+                                } 
                                 break;
                             }
                         case GObjectType.HealthWell:
@@ -671,7 +670,7 @@ namespace Trinity
                     }
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
                         "Weight={2:0} target= {0} ({1}) type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
-                            cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsElite, cacheObject.RActorGuid, unitWeightInfo);
+                            cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique, cacheObject.RActorGuid, unitWeightInfo);
 
                     // Prevent current target dynamic ranged weighting flip-flop 
                     if (CurrentTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)

@@ -239,19 +239,19 @@ namespace Trinity
                 if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && CurrentTarget.Unit != null && CurrentTarget.Unit.IsValid)
                 {
                     DiaUnit unit = CurrentTarget.Unit;
-                    if (unit.HitpointsCurrent <= 0d)
-                    {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget is dead, setting null");
-                        CurrentTarget = null;
-                        forceUpdate = true;
-                    }
-                    else
-                    {
+                    //if (unit.HitpointsCurrent <= 0d)
+                    //{
+                    //    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget is dead, setting null");
+                    //    CurrentTarget = null;
+                    //    forceUpdate = true;
+                    //}
+                    //else
+                    //{
                         CurrentTarget.Position = unit.Position;
                         CurrentTarget.HitPointsPct = unit.HitpointsCurrentPct;
                         CurrentTarget.HitPoints = unit.HitpointsCurrent;
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Updated CurrentTarget HitPoints={0:0.00} & Position={1}", CurrentTarget.HitPointsPct, CurrentTarget.Position);
-                    }
+                    //}
                 }
                 else if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit)
                 {

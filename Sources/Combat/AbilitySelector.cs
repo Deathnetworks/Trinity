@@ -174,8 +174,6 @@ namespace Trinity
 
         }
 
-        
-
         /// <summary>
         /// Gets the time in Millseconds since we've used the specified power
         /// </summary>

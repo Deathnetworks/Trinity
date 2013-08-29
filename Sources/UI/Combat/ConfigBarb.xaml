@@ -113,7 +113,7 @@
         <Grid Grid.Row="3" Margin="2">
             <ScrollViewer Tag="Combat\Avoidance.xaml" DataContext="{Binding Path=Barb}"/>
         </Grid>
-        <Grid Grid.Row="3" Margin="2">
+        <Grid Grid.Row="4" Margin="2">
 <!-- To be used later .. -->
         </Grid>
         <!--Reset Button-->

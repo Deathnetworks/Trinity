@@ -5,6 +5,7 @@ using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.Internals.Actors;
+using Trinity.Combat.Abilities;
 
 namespace Trinity
 {
@@ -254,7 +255,7 @@ namespace Trinity
                     Trinity.Hotbar.Add(power);
                     if (!DataDictionary.LastUseAbilityTimeDefaults.ContainsKey(power))
                     {
-                        DataDictionary.LastUseAbilityTimeDefaults.Add(power, DateTime.Now);
+                        DataDictionary.LastUseAbilityTimeDefaults.Add(power, DateTime.MinValue);
                     }
                     if (!Trinity.AbilityLastUsedCache.ContainsKey(power))
                     {
@@ -271,6 +272,42 @@ namespace Trinity
 
                 if (!Trinity.GetHasBuff(SNOPower.Wizard_Archon) && !Player.IsHidden)
                     Trinity.hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(Trinity.Hotbar);
+            }
+
+            if (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) && Player.ActorClass == ActorClass.Wizard)
+            {
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_FrostNova, 25);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_ExplosiveBlast, 25);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_DiamondSkin, 100);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_SlowTime, 6000);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_WaveOfForce, 1500);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_MirrorImage, 1500);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_Archon_ArcaneBlast, 1500);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_Teleport, 2700);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_Archon_SlowTime, 1500);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_Archon_Teleport, 2700);
+            }
+            if (Player.ActorClass == ActorClass.WitchDoctor && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice))
+            {
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_SoulHarvest, 1000);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_SpiritWalk, 1000);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_Horrify, 1000);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_Gargantuan, 20000);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_SummonZombieDog, 20000);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_GraspOfTheDead, 500);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_SpiritBarrage, 2000);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_Locust_Swarm, 2000);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_Haunt, 2000);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_Hex, 3000);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_MassConfusion, 15000);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_FetishArmy, 20000);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_BigBadVoodoo, 20000);
+            }
+            if (Player.ActorClass == ActorClass.Barbarian && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Barbarian_Passive_BoonOfBulKathos))
+            {
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Barbarian_Earthquake, 90500);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Barbarian_CallOfTheAncients, 90500);
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Barbarian_WrathOfTheBerserker, 90500);
             }
         }
     }

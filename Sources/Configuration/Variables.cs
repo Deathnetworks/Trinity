@@ -479,7 +479,7 @@ namespace Trinity
         private static Button btnPauseBot, btnTownRun;
 
         // On death, clear the timers for all abilities
-        private static DateTime lastDied = DateTime.Today;
+        internal static DateTime LastDeathTime = DateTime.Today;
         private static int iTotalDeaths = 0;
 
         // When did we last send a move-power command?

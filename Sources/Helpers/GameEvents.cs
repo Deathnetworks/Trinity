@@ -127,11 +127,12 @@ namespace Trinity
         
         private void TrinityOnDeath(object src, EventArgs mea)
         {
-            if (DateTime.Now.Subtract(lastDied).TotalSeconds > 10)
+            if (DateTime.Now.Subtract(LastDeathTime).TotalSeconds > 10)
             {
-                lastDied = DateTime.Now;
+                LastDeathTime = DateTime.Now;
                 iTotalDeaths++;
                 iDeathsThisRun++;
+                PlayerInfoCache.RefreshHotbar();
                 AbilityLastUsedCache = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
                 vBacktrackList = new SortedList<int, Vector3>();
                 iTotalBacktracks = 0;
@@ -186,10 +187,14 @@ namespace Trinity
 
             V.ValidateLoad();
 
+            AbilityLastUsedCache.Clear();
+            PlayerInfoCache.RefreshHotbar();
+
             hashUseOnceID = new HashSet<int>();
             dictUseOnceID = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;
             iDeathsThisRun = 0;
+            Trinity.LastDeathTime = DateTime.Now;
             _hashsetItemStatsLookedAt = new HashSet<string>();
             _hashsetItemPicksLookedAt = new HashSet<string>();
             _hashsetItemFollowersIgnored = new HashSet<string>();
@@ -233,6 +238,7 @@ namespace Trinity
             CurrentProfile = "";
             FirstProfile = "";
 
+            PlayerInfoCache.RefreshHotbar();
             AbilityLastUsedCache = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
 
             GoldInactivity.ResetCheckGold();
