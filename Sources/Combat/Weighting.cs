@@ -449,15 +449,15 @@ namespace Trinity
                                 // Give all globes super low weight (so never gone-to), unless we have low health, then go for them
                                 else if (!witchDoctorManaLow && (Player.CurrentHealthPct > PlayerEmergencyHealthGlobeLimit))
                                 {
-                                    var myHealth = 1 - Player.CurrentHealthPct;
+                                    var myHealth = Player.CurrentHealthPct;
                                     var minPartyHealth = ObjectCache.Where(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid).Min(p => p.HitPointsPct);
 
-                                    if (myHealth < 0.90)
-                                        cacheObject.Weight = myHealth * 1000;
+                                    if (myHealth < V.D("Weight.Globe.MinPlayerHealthPct"))
+                                        cacheObject.Weight = (1 - myHealth) * 1000;
 
                                     // Added weight for lowest health of party member
-                                    if (minPartyHealth < 0.90)
-                                        cacheObject.Weight = minPartyHealth * 2500;
+                                    if (minPartyHealth < V.D("Weight.Globe.MinPartyHealthPct"))
+                                        cacheObject.Weight = (1 - minPartyHealth) * 2500;
                                 }
                                 else
                                 {

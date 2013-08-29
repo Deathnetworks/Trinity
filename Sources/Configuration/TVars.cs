@@ -255,6 +255,10 @@ namespace Trinity
             Set(new TVar("Combat.DefaultTickPreDelay", 1, "Default Combat Power Pre-use Delay (in ticks)"));
             Set(new TVar("Combat.DefaultTickPostDelay", 1, "Default Combat Power Post-use Delay (in ticks)"));
             Set(new TVar("Cache.PretownRun.MaxDistance", 1500, "Default PreTownrun max distance"));
+
+            Set(new TVar("Weight.Globe.MinPlayerHealthPct", 0.90d, "Minimum player health before health globes considered (does not effect emergency health globe)"));
+            Set(new TVar("Weight.Globe.MinPartyHealthPct", 0.90d, "Minimum party player health befefore globes considered (party mode only)"));
+
             batch = false;
         }
 
