@@ -64,7 +64,7 @@ namespace Trinity
                     !prioritizeCloseRangeUnits &&
                     Settings.Combat.Misc.TrashPackSize > 1 &&
                     EliteCount == 0 &&
-                    AvoidanceCount == 0 &&
+                    //AvoidanceCount == 0 &&
                     Player.Level >= 15 &&
                     MovementSpeed >= 1
                     );
@@ -450,7 +450,10 @@ namespace Trinity
                                 else if (!witchDoctorManaLow && (Player.CurrentHealthPct > PlayerEmergencyHealthGlobeLimit))
                                 {
                                     var myHealth = Player.CurrentHealthPct;
-                                    var minPartyHealth = ObjectCache.Where(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid).Min(p => p.HitPointsPct);
+
+                                    double minPartyHealth = 0d;
+                                    if (ObjectCache.Any(p => p.Type == GObjectType.Player))
+                                        minPartyHealth = ObjectCache.Where(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid).Min(p => p.HitPointsPct);
 
                                     if (myHealth < V.D("Weight.Globe.MinPlayerHealthPct"))
                                         cacheObject.Weight = (1 - myHealth) * 1000;
