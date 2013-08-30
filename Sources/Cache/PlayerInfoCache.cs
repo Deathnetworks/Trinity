@@ -149,10 +149,11 @@ namespace Trinity
                     Player.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
                     Player.LevelAreaId = ZetaDia.CurrentLevelAreaId;
 
-                    if (Player.ActorClass == ActorClass.WitchDoctor && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1))
-                        Player.IsHidden = me.IsHidden;
-                    else
-                        Player.IsHidden = false;
+                    //if (Player.ActorClass == ActorClass.WitchDoctor && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1))
+                    //    Player.IsHidden = me.IsHidden;
+                    //else
+                    //    Player.IsHidden = false;
+                    Player.IsHidden = me.IsHidden;
 
                     if (DateTime.Now.Subtract(Player.Scene.LastUpdate).TotalMilliseconds > 1000 && Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
                     {

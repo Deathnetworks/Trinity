@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:Trinity.UIComponents"
              mc:Ignorable="d"  Foreground="{DynamicResource TextBrush}"
-             d:DesignHeight="350" d:DesignWidth="390">
+             d:DesignHeight="450" d:DesignWidth="390">
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
@@ -108,7 +108,7 @@
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.ExtendedTrashKill}" ToolTip="Extended range for ~ 2 seconds">Extend trash-kill range after combat</CheckBox>
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AvoidAOE}">Attempt to avoid AoE</CheckBox>
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.KillMonstersInAoE}" ToolTip="Attack units standing in AoE">Attack Mobs in AoE</CheckBox>
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Use movement spells</CheckBox>
+            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Use movement spells Out of Combat</CheckBox>
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.CollectHealthGlobe}">Attempt to collect health globes</CheckBox>
             <!--<CheckBox Margin="2" IsChecked="{Binding Path=Misc.AllowBacktracking}" ToolTip="currently experimental and buggy">Allow Backtracking path after combat</CheckBox>-->
             <CheckBox Margin="2" IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>

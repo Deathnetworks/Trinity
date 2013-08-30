@@ -15,9 +15,7 @@ namespace Trinity
             bool hasGraveInjustice = ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice);
 
             bool hasAngryChicken = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1);
-            bool isChicken = hasAngryChicken && 
-                SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Hex).TotalSeconds <= 12 && 
-                SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Hex_Explode).TotalSeconds >= SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Hex).TotalSeconds;
+            bool isChicken = hasAngryChicken && Player.IsHidden;
 
             // Hex with angry chicken, is chicken, explode!
             if (!UseOOCBuff && isChicken && (TargetUtil.AnyMobsInRange(12f, 1, false) || CurrentTarget.RadiusDistance <= 10f || UseDestructiblePower) && PowerManager.CanCast(SNOPower.Witchdoctor_Hex_Explode))
@@ -25,7 +23,7 @@ namespace Trinity
                 ShouldRefreshHotbarAbilities = true;
                 return new TrinityPower(SNOPower.Witchdoctor_Hex_Explode, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
             }
-            else if (isChicken)
+            else if (hasAngryChicken)
             {
                 ShouldRefreshHotbarAbilities = true;
             }
@@ -112,7 +110,7 @@ namespace Trinity
             }
 
             // Hex with angry chicken, check if we want to shape shift and explode
-            if (Hotbar.Contains(SNOPower.Witchdoctor_Hex) && hasAngryChicken && PowerManager.CanCast(SNOPower.Witchdoctor_Hex) && Player.PrimaryResource >= 49)
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_Hex) && hasAngryChicken && PowerManager.CanCast(SNOPower.Witchdoctor_Hex) && Player.PrimaryResource >= 49)
             {
                 ShouldRefreshHotbarAbilities = true;
                 return new TrinityPower(SNOPower.Witchdoctor_Hex, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
@@ -149,18 +147,40 @@ namespace Trinity
 
                 return new TrinityPower(SNOPower.Witchdoctor_GraspOfTheDead, 25f, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
-            // Horrify Buff When not in combat for movement speed
+            //skillDict.Add("Horrify", SNOPower.Witchdoctor_Horrify);
+            //runeDict.Add("Phobia", 2);
+            //runeDict.Add("Stalker", 4);
+            //runeDict.Add("FaceOfDeath", 1);
+            //runeDict.Add("FrighteningAspect", 0);
+            //runeDict.Add("RuthlessTerror", 3);
+
+            bool hasPhobia = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 2);
+            bool hasStalker = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 4);
+            bool hasFaceOfDeath = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 1);
+            bool hasFrighteningAspect = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 0);
+            bool hasRuthlessTerror = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Horrify && s.RuneIndex == 3);
+
+            float horrifyRadius = hasFaceOfDeath ? 24f : 12f;
+
+            // Horrify 
             if (UseOOCBuff && hasGraveInjustice && Hotbar.Contains(SNOPower.Witchdoctor_Horrify) && !Player.IsIncapacitated && Player.PrimaryResource >= 37 &&
-                PowerManager.CanCast(SNOPower.Witchdoctor_Horrify))
+                !hasStalker && !hasFrighteningAspect && PowerManager.CanCast(SNOPower.Witchdoctor_Horrify) && TargetUtil.AnyMobsInRange(horrifyRadius, 3))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Horrify, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_Horrify, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
             }
-            // Horrify Buff at 35% health
+
+            // Horrify Buff When not in combat for movement speed -- Stalker
+            if (UseOOCBuff && hasGraveInjustice && Hotbar.Contains(SNOPower.Witchdoctor_Horrify) && !Player.IsIncapacitated && Player.PrimaryResource >= 37 &&
+                hasStalker && PowerManager.CanCast(SNOPower.Witchdoctor_Horrify))
+            {
+                return new TrinityPower(SNOPower.Witchdoctor_Horrify, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
+            }
+            // Horrify Buff at 35% health -- Freightening Aspect
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_Horrify) && !Player.IsIncapacitated && Player.PrimaryResource >= 37 &&
-                Player.CurrentHealthPct <= 0.35 &&
+                Player.CurrentHealthPct <= 0.35 && hasFrighteningAspect &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_Horrify))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Horrify, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_Horrify, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
             }
             // Fetish Army, elites only
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_FetishArmy) && !Player.IsIncapacitated &&
@@ -232,7 +252,7 @@ namespace Trinity
             var zombieChargerRange = hasGraveInjustice ? Math.Min(Player.GoldPickupRadius + 8f, 11f) : 11f;
 
             // Zombie Charger aka Zombie bears Spams Bears @ Everything from 11feet away
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && !Player.IsIncapacitated && Player.PrimaryResource >= 134 &&
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && !Player.IsIncapacitated && Player.PrimaryResource >= 140 &&
                 TargetUtil.AnyMobsInRange(zombieChargerRange) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_ZombieCharger))
             {
@@ -256,14 +276,15 @@ namespace Trinity
 
             // Fire Bats:Cloud of bats 
             if (!UseOOCBuff && !IsCurrentlyAvoiding && hasCloudOfBats &&
+                TargetUtil.AnyMobsInRange(8f) &&
                 Hotbar.Contains(SNOPower.Witchdoctor_Firebats) && !Player.IsIncapacitated && Player.PrimaryResource >= fireBatsMana)
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Firebats, 5f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_Firebats, Settings.Combat.WitchDoctor.FirebatsRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
             }
 
             // Fire Bats fast-attack
             if (!UseOOCBuff && !Player.IsIncapacitated && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Firebats) && Player.PrimaryResource >= fireBatsMana &&
-                 TargetUtil.AnyMobsInRange(Settings.Combat.WitchDoctor.FirebatsRange))
+                 TargetUtil.AnyMobsInRange(Settings.Combat.WitchDoctor.FirebatsRange) && !hasCloudOfBats)
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Firebats, Settings.Combat.WitchDoctor.FirebatsRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
             }
@@ -281,6 +302,13 @@ namespace Trinity
                     bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 30f);
 
                 return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, acidCloudRange, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+            }
+
+            // Zombie Charger backup
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && !Player.IsIncapacitated && Player.PrimaryResource >= 140 &&
+                PowerManager.CanCast(SNOPower.Witchdoctor_ZombieCharger))
+            {
+                return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, zombieChargerRange, CurrentTarget.Position, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
 
             // Spirit Barrage

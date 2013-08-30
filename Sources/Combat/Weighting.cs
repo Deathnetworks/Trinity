@@ -446,11 +446,11 @@ namespace Trinity
                                     Player.PrimaryResourcePct <= 0.15 &&
                                     ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast);
 
-                                if ((Player.CurrentHealthPct >= 1 || !Settings.Combat.Misc.CollectHealthGlobe) && ObjectCache.Any(p => p.Type == GObjectType.Player && p.HitPointsPct < 1))
+                                if ((Player.CurrentHealthPct >= 1 || !Settings.Combat.Misc.CollectHealthGlobe))
                                 {
                                     cacheObject.Weight = 0;
                                 }
-                                // Give all globes super low weight (so never gone-to), unless we have low health, then go for them
+                                // Give all globes super low weight if we don't urgently need them, but are not 100% health
                                 else if (!witchDoctorManaLow && (Player.CurrentHealthPct > PlayerEmergencyHealthGlobeLimit))
                                 {
                                     var myHealth = Player.CurrentHealthPct;

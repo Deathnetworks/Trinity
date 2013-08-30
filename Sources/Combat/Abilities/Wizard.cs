@@ -235,7 +235,7 @@ namespace Trinity
 
                 // Frost Nova for Critical Mass builds
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_FrostNova) && !Player.IsIncapacitated &&
-                    hasCriticalMass && TargetUtil.AnyMobsInRange(20, 1) && PowerManager.CanCast(SNOPower.Wizard_FrostNova))
+                    !hasDeepFreeze && hasCriticalMass && TargetUtil.AnyMobsInRange(10, 2) && PowerManager.CanCast(SNOPower.Wizard_FrostNova))
                 {
                     return new TrinityPower(SNOPower.Wizard_FrostNova, 10f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
                 }
