@@ -362,7 +362,7 @@ namespace Trinity
                 // Reset the counters for player-owned things
                 iPlayerOwnedMysticAlly = 0;
                 iPlayerOwnedGargantuan = 0;
-                iPlayerOwnedZombieDog = 0;
+                PlayerOwnedZombieDog = 0;
                 iPlayerOwnedDHPets = 0;
                 // Reset the counters for monsters at various ranges
                 ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -454,6 +454,10 @@ namespace Trinity
                                 t1.Stop();
 
                             double duration = t1.Elapsed.TotalMilliseconds;
+
+                            // don't log stuff we never care about
+                            if (duration <= 1 && c_IgnoreSubStep == "IgnoreNames")
+                                continue;
 
                             if ((Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && duration > 1 || !Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance)))
                             {

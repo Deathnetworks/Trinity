@@ -45,38 +45,41 @@ namespace Trinity
         /// </summary>
         public void OnPulse()
         {
-            try
+            using (new PerformanceLogger("OnPulse"))
             {
-                if (ZetaDia.Me == null)
-                    return;
-
-                GameUI.SafeClickUIButtons();
-                
-                if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
-                    return;
-
-                // hax for sending notifications after a town run
-                if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !Player.IsInTown)
+                try
                 {
-                    TownRun.SendEmailNotification();
-                    TownRun.SendMobileNotifications();
-                }
+                    if (ZetaDia.Me == null)
+                        return;
 
-                // See if we should update the stats file
-                if (DateTime.Now.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
+                    GameUI.SafeClickUIButtons();
+
+                    if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
+                        return;
+
+                    // hax for sending notifications after a town run
+                    if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !Player.IsInTown)
+                    {
+                        TownRun.SendEmailNotification();
+                        TownRun.SendMobileNotifications();
+                    }
+
+                    // See if we should update the stats file
+                    if (DateTime.Now.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
+                    {
+                        ItemStatsLastPostedReport = DateTime.Now;
+                        OutputReport();
+                    }
+
+                    // Recording of all the XML's in use this run
+                    UsedProfileManager.RecordProfile();
+
+                    Monk_MaintainTempestRush();
+                }
+                catch (Exception ex)
                 {
-                    ItemStatsLastPostedReport = DateTime.Now;
-                    OutputReport();
+                    Logger.Log(LogCategory.UserInformation, "Exception in Pulse: {0}", ex.ToString());
                 }
-
-                // Recording of all the XML's in use this run
-                UsedProfileManager.RecordProfile();
-
-                Monk_MaintainTempestRush();
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(LogCategory.UserInformation, "Exception in Pulse: {0}", ex.ToString());
             }
         }
 
@@ -85,6 +88,8 @@ namespace Trinity
         /// </summary>
         public void OnEnabled()
         {
+            DateTime date_onEnabledStart = DateTime.Now;
+
             BotMain.OnStart += TrinityBotStart;
             BotMain.OnStop += TrinityBotStop;
 
@@ -150,6 +155,8 @@ namespace Trinity
                 // reseting stash rules
                 StashRule.reset();
             }
+
+            Logger.LogDebug("OnEnable took {0}ms", DateTime.Now.Subtract(date_onEnabledStart).TotalMilliseconds);
         }
 
         /// <summary>
@@ -230,25 +237,29 @@ namespace Trinity
 
         internal static void SetWindowTitle(string profileName = "")
         {
-            string battleTagName = "";
-            try
+            if (ZetaDia.Service.IsValid && ZetaDia.Service.Platform.IsValid && ZetaDia.Service.Platform.IsConnected)
             {
-                battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
-            }
-            catch { }
 
-            string windowTitle = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
+                string battleTagName = "";
+                try
+                {
+                    battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
+                }
+                catch { }
 
-            if (profileName.Trim() != String.Empty)
-            {
-                windowTitle += " - " + profileName;
+                string windowTitle = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
+
+                if (profileName.Trim() != String.Empty)
+                {
+                    windowTitle += " - " + profileName;
+                }
+
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    Window mainWindow = Application.Current.MainWindow;
+                    mainWindow.Title = windowTitle;
+                }));
             }
-           
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                Window mainWindow = Application.Current.MainWindow;
-                mainWindow.Title = windowTitle;
-            }));
         }
 
     }

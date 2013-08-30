@@ -136,7 +136,26 @@ namespace Trinity
                             hashRGUIDBlacklist3.Add(c_RActorGuid);
                             AddToCache = false;
                             c_IgnoreSubStep = "Door is Open or Opening";
+                            return AddToCache;
                         }
+
+                        try
+                        {
+                            int gizmoState = c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
+                            if (gizmoState == 1)
+                            {
+                                AddToCache = false;
+                                c_IgnoreSubStep = "GizmoState=1";
+                                return AddToCache;
+                            }
+                        }
+                        catch
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "GizmoStateException";
+                            return AddToCache;
+                        }
+
                         if (AddToCache)
                         {
                             try
@@ -211,24 +230,41 @@ namespace Trinity
                         }
 
                         // Already used, blacklist it and don't look at it again
+                        //try
+                        //{
+                        //    int gizmoUsedAttrib = ((GizmoShrine)c_diaObject).CommonData.GetAttribute<int>(ActorAttributeType.GizmoHasBeenOperated);
+                        //    int gizmoOperatorAcdId = ((GizmoShrine)c_diaObject).CommonData.GetAttribute<int>(ActorAttributeType.GizmoOperatorACDID);
+
+                        //    gizmoUsed = (gizmoUsedAttrib >= 1 || gizmoOperatorAcdId > 0);
+                        //}
+                        //catch
+                        //{
+                        //    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                        //    c_IgnoreSubStep = "ShrineOperatedException";
+                        //    AddToCache = false;
+                        //}
+                        //if (gizmoUsed)
+                        //{
+                        //    // It's already open!
+                        //    c_IgnoreSubStep = "GizmoHasBeenOperated";
+                        //    AddToCache = false;
+                        //    return AddToCache;
+                        //}
+
                         try
                         {
-                            int gizmoUsedAttrib = ((GizmoShrine)c_diaObject).CommonData.GetAttribute<int>(ActorAttributeType.GizmoHasBeenOperated);
-                            int gizmoOperatorAcdId = ((GizmoShrine)c_diaObject).CommonData.GetAttribute<int>(ActorAttributeType.GizmoOperatorACDID);
-
-                            gizmoUsed = (gizmoUsedAttrib >= 1 || gizmoOperatorAcdId > 0);
+                            int gizmoState = c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
+                            if (gizmoState == 1)
+                            {
+                                AddToCache = false;
+                                c_IgnoreSubStep = "GizmoState=1";
+                                return AddToCache;
+                            }
                         }
                         catch
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
-                            c_IgnoreSubStep = "ShrineOperatedException";
                             AddToCache = false;
-                        }
-                        if (gizmoUsed)
-                        {
-                            // It's already open!
-                            c_IgnoreSubStep = "GizmoHasBeenOperated";
-                            AddToCache = false;
+                            c_IgnoreSubStep = "GizmoStateException";
                             return AddToCache;
                         }
 

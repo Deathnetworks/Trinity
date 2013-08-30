@@ -163,7 +163,7 @@ namespace Trinity
         // A count for player mystic ally, gargantuans, and zombie dogs
         private static int iPlayerOwnedMysticAlly = 0;
         public static int iPlayerOwnedGargantuan = 0;
-        public static int iPlayerOwnedZombieDog = 0;
+        public static int PlayerOwnedZombieDog = 0;
         private static int iPlayerOwnedDHPets = 0;
 
         // These are a bunch of safety counters for how many times in a row we register having *NO* ability to select when we need one (eg all off cooldown)

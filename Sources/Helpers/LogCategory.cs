@@ -26,5 +26,6 @@ namespace Trinity.Technicals
         GlobalHandler = 2048,
         Navigator = 4096,
         Avoidance = 8192,
+        SpellTrack = 16384,
     }
 }

@@ -1171,7 +1171,7 @@ namespace Trinity
                     if (Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && DataDictionary.ZombieDogIds.Contains(c_ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
-                            iPlayerOwnedZombieDog++;
+                            PlayerOwnedZombieDog++;
                         AddToCache = false;
                     }
                 }

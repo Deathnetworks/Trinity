@@ -28,25 +28,32 @@ namespace Trinity
 
         internal static void TrackSpellOnUnit(int acdGuid, SNOPower power)
         {
-            float duration = 0;
-
-            if (CachedTrackedSpells.ContainsKey(power))
+            try
             {
-                HotbarSkills skill = HotbarSkills.AssignedSkills.FirstOrDefault(p => p.Power == power);
-                TrackedSpell spell = TrackedSpells.FirstOrDefault(s => s.Equals(new TrackedSpell(power, skill.RuneIndex)));
-                if (spell != null)
-                    duration = spell.Duration;
+                float duration = 0;
+
+                if (CachedTrackedSpells.ContainsKey(power))
+                {
+                    HotbarSkills skill = HotbarSkills.AssignedSkills.FirstOrDefault(p => p.Power == power);
+                    TrackedSpell spell = TrackedSpells.FirstOrDefault(s => s.Equals(new TrackedSpell(power, skill.RuneIndex)));
+                    if (spell != null)
+                        duration = spell.Duration;
+                }
+
+                if (duration > 0)
+                {
+                    Technicals.Logger.Log(Technicals.LogCategory.SpellTrack, "Tracking unit {0} with power {1} for duration {2:0.00}", acdGuid, power, duration);
+                    TrackSpellOnUnit(new SpellTracker()
+                       {
+                           ACDGuid = acdGuid,
+                           Power = power,
+                           Expiration = DateTime.Now.AddMilliseconds(duration)
+                       });
+                }
             }
-
-            if (duration > 0)
+            catch (Exception ex)
             {
-                //Technicals.Logger.LogNormal("Tracking unit {0} with power {1} for duration {2:0.00}", acdGuid, power, duration);
-                TrackSpellOnUnit(new SpellTracker()
-                   {
-                       ACDGuid = acdGuid,
-                       Power = power,
-                       Expiration = DateTime.Now.AddMilliseconds(duration)
-                   });
+                Technicals.Logger.LogNormal("Exception in TrackSpellOnUnit: {0}", ex.ToString());
             }
         }
 
@@ -92,20 +99,27 @@ namespace Trinity
         {
             while (true)
             {
-                if (TrackedUnits.Any())
+                try
                 {
-                    lock (TrackedUnits)
+                    Thread.Sleep(100);
+                    if (TrackedUnits.Any())
                     {
-                        //TrackedUnits.RemoveWhere(t => t.Expiration < DateTime.Now);
-                        var units = TrackedUnits.Where(t => t.Expiration < DateTime.Now);
-                        foreach (var unit in units.ToList())
+                        lock (TrackedUnits)
                         {
-                            //Technicals.Logger.LogNormal("Removing unit {0} from TrackedUnits ({1}, {2})", unit.ACDGuid, unit.Expiration.Ticks, DateTime.Now.Ticks);
-                            TrackedUnits.Remove(unit);
+                            //TrackedUnits.RemoveWhere(t => t.Expiration < DateTime.Now);
+                            var units = TrackedUnits.Where(t => t.Expiration < DateTime.Now);
+                            foreach (var unit in units.ToList())
+                            {
+                                //Technicals.Logger.LogNormal("Removing unit {0} from TrackedUnits ({1}, {2})", unit.ACDGuid, unit.Expiration.Ticks, DateTime.Now.Ticks);
+                                TrackedUnits.Remove(unit);
+                            }
                         }
                     }
                 }
-                Thread.Sleep(100);
+                catch (Exception ex)
+                {
+                    Technicals.Logger.LogNormal("Exception in SpellTracker Maintenance: {0}", ex.ToString());
+                }
             }
         }
         #endregion
@@ -199,7 +213,7 @@ namespace Trinity
 
             public bool Equals(TrackedSpell other)
             {
-                return this.Power == other.Power && this.RuneIndex == other.RuneIndex;
+                return this.Power == other.Power && (this.RuneIndex == other.RuneIndex || this.RuneIndex == -999 || other.RuneIndex == -999);
             }
         }
     }

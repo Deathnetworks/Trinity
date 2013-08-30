@@ -671,6 +671,8 @@ namespace Trinity
             Logger.LogNormal("Found {0} TVars", Data.Count);
             foreach (KeyValuePair<string, TVar> item in Data)
             {
+                if (item.Value.DefaultValue == item.Value.Value)
+                    continue;
                 Logger.LogNormal(item.Value.ToString());
             }
             Logger.LogNormal("\n");

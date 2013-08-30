@@ -89,9 +89,9 @@ namespace Trinity
             }
 
             // Zombie Dogs non-sacrifice build
-            if (!IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && !Player.IsIncapacitated &&
+            if (!IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && !Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) && !Player.IsIncapacitated &&
                 Player.PrimaryResource >= 49 && (ElitesWithinRange[RANGE_20] >= 2 || AnythingWithinRange[RANGE_20] >= 5 ||
-                 (CurrentTarget != null && ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 30f)) || iPlayerOwnedZombieDog <= 2) &&
+                 (CurrentTarget != null && ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 30f)) || PlayerOwnedZombieDog <= 2) &&
                 !Settings.Combat.WitchDoctor.ZeroDogs &&
                  PowerManager.CanCast(SNOPower.Witchdoctor_SummonZombieDog))
             {
@@ -99,25 +99,27 @@ namespace Trinity
             }
 
             // Zombie Dogs for Sacrifice
-            if (Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) &&
+            if (Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) &&
                 Player.PrimaryResource >= 49 &&
-                (LastPowerUsed == SNOPower.Witchdoctor_Sacrifice || iPlayerOwnedZombieDog <= 2) &&
-                TimeSinceUse(SNOPower.Witchdoctor_SummonZombieDog) > 1000 &&
-                Settings.Combat.WitchDoctor.ZeroDogs &&
+                (LastPowerUsed == SNOPower.Witchdoctor_Sacrifice || PlayerOwnedZombieDog <= 2) &&
+                //((TimeSinceUse(SNOPower.Witchdoctor_SummonZombieDog) > 1000 && TimeSinceUse(SNOPower.Witchdoctor_Sacrifice) < 1000) || TimeSinceUse(SNOPower.Witchdoctor_SummonZombieDog) > 1800) &&
+                CombatBase.LastPowerUsed != SNOPower.Witchdoctor_SummonZombieDog &&
+                //Settings.Combat.WitchDoctor.ZeroDogs &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_SummonZombieDog))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_SummonZombieDog, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
             }
 
             // Hex with angry chicken, check if we want to shape shift and explode
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_Hex) && hasAngryChicken && PowerManager.CanCast(SNOPower.Witchdoctor_Hex) && Player.PrimaryResource >= 49)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && (TargetUtil.AnyMobsInRange(12f, 1, false) || CurrentTarget.RadiusDistance <= 10f) && 
+                CombatBase.CanCast(SNOPower.Witchdoctor_Hex) && hasAngryChicken && Player.PrimaryResource >= 49)
             {
                 ShouldRefreshHotbarAbilities = true;
                 return new TrinityPower(SNOPower.Witchdoctor_Hex, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
             }
 
             // Hex Spam Cast without angry chicken
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_Hex) && !Player.IsIncapacitated && Player.PrimaryResource >= 49 && !hasAngryChicken &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Hex) && !Player.IsIncapacitated && Player.PrimaryResource >= 49 && !hasAngryChicken &&
                (TargetUtil.AnyElitesInRange(12) || TargetUtil.AnyMobsInRange(12, 2) || TargetUtil.IsEliteTargetInRange(18f)) && PowerManager.CanCast(SNOPower.Witchdoctor_Hex))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Hex, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
@@ -242,7 +244,7 @@ namespace Trinity
             }
 
             // Wall of Zombies
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_WallOfZombies) && !Player.IsIncapacitated &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Witchdoctor_WallOfZombies) && !Player.IsIncapacitated &&
                 (ElitesWithinRange[RANGE_15] > 0 || AnythingWithinRange[RANGE_15] > 3 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 25f)) &&
                 Player.PrimaryResource >= 103 && PowerManager.CanCast(SNOPower.Witchdoctor_WallOfZombies))
             {
@@ -252,7 +254,7 @@ namespace Trinity
             var zombieChargerRange = hasGraveInjustice ? Math.Min(Player.GoldPickupRadius + 8f, 11f) : 11f;
 
             // Zombie Charger aka Zombie bears Spams Bears @ Everything from 11feet away
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && !Player.IsIncapacitated && Player.PrimaryResource >= 140 &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 140 &&
                 TargetUtil.AnyMobsInRange(zombieChargerRange) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_ZombieCharger))
             {
@@ -275,8 +277,7 @@ namespace Trinity
             int fireBatsMana = TimeSinceUse(SNOPower.Witchdoctor_Firebats) < 125 ? 66 : 220;
 
             // Fire Bats:Cloud of bats 
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && hasCloudOfBats &&
-                TargetUtil.AnyMobsInRange(8f) &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && hasCloudOfBats && TargetUtil.AnyMobsInRange(8f) &&
                 Hotbar.Contains(SNOPower.Witchdoctor_Firebats) && !Player.IsIncapacitated && Player.PrimaryResource >= fireBatsMana)
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Firebats, Settings.Combat.WitchDoctor.FirebatsRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
@@ -305,7 +306,7 @@ namespace Trinity
             }
 
             // Zombie Charger backup
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && !Player.IsIncapacitated && Player.PrimaryResource >= 140 &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && !Player.IsIncapacitated && Player.PrimaryResource >= 140 &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_ZombieCharger))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, zombieChargerRange, CurrentTarget.Position, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);

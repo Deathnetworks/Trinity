@@ -6,7 +6,7 @@
     <ProjectGuid>{997F24E1-4CD7-42C7-A5B5-4983636D5F2B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
-    <AssemblyName>GilesTrinity</AssemblyName>
+    <AssemblyName>Trinity</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -81,13 +81,6 @@
     <Compile Include="Helpers\ObservableDictionary.cs" />
     <Compile Include="Helpers\PluginCheck.cs" />
     <Compile Include="Items\ItemEvents.cs" />
-    <Compile Include="Cache\CacheAvoidance.cs" />
-    <Compile Include="Cache\CacheGizmo.cs" />
-    <Compile Include="Cache\CacheItem.cs" />
-    <Compile Include="Cache\CacheManager.cs" />
-    <Compile Include="Cache\CacheObject.cs" />
-    <Compile Include="Cache\CacheRefresher.cs" />
-    <Compile Include="Cache\CacheUnit.cs" />
     <Compile Include="Cache\CacheUtils.cs" />
     <Compile Include="Cache\GenericBlacklist.cs" />
     <Compile Include="Cache\GenericCache.cs" />

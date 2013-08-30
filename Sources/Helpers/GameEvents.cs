@@ -29,6 +29,8 @@ namespace Trinity
         /// <param name="bot"></param>
         private static void TrinityBotStart(IBot bot)
         {
+            DateTime time_botStart = DateTime.Now;
+
             V.ValidateLoad();
 
             // Recording of all the XML's in use this run
@@ -84,6 +86,8 @@ namespace Trinity
 
             Navigator.SearchGridProvider.Update();
 
+            Logger.LogDebug("Trinity OnEnable took {0}ms", DateTime.Now.Subtract(time_botStart).TotalMilliseconds);
+
         }
 
         void GameEvents_OnGameChanged(object sender, EventArgs e)
@@ -114,15 +118,6 @@ namespace Trinity
             dictRandomID = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;
             iDeathsThisRun = 0;
-            try
-            {
-                CacheManager.Destroy();
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Error Destroying CacheManager");
-                Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "{0}\n{1}", ex.Message, ex.StackTrace);
-            }
         }
         
         private void TrinityOnDeath(object src, EventArgs mea)
