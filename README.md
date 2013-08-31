@@ -7,26 +7,23 @@
 
 * Barbarian: Fixed Threating Shout so it casts as expected in combat
 
-* Barbarian: Fixed HOTA - using CanCast check
-
-* Barbarian: Added Treasure Goblins as 'elites' to HOTA check
+* Barbarian: Added Treasure Goblins as 'elites' to HOTA check (for HOTA/WW builds)
 
 * Barbarian: Fixed derp Whirlwind TVar name bug
 
 * Small tweaks to Barbarian Combat spell checks to make sure we can cast them
 
-* Barbarian: Added logic to Elite/HOTA when Ignoring Elites (will now use on stacked and "large" monsters)
+* Barbarian: Added logic to Elite/HOTA when Ignoring Elites (will now use on stacked and "large" monsters, for HOTA/WW builds)
 
-* Barbarian: Added slight delay for Sprint when dumping fury
+* Barbarian: Added slight delay for Sprint when dumping fury, fixes "fury dump stuck"
 
 * Barbarian: Added Min Health setting for HOTA when using with Whirlwind
 
-* Barbarian: Added Bash to 3 Stacks (Punish Rune)
+* Barbarian: Added Support for Bash: Punish rune
 
 * Barbarian: Fixed IgnoreElites randomly triggering WOTB
 
-* Barbarian: Added check for EliteRareUnique when checking for "Hard" monster affixes
-
+* Barbarian: Added check for EliteRareUnique when checking for "Hard" monster affixes for WOTB
 
 #### Witch Doctor
 
@@ -36,19 +33,17 @@
 
 * WitchDoctor: Added rune support to horrify
 
-* Tweak for WitchDoctor Hex: Angry chicken. IsHidden attribute doesn't seem to work anymore...
-
 #### Wizard
 
 * Wizard: Fixed Cancel and rebuff Archon with Magic Weapon / Familiar
 
 #### General
 
-* Added Combat GUI option/setting to Ignore Elites when we have 5 NV Stacks
+* Added Combat logic and GUI option to Ignore Elites when we have 5 NV Stacks
 
 * Added Carguy's Pushover.net notifications
 
-* Trinity should now instantly click Conversation buttons, and Boss 'Accept' button
+* Trinity should now instantly click Conversation buttons, and Boss portal 'Accept' button
 
 * Added Global configuration file option under Advanced tab - will force all bots running under a shared Demonbuddy to use the same configuration file.
 
