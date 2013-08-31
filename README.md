@@ -1,6 +1,101 @@
 ﻿
 # Trinity
 
+### Changelog 1.7.3.4
+
+#### Barbarian
+
+* Barbarian: Fixed Threating Shout so it casts as expected in combat
+
+* Barbarian: Fixed HOTA - using CanCast check
+
+* Barbarian: Added Treasure Goblins as 'elites' to HOTA check
+
+* Barbarian: Fixed derp Whirlwind TVar name bug
+
+* Small tweaks to Barbarian Combat spell checks to make sure we can cast them
+
+* Barbarian: Added logic to Elite/HOTA when Ignoring Elites (will now use on stacked and "large" monsters)
+
+* Barbarian: Added slight delay for Sprint when dumping fury
+
+* Barbarian: Added Min Health setting for HOTA when using with Whirlwind
+
+* Barbarian: Added Bash to 3 Stacks (Punish Rune)
+
+* Barbarian: Fixed IgnoreElites randomly triggering WOTB
+
+* Barbarian: Added check for EliteRareUnique when checking for "Hard" monster affixes
+
+
+#### Witch Doctor
+
+* WitchDoctor: Optimized/updated 0dogs a bit
+
+* WitchDoctor: Hex: Angry Chicken works again
+
+* WitchDoctor: Added rune support to horrify
+
+* Tweak for WitchDoctor Hex: Angry chicken. IsHidden attribute doesn't seem to work anymore...
+
+#### Wizard
+
+* Wizard: Fixed Cancel and rebuff Archon with Magic Weapon / Familiar
+
+#### General
+
+* Added Combat GUI option/setting to Ignore Elites when we have 5 NV Stacks
+
+* Added Carguy's Pushover.net notifications
+
+* Trinity should now instantly click Conversation buttons, and Boss 'Accept' button
+
+* Added Global configuration file option under Advanced tab - will force all bots running under a shared Demonbuddy to use the same configuration file.
+
+* Removed "has been primary target" check for trash mob ignore
+
+* Removed avoidance count check for ignoring trash mobs
+
+* Finally fixed re-using old shrines (GizmoState Attribute)
+
+* Refactored Health Globes a little for smarter weighting
+
+* Health Globes now have weight even when current health is less than "emergency health globe" health.
+
+* Health Globes given more weight when players in party are low on health.
+
+* Updated UI Combat.Misc.AllowOOCMovement checkbox label
+
+* Fixed combat and avoidance for Belial and Azmodan
+
+* Fixed a few Quests in Act 1 where bot was ignoring hostile quest NPC's
+
+* Tweaked "Champion Hunting" Item pickup defaults: Now uses "Hard" item rules, no gems, no junk yellows, 1500 gold stack minimum
+
+
+#### Technical
+
+* Added Pre-Townrun max distance check
+
+* Fixed crash condition for Generic Cache manager
+
+* Added TVar's for low priority health globes
+
+* Added TVar invalid key logging to detect bugs
+
+* Added IsDead check to TownRun to avoid noisy logs
+
+* Added buff logging
+
+* Added hotbar logging
+
+* Added SpellHistory class, so we can track every spell used and when
+
+* Added StraightLinePathing LevelAreaId's (fix for Belial navigation)
+
+* Added QuestLevelAreaId's HashSet and logic for better questing support - disables ignoring trash mobs in these LevelAreaId's
+
+
 ### Changelog 1.7.3.3
 
 * Added SpellTracker class - this can be used to track timed spells (like DoT's) without having to use DOTDPS Actor Attribute. This as added as the WitchDoctor
