@@ -57,8 +57,8 @@ namespace Trinity
         {
             // Arcane        Arcane 2      Desecrator   Poison Tree    Molten Core   Molten Core 2   Molten Trail   Plague Cloud   Ice Balls
             219702,          221225,       84608,       5482,6578,     4803, 4804,   224225, 247987, 95868,         108869,        402, 223675,
-            // Bees-Wasps    Plague-Hands  Azmo Pools   Azmo fireball  Azmo bodies   Belial 1       Belial 2    Belial 3
-            5212,            3865,         123124,      123842,        123839,       161822,        161833,     60108,
+            // Bees-Wasps    Plague-Hands  Azmo Pools   Azmo fireball  Azmo bodies   Belial 1       Belial 2    
+            5212,            3865,         123124,      123842,        123839,       161822,        161833,     
             // Sha-Ball      Mol Ball      Mage Fire    Diablo Prison  Diablo Meteor Ice-trail
             4103,            160154,       432,         168031,        214845,       260377,
             // Zolt Bubble	 Zolt Twister  Ghom Gas 	Maghda Proj

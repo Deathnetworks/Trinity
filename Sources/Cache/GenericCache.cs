@@ -136,10 +136,11 @@ namespace Trinity
 
         private static void Manage()
         {
-            try
+            while (true)
             {
-                while (true)
+                try
                 {
+
                     long NowTicks = DateTime.Now.Ticks;
 
                     lock (_Synchronizer)
@@ -156,11 +157,11 @@ namespace Trinity
 
                     Thread.Sleep(100);
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Exception in Generic Cache Manager");
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, ex.ToString());
+                catch (Exception ex)
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Exception in Generic Cache Manager");
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, ex.ToString());
+                }
             }
         }
 
