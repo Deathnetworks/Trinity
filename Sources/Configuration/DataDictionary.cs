@@ -12,6 +12,13 @@ namespace Trinity
     /// </summary>
     internal class DataDictionary
     {
+
+        public static HashSet<int> ForceTownPortalLevelAreaIds { get { return DataDictionary.forceTownPortalLevelAreaIds; } }
+        private static readonly HashSet<int> forceTownPortalLevelAreaIds = new HashSet<int>
+        {
+            55313, // Act 2 Caldeum Bazaar
+        };
+
         /// <summary>
         /// Contains the list of Boss Level Area ID's
         /// </summary>

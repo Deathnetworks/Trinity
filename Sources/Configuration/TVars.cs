@@ -260,10 +260,18 @@ namespace Trinity
             // Global
             Set(new TVar("Combat.DefaultTickPreDelay", 1, "Default Combat Power Pre-use Delay (in ticks)"));
             Set(new TVar("Combat.DefaultTickPostDelay", 1, "Default Combat Power Post-use Delay (in ticks)"));
-            Set(new TVar("Cache.PretownRun.MaxDistance", 1500, "Default PreTownrun max distance"));
 
             Set(new TVar("Weight.Globe.MinPlayerHealthPct", 0.90d, "Minimum player health before health globes considered (does not effect emergency health globe)"));
             Set(new TVar("Weight.Globe.MinPartyHealthPct", 0.90d, "Minimum party player health befefore globes considered (party mode only)"));
+
+            // Cache
+            Set(new TVar("Cache.PretownRun.MaxDistance", 1500, "Default PreTownrun max distance"));
+            Set(new TVar("Cache.TownPortal.KillRange", 60f, "Forced maximum distance for clearing the area before using a Town Portal"));
+            
+
+            // XmlTags
+            Set(new TVar("XmlTag.TrinityTownPortal.DefaultWaitTime", 2500, "Time in Milliseconds to set the default wait time for TrinityTownPortal (may be overriden by Profile tags)"));
+            Set(new TVar("XmlTag.TrinityTownPortal.ForceWaitTime", -1, "If not -1, Force set the Time in Milliseconds to clear the area for TrinityTownPortal"));
 
             batch = false;
         }

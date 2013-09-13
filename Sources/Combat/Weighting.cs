@@ -30,7 +30,7 @@ namespace Trinity
                 bool noGoblinsPresent = (!AnyTreasureGoblinsPresent && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize) || Settings.Combat.Misc.GoblinPriority < GoblinPriority.Prioritize;
 
                 // Store if we are ignoring all units this cycle or not
-                bool ignoreAllUnits = !AnyElitesPresent && !AnyMobsInRange && noGoblinsPresent && Player.CurrentHealthPct >= 0.85d;
+                bool ignoreAllUnits = !XmlTags.TrinityTownPortal.ForceClearArea && !AnyElitesPresent && !AnyMobsInRange && noGoblinsPresent && Player.CurrentHealthPct >= 0.85d;
 
                 bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || MovementSpeed < 1 || ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 5f) >= 3);
 
@@ -44,7 +44,7 @@ namespace Trinity
                 if (ProfileManager.CurrentProfileBehavior != null)
                 {
                     Type behaviorType = ProfileManager.CurrentProfileBehavior.GetType();
-                    if (behaviorType == typeof(WaitTimerTag) || behaviorType == typeof(UseTownPortalTag) || behaviorType == typeof(XmlTags.TrinityTownRun))
+                    if (behaviorType == typeof(WaitTimerTag) || behaviorType == typeof(UseTownPortalTag) || behaviorType == typeof(XmlTags.TrinityTownRun) || behaviorType == typeof(XmlTags.TrinityTownPortal))
                     {
                         profileTagCheck = true;
                     }
@@ -52,6 +52,7 @@ namespace Trinity
 
                 bool ShouldIgnoreTrashMobs =
                     (!DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
+                    !XmlTags.TrinityTownPortal.ForceClearArea &&
                     !TownRun.IsTryingToTownPortal() &&
                     !profileTagCheck &&
                     !prioritizeCloseRangeUnits &&
@@ -65,6 +66,7 @@ namespace Trinity
                 bool ShouldIgnoreElites =
                     !DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
                      !profileTagCheck &&
+                     !XmlTags.TrinityTownPortal.ForceClearArea &&
                      !TownRun.IsTryingToTownPortal() &&
                     CombatBase.IgnoringElites;
 
@@ -501,7 +503,7 @@ namespace Trinity
                                         cacheObject.Weight = 0;
                                     if (AvoidanceObstacleCache.Any(m => m.Location.Distance(cacheObject.Position) < PlayerKiteDistance))
                                         cacheObject.Weight = 0;
-                                } 
+                                }
                                 break;
                             }
                         case GObjectType.HealthWell:

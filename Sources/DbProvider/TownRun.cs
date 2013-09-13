@@ -89,7 +89,7 @@ namespace Trinity
             }
             if (!ZetaDia.Me.IsInTown && !BrainBehavior.IsVendoring && WasVendoring)
             {
-                
+
             }
         }
 
@@ -271,6 +271,9 @@ namespace Trinity
             if (TownRunCheckTimer.IsRunning)
                 result = true;
 
+            if (XmlTags.TrinityTownPortal.ForceClearArea)
+                result = true;
+
             ProfileBehavior CurrentProfileBehavior = null;
 
             try
@@ -286,7 +289,7 @@ namespace Trinity
             if (ProfileManager.CurrentProfileBehavior != null)
             {
                 Type profileBehaviortype = CurrentProfileBehavior.GetType();
-                if (profileBehaviortype != null && (profileBehaviortype == typeof(UseTownPortalTag) || profileBehaviortype == typeof(WaitTimerTag) || profileBehaviortype == typeof(XmlTags.TrinityTownRun)))
+                if (profileBehaviortype != null && (profileBehaviortype == typeof(UseTownPortalTag) || profileBehaviortype == typeof(WaitTimerTag) || profileBehaviortype == typeof(XmlTags.TrinityTownRun) || profileBehaviortype == typeof(XmlTags.TrinityTownPortal)))
                 {
                     result = true;
                 }

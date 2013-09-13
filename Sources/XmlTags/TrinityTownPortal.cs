@@ -1,0 +1,135 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using Trinity.Technicals;
+using Zeta;
+using Zeta.CommonBot;
+using Zeta.CommonBot.Profile;
+using Zeta.TreeSharp;
+using Zeta.XmlEngine;
+using Action = Zeta.TreeSharp.Action;
+
+namespace Trinity.XmlTags
+{
+    // TrinityTownRun forces a town-run request
+    [XmlElement("TrinityTownPortal")]
+    public class TrinityTownPortal : ProfileBehavior
+    {
+        public static int DefaultWaitTime = -1;
+
+        [XmlAttribute("waitTime")]
+        public static int WaitTime { get; set; }
+
+        public static Stopwatch AreaClearTimer = null;
+        public static bool ForceClearArea = false;
+
+        private double _StartHealth = -1;
+
+        private bool _IsDone = false;
+
+        public override bool IsDone
+        {
+            get { return _IsDone || !IsActiveQuestStep; }
+        }
+
+        public TrinityTownPortal()
+        {
+            AreaClearTimer = new Stopwatch();
+        }
+
+        public override void OnStart()
+        {
+            Logger.Log(LogCategory.ProfileTag, "TrinityTownPortal started - clearing area");
+            ForceClearArea = true;
+            AreaClearTimer.Start();
+            DefaultWaitTime = V.I("XmlTag.TrinityTownPortal.DefaultWaitTime");
+            int forceWaitTime = V.I("XmlTag.TrinityTownPortal.ForceWaitTime");
+            if (WaitTime <= 0 && forceWaitTime == -1)
+            {
+                WaitTime = DefaultWaitTime;
+            }
+            else
+            {
+                WaitTime = forceWaitTime;
+            }
+            _StartHealth = ZetaDia.Me.HitpointsCurrent;
+        }
+
+        protected override Composite CreateBehavior()
+        {
+            return new
+            PrioritySelector(
+                new Decorator(ret => ZetaDia.IsLoadingWorld,
+                    new Action()
+                ),
+                new Decorator(ret => ZetaDia.Me.IsInTown && !DataDictionary.ForceTownPortalLevelAreaIds.Contains(Trinity.Player.LevelAreaId),
+                    new Action(ret =>
+                    {
+                        ForceClearArea = false;
+                        AreaClearTimer.Reset();
+                        _IsDone = true;
+                        //Logger.Log("[TrinityTownPortal] In Town");
+                    })
+                ),
+                new Decorator(ret => !ZetaDia.Me.IsInTown && !ZetaDia.Me.CanUseTownPortal(),
+                    new Action(ret =>
+                    {
+                        ForceClearArea = false;
+                        AreaClearTimer.Reset();
+                        _IsDone = true;
+                        //Logger.Log("[TrinityTownPortal] Unable to use TownPortal!");
+                    })
+                ),
+                new Decorator(ret => ZetaDia.Me.HitpointsCurrent < _StartHealth,
+                    new Action(ret =>
+                    {
+                        _StartHealth = ZetaDia.Me.HitpointsCurrent;
+                        AreaClearTimer.Restart();
+                        ForceClearArea = true;
+                    })
+                ),
+                new Decorator(ret => AreaClearTimer.IsRunning,
+                    new PrioritySelector(
+                        new Decorator(ret => AreaClearTimer.ElapsedMilliseconds <= WaitTime,
+                            new Action(ret => ForceClearArea = true) // returns RunStatus.Success
+                        ),
+                        new Decorator(ret => AreaClearTimer.ElapsedMilliseconds > WaitTime,
+                            new Action(ret =>
+                            {
+                                Logger.Log(LogCategory.ProfileTag, "TownRun timer finished");
+                                ForceClearArea = false;
+                                AreaClearTimer.Reset();
+                            })
+                        )
+                    )
+                ),
+                new Decorator(ret => !ForceClearArea,
+                    new PrioritySelector(
+                        new Decorator(ret => ZetaDia.Me.Movement.IsMoving,
+                            Zeta.CommonBot.CommonBehaviors.MoveStop()
+                        ),
+                        new Sequence(
+                            // Already casting, just wait
+                            new DecoratorContinue(ret => ZetaDia.Me.LoopingAnimationEndTime > 0,
+                                new Action()
+                            ),
+                            new Action(ret => 
+                            {
+                                GameEvents.FireWorldTransferStart();
+                                ZetaDia.Me.UseTownPortal();
+                            })
+                        )
+                    )
+                )
+            );
+        }
+
+        public override void ResetCachedDone()
+        {
+            _IsDone = false;
+            base.ResetCachedDone();
+        }
+    }
+}

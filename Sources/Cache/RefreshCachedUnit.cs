@@ -409,7 +409,7 @@ namespace Trinity
             // Safety for TownRun and UseTownPortalTag
             if (TownRun.IsTryingToTownPortal())
             {
-                if (killRange <= 90) killRange = 90;
+                if (killRange <= V.F("Cache.TownPortal.KillRange")) killRange = V.F("Cache.TownPortal.KillRange");
             }
             return killRange;
         }
