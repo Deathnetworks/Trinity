@@ -150,7 +150,7 @@ namespace Trinity
             bool writeHeader = !File.Exists(droppedItemLogPath);
             using (StreamWriter LogWriter = new StreamWriter(droppedItemLogPath, true))
             {
-                if (writeHeader)
+                if (writeHeader) 
                 {
                     LogWriter.WriteLine("Timestamp,ActorSNO,RActorGUID,DyanmicID,GameBalanceID,ACDGuid,Name,InternalName,DBBaseType,TBaseType,DBItemType,TItemType,Quality,Level,IgnoreItemSubStep,Distance,Pickup,SHA1Hash");
                 }
