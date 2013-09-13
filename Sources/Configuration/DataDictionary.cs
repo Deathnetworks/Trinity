@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
@@ -48,6 +49,16 @@ namespace Trinity
             // Butcher Floor Panels
             201454, 201464, 201426, 201438, 200969, 201423, 201242,
         };
+
+        /// <summary>
+        /// This list is used for Units with specific Animations we want to treat as avoidance
+        /// </summary>
+        public static HashSet<DoubleInt> AvoidanceAnimations { get { return DataDictionary.avoidanceAnimations; } }
+        private static HashSet<DoubleInt> avoidanceAnimations = new HashSet<DoubleInt>
+        {
+           new DoubleInt(3847, (int)SNOAnim.Stitch_Suicide_Bomb), // Corpulent_A: Stitch_Suicide_Bomb
+       };
+
 
         /// <summary>
         /// A list of all the SNO's to avoid - you could add
@@ -300,6 +311,7 @@ namespace Trinity
             {2972, 10}, {80357, 16}, {116508, 10}, {113932, 8}, {197514, 18}, {108587, 8}, {108618, 8}, {108612, 8}, {116409, 18}, {121586, 22},
             {195101, 10}, {195108, 25}, {170657, 5}, {181228, 10}, {211959, 25}, {210418, 25}, {174496, 4}, {193963, 5}, {159066, 12}, {160570, 12},
             {55325, 5}, {5718, 14}, {5909, 10}, {5792, 8}, {108194, 8}, {129031, 30}, {192867, 3.5f}, {155255, 8}, {54530, 6}, {157541, 6},
+            {93306, 10},
          };
 
         /// <summary>
@@ -307,7 +319,7 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> DestroyAtLocationIds { get { return destroyAtLocationIds; } }
         private static HashSet<int> destroyAtLocationIds = new HashSet<int> {
-            170657, 116409, 121586, 155255, 104596,
+            170657, 116409, 121586, 155255, 104596, 93306,
          };
 
         /// <summary>
@@ -377,7 +389,7 @@ namespace Trinity
             //bone pile
             218951,245838,
             // rrrix act 1
-            108882, 245919, 5944, 165475, 199998, 168875, 105323, 85690, 105321, 108266,
+            108882, 245919, 5944, 165475, 199998, 168875, 105323, 85690, 105321, 108266, 89578,
             // rrrix act 2
             213907, 92519, 61544, 105681, 113983, 114527, 114642, 139933, 144405, 156890, 164057, 164195, 180254, 180802, 180809, 181173, 181174, 181177, 181181,
             181182, 181185, 181290, 181292, 181306, 181309, 181313, 181326, 181563, 181857, 181858, 187265, 191433, 191462, 191641, 192880, 192881, 196413, 196435,

@@ -642,7 +642,7 @@ namespace Trinity.Helpers
 
         #region KeyedDictionaryEntryCollection<TKey>
 
-        protected class KeyedDictionaryEntryCollection<TKey> : KeyedCollection<TKey, DictionaryEntry>
+        protected class KeyedDictionaryEntryCollection<TTKey> : KeyedCollection<TKey, DictionaryEntry>
         {
             #region constructors
 
@@ -678,7 +678,7 @@ namespace Trinity.Helpers
 
         #region Enumerator
 
-        public struct Enumerator<TKey, TValue> : IEnumerator<KeyValuePair<TKey, TValue>>, IDisposable, IDictionaryEnumerator, IEnumerator
+        public struct Enumerator<TTKey, TTValue> : IEnumerator<KeyValuePair<TKey, TValue>>, IDisposable, IDictionaryEnumerator, IEnumerator
         {
             #region constructors
 

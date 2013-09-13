@@ -361,11 +361,11 @@ namespace Trinity
                                 continue;
 
                             // if we're kiting, lets not actualy run through monsters
-                            if (Trinity.PlayerKiteDistance > 0 && Trinity.hashMonsterObstacleCache.Any(m => m.Location.Distance(zigZagPoint) <= Trinity.PlayerKiteDistance))
+                            if (Trinity.PlayerKiteDistance > 0 && Trinity.MonsterObstacleCache.Any(m => m.Location.Distance(zigZagPoint) <= Trinity.PlayerKiteDistance))
                                 continue;
 
                             // Ignore point if any AoE in this point position
-                            if (Trinity.hashAvoidanceObstacleCache.Any(m => m.Location.Distance(zigZagPoint) <= m.Radius && Player.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(m.ActorSNO, 1)))
+                            if (Trinity.AvoidanceObstacleCache.Any(m => m.Location.Distance(zigZagPoint) <= m.Radius && Player.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(m.ActorSNO, 1)))
                                 continue;
 
                             // Make sure this point is in LoS/walkable (not around corners or into a wall)
@@ -419,13 +419,13 @@ namespace Trinity
 
         internal static bool UnitInAoe(TrinityCacheObject u)
         {
-            return Trinity.hashAvoidanceObstacleCache.Any(a => 
+            return Trinity.AvoidanceObstacleCache.Any(a => 
                 MathUtil.IntersectsPath(a.Location, a.Radius, Player.Position, u.Position));
         }
 
         internal static bool PathToUnitIntersectsAoe(TrinityCacheObject u)
         {
-            return Trinity.hashAvoidanceObstacleCache.Any(a => 
+            return Trinity.AvoidanceObstacleCache.Any(a => 
                 Vector3.Distance(u.Position, a.Location) < AvoidanceManager.GetAvoidanceRadiusBySNO(a.ActorSNO, a.Radius) && 
                 Player.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(a.ActorSNO, 1));
         }

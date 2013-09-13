@@ -459,7 +459,7 @@ namespace Trinity
                             }
                         }
                         // Always add large destructibles within ultra close range
-                        if (!AddToCache && c_Radius >= 10f && c_RadiusDistance < 2f)
+                        if (!AddToCache && c_Radius >= 10f && c_RadiusDistance <= 5.9f)
                         {
                             AddToCache = true;
                             c_IgnoreSubStep = "";

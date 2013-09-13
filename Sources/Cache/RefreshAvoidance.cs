@@ -43,7 +43,14 @@ namespace Trinity
             double minAvoidanceHealth = GetAvoidanceHealth(c_ActorSNO);
             double minAvoidanceRadius = GetAvoidanceRadius(c_ActorSNO, c_Radius);
 
-            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, (float)minAvoidanceRadius);
+            // cap avoidance to 30f maximum
+            minAvoidanceRadius = Math.Min(30f, minAvoidanceRadius);
+
+            // Are we allowed to path around avoidance?
+            if (Settings.Combat.Misc.AvoidanceNavigation)
+            {
+                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, (float)minAvoidanceRadius);
+            }
 
             AvoidanceType avoidanceType = AvoidanceManager.GetAvoidanceType(c_ActorSNO);
 
@@ -109,7 +116,7 @@ namespace Trinity
 
                 float avoidanceRadius = (float)GetAvoidanceRadius();
 
-                hashAvoidanceObstacleCache.Add(new CacheObstacleObject(c_Position, avoidanceRadius, c_ActorSNO, dThisWeight, c_InternalName));
+                AvoidanceObstacleCache.Add(new CacheObstacleObject(c_Position, avoidanceRadius, c_ActorSNO, dThisWeight, c_InternalName));
 
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
                 if (c_CentreDistance <= minAvoidanceRadius)
@@ -143,6 +150,46 @@ namespace Trinity
 
             return AddToCache;
         }
+        private static double GetAvoidanceHealth(int actorSNO = -1)
+        {
+            // snag our SNO from cache variable if not provided
+            if (actorSNO == -1)
+                actorSNO = c_ActorSNO;
+            try
+            {
+                if (actorSNO != -1)
+                    return AvoidanceManager.GetAvoidanceHealthBySNO(c_ActorSNO, 1);
+                else
+                    return AvoidanceManager.GetAvoidanceHealthBySNO(actorSNO, 1);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0}", actorSNO);
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, ex.ToString());
+                // 100% unless specified
+                return 1;
+            }
+        }
+        private static double GetAvoidanceRadius(int actorSNO = -1, float radius = -1f)
+        {
+            if (actorSNO == -1)
+                actorSNO = c_ActorSNO;
 
+            if (radius == -1f)
+                radius = 20f;
+
+            try
+            {
+
+                return AvoidanceManager.GetAvoidanceRadiusBySNO(actorSNO, radius);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0} radius={1}", actorSNO, radius);
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, ex.ToString());
+                return radius;
+            }
+
+        }
     }
 }

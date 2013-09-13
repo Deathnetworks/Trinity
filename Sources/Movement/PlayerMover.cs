@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -491,7 +492,7 @@ namespace Trinity.DbProvider
 
             // See if there's an obstacle in our way, if so try to navigate around it
             Vector3 point = vMoveToTarget;
-            foreach (CacheObstacleObject obstacle in Trinity.hashNavigationObstacleCache.Where(o => vMoveToTarget.Distance2D(o.Location) <= o.Radius))
+            foreach (CacheObstacleObject obstacle in Trinity.NavigationObstacleCache.Where(o => vMoveToTarget.Distance2D(o.Location) <= o.Radius))
             {
                 if (vShiftedPosition == Vector3.Zero)
                 {
@@ -572,9 +573,9 @@ namespace Trinity.DbProvider
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) && !ShrinesInArea(vMoveToTarget) &&
                     // Don't Vault into avoidance/monsters if we're kiting
                     (Trinity.PlayerKiteDistance <= 0 || (Trinity.PlayerKiteDistance > 0 &&
-                     (!Trinity.hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= Trinity.PlayerKiteDistance) ||
-                     (!Trinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, Trinity.Player.Position, vMoveToTarget))) ||
-                     !Trinity.hashMonsterObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= Trinity.PlayerKiteDistance))))
+                     (!Trinity.AvoidanceObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= Trinity.PlayerKiteDistance) ||
+                     (!Trinity.AvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, Trinity.Player.Position, vMoveToTarget))) ||
+                     !Trinity.MonsterObstacleCache.Any(a => a.Location.Distance(vMoveToTarget) <= Trinity.PlayerKiteDistance))))
                     )
                 {
 
@@ -666,7 +667,7 @@ namespace Trinity.DbProvider
 
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
                 if (Trinity.Hotbar.Contains(SNOPower.Wizard_Teleport) &&
-                    ((PowerManager.CanCast(SNOPower.Wizard_Teleport) && 
+                    ((PowerManager.CanCast(SNOPower.Wizard_Teleport) &&
                     CombatBase.SNOPowerUseTimer(SNOPower.Wizard_Teleport)) ||
                     (hasWormHole && WizardTeleportCount < 3 && DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_Teleport]).TotalMilliseconds >= 250)) &&
                     DestinationDistance >= 10f && !ShrinesInArea(vMoveToTarget))
@@ -836,9 +837,9 @@ namespace Trinity.DbProvider
 
             lastRecordedSkipAheadCache = DateTime.Now;
 
-            if (!Trinity.hashSkipAheadAreaCache.Any(p => p.Location.Distance2D(Trinity.Player.Position) <= 5f))
+            if (!Trinity.SkipAheadAreaCache.Any(p => p.Location.Distance2D(Trinity.Player.Position) <= 5f))
             {
-                Trinity.hashSkipAheadAreaCache.Add(new CacheObstacleObject() { Location = Trinity.Player.Position, Radius = 20f });
+                Trinity.SkipAheadAreaCache.Add(new CacheObstacleObject() { Location = Trinity.Player.Position, Radius = 20f });
             }
         }
 

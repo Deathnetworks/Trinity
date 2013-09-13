@@ -23,6 +23,7 @@ namespace Trinity.Config.Combat
         private bool _IgnoreElites;
         private bool _AvoidDeath;
         private bool _SkipElitesOn5NV;
+        private bool _AvoidanceNavigation;
         #endregion Fields
 
         #region Events
@@ -326,6 +327,24 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool AvoidanceNavigation
+        {
+            get
+            {
+                return _AvoidanceNavigation;
+            }
+            set
+            {
+                if (_AvoidanceNavigation != value)
+                {
+                    _AvoidanceNavigation = value;
+                    OnPropertyChanged("AvoidanceNavigation");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -369,6 +388,7 @@ namespace Trinity.Config.Combat
             this.KillMonstersInAoE = true;
             this.EliteRange = 150;
             this.SkipElitesOn5NV = false;
+            this.AvoidanceNavigation = true;
         }
         #endregion Methods
     }

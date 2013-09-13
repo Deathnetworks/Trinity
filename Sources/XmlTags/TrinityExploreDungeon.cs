@@ -507,7 +507,7 @@ namespace Trinity.XmlTags
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Visited all nodes but objective not complete, forcing grid reset!")),
                         new Action(ret => timesForcedReset++),
-                        new Action(ret => Trinity.hashSkipAheadAreaCache.Clear()),
+                        new Action(ret => Trinity.SkipAheadAreaCache.Clear()),
                         new Action(ret => MiniMapMarker.KnownMarkers.Clear()),
                         new Action(ret => ForceUpdateScenes()),
                         new Action(ret => GridSegmentation.Reset()),
@@ -899,7 +899,7 @@ namespace Trinity.XmlTags
                         new Action(ret => UpdateRoute())
                     )
                 ),
-                new Decorator(ret => Trinity.hashNavigationObstacleCache.Any(o => o.Location.Distance2D(CurrentNavTarget) <= o.Radius * 2),
+                new Decorator(ret => Trinity.NavigationObstacleCache.Any(o => o.Location.Distance2D(CurrentNavTarget) <= o.Radius * 2),
                     new Sequence(
                         new Action(ret => SetNodeVisited("Navigation obstacle detected at node point")),
                         new Action(ret => UpdateRoute())
@@ -911,7 +911,7 @@ namespace Trinity.XmlTags
                         new Action(ret => UpdateRoute())
                     )
                 ),
-                new Decorator(ret => Trinity.hashSkipAheadAreaCache.Any(p => p.Location.Distance2D(CurrentNavTarget) <= PathPrecision),
+                new Decorator(ret => Trinity.SkipAheadAreaCache.Any(p => p.Location.Distance2D(CurrentNavTarget) <= PathPrecision),
                     new Sequence(
                         new Action(ret => SetNodeVisited("Found node to be in skip ahead cache, marking done")),
                         new Action(ret => UpdateRoute())
@@ -1111,11 +1111,11 @@ namespace Trinity.XmlTags
             if (DateTime.Now.Subtract(Trinity.lastAddedLocationCache).TotalMilliseconds >= 100)
             {
                 Trinity.lastAddedLocationCache = DateTime.Now;
-                if (Vector3.Distance(myPos, Trinity.vLastRecordedLocationCache) >= 5f)
+                if (Vector3.Distance(myPos, Trinity.LastRecordedPosition) >= 5f)
                 {
                     MarkNearbyNodesVisited();
-                    Trinity.hashSkipAheadAreaCache.Add(new CacheObstacleObject(myPos, 20f, 0));
-                    Trinity.vLastRecordedLocationCache = myPos;
+                    Trinity.SkipAheadAreaCache.Add(new CacheObstacleObject(myPos, 20f, 0));
+                    Trinity.LastRecordedPosition = myPos;
                 }
             }
 
@@ -1149,7 +1149,7 @@ namespace Trinity.XmlTags
             if (TimeoutValue == 0)
                 TimeoutValue = 900;
 
-            Trinity.hashSkipAheadAreaCache.Clear();
+            Trinity.SkipAheadAreaCache.Clear();
             PriorityScenesInvestigated.Clear();
             MiniMapMarker.KnownMarkers.Clear();
             if (PriorityScenes == null)

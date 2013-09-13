@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Combat.Abilities;
+using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -34,12 +35,29 @@ namespace Trinity
                 return GetWitchDoctorDestroyPower();
             }
 
+            //skillDict.Add("SpiritWalk", SNOPower.Witchdoctor_SpiritWalk);
+            //runeDict.Add("Jaunt", 1);
+            //runeDict.Add("HonoredGuest", 3);
+            //runeDict.Add("UmbralShock", 2);
+            //runeDict.Add("Severance", 0);
+            //runeDict.Add("HealingJourney", 4);
+
+            bool hasJaunt = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 1);
+            bool hasHonoredGuest = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 3);
+            bool hasUmbralShock = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 2);
+            bool hasSeverance = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 0);
+            bool hasHealingJourney = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritWalk && s.RuneIndex == 4);
+
             // Witch doctors have no reserve requirements?
             MinEnergyReserve = 0;
-            // Spirit Walk Cast on 65% health or while avoiding anything but molten core or incapacitated or Chasing Goblins
+            // Spirit Walk Cast on 65% health or while avoiding or incapacitated or Chasing Goblins or with honored guest and low mana
             if (Hotbar.Contains(SNOPower.Witchdoctor_SpiritWalk) && Player.PrimaryResource >= 49 &&
                 (
-                 Player.CurrentHealthPct <= 0.65 || Player.IsIncapacitated || Player.IsRooted || (Settings.Combat.Misc.AllowOOCMovement && UseOOCBuff) ||
+                 (hasHealingJourney && Player.CurrentHealthPct <= V.F("WitchDoctor.SpiritWalk.HealingJourneyHealth")) ||
+                 (hasHonoredGuest && Player.CurrentHealthPct <= V.F("WitchDoctor.SpiritWalk.HonoredGuestMana")) ||
+                 Player.IsIncapacitated ||
+                 Player.IsRooted ||
+                 (Settings.Combat.Misc.AllowOOCMovement && UseOOCBuff) ||
                  (!UseOOCBuff && CurrentTarget.IsTreasureGoblin && CurrentTarget.HitPointsPct < 0.90 && CurrentTarget.RadiusDistance <= 40f)
                 ) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_SpiritWalk))
@@ -111,7 +129,7 @@ namespace Trinity
             }
 
             // Hex with angry chicken, check if we want to shape shift and explode
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && (TargetUtil.AnyMobsInRange(12f, 1, false) || CurrentTarget.RadiusDistance <= 10f) && 
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && (TargetUtil.AnyMobsInRange(12f, 1, false) || CurrentTarget.RadiusDistance <= 10f) &&
                 CombatBase.CanCast(SNOPower.Witchdoctor_Hex) && hasAngryChicken && Player.PrimaryResource >= 49)
             {
                 ShouldRefreshHotbarAbilities = true;
@@ -217,7 +235,7 @@ namespace Trinity
             bool hasResentfulSpirit = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Haunt && s.RuneIndex == 4);
 
             // Haunt the shit out of monster and maybe they will give you treats
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Haunt) && 
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Haunt) &&
                 !Player.IsIncapacitated && Player.PrimaryResource >= 98 &&
                 !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Witchdoctor_Haunt) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_Haunt))
@@ -237,7 +255,7 @@ namespace Trinity
 
             // Sacrifice for 0 Dogs
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) &&
-                Settings.Combat.WitchDoctor.ZeroDogs &&
+                (Settings.Combat.WitchDoctor.ZeroDogs || !WitchDoctorHasPrimaryAttack) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_Sacrifice))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 9f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
@@ -354,6 +372,22 @@ namespace Trinity
 
             // Default attacks
             return CombatBase.DefaultPower;
+        }
+
+        private static bool WitchDoctorHasPrimaryAttack
+        {
+            get
+            {
+                return
+                    Hotbar.Contains(SNOPower.Witchdoctor_WallOfZombies) ||
+                    Hotbar.Contains(SNOPower.Witchdoctor_Firebats) ||
+                    Hotbar.Contains(SNOPower.Witchdoctor_AcidCloud) ||
+                    Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) ||
+                    Hotbar.Contains(SNOPower.Witchdoctor_PoisonDart) ||
+                    Hotbar.Contains(SNOPower.Witchdoctor_CorpseSpider) ||
+                    Hotbar.Contains(SNOPower.Witchdoctor_PlagueOfToads) ||
+                    Hotbar.Contains(SNOPower.Witchdoctor_Firebomb);
+            }
         }
 
         private static TrinityPower GetWitchDoctorDestroyPower()

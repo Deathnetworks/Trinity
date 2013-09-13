@@ -957,6 +957,10 @@ namespace Trinity
                     }
                 }
             }
+            catch (NullReferenceException)
+            {
+                // do nothing... db read error
+            }
             catch (AccessViolationException)
             {
                 // do nothing... db read error. 

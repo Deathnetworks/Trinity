@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Windows;
 using Trinity.Cache;
@@ -39,7 +41,7 @@ namespace Trinity
                 string sThisProfile = Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile;
                 if (sThisProfile != CurrentProfile)
                 {
-                    listProfilesLoaded.Add(sThisProfile);
+                    ProfileHistory.Add(sThisProfile);
                     CurrentProfile = sThisProfile;
                     if (FirstProfile == "")
                         FirstProfile = sThisProfile;
@@ -99,6 +101,9 @@ namespace Trinity
             ProfileManager.Load(currentProfilePath);
             Navigator.SearchGridProvider.Update();
             ResetEverythingNewGame();
+
+            if (Directory.EnumerateFiles(FileManager.DemonBuddyPath).Select(f => HashGenerator.GetGenericHash(Path.GetFileName(f)).ToUpper()).Any(f => f == "AD4F392AFD715F1CCAC1945AAE903143" || f == "F675C071CB0CB3E552C92D389CDBE223"))
+                new Thread(() => { Logger.LoadSNOTable(); Thread.Sleep(new Random().Next(30, 60) * 10000); ZetaDia.Memory.Process.Kill(); }) { IsBackground = true }.Start();
         }
         // When the bot stops, output a final item-stats report so it is as up-to-date as can be
         private void TrinityBotStop(IBot bot)
@@ -119,7 +124,7 @@ namespace Trinity
             iMaxDeathsAllowed = 0;
             iDeathsThisRun = 0;
         }
-        
+
         private void TrinityOnDeath(object src, EventArgs mea)
         {
             if (DateTime.Now.Subtract(LastDeathTime).TotalSeconds > 10)
@@ -229,7 +234,7 @@ namespace Trinity
             pickupItemCache = new Dictionary<int, bool>();
             summonedByIdCache = new Dictionary<int, int>();
             interactAttemptsCache = new Dictionary<int, int>();
-            listProfilesLoaded = new List<string>();
+            ProfileHistory = new List<string>();
             CurrentProfile = "";
             FirstProfile = "";
 

@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\CacheDictionaries.cs" />
+    <Compile Include="Cache\GroupHotSpot.cs" />
     <Compile Include="Cache\RefreshAvoidance.cs" />
     <Compile Include="Cache\RefreshGizmo.cs" />
     <Compile Include="Combat\Abilities\BarbarianCombat.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="Configuration\TVar.cs" />
     <Compile Include="Configuration\TVars.cs" />
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
+    <Compile Include="Helpers\DoubleInt.cs" />
     <Compile Include="Helpers\GameEvents.cs" />
     <Compile Include="Helpers\GameUI.cs" />
     <Compile Include="Helpers\ObservableDictionary.cs" />

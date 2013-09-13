@@ -20,7 +20,7 @@ namespace Trinity
             }
             MinEnergyReserve = 25;
             // Shadow Power
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated &&
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.DemonHunter_ShadowPower) && !Player.IsIncapacitated && !GetHasBuff(SNOPower.DemonHunter_ShadowPower) &&                
                 Player.SecondaryResource >= 14 &&
                 (Player.CurrentHealthPct <= 0.99 || Player.IsRooted || ElitesWithinRange[RANGE_25] >= 1 || AnythingWithinRange[RANGE_15] >= 3) &&
                 SNOPowerUseTimer(SNOPower.DemonHunter_ShadowPower))
@@ -31,7 +31,7 @@ namespace Trinity
             if ((!UseOOCBuff || Settings.Combat.DemonHunter.SpamSmokeScreen) && Hotbar.Contains(SNOPower.DemonHunter_SmokeScreen) &&
                 !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14 &&
                 (
-                 ( Player.CurrentHealthPct <= 0.90 || Player.IsRooted || ElitesWithinRange[RANGE_20] >= 1 || AnythingWithinRange[RANGE_15] >= 3 || Player.IsIncapacitated ) ||
+                 ( Player.CurrentHealthPct <= 0.50 || Player.IsRooted || ElitesWithinRange[RANGE_20] >= 1 || AnythingWithinRange[RANGE_15] >= 3 || Player.IsIncapacitated ) ||
                  Settings.Combat.DemonHunter.SpamSmokeScreen 
                 ) &&
                 SNOPowerUseTimer(SNOPower.DemonHunter_SmokeScreen))
@@ -39,14 +39,9 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
             // Preparation
-
-            if (
-                (
-                (( !UseOOCBuff && !Player.IsIncapacitated && AnythingWithinRange[RANGE_40] >= 1 ) 
-                 || Settings.Combat.DemonHunter.SpamPreparation ) 
-                ) && 
-                Hotbar.Contains(SNOPower.DemonHunter_Preparation) &&
-                Player.SecondaryResource <= 10 &&
+            if (((( !UseOOCBuff && !Player.IsIncapacitated && AnythingWithinRange[RANGE_40] >= 1 ) || Settings.Combat.DemonHunter.SpamPreparation )) && 
+                CombatBase.CanCast(SNOPower.DemonHunter_Preparation) &&
+                Player.SecondaryResource >= 25 || (Player.PrimaryResource <= 35 && Player.SecondaryResource >= 25) &&
 
                 TrinityPowerManager.CanUse(SNOPower.DemonHunter_Preparation)
                 )
@@ -133,8 +128,8 @@ namespace Trinity
             }
             // Strafe spam - similar to barbarian whirlwind routine
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Strafe) && !Player.IsIncapacitated && !Player.IsRooted &&
-                // Only if there's 3 guys in 25 yds
-                AnythingWithinRange[RANGE_25] >= 3 &&
+                // Only if there's 2 guys in 25 yds
+                AnythingWithinRange[RANGE_40] >= 1 &&
                 // Check for energy reservation amounts
                 ((Player.PrimaryResource >= 15 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
@@ -153,7 +148,7 @@ namespace Trinity
                     LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
                     LastChangedZigZag = DateTime.Now;
                 }
-                return new TrinityPower(SNOPower.DemonHunter_Strafe, 25f, CombatBase.ZigZagPosition, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_Strafe, 40f, CombatBase.ZigZagPosition, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
             // Spike Trap
             if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.DemonHunter_SpikeTrap) &&
@@ -201,20 +196,37 @@ namespace Trinity
                 ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 // Players with grenades *AND* elemental arrow should spam grenades at close-range instead
-                if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)
-                    return new TrinityPower(SNOPower.DemonHunter_Grenades, 18f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
+                if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 25f)
+                    return new TrinityPower(SNOPower.DemonHunter_Grenades, 25f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
                 // Now return elemental arrow, if not sending grenades instead
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
-            // Chakram
+
+            //skillDict.Add("Chakram", SNOPower.DemonHunter_Chakram);
+            //runeDict.Add("TwinChakrams", 0);
+            //runeDict.Add("Serpentine", 2);
+            //runeDict.Add("RazorDisk", 3);
+            //runeDict.Add("Boomerang", 1);
+            //runeDict.Add("ShurikenCloud", 4);
+
+            bool hasShurikenCloud = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Chakram && s.RuneIndex == 4);
+
+            // Chakram normal attack
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
-                // If we have elemental arrow or rapid fire, then use chakram as a 110 second buff, instead
-                ((!Hotbar.Contains(SNOPower.DemonHunter_ClusterArrow)) ||
-                TimeSinceUse(SNOPower.DemonHunter_Chakram) >= 110000) &&
+                !hasShurikenCloud && 
                 ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
+
+            // Chakram:Shuriken Cloud
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Chakram) && !Player.IsIncapacitated &&
+                hasShurikenCloud && TimeSinceUse(SNOPower.DemonHunter_Chakram) >= 110000 &&
+                ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+            {
+                return new TrinityPower(SNOPower.DemonHunter_Chakram, 0f, Vector3.Zero, -1, -1, 0, 1, WAIT_FOR_ANIM);
+            }
+
             // Rapid Fire
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && !Player.IsIncapacitated &&
                 ((Player.PrimaryResource >= 20 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
@@ -251,7 +263,7 @@ namespace Trinity
             // Grenades
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Grenades) && !Player.IsIncapacitated)
             {
-                return new TrinityPower(SNOPower.DemonHunter_Grenades, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_Grenades, 25f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 5, 5, WAIT_FOR_ANIM);
             }
 
             // Default attacks
@@ -281,7 +293,7 @@ namespace Trinity
             if (Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && Player.PrimaryResource >= 10)
                 return new TrinityPower(SNOPower.DemonHunter_RapidFire, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && Player.PrimaryResource >= 20)
-                return new TrinityPower(SNOPower.DemonHunter_Chakram, 15f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_Chakram, 0f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.DemonHunter_EvasiveFire) && Player.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.DemonHunter_EvasiveFire, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             return CombatBase.DefaultPower;

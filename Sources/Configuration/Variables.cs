@@ -17,6 +17,7 @@ namespace Trinity
     public partial class Trinity : IPlugin
     {
         private static TrinitySetting _Settings = new TrinitySetting();
+
         /// <summary>
         /// Settings of the plugin
         /// </summary>
@@ -27,7 +28,6 @@ namespace Trinity
                 return _Settings;
             }
         }
-
 
         /* I create so many variables that it's a pain in the arse to categorize them
          * So I just throw them all here for quick searching, reference etc.
@@ -129,30 +129,30 @@ namespace Trinity
         /// <summary>
         /// Obstacle cache, things we can't or shouldn't move through
         /// </summary>
-        internal static HashSet<CacheObstacleObject> hashNavigationObstacleCache = new HashSet<CacheObstacleObject>();
+        internal static HashSet<CacheObstacleObject> NavigationObstacleCache = new HashSet<CacheObstacleObject>();
 
         // Related to the profile reloaded when restarting games, to pick the FIRST profile.
 
         // Also storing a list of all profiles, for experimental reasons/incase I want to use them down the line
-        public static List<string> listProfilesLoaded = new List<string>();
+        public static List<string> ProfileHistory = new List<string>();
         public static string CurrentProfile = "";
         public static string FirstProfile = "";
 
         // A list of small areas covering zones we move through while fighting to help our custom move-handler skip ahead waypoints
-        internal static HashSet<CacheObstacleObject> hashSkipAheadAreaCache = new HashSet<CacheObstacleObject>();
+        internal static HashSet<CacheObstacleObject> SkipAheadAreaCache = new HashSet<CacheObstacleObject>();
         public static DateTime lastAddedLocationCache = DateTime.Today;
-        public static Vector3 vLastRecordedLocationCache = Vector3.Zero;
+        public static Vector3 LastRecordedPosition = Vector3.Zero;
         public static bool bSkipAheadAGo = false;
 
         /// <summary>
         /// A list of all monsters and their positions, so we don't try to walk through them during avoidance
         /// </summary>
-        internal static HashSet<CacheObstacleObject> hashMonsterObstacleCache = new HashSet<CacheObstacleObject>();
+        internal static HashSet<CacheObstacleObject> MonsterObstacleCache = new HashSet<CacheObstacleObject>();
 
         /// <summary>
         /// A list of all current obstacles, to help avoid running through them when picking targets
         /// </summary>
-        internal static HashSet<CacheObstacleObject> hashAvoidanceObstacleCache = new HashSet<CacheObstacleObject>();
+        internal static HashSet<CacheObstacleObject> AvoidanceObstacleCache = new HashSet<CacheObstacleObject>();
 
         /// <summary>
         /// Blacklist avoidance spots we failed to reach in time, for a period of time
@@ -344,7 +344,6 @@ namespace Trinity
         // Variables relating to quick-reference of monsters within sepcific ranges (if anyone has suggestion for similar functionality with reduced CPU use, lemme know, but this is fast atm!)
         private static int[] ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
         private static int[] AnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
-        private static bool anyBossesInRange = false;
         private const int RANGE_50 = 0;
         private const int RANGE_40 = 1;
         private const int RANGE_30 = 2;
@@ -353,11 +352,7 @@ namespace Trinity
         private const int RANGE_15 = 5;
         private const int RANGE_12 = 6;
         private const int RANGE_6 = 7;
-        private static int iWithinRangeLastRend = 0;
         private static int NonRendedTargets_9 = 0;
-
-        // Unique ID of mob last targetting when using rend
-        private static int iACDGUIDLastRend = 0;
 
         // Unique ID of mob last targetting when using whirlwind
         internal static int LastZigZagUnitAcdGuid = 0;
@@ -475,8 +470,6 @@ namespace Trinity
 
         // The following 2 variables are used to clear the dictionaries out - clearing one dictionary out per maximum every 2 seconds, working through in sequential order
         private static DateTime lastClearedCacheDictionary = DateTime.Today;
-
-        private static Button btnPauseBot, btnTownRun;
 
         // On death, clear the timers for all abilities
         internal static DateTime LastDeathTime = DateTime.Today;

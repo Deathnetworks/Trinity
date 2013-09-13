@@ -45,6 +45,7 @@ namespace Trinity.Config.Combat
         private bool _TargetBasedZigZag;
         private int _MinCycloneTrashCount;
         private int _MinWoLTrashCount;
+        private bool _SpamSweepingWindOnLowHP;
         #endregion Fields
 
         #region Events
@@ -745,7 +746,24 @@ namespace Trinity.Config.Combat
                     OnPropertyChanged("MinWoLTrashCount");
                 }
             }
-        }        
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SpamSweepingWindOnLowHP
+        {
+            get
+            {
+                return _SpamSweepingWindOnLowHP;
+            }
+            set
+            {
+                if (_SpamSweepingWindOnLowHP != value)
+                {
+                    _SpamSweepingWindOnLowHP = value;
+                    OnPropertyChanged("SpamSweepingWindOnLowHP");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -785,6 +803,7 @@ namespace Trinity.Config.Combat
             this._AvoidSuccubusStarHealth = 0.7f;
             this._MinCycloneTrashCount = 2;
             this._MinWoLTrashCount = 2;
+            this._SpamSweepingWindOnLowHP = false;
         }
         #endregion Methods
     }

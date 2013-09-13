@@ -95,7 +95,7 @@ namespace Trinity
 
             if (!rc)
             {
-                if (Trinity.hashNavigationObstacleCache.Any(o => MathEx.IntersectsPath(o.Location, o.Radius, vStartLocation, vDestination)))
+                if (Trinity.NavigationObstacleCache.Any(o => MathEx.IntersectsPath(o.Location, o.Radius, vStartLocation, vDestination)))
                     return false;
                 else
                     return true;
@@ -145,7 +145,7 @@ namespace Trinity
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
                 if (!shouldKite && PlayerStatus.ActorClass == ActorClass.Wizard && Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && PlayerStatus.PrimaryResource >= 25 &&
                     DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_WaveOfForce) &&
-                    !PlayerStatus.IsIncapacitated && Trinity.hashAvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(PlayerStatus.Position) <= 15f) >= 2 &&
+                    !PlayerStatus.IsIncapacitated && Trinity.AvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(PlayerStatus.Position) <= 15f) >= 2 &&
                     (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, Vector3.Zero, PlayerStatus.WorldDynamicID, -1);
@@ -272,13 +272,13 @@ namespace Trinity
                      * Check if a square is occupied already
                      */
                     // Avoidance
-                    if (Trinity.hashAvoidanceObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= gridSquareRadius))
+                    if (Trinity.AvoidanceObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= gridSquareRadius))
                     {
                         nodesAvoidance++;
                         continue;
                     }
                     // Obstacles
-                    if (Trinity.hashNavigationObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= gridSquareRadius))
+                    if (Trinity.NavigationObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= gridSquareRadius))
                     {
                         nodesMonsters++;
                         continue;
@@ -295,7 +295,7 @@ namespace Trinity
                         }
 
                         // Any monster standing in this GridPoint
-                        if (Trinity.hashMonsterObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) + a.Radius <= checkRadius))
+                        if (Trinity.MonsterObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) + a.Radius <= checkRadius))
                         {
                             nodesMonsters++;
                             continue;
@@ -304,7 +304,7 @@ namespace Trinity
                         if (!hasEmergencyTeleportUp)
                         {
                             // Any monsters blocking in a straight line between origin and this GridPoint
-                            foreach (CacheObstacleObject monster in Trinity.hashMonsterObstacleCache.Where(m =>
+                            foreach (CacheObstacleObject monster in Trinity.MonsterObstacleCache.Where(m =>
                                 MathEx.IntersectsPath(new Vector3(m.Location.X, m.Location.Y, 0), m.Radius, new Vector3(origin.X, origin.Y, 0), new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
                                 ))
                             {
@@ -360,7 +360,7 @@ namespace Trinity
                         /*
                         * We want to down-weight any grid points where monsters are closer to it than we are
                         */
-                        foreach (CacheObstacleObject monster in Trinity.hashMonsterObstacleCache)
+                        foreach (CacheObstacleObject monster in Trinity.MonsterObstacleCache)
                         {
                             float distFromMonster = gridPoint.Position.Distance2D(monster.Location);
                             float distFromOrigin = gridPoint.Position.Distance2D(origin);
@@ -377,7 +377,7 @@ namespace Trinity
                                 gridPoint.Weight += distFromMonster;
                             }
                         }
-                        foreach (CacheObstacleObject avoidance in Trinity.hashAvoidanceObstacleCache)
+                        foreach (CacheObstacleObject avoidance in Trinity.AvoidanceObstacleCache)
                         {
                             float distFromAvoidance = gridPoint.Position.Distance2D(avoidance.Location);
                             float distFromOrigin = gridPoint.Position.Distance2D(origin);

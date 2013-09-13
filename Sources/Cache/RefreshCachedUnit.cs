@@ -15,6 +15,9 @@ namespace Trinity
         {
             AddToCache = true;
 
+            // grab this first
+            c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
+
             // See if this is a boss
             c_unit_IsBoss = DataDictionary.BossIds.Contains(c_ActorSNO);
 
@@ -182,8 +185,6 @@ namespace Trinity
             if (!AddToCache)
                 return AddToCache;
 
-            c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
-
 
             // A "fake distance" to account for the large-object size of monsters
             c_RadiusDistance -= (float)c_Radius;
@@ -301,8 +302,6 @@ namespace Trinity
                 c_IgnoreSubStep += "IsTeam1+";
                 return AddToCache;
             }
-
-
 
             if (unit.IsUntargetable)
             {
@@ -466,7 +465,49 @@ namespace Trinity
             }
             return monsterType;
         }
-
+        private static bool RefreshStepCachedPlayerSummons(bool AddToCache)
+        {
+            if (c_diaUnit != null)
+            {
+                // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
+                if (Player.ActorClass == ActorClass.Monk)
+                {
+                    if (Hotbar.Contains(SNOPower.Monk_MysticAlly) && DataDictionary.MysticAllyIds.Contains(c_ActorSNO))
+                    {
+                        if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
+                            iPlayerOwnedMysticAlly++;
+                        AddToCache = false;
+                    }
+                }
+                // Count up Demon Hunter pets
+                if (Player.ActorClass == ActorClass.DemonHunter)
+                {
+                    if (Hotbar.Contains(SNOPower.DemonHunter_Companion) && DataDictionary.DemonHunterPetIds.Contains(c_ActorSNO))
+                    {
+                        if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
+                            iPlayerOwnedDHPets++;
+                        AddToCache = false;
+                    }
+                }
+                // Count up zombie dogs and gargantuans next
+                if (Player.ActorClass == ActorClass.WitchDoctor)
+                {
+                    if (Hotbar.Contains(SNOPower.Witchdoctor_Gargantuan) && DataDictionary.GargantuanIds.Contains(c_ActorSNO))
+                    {
+                        if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
+                            iPlayerOwnedGargantuan++;
+                        AddToCache = false;
+                    }
+                    if (Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && DataDictionary.ZombieDogIds.Contains(c_ActorSNO))
+                    {
+                        if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
+                            PlayerOwnedZombieDog++;
+                        AddToCache = false;
+                    }
+                }
+            }
+            return AddToCache;
+        }
 
     }
 }

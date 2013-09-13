@@ -35,7 +35,7 @@ namespace Trinity
                     Trinity.TotalProfileRecycles++;
                 }
 
-                Trinity.listProfilesLoaded.Add(currentProfile);
+                Trinity.ProfileHistory.Add(currentProfile);
                 Trinity.CurrentProfile = currentProfile;
 
                 if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.Name != null)

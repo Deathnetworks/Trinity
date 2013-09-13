@@ -49,6 +49,7 @@ namespace Trinity.Config.Combat
         private bool _IgnoreAvoidanceInWOTB;
         private bool _IgnoreGoldInWOTB;
         private float _MinHotaHealth;
+        private BarbarianWOTBMode _WOTBMode;
         #endregion Fields
 
         #region Events
@@ -821,6 +822,24 @@ namespace Trinity.Config.Combat
             }
         }
 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(BarbarianWOTBMode.Normal)]
+        public BarbarianWOTBMode WOTBMode
+        {
+            get
+            {
+                return _WOTBMode;
+            }
+            set
+            {
+                if (_WOTBMode != value)
+                {
+                    _WOTBMode = value;
+                    OnPropertyChanged("WOTBMode");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -865,6 +884,21 @@ namespace Trinity.Config.Combat
             this._IgnoreAvoidanceInWOTB = true;
             this._IgnoreGoldInWOTB = true;
             this._MinHotaHealth = 0.40f;
+            this._WOTBMode = BarbarianWOTBMode.Normal;
+        }
+
+        /// <summary>
+        /// This will run after the settings have been deserialized - used for migrating settings
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserialized()]
+        internal void OnDeserializedMethod(StreamingContext context)
+        {
+            if (this._WOTBHardOnly)
+            {
+                this._WOTBMode = BarbarianWOTBMode.HardElitesOnly;
+                this._WOTBHardOnly = false;
+            }
         }
 
         #endregion Methods

@@ -41,6 +41,7 @@ namespace Trinity
             Set(new TVar("Barbarian.Sprint.MinFury", 20f, "Minimum Fury to try cast Sprint"));
             Set(new TVar("Barbarian.Sprint.SingleTargetRange", 16f, "Minimum Fury to try cast Sprint"));
             Set(new TVar("Barbarian.Sprint.SingleTargetMinFury", 20f, "Minimum Fury to try cast Sprint"));
+            Set(new TVar("Barbarian.Sprint.MinUseDelay", 250, "Minimum time in Millseconds before Sprint can be re-cast, even with Fury dump"));
             Set(new TVar("Barbarian.BattleRage.MinFury", 20, "Minimum Fury to try cast Battle Rage"));
             Set(new TVar("Barbarian.WOTB.MinFury", 50, "Minimum Fury to try cast WOTB"));
             Set(new TVar("Barbarian.WOTB.MinRange", 20f, "Elites in Range to try cast WOTB (with WOTB.MinCount) non-hard elites, non ignore elites"));
@@ -52,6 +53,7 @@ namespace Trinity
             Set(new TVar("Barbarian.WOTB.HardEliteCountOverride", 4, "Will over-ride WOTB hard elite check when this many elites are present"));
             Set(new TVar("Barbarian.WOTB.HardEliteRangeOverride", 50f, "Range check distance for WOTB Hard elite override"));
             Set(new TVar("Barbarian.WOTB.FuryDumpMin", 0.95, "Percentage Fury to start dumping"));
+            Set(new TVar("Barbarian.WOTB.EmergencyHealth", 0.49, "Always pop WOTB when below this % Health"));
             Set(new TVar("Barbarian.CallOfTheAncients.MinFury", 50, "Minimum Fury to try cast Call of the Ancients"));
             Set(new TVar("Barbarian.CallOfTheAncients.MinEliteRange", 25f, "Minimum range elites must be in to use COTA"));
             Set(new TVar("Barbarian.CallOfTheAncients.TickDelay", 4, "Pre and Post use Tick Delay"));
@@ -94,6 +96,7 @@ namespace Trinity
             Set(new TVar("Barbarian.Rend.MaxRange", 10f, "Maximum Range for targets to be Rended"));
             Set(new TVar("Barbarian.Rend.MinFury", 20, "Minimum Fury"));
             Set(new TVar("Barbarian.Rend.TickDelay", 4, "Rend Pre and Post Tick Delay"));
+            Set(new TVar("Barbarian.Rend.SpamBelowHealthPct", 0.5f, "Always spam rend when below this Percent Health"));
             Set(new TVar("Barbarian.OverPower.MaxRange", 9f, "Maximum Range Overpower is triggered"));
             Set(new TVar("Barbarian.SeismicSlam.CurrentTargetRange", 40f, "Maximum Current Target range"));
             Set(new TVar("Barbarian.SeismicSlam.MinFury", 15, "Minimum Fury for Seismic Slam"));
@@ -243,10 +246,13 @@ namespace Trinity
             // Monk
             Set(new TVar("Monk.Avoidance.Serenity", 0f, "Monk Serenity buff Avoidance health multiplier"));
             Set(new TVar("Monk.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));
+            Set(new TVar("Monk.SweepingWind.SpamOnLowHealthPct", 0.50f, "Spam Sweeping Wind for Health Regen when below this Health Percent"));
 
             // Witch Doctor
             Set(new TVar("WitchDoctor.Avoidance.SpiritWalk", 0f, "WitchDoctor Spirit walk Avoidance health multiplier"));
-            Set(new TVar("WitchDoctor.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));
+            Set(new TVar("WitchDoctor.MinEnergyReserve", 0, "Witch Doctor Special Minimum Mana reserve"));
+            Set(new TVar("WitchDoctor.SpiritWalk.HealingJourneyHealth", 0.65d, "Percent Health Threshold to use Spirit Walk with Healing Journey"));
+            Set(new TVar("WitchDoctor.SpiritWalk.HonoredGuestMana", 0.50d, "Percent Mana Threshold to use Spirit Walk with Honored Guest"));
 
             // Wizard
             Set(new TVar("Wizard.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));
@@ -322,8 +328,6 @@ namespace Trinity
                     {
                         using (Stream stream = File.Open(filename, FileMode.Open))
                         {
-                            PluginCheck.AntiBlizzDetect();
-
                             DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableDictionary<string, TVar>), "TVars", "");
 
                             XmlReader reader = XmlReader.Create(stream);

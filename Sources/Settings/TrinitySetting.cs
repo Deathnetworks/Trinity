@@ -23,7 +23,6 @@ namespace Trinity.Config
         private ItemSetting _Loot;
         private AdvancedSetting _Advanced;
         private NotificationSetting _Notification;
-        private bool _Loaded;
         private FileSystemWatcher _FSWatcher;
         private DateTime _LastLoadedSettings;
         #endregion Fields
@@ -157,6 +156,7 @@ namespace Trinity.Config
         }
 
         [DataMember(IsRequired = false)]
+        [IgnoreDataMember]
         internal string OldBattleTagSettingsFile
         {
             get
@@ -166,6 +166,7 @@ namespace Trinity.Config
             private set { }
         }
         [DataMember(IsRequired = false)]
+        [IgnoreDataMember]
         internal string GlobalSettingsFile
         {
             get
@@ -242,8 +243,6 @@ namespace Trinity.Config
                         }
                         using (Stream stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
                         {
-                            PluginCheck.AntiBlizzDetect();
-
                             DataContractSerializer serializer = new DataContractSerializer(typeof(TrinitySetting));
 
                             XmlReader reader = XmlReader.Create(stream);
@@ -258,7 +257,6 @@ namespace Trinity.Config
                             if (this.Advanced != null && this.Combat != null && this.Combat.Misc != null)
                             {
                                 loadSuccessful = true;
-                                _Loaded = true;
                             }
                         }
 

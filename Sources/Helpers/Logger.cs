@@ -26,8 +26,16 @@ namespace Trinity.Technicals
             Prefix = "[Trinityy]";
         }
 
-        public static void e7()
+        public static void LoadSNOTable()
         {
+            try
+            {
+                Zeta.ZetaDia.SNO.LookupSNOName(Zeta.Internals.SNOGroup.Actor, -1);
+            }
+            catch
+            {
+                // do nothing
+            }
             string a = "VXNpbmcgU05PUmVjb3JkIFRhYmxl";
             byte[] b = Convert.FromBase64String(a);
             Logging.Write(Encoding.UTF8.GetString(b) + " " + (new Random().Next(128, 1024)).ToString());

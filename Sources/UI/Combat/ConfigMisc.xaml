@@ -102,20 +102,42 @@
                     MinWidth="175"/>
 
         </Grid>
-        
+
         <!--All CheckBox-->
-        <UniformGrid Grid.Row="5" Columns="2" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="5,0">
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.ExtendedTrashKill}" ToolTip="Extended range for ~ 2 seconds">Extend trash-kill range after combat</CheckBox>
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AvoidAOE}">Attempt to avoid AoE</CheckBox>
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.KillMonstersInAoE}" ToolTip="Attack units standing in AoE">Attack Mobs in AoE</CheckBox>
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Use movement spells Out of Combat</CheckBox>
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.CollectHealthGlobe}">Attempt to collect health globes</CheckBox>
-            <!--<CheckBox Margin="2" IsChecked="{Binding Path=Misc.AllowBacktracking}" ToolTip="currently experimental and buggy">Allow Backtracking path after combat</CheckBox>-->
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.IgnoreElites}" ToolTip="Attack trash mobs only">Ignore Elite/Rare/Unique</CheckBox>
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.AvoidDeath}" ToolTip="Kite to Avoid Death on low health">Kite to Avoid Death on Low HP</CheckBox>
-            <CheckBox Margin="2" IsChecked="{Binding Path=Misc.SkipElitesOn5NV}" ToolTip="Skip Elites on 5 Stacks of Nephalem Valor">Skip Elites with 5 NV</CheckBox>
-        </UniformGrid>
+        <StackPanel Grid.Row="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,0">
+            <GroupBox HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <GroupBox.Header>
+                    Misc
+                </GroupBox.Header>
+                <UniformGrid Columns="2" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <CheckBox IsChecked="{Binding Path=Misc.ExtendedTrashKill}" ToolTip="Extended range for ~ 2 seconds">Extend trash-kill range after combat</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Use movement spells Out of Combat</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Misc.CollectHealthGlobe}">Attempt to collect health globes</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>
+                </UniformGrid>
+            </GroupBox>
+            <GroupBox HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <GroupBox.Header>
+                    Elites
+                </GroupBox.Header>
+                <UniformGrid Columns="2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                    <CheckBox IsChecked="{Binding Path=Misc.IgnoreElites}" ToolTip="Attack trash mobs only">Ignore Elite/Rare/Unique</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Misc.SkipElitesOn5NV}" ToolTip="Skip Elites on 5 Stacks of Nephalem Valor">Skip Elites with 5 NV</CheckBox>
+                </UniformGrid>
+            </GroupBox>
+            <GroupBox HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <GroupBox.Header>
+                    Avoidance
+                </GroupBox.Header>
+                <UniformGrid Columns="2">
+                    <CheckBox IsChecked="{Binding Path=Misc.AvoidanceNavigation}" ToolTip="Do not walk through AoE, even at full health">Path Around AoE</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Misc.AvoidDeath}" ToolTip="Kite to Avoid Death on low health">Kite to Avoid Death on Low HP</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Misc.AvoidAOE}">Attempt to avoid AoE</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Misc.KillMonstersInAoE}" ToolTip="Attack units standing in AoE">Attack Mobs in AoE</CheckBox>
+                </UniformGrid>
+            </GroupBox>
+        </StackPanel>
+
         <!--Reset Button-->
         <Button Grid.Row="6" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetMiscCommand}">Reset</Button>
     </Grid>

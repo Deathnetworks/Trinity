@@ -66,11 +66,11 @@ namespace Trinity.XmlTags
             // First check if we can skip ahead because we recently moved here
             if (!Trinity.Settings.Combat.Misc.AllowBacktracking && (NoSkip == null || NoSkip.ToLower() != "true"))
             {
-                if (Trinity.hashSkipAheadAreaCache.Any())
+                if (Trinity.SkipAheadAreaCache.Any())
                 {
 
                     // Loop through all the skip ahead zones and see if one of them is within radius of our intended destination to skip ahead
-                    foreach (CacheObstacleObject thisObject in Trinity.hashSkipAheadAreaCache)
+                    foreach (CacheObstacleObject thisObject in Trinity.SkipAheadAreaCache)
                     {
                         if (thisObject.Location.Distance(Position) <= thisObject.Radius)
                         {
@@ -79,12 +79,12 @@ namespace Trinity.XmlTags
                             return RunStatus.Success;
                         }
                     }
-                    Trinity.hashSkipAheadAreaCache = new HashSet<CacheObstacleObject>();
+                    Trinity.SkipAheadAreaCache = new HashSet<CacheObstacleObject>();
                 }
             }
             else
             {
-                Trinity.hashSkipAheadAreaCache = new HashSet<CacheObstacleObject>();
+                Trinity.SkipAheadAreaCache = new HashSet<CacheObstacleObject>();
             }
 
             // Now use Trinity movement to try a direct movement towards that location

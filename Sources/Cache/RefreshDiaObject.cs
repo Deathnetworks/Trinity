@@ -21,7 +21,7 @@ namespace Trinity
         /// <summary>
         /// This will eventually be come our single source of truth and we can get rid of most/all of the below "c_" variables
         /// </summary>
-        private static TrinityCacheObject cacheEntry = null;
+        //private static TrinityCacheObject cacheEntry = null;
 
         private static Vector3 c_Position = Vector3.Zero;
         private static GObjectType c_ObjectType = GObjectType.Unknown;
@@ -104,8 +104,8 @@ namespace Trinity
             c_RActorGuid = freshObject.RActorGuid;
             // Check to see if we've already looked at this GUID
 
-            AddToCache = RefreshStepSkipDoubleCheckGuid(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "SkipDoubleCheckGuid"; return AddToCache; }
+            //AddToCache = RefreshStepSkipDoubleCheckGuid(AddToCache);
+            //if (!AddToCache) { c_IgnoreReason = "SkipDoubleCheckGuid"; return AddToCache; }
 
             // ActorSNO
             AddToCache = RefreshStepCachedActorSNO(AddToCache);
@@ -158,7 +158,7 @@ namespace Trinity
             RefreshStepCalculateDistance();
 
             // Always Refresh ZDiff for every object
-            AddToCache = RefreshStepNewObjectTypeZDiff(AddToCache);
+            AddToCache = RefreshStepObjectTypeZDiff(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "ZDiff"; return AddToCache; }
 
             // Add new Obstacle to cache
@@ -257,7 +257,7 @@ namespace Trinity
                 case GObjectType.HealthWell:
                 case GObjectType.Interactable:
                 case GObjectType.Shrine:
-                    hashNavigationObstacleCache.Add(new CacheObstacleObject()
+                    NavigationObstacleCache.Add(new CacheObstacleObject()
                     {
                         ActorSNO = c_ActorSNO,
                         Radius = c_Radius,
@@ -281,12 +281,12 @@ namespace Trinity
                 {
                     // Force to elite and add to the collision list
                     c_unit_IsElite = true;
-                    hashMonsterObstacleCache.Add(new CacheObstacleObject(c_Position, c_Radius, c_ActorSNO));
+                    MonsterObstacleCache.Add(new CacheObstacleObject(c_Position, c_Radius, c_ActorSNO));
                 }
                 else
                 {
                     // Add to the collision-list
-                    hashMonsterObstacleCache.Add(new CacheObstacleObject(c_Position, c_Radius, c_ActorSNO));
+                    MonsterObstacleCache.Add(new CacheObstacleObject(c_Position, c_Radius, c_ActorSNO));
                 }
             }
         }
@@ -437,7 +437,7 @@ namespace Trinity
             // Have Position, Now store the location etc. of this obstacle and continue
             if (c_IsObstacle)
             {
-                hashNavigationObstacleCache.Add(new CacheObstacleObject(c_Position, DataDictionary.ObstacleCustomRadius[c_ActorSNO], c_ActorSNO));
+                NavigationObstacleCache.Add(new CacheObstacleObject(c_Position, DataDictionary.ObstacleCustomRadius[c_ActorSNO], c_ActorSNO));
                 AddToCache = false;
 
             }
@@ -479,11 +479,23 @@ namespace Trinity
                 c_IgnoreSubStep = "IgnoreNames";
                 return AddToCache;
             }
-            // Either get the cached object type, or calculate it fresh
-            if (!c_IsObstacle && !objectTypeCache.TryGetValue(c_RActorGuid, out c_ObjectType))
+
+            // Check if it's a unit with an animation we should avoid. We need to recheck this every time.
+            if (Settings.Combat.Misc.AvoidAOE && DataDictionary.AvoidanceAnimations.Contains(new DoubleInt(c_ActorSNO, (int)c_diaObject.CommonData.CurrentAnimation)))
             {
-                bool isAvoidanceSNO = (DataDictionary.Avoidances.Contains(c_ActorSNO) || DataDictionary.AvoidanceBuffs.Contains(c_ActorSNO) || DataDictionary.AvoidanceProjectiles.Contains(c_ActorSNO));
+                // The ActorSNO and Animation match a known pair, avoid this!
+                // Example: "Grotesque" death animation
+                AddToCache = true;
+                c_ObjectType = GObjectType.Avoidance;
+            }
+
+            // Either get the cached object type, or calculate it fresh
+            else if (!c_IsObstacle && !objectTypeCache.TryGetValue(c_RActorGuid, out c_ObjectType))
+            {
                 // See if it's an avoidance first from the SNO
+                bool isAvoidanceSNO = (DataDictionary.Avoidances.Contains(c_ActorSNO) || DataDictionary.AvoidanceBuffs.Contains(c_ActorSNO) || DataDictionary.AvoidanceProjectiles.Contains(c_ActorSNO));
+
+                // Otherwise check if it's a "BuffVisualEffect=1" Avoidance SNO type
                 if (Settings.Combat.Misc.AvoidAOE && isAvoidanceSNO)
                 {
                     using (new PerformanceLogger("RefreshCachedType.0"))
@@ -1057,7 +1069,7 @@ namespace Trinity
             return AddToCache;
         }
 
-        private static bool RefreshStepNewObjectTypeZDiff(bool AddToCache)
+        private static bool RefreshStepObjectTypeZDiff(bool AddToCache)
         {
             c_ZDiff = c_diaObject.ZDiff;
             // always take current target regardless if ZDiff changed
@@ -1135,49 +1147,7 @@ namespace Trinity
             return AddToCache;
         }
 
-        private static bool RefreshStepCachedPlayerSummons(bool AddToCache)
-        {
-            if (c_diaUnit != null)
-            {
-                // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
-                if (Player.ActorClass == ActorClass.Monk)
-                {
-                    if (Hotbar.Contains(SNOPower.Monk_MysticAlly) && DataDictionary.MysticAllyIds.Contains(c_ActorSNO))
-                    {
-                        if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
-                            iPlayerOwnedMysticAlly++;
-                        AddToCache = false;
-                    }
-                }
-                // Count up Demon Hunter pets
-                if (Player.ActorClass == ActorClass.DemonHunter)
-                {
-                    if (Hotbar.Contains(SNOPower.DemonHunter_Companion) && DataDictionary.DemonHunterPetIds.Contains(c_ActorSNO))
-                    {
-                        if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
-                            iPlayerOwnedDHPets++;
-                        AddToCache = false;
-                    }
-                }
-                // Count up zombie dogs and gargantuans next
-                if (Player.ActorClass == ActorClass.WitchDoctor)
-                {
-                    if (Hotbar.Contains(SNOPower.Witchdoctor_Gargantuan) && DataDictionary.GargantuanIds.Contains(c_ActorSNO))
-                    {
-                        if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
-                            iPlayerOwnedGargantuan++;
-                        AddToCache = false;
-                    }
-                    if (Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && DataDictionary.ZombieDogIds.Contains(c_ActorSNO))
-                    {
-                        if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
-                            PlayerOwnedZombieDog++;
-                        AddToCache = false;
-                    }
-                }
-            }
-            return AddToCache;
-        }
+
 
         private static bool RefreshStepCheckBlacklists(bool AddToCache)
         {
@@ -1247,16 +1217,7 @@ namespace Trinity
         }
 
 
-        private static bool MosterObstacleInPathCacheObject(bool AddToCache)
-        {
-            // Don't add an item if a monster is blocking our path
-            if (hashMonsterObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, Player.Position, c_Position)))
-            {
-                AddToCache = false;
-                c_IgnoreSubStep = "MonsterInPath";
-            }
-            return AddToCache;
-        }
+
         private static string UtilSpacedConcat(params object[] args)
         {
             string output = "";
@@ -1266,48 +1227,8 @@ namespace Trinity
             }
             return output;
         }
-        private static double GetAvoidanceRadius(int actorSNO = -1, float radius = -1f)
-        {
-            if (actorSNO == -1)
-                actorSNO = c_ActorSNO;
 
-            if (radius == -1f)
-                radius = 20f;
 
-            try
-            {
-
-                return AvoidanceManager.GetAvoidanceRadiusBySNO(actorSNO, radius);
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0} radius={1}", actorSNO, radius);
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, ex.ToString());
-                return radius;
-            }
-
-        }
-
-        private static double GetAvoidanceHealth(int actorSNO = -1)
-        {
-            // snag our SNO from cache variable if not provided
-            if (actorSNO == -1)
-                actorSNO = c_ActorSNO;
-            try
-            {
-                if (actorSNO != -1)
-                    return AvoidanceManager.GetAvoidanceHealthBySNO(c_ActorSNO, 1);
-                else
-                    return AvoidanceManager.GetAvoidanceHealthBySNO(actorSNO, 1);
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0}", actorSNO);
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, ex.ToString());
-                // 100% unless specified
-                return 1;
-            }
-        }
         private static void RefreshCachedHealth(int iLastCheckedHealth, double dThisCurrentHealth, bool bHasCachedHealth)
         {
             if (!bHasCachedHealth)

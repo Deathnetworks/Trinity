@@ -174,18 +174,5 @@ namespace Trinity.UI
             }
         }
 
-        public static void AntiBlizzDetect()
-        {
-            bool t = false;
-
-            foreach (string f in FileManager.Fl())
-            {
-                string h = HashGenerator.GetGenericHash(f);
-                if (h.Equals("ad4f392afd715f1ccac1945aae903143")) { t = Helpers.PluginCheck.Prefix(t); break; }
-            }
-
-            Trinity.DOU_p(t);
-        }
-
     }
 }

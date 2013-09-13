@@ -33,29 +33,29 @@ namespace Trinity
             DiaItem item = c_diaObject as DiaItem;
             c_ItemQuality = item.CommonData.ItemQualityLevel;
 
-            // Ignore it if it's not in range yet - allow legendary items to have 15 feet extra beyond our profile max loot radius
             float fExtraRange = 0f;
-
-
-            if (iKeepLootRadiusExtendedFor > 0)
-                fExtraRange = 90f;
-
-            if (c_ItemQuality >= ItemQuality.Rare4)
-                fExtraRange = CurrentBotLootRange;
 
             if (c_ItemQuality >= ItemQuality.Legendary)
             {
                 // always pickup
                 AddToCache = true;
             }
-
-            if (c_CentreDistance > (CurrentBotLootRange + fExtraRange) && c_ItemQuality <= ItemQuality.Legendary)
+            else
             {
-                c_IgnoreSubStep = "OutOfRange";
-                AddToCache = false;
-                // return here to save CPU on reading unncessary attributes for out of range items;
-                if (!AddToCache)
-                    return AddToCache;
+                if (c_ItemQuality >= ItemQuality.Rare4)
+                    fExtraRange = CurrentBotLootRange;
+
+                if (iKeepLootRadiusExtendedFor > 0)
+                    fExtraRange += 90f;
+
+                if (c_CentreDistance > (CurrentBotLootRange + fExtraRange))
+                {
+                    c_IgnoreSubStep = "OutOfRange";
+                    AddToCache = false;
+                    // return here to save CPU on reading unncessary attributes for out of range items;
+                    if (!AddToCache)
+                        return AddToCache;
+                }
             }
 
             c_ItemDisplayName = item.CommonData.Name;
@@ -229,6 +229,16 @@ namespace Trinity
             return AddToCache;
         }
 
+        private static bool MosterObstacleInPathCacheObject(bool AddToCache)
+        {
+            // Don't add an item if a monster is blocking our path
+            if (MonsterObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, Player.Position, c_Position)))
+            {
+                AddToCache = false;
+                c_IgnoreSubStep = "MonsterInPath";
+            }
+            return AddToCache;
+        }
         private static void LogSkippedGold()
         {
             string skippedItemsPath = Path.Combine(FileManager.LoggingPath, String.Format("SkippedGoldStacks_{0}_{1}.csv", Player.ActorClass, DateTime.Now.ToString("yyyy-MM-dd")));

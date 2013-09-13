@@ -38,4 +38,11 @@ namespace Trinity.Config.Combat
         OnlyIfStuck,
         DestroyAll
     }
+
+    public enum BarbarianWOTBMode
+    {
+        HardElitesOnly,
+        Normal,
+        WhenReady
+    }
 }

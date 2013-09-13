@@ -316,10 +316,10 @@ namespace Trinity
                         if (DateTime.Now.Subtract(lastAddedLocationCache).TotalMilliseconds >= 100)
                         {
                             lastAddedLocationCache = DateTime.Now;
-                            if (Vector3.Distance(Player.Position, vLastRecordedLocationCache) >= 5f)
+                            if (Vector3.Distance(Player.Position, LastRecordedPosition) >= 5f)
                             {
-                                hashSkipAheadAreaCache.Add(new CacheObstacleObject(Player.Position, 20f, 0));
-                                vLastRecordedLocationCache = Player.Position;
+                                SkipAheadAreaCache.Add(new CacheObstacleObject(Player.Position, 20f, 0));
+                                LastRecordedPosition = Player.Position;
 
                                 // Mark Dungeon Explorer nodes as Visited if combat pulls us into it
                                 if (ProfileManager.CurrentProfileBehavior != null)
@@ -669,7 +669,7 @@ namespace Trinity
                         if (CurrentTarget.Type != GObjectType.Avoidance)
                         {
                             Vector3 point = vCurrentDestination;
-                            foreach (CacheObstacleObject tempobstacle in Trinity.hashNavigationObstacleCache.Where(cp =>
+                            foreach (CacheObstacleObject tempobstacle in Trinity.NavigationObstacleCache.Where(cp =>
                                             MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, point) &&
                                             cp.Location.Distance2D(Player.Position) > PlayerMover.GetObstacleNavigationSize(cp)))
                             {
@@ -1183,9 +1183,9 @@ namespace Trinity
                     //DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= CombatBase.SetSNOPowerUseDelay(SNOPower.DemonHunter_Vault] &&
                     DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
-                    (PlayerKiteDistance <= 0 || (!hashMonsterObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
-                    !hashAvoidanceObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance))) &&
-                    (!Trinity.hashAvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, Trinity.Player.Position, vCurrentDestination)))
+                    (PlayerKiteDistance <= 0 || (!MonsterObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
+                    !AvoidanceObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance))) &&
+                    (!Trinity.AvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, Trinity.Player.Position, vCurrentDestination)))
                     )
                 {
                     WaitWhileAnimating(3, true);

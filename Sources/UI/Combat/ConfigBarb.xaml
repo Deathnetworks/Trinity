@@ -11,11 +11,11 @@
             <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="..\Template.xaml"/></ResourceDictionary.MergedDictionaries>
 
             <ut:PercentConverter x:Key="percentConverter" />
+            <ut:EnumBooleanConverter x:Key="enumBooleanConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -97,26 +97,35 @@
         <!--Kite-->
         <!--CheckBox-->
         <Grid Grid.Row="2" Margin="2">
-            <UniformGrid Columns="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0">
+                <GroupBox.Header>Wrath of the Berserker</GroupBox.Header>
+                <UniformGrid Columns="2">
+                    <RadioButton GroupName="WOTBMode" Content="Use on Hard Elites Only" IsChecked="{Binding Path=Barb.WOTBMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=HardElitesOnly}"  />
+                    <RadioButton GroupName="WOTBMode" Content="Use on Any Elite or Ignore Elites" IsChecked="{Binding Path=Barb.WOTBMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Normal}" />
+                    <RadioButton GroupName="WOTBMode" Content="Use When not on Cooldown" IsChecked="{Binding Path=Barb.WOTBMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=WhenReady}" />
+                    <!--<CheckBox Margin="2" IsChecked="{Binding Path=Barb.WOTBHardOnly}" ToolTip="Saves WOTB for use on elites with Arcane, Frozen, Jailer, Molten, Electrified and Reflects Damage">Use WOTB on hard elites only</CheckBox>-->
+                    <CheckBox Margin="2" IsChecked="{Binding Path=Barb.WaitWOTB}">Wait for cooldown at Azmo</CheckBox>
+                    <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseWOTBGoblin}">Use on Goblins</CheckBox>
+                    <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpWOTB}">Fury Dump (Sprint)</CheckBox>
+                    <CheckBox Margin="2" IsChecked="{Binding Barb.IgnoreAvoidanceInWOTB}" ToolTip="Avoidance Health Triggers Reduced" Content="Modify AoE Health"/>
+                    <CheckBox Margin="2" IsChecked="{Binding Barb.IgnoreGoldInWOTB}" ToolTip="Ignores gold when WOTB is up" Content="Ignore Gold Stacks"/>
+                </UniformGrid>
+            </GroupBox>
+            <UniformGrid Columns="2" Grid.Row="1">
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.SelectiveWhirlwind}" ToolTip="eg goblins, occultists">Selective Whirlwind Target</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.WaitWOTB}">Wait WOTB cooldown at Azmo</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseWOTBGoblin}">Use WOTB on Goblins</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpWOTB}">Fury Dump in WOTB Mode</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpAlways}">Fury Dump always</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.WOTBHardOnly}" ToolTip="Saves WOTB for use on elites with Arcane, Frozen, Jailer, Molten, Electrified and Reflects Damage">Use WOTB on hard elites only</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpAlways}" ToolTip="Spam Sprint when at max fury">Fury Dump always</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.TargetBasedZigZag}" ToolTip="Uses Monster positions as WW points instead of random XYZ">Multi-Target Based ZigZag</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.ThreatShoutOOC}" ToolTip="Use Threating Shout Out of Combat to generate Fury">Use Threating Shout OOC</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.IgnoreAvoidanceInWOTB}" ToolTip="Avoidance Health Triggers Reduced">Modify Avoidance in WOTB</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.IgnoreGoldInWOTB}" ToolTip="Ignores gold when WOTB is up">Ignore Gold Stacks in WOTB</CheckBox>
             </UniformGrid>
         </Grid>
         <Grid Grid.Row="3" Margin="2">
             <ScrollViewer Tag="Combat\Avoidance.xaml" DataContext="{Binding Path=Barb}"/>
         </Grid>
-        <Grid Grid.Row="4" Margin="2">
-<!-- To be used later .. -->
-        </Grid>
         <!--Reset Button-->
-        <Button Grid.Row="5" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetBarbCommand}">Reset</Button>
+        <Button Grid.Row="4" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetBarbCommand}">Reset</Button>
     </Grid>
 </UserControl>

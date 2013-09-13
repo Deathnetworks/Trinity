@@ -27,17 +27,10 @@ namespace Trinity
             {
                 double MovementSpeed = PlayerMover.GetMovementSpeed();
 
+                bool noGoblinsPresent = (!AnyTreasureGoblinsPresent && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize) || Settings.Combat.Misc.GoblinPriority < GoblinPriority.Prioritize;
+
                 // Store if we are ignoring all units this cycle or not
-                bool ignoreAllUnits = !AnyElitesPresent &&
-                                        !AnyMobsInRange &&
-                                        (
-                                            (
-                                                !AnyTreasureGoblinsPresent &&
-                                                Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize
-                                            ) ||
-                                            Settings.Combat.Misc.GoblinPriority < GoblinPriority.Prioritize
-                                        ) &&
-                                        Player.CurrentHealthPct >= 0.85d;
+                bool ignoreAllUnits = !AnyElitesPresent && !AnyMobsInRange && noGoblinsPresent && Player.CurrentHealthPct >= 0.85d;
 
                 bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || MovementSpeed < 1 || ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 5f) >= 3);
 
@@ -147,8 +140,6 @@ namespace Trinity
                                     bool isRended = cacheObject.HasDotDPS;
 
                                     // Flag up any bosses in range
-                                    if (cacheObject.IsBoss)
-                                        anyBossesInRange = true;
                                     if (cacheObject.RadiusDistance <= 6f)
                                     {
                                         AnythingWithinRange[RANGE_6]++;
@@ -290,14 +281,14 @@ namespace Trinity
                                         if (!Settings.Combat.Misc.KillMonstersInAoE &&
                                             PlayerKiteDistance <= 0 &&
                                             cacheObject.AvoidanceType != AvoidanceType.PlagueCloud &&
-                                            hashAvoidanceObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, Player.Position, cacheObject.Position)))
+                                            AvoidanceObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, Player.Position, cacheObject.Position)))
                                             cacheObject.Weight = 1d;
 
                                         // See if there's any AOE avoidance in that spot, if so reduce the weight to 1, for non-ranged attacks only
                                         if (!Settings.Combat.Misc.KillMonstersInAoE &&
                                             PlayerKiteDistance <= 0 &&
                                             cacheObject.AvoidanceType != AvoidanceType.PlagueCloud &&
-                                            hashAvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
+                                            AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
                                             cacheObject.Weight = 1d;
 
                                         if (PlayerKiteDistance > 0)
@@ -336,7 +327,7 @@ namespace Trinity
                                                     lastGoblinTime = DateTime.Today;
                                             }
 
-                                            if (hashAvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius) && Settings.Combat.Misc.GoblinPriority != GoblinPriority.Kamikaze)
+                                            if (AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius) && Settings.Combat.Misc.GoblinPriority != GoblinPriority.Kamikaze)
                                             {
                                                 cacheObject.Weight = 1;
                                                 break;
@@ -412,7 +403,7 @@ namespace Trinity
 
                                 // If there's a monster in the path-line to the item, reduce the weight to 1, except legendaries
                                 if (//cacheObject.ItemQuality < ItemQuality.Legendary && 
-                                    hashMonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius * 1.2f, Player.Position, cacheObject.Position)))
+                                    MonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius * 1.2f, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
                                 // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
@@ -420,7 +411,7 @@ namespace Trinity
                                     cacheObject.Weight = 1;
 
                                 // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
-                                if (hashAvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
+                                if (AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
                                     cacheObject.Weight = 1;
 
                                 // ignore non-legendaries and gold near elites if we're ignoring elites
@@ -453,24 +444,23 @@ namespace Trinity
                                 // Give all globes super low weight if we don't urgently need them, but are not 100% health
                                 else if (!witchDoctorManaLow && (Player.CurrentHealthPct > PlayerEmergencyHealthGlobeLimit))
                                 {
-                                    var myHealth = Player.CurrentHealthPct;
+                                    double myHealth = Player.CurrentHealthPct;
 
-                                    double minPartyHealth = 0d;
+                                    double minPartyHealth = 1d;
                                     if (ObjectCache.Any(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid))
                                         minPartyHealth = ObjectCache.Where(p => p.Type == GObjectType.Player && p.RActorGuid != Player.RActorGuid).Min(p => p.HitPointsPct);
 
-                                    if (myHealth < V.D("Weight.Globe.MinPlayerHealthPct"))
-                                        cacheObject.Weight = (1 - myHealth) * 1000;
+                                    if (myHealth > 0d && myHealth < V.D("Weight.Globe.MinPlayerHealthPct"))
+                                        cacheObject.Weight = (1d - myHealth) * 1000d;
 
                                     // Added weight for lowest health of party member
-                                    if (minPartyHealth < V.D("Weight.Globe.MinPartyHealthPct"))
-                                        cacheObject.Weight = (1 - minPartyHealth) * 2500;
+                                    if (minPartyHealth > 0d && minPartyHealth < V.D("Weight.Globe.MinPartyHealthPct"))
+                                        cacheObject.Weight = (1d - minPartyHealth) * 2500d;
                                 }
                                 else
                                 {
                                     // Ok we have globes enabled, and our health is low
                                     cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 17000d;
-
 
                                     if (witchDoctorManaLow)
                                         cacheObject.Weight += 10000d; // 10k for WD's!
@@ -490,7 +480,7 @@ namespace Trinity
 
                                 // If there's a monster in the path-line to the item, reduce the weight by 15% for each
                                 Vector3 point = cacheObject.Position;
-                                foreach (CacheObstacleObject tempobstacle in hashMonsterObstacleCache.Where(cp =>
+                                foreach (CacheObstacleObject tempobstacle in MonsterObstacleCache.Where(cp =>
                                     MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, point)))
                                 {
                                     cacheObject.Weight *= 0.85;
@@ -499,7 +489,7 @@ namespace Trinity
                                 if (cacheObject.CentreDistance > 10f)
                                 {
                                     // See if there's any AOE avoidance in that spot, if so reduce the weight by 10%
-                                    if (hashAvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
+                                    if (AvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
                                         cacheObject.Weight *= 0.9;
 
                                 }
@@ -507,9 +497,9 @@ namespace Trinity
                                 // do not collect health globes if we are kiting and health globe is too close to monster or avoidance
                                 if (PlayerKiteDistance > 0)
                                 {
-                                    if (hashMonsterObstacleCache.Any(m => m.Location.Distance(cacheObject.Position) < PlayerKiteDistance))
+                                    if (MonsterObstacleCache.Any(m => m.Location.Distance(cacheObject.Position) < PlayerKiteDistance))
                                         cacheObject.Weight = 0;
-                                    if (hashAvoidanceObstacleCache.Any(m => m.Location.Distance(cacheObject.Position) < PlayerKiteDistance))
+                                    if (AvoidanceObstacleCache.Any(m => m.Location.Distance(cacheObject.Position) < PlayerKiteDistance))
                                         cacheObject.Weight = 0;
                                 } 
                                 break;
@@ -544,11 +534,11 @@ namespace Trinity
                                         cacheObject.Weight += 400;
 
                                     // If there's a monster in the path-line to the item
-                                    if (hashMonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
+                                    if (MonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
                                         cacheObject.Weight = 1;
 
                                     // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
-                                    if (hashAvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
+                                    if (AvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
                                         cacheObject.Weight = 1;
 
                                     // if there's any monsters nearby
@@ -591,11 +581,11 @@ namespace Trinity
                                 //    cacheObject.Weight += 1500d;
 
                                 // If there's a monster in the path-line to the item, reduce the weight by 50%
-                                if (hashMonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
+                                if (MonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight *= 0.5;
 
                                 // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
-                                if (hashAvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
+                                if (AvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
                                 // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
@@ -625,11 +615,11 @@ namespace Trinity
                                     cacheObject.Weight += 400;
 
                                 // If there's a monster in the path-line to the item, reduce the weight by 50%
-                                if (hashMonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
+                                if (MonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight *= 0.5;
 
                                 // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
-                                if (hashAvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
+                                if (AvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
                                 //if (bAnyMobsInCloseRange || (CurrentTarget != null && CurrentTarget.IsBossOrEliteRareUnique))
@@ -652,11 +642,11 @@ namespace Trinity
                                     cacheObject.Weight += 400;
 
                                 // If there's a monster in the path-line to the item, reduce the weight by 50%
-                                if (hashMonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
+                                if (MonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight *= 0.5;
 
                                 // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
-                                if (hashAvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
+                                if (AvoidanceObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 1;
                                 break;
                             }
@@ -692,7 +682,7 @@ namespace Trinity
                         // Kiting and Avoidance
                         if (CurrentTarget.Type == GObjectType.Unit)
                         {
-                            var AvoidanceList = hashAvoidanceObstacleCache.Where(o =>
+                            var AvoidanceList = AvoidanceObstacleCache.Where(o =>
                                 // Distance from avoidance to target is less than avoidance radius
                                 o.Location.Distance(CurrentTarget.Position) <= (GetAvoidanceRadius(o.ActorSNO) * 1.2) &&
                                     // Distance from obstacle to me is <= cacheObject.RadiusDistance

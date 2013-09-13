@@ -114,17 +114,30 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
             }
 
+            bool hasTranscendance = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Monk_Passive_Transcendence);
+            float minSweepingWindSpirit = Settings.Combat.Monk.HasInnaSet ? 5f : 75f;
+
             // Sweeping wind
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) && SNOPowerUseTimer(SNOPower.Monk_SweepingWind) &&
-                (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_20] >= 3 || Settings.Combat.Monk.HasInnaSet ||
+                ((TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyElitesInRange(20, 3) || Settings.Combat.Monk.HasInnaSet ||
                 (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 25f)) &&
                 // Check our mantras, if we have them, are up first
                 Monk_HasMantraAbilityAndBuff() &&
                 // Check if either we don't have blinding flash, or we do and it's been cast in the last 8000ms
                 (TimeSinceUse(SNOPower.Monk_BlindingFlash) <= 8000 || CheckAbilityAndBuff(SNOPower.Monk_BlindingFlash) ||
-                ElitesWithinRange[RANGE_25] > 0 && TimeSinceUse(SNOPower.Monk_BlindingFlash) <= 12500) &&
-                // Check the re-use timer and energy costs
-                (Player.PrimaryResource >= 75 || (Settings.Combat.Monk.HasInnaSet && Player.PrimaryResource >= 5)))
+                TargetUtil.AnyElitesInRange(25, 1) && TimeSinceUse(SNOPower.Monk_BlindingFlash) <= 12500)) &&
+                Player.PrimaryResource >= minSweepingWindSpirit)
+            {
+                SweepWindSpam = DateTime.Now;
+                return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
+            }
+
+            // Sweeping Wind for Transcendance Health Regen
+            if (CombatBase.CanCast(SNOPower.Monk_SweepingWind, CombatBase.CanCastFlags.NoTimer) &&
+                Player.PrimaryResource >= minSweepingWindSpirit &&
+                hasTranscendance && Settings.Combat.Monk.SpamSweepingWindOnLowHP &&
+                Player.CurrentHealthPct <= V.F("Monk.SweepingWind.SpamOnLowHealthPct") &&
+                TimeSinceUse(SNOPower.Monk_SweepingWind) > 500)
             {
                 SweepWindSpam = DateTime.Now;
                 return new TrinityPower(SNOPower.Monk_SweepingWind, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
@@ -186,7 +199,7 @@ namespace Trinity
                 (TargetUtil.AnyMobsInRange(16f, Settings.Combat.Monk.MinWoLTrashCount) || TargetUtil.IsEliteTargetInRange(20f)) &&
                 (Player.PrimaryResource >= minWoLSpirit && !IsWaitingForSpecial || Player.PrimaryResource > MinEnergyReserve) &&
                 // optional check for SW stacks
-                (Settings.Combat.Monk.SWBeforeWoL && (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) || !Settings.Combat.Monk.SWBeforeWoL) && 
+                (Settings.Combat.Monk.SWBeforeWoL && (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) && GetBuffStacks(SNOPower.Monk_SweepingWind) == 3) || !Settings.Combat.Monk.SWBeforeWoL) &&
                 Monk_HasMantraAbilityAndBuff())
             {
                 var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 15f);
@@ -210,8 +223,8 @@ namespace Trinity
             // Cyclone Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_CycloneStrike) && SNOPowerUseTimer(SNOPower.Monk_CycloneStrike) &&
                 (
-                 TargetUtil.AnyElitesInRange(cycloneStrikeRange, 2) || 
-                 TargetUtil.AnyMobsInRange(cycloneStrikeRange, Settings.Combat.Monk.MinCycloneTrashCount) || 
+                 TargetUtil.AnyElitesInRange(cycloneStrikeRange, 2) ||
+                 TargetUtil.AnyMobsInRange(cycloneStrikeRange, Settings.Combat.Monk.MinCycloneTrashCount) ||
                  (CurrentTarget.RadiusDistance >= 15f && CurrentTarget.RadiusDistance <= cycloneStrikeRange) // pull the current target into attack range
                 ) &&
                 ((Player.PrimaryResource >= cycloneStrikeSpirit && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
@@ -347,7 +360,7 @@ namespace Trinity
                 || AnythingWithinRange[RANGE_50] < 5 && ElitesWithinRange[RANGE_50] <= 0 && !WantToSwap))
             {
                 OtherThanDeadlyReach = DateTime.Now;
-                Monk_TickSweepingWindSpam(); 
+                Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 14f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, NO_WAIT_ANIM);
             }
             // Deadly reach

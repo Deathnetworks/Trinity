@@ -287,7 +287,7 @@ namespace Trinity
                 CurrentTarget = null;
                 // Reset all variables for target-weight finding
                 AnyTreasureGoblinsPresent = false;
-                CurrentBotKillRange = Math.Min((float)(Settings.Combat.Misc.NonEliteRange), Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius);
+                CurrentBotKillRange = Settings.Combat.Misc.NonEliteRange;
 
                 CurrentBotLootRange = Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius;
                 ShouldStayPutDuringAvoidance = false;
@@ -333,9 +333,9 @@ namespace Trinity
                     ForceCloseRangeTarget = false;
                 }
                 // Bunch of variables used throughout
-                hashMonsterObstacleCache = new HashSet<CacheObstacleObject>();
-                hashAvoidanceObstacleCache = new HashSet<CacheObstacleObject>();
-                hashNavigationObstacleCache = new HashSet<CacheObstacleObject>();
+                MonsterObstacleCache = new HashSet<CacheObstacleObject>();
+                AvoidanceObstacleCache = new HashSet<CacheObstacleObject>();
+                NavigationObstacleCache = new HashSet<CacheObstacleObject>();
                 AnyElitesPresent = false;
                 AnyMobsInRange = false;
                 TownRun.lastDistance = 0f;
@@ -368,7 +368,6 @@ namespace Trinity
                 ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
                 AnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
                 NonRendedTargets_9 = 0;
-                anyBossesInRange = false;
                 // Flag for if we should search for an avoidance spot or not
                 StandingInAvoidance = false;
                 // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
