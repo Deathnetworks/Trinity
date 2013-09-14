@@ -116,7 +116,7 @@ namespace Trinity.XmlTags
                             )
                         ),
                         new Sequence(
-                            // Already casting, just wait
+                // Already casting, just wait
                             new DecoratorContinue(ret => ZetaDia.Me.LoopingAnimationEndTime > 0,
                                 new Action()
                             ),
