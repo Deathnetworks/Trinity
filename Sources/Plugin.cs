@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta;

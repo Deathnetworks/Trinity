@@ -1,6 +1,4 @@
 ﻿// VERSION 1.1.3a
-using System;
-using System.Diagnostics;
 using System.Windows;
 using Zeta;
 using Zeta.Common;

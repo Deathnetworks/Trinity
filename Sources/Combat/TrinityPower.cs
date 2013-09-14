@@ -1,5 +1,4 @@
 ﻿using System;
-using Trinity.Combat;
 using Trinity.Combat.Abilities;
 using Zeta.Common;
 using Zeta.Internals.Actors;

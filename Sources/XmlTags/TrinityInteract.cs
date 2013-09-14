@@ -1,12 +1,11 @@
-﻿using Trinity.Technicals;
-using System.Linq;
+﻿using System.Linq;
+using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot.Profile;
 using Zeta.Internals.Actors;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
-using System;
 
 namespace Trinity.XmlTags
 {

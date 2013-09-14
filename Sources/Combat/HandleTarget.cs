@@ -1,24 +1,21 @@
-﻿using Trinity.DbProvider;
-using Trinity.Config.Combat;
-using Trinity.Technicals;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
+using Trinity.Combat.Abilities;
+using Trinity.Config.Combat;
+using Trinity.DbProvider;
+using Trinity.Technicals;
+using Trinity.XmlTags;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
-using Zeta.Internals.SNO;
+using Zeta.Navigation;
 using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
 using Decorator = Zeta.TreeSharp.Decorator;
-using System.Diagnostics;
-using Zeta.Navigation;
-using Trinity.XmlTags;
-using Trinity.Combat.Abilities;
 namespace Trinity
 {
     public partial class Trinity : IPlugin

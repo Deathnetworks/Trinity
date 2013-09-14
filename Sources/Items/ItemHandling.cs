@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using Trinity.Cache;
-using Trinity.ItemRules;
 using Trinity.Config.Loot;
+using Trinity.ItemRules;
 using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
@@ -186,7 +186,7 @@ namespace Trinity
             // using ItemEvaluationType.Identify isn't available so we are abusing Sell for that manner
             Interpreter.InterpreterAction action = Trinity.StashRule.checkPickUpItem(pickupItem, ItemEvaluationType.Sell);
 
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Action is: {0}", action);
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.ItemValuation, "Action is: {0}", action);
 
             switch (action)
             {

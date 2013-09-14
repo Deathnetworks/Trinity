@@ -1,10 +1,10 @@
-﻿using Trinity.Technicals;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
-using System.Web;
 using System.Text;
+using System.Web;
+using Trinity.Technicals;
 
 namespace Trinity.Notifications
 {

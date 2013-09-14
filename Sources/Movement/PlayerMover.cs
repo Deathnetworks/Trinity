@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
-using Trinity.XmlTags;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot;
-using Zeta.CommonBot.Dungeons;
 using Zeta.CommonBot.Profile;
 using Zeta.CommonBot.Profile.Common;
 using Zeta.Internals;

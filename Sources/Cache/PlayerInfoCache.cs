@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using Trinity.Combat.Abilities;
 using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.Internals.Actors;
-using Trinity.Combat.Abilities;
 
 namespace Trinity
 {

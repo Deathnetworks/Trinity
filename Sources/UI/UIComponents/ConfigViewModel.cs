@@ -1,13 +1,12 @@
-﻿using Trinity.DbProvider;
+﻿using System;
+using System.Diagnostics;
+using System.Windows.Forms;
+using System.Windows.Input;
 using Trinity.Config;
 using Trinity.Config.Combat;
 using Trinity.Config.Loot;
-using Trinity.UI;
-using System.Diagnostics;
-using System.Windows.Input;
 using Trinity.Technicals;
-using System;
-using System.Windows.Forms;
+using Trinity.UI;
 using Zeta.CommonBot;
 
 namespace Trinity.UIComponents

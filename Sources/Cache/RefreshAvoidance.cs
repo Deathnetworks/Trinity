@@ -1,10 +1,7 @@
 ﻿using System;
-using Trinity.Config.Combat;
-using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
-using Zeta.Internals.Actors.Gizmos;
 using Zeta.Navigation;
 
 namespace Trinity

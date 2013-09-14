@@ -9,7 +9,6 @@ using Zeta;
 using Zeta.Common;
 using Zeta.Internals.Actors;
 using Zeta.Navigation;
-using Zeta.Pathfinding;
 
 namespace Trinity
 {

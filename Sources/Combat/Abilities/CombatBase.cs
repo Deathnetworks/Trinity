@@ -1,14 +1,12 @@
-﻿using Trinity.DbProvider;
-using Trinity.Technicals;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Trinity.Config;
+using Trinity.Technicals;
+using Zeta;
 using Zeta.Common;
-using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
-using System.Collections.Generic;
-using Zeta;
-using Trinity.Config;
 
 namespace Trinity.Combat.Abilities
 {

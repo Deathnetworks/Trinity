@@ -63,7 +63,8 @@ namespace Trinity
             XmlWriterSettings xws = new XmlWriterSettings()
             {
                 Indent = false,
-                OmitXmlDeclaration = true
+                OmitXmlDeclaration = true, 
+                NewLineHandling = NewLineHandling.None, 
             };
             using (StringWriter sw = new StringWriter())
             {

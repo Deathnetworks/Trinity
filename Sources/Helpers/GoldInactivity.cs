@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using Trinity.DbProvider;
 using Trinity.Technicals;
@@ -10,7 +7,6 @@ using Zeta;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Profile;
 using Zeta.CommonBot.Profile.Common;
-using Zeta.TreeSharp;
 
 namespace Trinity
 {

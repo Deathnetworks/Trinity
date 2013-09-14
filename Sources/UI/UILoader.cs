@@ -1,13 +1,13 @@
-﻿using Trinity.Technicals;
-using Trinity.UIComponents;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
-using System.Text.RegularExpressions;
+using Trinity.Technicals;
+using Trinity.UIComponents;
 
 namespace Trinity.UI
 {

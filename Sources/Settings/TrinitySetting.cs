@@ -1,16 +1,14 @@
-﻿using Trinity.DbProvider;
-using Trinity.Config.Combat;
-using Trinity.Config.Loot;
-using Trinity.Technicals;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Zeta;
-using System.Xml;
-using Trinity.Helpers;
 using System.Threading;
+using System.Xml;
+using Trinity.Config.Combat;
+using Trinity.Config.Loot;
+using Trinity.Technicals;
+using Zeta;
 
 namespace Trinity.Config
 {

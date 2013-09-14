@@ -1,6 +1,6 @@
-﻿using Trinity.Technicals;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.Serialization;
+using Trinity.Technicals;
 
 namespace Trinity.Config
 {

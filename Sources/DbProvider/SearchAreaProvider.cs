@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using Trinity.Technicals;
-using Zeta;
-using Zeta.Common;
-using Zeta.Common.Helpers;
-using Zeta.Internals.Actors;
-using Zeta.Internals.SNO;
-using Zeta.Navigation;
-using Zeta.Pathfinding;
-
+﻿
 //namespace Trinity.DbProvider
 //{
 //    [Obsolete("No longer used, use ((MainGridProvider)Navigation.SearchAreaProvider).AddCellWeightingObstacle()")]

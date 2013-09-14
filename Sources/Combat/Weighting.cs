@@ -1,17 +1,16 @@
-using Trinity.Config.Combat;
-using Trinity.Technicals;
 using System;
 using System.Linq;
+using Trinity.Combat.Abilities;
+using Trinity.Config.Combat;
+using Trinity.DbProvider;
+using Trinity.Technicals;
+using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.Internals.Actors;
-using Zeta.Internals.SNO;
-using Zeta.TreeSharp;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Profile.Common;
-using Zeta;
-using Trinity.DbProvider;
-using Trinity.Combat.Abilities;
+using Zeta.Internals.Actors;
+using Zeta.Internals.SNO;
 namespace Trinity
 {
     public partial class Trinity : IPlugin
@@ -670,7 +669,12 @@ namespace Trinity
 
                         case GObjectType.HotSpot:
                             {
-                                if (!AvoidanceObstacleCache.Any(a => a.Location.Distance2D(cacheObject.Position) <= a.Radius))
+                                // If it's very close, ignore
+                                if (cacheObject.CentreDistance <= 25f)
+                                {
+                                    cacheObject.Weight = 0;
+                                }
+                                else if (!AvoidanceObstacleCache.Any(aoe => aoe.Location.Distance2D(cacheObject.Position) <= aoe.Radius))
                                 {
                                     float maxDist = V.F("Cache.HotSpot.MaxDistance");
                                     cacheObject.Weight = (maxDist - cacheObject.CentreDistance) / maxDist * 1000d;

@@ -1,5 +1,4 @@
-﻿using Zeta.Common.Plugins;
-namespace Trinity
+﻿namespace Trinity
 {
     public static class Constants
     {

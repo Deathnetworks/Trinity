@@ -1,5 +1,5 @@
-﻿using Trinity.ItemRules;
-using Trinity.Config.Loot;
+﻿using Trinity.Config.Loot;
+using Trinity.ItemRules;
 using Trinity.Technicals;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Items;

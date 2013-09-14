@@ -1,16 +1,16 @@
-﻿using Trinity.Config.Combat;
-using Trinity.Technicals;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Trinity.Combat.Abilities;
+using Trinity.Config.Combat;
+using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
 using Zeta.Internals.SNO;
-using Trinity.Combat.Abilities;
 namespace Trinity
 {
     public partial class Trinity : IPlugin

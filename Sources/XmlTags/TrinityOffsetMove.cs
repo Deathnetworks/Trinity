@@ -1,6 +1,5 @@
 ﻿using Trinity.DbProvider;
 using Trinity.Technicals;
-using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot.Profile;
 using Zeta.Navigation;

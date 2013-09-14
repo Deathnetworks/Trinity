@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
-using System.Windows;
-using Trinity.Cache;
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
-using Zeta.Common.Plugins;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
 using Zeta.Navigation;

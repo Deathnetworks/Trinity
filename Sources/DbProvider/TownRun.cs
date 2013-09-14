@@ -5,17 +5,17 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Trinity.Notifications;
 using Trinity.Config.Loot;
+using Trinity.Notifications;
 using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot;
+using Zeta.CommonBot.Logic;
 using Zeta.CommonBot.Profile;
 using Zeta.CommonBot.Profile.Common;
 using Zeta.Internals.Actors;
 using NotificationManager = Trinity.Notifications.NotificationManager;
-using Zeta.CommonBot.Logic;
 
 namespace Trinity
 {

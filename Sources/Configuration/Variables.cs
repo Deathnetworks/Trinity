@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Windows.Controls;
-using Trinity.ItemRules;
 using Trinity.Config;
+using Trinity.ItemRules;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
-using Zeta.Internals.SNO;
 using Zeta.Navigation;
 using Zeta.Pathfinding;
 

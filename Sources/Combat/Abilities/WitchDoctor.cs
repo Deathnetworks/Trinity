@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Combat.Abilities;
-using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;

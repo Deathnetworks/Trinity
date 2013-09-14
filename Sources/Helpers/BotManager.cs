@@ -1,17 +1,14 @@
-﻿using Trinity.Cache;
-using System;
-using System.Collections.Generic;
-using Trinity.DbProvider;
+﻿using System;
+using System.Threading;
+using System.Windows;
 using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.CommonBot;
+using Zeta.Navigation;
 using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
-using Zeta.Navigation;
-using System.Threading;
-using System.Windows;
 
 namespace Trinity
 {

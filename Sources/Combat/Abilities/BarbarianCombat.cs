@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.CommonBot;
@@ -127,7 +125,7 @@ namespace Trinity.Combat.Abilities
             if (IsNull(power) && CanUseFrenzyTo5)
                 power = PowerFrenzy;
 
-            // - Weapon Throw: Dreadbomb
+            // Weapon Throw: Dreadbomb
             if (IsNull(power) && CanUseDreadbomb)
                 power = PowerWeaponThrow;
 				
@@ -135,13 +133,13 @@ namespace Trinity.Combat.Abilities
             if (IsNull(power) && CanUseHammerOfTheAncientsElitesOnly)
                 power = PowerHammerOfTheAncients;
 
-            // Hammer of the Ancients
-            if (IsNull(power) && CanUseHammerOfTheAncients)
-                power = PowerHammerOfTheAncients;
-
             // Whirlwind
             if (IsNull(power) && CanUseWhirlwind)
                 power = PowerWhirlwind;
+
+            // Hammer of the Ancients
+            if (IsNull(power) && CanUseHammerOfTheAncients)
+                power = PowerHammerOfTheAncients;
 
             // Weapon Throw
             if (IsNull(power) && CanUseWeaponThrow)
@@ -610,8 +608,7 @@ namespace Trinity.Combat.Abilities
                     Player.PrimaryResource >= 20 && PowerManager.CanCast(SNOPower.Barbarian_BattleRage);
             }
         }
-		// - Dreadbomb build support
-		//public static bool hasDreadBomb = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_WeaponThrow && s.RuneIndex == 3);
+		// Dreadbomb build support
 		public static bool CanUseDreadbomb
         {
             get

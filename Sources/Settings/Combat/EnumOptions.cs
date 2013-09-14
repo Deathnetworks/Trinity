@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace Trinity.Config.Combat
 {
     public enum GoblinPriority

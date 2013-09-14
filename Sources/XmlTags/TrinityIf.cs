@@ -1,5 +1,5 @@
-﻿using Trinity.Technicals;
-using System;
+﻿using System;
+using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Profile;

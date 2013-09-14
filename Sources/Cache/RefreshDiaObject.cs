@@ -1,8 +1,6 @@
-﻿using Trinity.DbProvider;
-using Trinity.Technicals;
-using System;
-using System.IO;
+﻿using System;
 using System.Linq;
+using Trinity.Technicals;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -10,9 +8,6 @@ using Zeta.CommonBot;
 using Zeta.Internals.Actors;
 using Zeta.Internals.Actors.Gizmos;
 using Zeta.Internals.SNO;
-using System.Text;
-using Trinity.Cache;
-using Trinity.Config.Combat;
 using Zeta.Navigation;
 namespace Trinity
 {
