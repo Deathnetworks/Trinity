@@ -44,40 +44,47 @@ namespace Trinity
         /// </summary>
         public void OnPulse()
         {
-            using (new PerformanceLogger("OnPulse"))
+            using (ZetaDia.Memory.AcquireFrame())
             {
-                try
+                using (new PerformanceLogger("OnPulse"))
                 {
-                    if (ZetaDia.Me == null)
-                        return;
-
-                    GameUI.SafeClickUIButtons();
-
-                    if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
-                        return;
-
-                    // hax for sending notifications after a town run
-                    if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !Player.IsInTown)
+                    try
                     {
-                        TownRun.SendEmailNotification();
-                        TownRun.SendMobileNotifications();
-                    }
+                        if (ZetaDia.Me == null)
+                            return;
 
-                    // See if we should update the stats file
-                    if (DateTime.Now.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
+                        GameUI.SafeClickUIButtons();
+
+                        if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
+                            return;
+
+                        // hax for sending notifications after a town run
+                        if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !Player.IsInTown)
+                        {
+                            TownRun.SendEmailNotification();
+                            TownRun.SendMobileNotifications();
+                        }
+
+                        // See if we should update the stats file
+                        if (DateTime.Now.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
+                        {
+                            ItemStatsLastPostedReport = DateTime.Now;
+                            OutputReport();
+                        }
+
+                        // Recording of all the XML's in use this run
+                        UsedProfileManager.RecordProfile();
+
+                        Monk_MaintainTempestRush();
+                    }
+                    catch (System.AccessViolationException)
                     {
-                        ItemStatsLastPostedReport = DateTime.Now;
-                        OutputReport();
+                        // woof! 
                     }
-
-                    // Recording of all the XML's in use this run
-                    UsedProfileManager.RecordProfile();
-
-                    Monk_MaintainTempestRush();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(LogCategory.UserInformation, "Exception in Pulse: {0}", ex.ToString());
+                    catch (Exception ex)
+                    {
+                        Logger.Log(LogCategory.UserInformation, "Exception in Pulse: {0}", ex.ToString());
+                    }
                 }
             }
         }
