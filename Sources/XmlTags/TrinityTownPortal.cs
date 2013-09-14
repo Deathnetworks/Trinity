@@ -16,6 +16,7 @@ namespace Trinity.XmlTags
         public static int DefaultWaitTime = -1;
 
         [XmlAttribute("waitTime")]
+        [XmlAttribute("wait")]
         public static int WaitTime { get; set; }
 
         public static Stopwatch AreaClearTimer = null;
@@ -120,7 +121,7 @@ namespace Trinity.XmlTags
                             new DecoratorContinue(ret => ZetaDia.Me.LoopingAnimationEndTime > 0,
                                 new Action()
                             ),
-                            new Action(ret => 
+                            new Action(ret =>
                             {
                                 GameEvents.FireWorldTransferStart();
                                 ZetaDia.Me.UseTownPortal();

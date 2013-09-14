@@ -86,22 +86,24 @@ namespace Trinity
                             {
                                 int nearbyMonsterCount = ObjectCache.Count(u => u.IsTrashMob && cacheObject.Position.Distance2D(u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius);
 
+                                bool isInHotSpot = GroupHotSpots.CacheObjectIsInHotSpot(cacheObject);
+
                                 // Ignore Solitary Trash mobs (no elites present)
                                 // Except if has been primary target or if already low on health (<= 20%)
                                 if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && //!cacheObject.HasBeenPrimaryTarget &&
-                                    !GroupHotSpots.CacheObjectIsInHotSpot(cacheObject) &&
+                                    !isInHotSpot &&
                                     !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize))
                                 {
-                                    unitWeightInfo = String.Format("Ignoring trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12}",
+                                    unitWeightInfo = String.Format("Ignoring trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12} hotspot={13}",
                                         cacheObject.InternalName, cacheObject.RActorGuid, nearbyMonsterCount, Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius,
-                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, Player.Level, prioritizeCloseRangeUnits);
+                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, Player.Level, prioritizeCloseRangeUnits, isInHotSpot);
                                     break;
                                 }
                                 else
                                 {
-                                    unitWeightInfo = String.Format("Adding mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12}",
+                                    unitWeightInfo = String.Format("Adding mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12} hotspot={13}",
                                         cacheObject.InternalName, cacheObject.RActorGuid, nearbyMonsterCount, Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius,
-                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, Player.Level, prioritizeCloseRangeUnits);
+                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, Player.Level, prioritizeCloseRangeUnits, isInHotSpot);
                                 }
 
                                 // Ignore elite option, except if trying to town portal
@@ -690,7 +692,7 @@ namespace Trinity
                         ShouldStayPutDuringAvoidance = true;
                     }
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
-                        "Weight={2:0} name={0} sno={1}) type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
+                        "Weight={2:0} name={0} sno={1} type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
                             cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique, cacheObject.RActorGuid, unitWeightInfo);
 
                     // Prevent current target dynamic ranged weighting flip-flop 

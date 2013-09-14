@@ -86,7 +86,7 @@ namespace Trinity
         internal static List<TrinityCacheObject> GetCacheObjectHotSpots()
         {
             List<TrinityCacheObject> list = new List<TrinityCacheObject>();
-            foreach (var hotSpot in HotSpotList.Where(s => s.Location.Distance2D(Trinity.Player.Position) <= V.F("Cache.HotSpot.MaxDistance") && s.WorldId == Trinity.Player.WorldID))
+            foreach (var hotSpot in HotSpotList.Where(s => s.Location.Distance2D(Trinity.Player.Position) <= V.F("Cache.HotSpot.MaxDistance") && s.Location.Distance2D(Trinity.Player.Position) >= V.F("Cache.HotSpot.MinDistance") && s.WorldId == Trinity.Player.WorldID))
             {
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Adding HotSpot to Cache: {0}", hotSpot);
                 var o = new TrinityCacheObject()

@@ -1,6 +1,70 @@
 ﻿
 # Trinity
 
+### Changelog 1.7.3.5
+
+#### Barbarian
+
+* Barbarian: Now using dogmeat's Spell Priorities
+
+* Barbarian: Added force WOTB on Emergency Health (50%) (Adjustable via Trinity Variables window)
+
+* Barbarian: Added Radio button options for WOTB: Hard Elites Only | Normal | Pop when not on CD
+
+* Barbarian: Added Rend spam with Bloodlust rune when < 50% health (Adjustable via Trinity Variables window)
+
+* Barbarian: Added Sprint MinUseDelay TVar
+
+* Fixed Barbarian Avoidance GUI
+
+#### Monk
+
+* Monk: Added Spam Sweeping Winds on Low HP Option in Monk GUI
+
+#### WitchDoctor
+
+* WitchDoctor: Added Spirit Walk: Honored Guest and Healing Journey rune Support
+
+* WitchDoctor: Will now attempt to auto-detect if we're using 0-dogs (e.g. if there is no other "primary attack" present)
+
+#### Wizard
+
+#### DemonHunter
+
+* DemonHunter: Added Chakram: Shuriken Cloud support
+
+* DemonHunter: ShadowPower is no longer cast when we already have the buff
+
+#### General
+
+* Trinity now supports the <TrinityTownPortal /> tag. Simply replace any existing "UseTownPortal" with "TrinityTownPortal" to use this functionality. TrinityTownPortal will automatically clear the area of all mobs before using Town Portal.
+
+* Trinity now has SimpleFollow Integration using a "Hot Spot" system, so that the leaders and followers should no longer get seperated if one or the other remains in combat.
+
+* Added Grotesque "Stitcher Suicide Bomb" AoE avoidance
+
+* Added field set/group boxes to Combat.Misc GUI
+
+* Removed combat radius reading from Default DB settings. Combat radius logic is now always used from Trinity Combat misc settings.
+
+#### Technical
+
+* Added Unit Animation Avoidance Logic, with new AnimationAvoidance DataDictionary Property
+
+* Added option to disable avoidance pathing - maybe help with OutOfMemoryException's
+
+* Added maximum 30f cap to avoidance SNO's, in case there's a random large radius sneaking into the avoidance manager - maybe help with OutOfMemoryException's
+
+* Moved OnPulse UI button click event after safety checks
+
+* Added Memory.AcquireFrame() around Trinity.OnPulse()
+
+* Remove and sort all usings
+
+* Disabled cache double check guid logic
+
+* Increased default large destructible object minimum distance from 2f to 5.9f
+
 ### Changelog 1.7.3.4
 
 #### Barbarian

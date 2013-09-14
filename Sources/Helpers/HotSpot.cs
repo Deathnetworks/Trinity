@@ -63,16 +63,18 @@ namespace Trinity
             XmlWriterSettings xws = new XmlWriterSettings()
             {
                 Indent = false,
-                OmitXmlDeclaration = true, 
-                NewLineHandling = NewLineHandling.None, 
+                OmitXmlDeclaration = true,
+                NewLineHandling = NewLineHandling.None,
             };
-            using (StringWriter sw = new StringWriter())
+            using (StringWriter stringWriter = new StringWriter())
             {
-                using (XmlWriter xw = XmlWriter.Create(sw, xws))
+                using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter, xws))
                 {
-                    xs.Serialize(xw, hotSpot);
+                    XmlSerializerNamespaces xmlSerializerNamespaces = new XmlSerializerNamespaces();
+                    xmlSerializerNamespaces.Add("", "");
+                    xs.Serialize(xmlWriter, hotSpot, xmlSerializerNamespaces);
                 }
-                return sw.ToString();
+                return stringWriter.ToString();
             }
         }
 
@@ -88,9 +90,9 @@ namespace Trinity
             XmlReaderSettings settings = new XmlReaderSettings();
             // No settings need modifying here
 
-            using (StringReader textReader = new StringReader(xml))
+            using (StringReader stringReader = new StringReader(xml))
             {
-                using (XmlReader xmlReader = XmlReader.Create(textReader, settings))
+                using (XmlReader xmlReader = XmlReader.Create(stringReader, settings))
                 {
                     return (HotSpot)serializer.Deserialize(xmlReader);
                 }
@@ -121,7 +123,7 @@ namespace Trinity
 
         public bool IsValid
         {
-            get { return this.Location != Vector3.Zero && this.WorldId != 0; } 
+            get { return this.Location != Vector3.Zero && this.WorldId != 0; }
         }
     }
 }
