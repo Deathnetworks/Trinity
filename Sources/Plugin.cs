@@ -53,10 +53,10 @@ namespace Trinity
                         if (ZetaDia.Me == null)
                             return;
 
-                        GameUI.SafeClickUIButtons();
-
                         if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                             return;
+
+                        GameUI.SafeClickUIButtons();
 
                         // hax for sending notifications after a town run
                         if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !Player.IsInTown)
