@@ -457,7 +457,9 @@ namespace Trinity.Combat.Abilities
                     (TimeSincePowerUse(SNOPower.Barbarian_Rend) > V.I("Barbarian.Rend.MinUseIntervalMillseconds")) &&
                     Trinity.LastPowerUsed != SNOPower.Barbarian_Rend) || 
                     // Spam when < %50 with Bloodlust
-                    (Player.CurrentHealthPct <= V.F("Barbarian.Rend.SpamBelowHealthPct") && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Rend && s.RuneIndex == 3)));
+                    (Player.CurrentHealthPct <= V.F("Barbarian.Rend.SpamBelowHealthPct") && 
+                    HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Rend && s.RuneIndex == 3) && 
+                    TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"))));
             }
         }
         public static bool CanUseOverPower

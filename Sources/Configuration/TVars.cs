@@ -267,7 +267,8 @@ namespace Trinity
             // Cache
             Set(new TVar("Cache.PretownRun.MaxDistance", 1500, "Default PreTownrun max distance"));
             Set(new TVar("Cache.TownPortal.KillRange", 60f, "Forced maximum distance for clearing the area before using a Town Portal"));
-            
+
+            Set(new TVar("Cache.HotSpot.MaxDistance", 250f, "Maximum distance to add team hotspots to cache"));
 
             // XmlTags
             Set(new TVar("XmlTag.TrinityTownPortal.DefaultWaitTime", 2500, "Time in Milliseconds to set the default wait time for TrinityTownPortal (may be overriden by Profile tags)"));

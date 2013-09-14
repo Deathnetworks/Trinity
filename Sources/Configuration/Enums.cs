@@ -106,6 +106,7 @@
         Checkpoint,
         Proxy,
         Trigger,
-        Player
+        Player,
+        HotSpot,
     }
 }

@@ -63,6 +63,9 @@ namespace Trinity
                     }
                 }
 
+                // Add Team HotSpots to the cache
+                ObjectCache.AddRange(GroupHotSpots.GetCacheObjectHotSpots());
+
                 // Reduce ignore-for-loops counter
                 if (IgnoreTargetForLoops > 0)
                     IgnoreTargetForLoops--;

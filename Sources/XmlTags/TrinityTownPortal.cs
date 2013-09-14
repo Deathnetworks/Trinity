@@ -41,6 +41,12 @@ namespace Trinity.XmlTags
 
         public override void OnStart()
         {
+            if (ZetaDia.Me.IsInTown)
+            {
+                _IsDone = true;
+                return;
+            }
+
             Logger.Log(LogCategory.ProfileTag, "TrinityTownPortal started - clearing area");
             ForceClearArea = true;
             AreaClearTimer.Start();
@@ -108,7 +114,10 @@ namespace Trinity.XmlTags
                 new Decorator(ret => !ForceClearArea,
                     new PrioritySelector(
                         new Decorator(ret => ZetaDia.Me.Movement.IsMoving,
-                            Zeta.CommonBot.CommonBehaviors.MoveStop()
+                            new Sequence(
+                                Zeta.CommonBot.CommonBehaviors.MoveStop(),
+                                new Sleep(1000)
+                            )
                         ),
                         new Sequence(
                             // Already casting, just wait

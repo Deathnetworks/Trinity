@@ -80,6 +80,7 @@
     <Compile Include="Helpers\DoubleInt.cs" />
     <Compile Include="Helpers\GameEvents.cs" />
     <Compile Include="Helpers\GameUI.cs" />
+    <Compile Include="Helpers\HotSpot.cs" />
     <Compile Include="Helpers\ObservableDictionary.cs" />
     <Compile Include="Helpers\PluginCheck.cs" />
     <Compile Include="Items\ItemEvents.cs" />

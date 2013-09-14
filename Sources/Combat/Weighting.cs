@@ -90,6 +90,7 @@ namespace Trinity
                                 // Ignore Solitary Trash mobs (no elites present)
                                 // Except if has been primary target or if already low on health (<= 20%)
                                 if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && //!cacheObject.HasBeenPrimaryTarget &&
+                                    !GroupHotSpots.CacheObjectIsInHotSpot(cacheObject) &&
                                     !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize))
                                 {
                                     unitWeightInfo = String.Format("Ignoring trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12}",
@@ -234,6 +235,28 @@ namespace Trinity
                                         if (cacheObject.IsBossOrEliteRareUnique)
                                             cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 8000d;
 
+
+                                        // Monsters near players given higher weight
+                                        if (cacheObject.Weight > 0)
+                                        {
+                                            foreach (var player in ObjectCache.Where(p => p.Type == GObjectType.Player && p.ACDGuid != Player.ACDGuid))
+                                            {
+                                                cacheObject.Weight += ((55f - cacheObject.Position.Distance2D(player.Position)) / 55f * 5000d);
+                                            }
+                                        }
+
+                                        if (GroupHotSpots.CacheObjectIsInHotSpot(cacheObject))
+                                        {
+                                            // HotSpot Handling for ignored / unweighted mobs
+                                            if (cacheObject.Weight <= 0)
+                                            {
+                                                cacheObject.Weight = 500;
+                                            }
+                                            else
+                                            {
+                                                cacheObject.Weight += 1500;
+                                            }
+                                        }
                                         // Give extra weight to ranged enemies
                                         if ((Player.ActorClass == ActorClass.Barbarian || Player.ActorClass == ActorClass.Monk) &&
                                             (cacheObject.MonsterStyle == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(c_ActorSNO)))
@@ -244,15 +267,15 @@ namespace Trinity
 
                                         // Lower health gives higher weight - health is worth up to 1000ish extra weight
                                         if (cacheObject.IsTrashMob && cacheObject.HitPointsPct < 0.20)
-                                            cacheObject.Weight += (100 - cacheObject.HitPointsPct) / 100 * 1000d;
+                                            cacheObject.Weight += Math.Max((100 - cacheObject.HitPointsPct) / 100 * 1000d, 100);
 
                                         // Elites on low health get extra priority - up to 2500ish
                                         if (cacheObject.IsBossOrEliteRareUnique && cacheObject.HitPointsPct < 0.20)
-                                            cacheObject.Weight += (100 - cacheObject.HitPointsPct) / 100 * 2500d;
+                                            cacheObject.Weight += Math.Max((100 - cacheObject.HitPointsPct) / 100 * 2500d, 100);
 
                                         // Goblins on low health get extra priority - up to 4000ish
                                         if (Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize && cacheObject.IsTreasureGoblin && cacheObject.HitPointsPct <= 0.98)
-                                            cacheObject.Weight += (100 - cacheObject.HitPointsPct) / 100 * 4000d;
+                                            cacheObject.Weight += Math.Max((100 - cacheObject.HitPointsPct) / 100 * 4000d, 100);
 
                                         // Bonuses to priority type monsters from the dictionary/hashlist set at the top of the code
                                         int iExtraPriority;
@@ -303,14 +326,6 @@ namespace Trinity
                                             }
                                         }
 
-                                        // Monsters near players given higher weight
-                                        if (cacheObject.Weight > 0)
-                                        {
-                                            foreach (var player in ObjectCache.Where(p => p.Type == GObjectType.Player && p.ACDGuid != Player.ACDGuid))
-                                            {
-                                                cacheObject.Weight += ((55f - cacheObject.Position.Distance2D(player.Position)) / 55f * 5000d);
-                                            }
-                                        }
 
                                         // Deal with treasure goblins - note, of priority is set to "0", then the is-a-goblin flag isn't even set for use here - the monster is ignored
                                         if (cacheObject.IsTreasureGoblin && !ObjectCache.Any(u => (u.Type == GObjectType.Door || u.Type == GObjectType.Barricade) && u.RadiusDistance <= 40f))
@@ -344,7 +359,7 @@ namespace Trinity
                                                     break;
                                                 case GoblinPriority.Prioritize:
                                                     // Super-high priority option below... 
-                                                    cacheObject.Weight += 25000;
+                                                    cacheObject.Weight += 15000;
                                                     break;
                                                 case GoblinPriority.Kamikaze:
                                                     // KAMIKAZE SUICIDAL TREASURE GOBLIN RAPE AHOY!
@@ -652,6 +667,16 @@ namespace Trinity
                                     cacheObject.Weight = 1;
                                 break;
                             }
+
+                        case GObjectType.HotSpot:
+                            {
+                                if (!AvoidanceObstacleCache.Any(a => a.Location.Distance2D(cacheObject.Position) <= a.Radius))
+                                {
+                                    float maxDist = V.F("Cache.HotSpot.MaxDistance");
+                                    cacheObject.Weight = (maxDist - cacheObject.CentreDistance) / maxDist * 1000d;
+                                }
+                                break;
+                            }
                     }
 
                     // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
@@ -661,7 +686,7 @@ namespace Trinity
                         ShouldStayPutDuringAvoidance = true;
                     }
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
-                        "Weight={2:0} target= {0} ({1}) type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
+                        "Weight={2:0} name={0} sno={1}) type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
                             cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique, cacheObject.RActorGuid, unitWeightInfo);
 
                     // Prevent current target dynamic ranged weighting flip-flop 
