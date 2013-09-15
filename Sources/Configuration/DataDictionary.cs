@@ -39,9 +39,12 @@ namespace Trinity
         public static HashSet<int> QuestLevelAreaIds { get { return DataDictionary.questLevelAreaIds; } }
         private static readonly HashSet<int> questLevelAreaIds = new HashSet<int>
         {
-            19935, // Wortham
-            60757, // Belial's chambers
+            19935, // A1 Wortham
+            60757, // A2 Belial's chambers
             55313, // A2 Caldeum Bazaar
+            19947, // A1 New Tristram
+            101351, // A1 Old Ruins
+            94672, // A1 Cursed Hold
         };
 
 
@@ -279,6 +282,7 @@ namespace Trinity
         public static HashSet<int> InteractWhiteListIds { get { return interactWhiteListIds; } }
         private static HashSet<int> interactWhiteListIds = new HashSet<int> {
             56686, 211999, 52685, 54882, 180575, 105478, 
+            102927, // A1 Cursed Hold Prisoners
         };
 
         /// <summary>
