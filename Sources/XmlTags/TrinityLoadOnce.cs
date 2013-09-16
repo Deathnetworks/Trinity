@@ -62,6 +62,9 @@ namespace Trinity.XmlTags
         [XmlElement("ProfileList")]
         public List<LoadProfileOnce> Profiles { get; set; }
 
+        [XmlAttribute("noRandom")]
+        public bool NoRandom { get; set; }
+
         public TrinityLoadOnce()
         {
             if (Profiles == null)
@@ -102,8 +105,6 @@ namespace Trinity.XmlTags
             CurrentProfileName = Path.GetFileName(ProfileManager.CurrentProfile.Path);
 
             initialized = true;
-
-
         }
 
         // Re-align filenames with A, B, n, etc
@@ -114,8 +115,11 @@ namespace Trinity.XmlTags
 
             for (int i = 0; i < Profiles.Count; i++)
             {
-                string[] profilesArray = Profiles[i].FileName.Split(';');
-                Profiles[i].FileName = profilesArray[rand2.Next(0, profilesArray.Length)];
+                if (Profiles[i].FileName.Contains(';'))
+                {
+                    string[] profilesArray = Profiles[i].FileName.Split(';');
+                    Profiles[i].FileName = profilesArray[rand2.Next(0, profilesArray.Length)];
+                }
             }
         }
 
@@ -123,7 +127,6 @@ namespace Trinity.XmlTags
         {
             return new Sequence(
                 new Action(ret => Initialize()),
-                new Action(ret => RealignFileNames()),
                 new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: Found {0} Total Profiles, {1} Used Profiles, {2} Unused Profiles",
                     Profiles.Count(), UsedProfileCount, UnusedProfileCount)),
                 new PrioritySelector(
@@ -136,12 +139,17 @@ namespace Trinity.XmlTags
                     ),
                     new Decorator(ret => AvailableProfiles.Length > 0,
                         new Sequence(
-                            new Action(ret => NextProfileName = AvailableProfiles[rand.Next(0, AvailableProfiles.Length)]),
+                            new PrioritySelector(
+                                new Decorator(ret => NoRandom,
+                                    new Action(ret => NextProfileName = AvailableProfiles[0])
+                                ),
+                                new Action(ret => NextProfileName = AvailableProfiles[rand.Next(0, AvailableProfiles.Length)])
+                            ),
                             new Action(ret => NextProfilePath = Path.Combine(CurrentProfilePath, NextProfileName)),
                             new PrioritySelector(
                                 new Decorator(ret => File.Exists(NextProfilePath),
                                     new Sequence(
-                                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: Loading next random profile: {0}", NextProfileName)),
+                                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityLoadOnce: Loading next profile: {0}", NextProfileName)),
                                         new Action(ret => UsedProfiles.Add(NextProfileName)),
                                         new Action(ret => ProfileManager.Load(NextProfilePath))
                                     )

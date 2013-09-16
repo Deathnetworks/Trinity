@@ -232,7 +232,7 @@ namespace Trinity
             updated.TotalRunningTime += TotalRunningTime - PersistentLastSaved.TotalRunningTime;
             updated.TotalDeaths += iTotalDeaths - PersistentLastSaved.TotalDeaths;
             updated.TotalLeaveGames += TotalLeaveGames - PersistentLastSaved.TotalLeaveGames;
-            updated.TotalJoinGames += iTotalJoinGames - PersistentLastSaved.TotalJoinGames;
+            updated.TotalJoinGames += TotalGamesJoined - PersistentLastSaved.TotalJoinGames;
             updated.TotalProfileRecycles += TotalProfileRecycles - PersistentLastSaved.TotalProfileRecycles;
             updated.TotalXp += iTotalXp - PersistentLastSaved.TotalXp;
             updated.LastXp += iLastXp - PersistentLastSaved.LastXp;
@@ -275,7 +275,7 @@ namespace Trinity
             PersistentLastSaved.TotalRunningTime = TotalRunningTime;
             PersistentLastSaved.TotalDeaths = iTotalDeaths;
             PersistentLastSaved.TotalLeaveGames = TotalLeaveGames;
-            PersistentLastSaved.TotalJoinGames = iTotalJoinGames;
+            PersistentLastSaved.TotalJoinGames = TotalGamesJoined;
             PersistentLastSaved.TotalProfileRecycles = TotalProfileRecycles;
             PersistentLastSaved.TotalXp = iTotalXp;
             PersistentLastSaved.LastXp = iLastXp;

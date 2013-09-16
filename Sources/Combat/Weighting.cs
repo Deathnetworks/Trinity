@@ -112,6 +112,13 @@ namespace Trinity
                                     break;
                                 }
 
+                                // Ignore trash mobs < 15% health or 50% health with a DoT
+                                if (cacheObject.IsTrashMob &&
+                                    (cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealth ||
+                                     cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS))
+                                {
+                                    break;
+                                }
 
                                 // No champions, no mobs nearby, no treasure goblins to prioritize, and not injured, so skip mobs
                                 if (ignoreAllUnits)

@@ -453,45 +453,45 @@ namespace Trinity
             return itemBaseType;
         }
 
+        internal static bool[,] BackpackSlotBlocked = new bool[10, 6];
         /// <summary>
         /// Search backpack to see if we have room for a 2-slot item anywhere
         /// </summary>
-        internal static bool[,] BackpackSlotBlocked = new bool[10, 6];
         internal static Vector2 SortingFindLocationBackpack(bool isOriginalTwoSlot)
         {
-            int iPointX = -1;
-            int iPointY = -1;
-            for (int iRow = 0; iRow <= 5; iRow++)
+            int x = -1;
+            int y = -1;
+            for (int row = 0; row <= 5; row++)
             {
-                for (int iColumn = 0; iColumn <= 9; iColumn++)
+                for (int col = 0; col <= 9; col++)
                 {
-                    if (!BackpackSlotBlocked[iColumn, iRow])
+                    if (!BackpackSlotBlocked[col, row])
                     {
-                        bool bNotEnoughSpace = false;
-                        if (iRow < 5)
+                        bool notEnoughSpace = false;
+                        if (row < 5)
                         {
-                            bNotEnoughSpace = (isOriginalTwoSlot && BackpackSlotBlocked[iColumn, iRow + 1]);
+                            notEnoughSpace = (isOriginalTwoSlot && BackpackSlotBlocked[col, row + 1]);
                         }
                         else
                         {
                             if (isOriginalTwoSlot)
-                                bNotEnoughSpace = true;
+                                notEnoughSpace = true;
                         }
-                        if (!bNotEnoughSpace)
+                        if (!notEnoughSpace)
                         {
-                            iPointX = iColumn;
-                            iPointY = iRow;
+                            x = col;
+                            y = row;
                             goto FoundPackLocation;
                         }
                     }
                 }
             }
         FoundPackLocation:
-            if ((iPointX < 0) || (iPointY < 0))
+            if ((x < 0) || (y < 0))
             {
                 return new Vector2(-1, -1);
             }
-            return new Vector2(iPointX, iPointY);
+            return new Vector2(x, y);
         }
 
         /// <summary>
@@ -499,40 +499,48 @@ namespace Trinity
         /// </summary>
         internal static void TestScoring()
         {
-            if (TownRun.testingBackpack) return;
-            TownRun.testingBackpack = true;
-            //ZetaDia.Actors.Update();
-            if (ZetaDia.Actors.Me == null)
+            try
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error testing scores - not in game world?");
-                return;
-            }
-            if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "===== Outputting Test Scores =====");
-                foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
+                if (TownRun.testingBackpack) return;
+                TownRun.testingBackpack = true;
+                //ZetaDia.Actors.Update();
+                if (ZetaDia.Actors.Me == null)
                 {
-                    if (item.BaseAddress == IntPtr.Zero)
-                    {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [TestScore-1]");
-                    }
-                    else
-                    {
-                        CachedACDItem thiscacheditem = new CachedACDItem(item, item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId, item.DynamicId,
-                            item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.IsTwoHand, item.DyeType, item.ItemType, item.ItemBaseType, item.FollowerSpecialType, item.IsUnidentified, item.ItemStackQuantity,
-                            item.Stats);
-                        bool bShouldStashTest = ShouldWeStashThis(thiscacheditem);
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, bShouldStashTest ? "* KEEP *" : "-- TRASH --");
-                    }
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error testing scores - not in game world?");
+                    return;
                 }
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "===== Finished Test Score Outputs =====");
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: See bad scores? Wrong item types? Known DB bug - restart DB before using the test button!");
+                if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "===== Outputting Test Scores =====");
+                    foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
+                    {
+                        if (item.BaseAddress == IntPtr.Zero)
+                        {
+                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [TestScore-1]");
+                        }
+                        else
+                        {
+                            CachedACDItem cItem = new CachedACDItem(item, item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId, item.DynamicId,
+                                item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.IsTwoHand, item.DyeType, item.ItemType, item.ItemBaseType, item.FollowerSpecialType, item.IsUnidentified, item.ItemStackQuantity,
+                                item.Stats);
+                            bool bShouldStashTest = ShouldWeStashThis(cItem, item);
+                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, bShouldStashTest ? "* KEEP *" : "-- TRASH --");
+                        }
+                    }
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "===== Finished Test Score Outputs =====");
+                    //Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: See bad scores? Wrong item types? Known DB bug - restart DB before using the test button!");
+                }
+                else
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error testing scores - not in game world?");
+                }
+                TownRun.testingBackpack = false;
             }
-            else
+            catch (Exception ex)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error testing scores - not in game world?");
+                Logger.LogNormal("Exception in TestScoring(): {0}", ex);
+                TownRun.testingBackpack = false;
             }
-            TownRun.testingBackpack = false;
         }
 
         /// <summary>
@@ -542,108 +550,117 @@ namespace Trinity
         /// <returns></returns>
         internal static bool ShouldWeStashThis(CachedACDItem cItem, ACDItem acdItem = null)
         {
-            // Now look for Misc items we might want to keep
-            GItemType itemType = DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
-            GItemBaseType itemBaseType = DetermineBaseType(itemType);
+            try
+            {
+                // Now look for Misc items we might want to keep
+                GItemType itemType = DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
+                GItemBaseType itemBaseType = DetermineBaseType(itemType);
 
-            if (itemType == GItemType.StaffOfHerding)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, itemType);
-                return true;
-            }
-            if (itemType == GItemType.CraftingMaterial)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, itemType);
-                return true;
-            }
+                if (cItem.AcdItem.IsValid && acdItem == null)
+                    acdItem = cItem.AcdItem;
 
-            if (itemType == GItemType.Emerald)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
-                return true;
-            }
-            if (itemType == GItemType.Amethyst)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
-                return true;
-            }
-            if (itemType == GItemType.Topaz)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
-                return true;
-            }
-            if (itemType == GItemType.Ruby)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
-                return true;
-            }
-            if (itemType == GItemType.CraftTome)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, itemType);
-                return true;
-            }
-            if (itemType == GItemType.InfernalKey)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, itemType);
-                return true;
-            }
-            if (itemType == GItemType.HealthPotion)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, itemType);
-                return false;
-            }
-
-            // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
-            if (cItem.IsUnidentified)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] = (autokeep unidentified items)", cItem.RealName, cItem.InternalName);
-                return true;
-            }
-
-            if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
-            {
-                Interpreter.InterpreterAction action = StashRule.checkItem(acdItem, ItemEvaluationType.Keep);
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
-                switch (action)
+                if (itemType == GItemType.StaffOfHerding)
                 {
-                    case Interpreter.InterpreterAction.KEEP:
-                        return true;
-                    case Interpreter.InterpreterAction.TRASH:
-                        return false;
-                    case Interpreter.InterpreterAction.SCORE:
-                        break;
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, itemType);
+                    return true;
                 }
-            }
+                if (itemType == GItemType.CraftingMaterial)
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, itemType);
+                    return true;
+                }
 
-            // auto trash blue weapons/armor/jewlery
-            if ((acdItem.ItemBaseType == ItemBaseType.Armor
-               || acdItem.ItemBaseType == ItemBaseType.Weapon
-               || acdItem.ItemBaseType == ItemBaseType.Jewelry)
-                  && cItem.Quality < ItemQuality.Rare4)
+                if (itemType == GItemType.Emerald)
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
+                    return true;
+                }
+                if (itemType == GItemType.Amethyst)
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
+                    return true;
+                }
+                if (itemType == GItemType.Topaz)
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
+                    return true;
+                }
+                if (itemType == GItemType.Ruby)
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
+                    return true;
+                }
+                if (itemType == GItemType.CraftTome)
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, itemType);
+                    return true;
+                }
+                if (itemType == GItemType.InfernalKey)
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, itemType);
+                    return true;
+                }
+                if (itemType == GItemType.HealthPotion)
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, itemType);
+                    return false;
+                }
+
+                // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
+                if (cItem.IsUnidentified)
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] = (autokeep unidentified items)", cItem.RealName, cItem.InternalName);
+                    return true;
+                }
+
+                if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
+                {
+                    Interpreter.InterpreterAction action = StashRule.checkItem(acdItem, ItemEvaluationType.Keep);
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
+                    switch (action)
+                    {
+                        case Interpreter.InterpreterAction.KEEP:
+                            return true;
+                        case Interpreter.InterpreterAction.TRASH:
+                            return false;
+                        case Interpreter.InterpreterAction.SCORE:
+                            break;
+                    }
+                }
+
+                // auto trash blue weapons/armor/jewlery
+                if ((acdItem.ItemBaseType == ItemBaseType.Armor
+                   || acdItem.ItemBaseType == ItemBaseType.Weapon
+                   || acdItem.ItemBaseType == ItemBaseType.Jewelry)
+                      && cItem.Quality < ItemQuality.Rare4)
+                {
+                    return false;
+                }
+
+
+                if (cItem.Quality >= ItemQuality.Legendary)
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, itemType);
+                    return true;
+                }
+
+                if (itemType == GItemType.CraftingPlan)
+                {
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, itemType);
+                    return true;
+                }
+
+                // Ok now try to do some decent item scoring based on item types
+                double iNeedScore = ScoreNeeded(acdItem.ItemBaseType);
+                double iMyScore = ItemValuation.ValueThisItem(cItem, itemType);
+
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, itemType, iMyScore);
+                if (iMyScore >= iNeedScore) return true;
+            }
+            catch (Exception ex)
             {
-                return false;
+                Logger.LogNormal("Exception in Stash Check: {0}", ex);
             }
-
-
-            if (cItem.Quality >= ItemQuality.Legendary)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, itemType);
-                return true;
-            }
-
-            if (itemType == GItemType.CraftingPlan)
-            {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, itemType);
-                return true;
-            }
-
-            // Ok now try to do some decent item scoring based on item types
-            double iNeedScore = ScoreNeeded(acdItem.ItemBaseType);
-            double iMyScore = ItemValuation.ValueThisItem(cItem, itemType);
-
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, itemType, iMyScore);
-            if (iMyScore >= iNeedScore) return true;
-
             // If we reached this point, then we found no reason to keep the item!
             return false;
         }
@@ -761,9 +778,9 @@ namespace Trinity
                             "m " + TotalRunningTime.Seconds.ToString() + "s");
                         LogWriter.WriteLine("Total deaths: " + iTotalDeaths.ToString() + " [" + Math.Round(iTotalDeaths / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
                         LogWriter.WriteLine("Total games (approx): " + TotalLeaveGames.ToString() + " [" + Math.Round(TotalLeaveGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                        if (TotalLeaveGames == 0 && iTotalJoinGames > 0)
+                        if (TotalLeaveGames == 0 && TotalGamesJoined > 0)
                         {
-                            if (iTotalJoinGames == 1 && TotalProfileRecycles > 1)
+                            if (TotalGamesJoined == 1 && TotalProfileRecycles > 1)
                             {
                                 LogWriter.WriteLine("(a profile manager/death handler is interfering with join/leave game events, attempting to guess total runs based on profile-loops)");
                                 LogWriter.WriteLine("Total full profile cycles: " + TotalProfileRecycles.ToString() + " [" + Math.Round(TotalProfileRecycles / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
@@ -771,7 +788,7 @@ namespace Trinity
                             else
                             {
                                 LogWriter.WriteLine("(your games left value may be bugged @ 0 due to profile managers/routines etc., now showing games joined instead:)");
-                                LogWriter.WriteLine("Total games joined: " + iTotalJoinGames.ToString() + " [" + Math.Round(iTotalJoinGames / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
+                                LogWriter.WriteLine("Total games joined: " + TotalGamesJoined.ToString() + " [" + Math.Round(TotalGamesJoined / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
                             }
                         }
 
@@ -1029,42 +1046,42 @@ namespace Trinity
                     }
                 }
 
-                int iPointX = -1;
-                int iPointY = -1;
+                int x = -1;
+                int y = -1;
 
                 // 6 rows
-                for (int iRow = 0; iRow <= 5; iRow++)
+                for (int row = 0; row <= 5; row++)
                 {
                     // 10 columns
-                    for (int iColumn = 0; iColumn <= 9; iColumn++)
+                    for (int col = 0; col <= 9; col++)
                     {
-                        if (!BackpackSlotBlocked[iColumn, iRow])
+                        if (!BackpackSlotBlocked[col, row])
                         {
-                            bool NotEnoughSpace = false;
-                            if (iRow < 5)
+                            bool notEnoughSpace = false;
+                            if (row < 5)
                             {
-                                NotEnoughSpace = (IsOriginalTwoSlot && BackpackSlotBlocked[iColumn, iRow + 1]);
+                                notEnoughSpace = (IsOriginalTwoSlot && BackpackSlotBlocked[col, row + 1]);
                             }
                             else
                             {
                                 if (IsOriginalTwoSlot)
-                                    NotEnoughSpace = true;
+                                    notEnoughSpace = true;
                             }
-                            if (!NotEnoughSpace)
+                            if (!notEnoughSpace)
                             {
-                                iPointX = iColumn;
-                                iPointY = iRow;
+                                x = col;
+                                y = row;
                                 goto FoundPackLocation;
                             }
                         }
                     }
                 }
             FoundPackLocation:
-                if ((iPointX < 0) || (iPointY < 0))
+                if ((x < 0) || (y < 0))
                 {
                     return new Vector2(-1, -1);
                 }
-                return new Vector2(iPointX, iPointY);
+                return new Vector2(x, y);
             }
             catch (Exception ex)
             {

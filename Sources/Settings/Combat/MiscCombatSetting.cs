@@ -24,6 +24,8 @@ namespace Trinity.Config.Combat
         private bool _AvoidDeath;
         private bool _SkipElitesOn5NV;
         private bool _AvoidanceNavigation;
+        private double _IgnoreTrashBelowHealth;
+        private double _IgnoreTrashBelowHealthDoT;
         #endregion Fields
 
         #region Events
@@ -345,6 +347,40 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.15)]
+        public double IgnoreTrashBelowHealth
+        {
+            get
+            {
+                return _IgnoreTrashBelowHealth;
+            }
+            set
+            {
+                if (_IgnoreTrashBelowHealth != value)
+                {
+                    _IgnoreTrashBelowHealth = value;
+                    OnPropertyChanged("IgnoreTrashBelowHealth");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.50)]
+        public double IgnoreTrashBelowHealthDoT
+        {
+            get
+            {
+                return _IgnoreTrashBelowHealthDoT;
+            }
+            set
+            {
+                if (_IgnoreTrashBelowHealthDoT != value)
+                {
+                    _IgnoreTrashBelowHealthDoT = value;
+                    OnPropertyChanged("IgnoreTrashBelowHealthDoT");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -389,6 +425,8 @@ namespace Trinity.Config.Combat
             this.EliteRange = 150;
             this.SkipElitesOn5NV = false;
             this.AvoidanceNavigation = true;
+            this.IgnoreTrashBelowHealth = 0.15;
+            this.IgnoreTrashBelowHealthDoT = 0.50;
         }
         #endregion Methods
     }

@@ -80,6 +80,11 @@ namespace Trinity.Technicals
             LogNormal(formatMessage, 0);
         }
 
+        public static void Log(string formatMessage, params object[] args)
+        {
+            LogNormal(formatMessage, args);
+        }
+
         /// <summary>
         /// Logs a message with Normal/UserInformation
         /// </summary>

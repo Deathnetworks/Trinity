@@ -39,21 +39,39 @@ namespace Trinity.UIComponents
                 ResetTVarsCommand = new RelayCommand(
                                         (parameter) =>
                                         {
-                                            if (MessageBox.Show("Are you sure you want to reset all Trinity Variables?", "Confirm Reset All",
-                                                MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                                            try
                                             {
-                                                V.ResetAll();
+                                                if (MessageBox.Show(
+                                                    "Are you sure you want to reset all Trinity Variables?",
+                                                    "Confirm Reset All",
+                                                    MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                                                {
+                                                    V.ResetAll();
+                                                }
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Logger.Log("Exception Resetting TVars: {0}", ex);
                                             }
                                         });
                 SaveTVarsCommand = new RelayCommand(
                                         (parameter) =>
                                         {
-                                            V.Save();
+                                            try { V.Save(); }
+                                            catch (Exception ex)
+                                            {
+                                                Logger.Log("Exception saving TVars: {0}", ex);
+                                            }
                                         });
                 DumpTVarsCommand = new RelayCommand(
                                         (parameter) =>
                                         {
-                                            V.Dump();
+                                            try { V.Dump(); }
+                                            catch (Exception ex)
+                                            {
+                                                Logger.Log("Exception Dumping TVars: {0}", ex);
+                                            }
+
                                         });
             }
             catch (Exception ex)

@@ -32,12 +32,19 @@ namespace Trinity.UIComponents
             SaveCommand = new RelayCommand(
                                     (parameter) =>
                                     {
-                                        _Model.CopyTo(_OriginalModel);
-                                        _OriginalModel.Save();
-                                        Trinity.SetBotTPS();
-                                        Trinity.SetUnstuckProvider();
-                                        Trinity.SetItemManagerProvider();
-                                        UILoader.CloseWindow();
+                                        try
+                                        {
+                                            _Model.CopyTo(_OriginalModel);
+                                            _OriginalModel.Save();
+                                            Trinity.SetBotTPS();
+                                            Trinity.SetUnstuckProvider();
+                                            Trinity.SetItemManagerProvider();
+                                            UILoader.CloseWindow();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Logger.Log("Exception in UI SaveCommand", ex);
+                                        }
                                     });
             TestScoreCommand = new RelayCommand(
                                     (parameter) =>
@@ -45,7 +52,7 @@ namespace Trinity.UIComponents
                                         try
                                         {
                                             Trinity.TestScoring();
-                                            UILoader.CloseWindow();
+                                            //UILoader.CloseWindow();
                                         }
                                         catch (Exception ex)
                                         {
@@ -88,13 +95,27 @@ namespace Trinity.UIComponents
             LoadItemRuleSetCommand = new RelayCommand(
                                     (parameter) =>
                                     {
-                                        LoadItemRulesPath();
+                                        try
+                                        {
+                                            LoadItemRulesPath();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Logger.Log("Exception in LoadItemRuleSetCommand: {0}", ex);
+                                        }
                                     });
             OpenTVarsCommand = new RelayCommand(
                                     (parameter) =>
                                     {
-                                        V.ValidateLoad();
-                                        TVarsViewModel.CreateWindow().Show();
+                                        try
+                                        {
+                                            V.ValidateLoad();
+                                            TVarsViewModel.CreateWindow().Show();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Logger.Log("Exception in OpenTVarsCommand: {0}", ex);
+                                        }
                                     });
             UseGlobalConfigFileCommand = new RelayCommand(
                                     (parameter) =>
@@ -572,9 +593,16 @@ namespace Trinity.UIComponents
             ReloadScriptRulesCommand = new RelayCommand(
                                     (parameter) =>
                                     {
-                                        _Model.CopyTo(_OriginalModel);
-                                        _OriginalModel.Save();
-                                        BotMain.PauseWhile(Trinity.StashRule.reloadFromUI);
+                                        try
+                                        {
+                                            _Model.CopyTo(_OriginalModel);
+                                            _OriginalModel.Save();
+                                            BotMain.PauseWhile(Trinity.StashRule.reloadFromUI);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Logger.Log("Exception in ReloadScriptRulesCommand: {0}", ex);
+                                        }
                                     }
                                     );
             ResetTownRunCommand = new RelayCommand(
@@ -646,27 +674,33 @@ namespace Trinity.UIComponents
 
         private void LoadItemRulesPath()
         {
-
-            var folderDialog = new FolderBrowserDialog();
-
-            folderDialog.ShowNewFolderButton = false;
-            folderDialog.SelectedPath = FileManager.ItemRulePath;
-
-            DialogResult result = folderDialog.ShowDialog();
-
-
-            // Get the selected file name and display in a TextBox 
-            if (result == DialogResult.OK)
+            try
             {
-                // Open document 
-                string directory = folderDialog.SelectedPath;
+                var folderDialog = new FolderBrowserDialog();
 
-                if (directory != FileManager.ItemRulePath)
+                folderDialog.ShowNewFolderButton = false;
+                folderDialog.SelectedPath = FileManager.ItemRulePath;
+
+                DialogResult result = folderDialog.ShowDialog();
+
+
+                // Get the selected file name and display in a TextBox 
+                if (result == DialogResult.OK)
                 {
-                    ItemRules.ItemRuleSetPath = directory;
+                    // Open document 
+                    string directory = folderDialog.SelectedPath;
 
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loaded ItemRule Set {0}", ItemRules.ItemRuleSetPath);
+                    if (directory != FileManager.ItemRulePath)
+                    {
+                        ItemRules.ItemRuleSetPath = directory;
+
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loaded ItemRule Set {0}", ItemRules.ItemRuleSetPath);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Exception in LoadItemRulesPath: {0}", ex);
             }
         }
     }

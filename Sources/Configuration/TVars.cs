@@ -275,10 +275,17 @@ namespace Trinity
 
         internal static void Save()
         {
-            if (!ZetaDia.Service.Platform.IsConnected || !ZetaDia.Service.CurrentHero.IsValid)
-                return;
+            try
+            {
+                if (!ZetaDia.Service.Platform.IsConnected || !ZetaDia.Service.CurrentHero.IsValid)
+                    return;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Exception saving TVars in checking Service and Hero: {0}", ex);
+            }
 
-            string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "TVars.xml");
+            var filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "TVars.xml");
             lock (sync)
             {
                 try
@@ -286,7 +293,7 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Saving Variable Setting file");
                     using (Stream stream = File.Open(filename, FileMode.Create))
                     {
-                        List<Type> knownTypes = new List<Type>()
+                        var knownTypes = new List<Type>()
                         {
                             typeof(int),
                             typeof(string),
@@ -298,7 +305,7 @@ namespace Trinity
                             typeof(KeyValuePair<string, TVar>),
                             typeof(Dictionary<string,TVar>),
                         };
-                        DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableDictionary<string, TVar>), "TVars", "", knownTypes);
+                        var serializer = new DataContractSerializer(typeof(ObservableDictionary<string, TVar>), "TVars", "", knownTypes);
 
                         var xmlWriterSettings = new XmlWriterSettings { Indent = true };
                         using (var xmlWriter = XmlWriter.Create(stream, xmlWriterSettings))
@@ -318,10 +325,17 @@ namespace Trinity
         private static bool loaded = false;
         internal static void Load()
         {
-            if (!ZetaDia.Service.Platform.IsConnected || !ZetaDia.Service.CurrentHero.IsValid)
-                return;
+            try
+            {
+                if (!ZetaDia.Service.Platform.IsConnected || !ZetaDia.Service.CurrentHero.IsValid)
+                    return;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Exception Loading TVars in checking Service and Hero: {0}", ex);
+            }
 
-            string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "TVars.xml");
+            var filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "TVars.xml");
 
             lock (sync)
             {
@@ -333,9 +347,9 @@ namespace Trinity
                     {
                         using (Stream stream = File.Open(filename, FileMode.Open))
                         {
-                            DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableDictionary<string, TVar>), "TVars", "");
+                            var serializer = new DataContractSerializer(typeof(ObservableDictionary<string, TVar>), "TVars", "");
 
-                            XmlReader reader = XmlReader.Create(stream);
+                            var reader = XmlReader.Create(stream);
                             var loadedData = (ObservableDictionary<string, TVar>)serializer.ReadObject(reader);
 
                             if (loadedData.Count > 0)
@@ -429,7 +443,7 @@ namespace Trinity
         {
             lock (sync)
             {
-                bool containsKey = Data.ContainsKey(key);
+                var containsKey = Data.ContainsKey(key);
                 if (loaded && !containsKey)
                     Logger.LogDebug("Warning: unknown Trinity Variable requested: {0}", key);
                 return containsKey;
@@ -623,13 +637,21 @@ namespace Trinity
         /// <param name="var"></param>
         public static void Set(TVar var)
         {
-            lock (sync)
+            try
             {
-                if (ContainsKey(var.Name))
-                    Data[var.Name] = var;
-                else
-                    Data.Add(var.Name, var);
+                lock (sync)
+                {
+                    if (ContainsKey(var.Name))
+                        Data[var.Name] = var;
+                    else
+                        Data.Add(var.Name, var);
+                }
             }
+            catch (Exception ex)
+            {
+                Logger.Log("Exception Setting TVar: {0} {1}", var, ex);
+            }
+
         }
 
         /// <summary>

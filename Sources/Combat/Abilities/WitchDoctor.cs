@@ -73,9 +73,11 @@ namespace Trinity
             //runeDict.Add("VengefulSpirit", 4);
 
             bool hasVengefulSpirit = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 4);
+            bool hasSwallowYourSoul = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 3);
 
             // Soul Harvest Any Elites or 2+ Norms and baby it's harvest season
-            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_SoulHarvest) && !Player.IsIncapacitated && Player.PrimaryResource >= 59 && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4 &&
+            if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_SoulHarvest) && !Player.IsIncapacitated && Player.PrimaryResource >= 59 &&
+                (GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4 || (hasSwallowYourSoul && Player.PrimaryResourcePct <= 0.50)) &&
                 (TargetUtil.AnyMobsInRange(16f, 2) || TargetUtil.IsEliteTargetInRange(16f)) && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);

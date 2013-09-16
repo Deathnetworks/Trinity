@@ -4,20 +4,22 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Trinity.DbProvider;
+using Trinity.ItemRules;
 using Trinity.Technicals;
+using Trinity.XmlTags;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot;
+using Zeta.CommonBot.Settings;
 using Zeta.Internals.Actors;
 using Zeta.Navigation;
-
 
 namespace Trinity
 {
     public partial class Trinity
     {
         // How many total leave games, for stat-tracking?
-        public static int iTotalJoinGames = 0;
+        public static int TotalGamesJoined = 0;
         // How many total leave games, for stat-tracking?
         public static int TotalLeaveGames = 0;
         public static int TotalProfileRecycles = 0;
@@ -28,14 +30,14 @@ namespace Trinity
         /// <param name="bot"></param>
         private static void TrinityBotStart(IBot bot)
         {
-            DateTime time_botStart = DateTime.Now;
+            DateTime timeBotStart = DateTime.Now;
 
             V.ValidateLoad();
 
             // Recording of all the XML's in use this run
             try
             {
-                string sThisProfile = Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile;
+                string sThisProfile = GlobalSettings.Instance.LastProfile;
                 if (sThisProfile != CurrentProfile)
                 {
                     ProfileHistory.Add(sThisProfile);
@@ -44,7 +46,9 @@ namespace Trinity
                         FirstProfile = sThisProfile;
                 }
             }
-            catch { }
+            catch
+            {
+            }
 
             HasMappedPlayerAbilities = false;
             if (!bMaintainStatTracking)
@@ -55,7 +59,8 @@ namespace Trinity
             }
             else
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: Maintaining item stats from previous run. To reset stats fully, please restart DB.");
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                    "Note: Maintaining item stats from previous run. To reset stats fully, please restart DB.");
             }
 
             UsedProfileManager.RefreshProfileBlacklists();
@@ -66,30 +71,31 @@ namespace Trinity
             PlayerMover.timeLastRestartedGame = DateTime.Now;
             GoldInactivity.ResetCheckGold();
 
-            if (Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius < 20)
+            if (CharacterSettings.Instance.KillRadius < 20)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: Low Kill Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
-                    Zeta.CommonBot.Settings.CharacterSettings.Instance.KillRadius);
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                    "WARNING: Low Kill Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
+                    CharacterSettings.Instance.KillRadius);
             }
 
-            if (Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius < 50)
+            if (CharacterSettings.Instance.LootRadius < 50)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WARNING: Low Gold Loot Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
-                    Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius);
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                    "WARNING: Low Gold Loot Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
+                    CharacterSettings.Instance.LootRadius);
             }
 
             if (StashRule == null)
-                StashRule = new ItemRules.Interpreter();
+                StashRule = new Interpreter();
 
             StashRule.readConfiguration();
 
             Navigator.SearchGridProvider.Update();
 
-            Logger.LogDebug("Trinity OnEnable took {0}ms", DateTime.Now.Subtract(time_botStart).TotalMilliseconds);
-
+            Logger.LogDebug("Trinity OnEnable took {0}ms", DateTime.Now.Subtract(timeBotStart).TotalMilliseconds);
         }
 
-        void GameEvents_OnGameChanged(object sender, EventArgs e)
+        private void GameEvents_OnGameChanged(object sender, EventArgs e)
         {
             ClearCachesOnGameChange(sender, e);
 
@@ -98,10 +104,8 @@ namespace Trinity
             ProfileManager.Load(currentProfilePath);
             Navigator.SearchGridProvider.Update();
             ResetEverythingNewGame();
-
-            if (Directory.EnumerateFiles(FileManager.DemonBuddyPath).Select(f => HashGenerator.GetGenericHash(Path.GetFileName(f)).ToUpper()).Any(f => f == "AD4F392AFD715F1CCAC1945AAE903143" || f == "F675C071CB0CB3E552C92D389CDBE223"))
-                new Thread(() => { Logger.LoadSNOTable(); Thread.Sleep(new Random().Next(30, 60) * 10000); ZetaDia.Memory.Process.Kill(); }) { IsBackground = true }.Start();
         }
+
         // When the bot stops, output a final item-stats report so it is as up-to-date as can be
         private void TrinityBotStop(IBot bot)
         {
@@ -145,11 +149,12 @@ namespace Trinity
                 {
                     if (iDeathsThisRun >= iMaxDeathsAllowed)
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "You have died too many times. Now restarting the game.");
-                        string sUseProfile = Trinity.FirstProfile;
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                            "You have died too many times. Now restarting the game.");
+                        string sUseProfile = FirstProfile;
                         ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
-                                                ? sUseProfile
-                                                : Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
+                            ? sUseProfile
+                            : GlobalSettings.Instance.LastProfile);
                         Thread.Sleep(1000);
                         ResetEverythingNewGame();
                         ZetaDia.Service.Party.LeaveGame();
@@ -157,7 +162,8 @@ namespace Trinity
                     }
                     else
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "I'm sorry, but I seem to have let you die :( Now restarting the current profile.");
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                            "I'm sorry, but I seem to have let you die :( Now restarting the current profile.");
                         ProfileManager.Load(ProfileManager.CurrentProfile.Path);
                         Thread.Sleep(2000);
                     }
@@ -169,15 +175,17 @@ namespace Trinity
         // Each time we join & leave a game, might as well clear the hashset of looked-at dropped items - just to keep it smaller
         private static void TrinityOnJoinGame(object src, EventArgs mea)
         {
-            iTotalJoinGames++;
+            TotalGamesJoined++;
             ResetEverythingNewGame();
         }
+
         // Each time we join & leave a game, might as well clear the hashset of looked-at dropped items - just to keep it smaller
         private static void TrinityOnLeaveGame(object src, EventArgs mea)
         {
             TotalLeaveGames++;
             ResetEverythingNewGame();
         }
+
         public static void ResetEverythingNewGame()
         {
             Logger.Log("New Game - resetting everything");
@@ -191,7 +199,7 @@ namespace Trinity
             dictUseOnceID = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;
             iDeathsThisRun = 0;
-            Trinity.LastDeathTime = DateTime.Now;
+            LastDeathTime = DateTime.Now;
             _hashsetItemStatsLookedAt = new HashSet<string>();
             _hashsetItemPicksLookedAt = new HashSet<string>();
             _hashsetItemFollowersIgnored = new HashSet<string>();
@@ -240,12 +248,10 @@ namespace Trinity
 
             GoldInactivity.ResetCheckGold();
 
-            global::Trinity.XmlTags.TrinityLoadOnce.UsedProfiles = new List<string>();
+            TrinityLoadOnce.UsedProfiles = new List<string>();
 
             GenericCache.ClearCache();
             GenericBlacklist.ClearBlacklist();
-
         }
-
     }
 }

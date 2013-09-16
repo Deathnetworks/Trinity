@@ -67,10 +67,16 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_Preparation, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
 
+            //skillDict.Add("EvasiveFire", SNOPower.DemonHunter_EvasiveFire);
+            //runeDict.Add("Hardened", 0);
+            //runeDict.Add("PartingGift", 2);
+            //runeDict.Add("CoveringFire", 1);
+            //runeDict.Add("Displace", 4);
+            //runeDict.Add("Surge", 3);
+
             // Evasive Fire
             if (!UseOOCBuff && CombatBase.CanCast(SNOPower.DemonHunter_EvasiveFire) && !Player.IsIncapacitated &&
-                  (((TargetUtil.AnyMobsInRange(20) || CurrentTarget.RadiusDistance <= 20f)) ||
-                DemonHunter_HasNoPrimary()))
+                  (TargetUtil.AnyMobsInRange(10f) || DemonHunter_HasNoPrimary()))
             {
                 float range = DemonHunter_HasNoPrimary() ? 70f : 0f;
 
@@ -284,10 +290,10 @@ namespace Trinity
 
         private static bool DemonHunter_HasNoPrimary()
         {
-            return !Hotbar.Contains(SNOPower.DemonHunter_BolaShot) ||
-                                !Hotbar.Contains(SNOPower.DemonHunter_EntanglingShot) ||
-                                !Hotbar.Contains(SNOPower.DemonHunter_Grenades) ||
-                                !Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow);
+            return !(Hotbar.Contains(SNOPower.DemonHunter_BolaShot) ||
+                                Hotbar.Contains(SNOPower.DemonHunter_EntanglingShot) ||
+                                Hotbar.Contains(SNOPower.DemonHunter_Grenades) ||
+                                Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow));
         }
 
         private static TrinityPower GetDemonHunterDestroyPower()

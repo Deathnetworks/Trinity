@@ -4,141 +4,181 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:Trinity.UIComponents"
              mc:Ignorable="d"  Foreground="{DynamicResource TextBrush}"
-             d:DesignHeight="450" d:DesignWidth="390">
+             d:DesignHeight="600" d:DesignWidth="450">
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
-            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="..\Template.xaml"/></ResourceDictionary.MergedDictionaries>   
+            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="..\Template.xaml"/></ResourceDictionary.MergedDictionaries>
             <ut:EnumBooleanConverter x:Key="enumBooleanConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <!--Goblin Settings-->
-        <Grid Grid.Row="0" Margin="5">
+    <ScrollViewer>
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="Treasure Goblins :" FontWeight="Bold" TextAlignment="Center"/>
-            <UniformGrid Grid.Row="1" Margin="25,0,25,0" Columns="4">
-                <RadioButton GroupName="GoblinMode" Content="Ignore" IsChecked="{Binding Path=Misc.GoblinPriority, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Ignore}" />
-                <RadioButton GroupName="GoblinMode" Content="Normal" IsChecked="{Binding Path=Misc.GoblinPriority, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Normal}" />
-                <RadioButton GroupName="GoblinMode" Content="Prioritize" IsChecked="{Binding Path=Misc.GoblinPriority, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Prioritize}" />
-                <RadioButton GroupName="GoblinMode" Content="Kamikaze" IsChecked="{Binding Path=Misc.GoblinPriority, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Kamikaze}" />
-            </UniformGrid>
-        </Grid>
-        <!--Elite Range Settings-->
-        <Grid Grid.Row="1" Margin="5">
-            <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Trigger range for Elite combat:" FontWeight="Bold" TextAlignment="Center"/>
-            <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
+
+            <!--Elite/Rare/Unique Settings-->
+            <GroupBox Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <GroupBox.Header>
+                    Elite Mob Settings
+                </GroupBox.Header>
+                <StackPanel>
+                    <Grid Grid.Row="1" Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Trigger range for Elite combat:" FontWeight="Bold" TextAlignment="Center"/>
+                        <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
                     Interval="500" Maximum="150" Minimum="15" 
                     SmallChange="1" TickFrequency="5" IsSnapToTickEnabled="True"
                     TickPlacement="BottomRight" Value="{Binding Path=Misc.EliteRange}" 
                     HorizontalAlignment="Stretch" Margin="25,0,25,0"/>
-        </Grid>
-        <!--Non Elite Range Settings-->
-        <Grid Grid.Row="2" Margin="5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="Trigger range for Non-Elite combat:" FontWeight="Bold" TextAlignment="Center"/>
-            <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
-                    Interval="500" Maximum="120" Minimum="0" 
-                    SmallChange="1" TickFrequency="5" IsSnapToTickEnabled="True"
-                    TickPlacement="BottomRight" Value="{Binding Path=Misc.NonEliteRange}" 
-                    HorizontalAlignment="Stretch" Margin="25,0,25,0"/>
-        </Grid>
-
-        <!--Delay after kill Settings-->
-        <Grid Grid.Row="3" Margin="5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="Wait for loot drop - Delay after kill :" FontWeight="Bold" TextAlignment="Center"/>
-            <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
-                    Interval="100" IsSnapToTickEnabled="True"
-                    Maximum="1500" Minimum="0" SmallChange="100" TickFrequency="50" TickPlacement="BottomRight" 
-                    Value="{Binding Path=Misc.DelayAfterKill}" 
-                    HorizontalAlignment="Stretch" Margin="25,0,25,0"/>
-        </Grid>
-        
-        <Grid Grid.Row="4" Margin="5" HorizontalAlignment="Center">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <TextBlock Text="Minimum Trash Mob Pack Size:" FontWeight="Bold" TextAlignment="Center"/>
-            <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
-                    Interval="100" IsSnapToTickEnabled="True"
-                    Maximum="15" Minimum="1" SmallChange="100" TickFrequency="1" TickPlacement="BottomRight" 
-                    Value="{Binding Path=Misc.TrashPackSize}" 
-                    HorizontalAlignment="Stretch" Margin="0,0,0,0"
-                    MinWidth="175"/>
-            <TextBlock Grid.Column="1" Text="Trash Pack Cluster Radius:" FontWeight="Bold" TextAlignment="Center"/>
-            <Slider  Grid.Row="1" Grid.Column="1" Template="{DynamicResource Slider}" 
-                    Interval="100" IsSnapToTickEnabled="True"
-                    Maximum="90" Minimum="0" SmallChange="100" TickFrequency="5" TickPlacement="BottomRight" 
-                    Value="{Binding Path=Misc.TrashPackClusterRadius}" 
-                    HorizontalAlignment="Stretch" Margin="0,0,0,0"
-                    MinWidth="175"/>
-
-        </Grid>
-
-        <!--All CheckBox-->
-        <StackPanel Grid.Row="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,0">
-            <GroupBox HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                <GroupBox.Header>
-                    Misc
-                </GroupBox.Header>
-                <UniformGrid Columns="2" HorizontalAlignment="Center" VerticalAlignment="Top">
-                    <CheckBox IsChecked="{Binding Path=Misc.ExtendedTrashKill}" ToolTip="Extended range for ~ 2 seconds">Extend trash-kill range after combat</CheckBox>
-                    <CheckBox IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Use movement spells Out of Combat</CheckBox>
-                    <CheckBox IsChecked="{Binding Path=Misc.CollectHealthGlobe}">Attempt to collect health globes</CheckBox>
-                    <CheckBox IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>
-                </UniformGrid>
+                    </Grid>
+                    <UniformGrid Columns="2" HorizontalAlignment="Center" VerticalAlignment="Top">
+                        <CheckBox IsChecked="{Binding Path=Misc.IgnoreElites}" ToolTip="Attack trash mobs only">Ignore Elite/Rare/Unique</CheckBox>
+                        <CheckBox IsChecked="{Binding Path=Misc.SkipElitesOn5NV}" ToolTip="Skip Elites on 5 Stacks of Nephalem Valor">Skip Elites with 5 NV</CheckBox>
+                    </UniformGrid>
+                </StackPanel>
             </GroupBox>
-            <GroupBox HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                <GroupBox.Header>
-                    Elites
-                </GroupBox.Header>
-                <UniformGrid Columns="2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                    <CheckBox IsChecked="{Binding Path=Misc.IgnoreElites}" ToolTip="Attack trash mobs only">Ignore Elite/Rare/Unique</CheckBox>
-                    <CheckBox IsChecked="{Binding Path=Misc.SkipElitesOn5NV}" ToolTip="Skip Elites on 5 Stacks of Nephalem Valor">Skip Elites with 5 NV</CheckBox>
-                </UniformGrid>
-            </GroupBox>
-            <GroupBox HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                <GroupBox.Header>
-                    Avoidance
-                </GroupBox.Header>
-                <UniformGrid Columns="2">
-                    <CheckBox IsChecked="{Binding Path=Misc.AvoidanceNavigation}" ToolTip="Do not walk through AoE, even at full health">Path Around AoE</CheckBox>
-                    <CheckBox IsChecked="{Binding Path=Misc.AvoidDeath}" ToolTip="Kite to Avoid Death on low health">Kite to Avoid Death on Low HP</CheckBox>
-                    <CheckBox IsChecked="{Binding Path=Misc.AvoidAOE}">Attempt to avoid AoE</CheckBox>
-                    <CheckBox IsChecked="{Binding Path=Misc.KillMonstersInAoE}" ToolTip="Attack units standing in AoE">Attack Mobs in AoE</CheckBox>
-                </UniformGrid>
-            </GroupBox>
-        </StackPanel>
 
-        <!--Reset Button-->
-        <Button Grid.Row="6" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetMiscCommand}">Reset</Button>
-    </Grid>
+            <!-- Trash Mob Settings -->
+            <GroupBox Grid.Row="3">
+                <GroupBox.Header>Trash Mob Settings</GroupBox.Header>
+                <StackPanel>
+                    <!--Non Elite Range Settings-->
+                    <Grid Grid.Row="3" Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Trigger range for Trash Combat:" FontWeight="Bold" TextAlignment="Center"/>
+                        <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
+                            Interval="500" Maximum="120" Minimum="0" 
+                            SmallChange="1" TickFrequency="5" IsSnapToTickEnabled="True"
+                            TickPlacement="BottomRight" Value="{Binding Path=Misc.NonEliteRange}" 
+                            HorizontalAlignment="Stretch" Margin="25,0,25,0"/>
+                    </Grid>
+                    <Grid Grid.Row="4" Margin="5" HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Minimum Trash Mob Pack Size:" FontWeight="Bold" TextAlignment="Center"/>
+                        <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
+                            Interval="100" IsSnapToTickEnabled="True"
+                            Maximum="15" Minimum="1" SmallChange="100" TickFrequency="1" TickPlacement="BottomRight" 
+                            Value="{Binding Path=Misc.TrashPackSize}" 
+                            HorizontalAlignment="Stretch" Margin="0,0,0,0"
+                            MinWidth="175"/>
+                        <TextBlock Grid.Column="1" Text="Trash Pack Cluster Radius:" FontWeight="Bold" TextAlignment="Center"/>
+                        <Slider  Grid.Row="1" Grid.Column="1" Template="{DynamicResource Slider}" 
+                            Interval="100" IsSnapToTickEnabled="True"
+                            Maximum="90" Minimum="0" SmallChange="100" TickFrequency="5" TickPlacement="BottomRight" 
+                            Value="{Binding Path=Misc.TrashPackClusterRadius}" 
+                            HorizontalAlignment="Stretch" Margin="0,0,0,0"
+                            MinWidth="175"/>
+
+                    </Grid>
+                    <Grid Grid.Row="5" Margin="5" HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Ignore Trash Below Health %:" FontWeight="Bold" TextAlignment="Center" Margin="2,0"/>
+                        <Slider Grid.Row="1" Template="{DynamicResource Slider}" ToolTip="Always Ignore Trash Mobs Below this Percent Health"
+                            Interval="100" IsSnapToTickEnabled="True"
+                            Maximum="1" Minimum="0" SmallChange="100" TickFrequency=".05" TickPlacement="BottomRight" 
+                            Value="{Binding Path=Misc.IgnoreTrashBelowHealth}" 
+                            HorizontalAlignment="Stretch" Margin="0,0,0,0"
+                            MinWidth="200"/>
+                        <TextBlock Grid.Column="1" Text="Ignore Below Health % w/ DoT:" FontWeight="Bold" TextAlignment="Center" Margin="2,0"/>
+                        <Slider  Grid.Row="1" Grid.Column="1" Template="{DynamicResource Slider}" ToolTip="Ignore Trash Mobs Below this Percent Health who also have a DoT applied"
+                            Interval="100" IsSnapToTickEnabled="True"
+                            Maximum="1" Minimum="0" SmallChange="100" TickFrequency=".05" TickPlacement="BottomRight" 
+                            Value="{Binding Path=Misc.IgnoreTrashBelowHealthDoT}" 
+                            HorizontalAlignment="Stretch" Margin="0,0,0,0"
+                            MinWidth="200"/>
+
+                    </Grid>
+                    <UniformGrid Columns="1" HorizontalAlignment="Center">
+                        <CheckBox IsChecked="{Binding Path=Misc.ExtendedTrashKill}" ToolTip="Extended range for ~ 2 seconds">Extend trash-kill range after combat</CheckBox>
+                    </UniformGrid>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Misc -->
+            <StackPanel Grid.Row="6" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,0">
+                <GroupBox HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                    <GroupBox.Header>
+                        Misc Combat Settings
+                    </GroupBox.Header>
+                    <StackPanel>
+                        <!--Goblin Settings-->
+                        <Grid Grid.Row="0" Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Treasure Goblins :" FontWeight="Bold" TextAlignment="Center"/>
+                            <UniformGrid Grid.Row="1" Margin="25,0,25,0" Columns="4">
+                                <RadioButton GroupName="GoblinMode" Content="Ignore" IsChecked="{Binding Path=Misc.GoblinPriority, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Ignore}" />
+                                <RadioButton GroupName="GoblinMode" Content="Normal" IsChecked="{Binding Path=Misc.GoblinPriority, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Normal}" />
+                                <RadioButton GroupName="GoblinMode" Content="Prioritize" IsChecked="{Binding Path=Misc.GoblinPriority, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Prioritize}" />
+                                <RadioButton GroupName="GoblinMode" Content="Kamikaze" IsChecked="{Binding Path=Misc.GoblinPriority, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Kamikaze}" />
+                            </UniformGrid>
+                        </Grid>
+                        <!--Delay after kill Settings-->
+                        <Grid Grid.Row="2" Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Wait for loot drop - Delay after kill :" FontWeight="Bold" TextAlignment="Center"/>
+                            <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
+                                Interval="100" IsSnapToTickEnabled="True"
+                                Maximum="1500" Minimum="0" SmallChange="100" TickFrequency="50" TickPlacement="BottomRight" 
+                                Value="{Binding Path=Misc.DelayAfterKill}" 
+                                HorizontalAlignment="Stretch" Margin="25,0,25,0"/>
+                        </Grid>
+                        <UniformGrid Columns="2" HorizontalAlignment="Center" VerticalAlignment="Top">
+                            <CheckBox IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Use movement spells Out of Combat</CheckBox>
+                            <CheckBox IsChecked="{Binding Path=Misc.CollectHealthGlobe}">Attempt to collect health globes</CheckBox>
+                            <CheckBox IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>
+                        </UniformGrid>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                    <GroupBox.Header>
+                        Avoidance Settings
+                    </GroupBox.Header>
+                    <UniformGrid Columns="2">
+                        <CheckBox IsChecked="{Binding Path=Misc.AvoidanceNavigation}" ToolTip="Do not walk through AoE, even at full health">Path Around AoE</CheckBox>
+                        <CheckBox IsChecked="{Binding Path=Misc.AvoidDeath}" ToolTip="Kite to Avoid Death on low health">Kite to Avoid Death on Low HP</CheckBox>
+                        <CheckBox IsChecked="{Binding Path=Misc.AvoidAOE}">Attempt to avoid AoE</CheckBox>
+                        <CheckBox IsChecked="{Binding Path=Misc.KillMonstersInAoE}" ToolTip="Attack units standing in AoE">Attack Mobs in AoE</CheckBox>
+                    </UniformGrid>
+                </GroupBox>
+            </StackPanel>
+
+            <!--Reset Button-->
+            <Button Grid.Row="7" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetMiscCommand}">Reset</Button>
+        </Grid>
+    </ScrollViewer>
 </UserControl>

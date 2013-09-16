@@ -144,6 +144,11 @@ namespace Trinity
             WeaponMinDamage = stats.WeaponMinDamage;
         }
 
+        public CachedACDItem()
+        {
+
+        }
+
         public CachedACDItem(
             ACDItem acdItem,
             string internalName,

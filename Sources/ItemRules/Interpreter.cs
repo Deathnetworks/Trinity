@@ -294,9 +294,29 @@ namespace Trinity.ItemRules
         /// <returns></returns>
         internal InterpreterAction checkItem(ACDItem item, ItemEvaluationType evaluationType)
         {
-            fillDic(item);
+            try
+            {
+                fillDic(item);
 
-            return checkItem(evaluationType);
+                return checkItem(evaluationType);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Exception in checkItem: {0} item: {1}/{2} eval type: {3}", ex, item.Name, item.InternalName, evaluationType);
+                switch (evaluationType)
+                {
+                    case ItemEvaluationType.Keep:
+                        return InterpreterAction.KEEP;
+                    case ItemEvaluationType.PickUp:
+                        return InterpreterAction.PICKUP;
+                    case ItemEvaluationType.Salvage:
+                        return InterpreterAction.KEEP;
+                    case ItemEvaluationType.Sell:
+                        return InterpreterAction.KEEP;
+                    default:
+                        return InterpreterAction.NULL;
+                }
+            }
         }
 
         /// <summary>
@@ -386,7 +406,10 @@ namespace Trinity.ItemRules
 
             string logString = getFullItem() + validRule;
 
-            TrinityItemQuality quality = getTrinityItemQualityFromString(itemDic["[QUALITY]"]);
+            TrinityItemQuality quality = TrinityItemQuality.Unknown;
+
+            if (itemDic.ContainsKey("[QUALITY]"))
+                quality = getTrinityItemQualityFromString(itemDic["[QUALITY]"]);
 
             switch (action)
             {
