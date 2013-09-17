@@ -38,6 +38,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
+                // if disabled in the profile, or disabled through api
                 if (!CombatTargeting.Instance.AllowedToKillMonsters || !isCombatAllowed)
                     return false;
                 return true;

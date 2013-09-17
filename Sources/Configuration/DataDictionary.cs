@@ -170,7 +170,7 @@ namespace Trinity
             // The giant undead fat grotesques that explode in act 1 (3847)
             {3847, 401},
             // Hive pods that summon flyers in act 1 (4152, 4153, 4154)
-            {4152, 901}, {4153, 901}, {4154, 901},
+            {4152, 2901}, {4153, 2901}, {4154, 2901},
             // Totems in act 1 that summon the ranged goatmen (166452)
             {166452, 901},
             // Totems in act 1 dungeons that summon skeletons (176907)

@@ -1,4 +1,4 @@
-﻿// VERSION 1.1.3a
+﻿// VERSION 1.1.4
 using System.Windows;
 using Zeta;
 using Zeta.Common;
@@ -8,7 +8,7 @@ using Zeta.Internals.Actors;
 using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
 
-namespace Trinity
+namespace TrinityRoutine
 {
     public class TrinityRoutine : CombatRoutine
     {
