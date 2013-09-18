@@ -50,19 +50,6 @@ namespace Trinity
                     }
                 }
 
-                bool ShouldIgnoreTrashMobs =
-                    (!DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
-                    !XmlTags.TrinityTownPortal.ForceClearArea &&
-                    !TownRun.IsTryingToTownPortal() &&
-                    !profileTagCheck &&
-                    !prioritizeCloseRangeUnits &&
-                    Settings.Combat.Misc.TrashPackSize > 1 &&
-                    EliteCount == 0 &&
-                    //AvoidanceCount == 0 &&
-                    Player.Level >= 15 &&
-                    MovementSpeed >= 1
-                    );
-
                 bool ShouldIgnoreElites =
                     !DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
                      !profileTagCheck &&
@@ -70,17 +57,34 @@ namespace Trinity
                      !TownRun.IsTryingToTownPortal() &&
                     CombatBase.IgnoringElites;
 
-                string unitWeightInfo = "";
-
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight,
-                    "Starting weights: packSize={0} packRadius={1} ShouldIgnoreTrash={2} MovementSpeed={3} Elites={4} AoEs={5} disableIgnoreTag={6} closeRangePriority={7}",
-                    Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius,
-                    ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck,
-                    prioritizeCloseRangeUnits);
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
+                    "Starting weights: packSize={0} packRadius={1} MovementSpeed={2} Elites={3} AoEs={4} disableIgnoreTag={5} closeRangePriority={6} townRun={7} forceClear={8} questing={9} level={10}",
+                    Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck,
+                    prioritizeCloseRangeUnits, TownRun.IsTryingToTownPortal(), TrinityTownPortal.ForceClearArea, DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId), Player.Level);
 
                 foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.CentreDistance))
                 {
-                    unitWeightInfo = "";
+                    bool questing = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId);
+                    bool townPortal = TownRun.IsTryingToTownPortal();
+                    bool elitesInRange =
+                        ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 25f);
+
+                    bool shouldIgnoreTrashMobs =
+                        (!questing &&
+                        !XmlTags.TrinityTownPortal.ForceClearArea &&
+                        !townPortal &&
+                        !profileTagCheck &&
+                        !prioritizeCloseRangeUnits &&
+                        Settings.Combat.Misc.TrashPackSize > 1 &&
+                        //EliteCount == 0 &&
+                        !elitesInRange &&
+                        //AvoidanceCount == 0 &&
+                        Player.Level >= 15 &&
+                        MovementSpeed >= 1 &&
+                        Player.CurrentHealthPct > 0.10
+                        );
+
+                    string unitWeightInfo = "";
 
                     // Just to make sure each one starts at 0 weight...
                     cacheObject.Weight = 0d;
@@ -101,21 +105,24 @@ namespace Trinity
 
                                 bool isInHotSpot = GroupHotSpots.CacheObjectIsInHotSpot(cacheObject);
 
+                                bool ignoring = false;
                                 // Ignore Solitary Trash mobs (no elites present)
                                 // Except if has been primary target or if already low on health (<= 20%)
-                                if (ShouldIgnoreTrashMobs && cacheObject.IsTrashMob && //!cacheObject.HasBeenPrimaryTarget &&
+                                if (shouldIgnoreTrashMobs && cacheObject.IsTrashMob && //!cacheObject.HasBeenPrimaryTarget &&
                                     !isInHotSpot &&
                                     !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize))
                                 {
-                                    unitWeightInfo = String.Format("Ignoring nearbyCount={0} radiusDistance={1:0} hotspot={2}",
-                                        nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot);
-                                    break;
+                                    unitWeightInfo = "Ignoring ";
+                                    ignoring = true;
                                 }
                                 else
                                 {
-                                    unitWeightInfo = String.Format("Adding nearbyCount={0} radiusDistance={1:0} hotspot={2}",
-                                        nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot);
+                                    unitWeightInfo = "Adding ";
                                 }
+                                unitWeightInfo += String.Format("nearbyCount={0} radiusDistance={1:0} hotspot={2} ShouldIgnore={3} elitesInRange={4}",
+                                    nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot, shouldIgnoreTrashMobs, elitesInRange);
+                                if (ignoring)
+                                    break;
 
                                 // Ignore elite option, except if trying to town portal
                                 if (!cacheObject.IsBoss && ShouldIgnoreElites && cacheObject.IsEliteRareUnique)
@@ -124,7 +131,7 @@ namespace Trinity
                                 }
 
                                 // Ignore trash mobs < 15% health or 50% health with a DoT
-                                if (cacheObject.IsTrashMob &&
+                                if (cacheObject.IsTrashMob && shouldIgnoreTrashMobs &&
                                     (cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealth ||
                                      cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS))
                                 {
@@ -246,6 +253,10 @@ namespace Trinity
                                         // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                         if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                             cacheObject.Weight += 1000d;
+
+                                        if (ObjectCache.Any(u =>MathEx.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position,
+                                                        cacheObject.Position)))
+                                            cacheObject.Weight *= 0.10d;
 
                                         // Prevent going less than 300 yet to prevent annoyances (should only lose this much weight from priority reductions in priority list?)
                                         if (cacheObject.Weight < 300)
@@ -501,22 +512,17 @@ namespace Trinity
                             }
                         case GObjectType.HealthWell:
                             {
-
-                                // Healths Wells get handled correctly ... 
-                                if (cacheObject.Type == GObjectType.HealthWell && Player.CurrentHealthPct <= .75)
+                                if (MonsterObstacleCache.Any(unit => MathUtil.IntersectsPath(unit.Location, unit.Radius, Player.Position, cacheObject.Position)))
                                 {
-                                    cacheObject.Weight += 7500;
-                                }
-                                if (cacheObject.Type == GObjectType.HealthWell && Player.CurrentHealthPct <= .25)
-                                {
-                                    cacheObject.Weight += 20000d;
+                                    // As a percentage of health with typical maximum weight
+                                    cacheObject.Weight = 50000d * (1 - Trinity.Player.CurrentHealthPct);
                                 }
                                 break;
                             }
                         case GObjectType.Shrine:
                             {
                                 // Weight Shrines
-                                cacheObject.Weight = (75f - cacheObject.RadiusDistance) / 75f * 14500f;
+                                cacheObject.Weight = Math.Max(((75f - cacheObject.RadiusDistance) / 75f * 14500f), 100d);
 
                                 // Very close shrines get a weight increase
                                 if (cacheObject.CentreDistance <= 30f)

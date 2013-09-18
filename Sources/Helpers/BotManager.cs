@@ -23,15 +23,20 @@ namespace Trinity
             TreeHooks.Instance.ReplaceHook("Combat", new Decorator(ctx => TargetCheck(ctx), HandleTargetAction()));
 
             // We still want the main VendorRun logic, we're just going to take control of *when* this logic kicks in
-            PrioritySelector VendorRunPrioritySelector = (TreeHooks.Instance.Hooks["VendorRun"][0] as Decorator).Children[0] as PrioritySelector;
-            TreeHooks.Instance.ReplaceHook("VendorRun", new Decorator(ret => TownRun.TownRunCanRun(ret), VendorRunPrioritySelector));
+            PrioritySelector VendorRunPrioritySelector =
+                (TreeHooks.Instance.Hooks["VendorRun"][0] as Decorator).Children[0] as PrioritySelector;
+            TreeHooks.Instance.ReplaceHook("VendorRun",
+                new Decorator(ret => TownRun.TownRunCanRun(ret), TownRun.TownRunWrapper(VendorRunPrioritySelector)));
 
             // Loot tree is now empty and never runs (Loot is handled through combat)
             TreeHooks.Instance.ReplaceHook("Loot", new Decorator(ret => false, new Action()));
-            
+
+            // Death Handling
+            TreeHooks.Instance.ReplaceHook("Death",
+                DbProvider.DeathHandler.CreateDeathHandler(TreeHooks.Instance.Hooks["Death"][0]));
         }
 
-        
+
 
 
         internal static void SetBotTPS()

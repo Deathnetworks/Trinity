@@ -57,6 +57,9 @@ namespace Trinity
                 case AvoidanceType.AzmodanPool:
                     return Trinity.Settings.Combat.AvoidanceRadius.AzmoPools;
 
+                case AvoidanceType.BeastCharge:
+                    return 1;
+
                 case AvoidanceType.BeeWasp:
                     return Trinity.Settings.Combat.AvoidanceRadius.BeesWasps;
 
@@ -77,6 +80,9 @@ namespace Trinity
 
                 case AvoidanceType.DiabloRingOfFire:
                     return Trinity.Settings.Combat.AvoidanceRadius.DiabloRingOfFire;
+
+                case AvoidanceType.FireChains:
+                    return 1;
 
                 case AvoidanceType.GhomGas:
                     return Trinity.Settings.Combat.AvoidanceRadius.GhomGas;
@@ -181,6 +187,8 @@ namespace Trinity
                         return avoidanceHealth.AvoidAzmoFireBallHealth;
                     case AvoidanceType.AzmodanPool:
                         return avoidanceHealth.AvoidAzmoPoolsHealth;
+                    case AvoidanceType.BeastCharge:
+                        return 1;
                     case AvoidanceType.BeeWasp:
                         return avoidanceHealth.AvoidBeesWaspsHealth;
                     case AvoidanceType.Belial:
@@ -195,6 +203,8 @@ namespace Trinity
                         return avoidanceHealth.AvoidDiabloPrisonHealth;
                     case AvoidanceType.DiabloRingOfFire:
                         return avoidanceHealth.AvoidDiabloRingOfFireHealth;
+                    case AvoidanceType.FireChains:
+                        return 1;
                     case AvoidanceType.GhomGas:
                         return avoidanceHealth.AvoidGhomGasHealth;
                     case AvoidanceType.IceBall:

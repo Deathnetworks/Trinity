@@ -73,6 +73,8 @@ namespace Trinity
         private static string c_ObjectHash = String.Empty;
         private static double c_KillRange = 0f;
         private static MonsterAffixes c_MonsterAffixes = MonsterAffixes.None;
+        private static bool c_IsFacingPlayer;
+        private static float c_Rotation;
 
         private static bool CacheDiaObject(DiaObject freshObject)
         {
@@ -197,6 +199,7 @@ namespace Trinity
                         CentreDistance = c_CentreDistance,
                         RadiusDistance = c_RadiusDistance,
                         InternalName = c_InternalName,
+                        Animation = c_CurrentAnimation,
                         ACDGuid = c_ACDGUID,
                         RActorGuid = c_RActorGuid,
                         DynamicID = c_GameDynamicID,
@@ -339,6 +342,8 @@ namespace Trinity
             c_ObjectHash = String.Empty;
             c_KillRange = 0f;
             c_MonsterAffixes = MonsterAffixes.None;
+            c_IsFacingPlayer = false;
+            c_Rotation = 0f;
         }
         /// <summary>
         /// Inserts the ActorSNO <see cref="actorSNOCache"/> and sets <see cref="c_ActorSNO"/>

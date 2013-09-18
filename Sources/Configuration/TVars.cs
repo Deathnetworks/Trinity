@@ -32,6 +32,7 @@ namespace Trinity
             Set(new TVar("Barbarian.Avoidance.WOTB.IceBall", 0f, "WOTB IceBall health multiplier"));
             Set(new TVar("Barbarian.Avoidance.WOTB.PoisonTree", 1f, "WOTB Poison Tree / Spore health multiplier"));
             Set(new TVar("Barbarian.Avoidance.WOTB.Belial", 1f, "WOTB Belial health multiplier"));
+            Set(new TVar("Barbarian.Avoidance.WOTB.BeastCharge", 1f, "WOTB Belial health multiplier"));
             Set(new TVar("Barbarian.ThreatShout.Range", 25f, "Threating Shout Mob Range distance"));
             Set(new TVar("Barbarian.ThreatShout.OOCMaxFury", 25, "Threating Shout Out of Combat Max Fury"));
             Set(new TVar("Barbarian.WarCry.MaxFury", 60, "Maximum Fury to cast WarCry (with buff)"));
@@ -88,12 +89,14 @@ namespace Trinity
             Set(new TVar("Barbarian.Leap.TrashRange", 20f, "Leap Trash Check Range"));
             Set(new TVar("Barbarian.Leap.TrashCount", 1, "Minimum Leap Trash Count"));
             Set(new TVar("Barbarian.Leap.MinExtraDistance", 4f, "Extra distance added to target for Leap direction"));
-            Set(new TVar("Barbarian.Rend.MinNonBleedMobCount", 3, "Cast rend when this many mobs surrounding are not bleeding"));
-            Set(new TVar("Barbarian.Rend.MinUseIntervalMillseconds", 1500, "Cast rend when this many mobs surrounding are not bleeding"));
-            Set(new TVar("Barbarian.Rend.MaxRange", 10f, "Maximum Range for targets to be Rended"));
+
+            Set(new TVar("Barbarian.Rend.MinNonBleedMobCount", 1, "Cast rend when this many mobs surrounding are not bleeding"));
+            Set(new TVar("Barbarian.Rend.MinUseIntervalMillseconds", 1500, "Minimum Delay between uses"));
+            Set(new TVar("Barbarian.Rend.MaxRange", 15f, "Maximum Range for targets to be Rended"));
             Set(new TVar("Barbarian.Rend.MinFury", 20, "Minimum Fury"));
             Set(new TVar("Barbarian.Rend.TickDelay", 4, "Rend Pre and Post Tick Delay"));
-            Set(new TVar("Barbarian.Rend.SpamBelowHealthPct", 0.5f, "Always spam rend when below this Percent Health"));
+            Set(new TVar("Barbarian.Rend.SpamBelowHealthPct", 1f, "Always spam rend when below this Percent Health"));
+
             Set(new TVar("Barbarian.OverPower.MaxRange", 9f, "Maximum Range Overpower is triggered"));
             Set(new TVar("Barbarian.SeismicSlam.CurrentTargetRange", 40f, "Maximum Current Target range"));
             Set(new TVar("Barbarian.SeismicSlam.MinFury", 15, "Minimum Fury for Seismic Slam"));

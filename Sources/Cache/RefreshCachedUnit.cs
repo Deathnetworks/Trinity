@@ -21,6 +21,8 @@ namespace Trinity
 
             // hax for Diablo_shadowClone
             c_unit_IsAttackable = c_InternalName.StartsWith("Diablo_shadowClone");
+            c_IsFacingPlayer = c_diaUnit.IsFacingPlayer;
+            c_Rotation = c_diaUnit.Movement.Rotation;
 
             if (c_CommonData.ACDGuid == -1)
             {

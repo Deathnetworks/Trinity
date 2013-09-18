@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Web.UI.WebControls;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
@@ -66,12 +67,70 @@ namespace Trinity
                 // Add Team HotSpots to the cache
                 ObjectCache.AddRange(GroupHotSpots.GetCacheObjectHotSpots());
 
+                /* Fire Chains Experimental Avoidance */
+                const float fireChainSize = 5f;
+                foreach (var unit1 in ObjectCache.Where(u => u.MonsterAffixes.HasFlag(MonsterAffixes.FireChains)))
+                {
+                    foreach (var unit2 in ObjectCache.Where(u => u.MonsterAffixes.HasFlag(MonsterAffixes.FireChains)).Where(unit2 => unit1.RActorGuid != unit2.RActorGuid))
+                    {
+                        for (float i = 0; i <= unit1.Position.Distance2D(unit2.Position); i += (fireChainSize / 4))
+                        {
+                            Vector3 fireChainSpot = MathEx.CalculatePointFrom(unit1.Position, unit2.Position, i);
+
+                            if (Trinity.Player.Position.Distance2D(fireChainSpot) <= fireChainSize)
+                            {
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Fire Chains!");
+                                StandingInAvoidance = true;
+                            }
+                            AvoidanceObstacleCache.Add(new CacheObstacleObject(fireChainSpot, fireChainSize, -2, "FireChains"));
+                        }
+                    }
+                    if (AvoidanceObstacleCache.Any(aoe => aoe.ActorSNO == -2))
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Generated {0} avoidance points for FireChains, minDistance={1} maxDistance={2}",
+                      AvoidanceObstacleCache.Count(aoe => aoe.ActorSNO == -2),
+                      AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == -2)
+                          .Min(aoe => aoe.Location.Distance2D(Trinity.Player.Position)),
+                      AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == -2)
+                          .Max(aoe => aoe.Location.Distance2D(Trinity.Player.Position)));
+                }
+
+                /* Beast Charge Experimental Avoidance */
+                const float beastChargePathWidth = 10f;
+                const int beastChargerSNO = 3337;
+                foreach (var unit1 in ObjectCache.Where(u => u.IsFacingPlayer && u.Animation == SNOAnim.Beast_start_charge_02 || u.Animation == SNOAnim.Beast_charge_02 || u.Animation == SNOAnim.Beast_charge_04))
+                {
+                    Vector3 endPoint = MathEx.GetPointAt(unit1.Position, 90f, unit1.Unit.Movement.Rotation);
+
+                    for (float i = 0; i <= unit1.Position.Distance2D(endPoint); i += (beastChargePathWidth / 4))
+                    {
+                        Vector3 pathSpot = MathEx.CalculatePointFrom(unit1.Position, endPoint, i);
+
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                            "Generating BeastCharge Avoidance: {0} dist: {1}",
+                            pathSpot, pathSpot.Distance2D(unit1.Position));
+
+                        if (Trinity.Player.Position.Distance2D(pathSpot) <= beastChargePathWidth)
+                        {
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Beast Charger!");
+                            StandingInAvoidance = true;
+                        }
+                        AvoidanceObstacleCache.Add(new CacheObstacleObject(pathSpot, fireChainSize, beastChargerSNO, "BeastCharge"));
+                    }
+                    if (AvoidanceObstacleCache.Any(aoe => aoe.ActorSNO == beastChargerSNO))
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Generated {0} avoidance points for BeastCharge, minDistance={1} maxDistance={2}",
+                            AvoidanceObstacleCache.Count(aoe => aoe.ActorSNO == beastChargerSNO),
+                            AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == beastChargerSNO)
+                                .Min(aoe => aoe.Location.Distance2D(Trinity.Player.Position)),
+                            AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == beastChargerSNO)
+                                .Max(aoe => aoe.Location.Distance2D(Trinity.Player.Position)));
+                }
+
                 // Reduce ignore-for-loops counter
                 if (IgnoreTargetForLoops > 0)
                     IgnoreTargetForLoops--;
                 // If we have an avoidance under our feet, then create a new object which contains a safety point to move to
                 // But only if we aren't force-cancelling avoidance for XX time
-                bool bFoundSafeSpot = false;
+                bool hasFoundSafePoint = false;
 
                 using (new PerformanceLogger("RefreshDiaObjectCache.AvoidanceCheck"))
                 {
@@ -90,7 +149,7 @@ namespace Trinity
                                     Player.CurrentHealthPct, PlayerKiteDistance);
                             }
 
-                            bFoundSafeSpot = true;
+                            hasFoundSafePoint = true;
                             CurrentTarget = new TrinityCacheObject()
                                 {
                                     Position = vAnySafePoint,
@@ -116,7 +175,7 @@ namespace Trinity
                 // Special flag for special whirlwind circumstances
                 bAnyNonWWIgnoreMobsInRange = false;
                 // Now give each object a weight *IF* we aren't skipping direcly to a safe-spot
-                if (!bFoundSafeSpot)
+                if (!hasFoundSafePoint)
                 {
                     RefreshDiaGetWeights();
                     RefreshSetKiting(ref vKitePointAvoid, NeedToKite, ref TryToKite);
@@ -139,7 +198,7 @@ namespace Trinity
 
                 // Pre-townrun is too far away
                 if (!Player.IsInTown && TownRun.PreTownRunPosition != Vector3.Zero && TownRun.PreTownRunWorldId == Player.WorldID && !ForceVendorRunASAP
-                    && TownRun.PreTownRunPosition.Distance2D(Player.Position) <= V.F("Cache.PretownRun.MaxDistance")) 
+                    && TownRun.PreTownRunPosition.Distance2D(Player.Position) <= V.F("Cache.PretownRun.MaxDistance"))
                 {
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Pre-TownRun position is more than {0} yards away, canceling", V.I("Cache.PretownRun.MaxDistance"));
                     TownRun.PreTownRunPosition = Vector3.Zero;
@@ -203,8 +262,8 @@ namespace Trinity
                     if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
                     {
                         RecordTargetHistory();
-                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Found New Target - {0} CurrentTargetRactorGUID: {1} (ACDGuid: {3}) / CurrentTarget.RActorGuid: {2} (ACDGuid: {4})",
-                                        DateTime.Now, CurrentTargetRactorGUID, CurrentTarget.RActorGuid, CurrentTargetACDGuid, CurrentTarget.ACDGuid);
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Found New Target {0} dist={1} IsElite={2} Radius={3}",
+                                        CurrentTarget.InternalName, CurrentTarget.CentreDistance, CurrentTarget.IsEliteRareUnique, CurrentTarget.Radius);
                         dateSincePickedTarget = DateTime.Now;
                         iTargetLastHealth = 0f;
                     }
@@ -216,7 +275,7 @@ namespace Trinity
                             // Check if the health has changed, if so update the target-pick time before we blacklist them again
                             if (CurrentTarget.HitPointsPct != iTargetLastHealth)
                             {
-                                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Keeping Target {0} - CurrentTarget.iHitPoints: {1:0.00}  iTargetLastHealth: {2:0.00} ",
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Keeping Target {0} - CurrentTarget.HitPoints: {1:0.00} TargetLastHealth: {2:0.00} ",
                                                 CurrentTarget.RActorGuid, CurrentTarget.HitPointsPct, iTargetLastHealth);
                                 dateSincePickedTarget = DateTime.Now;
                             }
@@ -250,10 +309,10 @@ namespace Trinity
                     //}
                     //else
                     //{
-                        CurrentTarget.Position = unit.Position;
-                        CurrentTarget.HitPointsPct = unit.HitpointsCurrentPct;
-                        CurrentTarget.HitPoints = unit.HitpointsCurrent;
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Updated CurrentTarget HitPoints={0:0.00} & Position={1}", CurrentTarget.HitPointsPct, CurrentTarget.Position);
+                    CurrentTarget.Position = unit.Position;
+                    CurrentTarget.HitPointsPct = unit.HitpointsCurrentPct;
+                    CurrentTarget.HitPoints = unit.HitpointsCurrent;
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Updated CurrentTarget HitPoints={0:0.00} & Position={1}", CurrentTarget.HitPointsPct, CurrentTarget.Position);
                     //}
                 }
                 else if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit)
@@ -291,6 +350,10 @@ namespace Trinity
                 // Reset all variables for target-weight finding
                 AnyTreasureGoblinsPresent = false;
                 CurrentBotKillRange = Settings.Combat.Misc.NonEliteRange;
+
+                // Max kill range if we're questing
+                if (DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId))
+                    CurrentBotKillRange = 300f;
 
                 CurrentBotLootRange = Zeta.CommonBot.Settings.CharacterSettings.Instance.LootRadius;
                 ShouldStayPutDuringAvoidance = false;
@@ -474,7 +537,7 @@ namespace Trinity
                                         unitExtras += " HasDotDPS";
 
                                     if (c_HasBeenInLoS)
-                                        unitExtras += " HasBeenInLoS";                                    
+                                        unitExtras += " HasBeenInLoS";
 
                                     unitExtras += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
                                 }
@@ -698,6 +761,6 @@ namespace Trinity
             }
         }
 
-        
+
     }
 }

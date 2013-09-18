@@ -291,6 +291,35 @@ namespace Trinity.DbProvider
 
         public static double GetMovementSpeed()
         {
+            // record speed once per second
+            if (DateTime.Now.Subtract(lastRecordedPosition).TotalMilliseconds >= 1000)
+            {
+                // Record our current location and time
+                if (!SpeedSensors.Any())
+                {
+                    SpeedSensors.Add(new SpeedSensor()
+                    {
+                        Location = vMyCurrentPosition,
+                        TimeSinceLastMove = new TimeSpan(0),
+                        Distance = 0f,
+                        WorldID = Trinity.CurrentWorldDynamicId
+                    });
+                }
+                else
+                {
+                    SpeedSensor lastSensor = SpeedSensors.OrderByDescending(s => s.Timestamp).FirstOrDefault();
+                    SpeedSensors.Add(new SpeedSensor()
+                    {
+                        Location = vMyCurrentPosition,
+                        TimeSinceLastMove = new TimeSpan(DateTime.Now.Subtract(lastSensor.TimeSinceLastMove).Ticks),
+                        Distance = Vector3.Distance(vMyCurrentPosition, lastSensor.Location),
+                        WorldID = Trinity.CurrentWorldDynamicId
+                    });
+                }
+
+                lastRecordedPosition = DateTime.Now;
+            }
+            
             // If we just used a spell, we "moved"
             if (DateTime.Now.Subtract(Trinity.lastGlobalCooldownUse).TotalMilliseconds <= 1000)
                 return 1d;
@@ -376,34 +405,6 @@ namespace Trinity.DbProvider
             vMyCurrentPosition = Trinity.Player.Position;
             LastMoveToTarget = vMoveToTarget;
 
-            // record speed once per second
-            if (DateTime.Now.Subtract(lastRecordedPosition).TotalMilliseconds >= 1000)
-            {
-                // Record our current location and time
-                if (!SpeedSensors.Any())
-                {
-                    SpeedSensors.Add(new SpeedSensor()
-                    {
-                        Location = vMyCurrentPosition,
-                        TimeSinceLastMove = new TimeSpan(0),
-                        Distance = 0f,
-                        WorldID = Trinity.CurrentWorldDynamicId
-                    });
-                }
-                else
-                {
-                    SpeedSensor lastSensor = SpeedSensors.OrderByDescending(s => s.Timestamp).FirstOrDefault();
-                    SpeedSensors.Add(new SpeedSensor()
-                     {
-                         Location = vMyCurrentPosition,
-                         TimeSinceLastMove = new TimeSpan(DateTime.Now.Subtract(lastSensor.TimeSinceLastMove).Ticks),
-                         Distance = Vector3.Distance(vMyCurrentPosition, lastSensor.Location),
-                         WorldID = Trinity.CurrentWorldDynamicId
-                     });
-                }
-
-                lastRecordedPosition = DateTime.Now;
-            }
             // Set the public variable
             MovementSpeed = GetMovementSpeed();
 
@@ -418,7 +419,6 @@ namespace Trinity.DbProvider
             // Do unstuckery things
             if (Trinity.Settings.Advanced.UnstuckerEnabled)
             {
-
                 // See if we can reset the 10-limit unstuck counter, if >120 seconds since we last generated an unstuck location
                 // this is used if we're NOT stuck...
                 if (TotalAntiStuckAttempts > 1 && DateTime.Now.Subtract(LastGeneratedStuckPosition).TotalSeconds >= 120)

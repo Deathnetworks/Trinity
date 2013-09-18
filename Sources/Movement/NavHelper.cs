@@ -92,14 +92,10 @@ namespace Trinity
 
             bool rc = Navigator.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + ZDiff), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + ZDiff));
 
-            if (!rc)
-            {
-                if (Trinity.NavigationObstacleCache.Any(o => MathEx.IntersectsPath(o.Location, o.Radius, vStartLocation, vDestination)))
-                    return false;
-                else
-                    return true;
-            }
-            return false;
+            if (rc)
+                return false;
+
+            return !Trinity.NavigationObstacleCache.Any(o => MathEx.IntersectsPath(o.Location, o.Radius, vStartLocation, vDestination));
         }
 
         /// <summary>
@@ -151,21 +147,20 @@ namespace Trinity
                 }
             }
 
-            float fHighestWeight = 0f;
-            Vector3 vBestLocation = Vector3.Zero;
+            float highestWeight = 0f;
 
             if (monsterList == null)
                 monsterList = new List<TrinityCacheObject>();
 
-            vBestLocation = FindSafeZone(dangerPoint, shouldKite, isStuck, monsterList, avoidDeath);
-            fHighestWeight = 1;
+            Vector3 vBestLocation = FindSafeZone(dangerPoint, shouldKite, isStuck, monsterList, avoidDeath);
+            highestWeight = 1;
 
             // Loop through distance-range steps
-            if (fHighestWeight > 0)
-            {
-                lastFoundSafeSpot = DateTime.Now;
-                lastSafeZonePosition = vBestLocation;
-            }
+            if (highestWeight <= 0)
+                return vBestLocation;
+
+            lastFoundSafeSpot = DateTime.Now;
+            lastSafeZonePosition = vBestLocation;
             return vBestLocation;
         }
 
@@ -186,12 +181,12 @@ namespace Trinity
             end result should be that only navigable squares where no avoidance, monsters, or obstacles are present
             */
 
-            float gridSquareSize = 5f;
-            int maxDistance = 200;
-            int maxWeight = 100;
-            int maxZDiff = 14;
+            const float gridSquareSize = 5f;
+            const int maxDistance = 200;
+            const int maxWeight = 100;
+            const int maxZDiff = 14;
 
-            int gridTotalSize = (int)(maxDistance / gridSquareSize) * 2;
+            const int gridTotalSize = (int)(maxDistance / gridSquareSize) * 2;
 
             /* If maxDistance is the radius of a circle from the origin, then we want to get the hypotenuse of the radius (x) and tangent (y) as our search grid corner
              * anything outside of the circle will not be considered
@@ -255,12 +250,12 @@ namespace Trinity
                             continue;
                         }
                     }
-                    //if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) && 
-                    //    gridPoint.Distance > 45 && Navigator.Raycast(origin, xyz))
-                    //{
-                    //    nodesGT45Raycast++;
-                    //    continue;
-                    //}
+                    if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
+                        gridPoint.Distance > 45 && Navigator.Raycast(origin, xyz))
+                    {
+                        nodesGT45Raycast++;
+                        continue;
+                    }
 
                     if (isStuck && gridPoint.Distance > (PlayerMover.TotalAntiStuckAttempts + 2) * 5)
                     {
@@ -276,6 +271,7 @@ namespace Trinity
                         nodesAvoidance++;
                         continue;
                     }
+
                     // Obstacles
                     if (Trinity.NavigationObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= gridSquareRadius))
                     {
@@ -349,7 +345,7 @@ namespace Trinity
                     if (shouldKite)
                     {
                         // make sure we can raycast to our target
-                        if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) && 
+                        if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
                             !NavHelper.CanRayCast(gridPoint.Position, Trinity.LastPrimaryTargetPosition))
                         {
                             navRaycast++;

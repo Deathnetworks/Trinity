@@ -76,6 +76,7 @@
     <Compile Include="Combat\SpellTracker.cs" />
     <Compile Include="Configuration\TVar.cs" />
     <Compile Include="Configuration\TVars.cs" />
+    <Compile Include="DbProvider\DeathHandler.cs" />
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\DoubleInt.cs" />
     <Compile Include="Helpers\GameEvents.cs" />

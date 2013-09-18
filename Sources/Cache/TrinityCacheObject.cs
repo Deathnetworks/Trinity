@@ -20,6 +20,7 @@ namespace Trinity
         public float CentreDistance { get; set; }
         public float RadiusDistance { get; set; }
         public string InternalName { get; set; }
+        public SNOAnim Animation { get; set; }
         public int ACDGuid { get; set; }
         public int RActorGuid { get; set; }
         public int DynamicID { get; set; }
@@ -55,6 +56,8 @@ namespace Trinity
         public double HitPointsPct { get; set; }
         public double HitPoints { get; set; }
         public float Radius { get; set; }
+        public float Rotation { get; set; }
+        public bool IsFacingPlayer { get; set; }
         public bool ForceLeapAgainst { get; set; }
 
         public bool HasBeenPrimaryTarget { get; set; }
@@ -152,7 +155,8 @@ namespace Trinity
                 ItemLink = ItemLink,
                 KillRange = KillRange,
                 MonsterAffixes = MonsterAffixes,
-                TimesBeenPrimaryTarget = TimesBeenPrimaryTarget
+                TimesBeenPrimaryTarget = TimesBeenPrimaryTarget,
+                Animation = Animation,
             };
             return clone;
         }

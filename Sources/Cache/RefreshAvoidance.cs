@@ -1,5 +1,6 @@
 ﻿using System;
 using Trinity.Technicals;
+using Zeta;
 using Zeta.Common.Plugins;
 using Zeta.Internals.Actors;
 using Zeta.Navigation;
@@ -35,7 +36,8 @@ namespace Trinity
             {
                 c_CurrentAnimation = c_CommonData.CurrentAnimation;
             }
-            catch { }
+            catch (Exception)
+            { }
 
             double minAvoidanceHealth = GetAvoidanceHealth(c_ActorSNO);
             double minAvoidanceRadius = GetAvoidanceRadius(c_ActorSNO, c_Radius);
@@ -50,6 +52,10 @@ namespace Trinity
             }
 
             AvoidanceType avoidanceType = AvoidanceManager.GetAvoidanceType(c_ActorSNO);
+
+            // Beast Charge should set aoe position as players current position!
+            if (avoidanceType == AvoidanceType.BeastCharge)
+                c_Position = ZetaDia.Me.Position;
 
             // Monks with Serenity up ignore all AOE's
             if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_Serenity) && GetHasBuff(SNOPower.Monk_Serenity))
@@ -74,30 +80,30 @@ namespace Trinity
                 Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
                 GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
             {
-                if (avoidanceType == AvoidanceType.IceBall)
+                switch (avoidanceType)
                 {
-                    minAvoidanceHealth *= V.F("Barbarian.Avoidance.WOTB.IceBall");
+                    case AvoidanceType.IceBall:
+                        minAvoidanceHealth *= V.F("Barbarian.Avoidance.WOTB.IceBall");
+                        break;
+                    case AvoidanceType.Arcane:
+                        minAvoidanceHealth *= V.F("Barbarian.Avoidance.WOTB.Arcane");
+                        break;
+                    case AvoidanceType.Desecrator:
+                        minAvoidanceHealth *= V.F("Barbarian.Avoidance.WOTB.Desecrator");
+                        break;
+                    case AvoidanceType.Belial:
+                        minAvoidanceHealth = V.F("Barbarian.Avoidance.WOTB.Belial");
+                        break;
+                    case AvoidanceType.PoisonTree:
+                        minAvoidanceHealth = V.F("Barbarian.Avoidance.WOTB.PoisonTree");
+                        break;
+                    case AvoidanceType.BeastCharge:
+                        minAvoidanceHealth = V.F("Barbarian.Avoidance.WOTB.BeastCharge");
+                        break;
+                    default:
+                        minAvoidanceHealth *= V.F("Barbarian.Avoidance.WOTB.Other");
+                        break;
                 }
-                else if (avoidanceType == AvoidanceType.Arcane)
-                {
-                    minAvoidanceHealth *= V.F("Barbarian.Avoidance.WOTB.Arcane");
-                }
-                else if (avoidanceType == AvoidanceType.Desecrator)
-                {
-                    minAvoidanceHealth *= V.F("Barbarian.Avoidance.WOTB.Desecrator");
-                }
-                else if (avoidanceType == AvoidanceType.Belial)
-                {
-                    minAvoidanceHealth = V.F("Barbarian.Avoidance.WOTB.Belial");
-                }
-                else if (avoidanceType == AvoidanceType.PoisonTree)
-                {
-                    minAvoidanceHealth = V.F("Barbarian.Avoidance.WOTB.PoisonTree");
-                }
-                else
-                    // Anything else
-                    minAvoidanceHealth *= V.F("Barbarian.Avoidance.WOTB.Other");
-
             }
 
             if (minAvoidanceHealth == 0)

@@ -46,6 +46,7 @@ namespace Trinity
             101351, // A1 Old Ruins
             94672, // A1 Cursed Hold
             102964, // A2 City of Caldeum
+            100854, // A1 Khazra Den
         };
 
 
@@ -66,6 +67,9 @@ namespace Trinity
         private static readonly HashSet<DoubleInt> avoidanceAnimations = new HashSet<DoubleInt>
         {
            new DoubleInt(3847, (int)SNOAnim.Stitch_Suicide_Bomb), // Corpulent_A: Stitch_Suicide_Bomb
+           new DoubleInt(3337, (int)SNOAnim.Beast_start_charge_02), // A1 Savage Beast Charge - needs special handling!
+           new DoubleInt(3337, (int)SNOAnim.Beast_charge_02), // A1 Savage Beast Charge - needs special handling!
+           new DoubleInt(3337, (int)SNOAnim.Beast_charge_04), // A1 Savage Beast Charge - needs special handling!
        };
 
 

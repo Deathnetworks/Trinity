@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Trinity.Combat.Abilities;
 using Trinity.Technicals;
 using Zeta;
@@ -32,6 +33,15 @@ namespace Trinity
                     return false;
                 }
 
+                // We keep dying because we're spawning in AoE and next to 50 elites and we need to just leave the game
+                if (DateTime.Now.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 && ZetaDia.Me.Inventory.Equipped.Average(i => i.DurabilityPercent) < 0.05)
+                {
+                    Logger.Log("Durability is zero, emergency leave game");
+                    ZetaDia.Service.Party.LeaveGame(false);
+                    Thread.Sleep(11000);
+                    return false;
+                }
+
                 if (ZetaDia.Me.IsDead)
                 {
                     GoldInactivity.ResetCheckGold();
@@ -48,20 +58,7 @@ namespace Trinity
 
                 if (!HasMappedPlayerAbilities || HotbarRefreshTimer.ElapsedMilliseconds > 10000 || ShouldRefreshHotbarAbilities)
                 {
-                    // Update the cached player's cache
-                    ActorClass tempClass = ActorClass.Invalid;
-                    try
-                    {
-                        tempClass = Player.ActorClass;
-                    }
-                    catch
-                    {
-                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.GlobalHandler, "Safely handled exception trying to get character class.");
-                    }
-
                     PlayerInfoCache.RefreshHotbar();
-
-                    
                     // Pick an appropriate health set etc. based on class
                     switch (Player.ActorClass)
                     {

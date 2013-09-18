@@ -445,19 +445,20 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return
-                    !UseOOCBuff &&
+                    //!UseOOCBuff &&
                     !Player.IsIncapacitated &&
                     CanCast(SNOPower.Barbarian_Rend) &&
-                    ((TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange")) && 
+                    ((TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"), false) && 
                     !CurrentTarget.IsTreasureGoblin &&
                     ((!IsWaitingForSpecial && Player.PrimaryResource >= V.I("Barbarian.Rend.MinFury")) || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve)) &&
                     (Trinity.ObjectCache.Count(o => o.Type == GObjectType.Unit && !o.HasDotDPS && o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount") || !CurrentTarget.HasDotDPS) &&
-                    (TimeSincePowerUse(SNOPower.Barbarian_Rend) > V.I("Barbarian.Rend.MinUseIntervalMillseconds")) &&
-                    Trinity.LastPowerUsed != SNOPower.Barbarian_Rend) || 
-                    // Spam when < %50 with Bloodlust
+                    (TimeSincePowerUse(SNOPower.Barbarian_Rend) > V.I("Barbarian.Rend.MinUseIntervalMillseconds"))
+                    // && Trinity.LastPowerUsed != SNOPower.Barbarian_Rend
+                    ) || 
+                    // Spam with Bloodlust
                     (Player.CurrentHealthPct <= V.F("Barbarian.Rend.SpamBelowHealthPct") && 
-                    HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Rend && s.RuneIndex == 3) && 
-                    TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"))));
+                    HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Rend && s.RuneIndex == 3) &&
+                    TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"), false)));
             }
         }
         public static bool CanUseOverPower

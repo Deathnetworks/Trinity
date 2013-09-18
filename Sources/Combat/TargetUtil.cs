@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Web.Profile;
+using MainDev.RemoteASM.Handlers;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Technicals;
@@ -53,7 +55,7 @@ namespace Trinity
                 return Trinity.Hotbar;
             }
         }
-        
+
 
         #endregion
 
@@ -93,11 +95,12 @@ namespace Trinity
                 (from u in ObjectCache
                  where u.Type == GObjectType.Unit &&
                  u.RadiusDistance <= maxRange &&
-                 u.NearbyUnitsWithinDistance(radius) >= minCount 
+                 u.NearbyUnitsWithinDistance(radius) >= minCount
                  select u).Any();
 
             return clusterCheck;
         }
+
         /// <summary>
         /// Finds the optimal cluster position, works regardless if there is a cluster or not (will return single unit position if not). This is not a K-Means cluster, but rather a psuedo cluster based
         /// on the number of other monsters within a radius of any given unit
@@ -105,22 +108,38 @@ namespace Trinity
         /// <param name="radius">The maximum distance between monsters to be considered part of a cluster</param>
         /// <param name="maxRange">The maximum unit range to include, units further than this will not be checked as a cluster center but may be included in a cluster</param>
         /// <param name="useWeights">Whether or not to included un-weighted (ignored) targets in the cluster finding</param>
+        /// <param name="includeUnitsInAoe">Checks the cluster point for AoE effects</param>
         /// <returns>The Vector3 position of the unit that is the ideal "center" of a cluster</returns>
-        internal static Vector3 GetBestClusterPoint(float radius = 15f, float maxRange = 65f, bool useWeights = true)
+        internal static Vector3 GetBestClusterPoint(float radius = 15f, float maxRange = 65f, bool useWeights = true, bool includeUnitsInAoe = true)
         {
             if (radius < 5f)
                 radius = 5f;
             if (maxRange > 300f)
                 maxRange = 300f;
 
+            bool includeHealthGlobes = false;
+            switch (Trinity.Player.ActorClass)
+            {
+                case ActorClass.Barbarian:
+                    includeHealthGlobes = CombatBase.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
+                                          Trinity.Settings.Combat.Misc.CollectHealthGlobe &&
+                                          ObjectCache.Any(g => g.Type == GObjectType.Globe && g.Weight > 0);
+                    break;
+                default:
+                    includeHealthGlobes = false;
+                    break;
+            }
+
             using (new Technicals.PerformanceLogger("TargetUtil.GetBestClusterPoint"))
             {
-                Vector3 bestClusterPoint = Vector3.Zero;
+                Vector3 bestClusterPoint;
                 var clusterUnits =
                     (from u in ObjectCache
-                     where u.Type == GObjectType.Unit &&
+                     where (u.Type == GObjectType.Unit || (includeHealthGlobes && u.Type == GObjectType.Globe)) &&
                      ((useWeights && u.Weight > 0) || !useWeights) &&
+                     (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                      u.RadiusDistance <= maxRange
+                     orderby u.Type != GObjectType.Globe // if it's a globe this will be false and sorted at the top
                      orderby u.IsBossOrEliteRareUnique
                      orderby u.NearbyUnitsWithinDistance(radius) descending
                      orderby u.CentreDistance
@@ -298,24 +317,34 @@ namespace Trinity
 
                     if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Count(o => o.Type == GObjectType.Unit) >= minTargets)
                     {
-                        var clusterPoint = TargetUtil.GetBestClusterPoint(ringDistance, ringDistance, false);
+                        bool attackInAoe = Trinity.Settings.Combat.Misc.KillMonstersInAoE;
+                        var clusterPoint = TargetUtil.GetBestClusterPoint(ringDistance, ringDistance, false, attackInAoe);
                         if (clusterPoint.Distance2D(Player.Position) >= minDistance)
                         {
                             Logger.Log(LogCategory.Movement, "Returning ZigZag: BestClusterPoint {0} r-dist={1} t-dist={2}", clusterPoint, ringDistance, clusterPoint.Distance2D(Player.Position));
                             return clusterPoint;
                         }
 
-                        bool attackInAoe = Trinity.Settings.Combat.Misc.KillMonstersInAoE;                        
 
-                        IEnumerable<TrinityCacheObject> zigZagTargets =
-                            from u in ObjectCache
-                            where u.Type == GObjectType.Unit && u.CentreDistance < maxDistance &&
-                            ((attackInAoe && ShouldZigZagUnitInAoe(u)) || !attackInAoe)
-                            select u;
-
-                        if (zigZagTargets.Count() >= minTargets)
+                        var zigZagTargetList = new List<TrinityCacheObject>();
+                        if (attackInAoe)
                         {
-                            zigZagPoint = zigZagTargets.OrderByDescending(u => u.CentreDistance).FirstOrDefault().Position;
+                            zigZagTargetList =
+                                (from u in ObjectCache
+                                 where u.Type == GObjectType.Unit && u.CentreDistance < maxDistance
+                                 select u).ToList();
+                        }
+                        else
+                        {
+                            zigZagTargetList =
+                                (from u in ObjectCache
+                                 where u.Type == GObjectType.Unit && u.CentreDistance < maxDistance && !UnitOrPathInAoE(u)
+                                 select u).ToList();
+                        }
+
+                        if (zigZagTargetList.Count() >= minTargets)
+                        {
+                            zigZagPoint = zigZagTargetList.OrderByDescending(u => u.CentreDistance).FirstOrDefault().Position;
                             if (NavHelper.CanRayCast(zigZagPoint) && zigZagPoint.Distance2D(Player.Position) >= minDistance)
                             {
                                 Logger.Log(LogCategory.Movement, "Returning ZigZag: TargetBased {0} r-dist={1} t-dist={2}", zigZagPoint, ringDistance, zigZagPoint.Distance2D(Player.Position));
@@ -419,19 +448,31 @@ namespace Trinity
             }
         }
 
-        //!Trinity.hashAvoidanceObstacleCache.Any(a => Vector3.Distance(u.Position, a.Location) < AvoidanceManager.GetAvoidanceRadiusBySNO(a.ActorSNO, a.Radius) && PlayerStatus.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(a.ActorSNO, 1)) &&
-        //!Trinity.hashAvoidanceObstacleCache.Any(a => MathUtil.IntersectsPath(a.Location, a.Radius, PlayerStatus.CurrentPosition, u.Position))
-
-        internal static bool ShouldZigZagUnitInAoe(TrinityCacheObject u)
+        /// <summary>
+        /// Checks to see if a given Unit is standing in AoE, or if the direct paht-line to the unit goes through AoE
+        /// </summary>
+        /// <param name="u"></param>
+        /// <returns></returns>
+        internal static bool UnitOrPathInAoE(TrinityCacheObject u)
         {
             return UnitInAoe(u) && PathToUnitIntersectsAoe(u);
         }
 
+        /// <summary>
+        /// Checks to see if a given Unit is standing in AoE
+        /// </summary>
+        /// <param name="u"></param>
+        /// <returns></returns>
         internal static bool UnitInAoe(TrinityCacheObject u)
         {
             return Trinity.AvoidanceObstacleCache.Any(aoe => aoe.Location.Distance2D(u.Position) <= aoe.Radius);
         }
 
+        /// <summary>
+        /// Checks to see if the path-line to a unit goes through AoE
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <returns></returns>
         internal static bool PathToUnitIntersectsAoe(TrinityCacheObject unit)
         {
             return Trinity.AvoidanceObstacleCache.Any(aoe =>

@@ -26,6 +26,8 @@ namespace Trinity.Config.Combat
         private bool _AvoidanceNavigation;
         private double _IgnoreTrashBelowHealth;
         private double _IgnoreTrashBelowHealthDoT;
+        private bool _UseExperimentalSavageBeastAvoidance;
+        private bool _UseExperimentalFireChainsAvoidance; 
         #endregion Fields
 
         #region Events
@@ -381,6 +383,40 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseExperimentalSavageBeastAvoidance
+        {
+            get
+            {
+                return _UseExperimentalSavageBeastAvoidance;
+            }
+            set
+            {
+                if (_UseExperimentalSavageBeastAvoidance != value)
+                {
+                    _UseExperimentalSavageBeastAvoidance = value;
+                    OnPropertyChanged("UseExperimentalSavageBeastAvoidance");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseExperimentalFireChainsAvoidance
+        {
+            get
+            {
+                return _UseExperimentalFireChainsAvoidance;
+            }
+            set
+            {
+                if (_UseExperimentalFireChainsAvoidance != value)
+                {
+                    _UseExperimentalFireChainsAvoidance = value;
+                    OnPropertyChanged("UseExperimentalFireChainsAvoidance");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -427,6 +463,8 @@ namespace Trinity.Config.Combat
             this.AvoidanceNavigation = true;
             this.IgnoreTrashBelowHealth = 0.15;
             this.IgnoreTrashBelowHealthDoT = 0.50;
+            this.UseExperimentalSavageBeastAvoidance = true;
+            this.UseExperimentalFireChainsAvoidance = true;
         }
         #endregion Methods
     }
