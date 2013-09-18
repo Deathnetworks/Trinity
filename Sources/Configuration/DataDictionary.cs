@@ -45,6 +45,7 @@ namespace Trinity
             19947, // A1 New Tristram
             101351, // A1 Old Ruins
             94672, // A1 Cursed Hold
+            102964, // A2 City of Caldeum
         };
 
 

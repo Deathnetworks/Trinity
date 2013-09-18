@@ -255,12 +255,12 @@ namespace Trinity
                             continue;
                         }
                     }
-                    if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) && 
-                        gridPoint.Distance > 45 && Navigator.Raycast(origin, xyz))
-                    {
-                        nodesGT45Raycast++;
-                        continue;
-                    }
+                    //if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) && 
+                    //    gridPoint.Distance > 45 && Navigator.Raycast(origin, xyz))
+                    //{
+                    //    nodesGT45Raycast++;
+                    //    continue;
+                    //}
 
                     if (isStuck && gridPoint.Distance > (PlayerMover.TotalAntiStuckAttempts + 2) * 5)
                     {

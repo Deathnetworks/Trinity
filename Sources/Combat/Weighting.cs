@@ -314,21 +314,21 @@ namespace Trinity
                                             //aoe.AvoidanceType == AvoidanceType.MoltenTrail ||
                                             aoe.AvoidanceType == AvoidanceType.PoisonTree) &&
                                             cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
-                                            cacheObject.Weight = 1d;
+                                            cacheObject.Weight *= 0.25;
 
-                                        // If any AoE between us and target, do not attack, for non-ranged attacks only
+                                        // If any AoE between us and target, reduce weight, for melee only
                                         if (!Settings.Combat.Misc.KillMonstersInAoE &&
                                             PlayerKiteDistance <= 0 &&
                                             AvoidanceObstacleCache.Any(aoe => aoe.AvoidanceType != AvoidanceType.PlagueCloud &&
                                                 MathUtil.IntersectsPath(aoe.Location, aoe.Radius, Player.Position, cacheObject.Position)))
-                                            cacheObject.Weight = 1d;
+                                            cacheObject.Weight *= 0.25;
 
-                                        // See if there's any AOE avoidance in that spot, if so reduce the weight to 1, for non-ranged attacks only
+                                        // See if there's any AOE avoidance in that spot, if so reduce the weight to 1, for melee only
                                         if (!Settings.Combat.Misc.KillMonstersInAoE &&
                                             PlayerKiteDistance <= 0 &&
                                             AvoidanceObstacleCache.Any(aoe => aoe.AvoidanceType != AvoidanceType.PlagueCloud &&
                                                 cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
-                                            cacheObject.Weight = 1d;
+                                            cacheObject.Weight = 0.25;
 
                                         if (PlayerKiteDistance > 0)
                                         {
