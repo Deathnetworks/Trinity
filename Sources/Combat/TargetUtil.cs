@@ -172,7 +172,18 @@ namespace Trinity
                     o.RadiusDistance <= range
                     select o).Count() >= minCount;
         }
-        /// <summary>
+        internal static bool AnyTrashInRange(float range = 10f, int minCount = 1, bool useWeights = true)
+        {
+            if (range < 5f)
+                range = 5f;
+            if (minCount < 1)
+                minCount = 1;
+            return (from o in ObjectCache
+                    where o.Type == GObjectType.Unit && o.IsTrashMob &&
+                     ((useWeights && o.Weight > 0) || !useWeights) &&
+                    o.RadiusDistance <= range
+                    select o).Count() >= minCount;
+        }       /// <summary>
         /// Fast check to see if there are any attackable Elite units within a certain distance
         /// </summary>
         /// <param name="range"></param>
@@ -275,17 +286,17 @@ namespace Trinity
                     {
                         maxDistance = 20f;
                         minTargets = 3;
-                        useTargetBasedZigZag = (Trinity.Settings.Combat.Monk.TargetBasedZigZag);
+                        useTargetBasedZigZag = Trinity.Settings.Combat.Monk.TargetBasedZigZag;
                     }
                     if (Trinity.Player.ActorClass == ActorClass.Barbarian)
                     {
-                        useTargetBasedZigZag = (Trinity.Settings.Combat.Barbarian.TargetBasedZigZag);
+                        useTargetBasedZigZag = Trinity.Settings.Combat.Barbarian.TargetBasedZigZag;
                     }
 
                     int eliteCount = ObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
                     bool shouldZigZagElites = ((Trinity.CurrentTarget.IsBossOrEliteRareUnique && eliteCount > 1) || eliteCount == 0);
 
-                    if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Where(o => o.Type == GObjectType.Unit).Count() >= minTargets)
+                    if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Count(o => o.Type == GObjectType.Unit) >= minTargets)
                     {
                         var clusterPoint = TargetUtil.GetBestClusterPoint(ringDistance, ringDistance, false);
                         if (clusterPoint.Distance2D(Player.Position) >= minDistance)
@@ -418,15 +429,13 @@ namespace Trinity
 
         internal static bool UnitInAoe(TrinityCacheObject u)
         {
-            return Trinity.AvoidanceObstacleCache.Any(a => 
-                MathUtil.IntersectsPath(a.Location, a.Radius, Player.Position, u.Position));
+            return Trinity.AvoidanceObstacleCache.Any(aoe => aoe.Location.Distance2D(u.Position) <= aoe.Radius);
         }
 
-        internal static bool PathToUnitIntersectsAoe(TrinityCacheObject u)
+        internal static bool PathToUnitIntersectsAoe(TrinityCacheObject unit)
         {
-            return Trinity.AvoidanceObstacleCache.Any(a => 
-                Vector3.Distance(u.Position, a.Location) < AvoidanceManager.GetAvoidanceRadiusBySNO(a.ActorSNO, a.Radius) && 
-                Player.CurrentHealthPct <= AvoidanceManager.GetAvoidanceHealthBySNO(a.ActorSNO, 1));
+            return Trinity.AvoidanceObstacleCache.Any(aoe =>
+                MathUtil.IntersectsPath(aoe.Location, aoe.Radius, unit.Position, Player.Position));
         }
 
     }

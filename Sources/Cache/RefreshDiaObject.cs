@@ -20,7 +20,6 @@ namespace Trinity
 
         private static Vector3 c_Position = Vector3.Zero;
         private static GObjectType c_ObjectType = GObjectType.Unknown;
-        private static double c_Weight = 0d;
         /// <summary>
         /// Percent of total health remaining on unit
         /// </summary>
@@ -63,7 +62,7 @@ namespace Trinity
         private static bool c_IsEliteRareUnique = false;
         private static bool c_unit_IsBoss = false;
         private static bool c_unit_IsAttackable = false;
-        private static bool c_unit_IsShielded = false;
+        private static bool c_unit_HasShieldAffix = false;
         private static bool c_ForceLeapAgainst = false;
         private static bool c_IsObstacle = false;
         private static bool c_HasBeenNavigable = false;
@@ -195,7 +194,6 @@ namespace Trinity
                     {
                         Position = c_Position,
                         Type = c_ObjectType,
-                        Weight = c_Weight,
                         CentreDistance = c_CentreDistance,
                         RadiusDistance = c_RadiusDistance,
                         InternalName = c_InternalName,
@@ -229,7 +227,7 @@ namespace Trinity
                         HasDotDPS = c_HasDotDPS,
                         ObjectHash = c_ObjectHash,
                         KillRange = c_KillRange,
-                        IsShielded = c_unit_IsShielded,
+                        HasAffixShielded = c_unit_HasShieldAffix,
                         MonsterAffixes = c_MonsterAffixes,
                         DiaObject = c_diaObject,
                         HasBeenInLoS = c_HasBeenInLoS,
@@ -258,7 +256,6 @@ namespace Trinity
                         Radius = c_Radius,
                         Location = c_Position,
                         Name = c_InternalName,
-                        Weight = c_Weight
                     });
                     break;
             }
@@ -288,18 +285,14 @@ namespace Trinity
         /// <summary>
         /// Initializes variable set for single object refresh
         /// </summary>
-        /// <param name="AddTocache"></param>
-        /// <param name="iPercentage"></param>
         private static void RefreshStepInit(out bool AddTocache)
         {
             AddTocache = true;
             // Start this object as off as unknown type
             c_ObjectType = GObjectType.Unknown;
             // We will set weight up later in RefreshDiaObjects after we process all valid items
-            c_Weight = 0;
             c_Position = Vector3.Zero;
             c_ObjectType = GObjectType.Unknown;
-            c_Weight = 0d;
             c_CentreDistance = 0f;
             c_RadiusDistance = 0f;
             c_Radius = 0f;
@@ -325,7 +318,7 @@ namespace Trinity
             c_unit_IsTreasureGoblin = false;
             c_unit_IsBoss = false;
             c_unit_IsAttackable = false;
-            c_unit_IsShielded = false;
+            c_unit_HasShieldAffix = false;
             c_IsEliteRareUnique = false;
             c_ForceLeapAgainst = false;
             c_IsObstacle = false;

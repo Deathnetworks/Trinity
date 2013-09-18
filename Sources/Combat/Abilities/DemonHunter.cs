@@ -253,7 +253,7 @@ namespace Trinity
 
             // Impale
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Impale) && !Player.IsIncapacitated &&
-                (AnythingWithinRange[RANGE_12] <= 3) &&
+                (!TargetUtil.AnyMobsInRange(12, 4) ) &&
                 ((Player.PrimaryResource >= 25 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
                 CurrentTarget.RadiusDistance <= 50f)
             {

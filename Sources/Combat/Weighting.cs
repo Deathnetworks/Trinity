@@ -4,6 +4,7 @@ using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Technicals;
+using Trinity.XmlTags;
 using Zeta;
 using Zeta.Common;
 using Zeta.Common.Plugins;
@@ -71,6 +72,12 @@ namespace Trinity
 
                 string unitWeightInfo = "";
 
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight,
+                    "Starting weights: packSize={0} packRadius={1} ShouldIgnoreTrash={2} MovementSpeed={3} Elites={4} AoEs={5} disableIgnoreTag={6} closeRangePriority={7}",
+                    Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius,
+                    ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck,
+                    prioritizeCloseRangeUnits);
+
                 foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.CentreDistance))
                 {
                     unitWeightInfo = "";
@@ -84,6 +91,12 @@ namespace Trinity
                         // Weight Units
                         case GObjectType.Unit:
                             {
+                                // No champions, no mobs nearby, no treasure goblins to prioritize, and not injured, so skip mobs
+                                if (ignoreAllUnits)
+                                {
+                                    break;
+                                }
+
                                 int nearbyMonsterCount = ObjectCache.Count(u => u.IsTrashMob && cacheObject.Position.Distance2D(u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius);
 
                                 bool isInHotSpot = GroupHotSpots.CacheObjectIsInHotSpot(cacheObject);
@@ -94,16 +107,14 @@ namespace Trinity
                                     !isInHotSpot &&
                                     !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize))
                                 {
-                                    unitWeightInfo = String.Format("Ignoring trash mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12} hotspot={13}",
-                                        cacheObject.InternalName, cacheObject.RActorGuid, nearbyMonsterCount, Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius,
-                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, Player.Level, prioritizeCloseRangeUnits, isInHotSpot);
+                                    unitWeightInfo = String.Format("Ignoring nearbyCount={0} radiusDistance={1:0} hotspot={2}",
+                                        nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot);
                                     break;
                                 }
                                 else
                                 {
-                                    unitWeightInfo = String.Format("Adding mob {0} {1} nearbyCount={2} packSize={3} packRadius={4:0} radiusDistance={5:0} ShouldIgnore={6} ms={7:0.00} Elites={8} Avoid={9} profileTagCheck={10} level={11} prioritize={12} hotspot={13}",
-                                        cacheObject.InternalName, cacheObject.RActorGuid, nearbyMonsterCount, Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius,
-                                        cacheObject.RadiusDistance, ShouldIgnoreTrashMobs, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, Player.Level, prioritizeCloseRangeUnits, isInHotSpot);
+                                    unitWeightInfo = String.Format("Adding nearbyCount={0} radiusDistance={1:0} hotspot={2}",
+                                        nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot);
                                 }
 
                                 // Ignore elite option, except if trying to town portal
@@ -116,12 +127,6 @@ namespace Trinity
                                 if (cacheObject.IsTrashMob &&
                                     (cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealth ||
                                      cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS))
-                                {
-                                    break;
-                                }
-
-                                // No champions, no mobs nearby, no treasure goblins to prioritize, and not injured, so skip mobs
-                                if (ignoreAllUnits)
                                 {
                                     break;
                                 }
@@ -143,68 +148,9 @@ namespace Trinity
                                     break;
                                 }
 
-                                // Total up monsters at various ranges
-                                if (cacheObject.RadiusDistance <= 50f)
+                                if (cacheObject.RadiusDistance <= 25f && !bAnyNonWWIgnoreMobsInRange && !DataDictionary.WhirlwindIgnoreSNOIds.Contains(cacheObject.ActorSNO))
                                 {
-                                    bool isElite = (cacheObject.IsEliteRareUnique || cacheObject.IsBoss);
-
-                                    bool isRended = cacheObject.HasDotDPS;
-
-                                    // Flag up any bosses in range
-                                    if (cacheObject.RadiusDistance <= 6f)
-                                    {
-                                        AnythingWithinRange[RANGE_6]++;
-                                        if (isElite)
-                                            ElitesWithinRange[RANGE_6]++;
-                                    }
-                                    if (cacheObject.RadiusDistance <= 9f && !isRended)
-                                    {
-                                        NonRendedTargets_9++;
-                                    }
-                                    if (cacheObject.RadiusDistance <= 12f)
-                                    {
-                                        AnythingWithinRange[RANGE_12]++;
-                                        if (isElite)
-                                            ElitesWithinRange[RANGE_12]++;
-                                    }
-                                    if (cacheObject.RadiusDistance <= 15f)
-                                    {
-                                        AnythingWithinRange[RANGE_15]++;
-                                        if (isElite)
-                                            ElitesWithinRange[RANGE_15]++;
-                                    }
-                                    if (cacheObject.RadiusDistance <= 20f)
-                                    {
-                                        AnythingWithinRange[RANGE_20]++;
-                                        if (isElite)
-                                            ElitesWithinRange[RANGE_20]++;
-                                    }
-                                    if (cacheObject.RadiusDistance <= 25f)
-                                    {
-                                        if (!bAnyNonWWIgnoreMobsInRange && !DataDictionary.WhirlwindIgnoreSNOIds.Contains(cacheObject.ActorSNO))
-                                            bAnyNonWWIgnoreMobsInRange = true;
-                                        AnythingWithinRange[RANGE_25]++;
-                                        if (isElite)
-                                            ElitesWithinRange[RANGE_25]++;
-                                    }
-                                    if (cacheObject.RadiusDistance <= 30f)
-                                    {
-                                        AnythingWithinRange[RANGE_30]++;
-                                        if (isElite)
-                                            ElitesWithinRange[RANGE_30]++;
-                                    }
-                                    if (cacheObject.RadiusDistance <= 40f)
-                                    {
-                                        AnythingWithinRange[RANGE_40]++;
-                                        if (isElite)
-                                            ElitesWithinRange[RANGE_40]++;
-                                    }
-                                    if (cacheObject.RadiusDistance <= 50f)
-                                    {
-                                        AnythingWithinRange[RANGE_50]++;
-                                        if (isElite)
-                                            ElitesWithinRange[RANGE_50]++;
-                                    }
+                                    bAnyNonWWIgnoreMobsInRange = true;
                                 }
 
                                 // Force a close range target because we seem to be stuck *OR* if not ranged and currently rooted
@@ -220,10 +166,10 @@ namespace Trinity
                                 {
 
                                     // Not attackable, could be shielded, make super low priority
-                                    if (cacheObject.IsShielded)
+                                    if (cacheObject.HasAffixShielded && cacheObject.Unit.IsInvulnerable)
                                     {
-                                        // Only 500 weight helps prevent it being prioritized over an unshielded
-                                        cacheObject.Weight = 500;
+                                        // Only 100 weight helps prevent it being prioritized over an unshielded
+                                        cacheObject.Weight = 100;
                                     }
                                     // Not forcing close-ranged targets from being stuck, so let's calculate a weight!
                                     else
@@ -241,7 +187,7 @@ namespace Trinity
 
                                         // Starting weight of 1000 for elites
                                         if (cacheObject.IsBossOrEliteRareUnique)
-                                            cacheObject.Weight = Math.Max((90f - cacheObject.RadiusDistance) / 90f * 1000d, 20d);
+                                            cacheObject.Weight = Math.Max((90f - cacheObject.RadiusDistance) / 90f * 2000d, 20d);
 
 
                                         // Monsters near players given higher weight
@@ -305,13 +251,12 @@ namespace Trinity
                                         if (cacheObject.Weight < 300)
                                             cacheObject.Weight = 300d;
 
-                                        // If standing Molten, Arcane, or Poison Tree near unit, do NOT attack
-                                        if (!Settings.Combat.Misc.KillMonstersInAoE &&
-                                            PlayerKiteDistance <= 0 &&
+                                        // If standing Molten, Arcane, or Poison Tree near unit, reduce weight
+                                        if (PlayerKiteDistance <= 0 &&
                                             AvoidanceObstacleCache.Any(aoe =>
                                             (aoe.AvoidanceType == AvoidanceType.Arcane ||
                                             aoe.AvoidanceType == AvoidanceType.MoltenCore ||
-                                            //aoe.AvoidanceType == AvoidanceType.MoltenTrail ||
+                                                //aoe.AvoidanceType == AvoidanceType.MoltenTrail ||
                                             aoe.AvoidanceType == AvoidanceType.PoisonTree) &&
                                             cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
                                             cacheObject.Weight *= 0.25;
@@ -328,7 +273,7 @@ namespace Trinity
                                             PlayerKiteDistance <= 0 &&
                                             AvoidanceObstacleCache.Any(aoe => aoe.AvoidanceType != AvoidanceType.PlagueCloud &&
                                                 cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
-                                            cacheObject.Weight = 0.25;
+                                            cacheObject.Weight = 1d;
 
                                         if (PlayerKiteDistance > 0)
                                         {
@@ -459,6 +404,11 @@ namespace Trinity
                                 if (AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
                                     cacheObject.Weight = 1;
 
+                                // Deprioritize item if a monster is blocking our path
+                                if (MonsterObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, Player.Position, c_Position)))
+                                {
+                                    cacheObject.Weight *= 0.10d;
+                                }
                                 // ignore non-legendaries and gold near elites if we're ignoring elites
                                 // not sure how we should safely determine this distance
                                 if (CombatBase.IgnoringElites && cacheObject.ItemQuality < ItemQuality.Legendary &&

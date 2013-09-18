@@ -100,7 +100,7 @@ namespace Trinity
 
             // Gargantuan, Recast on 1+ Elites or Bosses to trigger Restless Giant
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Gargantuan) && !Player.IsIncapacitated && Player.PrimaryResource >= 147 &&
-                (ElitesWithinRange[RANGE_15] >= 1 ||
+                (TargetUtil.AnyElitesInRange(15, 1) ||
                  (CurrentTarget != null && (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) || iPlayerOwnedGargantuan == 0) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_Gargantuan))
             {
@@ -109,7 +109,7 @@ namespace Trinity
 
             // Zombie Dogs non-sacrifice build
             if (!IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && !Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) && !Player.IsIncapacitated &&
-                Player.PrimaryResource >= 49 && (ElitesWithinRange[RANGE_20] >= 2 || AnythingWithinRange[RANGE_20] >= 5 ||
+                Player.PrimaryResource >= 49 && (TargetUtil.AnyElitesInRange(20, 2) || !TargetUtil.AnyElitesInRange(20, 5) ||
                  (CurrentTarget != null && ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 30f)) || PlayerOwnedZombieDog <= 2) &&
                 !Settings.Combat.WitchDoctor.ZeroDogs &&
                  PowerManager.CanCast(SNOPower.Witchdoctor_SummonZombieDog))
@@ -145,7 +145,7 @@ namespace Trinity
             }
             // Mass Confuse, elites only or big mobs or to escape on low health
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_MassConfusion) && !Player.IsIncapacitated && Player.PrimaryResource >= 74 &&
-                (ElitesWithinRange[RANGE_12] >= 1 || AnythingWithinRange[RANGE_12] >= 6 || Player.CurrentHealthPct <= 0.25 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 12f)) &&
+                (TargetUtil.AnyElitesInRange(12, 1) || !TargetUtil.AnyElitesInRange(12, 6) || Player.CurrentHealthPct <= 0.25 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 12f)) &&
                 !CurrentTarget.IsTreasureGoblin && PowerManager.CanCast(SNOPower.Witchdoctor_MassConfusion))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_MassConfusion, 0f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
@@ -153,7 +153,7 @@ namespace Trinity
             // Big Bad Voodoo, elites and bosses only
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_BigBadVoodoo) && !Player.IsIncapacitated &&
                 !CurrentTarget.IsTreasureGoblin &&
-                (ElitesWithinRange[RANGE_6] > 0 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 12f)) &&
+                (TargetUtil.AnyElitesInRange(6, 1) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 12f)) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_BigBadVoodoo))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
@@ -205,7 +205,7 @@ namespace Trinity
             }
             // Fetish Army, elites only
             if (!UseOOCBuff && Hotbar.Contains(SNOPower.Witchdoctor_FetishArmy) && !Player.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_25] > 0 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 16f)) &&
+                (TargetUtil.AnyElitesInRange(25, 1) || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 16f)) &&
                 PowerManager.CanCast(SNOPower.Witchdoctor_FetishArmy))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_FetishArmy, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
@@ -264,7 +264,7 @@ namespace Trinity
 
             // Wall of Zombies
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Witchdoctor_WallOfZombies) && !Player.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_15] > 0 || AnythingWithinRange[RANGE_15] > 3 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 25f)) &&
+                (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 25f)) &&
                 Player.PrimaryResource >= 103 && PowerManager.CanCast(SNOPower.Witchdoctor_WallOfZombies))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_WallOfZombies, 25f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);

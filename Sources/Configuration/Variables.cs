@@ -339,19 +339,6 @@ namespace Trinity
 
         internal static DateTime SweepWindSpam = DateTime.Today;
 
-        // Variables relating to quick-reference of monsters within sepcific ranges (if anyone has suggestion for similar functionality with reduced CPU use, lemme know, but this is fast atm!)
-        private static int[] ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
-        private static int[] AnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0 };
-        private const int RANGE_50 = 0;
-        private const int RANGE_40 = 1;
-        private const int RANGE_30 = 2;
-        private const int RANGE_25 = 3;
-        private const int RANGE_20 = 4;
-        private const int RANGE_15 = 5;
-        private const int RANGE_12 = 6;
-        private const int RANGE_6 = 7;
-        private static int NonRendedTargets_9 = 0;
-
         // Unique ID of mob last targetting when using whirlwind
         internal static int LastZigZagUnitAcdGuid = 0;
         private static bool IsAlreadyMoving = false;

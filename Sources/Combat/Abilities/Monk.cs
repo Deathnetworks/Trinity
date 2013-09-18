@@ -80,12 +80,12 @@ namespace Trinity
             // Blinding Flash
             if (!UseOOCBuff && Player.PrimaryResource >= 20 && Hotbar.Contains(SNOPower.Monk_BlindingFlash) &&
                 (
-                    ElitesWithinRange[RANGE_15] >= 1 ||
+                    TargetUtil.AnyElitesInRange(15, 1)  ||
                     Player.CurrentHealthPct <= 0.4 ||
-                    (AnythingWithinRange[RANGE_15] >= 3) ||
+                    (TargetUtil.AnyMobsInRange(15, 3) ) ||
                     (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) ||
                 // as pre-sweeping wind buff
-                    (AnythingWithinRange[RANGE_15] >= 1 && Hotbar.Contains(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) && Settings.Combat.Monk.HasInnaSet)
+                    (TargetUtil.AnyMobsInRange(15, 1)  && Hotbar.Contains(SNOPower.Monk_SweepingWind) && !GetHasBuff(SNOPower.Monk_SweepingWind) && Settings.Combat.Monk.HasInnaSet)
                 ) &&
                 // Check if either we don't have sweeping winds, or we do and it's ready to cast in a moment
                 (CheckAbilityAndBuff(SNOPower.Monk_SweepingWind) ||
@@ -98,7 +98,7 @@ namespace Trinity
             }
             // Blinding Flash as a DEFENSE
             if (!UseOOCBuff && Player.PrimaryResource >= 10 && Hotbar.Contains(SNOPower.Monk_BlindingFlash) &&
-                Player.CurrentHealthPct <= 0.25 && AnythingWithinRange[RANGE_15] >= 1 &&
+                Player.CurrentHealthPct <= 0.25 && TargetUtil.AnyMobsInRange(15, 1)  &&
                 SNOPowerUseTimer(SNOPower.Monk_BlindingFlash) && PowerManager.CanCast(SNOPower.Monk_BlindingFlash))
             {
                 return new TrinityPower(SNOPower.Monk_BlindingFlash, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
@@ -166,7 +166,7 @@ namespace Trinity
 
             // Seven Sided Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_15] >= 1 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) || Player.CurrentHealthPct <= 0.55) &&
+                (TargetUtil.AnyElitesInRange(15, 1)  || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) || Player.CurrentHealthPct <= 0.55) &&
                 Hotbar.Contains(SNOPower.Monk_SevenSidedStrike) && ((Player.PrimaryResource >= 50 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
                 SNOPowerUseTimer(SNOPower.Monk_SevenSidedStrike, true) && PowerManager.CanCast(SNOPower.Monk_SevenSidedStrike))
             {
@@ -175,7 +175,7 @@ namespace Trinity
             }
             // Exploding Palm
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_15] >= 3 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 14f)) &&
+                (TargetUtil.AnyElitesInRange(25, 0+1)  || TargetUtil.AnyMobsInRange(15, 3)  || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 14f)) &&
                 Hotbar.Contains(SNOPower.Monk_ExplodingPalm) &&
                 ((Player.PrimaryResource >= 40 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
                 SNOPowerUseTimer(SNOPower.Monk_ExplodingPalm) && PowerManager.CanCast(SNOPower.Monk_ExplodingPalm))
@@ -272,8 +272,8 @@ namespace Trinity
                     !Hotbar.Contains(SNOPower.Monk_SevenSidedStrike) && !Hotbar.Contains(SNOPower.Monk_LashingTailKick) &&
                     !Hotbar.Contains(SNOPower.Monk_WaveOfLight) && !Hotbar.Contains(SNOPower.Monk_CycloneStrike) &&
                     !Hotbar.Contains(SNOPower.Monk_ExplodingPalm))) &&
-                (ElitesWithinRange[RANGE_15] >= 1 || AnythingWithinRange[RANGE_15] >= 3 ||
-                (AnythingWithinRange[RANGE_15] >= 1 && (Settings.Combat.Monk.HasInnaSet && Player.PrimaryResource >= 70))))
+                (TargetUtil.AnyElitesInRange(15, 1)  || TargetUtil.AnyMobsInRange(15, 3)  ||
+                (TargetUtil.AnyMobsInRange(15, 1)  && (Settings.Combat.Monk.HasInnaSet && Player.PrimaryResource >= 70))))
             {
                 if (Hotbar.Contains(SNOPower.Monk_MantraOfEvasion) && SNOPowerUseTimer(SNOPower.Monk_MantraOfEvasion))
                 {
@@ -294,7 +294,7 @@ namespace Trinity
             }
             // Lashing Tail Kick
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Monk_LashingTailKick) && !Player.IsIncapacitated &&
-                (ElitesWithinRange[RANGE_15] > 0 || AnythingWithinRange[RANGE_15] > 4 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 10f)) &&
+                (TargetUtil.AnyElitesInRange(15, 0+1)  || TargetUtil.AnyMobsInRange(15, 4)  || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 10f)) &&
                 // Either doesn't have sweeping wind, or does but the buff is already up
                 (!Hotbar.Contains(SNOPower.Monk_SweepingWind) || (Hotbar.Contains(SNOPower.Monk_SweepingWind) && GetHasBuff(SNOPower.Monk_SweepingWind))) &&
                 SNOPowerUseTimer(SNOPower.Monk_LashingTailKick) &&
@@ -337,7 +337,7 @@ namespace Trinity
             // Fists of thunder as the primary, repeatable attack
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Monk_FistsofThunder)
                 && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 && DateTime.Now.Subtract(ForeSightFirstHit).TotalMilliseconds < 29000 || !Hotbar.Contains(SNOPower.Monk_DeadlyReach) || CurrentTarget.RadiusDistance > 12f ||
-                AnythingWithinRange[RANGE_50] < 5 && ElitesWithinRange[RANGE_50] <= 0 && !WantToSwap))
+                !TargetUtil.AnyMobsInRange(50, 5)  && !TargetUtil.AnyElitesInRange(50)  && !WantToSwap))
             {
                 if (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700)
                     OtherThanDeadlyReach = DateTime.Now;
@@ -347,7 +347,7 @@ namespace Trinity
             // Crippling wave
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Monk_CripplingWave)
                 && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 && DateTime.Now.Subtract(ForeSightFirstHit).TotalMilliseconds < 29000 || !Hotbar.Contains(SNOPower.Monk_DeadlyReach)
-                || AnythingWithinRange[RANGE_50] < 5 && ElitesWithinRange[RANGE_50] <= 0 && !WantToSwap))
+                || !TargetUtil.AnyMobsInRange(50, 5)  && !TargetUtil.AnyElitesInRange(50)  && !WantToSwap))
             {
                 OtherThanDeadlyReach = DateTime.Now;
                 Monk_TickSweepingWindSpam();
@@ -356,7 +356,7 @@ namespace Trinity
             // Way of hundred fists
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Monk_WayOfTheHundredFists)
                 && (DateTime.Now.Subtract(OtherThanDeadlyReach).TotalMilliseconds < 2700 && DateTime.Now.Subtract(ForeSightFirstHit).TotalMilliseconds < 29000 || !Hotbar.Contains(SNOPower.Monk_DeadlyReach)
-                || AnythingWithinRange[RANGE_50] < 5 && ElitesWithinRange[RANGE_50] <= 0 && !WantToSwap))
+                || !TargetUtil.AnyMobsInRange(50, 5)  && !TargetUtil.AnyElitesInRange(50)  && !WantToSwap))
             {
                 OtherThanDeadlyReach = DateTime.Now;
                 Monk_TickSweepingWindSpam();

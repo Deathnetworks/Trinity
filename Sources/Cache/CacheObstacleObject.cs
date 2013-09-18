@@ -15,7 +15,7 @@ namespace Trinity
         {
             get
             {
-                return AvoidanceManager.GetAvoidanceType(this.ActorSNO);
+                return AvoidanceManager.GetAvoidanceType(ActorSNO);
             }
         }
 
@@ -24,12 +24,11 @@ namespace Trinity
 
         }
 
-        public CacheObstacleObject(Vector3 location, float radius, int snoId, double weight = 0, string name = "")
+        public CacheObstacleObject(Vector3 location, float radius, int snoId, string name = "")
         {
             Location = location;
             Radius = radius;
             ActorSNO = snoId;
-            Weight = weight;
         }
     }
 }

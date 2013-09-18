@@ -367,10 +367,7 @@ namespace Trinity
                 iPlayerOwnedGargantuan = 0;
                 PlayerOwnedZombieDog = 0;
                 iPlayerOwnedDHPets = 0;
-                // Reset the counters for monsters at various ranges
-                ElitesWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
-                AnythingWithinRange = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
-                NonRendedTargets_9 = 0;
+
                 // Flag for if we should search for an avoidance spot or not
                 StandingInAvoidance = false;
                 // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
@@ -470,8 +467,8 @@ namespace Trinity
                                     if (c_unit_IsElite)
                                         unitExtras += " IsElite";
 
-                                    if (c_unit_IsShielded)
-                                        unitExtras += " IsShielded";
+                                    if (c_unit_HasShieldAffix)
+                                        unitExtras += " HasAffixShielded";
 
                                     if (c_HasDotDPS)
                                         unitExtras += " HasDotDPS";

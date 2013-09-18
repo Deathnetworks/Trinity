@@ -88,7 +88,11 @@ namespace Trinity
                 }
                 else if (avoidanceType == AvoidanceType.Belial)
                 {
-                    minAvoidanceHealth = 1;
+                    minAvoidanceHealth = V.F("Barbarian.Avoidance.WOTB.Belial");
+                }
+                else if (avoidanceType == AvoidanceType.PoisonTree)
+                {
+                    minAvoidanceHealth = V.F("Barbarian.Avoidance.WOTB.PoisonTree");
                 }
                 else
                     // Anything else
@@ -108,12 +112,9 @@ namespace Trinity
             // Add it to the list of known avoidance objects, *IF* our health is lower than this avoidance health limit
             if (minAvoidanceHealth >= Player.CurrentHealthPct)
             {
-                // Generate a "weight" for how badly we want to avoid this obstacle, based on a percentage of 100% the avoidance health is, multiplied into a max of 200 weight
-                double dThisWeight = (200 * minAvoidanceHealth);
+                float avoidanceRadius = (float)GetAvoidanceRadius(c_ActorSNO, c_Radius);
 
-                float avoidanceRadius = (float)GetAvoidanceRadius();
-
-                AvoidanceObstacleCache.Add(new CacheObstacleObject(c_Position, avoidanceRadius, c_ActorSNO, dThisWeight, c_InternalName));
+                AvoidanceObstacleCache.Add(new CacheObstacleObject(c_Position, avoidanceRadius, c_ActorSNO, c_InternalName));
 
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
                 if (c_CentreDistance <= minAvoidanceRadius)
@@ -177,7 +178,6 @@ namespace Trinity
 
             try
             {
-
                 return AvoidanceManager.GetAvoidanceRadiusBySNO(actorSNO, radius);
             }
             catch (Exception ex)

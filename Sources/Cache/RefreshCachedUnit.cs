@@ -120,7 +120,7 @@ namespace Trinity
             c_KillRange = killRange;
 
             if (c_MonsterAffixes.HasFlag(MonsterAffixes.Shielding))
-                c_unit_IsShielded = true;
+                c_unit_HasShieldAffix = true;
 
             // Only if at full health, else don't bother checking each loop
             // See if we already have this monster's size stored, if not get it and cache it
@@ -301,7 +301,7 @@ namespace Trinity
                 return AddToCache;
             }
 
-            if (unit.IsUntargetable)
+            if (!DataDictionary.IgnoreUntargettableAttribute.Contains(c_ActorSNO) && unit.IsUntargetable)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "IsUntargetable";
@@ -309,7 +309,7 @@ namespace Trinity
             }
 
             // don't check for invulnerability on shielded and boss units, they are treated seperately
-            if (!c_unit_IsShielded && unit.IsInvulnerable)
+            if (!c_unit_HasShieldAffix && unit.IsInvulnerable)
             {
                 AddToCache = false;
                 c_IgnoreSubStep = "IsInvulnerable";

@@ -43,7 +43,7 @@ namespace Trinity
 
                 // Slow Time for in combat
                 if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_SlowTime) &&
-                    (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 1 || Player.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 35f)) &&
+                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || Player.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 35f)) &&
                     PowerManager.CanCast(SNOPower.Wizard_SlowTime))
                 {
                     return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
@@ -55,7 +55,7 @@ namespace Trinity
                     (hasCriticalMass && ((!Hotbar.Contains(SNOPower.Wizard_FrostNova) && !Hotbar.Contains(SNOPower.Wizard_ExplosiveBlast)) ||
                         (Player.CurrentHealthPct <= 0.7 && (TargetUtil.AnyMobsInRange(15f) || TargetUtil.IsEliteTargetInRange(23f)))))
                     // Else normal wizard in which case check standard stuff
-                    || (!hasCriticalMass && ElitesWithinRange[RANGE_15] > 0 || AnythingWithinRange[RANGE_15] > 3 || Player.CurrentHealthPct <= 0.7 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 23f))
+                    || (!hasCriticalMass && TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || Player.CurrentHealthPct <= 0.7 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 23f))
                     ) &&
                     Hotbar.Contains(SNOPower.Wizard_WaveOfForce) &&
                     SNOPowerUseTimer(SNOPower.Wizard_WaveOfForce, true) && PowerManager.CanCast(SNOPower.Wizard_WaveOfForce))
@@ -82,7 +82,7 @@ namespace Trinity
                 }
                 // Meteor
                 if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Meteor) &&
-                    (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 2 || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss || CurrentTarget.IsTreasureGoblin) &&
+                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 3) || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss || CurrentTarget.IsTreasureGoblin) &&
                     Player.PrimaryResource >= 50 && PowerManager.CanCast(SNOPower.Wizard_Meteor))
                 {
                     return new TrinityPower(SNOPower.Wizard_Meteor, 21f, new Vector3(CurrentTarget.Position.X, CurrentTarget.Position.Y, CurrentTarget.Position.Z), CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
@@ -99,7 +99,7 @@ namespace Trinity
 
                 // Diamond Skin SPAM
                 if (Hotbar.Contains(SNOPower.Wizard_DiamondSkin) && LastPowerUsed != SNOPower.Wizard_DiamondSkin &&
-                    (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 0 || Player.CurrentHealthPct <= 0.90 || Player.IsIncapacitated || Player.IsRooted || (!UseOOCBuff && CurrentTarget.RadiusDistance <= 40f)) &&
+                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 1) || Player.CurrentHealthPct <= 0.90 || Player.IsIncapacitated || Player.IsRooted || (!UseOOCBuff && CurrentTarget.RadiusDistance <= 40f)) &&
                     ((hasCriticalMass && !UseOOCBuff) || !GetHasBuff(SNOPower.Wizard_DiamondSkin)) &&
                     PowerManager.CanCast(SNOPower.Wizard_DiamondSkin))
                 {
@@ -155,7 +155,7 @@ namespace Trinity
                 // Hydra
                 if (!UseOOCBuff && !Player.IsIncapacitated &&
                     LastPowerUsed != SNOPower.Wizard_Hydra &&
-                    (ElitesWithinRange[RANGE_15] > 0 || AnythingWithinRange[RANGE_15] > 4 || Player.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 15f)) &&
+                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || Player.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 15f)) &&
                     Hotbar.Contains(SNOPower.Wizard_Hydra) &&
                     Player.PrimaryResource >= 15 && SNOPowerUseTimer(SNOPower.Wizard_Hydra))
                 {
@@ -174,7 +174,7 @@ namespace Trinity
                 }
                 // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_MirrorImage) &&
-                    (Player.CurrentHealthPct <= 0.50 || AnythingWithinRange[RANGE_30] >= 5 || Player.IsIncapacitated || Player.IsRooted || (ElitesWithinRange[RANGE_30] == 1 && CurrentTarget.IsEliteRareUnique &&
+                    (Player.CurrentHealthPct <= 0.50 || TargetUtil.AnyMobsInRange(30, 5) || Player.IsIncapacitated || Player.IsRooted || (TargetUtil.AnyElitesInRange(30) && CurrentTarget.IsEliteRareUnique &&
                     !CurrentTarget.IsBoss && CurrentTarget.HitPointsPct <= 0.35)) &&
                     PowerManager.CanCast(SNOPower.Wizard_MirrorImage))
                 {
@@ -198,7 +198,7 @@ namespace Trinity
                         Hotbar.Contains(SNOPower.Wizard_IceArmor) ||
                         Hotbar.Contains(SNOPower.Wizard_StormArmor));
 
-                    CanCastArchon =  Player.PrimaryResource >= reserveArcanePower || (
+                    CanCastArchon = Player.PrimaryResource >= reserveArcanePower || (
                         hasBuffSpells &&
                         CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon) &&
                         Wizard_HasFamiliar() &&
@@ -404,7 +404,7 @@ namespace Trinity
                 // Archon form
                 // Archon Slow Time for in combat
                 if (!UseOOCBuff && !Player.IsIncapacitated &&
-                    (ElitesWithinRange[RANGE_25] > 0 || AnythingWithinRange[RANGE_25] > 1 || Player.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 35f)) &&
+                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || Player.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 35f)) &&
                     Hotbar.Contains(SNOPower.Wizard_Archon_SlowTime) &&
                     SNOPowerUseTimer(SNOPower.Wizard_Archon_SlowTime, true) && PowerManager.CanCast(SNOPower.Wizard_Archon_SlowTime))
                 {
@@ -413,7 +413,7 @@ namespace Trinity
                 // Archon Teleport in combat
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
                     // Try and teleport-retreat from 1 elite or 3+ greys or a boss at 15 foot range
-                    (ElitesWithinRange[RANGE_15] >= 1 || AnythingWithinRange[RANGE_15] >= 3 || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 15f)) &&
+                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 3) || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 15f)) &&
                     SNOPowerUseTimer(SNOPower.Wizard_Archon_Teleport) && PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
                 {
                     Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -20f);
@@ -421,7 +421,7 @@ namespace Trinity
                 }
                 // Arcane Blast
                 if (!UseOOCBuff && !Player.IsIncapacitated &&
-                    (ElitesWithinRange[RANGE_15] >= 1 || AnythingWithinRange[RANGE_15] >= 1 ||
+                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 1) ||
                      (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) &&
                     SNOPowerUseTimer(SNOPower.Wizard_Archon_ArcaneBlast) && PowerManager.CanCast(SNOPower.Wizard_Archon_ArcaneBlast))
                 {

@@ -30,6 +30,8 @@ namespace Trinity
             Set(new TVar("Barbarian.Avoidance.WOTB.Desecrator", 0.2f, "WOTB Desecrator health multiplier"));
             Set(new TVar("Barbarian.Avoidance.WOTB.Arcane", 0f, "WOTB Arcane health multiplier"));
             Set(new TVar("Barbarian.Avoidance.WOTB.IceBall", 0f, "WOTB IceBall health multiplier"));
+            Set(new TVar("Barbarian.Avoidance.WOTB.PoisonTree", 1f, "WOTB Poison Tree / Spore health multiplier"));
+            Set(new TVar("Barbarian.Avoidance.WOTB.Belial", 1f, "WOTB Belial health multiplier"));
             Set(new TVar("Barbarian.ThreatShout.Range", 25f, "Threating Shout Mob Range distance"));
             Set(new TVar("Barbarian.ThreatShout.OOCMaxFury", 25, "Threating Shout Out of Combat Max Fury"));
             Set(new TVar("Barbarian.WarCry.MaxFury", 60, "Maximum Fury to cast WarCry (with buff)"));

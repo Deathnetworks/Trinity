@@ -44,7 +44,7 @@ namespace Trinity
         public bool IsTreasureGoblin { get; set; }
         public bool IsEliteRareUnique { get; set; }
         public bool IsBoss { get; set; }
-        public bool IsShielded { get; set; }
+        public bool HasAffixShielded { get; set; }
         public bool IsBossOrEliteRareUnique { get { return (this.Type == GObjectType.Unit && (IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         public bool IsTrashMob { get { return (this.Type == GObjectType.Unit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         public bool IsAttackable { get; set; }
@@ -148,7 +148,7 @@ namespace Trinity
                 HasDotDPS = HasDotDPS,
                 DiaObject = DiaObject,
                 FirstTargetAssignmentTime = FirstTargetAssignmentTime,
-                IsShielded = IsShielded,
+                HasAffixShielded = HasAffixShielded,
                 ItemLink = ItemLink,
                 KillRange = KillRange,
                 MonsterAffixes = MonsterAffixes,

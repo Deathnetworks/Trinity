@@ -116,12 +116,6 @@ namespace Trinity
             if (AddToCache && ForceVendorRunASAP)
                 c_IgnoreSubStep = "ForcedVendoring";
 
-            if (!AddToCache)
-            {
-                // Check if there's a monster intersecting the path-line to this item
-                AddToCache = MosterObstacleInPathCacheObject(AddToCache);
-            }
-
             // Didn't pass pickup rules, so ignore it
             if (!AddToCache && c_IgnoreSubStep == String.Empty)
                 c_IgnoreSubStep = "NoMatchingRule";
@@ -220,16 +214,6 @@ namespace Trinity
             return AddToCache;
         }
 
-        private static bool MosterObstacleInPathCacheObject(bool AddToCache)
-        {
-            // Don't add an item if a monster is blocking our path
-            if (MonsterObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, Player.Position, c_Position)))
-            {
-                AddToCache = false;
-                c_IgnoreSubStep = "MonsterInPath";
-            }
-            return AddToCache;
-        }
         private static void LogSkippedGold()
         {
             string skippedItemsPath = Path.Combine(FileManager.LoggingPath, String.Format("SkippedGoldStacks_{0}_{1}.csv", Player.ActorClass, DateTime.Now.ToString("yyyy-MM-dd")));
