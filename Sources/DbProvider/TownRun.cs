@@ -252,8 +252,8 @@ namespace Trinity
                 new Action(delegate
                 {
                     Logger.Log("TownRun complete");
-                    Trinity.IsReadyToTownRun = true;
-                    Trinity.ForceVendorRunASAP = true;
+                    Trinity.IsReadyToTownRun = false;
+                    Trinity.ForceVendorRunASAP = false;
                     TownRunCheckTimer.Reset();
                 })
             );

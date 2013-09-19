@@ -67,62 +67,71 @@ namespace Trinity
                 // Add Team HotSpots to the cache
                 ObjectCache.AddRange(GroupHotSpots.GetCacheObjectHotSpots());
 
-                /* Fire Chains Experimental Avoidance */
-                const float fireChainSize = 5f;
-                foreach (var unit1 in ObjectCache.Where(u => u.MonsterAffixes.HasFlag(MonsterAffixes.FireChains)))
+                if (Settings.Combat.Misc.UseExperimentalFireChainsAvoidance)
                 {
-                    foreach (var unit2 in ObjectCache.Where(u => u.MonsterAffixes.HasFlag(MonsterAffixes.FireChains)).Where(unit2 => unit1.RActorGuid != unit2.RActorGuid))
+                    /* Fire Chains Experimental Avoidance */
+                    const float fireChainSize = 5f;
+                    foreach (var unit1 in ObjectCache.Where(u => u.MonsterAffixes.HasFlag(MonsterAffixes.FireChains)))
                     {
-                        for (float i = 0; i <= unit1.Position.Distance2D(unit2.Position); i += (fireChainSize / 4))
+                        foreach (var unit2 in ObjectCache.Where(u => u.MonsterAffixes.HasFlag(MonsterAffixes.FireChains)).Where(unit2 => unit1.RActorGuid != unit2.RActorGuid))
                         {
-                            Vector3 fireChainSpot = MathEx.CalculatePointFrom(unit1.Position, unit2.Position, i);
-
-                            if (Trinity.Player.Position.Distance2D(fireChainSpot) <= fireChainSize)
+                            for (float i = 0; i <= unit1.Position.Distance2D(unit2.Position); i += (fireChainSize/4))
                             {
-                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Fire Chains!");
-                                StandingInAvoidance = true;
+                                Vector3 fireChainSpot = MathEx.CalculatePointFrom(unit1.Position, unit2.Position, i);
+
+                                if (Trinity.Player.Position.Distance2D(fireChainSpot) <= fireChainSize)
+                                {
+                                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Fire Chains!");
+                                    StandingInAvoidance = true;
+                                }
+                                AvoidanceObstacleCache.Add(new CacheObstacleObject(fireChainSpot, fireChainSize, -2, "FireChains"));
                             }
-                            AvoidanceObstacleCache.Add(new CacheObstacleObject(fireChainSpot, fireChainSize, -2, "FireChains"));
                         }
+                        if (AvoidanceObstacleCache.Any(aoe => aoe.ActorSNO == -2))
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Generated {0} avoidance points for FireChains, minDistance={1} maxDistance={2}",
+                                AvoidanceObstacleCache.Count(aoe => aoe.ActorSNO == -2),
+                                AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == -2)
+                                    .Min(aoe => aoe.Location.Distance2D(Trinity.Player.Position)),
+                                AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == -2)
+                                    .Max(aoe => aoe.Location.Distance2D(Trinity.Player.Position)));
                     }
-                    if (AvoidanceObstacleCache.Any(aoe => aoe.ActorSNO == -2))
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Generated {0} avoidance points for FireChains, minDistance={1} maxDistance={2}",
-                      AvoidanceObstacleCache.Count(aoe => aoe.ActorSNO == -2),
-                      AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == -2)
-                          .Min(aoe => aoe.Location.Distance2D(Trinity.Player.Position)),
-                      AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == -2)
-                          .Max(aoe => aoe.Location.Distance2D(Trinity.Player.Position)));
                 }
 
                 /* Beast Charge Experimental Avoidance */
-                const float beastChargePathWidth = 10f;
-                const int beastChargerSNO = 3337;
-                foreach (var unit1 in ObjectCache.Where(u => u.IsFacingPlayer && u.Animation == SNOAnim.Beast_start_charge_02 || u.Animation == SNOAnim.Beast_charge_02 || u.Animation == SNOAnim.Beast_charge_04))
+                if (Settings.Combat.Misc.UseExperimentalSavageBeastAvoidance)
                 {
-                    Vector3 endPoint = MathEx.GetPointAt(unit1.Position, 90f, unit1.Unit.Movement.Rotation);
-
-                    for (float i = 0; i <= unit1.Position.Distance2D(endPoint); i += (beastChargePathWidth / 4))
+                    const float beastChargePathWidth = 10f;
+                    const int beastChargerSNO = 3337;
+                    foreach (var unit1 in ObjectCache.Where(u => u.IsFacingPlayer && u.Animation == SNOAnim.Beast_start_charge_02 ||
+                                    u.Animation == SNOAnim.Beast_charge_02 || u.Animation == SNOAnim.Beast_charge_04))
                     {
-                        Vector3 pathSpot = MathEx.CalculatePointFrom(unit1.Position, endPoint, i);
+                        Vector3 endPoint = MathEx.GetPointAt(unit1.Position, 90f, unit1.Unit.Movement.Rotation);
 
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                            "Generating BeastCharge Avoidance: {0} dist: {1}",
-                            pathSpot, pathSpot.Distance2D(unit1.Position));
-
-                        if (Trinity.Player.Position.Distance2D(pathSpot) <= beastChargePathWidth)
+                        for (float i = 0; i <= unit1.Position.Distance2D(endPoint); i += (beastChargePathWidth / 4))
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Beast Charger!");
-                            StandingInAvoidance = true;
+                            Vector3 pathSpot = MathEx.CalculatePointFrom(unit1.Position, endPoint, i);
+
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                                "Generating BeastCharge Avoidance: {0} dist: {1}",
+                                pathSpot, pathSpot.Distance2D(unit1.Position));
+
+                            if (Trinity.Player.Position.Distance2D(pathSpot) <= beastChargePathWidth)
+                            {
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Beast Charger!");
+                                StandingInAvoidance = true;
+                            }
+                            AvoidanceObstacleCache.Add(new CacheObstacleObject(pathSpot, beastChargePathWidth, beastChargerSNO,
+                                "BeastCharge"));
                         }
-                        AvoidanceObstacleCache.Add(new CacheObstacleObject(pathSpot, fireChainSize, beastChargerSNO, "BeastCharge"));
+                        if (AvoidanceObstacleCache.Any(aoe => aoe.ActorSNO == beastChargerSNO))
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                                "Generated {0} avoidance points for BeastCharge, minDistance={1} maxDistance={2}",
+                                AvoidanceObstacleCache.Count(aoe => aoe.ActorSNO == beastChargerSNO),
+                                AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == beastChargerSNO)
+                                    .Min(aoe => aoe.Location.Distance2D(Trinity.Player.Position)),
+                                AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == beastChargerSNO)
+                                    .Max(aoe => aoe.Location.Distance2D(Trinity.Player.Position)));
                     }
-                    if (AvoidanceObstacleCache.Any(aoe => aoe.ActorSNO == beastChargerSNO))
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Generated {0} avoidance points for BeastCharge, minDistance={1} maxDistance={2}",
-                            AvoidanceObstacleCache.Count(aoe => aoe.ActorSNO == beastChargerSNO),
-                            AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == beastChargerSNO)
-                                .Min(aoe => aoe.Location.Distance2D(Trinity.Player.Position)),
-                            AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == beastChargerSNO)
-                                .Max(aoe => aoe.Location.Distance2D(Trinity.Player.Position)));
                 }
 
                 // Reduce ignore-for-loops counter

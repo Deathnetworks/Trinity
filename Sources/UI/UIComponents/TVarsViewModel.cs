@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -22,7 +23,7 @@ namespace Trinity.UIComponents
             try
             {
                 V.ValidateLoad();
-                TVars = CollectionViewSource.GetDefaultView(V.Data);
+                TVars = CollectionViewSource.GetDefaultView(V.Data.OrderBy(v => v.Key));
 
                 InitializeButtons();
             }

@@ -236,7 +236,9 @@ namespace Trinity
                         HasBeenInLoS = c_HasBeenInLoS,
                         HasBeenNavigable = c_HasBeenNavigable,
                         HasBeenRaycastable = c_HasBeenRaycastable,
-                        ItemLink = c_ItemLink
+                        ItemLink = c_ItemLink,
+                        Rotation = c_Rotation,
+                        IsFacingPlayer = c_IsFacingPlayer,
                     });
             }
             return true;
