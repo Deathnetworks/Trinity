@@ -1,6 +1,62 @@
 ﻿
 # Trinity
 
+### Changelog 1.7.3.6
+
+#### Combat
+
+Barbarian: Whirlwind will now path into health globes if needed
+
+Barbarian: Added WOTB Poison Tree (100%) and Belial (100%) AoE health (non) modifications & variables.
+
+Barbarian: HOTA on Elites is now used only if there's not 3 trash mobs in our immediate melee range
+
+Barbarian: Tuned up Barbarian Rend Parameters, should now use more liberally
+
+Barbarian: Added Poison Spore, Belial and Beast Charge WOTB Avoidance Helth Modifiers
+
+Monk: Fixed Sweeping Wind not casting on trash mobs
+
+DemonHunter: Reorder spell priorities (Sentry Turrent + Caltrops have higher priority)
+
+DemonHunter: Now using dogmeat's use ranges and mob counts (Strafe, Grenades,etc)
+
+DemonHunter: Added Preparation Punishment rune support
+
+DemonHunter: Combat Vault now uses an intelligent "Kite" point instead of just "backwards"
+
+DemonHunter: Upgraded spell checks to use CombatBase.CanCast and TargetUtil, and removed redundant logic checks
+
+DemonHunter: ShadowPower is now used on low health (50%)
+
+Combat > Misc: Added Options for Ignore Trash  Mob below Health Percent (15% default) and Ignore Trash Below Health Percent with DoT applied (50%). Credits to tesslerc for the idea.
+
+BIG re-working of weights. Spent a few hours looking at weights and priorities of the bot for units.
+
+Fixed attacking Shielded units when we shouldn't
+
+Trinity should be better about not trying to attack monsters behind other monsters (AoE/Cluster spells not included)
+
+#### Avoidance
+
+Added experimental fire chains avoidance; check Combat > Misc for enable/disable
+
+Added experimental Savage Beast charger avoidance; check Combat > Misc for enable/disable
+
+#### Misc
+
+Trinity Variables Window is now sorted automatically
+
+Added emergency leave game on 0% item durability (for when when we keep spawning and dying repeatedly)
+
+Refactored all "AnythingWithinRange" and "ElitesWithinRange" to use TargetUtil methods
+
+Added AnyTrashInRange function to TargetUtil
+
+Fixed crash on "Test Scoring" button and to actually produce ItemRules results
+
+Reloading item rules and sorting the stash should no longer crash Demonbuddy
+
 ### Changelog 1.7.3.5
 
 #### Barbarian
