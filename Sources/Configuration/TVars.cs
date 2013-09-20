@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Xml;
@@ -437,7 +438,13 @@ namespace Trinity
         /// </summary>
         //private static Dictionary<string, TVar> data = new Dictionary<string, TVar>();
         [DataMember(IsRequired = true)]
-        internal static ObservableDictionary<string, TVar> Data = new ObservableDictionary<string, TVar>();
+        internal static ObservableDictionary<string, TVar> Data
+        {
+            get { return _data; }
+            set { _data = value; }
+        }
+
+        private static ObservableDictionary<string, TVar> _data  = new ObservableDictionary<string, TVar>(); 
 
         /// <summary>
         /// Check if we have the given key in our dictionary

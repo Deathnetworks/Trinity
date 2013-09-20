@@ -87,7 +87,8 @@ namespace Trinity
         /// </summary>
         public void OnEnabled()
         {
-            DateTime date_onEnabledStart = DateTime.Now;
+            Logger.Log("OnEnable start");
+            DateTime dateOnEnabledStart = DateTime.Now;
 
             BotMain.OnStart += TrinityBotStart;
             BotMain.OnStop += TrinityBotStop;
@@ -155,7 +156,7 @@ namespace Trinity
                 StashRule.reset();
             }
 
-            Logger.LogDebug("OnEnable took {0}ms", DateTime.Now.Subtract(date_onEnabledStart).TotalMilliseconds);
+            Logger.LogDebug("OnEnable took {0}ms", DateTime.Now.Subtract(dateOnEnabledStart).TotalMilliseconds);
         }
 
         /// <summary>

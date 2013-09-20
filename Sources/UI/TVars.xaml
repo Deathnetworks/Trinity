@@ -23,21 +23,19 @@
         </WrapPanel>
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Visible">
             <DataGrid ItemsSource="{Binding Path=TVars}" AutoGenerateColumns="False"
-                  CanUserAddRows="False" CanUserDeleteRows="False" ScrollViewer.CanContentScroll="True"
-                  >
+                  CanUserAddRows="False" CanUserDeleteRows="False" ScrollViewer.CanContentScroll="True">
                 <DataGrid.RowValidationRules>
                     <ut:TVarValidationRule ValidationStep="UpdatedValue" />
                 </DataGrid.RowValidationRules>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Path=Value.Name}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Name" Binding="{Binding Path=Value.Name}" IsReadOnly="True" SortDirection="Ascending" />
                     <DataGridTextColumn Header="Type" Binding="{Binding Path=Value.Type}" IsReadOnly="True" CanUserSort="False" />
-                    <DataGridTextColumn Header="Value" Binding="{Binding Path=Value.Value, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" IsReadOnly="False" CanUserSort="False">
-                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Value" Binding="{Binding Path=Value.Value, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" IsReadOnly="False" CanUserSort="False"/>
                     <DataGridTextColumn Header="Description" Binding="{Binding Path=Value.Description}" IsReadOnly="True" />
                     <DataGridTextColumn Header="Default" Binding="{Binding Path=Value.DefaultValue}" IsReadOnly="True" CanUserSort="False" />
                     <DataGridTextColumn Header="Profile Value" Binding="{Binding Path=Value.ProfileValue}" IsReadOnly="True" CanUserSort="False" />
                     <DataGridTextColumn Header="Can Profile Set" Binding="{Binding Path=Value.AllowProfileSet}" IsReadOnly="True" CanUserSort="False" />
-                    
+
                     <DataGridTemplateColumn Header="Allow Profile Set" CanUserSort="False">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -45,7 +43,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    
+
                 </DataGrid.Columns>
             </DataGrid>
         </ScrollViewer>

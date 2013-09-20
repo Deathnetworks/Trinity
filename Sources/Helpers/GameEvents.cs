@@ -11,6 +11,7 @@ using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Settings;
+using Zeta.Internals;
 using Zeta.Internals.Actors;
 using Zeta.Navigation;
 
@@ -30,6 +31,7 @@ namespace Trinity
         /// <param name="bot"></param>
         private static void TrinityBotStart(IBot bot)
         {
+            Logger.Log("Bot Starting");
             DateTime timeBotStart = DateTime.Now;
 
             V.ValidateLoad();

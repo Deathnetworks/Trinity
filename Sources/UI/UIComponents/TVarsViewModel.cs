@@ -23,7 +23,7 @@ namespace Trinity.UIComponents
             try
             {
                 V.ValidateLoad();
-                TVars = CollectionViewSource.GetDefaultView(V.Data.OrderBy(v => v.Key));
+                TVars = CollectionViewSource.GetDefaultView(V.Data);
 
                 InitializeButtons();
             }
