@@ -286,13 +286,11 @@ namespace Trinity.Combat.Abilities
                  */
 
                 return
-                    !UseOOCBuff &&
+                    (!UseOOCBuff || (Settings.Combat.Barbarian.WOTBMode == Config.Combat.BarbarianWOTBMode.WhenReady && !Player.IsInTown)) &&
                     Player.PrimaryResource >= V.I("Barbarian.WOTB.MinFury") &&
                     // Don't still have the buff
                     !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    CanCast(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    // Not on heart of sin after Cydaea
-                    CurrentTarget.ActorSNO != 193077 &&
+                    CanCast(SNOPower.Barbarian_WrathOfTheBerserker, CanCastFlags.NoTimer) &&
                     (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent ||
                     Settings.Combat.Barbarian.WOTBMode == Config.Combat.BarbarianWOTBMode.WhenReady ||
                     //Or if our health is low
@@ -444,21 +442,25 @@ namespace Trinity.Combat.Abilities
             //runeDict.Add("Bloodbath", 4);
             get
             {
+                bool hasReserveEnergy = (!IsWaitingForSpecial && Player.PrimaryResource >= V.I("Barbarian.Rend.MinFury")) || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve);
+
                 return
-                    //!UseOOCBuff &&
+                    !UseOOCBuff &&
                     !Player.IsIncapacitated &&
-                    CanCast(SNOPower.Barbarian_Rend) &&
-                    ((TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"), false) && 
-                    !CurrentTarget.IsTreasureGoblin &&
-                    ((!IsWaitingForSpecial && Player.PrimaryResource >= V.I("Barbarian.Rend.MinFury")) || (IsWaitingForSpecial && Player.PrimaryResource > MinEnergyReserve)) &&
-                    (Trinity.ObjectCache.Count(o => o.Type == GObjectType.Unit && !o.HasDotDPS && o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount") || !CurrentTarget.HasDotDPS) &&
-                    (TimeSincePowerUse(SNOPower.Barbarian_Rend) > V.I("Barbarian.Rend.MinUseIntervalMillseconds"))
-                    // && Trinity.LastPowerUsed != SNOPower.Barbarian_Rend
-                    ) || 
+                    (CanCast(SNOPower.Barbarian_Rend, CanCastFlags.NoTimer)) &&
+                     (hasReserveEnergy &&
+                        (Trinity.ObjectCache.Count(o => o.Type == GObjectType.Unit && 
+                            !o.HasDotDPS && 
+                            o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount") 
+                            || !CurrentTarget.HasDotDPS
+                        )
+                     ) || 
                     // Spam with Bloodlust
-                    (Player.CurrentHealthPct <= V.F("Barbarian.Rend.SpamBelowHealthPct") && 
-                    HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Rend && s.RuneIndex == 3) &&
-                    TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"), false)));
+                    (CanCast(SNOPower.Barbarian_Rend, CanCastFlags.NoTimer) && 
+                     Player.CurrentHealthPct <= V.F("Barbarian.Rend.SpamBelowHealthPct") && 
+                     HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Rend && s.RuneIndex == 3) &&
+                     TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"), false)
+                    );
             }
         }
         public static bool CanUseOverPower

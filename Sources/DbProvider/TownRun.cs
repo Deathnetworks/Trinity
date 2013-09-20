@@ -255,6 +255,14 @@ namespace Trinity
                     Trinity.IsReadyToTownRun = false;
                     Trinity.ForceVendorRunASAP = false;
                     TownRunCheckTimer.Reset();
+                    // hax for sending notifications after a town run
+                    if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !Trinity.Player.IsInTown)
+                    {
+                        TownRun.SendEmailNotification();
+                        TownRun.SendMobileNotifications();
+                    }
+
+                    return RunStatus.Success;
                 })
             );
         }

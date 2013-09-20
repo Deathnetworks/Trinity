@@ -19,7 +19,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(1, 7, 3, 6);
+                return new Version(1, 7, 3, 7);
             }
         }
 
@@ -57,13 +57,6 @@ namespace Trinity
                             return;
 
                         GameUI.SafeClickUIButtons();
-
-                        // hax for sending notifications after a town run
-                        if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !Player.IsInTown)
-                        {
-                            TownRun.SendEmailNotification();
-                            TownRun.SendMobileNotifications();
-                        }
 
                         // See if we should update the stats file
                         if (DateTime.Now.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)

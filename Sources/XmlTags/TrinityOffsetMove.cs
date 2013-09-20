@@ -55,7 +55,7 @@ namespace Trinity.XmlTags
         {
             return
             new PrioritySelector(
-                new Decorator(ret => Position.Distance2D(MyPos) <= PathPrecision || lastMoveResult == MoveResult.ReachedDestination,
+                new Decorator(ret => IsFinished(),
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Finished Offset Move x={0} y={1} position={3}", 
                             OffsetX, OffsetY, Position.Distance2D(MyPos), Position)),
@@ -64,6 +64,11 @@ namespace Trinity.XmlTags
                 ),
                 new Action(ret => MoveToPostion())
             );
+        }
+
+        private bool IsFinished()
+        {
+            return Position.Distance2D(MyPos) <= PathPrecision || lastMoveResult == MoveResult.ReachedDestination || ((DefaultNavigationProvider)Navigator.NavigationProvider).CurrentPath.Count < 2;
         }
 
         private void MoveToPostion()

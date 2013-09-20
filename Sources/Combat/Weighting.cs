@@ -606,8 +606,12 @@ namespace Trinity
                             {
                                 // Weight Interactable Specials
 
+                                // Need to Prioritize, forget it!
+                                if (prioritizeCloseRangeUnits)
+                                    break;
+
                                 // Very close interactables get a weight increase
-                                cacheObject.Weight = (90d - cacheObject.CentreDistance) / 90d * 15000d;
+                                cacheObject.Weight = (90d - cacheObject.CentreDistance) / 90d * 1500d;
                                 if (cacheObject.CentreDistance <= 12f)
                                     cacheObject.Weight += 1000d;
 

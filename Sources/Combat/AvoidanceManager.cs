@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Navigation;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Internals.Actors;
@@ -86,6 +87,9 @@ namespace Trinity
 
                 case AvoidanceType.GhomGas:
                     return Trinity.Settings.Combat.AvoidanceRadius.GhomGas;
+
+                case AvoidanceType.Grotesque:
+                    return 10f;
 
                 case AvoidanceType.IceBall:
                     return Trinity.Settings.Combat.AvoidanceRadius.IceBalls;
@@ -181,60 +185,89 @@ namespace Trinity
                 {
                     case AvoidanceType.Arcane:
                         return avoidanceHealth.AvoidArcaneHealth;
+
                     case AvoidanceType.AzmodanBody:
                         return avoidanceHealth.AvoidAzmoBodiesHealth;
+
                     case AvoidanceType.AzmoFireball:
                         return avoidanceHealth.AvoidAzmoFireBallHealth;
+
                     case AvoidanceType.AzmodanPool:
                         return avoidanceHealth.AvoidAzmoPoolsHealth;
+
                     case AvoidanceType.BeastCharge:
                         return 1;
                     case AvoidanceType.BeeWasp:
                         return avoidanceHealth.AvoidBeesWaspsHealth;
+
                     case AvoidanceType.Belial:
                         return avoidanceHealth.AvoidBelialHealth;
+
                     case AvoidanceType.ButcherFloorPanel:
                         return avoidanceHealth.AvoidButcherFloorPanelHealth;
                     case AvoidanceType.Desecrator:
                         return avoidanceHealth.AvoidDesecratorHealth;
+
                     case AvoidanceType.DiabloMeteor:
                         return avoidanceHealth.AvoidDiabloMeteorHealth;
+
                     case AvoidanceType.DiabloPrison:
                         return avoidanceHealth.AvoidDiabloPrisonHealth;
+
                     case AvoidanceType.DiabloRingOfFire:
                         return avoidanceHealth.AvoidDiabloRingOfFireHealth;
+
                     case AvoidanceType.FireChains:
                         return 1;
+
                     case AvoidanceType.GhomGas:
                         return avoidanceHealth.AvoidGhomGasHealth;
+
+                    case AvoidanceType.Grotesque:
+                        return 1;
+
                     case AvoidanceType.IceBall:
                         return avoidanceHealth.AvoidIceBallsHealth;
+
                     case AvoidanceType.IceTrail:
                         return avoidanceHealth.AvoidIceTrailHealth;
+
                     case AvoidanceType.MageFire:
                         return avoidanceHealth.AvoidMageFireHealth;
+
                     case AvoidanceType.MaghdaProjectille:
                         return avoidanceHealth.AvoidMaghdaProjectilleHealth;
+
                     case AvoidanceType.MoltenBall:
                         return avoidanceHealth.AvoidMoltenBallHealth;
+
                     case AvoidanceType.MoltenCore:
                         return avoidanceHealth.AvoidMoltenCoreHealth;
+
                     case AvoidanceType.MoltenTrail:
                         return avoidanceHealth.AvoidMoltenTrailHealth;
+
                     case AvoidanceType.PlagueCloud:
                         return avoidanceHealth.AvoidPlagueCloudHealth;
+
                     case AvoidanceType.PlagueHand:
                         return avoidanceHealth.AvoidPlagueHandsHealth;
+
                     case AvoidanceType.PoisonTree:
                         return avoidanceHealth.AvoidPoisonTreeHealth;
+
                     case AvoidanceType.SuccubusStar:
                         return avoidanceHealth.AvoidSuccubusStarHealth;
+
                     case AvoidanceType.ShamanFire:
                         return avoidanceHealth.AvoidShamanFireHealth;
+
                     case AvoidanceType.ZoltBubble:
                         return avoidanceHealth.AvoidZoltBubbleHealth;
+
                     case AvoidanceType.ZoltTwister:
                         return avoidanceHealth.AvoidZoltTwisterHealth;
+
                     default:
                         {
                             Logger.Log(TrinityLogLevel.Error, LogCategory.Avoidance, "Unknown Avoidance type in Health Switch! {0}", type.ToString());
