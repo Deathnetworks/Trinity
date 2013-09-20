@@ -68,7 +68,7 @@ namespace Trinity.XmlTags
 
         private bool IsFinished()
         {
-            return Position.Distance2D(MyPos) <= PathPrecision || lastMoveResult == MoveResult.ReachedDestination || ((DefaultNavigationProvider)Navigator.NavigationProvider).CurrentPath.Count < 2;
+            return Position.Distance2D(MyPos) <= PathPrecision || lastMoveResult == MoveResult.ReachedDestination;
         }
 
         private void MoveToPostion()
