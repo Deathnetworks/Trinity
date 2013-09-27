@@ -384,6 +384,13 @@ namespace Trinity
             if (hasCombinationStrike)
                 cwInterval = 2500;
 
+            // Fists of Thunder Fly to Target
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Monk_FistsofThunder) && CurrentTarget.CentreDistance > 16f)
+            {
+                Monk_TickSweepingWindSpam();
+                return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3, WAIT_FOR_ANIM);
+            }
+
             // Deadly Reach: Foresight, every 27 seconds or 2.7 seconds with combo strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Monk_DeadlyReach) && (isDualOrTriGen || hasForesight) &&
                 (SpellHistory.TimeSinceUse(SNOPower.Monk_DeadlyReach) > TimeSpan.FromMilliseconds(drInterval) ||
