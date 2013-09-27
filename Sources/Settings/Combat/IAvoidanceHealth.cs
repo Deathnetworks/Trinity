@@ -13,6 +13,8 @@ namespace Trinity.Config.Combat
 
         float AvoidPoisonTreeHealth { get; set; }
 
+        float AvoidGrotesqueHealth { get; set; }
+
         float AvoidPlagueCloudHealth { get; set; }
 
         float AvoidIceBallsHealth { get; set; }

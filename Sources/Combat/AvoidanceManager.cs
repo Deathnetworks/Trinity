@@ -89,7 +89,7 @@ namespace Trinity
                     return Trinity.Settings.Combat.AvoidanceRadius.GhomGas;
 
                 case AvoidanceType.Grotesque:
-                    return 10f;
+                    return Trinity.Settings.Combat.AvoidanceRadius.Grotesque;
 
                 case AvoidanceType.IceBall:
                     return Trinity.Settings.Combat.AvoidanceRadius.IceBalls;
@@ -224,7 +224,7 @@ namespace Trinity
                         return avoidanceHealth.AvoidGhomGasHealth;
 
                     case AvoidanceType.Grotesque:
-                        return 1;
+                        return avoidanceHealth.AvoidGrotesqueHealth;
 
                     case AvoidanceType.IceBall:
                         return avoidanceHealth.AvoidIceBallsHealth;

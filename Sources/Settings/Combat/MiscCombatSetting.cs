@@ -27,7 +27,8 @@ namespace Trinity.Config.Combat
         private double _IgnoreTrashBelowHealth;
         private double _IgnoreTrashBelowHealthDoT;
         private bool _UseExperimentalSavageBeastAvoidance;
-        private bool _UseExperimentalFireChainsAvoidance; 
+        private bool _UseExperimentalFireChainsAvoidance;
+        private int _ForceKillElitesHealth;
         #endregion Fields
 
         #region Events
@@ -417,6 +418,25 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0)]
+        public int ForceKillElitesHealth
+        {
+            get
+            {
+                return _ForceKillElitesHealth;
+            }
+            set
+            {
+                if (_ForceKillElitesHealth != value)
+                {
+                    _ForceKillElitesHealth = value;
+                    OnPropertyChanged("ForceKillElitesHealth");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -465,6 +485,7 @@ namespace Trinity.Config.Combat
             this.IgnoreTrashBelowHealthDoT = 0.50;
             this.UseExperimentalSavageBeastAvoidance = true;
             this.UseExperimentalFireChainsAvoidance = true;
+            this.ForceKillElitesHealth = 0;
         }
         #endregion Methods
     }

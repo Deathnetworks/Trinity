@@ -15,6 +15,7 @@ namespace Trinity.Config.Combat
         private float _AvoidMoltenCoreHealth;
         private float _AvoidMoltenTrailHealth;
         private float _AvoidPoisonTreeHealth;
+        private float _AvoidGrotesqueHealth;
         private float _AvoidPlagueCloudHealth;
         private float _AvoidIceBallsHealth;
         private float _AvoidPlagueHandsHealth;
@@ -213,6 +214,25 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(1f)]
+        public float AvoidGrotesqueHealth
+        {
+            get
+            {
+                return _AvoidGrotesqueHealth;
+            }
+            set
+            {
+                if (_AvoidGrotesqueHealth != value)
+                {
+                    _AvoidGrotesqueHealth = value;
+                    OnPropertyChanged("AvoidGrotesqueHealth");
+                }
+            }
+        }
+
 
         [DataMember(IsRequired = false)]
         [DefaultValue(0.25f)]
@@ -898,6 +918,7 @@ namespace Trinity.Config.Combat
             {
                 this._WOTBMode = BarbarianWOTBMode.HardElitesOnly;
                 this._WOTBHardOnly = false;
+                this.AvoidGrotesqueHealth = 1;
             }
         }
 

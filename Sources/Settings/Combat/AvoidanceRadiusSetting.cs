@@ -12,6 +12,7 @@ namespace Trinity.Config.Combat
         private int _MoltenCore;
         private int _MoltenTrail;
         private int _PoisonTree;
+        private int _Grotesque;
         private int _PlagueCloud;
         private int _IceBalls;
         private int _PlagueHands;
@@ -140,6 +141,24 @@ namespace Trinity.Config.Combat
                 {
                     _PoisonTree = value;
                     OnPropertyChanged("PoisonTree");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(30)]
+        public int Grotesque
+        {
+            get
+            {
+                return _Grotesque;
+            }
+            set
+            {
+                if (_Grotesque != value)
+                {
+                    _Grotesque = value;
+                    OnPropertyChanged("Grotesque");
                 }
             }
         }
@@ -578,6 +597,7 @@ namespace Trinity.Config.Combat
         {
 
             this.SuccubusStar = 10;
+            this.Grotesque = 30;
         }
         #endregion Methods
     }

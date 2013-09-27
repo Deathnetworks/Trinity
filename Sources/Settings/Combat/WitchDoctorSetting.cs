@@ -17,6 +17,7 @@ namespace Trinity.Config.Combat
         private float _AvoidMoltenCoreHealth;
         private float _AvoidMoltenTrailHealth;
         private float _AvoidPoisonTreeHealth;
+        private float _AvoidGrotesqueHealth;
         private float _AvoidPlagueCloudHealth;
         private float _AvoidIceBallsHealth;
         private float _AvoidPlagueHandsHealth;
@@ -231,6 +232,24 @@ namespace Trinity.Config.Combat
                 {
                     _AvoidPoisonTreeHealth = value;
                     OnPropertyChanged("AvoidPoisonTreeHealth");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(1f)]
+        public float AvoidGrotesqueHealth
+        {
+            get
+            {
+                return _AvoidGrotesqueHealth;
+            }
+            set
+            {
+                if (_AvoidGrotesqueHealth != value)
+                {
+                    _AvoidGrotesqueHealth = value;
+                    OnPropertyChanged("AvoidGrotesqueHealth");
                 }
             }
         }
@@ -669,6 +688,7 @@ namespace Trinity.Config.Combat
         {
             this._AvoidSuccubusStarHealth = 0.7f;
             this._FirebatsRange = 20f;
+            this.AvoidGrotesqueHealth = 1;
         }
         #endregion Methods
     }

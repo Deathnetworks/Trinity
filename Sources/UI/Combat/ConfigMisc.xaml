@@ -31,7 +31,7 @@
                     Elite Mob Settings
                 </GroupBox.Header>
                 <StackPanel>
-                    <Grid Grid.Row="1" Margin="5">
+                    <Grid Margin="5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
@@ -41,6 +41,18 @@
                     Interval="500" Maximum="150" Minimum="15" 
                     SmallChange="1" TickFrequency="5" IsSnapToTickEnabled="True"
                     TickPlacement="BottomRight" Value="{Binding Path=Misc.EliteRange}" 
+                    HorizontalAlignment="Stretch" Margin="25,0,25,0"/>
+                    </Grid>
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Always kill elites below % Health" FontWeight="Bold" TextAlignment="Center"/>
+                        <Slider Grid.Row="1" Template="{DynamicResource Slider}" 
+                    Interval="500" Maximum="100" Minimum="0" 
+                    SmallChange="1" TickFrequency="5" IsSnapToTickEnabled="True"
+                    TickPlacement="BottomRight" Value="{Binding Path=Misc.ForceKillElitesHealth}" 
                     HorizontalAlignment="Stretch" Margin="25,0,25,0"/>
                     </Grid>
                     <UniformGrid Columns="2" HorizontalAlignment="Center" VerticalAlignment="Top">

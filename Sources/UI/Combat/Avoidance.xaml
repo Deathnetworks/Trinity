@@ -131,6 +131,27 @@
                             Value="{Binding Path=AvoidPoisonTreeHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
+            <!--Grotesque-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="2" Text="Grotesque" FontWeight="Bold" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                            Interval="500" Maximum="30" Minimum="2" 
+                            SmallChange="1" LargeChange="5"
+                            TickPlacement="None" IsMoveToPointEnabled="True"
+                            Value="{Binding Path=DataContext.Avoid.Grotesque, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
+                            HorizontalAlignment="Stretch" Margin="2"/>
+                <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
+                            Interval="500" Maximum="100" Minimum="0" 
+                            SmallChange="1" LargeChange="5"
+                            TickPlacement="None" IsMoveToPointEnabled="True"
+                            Value="{Binding Path=AvoidGrotesqueHealth, Converter={StaticResource percentConverter}}" 
+                            HorizontalAlignment="Stretch" Margin="2"/>
+            </Grid>
             <!--PlagueCloud-->
             <Grid>
                 <Grid.ColumnDefinitions>

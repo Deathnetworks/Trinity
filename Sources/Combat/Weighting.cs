@@ -125,7 +125,7 @@ namespace Trinity
                                     break;
 
                                 // Ignore elite option, except if trying to town portal
-                                if (!cacheObject.IsBoss && ShouldIgnoreElites && cacheObject.IsEliteRareUnique)
+                                if (!cacheObject.IsBoss && ShouldIgnoreElites && cacheObject.IsEliteRareUnique && !(cacheObject.HitPointsPct <= Settings.Combat.Misc.ForceKillElitesHealth))
                                 {
                                     break;
                                 }
@@ -254,7 +254,7 @@ namespace Trinity
                                         if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                             cacheObject.Weight += 1000d;
 
-                                        if (ObjectCache.Any(u =>MathEx.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position,
+                                        if (ObjectCache.Any(u => MathEx.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position,
                                                         cacheObject.Position)))
                                             cacheObject.Weight *= 0.10d;
 
