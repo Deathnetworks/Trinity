@@ -52,7 +52,7 @@ namespace Trinity.Config
                 EnableRaisingEvents = true
             };
             _FSWatcher.Changed += _FSWatcher_Changed;
-            _LastLoadedSettings = DateTime.Now;
+            _LastLoadedSettings = DateTime.MinValue;
         }
 
         #endregion Constructors
@@ -204,7 +204,7 @@ namespace Trinity.Config
             bool migrateConfig = false;
 
             // Only load once every 500ms (prevents duplicate Load calls)
-            if (DateTime.Now.Subtract(_LastLoadedSettings).TotalMilliseconds <= 500)
+            if (_LastLoadedSettings != null && DateTime.Now.Subtract(_LastLoadedSettings).TotalMilliseconds <= 500)
                 return;
 
             _LastLoadedSettings = DateTime.Now;

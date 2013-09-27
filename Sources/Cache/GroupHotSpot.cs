@@ -64,15 +64,15 @@ namespace Trinity
                 {
                     System.Threading.Thread.Sleep(Trinity.Settings.Advanced.CacheRefreshRate);
 
+                    if (hotSpotList == null)
+                        hotSpotList = new HashSet<HotSpot>();
+
                     lock (hotSpotList)
                     {
                         var hotSpots = hotSpotList;
-                        foreach (var hotspot in hotSpots.ToList())
+                        foreach (var hotspot in hotSpots.Where(hotspot => DateTime.Now.Subtract(hotspot.ExpirationTime).TotalMilliseconds > 0).ToList())
                         {
-                            if (DateTime.Now.Subtract(hotspot.ExpirationTime).TotalMilliseconds > 0)
-                            {
-                                hotSpotList.Remove(hotspot);
-                            }
+                            hotSpotList.Remove(hotspot);
                         }
                     }
                 }

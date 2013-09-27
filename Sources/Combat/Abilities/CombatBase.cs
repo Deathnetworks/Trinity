@@ -376,12 +376,12 @@ namespace Trinity.Combat.Abilities
             if (!hasPower)
                 return false;
 
-            bool timer = flags.HasFlag(CanCastFlags.NoTimer) ? true : SNOPowerUseTimer(power);
+            bool timer = flags.HasFlag(CanCastFlags.NoTimer) || SNOPowerUseTimer(power);
 
             if (!timer)
                 return false;
 
-            bool powerManager = flags.HasFlag(CanCastFlags.NoPowerManager) ? true : PowerManager.CanCast(power);
+            bool powerManager = flags.HasFlag(CanCastFlags.NoPowerManager) || PowerManager.CanCast(power);
 
             if (!powerManager)
                 return false;

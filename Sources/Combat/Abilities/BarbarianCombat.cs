@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.CommonBot;
@@ -37,14 +38,14 @@ namespace Trinity.Combat.Abilities
             // Check if we should conserve Fury for specials
             if (IsNull(power) && Player.PrimaryResource < MinEnergyReserve)
             {
-                if (ShouldWaitForEarthquake)
-                {
-                    Logger.LogNormal("Waiting for Barbarian_Earthquake!");
-                    IsWaitingForSpecial = true;
-                }
                 if (ShouldWaitForWrathOfTheBerserker)
                 {
                     Logger.LogNormal("Waiting for Barbarian_WrathOfTheBerserker 1!");
+                    IsWaitingForSpecial = true;
+                }
+                if (ShouldWaitForEarthquake)
+                {
+                    Logger.LogNormal("Waiting for Barbarian_Earthquake!");
                     IsWaitingForSpecial = true;
                 }
                 if (ShouldWaitForCallOfTheAncients)
@@ -183,7 +184,7 @@ namespace Trinity.Combat.Abilities
                 return
                     !UseOOCBuff &&
                     !IsCurrentlyAvoiding &&
-                    CanCast(SNOPower.Barbarian_Earthquake) &&
+                    !CanCast(SNOPower.Barbarian_Earthquake) &&
                     TargetUtil.AnyElitesInRange(25) &&
                     !GetHasBuff(SNOPower.Barbarian_Earthquake) &&
                     Player.PrimaryResource <= 50; ;
@@ -218,9 +219,9 @@ namespace Trinity.Combat.Abilities
                     !UseOOCBuff &&
                     !IsCurrentlyAvoiding &&
                     Player.PrimaryResource <= 50 &&
-                    CanCast(SNOPower.Barbarian_WrathOfTheBerserker) &&
+                    !CanCast(SNOPower.Barbarian_WrathOfTheBerserker) &&
                     !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    (WOTBIgnoreElites || wotbElites);
+                    (WOTBIgnoreElites || wotbElites || (Settings.Combat.Barbarian.WOTBMode == BarbarianWOTBMode.WhenReady));
             }
         }
 
@@ -285,16 +286,17 @@ namespace Trinity.Combat.Abilities
                  * And not on the Heart of sin
                  */
 
+                bool anyTime = (Settings.Combat.Barbarian.WOTBMode == Config.Combat.BarbarianWOTBMode.WhenReady && !Player.IsInTown);
+
                 return
-                    (!UseOOCBuff || (Settings.Combat.Barbarian.WOTBMode == Config.Combat.BarbarianWOTBMode.WhenReady && !Player.IsInTown)) &&
+                    (!UseOOCBuff || anyTime) &&
                     Player.PrimaryResource >= V.I("Barbarian.WOTB.MinFury") &&
                     // Don't still have the buff
                     !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
                     CanCast(SNOPower.Barbarian_WrathOfTheBerserker, CanCastFlags.NoTimer) &&
-                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent ||
-                    Settings.Combat.Barbarian.WOTBMode == Config.Combat.BarbarianWOTBMode.WhenReady ||
+                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent || anyTime ||
                     //Or if our health is low
-                    Player.CurrentHealthPct <= V.F("Barbarian.WOTB.EmergencyHealth"));
+                     Player.CurrentHealthPct <= V.F("Barbarian.WOTB.EmergencyHealth"));
             }
         }
         public static bool ShouldWaitForCallOfTheAncients
@@ -304,7 +306,7 @@ namespace Trinity.Combat.Abilities
                 return
                     !UseOOCBuff &&
                     !IsCurrentlyAvoiding &&
-                    CanCast(SNOPower.Barbarian_CallOfTheAncients) &&
+                    !CanCast(SNOPower.Barbarian_CallOfTheAncients) &&
                     TargetUtil.AnyElitesInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")) &&
                     !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients) &&
                     Player.PrimaryResource <= V.F("Barbarian.CallOfTheAncients.MinFury");
@@ -447,20 +449,22 @@ namespace Trinity.Combat.Abilities
                 return
                     !UseOOCBuff &&
                     !Player.IsIncapacitated &&
-                    (CanCast(SNOPower.Barbarian_Rend, CanCastFlags.NoTimer)) &&
+                    (CanCast(SNOPower.Barbarian_Rend)) &&
                      (hasReserveEnergy &&
                         (Trinity.ObjectCache.Count(o => o.Type == GObjectType.Unit && 
                             !o.HasDotDPS && 
                             o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount") 
                             || !CurrentTarget.HasDotDPS
                         )
-                     ) || 
+                     )
+                     ||
                     // Spam with Bloodlust
-                    (CanCast(SNOPower.Barbarian_Rend, CanCastFlags.NoTimer) && 
-                     Player.CurrentHealthPct <= V.F("Barbarian.Rend.SpamBelowHealthPct") && 
+                    (CanCast(SNOPower.Barbarian_Rend, CanCastFlags.NoTimer) &&
+                     Player.CurrentHealthPct <= V.F("Barbarian.Rend.SpamBelowHealthPct") &&
                      HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Rend && s.RuneIndex == 3) &&
                      TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"), false)
-                    );
+                    )
+                    ;
             }
         }
         public static bool CanUseOverPower

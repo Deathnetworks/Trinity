@@ -52,7 +52,7 @@ namespace Trinity
             AmountHighestScoringPrimary = 0;
             TotalRequirements = 0;
             GlobalMultiplier = 1;
-            TownRun.junkItemStatString = "";
+            TownRun.JunkItemStatString = "";
             TownRun.ValueItemStatString = "";
 
             // Checks for Invalid Item Types
@@ -833,9 +833,9 @@ namespace Trinity
                         if (TownRun.ValueItemStatString != "")
                             TownRun.ValueItemStatString += ". ";
                         TownRun.ValueItemStatString += Constants.StatNames[i] + "=" + Math.Round(TempStatistic).ToString();
-                        if (TownRun.junkItemStatString != "")
-                            TownRun.junkItemStatString += ". ";
-                        TownRun.junkItemStatString += Constants.StatNames[i] + "=" + Math.Round(TempStatistic).ToString();
+                        if (TownRun.JunkItemStatString != "")
+                            TownRun.JunkItemStatString += ". ";
+                        TownRun.JunkItemStatString += Constants.StatNames[i] + "=" + Math.Round(TempStatistic).ToString();
                     }
                 }
             }
@@ -854,7 +854,7 @@ namespace Trinity
                 TotalItemPoints += HighestScoringPrimary;
 
                 TownRun.ValueItemStatString = Constants.StatNames[WhichPrimaryIsHighest] + "=" + Math.Round(AmountHighestScoringPrimary).ToString() + ". " + TownRun.ValueItemStatString;
-                TownRun.junkItemStatString = Constants.StatNames[WhichPrimaryIsHighest] + "=" + Math.Round(AmountHighestScoringPrimary).ToString() + ". " + TownRun.junkItemStatString;
+                TownRun.JunkItemStatString = Constants.StatNames[WhichPrimaryIsHighest] + "=" + Math.Round(AmountHighestScoringPrimary).ToString() + ". " + TownRun.JunkItemStatString;
 
             }
             Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "--- +" + TotalItemPoints.ToString("0") + " total score pre-special reductions. (GlobalMultiplier=" + GlobalMultiplier.ToString("0.000") + ")", true);
@@ -1048,7 +1048,7 @@ namespace Trinity
         internal static void ResetValuationStatStrings()
         {
             TownRun.ValueItemStatString = "";
-            TownRun.junkItemStatString = "";
+            TownRun.JunkItemStatString = "";
         }
 
         private static void CheckForInvalidItemType(GItemType itemType)

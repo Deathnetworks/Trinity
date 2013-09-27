@@ -6,6 +6,9 @@ using Zeta.Internals.Actors;
 
 namespace Trinity
 {
+    /// <summary>
+    /// Provides facilities to track DoT and duration/expiration spells on monsters
+    /// </summary>
     public class SpellTracker : IEquatable<SpellTracker>
     {
         public int ACDGuid { get; set; }
@@ -65,6 +68,12 @@ namespace Trinity
             return TrackedUnits.Any(t => t.ACDGuid == acdGuid && t.Power == power);
         }
 
+        /// <summary>
+        /// Checks if a unit is currently being tracked with a given SNOPower. When the spell is properly configured, this can be used to set a "timer" on a DoT re-cast, for example.
+        /// </summary>
+        /// <param name="acdGuid"></param>
+        /// <param name="power"></param>
+        /// <returns></returns>
         public static bool IsUnitTracked(TrinityCacheObject unit, SNOPower power)
         {
             if (unit.Type != GObjectType.Unit)
@@ -161,7 +170,7 @@ namespace Trinity
             // TBD, maybe Rend is a good candidate?
 
             // Monk
-            // TBD
+            TrackedSpells.Add(new TrackedSpell(SNOPower.Monk_ExplodingPalm, -999, 15000f));
 
             // Wizard
             // TBD
@@ -174,6 +183,7 @@ namespace Trinity
             TrackedSpells.Add(new TrackedSpell(SNOPower.Witchdoctor_Haunt, 4, 2000f)); // WD, Resentful Spirit
 
             TrackedSpells.Add(new TrackedSpell(SNOPower.Witchdoctor_Locust_Swarm, -999, 8000f));
+
 
             // Demon Hunter
             // TBD

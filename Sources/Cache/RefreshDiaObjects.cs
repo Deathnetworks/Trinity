@@ -413,7 +413,7 @@ namespace Trinity
                 NavigationObstacleCache = new HashSet<CacheObstacleObject>();
                 AnyElitesPresent = false;
                 AnyMobsInRange = false;
-                TownRun.lastDistance = 0f;
+
                 IsAvoidingProjectiles = false;
                 // Every 15 seconds, clear the "blackspots" where avoidance failed, so we can re-check them
                 if (DateTime.Now.Subtract(lastClearedAvoidanceBlackspots).TotalSeconds > 15)

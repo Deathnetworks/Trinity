@@ -69,7 +69,6 @@ namespace Trinity
             Set(new TVar("Barbarian.Bash.UseRange", 6f, "Power Use Range"));
             Set(new TVar("Barbarian.Frenzy.UseRange", 10f, "Power Use Range"));
             Set(new TVar("Barbarian.Cleave.UseRange", 6f, "Power Use Range"));
-            Set(new TVar("Barbarian.Rend.UseRange", 10f, "Power Use Range"));
             Set(new TVar("Barbarian.WeaponThrow.UseRange", 25f, "Power Use Range"));
             Set(new TVar("Barbarian.GroundStomp.UseBelowHealthPct", 0.70f, "Use Ground Stomp below this health % (regardless of unit count)"));
             Set(new TVar("Barbarian.GroundStomp.EliteRange", 15f, "Use Ground Stomp Elites check Range"));
@@ -93,10 +92,11 @@ namespace Trinity
 
             Set(new TVar("Barbarian.Rend.MinNonBleedMobCount", 1, "Cast rend when this many mobs surrounding are not bleeding"));
             Set(new TVar("Barbarian.Rend.MinUseIntervalMillseconds", 0, "Minimum Delay between uses"));
+            Set(new TVar("Barbarian.Rend.UseRange", 10f, "Power Use Range"));
             Set(new TVar("Barbarian.Rend.MaxRange", 10f, "Maximum Range for targets to be Rended"));
             Set(new TVar("Barbarian.Rend.MinFury", 20, "Minimum Fury"));
             Set(new TVar("Barbarian.Rend.TickDelay", 4, "Rend Pre and Post Tick Delay"));
-            Set(new TVar("Barbarian.Rend.SpamBelowHealthPct", 1f, "Always spam rend when below this Percent Health"));
+            Set(new TVar("Barbarian.Rend.SpamBelowHealthPct", 25f, "Always spam rend when below this Percent Health"));
 
             Set(new TVar("Barbarian.OverPower.MaxRange", 9f, "Maximum Range Overpower is triggered"));
             Set(new TVar("Barbarian.SeismicSlam.CurrentTargetRange", 40f, "Maximum Current Target range"));
@@ -117,7 +117,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.Barbarian_Cleave", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_Frenzy", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_HammerOfTheAncients", 150, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Barbarian_Rend", 2650, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_Rend", 1500, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_SeismicSlam", 200, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_Whirlwind", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_GroundStomp", 12200, "Spell Use Delay/Interval, milliseconds"));
@@ -149,7 +149,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.Monk_Serenity", 20200, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Monk_InnerSanctuary", 20200, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Monk_DashingStrike", 1000, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Monk_ExplodingPalm", 5000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Monk_ExplodingPalm", 250, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Monk_SweepingWind", 1500, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Monk_CycloneStrike", 900, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Monk_SevenSidedStrike", 30200, "Spell Use Delay/Interval, milliseconds"));
@@ -444,7 +444,7 @@ namespace Trinity
             set { _data = value; }
         }
 
-        private static ObservableDictionary<string, TVar> _data  = new ObservableDictionary<string, TVar>(); 
+        private static ObservableDictionary<string, TVar> _data = new ObservableDictionary<string, TVar>();
 
         /// <summary>
         /// Check if we have the given key in our dictionary

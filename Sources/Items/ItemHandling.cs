@@ -501,8 +501,8 @@ namespace Trinity
         {
             try
             {
-                if (TownRun.testingBackpack) return;
-                TownRun.testingBackpack = true;
+                if (TownRun.TestingBackpack) return;
+                TownRun.TestingBackpack = true;
                 //ZetaDia.Actors.Update();
                 if (ZetaDia.Actors.Me == null)
                 {
@@ -534,12 +534,12 @@ namespace Trinity
                 {
                     Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error testing scores - not in game world?");
                 }
-                TownRun.testingBackpack = false;
+                TownRun.TestingBackpack = false;
             }
             catch (Exception ex)
             {
                 Logger.LogNormal("Exception in TestScoring(): {0}", ex);
-                TownRun.testingBackpack = false;
+                TownRun.TestingBackpack = false;
             }
         }
 

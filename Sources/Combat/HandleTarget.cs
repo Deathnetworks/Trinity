@@ -946,6 +946,9 @@ namespace Trinity
                 if ((CurrentTargetIsUnit() && !CurrentTarget.IsBoss && GetSecondsSinceTargetUpdate() > 10))
                     shouldTryBlacklist = true;
 
+                if (CurrentTarget.Type == GObjectType.HotSpot)
+                    shouldTryBlacklist = false;
+
                 if (shouldTryBlacklist)
                 {
                     // NOTE: This only blacklists if it's remained the PRIMARY TARGET that we are trying to actually directly attack!

@@ -1,4 +1,6 @@
 ﻿// VERSION 1.1.4
+
+using System;
 using System.Windows;
 using Zeta;
 using Zeta.Common;
@@ -33,12 +35,20 @@ namespace TrinityRoutine
         {
             get
             {
-                foreach (PluginContainer plugin in PluginManager.Plugins)
+                try
                 {
-                    if (plugin.Plugin.Name == "Trinity")
+                    foreach (PluginContainer plugin in PluginManager.Plugins)
                     {
-                        return plugin.Plugin.DisplayWindow;
+                        if (plugin.Plugin.Name == "Trinity")
+                        {
+                            return plugin.Plugin.DisplayWindow;
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Logging.Write("[Trinity] Error Opening Plugin Config window!");
+                    Logging.Write("[Trinity] {0}", ex);
                 }
                 Logging.Write("[Trinity] Unable to open Plugin Config window!");
                 return null;

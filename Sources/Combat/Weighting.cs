@@ -233,11 +233,11 @@ namespace Trinity
                                             cacheObject.Weight += Math.Max((100 - cacheObject.HitPointsPct) / 100 * 2000d, 100);
 
                                         // Bonuses to priority type monsters from the dictionary/hashlist set at the top of the code
-                                        int iExtraPriority;
-                                        if (DataDictionary.MonsterCustomWeights.TryGetValue(cacheObject.ActorSNO, out iExtraPriority))
+                                        int extraPriority;
+                                        if (DataDictionary.MonsterCustomWeights.TryGetValue(cacheObject.ActorSNO, out extraPriority))
                                         {
-                                            // adding a constant multiple of 10 to all weights here (e.g. 999 becomes 9990)
-                                            cacheObject.Weight += iExtraPriority * 10d;
+                                            // adding a constant multiple of 3 to all weights here (e.g. 999 becomes 2997)
+                                            cacheObject.Weight += extraPriority * 3d;
                                         }
 
                                         // Close range get higher weights the more of them there are, to prevent body-blocking
@@ -300,7 +300,6 @@ namespace Trinity
                                         // Deal with treasure goblins - note, of priority is set to "0", then the is-a-goblin flag isn't even set for use here - the monster is ignored
                                         if (cacheObject.IsTreasureGoblin && !ObjectCache.Any(u => (u.Type == GObjectType.Door || u.Type == GObjectType.Barricade) && u.RadiusDistance <= 40f))
                                         {
-
                                             // Logging goblin sightings
                                             if (lastGoblinTime == DateTime.Today)
                                             {

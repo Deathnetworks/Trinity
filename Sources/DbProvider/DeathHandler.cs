@@ -63,7 +63,7 @@ namespace Trinity.DbProvider
 
             double max = equippedItems.Max(i => i.DurabilityPercent);
 
-            Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "EquipmentNeedsEmergencyRepair={0}", max <= 1);
+            //Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "EquipmentNeedsEmergencyRepair={0}", max <= 1);
             return max <= 1;
         }
 

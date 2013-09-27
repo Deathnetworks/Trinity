@@ -205,7 +205,7 @@ namespace Trinity
             _hashsetItemStatsLookedAt = new HashSet<string>();
             _hashsetItemPicksLookedAt = new HashSet<string>();
             _hashsetItemFollowersIgnored = new HashSet<string>();
-            TownRun._dictItemStashAttempted = new Dictionary<int, int>();
+
             hashRGUIDBlacklist60 = new HashSet<int>();
             hashRGUIDBlacklist90 = new HashSet<int>();
             hashRGUIDBlacklist15 = new HashSet<int>();

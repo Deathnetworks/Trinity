@@ -33,46 +33,24 @@ namespace Trinity
 
         // Whether salvage/sell run should go to a middle-waypoint first to help prevent stucks
 
-        internal static bool bLastTownRunCheckResult = false;
+        internal static bool LastTownRunCheckResult = false;
         // Random variables used during item handling and town-runs
 
-        private static int itemDelayLoopLimit = 0;
+        private static bool _loggedAnythingThisStash = false;
 
-        private static bool loggedAnythingThisStash = false;
-
-        private static bool loggedJunkThisStash = false;
+        private static bool _loggedJunkThisStash = false;
         internal static string ValueItemStatString = "";
-        internal static string junkItemStatString = "";
-        internal static bool testingBackpack = false;
-        // Safety pauses to make sure we aren't still coming through the portal or selling
-
-        internal static bool bPreStashPauseDone = false;
+        internal static string JunkItemStatString = "";
+        internal static bool TestingBackpack = false;
 
 
-        internal static HashSet<CachedACDItem> itemStashCache = new HashSet<CachedACDItem>();
-
-        internal static HashSet<CachedACDItem> itemSalvageCache = new HashSet<CachedACDItem>();
-
-        internal static HashSet<CachedACDItem> itemSellCache = new HashSet<CachedACDItem>();
         // Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
 
         private static bool[,] StashSlotBlocked = new bool[7, 30];
 
-        internal static float iLowestDurabilityFound = -1;
-
-        internal static bool bNeedsEquipmentRepairs = false;
         // DateTime check to prevent inventory-check spam when looking for repairs being needed
-        internal static DateTime timeLastAttemptedTownRun = DateTime.Now;
-
-        internal static bool ShouldUseWalk = false;
-
-        internal static bool bReachedDestination = false;
-        // The distance last loop, so we can compare to current distance to work out if we moved
-
-        internal static float lastDistance = 0f;
-        // This dictionary stores attempted stash counts on items, to help detect any stash stucks on the same item etc.
-
-        internal static Dictionary<int, int> _dictItemStashAttempted = new Dictionary<int, int>();
+        internal static DateTime LastCheckBackpackDurability = DateTime.Now;
+        private static DateTime _LastCompletedTownRun = DateTime.MinValue;
 
 
         internal static Vector3 PreTownRunPosition { get; set; }
@@ -139,9 +117,8 @@ namespace Trinity
                 // Check if we should be forcing a town-run
                 if (Trinity.ForceVendorRunASAP || BrainBehavior.IsVendoring)
                 {
-                    if (!bLastTownRunCheckResult)
+                    if (!LastTownRunCheckResult)
                     {
-                        bPreStashPauseDone = false;
                         if (BrainBehavior.IsVendoring)
                         {
                             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Looks like we are being asked to force a town-run by a profile/plugin/new DB feature, now doing so.");
@@ -152,19 +129,18 @@ namespace Trinity
                 }
 
                 // Time safety switch for more advanced town-run checking to prevent CPU spam
-                else if (DateTime.Now.Subtract(timeLastAttemptedTownRun).TotalSeconds > 6)
+                if (DateTime.Now.Subtract(LastCheckBackpackDurability).TotalSeconds > 6)
                 {
-                    timeLastAttemptedTownRun = DateTime.Now;
+                    LastCheckBackpackDurability = DateTime.Now;
 
                     // Check for no space in backpack
-                    Vector2 ValidLocation = Trinity.FindValidBackpackLocation(true);
-                    if (ValidLocation.X < 0 || ValidLocation.Y < 0)
+                    Vector2 validLocation = Trinity.FindValidBackpackLocation(true);
+                    if (validLocation.X < 0 || validLocation.Y < 0)
                     {
                         Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, now running town-run routine.");
-                        if (!bLastTownRunCheckResult)
+                        if (!LastTownRunCheckResult)
                         {
-                            bPreStashPauseDone = false;
-                            bLastTownRunCheckResult = true;
+                            LastTownRunCheckResult = true;
                         }
                         Trinity.IsReadyToTownRun = true;
 
@@ -179,10 +155,7 @@ namespace Trinity
                         if (item.IsValid && item.DurabilityPercent <= Zeta.CommonBot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow)
                         {
                             Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Items may need repair, now running town-run routine.");
-                            if (!bLastTownRunCheckResult)
-                            {
-                                bPreStashPauseDone = false;
-                            }
+
                             Trinity.IsReadyToTownRun = true;
                             Trinity.ForceVendorRunASAP = true;
                             TownRun.SetPreTownRunPosition();
@@ -196,7 +169,7 @@ namespace Trinity
                     Trinity.IsReadyToTownRun = false;
                 }
 
-                bLastTownRunCheckResult = Trinity.IsReadyToTownRun;
+                LastTownRunCheckResult = Trinity.IsReadyToTownRun;
 
                 // Clear blacklists to triple check any potential targets
                 if (Trinity.IsReadyToTownRun)
@@ -237,8 +210,8 @@ namespace Trinity
                 if (Trinity.IsReadyToTownRun && !TownRunCheckTimer.IsRunning)
                 {
                     TownRunCheckTimer.Start();
-                    loggedAnythingThisStash = false;
-                    loggedJunkThisStash = false;
+                    _loggedAnythingThisStash = false;
+                    _loggedJunkThisStash = false;
                 }
                 return false;
             }
@@ -256,10 +229,10 @@ namespace Trinity
                     Trinity.ForceVendorRunASAP = false;
                     TownRunCheckTimer.Reset();
                     // hax for sending notifications after a town run
-                    if (!Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && !Trinity.Player.IsInTown)
+                    if (!BrainBehavior.IsVendoring && !Trinity.Player.IsInTown)
                     {
-                        TownRun.SendEmailNotification();
-                        TownRun.SendMobileNotifications();
+                        SendEmailNotification();
+                        SendMobileNotifications();
                     }
 
                     return RunStatus.Success;
@@ -331,16 +304,6 @@ namespace Trinity
             lastTownPortalCheckTime = DateTime.Now;
             lastTownPortalCheckResult = result;
             return result;
-        }
-
-        /// <summary>
-        /// Randomize the timer between stashing/salvaging etc.
-        /// </summary>
-        internal static void RandomizeTheTimer()
-        {
-            Random rndNum = new Random(int.Parse(Guid.NewGuid().ToString().Substring(0, 8), NumberStyles.HexNumber));
-            int rnd = rndNum.Next(7);
-            itemDelayLoopLimit = 4 + rnd + ((int)Math.Floor(((double)(BotMain.TicksPerSecond / 2))));
         }
 
         internal static Stopwatch randomTimer = new Stopwatch();
@@ -553,9 +516,9 @@ namespace Trinity
                 //TODO : Change File Log writing
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
                 {
-                    if (!loggedAnythingThisStash)
+                    if (!_loggedAnythingThisStash)
                     {
-                        loggedAnythingThisStash = true;
+                        _loggedAnythingThisStash = true;
                         LogWriter.WriteLine(DateTime.Now.ToString() + ":");
                         LogWriter.WriteLine("====================");
                     }
@@ -620,9 +583,9 @@ namespace Trinity
                 LogStream = File.Open(filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
                 using (StreamWriter LogWriter = new StreamWriter(LogStream))
                 {
-                    if (!loggedJunkThisStash)
+                    if (!_loggedJunkThisStash)
                     {
-                        loggedJunkThisStash = true;
+                        _loggedJunkThisStash = true;
                         LogWriter.WriteLine(DateTime.Now.ToString() + ":");
                         LogWriter.WriteLine("====================");
                     }
@@ -630,8 +593,8 @@ namespace Trinity
                     if (acdItem.Quality >= ItemQuality.Legendary)
                         isLegendaryItem = " {legendary item}";
                     LogWriter.WriteLine(itemBaseType.ToString() + " - " + itemType.ToString() + " '" + acdItem.RealName + "'. Score = " + itemValue.ToString("0") + isLegendaryItem);
-                    if (junkItemStatString != "")
-                        LogWriter.WriteLine("  " + junkItemStatString);
+                    if (JunkItemStatString != "")
+                        LogWriter.WriteLine("  " + JunkItemStatString);
                     else
                         LogWriter.WriteLine("  (no scorable attributes)");
                     LogWriter.WriteLine("");
