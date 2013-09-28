@@ -27,7 +27,7 @@ namespace Trinity
 
             //// Monk - Primary
 
-            //bool hasThunderClap = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_FistsofThunder && s.RuneIndex == 0);
+            bool hasThunderClap = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_FistsofThunder && s.RuneIndex == 0);
             //bool hasLightningFlash = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_FistsofThunder && s.RuneIndex == 4);
             //bool hasStaticCharge = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_FistsofThunder && s.RuneIndex == 3);
             //bool hasQuickening = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_FistsofThunder && s.RuneIndex == 3);
@@ -384,8 +384,8 @@ namespace Trinity
             if (hasCombinationStrike)
                 cwInterval = 2500;
 
-            // Fists of Thunder Fly to Target
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Monk_FistsofThunder) && CurrentTarget.CentreDistance > 16f)
+            // Fists of Thunder:Thunder Clap - Fly to Target
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Monk_FistsofThunder) && hasThunderClap && CurrentTarget.CentreDistance > 16f)
             {
                 Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_FistsofThunder, 30f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3, WAIT_FOR_ANIM);

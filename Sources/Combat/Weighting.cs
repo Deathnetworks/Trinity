@@ -125,7 +125,7 @@ namespace Trinity
                                     break;
 
                                 // Ignore elite option, except if trying to town portal
-                                if (!cacheObject.IsBoss && ShouldIgnoreElites && cacheObject.IsEliteRareUnique && !(cacheObject.HitPointsPct <= Settings.Combat.Misc.ForceKillElitesHealth))
+                                if (!cacheObject.IsBoss && ShouldIgnoreElites && cacheObject.IsEliteRareUnique && !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth/100)))
                                 {
                                     break;
                                 }

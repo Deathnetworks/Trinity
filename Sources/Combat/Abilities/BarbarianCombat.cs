@@ -449,18 +449,17 @@ namespace Trinity.Combat.Abilities
                 return
                     !UseOOCBuff &&
                     !Player.IsIncapacitated &&
-                    (CanCast(SNOPower.Barbarian_Rend)) &&
-                     (hasReserveEnergy &&
+                    hasReserveEnergy && 
+                    ((CanCast(SNOPower.Barbarian_Rend)) &&
                         (Trinity.ObjectCache.Count(o => o.Type == GObjectType.Unit && 
                             !o.HasDotDPS && o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount"))
-                     )
                      ||
                     // Spam with Bloodlust
                     (CanCast(SNOPower.Barbarian_Rend) &&
                      Player.CurrentHealthPct <= V.F("Barbarian.Rend.SpamBelowHealthPct") &&
                      HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_Rend && s.RuneIndex == 3) &&
                      TargetUtil.AnyMobsInRange(V.F("Barbarian.Rend.MaxRange"), false)
-                    )
+                    ))
                     ;
             }
         }
