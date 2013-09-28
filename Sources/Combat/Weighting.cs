@@ -251,7 +251,7 @@ namespace Trinity
                                             cacheObject.Weight += 2000d;
 
                                         // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                        if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                        if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                             cacheObject.Weight += 1000d;
 
                                         if (ObjectCache.Any(u => MathEx.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position,
@@ -347,6 +347,10 @@ namespace Trinity
                                 if (prioritizeCloseRangeUnits)
                                     break;
 
+                                // if we started cache refresh with a target already
+                                if (LastTargetRactorGUID != -1)
+                                    break;
+
                                 // If it's very close, ignore
                                 if (cacheObject.CentreDistance <= V.F("Cache.HotSpot.MinDistance"))
                                 {
@@ -381,7 +385,7 @@ namespace Trinity
                                     cacheObject.Weight += 1000d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                if (cacheObject.RActorGuid == CurrentTargetRactorGUID)
+                                if (cacheObject.RActorGuid == LastTargetRactorGUID)
                                     cacheObject.Weight += 800;
 
                                 // Give yellows more weight
@@ -479,7 +483,7 @@ namespace Trinity
                                         cacheObject.Weight += 1500d;
 
                                     // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                    if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                    if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                         cacheObject.Weight += 800;
                                 }
 
@@ -530,7 +534,7 @@ namespace Trinity
                                 if (cacheObject.Weight > 0)
                                 {
                                     // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                    if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                    if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                         cacheObject.Weight += 400;
 
                                     // If there's a monster in the path-line to the item
@@ -573,7 +577,7 @@ namespace Trinity
                                 cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 5000f;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                     cacheObject.Weight += 400;
 
                                 //// Close destructibles get a weight increase
@@ -615,7 +619,7 @@ namespace Trinity
                                     cacheObject.Weight += 1000d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                     cacheObject.Weight += 400;
 
                                 // If there's a monster in the path-line to the item, reduce the weight by 50%
@@ -642,7 +646,7 @@ namespace Trinity
                                     cacheObject.Weight += 600d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-                                if (cacheObject.RActorGuid == CurrentTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                     cacheObject.Weight += 400;
 
                                 // If there's a monster in the path-line to the item, reduce the weight by 50%
@@ -668,7 +672,7 @@ namespace Trinity
                             cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique, cacheObject.RActorGuid, unitWeightInfo);
 
                     // Prevent current target dynamic ranged weighting flip-flop 
-                    if (CurrentTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)
+                    if (LastTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)
                     {
                         cacheObject.Weight = 100;
                     }
@@ -682,7 +686,7 @@ namespace Trinity
 
                         // See if we can try attempting kiting later
                         NeedToKite = false;
-                        vKitePointAvoid = Vector3.Zero;
+                        KiteAvoidDestination = Vector3.Zero;
 
                         // Kiting and Avoidance
                         if (CurrentTarget.Type == GObjectType.Unit)
@@ -702,7 +706,7 @@ namespace Trinity
                                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Avoidance: Id={0} Weight={1} Loc={2} Radius={3} Name={4}", o.ActorSNO, o.Weight, o.Location, o.Radius, o.Name);
                                 }
 
-                                vKitePointAvoid = CurrentTarget.Position;
+                                KiteAvoidDestination = CurrentTarget.Position;
                                 NeedToKite = true;
                             }
                         }
@@ -710,7 +714,7 @@ namespace Trinity
                 }
 
                 // Loop through all the objects and give them a weight
-                if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.RActorGuid != CurrentTargetRactorGUID)
+                if (CurrentTarget != null && CurrentTarget.InternalName != null && CurrentTarget.ActorSNO > 0 && CurrentTarget.RActorGuid != LastTargetRactorGUID)
                 {
                     RecordTargetHistory();
 

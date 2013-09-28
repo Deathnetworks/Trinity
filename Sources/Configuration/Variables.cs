@@ -433,12 +433,12 @@ namespace Trinity
         /// The position of the last CurrentTarget (Primary Target)
         /// </summary>
         internal static Vector3 LastPrimaryTargetPosition;
-        private static Vector3 vKitePointAvoid;
+        private static Vector3 KiteAvoidDestination;
         /// <summary>
         /// The RActorGUID of the last CurrentTarget (PrimaryTarget)
         /// </summary>
-        private static int CurrentTargetRactorGUID;
-        private static int CurrentTargetACDGuid;
+        private static int LastTargetRactorGUID;
+        private static int LastTargetACDGuid;
         /// <summary>
         /// The number of monsters within melee range distance of the player
         /// </summary>

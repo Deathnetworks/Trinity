@@ -134,6 +134,8 @@ namespace Trinity
                     }
                 }
 
+
+
                 // Reduce ignore-for-loops counter
                 if (IgnoreTargetForLoops > 0)
                     IgnoreTargetForLoops--;
@@ -187,7 +189,7 @@ namespace Trinity
                 if (!hasFoundSafePoint)
                 {
                     RefreshDiaGetWeights();
-                    RefreshSetKiting(ref vKitePointAvoid, NeedToKite, ref TryToKite);
+                    RefreshSetKiting(ref KiteAvoidDestination, NeedToKite, ref TryToKite);
                 }
                 // Not heading straight for a safe-spot?
                 // No valid targets but we were told to stay put?
@@ -268,7 +270,7 @@ namespace Trinity
                             lastHadEliteUnitInSights = DateTime.Now;
                     }
                     // Record the last time our target changed
-                    if (CurrentTargetRactorGUID != CurrentTarget.RActorGuid)
+                    if (LastTargetRactorGUID != CurrentTarget.RActorGuid)
                     {
                         RecordTargetHistory();
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Found New Target {0} dist={1} IsElite={2} Radius={3}",
@@ -350,10 +352,10 @@ namespace Trinity
 
                 // Blank current/last/next targets
                 LastPrimaryTargetPosition = CurrentTarget != null ? CurrentTarget.Position : Vector3.Zero;
-                vKitePointAvoid = Vector3.Zero;
-                // store current target GUID
-                CurrentTargetRactorGUID = CurrentTarget != null ? CurrentTarget.RActorGuid : -1;
-                CurrentTargetACDGuid = CurrentTarget != null ? CurrentTarget.ACDGuid : -1;
+                KiteAvoidDestination = Vector3.Zero;
+                // store last target GUID
+                LastTargetRactorGUID = CurrentTarget != null ? CurrentTarget.RActorGuid : -1;
+                LastTargetACDGuid = CurrentTarget != null ? CurrentTarget.ACDGuid : -1;
                 //reset current target
                 CurrentTarget = null;
                 // Reset all variables for target-weight finding
@@ -534,22 +536,31 @@ namespace Trinity
                             {
                                 string unitExtras = "";
 
-                                if (c_ObjectType == GObjectType.Unit)
+                                switch (c_ObjectType)
                                 {
-                                    if (c_unit_IsElite)
-                                        unitExtras += " IsElite";
+                                    case GObjectType.Unit:
+                                        {
+                                            if (c_unit_IsElite)
+                                                unitExtras += " IsElite";
 
-                                    if (c_unit_HasShieldAffix)
-                                        unitExtras += " HasAffixShielded";
+                                            if (c_unit_HasShieldAffix)
+                                                unitExtras += " HasAffixShielded";
 
-                                    if (c_HasDotDPS)
-                                        unitExtras += " HasDotDPS";
+                                            if (c_HasDotDPS)
+                                                unitExtras += " HasDotDPS";
 
-                                    if (c_HasBeenInLoS)
-                                        unitExtras += " HasBeenInLoS";
+                                            if (c_HasBeenInLoS)
+                                                unitExtras += " HasBeenInLoS";
 
-                                    unitExtras += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
+                                            unitExtras += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
+                                        } break;
+                                    case GObjectType.Avoidance:
+                                        {
+                                            unitExtras += " Ro:" + c_Rotation.ToString("0.00");
+                                            break;
+                                        }
                                 }
+                                
                                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                     "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0} RAGuid: {13} {14}",
                                     duration,

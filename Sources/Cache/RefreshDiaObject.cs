@@ -745,7 +745,7 @@ namespace Trinity
             try
             {
                 // Everything except items and the current target
-                if (c_ObjectType != GObjectType.Item && c_RActorGuid != CurrentTargetRactorGUID && c_ObjectType != GObjectType.Unknown)
+                if (c_ObjectType != GObjectType.Item && c_RActorGuid != LastTargetRactorGUID && c_ObjectType != GObjectType.Unknown)
                 {
                     if (c_CentreDistance < 125)
                     {
@@ -897,7 +897,7 @@ namespace Trinity
                         c_IgnoreSubStep = "";
                     }
                     // always take the current target even if not in LoS
-                    if (c_RActorGuid == CurrentTargetRactorGUID)
+                    if (c_RActorGuid == LastTargetRactorGUID)
                     {
                         AddToCache = true;
                         c_IgnoreSubStep = "";
@@ -1068,7 +1068,7 @@ namespace Trinity
         {
             c_ZDiff = c_diaObject.ZDiff;
             // always take current target regardless if ZDiff changed
-            if (c_RActorGuid == CurrentTargetRactorGUID)
+            if (c_RActorGuid == LastTargetRactorGUID)
             {
                 AddToCache = true;
                 return AddToCache;

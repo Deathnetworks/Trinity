@@ -75,19 +75,18 @@ namespace Trinity
             bool hasVengefulSpirit = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 4);
             bool hasSwallowYourSoul = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 3);
 
-            
+
 
             // Soul Harvest Any Elites or 2+ Norms and baby it's harvest season
             if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_SoulHarvest) && !Player.IsIncapacitated && Player.PrimaryResource >= 59 &&
-                (TargetUtil.AnyMobsInRange(16f, GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) + 1, false) || (hasSwallowYourSoul && Player.PrimaryResourcePct <= 0.50))
-                || TargetUtil.IsEliteTargetInRange(16f))
+                (TargetUtil.AnyMobsInRange(16f, GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) + 1, false) || (hasSwallowYourSoul && Player.PrimaryResourcePct <= 0.50) || TargetUtil.IsEliteTargetInRange(16f)))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
 
             // Soul Harvest with VengefulSpirit
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Witchdoctor_SoulHarvest) && hasVengefulSpirit && Player.PrimaryResource >= 59
-                && TargetUtil.AnyMobsInRange(16, 3) && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4 && PowerManager.CanCast(SNOPower.Witchdoctor_SoulHarvest))
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_SoulHarvest) && hasVengefulSpirit && Player.PrimaryResource >= 59
+                && TargetUtil.AnyMobsInRange(16, 3) && GetBuffStacks(SNOPower.Witchdoctor_SoulHarvest) <= 4)
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
@@ -324,6 +323,19 @@ namespace Trinity
                     bestClusterPoint = TargetUtil.GetBestClusterPoint(15f, 30f);
 
                 return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, acidCloudRange, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+            }
+
+            bool hasWellOfSouls = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 1);
+            bool hasRushOfEssence = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_RushOfEssence);
+
+            // Spirit Barrage + Rush of Essence
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Witchdoctor_SpiritBarrage) && !Player.IsIncapacitated && Player.PrimaryResource >= 108 &&
+                hasRushOfEssence && Player.PrimaryResourcePct <= 0.25 && !hasManitou)
+            {
+                if (hasWellOfSouls)
+                    return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 2, 2);
+
+                return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
             }
 
             // Zombie Charger backup
