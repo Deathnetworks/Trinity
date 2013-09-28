@@ -1,61 +1,95 @@
 ﻿
 # Trinity
 
+### Changelog 1.7.3.7
+
+* Monk: DualGen/TriGen + Exploding Palm builds now work 
+
+* Barbarian: Rend no longer cast out of range 
+
+* Added avoidance radius/health sliders for Grotesque 
+
+* Added "Always kill elites below % health" slider (thanks to zorked for the idea) 
+
+* Barbarian: Rend tweaked - now always forces minimum delay of TVar value (default: 1000msec) 
+
+* Monk: Fixed sweeping wind stuck stuff 
+
+* WitchDoctor: Soul Harvest now used based on current buff stack 
+
+* WitchDoctor: Fixed wrong TargetUtil function 
+
+* Reduced Weighting multiplier for monster custom weights 
+
+* Cleaned up townrun a bit from old code 
+
+* Fixed settings not being loaded 
+
+* Fixed exception in GroupHotSpot 
+
+* Fixed crash in TVars 
+
+* Fixed Grotesque avoidance/health to AvoidanceManager bug 
+
+* Fixed IsInTown to emergency durability leave game bug 
+
+* Adjusted Weight/Priority down on interactables 
+
 ### Changelog 1.7.3.6
 
 #### Combat
 
-Barbarian: Whirlwind will now path into health globes if needed
+* Barbarian: Whirlwind will now path into health globes if needed
 
-Barbarian: Added WOTB Poison Tree (100%) and Belial (100%) AoE health (non) modifications & variables.
+* Barbarian: Added WOTB Poison Tree (100%) and Belial (100%) AoE health (non) modifications & variables.
 
-Barbarian: HOTA on Elites is now used only if there's not 3 trash mobs in our immediate melee range
+* Barbarian: HOTA on Elites is now used only if there's not 3 trash mobs in our immediate melee range
 
-Barbarian: Tuned up Barbarian Rend Parameters, should now use more liberally
+* Barbarian: Tuned up Barbarian Rend Parameters, should now use more liberally
 
-Barbarian: Added Poison Spore, Belial and Beast Charge WOTB Avoidance Helth Modifiers
+* Barbarian: Added Poison Spore, Belial and Beast Charge WOTB Avoidance Helth Modifiers
 
-Monk: Fixed Sweeping Wind not casting on trash mobs
+* Monk: Fixed Sweeping Wind not casting on trash mobs
 
-DemonHunter: Reorder spell priorities (Sentry Turrent + Caltrops have higher priority)
+* DemonHunter: Reorder spell priorities (Sentry Turrent + Caltrops have higher priority)
 
-DemonHunter: Now using dogmeat's use ranges and mob counts (Strafe, Grenades,etc)
+* DemonHunter: Now using dogmeat's use ranges and mob counts (Strafe, Grenades,etc)
 
-DemonHunter: Added Preparation Punishment rune support
+* DemonHunter: Added Preparation Punishment rune support
 
-DemonHunter: Combat Vault now uses an intelligent "Kite" point instead of just "backwards"
+* DemonHunter: Combat Vault now uses an intelligent "Kite" point instead of just "backwards"
 
-DemonHunter: Upgraded spell checks to use CombatBase.CanCast and TargetUtil, and removed redundant logic checks
+* DemonHunter: Upgraded spell checks to use CombatBase.CanCast and TargetUtil, and removed redundant logic checks
 
-DemonHunter: ShadowPower is now used on low health (50%)
+* DemonHunter: ShadowPower is now used on low health (50%)
 
-Combat > Misc: Added Options for Ignore Trash  Mob below Health Percent (15% default) and Ignore Trash Below Health Percent with DoT applied (50%). Credits to tesslerc for the idea.
+* Combat > Misc: Added Options for Ignore Trash  Mob below Health Percent (15% default) and Ignore Trash Below Health Percent with DoT applied (50%). Credits to tesslerc for the idea.
 
-BIG re-working of weights. Spent a few hours looking at weights and priorities of the bot for units.
+* BIG re-working of weights. Spent a few hours looking at weights and priorities of the bot for units.
 
-Fixed attacking Shielded units when we shouldn't
+* Fixed attacking Shielded units when we shouldn't
 
-Trinity should be better about not trying to attack monsters behind other monsters (AoE/Cluster spells not included)
+* Trinity should be better about not trying to attack monsters behind other monsters (AoE/Cluster spells not included)
 
 #### Avoidance
 
-Added experimental fire chains avoidance; check Combat > Misc for enable/disable
+* Added experimental fire chains avoidance; check Combat > Misc for enable/disable
 
-Added experimental Savage Beast charger avoidance; check Combat > Misc for enable/disable
+* Added experimental Savage Beast charger avoidance; check Combat > Misc for enable/disable
 
 #### Misc
 
-Trinity Variables Window is now sorted automatically
+* Trinity Variables Window is now sorted automatically
 
-Added emergency leave game on 0% item durability (for when when we keep spawning and dying repeatedly)
+* Added emergency leave game on 0% item durability (for when when we keep spawning and dying repeatedly)
 
-Refactored all "AnythingWithinRange" and "ElitesWithinRange" to use TargetUtil methods
+* Refactored all "AnythingWithinRange" and "ElitesWithinRange" to use TargetUtil methods
 
-Added AnyTrashInRange function to TargetUtil
+* Added AnyTrashInRange function to TargetUtil
 
-Fixed crash on "Test Scoring" button and to actually produce ItemRules results
+* Fixed crash on "Test Scoring" button and to actually produce ItemRules results
 
-Reloading item rules and sorting the stash should no longer crash Demonbuddy
+* Reloading item rules and sorting the stash should no longer crash Demonbuddy
 
 ### Changelog 1.7.3.5
 
