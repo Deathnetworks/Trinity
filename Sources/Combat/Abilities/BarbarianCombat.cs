@@ -182,6 +182,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return
+                    Hotbar.Contains(SNOPower.Barbarian_Earthquake) &&
                     !UseOOCBuff &&
                     !IsCurrentlyAvoiding &&
                     !CanCast(SNOPower.Barbarian_Earthquake) &&
@@ -216,6 +217,7 @@ namespace Trinity.Combat.Abilities
                     (WOTBGoblins || WOTBElitesPresent);
 
                 return
+                    Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) &&
                     !UseOOCBuff &&
                     !IsCurrentlyAvoiding &&
                     Player.PrimaryResource <= 50 &&
@@ -304,6 +306,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return
+                    Hotbar.Contains(SNOPower.Barbarian_CallOfTheAncients) &&
                     !UseOOCBuff &&
                     !IsCurrentlyAvoiding &&
                     !CanCast(SNOPower.Barbarian_CallOfTheAncients) &&
@@ -341,7 +344,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return
-                UseOOCBuff &&
+                Settings.Combat.Barbarian.UseSprintOOC &&
                 AllowSprintOOC &&
                 !Player.IsIncapacitated &&
                 CanCast(SNOPower.Barbarian_Sprint) &&

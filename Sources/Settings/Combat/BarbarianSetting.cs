@@ -51,6 +51,9 @@ namespace Trinity.Config.Combat
         private bool _IgnoreGoldInWOTB;
         private float _MinHotaHealth;
         private BarbarianWOTBMode _WOTBMode;
+        private bool _UseSprintOOC;
+        private bool _UseLeapOOC;
+        private bool _UseChargeOOC;
         #endregion Fields
 
         #region Events
@@ -860,6 +863,60 @@ namespace Trinity.Config.Combat
             }
         }
 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseLeapOOC
+        {
+            get
+            {
+                return _UseLeapOOC;
+            }
+            set
+            {
+                if (_UseLeapOOC != value)
+                {
+                    _UseLeapOOC = value;
+                    OnPropertyChanged("UseLeapOOC");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseSprintOOC
+        {
+            get
+            {
+                return _UseSprintOOC;
+            }
+            set
+            {
+                if (_UseSprintOOC != value)
+                {
+                    _UseSprintOOC = value;
+                    OnPropertyChanged("UseSprintOOC");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool UseChargeOOC
+        {
+            get
+            {
+                return _UseChargeOOC;
+            }
+            set
+            {
+                if (_UseChargeOOC != value)
+                {
+                    _UseChargeOOC = value;
+                    OnPropertyChanged("UseChargeOOC");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -897,14 +954,17 @@ namespace Trinity.Config.Combat
         [OnDeserializing()]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this._TargetBasedZigZag = true;
-            this._AvoidSuccubusStarHealth = 0.7f;
-            this._MinThreatShoutMobCount = 1;
-            this._ThreatShoutOOC = true;
-            this._IgnoreAvoidanceInWOTB = true;
-            this._IgnoreGoldInWOTB = true;
-            this._MinHotaHealth = 0.40f;
-            this._WOTBMode = BarbarianWOTBMode.Normal;
+            this.TargetBasedZigZag = true;
+            this.AvoidSuccubusStarHealth = 0.7f;
+            this.MinThreatShoutMobCount = 1;
+            this.ThreatShoutOOC = true;
+            this.IgnoreAvoidanceInWOTB = true;
+            this.IgnoreGoldInWOTB = true;
+            this.MinHotaHealth = 0.40f;
+            this.WOTBMode = BarbarianWOTBMode.Normal;
+            this.UseLeapOOC = true;
+            this.UseSprintOOC = true;
+            this.UseChargeOOC = true;
         }
 
         /// <summary>
@@ -916,8 +976,8 @@ namespace Trinity.Config.Combat
         {
             if (this._WOTBHardOnly)
             {
-                this._WOTBMode = BarbarianWOTBMode.HardElitesOnly;
-                this._WOTBHardOnly = false;
+                this.WOTBMode = BarbarianWOTBMode.HardElitesOnly;
+                this.WOTBHardOnly = false;
                 this.AvoidGrotesqueHealth = 1;
             }
         }

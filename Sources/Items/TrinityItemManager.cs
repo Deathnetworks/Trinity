@@ -9,19 +9,15 @@ namespace Trinity
 {
     public class TrinityItemManager : ItemManager
     {
-        public TrinityItemManager()
-        {
+        private RuleTypePriority _priority;
 
-        }
-
-        private RuleTypePriority _priority = null;
         public override RuleTypePriority Priority
         {
             get
             {
                 if (_priority == null)
                 {
-                    _priority = new RuleTypePriority()
+                    _priority = new RuleTypePriority
                     {
                         Priority1 = ItemEvaluationType.Keep,
                         Priority2 = ItemEvaluationType.Salvage,
@@ -34,9 +30,9 @@ namespace Trinity
 
         public override bool EvaluateItem(ACDItem item, ItemEvaluationType evaluationType)
         {
-            if (Trinity.Settings.Loot.ItemFilterMode != global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
+            if (Trinity.Settings.Loot.ItemFilterMode != ItemFilterMode.DemonBuddy)
             {
-                LootRuleItemManager.Current.EvaluateItem(item, evaluationType);
+                Current.EvaluateItem(item, evaluationType);
             }
             else
             {
@@ -61,23 +57,19 @@ namespace Trinity
         public bool ShouldSalvageItem(ACDItem item, ItemEvaluationType evaluationType)
         {
             ItemEvents.ResetTownRun();
-           
-            if (ItemManager.Current.ItemIsProtected(item))
+
+            if (Current.ItemIsProtected(item))
                 return false;
 
-            if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
+            if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
             {
-                return ItemManager.Current.ShouldSalvageItem(item);
+                return Current.ShouldSalvageItem(item);
             }
-            else if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.TrinityWithItemRules)
+            if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
                 return ItemRulesSalvageSell(item, evaluationType);
             }
-            else
-            {
-                return TrinitySalvage(item);
-            }
-
+            return TrinitySalvage(item);
         }
 
         public override bool ShouldSellItem(ACDItem item)
@@ -91,22 +83,18 @@ namespace Trinity
 
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
 
-            if (ItemManager.Current.ItemIsProtected(cItem.AcdItem))
+            if (Current.ItemIsProtected(cItem.AcdItem))
                 return false;
 
-            if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
+            if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
             {
-                return ItemManager.Current.ShouldSellItem(item);
+                return Current.ShouldSellItem(item);
             }
-            else if (Trinity.Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.TrinityWithItemRules)
+            if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
                 return ItemRulesSalvageSell(item, evaluationType);
             }
-            else
-            {
-                return TrinitySell(item);
-            }
-
+            return TrinitySell(item);
         }
 
         public override bool ShouldStashItem(ACDItem item)
@@ -118,7 +106,7 @@ namespace Trinity
         {
             ItemEvents.ResetTownRun();
 
-            if (ItemManager.Current.ItemIsProtected(item))
+            if (Current.ItemIsProtected(item))
                 return false;
 
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
@@ -195,10 +183,10 @@ namespace Trinity
             if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
                 Interpreter.InterpreterAction action = Trinity.StashRule.checkItem(item, evaluationType);
-                
+
                 if (evaluationType == ItemEvaluationType.Keep)
 
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
+                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
                 switch (action)
                 {
                     case Interpreter.InterpreterAction.KEEP:
@@ -212,9 +200,9 @@ namespace Trinity
 
             // auto trash blue weapons/armor/jewlery
             if ((item.ItemBaseType == ItemBaseType.Armor
-                || item.ItemBaseType == ItemBaseType.Weapon
-                || item.ItemBaseType == ItemBaseType.Jewelry)
-                   && item.ItemQualityLevel < ItemQuality.Rare4)
+                 || item.ItemBaseType == ItemBaseType.Weapon
+                 || item.ItemBaseType == ItemBaseType.Jewelry)
+                && item.ItemQualityLevel < ItemQuality.Rare4)
             {
                 return false;
             }
@@ -239,22 +227,22 @@ namespace Trinity
 
             if (evaluationType == ItemEvaluationType.Keep)
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, trinityItemType, iMyScore);
-            if (iMyScore >= iNeedScore) return true;
+            if (iMyScore >= iNeedScore)
+                return true;
 
             // If we reached this point, then we found no reason to keep the item!
             return false;
-
         }
 
         private bool ItemRulesSalvageSell(ACDItem item, ItemEvaluationType evaluationType)
         {
             ItemEvents.ResetTownRun();
             if (!item.IsPotion)
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation,
-                "Incoming {0} Request: {1}, {2}, {3}, {4}, {5}",
-                evaluationType, item.ItemQualityLevel, item.Level, item.ItemBaseType,
-                item.ItemType, item.IsOneHand ? "1H" : item.IsTwoHand ? "2H" : "NH");
-            
+                Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation,
+                    "Incoming {0} Request: {1}, {2}, {3}, {4}, {5}",
+                    evaluationType, item.ItemQualityLevel, item.Level, item.ItemBaseType,
+                    item.ItemType, item.IsOneHand ? "1H" : item.IsTwoHand ? "2H" : "NH");
+
             Interpreter.InterpreterAction action = Trinity.StashRule.checkItem(item, ItemEvaluationType.Salvage);
             switch (action)
             {
@@ -328,8 +316,7 @@ namespace Trinity
                 case GItemBaseType.Misc:
                     if (cItem.TrinityItemType == GItemType.CraftingPlan)
                         return true;
-                    else
-                        return false;
+                    return false;
                 case GItemBaseType.Unknown:
                     return false;
             }
@@ -343,16 +330,15 @@ namespace Trinity
             {
                 return Trinity.Settings.Loot.TownRun.SalvageBlueItemOption;
             }
-            else if (quality >= ItemQuality.Rare4 && quality <= ItemQuality.Rare6)
+            if (quality >= ItemQuality.Rare4 && quality <= ItemQuality.Rare6)
             {
                 return Trinity.Settings.Loot.TownRun.SalvageYellowItemOption;
             }
-            else if (quality >= ItemQuality.Legendary)
+            if (quality >= ItemQuality.Legendary)
             {
                 return Trinity.Settings.Loot.TownRun.SalvageLegendaryItemOption;
             }
             return SalvageOption.None;
         }
-
     }
 }

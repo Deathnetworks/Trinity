@@ -41,6 +41,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\db\Demonbuddy.exe</HintPath>
     </Reference>
+    <Reference Include="GreyMagic">
+      <HintPath>..\..\..\db\GreyMagic.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />

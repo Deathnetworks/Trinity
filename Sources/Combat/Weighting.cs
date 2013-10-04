@@ -32,7 +32,7 @@ namespace Trinity
                 // Store if we are ignoring all units this cycle or not
                 bool ignoreAllUnits = !XmlTags.TrinityTownPortal.ForceClearArea && !AnyElitesPresent && !AnyMobsInRange && noGoblinsPresent && Player.CurrentHealthPct >= 0.85d;
 
-                bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || MovementSpeed < 1 || ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 5f) >= 3);
+                bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || MovementSpeed < 1 || ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 10f) >= 3 || Player.CurrentHealthPct <= 0.25);
 
                 bool hasWrathOfTheBerserker = Player.ActorClass == ActorClass.Barbarian && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
 
@@ -236,8 +236,8 @@ namespace Trinity
                                         int extraPriority;
                                         if (DataDictionary.MonsterCustomWeights.TryGetValue(cacheObject.ActorSNO, out extraPriority))
                                         {
-                                            // adding a constant multiple of 3 to all weights here (e.g. 999 becomes 2997)
-                                            cacheObject.Weight += extraPriority * 3d;
+                                            // adding a constant multiple of 3 to all weights here (e.g. 999 becomes 1998)
+                                            cacheObject.Weight += extraPriority * 2d;
                                         }
 
                                         // Close range get higher weights the more of them there are, to prevent body-blocking
@@ -515,7 +515,7 @@ namespace Trinity
                             }
                         case GObjectType.HealthWell:
                             {
-                                if (MonsterObstacleCache.Any(unit => MathUtil.IntersectsPath(unit.Location, unit.Radius, Player.Position, cacheObject.Position)))
+                                if (!MonsterObstacleCache.Any(unit => MathUtil.IntersectsPath(unit.Location, unit.Radius, Player.Position, cacheObject.Position)))
                                 {
                                     // As a percentage of health with typical maximum weight
                                     cacheObject.Weight = 50000d * (1 - Trinity.Player.CurrentHealthPct);

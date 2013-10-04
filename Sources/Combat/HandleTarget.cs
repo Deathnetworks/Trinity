@@ -907,8 +907,6 @@ namespace Trinity
             return runStatus;
         }
 
-        private static Stack<KeyValuePair<int, DateTime>> BlackListStack = new Stack<KeyValuePair<int, DateTime>>(20);
-
         /// <summary>
         /// Handles target blacklist assignment if necessary, used for all targets (units/gold/items/interactables)
         /// </summary>
@@ -1250,7 +1248,10 @@ namespace Trinity
         private static void UpdateStatusTextTarget(bool targetIsInRange)
         {
             StringBuilder statusText = new StringBuilder();
-            switch (CurrentTarget.Type)
+            if (!targetIsInRange)
+                statusText.Append("Moveto ");
+            else 
+                switch (CurrentTarget.Type)
             {
                 case GObjectType.Avoidance:
                     statusText.Append("Avoid ");
@@ -1283,10 +1284,20 @@ namespace Trinity
             }
             statusText.Append("Target=");
             statusText.Append(CurrentTarget.InternalName);
-            statusText.Append(" {");
-            statusText.Append(CurrentTarget.ActorSNO);
-            statusText.Append("} ");
-            statusText.Append("Type=");
+            if (CurrentTarget.Type == GObjectType.Unit && CombatBase.CurrentPower.SNOPower != SNOPower.None)
+            {
+                statusText.Append(" Power=");
+                statusText.Append(CombatBase.CurrentPower.SNOPower);
+                //statusText.Append(" (range ");
+                //statusText.Append(TargetRangeRequired);
+                //statusText.Append(")");
+            }
+            //statusText.Append(" {");
+            //statusText.Append(CurrentTarget.ActorSNO);
+            //statusText.Append("} ");
+            statusText.Append(" Weight=");
+            statusText.Append(CurrentTarget.Weight.ToString("0"));
+            statusText.Append(" Type=");
             statusText.Append(CurrentTarget.Type);
             statusText.Append(" C-Dist=");
             statusText.Append(CurrentTarget.CentreDistance.ToString("0.0"));
@@ -1304,27 +1315,14 @@ namespace Trinity
             statusText.Append((Player.PrimaryResource).ToString("0"));
             statusText.Append(" InLoS=");
             statusText.Append(CurrentTargetIsInLoS);
-            statusText.Append(" ");
-            if (CurrentTarget.Type == GObjectType.Unit && CombatBase.CurrentPower.SNOPower != SNOPower.None)
-            {
-                statusText.Append("Power=");
-                statusText.Append(CombatBase.CurrentPower.SNOPower);
-                statusText.Append(" (range ");
-                statusText.Append(TargetRangeRequired);
-                statusText.Append(") ");
-            }
-            statusText.Append("Weight=");
-            statusText.Append(CurrentTarget.Weight.ToString("0"));
             statusText.Append(" RAGuid=");
             statusText.Append(CurrentTarget.RActorGuid);
 
             statusText.Append(String.Format(" Duration={0:0}", DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds));
 
-            if (!targetIsInRange)
-                statusText.Append(" MOVING INTO RANGE");
             if (Settings.Advanced.DebugInStatusBar)
             {
-                sStatusText = "[Trinity] " + statusText.ToString();
+                sStatusText = statusText.ToString();
                 BotMain.StatusText = sStatusText;
             }
             if (lastStatusText != statusText.ToString())

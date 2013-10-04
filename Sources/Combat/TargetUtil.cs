@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Web.Profile;
-using MainDev.RemoteASM.Handlers;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Technicals;

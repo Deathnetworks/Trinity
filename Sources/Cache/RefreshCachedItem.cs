@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using Trinity.Cache;
+using Trinity.Config.Loot;
 using Trinity.Technicals;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
@@ -21,7 +21,7 @@ namespace Trinity
                 c_IgnoreSubStep = "InvalidBalanceID";
             }
 
-            DiaItem item = c_diaObject as DiaItem;
+            var item = c_diaObject as DiaItem;
             c_ItemQuality = item.CommonData.ItemQualityLevel;
 
             float fExtraRange = 0f;
@@ -58,7 +58,7 @@ namespace Trinity
             c_IsTwoHandedItem = item.CommonData.IsTwoHand;
             c_item_tFollowerType = item.CommonData.FollowerSpecialType;
 
-            PickupItem pickupItem = new PickupItem()
+            var pickupItem = new PickupItem
             {
                 Name = c_ItemDisplayName,
                 InternalName = c_InternalName,
@@ -96,15 +96,21 @@ namespace Trinity
             // Get whether or not we want this item, cached if possible
             if (!pickupItemCache.TryGetValue(c_RActorGuid, out AddToCache))
             {
-                if (Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
+                if (Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
                 {
-                    AddToCache = ItemManager.Current.ShouldPickUpItem((ACDItem)c_CommonData);
+                    AddToCache = ItemManager.Current.ShouldPickUpItem((ACDItem) c_CommonData);
                 }
-                else if (Settings.Loot.ItemFilterMode == global::Trinity.Config.Loot.ItemFilterMode.TrinityWithItemRules)
+                else if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
                 {
                     AddToCache = ItemRulesPickupValidation(pickupItem);
                 }
                 else
+                {
+                    AddToCache = PickupItemValidation(pickupItem);
+                }
+
+                // Pickup low level enabled, and we're a low level
+                if (!AddToCache && Settings.Loot.Pickup.PickupLowLevel && Player.Level <= 10)
                 {
                     AddToCache = PickupItemValidation(pickupItem);
                 }
@@ -125,6 +131,7 @@ namespace Trinity
 
             return AddToCache;
         }
+
         private static void LogDroppedItem()
         {
             string droppedItemLogPath = Path.Combine(FileManager.TrinityLogsPath, String.Format("ItemsDropped.csv"));
@@ -133,9 +140,9 @@ namespace Trinity
             pickupItemCache.TryGetValue(c_RActorGuid, out pickupItem);
 
             bool writeHeader = !File.Exists(droppedItemLogPath);
-            using (StreamWriter LogWriter = new StreamWriter(droppedItemLogPath, true))
+            using (var LogWriter = new StreamWriter(droppedItemLogPath, true))
             {
-                if (writeHeader) 
+                if (writeHeader)
                 {
                     LogWriter.WriteLine("Timestamp,ActorSNO,RActorGUID,DyanmicID,GameBalanceID,ACDGuid,Name,InternalName,DBBaseType,TBaseType,DBItemType,TItemType,Quality,Level,IgnoreItemSubStep,Distance,Pickup,SHA1Hash");
                 }
@@ -160,8 +167,8 @@ namespace Trinity
                 LogWriter.Write(FormatCSVField(c_ItemMd5Hash));
                 LogWriter.Write("\n");
             }
-
         }
+
         private static bool RefreshGold(bool AddToCache)
         {
             //int rangedMinimumStackSize = 0;
@@ -180,7 +187,7 @@ namespace Trinity
             {
                 try
                 {
-                    c_GoldStackSize = ((ACDItem)c_CommonData).Gold;
+                    c_GoldStackSize = ((ACDItem) c_CommonData).Gold;
                 }
                 catch
                 {
@@ -219,7 +226,7 @@ namespace Trinity
             string skippedItemsPath = Path.Combine(FileManager.LoggingPath, String.Format("SkippedGoldStacks_{0}_{1}.csv", Player.ActorClass, DateTime.Now.ToString("yyyy-MM-dd")));
 
             bool writeHeader = !File.Exists(skippedItemsPath);
-            using (StreamWriter LogWriter = new StreamWriter(skippedItemsPath, true))
+            using (var LogWriter = new StreamWriter(skippedItemsPath, true))
             {
                 if (writeHeader)
                 {
@@ -235,7 +242,6 @@ namespace Trinity
                 LogWriter.Write(FormatCSVField(c_CentreDistance));
                 LogWriter.Write("\n");
             }
-
         }
 
         private static string FormatCSVField(DateTime time)
@@ -247,14 +253,17 @@ namespace Trinity
         {
             return String.Format("\"{0}\",", text);
         }
+
         private static string FormatCSVField(int number)
         {
             return String.Format("\"{0}\",", number);
         }
+
         private static string FormatCSVField(double number)
         {
             return String.Format("\"{0:0}\",", number);
         }
+
         private static string FormatCSVField(bool value)
         {
             return String.Format("\"{0}\",", value);

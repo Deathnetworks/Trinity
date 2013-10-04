@@ -534,7 +534,7 @@ namespace Trinity.DbProvider
                 }
 
                 // Leap movement for a barb
-                if (Trinity.Hotbar.Contains(SNOPower.Barbarian_Leap) &&
+                if (Trinity.Settings.Combat.Barbarian.UseLeapOOC && Trinity.Hotbar.Contains(SNOPower.Barbarian_Leap) &&
                     DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Barbarian_Leap]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_Leap) &&
                     DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Barbarian_Leap) && !ShrinesInArea(vMoveToTarget))
@@ -549,7 +549,7 @@ namespace Trinity.DbProvider
                     return;
                 }
                 // Furious Charge movement for a barb
-                if (Trinity.Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) && !bTooMuchZChange &&
+                if (Trinity.Settings.Combat.Barbarian.UseChargeOOC && Trinity.Hotbar.Contains(SNOPower.Barbarian_FuriousCharge) && !bTooMuchZChange &&
                     DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Barbarian_FuriousCharge]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_FuriousCharge) &&
                     DestinationDistance >= 20f &&
                     PowerManager.CanCast(SNOPower.Barbarian_FuriousCharge) && !ShrinesInArea(vMoveToTarget))

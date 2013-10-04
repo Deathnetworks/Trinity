@@ -120,6 +120,9 @@
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.FuryDumpAlways}" ToolTip="Spam Sprint when at max fury">Fury Dump always</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.TargetBasedZigZag}" ToolTip="Uses Monster positions as WW points instead of random XYZ">Multi-Target Based ZigZag</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.ThreatShoutOOC}" ToolTip="Use Threating Shout Out of Combat to generate Fury">Use Threating Shout OOC</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseLeapOOC}" ToolTip="Leap Out Of Combat">Leap OOC</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseSprintOOC}" ToolTip="Sprint Out Of Combat">Sprint OOC</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseChargeOOC}" ToolTip="Sprint Out Of Combat">Furious Charge OOC</CheckBox>
             </UniformGrid>
         </Grid>
         <Grid Grid.Row="3" Margin="2">

@@ -93,7 +93,7 @@ namespace Trinity
             BotMain.OnStart += TrinityBotStart;
             BotMain.OnStop += TrinityBotStop;
 
-            SetWindowTitle();
+            //SetWindowTitle();
 
             if (!Directory.Exists(FileManager.PluginPath))
             {
