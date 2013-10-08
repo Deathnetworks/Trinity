@@ -515,11 +515,24 @@ namespace Trinity
                             }
                         case GObjectType.HealthWell:
                             {
-                                if (!MonsterObstacleCache.Any(unit => MathUtil.IntersectsPath(unit.Location, unit.Radius, Player.Position, cacheObject.Position)))
-                                {
-                                    // As a percentage of health with typical maximum weight
-                                    cacheObject.Weight = 50000d * (1 - Trinity.Player.CurrentHealthPct);
-                                }
+                                if (!Settings.WorldObject.UseShrine)
+                                    break;
+
+                                if (MonsterObstacleCache.Any(unit => MathUtil.IntersectsPath(unit.Location, unit.Radius, Player.Position, cacheObject.Position)))
+                                    break;
+
+                                if (AvoidanceObstacleCache.Any(aoe => MathUtil.IntersectsPath(aoe.Location, aoe.Radius, Player.Position, cacheObject.Position)))
+                                    break;
+
+                                if (prioritizeCloseRangeUnits)
+                                    break;
+
+                                if (MovementSpeed < 1)
+                                    break;
+
+                                // As a percentage of health with typical maximum weight
+                                cacheObject.Weight = 50000d * (1 - Trinity.Player.CurrentHealthPct);
+
                                 break;
                             }
                         case GObjectType.Shrine:

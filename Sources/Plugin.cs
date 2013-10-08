@@ -44,40 +44,37 @@ namespace Trinity
         /// </summary>
         public void OnPulse()
         {
-            using (ZetaDia.Memory.AcquireFrame())
+            using (new PerformanceLogger("OnPulse"))
             {
-                using (new PerformanceLogger("OnPulse"))
+                try
                 {
-                    try
+                    if (ZetaDia.Me == null)
+                        return;
+
+                    if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
+                        return;
+
+                    GameUI.SafeClickUIButtons();
+
+                    // See if we should update the stats file
+                    if (DateTime.Now.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
                     {
-                        if (ZetaDia.Me == null)
-                            return;
-
-                        if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
-                            return;
-
-                        GameUI.SafeClickUIButtons();
-
-                        // See if we should update the stats file
-                        if (DateTime.Now.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
-                        {
-                            ItemStatsLastPostedReport = DateTime.Now;
-                            OutputReport();
-                        }
-
-                        // Recording of all the XML's in use this run
-                        UsedProfileManager.RecordProfile();
-
-                        Monk_MaintainTempestRush();
+                        ItemStatsLastPostedReport = DateTime.Now;
+                        OutputReport();
                     }
-                    catch (System.AccessViolationException)
-                    {
-                        // woof! 
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Log(LogCategory.UserInformation, "Exception in Pulse: {0}", ex.ToString());
-                    }
+
+                    // Recording of all the XML's in use this run
+                    UsedProfileManager.RecordProfile();
+
+                    Monk_MaintainTempestRush();
+                }
+                catch (System.AccessViolationException)
+                {
+                    // woof! 
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(LogCategory.UserInformation, "Exception in Pulse: {0}", ex.ToString());
                 }
             }
         }

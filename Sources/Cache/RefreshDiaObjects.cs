@@ -46,22 +46,20 @@ namespace Trinity
                     GenericCache.MaintainCache();
                     GenericBlacklist.MaintainBlacklist();
 
-                    using (ZetaDia.Memory.AcquireFrame())
+                    // Update player-data cache, including buffs
+                    PlayerInfoCache.UpdateCachedPlayerData();
+
+                    if (Player.CurrentHealthPct <= 0)
                     {
-                        // Update player-data cache, including buffs
-                        PlayerInfoCache.UpdateCachedPlayerData();
-
-                        if (Player.CurrentHealthPct <= 0)
-                        {
-                            return false;
-                        }
-
-                        RefreshCacheInit();
-
-                        // Now pull up all the data and store anything we want to handle in the super special cache list
-                        // Also use many cache dictionaries to minimize DB<->D3 memory hits, and speed everything up a lot
-                        RefreshCacheMainLoop();
+                        return false;
                     }
+
+                    RefreshCacheInit();
+
+                    // Now pull up all the data and store anything we want to handle in the super special cache list
+                    // Also use many cache dictionaries to minimize DB<->D3 memory hits, and speed everything up a lot
+                    RefreshCacheMainLoop();
+
                 }
 
                 // Add Team HotSpots to the cache
@@ -75,7 +73,7 @@ namespace Trinity
                     {
                         foreach (var unit2 in ObjectCache.Where(u => u.MonsterAffixes.HasFlag(MonsterAffixes.FireChains)).Where(unit2 => unit1.RActorGuid != unit2.RActorGuid))
                         {
-                            for (float i = 0; i <= unit1.Position.Distance2D(unit2.Position); i += (fireChainSize/4))
+                            for (float i = 0; i <= unit1.Position.Distance2D(unit2.Position); i += (fireChainSize / 4))
                             {
                                 Vector3 fireChainSpot = MathEx.CalculatePointFrom(unit1.Position, unit2.Position, i);
 
@@ -560,7 +558,7 @@ namespace Trinity
                                             break;
                                         }
                                 }
-                                
+
                                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                     "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0} RAGuid: {13} {14}",
                                     duration,
