@@ -254,6 +254,7 @@ namespace Trinity
             Set(new TVar("WitchDoctor.MinEnergyReserve", 0, "Witch Doctor Special Minimum Mana reserve"));
             Set(new TVar("WitchDoctor.SpiritWalk.HealingJourneyHealth", 0.65d, "Percent Health Threshold to use Spirit Walk with Healing Journey"));
             Set(new TVar("WitchDoctor.SpiritWalk.HonoredGuestMana", 0.50d, "Percent Mana Threshold to use Spirit Walk with Honored Guest"));
+            Set(new TVar("WitchDoctor.Firebats.MaintainRange", 35f, "Maintain Firebats while any mobs are in this range"));
 
             // Wizard
             Set(new TVar("Wizard.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));

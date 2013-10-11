@@ -281,18 +281,26 @@ namespace Trinity
 
             int fireBatsMana = TimeSinceUse(SNOPower.Witchdoctor_Firebats) < 125 ? 66 : 220;
 
+            bool firebatsMaintain =
+              ObjectCache.Any(u => u.Type == GObjectType.Unit &&
+                  u.IsFacingPlayer && u.Weight > 0 &&
+                  SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Firebats) <= TimeSpan.FromMilliseconds(150d) &&
+                  u.CentreDistance <= V.F("WitchDoctor.Firebats.MaintainRange") &&
+                  u.Unit.Movement.IsMoving);
+
             // Fire Bats:Cloud of bats 
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && hasCloudOfBats && TargetUtil.AnyMobsInRange(8f) &&
-                Hotbar.Contains(SNOPower.Witchdoctor_Firebats) && !Player.IsIncapacitated && Player.PrimaryResource >= fireBatsMana)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && hasCloudOfBats && (TargetUtil.AnyMobsInRange(8f) || firebatsMaintain) &&
+                CombatBase.CanCast(SNOPower.Witchdoctor_Firebats) && Player.PrimaryResource >= fireBatsMana)
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Firebats, Settings.Combat.WitchDoctor.FirebatsRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
             }
 
             // Fire Bats fast-attack
-            if (!UseOOCBuff && !Player.IsIncapacitated && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Witchdoctor_Firebats) && Player.PrimaryResource >= fireBatsMana &&
-                 TargetUtil.AnyMobsInRange(Settings.Combat.WitchDoctor.FirebatsRange) && !hasCloudOfBats)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_Firebats) && Player.PrimaryResource >= fireBatsMana &&
+                 (TargetUtil.AnyMobsInRange(Settings.Combat.WitchDoctor.FirebatsRange) || firebatsMaintain) && !hasCloudOfBats)
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Firebats, Settings.Combat.WitchDoctor.FirebatsRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
+                float range = firebatsMaintain ? Settings.Combat.WitchDoctor.FirebatsRange : V.F("WitchDoctor.Firebats.MaintainRange");
+                return new TrinityPower(SNOPower.Witchdoctor_Firebats, Settings.Combat.WitchDoctor.FirebatsRange, CurrentTarget.Position, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
             }
 
             var acidCloudRange = hasGraveInjustice ? Math.Min(Player.GoldPickupRadius + 8f, 30f) : 30f;
