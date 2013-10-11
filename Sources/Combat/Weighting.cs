@@ -141,11 +141,6 @@ namespace Trinity
                                 // Monster is in cache but not within kill range
                                 if (!cacheObject.IsBoss && cacheObject.RadiusDistance > cacheObject.KillRange)
                                 {
-                                    // monsters near players given higher weight
-                                    foreach (var player in ObjectCache.Where(p => p.Type == GObjectType.Player))
-                                    {
-                                        cacheObject.Weight += Math.Max((15f - cacheObject.Position.Distance2D(player.Position) / 15f * 500d), 10d);
-                                    }
                                     if (cacheObject.Weight <= 0)
                                         break;
                                 }

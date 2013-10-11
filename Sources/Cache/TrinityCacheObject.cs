@@ -50,6 +50,7 @@ namespace Trinity
         public bool IsTrashMob { get { return (this.Type == GObjectType.Unit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         public bool IsAttackable { get; set; }
         public bool HasDotDPS { get; set; }
+        public bool IsMe { get { return RActorGuid == Trinity.Player.RActorGuid; } }
         /// <summary>
         /// Percentage hit points
         /// </summary>

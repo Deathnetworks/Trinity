@@ -224,17 +224,15 @@ namespace Trinity
                 original,
                 new Action(delegate
                 {
-                    Logger.Log("TownRun complete");
-                    Trinity.IsReadyToTownRun = false;
-                    Trinity.ForceVendorRunASAP = false;
-                    TownRunCheckTimer.Reset();
-                    // hax for sending notifications after a town run
-                    if (!BrainBehavior.IsVendoring && !Trinity.Player.IsInTown)
+                    if (!BrainBehavior.IsVendoring)
                     {
+                        Logger.Log("TownRun complete");
+                        Trinity.IsReadyToTownRun = false;
+                        Trinity.ForceVendorRunASAP = false;
+                        TownRunCheckTimer.Reset();
                         SendEmailNotification();
                         SendMobileNotifications();
                     }
-
                     return RunStatus.Success;
                 })
             );
