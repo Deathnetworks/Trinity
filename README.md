@@ -1,6 +1,37 @@
 ﻿
 # Trinity
 
+### Changelog 1.7.3.8
+
+#### Combat:
+
+* WitchDoctor: WitchDoctor is a little better at maintaining firebats channeling now
+
+* WitchDoctor: Upgraded WitchDoctor to use CombatBase.CanCast... hopefully helps fix the "WD derping"!
+
+* WitchDoctor: WitchDoctor: Added Spirit Barage/Rush of Essence
+
+* Barbarian: Added GUI options for Use Leap, Sprint, Furious Charge OOC
+
+* Barbarian: Fixed erroneous Barbarian messages about Call of the Ancients and Earthquake
+
+#### General: 
+
+* (Hopefully) Fixed TownRun / Notifications not being sent
+
+* Fixed Trash Kill Radius not actually working
+
+* Removed all Framelocks for DB Beta
+
+* Added additional checks for HealthWells. UseShrines GUI option now applies to Health Wells too.
+
+* Fixed picking up low level items with ItemRules enabled (now overrides ItemRules if enabled)
+
+* Disabled SetWindowTitle()
+
+* Fixed HotSpots / SimpleFollow causing weird behavior
+
+
 ### Changelog 1.7.3.7
 
 * Monk: DualGen/TriGen + Exploding Palm builds now work 
