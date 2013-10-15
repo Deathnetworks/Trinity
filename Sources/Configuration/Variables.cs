@@ -532,8 +532,6 @@ namespace Trinity
         private static DateTime ForeSight2 = DateTime.Now;
         // Otherthandeadlyreach is used for other spirit generators to track for combination strike buff.
         private static DateTime OtherThanDeadlyReach = DateTime.Now;
-        // Set by sweeping winds or by blinding flash if the time is right for a swap.
-        private static bool WantToSwap = false;
 
         /// <summary>
         /// And a "global cooldown" to prevent non-signature-spells being used too fast

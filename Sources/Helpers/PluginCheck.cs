@@ -136,14 +136,17 @@ namespace Trinity.Helpers
                 return;
             }
 
-            Logger.LogNormal("Stopping bot to install latest routine");
-            BotMain.Stop();
+            System.Windows.Application.Current.Dispatcher.BeginInvoke((System.Action)(() =>
+                {
+                    Logger.LogNormal("Stopping bot to select latest routine");
+                    BotMain.Stop();
 
-            CombatRoutine trinityRoutine = (CombatRoutine)RoutineManager.Routines.FirstOrDefault(r => r.Name == "Trinity");
-            RoutineManager.Current = trinityRoutine;
+                    CombatRoutine trinityRoutine = (CombatRoutine)RoutineManager.Routines.FirstOrDefault(r => r.Name == "Trinity");
+                    RoutineManager.Current = trinityRoutine;
 
-            Logger.LogNormal("Routine installed, starting bot");
-            BotMain.Start();
+                    Logger.LogNormal("Routine selected, starting bot");
+                    BotMain.Start();
+                }));
         }
 
         /// <summary>

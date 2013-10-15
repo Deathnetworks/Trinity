@@ -1,5 +1,4 @@
-﻿// VERSION 1.1.4
-
+﻿// VERSION 1.2.0
 using System;
 using System.Windows;
 using Zeta;

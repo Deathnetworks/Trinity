@@ -326,7 +326,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Updated CurrentTarget HitPoints={0:0.00} & Position={1}", CurrentTarget.HitPointsPct, CurrentTarget.Position);
                         //}
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Error updating current target information");
                         CurrentTarget = null;

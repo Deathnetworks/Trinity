@@ -19,7 +19,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(1, 7, 3, 8);
+                return new Version(1, 7, 3, 9);
             }
         }
 
@@ -198,6 +198,7 @@ namespace Trinity
         public void OnInitialize()
         {
             Helpers.PluginCheck.CheckAndInstallTrinityRoutine();
+            Logger.Log("Initialized v{0}", this.Version);
         }
 
         public string Name
@@ -229,6 +230,8 @@ namespace Trinity
         public Trinity()
         {
             _instance = this;
+            Helpers.PluginCheck.CheckAndInstallTrinityRoutine();
+            Zeta.Common.Logging.Write("[Trinity] Compiled");
         }
 
 

@@ -24,6 +24,9 @@ xcopy /E /Y "Sources\*.xml" "Trinity\"
 xcopy /E /Y "Sources\*.xsd" "Trinity\"
 xcopy /E /Y "Sources\*.txt" "Trinity\"
 
+REM Copy to SVN
+xcopy /E /Y "C:\UnifiedTrinity\UnifiedTrinity\Sources" "C:\db\svn\Trinity\trunk\Sources\"
+
 REM Zip fresh directory
 7za.exe a Latest-Trinity.zip Trinity\ -mx9
 
