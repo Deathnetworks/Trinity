@@ -188,6 +188,7 @@
     <Compile Include="Cache\RefreshDiaObject.cs" />
     <Compile Include="Cache\RefreshDiaObjects.cs" />
     <Compile Include="XmlTags\BaseComplexNodeTag.cs" />
+    <Compile Include="XmlTags\TrinityCombatIgnore.cs" />
     <Compile Include="XmlTags\TrinityMoveToScene.cs" />
     <Compile Include="XmlTags\TrinityCastSweepingWinds.cs" />
     <Compile Include="XmlTags\TrinityExploreDungeon.cs">

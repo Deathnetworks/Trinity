@@ -42,6 +42,9 @@ namespace Trinity
 
                 if (Trinity.FirstProfile == "")
                     Trinity.FirstProfile = currentProfile;
+
+                // Clear Trinity Combat Ignore Tag
+                TrinityCombatIgnore.IgnoreList.Clear();
             }
         }
 

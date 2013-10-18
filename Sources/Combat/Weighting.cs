@@ -32,7 +32,8 @@ namespace Trinity
                 // Store if we are ignoring all units this cycle or not
                 bool ignoreAllUnits = !XmlTags.TrinityTownPortal.ForceClearArea && !AnyElitesPresent && !AnyMobsInRange && noGoblinsPresent && Player.CurrentHealthPct >= 0.85d;
 
-                bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || MovementSpeed < 1 || ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 10f) >= 3 || Player.CurrentHealthPct <= 0.25);
+                bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || MovementSpeed < 1 ||
+                    ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 10f) >= 3);
 
                 bool hasWrathOfTheBerserker = Player.ActorClass == ActorClass.Barbarian && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
 
@@ -51,11 +52,11 @@ namespace Trinity
                 }
 
                 bool ShouldIgnoreElites =
-                    !DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
+                     !DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
                      !profileTagCheck &&
                      !XmlTags.TrinityTownPortal.ForceClearArea &&
                      !TownRun.IsTryingToTownPortal() &&
-                    CombatBase.IgnoringElites;
+                     CombatBase.IgnoringElites;
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
                     "Starting weights: packSize={0} packRadius={1} MovementSpeed={2} Elites={3} AoEs={4} disableIgnoreTag={5} closeRangePriority={6} townRun={7} forceClear={8} questing={9} level={10}",
@@ -64,25 +65,25 @@ namespace Trinity
 
                 foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.CentreDistance))
                 {
-                    bool questing = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId);
-                    bool townPortal = TownRun.IsTryingToTownPortal();
-                    bool elitesInRange =
+                    bool inQuestArea = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId);
+                    bool usingTownPortal = TownRun.IsTryingToTownPortal();
+                    bool elitesInRangeOfUnit = !CombatBase.IgnoringElites &&
                         ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 25f);
 
                     bool shouldIgnoreTrashMobs =
-                        (!questing &&
+                        !inQuestArea &&
                         !XmlTags.TrinityTownPortal.ForceClearArea &&
-                        !townPortal &&
+                        !usingTownPortal &&
                         !profileTagCheck &&
                         !prioritizeCloseRangeUnits &&
                         Settings.Combat.Misc.TrashPackSize > 1 &&
                         //EliteCount == 0 &&
-                        !elitesInRange &&
+                        !elitesInRangeOfUnit &&
                         //AvoidanceCount == 0 &&
                         Player.Level >= 15 &&
                         MovementSpeed >= 1 &&
                         Player.CurrentHealthPct > 0.10
-                        );
+                        ;
 
                     string unitWeightInfo = "";
 
@@ -120,12 +121,12 @@ namespace Trinity
                                     unitWeightInfo = "Adding ";
                                 }
                                 unitWeightInfo += String.Format("nearbyCount={0} radiusDistance={1:0} hotspot={2} ShouldIgnore={3} elitesInRange={4}",
-                                    nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot, shouldIgnoreTrashMobs, elitesInRange);
+                                    nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot, shouldIgnoreTrashMobs, elitesInRangeOfUnit);
                                 if (ignoring)
                                     break;
 
                                 // Ignore elite option, except if trying to town portal
-                                if (!cacheObject.IsBoss && ShouldIgnoreElites && cacheObject.IsEliteRareUnique && !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth/100)))
+                                if (!cacheObject.IsBoss && ShouldIgnoreElites && cacheObject.IsEliteRareUnique && !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100)))
                                 {
                                     break;
                                 }
@@ -135,6 +136,17 @@ namespace Trinity
                                     (cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealth ||
                                      cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS))
                                 {
+                                    break;
+                                }
+
+                                // Monster on Combat Ignore list
+                                if (!usingTownPortal && !profileTagCheck && 
+                                    TrinityCombatIgnore.IgnoreList.Any(u => 
+                                        u.ActorSNO == cacheObject.ActorSNO && 
+                                        u.ExceptElites ? !cacheObject.IsEliteRareUnique : true &&
+                                        u.ExceptTrash ? !cacheObject.IsTrashMob : true))
+                                {
+
                                     break;
                                 }
 
