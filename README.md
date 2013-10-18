@@ -1,6 +1,37 @@
 ﻿
 # Trinity
 
+### Changelog 1.7.3.9
+
+### TrinityCombatIgnore tag:
+
+Will cause the bot to ignore combat with the given unit. Is only overridden when attempting to town portal.
+
+##### Attributes:
+
+actorId is the "ActorSNO" of the unit. You can get this from the info dumping tab > click "Dump Objects"
+
+name is optional - just the name of the unit for readability purposes only
+
+excludeElites: When set to "True", will cause the bot to attack elite units of this type.
+
+ExcludeTrash: When set to "True", will cause the bot to attack trash mob units of this type.
+
+Example to ignore a unit type, except elites of that unit type:
+
+    <TrinityCombatIgnore actorId="4157" name="FleshPitFlyer_B" exceptElites="True" exceptTrash="False" />
+
+Example to ignore a unit type, including elites and trash:
+
+    <TrinityCombatIgnore actorId="4157" name="FleshPitFlyer_B" exceptElites="False" exceptTrash="False" />
+
+Example to ignore a unit type, except trash mobs of that unit type:
+
+    <TrinityCombatIgnore actorId="4157" name="FleshPitFlyer_B" exceptElites="False" exceptTrash="True" />
+
+Setting both excludeElites and excludeTrash to True will effectively *do nothing* - the bot will still attack all units of this type.
+
+
 ### Changelog 1.7.3.8
 
 #### Combat:

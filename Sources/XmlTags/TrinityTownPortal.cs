@@ -3,6 +3,7 @@ using Trinity.Technicals;
 using Zeta;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Profile;
+using Zeta.Navigation;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;
@@ -20,6 +21,7 @@ namespace Trinity.XmlTags
         public static int WaitTime { get; set; }
 
         public static Stopwatch AreaClearTimer = null;
+        public static Stopwatch PortalCastTimer = null;
         public static bool ForceClearArea = false;
 
         private double _StartHealth = -1;
@@ -34,6 +36,7 @@ namespace Trinity.XmlTags
         public TrinityTownPortal()
         {
             AreaClearTimer = new Stopwatch();
+            PortalCastTimer = new Stopwatch();
         }
 
         public override void OnStart()
@@ -116,13 +119,22 @@ namespace Trinity.XmlTags
                                 new Sleep(1000)
                             )
                         ),
+                        new Decorator(ret => PortalCastTimer.IsRunning && PortalCastTimer.ElapsedMilliseconds >= 7000,
+                            new Sequence(
+                                new Action(ret => {
+                                    Technicals.Logger.LogNormal("Stuck casting town portal, moving a little");
+                                    Navigator.MoveTo(NavHelper.FindSafeZone(Trinity.Player.Position, false, true));
+                                    PortalCastTimer.Reset();
+                                })
+                            )
+                        ),
                         new Sequence(
-                // Already casting, just wait
-                            new DecoratorContinue(ret => ZetaDia.Me.LoopingAnimationEndTime > 0,
+                            new DecoratorContinue(ret => ZetaDia.Me.LoopingAnimationEndTime > 0, // Already casting, just wait
                                 new Action()
                             ),
                             new Action(ret =>
                             {
+                                PortalCastTimer.Restart();
                                 GameEvents.FireWorldTransferStart();
                                 ZetaDia.Me.UseTownPortal();
                             })
