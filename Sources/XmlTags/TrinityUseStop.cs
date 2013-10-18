@@ -24,14 +24,14 @@ namespace Trinity.XmlTags
                 // See if we've EVER hit this ID before
 
                 // If so, set it disabled - if not, add it and prevent it
-                if (Trinity.hashUseOnceID.Contains(ID))
+                if (TrinityUseOnce.UseOnceIDs.Contains(ID))
                 {
-                    Trinity.dictUseOnceID[ID] = -1;
+                    TrinityUseOnce.UseOnceCounter[ID] = -1;
                 }
                 else
                 {
-                    Trinity.hashUseOnceID.Add(ID);
-                    Trinity.dictUseOnceID.Add(ID, -1);
+                    TrinityUseOnce.UseOnceIDs.Add(ID);
+                    TrinityUseOnce.UseOnceCounter.Add(ID, -1);
                 }
                 m_IsDone = true;
             });

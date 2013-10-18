@@ -179,10 +179,6 @@ namespace Trinity
         // Do we need to reset the debug bar after combat handling?
         private static bool bResetStatusText = false;
 
-        // A list of "useonceonly" tags that have been triggered this xml profile
-        public static HashSet<int> hashUseOnceID = new HashSet<int>();
-        public static Dictionary<int, int> dictUseOnceID = new Dictionary<int, int>();
-
         // For the random ID tag
         public static Dictionary<int, int> dictRandomID = new Dictionary<int, int>();
 

@@ -27,8 +27,8 @@ namespace Trinity.XmlTags
         [XmlAttribute("actorSno")]
         public int ActorSNO { get; set; }
 
-        [XmlAttribute("actorName")]
-        public string ActorName { get; set; }
+        [XmlAttribute("name")]
+        public string Name { get; set; }
 
         [XmlAttribute("exceptElites")]
         public bool ExceptElites { get; set; }
@@ -51,13 +51,13 @@ namespace Trinity.XmlTags
                 IgnoreList.Add(new CombatIgnoreUnit()
                 {
                     ActorSNO = ActorSNO,
-                    ActorName = ActorName,
+                    Name = Name,
                     ExceptElites = ExceptElites,
                     ExceptTrash = ExceptTrash
                 });
 
-                if (!string.IsNullOrWhiteSpace(ActorName))
-                    Technicals.Logger.LogNormal("Added {0} ({1}) to Combat Ignore List", ActorName, ActorSNO);
+                if (!string.IsNullOrWhiteSpace(Name))
+                    Technicals.Logger.LogNormal("Added {0} ({1}) to Combat Ignore List", Name, ActorSNO);
                 else
                     Technicals.Logger.LogNormal("Added {0} to Combat Ignore List", ActorSNO);
 
@@ -75,8 +75,16 @@ namespace Trinity.XmlTags
         public class CombatIgnoreUnit
         {
             public int ActorSNO { get; set; }
-            public string ActorName { get; set; }
+            public string Name { get; set; }
+
+            /// <summary>
+            /// When set to True, should attack elite unit
+            /// </summary>
             public bool ExceptElites { get; set; }
+
+            /// <summary>
+            /// When set to True, should attack non-elite unit
+            /// </summary>
             public bool ExceptTrash { get; set; }
 
             public CombatIgnoreUnit() { }
@@ -85,7 +93,28 @@ namespace Trinity.XmlTags
             {
                 return string.Format(
                     "ActorSNO={0} Name={1} ExceptElites={2} ExceptTrash={3}",
-                    ActorSNO, ActorName, ExceptElites, ExceptTrash);
+                    ActorSNO, Name, ExceptElites, ExceptTrash);
+            }
+
+            public bool AttackElite(TrinityCacheObject tco)
+            {
+                if (ExceptElites && tco.IsEliteRareUnique)
+                    return true;
+
+                return false;
+            }
+
+            public bool AttackTrash(TrinityCacheObject tco)
+            {
+                if (!ExceptTrash && tco.IsTrashMob)
+                    return true;
+
+                return false;
+            }
+
+            public bool ShouldAttack(TrinityCacheObject tco)
+            {
+                return AttackElite(tco) || AttackTrash(tco);
             }
         }
     }

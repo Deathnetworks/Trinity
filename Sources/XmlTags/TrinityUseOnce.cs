@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
@@ -9,15 +10,19 @@ namespace Trinity.XmlTags
     [XmlElement("TrinityUseOnce")]
     public class TrinityUseOnce : BaseComplexNodeTag
     {
+        // A list of "useonceonly" tags that have been triggered this xml profile
+        public static HashSet<int> UseOnceIDs = new HashSet<int>();
+        public static Dictionary<int, int> UseOnceCounter = new Dictionary<int, int>();
+
         private Func<bool> funcConditionalProcess;
-        private int iUniqueID;
-        private int iMaxRedo;
-        private string sDisablePrevious;
+        private int uniqueId;
+        private int maxReuse;
+        private string disablePrevious;
 
         protected override Composite CreateBehavior()
         {
             return new
-                Decorator(ret => CheckNotAlreadyDone(ret),
+                Decorator(ret => CheckNotAlreadyDone(),
                     new PrioritySelector(base.GetNodes().Select(b => b.Behavior).ToArray())
             );
         }
@@ -25,15 +30,14 @@ namespace Trinity.XmlTags
         public override bool GetConditionExec()
         {
             // See if we've EVER hit this ID before
-            if (Trinity.hashUseOnceID.Contains(ID))
+            if (UseOnceIDs.Contains(ID))
             {
-
                 // See if we've hit it more than or equal to the max times before
-                if (Trinity.dictUseOnceID[ID] >= Max || Trinity.dictUseOnceID[ID] < 0)
+                if (UseOnceCounter[ID] >= Max || UseOnceCounter[ID] < 0)
                     return false;
 
                 // Add 1 to our hit count, and let it run this time
-                Trinity.dictUseOnceID[ID]++;
+                UseOnceCounter[ID]++;
                 return true;
             }
 
@@ -42,22 +46,22 @@ namespace Trinity.XmlTags
             // First see if we should disable all other ID's currently hit to prevent them ever being run again this run
             if (DisablePrevious != null && DisablePrevious.ToLower() == "true")
             {
-                foreach (int thisid in Trinity.hashUseOnceID)
+                foreach (int id in UseOnceIDs)
                 {
-                    if (thisid != ID)
+                    if (id != ID)
                     {
-                        Trinity.dictUseOnceID[thisid] = -1;
+                        UseOnceCounter[id] = -1;
                     }
                 }
             }
 
             // Now store the fact we have hit this ID and set up the dictionary entry for it
-            Trinity.hashUseOnceID.Add(ID);
-            Trinity.dictUseOnceID.Add(ID, 1);
+            UseOnceIDs.Add(ID);
+            UseOnceCounter.Add(ID, 1);
             return true;
         }
 
-        private bool CheckNotAlreadyDone(object object_0)
+        private bool CheckNotAlreadyDone()
         {
             return !IsDone;
         }
@@ -67,11 +71,11 @@ namespace Trinity.XmlTags
         {
             get
             {
-                return iUniqueID;
+                return uniqueId;
             }
             set
             {
-                iUniqueID = value;
+                uniqueId = value;
             }
         }
 
@@ -80,11 +84,11 @@ namespace Trinity.XmlTags
         {
             get
             {
-                return sDisablePrevious;
+                return disablePrevious;
             }
             set
             {
-                sDisablePrevious = value;
+                disablePrevious = value;
             }
         }
 
@@ -93,11 +97,11 @@ namespace Trinity.XmlTags
         {
             get
             {
-                return iMaxRedo;
+                return maxReuse;
             }
             set
             {
-                iMaxRedo = value;
+                maxReuse = value;
             }
         }
 

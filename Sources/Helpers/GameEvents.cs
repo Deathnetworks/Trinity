@@ -121,8 +121,8 @@ namespace Trinity
             PlayerMover.iTimesReachedStuckPoint = 0;
             PlayerMover.TimeLastRecordedPosition = DateTime.Today;
             PlayerMover.LastGeneratedStuckPosition = DateTime.Today;
-            hashUseOnceID = new HashSet<int>();
-            dictUseOnceID = new Dictionary<int, int>();
+            TrinityUseOnce.UseOnceIDs = new HashSet<int>();
+            TrinityUseOnce.UseOnceCounter = new Dictionary<int, int>();
             dictRandomID = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;
             iDeathsThisRun = 0;
@@ -197,8 +197,8 @@ namespace Trinity
             AbilityLastUsedCache.Clear();
             PlayerInfoCache.RefreshHotbar();
 
-            hashUseOnceID = new HashSet<int>();
-            dictUseOnceID = new Dictionary<int, int>();
+            TrinityUseOnce.UseOnceIDs = new HashSet<int>();
+            TrinityUseOnce.UseOnceCounter = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;
             iDeathsThisRun = 0;
             LastDeathTime = DateTime.Now;

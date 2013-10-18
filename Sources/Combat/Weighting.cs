@@ -142,14 +142,9 @@ namespace Trinity
                                 }
 
                                 // Monster on Combat Ignore list
-                                if (!usingTownPortal && !profileTagCheck && 
-                                    TrinityCombatIgnore.IgnoreList.Any(u => 
-                                        u.ActorSNO == cacheObject.ActorSNO && 
-                                        u.ExceptElites ? !cacheObject.IsEliteRareUnique : true &&
-                                        u.ExceptTrash ? !cacheObject.IsTrashMob : true))
+                                if (!usingTownPortal && !profileTagCheck && TrinityCombatIgnore.IgnoreList.Any(u => u.ActorSNO == cacheObject.ActorSNO && !u.ShouldAttack(cacheObject)))
                                 {
                                     unitWeightInfo += " CombatIgnore";
-                                    break;
                                 }
 
                                 // Monster is in cache but not within kill range
@@ -434,11 +429,11 @@ namespace Trinity
                                 }
                                 // ignore non-legendaries and gold near elites if we're ignoring elites
                                 // not sure how we should safely determine this distance
-                                if (CombatBase.IgnoringElites && cacheObject.ItemQuality < ItemQuality.Legendary &&
-                                    ObjectCache.Any(u => u.Type == GObjectType.Unit && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 40f))
-                                {
-                                    cacheObject.Weight = 0;
-                                }
+                                //if (CombatBase.IgnoringElites && cacheObject.ItemQuality < ItemQuality.Legendary &&
+                                //    ObjectCache.Any(u => u.Type == GObjectType.Unit && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 40f))
+                                //{
+                                //    cacheObject.Weight = 0;
+                                //}
 
                                 break;
                             }
@@ -629,14 +624,14 @@ namespace Trinity
                             }
                         case GObjectType.Interactable:
                             {
-                                // Weight Interactable Specials
-
                                 // Need to Prioritize, forget it!
                                 if (prioritizeCloseRangeUnits)
                                     break;
 
-                                // Very close interactables get a weight increase
+                                // Weight Interactable Specials
                                 cacheObject.Weight = (90d - cacheObject.CentreDistance) / 90d * 1500d;
+
+                                // Very close interactables get a weight increase
                                 if (cacheObject.CentreDistance <= 12f)
                                     cacheObject.Weight += 1000d;
 
@@ -659,11 +654,14 @@ namespace Trinity
                             }
                         case GObjectType.Container:
                             {
+                                // Need to Prioritize, forget it!
+                                if (prioritizeCloseRangeUnits)
+                                    break;
 
                                 // Weight Containers
+                                cacheObject.Weight = (190d - cacheObject.CentreDistance) / 190d * 11000d;
 
                                 // Very close containers get a weight increase
-                                cacheObject.Weight = (190d - cacheObject.CentreDistance) / 190d * 11000d;
                                 if (cacheObject.CentreDistance <= 12f)
                                     cacheObject.Weight += 600d;
 

@@ -24,10 +24,10 @@ namespace Trinity.XmlTags
                 // See if we've EVER hit this ID before
 
                 // If so, delete it, if not, do nothing
-                if (Trinity.hashUseOnceID.Contains(ID))
+                if (TrinityUseOnce.UseOnceIDs.Contains(ID))
                 {
-                    Trinity.hashUseOnceID.Remove(ID);
-                    Trinity.dictUseOnceID.Remove(ID);
+                    TrinityUseOnce.UseOnceIDs.Remove(ID);
+                    TrinityUseOnce.UseOnceCounter.Remove(ID);
                 }
                 m_IsDone = true;
             });
