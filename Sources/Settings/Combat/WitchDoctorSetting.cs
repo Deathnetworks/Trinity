@@ -8,6 +8,8 @@ namespace Trinity.Config.Combat
     {
         #region Fields
         private bool _ZeroDogs;
+        private float _HealingJourneyHealth;
+        private float _HonoredGuestMana;
         private float _FirebatsRange;
         private float _PotionLevel;
         private float _HealthGlobeLevel;
@@ -79,6 +81,29 @@ namespace Trinity.Config.Combat
             }
         }
 
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.20f)]
+        public float HealingJourneyHealth
+        {
+            get { return _HealingJourneyHealth; }
+            set
+            {
+                _HealingJourneyHealth = value;
+                OnPropertyChanged("HealingJourneyHealth");
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.20f)]
+        public float HonoredGuestMana
+        {
+            get { return _HonoredGuestMana; }
+            set
+            {
+                _HonoredGuestMana = value;
+                OnPropertyChanged("HonoredGuestMana");
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(20f)]

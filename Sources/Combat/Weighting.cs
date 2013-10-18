@@ -63,6 +63,8 @@ namespace Trinity
                     Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck,
                     prioritizeCloseRangeUnits, TownRun.IsTryingToTownPortal(), TrinityTownPortal.ForceClearArea, DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId), Player.Level);
 
+                Logger.Log(LogCategory.Weight, " CombatIgnoreList={0}", Logger.ListToString(TrinityCombatIgnore.IgnoreList.ToList<object>()));
+
                 foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.CentreDistance))
                 {
                     bool inQuestArea = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId);
@@ -146,7 +148,7 @@ namespace Trinity
                                         u.ExceptElites ? !cacheObject.IsEliteRareUnique : true &&
                                         u.ExceptTrash ? !cacheObject.IsTrashMob : true))
                                 {
-
+                                    unitWeightInfo += " CombatIgnore";
                                     break;
                                 }
 

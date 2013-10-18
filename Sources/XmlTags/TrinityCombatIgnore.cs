@@ -45,6 +45,9 @@ namespace Trinity.XmlTags
         {
             if (ActorSNO > 0)
             {
+                if (IgnoreList.Any(u => u.ActorSNO == ActorSNO))
+                    IgnoreList.RemoveWhere(u => u.ActorSNO == ActorSNO);
+
                 IgnoreList.Add(new CombatIgnoreUnit()
                 {
                     ActorSNO = ActorSNO,
@@ -77,7 +80,13 @@ namespace Trinity.XmlTags
             public bool ExceptTrash { get; set; }
 
             public CombatIgnoreUnit() { }
-        }
 
+            public override string ToString()
+            {
+                return string.Format(
+                    "ActorSNO={0} Name={1} ExceptElites={2} ExceptTrash={3}",
+                    ActorSNO, ActorName, ExceptElites, ExceptTrash);
+            }
+        }
     }
 }

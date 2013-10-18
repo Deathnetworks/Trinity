@@ -141,5 +141,17 @@ namespace Trinity.Technicals
             }
             return logLevel;
         }
+
+        public static string ListToString(System.Collections.Generic.List<object> list)
+        {
+            string result = "";
+            for (int i = 0; i < list.Count; i++) 
+            {
+                result += list[i];
+                if (i < list.Count - 1)
+                    result += ", ";
+            }
+            return result;
+        }
     }
 }
