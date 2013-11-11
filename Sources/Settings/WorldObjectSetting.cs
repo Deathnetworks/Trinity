@@ -18,6 +18,7 @@ namespace Trinity.Config
         private bool _UseEmpoweredShrine;
         private bool _UseEnlightenedShrine;
         private bool _UseFleetingShrine;
+        private int _HealthWellMinHealth;
         private DestructibleIgnoreOption _DestructibleOption;
         #endregion Fields
 
@@ -182,7 +183,7 @@ namespace Trinity.Config
                 }
             }
         }
-        
+
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool UseFleetingShrine
@@ -197,6 +198,24 @@ namespace Trinity.Config
                 {
                     _UseFleetingShrine = value;
                     OnPropertyChanged("UseFleetingShrine");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(90)]
+        public int HealthWellMinHealth
+        {
+            get
+            {
+                return _HealthWellMinHealth;
+            }
+            set
+            {
+                if (_HealthWellMinHealth != value)
+                {
+                    _HealthWellMinHealth = value;
+                    OnPropertyChanged("HealthWellMinHealth");
                 }
             }
         }
@@ -260,6 +279,7 @@ namespace Trinity.Config
             this.UseFortuneShrine = true;
             this.UseFrenzyShrine = true;
             this.UseProtectionShrine = true;
+            this.HealthWellMinHealth = 75;
             this.DestructibleOption = DestructibleIgnoreOption.OnlyIfStuck;
         }
         #endregion Methods

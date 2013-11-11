@@ -13,6 +13,7 @@ namespace Trinity.Config.Loot
         private SalvageOption _SalvageBlueItemOption;
         private SalvageOption _SalvageYellowItemOption;
         private SalvageOption _SalvageLegendaryItemOption;
+        private int _FreeBagSlots;
         #endregion Fields
 
         #region Events
@@ -27,8 +28,8 @@ namespace Trinity.Config.Loot
         /// Initializes a new instance of the <see cref="TownRunSetting" /> class.
         /// </summary>
         public TownRunSetting()
-        { 
-            Reset(); 
+        {
+            Reset();
         }
         #endregion Constructors
 
@@ -141,6 +142,23 @@ namespace Trinity.Config.Loot
             }
         }
 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(1)]
+        public int FreeBagSlots
+        {
+            get
+            {
+                return _FreeBagSlots;
+            }
+            set
+            {
+                if (_FreeBagSlots != value)
+                {
+                    _FreeBagSlots = value;
+                    OnPropertyChanged("FreeBagSlots");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -170,6 +188,17 @@ namespace Trinity.Config.Loot
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        /// <summary>
+        /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserializing()]
+        internal void OnDeserializingMethod(StreamingContext context)
+        {
+            this.FreeBagSlots = 1;
+        }
+
         #endregion Methods
 
         public ExtensionDataObject ExtensionData

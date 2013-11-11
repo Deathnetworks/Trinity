@@ -258,9 +258,9 @@ namespace Trinity
                                         if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                             cacheObject.Weight += 1000d;
 
-                                        if (ObjectCache.Any(u => MathEx.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position,
-                                                        cacheObject.Position)))
-                                            cacheObject.Weight *= 0.10d;
+                                        //if (ObjectCache.Any(u => MathEx.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position,
+                                        //                cacheObject.Position)))
+                                        //    cacheObject.Weight *= 0.10d;
 
                                         // Prevent going less than 300 yet to prevent annoyances (should only lose this much weight from priority reductions in priority list?)
                                         if (cacheObject.Weight < 300)
@@ -274,14 +274,14 @@ namespace Trinity
                                                 //aoe.AvoidanceType == AvoidanceType.MoltenTrail ||
                                             aoe.AvoidanceType == AvoidanceType.PoisonTree) &&
                                             cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
-                                            cacheObject.Weight *= 0.25;
+                                            cacheObject.Weight = 1;
 
                                         // If any AoE between us and target, reduce weight, for melee only
                                         if (!Settings.Combat.Misc.KillMonstersInAoE &&
                                             PlayerKiteDistance <= 0 &&
                                             AvoidanceObstacleCache.Any(aoe => aoe.AvoidanceType != AvoidanceType.PlagueCloud &&
                                                 MathUtil.IntersectsPath(aoe.Location, aoe.Radius, Player.Position, cacheObject.Position)))
-                                            cacheObject.Weight *= 0.25;
+                                            cacheObject.Weight = 1;
 
                                         // See if there's any AOE avoidance in that spot, if so reduce the weight to 1, for melee only
                                         if (!Settings.Combat.Misc.KillMonstersInAoE &&
@@ -296,7 +296,7 @@ namespace Trinity
                                                 MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, m.Position) &&
                                                 m.RActorGuid != cacheObject.RActorGuid))
                                             {
-                                                cacheObject.Weight = 0d;
+                                                cacheObject.Weight = 1d;
                                             }
                                         }
 
@@ -378,6 +378,64 @@ namespace Trinity
                                 //else
                                 //    cacheObject.Weight = 8000d - (Math.Floor(cacheObject.CentreDistance) * 1900d);
 
+                                // ignore non-legendaries and gold near elites if we're ignoring elites
+                                // not sure how we should safely determine this distance
+                                if (cacheObject.ItemQuality < ItemQuality.Legendary && ((CombatBase.IgnoringElites &&
+                                    ObjectCache.Any(u => u.Type == GObjectType.Unit && u.IsEliteRareUnique && 
+                                        u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreNonLegendaryNearEliteDistance"))) ||
+                                    AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius)))
+                                {
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
+                                // Ignore Legendaries in AoE
+                                if (Settings.Loot.Pickup.IgnoreLegendaryInAoE && cacheObject.Type == GObjectType.Item && cacheObject.ItemQuality >= ItemQuality.Legendary && 
+                                    AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
+                                {
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
+                                // Ignore Non-Legendaries in AoE
+                                if (Settings.Loot.Pickup.IgnoreNonLegendaryInAoE && cacheObject.Type == GObjectType.Item && cacheObject.ItemQuality < ItemQuality.Legendary && 
+                                    AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
+                                {
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
+                                // Ignore Legendaries near Elites
+                                if (Settings.Loot.Pickup.IgnoreLegendaryNearElites && cacheObject.Type == GObjectType.Item && cacheObject.ItemQuality >= ItemQuality.Legendary &&
+                                    ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreLegendaryNearEliteDistance")))
+                                {
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+                                // Ignore Non-Legendaries near Elites
+                                if (Settings.Loot.Pickup.IgnoreNonLegendaryNearElites && cacheObject.Type == GObjectType.Item && cacheObject.ItemQuality < ItemQuality.Legendary &&
+                                    ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreNonLegendaryNearEliteDistance")))
+                                {
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
+                                // Ignore gold near Elites
+                                if (Settings.Loot.Pickup.IgnoreGoldNearElites && cacheObject.Type == GObjectType.Gold && 
+                                    ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreGoldNearEliteDistance")))
+                                {
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
+                                // Ignore gold in AoE
+                                if (Settings.Loot.Pickup.IgnoreGoldInAoE && cacheObject.Type == GObjectType.Gold && 
+                                    AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
+                                {
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
                                 if (cacheObject.GoldAmount > 0)
                                     cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 9000d;
                                 else
@@ -427,14 +485,6 @@ namespace Trinity
                                 {
                                     cacheObject.Weight *= 0.10d;
                                 }
-                                // ignore non-legendaries and gold near elites if we're ignoring elites
-                                // not sure how we should safely determine this distance
-                                //if (CombatBase.IgnoringElites && cacheObject.ItemQuality < ItemQuality.Legendary &&
-                                //    ObjectCache.Any(u => u.Type == GObjectType.Unit && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 40f))
-                                //{
-                                //    cacheObject.Weight = 0;
-                                //}
-
                                 break;
                             }
                         case GObjectType.Globe:
@@ -532,6 +582,10 @@ namespace Trinity
                                     break;
 
                                 if (MovementSpeed < 1)
+                                    break;
+
+                                // Current Health Percentage is higher than setting
+                                if (Player.CurrentHealthPct * 100 > Settings.WorldObject.HealthWellMinHealth)
                                     break;
 
                                 // As a percentage of health with typical maximum weight

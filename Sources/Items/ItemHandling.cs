@@ -711,6 +711,12 @@ namespace Trinity
         /// </summary>
         internal static void OutputReport()
         {
+            if (!ZetaDia.Service.IsValid)
+                return;
+
+            if (!ZetaDia.Service.Platform.IsConnected)
+                return;
+
             if (ZetaDia.Me == null || !ZetaDia.Me.IsValid)
                 return;
 
@@ -1020,31 +1026,38 @@ namespace Trinity
             {
                 bool[,] BackpackSlotBlocked = new bool[10, 6];
 
+                int freeBagSlots = 60;
                 // Block off the entire of any "protected bag slots"
                 foreach (InventorySquare square in Zeta.CommonBot.Settings.CharacterSettings.Instance.ProtectedBagSlots)
                 {
                     BackpackSlotBlocked[square.Column, square.Row] = true;
+                    freeBagSlots--;
                 }
 
                 // Map out all the items already in the backpack
                 foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
                 {
-                    if (item.BaseAddress == IntPtr.Zero)
-                    {
-                        return new Vector2(-1, -1);
-                    }
+                    if (!item.IsValid)
+                        continue;
+
                     int inventoryRow = item.InventoryRow;
                     int inventoryColumn = item.InventoryColumn;
 
                     // Mark this slot as not-free
                     BackpackSlotBlocked[inventoryColumn, inventoryRow] = true;
+                    freeBagSlots--;
 
                     // Try and reliably find out if this is a two slot item or not
                     if (item.IsTwoSquareItem && inventoryRow < 5)
                     {
                         BackpackSlotBlocked[inventoryColumn, inventoryRow + 1] = true;
+                        freeBagSlots--;
                     }
                 }
+
+                // free bag slots is less than required
+                if (freeBagSlots <= Trinity.Settings.Loot.TownRun.FreeBagSlots)
+                    return new Vector2(-1, -1);
 
                 int x = -1;
                 int y = -1;

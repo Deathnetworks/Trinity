@@ -28,6 +28,14 @@ namespace Trinity.Config.Loot
         private bool _CraftMaterials;
         private bool _InfernalKeys;
         private bool _PickupLowLevel;
+        private bool _TwoHandedWeapons;
+
+        private bool _IgnoreLegendaryInAoE;
+        private bool _IgnoreRareInAoE;
+        private bool _IgnoreLegendaryNearElites;
+        private bool _IgnoreRareNearElites;
+        private bool _IgnoreGoldInAoE;
+        private bool _IgnoreGoldNearElites;
         #endregion Fields
 
         #region Events
@@ -421,6 +429,126 @@ namespace Trinity.Config.Loot
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool TwoHandedWeapons
+        {
+            get
+            {
+                return _TwoHandedWeapons;
+            }
+            set
+            {
+                if (_TwoHandedWeapons != value)
+                {
+                    _TwoHandedWeapons = value;
+                    OnPropertyChanged("TwoHandedWeapons");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool IgnoreLegendaryInAoE
+        {
+            get
+            {
+                return _IgnoreLegendaryInAoE;
+            }
+            set
+            {
+                if (_IgnoreLegendaryInAoE != value)
+                {
+                    _IgnoreLegendaryInAoE = value;
+                    OnPropertyChanged("IgnoreLegendaryInAoE");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool IgnoreNonLegendaryInAoE
+        {
+            get
+            {
+                return _IgnoreRareInAoE;
+            }
+            set
+            {
+                if (_IgnoreRareInAoE != value)
+                {
+                    _IgnoreRareInAoE = value;
+                    OnPropertyChanged("IgnoreNonLegendaryInAoE");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool IgnoreLegendaryNearElites
+        {
+            get
+            {
+                return _IgnoreLegendaryNearElites;
+            }
+            set
+            {
+                if (_IgnoreLegendaryNearElites != value)
+                {
+                    _IgnoreLegendaryNearElites = value;
+                    OnPropertyChanged("IgnoreLegendaryNearElites");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool IgnoreNonLegendaryNearElites
+        {
+            get
+            {
+                return _IgnoreRareNearElites;
+            }
+            set
+            {
+                if (_IgnoreRareNearElites != value)
+                {
+                    _IgnoreRareNearElites = value;
+                    OnPropertyChanged("IgnoreNonLegendaryNearElites");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool IgnoreGoldInAoE
+        {
+            get
+            {
+                return _IgnoreGoldInAoE;
+            }
+            set
+            {
+                if (_IgnoreGoldInAoE != value)
+                {
+                    _IgnoreGoldInAoE = value;
+                    OnPropertyChanged("IgnoreGoldInAoE");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool IgnoreGoldNearElites
+        {
+            get
+            {
+                return _IgnoreGoldNearElites;
+            }
+            set
+            {
+                if (_IgnoreGoldNearElites != value)
+                {
+                    _IgnoreGoldNearElites = value;
+                    OnPropertyChanged("IgnoreGoldNearElites");
+                }
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -431,7 +559,7 @@ namespace Trinity.Config.Loot
 
         public void CopyTo(PickupSetting setting)
         {
-            TrinitySetting.CopyTo(this,setting);
+            TrinitySetting.CopyTo(this, setting);
         }
 
         public PickupSetting Clone()
@@ -446,7 +574,7 @@ namespace Trinity.Config.Loot
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
- 
+
         /// <summary>
         /// This will set default values for new settings if they were not present in the serialized XML (otherwise they will be the type defaults)
         /// </summary>
@@ -460,6 +588,7 @@ namespace Trinity.Config.Loot
             this.Plans = true;
             this.LegendaryPlans = true;
             this.PickupLowLevel = true;
+            this.TwoHandedWeapons = true;
         }
         #endregion Methods
     }

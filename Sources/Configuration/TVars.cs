@@ -252,8 +252,8 @@ namespace Trinity
             // Witch Doctor
             Set(new TVar("WitchDoctor.Avoidance.SpiritWalk", 0f, "WitchDoctor Spirit walk Avoidance health multiplier"));
             Set(new TVar("WitchDoctor.MinEnergyReserve", 0, "Witch Doctor Special Minimum Mana reserve"));
-            Set(new TVar("WitchDoctor.SpiritWalk.HealingJourneyHealth", 0.65d, "Percent Health Threshold to use Spirit Walk with Healing Journey"));
-            Set(new TVar("WitchDoctor.SpiritWalk.HonoredGuestMana", 0.50d, "Percent Mana Threshold to use Spirit Walk with Honored Guest"));
+            Set(new TVar("WitchDoctor.SpiritWalk.HealingJourneyHealth", 0.65f, "Percent Health Threshold to use Spirit Walk with Healing Journey"));
+            Set(new TVar("WitchDoctor.SpiritWalk.HonoredGuestMana", 0.50f, "Percent Mana Threshold to use Spirit Walk with Honored Guest"));
             Set(new TVar("WitchDoctor.Firebats.MaintainRange", 35f, "Maintain Firebats while any mobs are in this range"));
 
             // Wizard
@@ -265,6 +265,10 @@ namespace Trinity
 
             Set(new TVar("Weight.Globe.MinPlayerHealthPct", 0.90d, "Minimum player health before health globes considered (does not effect emergency health globe)"));
             Set(new TVar("Weight.Globe.MinPartyHealthPct", 0.90d, "Minimum party player health befefore globes considered (party mode only)"));
+
+            Set(new TVar("Weight.Items.IgnoreLegendaryNearEliteDistance", 15f, "Ignore Legendary Items this far away from Elites"));
+            Set(new TVar("Weight.Items.IgnoreNonLegendaryNearEliteDistance", 15f, "Ignore Non Legendary Items this far away from Elites"));
+            Set(new TVar("Weight.Items.IgnoreGoldNearEliteDistance", 15f, "Ignore Gold this far away from Elites"));
 
             // Cache
             Set(new TVar("Cache.PretownRun.MaxDistance", 1500, "Default PreTownrun max distance"));

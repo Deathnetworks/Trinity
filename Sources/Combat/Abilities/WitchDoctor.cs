@@ -18,6 +18,19 @@ namespace Trinity
             bool hasAngryChicken = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1);
             bool isChicken = hasAngryChicken && Player.IsHidden;
 
+            bool hasVisionQuest = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_VisionQuest);
+
+            // Set max ranged attack range, based on Grave Injustice
+            var rangedAttackMaxRange = hasGraveInjustice ? Math.Min(Player.GoldPickupRadius + 8f, 30f) : 30f;
+
+            // Set basic attack range, depending on whether or not we have Bears
+            float basicAttackRange = 35f;
+            if (Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 150)
+                basicAttackRange = 30f;
+            if (hasGraveInjustice)
+                basicAttackRange = rangedAttackMaxRange;
+
+
             // Hex with angry chicken, is chicken, explode!
             if (!UseOOCBuff && isChicken && (TargetUtil.AnyMobsInRange(12f, 1, false) || CurrentTarget.RadiusDistance <= 10f || UseDestructiblePower) && PowerManager.CanCast(SNOPower.Witchdoctor_Hex_Explode))
             {
@@ -76,11 +89,41 @@ namespace Trinity
 
             // Spirit Walk < 50% Mana: Honored Guest
             if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk) && Player.PrimaryResource >= 49 && hasHonoredGuest && 
-                Player.CurrentHealthPct <= V.F("WitchDoctor.SpiritWalk.HonoredGuestMana"))
+                Player.PrimaryResourcePct <= V.F("WitchDoctor.SpiritWalk.HonoredGuestMana"))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
 
+            bool shouldRefreshVisionQuest = hasVisionQuest && (
+                (Hotbar.Contains(SNOPower.Witchdoctor_PoisonDart) && SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_PoisonDart).TotalMilliseconds >= 4700) ||
+                (Hotbar.Contains(SNOPower.Witchdoctor_CorpseSpider) && SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_CorpseSpider).TotalMilliseconds >= 4700) ||
+                (Hotbar.Contains(SNOPower.Witchdoctor_PlagueOfToads) && SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_PlagueOfToads).TotalMilliseconds >= 4700) ||
+                (Hotbar.Contains(SNOPower.Witchdoctor_PlagueOfToads) && SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Firebomb).TotalMilliseconds >= 4700));
+
+            // Vision Quest Passive
+            if (hasVisionQuest && shouldRefreshVisionQuest)
+            {
+                // Poison Darts 
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_PoisonDart, CombatBase.CanCastFlags.NoTimer))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_PoisonDart, basicAttackRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 2, WAIT_FOR_ANIM);
+                }
+                // Corpse Spiders
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_CorpseSpider, CombatBase.CanCastFlags.NoTimer))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_CorpseSpider, basicAttackRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
+                }
+                // Plague Of Toads 
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_PlagueOfToads, CombatBase.CanCastFlags.NoTimer))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_PlagueOfToads, basicAttackRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
+                }
+                // Fire Bomb 
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_Firebomb, CombatBase.CanCastFlags.NoTimer))
+                {
+                    return new TrinityPower(SNOPower.Witchdoctor_Firebomb, basicAttackRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
+                }
+            }
 
             // Witch Doctor - Terror
             //skillDict.Add("SoulHarvest", SNOPower.Witchdoctor_SoulHarvest);
@@ -107,9 +150,16 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_SoulHarvest, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
 
-            // Sacrifice AKA Zombie Dog Jihad, use on Elites Only or to try and Save yourself
+            // Sacrifice
             if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_Sacrifice) && PlayerOwnedZombieDog > 0 &&
                 (TargetUtil.AnyElitesInRange(15, 1) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 9f)))
+            {
+                return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 0, WAIT_FOR_ANIM);
+            }
+
+            // Sacrifice for Circle of Life
+            bool hasCircleofLife = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_CircleOfLife);
+            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_Sacrifice) && PlayerOwnedZombieDog > 0 && hasCircleofLife && TargetUtil.AnyMobsInRange(15f))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 0, WAIT_FOR_ANIM);
             }
@@ -321,8 +371,6 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_Firebats, Settings.Combat.WitchDoctor.FirebatsRange, CurrentTarget.Position, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
             }
 
-            var rangedAttackMaxRange = hasGraveInjustice ? Math.Min(Player.GoldPickupRadius + 8f, 30f) : 30f;
-
             // Acid Cloud
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_AcidCloud) && Player.PrimaryResource >= 172)
             {
@@ -359,13 +407,6 @@ namespace Trinity
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
             }
-
-
-            float basicAttackRange = 35f;
-            if (Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 150)
-                basicAttackRange = 30f;
-            if (hasGraveInjustice)
-                basicAttackRange = rangedAttackMaxRange;
 
             // Poison Darts fast-attack Spams Darts when mana is too low (to cast bears) @12yds or @10yds if Bears avialable
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_PoisonDart))
@@ -412,8 +453,6 @@ namespace Trinity
         {
             if (Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) && Settings.Combat.WitchDoctor.ZeroDogs)
                 return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 12f, Vector3.Zero, -1, -1, 1, 2, WAIT_FOR_ANIM);
-            if (Hotbar.Contains(SNOPower.Witchdoctor_Firebats))
-                return new TrinityPower(SNOPower.Witchdoctor_Firebats, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Witchdoctor_Firebomb))
                 return new TrinityPower(SNOPower.Witchdoctor_Firebomb, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Witchdoctor_PoisonDart))
@@ -426,6 +465,8 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_PlagueOfToads, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Witchdoctor_AcidCloud) && Player.PrimaryResource >= 172)
                 return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            //if (Hotbar.Contains(SNOPower.Witchdoctor_Firebats))
+            //    return new TrinityPower(SNOPower.Witchdoctor_Firebats, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             return CombatBase.DefaultPower;
         }
 
