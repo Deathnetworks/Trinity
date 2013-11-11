@@ -296,7 +296,7 @@ namespace Trinity
                 Logger.Log("Exception saving TVars in checking Service and Hero: {0}", ex);
             }
 
-            var filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "TVars.xml");
+            var filename = Path.Combine(Zeta.CommonBot.Settings.CharacterSettings.SettingsDirectory, "TVars.xml");
             lock (sync)
             {
                 try
@@ -346,7 +346,7 @@ namespace Trinity
                 Logger.Log("Exception Loading TVars in checking Service and Hero: {0}", ex);
             }
 
-            var filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "TVars.xml");
+            var filename = Path.Combine(Zeta.CommonBot.Settings.CharacterSettings.SettingsDirectory, "TVars.xml");
 
             lock (sync)
             {

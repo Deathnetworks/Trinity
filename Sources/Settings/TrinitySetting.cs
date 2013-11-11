@@ -147,8 +147,8 @@ namespace Trinity.Config
         internal string BattleTagSettingsFile
         {
             get
-            {
-                return Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "Trinity.xml");
+            {                
+                return Path.Combine(Zeta.CommonBot.Settings.CharacterSettings.SettingsDirectory, "Trinity.xml");
             }
             private set { }
         }
@@ -159,7 +159,7 @@ namespace Trinity.Config
         {
             get
             {
-                return Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Settings", ZetaDia.Service.CurrentHero.BattleTagName, "GilesTrinity.xml");
+                return Path.Combine(Zeta.CommonBot.Settings.CharacterSettings.SettingsDirectory, "GilesTrinity.xml");
             }
             private set { }
         }
