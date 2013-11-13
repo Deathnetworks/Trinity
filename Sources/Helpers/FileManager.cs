@@ -215,7 +215,7 @@ namespace Trinity.Technicals
         {
             get
             {
-                string path = Path.Combine(DemonBuddyPath, "Settings", ZetaDia.Service.CurrentHero.BattleTagName);
+                string path = Path.Combine(DemonBuddyPath, "Settings", BattleTagName);
                 CreateDirectory(path);
                 return path;
             }
@@ -229,7 +229,7 @@ namespace Trinity.Technicals
         {
             get
             {
-                string path = Path.Combine(DemonBuddyPath, "TrinityLogs", ZetaDia.Service.CurrentHero.BattleTagName);
+                string path = Path.Combine(DemonBuddyPath, "TrinityLogs", BattleTagName);
                 CreateDirectory(path);
                 return path;
             }
@@ -268,7 +268,7 @@ namespace Trinity.Technicals
         {
             get
             {
-                return Path.Combine(DemonBuddyPath, "ItemRules", ZetaDia.Service.CurrentHero.BattleTagName);
+                return Path.Combine(DemonBuddyPath, "ItemRules", BattleTagName);
             }
         }
 
@@ -285,6 +285,17 @@ namespace Trinity.Technicals
                     CreateDirectory(Path.GetDirectoryName(path));
                 }
                 Directory.CreateDirectory(path);
+            }
+        }
+
+        private static string _battleTagName;
+        public static string BattleTagName
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_battleTagName) && ZetaDia.Service.CurrentHero.IsValid)
+                    _battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
+                return _battleTagName;
             }
         }
 

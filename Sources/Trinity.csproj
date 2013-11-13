@@ -70,6 +70,7 @@
     <Compile Include="Combat\Abilities\Monk.cs" />
     <Compile Include="Combat\Abilities\SpellHistory.cs" />
     <Compile Include="Combat\Abilities\SpellHistoryItem.cs" />
+    <Compile Include="Combat\Abilities\WitchDoctorCombat.cs" />
     <Compile Include="Combat\Abilities\Wizard.cs" />
     <Compile Include="Combat\Abilities\DemonHunter.cs" />
     <Compile Include="Combat\Abilities\WitchDoctor.cs" />

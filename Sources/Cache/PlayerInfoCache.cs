@@ -146,7 +146,7 @@ namespace Trinity
                     Player.MyDynamicID = me.CommonData.DynamicId;
                     Player.Level = me.Level;
                     Player.ActorClass = me.ActorClass;
-                    Player.BattleTag = ZetaDia.Service.CurrentHero.BattleTagName;
+                    Player.BattleTag = FileManager.BattleTagName;
                     Player.LevelAreaId = ZetaDia.CurrentLevelAreaId;
 
                     //if (Player.ActorClass == ActorClass.WitchDoctor && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1))

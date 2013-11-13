@@ -484,7 +484,7 @@ namespace Trinity
                 NotificationManager.SendEmail(
                     Trinity.Settings.Notification.EmailAddress,
                     Trinity.Settings.Notification.EmailAddress,
-                    "New DB stash loot - " + ZetaDia.Service.CurrentHero.BattleTagName,
+                    "New DB stash loot - " + FileManager.BattleTagName,
                     NotificationManager.EmailMessage.ToString(),
                     NotificationManager.SmtpServer,
                     Trinity.Settings.Notification.EmailPassword);

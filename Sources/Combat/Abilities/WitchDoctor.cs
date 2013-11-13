@@ -13,6 +13,12 @@ namespace Trinity
     {
         private static TrinityPower GetWitchDoctorPower(bool IsCurrentlyAvoiding, bool UseOOCBuff, bool UseDestructiblePower)
         {
+            // Pick the best destructible power available
+            if (UseDestructiblePower)
+            {
+                return GetWitchDoctorDestroyPower();
+            }
+
             bool hasGraveInjustice = ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice);
 
             bool hasAngryChicken = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1);
@@ -20,15 +26,17 @@ namespace Trinity
 
             bool hasVisionQuest = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_VisionQuest);
 
-            // Set max ranged attack range, based on Grave Injustice
-            var rangedAttackMaxRange = hasGraveInjustice ? Math.Min(Player.GoldPickupRadius + 8f, 30f) : 30f;
+            // Set max ranged attack range, based on Grave Injustice, and current target NOT standing in avoidance, and health > 25%
+            float rangedAttackMaxRange = 30f;
+            if (!UseOOCBuff && hasGraveInjustice && !CurrentTarget.IsStandingInAvoidance && Player.CurrentHealthPct > 0.25)
+                rangedAttackMaxRange = Math.Min(Player.GoldPickupRadius + 8f, 30f);
 
             // Set basic attack range, depending on whether or not we have Bears
             float basicAttackRange = 35f;
-            if (Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 150)
-                basicAttackRange = 30f;
             if (hasGraveInjustice)
                 basicAttackRange = rangedAttackMaxRange;
+            else if (Hotbar.Contains(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 150)
+                basicAttackRange = 30f;
 
 
             // Hex with angry chicken, is chicken, explode!
@@ -40,12 +48,6 @@ namespace Trinity
             else if (hasAngryChicken)
             {
                 ShouldRefreshHotbarAbilities = true;
-            }
-
-            // Pick the best destructible power available
-            if (UseDestructiblePower)
-            {
-                return GetWitchDoctorDestroyPower();
             }
 
             //skillDict.Add("SpiritWalk", SNOPower.Witchdoctor_SpiritWalk);
@@ -94,11 +96,8 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
 
-            bool shouldRefreshVisionQuest = hasVisionQuest && (
-                (Hotbar.Contains(SNOPower.Witchdoctor_PoisonDart) && SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_PoisonDart).TotalMilliseconds >= 4700) ||
-                (Hotbar.Contains(SNOPower.Witchdoctor_CorpseSpider) && SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_CorpseSpider).TotalMilliseconds >= 4700) ||
-                (Hotbar.Contains(SNOPower.Witchdoctor_PlagueOfToads) && SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_PlagueOfToads).TotalMilliseconds >= 4700) ||
-                (Hotbar.Contains(SNOPower.Witchdoctor_PlagueOfToads) && SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Firebomb).TotalMilliseconds >= 4700));
+            //bool shouldRefreshVisionQuest = WitchDoctorCombat.GetTimeSinceLastVisionQuestRefresh() > 4000;
+            bool shouldRefreshVisionQuest = !GetHasBuff(SNOPower.Witchdoctor_Passive_VisionQuest) || WitchDoctorCombat.GetTimeSinceLastVisionQuestRefresh() > 3800;
 
             // Vision Quest Passive
             if (hasVisionQuest && shouldRefreshVisionQuest)
@@ -106,21 +105,25 @@ namespace Trinity
                 // Poison Darts 
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_PoisonDart, CombatBase.CanCastFlags.NoTimer))
                 {
+                    WitchDoctorCombat.VisionQuestRefreshTimer.Restart();
                     return new TrinityPower(SNOPower.Witchdoctor_PoisonDart, basicAttackRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 2, WAIT_FOR_ANIM);
                 }
                 // Corpse Spiders
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_CorpseSpider, CombatBase.CanCastFlags.NoTimer))
                 {
+                    WitchDoctorCombat.VisionQuestRefreshTimer.Restart();
                     return new TrinityPower(SNOPower.Witchdoctor_CorpseSpider, basicAttackRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
                 }
                 // Plague Of Toads 
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_PlagueOfToads, CombatBase.CanCastFlags.NoTimer))
                 {
+                    WitchDoctorCombat.VisionQuestRefreshTimer.Restart();
                     return new TrinityPower(SNOPower.Witchdoctor_PlagueOfToads, basicAttackRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
                 }
                 // Fire Bomb 
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_Firebomb, CombatBase.CanCastFlags.NoTimer))
                 {
+                    WitchDoctorCombat.VisionQuestRefreshTimer.Restart();
                     return new TrinityPower(SNOPower.Witchdoctor_Firebomb, basicAttackRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
                 }
             }
@@ -383,7 +386,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, rangedAttackMaxRange, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
 
-            bool hasWellOfSouls = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SoulHarvest && s.RuneIndex == 1);
+            bool hasWellOfSouls = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritBarrage && s.RuneIndex == 1);
             bool hasRushOfEssence = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Witchdoctor_Passive_RushOfEssence);
 
             // Spirit Barrage + Rush of Essence
@@ -411,21 +414,25 @@ namespace Trinity
             // Poison Darts fast-attack Spams Darts when mana is too low (to cast bears) @12yds or @10yds if Bears avialable
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_PoisonDart))
             {
+                WitchDoctorCombat.VisionQuestRefreshTimer.Restart();
                 return new TrinityPower(SNOPower.Witchdoctor_PoisonDart, basicAttackRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 2, WAIT_FOR_ANIM);
             }
             // Corpse Spiders fast-attacks Spams Spiders when mana is too low (to cast bears) @12yds or @10yds if Bears avialable
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_CorpseSpider))
             {
+                WitchDoctorCombat.VisionQuestRefreshTimer.Restart();
                 return new TrinityPower(SNOPower.Witchdoctor_CorpseSpider, basicAttackRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
             // Toads fast-attacks Spams Toads when mana is too low (to cast bears) @12yds or @10yds if Bears avialable
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_PlagueOfToads))
             {
+                WitchDoctorCombat.VisionQuestRefreshTimer.Restart();
                 return new TrinityPower(SNOPower.Witchdoctor_PlagueOfToads, basicAttackRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
             // Fire Bomb fast-attacks Spams Bomb when mana is too low (to cast bears) @12yds or @10yds if Bears avialable
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_Firebomb))
             {
+                WitchDoctorCombat.VisionQuestRefreshTimer.Restart();
                 return new TrinityPower(SNOPower.Witchdoctor_Firebomb, basicAttackRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
 

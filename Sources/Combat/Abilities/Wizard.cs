@@ -238,6 +238,13 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_FrostNova, 10f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
                 }
 
+                // Frost Nova when not on cooldown
+                //if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_FrostNova, CombatBase.CanCastFlags.NoTimer) &&
+                //    TargetUtil.AnyMobsInRange(10f, 1))
+                //{
+                //    return new TrinityPower(SNOPower.Wizard_FrostNova, 10f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
+                //}
+
                 // Explosive Blast SPAM when enough AP, blow erry thing up, nah mean
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_ExplosiveBlast) && !Player.IsIncapacitated && Player.PrimaryResource >= 20 &&
                     (TargetUtil.AnyMobsInRange(25) && CurrentTarget.RadiusDistance <= 25f) &&

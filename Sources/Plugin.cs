@@ -243,7 +243,7 @@ namespace Trinity
                 string battleTagName = "";
                 try
                 {
-                    battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
+                    battleTagName = FileManager.BattleTagName;
                 }
                 catch { }
 

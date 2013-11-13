@@ -91,6 +91,13 @@ namespace Trinity
         public DiaObject DiaObject { get; set; }
         public string ObjectHash { get; set; }
         public double KillRange { get; set; }
+        public bool IsStandingInAvoidance
+        {
+            get
+            {
+                return Trinity.AvoidanceObstacleCache.Any(a => a.Location.Distance2D(this.Position) <= a.Radius);
+            }
+        }
 
         public AvoidanceType AvoidanceType
         {
