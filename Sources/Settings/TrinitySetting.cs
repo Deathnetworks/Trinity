@@ -148,7 +148,7 @@ namespace Trinity.Config
         {
             get
             {                
-                return Path.Combine(Zeta.CommonBot.Settings.CharacterSettings.SettingsDirectory, "Trinity.xml");
+                return Path.Combine(FileManager.SpecificSettingsPath, "Trinity.xml");
             }
             private set { }
         }
@@ -159,7 +159,7 @@ namespace Trinity.Config
         {
             get
             {
-                return Path.Combine(Zeta.CommonBot.Settings.CharacterSettings.SettingsDirectory, "GilesTrinity.xml");
+                return Path.Combine(FileManager.SpecificSettingsPath, "GilesTrinity.xml");
             }
             private set { }
         }
