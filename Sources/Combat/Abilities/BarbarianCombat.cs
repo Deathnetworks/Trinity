@@ -73,12 +73,12 @@ namespace Trinity.Combat.Abilities
             // War Cry
             if (IsNull(power) && CanUseWarCry)
                 power = PowerWarCry;
-			
+
             // Battle Rage
-            if (IsNull(power) && CanCastBattleRage)
+            if (IsNull(power) && CanCastBattleRage || CanUseBattleRage)
                 power = PowerBattleRage;
 
-			// Leap
+            // Leap
             if (IsNull(power) && CanUseLeap)
                 power = PowerLeap;
 
@@ -129,7 +129,7 @@ namespace Trinity.Combat.Abilities
             // Weapon Throw: Dreadbomb
             if (IsNull(power) && CanUseDreadbomb)
                 power = PowerWeaponThrow;
-				
+
             // HOTA Elites
             if (IsNull(power) && CanUseHammerOfTheAncientsElitesOnly)
                 power = PowerHammerOfTheAncients;
@@ -335,7 +335,12 @@ namespace Trinity.Combat.Abilities
                     !UseOOCBuff &&
                     !Player.IsIncapacitated &&
                     CanCast(SNOPower.Barbarian_BattleRage, CanCastFlags.NoTimer) &&
-                    (SNOPowerUseTimer(SNOPower.Barbarian_BattleRage) || !GetHasBuff(SNOPower.Barbarian_BattleRage)) &&
+                    (
+                        !GetHasBuff(SNOPower.Barbarian_BattleRage) ||
+                        SNOPowerUseTimer(SNOPower.Barbarian_BattleRage) || 
+                        (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin") && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                        Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")
+                    ) &&
                     Player.PrimaryResource >= V.F("Barbarian.BattleRage.MinFury");
             }
         }
@@ -452,9 +457,9 @@ namespace Trinity.Combat.Abilities
                 return
                     !UseOOCBuff &&
                     !Player.IsIncapacitated &&
-                    hasReserveEnergy && 
+                    hasReserveEnergy &&
                     ((CanCast(SNOPower.Barbarian_Rend)) &&
-                        (Trinity.ObjectCache.Count(o => o.Type == GObjectType.Unit && 
+                        (Trinity.ObjectCache.Count(o => o.Type == GObjectType.Unit &&
                             !o.HasDotDPS && o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount"))
                      ||
                     // Spam with Bloodlust
@@ -607,15 +612,15 @@ namespace Trinity.Combat.Abilities
             {
                 return !UseOOCBuff && Hotbar.Contains(SNOPower.Barbarian_BattleRage) && !Player.IsIncapacitated &&
                     // Fury Dump Options for battle rage IF they don't have sprint 
-                    (
-                    (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= 0.99 && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
-                    (Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= 0.99) || !GetHasBuff(SNOPower.Barbarian_BattleRage)
-                    ) &&
-                    Player.PrimaryResource >= 20 && PowerManager.CanCast(SNOPower.Barbarian_BattleRage);
+                        (
+                        (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin") && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
+                        (Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")) || !GetHasBuff(SNOPower.Barbarian_BattleRage)
+                        ) &&
+                        Player.PrimaryResource >= 20 && PowerManager.CanCast(SNOPower.Barbarian_BattleRage);
             }
         }
-		// Dreadbomb build support
-		public static bool CanUseDreadbomb
+        // Dreadbomb build support
+        public static bool CanUseDreadbomb
         {
             get
             {
