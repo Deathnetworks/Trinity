@@ -3,6 +3,60 @@
 
 ### Changelog 1.7.3.9
 
+#### WitchDoctor
+
+* WitchDoctor: VisionQuest passive support works better now.
+
+* WitchDoctor: Fixed breaking bug/typo with Spirit Barrage: Well of Souls
+
+* WitchDoctor now supports the Vision Quest passive
+
+* WitchDoctor: Fixed Spirit Walk: Honored Guest not ever working
+
+* WitchDoctor now supports Sacrifice: Circle of Life rune
+
+* WitchDoctor: Firebats no longer used for destructible objects
+
+#### Monk
+
+* Modified Monk Exploding palm, should use more frequently now
+
+#### General
+
+* Added TrinityCombatIgnore tag
+
+* Added Option in Items > Scoring/TownRun for "Free Bag Slots for TownRun". When the number of empty bag slots is less than or equal to this slider, the bot will force a town run.
+
+* *may* have fixed the forever-present problem where bot keeps running even though backpack is full
+
+* Modified Units Weight/Priorities
+
+* Added "Item Pickup" options for Ignoring Legendaries, Non Legendaries, and Gold near AoE and near Elites (6 options)
+
+* Added Item Pickup option to ignore Two Handed weapons (overrides ItemRules)
+
+* Added Health Well Minimum Health slider ("World Objects" tab)
+
+* Chests/Containers should no longer be Kamikaze mode
+
+* Fixed trash mob targeting when elite units are near it & we're ignoring elites
+
+* TrinityTownPortal will now move a little when stuck casting town portal
+
+#### Technical
+
+* Added caching for BattleTagName. Should no longer cause the bot to derp out with the new DB Beta.
+
+* Added "IsStandingInAvoidance" property for TrinityCacheObject.
+
+* Fixed Out of thread "save settings" throwing ReadProcess/WriteProcess error for DB Beta compatibility
+
+* Refactored TrinityUseOnce a little
+
+* Started work on WitchDoctor Health/Mana Sliders for healing journey/honored guest
+
+* Routine check now does async bot stop/restart
+
 ### TrinityCombatIgnore tag:
 
 Will cause the bot to ignore combat with the given unit. Is only overridden when attempting to town portal.
