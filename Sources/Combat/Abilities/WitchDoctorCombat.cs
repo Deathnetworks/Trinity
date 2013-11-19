@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Trinity.Combat.Abilities
 {
-    class WitchDoctorCombat : CombatBase
+    public class WitchDoctorCombat : CombatBase
     {
         public static System.Diagnostics.Stopwatch VisionQuestRefreshTimer = new System.Diagnostics.Stopwatch();
         public static long GetTimeSinceLastVisionQuestRefresh()
