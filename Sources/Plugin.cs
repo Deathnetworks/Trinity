@@ -140,7 +140,8 @@ namespace Trinity
                         TrinityOnJoinGame(null, null);
                 }
 
-                SetBotTPS();
+                //SetBotTPS();
+                BotMain.TicksPerSecond = Int32.MaxValue;
 
                 TrinityPowerManager.LoadLegacyDelays();
 

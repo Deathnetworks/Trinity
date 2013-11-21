@@ -116,6 +116,9 @@ namespace Trinity
 
                 try
                 {
+                    // chicken / archon
+                    //me.SkillOverrideActive
+
                     Player.ACDGuid = me.ACDGuid;
                     Player.RActorGuid = me.RActorGuid;
                     Player.LastUpdated = DateTime.Now;
@@ -249,10 +252,13 @@ namespace Trinity
         {
             using (new PerformanceLogger("RefreshHotbar"))
             {
+                // Update Hotbar Skills first
+                HotbarSkills.Update();
+
                 Trinity.Hotbar = new HashSet<SNOPower>();
                 for (int i = 0; i <= 5; i++)
                 {
-                    SNOPower power = ZetaDia.CPlayer.GetPowerForSlot((HotbarSlot)i);
+                    SNOPower power = HotbarSkills.GetPowerForSlot((HotbarSlot)i);
                     Trinity.Hotbar.Add(power);
                     if (!DataDictionary.LastUseAbilityTimeDefaults.ContainsKey(power))
                     {
@@ -267,7 +273,6 @@ namespace Trinity
                 Trinity.ShouldRefreshHotbarAbilities = false;
                 Trinity.HotbarRefreshTimer.Restart();
 
-                HotbarSkills.Update();
 
                 SpellTracker.RefreshCachedSpells();
 

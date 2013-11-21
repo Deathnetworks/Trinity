@@ -11,79 +11,86 @@ namespace Trinity
     {
         private const ulong mercenaryOKHash = 1591817666218338490;
         private const ulong conversationSkipHash = 0x942F41B6B5346714;
-        private const ulong talkToInteractButton1 = 0x8EB3A93FB1E49EB8;
-        private const ulong confirmTimedDungeonOK = 0xF9E7B8A635A4F725;
+        private const ulong talkToInteractButton1Hash = 0x8EB3A93FB1E49EB8;
+        private const ulong confirmTimedDungeonOKHash = 0xF9E7B8A635A4F725;
+        private const ulong genericOKHash = 0x891D21408238D18E;
+        private const ulong partyLeaderBossAcceptHash = 0x69B3F61C0F8490B0;
+        private const ulong partyFollowerBossAcceptHash = 0xF495983BA9BE450F;
 
+        //private static UIElement _confirmTimedDungeonOK;
+        //public static UIElement ConfirmTimedDungeonOK { get { try { return _confirmTimedDungeonOK ?? (_confirmTimedDungeonOK = UIElement.FromHash(confirmTimedDungeonOKHash)); } catch { return null; } } }
         public static UIElement ConfirmTimedDungeonOK
         {
             get
             {
-                if (UIElement.IsValidElement(confirmTimedDungeonOK))
-                    return UIElement.FromHash(confirmTimedDungeonOK);
-                else
-                    return null;
+                try { return UIElement.FromHash(confirmTimedDungeonOKHash); }
+                catch { return null; }
             }
         }
 
+        //private static UIElement _mercenaryOKButton;
+        //public static UIElement MercenaryOKButton { get { try { return _mercenaryOKButton ?? (_mercenaryOKButton = UIElement.FromHash(mercenaryOKHash)); } catch { return null; } } }
         public static UIElement MercenaryOKButton
         {
             get
             {
-                if (UIElement.IsValidElement(mercenaryOKHash))
-                    return UIElement.FromHash(mercenaryOKHash);
-                else
-                    return null;
+                try { return UIElement.FromHash(mercenaryOKHash); }
+                catch { return null; }
             }
         }
 
+        //private static UIElement _conversationSkipButton;
+        //public static UIElement ConversationSkipButton { get { try { return _conversationSkipButton ?? (_conversationSkipButton = UIElement.FromHash(conversationSkipHash)); } catch { return null; } } }
         public static UIElement ConversationSkipButton
         {
             get
             {
-                if (UIElement.IsValidElement(conversationSkipHash))
-                    return UIElement.FromHash(conversationSkipHash);
-                else
-                    return null;
+                try { return UIElement.FromHash(conversationSkipHash); }
+                catch { return null; }
             }
         }
+
+        //private static UIElement _partyLeaderBossAccept;
+        //public static UIElement PartyLeaderBossAccept { get { try { return _partyLeaderBossAccept ?? (_partyLeaderBossAccept = UIElement.FromHash(partyLeaderBossAcceptHash)); } catch { return null; } } }
         public static UIElement PartyLeaderBossAccept
         {
             get
             {
-                if (UIElement.IsValidElement(0x69B3F61C0F8490B0))
-                    return UIElement.FromHash(0x69B3F61C0F8490B0);
-                else
-                    return null;
+                try { return UIElement.FromHash(partyLeaderBossAcceptHash); }
+                catch { return null; }
             }
         }
+
+        //private static UIElement _partyFollowerBossAccept;
+        //public static UIElement PartyFollowerBossAccept { get { try { return _partyFollowerBossAccept ?? (_partyFollowerBossAccept = UIElement.FromHash(partyFollowerBossAcceptHash)); } catch { return null; } } }
         public static UIElement PartyFollowerBossAccept
         {
             get
             {
-                if (UIElement.IsValidElement(0xF495983BA9BE450F))
-                    return UIElement.FromHash(0xF495983BA9BE450F);
-                else
-                    return null;
+                try { return UIElement.FromHash(0xF495983BA9BE450F); }
+                catch { return null; }
             }
         }
+
+        //private static UIElement _genericOK;
+        //public static UIElement GenericOK { get { try { return _genericOK ?? (_genericOK = UIElement.FromHash(genericOKHash)); } catch { return null; } } }
         public static UIElement GenericOK
         {
             get
             {
-                if (UIElement.IsValidElement(0x891D21408238D18E))
-                    return UIElement.FromHash(0x891D21408238D18E);
-                else
-                    return null;
+                try { return UIElement.FromHash(0x891D21408238D18E); }
+                catch { return null; }
             }
         }
+
+        //private static UIElement _talktoInteractButton1;
+        //public static UIElement TalktoInteractButton1 { get { try { return _talktoInteractButton1 ?? (_talktoInteractButton1 = UIElement.FromHash(talkToInteractButton1Hash)); } catch { return null; } } }
         public static UIElement TalktoInteractButton1
         {
             get
             {
-                if (UIElement.IsValidElement(talkToInteractButton1))
-                    return UIElement.FromHash(talkToInteractButton1);
-                else
-                    return null;
+                try { return UIElement.FromHash(talkToInteractButton1Hash); }
+                catch { return null; }
             }
         }
 
@@ -99,17 +106,19 @@ namespace Trinity
             return true;
         }
 
-        public static void SafeClickElement(UIElement element, string name = "")
+        public static void SafeClickElement(UIElement element, string name = "", bool fireWorldTransfer = false)
         {
-            if (ZetaDia.Me.IsValid && !ZetaDia.Me.IsDead)
+            if (ZetaDia.Me.IsValid)
             {
                 if (IsElementVisible(element))
                 {
-                    GameEvents.FireWorldTransferStart();
-                    Thread.Sleep(250);
-                    Logging.Write("[QuestTools] Clicking UI element {0} ({1})", name, element.BaseAddress);
+                    if (fireWorldTransfer)
+                        GameEvents.FireWorldTransferStart();
+
+                    //Thread.Sleep(250);
+                    Technicals.Logger.Log("Clicking UI element {0} ({1})", name, element.BaseAddress);
                     element.Click();
-                    Thread.Sleep(250);
+                    //Thread.Sleep(250);
                 }
             }
         }
@@ -118,8 +127,8 @@ namespace Trinity
         public static void SafeClickUIButtons()
         {
             SafeClickElement(ConversationSkipButton, "Conversation Button");
-            SafeClickElement(PartyLeaderBossAccept, "Party Leader Boss Accept");
-            SafeClickElement(PartyFollowerBossAccept, "Party Follower Boss Accept");
+            SafeClickElement(PartyLeaderBossAccept, "Party Leader Boss Accept", true);
+            SafeClickElement(PartyFollowerBossAccept, "Party Follower Boss Accept", true);
 
             if (DateTime.Now.Subtract(lastCheckedUIButtons).TotalMilliseconds <= 500)
                 return;
@@ -130,8 +139,8 @@ namespace Trinity
             {
                 SafeClickElement(MercenaryOKButton, "Mercenary OK Button");
                 SafeClickElement(GenericOK, "GenericOK");
-                SafeClickElement(UIElements.ConfirmationDialogOkButton, "ConfirmationDialogOKButton");
-                SafeClickElement(ConfirmTimedDungeonOK, "Confirm Timed Dungeon OK Button");
+                SafeClickElement(UIElements.ConfirmationDialogOkButton, "ConfirmationDialogOKButton", true);
+                SafeClickElement(ConfirmTimedDungeonOK, "Confirm Timed Dungeon OK Button", true);
             }
         }
 

@@ -36,7 +36,7 @@ namespace Trinity.UIComponents
                                         {
                                             _Model.CopyTo(_OriginalModel);
                                             _OriginalModel.Save();
-                                            Trinity.SetBotTPS();
+                                            //Trinity.SetBotTPS();
                                             Trinity.SetUnstuckProvider();
                                             Trinity.SetItemManagerProvider();
                                             UILoader.CloseWindow();

@@ -9,6 +9,14 @@ namespace Trinity
     public class HotbarSkills
     {
         private static HashSet<HotbarSkills> _assignedSkills = new HashSet<HotbarSkills>();
+        private static SNOPower[] _hotbarSlots = new SNOPower[6];
+
+        public static SNOPower[] HotbarSlots
+        {
+            get { return HotbarSkills._hotbarSlots; }
+            set { HotbarSkills._hotbarSlots = value; }
+        }
+
         /// <summary>
         /// The currently assigned hotbar skills with runes and slots
         /// </summary>
@@ -35,7 +43,7 @@ namespace Trinity
 
         public HotbarSkills()
         {
-
+            
         }
 
         /// <summary>
@@ -47,6 +55,7 @@ namespace Trinity
                 Trinity.Player.ActorClass != ActorClass.WitchDoctor && !Trinity.GetHasBuff(SNOPower.Witchdoctor_Hex))
             {
                 _assignedSkills.Clear();
+                UpdateHotbarSlotPowers();
                 foreach (SNOPower p in Trinity.Hotbar)
                 {
                     _assignedSkills.Add(new HotbarSkills()
@@ -60,7 +69,7 @@ namespace Trinity
                 string skillList = "";
                 foreach (HotbarSkills skill in HotbarSkills.AssignedSkills)
                 {
-                    skillList += " " + skill.Power.ToString() + "/" + skill.RuneIndex + "/" + skill.Slot; 
+                    skillList += " " + skill.Power.ToString() + "/" + skill.RuneIndex + "/" + skill.Slot;
                 }
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, " Hotbar Skills (Skill/RuneIndex/Slot): " + skillList);
             }
@@ -78,7 +87,8 @@ namespace Trinity
             {
                 for (int i = 0; i < 6; i++)
                 {
-                    if (cPlayer.GetPowerForSlot((HotbarSlot)i) == power)
+                    //if (cPlayer.GetPowerForSlot((HotbarSlot)i) == power)
+                    if (_hotbarSlots[i] == power)
                     {
                         return (HotbarSlot)i;
                     }
@@ -103,6 +113,22 @@ namespace Trinity
             }
 
             return runeIndex;
+        }
+
+        private static void UpdateHotbarSlotPowers()
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                _hotbarSlots[i] = cPlayer.GetPowerForSlot((HotbarSlot)i);
+            }
+        }
+
+        public static SNOPower GetPowerForSlot(HotbarSlot slot)
+        {
+            if (slot == HotbarSlot.Invalid)
+                return SNOPower.None;
+
+            return _hotbarSlots[(int)slot];
         }
 
         private static CPlayer cPlayer { get { return ZetaDia.CPlayer; } }

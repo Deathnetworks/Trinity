@@ -102,7 +102,7 @@ namespace Trinity.XmlTags
         /// The Ignore Scene class, used as IgnoreScenes child elements
         /// </summary>
         [XmlElement("IgnoreScene")]
-        public class IgnoreScene
+        public class IgnoreScene : IEquatable<Scene>
         {
             [XmlAttribute("sceneName")]
             public string SceneName { get; set; }
@@ -123,13 +123,63 @@ namespace Trinity.XmlTags
             {
                 this.SceneId = id;
             }
+
+            public bool Equals(Scene other)
+            {
+                return (SceneName != String.Empty && other.Name.ToLowerInvariant().Contains(SceneName.ToLowerInvariant())) || other.SceneInfo.SNOId == SceneId;
+            }
+        }
+
+        private CachedValue<List<Area>> m_IgnoredAreas;
+        private List<Area> IgnoredAreas
+        {
+            get
+            {
+                if (m_IgnoredAreas == null)
+                    m_IgnoredAreas = new CachedValue<List<Area>>(() =>
+                    {
+                        return ZetaDia.Scenes.GetScenes()
+                            .Where(scn => scn.IsValid && IgnoreScenes.Any(igns => igns.Equals(scn)) && PriorityScenes.Any(psc => psc.Equals(scn)))
+                            .Select(scn =>
+                                scn.Mesh.Zone == null
+                                ? new Area(new Vector2(float.MinValue, float.MinValue), new Vector2(float.MaxValue, float.MaxValue))
+                                : new Area(scn.Mesh.Zone.ZoneMin, scn.Mesh.Zone.ZoneMax))
+                                .ToList();
+                    }, TimeSpan.FromSeconds(5));
+                return m_IgnoredAreas.Value;
+            }
+        }
+
+        private class Area
+        {
+            public Vector2 Min { get; set; }
+            public Vector2 Max { get; set; }
+
+            /// <summary>
+            /// Initializes a new instance of the Area class.
+            /// </summary>
+            public Area(Vector2 min, Vector2 max)
+            {
+                Min = min;
+                Max = max;
+            }
+
+            public bool IsPositionInside(Vector2 position)
+            {
+                return position.X >= Min.X && position.X <= Max.X && position.Y >= Min.Y && position.Y <= Max.Y;
+            }
+
+            public bool IsPositionInside(Vector3 position)
+            {
+                return IsPositionInside(position.ToVector2());
+            }
         }
 
         /// <summary>
         /// The Priority Scene class, used as PrioritizeScenes child elements
         /// </summary>
         [XmlElement("PrioritizeScene")]
-        public class PrioritizeScene
+        public class PrioritizeScene : IEquatable<Scene>
         {
             [XmlAttribute("sceneName")]
             public string SceneName { get; set; }
@@ -152,6 +202,10 @@ namespace Trinity.XmlTags
             public PrioritizeScene(int id)
             {
                 this.SceneId = id;
+            }
+            public bool Equals(Scene other)
+            {
+                return (SceneName != String.Empty && other.Name.ToLowerInvariant().Contains(SceneName.ToLowerInvariant())) || other.SceneInfo.SNOId == SceneId;
             }
         }
 
@@ -821,13 +875,19 @@ namespace Trinity.XmlTags
             return
             new Decorator(ret => IgnoreScenes != null && IgnoreScenes.Any(),
                 new PrioritySelector(
-                    new Decorator(ret => PositionInsideIgnoredScene(CurrentNavTarget),
+                    new Decorator(ret => IsPositionInsideIgnoredScene(CurrentNavTarget),
                         new Sequence(
                             new Action(ret => SetNodeVisited("Node is in Ignored Scene"))
                         )
                     )
                 )
             );
+        }
+
+
+        private bool IsPositionInsideIgnoredScene(Vector3 position)
+        {
+            return IgnoredAreas.Any(a => a.IsPositionInside(position));
         }
 
         /// <summary>
