@@ -23,8 +23,7 @@ namespace Trinity
         {
             get
             {
-                try { return UIElement.FromHash(confirmTimedDungeonOKHash); }
-                catch { return null; }
+                return UIElement.FromHash(confirmTimedDungeonOKHash); 
             }
         }
 
@@ -34,8 +33,7 @@ namespace Trinity
         {
             get
             {
-                try { return UIElement.FromHash(mercenaryOKHash); }
-                catch { return null; }
+                return UIElement.FromHash(mercenaryOKHash); 
             }
         }
 
@@ -45,8 +43,7 @@ namespace Trinity
         {
             get
             {
-                try { return UIElement.FromHash(conversationSkipHash); }
-                catch { return null; }
+                return UIElement.FromHash(conversationSkipHash); 
             }
         }
 
@@ -56,8 +53,7 @@ namespace Trinity
         {
             get
             {
-                try { return UIElement.FromHash(partyLeaderBossAcceptHash); }
-                catch { return null; }
+                return UIElement.FromHash(partyLeaderBossAcceptHash); 
             }
         }
 
@@ -67,8 +63,7 @@ namespace Trinity
         {
             get
             {
-                try { return UIElement.FromHash(0xF495983BA9BE450F); }
-                catch { return null; }
+                return UIElement.FromHash(0xF495983BA9BE450F); 
             }
         }
 
@@ -78,8 +73,7 @@ namespace Trinity
         {
             get
             {
-                try { return UIElement.FromHash(0x891D21408238D18E); }
-                catch { return null; }
+               return UIElement.FromHash(0x891D21408238D18E); 
             }
         }
 
@@ -89,8 +83,7 @@ namespace Trinity
         {
             get
             {
-                try { return UIElement.FromHash(talkToInteractButton1Hash); }
-                catch { return null; }
+                return UIElement.FromHash(talkToInteractButton1Hash); 
             }
         }
 

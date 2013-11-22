@@ -13,6 +13,15 @@ namespace Trinity
         {
             AddToCache = true;
 
+            if (c_diaUnit == null)
+                return AddToCache;
+
+            if (!c_diaUnit.IsValid)
+                return AddToCache;
+
+            if (!c_diaUnit.CommonData.IsValid)
+                return AddToCache;
+
             // grab this first
             c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
 

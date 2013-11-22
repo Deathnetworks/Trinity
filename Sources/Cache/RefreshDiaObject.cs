@@ -563,6 +563,8 @@ namespace Trinity
                     {
                         using (new PerformanceLogger("RefreshCachedType.2"))
                         {
+                            c_ObjectType = GObjectType.Item;
+
                             if (c_CommonData == null)
                             {
                                 AddToCache = false;
@@ -574,10 +576,6 @@ namespace Trinity
                             if (c_InternalName.ToLower().StartsWith("gold"))
                             {
                                 c_ObjectType = GObjectType.Gold;
-                            }
-                            else
-                            {
-                                c_ObjectType = GObjectType.Item;
                             }
                         }
                     }

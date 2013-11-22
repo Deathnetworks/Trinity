@@ -22,6 +22,19 @@ namespace Trinity
             }
 
             var item = c_diaObject as DiaItem;
+
+            if (item == null)
+                return false;
+
+            if (item.CommonData == null)
+                return false;
+
+            if (!item.IsValid)
+                return false;
+
+            if (!item.CommonData.IsValid)
+                return false;
+
             c_ItemQuality = item.CommonData.ItemQualityLevel;
 
             float fExtraRange = 0f;
@@ -96,9 +109,9 @@ namespace Trinity
             // Get whether or not we want this item, cached if possible
             if (!pickupItemCache.TryGetValue(c_RActorGuid, out AddToCache))
             {
-                if (pickupItem.IsTwoHand && !Settings.Loot.Pickup.TwoHandedWeapons)
+                if (pickupItem.IsTwoHand && Settings.Loot.Pickup.TwoHandedWeapons)
                 {
-                    AddToCache = false;
+                    AddToCache = true;
                 }
                 else if (Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
                 {
