@@ -283,7 +283,7 @@
                 </Grid>
             </Grid>
             <UniformGrid Columns="2" Grid.Row="5" Margin="5">
-                <CheckBox Content="Pickup Two Handed Weapons" IsChecked="{Binding Path=Pickup.TwoHandedWeapons}" />
+                <CheckBox Content="Ignore Two Handed Weapons" IsChecked="{Binding Path=Pickup.IgnoreTwoHandedWeapons}" />
                 <TextBlock Text="" />
                 
                 <CheckBox Content="Ignore Legendary in AoE" ToolTip="Ignore Legendary Items in AoE" IsChecked="{Binding Path=Pickup.IgnoreLegendaryInAoE}" />

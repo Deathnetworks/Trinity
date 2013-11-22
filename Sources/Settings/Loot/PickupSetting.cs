@@ -28,7 +28,7 @@ namespace Trinity.Config.Loot
         private bool _CraftMaterials;
         private bool _InfernalKeys;
         private bool _PickupLowLevel;
-        private bool _TwoHandedWeapons;
+        private bool _IgnoreTwoHandedWeapons;
 
         private bool _IgnoreLegendaryInAoE;
         private bool _IgnoreRareInAoE;
@@ -432,17 +432,17 @@ namespace Trinity.Config.Loot
 
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
-        public bool TwoHandedWeapons
+        public bool IgnoreTwoHandedWeapons
         {
             get
             {
-                return _TwoHandedWeapons;
+                return _IgnoreTwoHandedWeapons;
             }
             set
             {
-                if (_TwoHandedWeapons != value)
+                if (_IgnoreTwoHandedWeapons != value)
                 {
-                    _TwoHandedWeapons = value;
+                    _IgnoreTwoHandedWeapons = value;
                     OnPropertyChanged("TwoHandedWeapons");
                 }
             }
@@ -588,7 +588,7 @@ namespace Trinity.Config.Loot
             this.Plans = true;
             this.LegendaryPlans = true;
             this.PickupLowLevel = true;
-            this.TwoHandedWeapons = true;
+            this.IgnoreTwoHandedWeapons = false;
         }
         #endregion Methods
     }

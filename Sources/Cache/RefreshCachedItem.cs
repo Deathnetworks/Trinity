@@ -109,9 +109,9 @@ namespace Trinity
             // Get whether or not we want this item, cached if possible
             if (!pickupItemCache.TryGetValue(c_RActorGuid, out AddToCache))
             {
-                if (pickupItem.IsTwoHand && Settings.Loot.Pickup.TwoHandedWeapons)
+                if (pickupItem.IsTwoHand && Settings.Loot.Pickup.IgnoreTwoHandedWeapons)
                 {
-                    AddToCache = true;
+                    AddToCache = false;
                 }
                 else if (Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
                 {
