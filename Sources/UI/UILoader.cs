@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -8,16 +9,19 @@ using System.Windows.Controls;
 using System.Windows.Markup;
 using Trinity.Technicals;
 using Trinity.UIComponents;
+using System.Diagnostics;
 
 namespace Trinity.UI
 {
     public class UILoader
     {
-        public static Window _ConfigWindow;
+        public static Window _configWindow;
+        private static UserControl _windowContent;
+        private static object _contentLock = new object();
 
         public static void CloseWindow()
         {
-            _ConfigWindow.Close();
+            _configWindow.Close();
         }
 
         public static Window GetDisplayWindow()
@@ -27,62 +31,86 @@ namespace Trinity.UI
 
         public static Window GetDisplayWindow(string uiPath)
         {
-            // Check we can actually find the .xaml file first - if not, report an error
-            if (!File.Exists(Path.Combine(uiPath, "MainView.xaml")))
+            using (new PerformanceLogger("GetDisplayWindow"))
             {
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "MainView.xaml not found {0}", Path.Combine(uiPath, "MainView.xaml"));
-                return null;
-            }
-            try
-            {
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "MainView.xaml found");
-                if (_ConfigWindow == null)
+                // Check we can actually find the .xaml file first - if not, report an error
+                if (!File.Exists(Path.Combine(uiPath, "MainView.xaml")))
                 {
-                    _ConfigWindow = new Window();
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "MainView.xaml not found {0}", Path.Combine(uiPath, "MainView.xaml"));
+                    return null;
                 }
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Context");
-                _ConfigWindow.DataContext = new ConfigViewModel(Trinity.Settings);
+                try
+                {
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "MainView.xaml found");
+                    if (_configWindow == null)
+                    {
+                        _configWindow = new Window();
+                    }
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Context");
+                    _configWindow.DataContext = new ConfigViewModel(Trinity.Settings);
 
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load MainView.xaml");
-                UserControl mainControl = LoadAndTransformXamlFile<UserControl>(Path.Combine(uiPath, "MainView.xaml"));
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Children");
-                LoadChild(mainControl, uiPath);
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Resources");
-                LoadResourceForWindow(Path.Combine(uiPath, "Template.xaml"), mainControl);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load MainView.xaml");
+                    if (_windowContent == null)
+                    {
+                        LoadWindowContent(uiPath);
+                    }
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Put MainControl to Window");
+                    _configWindow.Content = _windowContent;
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Configure Window");
+                    _configWindow.Height = 620;
+                    _configWindow.Width = 480;
+                    _configWindow.MinHeight = 580;
+                    _configWindow.MinWidth = 480;
+                    _configWindow.Title = "Trinity";
 
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Configure Window");
-                _ConfigWindow.Content = mainControl;
-                _ConfigWindow.Height = 620;
-                _ConfigWindow.Width = 480;
-                _ConfigWindow.MinHeight = 580;
-                _ConfigWindow.MinWidth = 480;
-                _ConfigWindow.Title = "Trinity";
+                    // Event handling for the config window loading up/closing
+                    //configWindow.Loaded += configWindow_Loaded;
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Set Window Events");
+                    _configWindow.Closed += WindowClosed;
 
-                // Event handling for the config window loading up/closing
-                //configWindow.Loaded += configWindow_Loaded;
-                _ConfigWindow.Closed += WindowClosed;
+                    Demonbuddy.App.Current.Exit += WindowClosed;
 
-                Demonbuddy.App.Current.Exit += WindowClosed;
 
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Put MainControl to Window");
-                // And finally put all of this content in effect
-                _ConfigWindow.Content = mainControl;
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window build finished.");
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window build finished.");
+                }
+                catch (XamlParseException ex)
+                {
+                    Logger.Log(TrinityLogLevel.Error, LogCategory.UI, "{0}", ex);
+                    return _configWindow;
+                }
+                return _configWindow;
             }
-            catch (XamlParseException ex)
+        }
+
+        /// <summary>
+        /// Loads the plugin config window XAML asyncronously, for fast re-use later.
+        /// </summary>
+        internal static void PreLoadWindowContent()
+        {
+            Trinity.BeginInvoke(new Action(() => LoadWindowContent(Path.Combine(FileManager.PluginPath, "UI"))));
+        }
+
+        internal static void LoadWindowContent(string uiPath)
+        {
+            lock (_contentLock)
             {
-                Logger.Log(TrinityLogLevel.Error, LogCategory.UI, "{0}", ex);
-                return _ConfigWindow;
+                _windowContent = LoadAndTransformXamlFile<UserControl>(Path.Combine(uiPath, "MainView.xaml"));
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Children");
+                LoadChild(_windowContent, uiPath);
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Resources");
+                LoadResourceForWindow(Path.Combine(uiPath, "Template.xaml"), _windowContent);
             }
-            return _ConfigWindow;
         }
 
         private static void LoadResourceForWindow(string filename, UserControl control)
         {
-            ResourceDictionary resource = LoadAndTransformXamlFile<ResourceDictionary>(filename);
-            foreach (System.Collections.DictionaryEntry res in resource)
+            using (new PerformanceLogger("LoadResourceForWindow"))
             {
-                control.Resources.Add(res.Key, res.Value);
+                ResourceDictionary resource = LoadAndTransformXamlFile<ResourceDictionary>(filename);
+                foreach (System.Collections.DictionaryEntry res in resource)
+                {
+                    control.Resources.Add(res.Key, res.Value);
+                }
             }
         }
 
@@ -113,7 +141,7 @@ namespace Trinity.UI
         static void WindowClosed(object sender, System.EventArgs e)
         {
             Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Window closed.");
-            _ConfigWindow = null;
+            _configWindow = null;
         }
 
         /// <summary>Loads recursivly the child in ContentControl or Decorator with Tag.</summary>
@@ -121,20 +149,23 @@ namespace Trinity.UI
         /// <param name="uiPath">The UI path.</param>
         private static void LoadChild(FrameworkElement parentControl, string uiPath)
         {
-            // Loop in Children of parent control of type FrameworkElement 
-            foreach (FrameworkElement ctrl in LogicalTreeHelper.GetChildren(parentControl).OfType<FrameworkElement>())
+            using (new PerformanceLogger("LoadChild"))
             {
-                string contentName = ctrl.Tag as string;
-                // Tag contains a string end with ".xaml" : It's dymanic content 
-                if (!string.IsNullOrWhiteSpace(contentName) && contentName.EndsWith(".xaml"))
+                // Loop in Children of parent control of type FrameworkElement 
+                foreach (FrameworkElement ctrl in LogicalTreeHelper.GetChildren(parentControl).OfType<FrameworkElement>())
                 {
-                    // Load content from XAML file
-                    LoadDynamicContent(uiPath, ctrl, System.IO.Path.Combine(uiPath, contentName));
-                }
-                else
-                {
-                    // Try again with children of control
-                    LoadChild(ctrl, uiPath);
+                    string contentName = ctrl.Tag as string;
+                    // Tag contains a string end with ".xaml" : It's dymanic content 
+                    if (!string.IsNullOrWhiteSpace(contentName) && contentName.EndsWith(".xaml"))
+                    {
+                        // Load content from XAML file
+                        LoadDynamicContent(uiPath, ctrl, System.IO.Path.Combine(uiPath, contentName));
+                    }
+                    else
+                    {
+                        // Try again with children of control
+                        LoadChild(ctrl, uiPath);
+                    }
                 }
             }
         }

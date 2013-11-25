@@ -47,7 +47,6 @@ namespace Trinity.XmlTags
                 return;
             }
 
-            Logger.Log(LogCategory.ProfileTag, "TrinityTownPortal started - clearing area");
             ForceClearArea = true;
             AreaClearTimer.Start();
             DefaultWaitTime = V.I("XmlTag.TrinityTownPortal.DefaultWaitTime");
@@ -61,6 +60,7 @@ namespace Trinity.XmlTags
                 WaitTime = forceWaitTime;
             }
             _StartHealth = ZetaDia.Me.HitpointsCurrent;
+            Logger.Log(LogCategory.UserInformation, "TrinityTownPortal started - clearing area, waitTime={0}, startHealth={1:0}", WaitTime, _StartHealth);
         }
 
         protected override Composite CreateBehavior()
@@ -76,7 +76,6 @@ namespace Trinity.XmlTags
                         ForceClearArea = false;
                         AreaClearTimer.Reset();
                         _IsDone = true;
-                        //Logger.Log("[TrinityTownPortal] In Town");
                     })
                 ),
                 new Decorator(ret => !ZetaDia.Me.IsInTown && !ZetaDia.Me.CanUseTownPortal(),
@@ -85,7 +84,6 @@ namespace Trinity.XmlTags
                         ForceClearArea = false;
                         AreaClearTimer.Reset();
                         _IsDone = true;
-                        //Logger.Log("[TrinityTownPortal] Unable to use TownPortal!");
                     })
                 ),
                 new Decorator(ret => ZetaDia.Me.HitpointsCurrent < _StartHealth,
@@ -104,7 +102,7 @@ namespace Trinity.XmlTags
                         new Decorator(ret => AreaClearTimer.ElapsedMilliseconds > WaitTime,
                             new Action(ret =>
                             {
-                                Logger.Log(LogCategory.ProfileTag, "TownRun timer finished");
+                                Logger.Log(LogCategory.UserInformation, "TownRun timer finished");
                                 ForceClearArea = false;
                                 AreaClearTimer.Reset();
                             })
@@ -129,7 +127,7 @@ namespace Trinity.XmlTags
                             )
                         ),
                         new Sequence(
-                            new DecoratorContinue(ret => ZetaDia.Me.LoopingAnimationEndTime > 0, // Already casting, just wait
+                            new DecoratorContinue(ret => PortalCastTimer.IsRunning && ZetaDia.Me.LoopingAnimationEndTime > 0, // Already casting, just wait
                                 new Action()
                             ),
                             new Action(ret =>

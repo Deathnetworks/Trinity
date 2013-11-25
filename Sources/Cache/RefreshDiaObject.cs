@@ -45,6 +45,7 @@ namespace Trinity
         private static bool c_IsOneHandedItem = false;
         private static bool c_IsTwoHandedItem = false;
         private static ItemQuality c_ItemQuality = ItemQuality.Invalid;
+        private static int c_ItemQualityLevelIdentified = -1;
         private static ItemType c_DBItemType = ItemType.Unknown;
         private static ItemBaseType c_DBItemBaseType = ItemBaseType.None;
         private static FollowerType c_item_tFollowerType = FollowerType.None;
@@ -297,7 +298,6 @@ namespace Trinity
             c_ObjectType = GObjectType.Unknown;
             // We will set weight up later in RefreshDiaObjects after we process all valid items
             c_Position = Vector3.Zero;
-            c_ObjectType = GObjectType.Unknown;
             c_CentreDistance = 0f;
             c_RadiusDistance = 0f;
             c_Radius = 0f;
@@ -332,6 +332,7 @@ namespace Trinity
             c_HasBeenInLoS = false;
             c_ItemMd5Hash = string.Empty;
             c_ItemQuality = ItemQuality.Invalid;
+            c_ItemQualityLevelIdentified = -1;
             c_DBItemBaseType = ItemBaseType.None;
             c_DBItemType = ItemType.Unknown;
             c_item_tFollowerType = FollowerType.None;
@@ -404,10 +405,8 @@ namespace Trinity
             {
                 return false;
             }
-            else
-            {
-                return true;
-            }
+
+            return true;
         }
 
         private static bool RefreshStepIgnoreNullCommonData(bool AddToCache)
@@ -579,7 +578,7 @@ namespace Trinity
                             }
                         }
                     }
-                    else if (c_diaObject is DiaGizmo)
+                    else if (c_diaObject is DiaGizmo && c_diaObject.ActorType == ActorType.Gizmo)
                     {
                         DiaGizmo c_diaGizmo;
                         using (new PerformanceLogger("RefreshCachedType.3"))

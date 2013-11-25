@@ -65,7 +65,7 @@ namespace Trinity
                     "Note: Maintaining item stats from previous run. To reset stats fully, please restart DB.");
             }
 
-            UsedProfileManager.RefreshProfileBlacklists();
+            BeginInvoke(new Action(() => UsedProfileManager.RefreshProfileBlacklists()));
 
             ReplaceTreeHooks();
 
@@ -87,14 +87,18 @@ namespace Trinity
                     CharacterSettings.Instance.LootRadius);
             }
 
-            if (StashRule == null)
-                StashRule = new Interpreter();
+            BeginInvoke(new Action(() =>
+                {
+                    if (StashRule == null)
+                        StashRule = new Interpreter();
 
-            StashRule.readConfiguration();
+                    StashRule.readConfiguration();
+                }
+            ));
 
             Navigator.SearchGridProvider.Update();
 
-            Logger.LogDebug("Trinity OnEnable took {0}ms", DateTime.Now.Subtract(timeBotStart).TotalMilliseconds);
+            Logger.LogDebug("Trinity BotStart took {0}ms", DateTime.Now.Subtract(timeBotStart).TotalMilliseconds);
         }
 
         private void GameEvents_OnGameChanged(object sender, EventArgs e)
@@ -190,70 +194,83 @@ namespace Trinity
 
         public static void ResetEverythingNewGame()
         {
-            Logger.Log("New Game - resetting everything");
-
+            // In-thread stuff
+            PlayerInfoCache.RefreshHotbar();
             V.ValidateLoad();
 
-            AbilityLastUsedCache.Clear();
-            PlayerInfoCache.RefreshHotbar();
+            // Out of thread Async stuff
+            BeginInvoke(new Action(() =>
+                {
+                    
+                    Logger.Log("New Game - resetting everything");
 
-            TrinityUseOnce.UseOnceIDs = new HashSet<int>();
-            TrinityUseOnce.UseOnceCounter = new Dictionary<int, int>();
-            iMaxDeathsAllowed = 0;
-            iDeathsThisRun = 0;
-            LastDeathTime = DateTime.Now;
-            _hashsetItemStatsLookedAt = new HashSet<string>();
-            _hashsetItemPicksLookedAt = new HashSet<string>();
-            _hashsetItemFollowersIgnored = new HashSet<string>();
+                    Trinity.IsReadyToTownRun = false;
+                    Trinity.ForceVendorRunASAP = false;
+                    TownRun.TownRunCheckTimer.Reset();
+                    TownRun.SendEmailNotification();
+                    TownRun.PreTownRunPosition = Vector3.Zero;
+                    TownRun.PreTownRunWorldId = -1;
+                    TownRun.WasVendoring = false;
 
-            hashRGUIDBlacklist60 = new HashSet<int>();
-            hashRGUIDBlacklist90 = new HashSet<int>();
-            hashRGUIDBlacklist15 = new HashSet<int>();
-            vBacktrackList = new SortedList<int, Vector3>();
-            iTotalBacktracks = 0;
-            HasMappedPlayerAbilities = false;
-            PlayerMover.TotalAntiStuckAttempts = 1;
-            PlayerMover.vSafeMovementLocation = Vector3.Zero;
-            PlayerMover.vOldPosition = Vector3.Zero;
-            PlayerMover.iTimesReachedStuckPoint = 0;
-            PlayerMover.TimeLastRecordedPosition = DateTime.Today;
-            PlayerMover.LastGeneratedStuckPosition = DateTime.Today;
-            PlayerMover.iTimesReachedMaxUnstucks = 0;
-            PlayerMover.iCancelUnstuckerForSeconds = 0;
-            PlayerMover._lastCancelledUnstucker = DateTime.Today;
-            NavHelper.UsedStuckSpots = new List<GridPoint>();
+                    AbilityLastUsedCache.Clear();
 
-            // Reset all the caches
-            objectTypeCache = new Dictionary<int, GObjectType>();
-            unitMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
-            unitMaxHealthCache = new Dictionary<int, double>();
-            currentHealthCache = new Dictionary<int, double>();
-            currentHealthCheckTimeCache = new Dictionary<int, int>();
-            unitBurrowedCache = new Dictionary<int, bool>();
-            actorSNOCache = new Dictionary<int, int>();
-            ACDGUIDCache = new Dictionary<int, int>();
-            nameCache = new Dictionary<int, string>();
-            gameBalanceIDCache = new Dictionary<int, int>();
-            dynamicIDCache = new Dictionary<int, int>();
-            positionCache = new Dictionary<int, Vector3>();
-            goldAmountCache = new Dictionary<int, int>();
-            itemQualityCache = new Dictionary<int, ItemQuality>();
-            pickupItemCache = new Dictionary<int, bool>();
-            summonedByIdCache = new Dictionary<int, int>();
-            interactAttemptsCache = new Dictionary<int, int>();
-            ProfileHistory = new List<string>();
-            CurrentProfile = "";
-            FirstProfile = "";
+                    TrinityUseOnce.UseOnceIDs = new HashSet<int>();
+                    TrinityUseOnce.UseOnceCounter = new Dictionary<int, int>();
+                    iMaxDeathsAllowed = 0;
+                    iDeathsThisRun = 0;
+                    LastDeathTime = DateTime.Now;
+                    _hashsetItemStatsLookedAt = new HashSet<string>();
+                    _hashsetItemPicksLookedAt = new HashSet<string>();
+                    _hashsetItemFollowersIgnored = new HashSet<string>();
 
-            PlayerInfoCache.RefreshHotbar();
-            AbilityLastUsedCache = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
+                    hashRGUIDBlacklist60 = new HashSet<int>();
+                    hashRGUIDBlacklist90 = new HashSet<int>();
+                    hashRGUIDBlacklist15 = new HashSet<int>();
+                    vBacktrackList = new SortedList<int, Vector3>();
+                    iTotalBacktracks = 0;
+                    HasMappedPlayerAbilities = false;
+                    PlayerMover.TotalAntiStuckAttempts = 1;
+                    PlayerMover.vSafeMovementLocation = Vector3.Zero;
+                    PlayerMover.vOldPosition = Vector3.Zero;
+                    PlayerMover.iTimesReachedStuckPoint = 0;
+                    PlayerMover.TimeLastRecordedPosition = DateTime.Today;
+                    PlayerMover.LastGeneratedStuckPosition = DateTime.Today;
+                    PlayerMover.iTimesReachedMaxUnstucks = 0;
+                    PlayerMover.iCancelUnstuckerForSeconds = 0;
+                    PlayerMover._lastCancelledUnstucker = DateTime.Today;
+                    NavHelper.UsedStuckSpots = new List<GridPoint>();
 
-            GoldInactivity.ResetCheckGold();
+                    // Reset all the caches
+                    objectTypeCache = new Dictionary<int, GObjectType>();
+                    unitMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
+                    unitMaxHealthCache = new Dictionary<int, double>();
+                    currentHealthCache = new Dictionary<int, double>();
+                    currentHealthCheckTimeCache = new Dictionary<int, int>();
+                    unitBurrowedCache = new Dictionary<int, bool>();
+                    actorSNOCache = new Dictionary<int, int>();
+                    ACDGUIDCache = new Dictionary<int, int>();
+                    nameCache = new Dictionary<int, string>();
+                    gameBalanceIDCache = new Dictionary<int, int>();
+                    dynamicIDCache = new Dictionary<int, int>();
+                    positionCache = new Dictionary<int, Vector3>();
+                    goldAmountCache = new Dictionary<int, int>();
+                    itemQualityCache = new Dictionary<int, ItemQuality>();
+                    pickupItemCache = new Dictionary<int, bool>();
+                    summonedByIdCache = new Dictionary<int, int>();
+                    interactAttemptsCache = new Dictionary<int, int>();
+                    ProfileHistory = new List<string>();
+                    CurrentProfile = "";
+                    FirstProfile = "";
 
-            TrinityLoadOnce.UsedProfiles = new List<string>();
+                    AbilityLastUsedCache = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
 
-            GenericCache.ClearCache();
-            GenericBlacklist.ClearBlacklist();
+                    GoldInactivity.ResetCheckGold();
+
+                    TrinityLoadOnce.UsedProfiles = new List<string>();
+
+                    GenericCache.ClearCache();
+                    GenericBlacklist.ClearBlacklist();
+                }));
         }
     }
 }

@@ -178,6 +178,7 @@ namespace Trinity.XmlTags
         /// <summary>
         /// The Priority Scene class, used as PrioritizeScenes child elements
         /// </summary>
+        [XmlElement("PriorityScene")]
         [XmlElement("PrioritizeScene")]
         public class PrioritizeScene : IEquatable<Scene>
         {

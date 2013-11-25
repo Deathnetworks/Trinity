@@ -330,7 +330,18 @@
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>rd /S /Q "$(ProjectDir)obj\"
-rem rd /S /Q "$(ProjectDir)bin\"
-</PostBuildEvent>
+rd /S /Q "$(ProjectDir)bin\"
+rd /S /Q "C:\db\svn\Trinity\trunk\Sources\"
+rd /S /Q "C:\db\Plugins\Trinity\"
+del /S "$(ProjectDir)*.bak"
+
+xcopy /E /Y "$(ProjectDir)*.cs" "C:\db\Plugins\Trinity\"
+xcopy /E /Y "$(ProjectDir)*.dis" "C:\db\Plugins\Trinity\"
+xcopy /E /Y "$(ProjectDir)*.xaml" "C:\db\Plugins\Trinity\"
+xcopy /E /Y "$(ProjectDir)*.xml" "C:\db\Plugins\Trinity\"
+xcopy /E /Y "$(ProjectDir)*.xsd" "C:\db\Plugins\Trinity\"
+xcopy /E /Y "$(ProjectDir)*.txt" "C:\db\Plugins\Trinity\"
+xcopy /E /Y "$(ProjectDir)*" "C:\db\svn\Trinity\trunk\Sources\"
+rd /S /Q "C:\db\svn\Trinity\trunk\Sources\bin\"</PostBuildEvent>
   </PropertyGroup>
 </Project>

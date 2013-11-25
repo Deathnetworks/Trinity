@@ -36,6 +36,7 @@ namespace Trinity
                 return false;
 
             c_ItemQuality = item.CommonData.ItemQualityLevel;
+            c_ItemQualityLevelIdentified = ((DiaItem)c_diaObject).CommonData.GetAttribute<int>(ActorAttributeType.ItemQualityLevelIdentified);
 
             float fExtraRange = 0f;
 
@@ -161,7 +162,7 @@ namespace Trinity
             {
                 if (writeHeader)
                 {
-                    LogWriter.WriteLine("Timestamp,ActorSNO,RActorGUID,DyanmicID,GameBalanceID,ACDGuid,Name,InternalName,DBBaseType,TBaseType,DBItemType,TItemType,Quality,Level,IgnoreItemSubStep,Distance,Pickup,SHA1Hash");
+                    LogWriter.WriteLine("Timestamp,ActorSNO,RActorGUID,DyanmicID,GameBalanceID,ACDGuid,Name,InternalName,DBBaseType,TBaseType,DBItemType,TItemType,Quality,QualityLevelIdentified,Level,IgnoreItemSubStep,Distance,Pickup,SHA1Hash");
                 }
                 LogWriter.Write(FormatCSVField(DateTime.Now));
                 LogWriter.Write(FormatCSVField(c_ActorSNO));
@@ -177,6 +178,7 @@ namespace Trinity
                 LogWriter.Write(FormatCSVField(c_DBItemType.ToString()));
                 LogWriter.Write(FormatCSVField(c_item_GItemType.ToString()));
                 LogWriter.Write(FormatCSVField(c_ItemQuality.ToString()));
+                LogWriter.Write(FormatCSVField(c_ItemQualityLevelIdentified));
                 LogWriter.Write(FormatCSVField(c_ItemLevel));
                 LogWriter.Write(FormatCSVField(c_IgnoreSubStep));
                 LogWriter.Write(FormatCSVField(c_CentreDistance));

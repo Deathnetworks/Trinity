@@ -125,8 +125,6 @@ namespace Trinity
                 LootTargeting.Instance.Provider = new BlankLootProvider();
                 ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
 
-                //Navigator.SearchGridProvider = new SearchAreaProvider();
-
                 if (Settings.Loot.ItemFilterMode != global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
                 {
                     ItemManager.Current = new TrinityItemManager();
@@ -140,10 +138,11 @@ namespace Trinity
                         TrinityOnJoinGame(null, null);
                 }
 
-                SetBotTPS();
-                //BotMain.TicksPerSecond = Int32.MaxValue;
+               BeginInvoke(new Action(() => SetBotTPS()));
 
                 TrinityPowerManager.LoadLegacyDelays();
+
+                UI.UILoader.PreLoadWindowContent();
 
                 Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
             }
@@ -151,7 +150,7 @@ namespace Trinity
             if (StashRule != null)
             {
                 // reseting stash rules
-                StashRule.reset();
+                BeginInvoke(new Action(() => StashRule.reset()));
             }
 
             Logger.LogDebug("OnEnable took {0}ms", DateTime.Now.Subtract(dateOnEnabledStart).TotalMilliseconds);
@@ -254,13 +253,18 @@ namespace Trinity
                 {
                     windowTitle += " - " + profileName;
                 }
-
-                Application.Current.Dispatcher.Invoke(new Action(() =>
+                
+                BeginInvoke(new Action(() =>
                 {
                     Window mainWindow = Application.Current.MainWindow;
                     mainWindow.Title = windowTitle;
                 }));
             }
+        }
+
+        internal static void BeginInvoke(Action action)
+        {
+            Application.Current.Dispatcher.BeginInvoke(action);
         }
 
     }
