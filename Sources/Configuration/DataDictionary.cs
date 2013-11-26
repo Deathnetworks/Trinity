@@ -47,6 +47,9 @@ namespace Trinity
             94672, // A1 Cursed Hold
             102964, // A2 City of Caldeum
             100854, // A1 Khazra Den
+            83110, // A1 Cellar of the Damned
+            101351, // A1 The Old Ruins
+            60714, // Leoric's Passage
         };
 
 

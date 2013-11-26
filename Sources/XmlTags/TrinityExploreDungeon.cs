@@ -417,6 +417,9 @@ namespace Trinity.XmlTags
                     new Decorator(ret => !IgnoreMarkers,
                         MiniMapMarker.VisitMiniMapMarkers(myPos, MarkerDistance)
                     ),
+                    new Decorator(ret => ShouldInvestigateActor(),
+                        InvestigatActor()
+                    ),
                     new Sequence(
                         new DecoratorContinue(ret => BrainBehavior.DungeonExplorer != null && !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
                             new Action(ret => UpdateRoute())
@@ -435,6 +438,44 @@ namespace Trinity.XmlTags
                     new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Error 1: Unknown error occured!"))
                 )
             );
+        }
+
+        private Action InvestigatActor()
+        {
+            return new Action(ret =>
+            {
+                RecordPosition();
+
+                var actor = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).FirstOrDefault(a => a.ActorSNO == ActorId);
+
+                if (actor != null && actor.IsValid && actor.Position.Distance2D(myPos) >= ObjectDistance)
+                    Navigator.MoveTo(actor.Position);
+            });
+        }
+
+        private bool ShouldInvestigateActor()
+        {
+            if (ActorId == 0)
+                return false;
+
+            if (ObjectDistance == 0)
+                return false;
+
+            var actors = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                .Where(a => Trinity.SkipAheadAreaCache.Any(o => o.Location.Distance2D(a.Position) >= ObjectDistance));
+
+            if (actors == null)
+                return false;
+
+            if (!actors.Any())
+                return false;
+
+            var actor = actors.OrderBy(a => a.Distance).FirstOrDefault();
+
+            if (actor.Distance <= ObjectDistance)
+                return false;
+            
+            return true;
         }
 
 
@@ -1169,6 +1210,13 @@ namespace Trinity.XmlTags
             string nodeName = String.Format("{0} Distance: {1:0} Direction: {2}",
                 NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(Trinity.Player.Position), MathUtil.GetHeadingToPoint(NextNode.NavigableCenter));
 
+            RecordPosition();
+
+            LastMoveResult = Navigator.MoveTo(CurrentNavTarget);
+        }
+
+        private void RecordPosition()
+        {
             if (DateTime.Now.Subtract(Trinity.lastAddedLocationCache).TotalMilliseconds >= 100)
             {
                 Trinity.lastAddedLocationCache = DateTime.Now;
@@ -1179,8 +1227,6 @@ namespace Trinity.XmlTags
                     Trinity.LastRecordedPosition = myPos;
                 }
             }
-
-            LastMoveResult = Navigator.MoveTo(CurrentNavTarget);
         }
         /// <summary>
         /// Initizializes the profile tag and sets defaults as needed

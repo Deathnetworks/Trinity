@@ -122,6 +122,7 @@ namespace Trinity
             SafeClickElement(ConversationSkipButton, "Conversation Button");
             SafeClickElement(PartyLeaderBossAccept, "Party Leader Boss Accept", true);
             SafeClickElement(PartyFollowerBossAccept, "Party Follower Boss Accept", true);
+            SafeClickElement(TalktoInteractButton1, "Conversation Button", false);
 
             if (DateTime.Now.Subtract(lastCheckedUIButtons).TotalMilliseconds <= 500)
                 return;
