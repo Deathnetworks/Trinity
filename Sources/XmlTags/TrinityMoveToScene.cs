@@ -167,10 +167,8 @@ namespace Trinity.XmlTags
         /// </summary>
         private void FindPrioritySceneTarget()
         {
-            if (SceneId == 0 && SceneName == String.Empty)
+            if (SceneId == 0 && string.IsNullOrWhiteSpace(SceneName))
                 return;
-
-            //gp.Update();
 
             if (PrioritySceneTarget != Vector3.Zero)
                 return;
@@ -179,45 +177,60 @@ namespace Trinity.XmlTags
 
             // find any matching priority scenes in scene manager - match by name or SNOId
 
-            List<Scene> PScenes = ZetaDia.Scenes.GetScenes()
-                .Where(s => s.SceneInfo.SNOId == SceneId).ToList();
+            List<Scene> PScenes = new List<Scene>();
+            var allScenes = ZetaDia.Scenes.GetScenes();
 
-            PScenes.AddRange(ZetaDia.Scenes.GetScenes()
-                 .Where(s => SceneName.Trim() != String.Empty && s.Name.ToLower().Contains(SceneName.ToLower())).ToList());
+            if (allScenes.Any())
+            {
+                PScenes = GetPScenesBySceneId(allScenes);
+
+                PScenes.AddRange(GetPScenesByName(allScenes));
+            }
+            else
+            {
+                return;
+            }
 
             List<Scene> foundPriorityScenes = new List<Scene>();
             Dictionary<int, Vector3> foundPrioritySceneIndex = new Dictionary<int, Vector3>();
 
             foreach (Scene scene in PScenes)
             {
-                if (PriorityScenesInvestigated.Contains(scene.SceneInfo.SNOId))
-                    continue;
-
-                foundPriorityScene = true;
-
-                NavZone navZone = scene.Mesh.Zone;
-                NavZoneDef zoneDef = navZone.NavZoneDef;
-
-                Vector2 zoneMin = navZone.ZoneMin;
-                Vector2 zoneMax = navZone.ZoneMax;
-
-                Vector3 zoneCenter = GetNavZoneCenter(navZone);
-
-                List<NavCell> NavCells = zoneDef.NavCells.Where(c => c.Flags.HasFlag(NavCellFlags.AllowWalk)).ToList();
-
-                if (!NavCells.Any())
-                    continue;
-
-                NavCell bestCell = NavCells.OrderBy(c => GetNavCellCenter(c.Min, c.Max, navZone).Distance2D(zoneCenter)).FirstOrDefault();
-
-                if (bestCell != null)
+                try
                 {
-                    foundPrioritySceneIndex.Add(scene.SceneInfo.SNOId, GetNavCellCenter(bestCell, navZone));
-                    foundPriorityScenes.Add(scene);
+                    if (PriorityScenesInvestigated.Contains(scene.SceneInfo.SNOId))
+                        continue;
+
+                    foundPriorityScene = true;
+
+                    NavZone navZone = scene.Mesh.Zone;
+                    NavZoneDef zoneDef = navZone.NavZoneDef;
+
+                    Vector2 zoneMin = navZone.ZoneMin;
+                    Vector2 zoneMax = navZone.ZoneMax;
+
+                    Vector3 zoneCenter = GetNavZoneCenter(navZone);
+
+                    List<NavCell> NavCells = zoneDef.NavCells.Where(c => c.Flags.HasFlag(NavCellFlags.AllowWalk)).ToList();
+
+                    if (!NavCells.Any())
+                        continue;
+
+                    NavCell bestCell = NavCells.OrderBy(c => GetNavCellCenter(c.Min, c.Max, navZone).Distance2D(zoneCenter)).FirstOrDefault();
+
+                    if (bestCell != null)
+                    {
+                        foundPrioritySceneIndex.Add(scene.SceneInfo.SNOId, GetNavCellCenter(bestCell, navZone));
+                        foundPriorityScenes.Add(scene);
+                    }
+                    else
+                    {
+                        Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene but could not find a navigable point!", true);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene but could not find a navigable point!", true);
+                    Logger.Log(ex.ToString());
                 }
             }
 
@@ -236,6 +249,37 @@ namespace Trinity.XmlTags
             if (!foundPriorityScene)
             {
                 PrioritySceneTarget = Vector3.Zero;
+            }
+        }
+
+        private List<Scene> GetPScenesByName(IEnumerable<Scene> allScenes)
+        {
+            if (string.IsNullOrWhiteSpace(SceneName))
+                return new List<Scene>();
+
+            try
+            {
+                var matchingScenes = allScenes.Where(s => s.Name.ToLower().Contains(SceneName.ToLower()));
+
+                return matchingScenes.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.ToString());
+                return new List<Scene>();
+            }
+        }
+
+        private List<Scene> GetPScenesBySceneId(IEnumerable<Scene> allScenes)
+        {
+            try
+            {
+                return allScenes.Where(s => s.SceneInfo.SNOId == SceneId).ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.ToString());
+                return new List<Scene>();
             }
         }
 

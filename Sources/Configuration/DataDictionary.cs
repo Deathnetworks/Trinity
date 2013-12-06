@@ -39,17 +39,19 @@ namespace Trinity
         public static HashSet<int> QuestLevelAreaIds { get { return DataDictionary.questLevelAreaIds; } }
         private static readonly HashSet<int> questLevelAreaIds = new HashSet<int>
         {
+            19947, // A1 New Tristram
+            91324, // A1 Old Tristram Road
+            109457, // A1 The Slaughtered Calf Inn
+            60714, // A1 Leoric's Passage
+            101351, // A1 The Old Ruins
+            83110, // A1 Cellar of the Damned
             19935, // A1 Wortham
+            100854, // A1 Khazra Den
+            94672, // A1 Cursed Hold
+
             60757, // A2 Belial's chambers
             55313, // A2 Caldeum Bazaar
-            19947, // A1 New Tristram
-            101351, // A1 Old Ruins
-            94672, // A1 Cursed Hold
             102964, // A2 City of Caldeum
-            100854, // A1 Khazra Den
-            83110, // A1 Cellar of the Damned
-            101351, // A1 The Old Ruins
-            60714, // Leoric's Passage
         };
 
 

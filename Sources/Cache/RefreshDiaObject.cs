@@ -120,9 +120,6 @@ namespace Trinity
             // Summons by the player 
             AddToCache = RefreshStepCachedPlayerSummons(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
-            // Check Blacklists
-            AddToCache = RefreshStepCheckBlacklists(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "CheckBlacklists"; return AddToCache; }
 
             using (new PerformanceLogger("RefreshDiaObject.CachedType"))
             {
@@ -133,6 +130,10 @@ namespace Trinity
                 AddToCache = RefreshStepCachedObjectType(AddToCache);
                 if (!AddToCache) { c_IgnoreReason = "CachedObjectType"; return AddToCache; }
             }
+
+            // Check Blacklists
+            AddToCache = RefreshStepCheckBlacklists(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "CheckBlacklists"; return AddToCache; }
 
             // Get Cached Position
             AddToCache = RefreshStepCachedPosition(AddToCache);

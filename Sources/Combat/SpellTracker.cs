@@ -184,6 +184,8 @@ namespace Trinity
 
             TrackedSpells.Add(new TrackedSpell(SNOPower.Witchdoctor_Locust_Swarm, -999, 8000f));
 
+            TrackedSpells.Add(new TrackedSpell(SNOPower.DemonHunter_MarkedForDeath, -999, 10f));
+
 
             // Demon Hunter
             // TBD

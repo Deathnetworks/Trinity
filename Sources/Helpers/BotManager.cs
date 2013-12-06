@@ -49,8 +49,8 @@ namespace Trinity
             }
             else
             {
-                //BotMain.TicksPerSecond = 10;
-                BotMain.TicksPerSecond = Int32.MaxValue;
+                BotMain.TicksPerSecond = 10;
+                //BotMain.TicksPerSecond = Int32.MaxValue;
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Reset bot TPS to default", (int)Settings.Advanced.TPSLimit);
             }
         }

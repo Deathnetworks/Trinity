@@ -43,7 +43,8 @@ namespace Trinity
             MonsterType monsterType;
             // See if we need to refresh the monster type or not
             bool notInCache = !dictionaryStoredMonsterTypes.TryGetValue(c_ActorSNO, out monsterType);
-            bool refreshMonsterType = notInCache;
+            // either we're in a quest area or not in cache
+            bool refreshMonsterType = DataDictionary.QuestLevelAreaIds.Contains( Player.LevelAreaId) || notInCache;
             using (new PerformanceLogger("RefreshUnit.5"))
             {
                 // If it's a boss and it was an ally, keep refreshing until it's not an ally
