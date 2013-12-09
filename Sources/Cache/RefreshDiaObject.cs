@@ -718,6 +718,11 @@ namespace Trinity
                 case GObjectType.Interactable:
                 case GObjectType.HealthWell:
                     {
+                        if (!(c_diaObject is DiaGizmo))
+                        {
+                            throw new InvalidCastException("Attempted to Refresh Gizmo on Object that is not a Gizmo!");
+                        }
+
                         AddToCache = RefreshGizmo(AddToCache);
                         break;
                     }

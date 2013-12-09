@@ -40,17 +40,17 @@ namespace Trinity.Combat.Abilities
             {
                 if (ShouldWaitForWrathOfTheBerserker)
                 {
-                    Logger.LogNormal("Waiting for Barbarian_WrathOfTheBerserker 1!");
+                    //Logger.LogNormal("Waiting for Barbarian_WrathOfTheBerserker 1!");
                     IsWaitingForSpecial = true;
                 }
                 if (ShouldWaitForEarthquake)
                 {
-                    Logger.LogNormal("Waiting for Barbarian_Earthquake!");
+                    //Logger.LogNormal("Waiting for Barbarian_Earthquake!");
                     IsWaitingForSpecial = true;
                 }
                 if (ShouldWaitForCallOfTheAncients)
                 {
-                    Logger.LogNormal("Waiting for Barbarian_CallOfTheAncients!");
+                    //Logger.LogNormal("Waiting for Barbarian_CallOfTheAncients!");
                     IsWaitingForSpecial = true;
                 }
             }
@@ -58,7 +58,7 @@ namespace Trinity.Combat.Abilities
             // WOTB
             if (IsNull(power) && CanCastWrathOfTheBerserker)
             {
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker being used! ({0})", CurrentTarget.InternalName);
+                //Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Barbarian_WrathOfTheBerserker being used! ({0})", CurrentTarget.InternalName);
                 power = PowerWrathOfTheBerserker;
             }
 

@@ -590,9 +590,9 @@ namespace Trinity
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
                                 currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance);
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "{0}", ex);
 
                     }
                 }

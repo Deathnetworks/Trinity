@@ -48,6 +48,7 @@ namespace Trinity.XmlTags
             }
 
             ForceClearArea = true;
+            AreaClearTimer.Reset();
             AreaClearTimer.Start();
             DefaultWaitTime = V.I("XmlTag.TrinityTownPortal.DefaultWaitTime");
             int forceWaitTime = V.I("XmlTag.TrinityTownPortal.ForceWaitTime");
@@ -102,7 +103,7 @@ namespace Trinity.XmlTags
                         new Decorator(ret => AreaClearTimer.ElapsedMilliseconds > WaitTime,
                             new Action(ret =>
                             {
-                                Logger.Log(LogCategory.UserInformation, "TownRun timer finished");
+                                Logger.Log(LogCategory.UserInformation, "Town Portal timer finished");
                                 ForceClearArea = false;
                                 AreaClearTimer.Reset();
                             })

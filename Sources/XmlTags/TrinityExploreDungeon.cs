@@ -126,7 +126,7 @@ namespace Trinity.XmlTags
 
             public bool Equals(Scene other)
             {
-                return (SceneName != String.Empty && other.Name.ToLowerInvariant().Contains(SceneName.ToLowerInvariant())) || other.SceneInfo.SNOId == SceneId;
+                return (!string.IsNullOrWhiteSpace(SceneName) && other.Name.ToLowerInvariant().Contains(SceneName.ToLowerInvariant())) || other.SceneInfo.SNOId == SceneId;
             }
         }
 
@@ -136,18 +136,22 @@ namespace Trinity.XmlTags
             get
             {
                 if (m_IgnoredAreas == null)
-                    m_IgnoredAreas = new CachedValue<List<Area>>(() =>
-                    {
-                        return ZetaDia.Scenes.GetScenes()
-                            .Where(scn => scn.IsValid && IgnoreScenes.Any(igns => igns.Equals(scn)) && PriorityScenes.Any(psc => psc.Equals(scn)))
-                            .Select(scn =>
-                                scn.Mesh.Zone == null
-                                ? new Area(new Vector2(float.MinValue, float.MinValue), new Vector2(float.MaxValue, float.MaxValue))
-                                : new Area(scn.Mesh.Zone.ZoneMin, scn.Mesh.Zone.ZoneMax))
-                                .ToList();
-                    }, TimeSpan.FromSeconds(5));
+                    m_IgnoredAreas = new CachedValue<List<Area>>(() => { return GetIgnoredAreas(); }, TimeSpan.FromSeconds(1));
                 return m_IgnoredAreas.Value;
             }
+        }
+
+        private List<Area> GetIgnoredAreas()
+        {
+            var ignoredScenes = ZetaDia.Scenes.GetScenes()
+                .Where(scn => scn.IsValid && IgnoreScenes.Any(igns => igns.Equals(scn)) && !PriorityScenes.Any(psc => psc.Equals(scn)))
+                .Select(scn =>
+                    scn.Mesh.Zone == null
+                    ? new Area(new Vector2(float.MinValue, float.MinValue), new Vector2(float.MaxValue, float.MaxValue))
+                    : new Area(scn.Mesh.Zone.ZoneMin, scn.Mesh.Zone.ZoneMax))
+                    .ToList();
+            Logger.Log(LogCategory.ProfileTag, "Returning {0} ignored areas", ignoredScenes.Count());
+            return ignoredScenes;
         }
 
         private class Area
@@ -300,6 +304,9 @@ namespace Trinity.XmlTags
         [XmlAttribute("minVisitedNodes")]
         public int MinVisistedNodes { get; set; }
 
+        [XmlAttribute("disableSetNodesExploredAutomatically")]
+        public bool DisableSetNodesExploredAutomatically { get; set; }
+
         /// <summary>
         /// The Position of the CurrentNode NavigableCenter
         /// </summary>
@@ -371,6 +378,12 @@ namespace Trinity.XmlTags
             timesForcedReset = 0;
 
             PrintNodeCounts("PostInit");
+
+            if (DisableSetNodesExploredAutomatically)
+                BrainBehavior.DungeonExplorer.SetNodesExploredAutomatically = false;
+            else
+                BrainBehavior.DungeonExplorer.SetNodesExploredAutomatically = true;
+
         }
 
         /// <summary>
@@ -421,12 +434,12 @@ namespace Trinity.XmlTags
                         InvestigatActor()
                     ),
                     new Sequence(
-                        new DecoratorContinue(ret => BrainBehavior.DungeonExplorer != null && !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
+                        new DecoratorContinue(ret => DungeonRouteIsEmpty(),
                             new Action(ret => UpdateRoute())
                         ),
                         CheckIsExplorerFinished()
                     ),
-                    new DecoratorContinue(ret => BrainBehavior.DungeonExplorer != null && BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
+                    new DecoratorContinue(ret => DungeonRouteIsValid(),
                         new PrioritySelector(
                             CheckNodeFinished(),
                             new Sequence(
@@ -438,6 +451,16 @@ namespace Trinity.XmlTags
                     new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Error 1: Unknown error occured!"))
                 )
             );
+        }
+
+        private static bool DungeonRouteIsValid()
+        {
+            return BrainBehavior.DungeonExplorer != null && BrainBehavior.DungeonExplorer.CurrentRoute != null && BrainBehavior.DungeonExplorer.CurrentRoute.Any();
+        }
+
+        private static bool DungeonRouteIsEmpty()
+        {
+            return BrainBehavior.DungeonExplorer != null && BrainBehavior.DungeonExplorer.CurrentRoute != null && !BrainBehavior.DungeonExplorer.CurrentRoute.Any();
         }
 
         private Action InvestigatActor()
@@ -474,7 +497,7 @@ namespace Trinity.XmlTags
 
             if (actor.Distance <= ObjectDistance)
                 return false;
-            
+
             return true;
         }
 
@@ -670,7 +693,7 @@ namespace Trinity.XmlTags
                         new Action(ret => isDone = true)
                     )
                 ),
-                new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && SceneName.Trim() != String.Empty && ZetaDia.Me.CurrentScene.Name.ToLower().Contains(SceneName.ToLower()),
+                new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && !string.IsNullOrWhiteSpace(SceneName) && ZetaDia.Me.CurrentScene.Name.ToLower().Contains(SceneName.ToLower()),
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found SceneName {0}!", SceneName)),
                         new Action(ret => isDone = true)
@@ -833,7 +856,7 @@ namespace Trinity.XmlTags
 
                 NavCell bestCell = NavCells.OrderBy(c => GetNavCellCenter(c.Min, c.Max, navZone).Distance2D(zoneCenter)).FirstOrDefault();
 
-                if (bestCell != null)
+                if (bestCell != null && !foundPrioritySceneIndex.ContainsKey(scene.SceneInfo.SNOId))
                 {
                     foundPrioritySceneIndex.Add(scene.SceneInfo.SNOId, GetNavCellCenter(bestCell, navZone));
                     foundPriorityScenes.Add(scene);
@@ -940,9 +963,9 @@ namespace Trinity.XmlTags
         private bool PositionInsideIgnoredScene(Vector3 position)
         {
             List<Scene> ignoredScenes = ZetaDia.Scenes.GetScenes()
-                .Where(scn => scn.IsValid && (IgnoreScenes.Any(igscn => igscn.SceneName != String.Empty && scn.Name.ToLower().Contains(igscn.SceneName.ToLower())) ||
+                .Where(scn => scn.IsValid && (IgnoreScenes.Any(igscn => !string.IsNullOrWhiteSpace(igscn.SceneName) && scn.Name.ToLower().Contains(igscn.SceneName.ToLower())) ||
                     IgnoreScenes.Any(igscn => scn.SceneInfo.SNOId == igscn.SceneId) &&
-                    !PriorityScenes.Any(psc => psc.SceneName.Trim() != String.Empty && scn.Name.ToLower().Contains(psc.SceneName)) &&
+                    !PriorityScenes.Any(psc => !string.IsNullOrWhiteSpace(psc.SceneName) && scn.Name.ToLower().Contains(psc.SceneName)) &&
                     !PriorityScenes.Any(psc => psc.SceneId != -1 && scn.SceneInfo.SNOId != psc.SceneId))).ToList();
 
             foreach (Scene scene in ignoredScenes)
