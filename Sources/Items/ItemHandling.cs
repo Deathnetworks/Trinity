@@ -721,9 +721,10 @@ namespace Trinity
                 return;
 
             if (!Settings.Advanced.OutputReports)
-            {
                 return;
-            }
+
+            if (cachedStaticWorldId <= 0 || Player.ActorClass == ActorClass.Invalid)
+                return;
 
             /*
               Check is Lv 60 or not
