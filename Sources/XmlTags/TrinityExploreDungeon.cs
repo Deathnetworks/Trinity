@@ -304,8 +304,8 @@ namespace Trinity.XmlTags
         [XmlAttribute("minVisitedNodes")]
         public int MinVisistedNodes { get; set; }
 
-        [XmlAttribute("disableSetNodesExploredAutomatically")]
-        public bool DisableSetNodesExploredAutomatically { get; set; }
+        [XmlAttribute("SetNodesExploredAutomatically")]
+        public bool SetNodesExploredAutomatically { get; set; }
 
         /// <summary>
         /// The Position of the CurrentNode NavigableCenter
@@ -379,10 +379,10 @@ namespace Trinity.XmlTags
 
             PrintNodeCounts("PostInit");
 
-            if (DisableSetNodesExploredAutomatically)
-                BrainBehavior.DungeonExplorer.SetNodesExploredAutomatically = false;
-            else
+            if (SetNodesExploredAutomatically)
                 BrainBehavior.DungeonExplorer.SetNodesExploredAutomatically = true;
+            else
+                BrainBehavior.DungeonExplorer.SetNodesExploredAutomatically = false;
 
         }
 
