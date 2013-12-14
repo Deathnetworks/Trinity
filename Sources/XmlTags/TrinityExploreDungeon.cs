@@ -366,6 +366,17 @@ namespace Trinity.XmlTags
         {
             Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "TrinityExploreDungeon OnStart() called");
 
+            if (SetNodesExploredAutomatically)
+            {
+                Logger.Log(LogCategory.ProfileTag, "Minimap Explored Nodes Enabled");
+                BrainBehavior.DungeonExplorer.SetNodesExploredAutomatically = true;
+            }
+            else
+            {
+                Logger.Log(LogCategory.ProfileTag, "Minimap Explored Nodes Disabled");
+                BrainBehavior.DungeonExplorer.SetNodesExploredAutomatically = false;
+            }
+
             UpdateSearchGridProvider();
 
             CheckResetDungeonExplorer();
@@ -378,11 +389,6 @@ namespace Trinity.XmlTags
             timesForcedReset = 0;
 
             PrintNodeCounts("PostInit");
-
-            if (SetNodesExploredAutomatically)
-                BrainBehavior.DungeonExplorer.SetNodesExploredAutomatically = true;
-            else
-                BrainBehavior.DungeonExplorer.SetNodesExploredAutomatically = false;
 
         }
 
