@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Trinity.Technicals;
-using Zeta.CommonBot.Profile;
+using Zeta.Bot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 

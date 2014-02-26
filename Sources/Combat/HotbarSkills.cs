@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Trinity.Technicals;
-using Zeta;
-using Zeta.Internals;
-using Zeta.Internals.Actors;
+using Zeta.Game;
+using Zeta.Game.Internals;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 
 namespace Trinity
 {
@@ -52,7 +52,7 @@ namespace Trinity
         public static void Update()
         {
             if (Trinity.Player.ActorClass != ActorClass.Wizard && !Trinity.GetHasBuff(SNOPower.Wizard_Archon) &&
-                Trinity.Player.ActorClass != ActorClass.WitchDoctor && !Trinity.GetHasBuff(SNOPower.Witchdoctor_Hex))
+                Trinity.Player.ActorClass != ActorClass.Witchdoctor && !Trinity.GetHasBuff(SNOPower.Witchdoctor_Hex))
             {
                 _assignedSkills.Clear();
                 UpdateHotbarSlotPowers();

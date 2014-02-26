@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using Trinity.Technicals;
-using Zeta;
-using Zeta.CommonBot;
-using Zeta.CommonBot.Profile;
-using Zeta.Navigation;
+using Zeta.Game;
+using Zeta.Bot;
+using Zeta.Bot.Profile;
+using Zeta.Bot.Navigation;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;
@@ -114,7 +114,7 @@ namespace Trinity.XmlTags
                     new PrioritySelector(
                         new Decorator(ret => ZetaDia.Me.Movement.IsMoving,
                             new Sequence(
-                                Zeta.CommonBot.CommonBehaviors.MoveStop(),
+                                Zeta.Bot.CommonBehaviors.MoveStop(),
                                 new Sleep(1000)
                             )
                         ),

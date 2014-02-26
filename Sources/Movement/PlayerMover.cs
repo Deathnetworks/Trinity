@@ -6,14 +6,15 @@ using System.Threading;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Bot;
+using Zeta.Bot.Navigation;
+using Zeta.Bot.Profile;
+using Zeta.Bot.Profile.Common;
 using Zeta.Common;
-using Zeta.CommonBot;
-using Zeta.CommonBot.Profile;
-using Zeta.CommonBot.Profile.Common;
-using Zeta.Internals;
-using Zeta.Internals.Actors;
-using Zeta.Navigation;
+using Zeta.Game;
+using Zeta.Game.Internals;
+using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.DbProvider
 {
@@ -69,7 +70,7 @@ namespace Trinity.DbProvider
         public static bool UnstuckChecker(Vector3 vMyCurrentPosition, int checkDuration = 3000)
         {
             // set checkDuration to 30 sec while in town or vendoring, just to avoid annoyances
-            if (ZetaDia.Me.IsInTown || Trinity.ForceVendorRunASAP || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+            if (ZetaDia.Me.IsInTown || Trinity.ForceVendorRunASAP || Zeta.Bot.Logic.BrainBehavior.IsVendoring)
             {
                 checkDuration = 15000;
             }
@@ -105,7 +106,7 @@ namespace Trinity.DbProvider
                     return UnStuckCheckerLastResult;
                 }
 
-                Zeta.Internals.UIElement vendorWindow = Zeta.Internals.UIElements.VendorWindow;
+                Zeta.Game.Internals.UIElement vendorWindow = Zeta.Game.Internals.UIElements.VendorWindow;
 
                 // We're not stuck if we're doing stuff!
                 if (ZetaDia.Me.IsInConversation || ZetaDia.IsPlayingCutscene || ZetaDia.IsLoadingWorld || (vendorWindow.IsValid && vendorWindow.IsVisible))
@@ -182,9 +183,9 @@ namespace Trinity.DbProvider
                 TotalAntiStuckAttempts = 20;
             }
             // intell
-            if (TotalAntiStuckAttempts <= 15)
+            if (TotalAntiStuckAttempts <= 10)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Your bot got stuck! Trying to unstuck (attempt #{0} of 15 attempts) {1} {2} {3} {4}",
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Your bot got stuck! Trying to unstuck (attempt #{0} of 10 attempts) {1} {2} {3} {4}",
                     TotalAntiStuckAttempts.ToString(),
                     "Act=\"" + ZetaDia.CurrentAct + "\"",
                     "questId=\"" + ZetaDia.CurrentQuest.QuestSNO + "\"",
@@ -226,7 +227,7 @@ namespace Trinity.DbProvider
             if (iTimesReachedMaxUnstucks == 1)
             {
                 Navigator.Clear();
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Anti-stuck measures now attempting to kickstart DB's path-finder into action.");
+                Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Anti-stuck measures now attempting to kickstart DB's path-finder into action.");
                 Navigator.MoveTo(vOriginalDestination, "original destination", false);
                 iCancelUnstuckerForSeconds = 40;
                 _lastCancelledUnstucker = DateTime.Now;
@@ -234,27 +235,27 @@ namespace Trinity.DbProvider
             }
             if (iTimesReachedMaxUnstucks == 2)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Anti-stuck measures failed. Now attempting to reload current profile.");
+                Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Anti-stuck measures failed. Now attempting to reload current profile.");
 
                 Navigator.Clear();
 
-                ProfileManager.Load(Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck successfully reloaded current profile, DemonBuddy now navigating again.");
+                ProfileManager.Load(Zeta.Bot.ProfileManager.CurrentProfile.Path);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Anti-stuck successfully reloaded current profile, DemonBuddy now navigating again.");
                 return vSafeMovementLocation;
 
                 // Didn't make it to town, so skip instantly to the exit game system
                 //iTimesReachedMaxUnstucks = 3;
             }
             // Exit the game and reload the profile
-            if (Trinity.Settings.Advanced.AllowRestartGame && DateTime.Now.Subtract(timeLastRestartedGame).TotalMinutes >= 15)
+            if (Trinity.Settings.Advanced.AllowRestartGame && DateTime.Now.Subtract(timeLastRestartedGame).TotalMinutes >= 5)
             {
                 timeLastRestartedGame = DateTime.Now;
                 string sUseProfile = Trinity.FirstProfile;
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Anti-stuck measures exiting current game.");
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Anti-stuck measures exiting current game.");
                 // Load the first profile seen last run
                 ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
                                         ? sUseProfile
-                                        : Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
+                                        : Zeta.Bot.ProfileManager.CurrentProfile.Path);
                 Thread.Sleep(1000);
                 Trinity.ResetEverythingNewGame();
                 ZetaDia.Service.Party.LeaveGame();
@@ -266,7 +267,7 @@ namespace Trinity.DbProvider
             }
             else
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Unstucking measures failed. Now stopping Trinity unstucker for 12 minutes to inactivity timers to kick in or DB to auto-fix.");
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Unstucking measures failed. Now stopping Trinity unstucker for 12 minutes to inactivity timers to kick in or DB to auto-fix.");
                 iCancelUnstuckerForSeconds = 720;
                 _lastCancelledUnstucker = DateTime.Now;
                 return vSafeMovementLocation;
@@ -319,7 +320,7 @@ namespace Trinity.DbProvider
 
                 lastRecordedPosition = DateTime.Now;
             }
-            
+
             // If we just used a spell, we "moved"
             if (DateTime.Now.Subtract(Trinity.lastGlobalCooldownUse).TotalMilliseconds <= 1000)
                 return 1d;
@@ -427,7 +428,7 @@ namespace Trinity.DbProvider
                     iTimesReachedStuckPoint = 0;
                     vSafeMovementLocation = Vector3.Zero;
                     NavHelper.UsedStuckSpots = new List<GridPoint>();
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.Movement, "Resetting unstuck timers", true);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Resetting unstuck timers", true);
                 }
 
                 // See if we need to, and can, generate unstuck actions
@@ -439,7 +440,7 @@ namespace Trinity.DbProvider
                     _lastRecordedAnyStuck = DateTime.Now;
                     // See if there's any stuck position to try and navigate to generated by random mover
                     vSafeMovementLocation = UnstuckHandler(vMyCurrentPosition, LastMoveToTarget);
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.Movement, "SafeMovement Location set to {0}", vSafeMovementLocation);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "SafeMovement Location set to {0}", vSafeMovementLocation);
                     if (vSafeMovementLocation == Vector3.Zero)
                         return;
                 }
@@ -820,7 +821,7 @@ namespace Trinity.DbProvider
                 }
                 catch (Exception ex)
                 {
-                    Logging.Write("{0}", ex);
+                    Logger.Log("{0}", ex);
                     return MoveResult.Failed;
                 }
             }

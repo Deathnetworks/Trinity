@@ -1,11 +1,11 @@
 ﻿// VERSION 1.2.0
 using System;
 using System.Windows;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.CommonBot;
-using Zeta.Internals.Actors;
+using Zeta.Bot;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
 
@@ -13,6 +13,7 @@ namespace TrinityRoutine
 {
     public class TrinityRoutine : CombatRoutine
     {
+        private static readonly log4net.ILog Log = Logger.GetLoggerInstanceForType();
         public override void Initialize()
         {
             foreach (PluginContainer plugin in PluginManager.Plugins)
@@ -46,10 +47,10 @@ namespace TrinityRoutine
                 }
                 catch (Exception ex)
                 {
-                    Logging.Write("[Trinity] Error Opening Plugin Config window!");
-                    Logging.Write("[Trinity] {0}", ex);
+                    Log.Error("[Trinity] Error Opening Plugin Config window!");
+                    Log.Error("[Trinity] {0}", ex);
                 }
-                Logging.Write("[Trinity] Unable to open Plugin Config window!");
+                Log.Error("[Trinity] Unable to open Plugin Config window!");
                 return null;
             }
         }

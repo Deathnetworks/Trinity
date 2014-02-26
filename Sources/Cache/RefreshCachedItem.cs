@@ -3,8 +3,8 @@ using System.IO;
 using Trinity.Cache;
 using Trinity.Config.Loot;
 using Trinity.Technicals;
-using Zeta.CommonBot;
-using Zeta.Internals.Actors;
+using Zeta.Bot;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 
 namespace Trinity
 {
@@ -110,7 +110,7 @@ namespace Trinity
             // Get whether or not we want this item, cached if possible
             if (!pickupItemCache.TryGetValue(c_RActorGuid, out AddToCache))
             {
-                if (pickupItem.IsTwoHand && Settings.Loot.Pickup.IgnoreTwoHandedWeapons)
+                if (pickupItem.IsTwoHand && Settings.Loot.Pickup.IgnoreTwoHandedWeapons && c_ItemQuality < ItemQuality.Legendary)
                 {
                     AddToCache = false;
                 }

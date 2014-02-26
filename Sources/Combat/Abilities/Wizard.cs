@@ -3,11 +3,12 @@ using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.CommonBot;
-using Zeta.Internals.Actors;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -36,7 +37,7 @@ namespace Trinity
             // Wizards want to save up to a reserve of 65+ energy
             MinEnergyReserve = 65;
 
-            bool hasCriticalMass = ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass);
+            bool hasCriticalMass = false; // ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass);
 
             if (!GetHasBuff(SNOPower.Wizard_Archon))
             {
@@ -399,7 +400,7 @@ namespace Trinity
                     var archonBuff = ZetaDia.Me.GetBuff(SNOPower.Wizard_Archon);
                     if (archonBuff != null && archonBuff.IsCancelable)
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Canceling Archon: {0}", reason);
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Canceling Archon: {0}", reason);
                         // this actually cancels Archon
                         archonBuff.Cancel();
 

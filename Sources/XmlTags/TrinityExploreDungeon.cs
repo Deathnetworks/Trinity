@@ -4,19 +4,20 @@ using System.Diagnostics;
 using System.Linq;
 using Trinity.DbProvider;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
-using Zeta.CommonBot.Dungeons;
-using Zeta.CommonBot.Logic;
-using Zeta.CommonBot.Profile;
-using Zeta.Internals;
-using Zeta.Internals.Actors;
-using Zeta.Internals.SNO;
-using Zeta.Navigation;
-using Zeta.Pathfinding;
+using Zeta.Bot.Dungeons;
+using Zeta.Bot.Logic;
+using Zeta.Bot.Profile;
+using Zeta.Game.Internals;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Game.Internals.SNO;
+using Zeta.Bot.Navigation;
+using Zeta.Bot.Pathfinding;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.XmlTags
 {
@@ -364,7 +365,7 @@ namespace Trinity.XmlTags
         /// </summary>
         public override void OnStart()
         {
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "TrinityExploreDungeon OnStart() called");
+            Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "TrinityExploreDungeon OnStart() called");
 
             if (SetNodesExploredAutomatically)
             {
@@ -403,7 +404,7 @@ namespace Trinity.XmlTags
             // I added this because GridSegmentation may (rarely) reset itself without us doing it to 15/.55.
             if ((BoxSize != 0 && BoxTolerance != 0) && (GridSegmentation.BoxSize != BoxSize || GridSegmentation.BoxTolerance != BoxTolerance) || (GetGridSegmentationNodeCount() == 0))
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Box Size or Tolerance has been changed! {0}/{1}", GridSegmentation.BoxSize, GridSegmentation.BoxTolerance);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Box Size or Tolerance has been changed! {0}/{1}", GridSegmentation.BoxSize, GridSegmentation.BoxTolerance);
 
                 BrainBehavior.DungeonExplorer.Reset();
                 PrintNodeCounts("BrainBehavior.DungeonExplorer.Reset");
@@ -454,7 +455,7 @@ namespace Trinity.XmlTags
                             )
                         )
                     ),
-                    new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Error 1: Unknown error occured!"))
+                    new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Error 1: Unknown error occured!"))
                 )
             );
         }
@@ -537,9 +538,9 @@ namespace Trinity.XmlTags
                     new Sequence(
                         new DecoratorContinue(ret => TownPortalOnTimeout && !Trinity.Player.IsInTown,
                             new Sequence(
-                                new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                                new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation,
                                     "TrinityExploreDungeon inactivity timer tripped ({0}), tag Using Town Portal!", TimeoutValue)),
-                                Zeta.CommonBot.CommonBehaviors.CreateUseTownPortal(),
+                                Zeta.Bot.CommonBehaviors.CreateUseTownPortal(),
                                 new Action(ret => isDone = true)
                             )
                         ),
@@ -573,7 +574,7 @@ namespace Trinity.XmlTags
             }
             if (ExploreTimeoutType == TimeoutType.Timer && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityExploreDungeon timer ended ({0}), tag finished!", TimeoutValue);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "TrinityExploreDungeon timer ended ({0}), tag finished!", TimeoutValue);
                 timeoutBreached = true;
                 return RunStatus.Success;
             }
@@ -601,7 +602,7 @@ namespace Trinity.XmlTags
             }
             else if (lastCoinage == Trinity.Player.Coinage && TagTimer.Elapsed.TotalSeconds > TimeoutValue)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "TrinityExploreDungeon gold inactivity timer tripped ({0}), tag finished!", TimeoutValue);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "TrinityExploreDungeon gold inactivity timer tripped ({0}), tag finished!", TimeoutValue);
                 timeoutBreached = true;
                 return RunStatus.Success;
             }
@@ -623,14 +624,14 @@ namespace Trinity.XmlTags
                 CheckIsObjectiveFinished(),
                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0 && timesForcedReset > timesForceResetMax,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation,
                             "Visited all nodes but objective not complete, forced reset more than {0} times, finished!", timesForceResetMax)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Visited all nodes but objective not complete, forcing grid reset!")),
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Visited all nodes but objective not complete, forcing grid reset!")),
                         new Action(ret => timesForcedReset++),
                         new Action(ret => Trinity.SkipAheadAreaCache.Clear()),
                         new Action(ret => MiniMapMarker.KnownMarkers.Clear()),
@@ -664,50 +665,50 @@ namespace Trinity.XmlTags
                 TimeoutCheck(),
                 new Decorator(ret => EndType == TrinityExploreEndType.FullyExplored && IgnoreLastNodes > 0 && GetRouteUnvisitedNodeCount() <= IgnoreLastNodes && GetGridSegmentationVisistedNodeCount() >= MinVisistedNodes,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fully explored area! Ignoring {0} nodes. Tag Finished.", IgnoreLastNodes)),
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Fully explored area! Ignoring {0} nodes. Tag Finished.", IgnoreLastNodes)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.FullyExplored && GetRouteUnvisitedNodeCount() == 0,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fully explored area! Tag Finished.", 0)),
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Fully explored area! Tag Finished.", 0)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.ExitFound && ExitNameHash != 0 && IsExitNameHashVisible(),
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found exitNameHash {0}!", ExitNameHash)),
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found exitNameHash {0}!", ExitNameHash)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.ObjectFound && ActorId != 0 && ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
                     .Any(a => a.ActorSNO == ActorId && a.Distance <= ObjectDistance),
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found Object {0}!", ActorId)),
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found Object {0}!", ActorId)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.ObjectFound && AlternateActorsFound(),
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found Alternate Object {0}!", GetAlternateActor().ActorSNO)),
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found Alternate Object {0}!", GetAlternateActor().ActorSNO)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && Trinity.Player.SceneId == SceneId,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found SceneId {0}!", SceneId)),
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found SceneId {0}!", SceneId)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => EndType == TrinityExploreEndType.SceneFound && !string.IsNullOrWhiteSpace(SceneName) && ZetaDia.Me.CurrentScene.Name.ToLower().Contains(SceneName.ToLower()),
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Found SceneName {0}!", SceneName)),
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found SceneName {0}!", SceneName)),
                         new Action(ret => isDone = true)
                     )
                 ),
                 new Decorator(ret => Trinity.Player.IsInTown,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Cannot use TrinityExploreDungeon in town - tag finished!", SceneName)),
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Cannot use TrinityExploreDungeon in town - tag finished!", SceneName)),
                         new Action(ret => isDone = true)
                     )
                 )
@@ -764,7 +765,7 @@ namespace Trinity.XmlTags
                         new PrioritySelector(
                             new Decorator(ret => PrioritySceneTarget.Distance2D(myPos) <= PriorityScenePathPrecision,
                                 new Sequence(
-                                    new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Successfully navigated to priority scene {0} {1} center {2} Distance {3:0}",
+                                    new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Successfully navigated to priority scene {0} {1} center {2} Distance {3:0}",
                                         CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos))),
                                     new Action(ret => PrioritySceneMoveToFinished())
                                 )
@@ -781,14 +782,14 @@ namespace Trinity.XmlTags
         /// </summary>
         private void MoveToPriorityScene()
         {
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Moving to Priority Scene {0} - {1} Center {2} Distance {3:0}",
+            Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Moving to Priority Scene {0} - {1} Center {2} Distance {3:0}",
                 CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
 
             MoveResult moveResult = PlayerMover.NavigateTo(PrioritySceneTarget);
 
             if (moveResult == MoveResult.PathGenerationFailed || moveResult == MoveResult.ReachedDestination)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Unable to navigate to Scene {0} - {1} Center {2} Distance {3:0}, cancelling!",
+                Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Unable to navigate to Scene {0} - {1} Center {2} Distance {3:0}, cancelling!",
                     CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
                 PrioritySceneMoveToFinished();
             }
@@ -869,7 +870,7 @@ namespace Trinity.XmlTags
                 }
                 else
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene but could not find a navigable point!", true);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Found Priority Scene but could not find a navigable point!", true);
                 }
             }
 
@@ -882,7 +883,7 @@ namespace Trinity.XmlTags
                 CurrentPriorityScene = foundPriorityScenes.FirstOrDefault(s => s.SceneInfo.SNOId == PrioritySceneSNOId);
                 PriorityScenePathPrecision = GetPriorityScenePathPrecision(PScenes.FirstOrDefault(s => s.SceneInfo.SNOId == nearestPriorityScene.Key));
 
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Found Priority Scene {0} - {1} Center {2} Distance {3:0}",
+                Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Found Priority Scene {0} - {1} Center {2} Distance {3:0}",
                     CurrentPriorityScene.Name, CurrentPriorityScene.SceneInfo.SNOId, PrioritySceneTarget, PrioritySceneTarget.Distance2D(myPos));
             }
 
@@ -1006,14 +1007,14 @@ namespace Trinity.XmlTags
                 ),
                 new Decorator(ret => BrainBehavior.DungeonExplorer.CurrentNode.Visited,
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Current node was already marked as visited!")),
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Current node was already marked as visited!")),
                         new Action(ret => BrainBehavior.DungeonExplorer.CurrentRoute.Dequeue()),
                         new Action(ret => UpdateRoute())
                     )
                 ),
                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0 || !BrainBehavior.DungeonExplorer.CurrentRoute.Any(),
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Error - CheckIsNodeFinished() called while Route is empty!")),
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Error - CheckIsNodeFinished() called while Route is empty!")),
                         new Action(ret => UpdateRoute())
                     )
                 ),
@@ -1072,7 +1073,7 @@ namespace Trinity.XmlTags
         /// <param name="reason"></param>
         private void SetNodeVisited(string reason = "")
         {
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Dequeueing current node {0} - {1}", BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter, reason);
+            Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Dequeueing current node {0} - {1}", BrainBehavior.DungeonExplorer.CurrentNode.NavigableCenter, reason);
             BrainBehavior.DungeonExplorer.CurrentNode.Visited = true;
             BrainBehavior.DungeonExplorer.CurrentRoute.Dequeue();
 
@@ -1090,7 +1091,7 @@ namespace Trinity.XmlTags
                 {
                     node.Visited = true;
                     string reason2 = String.Format("Node {0} is within path precision {1:0}/{2:0}", node.NavigableCenter, distance, PathPrecision);
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Marking unvisited nearby node as visited - {0}", reason2);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Marking unvisited nearby node as visited - {0}", reason2);
                 }
             }
         }
@@ -1143,7 +1144,7 @@ namespace Trinity.XmlTags
                     Math.Abs(myPos.Z - CurrentNavTarget.Z)
                     );
 
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, log);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, log);
             }
         }
 
@@ -1299,7 +1300,7 @@ namespace Trinity.XmlTags
 
             if (!forced)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag,
+                Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag,
                     "Initialized TrinityExploreDungeon: boxSize={0} boxTolerance={1:0.00} endType={2} timeoutType={3} timeoutValue={4} pathPrecision={5:0} sceneId={6} actorId={7} objectDistance={8} markerDistance={9} exitNameHash={10}",
                     GridSegmentation.BoxSize, GridSegmentation.BoxTolerance, EndType, ExploreTimeoutType, TimeoutValue, PathPrecision, SceneId, ActorId, ObjectDistance, MarkerDistance, ExitNameHash);
             }

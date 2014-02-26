@@ -5,10 +5,11 @@ using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
-using Zeta.Internals.Actors;
-using Zeta.Navigation;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Bot.Navigation;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -285,7 +286,7 @@ namespace Trinity
         /// <returns></returns>
         internal static Vector3 GetZigZagTarget(Vector3 origin, float ringDistance, bool randomizeDistance = false)
         {
-            var minDistance = 9f;
+            var minDistance = 20f;
             Vector3 myPos = Player.Position;
             float distanceToTarget = origin.Distance2D(myPos);
 

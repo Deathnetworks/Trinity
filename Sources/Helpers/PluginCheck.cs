@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Trinity.Technicals;
-using Zeta.CommonBot;
+using Zeta.Bot;
 
 namespace Trinity.Helpers
 {

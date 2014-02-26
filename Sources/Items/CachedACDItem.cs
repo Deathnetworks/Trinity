@@ -1,6 +1,6 @@
 ﻿using System;
-using Zeta.Internals;
-using Zeta.Internals.Actors;
+using Zeta.Game.Internals;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 namespace Trinity
 {
     // CachedACDItem - Special caching class to help with backpack-item handling
@@ -132,12 +132,12 @@ namespace Trinity
             DamageReductionPhysicalPercent = stats.DamageReductionPhysicalPercent;
             ArmorTotal = stats.ArmorTotal;
             Armor = stats.Armor;
-            FireDamagePercent = stats.FireDamagePercent;
-            LightningDamagePercent = stats.LightningDamagePercent;
-            ColdDamagePercent = stats.ColdDamagePercent;
-            PoisonDamagePercent = stats.PoisonDamagePercent;
-            ArcaneDamagePercent = stats.ArcaneDamagePercent;
-            HolyDamagePercent = stats.HolyDamagePercent;
+            //FireDamagePercent = stats.FireDamagePercent;
+            //LightningDamagePercent = stats.LightningDamagePercent;
+            //ColdDamagePercent = stats.ColdDamagePercent;
+            //PoisonDamagePercent = stats.PoisonDamagePercent;
+            //ArcaneDamagePercent = stats.ArcaneDamagePercent;
+            //HolyDamagePercent = stats.HolyDamagePercent;
             HealthGlobeBonus = stats.HealthGlobeBonus;
             WeaponAttacksPerSecond = stats.WeaponAttacksPerSecond;
             WeaponMaxDamage = stats.WeaponMaxDamage;
@@ -163,7 +163,7 @@ namespace Trinity
             bool twoHanded,
             DyeType dyeType,
             ItemType itemType,
-            Zeta.Internals.Actors.ItemBaseType itembasetype,
+            Zeta.Game.Internals.Actors.ItemBaseType itembasetype,
             FollowerType followerType,
             bool unidentified,
             int stackQuantity,
@@ -233,12 +233,12 @@ namespace Trinity
             DamageReductionPhysicalPercent = itemStats.DamageReductionPhysicalPercent;
             ArmorTotal = itemStats.ArmorTotal;
             Armor = itemStats.Armor;
-            FireDamagePercent = itemStats.FireDamagePercent;
-            LightningDamagePercent = itemStats.LightningDamagePercent;
-            ColdDamagePercent = itemStats.ColdDamagePercent;
-            PoisonDamagePercent = itemStats.PoisonDamagePercent;
-            ArcaneDamagePercent = itemStats.ArcaneDamagePercent;
-            HolyDamagePercent = itemStats.HolyDamagePercent;
+            //FireDamagePercent = itemStats.FireDamagePercent;
+            //LightningDamagePercent = itemStats.LightningDamagePercent;
+            //ColdDamagePercent = itemStats.ColdDamagePercent;
+            //PoisonDamagePercent = itemStats.PoisonDamagePercent;
+            //ArcaneDamagePercent = itemStats.ArcaneDamagePercent;
+            //HolyDamagePercent = itemStats.HolyDamagePercent;
             HealthGlobeBonus = itemStats.HealthGlobeBonus;
             WeaponAttacksPerSecond = itemStats.WeaponAttacksPerSecond;
             WeaponMaxDamage = itemStats.WeaponMaxDamage;

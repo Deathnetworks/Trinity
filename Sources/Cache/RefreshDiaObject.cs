@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Bot;
+using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.CommonBot;
-using Zeta.Internals.Actors;
-using Zeta.Internals.Actors.Gizmos;
-using Zeta.Internals.SNO;
-using Zeta.Navigation;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.Actors.Gizmos;
+using Zeta.Game.Internals.SNO;
+using Logger = Trinity.Technicals.Logger;
 namespace Trinity
 {
     public partial class Trinity : IPlugin
@@ -605,8 +606,8 @@ namespace Trinity
                                 c_ObjectType = GObjectType.Destructible;
                             else if (DataDictionary.InteractWhiteListIds.Contains(c_ActorSNO))
                                 c_ObjectType = GObjectType.Interactable;
-                            else if (c_diaObject.ActorInfo.GizmoType == GizmoType.WeirdGroup57)
-                                c_ObjectType = GObjectType.Interactable;
+                            //else if (c_diaObject.ActorInfo.GizmoType == GizmoType.WeirdGroup57)
+                            //    c_ObjectType = GObjectType.Interactable;
                             else
                                 c_ObjectType = GObjectType.Unknown;
                         }

@@ -2,13 +2,14 @@
 using System.Threading;
 using System.Windows;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.CommonBot;
-using Zeta.Navigation;
+using Zeta.Bot;
+using Zeta.Bot.Navigation;
 using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -76,7 +77,7 @@ namespace Trinity
             }
             else
             {
-                Navigator.StuckHandler = new Zeta.Navigation.DefaultStuckHandler();
+                Navigator.StuckHandler = new Zeta.Bot.Navigation.DefaultStuckHandler();
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Default Demonbuddy Unstucker", true);
             }
         }

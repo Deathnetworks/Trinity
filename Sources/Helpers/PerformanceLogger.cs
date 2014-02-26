@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
-using Zeta.Common;
 
 namespace Trinity.Technicals
 {
     [DebuggerStepThrough]
     public class PerformanceLogger : IDisposable
     {
+        private static readonly log4net.ILog Logging = Zeta.Common.Logger.GetLoggerInstanceForType();
         private readonly string _BlockName;
         private readonly Stopwatch _Stopwatch;
         private bool _IsDisposed;
@@ -33,7 +33,7 @@ namespace Trinity.Technicals
                     _Stopwatch.Stop();
                     if (_Stopwatch.Elapsed.TotalMilliseconds > 1)
                     {
-                        Logging.WriteVerbose("[Trinity][Performance] Execution of the block {0} took {1:00.00}ms.", _BlockName,
+                        Logging.DebugFormat("[Trinity][Performance] Execution of the block {0} took {1:00.00}ms.", _BlockName,
                                             _Stopwatch.Elapsed.TotalMilliseconds);
                     }
                 }

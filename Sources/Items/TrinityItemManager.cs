@@ -1,9 +1,9 @@
 ﻿using Trinity.Config.Loot;
 using Trinity.ItemRules;
 using Trinity.Technicals;
-using Zeta.CommonBot;
-using Zeta.CommonBot.Items;
-using Zeta.Internals.Actors;
+using Zeta.Bot;
+using Zeta.Bot.Items;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 
 namespace Trinity
 {
@@ -118,57 +118,57 @@ namespace Trinity
             if (trinityItemType == GItemType.StaffOfHerding)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.CraftingMaterial)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
 
             if (trinityItemType == GItemType.Emerald)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.Amethyst)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.Topaz)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.Ruby)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.CraftTome)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
             if (trinityItemType == GItemType.InfernalKey)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
 
             if (trinityItemType == GItemType.HealthPotion)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return false;
             }
 
@@ -176,7 +176,7 @@ namespace Trinity
             if (cItem.IsUnidentified)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] = (autokeep unidentified items)", cItem.RealName, cItem.InternalName);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] = (autokeep unidentified items)", cItem.RealName, cItem.InternalName);
                 return true;
             }
 
@@ -186,7 +186,7 @@ namespace Trinity
 
                 if (evaluationType == ItemEvaluationType.Keep)
 
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
                 switch (action)
                 {
                     case Interpreter.InterpreterAction.KEEP:
@@ -210,14 +210,14 @@ namespace Trinity
             if (cItem.Quality >= ItemQuality.Legendary)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
 
             if (trinityItemType == GItemType.CraftingPlan)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
 
@@ -238,7 +238,7 @@ namespace Trinity
         {
             ItemEvents.ResetTownRun();
             if (!item.IsPotion)
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ItemValuation,
+                Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation,
                     "Incoming {0} Request: {1}, {2}, {3}, {4}, {5}",
                     evaluationType, item.ItemQualityLevel, item.Level, item.ItemBaseType,
                     item.ItemType, item.IsOneHand ? "1H" : item.IsTwoHand ? "2H" : "NH");
@@ -247,13 +247,13 @@ namespace Trinity
             switch (action)
             {
                 case Interpreter.InterpreterAction.SALVAGE:
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0}: {1}", evaluationType, (evaluationType == ItemEvaluationType.Salvage));
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0}: {1}", evaluationType, (evaluationType == ItemEvaluationType.Salvage));
                     return (evaluationType == ItemEvaluationType.Salvage);
                 case Interpreter.InterpreterAction.SELL:
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "{0}: {1}", evaluationType, (evaluationType == ItemEvaluationType.Sell));
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0}: {1}", evaluationType, (evaluationType == ItemEvaluationType.Sell));
                     return (evaluationType == ItemEvaluationType.Sell);
                 default:
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ScriptRule, "Trinity, item is unhandled by ItemRules (SalvageSell)!");
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ScriptRule, "Trinity, item is unhandled by ItemRules (SalvageSell)!");
                     switch (evaluationType)
                     {
                         case ItemEvaluationType.Salvage:

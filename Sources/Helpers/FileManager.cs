@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
-using Zeta;
+using Zeta.Game;
 
 namespace Trinity.Technicals
 {
@@ -82,7 +82,7 @@ namespace Trinity.Technicals
         /// <returns></returns>
         private static IDictionary<K, T> Load<K, T>(string filename, string name, string keyName, string valueName)
         {
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loading Dictionary file={0} name={1} keys={2} values={3}", filename, name, keyName, valueName);
+            Logger.Log(TrinityLogLevel.Info, LogCategory.Configuration, "Loading Dictionary file={0} name={1} keys={2} values={3}", filename, name, keyName, valueName);
             IDictionary<K, T> ret = new Dictionary<K, T>();
             try
             {
@@ -113,11 +113,11 @@ namespace Trinity.Technicals
                 }
                 if (ret.Count > 0)
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loaded Dictionary name={0} key={1} value={2} with {3} values", name, keyName, valueName, ret.Count);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.Configuration, "Loaded Dictionary name={0} key={1} value={2} with {3} values", name, keyName, valueName, ret.Count);
                 }
                 else
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Attempted to load Dictionary name={0} key={1} value={2} but 0 values found!", name, keyName, valueName, ret.Count);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.Configuration, "Attempted to load Dictionary name={0} key={1} value={2} but 0 values found!", name, keyName, valueName, ret.Count);
                 }
             }
             catch (Exception ex)
@@ -293,8 +293,8 @@ namespace Trinity.Technicals
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(_battleTagName) && ZetaDia.Service.CurrentHero.IsValid)
-                    _battleTagName = ZetaDia.Service.CurrentHero.BattleTagName;
+                if (string.IsNullOrWhiteSpace(_battleTagName) && ZetaDia.Service.Hero.IsValid)
+                    _battleTagName = ZetaDia.Service.Hero.BattleTagName;
                 return _battleTagName;
             }
         }

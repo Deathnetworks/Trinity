@@ -4,6 +4,7 @@ using System.IO;
 using System.Xml.Serialization;
 using Trinity.Technicals;
 using Zeta.Common.Plugins;
+using Zeta.Game;
 
 namespace Trinity
 {
@@ -260,6 +261,9 @@ namespace Trinity
 
         private static void PersistentUpdateStats()
         {
+            if (cachedStaticWorldId <= 0 || Player.ActorClass == Zeta.Game.ActorClass.Invalid)
+				return;
+
             // Total stats
             string filename = Path.Combine(FileManager.LoggingPath, String.Format("FullStats - {0}.xml", Player.ActorClass));
             PersistentTotalStats = PersistentUpdateOne(filename);
@@ -300,12 +304,14 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "PersistentOutputReport exception: {0}", ex.ToString());
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "PersistentOutputReport exception: {0}", ex.ToString());
             }
 
             // Full Stats
             try
             {
+                if (Player.ActorClass.ToString() != "Invalid")
+				{
                 var fullStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("FullStats - {0}.log", Player.ActorClass));
 
                 using (FileStream LogStream =
@@ -314,15 +320,18 @@ namespace Trinity
                     LogStats(LogStream, PersistentTotalStats);
                 }
             }
+            }
             catch (Exception ex)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "FullStats exception: {0}", ex.ToString());
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "FullStats exception: {0}", ex.ToString());
             }
 
             // Current World Stats
 
             try
             {
+                if (cachedStaticWorldId > 0 && Player.ActorClass != ActorClass.Invalid)
+				{
                 var worldStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("WorldStats {1} - {0}.log", Player.ActorClass, cachedStaticWorldId));
 
                 using (FileStream LogStream = File.Open(worldStatsPath, FileMode.Create, FileAccess.Write, FileShare.Read))
@@ -330,14 +339,17 @@ namespace Trinity
                     LogStats(LogStream, worldStatsDictionary[cachedStaticWorldId]);
                 }
             }
+            }
             catch (Exception ex)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "WorldStats exception: {0}", ex.ToString());
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "WorldStats exception: {0}", ex.ToString());
             }
 
             // AggregateWorldStats
             try
             {
+                if (Player.ActorClass != ActorClass.Invalid)
+				{
                 var aggregateWorldStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("AgregateWorldStats - {0}.log", Player.ActorClass));
 
                 using (FileStream LogStream = File.Open(aggregateWorldStatsPath, FileMode.Create, FileAccess.Write, FileShare.Read))
@@ -345,9 +357,10 @@ namespace Trinity
                     LogWorldStats(LogStream, worldStatsDictionary);
                 }
             }
+            }
             catch (Exception ex)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "AggregateWorldStats exception: {0}", ex.ToString());
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "AggregateWorldStats exception: {0}", ex.ToString());
             }
 
         }
@@ -395,7 +408,7 @@ namespace Trinity
             using (StreamWriter LogWriter = new StreamWriter(LogStream))
             {
                 LogWriter.WriteLine("===== Misc Statistics =====");
-                LogWriter.WriteLine("Total tracking time: " + ((int)ts.TotalRunningTime.TotalHours).ToString() + "h " + ts.TotalRunningTime.Minutes.ToString("0.00") +
+                LogWriter.WriteLine("Total tracking time: " + ((int)ts.TotalRunningTime.TotalHours).ToString() + "h " + ts.TotalRunningTime.Minutes.ToString() +
                     "m " + ts.TotalRunningTime.Seconds.ToString() + "s");
                 LogWriter.WriteLine("Total deaths: " + ts.TotalDeaths.ToString() + " [" + Math.Round(ts.TotalDeaths / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
                 LogWriter.WriteLine("Total games (approx): " + ts.TotalLeaveGames.ToString() + " [" + Math.Round(ts.TotalLeaveGames / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
@@ -408,11 +421,11 @@ namespace Trinity
                     }
                     else
                     {
-                        LogWriter.WriteLine("(your games left value may be bugged @ 0 due to profile managers/routines etc., now showing games joined instead:)");
                         LogWriter.WriteLine("Total games joined: " + ts.TotalJoinGames.ToString() + " [" + Math.Round(ts.TotalJoinGames / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
                     }
                 }
                 LogWriter.WriteLine("Total XP gained: " + Math.Round(ts.TotalXp / (float)1000000, 2).ToString("0.00") + " million [" + Math.Round(ts.TotalXp / ts.TotalRunningTime.TotalHours / 1000000, 2).ToString("0.00") + " million per hour]");
+                LogWriter.WriteLine("Total Gold gained: " + Math.Round(ts.TotalGold / (float)1000, 2).ToString("0.00") + " Thousand [" + Math.Round(ts.TotalGold / ts.TotalRunningTime.TotalHours / 1000, 2).ToString("0.00") + " Thousand per hour]");
                 LogWriter.WriteLine("");
                 LogWriter.WriteLine("===== Item DROP Statistics =====");
 
@@ -422,12 +435,7 @@ namespace Trinity
                     LogWriter.WriteLine("Items:");
                     LogWriter.WriteLine("Total items dropped: " + ts.ItemsDropped.Total.ToString() + " [" +
                         Math.Round(ts.ItemsDropped.Total / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
-                    LogWriter.WriteLine("Items dropped by ilvl: ");
-                    for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
-                        if (ts.ItemsDropped.TotalPerLevel[itemLevel] > 0)
-                            LogWriter.WriteLine("- ilvl" + itemLevel.ToString() + ": " + ts.ItemsDropped.TotalPerLevel[itemLevel].ToString() + " [" +
-                                Math.Round(ts.ItemsDropped.TotalPerLevel[itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" +
-                                Math.Round((ts.ItemsDropped.TotalPerLevel[itemLevel] / ts.ItemsDropped.Total) * 100, 2).ToString("0.00") + " %}");
+
                     LogWriter.WriteLine("");
                     LogWriter.WriteLine("Items dropped by quality: ");
                     for (int iThisQuality = 0; iThisQuality <= 3; iThisQuality++)
@@ -435,9 +443,13 @@ namespace Trinity
                         if (ts.ItemsDropped.TotalPerQuality[iThisQuality] > 0)
                         {
                             LogWriter.WriteLine("- " + sQualityString[iThisQuality] + ": " + ts.ItemsDropped.TotalPerQuality[iThisQuality].ToString() + " [" + Math.Round(ts.ItemsDropped.TotalPerQuality[iThisQuality] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsDropped.TotalPerQuality[iThisQuality] / ts.ItemsDropped.Total) * 100, 2).ToString("0.00") + " %}");
+                            //intell
+							if (iThisQuality == 3)
+							{
                             for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
                                 if (ts.ItemsDropped.TotalPerQPerL[iThisQuality, itemLevel] > 0)
                                     LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sQualityString[iThisQuality] + ": " + ts.ItemsDropped.TotalPerQPerL[iThisQuality, itemLevel].ToString() + " [" + Math.Round(ts.ItemsDropped.TotalPerQPerL[iThisQuality, itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsDropped.TotalPerQPerL[iThisQuality, itemLevel] / ts.ItemsDropped.Total) * 100, 2).ToString("0.00") + " %}");
+                        }
                         }
 
                         // Any at all this quality?
@@ -449,40 +461,6 @@ namespace Trinity
 
                 // End of item stats
 
-                // Potion stats
-                if (ts.ItemsDropped.TotalPotions > 0)
-                {
-                    LogWriter.WriteLine("Potion Drops:");
-                    LogWriter.WriteLine("Total potions: " + ts.ItemsDropped.TotalPotions.ToString() + " [" + Math.Round(ts.ItemsDropped.TotalPotions / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
-                    for (int itemLevel = 1; itemLevel <= 63; itemLevel++) if (ts.ItemsDropped.PotionsPerLevel[itemLevel] > 0)
-                            LogWriter.WriteLine("- ilvl " + itemLevel.ToString() + ": " + ts.ItemsDropped.PotionsPerLevel[itemLevel].ToString() + " [" + Math.Round(ts.ItemsDropped.PotionsPerLevel[itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsDropped.PotionsPerLevel[itemLevel] / ts.ItemsDropped.TotalPotions) * 100, 2).ToString("0.00") + " %}");
-                    LogWriter.WriteLine("");
-                }
-
-                // End of potion stats
-
-                // Gem stats
-                if (ts.ItemsDropped.TotalGems > 0)
-                {
-                    LogWriter.WriteLine("Gem Drops:");
-                    LogWriter.WriteLine("Total gems: " + ts.ItemsDropped.TotalGems.ToString() + " [" + Math.Round(ts.ItemsDropped.TotalGems / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
-                    for (int iThisGemType = 0; iThisGemType <= 3; iThisGemType++)
-                    {
-                        if (ts.ItemsDropped.GemsPerType[iThisGemType] > 0)
-                        {
-                            LogWriter.WriteLine("- " + sGemString[iThisGemType] + ": " + ts.ItemsDropped.GemsPerType[iThisGemType].ToString() + " [" + Math.Round(ts.ItemsDropped.GemsPerType[iThisGemType] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsDropped.GemsPerType[iThisGemType] / ts.ItemsDropped.TotalGems) * 100, 2).ToString("0.00") + " %}");
-                            for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
-                                if (ts.ItemsDropped.GemsPerTPerL[iThisGemType, itemLevel] > 0)
-                                    LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sGemString[iThisGemType] + ": " + ts.ItemsDropped.GemsPerTPerL[iThisGemType, itemLevel].ToString() + " [" + Math.Round(ts.ItemsDropped.GemsPerTPerL[iThisGemType, itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsDropped.GemsPerTPerL[iThisGemType, itemLevel] / ts.ItemsDropped.TotalGems) * 100, 2).ToString("0.00") + " %}");
-                        }
-
-                        // Any at all this quality?
-                    }
-
-                    // For loop on quality
-                }
-
-                // End of gem stats
 
                 // Key stats
                 if (ts.ItemsDropped.TotalInfernalKeys > 0)
@@ -492,7 +470,7 @@ namespace Trinity
                 }
 
                 // End of key stats
-                LogWriter.WriteLine("");
+                //LogWriter.WriteLine("");
                 LogWriter.WriteLine("");
                 LogWriter.WriteLine("===== Item PICKUP Statistics =====");
 
@@ -501,10 +479,7 @@ namespace Trinity
                 {
                     LogWriter.WriteLine("Items:");
                     LogWriter.WriteLine("Total items picked up: " + ts.ItemsPicked.Total.ToString() + " [" + Math.Round(ts.ItemsPicked.Total / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
-                    LogWriter.WriteLine("Item picked up by ilvl: ");
-                    for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
-                        if (ts.ItemsPicked.TotalPerLevel[itemLevel] > 0)
-                            LogWriter.WriteLine("- ilvl" + itemLevel.ToString() + ": " + ts.ItemsPicked.TotalPerLevel[itemLevel].ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPerLevel[itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.TotalPerLevel[itemLevel] / ts.ItemsPicked.Total) * 100, 2).ToString("0.00") + " %}");
+
                     LogWriter.WriteLine("");
                     LogWriter.WriteLine("Items picked up by quality: ");
                     for (int iThisQuality = 0; iThisQuality <= 3; iThisQuality++)
@@ -512,9 +487,13 @@ namespace Trinity
                         if (ts.ItemsPicked.TotalPerQuality[iThisQuality] > 0)
                         {
                             LogWriter.WriteLine("- " + sQualityString[iThisQuality] + ": " + ts.ItemsPicked.TotalPerQuality[iThisQuality].ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPerQuality[iThisQuality] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.TotalPerQuality[iThisQuality] / ts.ItemsPicked.Total) * 100, 2).ToString("0.00") + " %}");
+                            //intell
+							if (iThisQuality == 3)
+							{
                             for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
                                 if (ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel] > 0)
                                     LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sQualityString[iThisQuality] + ": " + ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel].ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel] / ts.ItemsPicked.Total) * 100, 2).ToString("0.00") + " %}");
+                        }
                         }
 
                         // Any at all this quality?
@@ -535,8 +514,6 @@ namespace Trinity
                 {
                     LogWriter.WriteLine("Potion Pickups:");
                     LogWriter.WriteLine("Total potions: " + ts.ItemsPicked.TotalPotions.ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPotions / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour]");
-                    for (int itemLevel = 1; itemLevel <= 63; itemLevel++) if (ts.ItemsPicked.PotionsPerLevel[itemLevel] > 0)
-                            LogWriter.WriteLine("- ilvl " + itemLevel.ToString() + ": " + ts.ItemsPicked.PotionsPerLevel[itemLevel].ToString() + " [" + Math.Round(ts.ItemsPicked.PotionsPerLevel[itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.PotionsPerLevel[itemLevel] / ts.ItemsPicked.TotalPotions) * 100, 2).ToString("0.00") + " %}");
                     LogWriter.WriteLine("");
                 }
 

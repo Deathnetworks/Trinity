@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
-using Zeta.CommonBot;
-using Zeta.Internals;
+using Zeta.Bot;
+using Zeta.Game.Internals;
 
 namespace Trinity
 {

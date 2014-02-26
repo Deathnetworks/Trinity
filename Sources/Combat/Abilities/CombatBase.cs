@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Config;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Bot;
 using Zeta.Common;
-using Zeta.CommonBot;
-using Zeta.Internals.Actors;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.Combat.Abilities
 {
@@ -91,7 +92,7 @@ namespace Trinity.Combat.Abilities
                         //    power = GetWizardPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
                         //    break;
                         //// Witch Doctors
-                        //case ActorClass.WitchDoctor:
+                        //case ActorClass.Witchdoctor:
                         //    power = GetWitchDoctorPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
                         //    break;
                         //// Demon Hunters
@@ -166,7 +167,7 @@ namespace Trinity.Combat.Abilities
                         return V.I("DemonHunter.MinEnergyReserve");
                     case ActorClass.Monk:
                         return V.I("Monk.MinEnergyReserve");
-                    case ActorClass.WitchDoctor:
+                    case ActorClass.Witchdoctor:
                         return V.I("WitchDoctor.MinEnergyReserve");
                     case ActorClass.Wizard:
                         return V.I("Wizard.MinEnergyReserve");
@@ -314,7 +315,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                ACDItem rhItem = ZetaDia.Me.Inventory.Equipped.Where(i => i.InventorySlot == InventorySlot.PlayerLeftHand).FirstOrDefault();
+                ACDItem rhItem = ZetaDia.Me.Inventory.Equipped.Where(i => i.InventorySlot == InventorySlot.LeftHand).FirstOrDefault();
                 if (rhItem == null)
                     return SNOPower.None;
 

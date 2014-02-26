@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.DbProvider;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
-using Zeta.Navigation;
+using Zeta.Bot.Navigation;
 using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -37,7 +38,7 @@ namespace Trinity
             {
                 foreach (MiniMapMarker marker in KnownMarkers.Where(m => m.Equals(nearestMarker) && near.Distance2D(m.Position) <= pathPrecision))
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Setting MiniMapMarker {0} as Visited, within PathPrecision {1:0}", marker.MarkerNameHash, pathPrecision);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Setting MiniMapMarker {0} as Visited, within PathPrecision {1:0}", marker.MarkerNameHash, pathPrecision);
                     marker.Visited = true;
                     lastMoveResult = MoveResult.Moved;
                 }
@@ -47,7 +48,7 @@ namespace Trinity
                 {
                     foreach (MiniMapMarker marker in KnownMarkers.Where(m => m.Equals(nearestMarker)))
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Setting MiniMapMarker {0} as Visited, MoveResult=ReachedDestination", marker.MarkerNameHash);
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Setting MiniMapMarker {0} as Visited, MoveResult=ReachedDestination", marker.MarkerNameHash);
                         marker.Visited = true;
                         lastMoveResult = MoveResult.Moved;
                     }
@@ -57,7 +58,7 @@ namespace Trinity
                 {
                     foreach (MiniMapMarker marker in KnownMarkers.Where(m => m.Equals(nearestMarker)))
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Unable to navigate to marker, setting MiniMapMarker {0} at {1} as failed", marker.MarkerNameHash, marker.Position);
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Unable to navigate to marker, setting MiniMapMarker {0} at {1} as failed", marker.MarkerNameHash, marker.Position);
                         marker.Failed = true;
                         lastMoveResult = MoveResult.Moved;
                     }
@@ -91,7 +92,7 @@ namespace Trinity
 
         internal static void AddMarkersToList(int includeMarker = 0)
         {
-            foreach (Zeta.Internals.MinimapMarker marker in GetMarkerList(includeMarker))
+            foreach (Zeta.Game.Internals.MinimapMarker marker in GetMarkerList(includeMarker))
             {
                 MiniMapMarker mmm = new MiniMapMarker()
                 {
@@ -100,13 +101,13 @@ namespace Trinity
                     Visited = false
                 };
 
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Adding MiniMapMarker {0} at {1} to KnownMarkers", mmm.MarkerNameHash, mmm.Position);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Adding MiniMapMarker {0} at {1} to KnownMarkers", mmm.MarkerNameHash, mmm.Position);
 
                 KnownMarkers.Add(mmm);
             }
         }
 
-        private static IEnumerable<Zeta.Internals.MinimapMarker> GetMarkerList(int includeMarker)
+        private static IEnumerable<Zeta.Game.Internals.MinimapMarker> GetMarkerList(int includeMarker)
         {
             return ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => (m.NameHash == 0 || m.NameHash == includeMarker) && !KnownMarkers.Any(ml => ml.Position == m.Position && ml.MarkerNameHash == m.NameHash)).OrderBy(m => m.NameHash != 0);
         }
@@ -141,7 +142,7 @@ namespace Trinity
 
             lastMoveResult = Navigator.MoveTo(MiniMapMarker.GetNearestUnvisitedMarker(near).Position);
 
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Moving to inspect nameHash {0} at {1} distance {2:0} mr: {3}",
+            Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Moving to inspect nameHash {0} at {1} distance {2:0} mr: {3}",
                 m.MarkerNameHash, m.Position, Trinity.Player.Position.Distance2D(m.Position), lastMoveResult);
 
 

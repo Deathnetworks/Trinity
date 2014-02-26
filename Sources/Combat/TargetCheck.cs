@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading;
 using Trinity.Combat.Abilities;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common.Plugins;
-using Zeta.CommonBot;
-using Zeta.Internals.Actors;
+using Zeta.Bot;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 
 namespace Trinity
 {
@@ -81,7 +81,7 @@ namespace Trinity
                             PlayerEmergencyHealthGlobeLimit = Settings.Combat.Wizard.HealthGlobeLevel;
                             PlayerKiteDistance = Settings.Combat.Wizard.KiteLimit;
                             break;
-                        case ActorClass.WitchDoctor:
+                        case ActorClass.Witchdoctor:
                             // What health % should we use a potion, or look for a globe
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.WitchDoctor.PotionLevel;
                             PlayerEmergencyHealthGlobeLimit = Settings.Combat.WitchDoctor.HealthGlobeLevel;
@@ -209,7 +209,7 @@ namespace Trinity
 
                 if ((Trinity.ForceVendorRunASAP || Trinity.IsReadyToTownRun) && TownRun.TownRunTimerRunning())
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Waiting for town run timer", true);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Waiting for town run timer", true);
                     return true;
                 }
 

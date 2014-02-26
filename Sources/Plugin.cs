@@ -3,10 +3,10 @@ using System.IO;
 using System.Windows;
 using Trinity.DbProvider;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Bot;
+using Zeta.Bot.Navigation;
 using Zeta.Common.Plugins;
-using Zeta.CommonBot;
-using Zeta.Navigation;
+using Zeta.Game;
 
 namespace Trinity
 {
@@ -94,9 +94,9 @@ namespace Trinity
 
             if (!Directory.Exists(FileManager.PluginPath))
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Fatal Error - cannot enable plugin. Invalid path: {0}", FileManager.PluginPath);
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Please check you have installed the plugin to the correct location, and then restart DemonBuddy and re-enable the plugin.");
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, @"Plugin should be installed to \<DemonBuddyFolder>\Plugins\Trinity\");
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Fatal Error - cannot enable plugin. Invalid path: {0}", FileManager.PluginPath);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Please check you have installed the plugin to the correct location, and then restart DemonBuddy and re-enable the plugin.");
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, @"Plugin should be installed to \<DemonBuddyFolder>\Plugins\Trinity\");
             }
             else
             {
@@ -144,7 +144,7 @@ namespace Trinity
 
                 UI.UILoader.PreLoadWindowContent();
 
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
             }
 
             if (StashRule != null)
@@ -167,7 +167,7 @@ namespace Trinity
             CombatTargeting.Instance.Provider = new DefaultCombatTargetingProvider();
             LootTargeting.Instance.Provider = new DefaultLootTargetingProvider();
             ObstacleTargeting.Instance.Provider = new DefaultObstacleTargetingProvider();
-            Navigator.SearchGridProvider = new Zeta.Navigation.MainGridProvider();
+            Navigator.SearchGridProvider = new Zeta.Bot.Navigation.MainGridProvider();
 
             GameEvents.OnPlayerDied -= TrinityOnDeath;
             BotMain.OnStop -= TrinityBotStop;
@@ -175,9 +175,9 @@ namespace Trinity
             GameEvents.OnGameJoined -= TrinityOnJoinGame;
             GameEvents.OnGameLeft -= TrinityOnLeaveGame;
 
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "DISABLED: Trinity is now shut down...");
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "");
+            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "");
+            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "DISABLED: Trinity is now shut down...");
+            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "");
             GenericCache.Shutdown();
             GenericBlacklist.Shutdown();
         }
@@ -231,7 +231,6 @@ namespace Trinity
         {
             _instance = this;
             Helpers.PluginCheck.CheckAndInstallTrinityRoutine();
-            Zeta.Common.Logging.Write("[Trinity] Compiled");
         }
 
 

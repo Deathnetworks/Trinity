@@ -4,8 +4,11 @@ using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.Internals.Actors;
-using Zeta.Internals.SNO;
+using Zeta.Game.Internals.Actors;
+using Zeta.Game;
+using Zeta.Game.Internals.SNO;
+using Logger = Trinity.Technicals.Logger;
+
 namespace Trinity
 {
     public partial class Trinity : IPlugin
@@ -48,7 +51,7 @@ namespace Trinity
                 }
 
                 // Avoid Death
-                if (Settings.Combat.Misc.AvoidDeath && 
+                if (Settings.Combat.Misc.AvoidDeath &&
                     Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && // health is lower than potion limit
                     !SNOPowerUseTimer(SNOPower.DrinkHealthPotion) && // we can't use a potion anymore
                     TargetUtil.AnyMobsInRange(90f, false))

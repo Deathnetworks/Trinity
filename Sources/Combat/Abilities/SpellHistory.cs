@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Zeta.Internals.Actors;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 
 namespace Trinity.Combat.Abilities
 {

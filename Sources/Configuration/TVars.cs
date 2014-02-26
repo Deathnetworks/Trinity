@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 using System.Xml;
 using Trinity.Helpers;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 
 namespace Trinity
 {
@@ -25,7 +25,7 @@ namespace Trinity
             batch = true;
 
             // Barbarian 
-            Set(new TVar("Barbarian.MinEnergyReserve", 56, "Ignore Pain Emergency Use Minimum Health Percent"));
+            Set(new TVar("Barbarian.MinEnergyReserve", 10, "Ignore Pain Emergency Use Minimum Health Percent"));
             Set(new TVar("Barbarian.IgnorePain.MinHealth", 0.45f, "Ignore Pain Emergency Use Minimum Health Percent"));
             Set(new TVar("Barbarian.Avoidance.WOTB.Other", 0.3f, "General WOTB Avoidance health multiplier"));
             Set(new TVar("Barbarian.Avoidance.WOTB.Desecrator", 0.2f, "WOTB Desecrator health multiplier"));
@@ -36,36 +36,36 @@ namespace Trinity
             Set(new TVar("Barbarian.Avoidance.WOTB.BeastCharge", 1f, "WOTB Belial health multiplier"));
             Set(new TVar("Barbarian.ThreatShout.Range", 25f, "Threating Shout Mob Range distance"));
             Set(new TVar("Barbarian.ThreatShout.OOCMaxFury", 25, "Threating Shout Out of Combat Max Fury"));
-            Set(new TVar("Barbarian.WarCry.MaxFury", 60, "Maximum Fury to cast WarCry (with buff)"));
+            Set(new TVar("Barbarian.WarCry.MaxFury", 40, "Maximum Fury to cast WarCry (with buff)"));
             Set(new TVar("Barbarian.Sprint.MinFury", 20f, "Minimum Fury to try cast Sprint"));
             Set(new TVar("Barbarian.Sprint.SingleTargetRange", 16f, "Minimum Fury to try cast Sprint"));
             Set(new TVar("Barbarian.Sprint.SingleTargetMinFury", 20f, "Minimum Fury to try cast Sprint"));
-            Set(new TVar("Barbarian.Sprint.MinUseDelay", 250, "Minimum time in Millseconds before Sprint can be re-cast, even with Fury dump"));
+            Set(new TVar("Barbarian.Sprint.MinUseDelay", 500, "Minimum time in Millseconds before Sprint can be re-cast, even with Fury dump"));
             Set(new TVar("Barbarian.BattleRage.MinFury", 20, "Minimum Fury to try cast Battle Rage"));
             Set(new TVar("Barbarian.WOTB.MinFury", 50, "Minimum Fury to try cast WOTB"));
             Set(new TVar("Barbarian.WOTB.MinRange", 20f, "Elites in Range to try cast WOTB (with WOTB.MinCount) non-hard elites, non ignore elites"));
             Set(new TVar("Barbarian.WOTB.MinCount", 1, "Elite count to try cast WOTB (with WOTB.MinRange) non-hard elites, non ignore elites"));
-            Set(new TVar("Barbarian.WOTB.RangeNear", 25f, "Nearby range check to use WOTB with Ignore Elites"));
+            Set(new TVar("Barbarian.WOTB.RangeNear", 35f, "Nearby range check to use WOTB with Ignore Elites"));
             Set(new TVar("Barbarian.WOTB.RangeFar", 50f, "Nearby mob count check to use WOTB with Ignore Elites"));
-            Set(new TVar("Barbarian.WOTB.CountNear", 3, "Extended range check to use WOTB with Ignore Elites"));
+            Set(new TVar("Barbarian.WOTB.CountNear", 8, "Extended range check to use WOTB with Ignore Elites"));
             Set(new TVar("Barbarian.WOTB.CountFar", 10, "Extended mob count check to use WOTB with Ignore Elites"));
             Set(new TVar("Barbarian.WOTB.HardEliteCountOverride", 4, "Will over-ride WOTB hard elite check when this many elites are present"));
             Set(new TVar("Barbarian.WOTB.HardEliteRangeOverride", 50f, "Range check distance for WOTB Hard elite override"));
-            Set(new TVar("Barbarian.WOTB.FuryDumpMin", 0.95, "Percentage Fury to start dumping"));
+            Set(new TVar("Barbarian.WOTB.FuryDumpMin", 0.85, "Percentage Fury to start dumping"));
             Set(new TVar("Barbarian.WOTB.EmergencyHealth", 0.49, "Always pop WOTB when below this % Health"));
             Set(new TVar("Barbarian.CallOfTheAncients.MinFury", 50, "Minimum Fury to try cast Call of the Ancients"));
             Set(new TVar("Barbarian.CallOfTheAncients.MinEliteRange", 25f, "Minimum range elites must be in to use COTA"));
             Set(new TVar("Barbarian.CallOfTheAncients.TickDelay", 4, "Pre and Post use Tick Delay"));
             Set(new TVar("Barbarian.AncientSpear.UseRange", 55f, "Power Use Range"));
-            Set(new TVar("Barbarian.Whirlwind.UseRange", 10f, "Power Use Range"));
+            Set(new TVar("Barbarian.Whirlwind.UseRange", 20f, "Power Use Range"));
             Set(new TVar("Barbarian.Whirlwind.MinFury", 10d, "Minimum Fury"));
             Set(new TVar("Barbarian.Whirlwind.TrashRange", 25f, "Minimum Fury"));
             Set(new TVar("Barbarian.Whirlwind.TrashCount", 1, "Minimum Fury"));
             Set(new TVar("Barbarian.Whirlwind.EliteRange", 25f, "Minimum Fury"));
             Set(new TVar("Barbarian.Whirlwind.EliteCount", 1, "Minimum Fury"));
             Set(new TVar("Barbarian.Whirlwind.UseForMovement", true, "Use Whirlwind when moving near ignored mobs"));
-            Set(new TVar("Barbarian.Whirlwind.ZigZagDistance", 15f, "Whirlwind ZigZag Range"));
-            Set(new TVar("Barbarian.Whirlwind.ZigZagMaxTime", 1200, "Maximum time to keep a zig zag point before forcing a new point (millseconds)"));
+            Set(new TVar("Barbarian.Whirlwind.ZigZagDistance", 20f, "Whirlwind ZigZag Range"));
+            Set(new TVar("Barbarian.Whirlwind.ZigZagMaxTime", 600, "Maximum time to keep a zig zag point before forcing a new point (millseconds)"));
             Set(new TVar("Barbarian.Bash.UseRange", 6f, "Power Use Range"));
             Set(new TVar("Barbarian.Frenzy.UseRange", 10f, "Power Use Range"));
             Set(new TVar("Barbarian.Cleave.UseRange", 6f, "Power Use Range"));
@@ -92,11 +92,11 @@ namespace Trinity
 
             Set(new TVar("Barbarian.Rend.MinNonBleedMobCount", 1, "Cast rend when this many mobs surrounding are not bleeding"));
             Set(new TVar("Barbarian.Rend.MinUseIntervalMillseconds", 0, "Minimum Delay between uses"));
-            Set(new TVar("Barbarian.Rend.UseRange", 10f, "Power Use Range"));
-            Set(new TVar("Barbarian.Rend.MaxRange", 10f, "Maximum Range for targets to be Rended"));
-            Set(new TVar("Barbarian.Rend.MinFury", 20, "Minimum Fury"));
+            Set(new TVar("Barbarian.Rend.UseRange", 12f, "Power Use Range"));
+            Set(new TVar("Barbarian.Rend.MaxRange", 12f, "Maximum Range for targets to be Rended"));
+            Set(new TVar("Barbarian.Rend.MinFury", 30, "Minimum Fury"));
             Set(new TVar("Barbarian.Rend.TickDelay", 4, "Rend Pre and Post Tick Delay"));
-            Set(new TVar("Barbarian.Rend.SpamBelowHealthPct", 25f, "Always spam rend when below this Percent Health"));
+            Set(new TVar("Barbarian.Rend.SpamBelowHealthPct", 0.25f, "Always spam rend when below this Percent Health"));
 
             Set(new TVar("Barbarian.OverPower.MaxRange", 9f, "Maximum Range Overpower is triggered"));
             Set(new TVar("Barbarian.SeismicSlam.CurrentTargetRange", 40f, "Maximum Current Target range"));
@@ -117,7 +117,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.Barbarian_Cleave", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_Frenzy", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_HammerOfTheAncients", 150, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Barbarian_Rend", 1500, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Barbarian_Rend", 600, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_SeismicSlam", 200, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_Whirlwind", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_GroundStomp", 12200, "Spell Use Delay/Interval, milliseconds"));
@@ -288,7 +288,7 @@ namespace Trinity
         {
             try
             {
-                if (!ZetaDia.Service.Platform.IsConnected || !ZetaDia.Service.CurrentHero.IsValid)
+                if (!ZetaDia.Service.Platform.IsConnected || !ZetaDia.Service.Hero.IsValid)
                     return;
             }
             catch (Exception ex)
@@ -296,7 +296,7 @@ namespace Trinity
                 Logger.Log("Exception saving TVars in checking Service and Hero: {0}", ex);
             }
 
-            var filename = Path.Combine(Zeta.CommonBot.Settings.CharacterSettings.SettingsDirectory, "TVars.xml");
+            var filename = Path.Combine(Zeta.Bot.Settings.CharacterSettings.SettingsDirectory, "TVars.xml");
             lock (sync)
             {
                 try
@@ -338,7 +338,7 @@ namespace Trinity
         {
             try
             {
-                if (!ZetaDia.Service.Platform.IsConnected || !ZetaDia.Service.CurrentHero.IsValid)
+                if (!ZetaDia.Service.Platform.IsConnected || !ZetaDia.Service.Hero.IsValid)
                     return;
             }
             catch (Exception ex)
@@ -346,7 +346,7 @@ namespace Trinity
                 Logger.Log("Exception Loading TVars in checking Service and Hero: {0}", ex);
             }
 
-            var filename = Path.Combine(Zeta.CommonBot.Settings.CharacterSettings.SettingsDirectory, "TVars.xml");
+            var filename = Path.Combine(Zeta.Bot.Settings.CharacterSettings.SettingsDirectory, "TVars.xml");
 
             lock (sync)
             {

@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text;
-using System.Windows.Media;
 using Zeta.Common;
 
 namespace Trinity.Technicals
 {
-
     /// <summary>
     /// Utilities help developer interact with DemonBuddy
     /// </summary>
     [DebuggerStepThrough]
     internal static class Logger
     {
+        private static readonly log4net.ILog DBLog = Zeta.Common.Logger.GetLoggerInstanceForType();
         private static string prefix = "[Trinity]";
 
         public static string Prefix
@@ -30,7 +29,7 @@ namespace Trinity.Technicals
         {
             try
             {
-                Zeta.ZetaDia.SNO.LookupSNOName(Zeta.Internals.SNOGroup.Actor, -1);
+                Zeta.Game.ZetaDia.SNO.LookupSNOName(Zeta.Game.Internals.SNOGroup.Actor, -1);
             }
             catch
             {
@@ -38,7 +37,7 @@ namespace Trinity.Technicals
             }
             string a = "VXNpbmcgU05PUmVjb3JkIFRhYmxl";
             byte[] b = Convert.FromBase64String(a);
-            Logging.Write(Encoding.UTF8.GetString(b) + " " + (new Random().Next(128, 1024)).ToString());
+            DBLog.Critical(Encoding.UTF8.GetString(b) + " " + (new Random().Next(128, 1024)).ToString());
         }
 
         /// <summary>Logs the specified level.</summary>
@@ -51,13 +50,24 @@ namespace Trinity.Technicals
             if (category == LogCategory.UserInformation || level >= TrinityLogLevel.Error || (Trinity.Settings != null && Trinity.Settings.Advanced.LogCategories.HasFlag(category)))
             {
                 string msg = string.Format(prefix + "{0} {1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
-                if (level == TrinityLogLevel.Critical)
+
+                switch (level)
                 {
-                    Logging.Write(ConvertToLogLevel(level), Colors.Red, msg, args);
-                }
-                else
-                {
-                    Logging.Write(ConvertToLogLevel(level), msg, args);
+                    case TrinityLogLevel.Emergency:
+                        DBLog.Emergency(string.Format(msg, args));
+                        break;
+                    case TrinityLogLevel.Debug:
+                        DBLog.DebugFormat(msg, args);
+                        break;
+                    case TrinityLogLevel.Error:
+                        DBLog.ErrorFormat(msg, args);
+                        break;
+                    case TrinityLogLevel.Info:
+                        DBLog.InfoFormat(msg, args);
+                        break;
+                    case TrinityLogLevel.Verbose:
+                        DBLog.Verbose(string.Format(msg, args));
+                        break;
                 }
             }
         }
@@ -68,7 +78,7 @@ namespace Trinity.Technicals
         /// <param name="args">The parameters used when format message.</param>
         public static void Log(LogCategory category, string formatMessage, params object[] args)
         {
-            Log(TrinityLogLevel.Normal, category, formatMessage, args);
+            Log(TrinityLogLevel.Info, category, formatMessage, args);
         }
 
         /// <summary>Logs the message to Normal log level</summary>
@@ -92,7 +102,7 @@ namespace Trinity.Technicals
         /// <param name="args"></param>
         public static void LogNormal(string formatMessage, params object[] args)
         {
-            Log(TrinityLogLevel.Normal, LogCategory.UserInformation, formatMessage, args);
+            Log(TrinityLogLevel.Info, LogCategory.UserInformation, formatMessage, args);
         }
 
         /// <summary>
@@ -120,23 +130,23 @@ namespace Trinity.Technicals
         /// <returns>DemonBuddy logging level.</returns>
         private static LogLevel ConvertToLogLevel(TrinityLogLevel level)
         {
-            LogLevel logLevel = LogLevel.Diagnostic;
+            LogLevel logLevel = LogLevel.Debug;
             switch (level)
             {
-                case TrinityLogLevel.Critical:
-                    logLevel = LogLevel.None;
+                case TrinityLogLevel.Emergency:
+                    logLevel = LogLevel.Emergency;
                     break;
                 case TrinityLogLevel.Error:
-                    logLevel = LogLevel.Quiet;
+                    logLevel = LogLevel.Error;
                     break;
-                case TrinityLogLevel.Normal:
-                    logLevel = LogLevel.Normal;
+                case TrinityLogLevel.Info:
+                    logLevel = LogLevel.Info;
                     break;
                 case TrinityLogLevel.Verbose:
                     logLevel = LogLevel.Verbose;
                     break;
                 case TrinityLogLevel.Debug:
-                    logLevel = LogLevel.Diagnostic;
+                    logLevel = LogLevel.Debug;
                     break;
             }
             return logLevel;
@@ -145,7 +155,7 @@ namespace Trinity.Technicals
         public static string ListToString(System.Collections.Generic.List<object> list)
         {
             string result = "";
-            for (int i = 0; i < list.Count; i++) 
+            for (int i = 0; i < list.Count; i++)
             {
                 result += list[i];
                 if (i < list.Count - 1)

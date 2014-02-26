@@ -1,5 +1,5 @@
 ﻿using Trinity.Technicals;
-using Zeta.CommonBot.Profile;
+using Zeta.Bot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
@@ -20,7 +20,7 @@ namespace Trinity.XmlTags
         {
             return new Zeta.TreeSharp.Action(ret =>
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Town-run request received, will town-run at next possible moment.");
+                Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Town-run request received, will town-run at next possible moment.");
                 Trinity.ForceVendorRunASAP = true;
                 m_IsDone = true;
             });

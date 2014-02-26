@@ -7,7 +7,7 @@ using Trinity.Config.Combat;
 using Trinity.Config.Loot;
 using Trinity.Technicals;
 using Trinity.UI;
-using Zeta.CommonBot;
+using Zeta.Bot;
 
 namespace Trinity.UIComponents
 {
@@ -694,7 +694,7 @@ namespace Trinity.UIComponents
                     {
                         ItemRules.ItemRuleSetPath = directory;
 
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Configuration, "Loaded ItemRule Set {0}", ItemRules.ItemRuleSetPath);
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.Configuration, "Loaded ItemRule Set {0}", ItemRules.ItemRuleSetPath);
                     }
                 }
             }

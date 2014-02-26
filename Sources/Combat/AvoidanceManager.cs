@@ -3,7 +3,7 @@ using System.Linq;
 using System.Windows.Navigation;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
-using Zeta.Internals.Actors;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 
 namespace Trinity
 {
@@ -172,7 +172,7 @@ namespace Trinity
                 case ActorClass.Wizard:
                     avoidanceHealth = Trinity.Settings.Combat.Wizard;
                     break;
-                case ActorClass.WitchDoctor:
+                case ActorClass.Witchdoctor:
                     avoidanceHealth = Trinity.Settings.Combat.WitchDoctor;
                     break;
                 case ActorClass.DemonHunter:
@@ -218,7 +218,7 @@ namespace Trinity
                         return avoidanceHealth.AvoidDiabloRingOfFireHealth;
 
                     case AvoidanceType.FireChains:
-                        return 1;
+                        return 0.8f;
 
                     case AvoidanceType.GhomGas:
                         return avoidanceHealth.AvoidGhomGasHealth;

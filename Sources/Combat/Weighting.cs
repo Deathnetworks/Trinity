@@ -5,13 +5,14 @@ using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Trinity.XmlTags;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.CommonBot;
-using Zeta.CommonBot.Profile.Common;
-using Zeta.Internals.Actors;
-using Zeta.Internals.SNO;
+using Zeta.Bot;
+using Zeta.Bot.Profile.Common;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Game.Internals.SNO;
+using Logger = Trinity.Technicals.Logger;
 namespace Trinity
 {
     public partial class Trinity : IPlugin
@@ -308,7 +309,7 @@ namespace Trinity
                                             {
                                                 iTotalNumberGoblins++;
                                                 lastGoblinTime = DateTime.Now;
-                                                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Goblin #{0} in sight. Distance={1:0}", iTotalNumberGoblins, cacheObject.CentreDistance);
+                                                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Goblin #{0} in sight. Distance={1:0}", iTotalNumberGoblins, cacheObject.CentreDistance);
                                             }
                                             else
                                             {
@@ -472,7 +473,7 @@ namespace Trinity
                                     cacheObject.Weight = 1;
 
                                 // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
-                                if (CurrentTarget != null && AnyMobsInRange && !Zeta.CommonBot.Settings.CharacterSettings.Instance.CombatLooting && cacheObject.ItemQuality < ItemQuality.Legendary)
+                                if (CurrentTarget != null && AnyMobsInRange && !Zeta.Bot.Settings.CharacterSettings.Instance.CombatLooting && cacheObject.ItemQuality < ItemQuality.Legendary)
                                     cacheObject.Weight = 1;
 
                                 // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
@@ -495,7 +496,7 @@ namespace Trinity
                                 // Weight Health Globes
 
                                 bool witchDoctorManaLow =
-                                    Player.ActorClass == ActorClass.WitchDoctor &&
+                                    Player.ActorClass == ActorClass.Witchdoctor &&
                                     Player.PrimaryResourcePct <= 0.15 &&
                                     ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GruesomeFeast);
 
@@ -821,7 +822,7 @@ namespace Trinity
                 bool isLegendaryItem = cTarget.Type == GObjectType.Item && cTarget.ItemQuality >= ItemQuality.Legendary;
                 if (!cTarget.IsBoss && cTarget.TimesBeenPrimaryTarget > 15 && !isEliteLowHealth && !isLegendaryItem)
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Blacklisting target {0} ActorSNO={1} RActorGUID={2} due to possible stuck/flipflop!",
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Blacklisting target {0} ActorSNO={1} RActorGUID={2} due to possible stuck/flipflop!",
                         CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid);
 
                     hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);

@@ -1,5 +1,5 @@
 ﻿using Zeta.Common;
-using Zeta.Internals.Actors;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 
 namespace Trinity.Cache
 {

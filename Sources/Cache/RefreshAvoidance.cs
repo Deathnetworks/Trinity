@@ -1,9 +1,9 @@
 ﻿using System;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common.Plugins;
-using Zeta.Internals.Actors;
-using Zeta.Navigation;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Bot.Navigation;
 
 namespace Trinity
 {
@@ -65,7 +65,7 @@ namespace Trinity
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Ignoring avoidance as a Monk with Serenity");
             }
             // Witch doctors with spirit walk available and not currently Spirit Walking will subtly ignore ice balls, arcane, desecrator & plague cloud
-            if (Player.ActorClass == ActorClass.WitchDoctor && Hotbar.Contains(SNOPower.Witchdoctor_SpiritWalk) && GetHasBuff(SNOPower.Witchdoctor_SpiritWalk))
+            if (Player.ActorClass == ActorClass.Witchdoctor && Hotbar.Contains(SNOPower.Witchdoctor_SpiritWalk) && GetHasBuff(SNOPower.Witchdoctor_SpiritWalk))
             {
                 if (avoidanceType == AvoidanceType.IceBall || avoidanceType == AvoidanceType.Arcane || avoidanceType == AvoidanceType.Desecrator || avoidanceType == AvoidanceType.PlagueCloud)
                 {
@@ -168,8 +168,8 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0}", actorSNO);
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, ex.ToString());
+                Logger.Log(TrinityLogLevel.Info, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0}", actorSNO);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.Avoidance, ex.ToString());
                 // 100% unless specified
                 return 1;
             }
@@ -188,8 +188,8 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0} radius={1}", actorSNO, radius);
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.Avoidance, ex.ToString());
+                Logger.Log(TrinityLogLevel.Info, LogCategory.Avoidance, "Exception getting avoidance radius for sno={0} radius={1}", actorSNO, radius);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.Avoidance, ex.ToString());
                 return radius;
             }
 
