@@ -3,12 +3,11 @@ using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
-using Zeta.Game;
+using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.Bot;
-using Zeta.Game.Internals.Actors;
 using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
@@ -38,7 +37,7 @@ namespace Trinity
             // Wizards want to save up to a reserve of 65+ energy
             MinEnergyReserve = 65;
 
-            bool hasCriticalMass = ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass);
+            bool hasCriticalMass = false; // ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass);
 
             if (!GetHasBuff(SNOPower.Wizard_Archon))
             {

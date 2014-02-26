@@ -5,12 +5,12 @@ using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Technicals;
-using Zeta.Game;
-using Zeta.Common;
 using Zeta.Bot;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
 using Zeta.Bot.Navigation;
 using Zeta.Bot.Pathfinding;
+using Zeta.Common;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
@@ -142,7 +142,9 @@ namespace Trinity
                 if (!shouldKite && PlayerStatus.ActorClass == ActorClass.Wizard && Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && PlayerStatus.PrimaryResource >= 25 &&
                     DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_WaveOfForce) &&
                     !PlayerStatus.IsIncapacitated && Trinity.AvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(PlayerStatus.Position) <= 15f) >= 2 &&
-                    (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
+                    (
+                    //ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || 
+                    PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
                 {
                     ZetaDia.Me.UsePower(SNOPower.Wizard_WaveOfForce, Vector3.Zero, PlayerStatus.WorldDynamicID, -1);
                 }

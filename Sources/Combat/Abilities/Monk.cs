@@ -3,13 +3,12 @@ using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
-using Zeta.Game;
-using Zeta.Common;
-using Zeta.Common.Plugins;
 using Zeta.Bot;
 using Zeta.Bot.Profile.Common;
-using Zeta.Game.Internals.Actors;
+using Zeta.Common;
+using Zeta.Common.Plugins;
 using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
@@ -63,38 +62,38 @@ namespace Trinity
             }
 
             // 4 Mantras for the initial buff (slow-use)
-            if (CombatBase.CanCast(SNOPower.Monk_MantraOfEvasion) && !GetHasBuff(SNOPower.Monk_MantraOfEvasion) &&
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfEvasion_v2) &&
                 Player.PrimaryResource >= 50)
             {
-                return new TrinityPower(SNOPower.Monk_MantraOfEvasion, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
             }
-            if (CombatBase.CanCast(SNOPower.Monk_MantraOfConviction) && !GetHasBuff(SNOPower.Monk_MantraOfConviction) &&
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2) &&
                 (Player.PrimaryResource >= 50))
             {
-                return new TrinityPower(SNOPower.Monk_MantraOfConviction, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_Monk_MantraOfConviction_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
             }
-            if (CombatBase.CanCast(SNOPower.Monk_MantraOfHealing) && !GetHasBuff(SNOPower.Monk_MantraOfHealing) &&
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfHealing_v2) &&
                 Player.PrimaryResource >= 50)
             {
-                return new TrinityPower(SNOPower.Monk_MantraOfHealing, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
             }
-            if (CombatBase.CanCast(SNOPower.Monk_MantraOfRetribution) && !GetHasBuff(SNOPower.Monk_MantraOfRetribution) &&
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) &&
                 Player.PrimaryResource >= 50)
             {
-                return new TrinityPower(SNOPower.Monk_MantraOfRetribution, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_Monk_MantraOfRetribution_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
             }
 
             // Mystic ally
-            if (CombatBase.CanCast(SNOPower.Monk_MysticAlly) && Player.PrimaryResource >= 25 && iPlayerOwnedMysticAlly == 0)
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MysticAlly_v2) && Player.PrimaryResource >= 25 && iPlayerOwnedMysticAlly == 0)
             {
-                return new TrinityPower(SNOPower.Monk_MysticAlly, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_Monk_MysticAlly_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
             }
 
             // InnerSanctuary
-            if (!UseOOCBuff && Player.CurrentHealthPct <= 0.45 && CombatBase.CanCast(SNOPower.Monk_InnerSanctuary) &&
+            if (!UseOOCBuff && Player.CurrentHealthPct <= 0.45 && CombatBase.CanCast(SNOPower.X1_Monk_InnerSanctuary) &&
                 Player.PrimaryResource >= 30)
             {
-                return new TrinityPower(SNOPower.Monk_InnerSanctuary, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_Monk_InnerSanctuary, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
 
             // Blinding Flash
@@ -304,21 +303,21 @@ namespace Trinity
                 (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 1) ||
                 (TargetUtil.AnyMobsInRange(15, 1) && (Settings.Combat.Monk.HasInnaSet && Player.PrimaryResource >= 70))))
             {
-                if (CombatBase.CanCast(SNOPower.Monk_MantraOfEvasion))
+                if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2))
                 {
-                    return new TrinityPower(SNOPower.Monk_MantraOfEvasion, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
-                if (CombatBase.CanCast(SNOPower.Monk_MantraOfConviction))
+                if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfConviction_v2))
                 {
-                    return new TrinityPower(SNOPower.Monk_MantraOfConviction, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.X1_Monk_MantraOfConviction_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
-                if (CombatBase.CanCast(SNOPower.Monk_MantraOfRetribution))
+                if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2))
                 {
-                    return new TrinityPower(SNOPower.Monk_MantraOfRetribution, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.X1_Monk_MantraOfRetribution_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
-                if (CombatBase.CanCast(SNOPower.Monk_MantraOfHealing))
+                if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2))
                 {
-                    return new TrinityPower(SNOPower.Monk_MantraOfHealing, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
             }
             // Lashing Tail Kick
@@ -539,19 +538,19 @@ namespace Trinity
         private static bool Monk_HasMantraAbilityAndBuff()
         {
             return
-                (CheckAbilityAndBuff(SNOPower.Monk_MantraOfConviction) ||
-                CheckAbilityAndBuff(SNOPower.Monk_MantraOfEvasion) ||
-                CheckAbilityAndBuff(SNOPower.Monk_MantraOfHealing) ||
-                CheckAbilityAndBuff(SNOPower.Monk_MantraOfRetribution) ||
+                (CheckAbilityAndBuff(SNOPower.X1_Monk_MantraOfConviction_v2) ||
+                CheckAbilityAndBuff(SNOPower.X1_Monk_MantraOfEvasion_v2) ||
+                CheckAbilityAndBuff(SNOPower.X1_Monk_MantraOfHealing_v2) ||
+                CheckAbilityAndBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) ||
                 DoesNotHaveMonkMantraAbility());
         }
         private static bool DoesNotHaveMonkMantraAbility()
         {
             return
-                (!Hotbar.Contains(SNOPower.Monk_MantraOfConviction) &&
-                !Hotbar.Contains(SNOPower.Monk_MantraOfEvasion) &&
-                !Hotbar.Contains(SNOPower.Monk_MantraOfHealing) &&
-                !Hotbar.Contains(SNOPower.Monk_MantraOfRetribution));
+                (!Hotbar.Contains(SNOPower.X1_Monk_MantraOfConviction_v2) &&
+                !Hotbar.Contains(SNOPower.X1_Monk_MantraOfEvasion_v2) &&
+                !Hotbar.Contains(SNOPower.X1_Monk_MantraOfHealing_v2) &&
+                !Hotbar.Contains(SNOPower.X1_Monk_MantraOfRetribution_v2));
         }
 
         internal static bool Monk_TempestRushReady()

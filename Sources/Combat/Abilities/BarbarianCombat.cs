@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Config.Combat;
-using Trinity.Technicals;
-using Zeta.Common;
 using Zeta.Bot;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-
+using Zeta.Common;
+using Zeta.Game.Internals.Actors;
 namespace Trinity.Combat.Abilities
 {
     class BarbarianCombat : CombatBase
@@ -363,9 +361,9 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return
-                    CanCast(SNOPower.Barbarian_WarCry, CanCastFlags.NoTimer) &&
+                    CanCast(SNOPower.X1_Barbarian_WarCry_v2, CanCastFlags.NoTimer) &&
                     !Player.IsIncapacitated &&
-                    (Player.PrimaryResource <= V.F("Barbarian.WarCry.MaxFury") || !GetHasBuff(SNOPower.Barbarian_WarCry));
+                    (Player.PrimaryResource <= V.F("Barbarian.WarCry.MaxFury") || !GetHasBuff(SNOPower.X1_Barbarian_WarCry_v2));
             }
         }
         public static bool CanUseThreatingShout
@@ -501,7 +499,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.Barbarian_AncientSpear) &&
+                return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Barbarian_AncientSpear) &&
                     CurrentTarget.HitPointsPct >= V.F("Barbarian.AncientSpear.MinHealthPct");
             }
         }
@@ -624,8 +622,8 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WeaponThrow)
-                    && Player.PrimaryResourcePct >= 0.99 && (HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Barbarian_WeaponThrow && s.RuneIndex == 3));
+                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.X1_Barbarian_WeaponThrow)
+                    && Player.PrimaryResourcePct >= 0.99 && (HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Barbarian_WeaponThrow && s.RuneIndex == 3));
             }
         }
         public static bool CanUseHammerOfTheAncients
@@ -658,7 +656,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_WeaponThrow)
+                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.X1_Barbarian_WeaponThrow)
                     && (Player.PrimaryResource >= 10 && (CurrentTarget.RadiusDistance >= 5f || BarbHasNoPrimary));
             }
         }
@@ -672,7 +670,7 @@ namespace Trinity.Combat.Abilities
         public static TrinityPower PowerCallOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_CallOfTheAncients, V.I("Barbarian.CallOfTheAncients.TickDelay"), V.I("Barbarian.CallOfTheAncients.TickDelay")); } }
         public static TrinityPower PowerBattleRage { get { return new TrinityPower(SNOPower.Barbarian_BattleRage); } }
         public static TrinityPower PowerSprint { get { return new TrinityPower(SNOPower.Barbarian_Sprint, 0, 0); } }
-        public static TrinityPower PowerWarCry { get { return new TrinityPower(SNOPower.Barbarian_WarCry); } }
+        public static TrinityPower PowerWarCry { get { return new TrinityPower(SNOPower.X1_Barbarian_WarCry_v2); } }
         public static TrinityPower PowerThreateningShout { get { return new TrinityPower(SNOPower.Barbarian_ThreateningShout); } }
         public static TrinityPower PowerGroundStomp { get { return new TrinityPower(SNOPower.Barbarian_GroundStomp); } }
         public static TrinityPower PowerRevenge { get { return new TrinityPower(SNOPower.Barbarian_Revenge); } }
@@ -708,7 +706,7 @@ namespace Trinity.Combat.Abilities
         public static TrinityPower PowerRend { get { return new TrinityPower(SNOPower.Barbarian_Rend, V.I("Barbarian.Rend.TickDelay"), V.I("Barbarian.Rend.TickDelay")); } }
         public static TrinityPower PowerOverpower { get { return new TrinityPower(SNOPower.Barbarian_Overpower); } }
         public static TrinityPower PowerSeismicSlam { get { return new TrinityPower(SNOPower.Barbarian_SeismicSlam, V.F("Barbarian.SeismicSlam.UseRange"), CurrentTarget.ACDGuid); } }
-        public static TrinityPower PowerAncientSpear { get { return new TrinityPower(SNOPower.Barbarian_AncientSpear, V.F("Barbarian.AncientSpear.UseRange"), CurrentTarget.Position); } }
+        public static TrinityPower PowerAncientSpear { get { return new TrinityPower(SNOPower.X1_Barbarian_AncientSpear, V.F("Barbarian.AncientSpear.UseRange"), CurrentTarget.Position); } }
         public static TrinityPower PowerWhirlwind
         {
             get
@@ -731,7 +729,7 @@ namespace Trinity.Combat.Abilities
             }
         }
         public static TrinityPower PowerHammerOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_HammerOfTheAncients, V.F("Barbarian.HammerOfTheAncients.UseRange"), CurrentTarget.ACDGuid); } }
-        public static TrinityPower PowerWeaponThrow { get { return new TrinityPower(SNOPower.Barbarian_WeaponThrow, V.F("Barbarian.WeaponThrow.UseRange"), CurrentTarget.ACDGuid); } }
+        public static TrinityPower PowerWeaponThrow { get { return new TrinityPower(SNOPower.X1_Barbarian_WeaponThrow, V.F("Barbarian.WeaponThrow.UseRange"), CurrentTarget.ACDGuid); } }
         public static TrinityPower PowerFrenzy { get { return new TrinityPower(SNOPower.Barbarian_Frenzy, V.F("Barbarian.Frenzy.UseRange"), CurrentTarget.ACDGuid); } }
         public static TrinityPower PowerBash { get { return new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"), Vector3.Zero, -1, CurrentTarget.ACDGuid, 2, 2, true); } }
         public static TrinityPower PowerCleave { get { return new TrinityPower(SNOPower.Barbarian_Cleave, V.F("Barbarian.Cleave.UseRange"), CurrentTarget.ACDGuid); } }
@@ -755,8 +753,8 @@ namespace Trinity.Combat.Abilities
                 if (Hotbar.Contains(SNOPower.Barbarian_Rend) && Player.PrimaryResourcePct >= 0.65)
                     return new TrinityPower(SNOPower.Barbarian_Rend, V.F("Barbarian.Rend.UseRange"));
 
-                if (Hotbar.Contains(SNOPower.Barbarian_WeaponThrow) && Player.PrimaryResource >= 20)
-                    return new TrinityPower(SNOPower.Barbarian_WeaponThrow, V.F("Barbarian.WeaponThrow.UseRange"));
+                if (Hotbar.Contains(SNOPower.X1_Barbarian_WeaponThrow) && Player.PrimaryResource >= 20)
+                    return new TrinityPower(SNOPower.X1_Barbarian_WeaponThrow, V.F("Barbarian.WeaponThrow.UseRange"));
 
                 return CombatBase.DefaultPower;
             }

@@ -482,7 +482,7 @@ namespace Trinity
                 // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
                 if (Player.ActorClass == ActorClass.Monk)
                 {
-                    if (Hotbar.Contains(SNOPower.Monk_MysticAlly) && DataDictionary.MysticAllyIds.Contains(c_ActorSNO))
+                    if (Hotbar.Contains(SNOPower.X1_Monk_MysticAlly_v2) && DataDictionary.MysticAllyIds.Contains(c_ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             iPlayerOwnedMysticAlly++;
@@ -492,7 +492,7 @@ namespace Trinity
                 // Count up Demon Hunter pets
                 if (Player.ActorClass == ActorClass.DemonHunter)
                 {
-                    if (Hotbar.Contains(SNOPower.DemonHunter_Companion) && DataDictionary.DemonHunterPetIds.Contains(c_ActorSNO))
+                    if (Hotbar.Contains(SNOPower.X1_DemonHunter_Companion) && DataDictionary.DemonHunterPetIds.Contains(c_ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             iPlayerOwnedDHPets++;

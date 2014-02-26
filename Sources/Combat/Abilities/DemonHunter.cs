@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Combat.Abilities;
-using Zeta.Game;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 namespace Trinity
 {
     public partial class Trinity : IPlugin
@@ -75,19 +75,19 @@ namespace Trinity
             //runeDict.Add("Surge", 3);
 
             // Evasive Fire
-            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.DemonHunter_EvasiveFire) && !Player.IsIncapacitated &&
+            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.X1_DemonHunter_EvasiveFire) && !Player.IsIncapacitated &&
                   (TargetUtil.AnyMobsInRange(10f) || DemonHunter_HasNoPrimary()))
             {
                 float range = DemonHunter_HasNoPrimary() ? 70f : 0f;
 
-                return new TrinityPower(SNOPower.DemonHunter_EvasiveFire, range, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, range, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }
 
             // Companion
-            if (!Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Companion) && iPlayerOwnedDHPets == 0 &&
+            if (!Player.IsIncapacitated && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && iPlayerOwnedDHPets == 0 &&
                 Player.SecondaryResource >= 10)
             {
-                return new TrinityPower(SNOPower.DemonHunter_Companion, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_DemonHunter_Companion, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 1, WAIT_FOR_ANIM);
             }
 
             // Marked for Death
@@ -267,15 +267,15 @@ namespace Trinity
             }
 
             // Entangling shot
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_EntanglingShot) && !Player.IsIncapacitated)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.X1_DemonHunter_EntanglingShot) && !Player.IsIncapacitated)
             {
-                return new TrinityPower(SNOPower.DemonHunter_EntanglingShot, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
             }
 
             // Bola Shot
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_BolaShot) && !Player.IsIncapacitated)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Bolas) && !Player.IsIncapacitated)
             {
-                return new TrinityPower(SNOPower.DemonHunter_BolaShot, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_Bolas, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
             }
 
             // Grenades
@@ -290,8 +290,8 @@ namespace Trinity
 
         private static bool DemonHunter_HasNoPrimary()
         {
-            return !(Hotbar.Contains(SNOPower.DemonHunter_BolaShot) ||
-                                Hotbar.Contains(SNOPower.DemonHunter_EntanglingShot) ||
+            return !(Hotbar.Contains(SNOPower.DemonHunter_Bolas) ||
+                                Hotbar.Contains(SNOPower.X1_DemonHunter_EntanglingShot) ||
                                 Hotbar.Contains(SNOPower.DemonHunter_Grenades) ||
                                 Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow));
         }
@@ -300,10 +300,10 @@ namespace Trinity
         {
             if (Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow))
                 return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            if (Hotbar.Contains(SNOPower.DemonHunter_EntanglingShot))
-                return new TrinityPower(SNOPower.DemonHunter_EntanglingShot, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            if (Hotbar.Contains(SNOPower.DemonHunter_BolaShot))
-                return new TrinityPower(SNOPower.DemonHunter_BolaShot, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            if (Hotbar.Contains(SNOPower.X1_DemonHunter_EntanglingShot))
+                return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            if (Hotbar.Contains(SNOPower.DemonHunter_Bolas))
+                return new TrinityPower(SNOPower.DemonHunter_Bolas, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.DemonHunter_Grenades))
                 return new TrinityPower(SNOPower.DemonHunter_Grenades, 15f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && Player.PrimaryResource >= 10)
@@ -312,8 +312,8 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_RapidFire, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && Player.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 0f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            if (Hotbar.Contains(SNOPower.DemonHunter_EvasiveFire) && Player.PrimaryResource >= 20)
-                return new TrinityPower(SNOPower.DemonHunter_EvasiveFire, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            if (Hotbar.Contains(SNOPower.X1_DemonHunter_EvasiveFire) && Player.PrimaryResource >= 20)
+                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             return CombatBase.DefaultPower;
         }
     }

@@ -9,8 +9,7 @@ using Trinity.ItemRules.Core;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Items;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-
+using Zeta.Game.Internals.Actors;
 namespace Trinity.ItemRules
 {
     #region Interpreter
@@ -795,12 +794,12 @@ namespace Trinity.ItemRules
             itemDic.Add("[RESARCANE]", item.Stats.ResistArcane);
             itemDic.Add("[RESCOLD]", item.Stats.ResistCold);
             itemDic.Add("[RESPOISON]", item.Stats.ResistPoison);
-            itemDic.Add("[FIREDMG%]", item.Stats.FireDamagePercent);
-            itemDic.Add("[LIGHTNINGDMG%]", item.Stats.LightningDamagePercent);
-            itemDic.Add("[COLDDMG%]", item.Stats.ColdDamagePercent);
-            itemDic.Add("[POISONDMG%]", item.Stats.PoisonDamagePercent);
-            itemDic.Add("[ARCANEDMG%]", item.Stats.ArcaneDamagePercent);
-            itemDic.Add("[HOLYDMG%]", item.Stats.HolyDamagePercent);
+            //itemDic.Add("[FIREDMG%]", item.Stats.FireDamagePercent);
+            //itemDic.Add("[LIGHTNINGDMG%]", item.Stats.LightningDamagePercent);
+            //itemDic.Add("[COLDDMG%]", item.Stats.ColdDamagePercent);
+            //itemDic.Add("[POISONDMG%]", item.Stats.PoisonDamagePercent);
+            //itemDic.Add("[ARCANEDMG%]", item.Stats.ArcaneDamagePercent);
+            //itemDic.Add("[HOLYDMG%]", item.Stats.HolyDamagePercent);
             itemDic.Add("[ARMOR]", item.Stats.Armor);
             itemDic.Add("[ARMORBONUS]", item.Stats.ArmorBonus);
             itemDic.Add("[ARMORTOT]", item.Stats.ArmorTotal);
