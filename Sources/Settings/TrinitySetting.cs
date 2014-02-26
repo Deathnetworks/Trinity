@@ -8,7 +8,7 @@ using System.Xml;
 using Trinity.Config.Combat;
 using Trinity.Config.Loot;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 
 namespace Trinity.Config
 {
@@ -216,11 +216,11 @@ namespace Trinity.Config
                 {
                     if (File.Exists(GlobalSettingsFile))
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Loading Global Settings, You can use per-battletag settings by removing the Trinity.xml file under your Demonbuddy settings directory");
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Loading Global Settings, You can use per-battletag settings by removing the Trinity.xml file under your Demonbuddy settings directory");
                     }
                     else if (File.Exists(BattleTagSettingsFile))
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Loading BattleTag Settings");
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Loading BattleTag Settings");
                         filename = BattleTagSettingsFile;
                     }
                     else if (File.Exists(OldBattleTagSettingsFile))
@@ -249,7 +249,7 @@ namespace Trinity.Config
 
                             loadedSetting.CopyTo(this);
                             stream.Close();
-                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Configuration file loaded");
+                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Configuration file loaded");
 
                             // this tests to make sure we didn't load anything null, and our load was succesful
                             if (this.Advanced != null && this.Combat != null && this.Combat.Misc != null)
@@ -297,7 +297,7 @@ namespace Trinity.Config
                 {
                     _FSWatcher.EnableRaisingEvents = false;
 
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Saving Config file");
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Saving Config file");
                     using (Stream stream = File.Open(filename, FileMode.Create, FileAccess.Write, FileShare.Read))
                     {
                         DataContractSerializer serializer = new DataContractSerializer(typeof(TrinitySetting), "TrinitySetting", "");

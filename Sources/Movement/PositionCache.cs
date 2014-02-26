@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
 
 namespace Trinity

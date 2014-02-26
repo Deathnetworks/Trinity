@@ -1,6 +1,6 @@
 ﻿using System;
-using Zeta.Internals;
-using Zeta.Internals.Actors;
+using Zeta.Game.Internals;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 namespace Trinity
 {
     // CachedACDItem - Special caching class to help with backpack-item handling
@@ -163,7 +163,7 @@ namespace Trinity
             bool twoHanded,
             DyeType dyeType,
             ItemType itemType,
-            Zeta.Internals.Actors.ItemBaseType itembasetype,
+            Zeta.Game.Internals.Actors.ItemBaseType itembasetype,
             FollowerType followerType,
             bool unidentified,
             int stackQuantity,

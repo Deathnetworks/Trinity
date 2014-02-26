@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
-using Zeta.Internals.Actors;
+using Zeta.Game.Internals.Actors;
+using Zeta.Game;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -58,7 +60,7 @@ namespace Trinity
             WaitingForReserveEnergy = false;
             MyDynamicID = -1;
             Level = -1;
-            ActorClass = Zeta.Internals.Actors.ActorClass.Invalid;
+            ActorClass = Zeta.Game.ActorClass.Invalid;
             BattleTag = String.Empty;
             SceneId = -1;
             LevelAreaId = -1;
@@ -66,7 +68,7 @@ namespace Trinity
 
         public PlayerInfoCache(
             DateTime lastUpdated, bool incapacitated, bool isRooted, bool isInTown, double currentHealth, double currentEnergy, double currentEnergyPct,
-            double discipline, double disciplinePct, Vector3 currentPosition, bool waitingReserve, int dynamicId, int level, ActorClass actorClass, string battleTag)
+            double discipline, double disciplinePct, Vector3 currentPosition, bool waitingReserve, int dynamicId, int level, ActorClass ActorClass, string battleTag)
         {
             LastUpdated = lastUpdated;
             IsIncapacitated = incapacitated;
@@ -81,7 +83,7 @@ namespace Trinity
             WaitingForReserveEnergy = waitingReserve;
             MyDynamicID = dynamicId;
             Level = level;
-            ActorClass = actorClass;
+            ActorClass = ActorClass;
             BattleTag = battleTag;
             SceneId = -1;
             LevelAreaId = -1;
@@ -152,7 +154,7 @@ namespace Trinity
                     Player.BattleTag = FileManager.BattleTagName;
                     Player.LevelAreaId = ZetaDia.CurrentLevelAreaId;
 
-                    //if (Player.ActorClass == ActorClass.WitchDoctor && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1))
+                    //if (Player.ActorClass == ActorClass.Witchdoctor && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1))
                     //    Player.IsHidden = me.IsHidden;
                     //else
                     //    Player.IsHidden = false;
@@ -174,7 +176,7 @@ namespace Trinity
                     Player.WorldID = ZetaDia.CurrentWorldId;
                     Trinity.cachedStaticWorldId = ZetaDia.CurrentWorldId;
                     // Game difficulty, used really for vault on DH's
-                    Trinity.iCurrentGameDifficulty = ZetaDia.Service.CurrentHero.CurrentDifficulty;
+                    Trinity.iCurrentGameDifficulty = ZetaDia.Service.Hero.CurrentDifficulty;
 
                     // Refresh player buffs (to check for archon)
                     RefreshBuffs();
@@ -200,10 +202,12 @@ namespace Trinity
                 bool archonBuff = false;
                 int stackCount;
                 string buffList = "";
+				Trinity.GotFrenzyShrine = false;
+				Trinity.GotBlessedShrine = false;
                 // Store how many stacks of each buff we have
                 foreach (Buff buff in Trinity.listCachedBuffs)
                 {
-                    buffList += " " + buff.InternalName + " (" + buff.StackCount.ToString() + ")";
+                    buffList += " " + buff.InternalName + " (SNO: " + buff.SNOId + " stack: " + buff.StackCount.ToString() + ")";
 
                     // Store the stack count of this buff
                     if (!Trinity.dictCachedBuffs.TryGetValue(buff.SNOId, out stackCount))
@@ -211,6 +215,10 @@ namespace Trinity
                     // Check for archon stuff
                     if (buff.SNOId == (int)SNOPower.Wizard_Archon)
                         archonBuff = true;
+					if (buff.SNOId == 30476) //Blessed (+25% defence)
+						Trinity.GotBlessedShrine = true;
+					if (buff.SNOId == 30479) //Frenzy  (+25% atk speed)
+						Trinity.GotFrenzyShrine = true;
                 }
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Refreshed buffs: " + buffList);
                 // Archon stuff
@@ -293,7 +301,7 @@ namespace Trinity
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_Archon_SlowTime, 1500);
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_Archon_Teleport, 2700);
             }
-            if (Player.ActorClass == ActorClass.WitchDoctor && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice))
+            if (Player.ActorClass == ActorClass.Witchdoctor && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice))
             {
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_SoulHarvest, 1000);
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_SpiritWalk, 1000);

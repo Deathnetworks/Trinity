@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
-using Zeta.CommonBot.Profile;
-using Zeta.Navigation;
+using Zeta.Bot.Profile;
+using Zeta.Bot.Navigation;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.XmlTags
 {

@@ -1,5 +1,5 @@
 ﻿using Trinity.Technicals;
-using Zeta.CommonBot.Profile;
+using Zeta.Bot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
@@ -22,7 +22,7 @@ namespace Trinity.XmlTags
         {
             return new Zeta.TreeSharp.Action(ret =>
             {
-                Logger.Log((Level != null && Level.ToLower() == "diagnostic") ? TrinityLogLevel.Debug : TrinityLogLevel.Normal, LogCategory.UserInformation, Output);
+                Logger.Log((Level != null && Level.ToLower() == "diagnostic") ? TrinityLogLevel.Debug : TrinityLogLevel.Info, LogCategory.UserInformation, Output);
                 m_IsDone = true;
             });
         }

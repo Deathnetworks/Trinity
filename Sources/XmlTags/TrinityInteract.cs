@@ -1,11 +1,12 @@
 ﻿using System.Linq;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
-using Zeta.CommonBot.Profile;
-using Zeta.Internals.Actors;
+using Zeta.Bot.Profile;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.XmlTags
 {
@@ -48,7 +49,7 @@ namespace Trinity.XmlTags
 
             if (interactTarget != null && interactTarget.IsValid)
             {
-                Zeta.CommonBot.GameEvents.FireWorldTransferStart();
+                Zeta.Bot.GameEvents.FireWorldTransferStart();
                 interactTarget.Interact();
             }
 

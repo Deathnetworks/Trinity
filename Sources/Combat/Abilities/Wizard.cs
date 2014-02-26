@@ -3,11 +3,13 @@ using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.CommonBot;
-using Zeta.Internals.Actors;
+using Zeta.Bot;
+using Zeta.Game.Internals.Actors;
+using Zeta.Game;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -399,7 +401,7 @@ namespace Trinity
                     var archonBuff = ZetaDia.Me.GetBuff(SNOPower.Wizard_Archon);
                     if (archonBuff != null && archonBuff.IsCancelable)
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Canceling Archon: {0}", reason);
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Canceling Archon: {0}", reason);
                         // this actually cancels Archon
                         archonBuff.Cancel();
 

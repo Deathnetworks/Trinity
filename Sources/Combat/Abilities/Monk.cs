@@ -3,12 +3,14 @@ using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.CommonBot;
-using Zeta.CommonBot.Profile.Common;
-using Zeta.Internals.Actors;
+using Zeta.Bot;
+using Zeta.Bot.Profile.Common;
+using Zeta.Game.Internals.Actors;
+using Zeta.Game;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -595,7 +597,7 @@ namespace Trinity
             if (!Monk_TempestRushReady())
                 return;
 
-            if (Player.IsInTown || Zeta.CommonBot.Logic.BrainBehavior.IsVendoring)
+            if (Player.IsInTown || Zeta.Bot.Logic.BrainBehavior.IsVendoring)
                 return;
 
             if (TownRun.IsTryingToTownPortal())

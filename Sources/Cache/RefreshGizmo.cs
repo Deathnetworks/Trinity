@@ -2,8 +2,8 @@
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta.Common.Plugins;
-using Zeta.Internals.Actors;
-using Zeta.Internals.Actors.Gizmos;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Game.Internals.Actors.Gizmos;
 
 namespace Trinity
 {

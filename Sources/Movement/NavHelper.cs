@@ -5,12 +5,13 @@ using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
-using Zeta.CommonBot;
-using Zeta.Internals.Actors;
-using Zeta.Navigation;
-using Zeta.Pathfinding;
+using Zeta.Bot;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Bot.Navigation;
+using Zeta.Bot.Pathfinding;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {

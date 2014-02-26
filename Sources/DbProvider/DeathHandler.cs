@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Documents;
 using Trinity.Technicals;
-using Zeta;
-using Zeta.Internals.Actors;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
 

@@ -7,15 +7,17 @@ using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Trinity.XmlTags;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.CommonBot;
-using Zeta.Internals.Actors;
-using Zeta.Navigation;
+using Zeta.Bot;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Bot.Navigation;
 using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
 using Decorator = Zeta.TreeSharp.Decorator;
+using Logger = Trinity.Technicals.Logger;
+
 namespace Trinity
 {
     public partial class Trinity : IPlugin
@@ -220,9 +222,9 @@ namespace Trinity
                         }
                     }
 
-                    if (CurrentTarget == null && (ForceVendorRunASAP || IsReadyToTownRun) && !Zeta.CommonBot.Logic.BrainBehavior.IsVendoring && TownRun.TownRunTimerRunning())
+                    if (CurrentTarget == null && (ForceVendorRunASAP || IsReadyToTownRun) && !Zeta.Bot.Logic.BrainBehavior.IsVendoring && TownRun.TownRunTimerRunning())
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget is null but we are ready to to Town Run, waiting... ");
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "CurrentTarget is null but we are ready to to Town Run, waiting... ");
                         runStatus = HandlerRunStatus.TreeRunning;
                     }
 
@@ -232,12 +234,12 @@ namespace Trinity
 
                     if (CurrentTarget == null && TownRun.IsTryingToTownPortal() && TownRun.TownRunTimerRunning())
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Waiting for town run... ");
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Waiting for town run... ");
                         runStatus = HandlerRunStatus.TreeRunning;
                     }
                     else if (CurrentTarget == null && TownRun.IsTryingToTownPortal() && TownRun.TownRunTimerFinished())
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "Town Run Ready!");
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Town Run Ready!");
                         runStatus = HandlerRunStatus.TreeSuccess;
                     }
                     //check if we are returning to the tree
@@ -246,7 +248,7 @@ namespace Trinity
 
                     if (CurrentTarget == null)
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2");
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2");
                         runStatus = HandlerRunStatus.TreeFailure;
                     }
 
@@ -426,7 +428,7 @@ namespace Trinity
                                         Vector2 ValidLocation = FindValidBackpackLocation(true);
                                         if (ValidLocation.X < 0 || ValidLocation.Y < 0)
                                         {
-                                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "No more space to pickup a 2-slot item, town-run requested at next free moment.");
+                                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "No more space to pickup a 2-slot item, town-run requested at next free moment.");
                                             ForceVendorRunASAP = true;
 
                                             // Record the first position when we run out of bag space, so we can return later
@@ -1613,7 +1615,7 @@ namespace Trinity
                     IgnoreTargetForLoops = 6;
                     // Add this monster to our very short-term ignore list
                     hashRGUIDBlacklist3.Add(CurrentTarget.RActorGuid);
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Blacklisting {0} {1} {2} for 3 seconds due to Raycast failure", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 3 seconds due to Raycast failure", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
                     dateSinceBlacklist3Clear = DateTime.Now;
                     NeedToClearBlacklist3 = true;
                 }
@@ -1656,11 +1658,11 @@ namespace Trinity
                         //asserts	
                         if (iQuality > QUALITYORANGE)
                         {
-                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Item type (" + iQuality + ") out of range");
+                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ERROR: Item type (" + iQuality + ") out of range");
                         }
                         if ((CurrentTarget.ItemLevel < 0) || (CurrentTarget.ItemLevel >= 64))
                         {
-                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Item level (" + CurrentTarget.ItemLevel + ") out of range");
+                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ERROR: Item level (" + CurrentTarget.ItemLevel + ") out of range");
                         }
                         ItemsPickedStats.TotalPerQuality[iQuality]++;
                         ItemsPickedStats.TotalPerLevel[CurrentTarget.ItemLevel]++;
@@ -1681,11 +1683,11 @@ namespace Trinity
                         // !sp - asserts	
                         if (iGemType > GEMEMERALD)
                         {
-                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Gem type ({0}) out of range", iGemType);
+                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ERROR: Gem type ({0}) out of range", iGemType);
                         }
                         if ((CurrentTarget.ItemLevel < 0) || (CurrentTarget.ItemLevel > 63))
                         {
-                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Gem level ({0}) out of range", CurrentTarget.ItemLevel);
+                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ERROR: Gem level ({0}) out of range", CurrentTarget.ItemLevel);
                         }
 
                         ItemsPickedStats.GemsPerType[iGemType]++;
@@ -1697,7 +1699,7 @@ namespace Trinity
                         ItemsPickedStats.TotalPotions++;
                         if ((CurrentTarget.ItemLevel < 0) || (CurrentTarget.ItemLevel > 63))
                         {
-                            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "ERROR: Potion level ({0}) out of range", CurrentTarget.ItemLevel);
+                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ERROR: Potion level ({0}) out of range", CurrentTarget.ItemLevel);
                         }
                         ItemsPickedStats.PotionsPerLevel[CurrentTarget.ItemLevel]++;
                     }

@@ -2,10 +2,12 @@
 using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.Internals.Actors;
+using Zeta.Game.Internals.Actors;
+using Zeta.Game;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -91,7 +93,7 @@ namespace Trinity
             }
         }
 
-       
+
         /// <summary>
         /// A default power in case we can't use anything else
         /// </summary>
@@ -134,7 +136,7 @@ namespace Trinity
                             power = GetWizardPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
                             break;
                         // Witch Doctors
-                        case ActorClass.WitchDoctor:
+                        case ActorClass.Witchdoctor:
                             power = GetWitchDoctorPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
                             break;
                         // Demon Hunters

@@ -1,7 +1,7 @@
 ﻿using System;
 using Trinity.Technicals;
-using Zeta;
-using Zeta.CommonBot.Profile;
+using Zeta.Game;
+using Zeta.Bot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
@@ -22,25 +22,25 @@ namespace Trinity.XmlTags
         {
             return new Zeta.TreeSharp.Action(ret =>
             {
-                if (ZetaDia.Me.ActorClass == Zeta.Internals.Actors.ActorClass.Monk && Trinity.Hotbar.Contains(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind)
+                if (ZetaDia.Me.ActorClass == Zeta.Game.ActorClass.Monk && Trinity.Hotbar.Contains(Zeta.Game.Internals.Actors.SNOPower.Monk_SweepingWind)
                     && Trinity.Settings.Combat.Monk.HasInnaSet && Trinity.Player.PrimaryResource > 10)
                 {
                     if (DateTime.Now.Subtract(Trinity.SweepWindSpam).TotalMilliseconds >= 1500)
                     {
-                        if (Trinity.GetHasBuff(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind))
+                        if (Trinity.GetHasBuff(Zeta.Game.Internals.Actors.SNOPower.Monk_SweepingWind))
                         {
-                            ZetaDia.Me.UsePower(Zeta.Internals.Actors.SNOPower.Monk_SweepingWind, Trinity.Player.Position, Trinity.CurrentWorldDynamicId, -1);
+                            ZetaDia.Me.UsePower(Zeta.Game.Internals.Actors.SNOPower.Monk_SweepingWind, Trinity.Player.Position, Trinity.CurrentWorldDynamicId, -1);
                             Trinity.SweepWindSpam = DateTime.Now;
-                            Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Cast Sweeping Winds.");
+                            Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Cast Sweeping Winds.");
                         }
                         else
                         {
-                            Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "Sweeping winds buff is down - not casting.");
+                            Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Sweeping winds buff is down - not casting.");
                         }
                     }
                     else
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, " Too soon to cast SW again, avoiding spam.");
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, " Too soon to cast SW again, avoiding spam.");
                     }
                 }
                 m_IsDone = true;

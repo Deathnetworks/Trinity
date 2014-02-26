@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Zeta.CommonBot.Profile;
-using Zeta.CommonBot.Profile.Composites;
+using Zeta.Bot.Profile;
+using Zeta.Bot.Profile.Composites;
 
 namespace Trinity.XmlTags
 {

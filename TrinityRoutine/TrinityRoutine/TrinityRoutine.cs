@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows;
-using Zeta;
-using Zeta.CommonBot;
-using Zeta.Internals.Actors;
+using Zeta.Game;
+using Zeta.Bot;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 using Zeta.TreeSharp;
 using Trinity;
 using Zeta.Common.Plugins;

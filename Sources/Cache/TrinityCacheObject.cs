@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Zeta;
 using Zeta.Common;
-using Zeta.Internals.Actors;
-using Zeta.Internals.SNO;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 
 namespace Trinity
 {

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Trinity.Config;
 using Trinity.ItemRules;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.Internals.Actors;
-using Zeta.Navigation;
-using Zeta.Pathfinding;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Bot.Navigation;
+using Zeta.Bot.Pathfinding;
 
 namespace Trinity
 {
@@ -57,6 +57,14 @@ namespace Trinity
         /// Used to force-refresh dia objects at least once every XX milliseconds
         /// </summary>
         public static DateTime LastRefreshedCache = DateTime.MinValue;
+
+		//intell
+		public static DateTime TimeToRunFromPoison = DateTime.Now;
+		public static DateTime LogTest = DateTime.Now;
+		public static bool RunFromPoison = false;
+		public static bool GotFrenzyShrine = false;
+		public static bool GotBlessedShrine = false;
+		public static bool prioritizeCloseRangeUnits = false;
 
         /// <summary>
         /// This object is used for the main handling - the "current target" etc. as selected by the target-selecter, whether it be a unit, an item, a shrine, anything. 

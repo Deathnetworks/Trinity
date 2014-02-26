@@ -1,5 +1,5 @@
 ﻿using System;
-using Zeta.Internals.Actors;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 
 namespace Trinity
 {

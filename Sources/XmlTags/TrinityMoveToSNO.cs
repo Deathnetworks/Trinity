@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Zeta;
-using Zeta.CommonBot.Profile;
-using Zeta.Internals.Actors;
-using Zeta.Navigation;
+using Zeta.Bot.Navigation;
+using Zeta.Bot.Profile;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;

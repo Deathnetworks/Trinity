@@ -1,5 +1,5 @@
-﻿using Zeta.CommonBot;
-using Zeta.Internals.Actors;
+﻿using Zeta.Bot;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 
 namespace Trinity
 {

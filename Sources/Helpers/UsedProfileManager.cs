@@ -2,8 +2,8 @@
 using System.IO;
 using Trinity.Technicals;
 using Trinity.XmlTags;
-using Zeta.CommonBot;
-using Zeta.CommonBot.Profile;
+using Zeta.Bot;
+using Zeta.Bot.Profile;
 
 namespace Trinity
 {

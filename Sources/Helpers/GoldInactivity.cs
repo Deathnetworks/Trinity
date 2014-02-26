@@ -3,10 +3,10 @@ using System.Diagnostics;
 using System.Threading;
 using Trinity.DbProvider;
 using Trinity.Technicals;
-using Zeta;
-using Zeta.CommonBot;
-using Zeta.CommonBot.Profile;
-using Zeta.CommonBot.Profile.Common;
+using Zeta.Game;
+using Zeta.Bot;
+using Zeta.Bot.Profile;
+using Zeta.Bot.Profile.Common;
 
 namespace Trinity
 {
@@ -43,12 +43,12 @@ namespace Trinity
                 if (!ZetaDia.IsInGame)
                 {
                     ResetCheckGold(); //If not in game, reset the timer
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Not in game, gold inactivity reset", 0);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Not in game, gold inactivity reset", 0);
                     return false;
                 }
                 if (ZetaDia.IsLoadingWorld)
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Loading world, gold inactivity reset", 0);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Loading world, gold inactivity reset", 0);
                     return false;
                 }
                 if ((DateTime.Now.Subtract(lastCheckBag).TotalSeconds < 5))
@@ -59,14 +59,14 @@ namespace Trinity
                 // sometimes bosses take a LONG time
                 if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.IsBoss)
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Current target is boss, gold inactivity reset", 0);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Current target is boss, gold inactivity reset", 0);
                     ResetCheckGold();
                     return false;
                 }
 
                 if (TownRun.IsTryingToTownPortal())
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Trying to town portal or WaitTimer tag, gold inactivity reset", 0);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Trying to town portal or WaitTimer tag, gold inactivity reset", 0);
                     ResetCheckGold();
                     return false;
                 }
@@ -80,7 +80,7 @@ namespace Trinity
                 catch { }
                 if (c != null && c.GetType() == typeof(WaitTimerTag))
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Wait timer tag, gold inactivity reset", 0);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Wait timer tag, gold inactivity reset", 0);
                     ResetCheckGold();
                     return false;
                 }
@@ -98,7 +98,7 @@ namespace Trinity
                 int notpickupgoldsec = Convert.ToInt32(DateTime.Now.Subtract(lastRefreshCoin).TotalSeconds);
                 if (notpickupgoldsec >= Trinity.Settings.Advanced.GoldInactivityTimer)
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Gold inactivity after {0}s. Sending abort.", notpickupgoldsec);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Gold inactivity after {0}s. Sending abort.", notpickupgoldsec);
                     lastRefreshCoin = DateTime.Now;
                     lastKnowCoin = currentcoin;
                     notpickupgoldsec = 0;
@@ -106,14 +106,14 @@ namespace Trinity
                 }
                 else if (notpickupgoldsec > 0)
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Gold unchanged for {0}s", notpickupgoldsec);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Gold unchanged for {0}s", notpickupgoldsec);
                 }
             }
             catch (Exception e)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, e.Message);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, e.Message);
             }
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "Gold inactivity error - no result", 0);
+            Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Gold inactivity error - no result", 0);
             return false;
         }
 
@@ -139,7 +139,7 @@ namespace Trinity
             {
                 isLeavingGame = false;
                 leaveGameInitiated = false;
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "GoldInactiveLeaveGame called but not in game!");
+                Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "GoldInactiveLeaveGame called but not in game!");
                 return false;
             }
 
@@ -152,9 +152,9 @@ namespace Trinity
             {
                 // Exit the game and reload the profile
                 PlayerMover.timeLastRestartedGame = DateTime.Now;
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Gold Inactivity timer tripped - Anti-stuck measures exiting current game.");
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Gold Inactivity timer tripped - Anti-stuck measures exiting current game.");
                 // Reload this profile
-                ProfileManager.Load(Zeta.CommonBot.ProfileManager.CurrentProfile.Path);
+                ProfileManager.Load(Zeta.Bot.ProfileManager.CurrentProfile.Path);
                 Trinity.ResetEverythingNewGame();
                 isLeavingGame = true;
                 return true;
@@ -164,19 +164,19 @@ namespace Trinity
             {
                 leaveGameTimer.Start();
                 ZetaDia.Service.Party.LeaveGame();
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "GoldInactiveLeaveGame initiated LeaveGame");
+                Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "GoldInactiveLeaveGame initiated LeaveGame");
                 return true;
             }            
 
             if (DateTime.Now.Subtract(PlayerMover.timeLastRestartedGame).TotalSeconds <= 12)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "GoldInactiveLeaveGame waiting for LeaveGame");
+                Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "GoldInactiveLeaveGame waiting for LeaveGame");
                 return true;
             }
 
             isLeavingGame = false;
             leaveGameInitiated = false;
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.GlobalHandler, "GoldInactiveLeaveGame finished");
+            Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "GoldInactiveLeaveGame finished");
 
             return false;
         }

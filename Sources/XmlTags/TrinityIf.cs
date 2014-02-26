@@ -1,10 +1,11 @@
 ﻿using System;
 using Trinity.Technicals;
 using Zeta.Common;
-using Zeta.CommonBot;
-using Zeta.CommonBot.Profile;
+using Zeta.Bot;
+using Zeta.Bot.Profile;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.XmlTags
 {

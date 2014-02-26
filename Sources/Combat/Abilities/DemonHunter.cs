@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Combat.Abilities;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.Internals.Actors;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 namespace Trinity
 {
     public partial class Trinity : IPlugin
@@ -104,7 +104,7 @@ namespace Trinity
             // Vault
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_Vault) && !Player.IsRooted && !Player.IsIncapacitated &&
                 // Only use vault to retreat if < level 60, or if in inferno difficulty for level 60's
-                (Player.Level < 60 || iCurrentGameDifficulty == GameDifficulty.Inferno) &&
+                (Player.Level < 60 || iCurrentGameDifficulty > GameDifficulty.Master) &&
                 (CurrentTarget.RadiusDistance <= 10f || TargetUtil.AnyMobsInRange(10)) &&
                 // if we have ShadowPower and Disicpline is >= 16
                 // or if we don't have ShadoWpower and Discipline is >= 22

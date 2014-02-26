@@ -7,13 +7,14 @@ using Trinity.DbProvider;
 using Trinity.ItemRules;
 using Trinity.Technicals;
 using Trinity.XmlTags;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
-using Zeta.CommonBot;
-using Zeta.CommonBot.Settings;
-using Zeta.Internals;
-using Zeta.Internals.Actors;
-using Zeta.Navigation;
+using Zeta.Bot;
+using Zeta.Bot.Settings;
+using Zeta.Game.Internals;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Bot.Navigation;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -61,7 +62,7 @@ namespace Trinity
             }
             else
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation,
                     "Note: Maintaining item stats from previous run. To reset stats fully, please restart DB.");
             }
 
@@ -75,14 +76,14 @@ namespace Trinity
 
             if (CharacterSettings.Instance.KillRadius < 20)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation,
                     "WARNING: Low Kill Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
                     CharacterSettings.Instance.KillRadius);
             }
 
             if (CharacterSettings.Instance.LootRadius < 50)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation,
                     "WARNING: Low Gold Loot Radius detected, currently set to: {0} (you can change this through Demonbuddy bot settings)",
                     CharacterSettings.Instance.LootRadius);
             }
@@ -155,7 +156,7 @@ namespace Trinity
                 {
                     if (iDeathsThisRun >= iMaxDeathsAllowed)
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation,
                             "You have died too many times. Now restarting the game.");
                         string sUseProfile = FirstProfile;
                         ProfileManager.Load(!string.IsNullOrEmpty(sUseProfile)
@@ -168,7 +169,7 @@ namespace Trinity
                     }
                     else
                     {
-                        Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation,
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation,
                             "I'm sorry, but I seem to have let you die :( Now restarting the current profile.");
                         ProfileManager.Load(ProfileManager.CurrentProfile.Path);
                         Thread.Sleep(2000);

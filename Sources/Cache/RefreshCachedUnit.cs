@@ -2,8 +2,8 @@
 using System.Linq;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
-using Zeta.Internals.Actors;
-using Zeta.Internals.SNO;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Game.Internals.SNO;
 
 namespace Trinity
 {
@@ -352,7 +352,7 @@ namespace Trinity
             // Monks with Way of the Hundred Fists + Fists of Fury
             if (AddToCache &&
                 ((Player.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_Rend)) ||
-                Player.ActorClass == ActorClass.WitchDoctor ||
+                Player.ActorClass == ActorClass.Witchdoctor ||
                 (Player.ActorClass == ActorClass.Monk && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_WayOfTheHundredFists && s.RuneIndex == 0)))
                 )
             {
@@ -500,7 +500,7 @@ namespace Trinity
                     }
                 }
                 // Count up zombie dogs and gargantuans next
-                if (Player.ActorClass == ActorClass.WitchDoctor)
+                if (Player.ActorClass == ActorClass.Witchdoctor)
                 {
                     if (Hotbar.Contains(SNOPower.Witchdoctor_Gargantuan) && DataDictionary.GargantuanIds.Contains(c_ActorSNO))
                     {

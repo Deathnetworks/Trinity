@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Trinity.Technicals;
-using Zeta;
-using Zeta.CommonBot;
-using Zeta.CommonBot.Profile;
-using Zeta.Internals.Actors;
+using Zeta.Game;
+using Zeta.Bot;
+using Zeta.Bot.Profile;
+using Zeta.Game.Internals.Actors; using Zeta.Game;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
@@ -45,11 +45,11 @@ namespace Trinity.XmlTags
                 }
 
                 // Now calculate our current path by checking the currently loaded profile
-                string sCurrentProfilePath = Path.GetDirectoryName(Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
+                string sCurrentProfilePath = Path.GetDirectoryName(Zeta.Bot.Settings.GlobalSettings.Instance.LastProfile);
 
                 // And prepare a full string of the path, and the new .xml file name
                 string sNextProfile = sCurrentProfilePath + @"\" + sThisProfileString;
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Loading new profile."); 
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Loading new profile."); 
                 ProfileManager.Load(sNextProfile);
 
                 // A quick nap-time helps prevent some funny issues
@@ -61,7 +61,7 @@ namespace Trinity.XmlTags
                 // See if the XML tag requested we exit the game after loading this profile or not
                 if (bExitGame)
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Exiting game to continue with next profile."); 
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Exiting game to continue with next profile."); 
 
                     // Attempt to teleport to town first for a quicker exit
                     int iSafetyLoops = 0;

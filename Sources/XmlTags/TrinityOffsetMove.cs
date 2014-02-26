@@ -1,12 +1,13 @@
 ﻿using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta.Common;
-using Zeta.CommonBot.Profile;
-using Zeta.Navigation;
-using Zeta.Pathfinding;
+using Zeta.Bot.Profile;
+using Zeta.Bot.Navigation;
+using Zeta.Bot.Pathfinding;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity.XmlTags
 {
@@ -57,7 +58,7 @@ namespace Trinity.XmlTags
             new PrioritySelector(
                 new Decorator(ret => IsFinished(),
                     new Sequence(
-                        new Action(ret => Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Finished Offset Move x={0} y={1} position={3}", 
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Finished Offset Move x={0} y={1} position={3}", 
                             OffsetX, OffsetY, Position.Distance2D(MyPos), Position)),
                         new Action(ret => isDone = true)
                     )
@@ -73,14 +74,14 @@ namespace Trinity.XmlTags
 
         private void MoveToPostion()
         {
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Moving to offset x={0} y={1} distance={2:0} position={3}",
+            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Moving to offset x={0} y={1} distance={2:0} position={3}",
                         OffsetX, OffsetY, Position.Distance2D(MyPos), Position);
 
             lastMoveResult = PlayerMover.NavigateTo(Position);
 
             if (lastMoveResult == MoveResult.PathGenerationFailed)
             {
-                Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Error moving to offset x={0} y={1} distance={2:0} position={3}",
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Error moving to offset x={0} y={1} distance={2:0} position={3}",
                            OffsetX, OffsetY, Position.Distance2D(MyPos), Position);
                 isDone = true;
             }
@@ -100,7 +101,7 @@ namespace Trinity.XmlTags
 
             if (PathPrecision == 0)
                 PathPrecision = 10f;
-            Logger.Log(TrinityLogLevel.Normal, LogCategory.ProfileTag, "OffsetMove Initialized offset x={0} y={1} distance={2:0} position={3}",
+            Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "OffsetMove Initialized offset x={0} y={1} distance={2:0} position={3}",
                        OffsetX, OffsetY, Position.Distance2D(MyPos), Position);
 
         }

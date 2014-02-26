@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Trinity.Technicals;
-using Zeta;
+using Zeta.Game;
 using Zeta.Common;
-using Zeta.Internals.Actors;
+using Zeta.Game.Internals.Actors;
+using Zeta.Game;
+using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
 {
@@ -70,14 +72,14 @@ namespace Trinity
             {
                 if (_PowerDelay.ContainsKey(power))
                 {
-                    return DateTime.UtcNow.Subtract(_PowerLastUsage[power]).TotalMilliseconds >= _PowerDelay[power] * (HasEmpowered?0.75:1) && Zeta.CommonBot.PowerManager.CanCast(power);
+                    return DateTime.UtcNow.Subtract(_PowerLastUsage[power]).TotalMilliseconds >= _PowerDelay[power] * (HasEmpowered ? 0.75 : 1) && Zeta.Bot.PowerManager.CanCast(power);
                 }
                 else
                 {
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0} don't have usage delay.", power);
                 }
             }
-            return Zeta.CommonBot.PowerManager.CanCast(power);
+            return Zeta.Bot.PowerManager.CanCast(power);
         }
 
         /// <summary>
@@ -119,7 +121,7 @@ namespace Trinity
                 }
                 else if (_ScheduledPowers.Any(sp => sp.Power == power))
                 {
-                    Logger.Log(TrinityLogLevel.Normal, LogCategory.Behavior, "You try to schedule 2 times same Power.");
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "You try to schedule 2 times same Power.");
                     return;
                 }
                 _ScheduledPowers.Add(new ScheduledPower()
