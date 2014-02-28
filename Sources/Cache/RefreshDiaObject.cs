@@ -724,11 +724,12 @@ namespace Trinity
                     {
                         if (!(c_diaObject is DiaGizmo))
                         {
-                            string debugInfo = string.Format("Type: {0} Name: {1} ActorType: {2} SNO: {3}",
+                            string debugInfo = string.Format("Type: {0} Name: {1} ActorType: {2} SNO: {3} ObjectType: {4}",
                                 c_diaObject.GetType().Name,
                                 c_diaObject.Name,
                                 c_diaObject.ActorType,
-                                c_diaObject.ActorSNO);
+                                c_diaObject.ActorSNO,
+                                c_ObjectType);
 
                             Logger.LogDebug("Attempted to Refresh Gizmo on Object that is not a Gizmo! " + debugInfo);
                             c_IgnoreSubStep = "InvalidGizmoCast";

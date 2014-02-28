@@ -82,7 +82,7 @@ namespace Trinity
             WaitingForReserveEnergy = waitingReserve;
             MyDynamicID = dynamicId;
             Level = level;
-            actorClass = actorClass;
+            ActorClass = actorClass;
             BattleTag = battleTag;
             SceneId = -1;
             LevelAreaId = -1;

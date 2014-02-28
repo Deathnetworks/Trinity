@@ -373,7 +373,7 @@ namespace Trinity
         internal static Vector3 vPositionLastZigZagCheck = Vector3.Zero;
         public static int CurrentWorldDynamicId = -1;
         public static int cachedStaticWorldId = -1; // worldId from profiles, used in persistent stats
-        public static GameDifficulty iCurrentGameDifficulty = GameDifficulty.Invalid;
+        public static GameDifficulty iCurrentGameDifficulty = GameDifficulty.Normal;
 
 
         /// <summary>
