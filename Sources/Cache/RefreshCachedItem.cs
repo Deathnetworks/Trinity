@@ -4,7 +4,8 @@ using Trinity.Cache;
 using Trinity.Config.Loot;
 using Trinity.Technicals;
 using Zeta.Bot;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 
 namespace Trinity
 {

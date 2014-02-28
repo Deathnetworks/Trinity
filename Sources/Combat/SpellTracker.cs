@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-
+using Zeta.Game.Internals.Actors;
 namespace Trinity
 {
     /// <summary>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 
 namespace Trinity

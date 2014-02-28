@@ -1,11 +1,11 @@
 ﻿// VERSION 1.2.0
 using System;
 using System.Windows;
-using Zeta.Game;
+using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.Bot;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
 

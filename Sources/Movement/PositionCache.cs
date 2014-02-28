@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Zeta.Game;
 using Zeta.Common;
+using Zeta.Game;
 
 namespace Trinity
 {

@@ -4,8 +4,8 @@ using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.Game.Internals.Actors;
 using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
 

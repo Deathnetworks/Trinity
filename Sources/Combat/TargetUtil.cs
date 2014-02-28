@@ -5,10 +5,10 @@ using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.Technicals;
-using Zeta.Game;
-using Zeta.Common;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
 using Zeta.Bot.Navigation;
+using Zeta.Common;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity

@@ -9,7 +9,6 @@ using System.Windows.Controls;
 using System.Windows.Markup;
 using Trinity.Technicals;
 using Trinity.UIComponents;
-using System.Diagnostics;
 
 namespace Trinity.UI
 {

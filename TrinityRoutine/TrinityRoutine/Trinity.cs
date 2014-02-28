@@ -1,11 +1,9 @@
-﻿using System;
-using System.Windows;
-using Zeta.Game;
+﻿using System.Windows;
 using Zeta.Bot;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-using Zeta.TreeSharp;
-using Trinity;
 using Zeta.Common.Plugins;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
+using Zeta.TreeSharp;
 
 namespace Trinity
 {
@@ -45,7 +43,7 @@ namespace Trinity
 
         public override ActorClass Class { get { return ZetaDia.Me.ActorClass; } }
 
-        public override SNOPower DestroyObjectPower { get { return ZetaDia.Me.GetHotbarPowerId(HotbarSlot.HotbarMouseLeft); } }
+        public override SNOPower DestroyObjectPower { get { return ZetaDia.CPlayer.GetActiveSkillBySlot(HotbarSlot.HotbarMouseLeft).Power; } }
 
         public override float DestroyObjectDistance { get { return 15; } }
 

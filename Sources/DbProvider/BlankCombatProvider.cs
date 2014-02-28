@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Zeta.Bot;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-
+using Zeta.Game.Internals.Actors;
 namespace Trinity.DbProvider
 {
     /// <summary>Combat Targeting Provider </summary>

@@ -8,7 +8,6 @@ using System.Xml;
 using Trinity.Config.Combat;
 using Trinity.Config.Loot;
 using Trinity.Technicals;
-using Zeta.Game;
 
 namespace Trinity.Config
 {

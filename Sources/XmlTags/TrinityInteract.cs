@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using Trinity.Technicals;
-using Zeta.Game;
-using Zeta.Common;
 using Zeta.Bot.Profile;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Common;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Logger = Trinity.Technicals.Logger;

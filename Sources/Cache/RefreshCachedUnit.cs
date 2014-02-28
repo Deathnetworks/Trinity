@@ -2,7 +2,8 @@
 using System.Linq;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 
 namespace Trinity

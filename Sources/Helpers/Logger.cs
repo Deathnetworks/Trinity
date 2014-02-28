@@ -66,7 +66,7 @@ namespace Trinity.Technicals
                         DBLog.InfoFormat(msg, args);
                         break;
                     case TrinityLogLevel.Verbose:
-                        DBLog.Verbose(string.Format(msg, args));
+                        DBLog.DebugFormat(msg, args);
                         break;
                 }
             }

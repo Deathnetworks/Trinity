@@ -1,8 +1,8 @@
 ﻿using System;
 using Trinity.Technicals;
-using Zeta.Common;
 using Zeta.Bot;
 using Zeta.Bot.Profile;
+using Zeta.Common;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Logger = Trinity.Technicals.Logger;

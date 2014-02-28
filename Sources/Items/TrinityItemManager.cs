@@ -3,8 +3,7 @@ using Trinity.ItemRules;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Items;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-
+using Zeta.Game.Internals.Actors;
 namespace Trinity
 {
     public class TrinityItemManager : ItemManager

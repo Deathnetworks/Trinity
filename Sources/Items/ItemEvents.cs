@@ -1,6 +1,5 @@
 ﻿using Zeta.Bot;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-
+using Zeta.Game.Internals.Actors;
 namespace Trinity
 {
     public class ItemEvents

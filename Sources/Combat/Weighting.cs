@@ -5,12 +5,12 @@ using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Trinity.XmlTags;
-using Zeta.Game;
-using Zeta.Common;
-using Zeta.Common.Plugins;
 using Zeta.Bot;
 using Zeta.Bot.Profile.Common;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Common;
+using Zeta.Common.Plugins;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
 namespace Trinity

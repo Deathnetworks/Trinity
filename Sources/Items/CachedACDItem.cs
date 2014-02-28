@@ -1,6 +1,6 @@
 ﻿using System;
 using Zeta.Game.Internals;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 namespace Trinity
 {
     // CachedACDItem - Special caching class to help with backpack-item handling

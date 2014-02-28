@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Trinity.Technicals;
-using Zeta.Game;
-using Zeta.Common;
-using Zeta.Bot.Profile;
 using Zeta.Bot.Navigation;
+using Zeta.Bot.Profile;
+using Zeta.Common;
+using Zeta.Game;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;
@@ -91,10 +91,11 @@ namespace Trinity.XmlTags
             // Now use Trinity movement to try a direct movement towards that location
             Vector3 NavTarget = Position;
             Vector3 MyPos = Trinity.Player.Position;
-            if (!ZetaDia.WorldInfo.IsGenerated && Vector3.Distance(MyPos, NavTarget) > 250)
-            {
-                NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
-            }
+            // DB 300+ always uses local nav! Yay :)
+            //if (!ZetaDia.WorldInfo.IsGenerated && Vector3.Distance(MyPos, NavTarget) > 250)
+            //{
+            //    NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
+            //}
 
             if (useNavigator != null && useNavigator.ToLower() == "false")
             {

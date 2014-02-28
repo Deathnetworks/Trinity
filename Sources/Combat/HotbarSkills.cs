@@ -2,8 +2,7 @@
 using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Game.Internals;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-
+using Zeta.Game.Internals.Actors;
 namespace Trinity
 {
     public class HotbarSkills

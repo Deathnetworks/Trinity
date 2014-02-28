@@ -1,6 +1,5 @@
 ﻿using System;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-
+using Zeta.Game.Internals.Actors;
 namespace Trinity
 {
     [Serializable]

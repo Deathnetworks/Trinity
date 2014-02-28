@@ -5,11 +5,10 @@ using System.Linq;
 using System.Threading;
 using Trinity.Combat.Abilities;
 using Trinity.Technicals;
-using Zeta.Game;
-using Zeta.Common.Plugins;
 using Zeta.Bot;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-
+using Zeta.Common.Plugins;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 namespace Trinity
 {
     public partial class Trinity : IPlugin
@@ -136,7 +135,8 @@ namespace Trinity
                         if (thisBestPotion != null)
                         {
                             WaitWhileAnimating(4, true);
-                            ZetaDia.Me.Inventory.UseItem((thisBestPotion.DynamicId));
+                            UIManager.UsePotion();
+                            //ZetaDia.Me.Inventory.UseItem((bestPotion.DynamicId));
                         }
                         AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
                         WaitWhileAnimating(3, true);

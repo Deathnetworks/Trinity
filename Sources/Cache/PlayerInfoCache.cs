@@ -67,7 +67,7 @@ namespace Trinity
 
         public PlayerInfoCache(
             DateTime lastUpdated, bool incapacitated, bool isRooted, bool isInTown, double currentHealth, double currentEnergy, double currentEnergyPct,
-            double discipline, double disciplinePct, Vector3 currentPosition, bool waitingReserve, int dynamicId, int level, ActorClass ActorClass, string battleTag)
+            double discipline, double disciplinePct, Vector3 currentPosition, bool waitingReserve, int dynamicId, int level, ActorClass actorClass, string battleTag)
         {
             LastUpdated = lastUpdated;
             IsIncapacitated = incapacitated;
@@ -82,7 +82,7 @@ namespace Trinity
             WaitingForReserveEnergy = waitingReserve;
             MyDynamicID = dynamicId;
             Level = level;
-            ActorClass = ActorClass;
+            actorClass = actorClass;
             BattleTag = battleTag;
             SceneId = -1;
             LevelAreaId = -1;

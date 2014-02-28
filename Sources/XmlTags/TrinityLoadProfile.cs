@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Trinity.Technicals;
-using Zeta.Game;
 using Zeta.Bot;
 using Zeta.Bot.Profile;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 

@@ -1,8 +1,7 @@
 ﻿using System;
 using Trinity.Combat.Abilities;
 using Zeta.Common;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-
+using Zeta.Game.Internals.Actors;
 namespace Trinity
 {
     /// <summary>

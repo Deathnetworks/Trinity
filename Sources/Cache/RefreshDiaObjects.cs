@@ -488,7 +488,7 @@ namespace Trinity
         private static HashSet<string> ignoreNames = new HashSet<string>
         {
             "MarkerLocation", "Generic_Proxy", "Hireling", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint", "TriggerSphere", 
-            "minimapicon",
+            "minimapicon", "ClientEffect", 
         };
 
         private static void RefreshCacheMainLoop()
@@ -569,31 +569,42 @@ namespace Trinity
                                         }
                                 }
 
-                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                                    "Cache: [{0:0000.0000}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0} RAGuid: {13} {14}",
-                                    duration,
-                                    (AddToCache ? "Added " : "Ignored"),
-                                    (!AddToCache ? (" By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
-                                    c_diaObject.ActorType,
-                                    c_ObjectType,
-                                    c_InternalName,
-                                    c_ActorSNO,
-                                    (c_unit_IsBoss ? " IsBoss" : ""),
-                                    (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
-                                    c_CentreDistance,
-                                    c_RadiusDistance,
-                                    c_ZDiff,
-                                    c_Radius,
-                                    c_RActorGuid,
-                                    unitExtras);
+                                if (c_IgnoreReason != "InternalName")
+                                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                                        "[{0:0000.00}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0} RAGuid: {13} {14}",
+                                        duration,
+                                        (AddToCache ? "Added " : "Ignored"),
+                                        (!AddToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
+                                        c_diaObject.ActorType,
+                                        c_ObjectType,
+                                        c_InternalName,
+                                        c_ActorSNO,
+                                        (c_unit_IsBoss ? " IsBoss" : ""),
+                                        (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
+                                        c_CentreDistance,
+                                        c_RadiusDistance,
+                                        c_ZDiff,
+                                        c_Radius,
+                                        c_RActorGuid,
+                                        unitExtras);
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0}",
-                                currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance);
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "{0}", ex);
+                        string gizmoType = "";
+                        if (currentObject is DiaGizmo)
+                        {
+                            gizmoType = "GizmoType: " + ((DiaGizmo)currentObject).CommonData.ActorInfo.GizmoType.ToString();
+                        }
+                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0} {4}",
+                                currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType);
+                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "{0}", ex);
+
+                        if (c_ACDGUID != -1 && objectTypeCache.ContainsKey(c_RActorGuid))
+                        {
+                            objectTypeCache.Remove(c_RActorGuid);
+                        }
 
                     }
                 }

@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using Trinity.Technicals;
-using Zeta.Game;
 using Zeta.Bot;
-using Zeta.Bot.Profile;
 using Zeta.Bot.Navigation;
+using Zeta.Bot.Profile;
+using Zeta.Game;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;

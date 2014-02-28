@@ -1,9 +1,9 @@
 ﻿using System;
 using Trinity.Technicals;
-using Zeta.Game;
-using Zeta.Common.Plugins;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
 using Zeta.Bot.Navigation;
+using Zeta.Common.Plugins;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 
 namespace Trinity
 {

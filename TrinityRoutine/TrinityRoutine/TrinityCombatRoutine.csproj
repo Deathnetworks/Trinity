@@ -69,12 +69,14 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TrinityRoutine.cs" />
+    <Compile Include="Trinity.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>rd /Q /S $(ProjectDir)obj\
-rd /Q /S $(ProjectDir)bin\</PostBuildEvent>
+rd /Q /S $(ProjectDir)bin\
+
+xcopy /Y "$(ProjectDir)Trinity.cs" "C:\db\Routines\Trinity\"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>

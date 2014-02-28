@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Navigation;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
+using Zeta.Game;
 
 namespace Trinity
 {

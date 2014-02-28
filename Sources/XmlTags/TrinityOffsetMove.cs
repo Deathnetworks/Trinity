@@ -1,9 +1,9 @@
 ﻿using Trinity.DbProvider;
 using Trinity.Technicals;
-using Zeta.Common;
-using Zeta.Bot.Profile;
 using Zeta.Bot.Navigation;
 using Zeta.Bot.Pathfinding;
+using Zeta.Bot.Profile;
+using Zeta.Common;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;

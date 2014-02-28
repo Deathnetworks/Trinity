@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
 using Trinity.Combat.Abilities;
-using Zeta.Game;
+using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.Bot;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 namespace Trinity
 {
     public partial class Trinity : IPlugin

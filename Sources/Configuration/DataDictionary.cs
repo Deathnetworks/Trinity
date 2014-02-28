@@ -41,6 +41,7 @@ namespace Trinity
             19947, // A1 New Tristram
             91324, // A1 Old Tristram Road
             109457, // A1 The Slaughtered Calf Inn
+            62968, // A1 The Hidden Cellar
             60714, // A1 Leoric's Passage
             101351, // A1 The Old Ruins
             83110, // A1 Cellar of the Damned
@@ -391,7 +392,7 @@ namespace Trinity
             217285,
             // uber fire chains in Realm of Turmoil  
             263014,
-
+            249192, 251416, 249191, 251730, // summoned skeleton from ring   
             // Units below here
             111456, 5013, 5014, 205756, 205746, 4182, 4183, 4644, 4062, 4538, 52693, 162575, 2928, 51291, 51292,
             96132, 90958, 90959, 80980, 51292, 51291, 2928, 3546, 129345, 81857, 138428, 81857, 60583, 170038, 174854, 190390,

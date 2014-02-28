@@ -1,7 +1,7 @@
 ﻿using System;
 using Trinity.Technicals;
-using Zeta.Game;
 using Zeta.Bot.Profile;
+using Zeta.Game;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 

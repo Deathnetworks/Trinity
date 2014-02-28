@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using Trinity.DbProvider;
 using Trinity.ItemRules;
 using Trinity.Technicals;
 using Trinity.XmlTags;
-using Zeta.Game;
-using Zeta.Common;
 using Zeta.Bot;
-using Zeta.Bot.Settings;
-using Zeta.Game.Internals;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
 using Zeta.Bot.Navigation;
+using Zeta.Bot.Settings;
+using Zeta.Common;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity

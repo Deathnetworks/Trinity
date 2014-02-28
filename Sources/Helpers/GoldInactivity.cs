@@ -3,10 +3,10 @@ using System.Diagnostics;
 using System.Threading;
 using Trinity.DbProvider;
 using Trinity.Technicals;
-using Zeta.Game;
 using Zeta.Bot;
 using Zeta.Bot.Profile;
 using Zeta.Bot.Profile.Common;
+using Zeta.Game;
 
 namespace Trinity
 {

@@ -1,6 +1,6 @@
 ﻿using Trinity.DbProvider;
-using Zeta.Common;
 using Zeta.Bot.Navigation;
+using Zeta.Common;
 
 namespace Trinity
 {

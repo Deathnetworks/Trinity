@@ -2,11 +2,11 @@
 using System.Threading;
 using System.Windows;
 using Trinity.Technicals;
-using Zeta.Game;
-using Zeta.Common;
-using Zeta.Common.Plugins;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
+using Zeta.Common;
+using Zeta.Common.Plugins;
+using Zeta.Game;
 using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
 using Logger = Trinity.Technicals.Logger;

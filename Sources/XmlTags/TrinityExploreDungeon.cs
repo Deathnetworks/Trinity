@@ -4,16 +4,16 @@ using System.Diagnostics;
 using System.Linq;
 using Trinity.DbProvider;
 using Trinity.Technicals;
-using Zeta.Game;
-using Zeta.Common;
 using Zeta.Bot.Dungeons;
 using Zeta.Bot.Logic;
-using Zeta.Bot.Profile;
-using Zeta.Game.Internals;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-using Zeta.Game.Internals.SNO;
 using Zeta.Bot.Navigation;
 using Zeta.Bot.Pathfinding;
+using Zeta.Bot.Profile;
+using Zeta.Common;
+using Zeta.Game;
+using Zeta.Game.Internals;
+using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 using Action = Zeta.TreeSharp.Action;
@@ -813,6 +813,9 @@ namespace Trinity.XmlTags
         {
             if (!PriorityScenes.Any())
                 return;
+
+            // TODO: fixme
+            return;
 
             //gp.Update();
 

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Trinity.Config;
 using Trinity.ItemRules;
-using Zeta.Game;
-using Zeta.Common;
-using Zeta.Common.Plugins;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
 using Zeta.Bot.Navigation;
 using Zeta.Bot.Pathfinding;
+using Zeta.Common;
+using Zeta.Common.Plugins;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 
 namespace Trinity
 {

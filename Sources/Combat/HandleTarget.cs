@@ -7,12 +7,12 @@ using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Trinity.XmlTags;
-using Zeta.Game;
+using Zeta.Bot;
+using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Common.Plugins;
-using Zeta.Bot;
-using Zeta.Game.Internals.Actors; using Zeta.Game;
-using Zeta.Bot.Navigation;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Zeta.TreeSharp;
 using Action = Zeta.TreeSharp.Action;
 using Decorator = Zeta.TreeSharp.Decorator;
@@ -1064,11 +1064,13 @@ namespace Trinity
                     IsWaitingForPotion = false;
                     if (!Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
-                        ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).ThenBy(p => p.ItemStackQuantity).FirstOrDefault();
-                        if (thisBestPotion != null)
+
+                        ACDItem bestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderBy(p => p.ItemStackQuantity).FirstOrDefault();
+                        if (bestPotion != null)
                         {
                             WaitWhileAnimating(3, true);
-                            ZetaDia.Me.Inventory.UseItem((thisBestPotion.DynamicId));
+                            UIManager.UsePotion();
+                            //ZetaDia.Me.Inventory.UseItem((bestPotion.DynamicId));
                         }
                         AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
                         WaitWhileAnimating(2, true);

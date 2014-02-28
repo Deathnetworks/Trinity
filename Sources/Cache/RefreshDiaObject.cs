@@ -105,6 +105,10 @@ namespace Trinity
             //AddToCache = RefreshStepSkipDoubleCheckGuid(AddToCache);
             //if (!AddToCache) { c_IgnoreReason = "SkipDoubleCheckGuid"; return AddToCache; }
 
+            // Get Internal Name
+            AddToCache = RefreshInternalName(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "InternalName"; return AddToCache; }
+
             // ActorSNO
             AddToCache = RefreshStepCachedActorSNO(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
@@ -112,9 +116,6 @@ namespace Trinity
             // Have ActorSNO Check for SNO based navigation obstacle hashlist
             c_IsObstacle = DataDictionary.NavigationObstacleIds.Contains(c_ActorSNO);
 
-            // Get Internal Name
-            AddToCache = RefreshInternalName(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "InternalName"; return AddToCache; }
             // Get ACDGuid
             AddToCache = RefreshStepCachedACDGuid(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
@@ -367,8 +368,8 @@ namespace Trinity
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting ActorSNO for an object.");
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
+                    Logger.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "Safely handled exception getting ActorSNO for an object.");
+                    Logger.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                 }
                 actorSNOCache.Add(c_RActorGuid, c_ActorSNO);
@@ -537,28 +538,30 @@ namespace Trinity
                 else
                 {
                     // Calculate the object type of this object
-                    if (c_diaObject is DiaUnit)
+                    if (c_diaObject.ActorType == ActorType.Monster)
+                    //if (c_diaObject is DiaUnit)
                     {
                         using (new PerformanceLogger("RefreshCachedType.1"))
                         {
-
                             if (c_CommonData == null)
                             {
+                                c_IgnoreSubStep = "InvalidUnitCommonData";
                                 AddToCache = false;
                             }
                             else if (c_diaObject.ACDGuid != c_CommonData.ACDGuid)
                             {
+                                c_IgnoreSubStep = "InvalidUnitACDGuid";
                                 AddToCache = false;
-                            }
-                            else if (c_diaObject is DiaPlayer)
-                            {
-                                c_ObjectType = GObjectType.Player;
                             }
                             else
                             {
                                 c_ObjectType = GObjectType.Unit;
                             }
                         }
+                    }
+                    else if (c_diaObject.ActorType == ActorType.Player)
+                    {
+                        c_ObjectType = GObjectType.Player;
                     }
                     else if (DataDictionary.ForceToItemOverrideIds.Contains(c_ActorSNO) || (c_diaObject is DiaItem))
                     {
@@ -721,16 +724,28 @@ namespace Trinity
                     {
                         if (!(c_diaObject is DiaGizmo))
                         {
-                            throw new InvalidCastException("Attempted to Refresh Gizmo on Object that is not a Gizmo!");
-                        }
+                            string debugInfo = string.Format("Type: {0} Name: {1} ActorType: {2} SNO: {3}",
+                                c_diaObject.GetType().Name,
+                                c_diaObject.Name,
+                                c_diaObject.ActorType,
+                                c_diaObject.ActorSNO);
 
-                        AddToCache = RefreshGizmo(AddToCache);
-                        break;
+                            Logger.LogDebug("Attempted to Refresh Gizmo on Object that is not a Gizmo! " + debugInfo);
+                            c_IgnoreSubStep = "InvalidGizmoCast";
+                            AddToCache = false;
+                            break;
+                        }
+                        else
+                        {
+                            AddToCache = RefreshGizmo(AddToCache);
+                            break;
+                        }
                     }
                 // Object switch on type (to seperate shrines, destructibles, barricades etc.)
                 case GObjectType.Unknown:
                 default:
                     {
+                        c_IgnoreSubStep = "Unknown."+c_diaObject.ActorType.ToString();
                         AddToCache = false;
                         break;
                     }
