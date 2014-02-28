@@ -105,23 +105,26 @@ namespace Trinity
 
         public static void MaintainBlacklist()
         {
-            try
+            using (new PerformanceLogger("GenericBlacklist.MaintainBlacklist"))
             {
-                if (Manager == null || (Manager != null && !Manager.IsAlive))
+                try
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Starting up Generic Blacklist Manager thread");
-                    Manager = new Thread(Manage)
+                    if (Manager == null || (Manager != null && !Manager.IsAlive))
                     {
-                        IsBackground = true,
-                        Priority = ThreadPriority.Lowest
-                    };
-                    Manager.Start();
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Starting up Generic Blacklist Manager thread");
+                        Manager = new Thread(Manage)
+                        {
+                            IsBackground = true,
+                            Priority = ThreadPriority.Lowest
+                        };
+                        Manager.Start();
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Exception in Generic Blacklist Manager");
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, ex.ToString());
+                catch (Exception ex)
+                {
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Exception in Generic Blacklist Manager");
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, ex.ToString());
+                }
             }
         }
 

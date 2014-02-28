@@ -121,15 +121,18 @@ namespace Trinity
 
         public static void MaintainCache()
         {
-            if (Manager == null || (Manager != null && !Manager.IsAlive))
+            using (new PerformanceLogger("GenericCache.MaintainCache"))
             {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Starting up Generic Cache Manage thread");
-                Manager = new Thread(Manage)
+                if (Manager == null || (Manager != null && !Manager.IsAlive))
                 {
-                    IsBackground = true,
-                    Priority = ThreadPriority.Lowest
-                };
-                Manager.Start();
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Starting up Generic Cache Manage thread");
+                    Manager = new Thread(Manage)
+                    {
+                        IsBackground = true,
+                        Priority = ThreadPriority.Lowest
+                    };
+                    Manager.Start();
+                }
             }
         }
 

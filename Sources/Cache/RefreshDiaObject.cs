@@ -7,7 +7,6 @@ using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
-using Zeta.Game.Internals.Actors.Gizmos;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
 namespace Trinity
@@ -583,36 +582,46 @@ namespace Trinity
                             }
                         }
                     }
+                    else if (DataDictionary.InteractWhiteListIds.Contains(c_ActorSNO))
+                        c_ObjectType = GObjectType.Interactable;
+
                     else if (c_diaObject is DiaGizmo && c_diaObject.ActorType == ActorType.Gizmo)
                     {
                         DiaGizmo c_diaGizmo;
-                        using (new PerformanceLogger("RefreshCachedType.3"))
-                        {
-                            c_diaGizmo = (DiaGizmo)c_diaObject;
-                        }
-                        using (new PerformanceLogger("RefreshCachedType.4"))
-                        {
+                        c_diaGizmo = (DiaGizmo)c_diaObject;
 
-                            if (c_diaObject is GizmoShrine)
-                                c_ObjectType = GObjectType.Shrine;
-                            else if (c_diaObject is GizmoHealthwell)
-                                c_ObjectType = GObjectType.HealthWell;
-                            else if (c_diaObject is GizmoDestructibleLootContainer)
-                                c_ObjectType = GObjectType.Destructible;
-                            else if (c_diaObject is GizmoLootContainer)
-                                c_ObjectType = GObjectType.Container;
-                            else if (c_diaObject is GizmoDoor)
-                                c_ObjectType = GObjectType.Door;
-                            else if (c_diaGizmo.IsBarricade)
-                                c_ObjectType = GObjectType.Barricade;
-                            else if (c_diaObject is GizmoDestructible)
-                                c_ObjectType = GObjectType.Destructible;
-                            else if (DataDictionary.InteractWhiteListIds.Contains(c_ActorSNO))
-                                c_ObjectType = GObjectType.Interactable;
-                            //else if (c_diaObject.ActorInfo.GizmoType == GizmoType.WeirdGroup57)
-                            //    c_ObjectType = GObjectType.Interactable;
-                            else
-                                c_ObjectType = GObjectType.Unknown;
+                        if (c_diaGizmo.IsBarricade)
+                            c_ObjectType = GObjectType.Barricade;
+                        else
+                        {
+                            switch (c_diaGizmo.ActorInfo.GizmoType)
+                            {
+                                case GizmoType.Gate:
+                                case GizmoType.Door:
+                                    c_ObjectType = GObjectType.Door;
+                                    break;
+                                case GizmoType.PoolOfReflection:
+                                case GizmoType.PowerUp:
+                                    c_ObjectType = GObjectType.Shrine;
+                                    break;
+                                case GizmoType.Chest:
+                                    c_ObjectType = GObjectType.Container;
+                                    break;
+                                case GizmoType.BreakableDoor:
+                                case GizmoType.BreakableChest:
+                                case GizmoType.DestroyableObject:
+                                case GizmoType.DestroySelfWhenNear:
+                                    c_ObjectType = GObjectType.Destructible;
+                                    break;
+                                case GizmoType.PlacedLoot:
+                                case GizmoType.Switch:
+                                case GizmoType.Headstone:
+                                    c_ObjectType = GObjectType.Interactable;
+                                    break;
+                                default:
+                                    c_ObjectType = GObjectType.Unknown;
+                                    break;
+                            }
                         }
                     }
                     else
@@ -746,7 +755,7 @@ namespace Trinity
                 case GObjectType.Unknown:
                 default:
                     {
-                        c_IgnoreSubStep = "Unknown."+c_diaObject.ActorType.ToString();
+                        c_IgnoreSubStep = "Unknown." + c_diaObject.ActorType.ToString();
                         AddToCache = false;
                         break;
                     }

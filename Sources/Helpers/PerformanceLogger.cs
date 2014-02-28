@@ -31,7 +31,7 @@ namespace Trinity.Technicals
                 if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
                 {
                     _Stopwatch.Stop();
-                    if (_Stopwatch.Elapsed.TotalMilliseconds > 1)
+                    if (_Stopwatch.Elapsed.TotalMilliseconds > 100)
                     {
                         Logging.DebugFormat("[Trinity][Performance] Execution of the block {0} took {1:00.00}ms.", _BlockName,
                                             _Stopwatch.Elapsed.TotalMilliseconds);

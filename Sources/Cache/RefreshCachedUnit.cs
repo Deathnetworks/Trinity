@@ -45,7 +45,7 @@ namespace Trinity
             // See if we need to refresh the monster type or not
             bool notInCache = !dictionaryStoredMonsterTypes.TryGetValue(c_ActorSNO, out monsterType);
             // either we're in a quest area or not in cache
-            bool refreshMonsterType = DataDictionary.QuestLevelAreaIds.Contains( Player.LevelAreaId) || notInCache;
+            bool refreshMonsterType = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) || notInCache;
             using (new PerformanceLogger("RefreshUnit.5"))
             {
                 // If it's a boss and it was an ally, keep refreshing until it's not an ally
@@ -426,29 +426,31 @@ namespace Trinity
         }
         private static MonsterAffixes RefreshAffixes(ACD acd)
         {
-            MonsterAffixes affixFlags;
-            if (!unitMonsterAffixCache.TryGetValue(c_RActorGuid, out affixFlags))
+            using (new PerformanceLogger("RefreshAffixes"))
             {
-                try
+                MonsterAffixes affixFlags;
+                if (!unitMonsterAffixCache.TryGetValue(c_RActorGuid, out affixFlags))
                 {
-                    affixFlags = acd.MonsterAffixes;
-                    unitMonsterAffixCache.Add(c_RActorGuid, affixFlags);
+                    try
+                    {
+                        affixFlags = acd.MonsterAffixes;
+                        unitMonsterAffixCache.Add(c_RActorGuid, affixFlags);
+                    }
+                    catch (Exception ex)
+                    {
+                        affixFlags = MonsterAffixes.None;
+                        Logger.Log(LogCategory.CacheManagement, "Handled Exception getting affixes for Monster SNO={0} Name={1} RAGuid={2}", c_ActorSNO, c_InternalName, c_RActorGuid);
+                        Logger.Log(LogCategory.CacheManagement, ex.ToString());
+                    }
                 }
-                catch (Exception ex)
-                {
-                    affixFlags = MonsterAffixes.None;
-                    Logger.Log(LogCategory.CacheManagement, "Handled Exception getting affixes for Monster SNO={0} Name={1} RAGuid={2}", c_ActorSNO, c_InternalName, c_RActorGuid);
-                    Logger.Log(LogCategory.CacheManagement, ex.ToString());
-                }
+                c_unit_IsElite = affixFlags.HasFlag(MonsterAffixes.Elite);
+                c_unit_IsRare = affixFlags.HasFlag(MonsterAffixes.Rare);
+                c_unit_IsUnique = affixFlags.HasFlag(MonsterAffixes.Unique);
+                c_unit_IsMinion = affixFlags.HasFlag(MonsterAffixes.Minion);
+                // All-in-one flag for quicker if checks throughout
+                c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion);
+                return affixFlags;
             }
-            c_unit_IsElite = affixFlags.HasFlag(MonsterAffixes.Elite);
-            c_unit_IsRare = affixFlags.HasFlag(MonsterAffixes.Rare);
-            c_unit_IsUnique = affixFlags.HasFlag(MonsterAffixes.Unique);
-            c_unit_IsMinion = affixFlags.HasFlag(MonsterAffixes.Minion);
-            // All-in-one flag for quicker if checks throughout
-            c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion);
-
-            return affixFlags;
         }
         private static MonsterType RefreshMonsterType(ACD tempCommonData, MonsterType monsterType, bool bAddToDictionary)
         {
