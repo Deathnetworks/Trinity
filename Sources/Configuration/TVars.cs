@@ -122,7 +122,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.Barbarian_Leap", 10200, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_Sprint", 2800, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_IgnorePain", 30200, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Barbarian_AncientSpear", 300, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_Barbarian_AncientSpear", 300, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_Revenge", 600, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_FuriousCharge", 500, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Barbarian_Overpower", 200, "Spell Use Delay/Interval, milliseconds"));
@@ -274,6 +274,8 @@ namespace Trinity
 
             Set(new TVar("Cache.HotSpot.MaxDistance", 2500f, "Maximum distance to add team hotspots to cache"));
             Set(new TVar("Cache.HotSpot.MinDistance", 50f, "Minimum distance to add team hotspots to cache"));
+
+            Set(new TVar("Cache.ReadAffixFlags", true, "Enable/Disable whether or not to read AffixFlags for units"));
 
             // XmlTags
             Set(new TVar("XmlTag.TrinityTownPortal.DefaultWaitTime", 2500, "Time in Milliseconds to set the default wait time for TrinityTownPortal (may be overriden by Profile tags)"));

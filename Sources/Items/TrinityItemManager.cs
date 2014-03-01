@@ -1,8 +1,10 @@
-﻿using Trinity.Config.Loot;
+﻿using System;
+using Trinity.Config.Loot;
 using Trinity.ItemRules;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Items;
+using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 namespace Trinity
 {
@@ -338,6 +340,36 @@ namespace Trinity
                 return Trinity.Settings.Loot.TownRun.SalvageLegendaryItemOption;
             }
             return SalvageOption.None;
+        }
+
+        public static void DumpBackpack()
+        {
+            ZetaDia.Actors.Update();
+            using (ZetaDia.Memory.SaveCacheState())
+            {
+                ZetaDia.Memory.TemporaryCacheState(false);
+
+                foreach (var item in Zeta.Game.ZetaDia.Me.Inventory.Backpack)
+                {
+                    string itemName = string.Format("Name={0} InternalName={1} DynamicID={2} ", item.Name, item.InternalName, item.DynamicId);
+                    try
+                    {
+                        foreach (object val in Enum.GetValues(typeof(ActorAttributeType)))
+                        {
+                            int iVal = item.GetAttribute<int>((ActorAttributeType)val);
+                            float fVal = item.GetAttribute<float>((ActorAttributeType)val);
+
+                            if (iVal != 0 || fVal != 0)
+                                Logger.Log(itemName + "Attribute: {0}, iVal: {1}, fVal: {2}", val, iVal, (fVal != fVal) ? "" : fVal.ToString());
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log("Exception reading attributes for {0}\n{1}", item.Name, ex.ToString());
+                    }
+                }
+
+            }
         }
     }
 }

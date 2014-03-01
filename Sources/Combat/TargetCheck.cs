@@ -131,15 +131,17 @@ namespace Trinity
                 {
                     if (!Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
-                        ACDItem thisBestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderByDescending(p => p.HitpointsGranted).ThenBy(p => p.ItemStackQuantity).FirstOrDefault();
-                        if (thisBestPotion != null)
+                        IsWaitingForPotion = false;
+                        bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.DynamicId == 2015821930);
+                        if (hasPotion)
                         {
-                            WaitWhileAnimating(4, true);
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
+                            WaitWhileAnimating(3, true);
                             UIManager.UsePotion();
-                            //ZetaDia.Me.Inventory.UseItem((bestPotion.DynamicId));
+
+                            AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
+                            WaitWhileAnimating(2, true);
                         }
-                        AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
-                        WaitWhileAnimating(3, true);
                     }
                 }
                 sStatusText = "[Trinity] No more targets - DemonBuddy/profile management is now in control";

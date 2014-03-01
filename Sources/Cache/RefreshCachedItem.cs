@@ -117,7 +117,7 @@ namespace Trinity
                 }
                 else if (Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
                 {
-                    AddToCache = ItemManager.Current.ShouldPickUpItem((ACDItem) c_CommonData);
+                    AddToCache = ItemManager.Current.ShouldPickUpItem((ACDItem)c_CommonData);
                 }
                 else if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
                 {
@@ -145,7 +145,8 @@ namespace Trinity
             if (!AddToCache && c_IgnoreSubStep == String.Empty)
                 c_IgnoreSubStep = "NoMatchingRule";
 
-            if (Settings.Advanced.LogDroppedItems && logNewItem && c_DBItemType != ItemType.Unknown)
+            //if (Settings.Advanced.LogDroppedItems && logNewItem && c_DBItemType != ItemType.Unknown)
+            if (Settings.Advanced.LogDroppedItems && logNewItem)
                 LogDroppedItem();
 
             return AddToCache;
@@ -207,7 +208,7 @@ namespace Trinity
             {
                 try
                 {
-                    c_GoldStackSize = ((ACDItem) c_CommonData).Gold;
+                    c_GoldStackSize = ((ACDItem)c_CommonData).Gold;
                 }
                 catch
                 {

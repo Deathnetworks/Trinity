@@ -273,16 +273,18 @@ namespace Trinity
                     if (Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !IsWaitingForPower && !IsWaitingForPotion
                         && !Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Setting isWaitingForPotion: MyHP={0}, Limit={1}", Player.CurrentHealthPct, PlayerEmergencyHealthPotionLimit);
                         IsWaitingForPotion = true;
                         runStatus = HandlerRunStatus.TreeRunning;
                     }
+
+                    UseHealthPotionIfNeeded();
 
                     //check if we are returning to the tree
                     if (runStatus != HandlerRunStatus.NotFinished)
                         return GetTreeSharpRunStatus(runStatus);
 
                     // If we just looped waiting for a potion, use it
-                    UseHealthPotionIfNeeded();
 
                     using (new PerformanceLogger("HandleTarget.CheckAvoidanceBuffs"))
                     {
@@ -1061,19 +1063,19 @@ namespace Trinity
             {
                 if (IsWaitingForPotion)
                 {
-                    IsWaitingForPotion = false;
                     if (!Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
-
-                        ACDItem bestPotion = ZetaDia.Me.Inventory.Backpack.Where(i => i.IsPotion).OrderBy(p => p.ItemStackQuantity).FirstOrDefault();
-                        if (bestPotion != null)
+                        IsWaitingForPotion = false;
+                        bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.DynamicId == 2015821930);
+                        if (hasPotion)
                         {
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
                             WaitWhileAnimating(3, true);
                             UIManager.UsePotion();
-                            //ZetaDia.Me.Inventory.UseItem((bestPotion.DynamicId));
+
+                            AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
+                            WaitWhileAnimating(2, true);
                         }
-                        AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
-                        WaitWhileAnimating(2, true);
                     }
                 }
             }

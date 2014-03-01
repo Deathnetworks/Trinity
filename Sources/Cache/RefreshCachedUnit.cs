@@ -433,7 +433,10 @@ namespace Trinity
                 {
                     try
                     {
-                        affixFlags = acd.MonsterAffixes;
+                        using (new PerformanceLogger("acdAffixFlags"))
+                        {
+                            //affixFlags = acd.MonsterAffixes;
+                        }
                         unitMonsterAffixCache.Add(c_RActorGuid, affixFlags);
                     }
                     catch (Exception ex)

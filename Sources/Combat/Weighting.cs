@@ -64,7 +64,8 @@ namespace Trinity
                     Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck,
                     prioritizeCloseRangeUnits, TownRun.IsTryingToTownPortal(), TrinityTownPortal.ForceClearArea, DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId), Player.Level);
 
-                Logger.Log(LogCategory.Weight, " CombatIgnoreList={0}", Logger.ListToString(TrinityCombatIgnore.IgnoreList.ToList<object>()));
+                if (TrinityCombatIgnore.IgnoreList.Any())
+                    Logger.Log(LogCategory.Weight, " CombatIgnoreList={0}", Logger.ListToString(TrinityCombatIgnore.IgnoreList.ToList<object>()));
 
                 foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.CentreDistance))
                 {
@@ -381,7 +382,7 @@ namespace Trinity
                                 // ignore non-legendaries and gold near elites if we're ignoring elites
                                 // not sure how we should safely determine this distance
                                 if (cacheObject.ItemQuality < ItemQuality.Legendary && ((CombatBase.IgnoringElites &&
-                                    ObjectCache.Any(u => u.Type == GObjectType.Unit && u.IsEliteRareUnique && 
+                                    ObjectCache.Any(u => u.Type == GObjectType.Unit && u.IsEliteRareUnique &&
                                         u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreNonLegendaryNearEliteDistance"))) ||
                                     AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius)))
                                 {
@@ -390,7 +391,7 @@ namespace Trinity
                                 }
 
                                 // Ignore Legendaries in AoE
-                                if (Settings.Loot.Pickup.IgnoreLegendaryInAoE && cacheObject.Type == GObjectType.Item && cacheObject.ItemQuality >= ItemQuality.Legendary && 
+                                if (Settings.Loot.Pickup.IgnoreLegendaryInAoE && cacheObject.Type == GObjectType.Item && cacheObject.ItemQuality >= ItemQuality.Legendary &&
                                     AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
                                 {
                                     cacheObject.Weight = 0;
@@ -398,7 +399,7 @@ namespace Trinity
                                 }
 
                                 // Ignore Non-Legendaries in AoE
-                                if (Settings.Loot.Pickup.IgnoreNonLegendaryInAoE && cacheObject.Type == GObjectType.Item && cacheObject.ItemQuality < ItemQuality.Legendary && 
+                                if (Settings.Loot.Pickup.IgnoreNonLegendaryInAoE && cacheObject.Type == GObjectType.Item && cacheObject.ItemQuality < ItemQuality.Legendary &&
                                     AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
                                 {
                                     cacheObject.Weight = 0;
@@ -421,7 +422,7 @@ namespace Trinity
                                 }
 
                                 // Ignore gold near Elites
-                                if (Settings.Loot.Pickup.IgnoreGoldNearElites && cacheObject.Type == GObjectType.Gold && 
+                                if (Settings.Loot.Pickup.IgnoreGoldNearElites && cacheObject.Type == GObjectType.Gold &&
                                     ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreGoldNearEliteDistance")))
                                 {
                                     cacheObject.Weight = 0;
@@ -429,7 +430,7 @@ namespace Trinity
                                 }
 
                                 // Ignore gold in AoE
-                                if (Settings.Loot.Pickup.IgnoreGoldInAoE && cacheObject.Type == GObjectType.Gold && 
+                                if (Settings.Loot.Pickup.IgnoreGoldInAoE && cacheObject.Type == GObjectType.Gold &&
                                     AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
                                 {
                                     cacheObject.Weight = 0;
