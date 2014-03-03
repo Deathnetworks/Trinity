@@ -13,8 +13,7 @@ namespace Trinity.Config.Loot
         private int _ArmorYellowLevel;
         private int _JewelryBlueLevel;
         private int _JewelryYellowLevel;
-        private PotionMode _PotionMode;
-        private int _Potionlevel;
+        private int _PotionCount;
         private TrinityGemType _GemType;
         private int _GemLevel;
         private int _LegendaryLevel;
@@ -75,7 +74,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(63)]
+        [DefaultValue(58)]
         public int WeaponYellowLevel
         {
             get
@@ -111,7 +110,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(63)]
+        [DefaultValue(58)]
         public int ArmorYellowLevel
         {
             get
@@ -147,7 +146,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(58)]
+        [DefaultValue(56)]
         public int JewelryYellowLevel
         {
             get
@@ -165,37 +164,19 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(PotionMode.Cap)]
-        public PotionMode PotionMode
+        [DefaultValue(98)]
+        public int PotionCount
         {
             get
             {
-                return _PotionMode;
+                return _PotionCount;
             }
             set
             {
-                if (_PotionMode != value)
+                if (_PotionCount != value)
                 {
-                    _PotionMode = value;
-                    OnPropertyChanged("PotionMode");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(60)]
-        public int PotionLevel
-        {
-            get
-            {
-                return _Potionlevel;
-            }
-            set
-            {
-                if (_Potionlevel != value)
-                {
-                    _Potionlevel = value;
-                    OnPropertyChanged("PotionLevel");
+                    _PotionCount = value;
+                    OnPropertyChanged("PotionCount");
                 }
             }
         }
@@ -361,7 +342,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(60)]
+        [DefaultValue(1)]
         public int MiscItemLevel
         {
             get
@@ -431,7 +412,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         public bool IgnoreTwoHandedWeapons
         {
             get

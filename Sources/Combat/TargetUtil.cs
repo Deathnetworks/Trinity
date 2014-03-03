@@ -122,7 +122,7 @@ namespace Trinity
                 case ActorClass.Barbarian:
                     includeHealthGlobes = CombatBase.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
                                           Trinity.Settings.Combat.Misc.CollectHealthGlobe &&
-                                          ObjectCache.Any(g => g.Type == GObjectType.Globe && g.Weight > 0);
+                                          ObjectCache.Any(g => g.Type == GObjectType.HealthGlobe && g.Weight > 0);
                     break;
                 default:
                     includeHealthGlobes = false;
@@ -134,11 +134,11 @@ namespace Trinity
                 Vector3 bestClusterPoint;
                 var clusterUnits =
                     (from u in ObjectCache
-                     where (u.Type == GObjectType.Unit || (includeHealthGlobes && u.Type == GObjectType.Globe)) &&
+                     where (u.Type == GObjectType.Unit || (includeHealthGlobes && u.Type == GObjectType.HealthGlobe)) &&
                      ((useWeights && u.Weight > 0) || !useWeights) &&
                      (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                      u.RadiusDistance <= maxRange
-                     orderby u.Type != GObjectType.Globe // if it's a globe this will be false and sorted at the top
+                     orderby u.Type != GObjectType.HealthGlobe // if it's a globe this will be false and sorted at the top
                      orderby u.IsBossOrEliteRareUnique
                      orderby u.NearbyUnitsWithinDistance(radius) descending
                      orderby u.CentreDistance

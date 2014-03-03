@@ -617,7 +617,7 @@ namespace Trinity
                     case GObjectType.Avoidance:
                     case GObjectType.Barricade:
                     case GObjectType.Destructible:
-                    case GObjectType.Globe:
+                    case GObjectType.HealthGlobe:
                         {
                             if (Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly &&
                                 (TargetUtil.AnyElitesInRange(40f) || CurrentTarget.IsBossOrEliteRareUnique))

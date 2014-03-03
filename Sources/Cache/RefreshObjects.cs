@@ -299,6 +299,127 @@ namespace Trinity
             }
         }
 
+        private static void RefreshCacheMainLoop()
+        {
+            using (new PerformanceLogger("CacheManagement.RefreshCacheMainLoop"))
+            {
+                IEnumerable<DiaObject> refreshSource;
+
+                if (Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
+                {
+                    refreshSource = ReadDebugActorsFromMemory();
+                }
+                else
+                {
+                    refreshSource = ReadActorsFromMemory();
+                }
+                Stopwatch t1 = new Stopwatch();
+
+                foreach (DiaObject currentObject in refreshSource)
+                {
+                    try
+                    {
+                        bool AddToCache = false;
+
+                        if (!Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
+                        {
+                            /*
+                             *  Main Cache Function
+                             */
+                            AddToCache = CacheDiaObject(currentObject);
+                        }
+                        else
+                        {
+                            // We're debugging, slightly slower, calculate performance metrics and dump debugging to log 
+                            t1.Reset();
+                            t1.Start();
+
+                            /*
+                             *  Main Cache Function
+                             */
+                            AddToCache = CacheDiaObject(currentObject);
+
+                            if (t1.IsRunning)
+                                t1.Stop();
+
+                            double duration = t1.Elapsed.TotalMilliseconds;
+
+                            // don't log stuff we never care about
+                            if (duration <= 1 && c_IgnoreSubStep == "IgnoreNames")
+                                continue;
+
+                            if ((Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && duration > 1 || !Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance)))
+                            {
+                                string unitExtras = "";
+
+                                switch (c_ObjectType)
+                                {
+                                    case GObjectType.Unit:
+                                        {
+                                            if (c_unit_IsElite)
+                                                unitExtras += " IsElite " + c_MonsterAffixes.ToString();
+
+                                            if (c_unit_HasShieldAffix)
+                                                unitExtras += " HasAffixShielded";
+
+                                            if (c_HasDotDPS)
+                                                unitExtras += " HasDotDPS";
+
+                                            if (c_HasBeenInLoS)
+                                                unitExtras += " HasBeenInLoS";
+
+                                            unitExtras += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
+                                        } break;
+                                    case GObjectType.Avoidance:
+                                        {
+                                            unitExtras += " Ro:" + c_Rotation.ToString("0.00");
+                                            break;
+                                        }
+                                }
+
+                                if (c_IgnoreReason != "InternalName")
+                                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                                        "[{0:0000.00}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0} RAGuid: {13} {14}",
+                                        duration,
+                                        (AddToCache ? "Added " : "Ignored"),
+                                        (!AddToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
+                                        c_diaObject.ActorType,
+                                        c_ObjectType,
+                                        c_InternalName,
+                                        c_ActorSNO,
+                                        (c_unit_IsBoss ? " IsBoss" : ""),
+                                        (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
+                                        c_CentreDistance,
+                                        c_RadiusDistance,
+                                        c_ZDiff,
+                                        c_Radius,
+                                        c_RActorGuid,
+                                        unitExtras);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        string gizmoType = "";
+                        if (currentObject is DiaGizmo)
+                        {
+                            gizmoType = "GizmoType: " + ((DiaGizmo)currentObject).CommonData.ActorInfo.GizmoType.ToString();
+                        }
+                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0} {4}",
+                                currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType);
+                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "{0}", ex);
+
+                        if (c_ACDGUID != -1 && objectTypeCache.ContainsKey(c_RActorGuid))
+                        {
+                            objectTypeCache.Remove(c_RActorGuid);
+                        }
+
+                    }
+                }
+
+            }
+        }
+
         private static bool UpdateCurrentTarget()
         {
             // Return true if we need to refresh objects and get a new target
@@ -491,127 +612,7 @@ namespace Trinity
             "minimapicon", 
         };
 
-        private static void RefreshCacheMainLoop()
-        {
-            using (new PerformanceLogger("CacheManagement.RefreshCacheMainLoop"))
-            {
-                IEnumerable<DiaObject> refreshSource;
-
-                if (Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
-                {
-                    refreshSource = ReadDebugActorsFromMemory();
-                }
-                else
-                {
-                    refreshSource = ReadActorsFromMemory();
-                }
-                Stopwatch t1 = new Stopwatch();
-
-                foreach (DiaObject currentObject in refreshSource)
-                {
-                    try
-                    {
-                        bool AddToCache = false;
-
-                        if (!Settings.Advanced.LogCategories.HasFlag(LogCategory.CacheManagement))
-                        {
-                            /*
-                             *  Main Cache Function
-                             */
-                            AddToCache = CacheDiaObject(currentObject);
-                        }
-                        else
-                        {
-                            // We're debugging, slightly slower, calculate performance metrics and dump debugging to log 
-                            t1.Reset();
-                            t1.Start();
-
-                            /*
-                             *  Main Cache Function
-                             */
-                            AddToCache = CacheDiaObject(currentObject);
-
-                            if (t1.IsRunning)
-                                t1.Stop();
-
-                            double duration = t1.Elapsed.TotalMilliseconds;
-
-                            // don't log stuff we never care about
-                            if (duration <= 1 && c_IgnoreSubStep == "IgnoreNames")
-                                continue;
-
-                            if ((Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && duration > 1 || !Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance)))
-                            {
-                                string unitExtras = "";
-
-                                switch (c_ObjectType)
-                                {
-                                    case GObjectType.Unit:
-                                        {
-                                            if (c_unit_IsElite)
-                                                unitExtras += " IsElite";
-
-                                            if (c_unit_HasShieldAffix)
-                                                unitExtras += " HasAffixShielded";
-
-                                            if (c_HasDotDPS)
-                                                unitExtras += " HasDotDPS";
-
-                                            if (c_HasBeenInLoS)
-                                                unitExtras += " HasBeenInLoS";
-
-                                            unitExtras += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
-                                        } break;
-                                    case GObjectType.Avoidance:
-                                        {
-                                            unitExtras += " Ro:" + c_Rotation.ToString("0.00");
-                                            break;
-                                        }
-                                }
-
-                                if (c_IgnoreReason != "InternalName")
-                                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                                        "[{0:0000.00}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0} RAGuid: {13} {14}",
-                                        duration,
-                                        (AddToCache ? "Added " : "Ignored"),
-                                        (!AddToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
-                                        c_diaObject.ActorType,
-                                        c_ObjectType,
-                                        c_InternalName,
-                                        c_ActorSNO,
-                                        (c_unit_IsBoss ? " IsBoss" : ""),
-                                        (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
-                                        c_CentreDistance,
-                                        c_RadiusDistance,
-                                        c_ZDiff,
-                                        c_Radius,
-                                        c_RActorGuid,
-                                        unitExtras);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        string gizmoType = "";
-                        if (currentObject is DiaGizmo)
-                        {
-                            gizmoType = "GizmoType: " + ((DiaGizmo)currentObject).CommonData.ActorInfo.GizmoType.ToString();
-                        }
-                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while refreshing DiaObject ActorSNO: {0} Name: {1} Type: {2} Distance: {3:0} {4}",
-                                currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType);
-                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "{0}", ex);
-
-                        if (c_ACDGUID != -1 && objectTypeCache.ContainsKey(c_RActorGuid))
-                        {
-                            objectTypeCache.Remove(c_RActorGuid);
-                        }
-
-                    }
-                }
-
-            }
-        }
-
+        
         private static IOrderedEnumerable<DiaObject> ReadDebugActorsFromMemory()
         {
             return from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)

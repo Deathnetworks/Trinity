@@ -41,7 +41,7 @@ namespace Trinity.XmlTags
 
         public override void OnStart()
         {
-            if (ZetaDia.Me.IsInTown)
+            if (ZetaDia.IsInTown)
             {
                 _IsDone = true;
                 return;
@@ -71,7 +71,7 @@ namespace Trinity.XmlTags
                 new Decorator(ret => ZetaDia.IsLoadingWorld,
                     new Action()
                 ),
-                new Decorator(ret => ZetaDia.Me.IsInTown && !DataDictionary.ForceTownPortalLevelAreaIds.Contains(Trinity.Player.LevelAreaId),
+                new Decorator(ret => ZetaDia.IsInTown && !DataDictionary.ForceTownPortalLevelAreaIds.Contains(Trinity.Player.LevelAreaId),
                     new Action(ret =>
                     {
                         ForceClearArea = false;
@@ -79,7 +79,7 @@ namespace Trinity.XmlTags
                         _IsDone = true;
                     })
                 ),
-                new Decorator(ret => !ZetaDia.Me.IsInTown && !ZetaDia.Me.CanUseTownPortal(),
+                new Decorator(ret => !ZetaDia.IsInTown && !ZetaDia.Me.CanUseTownPortal(),
                     new Action(ret =>
                     {
                         ForceClearArea = false;

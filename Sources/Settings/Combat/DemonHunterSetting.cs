@@ -24,6 +24,7 @@ namespace Trinity.Config.Combat
         private float _AvoidDiabloMeteorHealth;
         private float _AvoidDiabloPrisonHealth;
         private float _AvoidDiabloRingOfFireHealth;
+        private float _AvoidFrozenPulseHealth;
         private float _AvoidGhomGasHealth;
         private float _AvoidGrotesqueHealth;
         private float _AvoidIceBallsHealth;
@@ -66,7 +67,7 @@ namespace Trinity.Config.Combat
 
         #region Properties
         [DataMember(IsRequired = false)]
-        [DefaultValue(0.7f)]
+        [DefaultValue(0.35f)]
         public float PotionLevel
         {
             get
@@ -403,6 +404,24 @@ namespace Trinity.Config.Combat
                 {
                     _AvoidShamanFireHealth = value;
                     OnPropertyChanged("AvoidShamanFireHealth");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(1f)]
+        public float AvoidFrozenPulseHealth
+        {
+            get
+            {
+                return _AvoidFrozenPulseHealth;
+            }
+            set
+            {
+                if (_AvoidFrozenPulseHealth != value)
+                {
+                    _AvoidFrozenPulseHealth = value;
+                    OnPropertyChanged("AvoidFrozenPulseHealth");
                 }
             }
         }

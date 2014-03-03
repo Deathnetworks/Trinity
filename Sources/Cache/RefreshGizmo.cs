@@ -4,7 +4,6 @@ using Trinity.Technicals;
 using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
-using Zeta.Game.Internals.Actors.Gizmos;
 
 namespace Trinity
 {
@@ -113,7 +112,7 @@ namespace Trinity
                     {
                         AddToCache = true;
 
-                        if (((GizmoDoor)c_diaObject).HasBeenOperated)
+                        if (c_diaObject is DiaGizmo && ((DiaGizmo)c_diaObject).HasBeenOperated)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "Door has been operated";
@@ -162,9 +161,9 @@ namespace Trinity
                             try
                             {
                                 DiaGizmo door = null;
-                                if (c_diaObject is GizmoDoor)
+                                if (c_diaObject is DiaGizmo)
                                 {
-                                    door = (GizmoDoor)c_diaObject;
+                                    door = (DiaGizmo)c_diaObject;
 
                                     if (door != null && door.IsGizmoDisabledByScript)
                                     {

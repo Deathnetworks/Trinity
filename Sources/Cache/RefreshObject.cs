@@ -227,7 +227,7 @@ namespace Trinity
                         HitPoints = c_HitPoints,
                         HitPointsPct = c_HitPointsPct,
                         Radius = c_Radius,
-                        MonsterStyle = c_unit_MonsterSize,
+                        MonsterSize = c_unit_MonsterSize,
                         IsEliteRareUnique = c_IsEliteRareUnique,
                         ForceLeapAgainst = c_ForceLeapAgainst,
                         HasDotDPS = c_HasDotDPS,
@@ -562,7 +562,7 @@ namespace Trinity
                     {
                         c_ObjectType = GObjectType.Player;
                     }
-                    else if (DataDictionary.ForceToItemOverrideIds.Contains(c_ActorSNO) || (c_diaObject is DiaItem))
+                    else if (DataDictionary.ForceToItemOverrideIds.Contains(c_ActorSNO) || (c_diaObject.ActorType == ActorType.Item))
                     {
                         using (new PerformanceLogger("RefreshCachedType.2"))
                         {
@@ -585,7 +585,7 @@ namespace Trinity
                     else if (DataDictionary.InteractWhiteListIds.Contains(c_ActorSNO))
                         c_ObjectType = GObjectType.Interactable;
 
-                    else if (c_diaObject is DiaGizmo && c_diaObject.ActorType == ActorType.Gizmo)
+                    else if (c_diaObject.ActorType == ActorType.Gizmo)
                     {
                         DiaGizmo c_diaGizmo;
                         c_diaGizmo = (DiaGizmo)c_diaObject;
@@ -674,7 +674,7 @@ namespace Trinity
                         //    break;
                         //}
 
-                        if (ForceVendorRunASAP || TownRun.TownRunTimerRunning())
+                        if (c_ObjectType != GObjectType.HealthGlobe && (ForceVendorRunASAP || TownRun.TownRunTimerRunning()))
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "IsTryingToTownPortal";
@@ -706,7 +706,7 @@ namespace Trinity
                         }
                     }
                 // Handle Globes
-                case GObjectType.Globe:
+                case GObjectType.HealthGlobe:
                     {
                         // Ignore it if it's not in range yet
                         if (c_CentreDistance > CurrentBotLootRange || c_CentreDistance > 60f)
@@ -1136,7 +1136,7 @@ namespace Trinity
                         }
                         break;
                     case GObjectType.Gold:
-                    case GObjectType.Globe:
+                    case GObjectType.HealthGlobe:
                         // Gold/Globes at 11+ z-height difference
                         if (c_ZDiff >= 11f)
                         {

@@ -8,7 +8,9 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
-            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="..\Template.xaml"/></ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="..\Template.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
             <ut:FlagsEnumValueConverter x:Key="flagsEnumValueConverter"/>
             <ut:EnumVisibilityConverter x:Key="enumVisibilityConverter" />
@@ -279,13 +281,13 @@
                         <ComboBoxItem Content="62+" Tag="62" />
                         <ComboBoxItem Content="63+" Tag="63" />
                     </ComboBox>
-                    
+
                 </Grid>
             </Grid>
             <UniformGrid Columns="2" Grid.Row="5" Margin="5">
                 <CheckBox Content="Ignore Two Handed Weapons" IsChecked="{Binding Path=Pickup.IgnoreTwoHandedWeapons}" />
                 <TextBlock Text="" />
-                
+
                 <CheckBox Content="Ignore Legendary in AoE" ToolTip="Ignore Legendary Items in AoE" IsChecked="{Binding Path=Pickup.IgnoreLegendaryInAoE}" />
                 <CheckBox Content="Ignore Non-Legendary in AoE" ToolTip="Includes all non-legendaries" IsChecked="{Binding Path=Pickup.IgnoreNonLegendaryInAoE}" />
 
@@ -335,12 +337,15 @@
                     <ColumnDefinition Width="2*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock FontWeight="Bold" Margin="5" Text="Potion Cap:"/>
-                <ComboBox Grid.Row="0" Grid.Column="1" SelectedValuePath="Tag" Margin="5" SelectedValue="{Binding Path=Pickup.PotionMode}">
-                    <ComboBoxItem Content="Ignore All" IsSelected="True" Tag="Ignore" />
-                    <ComboBoxItem Content="Cap At 100" Tag="Cap" />
-                    <ComboBoxItem Content="Pickup All" Tag="All" />
+                <ComboBox Grid.Row="0" Grid.Column="1" SelectedValuePath="Tag" Margin="5" SelectedValue="{Binding Path=Pickup.PotionCount}">
+                    <ComboBoxItem Content="0" Tag="0" />
+                    <ComboBoxItem Content="25" Tag="25" />
+                    <ComboBoxItem Content="50" Tag="50" />
+                    <ComboBoxItem Content="98" IsSelected="True" Tag="98" />
+                    <ComboBoxItem Content="198" Tag="198" />
+                    <ComboBoxItem Content="Pickup All" Tag="6000" />
                 </ComboBox>
-                <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" Margin="5" Text="Potion Types:"/>
+                <!--<TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" Margin="5" Text="Potion Types:"/>
                 <ComboBox Grid.Row="1" Grid.Column="1" SelectedValuePath="Tag" Margin="5" SelectedValue="{Binding Path=Pickup.PotionLevel, Converter={StaticResource intToStringConverter}}">
                     <ComboBoxItem Content="Minor+" Tag="1" />
                     <ComboBoxItem Content="Lesser+" Tag="10" />
@@ -352,8 +357,8 @@
                     <ComboBoxItem Content="Resplendent+" Tag="50" />
                     <ComboBoxItem Content="Runic+" Tag="55" />
                     <ComboBoxItem Content="Mythic+" IsSelected="True" Tag="60" />
-                </ComboBox>
-                <TextBlock Grid.Row="0" Grid.Column="2" FontWeight="Bold" Text="Minimum Gold Pile:"/>
+                </ComboBox>-->
+                <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" Text="Minimum Gold Pile:"/>
                 <Slider Grid.Row="1" Grid.Column="2" Template="{DynamicResource Slider}"
                         Interval="500" Maximum="4000" Minimum="0" SmallChange="10" LargeChange="100"
                         TickFrequency="100" TickPlacement="BottomRight" IsSnapToTickEnabled="True"
@@ -397,7 +402,7 @@
             <!--Reset Buttons -->
             <UniformGrid Grid.Row="9" Margin="5" HorizontalAlignment="Center" VerticalAlignment="Bottom" Rows="1">
                 <Button Margin="5" Grid.Column="0" HorizontalAlignment="Stretch" Command="{Binding ConfigureLootToQuesting}">Set Questing</Button>
-                <Button Margin="5" Grid.Column="1" HorizontalAlignment="Stretch" Command="{Binding ConfigureLootToHunting}">Set Champion Hunting </Button>
+                <Button Margin="5" Grid.Column="1" HorizontalAlignment="Stretch" Command="{Binding ConfigureLootToHunting}">Set Champion Hunting</Button>
             </UniformGrid>
             <!--Reset Buttons -->
             <Grid Grid.Row="10" Margin="5" HorizontalAlignment="Center">

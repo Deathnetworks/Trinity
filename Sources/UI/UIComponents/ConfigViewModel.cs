@@ -669,8 +669,7 @@ namespace Trinity.UIComponents
             _Model.Loot.Pickup.FollowerItem = true;
             _Model.Loot.Pickup.MinimumGoldStack = 0;
             _Model.Loot.Pickup.MiscItemLevel = 1;
-            _Model.Loot.Pickup.PotionLevel = 1;
-            _Model.Loot.Pickup.PotionMode = PotionMode.Cap;
+            _Model.Loot.Pickup.PotionCount = 98;
             _Model.Loot.Pickup.Plans = true;
             _Model.Loot.Pickup.CraftTomes = true;
             _Model.Loot.Pickup.PickupLowLevel = true;
@@ -690,10 +689,9 @@ namespace Trinity.UIComponents
             _Model.Loot.Pickup.GemLevel = 60;
             _Model.Loot.Pickup.GemType = TrinityGemType.None;
             _Model.Loot.Pickup.FollowerItem = false;
-            _Model.Loot.Pickup.MinimumGoldStack = 1500;
+            _Model.Loot.Pickup.MinimumGoldStack = 900;
             _Model.Loot.Pickup.MiscItemLevel = 60;
-            _Model.Loot.Pickup.PotionLevel = 60;
-            _Model.Loot.Pickup.PotionMode = PotionMode.Cap;
+            _Model.Loot.Pickup.PotionCount = 98;
             _Model.Loot.Pickup.Plans = false;
             _Model.Loot.Pickup.CraftTomes = false;
             _Model.Loot.Pickup.PickupLowLevel = false;

@@ -63,12 +63,12 @@ namespace Trinity
         internal static void VendorRunPulseCheck()
         {
             // If we're in town and vendoring
-            if (ZetaDia.Me.IsInTown && BrainBehavior.IsVendoring)
+            if (ZetaDia.IsInTown && BrainBehavior.IsVendoring)
             {
                 WasVendoring = true;
                 Trinity.ForceVendorRunASAP = true;
             }
-            if (!ZetaDia.Me.IsInTown && !BrainBehavior.IsVendoring && WasVendoring)
+            if (!ZetaDia.IsInTown && !BrainBehavior.IsVendoring && WasVendoring)
             {
 
             }
@@ -103,7 +103,7 @@ namespace Trinity
                 if (DataDictionary.BossLevelAreaIDs.Contains(Trinity.Player.LevelAreaId))
                     return false;
 
-                if (ZetaDia.Me.IsInTown && DbProvider.DeathHandler.EquipmentNeedsEmergencyRepair())
+                if (ZetaDia.IsInTown && DbProvider.DeathHandler.EquipmentNeedsEmergencyRepair())
                 {
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "EquipmentNeedsEmergencyRepair!");
                     return true;
@@ -195,7 +195,7 @@ namespace Trinity
                 if (Trinity.IsReadyToTownRun && !(BrainBehavior.IsVendoring || Trinity.Player.IsInTown))
                 {
                     string cantUseTPreason;
-                    if (!ZetaDia.Me.CanUseTownPortal(out cantUseTPreason) && !ZetaDia.Me.IsInTown)
+                    if (!ZetaDia.Me.CanUseTownPortal(out cantUseTPreason) && !ZetaDia.IsInTown)
                     {
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "It appears we need to town run but can't: {0}", cantUseTPreason);
                         Trinity.IsReadyToTownRun = false;
@@ -240,7 +240,7 @@ namespace Trinity
 
         internal static bool TownRunTimerFinished()
         {
-            return ZetaDia.Me.IsInTown || (TownRunCheckTimer.IsRunning && TownRunCheckTimer.ElapsedMilliseconds > 2000);
+            return ZetaDia.IsInTown || (TownRunCheckTimer.IsRunning && TownRunCheckTimer.ElapsedMilliseconds > 2000);
         }
 
         internal static bool TownRunTimerRunning()

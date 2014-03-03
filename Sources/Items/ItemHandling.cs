@@ -130,25 +130,12 @@ namespace Trinity
                     // Potion filtering
                     if (itemType == GItemType.HealthPotion)
                     {
-                        if (Settings.Loot.Pickup.PotionMode == PotionMode.Ignore || item.Level < Settings.Loot.Pickup.PotionLevel)
-                        {
+                        int potionsInBackPack = ZetaDia.Me.Inventory.Backpack.Count(p => p.Name.ToLower().Contains("potion"));
+
+                        if (potionsInBackPack >= Settings.Loot.Pickup.PotionCount)
                             return false;
-                        }
-                        if (Settings.Loot.Pickup.PotionMode == PotionMode.Cap)
-                        {
-                            // Map out all the items already in the backpack
-                            int iTotalPotions =
-                                (from tempitem in Zeta.Game.ZetaDia.Me.Inventory.Backpack
-                                 where tempitem.BaseAddress != IntPtr.Zero &&
-                                 tempitem.GameBalanceId == item.BalanceID
-                                 select tempitem.ItemStackQuantity).Sum();
-                            if (iTotalPotions > 98)
-                            {
-                                return false;
-                            }
-                        }
-                        // if we're picking up all
-                        return true;
+                        else
+                            return true;
                     }
                     break;
                 case GItemBaseType.HealthGlobe:
@@ -329,6 +316,7 @@ namespace Trinity
             if (name.StartsWith("dye_")) return GItemType.Dye;
             if (name.StartsWith("a1_")) return GItemType.SpecialItem;
             if (name.StartsWith("healthglobe")) return GItemType.HealthGlobe;
+            if (name.Equals("console_powerglobe")) return GItemType.PowerGlobe;
 
             // Follower item types
             if (name.StartsWith("jewelbox_") || dbItemType == ItemType.FollowerSpecial)
@@ -438,7 +426,7 @@ namespace Trinity
             }
             else if (itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome ||
                 itemType == GItemType.SpecialItem || itemType == GItemType.CraftingPlan || itemType == GItemType.HealthPotion ||
-                itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey)
+                itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey || itemType == GItemType.PowerGlobe)
             {
                 itemBaseType = GItemBaseType.Misc;
             }
@@ -1011,7 +999,7 @@ namespace Trinity
             double ratioCellsFilled = cellsFilled / maxCells;
 
             // return true if we're already in town and backpack is 1/2 full
-            if (ratioCellsFilled > .5 && ZetaDia.Me.IsInTown)
+            if (ratioCellsFilled > .5 && ZetaDia.IsInTown)
                 return true;
 
             return false;

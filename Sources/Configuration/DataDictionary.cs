@@ -96,13 +96,16 @@ namespace Trinity
             226350, 226525,
             250031, // Mortar MonsterAffix_Mortar_Pending
 
+            340319, // x1_MonsterAffix_CorpseBomber_bomb_start (340319)
+
             84608, // Desecrator monsterAffix_Desecrator_damage_AOE
             84606, // Desecrator monsterAffix_Desecrator_telegraph
 
             337109, // Wormhole X1_MonsterAffix_TeleportMines
             4394, // Orbiter g_ChargedBolt_Projectile 
-            349774, // Pulse x1_MonsterAffix_frozenPulse_monster
+            349774, // FrozenPulse x1_MonsterAffix_frozenPulse_monster
             341512, // Thunderstorm x1_MonsterAffix_Thunderstorm_Impact
+            // PoisonEnchanted ??
         };
 
         /// <summary>

@@ -14,6 +14,15 @@ namespace Trinity
         private const ulong genericOKHash = 0x891D21408238D18E;
         private const ulong partyLeaderBossAcceptHash = 0x69B3F61C0F8490B0;
         private const ulong partyFollowerBossAcceptHash = 0xF495983BA9BE450F;
+        private const ulong potionButtonHash = 0xE1F43DD874E42728;
+
+        public static UIElement PotionButton
+        {
+            get
+            {
+                return UIElement.FromHash(potionButtonHash);
+            }
+        }
 
         //private static UIElement _confirmTimedDungeonOK;
         //public static UIElement ConfirmTimedDungeonOK { get { try { return _confirmTimedDungeonOK ?? (_confirmTimedDungeonOK = UIElement.FromHash(confirmTimedDungeonOKHash)); } catch { return null; } } }

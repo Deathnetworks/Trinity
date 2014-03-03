@@ -47,103 +47,72 @@ namespace Trinity
             {
                 case AvoidanceType.Arcane:
                     return Trinity.Settings.Combat.AvoidanceRadius.Arcane;
-
                 case AvoidanceType.AzmodanBody:
                     return Trinity.Settings.Combat.AvoidanceRadius.AzmoBodies;
-
                 case AvoidanceType.AzmoFireball:
                     return Trinity.Settings.Combat.AvoidanceRadius.AzmoFireBall;
-
                 case AvoidanceType.AzmodanPool:
                     return Trinity.Settings.Combat.AvoidanceRadius.AzmoPools;
-
                 case AvoidanceType.BeastCharge:
                     return 1;
-
                 case AvoidanceType.BeeWasp:
                     return Trinity.Settings.Combat.AvoidanceRadius.BeesWasps;
-
                 case AvoidanceType.Belial:
                     return Trinity.Settings.Combat.AvoidanceRadius.Belial;
-
                 case AvoidanceType.ButcherFloorPanel:
                     return Trinity.Settings.Combat.AvoidanceRadius.ButcherFloorPanel;
-
                 case AvoidanceType.Desecrator:
                     return Trinity.Settings.Combat.AvoidanceRadius.Desecrator;
-
                 case AvoidanceType.DiabloMeteor:
                     return Trinity.Settings.Combat.AvoidanceRadius.DiabloMeteor;
-
                 case AvoidanceType.DiabloPrison:
                     return Trinity.Settings.Combat.AvoidanceRadius.DiabloPrison;
-
                 case AvoidanceType.DiabloRingOfFire:
                     return Trinity.Settings.Combat.AvoidanceRadius.DiabloRingOfFire;
-
                 case AvoidanceType.FireChains:
                     return 1;
-
+                case AvoidanceType.FrozenPulse:
+                    return Trinity.Settings.Combat.AvoidanceRadius.FrozenPulse;
                 case AvoidanceType.GhomGas:
                     return Trinity.Settings.Combat.AvoidanceRadius.GhomGas;
-
                 case AvoidanceType.Grotesque:
                     return Trinity.Settings.Combat.AvoidanceRadius.Grotesque;
-
                 case AvoidanceType.IceBall:
                     return Trinity.Settings.Combat.AvoidanceRadius.IceBalls;
-
                 case AvoidanceType.IceTrail:
                     return Trinity.Settings.Combat.AvoidanceRadius.IceTrail;
-
                 case AvoidanceType.Orbiter:
                     return Trinity.Settings.Combat.AvoidanceRadius.Orbiter;
-
                 case AvoidanceType.MageFire:
                     return Trinity.Settings.Combat.AvoidanceRadius.MageFire;
-
                 case AvoidanceType.MaghdaProjectille:
                     return Trinity.Settings.Combat.AvoidanceRadius.MaghdaProjectille;
-
                 case AvoidanceType.MoltenCore:
                     return Trinity.Settings.Combat.AvoidanceRadius.MoltenCore;
-
                 case AvoidanceType.MoltenTrail:
                     return Trinity.Settings.Combat.AvoidanceRadius.MoltenTrail;
-
                 case AvoidanceType.MoltenBall:
                     return Trinity.Settings.Combat.AvoidanceRadius.MoltenBall;
-
                 case AvoidanceType.PlagueCloud:
                     return Trinity.Settings.Combat.AvoidanceRadius.PlagueCloud;
-
                 case AvoidanceType.PlagueHand:
                     return Trinity.Settings.Combat.AvoidanceRadius.PlagueHands;
-
                 case AvoidanceType.PoisonTree:
                     return Trinity.Settings.Combat.AvoidanceRadius.PoisonTree;
-
                 case AvoidanceType.PoisonEnchanted:
                     return Trinity.Settings.Combat.AvoidanceRadius.PoisonEnchanted;
-
                 case AvoidanceType.SuccubusStar:
                     return Trinity.Settings.Combat.AvoidanceRadius.SuccubusStar;
-
                 case AvoidanceType.ShamanFire:
                     return Trinity.Settings.Combat.AvoidanceRadius.ShamanFire;
-
                 case AvoidanceType.Thunderstorm:
                     return Trinity.Settings.Combat.AvoidanceRadius.Thunderstorm;
-
                 case AvoidanceType.Wormhole:
                     return Trinity.Settings.Combat.AvoidanceRadius.Wormhole;
-
                 case AvoidanceType.ZoltBubble:
                     return Trinity.Settings.Combat.AvoidanceRadius.ZoltBubble;
-
                 case AvoidanceType.ZoltTwister:
                     return Trinity.Settings.Combat.AvoidanceRadius.ZoltTwister;
-
                 default:
                     {
                         Logger.Log(TrinityLogLevel.Error, LogCategory.Avoidance, "Unknown Avoidance type in Radius Switch! {0}", type.ToString());
@@ -220,6 +189,8 @@ namespace Trinity
                         return avoidanceHealth.AvoidDiabloRingOfFireHealth;
                     case AvoidanceType.FireChains:
                         return 0.8f;
+                    case AvoidanceType.FrozenPulse:
+                        return avoidanceHealth.AvoidFrozenPulseHealth;
                     case AvoidanceType.GhomGas:
                         return avoidanceHealth.AvoidGhomGasHealth;
                     case AvoidanceType.Grotesque:

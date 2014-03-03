@@ -97,9 +97,9 @@ namespace Trinity
             GItemBaseType itemBaseType = DetermineBaseType(c_item_GItemType);
 
             // Treat all globes as a yes
-            if (c_item_GItemType == GItemType.HealthGlobe)
+            if (c_item_GItemType == GItemType.HealthGlobe || c_item_GItemType == GItemType.PowerGlobe)
             {
-                c_ObjectType = GObjectType.Globe;
+                c_ObjectType = GObjectType.HealthGlobe;
                 // Create or alter this cached object type
                 objectTypeCache[c_RActorGuid] = c_ObjectType;
                 AddToCache = true;

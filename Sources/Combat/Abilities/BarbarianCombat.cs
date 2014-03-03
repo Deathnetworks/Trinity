@@ -645,7 +645,7 @@ namespace Trinity.Combat.Abilities
                     bool hotaElites = (CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin) && !TargetUtil.AnyMobsInRange(10f, 3, false);
 
                     bool hotaTrash = CombatBase.IgnoringElites && CurrentTarget.IsTrashMob &&
-                        (Trinity.ObjectCache.Count(u => u.Position.Distance(CurrentTarget.Position) <= 6f) >= 3 || CurrentTarget.MonsterStyle == Zeta.Game.Internals.SNO.MonsterSize.Big);
+                        (Trinity.ObjectCache.Count(u => u.Position.Distance(CurrentTarget.Position) <= 6f) >= 3 || CurrentTarget.MonsterSize == Zeta.Game.Internals.SNO.MonsterSize.Big);
 
                     return canUseHota && (hotaElites || hotaTrash);
                 }

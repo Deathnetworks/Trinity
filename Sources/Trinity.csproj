@@ -110,8 +110,8 @@
     <Compile Include="Cache\GenericBlacklist.cs" />
     <Compile Include="Cache\GenericCache.cs" />
     <Compile Include="Cache\PickupItem.cs" />
-    <Compile Include="Cache\RefreshCachedItem.cs" />
-    <Compile Include="Cache\RefreshCachedUnit.cs" />
+    <Compile Include="Cache\RefreshItem.cs" />
+    <Compile Include="Cache\RefreshUnit.cs" />
     <Compile Include="Cache\TrinityItemQuality.cs" />
     <Compile Include="Cache\CacheObstacleObject.cs" />
     <Compile Include="Combat\TrinityPower.cs" />
@@ -203,8 +203,8 @@
     <Compile Include="Configuration\DataDictionary.cs" />
     <Compile Include="Movement\StuckHandler.cs" />
     <Compile Include="Movement\PlayerMover.cs" />
-    <Compile Include="Cache\RefreshDiaObject.cs" />
-    <Compile Include="Cache\RefreshDiaObjects.cs" />
+    <Compile Include="Cache\RefreshObject.cs" />
+    <Compile Include="Cache\RefreshObjects.cs" />
     <Compile Include="XmlTags\BaseComplexNodeTag.cs" />
     <Compile Include="XmlTags\TrinityCombatIgnore.cs" />
     <Compile Include="XmlTags\TrinityMoveToScene.cs" />

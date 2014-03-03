@@ -26,7 +26,6 @@ namespace Trinity
         public int DynamicID { get; set; }
         public int BalanceID { get; set; }
         public int ActorSNO { get; set; }
-        // Item/gold/other stuff
         public int ItemLevel { get; set; }
         public string ItemLink { get; set; }
         public int GoldAmount { get; set; }
@@ -37,49 +36,37 @@ namespace Trinity
         public ItemType DBItemType { get; set; }
         public FollowerType FollowerType { get; set; }
         public GItemType TrinityItemType { get; set; }
-        // Monster/unit stuff
         public bool IsElite { get; set; }
         public bool IsRare { get; set; }
         public bool IsUnique { get; set; }
         public bool IsMinion { get; set; }
+        public MonsterAffixes MonsterAffixes { get; set; }
         public bool IsTreasureGoblin { get; set; }
         public bool IsEliteRareUnique { get; set; }
         public bool IsBoss { get; set; }
         public bool HasAffixShielded { get; set; }
-        public bool IsBossOrEliteRareUnique { get { return (this.Type == GObjectType.Unit && (IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
-        public bool IsTrashMob { get { return (this.Type == GObjectType.Unit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         public bool IsAttackable { get; set; }
         public bool HasDotDPS { get; set; }
-        public bool IsMe { get { return RActorGuid == Trinity.Player.RActorGuid; } }
-        /// <summary>
-        /// Percentage hit points
-        /// </summary>
         public double HitPointsPct { get; set; }
         public double HitPoints { get; set; }
         public float Radius { get; set; }
         public float Rotation { get; set; }
         public bool IsFacingPlayer { get; set; }
         public bool ForceLeapAgainst { get; set; }
-
         public bool HasBeenPrimaryTarget { get; set; }
         public int TimesBeenPrimaryTarget { get; set; }
         public DateTime FirstTargetAssignmentTime { get; set; }
-
-        /// <summary>
-        /// If the object has ever been navigable
-        /// </summary>
+        public DiaObject DiaObject { get; set; }
+        public string ObjectHash { get; set; }
+        public double KillRange { get; set; }
+        public MonsterSize MonsterSize { get; set; }
         public bool HasBeenNavigable { get; set; }
-        /// <summary>
-        /// If the object has ever had RayCast AllowWalk
-        /// </summary>
         public bool HasBeenRaycastable { get; set; }
-        /// <summary>
-        /// If the object has ever been in Line of Sight
-        /// </summary>
         public bool HasBeenInLoS { get; set; }
+        public bool IsBossOrEliteRareUnique { get { return (this.Type == GObjectType.Unit && (IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
+        public bool IsTrashMob { get { return (this.Type == GObjectType.Unit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
+        public bool IsMe { get { return RActorGuid == Trinity.Player.RActorGuid; } }
 
-        public MonsterSize MonsterStyle { get; set; }
-        // A reference to the original object for fast updates
         public DiaUnit Unit
         {
             get
@@ -88,9 +75,14 @@ namespace Trinity
             }
 
         }
-        public DiaObject DiaObject { get; set; }
-        public string ObjectHash { get; set; }
-        public double KillRange { get; set; }
+        public DiaGizmo Gizmo
+        {
+            get
+            {
+                return ZetaDia.Actors.GetActorsOfType<DiaGizmo>(true, true).Where(u => u.RActorGuid == this.RActorGuid).FirstOrDefault();
+            }
+
+        }
         public bool IsStandingInAvoidance
         {
             get
@@ -106,7 +98,6 @@ namespace Trinity
                 return AvoidanceManager.GetAvoidanceType(this.ActorSNO);
             }
         }
-        public MonsterAffixes MonsterAffixes { get; set; }
 
         public TrinityCacheObject(DiaObject _DiaObject = null)
         {
@@ -149,7 +140,7 @@ namespace Trinity
                 HitPointsPct = HitPointsPct,
                 HitPoints = HitPoints,
                 Radius = Radius,
-                MonsterStyle = MonsterStyle,
+                MonsterSize = MonsterSize,
                 ForceLeapAgainst = ForceLeapAgainst,
                 ObjectHash = ObjectHash,
                 HasBeenInLoS = HasBeenInLoS,

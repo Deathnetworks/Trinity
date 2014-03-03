@@ -33,7 +33,7 @@ namespace Trinity
                 }
 
                 // We keep dying because we're spawning in AoE and next to 50 elites and we need to just leave the game
-                if (DateTime.Now.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 && ZetaDia.Me.Inventory.Equipped.Average(i => i.DurabilityPercent) < 0.05 && !ZetaDia.Me.IsInTown)
+                if (DateTime.Now.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 && ZetaDia.Me.Inventory.Equipped.Average(i => i.DurabilityPercent) < 0.05 && !ZetaDia.IsInTown)
                 {
                     Logger.Log("Durability is zero, emergency leave game");
                     ZetaDia.Service.Party.LeaveGame(false);
@@ -137,7 +137,8 @@ namespace Trinity
                         {
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
                             WaitWhileAnimating(3, true);
-                            UIManager.UsePotion();
+                            //UIManager.UsePotion();
+                            GameUI.SafeClickElement(GameUI.PotionButton, "Use Potion", false);
 
                             AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
                             WaitWhileAnimating(2, true);

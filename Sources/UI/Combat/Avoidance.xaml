@@ -132,6 +132,27 @@
                             Value="{Binding Path=AvoidDesecratorHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
+            <!-- FrozenPulse -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="2" Text="Orbiter" FontWeight="Bold" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                            Interval="500" Maximum="30" Minimum="2" 
+                            SmallChange="1" LargeChange="5"
+                            TickPlacement="None" IsMoveToPointEnabled="True"
+                            Value="{Binding Path=DataContext.Avoid.FrozenPulse, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
+                            HorizontalAlignment="Stretch" Margin="2"/>
+                <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
+                            Interval="500" Maximum="100" Minimum="0" 
+                            SmallChange="1" LargeChange="5"
+                            TickPlacement="None" IsMoveToPointEnabled="True"
+                            Value="{Binding Path=AvoidFrozenPulseHealth, Converter={StaticResource percentConverter}}" 
+                            HorizontalAlignment="Stretch" Margin="2"/>
+            </Grid>
             <!-- GhomGas -->
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -195,6 +216,27 @@
                             Value="{Binding Path=AvoidIceBallsHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
+            <!-- Orbiter -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="2" Text="Orbiter" FontWeight="Bold" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                            Interval="500" Maximum="30" Minimum="2" 
+                            SmallChange="1" LargeChange="5"
+                            TickPlacement="None" IsMoveToPointEnabled="True"
+                            Value="{Binding Path=DataContext.Avoid.Orbiter, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
+                            HorizontalAlignment="Stretch" Margin="2"/>
+                <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
+                            Interval="500" Maximum="100" Minimum="0" 
+                            SmallChange="1" LargeChange="5"
+                            TickPlacement="None" IsMoveToPointEnabled="True"
+                            Value="{Binding Path=AvoidOrbiterHealth, Converter={StaticResource percentConverter}}" 
+                            HorizontalAlignment="Stretch" Margin="2"/>
+            </Grid>
             <!-- MoltenCore -->
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -235,6 +277,27 @@
                             SmallChange="1" LargeChange="5"
                             TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidMoltenTrailHealth, Converter={StaticResource percentConverter}}" 
+                            HorizontalAlignment="Stretch" Margin="2"/>
+            </Grid>
+            <!-- PoisonEnchanted -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="2" Text="Poison Enchanted" FontWeight="Bold" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                            Interval="500" Maximum="30" Minimum="2" 
+                            SmallChange="1" LargeChange="5"
+                            TickPlacement="None" IsMoveToPointEnabled="True"
+                            Value="{Binding Path=DataContext.Avoid.PoisonEnchanted, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
+                            HorizontalAlignment="Stretch" Margin="2"/>
+                <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
+                            Interval="500" Maximum="100" Minimum="0" 
+                            SmallChange="1" LargeChange="5"
+                            TickPlacement="None" IsMoveToPointEnabled="True"
+                            Value="{Binding Path=AvoidPoisonEnchantedHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
             <!-- PoisonTree -->
@@ -361,6 +424,27 @@
                             SmallChange="1" LargeChange="5"
                             TickPlacement="None" IsMoveToPointEnabled="True"
                             Value="{Binding Path=AvoidWormholeHealth, Converter={StaticResource percentConverter}}" 
+                            HorizontalAlignment="Stretch" Margin="2"/>
+            </Grid>
+            <!-- Thunderstorm -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="2" Text="Thunderstorm" FontWeight="Bold" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                            Interval="500" Maximum="30" Minimum="2" 
+                            SmallChange="1" LargeChange="5"
+                            TickPlacement="None" IsMoveToPointEnabled="True"
+                            Value="{Binding Path=DataContext.Avoid.Thunderstorm, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl, AncestorLevel=2}}" 
+                            HorizontalAlignment="Stretch" Margin="2"/>
+                <Slider Grid.Column="2" Template="{DynamicResource Slider}" 
+                            Interval="500" Maximum="100" Minimum="0" 
+                            SmallChange="1" LargeChange="5"
+                            TickPlacement="None" IsMoveToPointEnabled="True"
+                            Value="{Binding Path=AvoidThunderstormHealth, Converter={StaticResource percentConverter}}" 
                             HorizontalAlignment="Stretch" Margin="2"/>
             </Grid>
         </StackPanel>

@@ -9,13 +9,6 @@ namespace Trinity.Config.Loot
         All = 2
     }
 
-    public enum PotionMode
-    {
-        All = 1,
-        Cap = 2,
-        Ignore = 3
-    }
-
     public enum ItemRuleType
     {
         Config,

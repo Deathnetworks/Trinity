@@ -34,7 +34,7 @@ namespace Trinity
                                   m.Weight > 0 &&
                                   m.RadiusDistance <= PlayerKiteDistance &&
                                   (m.IsBossOrEliteRareUnique ||
-                                   ((m.HitPointsPct >= .15 || m.MonsterStyle != MonsterSize.Swarm) && !m.IsBossOrEliteRareUnique)
+                                   ((m.HitPointsPct >= .15 || m.MonsterSize != MonsterSize.Swarm) && !m.IsBossOrEliteRareUnique)
                                    )
                                   select m;
 

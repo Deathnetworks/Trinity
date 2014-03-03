@@ -18,6 +18,7 @@ namespace Trinity.Config.Combat
         private int _DiabloMeteor;
         private int _DiabloPrison;
         private int _DiabloRingOfFire;
+        private int _FrozenPulse;
         private int _GhomGas;
         private int _Grotesque;
         private int _IceBalls;
@@ -259,6 +260,24 @@ namespace Trinity.Config.Combat
 
         [DataMember(IsRequired = false)]
         [DefaultValue(25)]
+        public int FrozenPulse
+        {
+            get
+            {
+                return _FrozenPulse;
+            }
+            set
+            {
+                if (_FrozenPulse != value)
+                {
+                    _FrozenPulse = value;
+                    OnPropertyChanged("FrozenPulse");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(25)]
         public int GhomGas
         {
             get
@@ -330,7 +349,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(6)]
+        [DefaultValue(15)]
         public int Orbiter
         {
             get
@@ -581,7 +600,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(15)]
+        [DefaultValue(20)]
         public int Wormhole
         {
             get

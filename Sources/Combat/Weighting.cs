@@ -220,7 +220,7 @@ namespace Trinity
 
                                         // Give extra weight to ranged enemies
                                         if ((Player.ActorClass == ActorClass.Barbarian || Player.ActorClass == ActorClass.Monk) &&
-                                            (cacheObject.MonsterStyle == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(c_ActorSNO)))
+                                            (cacheObject.MonsterSize == MonsterSize.Ranged || DataDictionary.RangedMonsterIds.Contains(c_ActorSNO)))
                                         {
                                             cacheObject.Weight += 1100d;
                                             cacheObject.ForceLeapAgainst = true;
@@ -488,7 +488,7 @@ namespace Trinity
                                 }
                                 break;
                             }
-                        case GObjectType.Globe:
+                        case GObjectType.HealthGlobe:
                             {
                                 // Calculate a spot reaching a little bit further out from the globe, to help globe-movements
                                 if (cacheObject.Weight > 0)

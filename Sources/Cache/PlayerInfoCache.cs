@@ -123,7 +123,7 @@ namespace Trinity
                     Player.ACDGuid = me.ACDGuid;
                     Player.RActorGuid = me.RActorGuid;
                     Player.LastUpdated = DateTime.Now;
-                    Player.IsInTown = me.IsInTown;
+                    Player.IsInTown = ZetaDia.IsInTown;
                     Player.IsDead = me.IsDead;
                     Player.IsInGame = ZetaDia.IsInGame;
                     Player.IsLoadingWorld = ZetaDia.IsLoadingWorld;
@@ -145,7 +145,6 @@ namespace Trinity
                         Player.WaitingForReserveEnergy = false;
                     if (Player.PrimaryResource < 20)
                         Player.WaitingForReserveEnergy = true;
-
 
                     Player.MyDynamicID = me.CommonData.DynamicId;
                     Player.Level = me.Level;

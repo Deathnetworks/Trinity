@@ -450,7 +450,7 @@ namespace Trinity
                                     }
                                 // * Gold & Globe - need to get within pickup radius only
                                 case GObjectType.Gold:
-                                case GObjectType.Globe:
+                                case GObjectType.HealthGlobe:
                                     {
                                         // Count how many times we've tried interacting
                                         if (!interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
@@ -742,7 +742,7 @@ namespace Trinity
 
                         // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||
-                            CurrentTarget.Type == GObjectType.Globe ||
+                            CurrentTarget.Type == GObjectType.HealthGlobe ||
                             Monk_SpecialMovement ||
                             (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
                             && NavHelper.CanRayCast(Player.Position, vCurrentDestination)
@@ -1071,7 +1071,8 @@ namespace Trinity
                         {
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
                             WaitWhileAnimating(3, true);
-                            UIManager.UsePotion();
+                            //UIManager.UsePotion();
+                            GameUI.SafeClickElement(GameUI.PotionButton, "Use Potion", false);
 
                             AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
                             WaitWhileAnimating(2, true);
@@ -1267,7 +1268,7 @@ namespace Trinity
                     break;
                 case GObjectType.Item:
                 case GObjectType.Gold:
-                case GObjectType.Globe:
+                case GObjectType.HealthGlobe:
                     statusText.Append("Pickup ");
                     break;
                 case GObjectType.Backtrack:
@@ -1438,7 +1439,7 @@ namespace Trinity
                             break;
                         }
                     // * Globes - need to get within pickup radius only
-                    case GObjectType.Globe:
+                    case GObjectType.HealthGlobe:
                         {
                             TargetRangeRequired = Player.GoldPickupRadius;
                             if (TargetRangeRequired < 2f)

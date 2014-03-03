@@ -382,6 +382,10 @@ namespace Trinity.XmlTags
 
             CheckResetDungeonExplorer();
 
+            GridSegmentation.Reset();
+            BrainBehavior.DungeonExplorer.Reset();
+            MiniMapMarker.KnownMarkers.Clear();
+
             if (!InitDone)
             {
                 Init();
@@ -1322,9 +1326,6 @@ namespace Trinity.XmlTags
         {
             isDone = false;
             InitDone = false;
-            GridSegmentation.Reset();
-            BrainBehavior.DungeonExplorer.Reset();
-            MiniMapMarker.KnownMarkers.Clear();
         }
     }
 }

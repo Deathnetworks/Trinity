@@ -14,6 +14,7 @@ namespace Trinity.Config.Combat
         float AvoidDiabloMeteorHealth { get; set; }
         float AvoidDiabloPrisonHealth { get; set; }
         float AvoidDiabloRingOfFireHealth { get; set; }
+        float AvoidFrozenPulseHealth { get; set; }
         float AvoidGhomGasHealth { get; set; }
         float AvoidGrotesqueHealth { get; set; }
         float AvoidIceBallsHealth { get; set; }

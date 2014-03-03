@@ -70,7 +70,7 @@ namespace Trinity.DbProvider
         public static bool UnstuckChecker(Vector3 vMyCurrentPosition, int checkDuration = 3000)
         {
             // set checkDuration to 30 sec while in town or vendoring, just to avoid annoyances
-            if (ZetaDia.Me.IsInTown || Trinity.ForceVendorRunASAP || Zeta.Bot.Logic.BrainBehavior.IsVendoring)
+            if (ZetaDia.IsInTown || Trinity.ForceVendorRunASAP || Zeta.Bot.Logic.BrainBehavior.IsVendoring)
             {
                 checkDuration = 15000;
             }
@@ -78,7 +78,7 @@ namespace Trinity.DbProvider
             // Keep checking distance changes every 3 seconds
             if (DateTime.Now.Subtract(TimeLastRecordedPosition).TotalMilliseconds >= checkDuration)
             {
-                if (ZetaDia.Me.IsInTown && (UIElements.VendorWindow.IsVisible || UIElements.SalvageWindow.IsVisible))
+                if (ZetaDia.IsInTown && (UIElements.VendorWindow.IsVisible || UIElements.SalvageWindow.IsVisible))
                 {
                     UnStuckCheckerLastResult = false;
                     return UnStuckCheckerLastResult;
@@ -260,7 +260,7 @@ namespace Trinity.DbProvider
                 Trinity.ResetEverythingNewGame();
                 ZetaDia.Service.Party.LeaveGame();
                 // Wait for 10 second log out timer if not in town
-                if (!ZetaDia.Me.IsInTown)
+                if (!ZetaDia.IsInTown)
                 {
                     Thread.Sleep(15000);
                 }
