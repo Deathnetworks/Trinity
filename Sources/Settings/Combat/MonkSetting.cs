@@ -10,34 +10,6 @@ namespace Trinity.Config.Combat
         private TempestRushOption _TROption;
         private float _PotionLevel;
         private float _HealthGlobeLevel;
-        private float _AvoidArcaneHealth;
-        private float _AvoidDesecratorHealth;
-        private float _AvoidMoltenCoreHealth;
-        private float _AvoidMoltenTrailHealth;
-        private float _AvoidPoisonTreeHealth;
-        private float _AvoidGrotesqueHealth;
-        private float _AvoidPlagueCloudHealth;
-        private float _AvoidIceBallsHealth;
-        private float _AvoidPlagueHandsHealth;
-        private float _AvoidBeesWaspsHealth;
-        private float _AvoidAzmoPoolsHealth;
-        private float _AvoidAzmoBodiesHealth;
-        private float _AvoidShamanFireHealth;
-        private float _AvoidGhomGasHealth;
-        private float _AvoidAzmoFireBallHealth;
-        private float _AvoidBelialHealth;
-        private float _AvoidButcherFloorPanelHealth;
-        private float _AvoidDiabloMeteorHealth;
-        private float _AvoidDiabloPrisonHealth;
-        private float _AvoidDiabloRingOfFireHealth;
-        private float _AvoidIceTrailHealth;
-        private float _AvoidMageFireHealth;
-        private float _AvoidMaghdaProjectilleHealth;
-        private float _AvoidMoltenBallHealth;
-        private float _AvoidWallOfFireHealth;
-        private float _AvoidZoltBubbleHealth;
-        private float _AvoidZoltTwisterHealth;
-        private float _AvoidSuccubusStarHealth;
         private int _TR_MinSpirit;
         private int _TR_MinDist;
         private bool _HasInnaSet;
@@ -47,6 +19,38 @@ namespace Trinity.Config.Combat
         private int _MinCycloneTrashCount;
         private int _MinWoLTrashCount;
         private bool _SpamSweepingWindOnLowHP;
+        private float _AvoidArcaneHealth;
+        private float _AvoidAzmoBodiesHealth;
+        private float _AvoidAzmoFireBallHealth;
+        private float _AvoidAzmoPoolsHealth;
+        private float _AvoidBeesWaspsHealth;
+        private float _AvoidBelialHealth;
+        private float _AvoidButcherFloorPanelHealth;
+        private float _AvoidDesecratorHealth;
+        private float _AvoidDiabloMeteorHealth;
+        private float _AvoidDiabloPrisonHealth;
+        private float _AvoidDiabloRingOfFireHealth;
+        private float _AvoidGhomGasHealth;
+        private float _AvoidGrotesqueHealth;
+        private float _AvoidIceBallsHealth;
+        private float _AvoidIceTrailHealth;
+        private float _AvoidMageFireHealth;
+        private float _AvoidMaghdaProjectilleHealth;
+        private float _AvoidMoltenBallHealth;
+        private float _AvoidMoltenCoreHealth;
+        private float _AvoidMoltenTrailHealth;
+        private float _AvoidOrbiterHealth;
+        private float _AvoidPlagueCloudHealth;
+        private float _AvoidPlagueHandsHealth;
+        private float _AvoidPoisonEnchantedHealth;
+        private float _AvoidPoisonTreeHealth;
+        private float _AvoidThunderstormHealth;
+        private float _AvoidShamanFireHealth;
+        private float _AvoidSuccubusStarHealth;
+        private float _AvoidWallOfFireHealth;
+        private float _AvoidWormholeHealth;
+        private float _AvoidZoltBubbleHealth;
+        private float _AvoidZoltTwisterHealth;
         #endregion Fields
 
         #region Events
@@ -102,6 +106,185 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(60)]
+        public float TR_MinSpirit
+        {
+            get
+            {
+                return _TR_MinSpirit;
+            }
+            set
+            {
+                if (_TR_MinSpirit != value)
+                {
+                    _TR_MinSpirit = (int)value;
+                    OnPropertyChanged("TR_MinSpirit");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(10f)]
+        public float TR_MinDist
+        {
+            get
+            {
+                return _TR_MinDist;
+            }
+            set
+            {
+                if (_TR_MinDist != value)
+                {
+                    _TR_MinDist = (int)value;
+                    OnPropertyChanged("TR_MinDist");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(TempestRushOption.Always)]
+        public TempestRushOption TROption
+        {
+            get
+            {
+                return _TROption;
+            }
+            set
+            {
+                if (_TROption != value)
+                {
+                    _TROption = value;
+                    OnPropertyChanged("TROption");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool HasInnaSet
+        {
+            get
+            {
+                return _HasInnaSet;
+            }
+            set
+            {
+                if (_HasInnaSet != value)
+                {
+                    _HasInnaSet = value;
+                    OnPropertyChanged("HasInnaSet");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SWBeforeWoL
+        {
+            get
+            {
+                return _SWBeforeWoL;
+            }
+            set
+            {
+                if (_SWBeforeWoL != value)
+                {
+                    _SWBeforeWoL = value;
+                    OnPropertyChanged("SWBeforeWoL");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool DisableMantraSpam
+        {
+            get
+            {
+                return _DisableMantraSpam;
+            }
+            set
+            {
+                if (_DisableMantraSpam != value)
+                {
+                    _DisableMantraSpam = value;
+                    OnPropertyChanged("DisableMantraSpam");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool TargetBasedZigZag
+        {
+            get
+            {
+                return _TargetBasedZigZag;
+            }
+            set
+            {
+                if (_TargetBasedZigZag != value)
+                {
+                    _TargetBasedZigZag = value;
+                    OnPropertyChanged("TargetBasedZigZag");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(2)]
+        public int MinCycloneTrashCount
+        {
+            get
+            {
+                return _MinCycloneTrashCount;
+            }
+            set
+            {
+                if (_MinCycloneTrashCount != value)
+                {
+                    _MinCycloneTrashCount = (int)value;
+                    OnPropertyChanged("MinCycloneTrashCount");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(2)]
+        public int MinWoLTrashCount
+        {
+            get
+            {
+                return _MinWoLTrashCount;
+            }
+            set
+            {
+                if (_MinWoLTrashCount != value)
+                {
+                    _MinWoLTrashCount = (int)value;
+                    OnPropertyChanged("MinWoLTrashCount");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool SpamSweepingWindOnLowHP
+        {
+            get
+            {
+                return _SpamSweepingWindOnLowHP;
+            }
+            set
+            {
+                if (_SpamSweepingWindOnLowHP != value)
+                {
+                    _SpamSweepingWindOnLowHP = value;
+                    OnPropertyChanged("SpamSweepingWindOnLowHP");
+                }
+            }
+        }
+
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
@@ -171,6 +354,24 @@ namespace Trinity.Config.Combat
                 {
                     _AvoidMoltenTrailHealth = value;
                     OnPropertyChanged("AvoidMoltenTrailHealth");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.9f)]
+        public float AvoidPoisonEnchantedHealth
+        {
+            get
+            {
+                return _AvoidPoisonEnchantedHealth;
+            }
+            set
+            {
+                if (_AvoidPoisonEnchantedHealth != value)
+                {
+                    _AvoidPoisonEnchantedHealth = value;
+                    OnPropertyChanged("AvoidPoisonEnchantedHealth");
                 }
             }
         }
@@ -482,6 +683,24 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(1f)]
+        public float AvoidOrbiterHealth
+        {
+            get
+            {
+                return _AvoidOrbiterHealth;
+            }
+            set
+            {
+                if (_AvoidOrbiterHealth != value)
+                {
+                    _AvoidOrbiterHealth = value;
+                    OnPropertyChanged("AvoidOrbiterHealth");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.3f)]
         public float AvoidMageFireHealth
         {
@@ -553,6 +772,24 @@ namespace Trinity.Config.Combat
             }
         }
 
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.5f)]
+        public float AvoidWormholeHealth
+        {
+            get
+            {
+                return _AvoidWormholeHealth;
+            }
+            set
+            {
+                if (_AvoidWormholeHealth != value)
+                {
+                    _AvoidWormholeHealth = value;
+                    OnPropertyChanged("AvoidWormholeHealth");
+                }
+            }
+        }
         [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidZoltBubbleHealth
@@ -606,183 +843,25 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+
         [DataMember(IsRequired = false)]
-        [DefaultValue(60)]
-        public float TR_MinSpirit
+        [DefaultValue(1f)]
+        public float AvoidThunderstormHealth
         {
             get
             {
-                return _TR_MinSpirit;
+                return _AvoidThunderstormHealth;
             }
             set
             {
-                if (_TR_MinSpirit != value)
+                if (_AvoidThunderstormHealth != value)
                 {
-                    _TR_MinSpirit = (int)value;
-                    OnPropertyChanged("TR_MinSpirit");
+                    _AvoidThunderstormHealth = value;
+                    OnPropertyChanged("AvoidThunderstormHealth");
                 }
             }
         }
 
-        [DataMember(IsRequired = false)]
-        [DefaultValue(10f)]
-        public float TR_MinDist
-        {
-            get
-            {
-                return _TR_MinDist;
-            }
-            set
-            {
-                if (_TR_MinDist != value)
-                {
-                    _TR_MinDist = (int)value;
-                    OnPropertyChanged("TR_MinDist");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(TempestRushOption.Always)]
-        public TempestRushOption TROption
-        {
-            get
-            {
-                return _TROption;
-            }
-            set
-            {
-                if (_TROption != value)
-                {
-                    _TROption = value;
-                    OnPropertyChanged("TROption");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool HasInnaSet
-        {
-            get
-            {
-                return _HasInnaSet;
-            }
-            set
-            {
-                if (_HasInnaSet != value)
-                {
-                    _HasInnaSet = value;
-                    OnPropertyChanged("HasInnaSet");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool SWBeforeWoL
-        {
-            get
-            {
-                return _SWBeforeWoL;
-            }
-            set
-            {
-                if (_SWBeforeWoL != value)
-                {
-                    _SWBeforeWoL = value;
-                    OnPropertyChanged("SWBeforeWoL");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool DisableMantraSpam
-        {
-            get
-            {
-                return _DisableMantraSpam;
-            }
-            set
-            {
-                if (_DisableMantraSpam != value)
-                {
-                    _DisableMantraSpam = value;
-                    OnPropertyChanged("DisableMantraSpam");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
-        public bool TargetBasedZigZag
-        {
-            get
-            {
-                return _TargetBasedZigZag;
-            }
-            set
-            {
-                if (_TargetBasedZigZag != value)
-                {
-                    _TargetBasedZigZag = value;
-                    OnPropertyChanged("TargetBasedZigZag");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(2)]
-        public int MinCycloneTrashCount
-        {
-            get
-            {
-                return _MinCycloneTrashCount;
-            }
-            set
-            {
-                if (_MinCycloneTrashCount != value)
-                {
-                    _MinCycloneTrashCount = (int)value;
-                    OnPropertyChanged("MinCycloneTrashCount");
-                }
-            }
-        }
-        [DataMember(IsRequired = false)]
-        [DefaultValue(2)]
-        public int MinWoLTrashCount
-        {
-            get
-            {
-                return _MinWoLTrashCount;
-            }
-            set
-            {
-                if (_MinWoLTrashCount != value)
-                {
-                    _MinWoLTrashCount = (int)value;
-                    OnPropertyChanged("MinWoLTrashCount");
-                }
-            }
-        }
-        [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
-        public bool SpamSweepingWindOnLowHP
-        {
-            get
-            {
-                return _SpamSweepingWindOnLowHP;
-            }
-            set
-            {
-                if (_SpamSweepingWindOnLowHP != value)
-                {
-                    _SpamSweepingWindOnLowHP = value;
-                    OnPropertyChanged("SpamSweepingWindOnLowHP");
-                }
-            }
-        }
         #endregion Properties
 
         #region Methods
@@ -815,15 +894,17 @@ namespace Trinity.Config.Combat
         [OnDeserializing()]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-            this._TR_MinSpirit = 60;
-            this._TR_MinDist = 10;
-            this._TargetBasedZigZag = true;
-            this._TROption = TempestRushOption.Always;
-            this._AvoidSuccubusStarHealth = 0.7f;
-            this._MinCycloneTrashCount = 2;
-            this._MinWoLTrashCount = 2;
-            this._SpamSweepingWindOnLowHP = false;
+            this.TR_MinSpirit = 60;
+            this.TR_MinDist = 10;
+            this.TargetBasedZigZag = true;
+            this.TROption = TempestRushOption.Always;
+            this.AvoidSuccubusStarHealth = 0.7f;
+            this.MinCycloneTrashCount = 2;
+            this.MinWoLTrashCount = 2;
+            this.SpamSweepingWindOnLowHP = false;
             this.AvoidGrotesqueHealth = 1;
+            this.AvoidOrbiterHealth = 1;
+            this.AvoidWormholeHealth = 0.50f;
         }
         #endregion Methods
     }

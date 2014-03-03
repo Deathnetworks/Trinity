@@ -176,7 +176,7 @@ namespace Trinity.DbProvider
                 return vSafeMovementLocation;
             }
             // Only try an unstuck 10 times maximum in XXX period of time
-            if (Vector3.Distance(vOriginalDestination, vMyCurrentPosition) >= 700f)
+            if (Vector3.Distance(vOriginalDestination, vMyCurrentPosition) >= V.F("Unstucker.MaxDistance"))
             {
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "You are " + Vector3.Distance(vOriginalDestination, vMyCurrentPosition).ToString() + " distance away from your destination.");
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "This is too far for the unstucker, and is likely a sign of ending up in the wrong map zone.");
@@ -525,14 +525,14 @@ namespace Trinity.DbProvider
                 bool bTooMuchZChange = (Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z) >= 4f);
 
                 // Whirlwind for a barb, special context only
-                if (Trinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Trinity.ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= V.F("Barbarian.Whirlwind.UseRange")) >= 1 &&
-                    Trinity.Player.PrimaryResource >= V.F("Barbarian.Whirlwind.MinFury") && !Trinity.IsWaitingForSpecial && V.B("Barbarian.Whirlwind.UseForMovement"))
-                {
-                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
-                    if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Whirlwind for OOC movement, distance={0}", DestinationDistance);
-                    return;
-                }
+                //if (Trinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Trinity.ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= V.F("Barbarian.Whirlwind.UseRange")) >= 1 &&
+                //    Trinity.Player.PrimaryResource >= V.F("Barbarian.Whirlwind.MinFury") && !Trinity.IsWaitingForSpecial && V.B("Barbarian.Whirlwind.UseForMovement"))
+                //{
+                //    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
+                //    if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
+                //        Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Whirlwind for OOC movement, distance={0}", DestinationDistance);
+                //    return;
+                //}
 
                 // Leap movement for a barb
                 if (Trinity.Settings.Combat.Barbarian.UseLeapOOC && Trinity.Hotbar.Contains(SNOPower.Barbarian_Leap) &&

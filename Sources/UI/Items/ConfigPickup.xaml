@@ -319,8 +319,8 @@
                 <ComboBox Grid.Row="1" Grid.Column="1" SelectedValuePath="Tag" Margin="5" SelectedValue="{Binding Path=Pickup.MiscItemLevel}">
                     <ComboBoxItem Content="None" IsSelected="True" Tag="999" />
                     <ComboBoxItem Content="1+ All Level Misc" Tag="1" />
-                    <ComboBoxItem Content="60+ All Inferno Misc" IsSelected="True" Tag="60" />
-                    <ComboBoxItem Content="63+ Archon/Razorspikes/Demonic Essences/Radiant Star" IsSelected="True" Tag="63" />
+                    <ComboBoxItem Content="60+ Demonic Essences/Radiant Star" IsSelected="True" Tag="60" />
+                    <ComboBoxItem Content="63+ Archon/Razorspikes" IsSelected="True" Tag="63" />
                     <ComboBoxItem Content="64+ Marquise Plans Only" IsSelected="True" Tag="64" />
                 </ComboBox>
             </Grid>

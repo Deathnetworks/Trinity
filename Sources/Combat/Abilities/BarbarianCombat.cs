@@ -499,7 +499,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Barbarian_AncientSpear) &&
+                return !UseOOCBuff && !IsCurrentlyAvoiding && CanCast(SNOPower.X1_Barbarian_AncientSpear) && Player.PrimaryResource >= 25 &&
                     CurrentTarget.HitPointsPct >= V.F("Barbarian.AncientSpear.MinHealthPct");
             }
         }
@@ -656,8 +656,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.X1_Barbarian_WeaponThrow)
-                    && (Player.PrimaryResource >= 10 && (CurrentTarget.RadiusDistance >= 5f || BarbHasNoPrimary));
+                return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.X1_Barbarian_WeaponThrow);
             }
         }
         public static bool CanUseFrenzy { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Frenzy) && PowerManager.CanCast(SNOPower.Barbarian_Frenzy); } }

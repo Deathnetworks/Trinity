@@ -8,33 +8,37 @@ namespace Trinity.Config.Combat
     {
         #region Fields
         private int _Arcane;
-        private int _Desecrator;
-        private int _MoltenCore;
-        private int _MoltenTrail;
-        private int _PoisonTree;
-        private int _Grotesque;
-        private int _PlagueCloud;
-        private int _IceBalls;
-        private int _PlagueHands;
-        private int _BeesWasps;
-        private int _AzmoPools;
         private int _AzmoBodies;
-        private int _ShamanFire;
-        private int _GhomGas;
         private int _AzmoFireBall;
+        private int _AzmoPools;
+        private int _BeesWasps;
         private int _Belial;
         private int _ButcherFloorPanel;
+        private int _Desecrator;
         private int _DiabloMeteor;
         private int _DiabloPrison;
         private int _DiabloRingOfFire;
+        private int _GhomGas;
+        private int _Grotesque;
+        private int _IceBalls;
         private int _IceTrail;
+        private int _Orbiter;
         private int _MageFire;
         private int _MaghdaProjectille;
         private int _MoltenBall;
+        private int _MoltenCore;
+        private int _MoltenTrail;
+        private int _PlagueCloud;
+        private int _PlagueHands;
+        private int _PoisonTree;
+        private int _PoisonEnchanted;
+        private int _ShamanFire;
+        private int _SuccubusStar;
+        private int _Thunderstorm;
         private int _WallOfFire;
+        private int _Wormhole;
         private int _ZoltBubble;
         private int _ZoltTwister;
-        private int _SuccubusStar;
         #endregion Fields
 
         #region Events
@@ -74,163 +78,37 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(10)]
-        public int Desecrator
+        [DefaultValue(47)]
+        public int AzmoBodies
         {
             get
             {
-                return _Desecrator;
+                return _AzmoBodies;
             }
             set
             {
-                if (_Desecrator != value)
+                if (_AzmoBodies != value)
                 {
-                    _Desecrator = value;
-                    OnPropertyChanged("Desecrator");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(19)]
-        public int MoltenCore
-        {
-            get
-            {
-                return _MoltenCore;
-            }
-            set
-            {
-                if (_MoltenCore != value)
-                {
-                    _MoltenCore = value;
-                    OnPropertyChanged("MoltenCore");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(6)]
-        public int MoltenTrail
-        {
-            get
-            {
-                return _MoltenTrail;
-            }
-            set
-            {
-                if (_MoltenTrail != value)
-                {
-                    _MoltenTrail = value;
-                    OnPropertyChanged("MoltenTrail");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(14)]
-        public int PoisonTree
-        {
-            get
-            {
-                return _PoisonTree;
-            }
-            set
-            {
-                if (_PoisonTree != value)
-                {
-                    _PoisonTree = value;
-                    OnPropertyChanged("PoisonTree");
+                    _AzmoBodies = value;
+                    OnPropertyChanged("AzmoBodies");
                 }
             }
         }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(30)]
-        public int Grotesque
+        public int AzmoFireBall
         {
             get
             {
-                return _Grotesque;
+                return _AzmoFireBall;
             }
             set
             {
-                if (_Grotesque != value)
+                if (_AzmoFireBall != value)
                 {
-                    _Grotesque = value;
-                    OnPropertyChanged("Grotesque");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(14)]
-        public int PlagueCloud
-        {
-            get
-            {
-                return _PlagueCloud;
-            }
-            set
-            {
-                if (_PlagueCloud != value)
-                {
-                    _PlagueCloud = value;
-                    OnPropertyChanged("PlagueCloud");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(20)]
-        public int IceBalls
-        {
-            get
-            {
-                return _IceBalls;
-            }
-            set
-            {
-                if (_IceBalls != value)
-                {
-                    _IceBalls = value;
-                    OnPropertyChanged("IceBalls");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(12)]
-        public int PlagueHands
-        {
-            get
-            {
-                return _PlagueHands;
-            }
-            set
-            {
-                if (_PlagueHands != value)
-                {
-                    _PlagueHands = value;
-                    OnPropertyChanged("PlagueHands");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(10)]
-        public int BeesWasps
-        {
-            get
-            {
-                return _BeesWasps;
-            }
-            set
-            {
-                if (_BeesWasps != value)
-                {
-                    _BeesWasps = value;
-                    OnPropertyChanged("BeesWasps");
+                    _AzmoFireBall = value;
+                    OnPropertyChanged("AzmoFireBall");
                 }
             }
         }
@@ -254,73 +132,19 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(47)]
-        public int AzmoBodies
+        [DefaultValue(10)]
+        public int BeesWasps
         {
             get
             {
-                return _AzmoBodies;
+                return _BeesWasps;
             }
             set
             {
-                if (_AzmoBodies != value)
+                if (_BeesWasps != value)
                 {
-                    _AzmoBodies = value;
-                    OnPropertyChanged("AzmoBodies");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(8)]
-        public int ShamanFire
-        {
-            get
-            {
-                return _ShamanFire;
-            }
-            set
-            {
-                if (_ShamanFire != value)
-                {
-                    _ShamanFire = value;
-                    OnPropertyChanged("ShamanFire");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(25)]
-        public int GhomGas
-        {
-            get
-            {
-                return _GhomGas;
-            }
-            set
-            {
-                if (_GhomGas != value)
-                {
-                    _GhomGas = value;
-                    OnPropertyChanged("GhomGas");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(30)]
-        public int AzmoFireBall
-        {
-            get
-            {
-                return _AzmoFireBall;
-            }
-            set
-            {
-                if (_AzmoFireBall != value)
-                {
-                    _AzmoFireBall = value;
-                    OnPropertyChanged("AzmoFireBall");
+                    _BeesWasps = value;
+                    OnPropertyChanged("BeesWasps");
                 }
             }
         }
@@ -357,6 +181,24 @@ namespace Trinity.Config.Combat
                 {
                     _ButcherFloorPanel = value;
                     OnPropertyChanged("ButcherFloorPanel");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(10)]
+        public int Desecrator
+        {
+            get
+            {
+                return _Desecrator;
+            }
+            set
+            {
+                if (_Desecrator != value)
+                {
+                    _Desecrator = value;
+                    OnPropertyChanged("Desecrator");
                 }
             }
         }
@@ -416,6 +258,60 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(25)]
+        public int GhomGas
+        {
+            get
+            {
+                return _GhomGas;
+            }
+            set
+            {
+                if (_GhomGas != value)
+                {
+                    _GhomGas = value;
+                    OnPropertyChanged("GhomGas");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(30)]
+        public int Grotesque
+        {
+            get
+            {
+                return _Grotesque;
+            }
+            set
+            {
+                if (_Grotesque != value)
+                {
+                    _Grotesque = value;
+                    OnPropertyChanged("Grotesque");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(20)]
+        public int IceBalls
+        {
+            get
+            {
+                return _IceBalls;
+            }
+            set
+            {
+                if (_IceBalls != value)
+                {
+                    _IceBalls = value;
+                    OnPropertyChanged("IceBalls");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(6)]
         public int IceTrail
         {
@@ -429,6 +325,24 @@ namespace Trinity.Config.Combat
                 {
                     _IceTrail = value;
                     OnPropertyChanged("IceTrail");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(6)]
+        public int Orbiter
+        {
+            get
+            {
+                return _Orbiter;
+            }
+            set
+            {
+                if (_Orbiter != value)
+                {
+                    _Orbiter = value;
+                    OnPropertyChanged("Orbiter");
                 }
             }
         }
@@ -488,6 +402,167 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(19)]
+        public int MoltenCore
+        {
+            get
+            {
+                return _MoltenCore;
+            }
+            set
+            {
+                if (_MoltenCore != value)
+                {
+                    _MoltenCore = value;
+                    OnPropertyChanged("MoltenCore");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(6)]
+        public int MoltenTrail
+        {
+            get
+            {
+                return _MoltenTrail;
+            }
+            set
+            {
+                if (_MoltenTrail != value)
+                {
+                    _MoltenTrail = value;
+                    OnPropertyChanged("MoltenTrail");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(14)]
+        public int PlagueCloud
+        {
+            get
+            {
+                return _PlagueCloud;
+            }
+            set
+            {
+                if (_PlagueCloud != value)
+                {
+                    _PlagueCloud = value;
+                    OnPropertyChanged("PlagueCloud");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(12)]
+        public int PlagueHands
+        {
+            get
+            {
+                return _PlagueHands;
+            }
+            set
+            {
+                if (_PlagueHands != value)
+                {
+                    _PlagueHands = value;
+                    OnPropertyChanged("PlagueHands");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(14)]
+        public int PoisonEnchanted
+        {
+            get
+            {
+                return _PoisonEnchanted;
+            }
+            set
+            {
+                if (_PoisonEnchanted != value)
+                {
+                    _PoisonEnchanted = value;
+                    OnPropertyChanged("PoisonEnchanted");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(14)]
+        public int PoisonTree
+        {
+            get
+            {
+                return _PoisonTree;
+            }
+            set
+            {
+                if (_PoisonTree != value)
+                {
+                    _PoisonTree = value;
+                    OnPropertyChanged("PoisonTree");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
+        [DefaultValue(8)]
+        public int ShamanFire
+        {
+            get
+            {
+                return _ShamanFire;
+            }
+            set
+            {
+                if (_ShamanFire != value)
+                {
+                    _ShamanFire = value;
+                    OnPropertyChanged("ShamanFire");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(10)]
+        public int SuccubusStar
+        {
+            get
+            {
+                return _SuccubusStar;
+            }
+            set
+            {
+                if (_SuccubusStar != value)
+                {
+                    _SuccubusStar = value;
+                    OnPropertyChanged("SuccubusStar");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(15)]
+        public int Thunderstorm
+        {
+            get
+            {
+                return _Thunderstorm;
+            }
+            set
+            {
+                if (_Thunderstorm != value)
+                {
+                    _Thunderstorm = value;
+                    OnPropertyChanged("Thunderstorm");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(10)]
         public int WallOfFire
         {
@@ -501,6 +576,24 @@ namespace Trinity.Config.Combat
                 {
                     _WallOfFire = value;
                     OnPropertyChanged("WallOfFire");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(15)]
+        public int Wormhole
+        {
+            get
+            {
+                return _Wormhole;
+            }
+            set
+            {
+                if (_Wormhole != value)
+                {
+                    _Wormhole = value;
+                    OnPropertyChanged("Wormhole");
                 }
             }
         }
@@ -537,24 +630,6 @@ namespace Trinity.Config.Combat
                 {
                     _ZoltTwister = value;
                     OnPropertyChanged("ZoltTwister");
-                }
-            }
-        }
-
-        [DataMember(IsRequired = false)]
-        [DefaultValue(10)]
-        public int SuccubusStar
-        {
-            get
-            {
-                return _SuccubusStar;
-            }
-            set
-            {
-                if (_SuccubusStar != value)
-                {
-                    _SuccubusStar = value;
-                    OnPropertyChanged("SuccubusStar");
                 }
             }
         }
@@ -598,6 +673,8 @@ namespace Trinity.Config.Combat
 
             this.SuccubusStar = 10;
             this.Grotesque = 30;
+            this.Wormhole = 15;
+            this.Thunderstorm = 15;
         }
         #endregion Methods
     }

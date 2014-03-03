@@ -278,7 +278,7 @@ namespace Trinity
                         runStatus = HandlerRunStatus.TreeRunning;
                     }
 
-                    UseHealthPotionIfNeeded();
+                    UsePotionIfNeeded();
 
                     //check if we are returning to the tree
                     if (runStatus != HandlerRunStatus.NotFinished)
@@ -1057,7 +1057,7 @@ namespace Trinity
         /// <summary>
         /// Will check <see cref=" IsWaitingForPotion"/> and Use a Potion if needed
         /// </summary>
-        private static void UseHealthPotionIfNeeded()
+        private static void UsePotionIfNeeded()
         {
             using (new PerformanceLogger("HandleTarget.UseHealthPotionIfNeeded"))
             {
@@ -1066,7 +1066,7 @@ namespace Trinity
                     if (!Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         IsWaitingForPotion = false;
-                        bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.DynamicId == 2015821930);
+                        bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.GameBalanceId == -2142362846);
                         if (hasPotion)
                         {
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
@@ -1097,7 +1097,7 @@ namespace Trinity
                         StaleCache = true;
                     }
                     // If we AREN'T getting new targets - find out if we SHOULD because the current unit has died etc.
-                    if (!StaleCache && CurrentTarget.Type == GObjectType.Unit)
+                    if (!StaleCache && CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit)
                     {
                         if (CurrentTarget.Unit == null || CurrentTarget.Unit.BaseAddress == IntPtr.Zero)
                         {

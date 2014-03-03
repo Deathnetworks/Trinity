@@ -14,33 +14,37 @@ namespace Trinity.Config.Combat
         private bool _SpamSmokeScreen;
         private bool _SpamPreparation;
         private float _AvoidArcaneHealth;
-        private float _AvoidDesecratorHealth;
-        private float _AvoidMoltenCoreHealth;
-        private float _AvoidMoltenTrailHealth;
-        private float _AvoidPoisonTreeHealth;
-        private float _AvoidGrotesqueHealth;
-        private float _AvoidPlagueCloudHealth;
-        private float _AvoidIceBallsHealth;
-        private float _AvoidPlagueHandsHealth;
-        private float _AvoidBeesWaspsHealth;
-        private float _AvoidAzmoPoolsHealth;
         private float _AvoidAzmoBodiesHealth;
-        private float _AvoidShamanFireHealth;
-        private float _AvoidGhomGasHealth;
         private float _AvoidAzmoFireBallHealth;
+        private float _AvoidAzmoPoolsHealth;
+        private float _AvoidBeesWaspsHealth;
         private float _AvoidBelialHealth;
         private float _AvoidButcherFloorPanelHealth;
+        private float _AvoidDesecratorHealth;
         private float _AvoidDiabloMeteorHealth;
         private float _AvoidDiabloPrisonHealth;
         private float _AvoidDiabloRingOfFireHealth;
+        private float _AvoidGhomGasHealth;
+        private float _AvoidGrotesqueHealth;
+        private float _AvoidIceBallsHealth;
         private float _AvoidIceTrailHealth;
+        private float _AvoidOrbiterHealth;
         private float _AvoidMageFireHealth;
         private float _AvoidMaghdaProjectilleHealth;
         private float _AvoidMoltenBallHealth;
-        private float _AvoidWallOfFireHealth;
-        private float _AvoidZoltBubbleHealth;
-        private float _AvoidZoltTwisterHealth;
+        private float _AvoidMoltenCoreHealth;
+        private float _AvoidMoltenTrailHealth;
+        private float _AvoidPlagueCloudHealth;
+        private float _AvoidPlagueHandsHealth;
+        private float _AvoidPoisonEnchantedHealth;
+        private float _AvoidPoisonTreeHealth;
+        private float _AvoidShamanFireHealth;
         private float _AvoidSuccubusStarHealth;
+        private float _AvoidThunderstormHealth;
+        private float _AvoidWallOfFireHealth;
+        private float _AvoidWormholeHealth;
+        private float _AvoidZoltBubbleHealth;
+        private float _AvoidZoltTwisterHealth; 
         #endregion Fields
 
         #region Events
@@ -219,6 +223,24 @@ namespace Trinity.Config.Combat
                 {
                     _AvoidMoltenTrailHealth = value;
                     OnPropertyChanged("AvoidMoltenTrailHealth");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(0.9f)]
+        public float AvoidPoisonEnchantedHealth
+        {
+            get
+            {
+                return _AvoidPoisonEnchantedHealth;
+            }
+            set
+            {
+                if (_AvoidPoisonEnchantedHealth != value)
+                {
+                    _AvoidPoisonEnchantedHealth = value;
+                    OnPropertyChanged("AvoidPoisonEnchantedHealth");
                 }
             }
         }
@@ -530,6 +552,24 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(1f)]
+        public float AvoidOrbiterHealth
+        {
+            get
+            {
+                return _AvoidOrbiterHealth;
+            }
+            set
+            {
+                if (_AvoidOrbiterHealth != value)
+                {
+                    _AvoidOrbiterHealth = value;
+                    OnPropertyChanged("AvoidOrbiterHealth");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(0.3f)]
         public float AvoidMageFireHealth
         {
@@ -602,6 +642,24 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(0.5f)]
+        public float AvoidWormholeHealth
+        {
+            get
+            {
+                return _AvoidWormholeHealth;
+            }
+            set
+            {
+                if (_AvoidWormholeHealth != value)
+                {
+                    _AvoidWormholeHealth = value;
+                    OnPropertyChanged("AvoidWormholeHealth");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(1f)]
         public float AvoidZoltBubbleHealth
         {
@@ -654,6 +712,25 @@ namespace Trinity.Config.Combat
                 }
             }
         }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(1f)]
+        public float AvoidThunderstormHealth
+        {
+            get
+            {
+                return _AvoidThunderstormHealth;
+            }
+            set
+            {
+                if (_AvoidThunderstormHealth != value)
+                {
+                    _AvoidThunderstormHealth = value;
+                    OnPropertyChanged("AvoidThunderstormHealth");
+                }
+            }
+        }
+        
         [DataMember(IsRequired = false)]
         [DefaultValue(400)]
         public int VaultMovementDelay
@@ -707,9 +784,10 @@ namespace Trinity.Config.Combat
         [OnDeserializing()]
         internal void OnDeserializingMethod(StreamingContext context)
         {
-
-            this._AvoidSuccubusStarHealth = 0.7f;
+            this.AvoidSuccubusStarHealth = 0.7f;
             this.AvoidGrotesqueHealth = 1;
+            this.AvoidOrbiterHealth = 1;
+            this.AvoidWormholeHealth = 0.50f;
         }
         #endregion Methods
     }

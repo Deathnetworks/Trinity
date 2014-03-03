@@ -132,7 +132,7 @@ namespace Trinity
                     if (!Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         IsWaitingForPotion = false;
-                        bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.DynamicId == 2015821930);
+                        bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.GameBalanceId == -2142362846);
                         if (hasPotion)
                         {
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);

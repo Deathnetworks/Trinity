@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
+using System.Threading;
 using Zeta.Common;
 
 namespace Trinity.Technicals
@@ -51,13 +54,12 @@ namespace Trinity.Technicals
             {
                 string msg = string.Format(prefix + "{0} {1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
 
+                LogToTrinityDebug(msg, args);
+
                 switch (level)
                 {
                     case TrinityLogLevel.Emergency:
                         DBLog.Emergency(string.Format(msg, args));
-                        break;
-                    case TrinityLogLevel.Debug:
-                        DBLog.DebugFormat(msg, args);
                         break;
                     case TrinityLogLevel.Error:
                         DBLog.ErrorFormat(msg, args);
@@ -67,6 +69,9 @@ namespace Trinity.Technicals
                         break;
                     case TrinityLogLevel.Verbose:
                         DBLog.DebugFormat(msg, args);
+                        break;
+                    case TrinityLogLevel.Debug:
+                        //DBLog.DebugFormat(msg, args);
                         break;
                 }
             }
@@ -163,5 +168,75 @@ namespace Trinity.Technicals
             }
             return result;
         }
+
+        private static Object _logLock = 0;
+        private static Queue<string> DebugLogQueue = new Queue<string>();
+        private static Thread LoggerThread;
+
+        private static void DebugLogger()
+        {
+            int myPid = Process.GetCurrentProcess().Id;
+            DateTime startTime = Process.GetCurrentProcess().StartTime;
+            string logFile = Path.Combine(FileManager.DemonBuddyPath, "Logs", myPid + " " + startTime.ToString("yyyy-MM-dd HH.mm") + " TrinityDebug.txt");
+            List<string> messages = new List<string>();
+
+            while (true)
+            {
+                try
+                {
+                    messages.Clear();
+                    lock (_logLock)
+                    {
+                        while (DebugLogQueue.Count > 0)
+                        {
+                            messages.Add(DebugLogQueue.Dequeue());
+                        }
+                    }
+
+                    using (StreamWriter w = File.AppendText(logFile))
+                    {
+                        foreach (string message in messages)
+                        {
+                            w.WriteLine(message);
+                        }
+                    }
+
+                    Thread.Sleep(1);
+                }
+                catch (ThreadAbortException)
+                {
+
+                }
+                catch (Exception ex)
+                {
+                    DBLog.Error("Exception in DebugLogger: " + ex.ToString());
+                }
+            }
+        }
+
+        private static void SetupLoggerThread()
+        {
+            if (LoggerThread == null || (LoggerThread != null && !LoggerThread.IsAlive))
+            {
+                LoggerThread = new Thread(DebugLogger)
+                {
+                    IsBackground = true
+                };
+                DBLog.Info("[Trinity] Starting up Debug Logger");
+                LoggerThread.Start();
+            }
+        }
+
+
+        public static void LogToTrinityDebug(string message, params object[] args)
+        {
+            SetupLoggerThread();
+
+            lock (_logLock)
+            {
+                DebugLogQueue.Enqueue(DateTime.Now.ToString("HH:mm:ss.fff") + " " + string.Format(message, args));
+            }
+        }
+
     }
 }

@@ -435,7 +435,7 @@ namespace Trinity
                     {
                         using (new PerformanceLogger("acdAffixFlags"))
                         {
-                            //affixFlags = acd.MonsterAffixes;
+                            affixFlags = acd.MonsterAffixes;
                         }
                         unitMonsterAffixCache.Add(c_RActorGuid, affixFlags);
                     }

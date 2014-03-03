@@ -361,7 +361,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(63)]
+        [DefaultValue(60)]
         public int MiscItemLevel
         {
             get

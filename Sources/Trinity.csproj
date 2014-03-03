@@ -348,17 +348,17 @@
   <PropertyGroup>
     <PostBuildEvent>rd /S /Q "$(ProjectDir)obj\"
 rd /S /Q "$(ProjectDir)bin\"
-rd /S /Q "C:\db\svn\Trinity\trunk\Sources\"
-rd /S /Q "C:\db\Plugins\Trinity\"
+rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\"
+rd /S /Q "C:\db\Plugins\$(ProjectName)\"
 del /S "$(ProjectDir)*.bak"
 
-xcopy /E /Y "$(ProjectDir)*.cs" "C:\db\Plugins\Trinity\"
-xcopy /E /Y "$(ProjectDir)*.dis" "C:\db\Plugins\Trinity\"
-xcopy /E /Y "$(ProjectDir)*.xaml" "C:\db\Plugins\Trinity\"
-xcopy /E /Y "$(ProjectDir)*.xml" "C:\db\Plugins\Trinity\"
-xcopy /E /Y "$(ProjectDir)*.xsd" "C:\db\Plugins\Trinity\"
-xcopy /E /Y "$(ProjectDir)*.txt" "C:\db\Plugins\Trinity\"
-xcopy /E /Y "$(ProjectDir)*" "C:\db\svn\Trinity\trunk\Sources\"
-rd /S /Q "C:\db\svn\Trinity\trunk\Sources\bin\"</PostBuildEvent>
+xcopy /E /Y "$(ProjectDir)*.cs" "C:\db\Plugins\$(ProjectName)\"
+xcopy /E /Y "$(ProjectDir)*.dis" "C:\db\Plugins\$(ProjectName)\"
+xcopy /E /Y "$(ProjectDir)*.xaml" "C:\db\Plugins\$(ProjectName)\"
+xcopy /E /Y "$(ProjectDir)*.xml" "C:\db\Plugins\$(ProjectName)\"
+xcopy /E /Y "$(ProjectDir)*.xsd" "C:\db\Plugins\$(ProjectName)\"
+xcopy /E /Y "$(ProjectDir)*.txt" "C:\db\Plugins\$(ProjectName)\"
+xcopy /E /Y "$(ProjectDir)*" "C:\db\svn\$(ProjectName)\trunk\Sources\"
+rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\bin\"</PostBuildEvent>
   </PropertyGroup>
 </Project>

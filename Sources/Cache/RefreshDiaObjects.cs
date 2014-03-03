@@ -488,7 +488,7 @@ namespace Trinity
         private static HashSet<string> ignoreNames = new HashSet<string>
         {
             "MarkerLocation", "Generic_Proxy", "Hireling", "Start_Location", "SphereTrigger", "Checkpoint", "ConductorProxyMaster", "BoxTrigger", "SavePoint", "TriggerSphere", 
-            "minimapicon", "ClientEffect", 
+            "minimapicon", 
         };
 
         private static void RefreshCacheMainLoop()

@@ -20,8 +20,13 @@
     <Entry Value="5212"/>
   </HashSet>
   <Dictionary Name="AvoidanceType">
+    <Entry SNO="250031" Type="Mortar" />
+    <Entry SNO="349774" Type="Pulse" />
+    <Entry SNO="341512" Type="Thunderstorm" />
+    <Entry SNO="337109" Type="Wormhole" />
     <Entry SNO="219702" Type="Arcane" />
     <Entry SNO="221225" Type="Arcane" />
+    <Entry SNO="4394" Type="Orbiter" />
     <Entry SNO="84608" Type="Desecrator" />
     <Entry SNO="5482" Type="PoisonTree" />
     <Entry SNO="6578" Type="PoisonTree" />

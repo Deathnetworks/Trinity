@@ -96,6 +96,9 @@ namespace Trinity
                 case AvoidanceType.IceTrail:
                     return Trinity.Settings.Combat.AvoidanceRadius.IceTrail;
 
+                case AvoidanceType.Orbiter:
+                    return Trinity.Settings.Combat.AvoidanceRadius.Orbiter;
+
                 case AvoidanceType.MageFire:
                     return Trinity.Settings.Combat.AvoidanceRadius.MageFire;
 
@@ -120,11 +123,20 @@ namespace Trinity
                 case AvoidanceType.PoisonTree:
                     return Trinity.Settings.Combat.AvoidanceRadius.PoisonTree;
 
+                case AvoidanceType.PoisonEnchanted:
+                    return Trinity.Settings.Combat.AvoidanceRadius.PoisonEnchanted;
+
                 case AvoidanceType.SuccubusStar:
                     return Trinity.Settings.Combat.AvoidanceRadius.SuccubusStar;
 
                 case AvoidanceType.ShamanFire:
                     return Trinity.Settings.Combat.AvoidanceRadius.ShamanFire;
+
+                case AvoidanceType.Thunderstorm:
+                    return Trinity.Settings.Combat.AvoidanceRadius.Thunderstorm;
+
+                case AvoidanceType.Wormhole:
+                    return Trinity.Settings.Combat.AvoidanceRadius.Wormhole;
 
                 case AvoidanceType.ZoltBubble:
                     return Trinity.Settings.Combat.AvoidanceRadius.ZoltBubble;
@@ -184,89 +196,70 @@ namespace Trinity
                 {
                     case AvoidanceType.Arcane:
                         return avoidanceHealth.AvoidArcaneHealth;
-
-                    case AvoidanceType.AzmodanBody:
-                        return avoidanceHealth.AvoidAzmoBodiesHealth;
-
                     case AvoidanceType.AzmoFireball:
                         return avoidanceHealth.AvoidAzmoFireBallHealth;
-
+                    case AvoidanceType.AzmodanBody:
+                        return avoidanceHealth.AvoidAzmoBodiesHealth;
                     case AvoidanceType.AzmodanPool:
                         return avoidanceHealth.AvoidAzmoPoolsHealth;
-
                     case AvoidanceType.BeastCharge:
                         return 1;
                     case AvoidanceType.BeeWasp:
                         return avoidanceHealth.AvoidBeesWaspsHealth;
-
                     case AvoidanceType.Belial:
                         return avoidanceHealth.AvoidBelialHealth;
-
                     case AvoidanceType.ButcherFloorPanel:
                         return avoidanceHealth.AvoidButcherFloorPanelHealth;
                     case AvoidanceType.Desecrator:
                         return avoidanceHealth.AvoidDesecratorHealth;
-
                     case AvoidanceType.DiabloMeteor:
                         return avoidanceHealth.AvoidDiabloMeteorHealth;
-
                     case AvoidanceType.DiabloPrison:
                         return avoidanceHealth.AvoidDiabloPrisonHealth;
-
                     case AvoidanceType.DiabloRingOfFire:
                         return avoidanceHealth.AvoidDiabloRingOfFireHealth;
-
                     case AvoidanceType.FireChains:
                         return 0.8f;
-
                     case AvoidanceType.GhomGas:
                         return avoidanceHealth.AvoidGhomGasHealth;
-
                     case AvoidanceType.Grotesque:
                         return avoidanceHealth.AvoidGrotesqueHealth;
-
                     case AvoidanceType.IceBall:
                         return avoidanceHealth.AvoidIceBallsHealth;
-
                     case AvoidanceType.IceTrail:
                         return avoidanceHealth.AvoidIceTrailHealth;
-
+                    case AvoidanceType.Orbiter:
+                        return avoidanceHealth.AvoidOrbiterHealth;
                     case AvoidanceType.MageFire:
                         return avoidanceHealth.AvoidMageFireHealth;
-
                     case AvoidanceType.MaghdaProjectille:
                         return avoidanceHealth.AvoidMaghdaProjectilleHealth;
-
                     case AvoidanceType.MoltenBall:
                         return avoidanceHealth.AvoidMoltenBallHealth;
-
                     case AvoidanceType.MoltenCore:
                         return avoidanceHealth.AvoidMoltenCoreHealth;
-
                     case AvoidanceType.MoltenTrail:
                         return avoidanceHealth.AvoidMoltenTrailHealth;
-
                     case AvoidanceType.PlagueCloud:
                         return avoidanceHealth.AvoidPlagueCloudHealth;
-
                     case AvoidanceType.PlagueHand:
                         return avoidanceHealth.AvoidPlagueHandsHealth;
-
+                    case AvoidanceType.PoisonEnchanted:
+                        return avoidanceHealth.AvoidPoisonEnchantedHealth;
                     case AvoidanceType.PoisonTree:
                         return avoidanceHealth.AvoidPoisonTreeHealth;
-
-                    case AvoidanceType.SuccubusStar:
-                        return avoidanceHealth.AvoidSuccubusStarHealth;
-
                     case AvoidanceType.ShamanFire:
                         return avoidanceHealth.AvoidShamanFireHealth;
-
+                    case AvoidanceType.SuccubusStar:
+                        return avoidanceHealth.AvoidSuccubusStarHealth;
+                    case AvoidanceType.Thunderstorm:
+                        return avoidanceHealth.AvoidThunderstormHealth;
+                    case AvoidanceType.Wormhole:
+                        return avoidanceHealth.AvoidWormholeHealth;
                     case AvoidanceType.ZoltBubble:
                         return avoidanceHealth.AvoidZoltBubbleHealth;
-
                     case AvoidanceType.ZoltTwister:
                         return avoidanceHealth.AvoidZoltTwisterHealth;
-
                     default:
                         {
                             Logger.Log(TrinityLogLevel.Error, LogCategory.Avoidance, "Unknown Avoidance type in Health Switch! {0}", type.ToString());

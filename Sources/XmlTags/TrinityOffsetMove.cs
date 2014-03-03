@@ -74,7 +74,7 @@ namespace Trinity.XmlTags
 
         private void MoveToPostion()
         {
-            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Moving to offset x={0} y={1} distance={2:0} position={3}",
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Moving to offset x={0} y={1} distance={2:0} position={3}",
                         OffsetX, OffsetY, Position.Distance2D(MyPos), Position);
 
             lastMoveResult = PlayerMover.NavigateTo(Position);

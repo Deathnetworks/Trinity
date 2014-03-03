@@ -67,7 +67,7 @@ namespace Trinity
             Set(new TVar("Barbarian.Bash.UseRange", 6f, "Power Use Range"));
             Set(new TVar("Barbarian.Frenzy.UseRange", 10f, "Power Use Range"));
             Set(new TVar("Barbarian.Cleave.UseRange", 6f, "Power Use Range"));
-            Set(new TVar("Barbarian.WeaponThrow.UseRange", 25f, "Power Use Range"));
+            Set(new TVar("Barbarian.WeaponThrow.UseRange", 60f, "Power Use Range"));
             Set(new TVar("Barbarian.GroundStomp.UseBelowHealthPct", 0.70f, "Use Ground Stomp below this health % (regardless of unit count)"));
             Set(new TVar("Barbarian.GroundStomp.EliteRange", 15f, "Use Ground Stomp Elites check Range"));
             Set(new TVar("Barbarian.GroundStomp.EliteCount", 1, "Use Ground Stomp when this many Elites in Range"));
@@ -152,10 +152,10 @@ namespace Trinity
             Set(new TVar("SpellDelay.Monk_CycloneStrike", 900, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Monk_SevenSidedStrike", 30200, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Monk_MysticAlly", 30000, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Monk_MantraOfEvasion", 3300, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Monk_MantraOfRetribution", 3300, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Monk_MantraOfHealing", 3300, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Monk_MantraOfConviction", 3300, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_Monk_MantraOfEvasion_v2", 3300, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_Monk_MantraOfRetribution_v2", 3300, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_Monk_MantraOfHealing_v2", 3300, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_Monk_MantraOfConviction_v2", 3300, "Spell Use Delay/Interval, milliseconds"));
 
             // Wizard skills
             Set(new TVar("SpellDelay.Wizard_MagicMissile", 5, "Spell Use Delay/Interval, milliseconds"));
@@ -280,6 +280,9 @@ namespace Trinity
             // XmlTags
             Set(new TVar("XmlTag.TrinityTownPortal.DefaultWaitTime", 2500, "Time in Milliseconds to set the default wait time for TrinityTownPortal (may be overriden by Profile tags)"));
             Set(new TVar("XmlTag.TrinityTownPortal.ForceWaitTime", -1, "If not -1, Force set the Time in Milliseconds to clear the area for TrinityTownPortal"));
+
+            // Unstucker
+            Set(new TVar("Unstucker.MaxDistance", 1500f, "Max distance for unstucker to be able to work"));
 
             batch = false;
         }

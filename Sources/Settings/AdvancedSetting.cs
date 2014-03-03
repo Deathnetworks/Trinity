@@ -222,7 +222,7 @@ namespace Trinity.Config
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(false)]
+        [DefaultValue(true)]
         public bool LogDroppedItems
         {
             get
@@ -312,6 +312,7 @@ namespace Trinity.Config
             this._CacheRefreshRate = 100;
             this._OutputReports = true;
             this._ItemRulesLogs = true;
+            this._LogDroppedItems = true;
         }
         #endregion Methods
     }

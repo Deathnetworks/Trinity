@@ -814,11 +814,6 @@ namespace Trinity.XmlTags
             if (!PriorityScenes.Any())
                 return;
 
-            // TODO: fixme
-            return;
-
-            /*
-
             if (PrioritySceneTarget != Vector3.Zero)
                 return;
 
@@ -894,7 +889,6 @@ namespace Trinity.XmlTags
             {
                 PrioritySceneTarget = Vector3.Zero;
             }
-            */
         }
 
         private float GetPriorityScenePathPrecision(Scene scene)

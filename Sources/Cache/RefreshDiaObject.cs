@@ -491,7 +491,7 @@ namespace Trinity
                 // See if it's an avoidance first from the SNO
                 bool isAvoidanceSNO = (DataDictionary.Avoidances.Contains(c_ActorSNO) || DataDictionary.AvoidanceBuffs.Contains(c_ActorSNO) || DataDictionary.AvoidanceProjectiles.Contains(c_ActorSNO));
 
-                // Otherwise check if it's a "BuffVisualEffect=1" Avoidance SNO type
+                // We're avoiding AoE and this is an AoE
                 if (Settings.Combat.Misc.AvoidAOE && isAvoidanceSNO)
                 {
                     using (new PerformanceLogger("RefreshCachedType.0"))
@@ -592,6 +592,7 @@ namespace Trinity
 
                         if (c_diaGizmo.IsBarricade)
                             c_ObjectType = GObjectType.Barricade;
+
                         else
                         {
                             switch (c_diaGizmo.ActorInfo.GizmoType)
@@ -610,7 +611,7 @@ namespace Trinity
                                 case GizmoType.BreakableDoor:
                                 case GizmoType.BreakableChest:
                                 case GizmoType.DestroyableObject:
-                                case GizmoType.DestroySelfWhenNear:
+                                    //case GizmoType.DestroySelfWhenNear:
                                     c_ObjectType = GObjectType.Destructible;
                                     break;
                                 case GizmoType.PlacedLoot:
@@ -627,8 +628,10 @@ namespace Trinity
                     else
                         c_ObjectType = GObjectType.Unknown;
                 }
-                // Now cache the object type
-                objectTypeCache.Add(c_RActorGuid, c_ObjectType);
+                if (c_ObjectType != GObjectType.Unknown)
+                {  // Now cache the object type
+                    objectTypeCache.Add(c_RActorGuid, c_ObjectType);
+                }
             }
             return AddToCache;
         }
@@ -731,25 +734,25 @@ namespace Trinity
                 case GObjectType.Interactable:
                 case GObjectType.HealthWell:
                     {
-                        if (!(c_diaObject is DiaGizmo))
-                        {
-                            string debugInfo = string.Format("Type: {0} Name: {1} ActorType: {2} SNO: {3} ObjectType: {4}",
-                                c_diaObject.GetType().Name,
-                                c_diaObject.Name,
-                                c_diaObject.ActorType,
-                                c_diaObject.ActorSNO,
-                                c_ObjectType);
+                        //if (!(c_diaObject is DiaGizmo))
+                        //{
+                        //    string debugInfo = string.Format("Type: {0} Name: {1} ActorType: {2} SNO: {3} ObjectType: {4}",
+                        //        c_diaObject.GetType().Name,
+                        //        c_diaObject.Name,
+                        //        c_diaObject.ActorType,
+                        //        c_diaObject.ActorSNO,
+                        //        c_ObjectType);
 
-                            Logger.LogDebug("Attempted to Refresh Gizmo on Object that is not a Gizmo! " + debugInfo);
-                            c_IgnoreSubStep = "InvalidGizmoCast";
-                            AddToCache = false;
-                            break;
-                        }
-                        else
-                        {
-                            AddToCache = RefreshGizmo(AddToCache);
-                            break;
-                        }
+                        //    Logger.LogDebug("Attempted to Refresh Gizmo on Object that is not a Gizmo! " + debugInfo);
+                        //    c_IgnoreSubStep = "InvalidGizmoCast";
+                        //    AddToCache = false;
+                        //    break;
+                        //}
+                        //else
+                        //{
+                        AddToCache = RefreshGizmo(AddToCache);
+                        break;
+                        //}
                     }
                 // Object switch on type (to seperate shrines, destructibles, barricades etc.)
                 case GObjectType.Unknown:

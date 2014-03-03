@@ -62,22 +62,22 @@ namespace Trinity
             }
 
             // 4 Mantras for the initial buff (slow-use)
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfEvasion_v2) &&
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2_Passive) &&
                 Player.PrimaryResource >= 50)
             {
                 return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
             }
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2) &&
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2_Passive) &&
                 (Player.PrimaryResource >= 50))
             {
                 return new TrinityPower(SNOPower.X1_Monk_MantraOfConviction_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
             }
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfHealing_v2) &&
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfHealing_v2_Passive) &&
                 Player.PrimaryResource >= 50)
             {
                 return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
             }
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) &&
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2_Passive) &&
                 Player.PrimaryResource >= 50)
             {
                 return new TrinityPower(SNOPower.X1_Monk_MantraOfRetribution_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);

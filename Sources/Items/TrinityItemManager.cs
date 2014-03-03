@@ -341,7 +341,7 @@ namespace Trinity
             }
             return SalvageOption.None;
         }
-
+#pragma warning disable 1718
         public static void DumpBackpack()
         {
             ZetaDia.Actors.Update();

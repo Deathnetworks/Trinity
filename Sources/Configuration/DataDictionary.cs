@@ -84,8 +84,8 @@ namespace Trinity
         public static HashSet<int> Avoidances { get { return avoidances; } }
         private static readonly HashSet<int> avoidances = new HashSet<int>
         {
-            // Arcane        Arcane 2      Desecrator   Poison Tree    Molten Core   Molten Core 2   Molten Trail   Plague Cloud   Ice Balls
-            219702,          221225,       84608,       5482,6578,     4803, 4804,   224225, 247987, 95868,         108869,        402, 223675,
+            // Arcane        Arcane 2      Poison Tree    Molten Core   Molten Core 2   Molten Trail   Plague Cloud   Ice Balls
+            219702,          221225,       5482,6578,     4803, 4804,   224225, 247987, 95868,         108869,        402, 223675,
             // Bees-Wasps    Plague-Hands  Azmo Pools   Azmo fireball  Azmo bodies   Belial 1       Belial 2    
             5212,            3865,         123124,      123842,        123839,       161822,        161833,     
             // Sha-Ball      Mol Ball      Mage Fire    Diablo Prison  Diablo Meteor Ice-trail
@@ -94,6 +94,15 @@ namespace Trinity
             185924,			 139741,	   93837,		166686,
             // Diablo Ring of Fire
             226350, 226525,
+            250031, // Mortar MonsterAffix_Mortar_Pending
+
+            84608, // Desecrator monsterAffix_Desecrator_damage_AOE
+            84606, // Desecrator monsterAffix_Desecrator_telegraph
+
+            337109, // Wormhole X1_MonsterAffix_TeleportMines
+            4394, // Orbiter g_ChargedBolt_Projectile 
+            349774, // Pulse x1_MonsterAffix_frozenPulse_monster
+            341512, // Thunderstorm x1_MonsterAffix_Thunderstorm_Impact
         };
 
         /// <summary>
@@ -103,7 +112,8 @@ namespace Trinity
         private static readonly HashSet<int> avoidanceProjectiles = new HashSet<int>
             {
                 // Bees-Wasps  Sha-Ball   Mol Ball   Azmo fireball	Zolt Twister	Maghda Projectile   Succubus Stars  Diablo Expanding Fire           Diablo Lightning Breath
-                5212,          4103,      160154,    123842,		139741,			166686,             164829,         185999, 196526, 136533
+                5212,          4103,      160154,    123842,		139741,			166686,             164829,         185999, 196526, 136533, 
+                4394, // Orbiter 
             };
 
         /*
@@ -293,6 +303,7 @@ namespace Trinity
         private static readonly HashSet<int> interactWhiteListIds = new HashSet<int> {
             56686, 211999, 52685, 54882, 180575, 105478, 
             102927, // A1 Cursed Hold Prisoners
+            5747, // A1 Cathedral Switch
         };
 
         /// <summary>
