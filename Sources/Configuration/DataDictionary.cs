@@ -402,8 +402,8 @@ namespace Trinity
             108490, 52833, 200371, 153752, 2972, 206527, 3628,
             //a3dun_crater_st_Demo_ChainPylon_Fire_Azmodan, a3dun_crater_st_Demon_ChainPylon_Fire_MistressOfPain
             198977, 201680,
-            //trOut_Leor_painting
-            217285,
+            217285,  //trOut_Leor_painting
+            5902, // trDun_Magic_Painting_H_NoSpawn
             // uber fire chains in Realm of Turmoil  
             263014,
             249192, 251416, 249191, 251730, // summoned skeleton from ring   

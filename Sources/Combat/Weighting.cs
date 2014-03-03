@@ -488,6 +488,14 @@ namespace Trinity
                                 }
                                 break;
                             }
+                        case GObjectType.PowerGlobe:
+                            {
+                                if (!TownRun.IsTryingToTownPortal())
+                                {
+                                    cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 17000d;
+                                }
+                                break;
+                            }
                         case GObjectType.HealthGlobe:
                             {
                                 // Calculate a spot reaching a little bit further out from the globe, to help globe-movements

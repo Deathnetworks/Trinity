@@ -313,6 +313,7 @@ namespace Trinity
             if (name.StartsWith("followeritem_templar_") || dbFollowerType == FollowerType.Templar) return GItemType.FollowerTemplar;
             if (name.StartsWith("craftingplan_")) return GItemType.CraftingPlan;
             if (name.StartsWith("craftingmaterials_")) return GItemType.CraftingMaterial;
+            if (name.StartsWith("craftingreagent_legendary_")) return GItemType.CraftingPlan;
             if (name.StartsWith("dye_")) return GItemType.Dye;
             if (name.StartsWith("a1_")) return GItemType.SpecialItem;
             if (name.StartsWith("healthglobe")) return GItemType.HealthGlobe;
