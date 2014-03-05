@@ -104,12 +104,12 @@ namespace Trinity.Combat.Abilities
                 // use IEquatable to check if they're equal
                 if (CombatBase.CurrentPower == power)
                 {
-                    Logger.Log(LogCategory.Behavior, "Keeping {0}", CombatBase.CurrentPower.ToString());
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Keeping {0}", CombatBase.CurrentPower.ToString());
                     return CombatBase.CurrentPower;
                 }
                 else if (power != null)
                 {
-                    Logger.Log(LogCategory.Behavior, "Selected new {0}", power.ToString());
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Selected new {0}", power.ToString());
                     return power;
                 }
                 else

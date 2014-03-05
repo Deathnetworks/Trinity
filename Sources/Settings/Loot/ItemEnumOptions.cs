@@ -27,12 +27,13 @@ namespace Trinity.Config.Loot
     [Flags]
     public enum TrinityGemType
     {
-        Emerald = 1,
-        Topaz = 2,
-        Amethyst = 4,
-        Ruby = 8,
-        None = 16,
-        All = Emerald | Topaz | Amethyst | Ruby
+        None = 1, 
+        Emerald = 2,
+        Topaz = 4,
+        Amethyst = 8,
+        Ruby = 16,
+        Diamond = 32,
+        All = Emerald | Topaz | Amethyst | Ruby | Diamond
     }
 
     public enum ItemRuleLogLevel

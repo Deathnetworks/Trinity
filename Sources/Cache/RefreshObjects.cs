@@ -667,6 +667,8 @@ namespace Trinity
                         iThisGemType = GEMEMERALD;
                     if (c_item_GItemType == GItemType.Amethyst)
                         iThisGemType = GEMAMETHYST;
+                    if (c_item_GItemType == GItemType.Diamond)
+                        iThisGemType = GEMDIAMOND;
                     ItemsDroppedStats.GemsPerType[iThisGemType]++;
                     ItemsDroppedStats.GemsPerLevel[c_ItemLevel]++;
                     ItemsDroppedStats.GemsPerTPerL[iThisGemType, c_ItemLevel]++;
@@ -703,7 +705,7 @@ namespace Trinity
                                         RadiusDistance = 2f,
                                         InternalName = "WaitForLootDrops"
                                     };
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Waiting for loot to drop, delay: {0}ms", Settings.Combat.Misc.DelayAfterKill);
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Waiting for loot to drop, delay: {0}ms", Settings.Combat.Misc.DelayAfterKill);
             }
             // Now see if we need to do any backtracking
             if (CurrentTarget == null && iTotalBacktracks >= 2 && Settings.Combat.Misc.AllowBacktracking && !Player.IsInTown)

@@ -400,7 +400,7 @@ namespace Trinity
                     var archonBuff = ZetaDia.Me.GetBuff(SNOPower.Wizard_Archon);
                     if (archonBuff != null && archonBuff.IsCancelable)
                     {
-                        Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "Canceling Archon: {0}", reason);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Canceling Archon: {0}", reason);
                         // this actually cancels Archon
                         archonBuff.Cancel();
 

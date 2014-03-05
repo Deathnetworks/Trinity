@@ -20,9 +20,9 @@ namespace Trinity
             public int TotalLeaveGames;
             public int TotalJoinGames;
             public int TotalProfileRecycles;
-            public int TotalXp;
-            public int LastXp;
-            public int NextLvXp;
+            public long TotalXp;
+            public long LastXp;
+            public long NextLvXp;
             public int TotalGold;
             public int LastGold;
             public int Level;
@@ -235,9 +235,9 @@ namespace Trinity
             updated.TotalLeaveGames += TotalLeaveGames - PersistentLastSaved.TotalLeaveGames;
             updated.TotalJoinGames += TotalGamesJoined - PersistentLastSaved.TotalJoinGames;
             updated.TotalProfileRecycles += TotalProfileRecycles - PersistentLastSaved.TotalProfileRecycles;
-            updated.TotalXp += iTotalXp - PersistentLastSaved.TotalXp;
-            updated.LastXp += iLastXp - PersistentLastSaved.LastXp;
-            updated.NextLvXp += iNextLvXp - PersistentLastSaved.NextLvXp;
+            updated.TotalXp += TotalXP - PersistentLastSaved.TotalXp;
+            updated.LastXp += LastXP - PersistentLastSaved.LastXp;
+            updated.NextLvXp += NextLevelXP - PersistentLastSaved.NextLvXp;
 
             updated.TotalGold = iTotalGold;
             updated.LastGold = iLastGold;
@@ -281,9 +281,9 @@ namespace Trinity
             PersistentLastSaved.TotalLeaveGames = TotalLeaveGames;
             PersistentLastSaved.TotalJoinGames = TotalGamesJoined;
             PersistentLastSaved.TotalProfileRecycles = TotalProfileRecycles;
-            PersistentLastSaved.TotalXp = iTotalXp;
-            PersistentLastSaved.LastXp = iLastXp;
-            PersistentLastSaved.NextLvXp = iNextLvXp;
+            PersistentLastSaved.TotalXp = TotalXP;
+            PersistentLastSaved.LastXp = LastXP;
+            PersistentLastSaved.NextLvXp = NextLevelXP;
             PersistentLastSaved.TotalGold = iTotalGold;
             PersistentLastSaved.LastGold = iLastGold;
             PersistentLastSaved.Level = iLevel;

@@ -87,7 +87,8 @@ namespace Trinity
                         (itemType == GItemType.Ruby && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Ruby)) ||
                         (itemType == GItemType.Emerald && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Emerald)) ||
                         (itemType == GItemType.Amethyst && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Amethyst)) ||
-                        (itemType == GItemType.Topaz && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Topaz)))
+                        (itemType == GItemType.Topaz && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Topaz)) ||
+                        (itemType == GItemType.Diamond && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Diamond)))
                     {
                         return false;
                     }
@@ -208,6 +209,12 @@ namespace Trinity
         /// <returns></returns>
         internal static bool CheckLevelRequirements(int level, ItemQuality quality, int requiredBlueLevel, int requiredYellowLevel)
         {
+            if (quality == ItemQuality.Inferior && Settings.Loot.Pickup.PickupGrayItems)
+                return true;
+
+            if (quality == ItemQuality.Normal && Settings.Loot.Pickup.PickupWhiteItems)
+                return true;
+
             if (quality < ItemQuality.Normal && Player.Level > 5)
             {
                 // Grey item, ignore if we're over level 5
@@ -317,7 +324,7 @@ namespace Trinity
             if (name.StartsWith("dye_")) return GItemType.Dye;
             if (name.StartsWith("a1_")) return GItemType.SpecialItem;
             if (name.StartsWith("healthglobe")) return GItemType.HealthGlobe;
-            if (name.Equals("console_powerglobe")) return GItemType.PowerGlobe;
+            if (name == "console_powerglobe") return GItemType.PowerGlobe;
 
             // Follower item types
             if (name.StartsWith("jewelbox_") || dbItemType == ItemType.FollowerSpecial)
@@ -727,35 +734,35 @@ namespace Trinity
                 iParagonLevel = ZetaDia.Me.ParagonLevel;
                 if (Player.Level < 60)
                 {
-                    if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
+                    if (!(TotalXP == 0 && LastXP == 0 && NextLevelXP == 0))
                     {
-                        if (iLastXp > ZetaDia.Me.CurrentExperience)
+                        if (LastXP > ZetaDia.Me.CurrentExperience)
                         {
-                            iTotalXp += iNextLvXp;
+                            TotalXP += NextLevelXP;
                         }
                         else
                         {
-                            iTotalXp += ZetaDia.Me.CurrentExperience - iLastXp;
+                            TotalXP += ZetaDia.Me.CurrentExperience - LastXP;
                         }
                     }
-                    iLastXp = ZetaDia.Me.CurrentExperience;
-                    iNextLvXp = ZetaDia.Me.ExperienceNextLevel;
+                    LastXP = ZetaDia.Me.CurrentExperience;
+                    NextLevelXP = ZetaDia.Me.ExperienceNextLevel;
                 }
                 else
                 {
-                    if (!(iTotalXp == 0 && iLastXp == 0 && iNextLvXp == 0))
+                    if (!(TotalXP == 0 && LastXP == 0 && NextLevelXP == 0))
                     {
-                        if (iLastXp > ZetaDia.Me.ParagonCurrentExperience)
+                        if (LastXP > ZetaDia.Me.ParagonCurrentExperience)
                         {
-                            iTotalXp += iNextLvXp;
+                            TotalXP += NextLevelXP;
                         }
                         else
                         {
-                            iTotalXp += ZetaDia.Me.ParagonCurrentExperience - iLastXp;
+                            TotalXP += ZetaDia.Me.ParagonCurrentExperience - LastXP;
                         }
                     }
-                    iLastXp = ZetaDia.Me.ParagonCurrentExperience;
-                    iNextLvXp = ZetaDia.Me.ParagonExperienceNextLevel;
+                    LastXP = ZetaDia.Me.ParagonCurrentExperience;
+                    NextLevelXP = ZetaDia.Me.ParagonExperienceNextLevel;
                 }
 
 
@@ -789,7 +796,7 @@ namespace Trinity
                             }
                         }
 
-                        LogWriter.WriteLine("Total XP gained: " + Math.Round(iTotalXp / (float)1000000, 2).ToString() + " million [" + Math.Round(iTotalXp / TotalRunningTime.TotalHours / 1000000, 2).ToString() + " million per hour]");
+                        LogWriter.WriteLine("Total XP gained: " + Math.Round(TotalXP / (float)1000000, 2).ToString() + " million [" + Math.Round(TotalXP / TotalRunningTime.TotalHours / 1000000, 2).ToString() + " million per hour]");
                         if (iLastGold == 0)
                         {
                             iLastGold = Player.Coinage;

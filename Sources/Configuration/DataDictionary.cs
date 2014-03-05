@@ -96,7 +96,6 @@ namespace Trinity
             226350, 226525,
             250031, // Mortar MonsterAffix_Mortar_Pending
 
-            340319, // x1_MonsterAffix_CorpseBomber_bomb_start (340319)
 
             84608, // Desecrator monsterAffix_Desecrator_damage_AOE
             84606, // Desecrator monsterAffix_Desecrator_telegraph
@@ -105,7 +104,8 @@ namespace Trinity
             4394, // Orbiter g_ChargedBolt_Projectile 
             349774, // FrozenPulse x1_MonsterAffix_frozenPulse_monster
             341512, // Thunderstorm x1_MonsterAffix_Thunderstorm_Impact
-            // PoisonEnchanted ??
+            316389, // PoisonEnchanted  x1_MonsterAffix_CorpseBomber_projectile (316389)
+            340319 // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
         };
 
         /// <summary>
@@ -117,7 +117,10 @@ namespace Trinity
                 // Bees-Wasps  Sha-Ball   Mol Ball   Azmo fireball	Zolt Twister	Maghda Projectile   Succubus Stars  Diablo Expanding Fire           Diablo Lightning Breath
                 5212,          4103,      160154,    123842,		139741,			166686,             164829,         185999, 196526, 136533, 
                 4394, // Orbiter 
-            };
+                341512, // Thunderstorm 
+                316389, // PoisonEnchanted  x1_MonsterAffix_CorpseBomber_projectile (316389)
+                340319 // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
+         };
 
         /*
          * Combat-related dictionaries/defaults

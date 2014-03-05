@@ -91,6 +91,8 @@ namespace Trinity
                     return Trinity.Settings.Combat.AvoidanceRadius.MoltenCore;
                 case AvoidanceType.MoltenTrail:
                     return Trinity.Settings.Combat.AvoidanceRadius.MoltenTrail;
+                case AvoidanceType.Mortar:
+                    return defaultValue;
                 case AvoidanceType.MoltenBall:
                     return Trinity.Settings.Combat.AvoidanceRadius.MoltenBall;
                 case AvoidanceType.PlagueCloud:
@@ -211,6 +213,8 @@ namespace Trinity
                         return avoidanceHealth.AvoidMoltenCoreHealth;
                     case AvoidanceType.MoltenTrail:
                         return avoidanceHealth.AvoidMoltenTrailHealth;
+                    case AvoidanceType.Mortar:
+                        return 0.25f;
                     case AvoidanceType.PlagueCloud:
                         return avoidanceHealth.AvoidPlagueCloudHealth;
                     case AvoidanceType.PlagueHand:

@@ -7,6 +7,8 @@ namespace Trinity.Config.Loot
     public class PickupSetting : ITrinitySetting<PickupSetting>, INotifyPropertyChanged
     {
         #region Fields
+        private bool _PickupGrayItems;
+        private bool _PickupWhiteItems;
         private int _WeaponBlueLevel;
         private int _WeaponYellowLevel;
         private int _ArmorBlueLevel;
@@ -55,6 +57,42 @@ namespace Trinity.Config.Loot
         #endregion Constructors
 
         #region Properties
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool PickupGrayItems
+        {
+            get
+            {
+                return _PickupGrayItems;
+            }
+            set
+            {
+                if (_PickupGrayItems != value)
+                {
+                    _PickupGrayItems = value;
+                    OnPropertyChanged("PickupGrayItems");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool PickupWhiteItems
+        {
+            get
+            {
+                return _PickupWhiteItems;
+            }
+            set
+            {
+                if (_PickupWhiteItems != value)
+                {
+                    _PickupWhiteItems = value;
+                    OnPropertyChanged("PickupWhiteItems");
+                }
+            }
+        }
+        
         [DataMember(IsRequired = false)]
         [DefaultValue(0)]
         public int WeaponBlueLevel
@@ -182,7 +220,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(TrinityGemType.Ruby | TrinityGemType.Amethyst | TrinityGemType.Emerald | TrinityGemType.Topaz)]
+        [DefaultValue(TrinityGemType.Ruby | TrinityGemType.Amethyst | TrinityGemType.Emerald | TrinityGemType.Topaz | TrinityGemType.Diamond)]
         public TrinityGemType GemType
         {
             get
@@ -570,6 +608,8 @@ namespace Trinity.Config.Loot
             this.LegendaryPlans = true;
             this.PickupLowLevel = true;
             this.IgnoreTwoHandedWeapons = false;
+            this.PickupGrayItems = true;
+            this.PickupWhiteItems = true;
         }
         #endregion Methods
     }

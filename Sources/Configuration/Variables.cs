@@ -395,6 +395,7 @@ namespace Trinity
         private const int GEMTOPAZ = 1;
         private const int GEMAMETHYST = 2;
         private const int GEMEMERALD = 3;
+        private const int GEMDIAMOND = 4;
         private static readonly string[] sGemString = new string[4] { "Ruby", "Topaz", "Amethyst", "Emerald" };
         private static DateTime ItemStatsLastPostedReport = DateTime.Now;
         private static DateTime ItemStatsWhenStartedBot = DateTime.Now;
@@ -544,9 +545,9 @@ namespace Trinity
 
 
         // Xp Counter
-        private static int iTotalXp = 0;
-        private static int iLastXp = 0;
-        private static int iNextLvXp = 0;
+        private static long TotalXP = 0;
+        private static long LastXP = 0;
+        private static long NextLevelXP = 0;
         // Gold counter
         private static int iTotalGold = 0;
         private static int iLastGold = 0;

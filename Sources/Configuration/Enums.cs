@@ -19,6 +19,7 @@
         CraftingMaterial,
         CraftingPlan,
         Dagger,
+        Diamond,
         Dye,
         Emerald,
         FistWeapon,

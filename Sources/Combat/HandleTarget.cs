@@ -268,9 +268,11 @@ namespace Trinity
                     IsWholeNewTarget = false;
                     AssignMonsterTargetPower();
 
+                    bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.GameBalanceId == -2142362846);
+
                     // Pop a potion when necessary
                     // Note that we force a single-loop pause first, to help potion popping "go off"
-                    if (Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !IsWaitingForPower && !IsWaitingForPotion
+                    if (hasPotion && Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !IsWaitingForPower && !IsWaitingForPotion
                         && !Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Setting isWaitingForPotion: MyHP={0}, Limit={1}", Player.CurrentHealthPct, PlayerEmergencyHealthPotionLimit);
@@ -1063,20 +1065,17 @@ namespace Trinity
             {
                 if (IsWaitingForPotion)
                 {
+
                     if (!Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
                         IsWaitingForPotion = false;
-                        bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.GameBalanceId == -2142362846);
-                        if (hasPotion)
-                        {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
-                            WaitWhileAnimating(3, true);
-                            //UIManager.UsePotion();
-                            GameUI.SafeClickElement(GameUI.PotionButton, "Use Potion", false);
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
+                        WaitWhileAnimating(3, true);
+                        //UIManager.UsePotion();
+                        GameUI.SafeClickElement(GameUI.PotionButton, "Use Potion", false);
 
-                            AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
-                            WaitWhileAnimating(2, true);
-                        }
+                        AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
+                        WaitWhileAnimating(2, true);
                     }
                 }
             }
@@ -1257,38 +1256,38 @@ namespace Trinity
             StringBuilder statusText = new StringBuilder();
             if (!targetIsInRange)
                 statusText.Append("Moveto ");
-            else 
+            else
                 switch (CurrentTarget.Type)
-            {
-                case GObjectType.Avoidance:
-                    statusText.Append("Avoid ");
-                    break;
-                case GObjectType.Unit:
-                    statusText.Append("Attack ");
-                    break;
-                case GObjectType.Item:
-                case GObjectType.Gold:
-                case GObjectType.HealthGlobe:
-                    statusText.Append("Pickup ");
-                    break;
-                case GObjectType.Backtrack:
-                    statusText.Append("Backtrack ");
-                    break;
-                case GObjectType.Interactable:
-                    statusText.Append("Interact ");
-                    break;
-                case GObjectType.Door:
-                case GObjectType.Container:
-                    statusText.Append("Open ");
-                    break;
-                case GObjectType.Destructible:
-                case GObjectType.Barricade:
-                    statusText.Append("Destroy ");
-                    break;
-                case GObjectType.Shrine:
-                    statusText.Append("Click ");
-                    break;
-            }
+                {
+                    case GObjectType.Avoidance:
+                        statusText.Append("Avoid ");
+                        break;
+                    case GObjectType.Unit:
+                        statusText.Append("Attack ");
+                        break;
+                    case GObjectType.Item:
+                    case GObjectType.Gold:
+                    case GObjectType.HealthGlobe:
+                        statusText.Append("Pickup ");
+                        break;
+                    case GObjectType.Backtrack:
+                        statusText.Append("Backtrack ");
+                        break;
+                    case GObjectType.Interactable:
+                        statusText.Append("Interact ");
+                        break;
+                    case GObjectType.Door:
+                    case GObjectType.Container:
+                        statusText.Append("Open ");
+                        break;
+                    case GObjectType.Destructible:
+                    case GObjectType.Barricade:
+                        statusText.Append("Destroy ");
+                        break;
+                    case GObjectType.Shrine:
+                        statusText.Append("Click ");
+                        break;
+                }
             statusText.Append("Target=");
             statusText.Append(CurrentTarget.InternalName);
             if (CurrentTarget.Type == GObjectType.Unit && CombatBase.CurrentPower.SNOPower != SNOPower.None)
@@ -1574,7 +1573,7 @@ namespace Trinity
 
                 if (usePowerResult)
                 {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "UsePower SUCCESS {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower SUCCESS {0} at {1} on {2} dist={3}", CombatBase.CurrentPower.SNOPower, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
                     if (CombatBase.CurrentPower.SNOPower == SNOPower.Monk_TempestRush)
                         LastTempestRushLocation = CombatBase.CurrentPower.TargetPosition;
 
@@ -1601,7 +1600,7 @@ namespace Trinity
                 {
                     PowerManager.CanCastFlags failFlags;
                     PowerManager.CanCast(CombatBase.CurrentPower.SNOPower, out failFlags);
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "UsePower FAILED {0} ({1}) at {2} on {3} dist={4}", CombatBase.CurrentPower.SNOPower, failFlags, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "UsePower FAILED {0} ({1}) at {2} on {3} dist={4}", CombatBase.CurrentPower.SNOPower, failFlags, CombatBase.CurrentPower.TargetPosition, CombatBase.CurrentPower.TargetACDGUID, dist);
                 }
 
                 ShouldPickNewAbilities = true;
@@ -1685,15 +1684,8 @@ namespace Trinity
                             iGemType = GEMEMERALD;
                         if (itemType == GItemType.Amethyst)
                             iGemType = GEMAMETHYST;
-                        // !sp - asserts	
-                        if (iGemType > GEMEMERALD)
-                        {
-                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ERROR: Gem type ({0}) out of range", iGemType);
-                        }
-                        if ((CurrentTarget.ItemLevel < 0) || (CurrentTarget.ItemLevel > 63))
-                        {
-                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ERROR: Gem level ({0}) out of range", CurrentTarget.ItemLevel);
-                        }
+                        if (itemType == GItemType.Amethyst)
+                            iGemType = GEMDIAMOND;
 
                         ItemsPickedStats.GemsPerType[iGemType]++;
                         ItemsPickedStats.GemsPerLevel[CurrentTarget.ItemLevel]++;
