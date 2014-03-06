@@ -597,6 +597,9 @@ namespace Trinity
                         {
                             switch (c_diaGizmo.ActorInfo.GizmoType)
                             {
+                                case GizmoType.HealingWell:
+                                    c_ObjectType = GObjectType.HealthWell;
+                                    break;
                                 case GizmoType.Gate:
                                 case GizmoType.Door:
                                     c_ObjectType = GObjectType.Door;
