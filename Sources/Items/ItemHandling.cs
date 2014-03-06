@@ -212,7 +212,7 @@ namespace Trinity
             if (quality == ItemQuality.Inferior && Settings.Loot.Pickup.PickupGrayItems)
                 return true;
 
-            if (quality == ItemQuality.Normal && Settings.Loot.Pickup.PickupWhiteItems)
+            if (quality == ItemQuality.Normal  || quality == ItemQuality.Superior && Settings.Loot.Pickup.PickupWhiteItems)
                 return true;
 
             if (quality < ItemQuality.Normal && Player.Level > 5)
@@ -314,6 +314,7 @@ namespace Trinity
             if (name.StartsWith("emerald_")) return GItemType.Emerald;
             if (name.StartsWith("topaz_")) return GItemType.Topaz;
             if (name.StartsWith("amethyst")) return GItemType.Amethyst;
+            if (name.StartsWith("diamond_")) return GItemType.Amethyst;
             if (name.StartsWith("healthpotion")) return GItemType.HealthPotion;
             if (name.StartsWith("followeritem_enchantress_") || dbFollowerType == FollowerType.Enchantress) return GItemType.FollowerEnchantress;
             if (name.StartsWith("followeritem_scoundrel_") || dbFollowerType == FollowerType.Scoundrel) return GItemType.FollowerScoundrel;

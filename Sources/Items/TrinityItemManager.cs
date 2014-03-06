@@ -269,6 +269,9 @@ namespace Trinity
         {
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
 
+            if (cItem.AcdItem.IsVendorBought)
+                return false;
+
             GItemType trinityItemType = Trinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
             GItemBaseType trinityItemBaseType = Trinity.DetermineBaseType(trinityItemType);
 
@@ -327,6 +330,11 @@ namespace Trinity
 
         private SalvageOption GetSalvageOption(ItemQuality quality)
         {
+            if (quality < ItemQuality.Magic1)
+            {
+                return SalvageOption.All;
+            }
+
             if (quality >= ItemQuality.Magic1 && quality <= ItemQuality.Magic3)
             {
                 return Trinity.Settings.Loot.TownRun.SalvageBlueItemOption;

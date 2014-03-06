@@ -383,7 +383,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Label FontWeight="Bold" Margin="5">Gems:</Label>
-                    <ComboBox Grid.Column="1" SelectedValuePath="Tag" Margin="5" SelectedValue="{Binding Path=Pickup.GemLevel, Converter={StaticResource intToStringConverter}}" >
+                    <ComboBox Grid.Column="1" SelectedValuePath="Tag" Margin="0" SelectedValue="{Binding Path=Pickup.GemLevel, Converter={StaticResource intToStringConverter}}" >
                         <ComboBoxItem Content="Chipped+" Tag="14" />
                         <ComboBoxItem Content="Flawed+" Tag="22" />
                         <ComboBoxItem Content="(plain)+" Tag="30" />
@@ -395,19 +395,19 @@
                     </ComboBox>
                     <CheckBox Grid.Row="0" Grid.Column="2" Content="Emerald" 
                               IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Emerald'}" 
-                              Margin="5" VerticalAlignment="Center"/>
+                              Margin="0" VerticalAlignment="Center"/>
                     <CheckBox Grid.Row="0" Grid.Column="3" Content="Topaz" 
                               IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Topaz'}" 
-                              Margin="5" VerticalAlignment="Center"/>
+                              Margin="0" VerticalAlignment="Center"/>
                     <CheckBox Grid.Row="0" Grid.Column="4" Content="Amethyst" 
                               IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Amethyst'}" 
-                              Margin="5" VerticalAlignment="Center"/>
+                              Margin="0" VerticalAlignment="Center"/>
                     <CheckBox Grid.Row="0" Grid.Column="5" Content="Ruby" 
                               IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Ruby'}" 
-                              Margin="5" VerticalAlignment="Center"/>
+                              Margin="0" VerticalAlignment="Center"/>
                     <CheckBox Grid.Row="0" Grid.Column="6" Content="Diamond" 
                               IsChecked="{Binding Path=Pickup.GemType,Converter={StaticResource flagsEnumValueConverter}, ConverterParameter='Diamond'}" 
-                              Margin="5" VerticalAlignment="Center"/>
+                              Margin="0" VerticalAlignment="Center"/>
                 </Grid>
             </Grid>
             <!--Reset Buttons -->
