@@ -99,7 +99,7 @@
             </Grid.RowDefinitions>
             <TextBlock Text="Trinity Support Required Logs:" FontWeight="Bold" TextAlignment="Center" Margin="2"/>
             <UniformGrid Grid.Row="1" Columns="2" HorizontalAlignment="Stretch">
-                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.DebugInStatusBar}" ToolTip="Update the DB Status bar with Combat Info">Use Trinity Staus Bar</CheckBox>
+                <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.DebugInStatusBar}" ToolTip="Update the DB Status bar with Combat Info">Use Trinity Status Bar</CheckBox>
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=ProfileTag}">Use Profile Tag Logging</CheckBox>
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Targetting}">Log Targetting System</CheckBox>
                 <CheckBox Margin="2,2" IsChecked="{Binding Path=Advanced.LogCategories, Converter={StaticResource flagsEnumValueBooleanConverter}, ConverterParameter=Weight}">Log Target Weight System</CheckBox>

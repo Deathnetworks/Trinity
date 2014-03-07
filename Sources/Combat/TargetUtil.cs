@@ -237,7 +237,7 @@ namespace Trinity
                     where o.Type == GObjectType.Unit &&
                     o.IsBossOrEliteRareUnique &&
                     o.RadiusDistance <= range
-                    select o).Count() > minCount;
+                    select o).Count() >= minCount;
         }
         /// <summary>
         /// Returns true if there is any elite units within the given range

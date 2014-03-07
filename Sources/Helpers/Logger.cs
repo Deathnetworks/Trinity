@@ -230,13 +230,23 @@ namespace Trinity.Technicals
 
         public static void LogToTrinityDebug(string message, params object[] args)
         {
-            SetupLoggerThread();
 
-            lock (_logLock)
+            try
             {
-                DebugLogQueue.Enqueue(DateTime.Now.ToString("HH:mm:ss.fff") + " " + string.Format(message, args));
+                SetupLoggerThread();
+
+                lock (_logLock)
+                {
+                    if (message.Contains("{c:"))
+                        DebugLogQueue.Enqueue(DateTime.Now.ToString("HH:mm:ss.fff") + " " + message + " args: " + args);
+                    else
+                        DebugLogQueue.Enqueue(DateTime.Now.ToString("HH:mm:ss.fff") + " " + string.Format(message, args));
+                }
+            }
+            catch (Exception ex)
+            {
+                DBLog.Error("Error in LogToTrinityDebug: " + ex.ToString());
             }
         }
-
     }
 }

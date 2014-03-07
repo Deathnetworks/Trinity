@@ -206,6 +206,7 @@
     <Compile Include="Cache\RefreshObject.cs" />
     <Compile Include="Cache\RefreshObjects.cs" />
     <Compile Include="XmlTags\BaseComplexNodeTag.cs" />
+    <Compile Include="XmlTags\TrinitySetQuesting.cs" />
     <Compile Include="XmlTags\TrinityCombatIgnore.cs" />
     <Compile Include="XmlTags\TrinityMoveToScene.cs" />
     <Compile Include="XmlTags\TrinityCastSweepingWinds.cs" />

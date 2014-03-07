@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using Trinity.Config.Loot;
 using Trinity.ItemRules;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Items;
 using Zeta.Game;
+using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
+
 namespace Trinity
 {
     public class TrinityItemManager : ItemManager
@@ -349,17 +355,61 @@ namespace Trinity
             }
             return SalvageOption.None;
         }
+
+        public enum DumpItemLocation
+        {
+            Equipped,
+            Backpack,
+            Ground,
+            Stash
+        }
+
 #pragma warning disable 1718
-        public static void DumpBackpack()
+        public static void DumpItems(DumpItemLocation location)
         {
             ZetaDia.Actors.Update();
             using (ZetaDia.Memory.SaveCacheState())
             {
                 ZetaDia.Memory.TemporaryCacheState(false);
 
-                foreach (var item in Zeta.Game.ZetaDia.Me.Inventory.Backpack)
+                List<ACDItem> itemList = new List<ACDItem>();
+
+                switch (location)
                 {
-                    string itemName = string.Format("Name={0} InternalName={1} DynamicID={2} ", item.Name, item.InternalName, item.DynamicId);
+                    case DumpItemLocation.Backpack:
+                        itemList = ZetaDia.Me.Inventory.Backpack.ToList();
+                        break;
+                    case DumpItemLocation.Ground:
+                        itemList = ZetaDia.Actors.GetActorsOfType<DiaItem>(true, false).Select(i => i.CommonData).ToList();
+                        break;
+                    case DumpItemLocation.Equipped:
+                        itemList = ZetaDia.Me.Inventory.Equipped.ToList();
+                        break;
+                    case DumpItemLocation.Stash:
+                        if (UIElements.StashWindow.IsVisible)
+                        {
+                            itemList = ZetaDia.Me.Inventory.StashItems.ToList();
+                        }
+                        else
+                        {
+                            Logger.Log("Stash window not open!");
+                        }
+                        break;
+                }
+
+                foreach (var item in itemList)
+                {
+                    try
+                    {
+                        string itemName = string.Format("\n\nName={0} InternalName={1} GameBalanceID={2}",
+                            item.Name, item.InternalName, item.GameBalanceId) + " ItemLink: " + item.ItemLink.Replace("{", "{{").Replace("}", "}}");
+
+                        Logger.Log(itemName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log("Exception reading Basic Item Info\n{0}", ex.ToString());
+                    }
                     try
                     {
                         foreach (object val in Enum.GetValues(typeof(ActorAttributeType)))
@@ -367,17 +417,108 @@ namespace Trinity
                             int iVal = item.GetAttribute<int>((ActorAttributeType)val);
                             float fVal = item.GetAttribute<float>((ActorAttributeType)val);
 
-                            if (iVal != 0 || fVal != 0)
-                                Logger.Log(itemName + "Attribute: {0}, iVal: {1}, fVal: {2}", val, iVal, (fVal != fVal) ? "" : fVal.ToString());
+                            if (iVal > 0 || fVal > 0)
+                                Logger.Log("Attribute: {0}, iVal: {1}, fVal: {2}", val, iVal, (fVal != fVal) ? "" : fVal.ToString());
                         }
                     }
                     catch (Exception ex)
                     {
                         Logger.Log("Exception reading attributes for {0}\n{1}", item.Name, ex.ToString());
                     }
-                }
 
+                    try
+                    {
+                        foreach (var stat in Enum.GetValues(typeof(ItemStats.Stat)).Cast<ItemStats.Stat>())
+                        {
+                            float fStatVal = item.Stats.GetStat<float>(stat);
+                            int iStatVal = item.Stats.GetStat<int>(stat);
+                            if (fStatVal > 0 || iStatVal > 0)
+                                Logger.Log("Stat {0}={1}f ({2})", stat, fStatVal, iStatVal);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log("Exception reading Item Stats\n{0}", ex.ToString());
+                    }
+
+                    try
+                    {
+                        Logger.Log("Link Color ItemQuality=" + ItemLinkColorToQuality(item.ItemLink, item.InternalName, item.Name, item.GameBalanceId));
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log("Exception reading Item Link\n{0}", ex.ToString());
+                    }
+
+                    try
+                    {
+                        PrintObjectProperties<ACDItem>(item);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log("Exception reading Item Properties\n{0}", ex.ToString());
+                    }
+
+                }
+            }
+
+        }
+
+        private static void PrintObjectProperties<T>(T item)
+        {
+            PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            foreach (PropertyInfo property in properties)
+            {
+                try
+                {
+                    object val = property.GetValue(item, null);
+                    if (val != null)
+                        Logger.Log(typeof(T).Name + "." + property.Name + "=" + val.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("Exception reading {0} from object", property.Name);
+                }
             }
         }
+
+        private static Regex ItemQualityRegex = new Regex("{c:[a-zA-Z0-9]{8}}", RegexOptions.Compiled);
+        public static ItemQuality ItemLinkColorToQuality(string itemLink, string internalName, string name, int gameBalanceId)
+        {
+            /*
+            {c:ff00ff00} = Set
+            {c:ffff8000} = Legendary
+            {c:ffffff00} = Rare
+            {c:ff6969ff} = Magic
+             */
+
+            string linkColor = ItemQualityRegex.Match(itemLink).Value;
+
+            ItemQuality qualityResult;
+            string itemLinkLog = itemLink.Replace("{", "{{").Replace("}", "}}");
+
+            switch (linkColor)
+            {
+                case "{c:ff00ff00}":
+                    qualityResult = ItemQuality.Legendary;
+                    break;
+                case "{c:ffff8000}":
+                    qualityResult = ItemQuality.Legendary;
+                    break;
+                case "{c:ffffff00}":
+                    qualityResult = ItemQuality.Rare4;
+                    break;
+                case "{c:ff6969ff}":
+                    qualityResult = ItemQuality.Magic1;
+                    break;
+                default:
+                    Logger.Log("Invalid Item Link color={0} link={1} internalName={2} name={3} gameBalanceId={4}", linkColor, itemLinkLog, internalName, name, gameBalanceId);
+                    qualityResult = ItemQuality.Invalid;
+                    break;
+            }
+
+            return qualityResult;
+        }
+
     }
 }

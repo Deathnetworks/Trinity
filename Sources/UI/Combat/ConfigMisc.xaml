@@ -57,7 +57,7 @@
                     </Grid>
                     <UniformGrid Columns="2" HorizontalAlignment="Center" VerticalAlignment="Top">
                         <CheckBox IsChecked="{Binding Path=Misc.IgnoreElites}" ToolTip="Attack trash mobs only">Ignore Elite/Rare/Unique</CheckBox>
-                        <CheckBox IsChecked="{Binding Path=Misc.SkipElitesOn5NV}" ToolTip="Skip Elites on 5 Stacks of Nephalem Valor">Skip Elites with 5 NV</CheckBox>
+                        <!--<CheckBox IsChecked="{Binding Path=Misc.SkipElitesOn5NV}" ToolTip="Skip Elites on 5 Stacks of Nephalem Valor">Skip Elites with 5 NV</CheckBox>-->
                     </UniformGrid>
                 </StackPanel>
             </GroupBox>

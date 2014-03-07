@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Trinity.Combat.Abilities;
 using Trinity.DbProvider;
 using Trinity.ItemRules;
 using Trinity.Technicals;
@@ -265,6 +266,7 @@ namespace Trinity
                     GoldInactivity.ResetCheckGold();
 
                     TrinityLoadOnce.UsedProfiles = new List<string>();
+                    CombatBase.IsQuestingMode = false;
 
                     GenericCache.ClearCache();
                     GenericBlacklist.ClearBlacklist();

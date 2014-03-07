@@ -350,36 +350,36 @@ namespace Trinity
 
                             if ((Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && duration > 1 || !Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance)))
                             {
-                                string unitExtras = "";
+                                string extraData = "";
 
                                 switch (c_ObjectType)
                                 {
                                     case GObjectType.Unit:
                                         {
-                                            if (c_unit_IsElite)
-                                                unitExtras += " IsElite " + c_MonsterAffixes.ToString();
+                                            if (c_IsEliteRareUnique)
+                                                extraData += " IsElite " + c_MonsterAffixes.ToString();
 
                                             if (c_unit_HasShieldAffix)
-                                                unitExtras += " HasAffixShielded";
+                                                extraData += " HasAffixShielded";
 
                                             if (c_HasDotDPS)
-                                                unitExtras += " HasDotDPS";
+                                                extraData += " HasDotDPS";
 
                                             if (c_HasBeenInLoS)
-                                                unitExtras += " HasBeenInLoS";
+                                                extraData += " HasBeenInLoS";
 
-                                            unitExtras += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
+                                            extraData += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
                                         } break;
                                     case GObjectType.Avoidance:
                                         {
-                                            unitExtras += " Ro:" + c_Rotation.ToString("0.00");
+                                            extraData += " Ro:" + c_Rotation.ToString("0.00");
                                             break;
                                         }
                                 }
 
                                 if (c_IgnoreReason != "InternalName")
                                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                                        "[{0:0000.00}ms] {1} {2} Type: {3} ({4}) Name: {5} ({6}) {7} {8} Dist2Mid: {9:0} Dist2Rad: {10:0} ZDiff: {11:0} Radius: {12:0} RAGuid: {13} {14}",
+                                        "[{0:0000.00}ms] {1} {2} Type: {3} ({4}) Name={5} ({6}) {7} {8} Dist2Mid={9:0} Dist2Rad={10:0} ZDiff={11:0} Radius={12:0} RAGuid={13} {14}",
                                         duration,
                                         (AddToCache ? "Added " : "Ignored"),
                                         (!AddToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
@@ -394,7 +394,7 @@ namespace Trinity
                                         c_ZDiff,
                                         c_Radius,
                                         c_RActorGuid,
-                                        unitExtras);
+                                        extraData);
                             }
                         }
                     }

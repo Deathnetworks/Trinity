@@ -18,6 +18,8 @@ namespace Trinity.Config
         private bool _UseEmpoweredShrine;
         private bool _UseEnlightenedShrine;
         private bool _UseFleetingShrine;
+        private bool _OpenContainers;
+        private bool _OpenRareChest;
         private int _HealthWellMinHealth;
         private DestructibleIgnoreOption _DestructibleOption;
         #endregion Fields
@@ -198,6 +200,42 @@ namespace Trinity.Config
                 {
                     _UseFleetingShrine = value;
                     OnPropertyChanged("UseFleetingShrine");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool OpenContainers
+        {
+            get
+            {
+                return _OpenContainers;
+            }
+            set
+            {
+                if (_OpenContainers != value)
+                {
+                    _OpenContainers = value;
+                    OnPropertyChanged("OpenContainers");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool OpenRareChest
+        {
+            get
+            {
+                return _OpenRareChest;
+            }
+            set
+            {
+                if (_OpenRareChest != value)
+                {
+                    _OpenRareChest = value;
+                    OnPropertyChanged("OpenRareChest");
                 }
             }
         }

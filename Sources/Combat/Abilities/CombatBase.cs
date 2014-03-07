@@ -47,6 +47,8 @@ namespace Trinity.Combat.Abilities
             set { CombatBase.isCombatAllowed = value; }
         }
 
+        public static bool IsQuestingMode { get; set; }
+
         /// <summary>
         /// The last "ZigZag" position, used with Barb Whirlwind, Monk Tempest Rush, etc.
         /// </summary>
@@ -196,8 +198,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return Settings.Combat.Misc.IgnoreElites ||
-                     (Settings.Combat.Misc.SkipElitesOn5NV && GetBuffStacks(SNOPower.g_killElitePack) >= 5);
+                return Settings.Combat.Misc.IgnoreElites;
             }
         }
 

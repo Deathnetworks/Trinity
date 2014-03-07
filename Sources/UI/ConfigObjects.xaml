@@ -20,6 +20,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -93,13 +94,17 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Non blocking containers and destructables:" FontWeight="Bold" TextAlignment="Center"/>
+            <TextBlock Text="Non blocking destructables:" FontWeight="Bold" TextAlignment="Center"/>
             <UniformGrid Grid.Row="1" Margin="0,0,0,0" Columns="1" HorizontalAlignment="Center">
                 <RadioButton GroupName="WorldObjectDestructibles" Content="Force Ignore Destructibles" IsChecked="{Binding Path=WorldObject.DestructibleOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=ForceIgnore}" Margin="5"/>
                 <RadioButton GroupName="WorldObjectDestructibles" Content="Skip Destructibles unless Stuck" IsChecked="{Binding Path=WorldObject.DestructibleOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=OnlyIfStuck}" Margin="5"/>
                 <RadioButton GroupName="WorldObjectDestructibles" Content="Destroy Destructibles" IsChecked="{Binding Path=WorldObject.DestructibleOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=DestroyAll}" Margin="5"/>
             </UniformGrid>
         </Grid>
+        <UniformGrid Grid.Row="5" Margin="5">
+            <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.OpenContainers}" ToolTip="Normal Chests, Dead bodies, other common containers">Open Containers</CheckBox>
+            <CheckBox Margin="2" IsChecked="{Binding Path=WorldObject.OpenRareChests}" ToolTip="Open Rare Chests">Open Rare Chests</CheckBox>
+        </UniformGrid>
         <!--Reset Button-->
         <Button Grid.Row="5" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetWorldObjectCommand}">Reset</Button>
     </Grid>

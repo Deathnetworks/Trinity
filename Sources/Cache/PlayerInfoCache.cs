@@ -258,6 +258,7 @@ namespace Trinity
         {
             using (new PerformanceLogger("RefreshHotbar"))
             {
+                string hotbarSkills = "Hotbar: ";
                 // Update Hotbar Skills first
                 HotbarSkills.Update();
 
@@ -265,6 +266,7 @@ namespace Trinity
                 for (int i = 0; i <= 5; i++)
                 {
                     SNOPower power = HotbarSkills.GetPowerForSlot((HotbarSlot)i);
+                    hotbarSkills += string.Format("{0}-{1}", power, (HotbarSlot)i);
                     Trinity.Hotbar.Add(power);
                     if (!DataDictionary.LastUseAbilityTimeDefaults.ContainsKey(power))
                     {
@@ -279,26 +281,14 @@ namespace Trinity
                 Trinity.ShouldRefreshHotbarAbilities = false;
                 Trinity.HotbarRefreshTimer.Restart();
 
-
                 SpellTracker.RefreshCachedSpells();
 
                 if (!Trinity.GetHasBuff(SNOPower.Wizard_Archon) && !Player.IsHidden)
                     Trinity.hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(Trinity.Hotbar);
-            }
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, hotbarSkills);
+         }
 
-            //if (ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) && Player.ActorClass == ActorClass.Wizard)
-            //{
-            //    CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_FrostNova, 25);
-            //    CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_ExplosiveBlast, 25);
-            //    CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_DiamondSkin, 100);
-            //    CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_SlowTime, 6000);
-            //    CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_WaveOfForce, 1500);
-            //    CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_MirrorImage, 1500);
-            //    CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_Archon_ArcaneBlast, 1500);
-            //    CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_Teleport, 2700);
-            //    CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_Archon_SlowTime, 1500);
-            //    CombatBase.SetSNOPowerUseDelay(SNOPower.Wizard_Archon_Teleport, 2700);
-            //}
+
             if (Player.ActorClass == ActorClass.Witchdoctor && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice))
             {
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Witchdoctor_SoulHarvest, 1000);

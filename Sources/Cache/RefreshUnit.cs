@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Game;
@@ -121,7 +122,7 @@ namespace Trinity
                     }
                 }
                 // Pull up the Monster Affix cached data
-                c_MonsterAffixes = RefreshAffixes(c_CommonData);
+                RefreshAffixes();
 
                 // Is this something we should try to force leap/other movement abilities against?
                 c_ForceLeapAgainst = false;
@@ -171,10 +172,7 @@ namespace Trinity
                 }
             }
 
-            double dThisMaxHealth = RefreshMonsterHealth();
-
-            // And finally put the two together for a current health percentage
-            c_HitPointsPct = c_HitPoints / dThisMaxHealth;
+            RefreshMonsterHealth();
 
             // Unit is already dead
             if (c_HitPoints <= 0d && !c_unit_IsBoss)
@@ -221,22 +219,22 @@ namespace Trinity
                 AnyTreasureGoblinsPresent = true;
 
             // Units with very high priority (1900+) allow an extra 50% on the non-elite kill slider range
-            if (!AnyMobsInRange && !AnyElitesPresent && !AnyTreasureGoblinsPresent && c_RadiusDistance <= (Settings.Combat.Misc.NonEliteRange * 1.5))
-            {
-                int extraPriority;
-                // Enable extended kill radius for specific unit-types
-                if (DataDictionary.RangedMonsterIds.Contains(c_ActorSNO))
-                {
-                    AnyMobsInRange = true;
-                }
-                if (!AnyMobsInRange && DataDictionary.MonsterCustomWeights.TryGetValue(c_ActorSNO, out extraPriority))
-                {
-                    if (extraPriority >= 1900)
-                    {
-                        AnyMobsInRange = true;
-                    }
-                }
-            }
+            //if (!AnyMobsInRange && !AnyElitesPresent && !AnyTreasureGoblinsPresent && c_RadiusDistance <= (Settings.Combat.Misc.NonEliteRange * 1.5))
+            //{
+            //    int extraPriority;
+            //    // Enable extended kill radius for specific unit-types
+            //    if (DataDictionary.RangedMonsterIds.Contains(c_ActorSNO))
+            //    {
+            //        AnyMobsInRange = true;
+            //    }
+            //    if (!AnyMobsInRange && DataDictionary.MonsterCustomWeights.TryGetValue(c_ActorSNO, out extraPriority))
+            //    {
+            //        if (extraPriority >= 1900)
+            //        {
+            //            AnyMobsInRange = true;
+            //        }
+            //    }
+            //}
             return AddToCache;
         }
 
@@ -268,20 +266,22 @@ namespace Trinity
             }
         }
 
-        private static double RefreshMonsterHealth()
+        private static void RefreshMonsterHealth()
         {
             // health calculations
-            double dThisMaxHealth;
+            double maxHealth;
             // Get the max health of this unit, a cached version if available, if not cache it
-            if (!unitMaxHealthCache.TryGetValue(c_RActorGuid, out dThisMaxHealth))
+            if (!unitMaxHealthCache.TryGetValue(c_RActorGuid, out maxHealth))
             {
-                dThisMaxHealth = c_diaUnit.HitpointsMax;
-                unitMaxHealthCache.Add(c_RActorGuid, dThisMaxHealth);
+                maxHealth = c_diaUnit.HitpointsMax;
+                unitMaxHealthCache.Add(c_RActorGuid, maxHealth);
             }
-            // Now try to get the current health - using temporary and intelligent caching
+
             // Health calculations
             c_HitPoints = c_diaUnit.HitpointsCurrent;
-            return dThisMaxHealth;
+
+            // And finally put the two together for a current health percentage
+            c_HitPointsPct = c_HitPoints / maxHealth;
         }
 
         private static bool RefreshUnitAttributes(bool AddToCache = true, DiaUnit unit = null)
@@ -307,10 +307,10 @@ namespace Trinity
                     Expires = DateTime.Now.AddMinutes(60)
                 });
             }
-            if (teamId == 1)
+            if (teamId == 1 || teamId == 2)
             {
                 AddToCache = false;
-                c_IgnoreSubStep += "IsTeam1+";
+                c_IgnoreSubStep += "IsTeam1|2+";
                 return AddToCache;
             }
 
@@ -370,6 +370,10 @@ namespace Trinity
         {
             // Cancel altogether if it's not even in range, unless it's a boss or an injured treasure goblin
             double killRange = CurrentBotKillRange;
+
+            if (CombatBase.IsQuestingMode && killRange <= 45f)
+                killRange = 45f;
+
             // Bosses get extra radius
             if (c_unit_IsBoss)
             {
@@ -424,7 +428,7 @@ namespace Trinity
             }
             return killRange;
         }
-        private static MonsterAffixes RefreshAffixes(ACD acd)
+        private static void RefreshAffixes()
         {
             using (new PerformanceLogger("RefreshAffixes"))
             {
@@ -433,10 +437,7 @@ namespace Trinity
                 {
                     try
                     {
-                        using (new PerformanceLogger("acdAffixFlags"))
-                        {
-                            affixFlags = acd.MonsterAffixes;
-                        }
+                        affixFlags = c_CommonData.MonsterAffixes;
                         unitMonsterAffixCache.Add(c_RActorGuid, affixFlags);
                     }
                     catch (Exception ex)
@@ -446,13 +447,16 @@ namespace Trinity
                         Logger.Log(LogCategory.CacheManagement, ex.ToString());
                     }
                 }
+
                 c_unit_IsElite = affixFlags.HasFlag(MonsterAffixes.Elite);
                 c_unit_IsRare = affixFlags.HasFlag(MonsterAffixes.Rare);
                 c_unit_IsUnique = affixFlags.HasFlag(MonsterAffixes.Unique);
                 c_unit_IsMinion = affixFlags.HasFlag(MonsterAffixes.Minion);
                 // All-in-one flag for quicker if checks throughout
                 c_IsEliteRareUnique = (c_unit_IsElite || c_unit_IsRare || c_unit_IsUnique || c_unit_IsMinion);
-                return affixFlags;
+
+                c_MonsterAffixes = affixFlags;
+
             }
         }
         private static MonsterType RefreshMonsterType(ACD tempCommonData, MonsterType monsterType, bool bAddToDictionary)
@@ -485,6 +489,13 @@ namespace Trinity
         {
             if (c_diaUnit != null)
             {
+                c_SummonedByACDId = c_diaUnit.SummonedByACDId;
+
+                if (c_SummonedByACDId == Player.MyDynamicID)
+                {
+                    c_IsPlayerSummoned = true;
+                }
+
                 // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
                 if (Player.ActorClass == ActorClass.Monk)
                 {

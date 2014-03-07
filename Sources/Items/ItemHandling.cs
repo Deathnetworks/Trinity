@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Trinity.Cache;
 using Trinity.Config.Loot;
 using Trinity.ItemRules;
@@ -261,6 +262,8 @@ namespace Trinity
             return true;
         }
 
+        private static Regex x1Regex = new Regex("^x1_", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
         /// <summary>
         /// DetermineItemType - Calculates what kind of item it is from D3 internalnames
         /// </summary>
@@ -271,6 +274,7 @@ namespace Trinity
         internal static GItemType DetermineItemType(string name, ItemType dbItemType, FollowerType dbFollowerType = FollowerType.None)
         {
             name = name.ToLower();
+            name = x1Regex.Replace(name, "");
             if (name.StartsWith("axe_")) return GItemType.Axe;
             if (name.StartsWith("ceremonialdagger_")) return GItemType.CeremonialKnife;
             if (name.StartsWith("handxbow_")) return GItemType.HandCrossbow;
@@ -295,6 +299,7 @@ namespace Trinity
             if (name.StartsWith("orb_")) return GItemType.Orb;
             if (name.StartsWith("quiver_")) return GItemType.Quiver;
             if (name.StartsWith("shield_")) return GItemType.Shield;
+            if (name.StartsWith("crushield_")) return GItemType.Shield;
             if (name.StartsWith("amulet_")) return GItemType.Amulet;
             if (name.StartsWith("ring_")) return GItemType.Ring;
             if (name.StartsWith("boots_")) return GItemType.Boots;

@@ -4,6 +4,7 @@ using Trinity.Config.Combat;
 using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
+
 namespace Trinity.Combat.Abilities
 {
     class BarbarianCombat : CombatBase
@@ -240,9 +241,9 @@ namespace Trinity.Combat.Abilities
 
                 bool hardElitesOnly = Settings.Combat.Barbarian.WOTBMode == Config.Combat.BarbarianWOTBMode.HardElitesOnly;
 
-                return
-                    (!hardElitesOnly && TargetUtil.AnyElitesInRange(V.F("Barbarian.WOTB.MinRange"), V.I("Barbarian.WOTB.MinCount")))
-                    || (hardElitesOnly && HardElitesPresent);
+                bool elitesPresent = TargetUtil.AnyElitesInRange(V.F("Barbarian.WOTB.MinRange"), V.I("Barbarian.WOTB.MinCount"));
+
+                return ((!hardElitesOnly && elitesPresent) || (hardElitesOnly && HardElitesPresent));
             }
         }
 
@@ -287,16 +288,20 @@ namespace Trinity.Combat.Abilities
                  */
 
                 bool anyTime = (Settings.Combat.Barbarian.WOTBMode == Config.Combat.BarbarianWOTBMode.WhenReady && !Player.IsInTown);
+                bool hasBuff = GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
+                bool canCast = CanCast(SNOPower.Barbarian_WrathOfTheBerserker, CanCastFlags.NoTimer);
 
-                return
+                bool emergencyHealth = Player.CurrentHealthPct <= V.F("Barbarian.WOTB.EmergencyHealth");
+
+                bool result = 
                     (!UseOOCBuff || anyTime) &&
-                    Player.PrimaryResource >= V.I("Barbarian.WOTB.MinFury") &&
+                    //Player.PrimaryResource >= V.I("Barbarian.WOTB.MinFury") && // WOTB is "free" !
                     // Don't still have the buff
-                    !GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker) &&
-                    CanCast(SNOPower.Barbarian_WrathOfTheBerserker, CanCastFlags.NoTimer) &&
-                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent || anyTime ||
-                    //Or if our health is low
-                     Player.CurrentHealthPct <= V.F("Barbarian.WOTB.EmergencyHealth"));
+                    !hasBuff &&
+                    canCast &&
+                    (WOTBGoblins || WOTBIgnoreElites || WOTBElitesPresent || anyTime || emergencyHealth);
+
+                return result;
             }
         }
         public static bool ShouldWaitForCallOfTheAncients
@@ -335,7 +340,7 @@ namespace Trinity.Combat.Abilities
                     CanCast(SNOPower.Barbarian_BattleRage, CanCastFlags.NoTimer) &&
                     (
                         !GetHasBuff(SNOPower.Barbarian_BattleRage) ||
-                        SNOPowerUseTimer(SNOPower.Barbarian_BattleRage) || 
+                        SNOPowerUseTimer(SNOPower.Barbarian_BattleRage) ||
                         (Settings.Combat.Barbarian.FuryDumpWOTB && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin") && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker)) ||
                         Settings.Combat.Barbarian.FuryDumpAlways && Player.PrimaryResourcePct >= V.F("Barbarian.WOTB.FuryDumpMin")
                     ) &&
@@ -631,7 +636,7 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !IsWaitingForSpecial && CanCast(SNOPower.Barbarian_HammerOfTheAncients) &&
-                    Player.PrimaryResource >= 20 && Player.CurrentHealthPct >= Settings.Combat.Barbarian.MinHotaHealth;
+                    Player.PrimaryResource >= V.F("Barbarian.HammerOfTheAncients.MinFury") && Player.CurrentHealthPct >= Settings.Combat.Barbarian.MinHotaHealth;
             }
         }
         public static bool CanUseHammerOfTheAncientsElitesOnly

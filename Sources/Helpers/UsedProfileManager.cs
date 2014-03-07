@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Trinity.Combat.Abilities;
 using Trinity.Technicals;
 using Trinity.XmlTags;
 using Zeta.Bot;
@@ -26,6 +27,8 @@ namespace Trinity
 
             if (currentProfile != Trinity.CurrentProfile)
             {
+                CombatBase.IsQuestingMode = false;
+
                 // See if we appear to have started a new game
                 if (Trinity.FirstProfile != "" && currentProfile == Trinity.FirstProfile)
                 {

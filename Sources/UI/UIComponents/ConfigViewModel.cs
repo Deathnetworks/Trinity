@@ -53,16 +53,67 @@ namespace Trinity.UIComponents
                                         {
                                             Logger.Log(
                                                 "\n############################################\n"
-                                                + "\nDumping backpack. This will hang your client. Please wait....\n"
+                                                + "\nDumping Backpack Items. This will hang your client. Please wait....\n"
                                                 + "##########################");
                                             UILoader.CloseWindow();
-                                            TrinityItemManager.DumpBackpack();
+                                            TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Backpack);
                                         }
                                         catch (Exception ex)
                                         {
                                             Logger.Log(LogCategory.UserInformation, "Exception dumping Backpack: {0}", ex);
                                         }
                                     });
+            DumpEquippedCommand = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        try
+                                        {
+                                            Logger.Log(
+                                                "\n############################################\n"
+                                                + "\nDumping Equipped Items. This will hang your client. Please wait....\n"
+                                                + "##########################");
+                                            UILoader.CloseWindow();
+                                            TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Equipped);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Logger.Log(LogCategory.UserInformation, "Exception dumping Equipped: {0}", ex);
+                                        }
+                                    });
+            DumpGroundItemsCommand = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        try
+                                        {
+                                            Logger.Log(
+                                                "\n############################################\n"
+                                                + "\nDumping Ground Items. This will hang your client. Please wait....\n"
+                                                + "##########################");
+                                            UILoader.CloseWindow();
+                                            TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Ground);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Logger.Log(LogCategory.UserInformation, "Exception dumping Ground: {0}", ex);
+                                        }
+                                    });
+            DumpStashCommand = new RelayCommand(
+                                  (parameter) =>
+                                  {
+                                      try
+                                      {
+                                          Logger.Log(
+                                              "\n############################################\n"
+                                              + "\nDumping Stash Items. This will hang your client. Please wait....\n"
+                                              + "##########################");
+                                          UILoader.CloseWindow();
+                                          TrinityItemManager.DumpItems(TrinityItemManager.DumpItemLocation.Stash);
+                                      }
+                                      catch (Exception ex)
+                                      {
+                                          Logger.Log(LogCategory.UserInformation, "Exception dumping Stash: {0}", ex);
+                                      }
+                                  });
             TestScoreCommand = new RelayCommand(
                                     (parameter) =>
                                     {
@@ -213,6 +264,36 @@ namespace Trinity.UIComponents
         /// </summary>
         /// <value>The save command.</value>
         public ICommand DumpBackpackCommand
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the test score command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpEquippedCommand
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the test score command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpGroundItemsCommand
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the test score command.
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpStashCommand
         {
             get;
             private set;

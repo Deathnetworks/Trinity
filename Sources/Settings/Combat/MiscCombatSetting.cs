@@ -264,7 +264,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(0)]
+        [DefaultValue(100)]
         public int DelayAfterKill
         {
             get
@@ -351,7 +351,7 @@ namespace Trinity.Config.Combat
             }
         }
         [DataMember(IsRequired = false)]
-        [DefaultValue(0.15)]
+        [DefaultValue(0)]
         public double IgnoreTrashBelowHealth
         {
             get
@@ -368,7 +368,7 @@ namespace Trinity.Config.Combat
             }
         }
         [DataMember(IsRequired = false)]
-        [DefaultValue(0.50)]
+        [DefaultValue(0.25)]
         public double IgnoreTrashBelowHealthDoT
         {
             get

@@ -40,7 +40,7 @@ namespace Trinity
             Set(new TVar("Barbarian.Sprint.SingleTargetMinFury", 20f, "Minimum Fury to try cast Sprint"));
             Set(new TVar("Barbarian.Sprint.MinUseDelay", 500, "Minimum time in Millseconds before Sprint can be re-cast, even with Fury dump"));
             Set(new TVar("Barbarian.BattleRage.MinFury", 20, "Minimum Fury to try cast Battle Rage"));
-            Set(new TVar("Barbarian.WOTB.MinFury", 50, "Minimum Fury to try cast WOTB"));
+            Set(new TVar("Barbarian.WOTB.MinFury", 0, "Minimum Fury to try cast WOTB"));
             Set(new TVar("Barbarian.WOTB.MinRange", 20f, "Elites in Range to try cast WOTB (with WOTB.MinCount) non-hard elites, non ignore elites"));
             Set(new TVar("Barbarian.WOTB.MinCount", 1, "Elite count to try cast WOTB (with WOTB.MinRange) non-hard elites, non ignore elites"));
             Set(new TVar("Barbarian.WOTB.RangeNear", 35f, "Nearby range check to use WOTB with Ignore Elites"));
@@ -87,6 +87,7 @@ namespace Trinity
             Set(new TVar("Barbarian.Leap.TrashRange", 20f, "Leap Trash Check Range"));
             Set(new TVar("Barbarian.Leap.TrashCount", 1, "Minimum Leap Trash Count"));
             Set(new TVar("Barbarian.Leap.MinExtraDistance", 4f, "Extra distance added to target for Leap direction"));
+            Set(new TVar("Barbarian.HammerOfTheAncients.MinFury", 45, "Minimum Fury for Hammer of the Ancients"));
 
             Set(new TVar("Barbarian.Rend.MinNonBleedMobCount", 1, "Cast rend when this many mobs surrounding are not bleeding"));
             Set(new TVar("Barbarian.Rend.MinUseIntervalMillseconds", 0, "Minimum Delay between uses"));
@@ -163,7 +164,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.Wizard_SpectralBlade", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Wizard_Electrocute", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Wizard_RayOfFrost", 5, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Wizard_ArcaneOrb", 500, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_ArcaneOrb", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Wizard_ArcaneTorrent", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Wizard_Disintegrate", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Wizard_FrostNova", 9000, "Spell Use Delay/Interval, milliseconds"));

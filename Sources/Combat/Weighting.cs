@@ -30,8 +30,6 @@ namespace Trinity
 
                 bool noGoblinsPresent = (!AnyTreasureGoblinsPresent && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize) || Settings.Combat.Misc.GoblinPriority < GoblinPriority.Prioritize;
 
-                // Store if we are ignoring all units this cycle or not
-                bool ignoreAllUnits = !XmlTags.TrinityTownPortal.ForceClearArea && !AnyElitesPresent && !AnyMobsInRange && noGoblinsPresent && Player.CurrentHealthPct >= 0.85d;
 
                 bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || MovementSpeed < 1 ||
                     ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 10f) >= 3);
@@ -46,13 +44,15 @@ namespace Trinity
                 if (ProfileManager.CurrentProfileBehavior != null)
                 {
                     Type behaviorType = ProfileManager.CurrentProfileBehavior.GetType();
-                    if (behaviorType == typeof(WaitTimerTag) || behaviorType == typeof(UseTownPortalTag) || behaviorType == typeof(XmlTags.TrinityTownRun) || behaviorType == typeof(XmlTags.TrinityTownPortal))
+                    if (CombatBase.IsQuestingMode || behaviorType == typeof(WaitTimerTag) || behaviorType == typeof(UseTownPortalTag) || behaviorType == typeof(XmlTags.TrinityTownRun) || behaviorType == typeof(XmlTags.TrinityTownPortal))
                     {
                         profileTagCheck = true;
                     }
                 }
 
+
                 bool ShouldIgnoreElites =
+                     !CombatBase.IsQuestingMode &&
                      !DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
                      !profileTagCheck &&
                      !XmlTags.TrinityTownPortal.ForceClearArea &&
@@ -60,9 +60,9 @@ namespace Trinity
                      CombatBase.IgnoringElites;
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
-                    "Starting weights: packSize={0} packRadius={1} MovementSpeed={2} Elites={3} AoEs={4} disableIgnoreTag={5} closeRangePriority={6} townRun={7} forceClear={8} questing={9} level={10}",
+                    "Starting weights: packSize={0} packRadius={1} MovementSpeed={2:0.0} Elites={3} AoEs={4} disableIgnoreTag={5} closeRangePriority={6} townRun={7} forceClear={8} questing={9} level={10} isQuestingMode={11}",
                     Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck,
-                    prioritizeCloseRangeUnits, TownRun.IsTryingToTownPortal(), TrinityTownPortal.ForceClearArea, DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId), Player.Level);
+                    prioritizeCloseRangeUnits, TownRun.IsTryingToTownPortal(), TrinityTownPortal.ForceClearArea, DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId), Player.Level, CombatBase.IsQuestingMode);
 
                 if (TrinityCombatIgnore.IgnoreList.Any())
                     Logger.Log(LogCategory.Weight, " CombatIgnoreList={0}", Logger.ListToString(TrinityCombatIgnore.IgnoreList.ToList<object>()));
@@ -75,6 +75,7 @@ namespace Trinity
                         ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 25f);
 
                     bool shouldIgnoreTrashMobs =
+                        !CombatBase.IsQuestingMode &&
                         !inQuestArea &&
                         !XmlTags.TrinityTownPortal.ForceClearArea &&
                         !usingTownPortal &&
@@ -89,6 +90,9 @@ namespace Trinity
                         Player.CurrentHealthPct > 0.10
                         ;
 
+                    // Store if we are ignoring all units this cycle or not
+                    bool ignoreAllUnits = shouldIgnoreTrashMobs && ShouldIgnoreElites && noGoblinsPresent;
+                    
                     string unitWeightInfo = "";
 
                     // Just to make sure each one starts at 0 weight...
@@ -103,6 +107,7 @@ namespace Trinity
                                 // No champions, no mobs nearby, no treasure goblins to prioritize, and not injured, so skip mobs
                                 if (ignoreAllUnits)
                                 {
+                                    unitWeightInfo = "ignoreAllUnits";
                                     break;
                                 }
 
@@ -751,8 +756,8 @@ namespace Trinity
                         ShouldStayPutDuringAvoidance = true;
                     }
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
-                        "Weight={2:0} name={0} sno={1} type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
-                            cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Weight, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique, cacheObject.RActorGuid, unitWeightInfo);
+                        "Weight={0:0} name={1} sno={2} type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
+                            cacheObject.Weight, cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique, cacheObject.RActorGuid, unitWeightInfo);
 
                     // Prevent current target dynamic ranged weighting flip-flop 
                     if (LastTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)

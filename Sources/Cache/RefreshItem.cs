@@ -22,22 +22,34 @@ namespace Trinity
                 c_IgnoreSubStep = "InvalidBalanceID";
             }
 
-            var item = c_diaObject as DiaItem;
+            var diaItem = c_diaObject as DiaItem;
 
-            if (item == null)
+            if (diaItem == null)
                 return false;
 
-            if (item.CommonData == null)
+            if (diaItem.CommonData == null)
                 return false;
 
-            if (!item.IsValid)
+            if (!diaItem.IsValid)
                 return false;
 
-            if (!item.CommonData.IsValid)
+            if (!diaItem.CommonData.IsValid)
                 return false;
 
-            c_ItemQuality = item.CommonData.ItemQualityLevel;
+            c_ItemQuality = diaItem.CommonData.ItemQualityLevel;
             c_ItemQualityLevelIdentified = ((DiaItem)c_diaObject).CommonData.GetAttribute<int>(ActorAttributeType.ItemQualityLevelIdentified);
+            c_ItemDisplayName = diaItem.CommonData.Name;
+            c_GameBalanceID = diaItem.CommonData.GameBalanceId;
+
+            // Compute item quality from item link for Crafting Plans (Blacksmith or Jewler)
+            if(c_InternalName.StartsWith("CraftingPlan_") || c_InternalName.StartsWith("CraftingReagent_Legendary_Unique_"))
+            {
+                if (!itemLinkQualityCache.TryGetValue(c_ACDGUID, out c_ItemQuality))
+                {
+                    c_ItemQuality = TrinityItemManager.ItemLinkColorToQuality(diaItem.CommonData.ItemLink, c_InternalName, c_ItemDisplayName, c_GameBalanceID);
+                    itemLinkQualityCache.Add(c_ACDGUID, c_ItemQuality);
+                }
+            }
 
             float fExtraRange = 0f;
 
@@ -64,14 +76,12 @@ namespace Trinity
                 }
             }
 
-            c_ItemDisplayName = item.CommonData.Name;
-            c_GameBalanceID = item.CommonData.GameBalanceId;
-            c_ItemLevel = item.CommonData.Level;
-            c_DBItemBaseType = item.CommonData.ItemBaseType;
-            c_DBItemType = item.CommonData.ItemType;
-            c_IsOneHandedItem = item.CommonData.IsOneHand;
-            c_IsTwoHandedItem = item.CommonData.IsTwoHand;
-            c_item_tFollowerType = item.CommonData.FollowerSpecialType;
+            c_ItemLevel = diaItem.CommonData.Level;
+            c_DBItemBaseType = diaItem.CommonData.ItemBaseType;
+            c_DBItemType = diaItem.CommonData.ItemType;
+            c_IsOneHandedItem = diaItem.CommonData.IsOneHand;
+            c_IsTwoHandedItem = diaItem.CommonData.IsTwoHand;
+            c_item_tFollowerType = diaItem.CommonData.FollowerSpecialType;
 
             var pickupItem = new PickupItem
             {
@@ -145,7 +155,6 @@ namespace Trinity
             if (!AddToCache && c_IgnoreSubStep == String.Empty)
                 c_IgnoreSubStep = "NoMatchingRule";
 
-            //if (Settings.Advanced.LogDroppedItems && logNewItem && c_DBItemType != ItemType.Unknown)
             if (Settings.Advanced.LogDroppedItems && logNewItem)
                 LogDroppedItem();
 

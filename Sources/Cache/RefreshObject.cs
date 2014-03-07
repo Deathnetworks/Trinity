@@ -39,6 +39,8 @@ namespace Trinity
         private static int c_GameDynamicID = 0;
         private static int c_BalanceID = 0;
         private static int c_ActorSNO = 0;
+        private static int c_SummonedByACDId = 0;
+        private static bool c_IsPlayerSummoned = false;
         private static int c_ItemLevel = 0;
         private static string c_ItemLink = String.Empty;
         private static int c_GoldStackSize = 0;
@@ -312,6 +314,8 @@ namespace Trinity
             c_GameDynamicID = -1;
             c_BalanceID = -1;
             c_ActorSNO = -1;
+            c_IsPlayerSummoned = false;
+            c_SummonedByACDId = -1;
             c_ItemLevel = -1;
             c_GoldStackSize = -1;
             c_HitPointsPct = -1;
@@ -444,6 +448,7 @@ namespace Trinity
         {
             // Calculate distance, don't rely on DB's internal method as this may hit Diablo 3 memory again
             c_CentreDistance = Player.Position.Distance2D(c_Position);
+
             // Set radius-distance to centre distance at first
             c_RadiusDistance = c_CentreDistance;
         }

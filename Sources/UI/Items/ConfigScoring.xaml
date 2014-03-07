@@ -47,6 +47,14 @@
             </Grid.RowDefinitions>
             <TextBlock Text="Salvage options:" FontWeight="Bold" TextAlignment="Center"/>
             <UniformGrid Grid.Row="1" Columns="4" Margin="25,2">
+                <TextBlock Margin="2" Text="Whites" FontWeight="Bold" VerticalAlignment="Center"/>
+                <RadioButton GroupName="WhiteSalvage" Content="None" ToolTip="Sell all items"
+                             IsChecked="{Binding Path=TownRun.SalvageWhiteItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="SalvageWhiteItemOption" Content="Inferno" ToolTip="Salvage Only 59/60+ Items" IsEnabled="False"
+                             IsChecked="{Binding Path=TownRun.SalvageWhiteItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=InfernoOnly}" VerticalAlignment="Center"/>
+                <RadioButton GroupName="WhiteSalvage" Content="All levels" ToolTip="Salvage all items, will not sell"
+                             IsChecked="{Binding Path=TownRun.SalvageWhiteItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=All}" VerticalAlignment="Center"/>
+
                 <TextBlock Margin="2" Text="Magics" FontWeight="Bold" VerticalAlignment="Center"/>
                 <RadioButton GroupName="BlueSalvage" Content="None" ToolTip="Sell all items"
                              IsChecked="{Binding Path=TownRun.SalvageBlueItemOption, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None}" VerticalAlignment="Center"/>
@@ -101,16 +109,14 @@
                     HorizontalAlignment="Stretch" Margin="2"/>
             </StackPanel>
         </Grid>
-        
-        <Grid Grid.Row="3" Margin="5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="Dump Backpack" FontWeight="Bold" TextAlignment="Center"/>
-            <Button Grid.Row="1" Margin="50,0,50,0" HorizontalAlignment="Center" Content="Dump Backpack" Command="{Binding Path=DumpBackpackCommand}"/>
-        </Grid>
 
+        <StackPanel Grid.Row="3" Margin="5">
+            <TextBlock Text="Dump Items" FontWeight="Bold" TextAlignment="Center"/>
+            <Button Grid.Row="1" Margin="50,0" HorizontalAlignment="Center" Content="Dump Backpack Items" Command="{Binding Path=DumpBackpackCommand}"/>
+            <Button Grid.Row="1" Margin="50,0" HorizontalAlignment="Center" Content="Dump Equipped Items" Command="{Binding Path=DumpEquippedCommand}"/>
+            <Button Grid.Row="1" Margin="50,0" HorizontalAlignment="Center" Content="Dump Ground Items" Command="{Binding Path=DumpGroundItemsCommand}"/>
+            <Button Grid.Row="1" Margin="50,0" HorizontalAlignment="Center" Content="Dump Stash items" Command="{Binding Path=DumpStashCommand}"/>
+        </StackPanel>
         <!--Test Score-->
         <!--<Grid Grid.Row="3" Margin="5">
             <Grid.RowDefinitions>

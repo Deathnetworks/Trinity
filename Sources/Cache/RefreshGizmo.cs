@@ -39,6 +39,8 @@ namespace Trinity
                     // Minimum range clamp
                     if (c_Radius <= 1f)
                         c_Radius = 1f;
+
+                    c_RadiusDistance = c_Radius + c_CentreDistance;
                 }
                 catch
                 {
@@ -93,14 +95,6 @@ namespace Trinity
             {
                 // do nothing
             }
-
-            // rrrix: i'm not sure if this is used anywhere?
-            //if (!operatable)
-            //{
-            //    AddToCache = false;
-            //    c_IgnoreSubStep = "NonOperatable";
-            //    return AddToCache;
-            //}
 
             // Now for the specifics
             int physicsSno;
@@ -229,28 +223,6 @@ namespace Trinity
                             return AddToCache;
                         }
 
-                        // Already used, blacklist it and don't look at it again
-                        //try
-                        //{
-                        //    int gizmoUsedAttrib = ((GizmoShrine)c_diaObject).CommonData.GetAttribute<int>(ActorAttributeType.GizmoHasBeenOperated);
-                        //    int gizmoOperatorAcdId = ((GizmoShrine)c_diaObject).CommonData.GetAttribute<int>(ActorAttributeType.GizmoOperatorACDID);
-
-                        //    gizmoUsed = (gizmoUsedAttrib >= 1 || gizmoOperatorAcdId > 0);
-                        //}
-                        //catch
-                        //{
-                        //    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
-                        //    c_IgnoreSubStep = "ShrineOperatedException";
-                        //    AddToCache = false;
-                        //}
-                        //if (gizmoUsed)
-                        //{
-                        //    // It's already open!
-                        //    c_IgnoreSubStep = "GizmoHasBeenOperated";
-                        //    AddToCache = false;
-                        //    return AddToCache;
-                        //}
-
                         try
                         {
                             int gizmoState = c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
@@ -343,21 +315,6 @@ namespace Trinity
                 case GObjectType.Barricade:
                     {
                         AddToCache = true;
-                        // Get the cached physics SNO of this object
-                        if (!physicsSNOCache.TryGetValue(c_ActorSNO, out physicsSno))
-                        {
-                            try
-                            {
-                                physicsSno = c_diaObject.PhysicsSNO;
-                            }
-                            catch
-                            {
-                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
-                                c_IgnoreSubStep = "BarricadePhysicsSNOException";
-                                AddToCache = false;
-                            }
-                            physicsSNOCache.Add(c_ActorSNO, physicsSno);
-                        }
 
                         float maxRadiusDistance = -1f;
 
@@ -413,21 +370,6 @@ namespace Trinity
                             AddToCache = false;
                             c_IgnoreSubStep = "ForceIgnoreDestructibles";
                             break;
-                        }
-
-                        // Get the cached physics SNO of this object
-                        if (!physicsSNOCache.TryGetValue(c_ActorSNO, out physicsSno))
-                        {
-                            try
-                            {
-                                physicsSno = c_diaObject.PhysicsSNO;
-                            }
-                            catch
-                            {
-                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
-                                AddToCache = false;
-                            }
-                            physicsSNOCache.Add(c_ActorSNO, physicsSno);
                         }
 
                         // Set min distance to user-defined setting
@@ -491,16 +433,16 @@ namespace Trinity
                             c_IgnoreSubStep = "";
                         }
 
-                        // special mojo for whitelists
-                        if (DataDictionary.InteractWhiteListIds.Contains(c_ActorSNO))
-                            AddToCache = true;
-
-                        if (DataDictionary.ResplendentChestIds.Contains(c_ActorSNO))
-                            AddToCache = true;
                         break;
                     }
                 case GObjectType.Container:
                     {
+                        AddToCache = false;
+
+                        bool isRareChest = c_InternalName.ToLower().Contains("chest_rare") || DataDictionary.ResplendentChestIds.Contains(c_ActorSNO);
+                        bool isChest = !isRareChest || DataDictionary.ContainerWhiteListIds.Contains(c_ActorSNO); // We know it's a container but this is not a known rare chest
+                        bool isCorpse = c_InternalName.ToLower().Contains("corpse");
+
                         // We want to do some vendoring, so don't open anything new yet
                         if (ForceVendorRunASAP)
                         {
@@ -518,7 +460,10 @@ namespace Trinity
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting container-been-opened attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
                             c_IgnoreSubStep = "ChestOpenException";
                             AddToCache = false;
+                            return AddToCache;
                         }
+
+                        // Check if chest is open
                         if (chestOpen)
                         {
                             // It's already open!
@@ -526,81 +471,21 @@ namespace Trinity
                             c_IgnoreSubStep = "AlreadyOpen";
                             return AddToCache;
                         }
-                        else if (!chestOpen && c_InternalName.ToLower().Contains("chest") && !c_InternalName.ToLower().Contains("chest_rare"))
+
+                        if ((isChest || isCorpse) && Settings.WorldObject.OpenContainers && c_RadiusDistance <= Settings.WorldObject.ContainerOpenRange)
                         {
-                            // This should make the magic happen with Chests we actually want :)
                             AddToCache = true;
+                            return AddToCache;
                         }
-                        // Default to blacklisting all containers, then find reasons not to
-                        bool addToBlacklist = true;
-                        minDistance = 0f;
-                        // Get the cached physics SNO of this object
-                        if (!physicsSNOCache.TryGetValue(c_ActorSNO, out physicsSno))
+
+                        if (isRareChest && Settings.WorldObject.OpenRareChest)
                         {
-                            try
-                            {
-                                physicsSno = c_diaObject.PhysicsSNO;
-                            }
-                            catch
-                            {
-                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting physics SNO for object {0} [{1}]", c_InternalName, c_ActorSNO);
-                                c_IgnoreSubStep = "ChestPhysicsSNO";
-                                AddToCache = false;
-                            }
-                            physicsSNOCache.Add(c_ActorSNO, physicsSno);
+                            AddToCache = true;
+                            return AddToCache;
                         }
-                        // Any physics mesh? Give a minimum distance of 5 feet
-                        if (c_InternalName.ToLower().Contains("corpse") && Settings.WorldObject.DestructibleOption != DestructibleIgnoreOption.DestroyAll)
-                        {
-                            addToBlacklist = true;
-                        }
-                        else if (physicsSno > 0 || Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.DestroyAll)
-                        {
-                            //Logging.WriteDiagnostic("[Trinity] open container " + tmp_sThisInternalName + "[" + tmp_iThisActorSNO.ToString() + "]" + iThisPhysicsSNO);
-                            addToBlacklist = false;
-                            minDistance = Settings.WorldObject.ContainerOpenRange;
-                        }
-                        else
-                        {
-                            addToBlacklist = true;
-                        }
-                        // Whitelist for chests we want to open if we ever get close enough to them
-                        if (DataDictionary.ContainerWhiteListIds.Contains(c_ActorSNO))
-                        {
-                            addToBlacklist = false;
-                            if (Settings.WorldObject.ContainerOpenRange > 0)
-                                minDistance = Settings.WorldObject.ContainerOpenRange + 5;
-                        }
-                        else if (c_InternalName.ToLower().Contains("chest") && !c_InternalName.ToLower().Contains("chest_rare"))
-                        {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "GSDebug: Possible Chest SNO: {0}, SNO={1}", c_InternalName, c_ActorSNO);
-                        }
-                        // Superlist for rare chests etc.
-                        if (DataDictionary.ResplendentChestIds.Contains(c_ActorSNO) || openResplendentChest)
-                        {
-                            addToBlacklist = false;
-                            if (Settings.WorldObject.ContainerOpenRange > 0)
-                                minDistance = Settings.WorldObject.ContainerOpenRange + 90;
-                            else
-                                minDistance = 60;
-                        }
-                        else if (c_InternalName.Contains("chest_rare"))
-                        {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "GSDebug: Possible Resplendant Chest SNO: {0}, SNO={1}", c_InternalName, c_ActorSNO);
-                        }
-                        // Blacklist this if it's something we should never bother looking at again
-                        if (addToBlacklist)
-                        {
-                            hashRGUIDBlacklist60.Add(c_RActorGuid);
-                            c_IgnoreSubStep = "ChestBlacklisted";
-                            AddToCache = false;
-                        }
-                        if (minDistance <= 0 || c_CentreDistance > minDistance)
-                        {
-                            AddToCache = false;
-                            c_IgnoreSubStep = "ChestDistance";
-                        }
-                        // Bag it!
+
+                        Logger.LogDebug("Possible Chest SNO: {0} ({1})", c_ActorSNO, c_InternalName);
+                        c_IgnoreSubStep = "InvalidContainer";
                         break;
                     }
             }

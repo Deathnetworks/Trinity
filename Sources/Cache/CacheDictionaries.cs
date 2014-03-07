@@ -96,10 +96,6 @@ namespace Trinity
         /// </summary>
         private static Dictionary<int, int> interactAttemptsCache = new Dictionary<int, int>();
         /// <summary>
-        /// Physics SNO for certain objects (SNO based)
-        /// </summary>
-        private static Dictionary<int, int> physicsSNOCache = new Dictionary<int, int>();
-        /// <summary>
         /// Summoned-by ID for units (RactorGUID based)
         /// </summary>
         private static Dictionary<int, int> summonedByIdCache = new Dictionary<int, int>();
@@ -118,6 +114,11 @@ namespace Trinity
         /// If a unit, item, or other object has been in LoS before, this will contain true value and will be considered for targetting, otherwise we will continue to check
         /// </summary>
         private static Dictionary<int, bool> hasBeenInLoSCache = new Dictionary<int, bool>();
+
+        /// <summary>
+        /// Stores the computed ItemQuality from an ACDItem.ItemLink
+        /// </summary>
+        private static Dictionary<int, ItemQuality> itemLinkQualityCache = new Dictionary<int, ItemQuality>();
 
     }
 }

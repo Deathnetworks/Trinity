@@ -10,6 +10,7 @@ namespace Trinity.Config.Loot
         private int _WeaponScore;
         private int _ArmorScore;
         private int _JewelryScore;
+        private SalvageOption _SalvageWhiteItemOption;
         private SalvageOption _SalvageBlueItemOption;
         private SalvageOption _SalvageYellowItemOption;
         private SalvageOption _SalvageLegendaryItemOption;
@@ -89,7 +90,25 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(SalvageOption.None)]
+        [DefaultValue(SalvageOption.All)]
+        public SalvageOption SalvageWhiteItemOption
+        {
+            get
+            {
+                return _SalvageWhiteItemOption;
+            }
+            set
+            {
+                if (_SalvageWhiteItemOption != value)
+                {
+                    _SalvageWhiteItemOption = value;
+                    OnPropertyChanged("SalvageWhiteItemOption");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(SalvageOption.All)]
         public SalvageOption SalvageBlueItemOption
         {
             get
@@ -107,7 +126,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(SalvageOption.None)]
+        [DefaultValue(SalvageOption.All)]
         public SalvageOption SalvageYellowItemOption
         {
             get
