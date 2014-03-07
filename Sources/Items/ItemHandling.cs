@@ -631,13 +631,22 @@ namespace Trinity
                     }
                 }
 
-                // auto trash blue weapons/armor/jewlery
-                if ((acdItem.ItemBaseType == ItemBaseType.Armor
+                bool isEquipment = (acdItem.ItemBaseType == ItemBaseType.Armor
                    || acdItem.ItemBaseType == ItemBaseType.Weapon
-                   || acdItem.ItemBaseType == ItemBaseType.Jewelry)
-                      && cItem.Quality < ItemQuality.Rare4)
+                   || acdItem.ItemBaseType == ItemBaseType.Jewelry);
+
+                // Stashing Whites, auto-keep
+                if (Settings.Loot.TownRun.StashWhites && isEquipment && cItem.Quality < ItemQuality.Magic1)
                 {
-                    return false;
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing whites)", cItem.RealName, cItem.InternalName, itemType);
+                    return true;
+                }
+
+                // Stashing blues, auto-keep
+                if (Settings.Loot.TownRun.StashWhites && isEquipment && cItem.Quality < ItemQuality.Rare4 && cItem.Quality > ItemQuality.Superior)
+                {
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing blues)", cItem.RealName, cItem.InternalName, itemType);
+                    return true;
                 }
 
 

@@ -404,6 +404,14 @@ namespace Trinity
                 return false;
             }
 
+            // Stashing Whites
+            if (Trinity.Settings.Loot.TownRun.StashWhites && cItem.Quality < ItemQuality.Magic1)
+                return false;
+
+            // Stashing Blues
+            if (Trinity.Settings.Loot.TownRun.StashBlues && cItem.Quality > ItemQuality.Superior && cItem.Quality < ItemQuality.Rare4)
+                return false;
+
             if (cItem.Quality >= ItemQuality.Legendary && salvageOption == SalvageOption.InfernoOnly && cItem.Level >= 60)
                 return true;
 

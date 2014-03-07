@@ -472,13 +472,19 @@ namespace Trinity
                             return AddToCache;
                         }
 
-                        if ((isChest || isCorpse) && Settings.WorldObject.OpenContainers && c_RadiusDistance <= Settings.WorldObject.ContainerOpenRange)
+                        if (isChest && Settings.WorldObject.OpenContainers && c_RadiusDistance <= Settings.WorldObject.ContainerOpenRange)
                         {
                             AddToCache = true;
                             return AddToCache;
                         }
 
-                        if (isRareChest && Settings.WorldObject.OpenRareChest)
+                        if (isCorpse && Settings.WorldObject.InspectCorpses && c_RadiusDistance <= Settings.WorldObject.ContainerOpenRange)
+                        {
+                            AddToCache = true;
+                            return AddToCache;
+                        }
+
+                        if (isRareChest && Settings.WorldObject.OpenRareChests)
                         {
                             AddToCache = true;
                             return AddToCache;

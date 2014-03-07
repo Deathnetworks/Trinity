@@ -713,7 +713,7 @@ namespace Trinity
                             break;
                         }
                     }
-                // Handle Globes
+                case GObjectType.PowerGlobe:
                 case GObjectType.HealthGlobe:
                     {
                         // Ignore it if it's not in range yet

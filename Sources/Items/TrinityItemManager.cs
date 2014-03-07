@@ -205,13 +205,22 @@ namespace Trinity
                 }
             }
 
-            // auto trash blue weapons/armor/jewlery
-            if ((item.ItemBaseType == ItemBaseType.Armor
-                 || item.ItemBaseType == ItemBaseType.Weapon
-                 || item.ItemBaseType == ItemBaseType.Jewelry)
-                && item.ItemQualityLevel < ItemQuality.Rare4)
+            bool isEquipment = (cItem.DBBaseType == ItemBaseType.Armor
+               || cItem.DBBaseType == ItemBaseType.Weapon
+               || cItem.DBBaseType == ItemBaseType.Jewelry);
+
+            // Stashing Whites, auto-keep
+            if (Trinity.Settings.Loot.TownRun.StashWhites && isEquipment && cItem.Quality < ItemQuality.Magic1)
             {
-                return false;
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing whites)", cItem.RealName, cItem.InternalName, trinityItemType);
+                return true;
+            }
+
+            // Stashing blues, auto-keep
+            if (Trinity.Settings.Loot.TownRun.StashWhites && isEquipment && cItem.Quality < ItemQuality.Rare4 && cItem.Quality > ItemQuality.Superior)
+            {
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing blues)", cItem.RealName, cItem.InternalName, trinityItemType);
+                return true;
             }
 
             if (cItem.Quality >= ItemQuality.Legendary)
@@ -284,6 +293,14 @@ namespace Trinity
             // Take Salvage Option corresponding to ItemLevel
             SalvageOption salvageOption = GetSalvageOption(cItem.Quality);
 
+            // Stashing Whites
+            if (Trinity.Settings.Loot.TownRun.StashWhites && cItem.Quality < ItemQuality.Magic1)
+                return false;
+
+            // Stashing Blues
+            if (Trinity.Settings.Loot.TownRun.StashBlues && cItem.Quality > ItemQuality.Superior && cItem.Quality < ItemQuality.Rare4)
+                return false;
+            
             if (cItem.Quality >= ItemQuality.Legendary && salvageOption == SalvageOption.InfernoOnly && cItem.Level >= 60)
                 return true;
 

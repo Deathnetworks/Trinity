@@ -18,6 +18,7 @@ namespace Trinity.Config
         private bool _UseEmpoweredShrine;
         private bool _UseEnlightenedShrine;
         private bool _UseFleetingShrine;
+        private bool _InspectCorpses;
         private bool _OpenContainers;
         private bool _OpenRareChest;
         private int _HealthWellMinHealth;
@@ -43,7 +44,7 @@ namespace Trinity.Config
 
         #region Properties
         [DataMember(IsRequired = false)]
-        [DefaultValue(15)]
+        [DefaultValue(45)]
         public int ContainerOpenRange
         {
             get
@@ -205,7 +206,25 @@ namespace Trinity.Config
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
+        public bool InspectCorpses
+        {
+            get
+            {
+                return _InspectCorpses;
+            }
+            set
+            {
+                if (_InspectCorpses != value)
+                {
+                    _InspectCorpses = value;
+                    OnPropertyChanged("InspectCorpses");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
         public bool OpenContainers
         {
             get
@@ -224,7 +243,7 @@ namespace Trinity.Config
 
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
-        public bool OpenRareChest
+        public bool OpenRareChests
         {
             get
             {
@@ -319,6 +338,8 @@ namespace Trinity.Config
             this.UseProtectionShrine = true;
             this.HealthWellMinHealth = 75;
             this.DestructibleOption = DestructibleIgnoreOption.OnlyIfStuck;
+            this.OpenContainers = true;
+            this.OpenRareChests = true;
         }
         #endregion Methods
     }
