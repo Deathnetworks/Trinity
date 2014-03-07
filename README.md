@@ -1,6 +1,156 @@
 ﻿
 # Trinity
 
+### Changelog 1.8.2
+
+#### Items and Looting
+
+* Fixed not picking up legendary/set plans with "Legendary Plans" checkbox checked
+
+* Added option for Inspecting Corpses
+
+* Fixed not picking up PowerGlobes
+
+* Added new Container/Chest GUI options
+
+* Added options to pickup white and gray items
+
+* Added White Item Salvage Options
+
+* Fixed not opening demonic vessels
+
+* (Hopefully) fixed missing legendaries - related to Loot 2.0/X1 item names.
+
+* Trinity now picks up diamonds
+
+#### Combat
+
+* Fixed hero attacking friendly summoned minions (from items and such)
+
+* Fixed not casting WOTB on single elites
+
+* Set default Wizard Arcane Orb time to spam (from 1/2 second)
+
+* Default BarbHOTA changed to 45 fury (up from 20)
+
+* Fixed Health Wells
+
+* Added mortar avoidance defaults
+
+* Fixed using potions
+
+* Added Avoidance for FrozenPulse
+
+* Changed default potion levels for all classes to 35% (potions restore a constant 60% health)
+
+* Fixed Monk Mantra Passive checks
+
+* Added support for new Weapon Throw and Ancient Spear
+
+* Added AoE logic for Wormhole, Thunderstorm, Poison Enchanted, Pulse, Orbiter
+
+#### General/Technical
+
+* Added TrinitySetQuesting tag to disable Trashpack settings for Questing
+
+* Fixed IndexOutOfRangeException in ItemDropStats
+
+* Completely rebuilt chest/container cache logic
+
+* Add Equipped/Backpack/Ground/Stash Item Attribute/Property debug dump buttons to Items/Scoring page
+
+* Removed potion types from UI, added more potion stack options
+
+* Healthglobes should now be picked up even if we're trying to Town Portal
+
+* Fixed Exception/errors when refreshing Gizmo/Doors
+
+* Added Trinity Debug Logger
+
+* Reworked Gizmo identification for RoS
+
+* Fixed warnings, .313 GameDifficulty error
+
+### Changelog 1.8.0
+
+* Removed force local pathfinding, DB now always has local pathfinding
+
+* Added Litany/Wailing host rings summoned skeleton to blacklist
+
+* Increase Max Trash Combat Range to 200 in UI
+
+* Using intell's persistent stats
+
+* Forcetownrun with Minimum free bag slots now only triggered in town (intell)
+
+* Using intell's Barbarian TVars
+
+* Ignore Two-Hand Pickup now only ignores Rare and lesser
+
+* Fixed TrinityExploreDungeon to ACTUALLY disable SetNodesExploredAutomatically
+
+* Changed default behavior of TrinityExploreDungeon to automatically disable new minimap explored logic
+
+* Bombastic's "-1 or Invalid" Trinity logs fix
+
+* Added debug logging for Units that somehow get casted to Gizmo's
+
+* Fixed IgnoreScenes broken in TrinityExploreDungeon due to new caching system
+
+* Added fail-safe checks to TrinityMoveToScene
+
+* Fixed TrinityTownPortal only working *once* :)
+
+* Cache: always refresh units in Quest areas
+
+* Cache: Moved blacklist check to after Object type check
+
+* DemonHunter: Added MarkedForDeath to tracked spells
+
+* Fixed bot TPS default
+
+* Fixed exception in TrinityMoveToScene where no scene name was specified
+
+* Added a few more QuestLevelAreaId's
+
+* TrinityExploreDungeon will now investigate an actor if the actorId is defined and EndType=ExitFound
+
+* Added Conversation Close button to UI Element click checks
+
+* Added ItemQualityLevelIdentified to ItemsDropped.log
+
+* Added PriorityScene as an alias to PrioritizeScene TrinityDungeonExplorer PrioritizeScenes element
+
+* Converted a bunch of stuff to be Async for performance.
+
+* UI XAML is now loaded Asynchronously when Plugin is enabled.
+
+* Added potential safety checks for new game reset if we get disconnected during a town run
+
+* Changed "Pickup Two Handed Weapons" to "Ignore Two Handed Weapons"
+
+* Fixed a few NullReferenceExceptions
+
+* Refactored GameUI a little more
+
+* Fixed not picking up 2 hand weapons
+
+* Optimizations for HotbarSkills / Hotbar
+
+* Optimizations for UI Elements
+
+* Removed Bot TPS (now set to Maximum)
+
+* Optimizations for TrinityExploreDungeon
+
+* DemonHunter: Fixed Chakram: Shuriken Cloud
+
+* DemonHunter: Set default kite distance to 0
+
+### Changelog 1.7.3.10
+
+* Barbarian: Fixed Fury Dump with Battle Rage
+
 ### Changelog 1.7.3.9
 
 #### WitchDoctor
