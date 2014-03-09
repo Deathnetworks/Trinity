@@ -1,6 +1,36 @@
 ﻿
 # Trinity
 
+### Changelog 1.8.3
+
+* Fixed Monk refreshing sweeping wind while casting TownPortal
+
+* Added Wizard option for Archon with Elites only (still requires buffs up if on hotbar)
+
+* Fixed (Suppressed to debug) common Memory Reading errors
+
+* Added OverPower as a Barbarian Destructible Power
+
+* Dashing strike can now be used for OOC movement
+
+* Fixed Trinity not reading new hotbar skills when changed
+
+* Fixed the 10-20 second stuck when PowerGlobes are dropped
+
+* Removed electrified affix avoidance bug
+
+* Fixed monk Mystic Ally TVar error
+
+* Fixed startup crash on missing ItemRules directory/files
+
+* Fixed TrinityTownPortal causing lots of lag in town
+
+* Added support for identifying Summoner units (will eventually get higher priority in another release)
+
+* Modified FrozenPulse defaults for all classes to 5 radius / 25% health
+
+* Modified ThunderStorm defaults for all classes to 5 radius / 50% health
+
 ### Changelog 1.8.2
 
 #### Items and Looting
