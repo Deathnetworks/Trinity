@@ -484,7 +484,7 @@ namespace Trinity
         private static void PrintObjectProperties<T>(T item)
         {
             PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            foreach (PropertyInfo property in properties)
+            foreach (PropertyInfo property in properties.ToList().OrderBy(p => p.Name))
             {
                 try
                 {
@@ -492,7 +492,7 @@ namespace Trinity
                     if (val != null)
                         Logger.Log(typeof(T).Name + "." + property.Name + "=" + val.ToString());
                 }
-                catch (Exception ex)
+                catch 
                 {
                     Logger.Log("Exception reading {0} from object", property.Name);
                 }

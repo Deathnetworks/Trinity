@@ -139,7 +139,7 @@ namespace Trinity
                 iTotalDeaths++;
                 iDeathsThisRun++;
                 PlayerInfoCache.RefreshHotbar();
-                AbilityLastUsedCache = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
+                CacheData.AbilityLastUsedCache = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
                 vBacktrackList = new SortedList<int, Vector3>();
                 iTotalBacktracks = 0;
                 PlayerMover.TotalAntiStuckAttempts = 1;
@@ -211,7 +211,7 @@ namespace Trinity
                     TownRun.PreTownRunWorldId = -1;
                     TownRun.WasVendoring = false;
 
-                    AbilityLastUsedCache.Clear();
+                    CacheData.AbilityLastUsedCache.Clear();
 
                     TrinityUseOnce.UseOnceIDs = new HashSet<int>();
                     TrinityUseOnce.UseOnceCounter = new Dictionary<int, int>();
@@ -240,28 +240,30 @@ namespace Trinity
                     NavHelper.UsedStuckSpots = new List<GridPoint>();
 
                     // Reset all the caches
-                    objectTypeCache = new Dictionary<int, GObjectType>();
-                    unitMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
-                    unitMaxHealthCache = new Dictionary<int, double>();
-                    currentHealthCache = new Dictionary<int, double>();
-                    currentHealthCheckTimeCache = new Dictionary<int, int>();
-                    unitBurrowedCache = new Dictionary<int, bool>();
-                    actorSNOCache = new Dictionary<int, int>();
-                    ACDGUIDCache = new Dictionary<int, int>();
-                    nameCache = new Dictionary<int, string>();
-                    gameBalanceIDCache = new Dictionary<int, int>();
-                    dynamicIDCache = new Dictionary<int, int>();
-                    positionCache = new Dictionary<int, Vector3>();
-                    goldAmountCache = new Dictionary<int, int>();
-                    itemQualityCache = new Dictionary<int, ItemQuality>();
-                    pickupItemCache = new Dictionary<int, bool>();
-                    summonedByIdCache = new Dictionary<int, int>();
-                    interactAttemptsCache = new Dictionary<int, int>();
+                    CacheData.objectTypeCache = new Dictionary<int, GObjectType>();
+                    CacheData.unitMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
+                    CacheData.unitMaxHealthCache = new Dictionary<int, double>();
+                    CacheData.currentHealthCache = new Dictionary<int, double>();
+                    CacheData.currentHealthCheckTimeCache = new Dictionary<int, int>();
+                    CacheData.unitBurrowedCache = new Dictionary<int, bool>();
+                    CacheData.actorSNOCache = new Dictionary<int, int>();
+                    CacheData.ACDGUIDCache = new Dictionary<int, int>();
+                    CacheData.nameCache = new Dictionary<int, string>();
+                    CacheData.gameBalanceIDCache = new Dictionary<int, int>();
+                    CacheData.dynamicIDCache = new Dictionary<int, int>();
+                    CacheData.positionCache = new Dictionary<int, Vector3>();
+                    CacheData.goldAmountCache = new Dictionary<int, int>();
+                    CacheData.itemQualityCache = new Dictionary<int, ItemQuality>();
+                    CacheData.pickupItemCache = new Dictionary<int, bool>();
+                    CacheData.summonedByACDIdCache = new Dictionary<int, int>();
+                    CacheData.interactAttemptsCache = new Dictionary<int, int>();
+                    CacheData.itemLinkQualityCache = new Dictionary<int, ItemQuality>();
+                    CacheData.isSummonerCache = new Dictionary<int, bool>();
                     ProfileHistory = new List<string>();
                     CurrentProfile = "";
                     FirstProfile = "";
 
-                    AbilityLastUsedCache = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
+                    CacheData.AbilityLastUsedCache = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
 
                     GoldInactivity.ResetCheckGold();
 

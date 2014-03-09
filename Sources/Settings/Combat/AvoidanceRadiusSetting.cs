@@ -259,7 +259,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(25)]
+        [DefaultValue(5)]
         public int FrozenPulse
         {
             get
@@ -564,7 +564,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(15)]
+        [DefaultValue(5)]
         public int Thunderstorm
         {
             get

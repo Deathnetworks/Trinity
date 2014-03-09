@@ -12,6 +12,7 @@ namespace Trinity.Config.Combat
         private int _KiteLimit;
         private bool _WaitArchon;
         private bool _NoArcaneStrike;
+        private bool _ArchonElitesOnly;
         private int _ArchonMobCount;
         private float _ArchonMobDistance;
         private WizardKiteOption _KiteOption;
@@ -70,6 +71,24 @@ namespace Trinity.Config.Combat
         #endregion Constructors
 
         #region Properties
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool ArchonElitesOnly
+        {
+            get
+            {
+                return _ArchonElitesOnly;
+            }
+            set
+            {
+                if (_ArchonElitesOnly != value)
+                {
+                    _ArchonElitesOnly = value;
+                    OnPropertyChanged("ArchonElitesOnly");
+                }
+            }
+        }
+        
         [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool NoArcaneStrike
@@ -143,7 +162,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(WizardArchonCancelOption.RebuffMagicWeaponFamiliar)]
+        [DefaultValue(WizardArchonCancelOption.Never)]
         public WizardArchonCancelOption ArchonCancelOption
         {
             get
@@ -502,7 +521,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1f)]
+        [DefaultValue(0.25f)]
         public float AvoidFrozenPulseHealth
         {
             get
@@ -826,7 +845,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1f)]
+        [DefaultValue(0.50f)]
         public float AvoidThunderstormHealth
         {
             get
@@ -889,6 +908,7 @@ namespace Trinity.Config.Combat
             this.AvoidGrotesqueHealth = 1;
             this.AvoidOrbiterHealth = 1;
             this.AvoidWormholeHealth = 0.50f;
+            this.ArchonElitesOnly = true;
         }
 
         #endregion Methods

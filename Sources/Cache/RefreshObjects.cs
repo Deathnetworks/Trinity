@@ -66,9 +66,9 @@ namespace Trinity
                 // Add Team HotSpots to the cache
                 ObjectCache.AddRange(GroupHotSpots.GetCacheObjectHotSpots());
 
+                    /* Fire Chains Experimental Avoidance */
                 if (Settings.Combat.Misc.UseExperimentalFireChainsAvoidance)
                 {
-                    /* Fire Chains Experimental Avoidance */
                     const float fireChainSize = 5f;
                     foreach (var unit1 in ObjectCache.Where(u => u.MonsterAffixes.HasFlag(MonsterAffixes.FireChains)))
                     {
@@ -104,6 +104,7 @@ namespace Trinity
                     foreach (var unit1 in ObjectCache.Where(u => u.IsFacingPlayer && u.Animation == SNOAnim.Beast_start_charge_02 ||
                                     u.Animation == SNOAnim.Beast_charge_02 || u.Animation == SNOAnim.Beast_charge_04))
                     {
+
                         Vector3 endPoint = MathEx.GetPointAt(unit1.Position, 90f, unit1.Unit.Movement.Rotation);
 
                         for (float i = 0; i <= unit1.Position.Distance2D(endPoint); i += (beastChargePathWidth / 4))
@@ -132,6 +133,9 @@ namespace Trinity
                                     .Max(aoe => aoe.Location.Distance2D(Trinity.Player.Position)));
                     }
                 }
+
+                /* Poison Experimental Avoidance */
+
 
 
 
@@ -409,9 +413,9 @@ namespace Trinity
                                 currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType);
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "{0}", ex);
 
-                        if (c_ACDGUID != -1 && objectTypeCache.ContainsKey(c_RActorGuid))
+                        if (c_ACDGUID != -1 && CacheData.objectTypeCache.ContainsKey(c_RActorGuid))
                         {
-                            objectTypeCache.Remove(c_RActorGuid);
+                            CacheData.objectTypeCache.Remove(c_RActorGuid);
                         }
 
                     }
@@ -542,7 +546,7 @@ namespace Trinity
                 MonsterObstacleCache = new HashSet<CacheObstacleObject>();
                 AvoidanceObstacleCache = new HashSet<CacheObstacleObject>();
                 NavigationObstacleCache = new HashSet<CacheObstacleObject>();
-                AnyElitesPresent = false;
+                //AnyElitesPresent = false;
                 AnyMobsInRange = false;
 
                 IsAvoidingProjectiles = false;
@@ -583,27 +587,27 @@ namespace Trinity
 
         private static void ClearCachesOnGameChange(object sender, EventArgs e)
         {
-            positionCache = new Dictionary<int, Vector3>();
-            objectTypeCache = new Dictionary<int, GObjectType>();
-            actorSNOCache = new Dictionary<int, int>();
-            ACDGUIDCache = new Dictionary<int, int>();
-            currentHealthCache = new Dictionary<int, double>();
-            currentHealthCheckTimeCache = new Dictionary<int, int>();
-            unitMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
-            unitMaxHealthCache = new Dictionary<int, double>();
-            dictionaryStoredMonsterTypes = new Dictionary<int, MonsterType>();
-            dictionaryStoredMonsterSizes = new Dictionary<int, MonsterSize>();
-            unitBurrowedCache = new Dictionary<int, bool>();
-            summonedByIdCache = new Dictionary<int, int>();
-            nameCache = new Dictionary<int, string>();
-            goldAmountCache = new Dictionary<int, int>();
-            gameBalanceIDCache = new Dictionary<int, int>();
-            dynamicIDCache = new Dictionary<int, int>();
-            itemQualityCache = new Dictionary<int, ItemQuality>();
-            pickupItemCache = new Dictionary<int, bool>();
-            hasBeenRayCastedCache = new Dictionary<int, bool>();
-            hasBeenNavigableCache = new Dictionary<int, bool>();
-            hasBeenInLoSCache = new Dictionary<int, bool>();
+            CacheData.positionCache = new Dictionary<int, Vector3>();
+            CacheData.objectTypeCache = new Dictionary<int, GObjectType>();
+            CacheData.actorSNOCache = new Dictionary<int, int>();
+            CacheData.ACDGUIDCache = new Dictionary<int, int>();
+            CacheData.currentHealthCache = new Dictionary<int, double>();
+            CacheData.currentHealthCheckTimeCache = new Dictionary<int, int>();
+            CacheData.unitMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
+            CacheData.unitMaxHealthCache = new Dictionary<int, double>();
+            CacheData.dictionaryStoredMonsterTypes = new Dictionary<int, MonsterType>();
+            CacheData.dictionaryStoredMonsterSizes = new Dictionary<int, MonsterSize>();
+            CacheData.unitBurrowedCache = new Dictionary<int, bool>();
+            CacheData.summonedByACDIdCache = new Dictionary<int, int>();
+            CacheData.nameCache = new Dictionary<int, string>();
+            CacheData.goldAmountCache = new Dictionary<int, int>();
+            CacheData.gameBalanceIDCache = new Dictionary<int, int>();
+            CacheData.dynamicIDCache = new Dictionary<int, int>();
+            CacheData.itemQualityCache = new Dictionary<int, ItemQuality>();
+            CacheData.pickupItemCache = new Dictionary<int, bool>();
+            CacheData.hasBeenRayCastedCache = new Dictionary<int, bool>();
+            CacheData.hasBeenNavigableCache = new Dictionary<int, bool>();
+            CacheData.hasBeenInLoSCache = new Dictionary<int, bool>();
         }
 
         private static HashSet<string> ignoreNames = new HashSet<string>

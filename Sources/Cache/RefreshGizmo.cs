@@ -31,7 +31,7 @@ namespace Trinity
             }
 
             // Retrieve collision sphere radius, cached if possible
-            if (!collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
+            if (!CacheData.collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
             {
                 try
                 {
@@ -48,7 +48,7 @@ namespace Trinity
                     c_IgnoreSubStep = "CollisionSphereException";
                     AddToCache = false;
                 }
-                collisionSphereCache.Add(c_ActorSNO, c_Radius);
+                CacheData.collisionSphereCache.Add(c_ActorSNO, c_Radius);
             }
 
             // A "fake distance" to account for the large-object size of monsters
@@ -84,20 +84,6 @@ namespace Trinity
                 return AddToCache;
             }
 
-            // Anything that's not operatable
-            bool operatable = false;
-
-            try
-            {
-                operatable = ((DiaGizmo)c_diaObject).Operatable;
-            }
-            catch
-            {
-                // do nothing
-            }
-
-            // Now for the specifics
-            int physicsSno;
             double minDistance;
             bool gizmoUsed = false;
             switch (c_ObjectType)
@@ -440,7 +426,9 @@ namespace Trinity
                         AddToCache = false;
 
                         bool isRareChest = c_InternalName.ToLower().Contains("chest_rare") || DataDictionary.ResplendentChestIds.Contains(c_ActorSNO);
-                        bool isChest = !isRareChest || DataDictionary.ContainerWhiteListIds.Contains(c_ActorSNO); // We know it's a container but this is not a known rare chest
+                        bool isChest = (!isRareChest && c_InternalName.ToLower().Contains("chest")) ||
+                            c_InternalName.ToLower().Contains("weaponrack") ||
+                            DataDictionary.ContainerWhiteListIds.Contains(c_ActorSNO); // We know it's a container but this is not a known rare chest
                         bool isCorpse = c_InternalName.ToLower().Contains("corpse");
 
                         // We want to do some vendoring, so don't open anything new yet
@@ -490,8 +478,15 @@ namespace Trinity
                             return AddToCache;
                         }
 
-                        Logger.LogDebug("Possible Chest SNO: {0} ({1})", c_ActorSNO, c_InternalName);
-                        c_IgnoreSubStep = "InvalidContainer";
+                        if (!isChest && !isCorpse && !isRareChest)
+                        {
+                            Logger.LogDebug("Possible Chest SNO: {0} ({1})", c_ActorSNO, c_InternalName);
+                            c_IgnoreSubStep = "InvalidContainer";
+                        }
+                        else
+                        {
+                            c_IgnoreSubStep = "IgnoreContainer";
+                        }
                         break;
                     }
             }

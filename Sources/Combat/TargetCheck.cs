@@ -140,7 +140,7 @@ namespace Trinity
                             //UIManager.UsePotion();
                             GameUI.SafeClickElement(GameUI.PotionButton, "Use Potion", false);
 
-                            AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
+                            CacheData.AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
                             WaitWhileAnimating(2, true);
                         }
                     }
@@ -162,7 +162,9 @@ namespace Trinity
                     // Out of combat buffing etc. but only if we don't want to return to town etc.
                     ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
 
-                    if (!Player.IsInTown && !IsReadyToTownRun && !ForceVendorRunASAP && myAnimationState != null
+                    bool isLoopingAnimation = ZetaDia.Me.LoopingAnimationEndTime > 0;
+
+                    if (!Player.IsInTown && !isLoopingAnimation && !IsReadyToTownRun && !ForceVendorRunASAP && myAnimationState != null
                         && myAnimationState.State != AnimationState.Attacking
                         && myAnimationState.State != AnimationState.Casting
                         && myAnimationState.State != AnimationState.Channeling)
@@ -180,7 +182,7 @@ namespace Trinity
                                 BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitBeforeUseDelay));
                             ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
                             LastPowerUsed = powerBuff.SNOPower;
-                            AbilityLastUsedCache[powerBuff.SNOPower] = DateTime.Now;
+                            CacheData.AbilityLastUsedCache[powerBuff.SNOPower] = DateTime.Now;
                             if (powerBuff.WaitTicksAfterUse > 0)
                                 BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitAfterUseDelay));
                             WaitWhileAnimating(3, true);

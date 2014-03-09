@@ -126,11 +126,11 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return Trinity.AbilityLastUsedCache;
+                return CacheData.AbilityLastUsedCache;
             }
             set
             {
-                Trinity.AbilityLastUsedCache = value;
+                CacheData.AbilityLastUsedCache = value;
             }
         }
 
@@ -472,8 +472,8 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         internal static double TimeSincePowerUse(SNOPower power)
         {
-            if (AbilityLastUsedCache.ContainsKey(power))
-                return DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds;
+            if (CacheData.AbilityLastUsedCache.ContainsKey(power))
+                return DateTime.Now.Subtract(CacheData.AbilityLastUsedCache[power]).TotalMilliseconds;
             else
                 return -1;
         }

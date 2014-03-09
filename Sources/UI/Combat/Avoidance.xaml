@@ -139,7 +139,7 @@
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Margin="2" Text="Orbiter" FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock Margin="2" Text="FrozenPulse" FontWeight="Bold" VerticalAlignment="Center"/>
                 <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
                             Interval="500" Maximum="30" Minimum="2" 
                             SmallChange="1" LargeChange="5"

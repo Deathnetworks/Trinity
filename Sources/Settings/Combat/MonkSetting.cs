@@ -16,6 +16,7 @@ namespace Trinity.Config.Combat
         private bool _SWBeforeWoL;
         private bool _DisableMantraSpam;
         private bool _TargetBasedZigZag;
+        private bool _UseDashingStrikeOOC;
         private int _MinCycloneTrashCount;
         private int _MinWoLTrashCount;
         private bool _SpamSweepingWindOnLowHP;
@@ -230,6 +231,24 @@ namespace Trinity.Config.Combat
                 {
                     _TargetBasedZigZag = value;
                     OnPropertyChanged("TargetBasedZigZag");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool UseDashingStrikeOOC
+        {
+            get
+            {
+                return _UseDashingStrikeOOC;
+            }
+            set
+            {
+                if (_UseDashingStrikeOOC != value)
+                {
+                    _UseDashingStrikeOOC = value;
+                    OnPropertyChanged("UseDashingStrikeOOC");
                 }
             }
         }
@@ -540,7 +559,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1f)]
+        [DefaultValue(0.25f)]
         public float AvoidFrozenPulseHealth
         {
             get
@@ -864,7 +883,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1f)]
+        [DefaultValue(0.50f)]
         public float AvoidThunderstormHealth
         {
             get

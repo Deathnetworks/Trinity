@@ -218,7 +218,7 @@ namespace Trinity
 					if (buff.SNOId == 30479) //Frenzy  (+25% atk speed)
 						Trinity.GotFrenzyShrine = true;
                 }
-                Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Refreshed buffs: " + buffList);
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Refreshed buffs: " + buffList);
                 // Archon stuff
                 if (archonBuff)
                 {
@@ -266,15 +266,15 @@ namespace Trinity
                 for (int i = 0; i <= 5; i++)
                 {
                     SNOPower power = HotbarSkills.GetPowerForSlot((HotbarSlot)i);
-                    hotbarSkills += string.Format("{0}-{1}", power, (HotbarSlot)i);
+                    hotbarSkills += string.Format("{0}-{1} ", power, (HotbarSlot)i);
                     Trinity.Hotbar.Add(power);
                     if (!DataDictionary.LastUseAbilityTimeDefaults.ContainsKey(power))
                     {
                         DataDictionary.LastUseAbilityTimeDefaults.Add(power, DateTime.MinValue);
                     }
-                    if (!Trinity.AbilityLastUsedCache.ContainsKey(power))
+                    if (!CacheData.AbilityLastUsedCache.ContainsKey(power))
                     {
-                        Trinity.AbilityLastUsedCache.Add(power, DateTime.MinValue);
+                        CacheData.AbilityLastUsedCache.Add(power, DateTime.MinValue);
                     }
                 }
                 Trinity.HasMappedPlayerAbilities = true;

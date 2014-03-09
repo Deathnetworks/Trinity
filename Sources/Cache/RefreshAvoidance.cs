@@ -14,7 +14,7 @@ namespace Trinity
             AddToCache = true;
 
             // Retrieve collision sphere radius, cached if possible
-            if (!collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
+            if (!CacheData.collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
             {
                 try
                 {
@@ -29,7 +29,7 @@ namespace Trinity
                     AddToCache = false;
                     return AddToCache;
                 }
-                collisionSphereCache.Add(c_ActorSNO, c_Radius);
+                CacheData.collisionSphereCache.Add(c_ActorSNO, c_Radius);
             }
 
             try
@@ -137,19 +137,19 @@ namespace Trinity
                     else
                     {
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Is standing in avoidance Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-                       c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
+                            c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
                     }
                 }
                 else
                 {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "NOT standing in Avoidance Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-                   c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
+                    // Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "NOT standing in Avoidance Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+                    //    c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
                 }
             }
             else
             {
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Enough health for avoidance, ignoring Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-               c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
+               //Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Enough health for avoidance, ignoring Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+               //c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
             }
 
             return AddToCache;

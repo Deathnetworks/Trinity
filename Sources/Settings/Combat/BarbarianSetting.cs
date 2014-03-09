@@ -711,7 +711,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1f)]
+        [DefaultValue(0.50f)]
         public float AvoidThunderstormHealth
         {
             get

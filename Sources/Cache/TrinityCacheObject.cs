@@ -66,6 +66,8 @@ namespace Trinity
         public bool IsBossOrEliteRareUnique { get { return (this.Type == GObjectType.Unit && (IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         public bool IsTrashMob { get { return (this.Type == GObjectType.Unit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         public bool IsMe { get { return RActorGuid == Trinity.Player.RActorGuid; } }
+        public bool IsSummonedByPlayer { get; set; }
+        public bool IsSummoner { get; set; }
 
         public DiaUnit Unit
         {

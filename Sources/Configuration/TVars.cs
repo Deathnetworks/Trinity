@@ -152,7 +152,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.Monk_SweepingWind", 1500, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Monk_CycloneStrike", 900, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Monk_SevenSidedStrike", 30200, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Monk_MysticAlly", 30000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_Monk_MysticAlly_v2", 30000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.X1_Monk_MantraOfEvasion_v2", 3300, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.X1_Monk_MantraOfRetribution_v2", 3300, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.X1_Monk_MantraOfHealing_v2", 3300, "Spell Use Delay/Interval, milliseconds"));

@@ -19,10 +19,13 @@ namespace Trinity
                 return AddToCache;
 
             if (!c_diaUnit.IsValid)
-                return AddToCache;
+                return false;
 
             if (!c_diaUnit.CommonData.IsValid)
-                return AddToCache;
+                return false;
+
+            if (c_CommonData.ACDGuid == -1)
+                return false;
 
             // grab this first
             c_CurrentAnimation = c_diaUnit.CommonData.CurrentAnimation;
@@ -32,76 +35,64 @@ namespace Trinity
 
             // hax for Diablo_shadowClone
             c_unit_IsAttackable = c_InternalName.StartsWith("Diablo_shadowClone");
-            c_IsFacingPlayer = c_diaUnit.IsFacingPlayer;
-            c_Rotation = c_diaUnit.Movement.Rotation;
 
-            if (c_CommonData.ACDGuid == -1)
+            try
+            {
+                if (c_diaUnit.Movement.IsValid)
+                {
+                    c_IsFacingPlayer = c_diaUnit.IsFacingPlayer;
+                    c_Rotation = c_diaUnit.Movement.Rotation;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error while reading Rotation/Facing: {0}", ex.ToString());
+            }
+
+            /*
+            *  TeamID  - check once for all units except bosses (which can potentially change teams - Belial, Cydea)
+            */
+            string teamIdHash = HashGenerator.GetGenericHash("teamId.RActorGuid=" + c_RActorGuid + ".ActorSNO=" + c_ActorSNO + ".WorldId=" + Player.WorldID);
+
+            int teamId = 0;
+            if (!c_unit_IsBoss && GenericCache.ContainsKey(teamIdHash))
+            {
+                teamId = (int)GenericCache.GetObject(teamIdHash).Value;
+            }
+            else
+            {
+                teamId = c_CommonData.GetAttribute<int>(ActorAttributeType.TeamID);
+
+                GenericCache.AddToCache(new GenericCacheObject()
+                {
+                    Key = teamIdHash,
+                    Value = teamId,
+                    Expires = DateTime.Now.AddMinutes(60)
+                });
+            }
+            if (teamId == 1 || teamId == 2)
             {
                 AddToCache = false;
+                c_IgnoreSubStep += "IsTeam1|2+";
                 return AddToCache;
             }
 
-            // Dictionary based caching of monster types based on the SNO codes
-            MonsterType monsterType;
-            // See if we need to refresh the monster type or not
-            bool notInCache = !dictionaryStoredMonsterTypes.TryGetValue(c_ActorSNO, out monsterType);
-            // either we're in a quest area or not in cache
-            bool refreshMonsterType = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) || notInCache;
-            using (new PerformanceLogger("RefreshUnit.5"))
+            /* Always refresh monster type */
+            if (c_ObjectType != GObjectType.Player)
             {
-                // If it's a boss and it was an ally, keep refreshing until it's not an ally
-                // Because some bosses START as allied for cutscenes etc. until they become hostile
-                if (c_unit_IsBoss && !refreshMonsterType)
+                switch (c_CommonData.MonsterInfo.MonsterType)
                 {
-                    switch (monsterType)
-                    {
-                        case MonsterType.Ally:
-                        case MonsterType.Scenery:
-                        case MonsterType.Helper:
-                        case MonsterType.Team:
-                            refreshMonsterType = true;
-                            break;
-                    }
+                    case MonsterType.Ally:
+                    case MonsterType.Scenery:
+                    case MonsterType.Helper:
+                    case MonsterType.Team:
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "AllySceneryHelperTeam";
+                            return AddToCache;
+                        }
                 }
             }
-            using (new PerformanceLogger("RefreshUnit.6"))
-            {
-                // Now see if we do need to get new data for this boss or not
-                if (refreshMonsterType)
-                {
-                    try
-                    {
-                        monsterType = RefreshMonsterType(c_CommonData, monsterType, notInCache);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monsterinfo and monstertype for unit {0} [{1}]", c_InternalName, c_ActorSNO);
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.CacheManagement, "ActorTypeAttempt={0}", c_diaUnit.ActorType);
-                        AddToCache = false;
-                    }
-                }
-
-                // Make sure it's a valid monster type
-                if (c_ObjectType != GObjectType.Player)
-                {
-                    switch (monsterType)
-                    {
-                        case MonsterType.Ally:
-                        case MonsterType.Scenery:
-                        case MonsterType.Helper:
-                        case MonsterType.Team:
-                            {
-                                AddToCache = false;
-                                c_IgnoreSubStep = "AllySceneryHelperTeam";
-                                return AddToCache;
-                            }
-                    }
-                }
-            }
-            // Force return here for un-attackable allies
-            if (!AddToCache)
-                return AddToCache;
 
             using (new PerformanceLogger("RefreshUnit.8"))
             {
@@ -123,9 +114,9 @@ namespace Trinity
                 }
                 // Pull up the Monster Affix cached data
                 RefreshAffixes();
+                if (c_MonsterAffixes.HasFlag(MonsterAffixes.Shielding))
+                    c_unit_HasShieldAffix = true;
 
-                // Is this something we should try to force leap/other movement abilities against?
-                c_ForceLeapAgainst = false;
             }
             double killRange;
 
@@ -133,12 +124,10 @@ namespace Trinity
 
             c_KillRange = killRange;
 
-            if (c_MonsterAffixes.HasFlag(MonsterAffixes.Shielding))
-                c_unit_HasShieldAffix = true;
 
             // Only if at full health, else don't bother checking each loop
             // See if we already have this monster's size stored, if not get it and cache it
-            if (!dictionaryStoredMonsterSizes.TryGetValue(c_ActorSNO, out c_unit_MonsterSize))
+            if (!CacheData.dictionaryStoredMonsterSizes.TryGetValue(c_ActorSNO, out c_unit_MonsterSize))
             {
                 try
                 {
@@ -155,7 +144,7 @@ namespace Trinity
             if (!DataDictionary.InteractAtCustomRange.TryGetValue(c_ActorSNO, out c_Radius))
             {
                 // Retrieve collision sphere radius, cached if possible
-                if (!collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
+                if (!CacheData.collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
                 {
                     try
                     {
@@ -168,7 +157,7 @@ namespace Trinity
                         AddToCache = false;
                         return AddToCache;
                     }
-                    collisionSphereCache.Add(c_ActorSNO, c_Radius);
+                    CacheData.collisionSphereCache.Add(c_ActorSNO, c_Radius);
                 }
             }
 
@@ -201,8 +190,8 @@ namespace Trinity
                 c_RadiusDistance = 1f;
 
             // Special flags to decide whether to target anything at all
-            if (c_IsEliteRareUnique || c_unit_IsBoss)
-                AnyElitesPresent = true;
+            //if (c_IsEliteRareUnique || c_unit_IsBoss)
+            //    AnyElitesPresent = true;
 
             // Extended kill radius after last fighting, or when we want to force a town run
             if ((Settings.Combat.Misc.ExtendedTrashKill && iKeepKillRadiusExtendedFor > 0) || ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
@@ -258,7 +247,7 @@ namespace Trinity
             if (monsterInfo != null)
             {
                 c_unit_MonsterSize = monsterInfo.MonsterSize;
-                dictionaryStoredMonsterSizes.Add(c_ActorSNO, c_unit_MonsterSize);
+                CacheData.dictionaryStoredMonsterSizes.Add(c_ActorSNO, c_unit_MonsterSize);
             }
             else
             {
@@ -268,16 +257,19 @@ namespace Trinity
 
         private static void RefreshMonsterHealth()
         {
+            if (!c_diaUnit.IsValid)
+                return;
+
             // health calculations
             double maxHealth;
             // Get the max health of this unit, a cached version if available, if not cache it
-            if (!unitMaxHealthCache.TryGetValue(c_RActorGuid, out maxHealth))
+            if (!CacheData.unitMaxHealthCache.TryGetValue(c_RActorGuid, out maxHealth))
             {
                 maxHealth = c_diaUnit.HitpointsMax;
-                unitMaxHealthCache.Add(c_RActorGuid, maxHealth);
+                CacheData.unitMaxHealthCache.Add(c_RActorGuid, maxHealth);
             }
 
-            // Health calculations
+            // Health calculations            
             c_HitPoints = c_diaUnit.HitpointsCurrent;
 
             // And finally put the two together for a current health percentage
@@ -286,33 +278,7 @@ namespace Trinity
 
         private static bool RefreshUnitAttributes(bool AddToCache = true, DiaUnit unit = null)
         {
-            /*
-             *  TeamID  - check once for all units except bosses (which can potentially change teams - Belial, Cydea)
-             */
-            string teamIdHash = HashGenerator.GetGenericHash("teamId.RActorGuid=" + c_RActorGuid + ".ActorSNO=" + c_ActorSNO + ".WorldId=" + Player.WorldID);
 
-            int teamId = 0;
-            if (!c_unit_IsBoss && GenericCache.ContainsKey(teamIdHash))
-            {
-                teamId = (int)GenericCache.GetObject(teamIdHash).Value;
-            }
-            else
-            {
-                teamId = c_CommonData.GetAttribute<int>(ActorAttributeType.TeamID);
-
-                GenericCache.AddToCache(new GenericCacheObject()
-                {
-                    Key = teamIdHash,
-                    Value = teamId,
-                    Expires = DateTime.Now.AddMinutes(60)
-                });
-            }
-            if (teamId == 1 || teamId == 2)
-            {
-                AddToCache = false;
-                c_IgnoreSubStep += "IsTeam1|2+";
-                return AddToCache;
-            }
 
             if (!DataDictionary.IgnoreUntargettableAttribute.Contains(c_ActorSNO) && unit.IsUntargetable)
             {
@@ -330,13 +296,13 @@ namespace Trinity
             }
 
             bool isBurrowed = false;
-            if (!unitBurrowedCache.TryGetValue(c_RActorGuid, out isBurrowed))
+            if (!CacheData.unitBurrowedCache.TryGetValue(c_RActorGuid, out isBurrowed))
             {
                 isBurrowed = unit.IsBurrowed;
                 // if the unit is NOT burrowed - we can attack them, add to cache (as IsAttackable)
                 if (!isBurrowed)
                 {
-                    unitBurrowedCache.Add(c_RActorGuid, isBurrowed);
+                    CacheData.unitBurrowedCache.Add(c_RActorGuid, isBurrowed);
                 }
             }
 
@@ -433,12 +399,12 @@ namespace Trinity
             using (new PerformanceLogger("RefreshAffixes"))
             {
                 MonsterAffixes affixFlags;
-                if (!unitMonsterAffixCache.TryGetValue(c_RActorGuid, out affixFlags))
+                if (!CacheData.unitMonsterAffixCache.TryGetValue(c_RActorGuid, out affixFlags))
                 {
                     try
                     {
                         affixFlags = c_CommonData.MonsterAffixes;
-                        unitMonsterAffixCache.Add(c_RActorGuid, affixFlags);
+                        CacheData.unitMonsterAffixCache.Add(c_RActorGuid, affixFlags);
                     }
                     catch (Exception ex)
                     {
@@ -459,9 +425,10 @@ namespace Trinity
 
             }
         }
-        private static MonsterType RefreshMonsterType(ACD tempCommonData, MonsterType monsterType, bool bAddToDictionary)
+        private static MonsterType RefreshMonsterType(bool addToDictionary)
         {
-            SNORecordMonster monsterInfo = tempCommonData.MonsterInfo;
+            SNORecordMonster monsterInfo = c_CommonData.MonsterInfo;
+            MonsterType monsterType;
             if (monsterInfo != null)
             {
                 // Force Jondar as an undead, since Diablo 3 sticks him as a permanent ally
@@ -474,10 +441,10 @@ namespace Trinity
                     monsterType = monsterInfo.MonsterType;
                 }
                 // Is this going to be a new dictionary entry, or updating one already existing?
-                if (bAddToDictionary)
-                    dictionaryStoredMonsterTypes.Add(c_ActorSNO, monsterType);
+                if (addToDictionary)
+                    CacheData.dictionaryStoredMonsterTypes.Add(c_ActorSNO, monsterType);
                 else
-                    dictionaryStoredMonsterTypes[c_ActorSNO] = monsterType;
+                    CacheData.dictionaryStoredMonsterTypes[c_ActorSNO] = monsterType;
             }
             else
             {
@@ -485,16 +452,39 @@ namespace Trinity
             }
             return monsterType;
         }
-        private static bool RefreshStepCachedPlayerSummons(bool AddToCache)
+        private static bool RefreshStepCachedSummons(bool AddToCache)
         {
-            if (c_diaUnit != null)
+            if (c_diaUnit != null && c_diaUnit.IsValid)
             {
-                c_SummonedByACDId = c_diaUnit.SummonedByACDId;
 
-                if (c_SummonedByACDId == Player.MyDynamicID)
+                if (!CacheData.summonedByACDIdCache.TryGetValue(c_ACDGUID, out c_SummonedByACDId))
                 {
-                    c_IsPlayerSummoned = true;
+                    try
+                    {
+                        c_SummonedByACDId = c_diaUnit.SummonedByACDId;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Exception reading SummonedByACDId {0}", ex.ToString());
+                    }
                 }
+                if (!CacheData.isSummonerCache.TryGetValue(c_ACDGUID, out c_IsSummoner))
+                {
+                    try
+                    {
+                        c_IsSummoner = c_diaUnit.CommonData.GetAttribute<int>(ActorAttributeType.SummonerID) > 0;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Exception reading SummonerID {0}", ex.ToString());
+                    }
+                }
+
+                if (c_SummonedByACDId == Player.ACDGuid)
+                {
+                    c_IsSummonedByPlayer = true;
+                }
+
 
                 // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
                 if (Player.ActorClass == ActorClass.Monk)

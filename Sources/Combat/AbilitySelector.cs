@@ -179,8 +179,8 @@ namespace Trinity
         /// <returns></returns>
         internal static double TimeSinceUse(SNOPower power)
         {
-            if (AbilityLastUsedCache.ContainsKey(power))
-                return DateTime.Now.Subtract(AbilityLastUsedCache[power]).TotalMilliseconds;
+            if (CacheData.AbilityLastUsedCache.ContainsKey(power))
+                return DateTime.Now.Subtract(CacheData.AbilityLastUsedCache[power]).TotalMilliseconds;
             else
                 return -1;
         }

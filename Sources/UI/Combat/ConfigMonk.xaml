@@ -59,6 +59,7 @@
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.SWBeforeWoL}" ToolTip="Always use Sweeping Wind before Wave of Light">Always use SW before WoL</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.DisableMantraSpam}" ToolTip="Disable Spamming Mantras (for the 3-sec. buff)">Disable Mantra Spam</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Monk.SpamSweepingWindOnLowHP}" ToolTip="Use with Transcendance Passive for Health Regen">Spam Sweeping Wind on Low HP</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Monk.UseDashingStrikeOOC}" ToolTip="Use Dashing Strike for OOC Movement">Use Dashing Strike OOC</CheckBox>
             </UniformGrid>
         </Grid>
 

@@ -1,4 +1,5 @@
-﻿using Zeta.Common;
+﻿using System;
+using Zeta.Common;
 namespace Trinity
 {
     // Obstacles for quick mapping of paths etc.
@@ -11,6 +12,8 @@ namespace Trinity
         public string Name { get; set; }
         public int HitPointsCurPct { get; set; }
         public int HitPointsCur { get; set; }
+        public DateTime Expires { get; set; }
+
         public AvoidanceType AvoidanceType
         {
             get

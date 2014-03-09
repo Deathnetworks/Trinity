@@ -42,7 +42,7 @@ namespace Trinity
 
         public HotbarSkills()
         {
-            
+
         }
 
         /// <summary>
@@ -50,28 +50,24 @@ namespace Trinity
         /// </summary>
         public static void Update()
         {
-            if (Trinity.Player.ActorClass != ActorClass.Wizard && !Trinity.GetHasBuff(SNOPower.Wizard_Archon) &&
-                Trinity.Player.ActorClass != ActorClass.Witchdoctor && !Trinity.GetHasBuff(SNOPower.Witchdoctor_Hex))
+            _assignedSkills.Clear();
+            UpdateHotbarSlotPowers();
+            foreach (SNOPower p in Trinity.Hotbar)
             {
-                _assignedSkills.Clear();
-                UpdateHotbarSlotPowers();
-                foreach (SNOPower p in Trinity.Hotbar)
+                _assignedSkills.Add(new HotbarSkills()
                 {
-                    _assignedSkills.Add(new HotbarSkills()
-                    {
-                        Power = p,
-                        Slot = HotbarSkills.GetHotbarSlotFromPower(p),
-                        RuneIndex = HotbarSkills.GetRuneIndexFromPower(p)
-                    });
-                }
-
-                string skillList = "";
-                foreach (HotbarSkills skill in HotbarSkills.AssignedSkills)
-                {
-                    skillList += " " + skill.Power.ToString() + "/" + skill.RuneIndex + "/" + skill.Slot;
-                }
-                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, " Hotbar Skills (Skill/RuneIndex/Slot): " + skillList);
+                    Power = p,
+                    Slot = HotbarSkills.GetHotbarSlotFromPower(p),
+                    RuneIndex = HotbarSkills.GetRuneIndexFromPower(p)
+                });
             }
+
+            string skillList = "";
+            foreach (HotbarSkills skill in HotbarSkills.AssignedSkills)
+            {
+                skillList += " " + skill.Power.ToString() + "/" + skill.RuneIndex + "/" + skill.Slot;
+            }
+            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, " Hotbar Skills (Skill/RuneIndex/Slot): " + skillList);
         }
 
 

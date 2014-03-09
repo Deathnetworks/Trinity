@@ -745,7 +745,7 @@ namespace Trinity.UIComponents
             _Model.Loot.Pickup.JewelryBlueLevel = 1;
             _Model.Loot.Pickup.JewelryYellowLevel = 1;
             _Model.Loot.Pickup.LegendaryLevel = 1;
-            _Model.Loot.Pickup.GemLevel = 14;
+            _Model.Loot.Pickup.GemLevel = 60;
             _Model.Loot.Pickup.GemType = TrinityGemType.All;
             _Model.Loot.Pickup.FollowerItem = true;
             _Model.Loot.Pickup.MinimumGoldStack = 0;
@@ -768,7 +768,7 @@ namespace Trinity.UIComponents
             _Model.Loot.Pickup.JewelryYellowLevel = 0;
             _Model.Loot.Pickup.LegendaryLevel = 62;
             _Model.Loot.Pickup.GemLevel = 60;
-            _Model.Loot.Pickup.GemType = TrinityGemType.None;
+            _Model.Loot.Pickup.GemType = TrinityGemType.All;
             _Model.Loot.Pickup.FollowerItem = false;
             _Model.Loot.Pickup.MinimumGoldStack = 900;
             _Model.Loot.Pickup.MiscItemLevel = 60;

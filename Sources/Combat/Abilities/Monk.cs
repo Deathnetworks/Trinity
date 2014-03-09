@@ -618,6 +618,7 @@ namespace Trinity
                     case GObjectType.Barricade:
                     case GObjectType.Destructible:
                     case GObjectType.HealthGlobe:
+                    case GObjectType.PowerGlobe:
                         {
                             if (Settings.Combat.Monk.TROption == TempestRushOption.TrashOnly &&
                                 (TargetUtil.AnyElitesInRange(40f) || CurrentTarget.IsBossOrEliteRareUnique))
@@ -659,7 +660,7 @@ namespace Trinity
                     var usePowerResult = ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, target, CurrentWorldDynamicId, -1);
                     if (usePowerResult)
                     {
-                        AbilityLastUsedCache[SNOPower.Monk_TempestRush] = DateTime.Now;
+                        CacheData.AbilityLastUsedCache[SNOPower.Monk_TempestRush] = DateTime.Now;
                     }
                 }
             }

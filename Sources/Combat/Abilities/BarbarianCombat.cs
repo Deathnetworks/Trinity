@@ -293,7 +293,7 @@ namespace Trinity.Combat.Abilities
 
                 bool emergencyHealth = Player.CurrentHealthPct <= V.F("Barbarian.WOTB.EmergencyHealth");
 
-                bool result = 
+                bool result =
                     (!UseOOCBuff || anyTime) &&
                     //Player.PrimaryResource >= V.I("Barbarian.WOTB.MinFury") && // WOTB is "free" !
                     // Don't still have the buff
@@ -742,6 +742,9 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
+                if (Hotbar.Contains(SNOPower.Barbarian_Overpower))
+                    return new TrinityPower(SNOPower.Barbarian_Overpower, 9);
+                
                 if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource > MinEnergyReserve)
                     return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), LastZigZagLocation);
 

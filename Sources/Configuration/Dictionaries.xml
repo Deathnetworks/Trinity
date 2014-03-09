@@ -21,45 +21,29 @@
   </HashSet>
   <Dictionary Name="AvoidanceType">
     <!-- Patch 2.0.1 -->
-    <Entry SNO="250031" Type="Mortar" />
     <Entry SNO="349774" Type="FrozenPulse" />
+    <Entry SNO="343539" Type="Orbiter" />
+    <Entry SNO="316389" Type="PoisonEnchanted" />
+    <Entry SNO="340319" Type="PoisonEnchanted" />
     <Entry SNO="341512" Type="Thunderstorm" />
     <Entry SNO="337109" Type="Wormhole" />
-    <Entry SNO="4394" Type="Orbiter" />
 
     <!-- 1.0 -->
-    <Entry SNO="219702"     Type="Arcane" />
-    <Entry SNO="221225"    Type="Arcane" />
-    <Entry SNO="84608"     Type="Desecrator" />
-    <Entry SNO="5482"     Type="PoisonTree" />
-    <Entry SNO="6578"     Type="PoisonTree" />
-    <Entry SNO="4803"     Type="MoltenCore" />
-    <Entry SNO="4804"     Type="MoltenCore" />
-    <Entry SNO="224225" Type="MoltenCore" />
-    <Entry SNO="247987" Type="MoltenCore" />
-    <Entry SNO="3847"     Type="Grotesque" />
-    <Entry SNO="3337"    Type="BeastCharge" />
-    <Entry SNO="95868"    Type="MoltenTrail" />
-    <Entry SNO="108869"    Type="PlagueCloud" />
-    <Entry SNO="402"     Type="IceBall" />
-    <Entry SNO="223675"    Type="IceBall" />
-    <Entry SNO="4103"   Type="ShamanFire" />
-    <Entry SNO="5212"   Type="BeeWasp" />
-    <Entry SNO="3865"   Type="PlagueHand" />
-    <Entry SNO="123124" Type="AzmodanPool" />
-    <Entry SNO="93837"    Type="GhomGas" />
+
     <Entry SNO="123839" Type="AzmodanBody" />
+    <Entry SNO="123124" Type="AzmodanPool" />
+    <Entry SNO="123842" Type="AzmoFireball" />
+
+    <Entry SNO="219702" Type="Arcane" />
+    <Entry SNO="221225" Type="Arcane" />
+
+    <Entry SNO="3337"   Type="BeastCharge" />
+
+    <Entry SNO="5212"   Type="BeeWasp" />
+
     <Entry SNO="161822" Type="Belial" />
     <Entry SNO="161833" Type="Belial" />
-    <Entry SNO="123842" Type="AzmoFireball" />
-    <Entry SNO="432"    Type="MageFire" />
-    <Entry SNO="168031" Type="DiabloPrison" />
-    <Entry SNO="214845" Type="DiabloMeteor" />
-    <Entry SNO="260377" Type="IceTrail" />
-    <Entry SNO="160154" Type="MoltenBall" />
-    <Entry SNO="185924" Type="ZoltBubble" />
-    <Entry SNO="139741" Type="ZoltTwister" />
-    <Entry SNO="166686" Type="MaghdaProjectille" />
+
     <Entry SNO="201454" Type="ButcherFloorPanel" />
     <Entry SNO="201464" Type="ButcherFloorPanel" />
     <Entry SNO="201426" Type="ButcherFloorPanel" />
@@ -67,11 +51,57 @@
     <Entry SNO="200969" Type="ButcherFloorPanel" />
     <Entry SNO="201423" Type="ButcherFloorPanel" />
     <Entry SNO="201242" Type="ButcherFloorPanel" />
+
     <Entry SNO="226350" Type="DiabloRingOfFire" />
     <Entry SNO="226525" Type="DiabloRingOfFire" />
+
+    <Entry SNO="84608"  Type="Desecrator" />
+
+    <Entry SNO="93837"  Type="GhomGas" />
+    <Entry SNO="3847"   Type="Grotesque" />
+
+    <Entry SNO="168031" Type="DiabloPrison" />
+    <Entry SNO="214845" Type="DiabloMeteor" />
+
+    <Entry SNO="402"    Type="IceBall" />
+    <Entry SNO="223675" Type="IceBall" />
+
+    <Entry SNO="260377" Type="IceTrail" />
+
+    <Entry SNO="432"    Type="MageFire" />
+
+    <Entry SNO="166686" Type="MaghdaProjectille" />
+
+    <Entry SNO="160154" Type="MoltenBall" />
+    <Entry SNO="4803"   Type="MoltenCore" />
+    <Entry SNO="4804"   Type="MoltenCore" />
+    <Entry SNO="224225" Type="MoltenCore" />
+    <Entry SNO="247987" Type="MoltenCore" />
+
+    <Entry SNO="95868"  Type="MoltenTrail" />
+
+    <Entry SNO="250031" Type="Mortar" />
+
+    <Entry SNO="108869" Type="PlagueCloud" />
+    <Entry SNO="3865"   Type="PlagueHand" />
+
+    <Entry SNO="5482"   Type="PoisonTree" />
+    <Entry SNO="6578"   Type="PoisonTree" />
+
+    <Entry SNO="4103"   Type="ShamanFire" />
+
+    <Entry SNO="185924" Type="ZoltBubble" />
+    <Entry SNO="139741" Type="ZoltTwister" />
+
+
     <Entry SNO="164829" Type="SuccubusStar"/>
   </Dictionary>
   <Dictionary Name="AvoidanceProjectileSNO">
+    <Entry SNO="343539" Type="Orbiter" />
+
+    <Entry SNO="316389" Type="PoisonEnchanted" />
+    <Entry SNO="340319" Type="PoisonEnchanted" />
+
     <Entry SNO="5212" Type="BeesWasps"/>
     <Entry SNO="4103" Type="ShaBall"/>
     <Entry SNO="160154" Type="MolBall"/>

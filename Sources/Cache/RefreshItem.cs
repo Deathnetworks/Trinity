@@ -44,10 +44,10 @@ namespace Trinity
             // Compute item quality from item link for Crafting Plans (Blacksmith or Jewler)
             if(c_InternalName.StartsWith("CraftingPlan_") || c_InternalName.StartsWith("CraftingReagent_Legendary_Unique_"))
             {
-                if (!itemLinkQualityCache.TryGetValue(c_ACDGUID, out c_ItemQuality))
+                if (!CacheData.itemLinkQualityCache.TryGetValue(c_ACDGUID, out c_ItemQuality))
                 {
                     c_ItemQuality = TrinityItemManager.ItemLinkColorToQuality(diaItem.CommonData.ItemLink, c_InternalName, c_ItemDisplayName, c_GameBalanceID);
-                    itemLinkQualityCache.Add(c_ACDGUID, c_ItemQuality);
+                    CacheData.itemLinkQualityCache.Add(c_ACDGUID, c_ItemQuality);
                 }
             }
 
@@ -111,7 +111,7 @@ namespace Trinity
             {
                 c_ObjectType = GObjectType.HealthGlobe;
                 // Create or alter this cached object type
-                objectTypeCache[c_RActorGuid] = c_ObjectType;
+                CacheData.objectTypeCache[c_RActorGuid] = c_ObjectType;
                 AddToCache = true;
             }
 
@@ -120,7 +120,7 @@ namespace Trinity
             {
                 c_ObjectType = GObjectType.PowerGlobe;
                 // Create or alter this cached object type
-                objectTypeCache[c_RActorGuid] = c_ObjectType;
+                CacheData.objectTypeCache[c_RActorGuid] = c_ObjectType;
                 AddToCache = true;
             }
 
@@ -130,7 +130,7 @@ namespace Trinity
             logNewItem = RefreshItemStats(itemBaseType);
 
             // Get whether or not we want this item, cached if possible
-            if (!pickupItemCache.TryGetValue(c_RActorGuid, out AddToCache))
+            if (!CacheData.pickupItemCache.TryGetValue(c_RActorGuid, out AddToCache))
             {
                 if (pickupItem.IsTwoHand && Settings.Loot.Pickup.IgnoreTwoHandedWeapons && c_ItemQuality < ItemQuality.Legendary)
                 {
@@ -155,7 +155,7 @@ namespace Trinity
                     AddToCache = PickupItemValidation(pickupItem);
                 }
 
-                pickupItemCache.Add(c_RActorGuid, AddToCache);
+                CacheData.pickupItemCache.Add(c_RActorGuid, AddToCache);
             }
 
             // Using DB built-in item rules
@@ -177,7 +177,7 @@ namespace Trinity
             string droppedItemLogPath = Path.Combine(FileManager.TrinityLogsPath, String.Format("ItemsDropped.csv"));
 
             bool pickupItem = false;
-            pickupItemCache.TryGetValue(c_RActorGuid, out pickupItem);
+            CacheData.pickupItemCache.TryGetValue(c_RActorGuid, out pickupItem);
 
             bool writeHeader = !File.Exists(droppedItemLogPath);
             using (var LogWriter = new StreamWriter(droppedItemLogPath, true))
@@ -224,7 +224,7 @@ namespace Trinity
             }
 
             // Get the gold amount of this pile, cached if possible
-            if (!goldAmountCache.TryGetValue(c_RActorGuid, out c_GoldStackSize))
+            if (!CacheData.goldAmountCache.TryGetValue(c_RActorGuid, out c_GoldStackSize))
             {
                 try
                 {
@@ -236,7 +236,7 @@ namespace Trinity
                     AddToCache = false;
                     c_IgnoreSubStep = "GetAttributeException";
                 }
-                goldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
+                CacheData.goldAmountCache.Add(c_RActorGuid, c_GoldStackSize);
             }
 
             if (c_GoldStackSize < Settings.Loot.Pickup.MinimumGoldStack)

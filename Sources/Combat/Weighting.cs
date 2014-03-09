@@ -65,7 +65,7 @@ namespace Trinity
                     prioritizeCloseRangeUnits, TownRun.IsTryingToTownPortal(), TrinityTownPortal.ForceClearArea, DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId), Player.Level, CombatBase.IsQuestingMode);
 
                 if (TrinityCombatIgnore.IgnoreList.Any())
-                    Logger.Log(LogCategory.Weight, " CombatIgnoreList={0}", Logger.ListToString(TrinityCombatIgnore.IgnoreList.ToList<object>()));
+                    Logger.LogDebug(LogCategory.Weight, " CombatIgnoreList={0}", Logger.ListToString(TrinityCombatIgnore.IgnoreList.ToList<object>()));
 
                 foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.CentreDistance))
                 {
@@ -90,9 +90,6 @@ namespace Trinity
                         Player.CurrentHealthPct > 0.10
                         ;
 
-                    // Store if we are ignoring all units this cycle or not
-                    bool ignoreAllUnits = shouldIgnoreTrashMobs && ShouldIgnoreElites && noGoblinsPresent;
-                    
                     string unitWeightInfo = "";
 
                     // Just to make sure each one starts at 0 weight...
@@ -104,13 +101,6 @@ namespace Trinity
                         // Weight Units
                         case GObjectType.Unit:
                             {
-                                // No champions, no mobs nearby, no treasure goblins to prioritize, and not injured, so skip mobs
-                                if (ignoreAllUnits)
-                                {
-                                    unitWeightInfo = "ignoreAllUnits";
-                                    break;
-                                }
-
                                 int nearbyMonsterCount = ObjectCache.Count(u => u.IsTrashMob && cacheObject.Position.Distance2D(u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius);
 
                                 bool isInHotSpot = GroupHotSpots.CacheObjectIsInHotSpot(cacheObject);
@@ -118,7 +108,7 @@ namespace Trinity
                                 bool ignoring = false;
                                 // Ignore Solitary Trash mobs (no elites present)
                                 // Except if has been primary target or if already low on health (<= 20%)
-                                if (shouldIgnoreTrashMobs && cacheObject.IsTrashMob && //!cacheObject.HasBeenPrimaryTarget &&
+                                if (shouldIgnoreTrashMobs && cacheObject.IsTrashMob && 
                                     !isInHotSpot &&
                                     !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize))
                                 {
@@ -251,10 +241,16 @@ namespace Trinity
                                             cacheObject.Weight += extraPriority * 2d;
                                         }
 
-                                        // Close range get higher weights the more of them there are, to prevent body-blocking
-                                        if (!cacheObject.IsBoss && cacheObject.RadiusDistance <= 5f)
+                                        // Extra weight for summoners
+                                        if (cacheObject.IsSummoner)
                                         {
-                                            cacheObject.Weight += (2000d * cacheObject.Radius);
+                                            cacheObject.Weight += 2500;
+                                        }
+
+                                        // Close range get higher weights the more of them there are, to prevent body-blocking
+                                        if (!cacheObject.IsBoss && cacheObject.RadiusDistance <= 10f)
+                                        {
+                                            cacheObject.Weight += (3000d * cacheObject.Radius);
                                         }
 
                                         // Special additional weight for corrupt growths in act 4 ONLY if they are at close range (not a standard priority thing)
@@ -474,8 +470,7 @@ namespace Trinity
                                 }
 
                                 // If there's a monster in the path-line to the item, reduce the weight to 1, except legendaries
-                                if (//cacheObject.ItemQuality < ItemQuality.Legendary && 
-                                    MonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius * 1.2f, Player.Position, cacheObject.Position)))
+                                if (MonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius * 1.2f, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 
                                 // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
@@ -497,8 +492,21 @@ namespace Trinity
                             {
                                 if (!TownRun.IsTryingToTownPortal())
                                 {
-                                    cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 17000d;
+                                    cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 5000d;
                                 }
+
+                                // Point-blank items get a weight increase 
+                                if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 12f)
+                                    cacheObject.Weight += 1000d;
+
+                                // If there's a monster in the path-line to the item, reduce the weight to 1, except legendaries
+                                if (MonsterObstacleCache.Any(cp => MathUtil.IntersectsPath(cp.Location, cp.Radius * 1.2f, Player.Position, cacheObject.Position)))
+                                    cacheObject.Weight = 1;
+
+                                // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
+                                if (AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
+                                    cacheObject.Weight = 1;
+
                                 break;
                             }
                         case GObjectType.HealthGlobe:

@@ -22,7 +22,7 @@ namespace Trinity
         public static HashSet<int> BossLevelAreaIDs { get { return bossLevelAreaIDs; } }
         private static readonly HashSet<int> bossLevelAreaIDs = new HashSet<int> { 
             109457, 185228, 60194, 130163, 60714, 19789, 62726, 90881, 195268, 58494, 81178, 60757, 111232, 112580, 
-            119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, 
+            119656, 111516, 143648, 215396, 119882, 109563, 153669, 215235, 55313, 60193, 19789,
         };
 
         /// <summary>
@@ -84,28 +84,49 @@ namespace Trinity
         public static HashSet<int> Avoidances { get { return avoidances; } }
         private static readonly HashSet<int> avoidances = new HashSet<int>
         {
-            // Arcane        Arcane 2      Poison Tree    Molten Core   Molten Core 2   Molten Trail   Plague Cloud   Ice Balls
-            219702,          221225,       5482,6578,     4803, 4804,   224225, 247987, 95868,         108869,        402, 223675,
-            // Bees-Wasps    Plague-Hands  Azmo Pools   Azmo fireball  Azmo bodies   Belial 1       Belial 2    
-            5212,            3865,         123124,      123842,        123839,       161822,        161833,     
-            // Sha-Ball      Mol Ball      Mage Fire    Diablo Prison  Diablo Meteor Ice-trail
-            4103,            160154,       432,         168031,        214845,       260377,
-            // Zolt Bubble	 Zolt Twister  Ghom Gas 	Maghda Proj
-            185924,			 139741,	   93837,		166686,
-            // Diablo Ring of Fire
-            226350, 226525,
+            219702, // Arcane
+            221225, // Arcane 2
+            5482,   // Poison Tree
+            6578,   // Poison Tree
+            4803,   // Molten Core
+            4804,   // Molten Core 
+            224225, // Molten Core 2
+            247987, // Molten Core 2
+            95868,  // Molten Trail
+            108869, // Plague Cloud
+            402,    // Ice Balls
+            223675, // Ice Balls
+            5212,   // Bees-Wasps
+            3865,   // Plague-Hands
+            123124, // Azmo Pools
+            123842, // Azmo fireball
+            123839, // Azmo bodies
+            161822, // Belial 1
+            161833, // Belial 2
+            4103,   // Sha-Ball
+            160154, // Mol Ball
+            432,    // Mage Fire
+            168031, // Diablo Prison
+            214845, // Diablo Meteor
+            260377, // Ice-trail
+            185924, // Zolt Bubble
+            139741, // Zolt Twister
+            93837,  // Ghom Gas
+            166686, // Maghda Proj
+            226350, // Diablo Ring of Fire
+            226525, // Diablo Ring of Fire
             250031, // Mortar MonsterAffix_Mortar_Pending
 
+            84608,  // Desecrator monsterAffix_Desecrator_damage_AOE
+            84606,  // Desecrator monsterAffix_Desecrator_telegraph
 
-            84608, // Desecrator monsterAffix_Desecrator_damage_AOE
-            84606, // Desecrator monsterAffix_Desecrator_telegraph
-
-            337109, // Wormhole X1_MonsterAffix_TeleportMines
-            4394, // Orbiter g_ChargedBolt_Projectile 
+            /* 2.0 */
             349774, // FrozenPulse x1_MonsterAffix_frozenPulse_monster
+            343539, // Orbiter X1_MonsterAffix_Orbiter_Projectile
+            316389, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
+            340319, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
             341512, // Thunderstorm x1_MonsterAffix_Thunderstorm_Impact
-            316389, // PoisonEnchanted  x1_MonsterAffix_CorpseBomber_projectile (316389)
-            340319 // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
+            337109, // Wormhole X1_MonsterAffix_TeleportMines
         };
 
         /// <summary>
@@ -113,14 +134,46 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> AvoidanceProjectiles { get { return avoidanceProjectiles; } }
         private static readonly HashSet<int> avoidanceProjectiles = new HashSet<int>
-            {
-                // Bees-Wasps  Sha-Ball   Mol Ball   Azmo fireball	Zolt Twister	Maghda Projectile   Succubus Stars  Diablo Expanding Fire           Diablo Lightning Breath
-                5212,          4103,      160154,    123842,		139741,			166686,             164829,         185999, 196526, 136533, 
-                4394, // Orbiter 
-                341512, // Thunderstorm 
-                316389, // PoisonEnchanted  x1_MonsterAffix_CorpseBomber_projectile (316389)
-                340319 // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
+        {
+            5212,   // Bees-Wasps
+            4103,   // Sha-Ball
+            160154, // Molten Ball
+            123842, // Azmo fireball
+            139741, // Zolt Twister
+            166686, // Maghda Projectile
+            164829, // Succubus Stars
+            185999, // Diablo Expanding Fire
+            196526, // Diablo Expanding Fire
+            136533, // Diablo Lightning Breath
+            343539, // Orbiter X1_MonsterAffix_Orbiter_Projectile
+            341512, // Thunderstorm 
+            316389, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
+            340319, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
          };
+
+        /// <summary>
+        /// A list of SNO's that spawn AoE then disappear from the object manager
+        /// </summary>
+        public static HashSet<int> AvoidanceSpawners { get { return avoidanceSpawners; } }
+        private static readonly HashSet<int> avoidanceSpawners = new HashSet<int>
+        {
+            5482,   // Poison Tree
+            6578,   // Poison Tree
+            316389, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
+            340319, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
+        };
+
+        /// <summary>
+        /// The duration the AoE from AvoidanceSpawners should be avoided for
+        /// </summary>
+        public static Dictionary<int, TimeSpan> AvoidanceSpawnerDuration { get { return avoidanceSpawnerDuration; } }
+        private static readonly Dictionary<int, TimeSpan> avoidanceSpawnerDuration = new Dictionary<int, TimeSpan>
+        {
+            {5482, TimeSpan.FromSeconds(10)},   // Poison Tree
+            {6578, TimeSpan.FromSeconds(10)},   // Poison Tree
+            {316389, TimeSpan.FromSeconds(10)}, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
+            {340319, TimeSpan.FromSeconds(10)}, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
+        };
 
         /*
          * Combat-related dictionaries/defaults
@@ -269,6 +322,7 @@ namespace Trinity
             115403, // A1 Cain Skeleton boss
             4373, 4376, 177539, // A1 Robbers
             168240, // A2 Jewler quest
+            84919, // Skelton King
          };
 
 
@@ -387,7 +441,7 @@ namespace Trinity
         /// </summary>
         public static HashSet<int> ContainerWhiteListIds { get { return containerWhiteListIds; } }
         private static readonly HashSet<int> containerWhiteListIds = new HashSet<int> {
-            62859, 62865, 62872, 78790, 79016, 94708, 96522, 130170, 108122, 111870, 111947, 213447, 213446, 51300, 179865, 109264, 212491, 210422, 211861,
+            62859, 62865, 62872, 78790, 79016, 94708, 96522, 130170, 108122, 111870, 111947, 213447, 213446, 51300, 179865, 109264, 212491, 210422, 211861, 
             // Magi
 			196945, 70534,
             // Demonic Vessels
@@ -438,6 +492,8 @@ namespace Trinity
             182443, 211456,
             // uber fire chains in Realm of Turmoil and Iron Gate in Realm of Chaos
             263014, 
+            5724, 5727, 
+            116063, 
         };
 
         /// <summary>

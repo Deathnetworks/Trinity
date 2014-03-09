@@ -298,7 +298,7 @@ namespace Trinity
                             {
                                 ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
                                 LastPowerUsed = powerBuff.SNOPower;
-                                AbilityLastUsedCache[powerBuff.SNOPower] = DateTime.Now;
+                                CacheData.AbilityLastUsedCache[powerBuff.SNOPower] = DateTime.Now;
                             }
                         }
                     }
@@ -453,15 +453,16 @@ namespace Trinity
                                 // * Gold & Globe - need to get within pickup radius only
                                 case GObjectType.Gold:
                                 case GObjectType.HealthGlobe:
+                                case GObjectType.PowerGlobe:
                                     {
                                         // Count how many times we've tried interacting
-                                        if (!interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                                        if (!CacheData.interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                                         {
-                                            interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
+                                            CacheData.interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
                                         }
                                         else
                                         {
-                                            interactAttemptsCache[CurrentTarget.RActorGuid]++;
+                                            CacheData.interactAttemptsCache[CurrentTarget.RActorGuid]++;
                                         }
                                         // If we've tried interacting too many times, blacklist this for a while
                                         if (iInteractAttempts > 3)
@@ -504,13 +505,13 @@ namespace Trinity
                                             hashRGUIDDestructible3SecBlacklist.Add(CurrentTarget.RActorGuid);
                                         }
                                         // Count how many times we've tried interacting
-                                        if (!interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                                        if (!CacheData.interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                                         {
-                                            interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
+                                            CacheData.interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
                                         }
                                         else
                                         {
-                                            interactAttemptsCache[CurrentTarget.RActorGuid]++;
+                                            CacheData.interactAttemptsCache[CurrentTarget.RActorGuid]++;
                                         }
                                         // If we've tried interacting too many times, blacklist this for a while
                                         if ((iInteractAttempts > 5 || (CurrentTarget.Type == GObjectType.Interactable && iInteractAttempts > 3)) &&
@@ -588,16 +589,16 @@ namespace Trinity
                                                     LastTempestRushLocation = CurrentTarget.Position;
                                             }
                                             // Count how many times we've tried interacting
-                                            if (!interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                                            if (!CacheData.interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                                             {
-                                                interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
+                                                CacheData.interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
                                             }
                                             else
                                             {
-                                                interactAttemptsCache[CurrentTarget.RActorGuid]++;
+                                                CacheData.interactAttemptsCache[CurrentTarget.RActorGuid]++;
                                             }
 
-                                            AbilityLastUsedCache[CombatBase.CurrentPower.SNOPower] = DateTime.Now;
+                                            CacheData.AbilityLastUsedCache[CombatBase.CurrentPower.SNOPower] = DateTime.Now;
                                             //CurrentPower.SNOPower = SNOPower.None;
                                             WaitWhileAnimating(6, true);
                                             // Prevent this EXACT object being targetted again for a short while, just incase
@@ -745,6 +746,7 @@ namespace Trinity
                         // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
                         if ((CurrentTarget.Type == GObjectType.Avoidance ||
                             CurrentTarget.Type == GObjectType.HealthGlobe ||
+                            CurrentTarget.Type == GObjectType.PowerGlobe ||
                             Monk_SpecialMovement ||
                             (CurrentTarget.Type == GObjectType.Backtrack && Settings.Combat.Misc.AllowOOCMovement))
                             && NavHelper.CanRayCast(Player.Position, vCurrentDestination)
@@ -776,7 +778,7 @@ namespace Trinity
                                     Monk_TempestRushReady())
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, CurrentWorldDynamicId, -1);
-                                    AbilityLastUsedCache[SNOPower.Monk_TempestRush] = DateTime.Now;
+                                    CacheData.AbilityLastUsedCache[SNOPower.Monk_TempestRush] = DateTime.Now;
                                     LastPowerUsed = SNOPower.Monk_TempestRush;
                                     LastTempestRushLocation = vCurrentDestination;
                                     // Store the current destination for comparison incase of changes next loop
@@ -842,7 +844,7 @@ namespace Trinity
                         {
                             ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, CurrentWorldDynamicId, -1);
                             LastPowerUsed = SNOPower.Barbarian_Whirlwind;
-                            AbilityLastUsedCache[SNOPower.Barbarian_Whirlwind] = DateTime.Now;
+                            CacheData.AbilityLastUsedCache[SNOPower.Barbarian_Whirlwind] = DateTime.Now;
                         }
                         // Store the current destination for comparison incase of changes next loop
                         vLastMoveToTarget = vCurrentDestination;
@@ -1074,7 +1076,7 @@ namespace Trinity
                         //UIManager.UsePotion();
                         GameUI.SafeClickElement(GameUI.PotionButton, "Use Potion", false);
 
-                        AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
+                        CacheData.AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
                         WaitWhileAnimating(2, true);
                     }
                 }
@@ -1108,13 +1110,13 @@ namespace Trinity
                             // health calculations
                             double dThisMaxHealth;
                             // Get the max health of this unit, a cached version if available, if not cache it
-                            if (!unitMaxHealthCache.TryGetValue(c_RActorGuid, out dThisMaxHealth))
+                            if (!CacheData.unitMaxHealthCache.TryGetValue(c_RActorGuid, out dThisMaxHealth))
                             {
                                 try
                                 {
 
                                     dThisMaxHealth = CurrentTarget.Unit.HitpointsMax;
-                                    unitMaxHealthCache.Add(c_RActorGuid, CurrentTarget.Unit.HitpointsMax);
+                                    CacheData.unitMaxHealthCache.Add(c_RActorGuid, CurrentTarget.Unit.HitpointsMax);
                                 }
                                 catch
                                 {
@@ -1169,7 +1171,7 @@ namespace Trinity
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    AbilityLastUsedCache[SNOPower.Barbarian_Leap] = DateTime.Now;
+                    CacheData.AbilityLastUsedCache[SNOPower.Barbarian_Leap] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
                 // Furious Charge movement for a barb
@@ -1179,13 +1181,13 @@ namespace Trinity
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    AbilityLastUsedCache[SNOPower.Barbarian_FuriousCharge] = DateTime.Now;
+                    CacheData.AbilityLastUsedCache[SNOPower.Barbarian_FuriousCharge] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
                 // Vault for a Demon Hunter
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Vault) &&
                     //DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= CombatBase.SetSNOPowerUseDelay(SNOPower.DemonHunter_Vault] &&
-                    DateTime.Now.Subtract(Trinity.AbilityLastUsedCache[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
+                    DateTime.Now.Subtract(CacheData.AbilityLastUsedCache[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
                     (PlayerKiteDistance <= 0 || (!MonsterObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
                     !AvoidanceObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance))) &&
@@ -1194,7 +1196,7 @@ namespace Trinity
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    AbilityLastUsedCache[SNOPower.DemonHunter_Vault] = DateTime.Now;
+                    CacheData.AbilityLastUsedCache[SNOPower.DemonHunter_Vault] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
@@ -1205,7 +1207,7 @@ namespace Trinity
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    AbilityLastUsedCache[SNOPower.Wizard_Teleport] = DateTime.Now;
+                    CacheData.AbilityLastUsedCache[SNOPower.Wizard_Teleport] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
                 // Archon Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
@@ -1215,7 +1217,7 @@ namespace Trinity
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    AbilityLastUsedCache[SNOPower.Wizard_Archon_Teleport] = DateTime.Now;
+                    CacheData.AbilityLastUsedCache[SNOPower.Wizard_Archon_Teleport] = DateTime.Now;
                     bFoundSpecialMovement = true;
                 }
                 return bFoundSpecialMovement;
@@ -1267,6 +1269,7 @@ namespace Trinity
                         break;
                     case GObjectType.Item:
                     case GObjectType.Gold:
+                    case GObjectType.PowerGlobe:
                     case GObjectType.HealthGlobe:
                         statusText.Append("Pickup ");
                         break;
@@ -1369,11 +1372,10 @@ namespace Trinity
                         lastMoveResult = MoveResult.Moved;
                         // just "Click" 
                         Navigator.PlayerMover.MoveTowards(vCurrentDestination);
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Straight line pathing to {0}", destname);
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Straight line pathing to {0}", destname);
                     }
                     else
                     {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Using Navigator to reach target");
                         lastMoveResult = PlayerMover.NavigateTo(vCurrentDestination, destname);
                     }
 
@@ -1438,6 +1440,7 @@ namespace Trinity
                             break;
                         }
                     // * Globes - need to get within pickup radius only
+                    case GObjectType.PowerGlobe:
                     case GObjectType.HealthGlobe:
                         {
                             TargetRangeRequired = Player.GoldPickupRadius;
@@ -1581,7 +1584,7 @@ namespace Trinity
                     SpellTracker.TrackSpellOnUnit(CombatBase.CurrentPower.TargetACDGUID, CombatBase.CurrentPower.SNOPower);
                     SpellHistory.RecordSpell(CombatBase.CurrentPower);
 
-                    AbilityLastUsedCache[CombatBase.CurrentPower.SNOPower] = DateTime.Now;
+                    CacheData.AbilityLastUsedCache[CombatBase.CurrentPower.SNOPower] = DateTime.Now;
                     lastGlobalCooldownUse = DateTime.Now;
                     LastPowerUsed = CombatBase.CurrentPower.SNOPower;
                     //CombatBase.CurrentPower.SNOPower = SNOPower.None;
@@ -1707,16 +1710,16 @@ namespace Trinity
                 }
                 WaitWhileAnimating(5, true);
                 // Count how many times we've tried interacting
-                if (!interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                if (!CacheData.interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                 {
-                    interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
+                    CacheData.interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
 
                     // Fire item looted for Demonbuddy Item stats
                     GameEvents.FireItemLooted(CurrentTarget.ACDGuid);
                 }
                 else
                 {
-                    interactAttemptsCache[CurrentTarget.RActorGuid]++;
+                    CacheData.interactAttemptsCache[CurrentTarget.RActorGuid]++;
                 }
                 // If we've tried interacting too many times, blacklist this for a while
                 if (iInteractAttempts > 20 && CurrentTarget.ItemQuality < ItemQuality.Legendary)

@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿
+
+using System.Diagnostics;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
@@ -110,33 +112,44 @@ namespace Trinity.XmlTags
                         )
                     )
                 ),
+
                 new Decorator(ret => !ForceClearArea,
                     new PrioritySelector(
+
                         new Decorator(ret => ZetaDia.Me.Movement.IsMoving,
                             new Sequence(
                                 Zeta.Bot.CommonBehaviors.MoveStop(),
                                 new Sleep(1000)
                             )
                         ),
+
                         new Decorator(ret => PortalCastTimer.IsRunning && PortalCastTimer.ElapsedMilliseconds >= 7000,
                             new Sequence(
-                                new Action(ret => {
+                                new Action(ret =>
+                                {
                                     Technicals.Logger.LogNormal("Stuck casting town portal, moving a little");
                                     Navigator.MoveTo(NavHelper.FindSafeZone(Trinity.Player.Position, false, true));
                                     PortalCastTimer.Reset();
                                 })
                             )
                         ),
+
+
+                        new Decorator(ret => PortalCastTimer.IsRunning && ZetaDia.Me.LoopingAnimationEndTime > 0, // Already casting, just wait
+                            new Action(ret => RunStatus.Success)
+                        ),
+
                         new Sequence(
-                            new DecoratorContinue(ret => PortalCastTimer.IsRunning && ZetaDia.Me.LoopingAnimationEndTime > 0, // Already casting, just wait
-                                new Action()
-                            ),
                             new Action(ret =>
                             {
                                 PortalCastTimer.Restart();
                                 GameEvents.FireWorldTransferStart();
                                 ZetaDia.Me.UseTownPortal();
-                            })
+                            }),
+
+                            new WaitContinue(3, ret => ZetaDia.Me.LoopingAnimationEndTime > 0,
+                                new Sleep(100)
+                            )
                         )
                     )
                 )
@@ -150,3 +163,4 @@ namespace Trinity.XmlTags
         }
     }
 }
+

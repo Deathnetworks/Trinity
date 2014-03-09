@@ -129,6 +129,15 @@ namespace Trinity.Technicals
         {
             Log(TrinityLogLevel.Debug, LogCategory.UserInformation, formatMessage, args);
         }
+        /// <summary>
+        /// Logs a message with Normal/UserInformation
+        /// </summary>
+        /// <param name="formatMessage"></param>
+        /// <param name="args"></param>
+        public static void LogDebug(LogCategory logCategory, string formatMessage, params object[] args)
+        {
+            Log(TrinityLogLevel.Debug, logCategory, formatMessage, args);
+        }
 
         /// <summary>Converts <see cref="TrinityLogLevel"/> to <see cref="LogLevel"/>.</summary>
         /// <param name="level">The trinity logging level.</param>
@@ -171,7 +180,7 @@ namespace Trinity.Technicals
 
         private static Object _logLock = 0;
         private static Queue<string> DebugLogQueue = new Queue<string>();
-        private static Thread LoggerThread;
+        internal static Thread LoggerThread;
 
         private static void DebugLogger()
         {

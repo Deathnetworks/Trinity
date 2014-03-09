@@ -37,10 +37,15 @@ namespace Trinity
             // Wizards want to save up to a reserve of 65+ energy
             MinEnergyReserve = 65;
 
-            bool hasCriticalMass = false; // ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass);
-
             if (!GetHasBuff(SNOPower.Wizard_Archon))
             {
+
+                // Diamond Skin SPAM
+                if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Wizard_DiamondSkin) && LastPowerUsed != SNOPower.Wizard_DiamondSkin && !GetHasBuff(SNOPower.Wizard_DiamondSkin) &&
+                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 1) || Player.CurrentHealthPct <= 0.90 || Player.IsIncapacitated || Player.IsRooted || CurrentTarget.RadiusDistance <= 40f))
+                {
+                    return new TrinityPower(SNOPower.Wizard_DiamondSkin, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
+                }
 
                 // Slow Time for in combat
                 if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_SlowTime) &&
@@ -48,63 +53,6 @@ namespace Trinity
                     PowerManager.CanCast(SNOPower.Wizard_SlowTime))
                 {
                     return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
-                }
-                // Wave of force
-                if (!UseOOCBuff && !Player.IsIncapacitated && Player.PrimaryResource >= 25 &&
-                    (
-                    // Check this isn't a critical mass wizard, cos they won't want to use this except for low health unless they don't have nova/blast in which case go for it
-                    (hasCriticalMass && ((!Hotbar.Contains(SNOPower.Wizard_FrostNova) && !Hotbar.Contains(SNOPower.Wizard_ExplosiveBlast)) ||
-                        (Player.CurrentHealthPct <= 0.7 && (TargetUtil.AnyMobsInRange(15f) || TargetUtil.IsEliteTargetInRange(23f)))))
-                    // Else normal wizard in which case check standard stuff
-                    || (!hasCriticalMass && TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || Player.CurrentHealthPct <= 0.7 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 23f))
-                    ) &&
-                    Hotbar.Contains(SNOPower.Wizard_WaveOfForce) &&
-                    SNOPowerUseTimer(SNOPower.Wizard_WaveOfForce, true) && PowerManager.CanCast(SNOPower.Wizard_WaveOfForce))
-                {
-                    return new TrinityPower(SNOPower.Wizard_WaveOfForce, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
-                }
-
-                //SkillDict.Add("Blizzard", SNOPower.Wizard_Blizzard);
-                //RuneDict.Add("GraspingChill", 2);
-                //RuneDict.Add("FrozenSolid", 4);
-                //RuneDict.Add("Snowbound", 3);
-                //RuneDict.Add("StarkWinter", 1);
-                //RuneDict.Add("UnrelentingStorm", 0);
-
-                bool hasSnowBoundRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Blizzard && s.RuneIndex == 3);
-
-                // Blizzard
-                if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Blizzard) &&
-                    (TargetUtil.ClusterExists(18f, 90f, 2, false) || TargetUtil.AnyElitesInRange(40f) || TargetUtil.IsEliteTargetInRange(45f)) &&
-                    (Player.PrimaryResource >= 40 || (hasSnowBoundRune && Player.PrimaryResource >= 20)) && SNOPowerUseTimer(SNOPower.Wizard_Blizzard))
-                {
-                    var bestClusterPoint = TargetUtil.GetBestClusterPoint(18f, 45f, false);
-                    return new TrinityPower(SNOPower.Wizard_Blizzard, 45f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
-                }
-                // Meteor
-                if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Meteor) &&
-                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 3) || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss || CurrentTarget.IsTreasureGoblin) &&
-                    Player.PrimaryResource >= 50 && PowerManager.CanCast(SNOPower.Wizard_Meteor))
-                {
-                    return new TrinityPower(SNOPower.Wizard_Meteor, 21f, new Vector3(CurrentTarget.Position.X, CurrentTarget.Position.Y, CurrentTarget.Position.Z), CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
-                }
-                // Teleport in combat for critical-mass wizards
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Teleport) && hasCriticalMass &&
-                    LastPowerUsed != SNOPower.Wizard_Teleport &&
-                    Player.PrimaryResource >= 15 && CurrentTarget.CentreDistance <= 35f &&
-                    PowerManager.CanCast(SNOPower.Wizard_Teleport))
-                {
-                    var pos = TargetUtil.GetBestClusterPoint(15f, 35f);
-                    return new TrinityPower(SNOPower.Wizard_Teleport, 35f, pos, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
-                }
-
-                // Diamond Skin SPAM
-                if (Hotbar.Contains(SNOPower.Wizard_DiamondSkin) && LastPowerUsed != SNOPower.Wizard_DiamondSkin &&
-                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 1) || Player.CurrentHealthPct <= 0.90 || Player.IsIncapacitated || Player.IsRooted || (!UseOOCBuff && CurrentTarget.RadiusDistance <= 40f)) &&
-                    ((hasCriticalMass && !UseOOCBuff) || !GetHasBuff(SNOPower.Wizard_DiamondSkin)) &&
-                    PowerManager.CanCast(SNOPower.Wizard_DiamondSkin))
-                {
-                    return new TrinityPower(SNOPower.Wizard_DiamondSkin, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
                 }
                 // Familiar
                 if (!Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Familiar) &&
@@ -141,7 +89,7 @@ namespace Trinity
                         }
                     }
                 }
-                // Magic Weapon                        
+                // Magic Weapon for Archon                   
                 if (!Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_MagicWeapon) && PowerManager.CanCast(SNOPower.Wizard_MagicWeapon) &&
                     (!GetHasBuff(SNOPower.Wizard_MagicWeapon) || ((TimeSinceUse(SNOPower.Wizard_MagicWeapon) >= 10000) && PowerManager.CanCast(SNOPower.Wizard_Archon))))
                 {
@@ -153,6 +101,88 @@ namespace Trinity
                 {
                     return new TrinityPower(SNOPower.Wizard_MagicWeapon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
+                // Archon
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Wizard_Archon) && Wizard_ShouldStartArchon())
+                {
+                    //CanCastArchon = false;
+                    //return new TrinityPower(SNOPower.Wizard_Archon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 4, 5, WAIT_FOR_ANIM);
+            
+                    // Familiar has been removed for now. Uncomment the three comments below relating to familiars to force re-buffing them
+                    int reserveArcanePower = 0;
+                    if (Hotbar.Contains(SNOPower.Wizard_MagicWeapon)) reserveArcanePower += 25;
+                    if (Hotbar.Contains(SNOPower.Wizard_Familiar)) reserveArcanePower += 25;
+                    if (Hotbar.Contains(SNOPower.Wizard_EnergyArmor) || Hotbar.Contains(SNOPower.Wizard_IceArmor) ||
+                        Hotbar.Contains(SNOPower.Wizard_StormArmor)) reserveArcanePower += 25;
+
+                    bool hasBuffSpells =
+                        (Hotbar.Contains(SNOPower.Wizard_MagicWeapon) ||
+                        Hotbar.Contains(SNOPower.Wizard_Familiar) ||
+                        Hotbar.Contains(SNOPower.Wizard_EnergyArmor) ||
+                        Hotbar.Contains(SNOPower.Wizard_IceArmor) ||
+                        Hotbar.Contains(SNOPower.Wizard_StormArmor));
+
+                    CanCastArchon = //Player.PrimaryResource >= reserveArcanePower || 
+                        (
+                        //hasBuffSpells &&
+                        CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon) &&
+                        Wizard_HasFamiliar() &&
+                        CheckAbilityAndBuff(SNOPower.Wizard_EnergyArmor) &&
+                        CheckAbilityAndBuff(SNOPower.Wizard_IceArmor) &&
+                        CheckAbilityAndBuff(SNOPower.Wizard_StormArmor));
+
+                    if (CanCastArchon)
+                    {
+                        Player.WaitingForReserveEnergy = false;
+                        CanCastArchon = false;
+                        return new TrinityPower(SNOPower.Wizard_Archon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 4, 5, WAIT_FOR_ANIM);
+                    }
+                    else
+                    {
+                        Player.WaitingForReserveEnergy = true;
+                    }
+
+                }           
+                // Wave of force
+                if (!UseOOCBuff && !Player.IsIncapacitated && Player.PrimaryResource >= 25 && CombatBase.CanCast(SNOPower.Wizard_WaveOfForce) &&
+                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || Player.CurrentHealthPct <= 0.7 || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 23f)))
+                {
+                    return new TrinityPower(SNOPower.Wizard_WaveOfForce, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
+                }
+
+                //SkillDict.Add("Blizzard", SNOPower.Wizard_Blizzard);
+                //RuneDict.Add("GraspingChill", 2);
+                //RuneDict.Add("FrozenSolid", 4);
+                //RuneDict.Add("Snowbound", 3);
+                //RuneDict.Add("StarkWinter", 1);
+                //RuneDict.Add("UnrelentingStorm", 0);
+
+                bool hasSnowBoundRune = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Blizzard && s.RuneIndex == 3);
+
+                // Blizzard
+                if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Blizzard) &&
+                    (TargetUtil.ClusterExists(18f, 90f, 2, false) || TargetUtil.AnyElitesInRange(40f) || TargetUtil.IsEliteTargetInRange(45f)) &&
+                    (Player.PrimaryResource >= 40 || (hasSnowBoundRune && Player.PrimaryResource >= 20)) && SNOPowerUseTimer(SNOPower.Wizard_Blizzard))
+                {
+                    var bestClusterPoint = TargetUtil.GetBestClusterPoint(18f, 45f, false);
+                    return new TrinityPower(SNOPower.Wizard_Blizzard, 45f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                }
+                // Meteor
+                if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Meteor) &&
+                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 3) || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss || CurrentTarget.IsTreasureGoblin) &&
+                    Player.PrimaryResource >= 50 && PowerManager.CanCast(SNOPower.Wizard_Meteor))
+                {
+                    return new TrinityPower(SNOPower.Wizard_Meteor, 21f, new Vector3(CurrentTarget.Position.X, CurrentTarget.Position.Y, CurrentTarget.Position.Z), CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
+                }
+                // Teleport in combat for critical-mass wizards
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Teleport) && 
+                    LastPowerUsed != SNOPower.Wizard_Teleport &&
+                    Player.PrimaryResource >= 15 && CurrentTarget.CentreDistance <= 35f &&
+                    PowerManager.CanCast(SNOPower.Wizard_Teleport))
+                {
+                    var pos = TargetUtil.GetBestClusterPoint(15f, 35f);
+                    return new TrinityPower(SNOPower.Wizard_Teleport, 35f, pos, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
+                }
+
                 // Hydra
                 if (!UseOOCBuff && !Player.IsIncapacitated &&
                     LastPowerUsed != SNOPower.Wizard_Hydra &&
@@ -181,38 +211,6 @@ namespace Trinity
                 {
                     return new TrinityPower(SNOPower.Wizard_MirrorImage, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
-                // Archon
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_Archon) && Wizard_ShouldStartArchon() &&
-                    PowerManager.CanCast(SNOPower.Wizard_Archon))
-                {
-                    // Familiar has been removed for now. Uncomment the three comments below relating to familiars to force re-buffing them
-                    int reserveArcanePower = 25;
-                    if (Hotbar.Contains(SNOPower.Wizard_MagicWeapon)) reserveArcanePower += 25;
-                    if (Hotbar.Contains(SNOPower.Wizard_Familiar)) reserveArcanePower += 25;
-                    if (Hotbar.Contains(SNOPower.Wizard_EnergyArmor) || Hotbar.Contains(SNOPower.Wizard_IceArmor) ||
-                        Hotbar.Contains(SNOPower.Wizard_StormArmor)) reserveArcanePower += 25;
-
-                    bool hasBuffSpells =
-                        (Hotbar.Contains(SNOPower.Wizard_MagicWeapon) ||
-                        Hotbar.Contains(SNOPower.Wizard_Familiar) ||
-                        Hotbar.Contains(SNOPower.Wizard_EnergyArmor) ||
-                        Hotbar.Contains(SNOPower.Wizard_IceArmor) ||
-                        Hotbar.Contains(SNOPower.Wizard_StormArmor));
-
-                    CanCastArchon = Player.PrimaryResource >= reserveArcanePower || (
-                        hasBuffSpells &&
-                        CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon) &&
-                        Wizard_HasFamiliar() &&
-                        CheckAbilityAndBuff(SNOPower.Wizard_EnergyArmor) &&
-                        CheckAbilityAndBuff(SNOPower.Wizard_IceArmor) &&
-                        CheckAbilityAndBuff(SNOPower.Wizard_StormArmor));
-
-                    if (CanCastArchon)
-                    {
-                        CanCastArchon = false;
-                        return new TrinityPower(SNOPower.Wizard_Archon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 4, 5, WAIT_FOR_ANIM);
-                    }
-                }
 
                 //SkillDict.Add("FrostNova", SNOPower.Wizard_FrostNova);
                 //RuneDict.Add("Shatter", 1);
@@ -232,28 +230,12 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_FrostNova, 20f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
                 }
 
-                // Frost Nova for Critical Mass builds
-                if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_FrostNova) && !Player.IsIncapacitated &&
-                    !hasDeepFreeze && hasCriticalMass && TargetUtil.AnyMobsInRange(10, 2) && PowerManager.CanCast(SNOPower.Wizard_FrostNova))
-                {
-                    return new TrinityPower(SNOPower.Wizard_FrostNova, 10f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
-                }
-
-                // Frost Nova when not on cooldown
-                //if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_FrostNova, CombatBase.CanCastFlags.NoTimer) &&
-                //    TargetUtil.AnyMobsInRange(10f, 1))
-                //{
-                //    return new TrinityPower(SNOPower.Wizard_FrostNova, 10f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
-                //}
-
                 // Explosive Blast SPAM when enough AP, blow erry thing up, nah mean
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_ExplosiveBlast) && !Player.IsIncapacitated && Player.PrimaryResource >= 20 &&
                     (TargetUtil.AnyMobsInRange(25) && CurrentTarget.RadiusDistance <= 25f) &&
                     PowerManager.CanCast(SNOPower.Wizard_ExplosiveBlast))
                 {
                     float blastRange = 11f;
-                    if (hasCriticalMass)
-                        blastRange = 5f;
                     return new TrinityPower(SNOPower.Wizard_ExplosiveBlast, blastRange, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
                 }
 
@@ -277,16 +259,13 @@ namespace Trinity
                     (!bHasSignatureSpell || GetBuffStacks(SNOPower.Wizard_EnergyTwister) < 1) &&
                     ((!hasWickedWindRune && CurrentTarget.RadiusDistance <= 25f) ||
                     (hasWickedWindRune && CurrentTarget.RadiusDistance <= 60f)) &&
-                    (!Hotbar.Contains(SNOPower.Wizard_Electrocute) || !DataDictionary.FastMovingMonsterIds.Contains(CurrentTarget.ActorSNO)) &&
-                    ((hasCriticalMass && !bHasSignatureSpell) || !hasCriticalMass))
+                    (!Hotbar.Contains(SNOPower.Wizard_Electrocute) || !DataDictionary.FastMovingMonsterIds.Contains(CurrentTarget.ActorSNO)))
                 {
                     Vector3 targetDirection = MathEx.CalculatePointFrom(Player.Position, CurrentTarget.Position, 3f);
 
                     Vector3 bestClusterPoint = TargetUtil.GetBestClusterPoint(10f, 15f);
 
                     float twisterRange = 28f;
-                    if (hasCriticalMass)
-                        twisterRange = 9f;
                     return new TrinityPower(SNOPower.Wizard_EnergyTwister, twisterRange, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
                 }
 
@@ -295,19 +274,14 @@ namespace Trinity
                     ((Player.PrimaryResource >= 20 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
                 {
                     float fThisRange = 35f;
-                    if (hasCriticalMass)
-                        fThisRange = 20f;
                     return new TrinityPower(SNOPower.Wizard_Disintegrate, fThisRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
                 }
                 // Arcane Orb
                 if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_ArcaneOrb) &&
-                    ((Player.PrimaryResource >= 35 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
+                    ((Player.PrimaryResource >= 30 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
                     SNOPowerUseTimer(SNOPower.Wizard_ArcaneOrb))
                 {
-                    float fThisRange = 40f;
-                    if (hasCriticalMass)
-                        fThisRange = 20f;
-                    return new TrinityPower(SNOPower.Wizard_ArcaneOrb, fThisRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Arcane Torrent
                 if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_ArcaneTorrent) &&
@@ -315,8 +289,6 @@ namespace Trinity
                     SNOPowerUseTimer(SNOPower.Wizard_ArcaneTorrent))
                 {
                     float fThisRange = 40f;
-                    /*if (hasCriticalMass)
-                        fThisRange = 20f;*/
                     return new TrinityPower(SNOPower.Wizard_ArcaneTorrent, fThisRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
                 }
 
@@ -331,11 +303,9 @@ namespace Trinity
 
                 // Ray of Frost
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_RayOfFrost) &&
-                    Player.PrimaryResource >= 12)
+                    Player.PrimaryResource >= 12 && !Player.WaitingForReserveEnergy)
                 {
-                    float range = 35f;
-                    if (hasCriticalMass)
-                        range = 20f;
+                    float range = 60f;
                     if (hasSleetStorm)
                         range = 5f;
 
@@ -344,10 +314,7 @@ namespace Trinity
                 // Magic Missile
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_MagicMissile))
                 {
-                    float fThisRange = 35f;
-                    if (hasCriticalMass)
-                        fThisRange = 20f;
-                    return new TrinityPower(SNOPower.Wizard_MagicMissile, fThisRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_MagicMissile, 35f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
                 }
                 // Shock Pulse
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_ShockPulse))
@@ -389,7 +356,7 @@ namespace Trinity
                 }
 
                 if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.Timer &&
-                    DateTime.Now.Subtract(AbilityLastUsedCache[SNOPower.Wizard_Archon]).TotalSeconds >= Settings.Combat.Wizard.ArchonCancelSeconds)
+                    DateTime.Now.Subtract(CacheData.AbilityLastUsedCache[SNOPower.Wizard_Archon]).TotalSeconds >= Settings.Combat.Wizard.ArchonCancelSeconds)
                 {
                     reason += "Timer";
                     cancelArchon = true;
@@ -452,9 +419,10 @@ namespace Trinity
 
         private static bool Wizard_ShouldStartArchon()
         {
-            return (TargetUtil.AnyElitesInRange(30, 1) || TargetUtil.AnyMobsInRange(Settings.Combat.Wizard.ArchonMobDistance, Settings.Combat.Wizard.ArchonMobCount) ||
-                    TargetUtil.IsEliteTargetInRange(30f)) &&
-                    Player.PrimaryResource >= 25 && Player.CurrentHealthPct >= 0.10;
+            bool elitesOnly = Settings.Combat.Wizard.ArchonElitesOnly && (TargetUtil.AnyElitesInRange(30, 1) || TargetUtil.IsEliteTargetInRange(30f) || CurrentTarget.IsBossOrEliteRareUnique);
+            bool trashInRange = !Settings.Combat.Wizard.ArchonElitesOnly && TargetUtil.AnyMobsInRange(Settings.Combat.Wizard.ArchonMobDistance, Settings.Combat.Wizard.ArchonMobCount);
+
+            return elitesOnly || trashInRange;
         }
 
         private static bool Wizard_HasWizardArmor()

@@ -134,92 +134,117 @@ namespace Trinity.ItemRules
         /// </summary>
         public void readConfiguration()
         {
-            reset();
-
-            // initialize or reset ruleSet array
-            pickUpRuleSet = new ArrayList();
-            identifyRuleSet = new ArrayList();
-            keepRuleSet = new ArrayList();
-            salvageSellRuleSet = new ArrayList();
-
-            // instantiating our macro dictonary
-            macroDic = new Dictionary<string, string>();
-
-            // use Trinity setting
-            if (Trinity.Settings.Loot.ItemRules.Debug)
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ItemRules is running in debug mode!", logPickQuality);
-
-            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ItemRules is using the {0} rule set.", Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
-            logPickQuality = getTrinityItemQualityFromString(Trinity.Settings.Loot.ItemRules.PickupLogLevel.ToString());
-            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "PICKLOG = {0} ", logPickQuality);
-            logKeepQuality = getTrinityItemQualityFromString(Trinity.Settings.Loot.ItemRules.KeepLogLevel.ToString());
-            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "KEEPLOG = {0} ", logKeepQuality);
-
-            string rulesPath;
-            if (Trinity.Settings.Loot.ItemRules.ItemRuleSetPath.ToString() != String.Empty)
-                rulesPath = Trinity.Settings.Loot.ItemRules.ItemRuleSetPath.ToString();
-            else
-                rulesPath = Path.Combine(FileManager.ItemRulePath, "Rules", Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
-
-            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "RULEPATH = {0} ", rulesPath);
-
-            // fill translation dictionary
-            nameToBalanceId = new Dictionary<string, string>();
-            StreamReader streamReader = new StreamReader(Path.Combine(FileManager.ItemRulePath, translationFile));
-            string str;
-            while ((str = streamReader.ReadLine()) != null)
+            try
             {
-                string[] strArrray = str.Split(';');
-                nameToBalanceId[strArrray[1].Replace(" ", "")] = strArrray[0];
-            }
-            //DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} ITEMID translations", nameToBalanceId.Count);
+                reset();
 
-            // parse pickup file
-            pickUpRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, pickupFile)), pickUpRuleSet);
-            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... loaded: {0} Pickup rules", pickUpRuleSet.Count);
+                // initialize or reset ruleSet array
+                pickUpRuleSet = new ArrayList();
+                identifyRuleSet = new ArrayList();
+                keepRuleSet = new ArrayList();
+                salvageSellRuleSet = new ArrayList();
 
-            // parse identify file
-            if (File.Exists(Path.Combine(rulesPath, identifyFile)))
-            {
-                identifyRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, identifyFile)), identifyRuleSet);
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... loaded: {0} Identify rules", identifyRuleSet.Count);
-            }
-            else
-            {
-                // create an empty identify file
-                using (File.Create(Path.Combine(rulesPath, identifyFile))) { }
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... created empty identify rule file", identifyRuleSet.Count);
-            }
+                // instantiating our macro dictonary
+                macroDic = new Dictionary<string, string>();
 
-            if (File.Exists(Path.Combine(rulesPath, salvageSellFile)))
-            {
-                // parse salvage file
-                salvageSellRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, salvageSellFile)), salvageSellRuleSet);
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... loaded: {0} Salvage rules", salvageSellRuleSet.Count);
-            }
-            else
-            {
-                // create an empty salvage file
-                using (File.Create(Path.Combine(rulesPath, salvageSellFile))) { }
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... created empty salvage rules file", identifyRuleSet.Count);
-            }
+                // use Trinity setting
+                if (Trinity.Settings.Loot.ItemRules.Debug)
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ItemRules is running in debug mode!", logPickQuality);
 
-            // parse all keep files
-            foreach (TrinityItemQuality itemQuality in Enum.GetValues(typeof(TrinityItemQuality)))
-            {
-                string fileName = itemQuality.ToString().ToLower() + ".dis";
-                string filePath = Path.Combine(rulesPath, fileName);
-                int oldValue = keepRuleSet.Count;
-                if (File.Exists(filePath))
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ItemRules is using the {0} rule set.", Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
+                logPickQuality = getTrinityItemQualityFromString(Trinity.Settings.Loot.ItemRules.PickupLogLevel.ToString());
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "PICKLOG = {0} ", logPickQuality);
+                logKeepQuality = getTrinityItemQualityFromString(Trinity.Settings.Loot.ItemRules.KeepLogLevel.ToString());
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "KEEPLOG = {0} ", logKeepQuality);
+
+                string rulesPath;
+                if (Trinity.Settings.Loot.ItemRules.ItemRuleSetPath.ToString() != String.Empty)
                 {
-                    keepRuleSet = readLinesToArray(new StreamReader(filePath), keepRuleSet);
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... loaded: {0} {1} Keep rules", (keepRuleSet.Count - oldValue), itemQuality.ToString());
+                    rulesPath = Trinity.Settings.Loot.ItemRules.ItemRuleSetPath.ToString();
                 }
-            }
+                else
+                {
+                    rulesPath = Path.Combine(FileManager.ItemRulePath, "Rules", Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString().ToLower());
+                }
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "RULEPATH = {0} ", rulesPath);
+                if (!Directory.Exists(rulesPath))
+                {
+                    Logger.Log("ERROR: RulesPath {0} does not exist!", rulesPath);
+                    return;
+                }
 
-            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... loaded: {0} Macros", macroDic.Count);
-            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ItemRules loaded a total of {0} {1} rules!", keepRuleSet.Count, Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString());
+                // fill translation dictionary
+                nameToBalanceId = new Dictionary<string, string>();
+                StreamReader streamReader = new StreamReader(Path.Combine(FileManager.ItemRulePath, translationFile));
+                string str;
+                while ((str = streamReader.ReadLine()) != null)
+                {
+                    string[] strArrray = str.Split(';');
+                    nameToBalanceId[strArrray[1].Replace(" ", "")] = strArrray[0];
+                }
+                //DbHelper.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "... loaded: {0} ITEMID translations", nameToBalanceId.Count);
+
+                // parse pickup file
+                if (File.Exists(Path.Combine(rulesPath, pickupFile)))
+                {
+                    pickUpRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, pickupFile)), pickUpRuleSet);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... loaded: {0} Pickup rules", pickUpRuleSet.Count);
+                }
+                else
+                {
+                    // create an empty pickup file
+                    using (File.Create(Path.Combine(rulesPath, pickupFile))) { }
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... created empty pickup rule file", identifyRuleSet.Count);
+                }
+
+                // parse identify file
+                if (File.Exists(Path.Combine(rulesPath, identifyFile)))
+                {
+                    identifyRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, identifyFile)), identifyRuleSet);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... loaded: {0} Identify rules", identifyRuleSet.Count);
+                }
+                else
+                {
+                    // create an empty identify file
+                    using (File.Create(Path.Combine(rulesPath, identifyFile))) { }
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... created empty identify rule file", identifyRuleSet.Count);
+                }
+
+                if (File.Exists(Path.Combine(rulesPath, salvageSellFile)))
+                {
+                    // parse salvage file
+                    salvageSellRuleSet = readLinesToArray(new StreamReader(Path.Combine(rulesPath, salvageSellFile)), salvageSellRuleSet);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... loaded: {0} Salvage rules", salvageSellRuleSet.Count);
+                }
+                else
+                {
+                    // create an empty salvage file
+                    using (File.Create(Path.Combine(rulesPath, salvageSellFile))) { }
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... created empty salvage rules file", identifyRuleSet.Count);
+                }
+
+                // parse all keep files
+                foreach (TrinityItemQuality itemQuality in Enum.GetValues(typeof(TrinityItemQuality)))
+                {
+                    string fileName = itemQuality.ToString().ToLower() + ".dis";
+                    string filePath = Path.Combine(rulesPath, fileName);
+                    int oldValue = keepRuleSet.Count;
+                    if (File.Exists(filePath))
+                    {
+                        keepRuleSet = readLinesToArray(new StreamReader(filePath), keepRuleSet);
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... loaded: {0} {1} Keep rules", (keepRuleSet.Count - oldValue), itemQuality.ToString());
+                    }
+                }
+
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "... loaded: {0} Macros", macroDic.Count);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ItemRules loaded a total of {0} {1} rules!", keepRuleSet.Count, Trinity.Settings.Loot.ItemRules.ItemRuleType.ToString());
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Error reading ItemRules configuration: {0}", ex.ToString());
+            }
         }
+
 
         /// <summary>
         /// 

@@ -320,7 +320,7 @@ namespace Trinity
         public static bool bOnlyTarget = false;
 
         // Target provider and core routine variables
-        private static bool AnyElitesPresent = false;
+        //private static bool AnyElitesPresent = false;
         private static bool AnyTreasureGoblinsPresent = false;
         private static bool AnyMobsInRange = false;
         private static float CurrentBotKillRange = 0f;
