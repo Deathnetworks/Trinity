@@ -1293,7 +1293,7 @@ namespace Trinity
                         action = "Click ";
                         break;
                 }
-            statusText.Append(action.PadLeft(10);
+            statusText.Append(action.PadLeft(10));
 
             statusText.Append("Target=");
             statusText.Append(CurrentTarget.InternalName.PadLeft(40));
