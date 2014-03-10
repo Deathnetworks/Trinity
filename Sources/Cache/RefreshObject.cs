@@ -793,50 +793,6 @@ namespace Trinity
                 {
                     if (c_CentreDistance < 125)
                     {
-                        /*
-                         * Per Nesox, spamming NavProvider.CanFullyClientPathTo "is really bad"
-                         * We need to come up with another way of doing this that doesnt lag the client
-                         */
-                        //switch (c_ObjectType)
-                        //{
-                        //    case GObjectType.Destructible:
-                        //    case GObjectType.Unit:
-                        //    case GObjectType.Shrine:
-                        //    case GObjectType.Barricade:
-                        //    case GObjectType.Gold:
-                        //        {
-                        //            using (new PerformanceLogger("RefreshLoS.1"))
-                        //            {
-                        //                // Get whether or not this RActor has ever been navigable. If it hasn't, don't add to cache and keep rechecking
-                        //                if (!dictHasBeenNavigableCache.TryGetValue(c_RActorGuid, out c_HasBeenNavigable))
-                        //                {
-                        //                    if (Settings.Combat.Misc.UseNavMeshTargeting)
-                        //                    {
-                        //                        bool isNavigable = NavProvider.CanFullyClientPathTo(c_Position);                                               
-
-                        //                        if (!isNavigable)
-                        //                        {
-                        //                            AddToCache = false;
-                        //                            c_IgnoreSubStep = "NotNavigable";
-                        //                        }
-                        //                        else
-                        //                        {
-                        //                            c_HasBeenNavigable = true;
-                        //                            dictHasBeenNavigableCache.Add(c_RActorGuid, c_HasBeenNavigable);
-                        //                        }
-                        //                    }
-                        //                    else
-                        //                    {
-                        //                        c_HasBeenNavigable = true;
-                        //                        dictHasBeenNavigableCache.Add(c_RActorGuid, c_HasBeenNavigable);
-                        //                    }
-                        //                }
-                        //            }
-                        //        }
-                        //        break;
-
-                        //}
-
                         switch (c_ObjectType)
                         {
                             case GObjectType.Destructible:
@@ -858,8 +814,7 @@ namespace Trinity
                                             {
                                                 Vector3 myPos = new Vector3(Player.Position.X, Player.Position.Y, Player.Position.Z + 8f);
                                                 Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 8f);
-
-                                                //cPos = MathEx.CalculatePointFrom(myPos, cPos, c_CentreDistance - PlayerStatus.GoldPickupRadius);
+                                                cPos = MathEx.CalculatePointFrom(cPos, myPos, c_Radius + 1f);
 
                                                 if (Navigator.Raycast(myPos, cPos))
                                                 {

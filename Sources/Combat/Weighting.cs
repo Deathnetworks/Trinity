@@ -41,9 +41,12 @@ namespace Trinity
                 int AvoidanceCount = Settings.Combat.Misc.AvoidAOE ? 0 : ObjectCache.Count(o => o.Type == GObjectType.Avoidance && o.CentreDistance <= 50f);
 
                 bool profileTagCheck = false;
+
+                string behaviorName = "";
                 if (ProfileManager.CurrentProfileBehavior != null)
                 {
                     Type behaviorType = ProfileManager.CurrentProfileBehavior.GetType();
+                    behaviorName = behaviorType.Name;
                     if (CombatBase.IsQuestingMode || behaviorType == typeof(WaitTimerTag) || behaviorType == typeof(UseTownPortalTag) || behaviorType == typeof(XmlTags.TrinityTownRun) || behaviorType == typeof(XmlTags.TrinityTownPortal))
                     {
                         profileTagCheck = true;
@@ -60,19 +63,19 @@ namespace Trinity
                      CombatBase.IgnoringElites;
 
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
-                    "Starting weights: packSize={0} packRadius={1} MovementSpeed={2:0.0} Elites={3} AoEs={4} disableIgnoreTag={5} closeRangePriority={6} townRun={7} forceClear={8} questing={9} level={10} isQuestingMode={11}",
-                    Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck,
+                    "Starting weights: packSize={0} packRadius={1} MovementSpeed={2:0.0} Elites={3} AoEs={4} disableIgnoreTag={5} ({6}) closeRangePriority={7} townRun={8} forceClear={9} questingArea={10} level={11} isQuestingMode={12}",
+                    Settings.Combat.Misc.TrashPackSize, Settings.Combat.Misc.TrashPackClusterRadius, MovementSpeed, EliteCount, AvoidanceCount, profileTagCheck, behaviorName,
                     prioritizeCloseRangeUnits, TownRun.IsTryingToTownPortal(), TrinityTownPortal.ForceClearArea, DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId), Player.Level, CombatBase.IsQuestingMode);
 
                 if (TrinityCombatIgnore.IgnoreList.Any())
                     Logger.LogDebug(LogCategory.Weight, " CombatIgnoreList={0}", Logger.ListToString(TrinityCombatIgnore.IgnoreList.ToList<object>()));
 
+                bool inQuestArea = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId);
+                bool usingTownPortal = TownRun.IsTryingToTownPortal();
                 foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.CentreDistance))
                 {
-                    bool inQuestArea = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId);
-                    bool usingTownPortal = TownRun.IsTryingToTownPortal();
                     bool elitesInRangeOfUnit = !CombatBase.IgnoringElites &&
-                        ObjectCache.Any(u => u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 25f);
+                        ObjectCache.Any(u => u.ACDGuid != cacheObject.ACDGuid && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 25f);
 
                     bool shouldIgnoreTrashMobs =
                         !CombatBase.IsQuestingMode &&
@@ -101,41 +104,60 @@ namespace Trinity
                         // Weight Units
                         case GObjectType.Unit:
                             {
-                                int nearbyMonsterCount = ObjectCache.Count(u => u.IsTrashMob && cacheObject.Position.Distance2D(u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius);
+                                int nearbyMonsterCount = ObjectCache.Count(u => u.ACDGuid != cacheObject.ACDGuid && u.IsTrashMob && u.HitPoints > 0 &&
+                                    cacheObject.Position.Distance2D(u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius);
 
                                 bool isInHotSpot = GroupHotSpots.CacheObjectIsInHotSpot(cacheObject);
 
                                 bool ignoring = false;
-                                // Ignore Solitary Trash mobs (no elites present)
-                                // Except if has been primary target or if already low on health (<= 20%)
-                                if (shouldIgnoreTrashMobs && cacheObject.IsTrashMob && 
-                                    !isInHotSpot &&
-                                    !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize))
-                                {
-                                    unitWeightInfo = "Ignoring ";
-                                    ignoring = true;
-                                }
-                                else
-                                {
-                                    unitWeightInfo = "Adding ";
-                                }
-                                unitWeightInfo += String.Format("nearbyCount={0} radiusDistance={1:0} hotspot={2} ShouldIgnore={3} elitesInRange={4}",
-                                    nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot, shouldIgnoreTrashMobs, elitesInRangeOfUnit);
-                                if (ignoring)
-                                    break;
 
-                                // Ignore elite option, except if trying to town portal
-                                if (!cacheObject.IsBoss && ShouldIgnoreElites && cacheObject.IsEliteRareUnique && !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100)))
+                                if (cacheObject.IsTrashMob)
                                 {
-                                    break;
+                                    // Ignore trash mobs < 15% health or 50% health with a DoT
+                                    if (cacheObject.IsTrashMob && shouldIgnoreTrashMobs &&
+                                        (cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealth ||
+                                         cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS))
+                                    {
+                                        unitWeightInfo = "Ignoring ";
+                                        ignoring = true;
+                                    }
+
+                                    // Ignore Solitary Trash mobs (no elites present)
+                                    // Except if has been primary target or if already low on health (<= 20%)
+                                    if (shouldIgnoreTrashMobs && !isInHotSpot &&
+                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize))
+                                    {
+                                        unitWeightInfo = "Ignoring ";
+                                        ignoring = true;
+                                    }
+                                    else
+                                    {
+                                        unitWeightInfo = "Adding ";
+                                    }
+                                    unitWeightInfo += String.Format("nearbyCount={0} radiusDistance={1:0} hotspot={2} ShouldIgnore={3} elitesInRange={4} hitPointsPc={5}",
+                                        nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot, shouldIgnoreTrashMobs, elitesInRangeOfUnit, cacheObject.HitPointsPct);
+
+                                    if (ignoring)
+                                        break;
                                 }
 
-                                // Ignore trash mobs < 15% health or 50% health with a DoT
-                                if (cacheObject.IsTrashMob && shouldIgnoreTrashMobs &&
-                                    (cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealth ||
-                                     cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS))
+                                if (cacheObject.IsEliteRareUnique)
                                 {
-                                    break;
+                                    // Ignore elite option, except if trying to town portal
+                                    if (!cacheObject.IsBoss && ShouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
+                                        !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100)))
+                                    {
+                                        unitWeightInfo = "Ignoring ";
+                                        ignoring = true;
+                                    }
+                                    else if (cacheObject.IsEliteRareUnique && ShouldIgnoreElites)
+                                    {
+                                        unitWeightInfo = "Adding ";
+                                    }
+                                    unitWeightInfo += String.Format("shouldIgnore={0} hitPointsPct={1}", ShouldIgnoreElites, cacheObject.HitPointsPct);
+
+                                    if (ignoring)
+                                        break;
                                 }
 
                                 // Monster on Combat Ignore list

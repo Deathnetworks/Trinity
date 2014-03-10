@@ -89,18 +89,12 @@ namespace Trinity
                         }
                     }
                 }
-                // Magic Weapon for Archon                   
-                if (!Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_MagicWeapon) && PowerManager.CanCast(SNOPower.Wizard_MagicWeapon) &&
-                    (!GetHasBuff(SNOPower.Wizard_MagicWeapon) || ((TimeSinceUse(SNOPower.Wizard_MagicWeapon) >= 10000) && PowerManager.CanCast(SNOPower.Wizard_Archon))))
+                // Magic Weapon (10 minutes)                 
+                if (!Player.IsIncapacitated && Player.PrimaryResource >= 25 && CombatBase.CanCast(SNOPower.Wizard_MagicWeapon) && !GetHasBuff(SNOPower.Wizard_MagicWeapon))
                 {
                     return new TrinityPower(SNOPower.Wizard_MagicWeapon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
-                // Magic Weapon
-                if (!Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_MagicWeapon) &&
-                    Player.PrimaryResource >= 25 && (SNOPowerUseTimer(SNOPower.Wizard_MagicWeapon) || !GetHasBuff(SNOPower.Wizard_MagicWeapon)))
-                {
-                    return new TrinityPower(SNOPower.Wizard_MagicWeapon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
-                }
+
                 // Archon
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Wizard_Archon) && Wizard_ShouldStartArchon())
                 {
@@ -380,39 +374,42 @@ namespace Trinity
                 // Archon Slow Time for in combat
                 if (!UseOOCBuff && !Player.IsIncapacitated &&
                     (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || Player.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 35f)) &&
-                    Hotbar.Contains(SNOPower.Wizard_Archon_SlowTime) &&
-                    SNOPowerUseTimer(SNOPower.Wizard_Archon_SlowTime, true) && PowerManager.CanCast(SNOPower.Wizard_Archon_SlowTime))
+                    CombatBase.CanCast(SNOPower.Wizard_Archon_SlowTime))
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
+
                 // Archon Teleport in combat
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
+                    CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport) &&
                     // Try and teleport-retreat from 1 elite or 3+ greys or a boss at 15 foot range
-                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 3) || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 15f)) &&
-                    SNOPowerUseTimer(SNOPower.Wizard_Archon_Teleport) && PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
+                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 3) || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 15f)) )
                 {
                     Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, -20f);
                     return new TrinityPower(SNOPower.Wizard_Archon_Teleport, 35f, vNewTarget, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
+
                 // Arcane Blast
-                if (!UseOOCBuff && !Player.IsIncapacitated &&
+                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_ArcaneBlast) && 
                     (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 1) ||
-                     (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) &&
-                    SNOPowerUseTimer(SNOPower.Wizard_Archon_ArcaneBlast) && PowerManager.CanCast(SNOPower.Wizard_Archon_ArcaneBlast))
+                     (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)))
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_ArcaneBlast, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
-                // Arcane Strike (Arcane Strike) Rapid Spam at close-range only
-                if (!UseOOCBuff && !Player.IsIncapacitated && CurrentTarget.RadiusDistance <= 5f && TargetUtil.AnyMobsInRange(7f, 2) &&
+
+                // Arcane Strike Rapid Spam at close-range only
+                if (!UseOOCBuff && !Player.IsIncapacitated && CurrentTarget.RadiusDistance <= 10f && TargetUtil.AnyMobsInRange(15f, 2) &&
                     CurrentTarget.IsBossOrEliteRareUnique && !Settings.Combat.Wizard.NoArcaneStrike)
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 7f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
                 }
+
                 // Disintegrate
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated)
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_DisintegrationWave, 49f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
                 }
+
                 return new TrinityPower(SNOPower.None, -1, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             }
         }

@@ -8,7 +8,9 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
-            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="..\Template.xaml"/></ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="..\Template.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
             <ut:EnumBooleanConverter x:Key="enumBooleanConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -173,8 +175,6 @@
                             <CheckBox IsChecked="{Binding Path=Misc.AllowOOCMovement}" ToolTip="leap, charge, teleport, sprint, spirit walk">Use movement spells Out of Combat</CheckBox>
                             <CheckBox IsChecked="{Binding Path=Misc.CollectHealthGlobe}">Attempt to collect health globes</CheckBox>
                             <CheckBox IsChecked="{Binding Path=Misc.UseNavMeshTargeting}" ToolTip="Recommended ON, May increase CPU/Memory usage">Use NavMesh to prevent stucks</CheckBox>
-                            <CheckBox IsChecked="{Binding Path=Misc.UseExperimentalSavageBeastAvoidance}" ToolTip="Use Experimental Savage Beast Charge Avoidance">Avoid Savage Beast Charge</CheckBox>
-                            <CheckBox IsChecked="{Binding Path=Misc.UseExperimentalFireChainsAvoidance}" ToolTip="Use Experimental Fire Chains Avoidance">Avoid Fire Chains</CheckBox>
                         </UniformGrid>
                     </StackPanel>
                 </GroupBox>
@@ -187,6 +187,8 @@
                         <CheckBox IsChecked="{Binding Path=Misc.AvoidDeath}" ToolTip="Kite to Avoid Death on low health">Kite to Avoid Death on Low HP</CheckBox>
                         <CheckBox IsChecked="{Binding Path=Misc.AvoidAOE}">Attempt to avoid AoE</CheckBox>
                         <CheckBox IsChecked="{Binding Path=Misc.KillMonstersInAoE}" ToolTip="Attack units standing in AoE">Attack Mobs in AoE</CheckBox>
+                        <CheckBox IsChecked="{Binding Path=Misc.UseExperimentalSavageBeastAvoidance}" ToolTip="Use Experimental Savage Beast Charge Avoidance">Avoid Savage Beast Charge</CheckBox>
+                        <CheckBox IsChecked="{Binding Path=Misc.UseExperimentalFireChainsAvoidance}" ToolTip="Use Experimental Fire Chains Avoidance">Avoid Fire Chains</CheckBox>
                     </UniformGrid>
                 </GroupBox>
             </StackPanel>

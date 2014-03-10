@@ -17,6 +17,7 @@ namespace Trinity.Config.Loot
         private int _FreeBagSlots;
         private bool _StashWhites;
         private bool _StashBlues;
+        private bool _ForceSalvageRares;
         #endregion Fields
 
         #region Events
@@ -213,6 +214,24 @@ namespace Trinity.Config.Loot
                 {
                     _StashBlues = value;
                     OnPropertyChanged("StashBlues");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool ForceSalvageRares
+        {
+            get
+            {
+                return _ForceSalvageRares;
+            }
+            set
+            {
+                if (_ForceSalvageRares != value)
+                {
+                    _ForceSalvageRares = value;
+                    OnPropertyChanged("ForceSalvageRares");
                 }
             }
         }

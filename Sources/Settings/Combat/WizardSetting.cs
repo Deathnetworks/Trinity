@@ -449,7 +449,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1f)]
+        [DefaultValue(0.25f)]
         public float AvoidBeesWaspsHealth
         {
             get

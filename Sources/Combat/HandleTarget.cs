@@ -1255,77 +1255,77 @@ namespace Trinity
         /// </summary>
         private static void UpdateStatusTextTarget(bool targetIsInRange)
         {
+            string action = "";
+
             StringBuilder statusText = new StringBuilder();
             if (!targetIsInRange)
-                statusText.Append("Moveto ");
+                action = "Moveto ";
             else
                 switch (CurrentTarget.Type)
                 {
                     case GObjectType.Avoidance:
-                        statusText.Append("Avoid ");
+                        action = "Avoid ";
                         break;
                     case GObjectType.Unit:
-                        statusText.Append("Attack ");
+                        action = "Attack ";
                         break;
                     case GObjectType.Item:
                     case GObjectType.Gold:
                     case GObjectType.PowerGlobe:
                     case GObjectType.HealthGlobe:
-                        statusText.Append("Pickup ");
+                        action = "Pickup ";
                         break;
                     case GObjectType.Backtrack:
-                        statusText.Append("Backtrack ");
+                        action = "Backtrack ";
                         break;
                     case GObjectType.Interactable:
-                        statusText.Append("Interact ");
+                        action = "Interact ";
                         break;
                     case GObjectType.Door:
                     case GObjectType.Container:
-                        statusText.Append("Open ");
+                        action = "Open ";
                         break;
                     case GObjectType.Destructible:
                     case GObjectType.Barricade:
-                        statusText.Append("Destroy ");
+                        action = "Destroy ";
                         break;
                     case GObjectType.Shrine:
-                        statusText.Append("Click ");
+                        action = "Click ";
                         break;
                 }
+            statusText.Append(action.PadLeft(10);
+
             statusText.Append("Target=");
-            statusText.Append(CurrentTarget.InternalName);
+            statusText.Append(CurrentTarget.InternalName.PadLeft(40));
             if (CurrentTarget.Type == GObjectType.Unit && CombatBase.CurrentPower.SNOPower != SNOPower.None)
             {
                 statusText.Append(" Power=");
-                statusText.Append(CombatBase.CurrentPower.SNOPower);
-                //statusText.Append(" (range ");
-                //statusText.Append(TargetRangeRequired);
-                //statusText.Append(")");
+                statusText.Append(CombatBase.CurrentPower.SNOPower.ToString().PadLeft(40));
             }
-            //statusText.Append(" {");
-            //statusText.Append(CurrentTarget.ActorSNO);
-            //statusText.Append("} ");
+            statusText.Append(" SNO=");
+            statusText.Append(CurrentTarget.ActorSNO.ToString().PadLeft(6));
+            statusText.Append(" Elite=");
+            statusText.Append(CurrentTarget.IsBossOrEliteRareUnique.ToString().PadLeft(5));
             statusText.Append(" Weight=");
-            statusText.Append(CurrentTarget.Weight.ToString("0"));
+            statusText.Append(CurrentTarget.Weight.ToString("0").PadLeft(6));
             statusText.Append(" Type=");
-            statusText.Append(CurrentTarget.Type);
+            statusText.Append(CurrentTarget.Type.ToString().PadLeft(10));
             statusText.Append(" C-Dist=");
-            statusText.Append(CurrentTarget.CentreDistance.ToString("0.0"));
+            statusText.Append(CurrentTarget.CentreDistance.ToString("0.0").PadLeft(5));
             statusText.Append(" R-Dist=");
-            statusText.Append(CurrentTarget.RadiusDistance.ToString("0.0"));
+            statusText.Append(CurrentTarget.RadiusDistance.ToString("0.0").PadLeft(5));
             statusText.Append(" RangeReq'd=");
-            statusText.Append(TargetRangeRequired.ToString("0.0"));
+            statusText.Append(TargetRangeRequired.ToString("0.0").PadLeft(3));
             statusText.Append(" DistfromTrgt=");
-            statusText.Append(TargetCurrentDistance.ToString("0"));
+            statusText.Append(TargetCurrentDistance.ToString("0").PadLeft(3));
             statusText.Append(" tHP=");
-            statusText.Append((CurrentTarget.HitPointsPct * 100).ToString("0"));
+            statusText.Append((CurrentTarget.HitPointsPct * 100).ToString("0").PadLeft(3));
             statusText.Append(" MyHP=");
-            statusText.Append((Player.CurrentHealthPct * 100).ToString("0"));
+            statusText.Append((Player.CurrentHealthPct * 100).ToString("0").PadLeft(3));
             statusText.Append(" MyMana=");
-            statusText.Append((Player.PrimaryResource).ToString("0"));
+            statusText.Append((Player.PrimaryResource).ToString("0").PadLeft(3));
             statusText.Append(" InLoS=");
-            statusText.Append(CurrentTargetIsInLoS);
-            statusText.Append(" RAGuid=");
-            statusText.Append(CurrentTarget.RActorGuid);
+            statusText.Append(CurrentTargetIsInLoS.ToString().PadLeft(5));
 
             statusText.Append(String.Format(" Duration={0:0}", DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds));
 

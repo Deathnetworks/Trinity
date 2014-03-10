@@ -59,7 +59,7 @@ namespace Trinity.Technicals
                 switch (level)
                 {
                     case TrinityLogLevel.Emergency:
-                        DBLog.Emergency(string.Format(msg, args));
+                        DBLog.ErrorFormat(string.Format(msg, args));
                         break;
                     case TrinityLogLevel.Error:
                         DBLog.ErrorFormat(msg, args);

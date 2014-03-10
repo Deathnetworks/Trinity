@@ -61,7 +61,7 @@ namespace Trinity.Config.Combat
 
         #region Properties
         [DataMember(IsRequired = false)]
-        [DefaultValue(12)]
+        [DefaultValue(10)]
         public int Arcane
         {
             get
@@ -133,7 +133,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(10)]
+        [DefaultValue(6)]
         public int BeesWasps
         {
             get
@@ -457,7 +457,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(14)]
+        [DefaultValue(6)]
         public int PlagueCloud
         {
             get

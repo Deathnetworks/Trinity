@@ -84,10 +84,14 @@
         </Grid>
         <StackPanel Grid.Row="2" Margin="10" HorizontalAlignment="Center">
             <UniformGrid Columns="2" HorizontalAlignment="Center">
-                <TextBlock Text="Stash Whites" FontWeight="Bold" HorizontalAlignment="Center" />
-                <TextBlock Text="Stash Blues" FontWeight="Bold" HorizontalAlignment="Center" />
-                <CheckBox Margin="10,0" Content="Stash White Items" ToolTip="Stash White Items" IsChecked="{Binding Path=TownRun.StashWhites}"  HorizontalAlignment="Center"/>
-                <CheckBox Margin="10,0" Content="Stash Blue Items" ToolTip="Stash Blue Items" IsChecked="{Binding Path=TownRun.StashBlues}" HorizontalAlignment="Center" />
+                <TextBlock Text="Stash Whites" FontWeight="Bold" HorizontalAlignment="Right" />
+                <CheckBox Margin="10,0" Content="Stash White Items" ToolTip="Stash White Items" IsChecked="{Binding Path=TownRun.StashWhites}"  HorizontalAlignment="Left"/>
+                
+                <TextBlock Text="Stash Blues" FontWeight="Bold" HorizontalAlignment="Right" />
+                <CheckBox Margin="10,0" Content="Stash Blue Items" ToolTip="Stash Blue Items" IsChecked="{Binding Path=TownRun.StashBlues}" HorizontalAlignment="Left" />
+                
+                <TextBlock Text="Salvage all Rares" FontWeight="Bold" HorizontalAlignment="Right" />
+                <CheckBox Margin="10,0" Content="Salvage all Rares" ToolTip="Salvage all Rares" IsChecked="{Binding Path=TownRun.ForceSalvageRares}" HorizontalAlignment="Left" />
             </UniformGrid>
         </StackPanel>
         <!--Junk items Settings-->

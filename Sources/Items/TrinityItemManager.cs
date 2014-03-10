@@ -187,6 +187,31 @@ namespace Trinity
                 return true;
             }
 
+            bool isEquipment = (cItem.DBBaseType == ItemBaseType.Armor
+               || cItem.DBBaseType == ItemBaseType.Weapon
+               || cItem.DBBaseType == ItemBaseType.Jewelry);
+
+            // Stashing Whites, auto-keep
+            if (Trinity.Settings.Loot.TownRun.StashWhites && isEquipment && cItem.Quality >= ItemQuality.Normal && cItem.Quality <= ItemQuality.Superior)
+            {
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing whites)", cItem.RealName, cItem.InternalName, trinityItemType);
+                return true;
+            }
+
+            // Stashing blues, auto-keep
+            if (Trinity.Settings.Loot.TownRun.StashBlues && isEquipment && cItem.Quality >= ItemQuality.Magic1 && cItem.Quality <= ItemQuality.Magic3)
+            {
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing blues)", cItem.RealName, cItem.InternalName, trinityItemType);
+                return true;
+            }
+
+            // Force salvage Rares
+            if (Trinity.Settings.Loot.TownRun.ForceSalvageRares && isEquipment && cItem.Quality >= ItemQuality.Rare4 && cItem.Quality <= ItemQuality.Rare6)
+            {
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (force salvage rare)", cItem.RealName, cItem.InternalName, trinityItemType);
+                return false;
+            }
+
             if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
             {
                 Interpreter.InterpreterAction action = Trinity.StashRule.checkItem(item, evaluationType);
@@ -205,24 +230,7 @@ namespace Trinity
                 }
             }
 
-            bool isEquipment = (cItem.DBBaseType == ItemBaseType.Armor
-               || cItem.DBBaseType == ItemBaseType.Weapon
-               || cItem.DBBaseType == ItemBaseType.Jewelry);
-
-            // Stashing Whites, auto-keep
-            if (Trinity.Settings.Loot.TownRun.StashWhites && isEquipment && cItem.Quality < ItemQuality.Magic1)
-            {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing whites)", cItem.RealName, cItem.InternalName, trinityItemType);
-                return true;
-            }
-
-            // Stashing blues, auto-keep
-            if (Trinity.Settings.Loot.TownRun.StashWhites && isEquipment && cItem.Quality < ItemQuality.Rare4 && cItem.Quality > ItemQuality.Superior)
-            {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing blues)", cItem.RealName, cItem.InternalName, trinityItemType);
-                return true;
-            }
-
+            
             if (cItem.Quality >= ItemQuality.Legendary)
             {
                 if (evaluationType == ItemEvaluationType.Keep)

@@ -514,8 +514,6 @@ namespace Trinity.DbProvider
                 }
             }
 
-
-
             // don't use special movement within 10 seconds of being stuck
             bool cancelSpecialMovementAfterStuck = DateTime.Now.Subtract(LastGeneratedStuckPosition).TotalMilliseconds > 10000;
 
@@ -525,14 +523,16 @@ namespace Trinity.DbProvider
                 bool bTooMuchZChange = (Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z) >= 4f);
 
                 // Whirlwind for a barb, special context only
-                //if (Trinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Trinity.ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance <= V.F("Barbarian.Whirlwind.UseRange")) >= 1 &&
-                //    Trinity.Player.PrimaryResource >= V.F("Barbarian.Whirlwind.MinFury") && !Trinity.IsWaitingForSpecial && V.B("Barbarian.Whirlwind.UseForMovement"))
-                //{
-                //    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
-                //    if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                //        Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Whirlwind for OOC movement, distance={0}", DestinationDistance);
-                //    return;
-                //}
+                if (Trinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Trinity.ObjectCache.Any(u => u.Type == GObjectType.Unit && 
+                    MathUtil.IntersectsPath(u.Position, u.Radius + 5f, Trinity.Player.Position, vMoveToTarget)) &&
+                    //u.RadiusDistance <= V.F("Barbarian.Whirlwind.UseRange")) >= 1 &&
+                    Trinity.Player.PrimaryResource >= V.F("Barbarian.Whirlwind.MinFury") && !Trinity.IsWaitingForSpecial && V.B("Barbarian.Whirlwind.UseForMovement"))
+                {
+                    ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
+                    if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Whirlwind for OOC movement, distance={0}", DestinationDistance);
+                    return;
+                }
 
                 // Leap movement for a barb
                 if (Trinity.Settings.Combat.Barbarian.UseLeapOOC && Trinity.Hotbar.Contains(SNOPower.Barbarian_Leap) &&
