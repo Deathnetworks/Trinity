@@ -133,6 +133,7 @@
                     </Grid>
                     <UniformGrid Columns="1" HorizontalAlignment="Center">
                         <CheckBox IsChecked="{Binding Path=Misc.ExtendedTrashKill}" ToolTip="Extended range for ~ 2 seconds">Extend trash-kill range after combat</CheckBox>
+                        <CheckBox IsChecked="{Binding Path=Misc.ForceKillSummoners}" ToolTip="Extended range for ~ 2 seconds">Force Kill Summoners</CheckBox>
                     </UniformGrid>
                 </StackPanel>
             </GroupBox>

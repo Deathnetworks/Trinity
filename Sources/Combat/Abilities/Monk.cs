@@ -84,14 +84,13 @@ namespace Trinity
             }
 
             // Mystic ally
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MysticAlly_v2) && Player.PrimaryResource >= 25 && iPlayerOwnedMysticAlly == 0)
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MysticAlly_v2) && TargetUtil.EliteOrTrashInRange(30f))
             {
                 return new TrinityPower(SNOPower.X1_Monk_MysticAlly_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
             }
 
-            // InnerSanctuary
-            if (!UseOOCBuff && Player.CurrentHealthPct <= 0.45 && CombatBase.CanCast(SNOPower.X1_Monk_InnerSanctuary) &&
-                Player.PrimaryResource >= 30)
+            // InnerSanctuary 
+            if (!UseOOCBuff && TargetUtil.EliteOrTrashInRange(16f) && CombatBase.CanCast(SNOPower.X1_Monk_InnerSanctuary))
             {
                 return new TrinityPower(SNOPower.X1_Monk_InnerSanctuary, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
@@ -300,8 +299,7 @@ namespace Trinity
                     !CombatBase.CanCast(SNOPower.Monk_WaveOfLight) &&
                     !CombatBase.CanCast(SNOPower.Monk_CycloneStrike) &&
                     !CombatBase.CanCast(SNOPower.Monk_ExplodingPalm))) &&
-                (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 1) ||
-                (TargetUtil.AnyMobsInRange(15, 1) && (Settings.Combat.Monk.HasInnaSet && Player.PrimaryResource >= 70))))
+                (TargetUtil.AnyElitesInRange(15, 1) || (CombatBase.IgnoringElites && TargetUtil.AnyMobsInRange(Settings.Combat.Misc.TrashPackClusterRadius, Settings.Combat.Misc.TrashPackSize ))))
             {
                 if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2))
                 {
@@ -357,7 +355,7 @@ namespace Trinity
             /*
              * Dual/Trigen Monk section
              * 
-             * Cycle through DR, WotHF, and FoT every 3 seconds to keep 8% passive buff up if we have Combination Strike
+             * Cycle through Deadly Reach, Way of the Hundred Fists, and Fists of Thunder every 3 seconds to keep 8% passive buff up if we have Combination Strike
              *  - or - 
              * Keep Foresight and Blazing Fists buffs up every 30/5 seconds
              */

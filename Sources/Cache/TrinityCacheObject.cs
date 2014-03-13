@@ -170,8 +170,18 @@ namespace Trinity
                     return 0;
 
                 return Trinity.ObjectCache
-                    .Count(u => u.Type == GObjectType.Unit && u.Position.Distance2D(this.Position) <= range && u.HasBeenInLoS);
+                    .Count(u => u.RActorGuid != this.RActorGuid && u.Type == GObjectType.Unit && u.Position.Distance2D(this.Position) <= range && u.HasBeenInLoS);
             }
+        }
+
+        public int CountUnitsBehind(float range)
+        {
+            return
+                (from u in Trinity.ObjectCache
+                 where u.RActorGuid != this.RActorGuid &&
+                 u.Type == GObjectType.Unit &&
+                 MathUtil.IntersectsPath(this.Position, this.Radius, Trinity.Player.Position, u.Position)
+                 select u).Count();
         }
     }
 }

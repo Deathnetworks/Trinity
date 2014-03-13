@@ -58,6 +58,30 @@ namespace Trinity
 
         #endregion
 
+
+        internal static bool EliteOrTrashInRange(float range)
+        {
+            if (CombatBase.IgnoringElites)
+            {
+                return
+                    (from u in ObjectCache
+                     where u.Type == GObjectType.Unit &&
+                     !u.IsEliteRareUnique &&
+                     u.RadiusDistance <= Trinity.Settings.Combat.Misc.TrashPackClusterRadius
+                     select u).Count() >= Trinity.Settings.Combat.Misc.TrashPackSize;
+            }
+            else
+            {
+                return
+                    (from u in ObjectCache
+                     where u.Type == GObjectType.Unit &&
+                     u.IsBossOrEliteRareUnique &&
+                     u.RadiusDistance <= range
+                     select u).Any();
+            }
+
+        }
+
         /// <summary>
         /// Checks to make sure there's at least one valid cluster with the minimum monster count
         /// </summary>

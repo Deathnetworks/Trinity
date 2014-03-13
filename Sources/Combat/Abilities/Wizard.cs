@@ -389,25 +389,22 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_Archon_Teleport, 35f, vNewTarget, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
 
-                // Arcane Blast
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_ArcaneBlast) && 
-                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 1) ||
-                     (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)))
+                // Arcane Blast - 2 second cooldown, big AoE
+                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_ArcaneBlast) && TargetUtil.AnyMobsInRange(15, 1))
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_ArcaneBlast, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
 
-                // Arcane Strike Rapid Spam at close-range only
-                if (!UseOOCBuff && !Player.IsIncapacitated && CurrentTarget.RadiusDistance <= 10f && TargetUtil.AnyMobsInRange(15f, 2) &&
-                    CurrentTarget.IsBossOrEliteRareUnique && !Settings.Combat.Wizard.NoArcaneStrike)
-                {
-                    return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 7f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
-                }
-
                 // Disintegrate
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated)
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CurrentTarget.CountUnitsBehind(35f) > 2)
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_DisintegrationWave, 49f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
+                }
+
+                // Arcane Strike Rapid Spam at close-range only
+                if (!UseOOCBuff && !Player.IsIncapacitated && !Settings.Combat.Wizard.NoArcaneStrike)
+                {
+                    return new TrinityPower(SNOPower.Wizard_Archon_ArcaneStrike, 7f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
                 }
 
                 return new TrinityPower(SNOPower.None, -1, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);

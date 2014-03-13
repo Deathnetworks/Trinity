@@ -595,7 +595,7 @@ namespace Trinity
                     else if (DataDictionary.InteractWhiteListIds.Contains(c_ActorSNO))
                         c_ObjectType = GObjectType.Interactable;
 
-                    else if (c_diaObject.ActorType == ActorType.Gizmo)
+                    else if (c_diaObject is DiaGizmo && c_diaObject.ActorType == ActorType.Gizmo)
                     {
                         DiaGizmo c_diaGizmo;
                         c_diaGizmo = (DiaGizmo)c_diaObject;

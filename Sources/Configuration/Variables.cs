@@ -142,6 +142,7 @@ namespace Trinity
         // Also storing a list of all profiles, for experimental reasons/incase I want to use them down the line
         public static List<string> ProfileHistory = new List<string>();
         public static string CurrentProfile = "";
+        public static string CurrentProfileName = "";
         public static string FirstProfile = "";
 
         // A list of small areas covering zones we move through while fighting to help our custom move-handler skip ahead waypoints

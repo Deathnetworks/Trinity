@@ -1293,39 +1293,39 @@ namespace Trinity
                         action = "Click ";
                         break;
                 }
-            statusText.Append(action.PadLeft(10));
+            statusText.Append(action.PadRight(10));
 
             statusText.Append("Target=");
-            statusText.Append(CurrentTarget.InternalName.PadLeft(40));
+            statusText.Append(CurrentTarget.InternalName.PadRight(40));
             if (CurrentTarget.Type == GObjectType.Unit && CombatBase.CurrentPower.SNOPower != SNOPower.None)
             {
                 statusText.Append(" Power=");
-                statusText.Append(CombatBase.CurrentPower.SNOPower.ToString().PadLeft(40));
+                statusText.Append(CombatBase.CurrentPower.SNOPower.ToString().PadRight(40));
             }
             statusText.Append(" SNO=");
-            statusText.Append(CurrentTarget.ActorSNO.ToString().PadLeft(6));
+            statusText.Append(CurrentTarget.ActorSNO.ToString().PadRight(6));
             statusText.Append(" Elite=");
-            statusText.Append(CurrentTarget.IsBossOrEliteRareUnique.ToString().PadLeft(5));
+            statusText.Append(CurrentTarget.IsBossOrEliteRareUnique.ToString().PadRight(5));
             statusText.Append(" Weight=");
-            statusText.Append(CurrentTarget.Weight.ToString("0").PadLeft(6));
+            statusText.Append(CurrentTarget.Weight.ToString("0").PadRight(6));
             statusText.Append(" Type=");
-            statusText.Append(CurrentTarget.Type.ToString().PadLeft(10));
+            statusText.Append(CurrentTarget.Type.ToString().PadRight(10));
             statusText.Append(" C-Dist=");
-            statusText.Append(CurrentTarget.CentreDistance.ToString("0.0").PadLeft(5));
+            statusText.Append(CurrentTarget.CentreDistance.ToString("0.0").PadRight(5));
             statusText.Append(" R-Dist=");
-            statusText.Append(CurrentTarget.RadiusDistance.ToString("0.0").PadLeft(5));
+            statusText.Append(CurrentTarget.RadiusDistance.ToString("0.0").PadRight(5));
             statusText.Append(" RangeReq'd=");
-            statusText.Append(TargetRangeRequired.ToString("0.0").PadLeft(3));
+            statusText.Append(TargetRangeRequired.ToString("0.0").PadRight(3));
             statusText.Append(" DistfromTrgt=");
-            statusText.Append(TargetCurrentDistance.ToString("0").PadLeft(3));
+            statusText.Append(TargetCurrentDistance.ToString("0").PadRight(3));
             statusText.Append(" tHP=");
-            statusText.Append((CurrentTarget.HitPointsPct * 100).ToString("0").PadLeft(3));
+            statusText.Append((CurrentTarget.HitPointsPct * 100).ToString("0").PadRight(3));
             statusText.Append(" MyHP=");
-            statusText.Append((Player.CurrentHealthPct * 100).ToString("0").PadLeft(3));
+            statusText.Append((Player.CurrentHealthPct * 100).ToString("0").PadRight(3));
             statusText.Append(" MyMana=");
-            statusText.Append((Player.PrimaryResource).ToString("0").PadLeft(3));
+            statusText.Append((Player.PrimaryResource).ToString("0").PadRight(3));
             statusText.Append(" InLoS=");
-            statusText.Append(CurrentTargetIsInLoS.ToString().PadLeft(5));
+            statusText.Append(CurrentTargetIsInLoS.ToString().PadRight(5));
 
             statusText.Append(String.Format(" Duration={0:0}", DateTime.Now.Subtract(dateSincePickedTarget).TotalSeconds));
 

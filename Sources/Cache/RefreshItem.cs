@@ -144,7 +144,7 @@ namespace Trinity
                 {
                     AddToCache = ItemRulesPickupValidation(pickupItem);
                 }
-                else
+                else // Trinity Scoring Only
                 {
                     AddToCache = PickupItemValidation(pickupItem);
                 }

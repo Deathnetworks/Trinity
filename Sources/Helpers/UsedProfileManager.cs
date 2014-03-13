@@ -37,10 +37,11 @@ namespace Trinity
 
                 Trinity.ProfileHistory.Add(currentProfile);
                 Trinity.CurrentProfile = currentProfile;
+                Trinity.CurrentProfileName = ProfileManager.CurrentProfile.Name;
 
                 if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.Name != null)
                 {
-                    Trinity.SetWindowTitle(ProfileManager.CurrentProfile.Name);
+                    Trinity.SetWindowTitle(Trinity.CurrentProfileName);
                 }
 
                 if (Trinity.FirstProfile == "")

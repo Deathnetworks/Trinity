@@ -73,6 +73,10 @@ namespace Trinity
                 case GItemBaseType.Jewelry:
                     return CheckLevelRequirements(item.Level, item.Quality, Settings.Loot.Pickup.JewelryBlueLevel, Settings.Loot.Pickup.JewelryYellowLevel);
                 case GItemBaseType.FollowerItem:
+                    if (item.Quality >= ItemQuality.Legendary)
+                    {
+                        return true;
+                    }
                     if (item.Level < 60 || !Settings.Loot.Pickup.FollowerItem || item.Quality < ItemQuality.Rare4)
                     {
                         if (!_hashsetItemFollowersIgnored.Contains(itemSha1Hash))
@@ -210,22 +214,33 @@ namespace Trinity
         /// <returns></returns>
         internal static bool CheckLevelRequirements(int level, ItemQuality quality, int requiredBlueLevel, int requiredYellowLevel)
         {
-            if (quality == ItemQuality.Inferior && Settings.Loot.Pickup.PickupGrayItems)
-                return true;
+            // Gray Items
+            if (quality < ItemQuality.Normal)
+            {
+                if (Settings.Loot.Pickup.PickupGrayItems)
+                    return true;
+                else
+                    return false;
+            }
 
-            if (quality == ItemQuality.Normal  || quality == ItemQuality.Superior && Settings.Loot.Pickup.PickupWhiteItems)
-                return true;
+            // White Items
+            if (quality == ItemQuality.Normal || quality == ItemQuality.Superior)
+            {
+                if (Settings.Loot.Pickup.PickupWhiteItems)
+                    return true;
+                else
+                    return false;
+            }
 
-            if (quality < ItemQuality.Normal && Player.Level > 5)
+            if (quality < ItemQuality.Normal && Player.Level > 5 && !Settings.Loot.Pickup.PickupLowLevel)
             {
                 // Grey item, ignore if we're over level 5
                 return false;
             }
 
-            // PickupLowLevel setting
+            // Ignore Gray/White if player level is <= 5 and we are picking up white
             if (quality <= ItemQuality.Normal && Player.Level <= 5 && !Settings.Loot.Pickup.PickupLowLevel)
             {
-                // ignore if we don't have the setting enabled
                 return false;
             }
 

@@ -313,7 +313,7 @@ namespace Trinity.Combat.Abilities
                     !UseOOCBuff &&
                     !IsCurrentlyAvoiding &&
                     !CanCast(SNOPower.Barbarian_CallOfTheAncients) &&
-                    TargetUtil.AnyElitesInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")) &&
+                    TargetUtil.AnyMobsInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange"), 3) &&
                     !GetHasBuff(SNOPower.Barbarian_CallOfTheAncients) &&
                     Player.PrimaryResource <= V.F("Barbarian.CallOfTheAncients.MinFury");
             }
@@ -327,7 +327,7 @@ namespace Trinity.Combat.Abilities
                     !IsCurrentlyAvoiding &&
                     CanCast(SNOPower.Barbarian_CallOfTheAncients) &&
                     !Player.IsIncapacitated &&
-                    TargetUtil.AnyElitesInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange"));
+                    TargetUtil.AnyMobsInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange"), 3);
             }
         }
         public static bool CanCastBattleRage

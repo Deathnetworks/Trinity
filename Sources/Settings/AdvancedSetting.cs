@@ -21,6 +21,7 @@ namespace Trinity.Config
         private bool _LogDroppedItems;
         private bool _OutputReports;
         private bool _ItemRulesLogs;
+        private bool _ShowBattleTag;
         #endregion Fields
 
         #region Events
@@ -255,6 +256,7 @@ namespace Trinity.Config
                 }
             }
         }
+
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool ItemRulesLogs
@@ -269,6 +271,24 @@ namespace Trinity.Config
                 {
                     _ItemRulesLogs = value;
                     OnPropertyChanged("ItemRulesLogs");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool ShowBattleTag
+        {
+            get
+            {
+                return _ShowBattleTag;
+            }
+            set
+            {
+                if (_ShowBattleTag != value)
+                {
+                    _ShowBattleTag = value;
+                    OnPropertyChanged("ShowBattleTag");
                 }
             }
         }

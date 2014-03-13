@@ -427,7 +427,7 @@ namespace Trinity
 
                         bool isRareChest = c_InternalName.ToLower().Contains("chest_rare") || DataDictionary.ResplendentChestIds.Contains(c_ActorSNO);
                         bool isChest = (!isRareChest && c_InternalName.ToLower().Contains("chest")) ||
-                            c_InternalName.ToLower().Contains("weaponrack") ||
+                            c_InternalName.ToLower().Contains("rack") ||
                             DataDictionary.ContainerWhiteListIds.Contains(c_ActorSNO); // We know it's a container but this is not a known rare chest
                         bool isCorpse = c_InternalName.ToLower().Contains("corpse");
 

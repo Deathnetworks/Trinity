@@ -84,7 +84,7 @@ namespace Trinity
             }
 
             // Companion
-            if (!Player.IsIncapacitated && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && iPlayerOwnedDHPets == 0 &&
+            if (!Player.IsIncapacitated && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && TargetUtil.EliteOrTrashInRange(30f) &&
                 Player.SecondaryResource >= 10)
             {
                 return new TrinityPower(SNOPower.X1_DemonHunter_Companion, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 1, WAIT_FOR_ANIM);
@@ -120,7 +120,7 @@ namespace Trinity
 
             // Rain of Vengeance
             if (!UseOOCBuff && CombatBase.CanCast(SNOPower.DemonHunter_RainOfVengeance) && !Player.IsIncapacitated &&
-                (TargetUtil.AnyMobsInRange(25, 3) || TargetUtil.AnyElitesInRange(25)))
+                ((TargetUtil.AnyMobsInRange(25, 3) && CombatBase.IgnoringElites) || TargetUtil.AnyElitesInRange(25)))
             {
                 return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
@@ -253,7 +253,7 @@ namespace Trinity
 
             // Impale
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_Impale) && !Player.IsIncapacitated &&
-                (!TargetUtil.AnyMobsInRange(12, 4) ) &&
+                (!TargetUtil.AnyMobsInRange(12, 4)) &&
                 ((Player.PrimaryResource >= 25 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
                 CurrentTarget.RadiusDistance <= 50f)
             {

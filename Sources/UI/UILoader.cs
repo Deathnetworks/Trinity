@@ -30,7 +30,7 @@ namespace Trinity.UI
 
         public static Window GetDisplayWindow(string uiPath)
         {
-            using (new PerformanceLogger("GetDisplayWindow"))
+           using (new PerformanceLogger("GetDisplayWindow"))
             {
                 // Check we can actually find the .xaml file first - if not, report an error
                 if (!File.Exists(Path.Combine(uiPath, "MainView.xaml")))

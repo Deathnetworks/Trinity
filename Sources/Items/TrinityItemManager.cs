@@ -192,7 +192,7 @@ namespace Trinity
                || cItem.DBBaseType == ItemBaseType.Jewelry);
 
             // Stashing Whites, auto-keep
-            if (Trinity.Settings.Loot.TownRun.StashWhites && isEquipment && cItem.Quality >= ItemQuality.Normal && cItem.Quality <= ItemQuality.Superior)
+            if (Trinity.Settings.Loot.TownRun.StashWhites && isEquipment && cItem.Quality <= ItemQuality.Superior)
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing whites)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;

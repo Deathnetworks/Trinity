@@ -29,6 +29,7 @@ namespace Trinity.Config.Combat
         private bool _UseExperimentalSavageBeastAvoidance;
         private bool _UseExperimentalFireChainsAvoidance;
         private int _ForceKillElitesHealth;
+        private bool _ForceKillSummoners;
         #endregion Fields
 
         #region Events
@@ -437,6 +438,24 @@ namespace Trinity.Config.Combat
             }
         }
 
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool ForceKillSummoners
+        {
+            get
+            {
+                return _ForceKillSummoners;
+            }
+            set
+            {
+                if (_ForceKillSummoners != value)
+                {
+                    _ForceKillSummoners = value;
+                    OnPropertyChanged("ForceKillSummoners");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -486,6 +505,7 @@ namespace Trinity.Config.Combat
             this.UseExperimentalSavageBeastAvoidance = true;
             this.UseExperimentalFireChainsAvoidance = true;
             this.ForceKillElitesHealth = 0;
+            this.ForceKillSummoners = true;
         }
         #endregion Methods
     }

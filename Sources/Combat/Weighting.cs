@@ -122,10 +122,12 @@ namespace Trinity
                                         ignoring = true;
                                     }
 
+                                    bool forceKillSummoner = ((cacheObject.IsSummoner && Settings.Combat.Misc.ForceKillSummoners) || !cacheObject.IsSummoner);
+
                                     // Ignore Solitary Trash mobs (no elites present)
                                     // Except if has been primary target or if already low on health (<= 20%)
                                     if (shouldIgnoreTrashMobs && !isInHotSpot &&
-                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize))
+                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) && forceKillSummoner)
                                     {
                                         unitWeightInfo = "Ignoring ";
                                         ignoring = true;
@@ -219,6 +221,12 @@ namespace Trinity
                                         if (cacheObject.IsBossOrEliteRareUnique)
                                             cacheObject.Weight = Math.Max((90f - cacheObject.RadiusDistance) / 90f * 2000d, 20d);
 
+                                        // Elites with Archon get super weight
+                                        if (!CombatBase.IgnoringElites && Player.ActorClass == ActorClass.Wizard && GetHasBuff(SNOPower.Wizard_Archon) && cacheObject.IsBossOrEliteRareUnique)
+                                        {
+                                            cacheObject.Weight += 10000d;
+                                        }
+
 
                                         // Monsters near players given higher weight
                                         if (cacheObject.Weight > 0)
@@ -245,15 +253,15 @@ namespace Trinity
 
                                         // Lower health gives higher weight - health is worth up to 1000ish extra weight
                                         if (cacheObject.IsTrashMob && cacheObject.HitPointsPct < 0.20)
-                                            cacheObject.Weight += Math.Max((100 - cacheObject.HitPointsPct) / 100 * 1000d, 100);
+                                            cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 1000d, 100);
 
                                         // Elites on low health get extra priority - up to 2500ish
                                         if (cacheObject.IsBossOrEliteRareUnique && cacheObject.HitPointsPct < 0.20)
-                                            cacheObject.Weight += Math.Max((100 - cacheObject.HitPointsPct) / 100 * 2500d, 100);
+                                            cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 2500d, 100);
 
                                         // Goblins on low health get extra priority - up to 2000ish
                                         if (Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize && cacheObject.IsTreasureGoblin && cacheObject.HitPointsPct <= 0.98)
-                                            cacheObject.Weight += Math.Max((100 - cacheObject.HitPointsPct) / 100 * 2000d, 100);
+                                            cacheObject.Weight += Math.Max((1 - cacheObject.HitPointsPct) / 100 * 2000d, 100);
 
                                         // Bonuses to priority type monsters from the dictionary/hashlist set at the top of the code
                                         int extraPriority;
@@ -757,10 +765,10 @@ namespace Trinity
                                     break;
 
                                 // Weight Containers
-                                cacheObject.Weight = (190d - cacheObject.CentreDistance) / 190d * 11000d;
+                                cacheObject.Weight = (190d - cacheObject.CentreDistance) / 190d * 5000d;
 
                                 // Very close containers get a weight increase
-                                if (cacheObject.CentreDistance <= 12f)
+                                if (cacheObject.CentreDistance <= 8f)
                                     cacheObject.Weight += 600d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets

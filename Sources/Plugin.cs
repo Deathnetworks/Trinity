@@ -19,7 +19,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(1, 8, 4);
+                return new Version(1, 8, 5);
             }
         }
 
@@ -55,6 +55,8 @@ namespace Trinity
                         return;
 
                     GameUI.SafeClickUIButtons();
+
+                    SetWindowTitle(Trinity.CurrentProfileName);
 
                     // See if we should update the stats file
                     if (DateTime.Now.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
@@ -234,19 +236,26 @@ namespace Trinity
         }
 
 
+        private static DateTime _lastWindowTitleTick = DateTime.MinValue;
         internal static void SetWindowTitle(string profileName = "")
         {
+            if (DateTime.Now.Subtract(_lastWindowTitleTick).TotalMilliseconds < 500)
+                return;
+
             if (ZetaDia.Service.IsValid && ZetaDia.Service.Platform.IsValid && ZetaDia.Service.Platform.IsConnected)
             {
 
                 string battleTagName = "";
-                try
+                if (Settings.Advanced.ShowBattleTag)
                 {
-                    battleTagName = FileManager.BattleTagName;
+                    try
+                    {
+                        battleTagName = "- " + FileManager.BattleTagName + " ";
+                    }
+                    catch { }
                 }
-                catch { }
 
-                string windowTitle = "DB - " + battleTagName + " - PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
+                string windowTitle = "DB " + battleTagName + "- PID:" + System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
 
                 if (profileName.Trim() != String.Empty)
                 {

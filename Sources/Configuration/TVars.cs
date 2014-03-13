@@ -184,8 +184,8 @@ namespace Trinity
             Set(new TVar("SpellDelay.Wizard_ExplosiveBlast", 6000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Wizard_MirrorImage", 5000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Wizard_Archon", 100000, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Wizard_Archon_ArcaneBlast", 5000, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.Wizard_Archon_ArcaneStrike", 200, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Archon_ArcaneBlast", 2000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.Wizard_Archon_ArcaneStrike", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Wizard_Archon_DisintegrationWave", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Wizard_Archon_SlowTime", 16000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Wizard_Archon_Teleport", 10000, "Spell Use Delay/Interval, milliseconds"));
@@ -229,7 +229,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.DemonHunter_ShadowPower", 5000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_Vault", 400, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_Preparation", 5000, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_Companion", 30000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_DemonHunter_Companion", 30000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_MarkedForDeath", 3000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_EvasiveFire", 300, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_FanOfKnives", 10000, "Spell Use Delay/Interval, milliseconds"));

@@ -6,7 +6,6 @@ namespace Trinity.Technicals
     /// </summary>
     internal enum TrinityLogLevel
     {
-        Emergency = 5,
         Error = 4,
         Info = 3,
         Verbose = 2,

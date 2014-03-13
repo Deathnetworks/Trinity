@@ -58,9 +58,6 @@ namespace Trinity.Technicals
 
                 switch (level)
                 {
-                    case TrinityLogLevel.Emergency:
-                        DBLog.ErrorFormat(string.Format(msg, args));
-                        break;
                     case TrinityLogLevel.Error:
                         DBLog.ErrorFormat(msg, args);
                         break;
@@ -147,9 +144,6 @@ namespace Trinity.Technicals
             LogLevel logLevel = LogLevel.Debug;
             switch (level)
             {
-                case TrinityLogLevel.Emergency:
-                    logLevel = LogLevel.Emergency;
-                    break;
                 case TrinityLogLevel.Error:
                     logLevel = LogLevel.Error;
                     break;

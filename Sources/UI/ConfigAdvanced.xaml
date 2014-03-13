@@ -32,6 +32,7 @@
             </Grid.RowDefinitions>
             <TextBlock Text="Trinity Unstucker :" FontWeight="Bold" TextAlignment="Center" Margin="5"/>
             <UniformGrid Grid.Row="1" Columns="2">
+                <CheckBox Margin="5" IsChecked="{Binding Advanced.ShowBattleTag}" Content="Show BattleTag in Title bar"/>
                 <CheckBox Margin="5" IsChecked="{Binding Advanced.UnstuckerEnabled}" Content="Enable Trinity unstucker"/>
                 <CheckBox Margin="5" IsChecked="{Binding Advanced.AllowRestartGame}" Content="Allow game restarts"/>
             </UniformGrid>

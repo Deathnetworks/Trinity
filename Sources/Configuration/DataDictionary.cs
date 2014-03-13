@@ -446,6 +446,8 @@ namespace Trinity
 			196945, 70534,
             // Demonic Vessels
             103919,
+            // GizmoType: Chest Name: trOut_Wilderness_Scarecrow_A-3924 ActorSNO: 78030 
+            78030, 
          };
 
         /// <summary>
