@@ -53,7 +53,6 @@ namespace Trinity
                     }
                 }
 
-
                 bool ShouldIgnoreElites =
                      !CombatBase.IsQuestingMode &&
                      !DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&

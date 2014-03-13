@@ -39,11 +39,11 @@ namespace Trinity
         private static readonly HashSet<int> questLevelAreaIds = new HashSet<int>
         {
             19947, // A1 New Tristram
-            91324, // A1 Old Tristram Road
+            // 91324, // A1 Old Tristram Road
             109457, // A1 The Slaughtered Calf Inn
             62968, // A1 The Hidden Cellar
             60714, // A1 Leoric's Passage
-            101351, // A1 The Old Ruins
+            // 101351, // A1 The Old Ruins
             83110, // A1 Cellar of the Damned
             19935, // A1 Wortham
             100854, // A1 Khazra Den
