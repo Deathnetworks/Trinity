@@ -459,6 +459,12 @@ namespace Trinity
             if (Hotbar.Contains(SNOPower.Wizard_Electrocute))
                 return new TrinityPower(SNOPower.Wizard_Electrocute, 9f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
 
+            if (Hotbar.Contains(SNOPower.Wizard_ArcaneTorrent))
+                return new TrinityPower(SNOPower.Wizard_ArcaneTorrent, 9f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+
+            if (Hotbar.Contains(SNOPower.Wizard_Blizzard))
+                return new TrinityPower(SNOPower.Wizard_Blizzard, 9f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+
             return CombatBase.DefaultPower;
         }
 
