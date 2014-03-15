@@ -54,11 +54,13 @@ namespace Trinity
                 return Trinity.Hotbar;
             }
         }
-
-
         #endregion
 
-
+        /// <summary>
+        /// If ignoring elites, checks to see if enough trash trash pack are around
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
         internal static bool EliteOrTrashInRange(float range)
         {
             if (CombatBase.IgnoringElites)
@@ -82,6 +84,47 @@ namespace Trinity
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <param name="maxRange"></param>
+        /// <param name="count"></param>
+        /// <param name="useWeights"></param>
+        /// <param name="includeUnitsInAoe"></param>
+        /// <returns></returns>
+        internal static TrinityCacheObject GetBestClusterUnit(float radius = 15f, float maxRange = 65f, int count = 1, bool useWeights = true, bool includeUnitsInAoe = true)
+        {
+            if (radius < 1f)
+                radius = 1f;
+            if (maxRange > 300f)
+                maxRange = 300f;
+
+            using (new PerformanceLogger("TargetUtil.GetBestClusterUnit"))
+            {
+                TrinityCacheObject bestClusterUnit;
+                var clusterUnits =
+                    (from u in ObjectCache
+                     where ((useWeights && u.Weight > 0) || !useWeights) &&
+                     (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
+                     u.RadiusDistance <= maxRange &&
+                     u.NearbyUnitsWithinDistance(radius) >= count &&
+                     !u.IsBossOrEliteRareUnique
+                     orderby u.Type != GObjectType.HealthGlobe && u.Type != GObjectType.PowerGlobe
+                     orderby u.NearbyUnitsWithinDistance(radius)
+                     orderby u.CentreDistance
+                     select u).ToList();
+
+                if (clusterUnits.Any())
+                    bestClusterUnit = clusterUnits.FirstOrDefault();
+                else if (Trinity.CurrentTarget != null)
+                    bestClusterUnit = Trinity.CurrentTarget;
+                else
+                    bestClusterUnit = null;
+
+                return bestClusterUnit;
+            }
+        }
         /// <summary>
         /// Checks to make sure there's at least one valid cluster with the minimum monster count
         /// </summary>
@@ -123,6 +166,171 @@ namespace Trinity
 
             return clusterCheck;
         }
+
+        internal static TrinityCacheObject GetBestPierceTarget(float maxRange)
+        {
+            var bestUnit =
+                (from u in ObjectCache
+                 where u.Type == GObjectType.Unit &&
+                 u.RadiusDistance <= maxRange
+                 orderby u.CountUnitsInFront() descending
+                 select u).FirstOrDefault();
+
+            return bestUnit;
+        }
+
+        private static Vector3 GetBestAoEMovementPosition()
+        {
+            Vector3 _bestMovementPosition = Vector3.Zero;
+
+            if (TargetUtil.HealthGlobeExists(25) && Player.CurrentHealthPct < Trinity.Settings.Combat.Barbarian.HealthGlobeLevel)
+                _bestMovementPosition = TargetUtil.GetBestHealthGlobeClusterPoint(7, 25);
+            else if (TargetUtil.PowerGlobeExists(25))
+                _bestMovementPosition = TargetUtil.GetBestPowerGlobeClusterPoint(7, 25);
+            else if (TargetUtil.GetFarthestClusterUnit(7, 25, 4) != null && !CurrentTarget.IsEliteRareUnique && !CurrentTarget.IsTreasureGoblin)
+                _bestMovementPosition = TargetUtil.GetFarthestClusterUnit(7, 25).Position;
+            else if (_bestMovementPosition == Vector3.Zero)
+                _bestMovementPosition = CurrentTarget.Position;
+
+            return _bestMovementPosition;
+        }
+
+        internal static TrinityCacheObject GetFarthestClusterUnit(float aoe_radius = 25f, float maxRange = 65f, int count = 1, bool useWeights = true, bool includeUnitsInAoe = true)
+        {
+            if (aoe_radius < 1f)
+                aoe_radius = 1f;
+            if (maxRange > 300f)
+                maxRange = 300f;
+
+            using (new PerformanceLogger("TargetUtil.GetFarthestClusterUnit"))
+            {
+                TrinityCacheObject bestClusterUnit;
+                var clusterUnits =
+                    (from u in ObjectCache
+                     where ((useWeights && u.Weight > 0) || !useWeights) &&
+                     (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
+                     u.RadiusDistance <= maxRange &&
+                     u.NearbyUnitsWithinDistance(aoe_radius) >= count
+                     orderby u.Type != GObjectType.HealthGlobe && u.Type != GObjectType.PowerGlobe
+                     orderby u.NearbyUnitsWithinDistance(aoe_radius)
+                     orderby u.CentreDistance descending
+                     select u).ToList();
+
+                if (clusterUnits.Any())
+                    bestClusterUnit = clusterUnits.FirstOrDefault();
+                else if (Trinity.CurrentTarget != null)
+                    bestClusterUnit = Trinity.CurrentTarget;
+                else
+                    bestClusterUnit = null;
+
+                return bestClusterUnit;
+            }
+        }
+        /// <summary>
+        /// Finds the optimal cluster position, works regardless if there is a cluster or not (will return single unit position if not). This is not a K-Means cluster, but rather a psuedo cluster based
+        /// on the number of other monsters within a radius of any given unit
+        /// </summary>
+        /// <param name="radius">The maximum distance between monsters to be considered part of a cluster</param>
+        /// <param name="maxRange">The maximum unit range to include, units further than this will not be checked as a cluster center but may be included in a cluster</param>
+        /// <param name="useWeights">Whether or not to included un-weighted (ignored) targets in the cluster finding</param>
+        /// <param name="includeUnitsInAoe">Checks the cluster point for AoE effects</param>
+        /// <returns>The Vector3 position of the unit that is the ideal "center" of a cluster</returns>
+        internal static Vector3 GetBestHealthGlobeClusterPoint(float radius = 15f, float maxRange = 65f, bool useWeights = true, bool includeUnitsInAoe = true)
+        {
+            if (radius < 5f)
+                radius = 5f;
+            if (maxRange > 30f)
+                maxRange = 30f;
+
+            using (new Technicals.PerformanceLogger("TargetUtil.GetBestGlobeClusterPoint"))
+            {
+                Vector3 bestClusterPoint;
+                var clusterUnits =
+                    (from u in ObjectCache
+                     where u.Type == GObjectType.HealthGlobe &&
+                     (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
+                     u.RadiusDistance <= maxRange
+                     orderby u.NearbyUnitsWithinDistance(radius)
+                     orderby u.CentreDistance descending
+                     select u.Position).ToList();
+
+                if (clusterUnits.Any())
+                    bestClusterPoint = clusterUnits.FirstOrDefault();
+                else
+                    bestClusterPoint = Trinity.Player.Position;
+
+                return bestClusterPoint;
+            }
+
+        }
+        /// <summary>
+        /// Finds the optimal cluster position, works regardless if there is a cluster or not (will return single unit position if not). This is not a K-Means cluster, but rather a psuedo cluster based
+        /// on the number of other monsters within a radius of any given unit
+        /// </summary>
+        /// <param name="radius">The maximum distance between monsters to be considered part of a cluster</param>
+        /// <param name="maxRange">The maximum unit range to include, units further than this will not be checked as a cluster center but may be included in a cluster</param>
+        /// <param name="useWeights">Whether or not to included un-weighted (ignored) targets in the cluster finding</param>
+        /// <param name="includeUnitsInAoe">Checks the cluster point for AoE effects</param>
+        /// <returns>The Vector3 position of the unit that is the ideal "center" of a cluster</returns>
+        internal static Vector3 GetBestPowerGlobeClusterPoint(float radius = 15f, float maxRange = 65f, bool useWeights = true, bool includeUnitsInAoe = true)
+        {
+            if (radius < 5f)
+                radius = 5f;
+            if (maxRange > 30f)
+                maxRange = 30f;
+
+            using (new Technicals.PerformanceLogger("TargetUtil.GetBestGlobeClusterPoint"))
+            {
+                Vector3 bestClusterPoint;
+                var clusterUnits =
+                    (from u in ObjectCache
+                     where u.Type == GObjectType.PowerGlobe &&
+                     (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
+                     u.RadiusDistance <= maxRange
+                     orderby u.NearbyUnitsWithinDistance(radius)
+                     orderby u.CentreDistance descending
+                     select u.Position).ToList();
+
+                if (clusterUnits.Any())
+                    bestClusterPoint = clusterUnits.FirstOrDefault();
+                else
+                    bestClusterPoint = Trinity.Player.Position;
+
+                return bestClusterPoint;
+            }
+        }
+        /// <summary>
+        /// Checks to see if there is a health globe around to grab
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <returns></returns>
+        internal static bool HealthGlobeExists(float radius = 15f)
+        {
+            var clusterCheck =
+                (from u in ObjectCache
+                 where u.Type == GObjectType.HealthGlobe && !UnitOrPathInAoE(u) &&
+                 u.RadiusDistance <= radius
+                 select u).Any();
+
+            return clusterCheck;
+        }
+
+        /// <summary>
+        /// Checks to see if there is a health globe around to grab
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <returns></returns>
+        internal static bool PowerGlobeExists(float radius = 15f)
+        {
+            var clusterCheck =
+                (from u in ObjectCache
+                 where u.Type == GObjectType.PowerGlobe && !UnitOrPathInAoE(u) &&
+                 u.RadiusDistance <= radius
+                 select u).Any();
+
+            return clusterCheck;
+        }
+
 
         /// <summary>
         /// Finds the optimal cluster position, works regardless if there is a cluster or not (will return single unit position if not). This is not a K-Means cluster, but rather a psuedo cluster based
@@ -225,7 +433,8 @@ namespace Trinity
                      ((useWeights && o.Weight > 0) || !useWeights) &&
                     o.RadiusDistance <= range
                     select o).Count() >= minCount;
-        }       /// <summary>
+        }       
+        /// <summary>
         /// Fast check to see if there are any attackable Elite units within a certain distance
         /// </summary>
         /// <param name="range"></param>

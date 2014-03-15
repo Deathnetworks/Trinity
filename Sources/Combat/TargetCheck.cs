@@ -33,7 +33,7 @@ namespace Trinity
                 }
 
                 // We keep dying because we're spawning in AoE and next to 50 elites and we need to just leave the game
-                if (DateTime.Now.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 && ZetaDia.Me.Inventory.Equipped.Average(i => i.DurabilityPercent) < 0.05 && !ZetaDia.IsInTown)
+                if (DateTime.UtcNow.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 && ZetaDia.Me.Inventory.Equipped.Average(i => i.DurabilityPercent) < 0.05 && !ZetaDia.IsInTown)
                 {
                     Logger.Log("Durability is zero, emergency leave game");
                     ZetaDia.Service.Party.LeaveGame(false);
@@ -140,7 +140,7 @@ namespace Trinity
                             //UIManager.UsePotion();
                             GameUI.SafeClickElement(GameUI.PotionButton, "Use Potion", false);
 
-                            CacheData.AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.Now;
+                            CacheData.AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.UtcNow;
                             WaitWhileAnimating(2, true);
                         }
                     }
@@ -155,9 +155,9 @@ namespace Trinity
 
                 // Nothing to do... do we have some maintenance we can do instead, like out of combat buffing?
 
-                if (DateTime.Now.Subtract(lastMaintenanceCheck).TotalMilliseconds > 150)
+                if (DateTime.UtcNow.Subtract(lastMaintenanceCheck).TotalMilliseconds > 150)
                 {
-                    lastMaintenanceCheck = DateTime.Now;
+                    lastMaintenanceCheck = DateTime.UtcNow;
                     
                     // Out of combat buffing etc. but only if we don't want to return to town etc.
                     ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
@@ -182,7 +182,7 @@ namespace Trinity
                                 BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitBeforeUseDelay));
                             ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
                             LastPowerUsed = powerBuff.SNOPower;
-                            CacheData.AbilityLastUsedCache[powerBuff.SNOPower] = DateTime.Now;
+                            CacheData.AbilityLastUsedCache[powerBuff.SNOPower] = DateTime.UtcNow;
                             if (powerBuff.WaitTicksAfterUse > 0)
                                 BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitAfterUseDelay));
                             WaitWhileAnimating(3, true);
@@ -204,7 +204,7 @@ namespace Trinity
                             case SNOAnim.Demonhunter_Male_HTH_recall_channel:
                             case SNOAnim.Demonhunter_Female_HTH_recall_channel:
                                 iKeepKillRadiusExtendedFor = 20;
-                                timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
+                                timeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(iKeepKillRadiusExtendedFor);
                                 break;
                         }
 
@@ -224,35 +224,35 @@ namespace Trinity
                 return false;
             }
         }
-        private static DateTime lastMaintenanceCheck = DateTime.Now;
+        private static DateTime lastMaintenanceCheck = DateTime.UtcNow;
 
         private static void ClearBlacklists()
         {
             // Clear the temporary blacklist every 90 seconds (default was 90)
-            if (DateTime.Now.Subtract(dateSinceBlacklist90Clear).TotalSeconds > 90)
+            if (DateTime.UtcNow.Subtract(dateSinceBlacklist90Clear).TotalSeconds > 90)
             {
-                dateSinceBlacklist90Clear = DateTime.Now;
+                dateSinceBlacklist90Clear = DateTime.UtcNow;
                 hashRGUIDBlacklist90 = new HashSet<int>();
 
                 // Refresh profile blacklists now, just in case
                 UsedProfileManager.RefreshProfileBlacklists();
             }
             // Clear the full blacklist every 60 seconds (default was 60)
-            if (DateTime.Now.Subtract(dateSinceBlacklist60Clear).TotalSeconds > 60)
+            if (DateTime.UtcNow.Subtract(dateSinceBlacklist60Clear).TotalSeconds > 60)
             {
-                dateSinceBlacklist60Clear = DateTime.Now;
+                dateSinceBlacklist60Clear = DateTime.UtcNow;
                 hashRGUIDBlacklist60 = new HashSet<int>();
             }
             // Clear the temporary blacklist every 15 seconds (default was 15)
-            if (DateTime.Now.Subtract(dateSinceBlacklist15Clear).TotalSeconds > 15)
+            if (DateTime.UtcNow.Subtract(dateSinceBlacklist15Clear).TotalSeconds > 15)
             {
-                dateSinceBlacklist15Clear = DateTime.Now;
+                dateSinceBlacklist15Clear = DateTime.UtcNow;
                 hashRGUIDBlacklist15 = new HashSet<int>();
             }
             // Clear our very short-term ignore-monster blacklist (from not being able to raycast on them or already dead units)
-            if (DateTime.Now.Subtract(dateSinceBlacklist3Clear).TotalMilliseconds > 3000)
+            if (DateTime.UtcNow.Subtract(dateSinceBlacklist3Clear).TotalMilliseconds > 3000)
             {
-                dateSinceBlacklist3Clear = DateTime.Now;
+                dateSinceBlacklist3Clear = DateTime.UtcNow;
                 NeedToClearBlacklist3 = false;
                 hashRGUIDBlacklist3 = new HashSet<int>();
             }

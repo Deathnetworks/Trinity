@@ -19,7 +19,7 @@ namespace Trinity
     {
         private static double GetLastHadUnitsInSights()
         {
-            return Math.Max(DateTime.Now.Subtract(lastHadUnitInSights).TotalMilliseconds, DateTime.Now.Subtract(lastHadEliteUnitInSights).TotalMilliseconds);
+            return Math.Max(DateTime.UtcNow.Subtract(lastHadUnitInSights).TotalMilliseconds, DateTime.UtcNow.Subtract(lastHadEliteUnitInSights).TotalMilliseconds);
         }
 
         private static void RefreshDiaGetWeights()
@@ -339,12 +339,12 @@ namespace Trinity
                                             if (lastGoblinTime == DateTime.Today)
                                             {
                                                 iTotalNumberGoblins++;
-                                                lastGoblinTime = DateTime.Now;
+                                                lastGoblinTime = DateTime.UtcNow;
                                                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Goblin #{0} in sight. Distance={1:0}", iTotalNumberGoblins, cacheObject.CentreDistance);
                                             }
                                             else
                                             {
-                                                if (DateTime.Now.Subtract(lastGoblinTime).TotalMilliseconds > 30000)
+                                                if (DateTime.UtcNow.Subtract(lastGoblinTime).TotalMilliseconds > 30000)
                                                     lastGoblinTime = DateTime.Today;
                                             }
 
@@ -863,7 +863,7 @@ namespace Trinity
             {
                 CurrentTarget.HasBeenPrimaryTarget = true;
                 CurrentTarget.TimesBeenPrimaryTarget = 1;
-                CurrentTarget.FirstTargetAssignmentTime = DateTime.Now;
+                CurrentTarget.FirstTargetAssignmentTime = DateTime.UtcNow;
                 GenericCache.AddToCache(new GenericCacheObject(targetMd5Hash, CurrentTarget, new TimeSpan(0, 10, 0)));
             }
             else if (GenericCache.ContainsKey(targetMd5Hash))
@@ -884,7 +884,7 @@ namespace Trinity
                     {
                         Key = CurrentTarget.ObjectHash,
                         Value = null,
-                        Expires = DateTime.Now.AddSeconds(60)
+                        Expires = DateTime.UtcNow.AddSeconds(60)
                     });
                 }
                 else

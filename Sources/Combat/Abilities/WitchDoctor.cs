@@ -66,14 +66,14 @@ namespace Trinity
             MinEnergyReserve = 0;
 
             // Spirit Walk OOC 
-            if (UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk) && Player.PrimaryResource >= 49 &&
+            if (UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 49 &&
                Settings.Combat.Misc.AllowOOCMovement)              
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
           
             // Spirit Walk While incapacitated or for Goblins
-            if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk) && Player.PrimaryResource >= 49 &&
+            if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 49 &&
                 (Player.IsIncapacitated || Player.IsRooted ||
                  (!UseOOCBuff && CurrentTarget.IsTreasureGoblin && CurrentTarget.HitPointsPct < 0.90 && CurrentTarget.RadiusDistance <= 40f)
                 ))

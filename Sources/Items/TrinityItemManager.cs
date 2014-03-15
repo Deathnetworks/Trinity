@@ -159,6 +159,12 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
+            if (trinityItemType == GItemType.Diamond)
+            {
+                if (evaluationType == ItemEvaluationType.Keep)
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
+                return true;
+            }
             if (trinityItemType == GItemType.CraftTome)
             {
                 if (evaluationType == ItemEvaluationType.Keep)

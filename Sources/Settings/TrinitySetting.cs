@@ -203,10 +203,10 @@ namespace Trinity.Config
             bool migrateConfig = false;
 
             // Only load once every 500ms (prevents duplicate Load calls)
-            if (_LastLoadedSettings != null && DateTime.Now.Subtract(_LastLoadedSettings).TotalMilliseconds <= 500)
+            if (_LastLoadedSettings != null && DateTime.UtcNow.Subtract(_LastLoadedSettings).TotalMilliseconds <= 500)
                 return;
 
-            _LastLoadedSettings = DateTime.Now;
+            _LastLoadedSettings = DateTime.UtcNow;
 
             string filename = GlobalSettingsFile;
             lock (this)
@@ -231,11 +231,11 @@ namespace Trinity.Config
 
                     if (File.Exists(filename))
                     {
-                        DateTime fsChangeStart = DateTime.Now;
+                        DateTime fsChangeStart = DateTime.UtcNow;
                         while (FileManager.IsFileReadLocked(new FileInfo(GlobalSettingsFile)))
                         {
                             Thread.Sleep(10);
-                            if (DateTime.Now.Subtract(fsChangeStart).TotalMilliseconds > 5000)
+                            if (DateTime.UtcNow.Subtract(fsChangeStart).TotalMilliseconds > 5000)
                                 break;
                         }
                         using (Stream stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))

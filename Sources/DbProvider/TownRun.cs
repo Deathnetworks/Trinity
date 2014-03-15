@@ -49,7 +49,7 @@ namespace Trinity
         private static bool[,] StashSlotBlocked = new bool[7, 30];
 
         // DateTime check to prevent inventory-check spam when looking for repairs being needed
-        internal static DateTime LastCheckBackpackDurability = DateTime.Now;
+        internal static DateTime LastCheckBackpackDurability = DateTime.UtcNow;
         private static DateTime _LastCompletedTownRun = DateTime.MinValue;
 
 
@@ -129,9 +129,9 @@ namespace Trinity
                 }
 
                 // Time safety switch for more advanced town-run checking to prevent CPU spam
-                if (DateTime.Now.Subtract(LastCheckBackpackDurability).TotalSeconds > 6)
+                if (DateTime.UtcNow.Subtract(LastCheckBackpackDurability).TotalSeconds > 6)
                 {
-                    LastCheckBackpackDurability = DateTime.Now;
+                    LastCheckBackpackDurability = DateTime.UtcNow;
 
                     // Check for no space in backpack
                     Vector2 validLocation = Trinity.FindValidBackpackLocation(true);
@@ -261,7 +261,7 @@ namespace Trinity
         /// <returns></returns>
         internal static bool IsTryingToTownPortal()
         {
-            if (DateTime.Now.Subtract(lastTownPortalCheckTime).TotalMilliseconds < Trinity.Settings.Advanced.CacheRefreshRate)
+            if (DateTime.UtcNow.Subtract(lastTownPortalCheckTime).TotalMilliseconds < Trinity.Settings.Advanced.CacheRefreshRate)
                 return lastTownPortalCheckResult;
 
             bool result = false;
@@ -303,7 +303,7 @@ namespace Trinity
                 result = true;
 
 
-            lastTownPortalCheckTime = DateTime.Now;
+            lastTownPortalCheckTime = DateTime.UtcNow;
             lastTownPortalCheckResult = result;
             return result;
         }
@@ -529,7 +529,7 @@ namespace Trinity
                     if (!_loggedAnythingThisStash)
                     {
                         _loggedAnythingThisStash = true;
-                        LogWriter.WriteLine(DateTime.Now.ToString() + ":");
+                        LogWriter.WriteLine(DateTime.UtcNow.ToString() + ":");
                         LogWriter.WriteLine("====================");
                     }
                     string sLegendaryString = "";
@@ -596,7 +596,7 @@ namespace Trinity
                     if (!_loggedJunkThisStash)
                     {
                         _loggedJunkThisStash = true;
-                        LogWriter.WriteLine(DateTime.Now.ToString() + ":");
+                        LogWriter.WriteLine(DateTime.UtcNow.ToString() + ":");
                         LogWriter.WriteLine("====================");
                     }
                     string isLegendaryItem = "";

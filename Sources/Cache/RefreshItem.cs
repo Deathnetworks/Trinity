@@ -186,7 +186,7 @@ namespace Trinity
                 {
                     LogWriter.WriteLine("Timestamp,ActorSNO,RActorGUID,DyanmicID,GameBalanceID,ACDGuid,Name,InternalName,DBBaseType,TBaseType,DBItemType,TItemType,Quality,QualityLevelIdentified,Level,IgnoreItemSubStep,Distance,Pickup,SHA1Hash");
                 }
-                LogWriter.Write(FormatCSVField(DateTime.Now));
+                LogWriter.Write(FormatCSVField(DateTime.UtcNow));
                 LogWriter.Write(FormatCSVField(c_ActorSNO));
                 LogWriter.Write(FormatCSVField(c_RActorGuid));
                 LogWriter.Write(FormatCSVField(c_GameDynamicID));
@@ -261,10 +261,75 @@ namespace Trinity
 
             return AddToCache;
         }
+        private static bool RefreshItemStats(GItemBaseType tempbasetype)
+        {
+            bool isNewLogItem = false;
+
+            c_ItemMd5Hash = HashGenerator.GenerateItemHash(c_Position, c_ActorSNO, c_InternalName, CurrentWorldDynamicId, c_ItemQuality, c_ItemLevel);
+
+            if (!GenericCache.ContainsKey(c_ItemMd5Hash))
+            {
+                GenericCache.AddToCache(new GenericCacheObject(c_ItemMd5Hash, null, new TimeSpan(1, 0, 0)));
+
+                isNewLogItem = true;
+                if (tempbasetype == GItemBaseType.Armor || tempbasetype == GItemBaseType.WeaponOneHand || tempbasetype == GItemBaseType.WeaponTwoHand ||
+                    tempbasetype == GItemBaseType.WeaponRange || tempbasetype == GItemBaseType.Jewelry || tempbasetype == GItemBaseType.FollowerItem ||
+                    tempbasetype == GItemBaseType.Offhand)
+                {
+                    int iThisQuality;
+                    ItemsDroppedStats.Total++;
+                    if (c_ItemQuality >= ItemQuality.Legendary)
+                        iThisQuality = QUALITYORANGE;
+                    else if (c_ItemQuality >= ItemQuality.Rare4)
+                        iThisQuality = QUALITYYELLOW;
+                    else if (c_ItemQuality >= ItemQuality.Magic1)
+                        iThisQuality = QUALITYBLUE;
+                    else
+                        iThisQuality = QUALITYWHITE;
+                    ItemsDroppedStats.TotalPerQuality[iThisQuality]++;
+                    ItemsDroppedStats.TotalPerLevel[c_ItemLevel]++;
+                    ItemsDroppedStats.TotalPerQPerL[iThisQuality, c_ItemLevel]++;
+                }
+                else if (tempbasetype == GItemBaseType.Gem)
+                {
+                    int iThisGemType = 0;
+                    ItemsDroppedStats.TotalGems++;
+                    if (c_item_GItemType == GItemType.Topaz)
+                        iThisGemType = GEMTOPAZ;
+                    if (c_item_GItemType == GItemType.Ruby)
+                        iThisGemType = GEMRUBY;
+                    if (c_item_GItemType == GItemType.Emerald)
+                        iThisGemType = GEMEMERALD;
+                    if (c_item_GItemType == GItemType.Amethyst)
+                        iThisGemType = GEMAMETHYST;
+                    if (c_item_GItemType == GItemType.Diamond)
+                        iThisGemType = GEMDIAMOND;
+                    ItemsDroppedStats.GemsPerType[iThisGemType]++;
+                    ItemsDroppedStats.GemsPerLevel[c_ItemLevel]++;
+                    ItemsDroppedStats.GemsPerTPerL[iThisGemType, c_ItemLevel]++;
+                }
+                else if (c_item_GItemType == GItemType.HealthPotion)
+                {
+                    ItemsDroppedStats.TotalPotions++;
+                    ItemsDroppedStats.PotionsPerLevel[c_ItemLevel]++;
+                }
+                else if (c_item_GItemType == GItemType.InfernalKey)
+                {
+                    ItemsDroppedStats.TotalInfernalKeys++;
+                }
+                // See if we should update the stats file
+                if (DateTime.UtcNow.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
+                {
+                    ItemStatsLastPostedReport = DateTime.UtcNow;
+                    OutputReport();
+                }
+            }
+            return isNewLogItem;
+        }
 
         private static void LogSkippedGold()
         {
-            string skippedItemsPath = Path.Combine(FileManager.LoggingPath, String.Format("SkippedGoldStacks_{0}_{1}.csv", Player.ActorClass, DateTime.Now.ToString("yyyy-MM-dd")));
+            string skippedItemsPath = Path.Combine(FileManager.LoggingPath, String.Format("SkippedGoldStacks_{0}_{1}.csv", Player.ActorClass, DateTime.UtcNow.ToString("yyyy-MM-dd")));
 
             bool writeHeader = !File.Exists(skippedItemsPath);
             using (var LogWriter = new StreamWriter(skippedItemsPath, true))

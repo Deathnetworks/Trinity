@@ -334,7 +334,7 @@ namespace Trinity
             if (name.StartsWith("emerald_")) return GItemType.Emerald;
             if (name.StartsWith("topaz_")) return GItemType.Topaz;
             if (name.StartsWith("amethyst")) return GItemType.Amethyst;
-            if (name.StartsWith("diamond_")) return GItemType.Amethyst;
+            if (name.StartsWith("diamond_")) return GItemType.Diamond;
             if (name.StartsWith("healthpotion")) return GItemType.HealthPotion;
             if (name.StartsWith("followeritem_enchantress_") || dbFollowerType == FollowerType.Enchantress) return GItemType.FollowerEnchantress;
             if (name.StartsWith("followeritem_scoundrel_") || dbFollowerType == FollowerType.Scoundrel) return GItemType.FollowerScoundrel;
@@ -460,7 +460,7 @@ namespace Trinity
                 itemBaseType = GItemBaseType.Misc;
             }
             else if (itemType == GItemType.Ruby || itemType == GItemType.Emerald || itemType == GItemType.Topaz ||
-                itemType == GItemType.Amethyst)
+                itemType == GItemType.Amethyst || itemType == GItemType.Diamond)
             {
                 itemBaseType = GItemBaseType.Gem;
             }
@@ -804,7 +804,7 @@ namespace Trinity
 
 
                 PersistentOutputReport();
-                TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
+                TimeSpan TotalRunningTime = DateTime.UtcNow.Subtract(ItemStatsWhenStartedBot);
 
                 var runStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("RunStats - {0}.log", Player.ActorClass));
 

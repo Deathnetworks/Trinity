@@ -67,10 +67,10 @@ namespace Trinity
                 // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
                 bool shouldKamikazeTreasureGoblins = (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize);
 
-                double msCancelledEmergency = DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds;
+                double msCancelledEmergency = DateTime.UtcNow.Subtract(timeCancelledEmergencyMove).TotalMilliseconds;
                 bool shouldEmergencyMove = msCancelledEmergency >= cancelledEmergencyMoveForMilliseconds && NeedToKite;
 
-                double msCancelledKite = DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds;
+                double msCancelledKite = DateTime.UtcNow.Subtract(timeCancelledKiteMove).TotalMilliseconds;
                 bool shouldKite = msCancelledKite >= cancelledKiteMoveForMilliseconds && TryToKite;
 
                 if (shouldKamikazeTreasureGoblins && (shouldEmergencyMove || shouldKite))
@@ -81,7 +81,7 @@ namespace Trinity
                     {
                         LastKitePosition = new KitePosition()
                         {
-                            PositionFoundTime = DateTime.Now,
+                            PositionFoundTime = DateTime.UtcNow,
                             Position = vAnySafePoint,
                             Distance = vAnySafePoint.Distance(Player.Position)
                         };
@@ -90,10 +90,10 @@ namespace Trinity
                     if (vAnySafePoint != Vector3.Zero && vAnySafePoint.Distance(Player.Position) >= 1)
                     {
 
-                        if ((DateTime.Now.Subtract(LastKitePosition.PositionFoundTime).TotalMilliseconds > 3000 && LastKitePosition.Position == vAnySafePoint) ||
-                            (CurrentTarget != null && DateTime.Now.Subtract(lastGlobalCooldownUse).TotalMilliseconds > 1500 && TryToKite))
+                        if ((DateTime.UtcNow.Subtract(LastKitePosition.PositionFoundTime).TotalMilliseconds > 3000 && LastKitePosition.Position == vAnySafePoint) ||
+                            (CurrentTarget != null && DateTime.UtcNow.Subtract(lastGlobalCooldownUse).TotalMilliseconds > 1500 && TryToKite))
                         {
-                            timeCancelledKiteMove = DateTime.Now;
+                            timeCancelledKiteMove = DateTime.UtcNow;
                             cancelledKiteMoveForMilliseconds = 1500;
                             Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kite movement failed, cancelling for {0:0}ms", cancelledKiteMoveForMilliseconds);
                             return;
@@ -102,7 +102,7 @@ namespace Trinity
                         {
                             LastKitePosition = new KitePosition()
                             {
-                                PositionFoundTime = DateTime.Now,
+                                PositionFoundTime = DateTime.UtcNow,
                                 Position = vAnySafePoint,
                                 Distance = vAnySafePoint.Distance(Player.Position)
                             };
@@ -125,7 +125,7 @@ namespace Trinity
                             InternalName = "KitePoint"
                         };
 
-                        //timeCancelledKiteMove = DateTime.Now;
+                        //timeCancelledKiteMove = DateTime.UtcNow;
                         //cancelledKiteMoveForMilliseconds = 100;
 
                         // Try forcing a target update with each kiting
@@ -134,17 +134,17 @@ namespace Trinity
                     //else
                     //{
                     //    // Didn't find any kiting we could reach, so don't look for any more kite spots for at least 1.5 seconds
-                    //    timeCancelledKiteMove = DateTime.Now;
+                    //    timeCancelledKiteMove = DateTime.UtcNow;
                     //    cancelledKiteMoveForMilliseconds = 500;
                     //}
                 }
                 else if (!shouldEmergencyMove && NeedToKite)
                 {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Emergency movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Emergency movement cancelled for {0:0}ms", DateTime.UtcNow.Subtract(timeCancelledEmergencyMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
                 }
                 else if (!shouldKite && TryToKite)
                 {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kite movement cancelled for {0:0}ms", DateTime.Now.Subtract(timeCancelledKiteMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kite movement cancelled for {0:0}ms", DateTime.UtcNow.Subtract(timeCancelledKiteMove).TotalMilliseconds - cancelledKiteMoveForMilliseconds);
                 }
             }
         }

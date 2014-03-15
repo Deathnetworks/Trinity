@@ -25,12 +25,12 @@ namespace Trinity.XmlTags
                 if (ZetaDia.Me.ActorClass == Zeta.Game.ActorClass.Monk && Trinity.Hotbar.Contains(Zeta.Game.Internals.Actors.SNOPower.Monk_SweepingWind)
                     && Trinity.Settings.Combat.Monk.HasInnaSet && Trinity.Player.PrimaryResource > 10)
                 {
-                    if (DateTime.Now.Subtract(Trinity.SweepWindSpam).TotalMilliseconds >= 1500)
+                    if (DateTime.UtcNow.Subtract(Trinity.SweepWindSpam).TotalMilliseconds >= 1500)
                     {
                         if (Trinity.GetHasBuff(Zeta.Game.Internals.Actors.SNOPower.Monk_SweepingWind))
                         {
                             ZetaDia.Me.UsePower(Zeta.Game.Internals.Actors.SNOPower.Monk_SweepingWind, Trinity.Player.Position, Trinity.CurrentWorldDynamicId, -1);
-                            Trinity.SweepWindSpam = DateTime.Now;
+                            Trinity.SweepWindSpam = DateTime.UtcNow;
                             Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Cast Sweeping Winds.");
                         }
                         else

@@ -55,8 +55,7 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Familiar
-                if (!Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Familiar) &&
-                    Player.PrimaryResource >= 20 && SNOPowerUseTimer(SNOPower.Wizard_Familiar))
+                if (!Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Familiar) && Player.PrimaryResource >= 20)
                 {
                     return new TrinityPower(SNOPower.Wizard_Familiar, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
@@ -83,7 +82,7 @@ namespace Trinity
                     // Storm Armor
                     else if (Hotbar.Contains(SNOPower.Wizard_StormArmor))
                     {
-                        if (!GetHasBuff(SNOPower.Wizard_StormArmor) || ((TimeSinceUse(SNOPower.Wizard_StormArmor) >= 15000) && PowerManager.CanCast(SNOPower.Wizard_Archon)))
+                        if (!GetHasBuff(SNOPower.Wizard_StormArmor) && PowerManager.CanCast(SNOPower.Wizard_StormArmor))
                         {
                             return new TrinityPower(SNOPower.Wizard_StormArmor, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                         }
@@ -308,7 +307,7 @@ namespace Trinity
                 // Magic Missile
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_MagicMissile))
                 {
-                    return new TrinityPower(SNOPower.Wizard_MagicMissile, 35f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_MagicMissile, 35f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3, WAIT_FOR_ANIM);
                 }
                 // Shock Pulse
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_ShockPulse))
@@ -350,7 +349,7 @@ namespace Trinity
                 }
 
                 if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.Timer &&
-                    DateTime.Now.Subtract(CacheData.AbilityLastUsedCache[SNOPower.Wizard_Archon]).TotalSeconds >= Settings.Combat.Wizard.ArchonCancelSeconds)
+                    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsedCache[SNOPower.Wizard_Archon]).TotalSeconds >= Settings.Combat.Wizard.ArchonCancelSeconds)
                 {
                     reason += "Timer";
                     cancelArchon = true;
@@ -396,7 +395,7 @@ namespace Trinity
                 }
 
                 // Disintegrate
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CurrentTarget.CountUnitsBehind(35f) > 2)
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && (CurrentTarget.CountUnitsBehind(25f) > 2 || Settings.Combat.Wizard.NoArcaneStrike))
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_DisintegrationWave, 49f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
                 }
@@ -426,7 +425,7 @@ namespace Trinity
 
         private static bool Wizard_HasFamiliar()
         {
-            double timeSinceDeath = DateTime.Now.Subtract(Trinity.LastDeathTime).TotalMilliseconds;
+            double timeSinceDeath = DateTime.UtcNow.Subtract(Trinity.LastDeathTime).TotalMilliseconds;
 
             // We've died, no longer have familiar
             if (timeSinceDeath < CombatBase.TimeSincePowerUse(SNOPower.Wizard_Familiar))

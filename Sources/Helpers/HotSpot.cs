@@ -29,7 +29,7 @@ namespace Trinity
         {
             Location = location;
             WorldId = worldId;
-            ExpirationTime = DateTime.Now.AddMilliseconds(DefaultDuration);
+            ExpirationTime = DateTime.UtcNow.AddMilliseconds(DefaultDuration);
         }
         public override int GetHashCode()
         {
@@ -54,7 +54,7 @@ namespace Trinity
 
         public override string ToString()
         {
-            return string.Format("Location: {0} WorldId: {1} Expires: {2}", Location, WorldId, ExpirationTime.Subtract(DateTime.Now));
+            return string.Format("Location: {0} WorldId: {1} Expires: {2}", Location, WorldId, ExpirationTime.Subtract(DateTime.UtcNow));
         }
 
         public static string Serialize(HotSpot hotSpot)

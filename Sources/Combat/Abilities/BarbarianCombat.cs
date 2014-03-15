@@ -21,7 +21,7 @@ namespace Trinity.Combat.Abilities
             if (UseOOCBuff)
             {
                 // Sprint OOC
-                if (IsNull(power) && CanCastSprintOOC)
+                if (IsNull(power) && CanUseSprintOOC)
                     power = PowerSprint;
 
                 // Threatening Shout OOC
@@ -77,10 +77,6 @@ namespace Trinity.Combat.Abilities
             if (IsNull(power) && CanCastBattleRage || CanUseBattleRage)
                 power = PowerBattleRage;
 
-            // Leap
-            if (IsNull(power) && CanUseLeap)
-                power = PowerLeap;
-
             // Rend
             if (IsNull(power) && CanUseRend)
                 power = PowerRend;
@@ -101,14 +97,6 @@ namespace Trinity.Combat.Abilities
             if (IsNull(power) && CanUseRevenge)
                 power = PowerRevenge;
 
-            // Furious Charge
-            if (IsNull(power) && CanUseFuriousCharge)
-                power = PowerFuriousCharge;
-
-            // Seismic Slam
-            if (IsNull(power) && CanUseSeismicSlam)
-                power = PowerSeismicSlam;
-
             // Ancient Spear
             if (IsNull(power) && CanUseAncientSpear)
                 power = PowerAncientSpear;
@@ -116,6 +104,18 @@ namespace Trinity.Combat.Abilities
             // Sprint
             if (IsNull(power) && CanUseSprint)
                 power = PowerSprint;
+
+            // Furious Charge
+            if (IsNull(power) && CanUseFuriousCharge)
+                power = PowerFuriousCharge;
+
+            // Leap
+            if (IsNull(power) && CanUseLeap)
+                power = PowerLeap;
+
+            // Seismic Slam
+            if (IsNull(power) && CanUseSeismicSlam)
+                power = PowerSeismicSlam;
 
             // Bash to 3 stacks (Punish)
             if (IsNull(power) && CanUseBashTo3)
@@ -164,7 +164,6 @@ namespace Trinity.Combat.Abilities
             return power;
 
         }
-
 
         public static bool CanCastIgnorePain
         {
@@ -347,12 +346,12 @@ namespace Trinity.Combat.Abilities
                     Player.PrimaryResource >= V.F("Barbarian.BattleRage.MinFury");
             }
         }
-        public static bool CanCastSprintOOC
+        public static bool CanUseSprintOOC
         {
             get
             {
                 return
-                Settings.Combat.Barbarian.UseSprintOOC &&
+                (Settings.Combat.Barbarian.SprintMode != BarbarianSprintMode.CombatOnly) &&
                 AllowSprintOOC &&
                 !Player.IsIncapacitated &&
                 CanCast(SNOPower.Barbarian_Sprint) &&
@@ -429,8 +428,9 @@ namespace Trinity.Combat.Abilities
                 return
                     !UseOOCBuff &&
                     CanCast(SNOPower.Barbarian_FuriousCharge) &&
-                    (TargetUtil.AnyElitesInRange(V.F("Barbarian.FuriousCharge.EliteRange"), V.I("Barbarian.FuriousCharge.EliteCount")) ||
-                    TargetUtil.AnyElitesInRange(V.F("Barbarian.FuriousCharge.TrashRange"), V.I("Barbarian.FuriousCharge.TrashCount")));
+                    ((CurrentTarget.RadiusDistance > 7f && CurrentTarget.IsBossOrEliteRareUnique) || 
+                    TargetUtil.GetBestPierceTarget(35f).CountUnitsInFront() >= 3);
+
             }
         }
         public static bool CanUseLeap
@@ -441,8 +441,7 @@ namespace Trinity.Combat.Abilities
                     !UseOOCBuff &&
                     !Player.IsIncapacitated &&
                     CanCast(SNOPower.Barbarian_Leap) &&
-                    (TargetUtil.AnyMobsInRange(V.F("Barbarian.Leap.TrashRange"), V.I("Barbarian.Leap.TrashCount")) ||
-                    TargetUtil.AnyElitesInRange(V.F("Barbarian.Leap.EliteRange"), V.I("Barbarian.Leap.EliteCount")));
+                    (TargetUtil.ClusterExists(15f, 35f, V.I("Barbarian.Leap.TrashCount")) || CurrentTarget.IsBossOrEliteRareUnique);
             }
         }
         public static bool CanUseRend
@@ -512,7 +511,8 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return !UseOOCBuff && CanCast(SNOPower.Barbarian_Sprint, CanCastFlags.NoTimer) && !Player.IsIncapacitated &&
+                return Trinity.Settings.Combat.Barbarian.SprintMode != BarbarianSprintMode.MovementOnly &&
+                    !UseOOCBuff && CanCast(SNOPower.Barbarian_Sprint, CanCastFlags.NoTimer) && !Player.IsIncapacitated &&
                     (
                     // last power used was whirlwind and we don't have sprint up
                         (LastPowerUsed == SNOPower.Barbarian_Whirlwind && !GetHasBuff(SNOPower.Barbarian_Sprint)) ||
@@ -682,41 +682,35 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                float extraDistance;
-                if (CurrentTarget.CentreDistance <= 25)
-                    extraDistance = 30;
-                else
-                    extraDistance = (25 - CurrentTarget.CentreDistance);
-                if (extraDistance < V.F("Barbarian.FuriousCharge.MinExtraTargetDistance"))
-                    extraDistance = V.F("Barbarian.FuriousCharge.MinExtraTargetDistance");
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance + extraDistance);
-                return new TrinityPower(SNOPower.Barbarian_FuriousCharge, V.F("Barbarian.FuriousCharge.UseRange"), vNewTarget);
+                var bestTarget = TargetUtil.GetBestPierceTarget(35f);
+
+                return new TrinityPower(SNOPower.Barbarian_FuriousCharge, V.F("Barbarian.FuriousCharge.UseRange"), bestTarget.Position);
             }
         }
         public static TrinityPower PowerLeap
         {
             get
             {
-                float extraDistance = CurrentTarget.Radius;
-                if (extraDistance <= V.F("Barbarian.Leap.MinExtraDistance"))
-                    extraDistance = V.F("Barbarian.Leap.MinExtraDistance");
-                if (CurrentTarget.CentreDistance + extraDistance > 35f)
-                    extraDistance = 35 - CurrentTarget.CentreDistance;
+                Vector3 aoeTarget = TargetUtil.GetBestClusterPoint(15f, 35f, false, true);
 
-                Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance + extraDistance);
-                return new TrinityPower(SNOPower.Barbarian_Leap, V.F("Barbarian.Leap.UseRange"), vNewTarget);
+                return new TrinityPower(SNOPower.Barbarian_Leap, V.F("Barbarian.Leap.UseRange"), aoeTarget);
             }
         }
         public static TrinityPower PowerRend { get { return new TrinityPower(SNOPower.Barbarian_Rend, V.I("Barbarian.Rend.TickDelay"), V.I("Barbarian.Rend.TickDelay")); } }
         public static TrinityPower PowerOverpower { get { return new TrinityPower(SNOPower.Barbarian_Overpower); } }
         public static TrinityPower PowerSeismicSlam { get { return new TrinityPower(SNOPower.Barbarian_SeismicSlam, V.F("Barbarian.SeismicSlam.UseRange"), CurrentTarget.ACDGuid); } }
-        public static TrinityPower PowerAncientSpear { get { return new TrinityPower(SNOPower.X1_Barbarian_AncientSpear, V.F("Barbarian.AncientSpear.UseRange"), CurrentTarget.Position); } }
+        public static TrinityPower PowerAncientSpear { 
+            get {
+                var bestAoEUnit = TargetUtil.GetBestPierceTarget(35f);
+                return new TrinityPower(SNOPower.X1_Barbarian_AncientSpear, V.F("Barbarian.AncientSpear.UseRange"), bestAoEUnit.ACDGuid); 
+            } 
+        }
         public static TrinityPower PowerWhirlwind
         {
             get
             {
                 bool shouldGetNewZigZag =
-                    (DateTime.Now.Subtract(Trinity.LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
+                    (DateTime.UtcNow.Subtract(Trinity.LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
                     CurrentTarget.ACDGuid != Trinity.LastZigZagUnitAcdGuid ||
                     ZigZagPosition.Distance2D(Player.Position) <= 5f);
 
@@ -727,7 +721,7 @@ namespace Trinity.Combat.Abilities
                     ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
 
                     Trinity.LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
-                    Trinity.LastChangedZigZag = DateTime.Now;
+                    Trinity.LastChangedZigZag = DateTime.UtcNow;
                 }
                 return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), ZigZagPosition, Trinity.CurrentWorldDynamicId, -1, 0, 1, false);
             }

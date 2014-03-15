@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Threading;
+using log4net;
+using log4net.Appender;
+using log4net.Layout;
 using Zeta.Common;
 
 namespace Trinity.Technicals
@@ -11,8 +12,8 @@ namespace Trinity.Technicals
     /// <summary>
     /// Utilities help developer interact with DemonBuddy
     /// </summary>
-    [DebuggerStepThrough]
-    internal static class Logger
+    //[DebuggerStepThrough]
+    internal class Logger
     {
         private static readonly log4net.ILog DBLog = Zeta.Common.Logger.GetLoggerInstanceForType();
         private static string prefix = "[Trinity]";
@@ -172,79 +173,87 @@ namespace Trinity.Technicals
             return result;
         }
 
-        private static Object _logLock = 0;
-        private static Queue<string> DebugLogQueue = new Queue<string>();
-        internal static Thread LoggerThread;
+        /*
+         * Log4Net logging
+         */
 
-        private static void DebugLogger()
+        private static ILog trinityLog;
+        private static log4net.Filter.LoggerMatchFilter trinityFilter;
+        private static PatternLayout trinityLayout;
+        private static log4net.Repository.Hierarchy.Logger trinityLogger;
+        private static RollingFileAppender trinityAppender;
+        private static Object _loglock = 0;
+
+        private static void SetupLogger()
         {
-            int myPid = Process.GetCurrentProcess().Id;
-            DateTime startTime = Process.GetCurrentProcess().StartTime;
-            string logFile = Path.Combine(FileManager.DemonBuddyPath, "Logs", myPid + " " + startTime.ToString("yyyy-MM-dd HH.mm") + " TrinityDebug.txt");
-            List<string> messages = new List<string>();
-
-            while (true)
+            try
             {
-                try
+                if (trinityLog == null)
                 {
-                    messages.Clear();
-                    lock (_logLock)
+                    lock (_loglock)
                     {
-                        while (DebugLogQueue.Count > 0)
-                        {
-                            messages.Add(DebugLogQueue.Dequeue());
-                        }
+
+                        DBLog.Info("Setting up Trinity Logging");
+                        int myPid = Process.GetCurrentProcess().Id;
+                        DateTime startTime = Process.GetCurrentProcess().StartTime;
+                        string logFile = Path.Combine(FileManager.DemonBuddyPath, "Logs", myPid + " " + startTime.ToString("yyyy-MM-dd HH.mm") + " TrinityDebug.txt");
+
+                        trinityLayout = new PatternLayout("%date{HH:mm:ss.fff} %-5level %m%n");
+                        trinityLayout.ActivateOptions();
+
+                        trinityFilter = new log4net.Filter.LoggerMatchFilter();
+                        trinityFilter.LoggerToMatch = "Trinity";
+                        trinityFilter.AcceptOnMatch = true;
+                        trinityFilter.ActivateOptions();
+
+                        trinityAppender = new RollingFileAppender();
+                        trinityAppender.File = logFile;
+                        trinityAppender.Layout = trinityLayout;
+                        trinityAppender.AddFilter(trinityFilter);
+
+                        trinityAppender.MaxFileSize = 20971520;
+                        trinityAppender.MaxSizeRollBackups = 10;
+                        trinityAppender.PreserveLogFileNameExtension = true;
+                        trinityAppender.RollingStyle = RollingFileAppender.RollingMode.Size;
+
+                        trinityAppender.ActivateOptions();
+
+                        //Hierarchy logHierarchy = (Hierarchy)LogManager.GetRepository();
+                        //trinityLogger = logHierarchy.LoggerFactory.CreateLogger(logHierarchy, "TrinityDebug");
+                        //trinityLogger.AddAppender(trinityAppender);
+                        //trinityLogger.Additivity = false;
+
+                        trinityLog = LogManager.GetLogger("TrinityDebug");
+                        trinityLogger = ((log4net.Repository.Hierarchy.Logger)trinityLog.Logger);
+                        trinityLogger.Additivity = false;
+                        trinityLogger.AddAppender(trinityAppender);
+                        
                     }
-
-                    using (StreamWriter w = File.AppendText(logFile))
-                    {
-                        foreach (string message in messages)
-                        {
-                            w.WriteLine(message);
-                        }
-                    }
-
-                    Thread.Sleep(1);
-                }
-                catch (ThreadAbortException)
-                {
-
-                }
-                catch (Exception ex)
-                {
-                    DBLog.Error("Exception in DebugLogger: " + ex.ToString());
                 }
             }
-        }
-
-        private static void SetupLoggerThread()
-        {
-            if (LoggerThread == null || (LoggerThread != null && !LoggerThread.IsAlive))
+            catch (Exception ex)
             {
-                LoggerThread = new Thread(DebugLogger)
-                {
-                    IsBackground = true
-                };
-                DBLog.Info("[Trinity] Starting up Debug Logger");
-                LoggerThread.Start();
+                DBLog.Error("Error setting up Trinity Logger:\n" + ex.ToString());
             }
         }
-
 
         public static void LogToTrinityDebug(string message, params object[] args)
         {
 
             try
             {
-                SetupLoggerThread();
+                SetupLogger();
 
-                lock (_logLock)
-                {
-                    if (message.Contains("{c:"))
-                        DebugLogQueue.Enqueue(DateTime.Now.ToString("HH:mm:ss.fff") + " " + message + " args: " + args);
-                    else
-                        DebugLogQueue.Enqueue(DateTime.Now.ToString("HH:mm:ss.fff") + " " + string.Format(message, args));
-                }
+                string data = "";
+
+                if (message.Contains("{c:"))
+                    data = message + " args: " + args;
+                else if (args != null)
+                    data = string.Format(message, args);
+                else
+                    data = message;
+
+                trinityLog.Debug(data);
             }
             catch (Exception ex)
             {

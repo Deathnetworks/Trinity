@@ -22,7 +22,7 @@ namespace Trinity.Combat.Abilities
             historyQueue.Enqueue(new SpellHistoryItem()
             {
                 Power = power,
-                UseTime = DateTime.Now
+                UseTime = DateTime.UtcNow
             });
         }
 
@@ -53,14 +53,14 @@ namespace Trinity.Combat.Abilities
         public static TimeSpan TimeSinceUse(SNOPower power)
         {
             DateTime lastUsed = GetSpellLastused(power);
-            return DateTime.Now.Subtract(lastUsed);
+            return DateTime.UtcNow.Subtract(lastUsed);
         }
 
         public static int SpellUseCountInTime(SNOPower power, TimeSpan time)
         {
             if (historyQueue.Any(i => i.Power.SNOPower == power))
             {
-                DateTime lookBack = DateTime.Now.Subtract(time);
+                DateTime lookBack = DateTime.UtcNow.Subtract(time);
 
                 var spellCount = historyQueue.Count(i => i.Power.SNOPower == power && i.UseTime >= lookBack);
 

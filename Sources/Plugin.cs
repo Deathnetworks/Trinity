@@ -59,9 +59,9 @@ namespace Trinity
                     SetWindowTitle(Trinity.CurrentProfileName);
 
                     // See if we should update the stats file
-                    if (DateTime.Now.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
+                    if (DateTime.UtcNow.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
                     {
-                        ItemStatsLastPostedReport = DateTime.Now;
+                        ItemStatsLastPostedReport = DateTime.UtcNow;
                         OutputReport();
                     }
 
@@ -87,7 +87,7 @@ namespace Trinity
         public void OnEnabled()
         {
             Logger.Log("OnEnable start");
-            DateTime dateOnEnabledStart = DateTime.Now;
+            DateTime dateOnEnabledStart = DateTime.UtcNow;
 
             BotMain.OnStart += TrinityBotStart;
             BotMain.OnStop += TrinityBotStop;
@@ -155,7 +155,7 @@ namespace Trinity
                 BeginInvoke(new Action(() => StashRule.reset()));
             }
 
-            Logger.LogDebug("OnEnable took {0}ms", DateTime.Now.Subtract(dateOnEnabledStart).TotalMilliseconds);
+            Logger.LogDebug("OnEnable took {0}ms", DateTime.UtcNow.Subtract(dateOnEnabledStart).TotalMilliseconds);
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace Trinity
         private static DateTime _lastWindowTitleTick = DateTime.MinValue;
         internal static void SetWindowTitle(string profileName = "")
         {
-            if (DateTime.Now.Subtract(_lastWindowTitleTick).TotalMilliseconds < 500)
+            if (DateTime.UtcNow.Subtract(_lastWindowTitleTick).TotalMilliseconds < 500)
                 return;
 
             if (ZetaDia.Service.IsValid && ZetaDia.Service.Platform.IsValid && ZetaDia.Service.Platform.IsConnected)

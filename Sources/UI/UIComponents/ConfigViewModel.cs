@@ -34,11 +34,24 @@ namespace Trinity.UIComponents
                                     {
                                         try
                                         {
+                                            if (Trinity.StashRule == null && _Model.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
+                                            {
+                                                // Load interpreter for the first time if needed
+                                                Trinity.StashRule = new ItemRules.Interpreter();
+                                            }
+
                                             _Model.CopyTo(_OriginalModel);
                                             _OriginalModel.Save();
-                                            Trinity.SetBotTPS();
-                                            Trinity.SetUnstuckProvider();
-                                            Trinity.SetItemManagerProvider();
+
+                                            if (_Model.Advanced.TPSEnabled != _OriginalModel.Advanced.TPSEnabled)
+                                                Trinity.SetBotTPS();
+
+                                            if (_Model.Advanced.UnstuckerEnabled != _OriginalModel.Advanced.UnstuckerEnabled)
+                                                Trinity.SetUnstuckProvider();
+
+                                            if (_Model.Loot.ItemFilterMode != _OriginalModel.Loot.ItemFilterMode)
+                                                Trinity.SetItemManagerProvider();
+
                                             UILoader.CloseWindow();
                                         }
                                         catch (Exception ex)

@@ -35,12 +35,12 @@ namespace Trinity
         {
             using (new PerformanceLogger("RefreshDiaObjectCache"))
             {
-                if (DateTime.Now.Subtract(LastRefreshedCache).TotalMilliseconds < Settings.Advanced.CacheRefreshRate && !forceUpdate)
+                if (DateTime.UtcNow.Subtract(LastRefreshedCache).TotalMilliseconds < Settings.Advanced.CacheRefreshRate && !forceUpdate)
                 {
                     if (!UpdateCurrentTarget())
                         return false;
                 }
-                LastRefreshedCache = DateTime.Now;
+                LastRefreshedCache = DateTime.UtcNow;
 
                 using (new PerformanceLogger("RefreshDiaObjectCache.UpdateBlock"))
                 {
@@ -150,7 +150,7 @@ namespace Trinity
                 {
                     // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
                     if (StandingInAvoidance && (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
-                        DateTime.Now.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
+                        DateTime.UtcNow.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
                     {
                         Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, Player.Position, true, null, true);
                         // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
@@ -178,7 +178,7 @@ namespace Trinity
                         //{
                         //    // Didn't find any safe spot we could reach, so don't look for any more safe spots for at least 2.8 seconds
                         //    cancelledEmergencyMoveForMilliseconds = 2800;
-                        //    timeCancelledEmergencyMove = DateTime.Now;
+                        //    timeCancelledEmergencyMove = DateTime.UtcNow;
                         //    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Unable to find kite location, canceling emergency movement for {0}ms", cancelledEmergencyMoveForMilliseconds);
                         //}
                     }
@@ -267,10 +267,14 @@ namespace Trinity
                     // Ok record the time we last saw any unit at all
                     if (CurrentTarget.Type == GObjectType.Unit)
                     {
-                        lastHadUnitInSights = DateTime.Now;
+                        lastHadUnitInSights = DateTime.UtcNow;
                         // And record when we last saw any form of elite
                         if (CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin)
-                            lastHadEliteUnitInSights = DateTime.Now;
+                            lastHadEliteUnitInSights = DateTime.UtcNow;
+                    }
+                    if (CurrentTarget.Type == GObjectType.Container)
+                    {
+                        lastHadContainerInSights = DateTime.UtcNow;
                     }
                     // Record the last time our target changed
                     if (LastTargetRactorGUID != CurrentTarget.RActorGuid)
@@ -278,7 +282,7 @@ namespace Trinity
                         RecordTargetHistory();
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Found New Target {0} dist={1} IsElite={2} Radius={3}",
                                         CurrentTarget.InternalName, CurrentTarget.CentreDistance, CurrentTarget.IsEliteRareUnique, CurrentTarget.Radius);
-                        dateSincePickedTarget = DateTime.Now;
+                        dateSincePickedTarget = DateTime.UtcNow;
                         iTargetLastHealth = 0f;
                     }
                     else
@@ -291,7 +295,7 @@ namespace Trinity
                             {
                                 Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight, "Keeping Target {0} - CurrentTarget.HitPoints: {1:0.00} TargetLastHealth: {2:0.00} ",
                                                 CurrentTarget.RActorGuid, CurrentTarget.HitPointsPct, iTargetLastHealth);
-                                dateSincePickedTarget = DateTime.Now;
+                                dateSincePickedTarget = DateTime.UtcNow;
                             }
                             // Now store the target's last-known health
                             iTargetLastHealth = CurrentTarget.HitPointsPct;
@@ -481,7 +485,7 @@ namespace Trinity
             {
 
                 // Update when we last refreshed with current time
-                LastRefreshedCache = DateTime.Now;
+                LastRefreshedCache = DateTime.UtcNow;
 
                 // Blank current/last/next targets
                 LastPrimaryTargetPosition = CurrentTarget != null ? CurrentTarget.Position : Vector3.Zero;
@@ -521,15 +525,15 @@ namespace Trinity
                 if (Player.ActorClass == ActorClass.Barbarian && Hotbar.Contains(SNOPower.Barbarian_WrathOfTheBerserker) && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker))
                 { //!sp - keep looking for kills while WOTB is up
                     iKeepKillRadiusExtendedFor = Math.Max(3, iKeepKillRadiusExtendedFor);
-                    timeKeepKillRadiusExtendedUntil = DateTime.Now.AddSeconds(iKeepKillRadiusExtendedFor);
+                    timeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(iKeepKillRadiusExtendedFor);
                 }
                 // Counter for how many cycles we extend or reduce our attack/kill radius, and our loot radius, after a last kill
                 if (iKeepKillRadiusExtendedFor > 0)
                 {
-                    TimeSpan diffResult = DateTime.Now.Subtract(timeKeepKillRadiusExtendedUntil);
+                    TimeSpan diffResult = DateTime.UtcNow.Subtract(timeKeepKillRadiusExtendedUntil);
                     iKeepKillRadiusExtendedFor = (int)diffResult.Seconds;
                     //DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Moving, "Kill Radius remaining " + diffResult.Seconds + "s");
-                    if (timeKeepKillRadiusExtendedUntil <= DateTime.Now)
+                    if (timeKeepKillRadiusExtendedUntil <= DateTime.UtcNow)
                     {
                         iKeepKillRadiusExtendedFor = 0;
                     }
@@ -538,7 +542,7 @@ namespace Trinity
                     iKeepLootRadiusExtendedFor--;
 
                 // Clear forcing close-range priority on mobs after XX period of time
-                if (ForceCloseRangeTarget && DateTime.Now.Subtract(lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds)
+                if (ForceCloseRangeTarget && DateTime.UtcNow.Subtract(lastForcedKeepCloseRange).TotalMilliseconds > ForceCloseRangeForMilliseconds)
                 {
                     ForceCloseRangeTarget = false;
                 }
@@ -551,19 +555,19 @@ namespace Trinity
 
                 IsAvoidingProjectiles = false;
                 // Every 15 seconds, clear the "blackspots" where avoidance failed, so we can re-check them
-                if (DateTime.Now.Subtract(lastClearedAvoidanceBlackspots).TotalSeconds > 15)
+                if (DateTime.UtcNow.Subtract(lastClearedAvoidanceBlackspots).TotalSeconds > 15)
                 {
-                    lastClearedAvoidanceBlackspots = DateTime.Now;
+                    lastClearedAvoidanceBlackspots = DateTime.UtcNow;
                     hashAvoidanceBlackspot = new HashSet<CacheObstacleObject>();
                 }
                 // Clear our very short-term destructible blacklist within 3 seconds of last attacking a destructible
-                if (bNeedClearDestructibles && DateTime.Now.Subtract(lastDestroyedDestructible).TotalMilliseconds > 2500)
+                if (bNeedClearDestructibles && DateTime.UtcNow.Subtract(lastDestroyedDestructible).TotalMilliseconds > 2500)
                 {
                     bNeedClearDestructibles = false;
                     hashRGUIDDestructible3SecBlacklist = new HashSet<int>();
                 }
                 // Clear our very short-term ignore-monster blacklist (from not being able to raycast on them or already dead units)
-                if (NeedToClearBlacklist3 && DateTime.Now.Subtract(dateSinceBlacklist3Clear).TotalMilliseconds > 3000)
+                if (NeedToClearBlacklist3 && DateTime.UtcNow.Subtract(dateSinceBlacklist3Clear).TotalMilliseconds > 3000)
                 {
                     NeedToClearBlacklist3 = false;
                     hashRGUIDBlacklist3 = new HashSet<int>();
@@ -630,75 +634,12 @@ namespace Trinity
                    select o;
         }
 
-        private static bool RefreshItemStats(GItemBaseType tempbasetype)
-        {
-            bool isNewLogItem = false;
-
-            c_ItemMd5Hash = HashGenerator.GenerateItemHash(c_Position, c_ActorSNO, c_InternalName, CurrentWorldDynamicId, c_ItemQuality, c_ItemLevel);
-
-            if (!GenericCache.ContainsKey(c_ItemMd5Hash))
-            {
-                GenericCache.AddToCache(new GenericCacheObject(c_ItemMd5Hash, null, new TimeSpan(1, 0, 0)));
-
-                isNewLogItem = true;
-                if (tempbasetype == GItemBaseType.Armor || tempbasetype == GItemBaseType.WeaponOneHand || tempbasetype == GItemBaseType.WeaponTwoHand ||
-                    tempbasetype == GItemBaseType.WeaponRange || tempbasetype == GItemBaseType.Jewelry || tempbasetype == GItemBaseType.FollowerItem ||
-                    tempbasetype == GItemBaseType.Offhand)
-                {
-                    int iThisQuality;
-                    ItemsDroppedStats.Total++;
-                    if (c_ItemQuality >= ItemQuality.Legendary)
-                        iThisQuality = QUALITYORANGE;
-                    else if (c_ItemQuality >= ItemQuality.Rare4)
-                        iThisQuality = QUALITYYELLOW;
-                    else if (c_ItemQuality >= ItemQuality.Magic1)
-                        iThisQuality = QUALITYBLUE;
-                    else
-                        iThisQuality = QUALITYWHITE;
-                    ItemsDroppedStats.TotalPerQuality[iThisQuality]++;
-                    ItemsDroppedStats.TotalPerLevel[c_ItemLevel]++;
-                    ItemsDroppedStats.TotalPerQPerL[iThisQuality, c_ItemLevel]++;
-                }
-                else if (tempbasetype == GItemBaseType.Gem)
-                {
-                    int iThisGemType = 0;
-                    ItemsDroppedStats.TotalGems++;
-                    if (c_item_GItemType == GItemType.Topaz)
-                        iThisGemType = GEMTOPAZ;
-                    if (c_item_GItemType == GItemType.Ruby)
-                        iThisGemType = GEMRUBY;
-                    if (c_item_GItemType == GItemType.Emerald)
-                        iThisGemType = GEMEMERALD;
-                    if (c_item_GItemType == GItemType.Amethyst)
-                        iThisGemType = GEMAMETHYST;
-                    if (c_item_GItemType == GItemType.Diamond)
-                        iThisGemType = GEMDIAMOND;
-                    ItemsDroppedStats.GemsPerType[iThisGemType]++;
-                    ItemsDroppedStats.GemsPerLevel[c_ItemLevel]++;
-                    ItemsDroppedStats.GemsPerTPerL[iThisGemType, c_ItemLevel]++;
-                }
-                else if (c_item_GItemType == GItemType.HealthPotion)
-                {
-                    ItemsDroppedStats.TotalPotions++;
-                    ItemsDroppedStats.PotionsPerLevel[c_ItemLevel]++;
-                }
-                else if (c_item_GItemType == GItemType.InfernalKey)
-                {
-                    ItemsDroppedStats.TotalInfernalKeys++;
-                }
-                // See if we should update the stats file
-                if (DateTime.Now.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
-                {
-                    ItemStatsLastPostedReport = DateTime.Now;
-                    OutputReport();
-                }
-            }
-            return isNewLogItem;
-        }
         private static void RefreshDoBackTrack()
         {
             // See if we should wait for [playersetting] milliseconds for possible loot drops before continuing run
-            if (DateTime.Now.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill || DateTime.Now.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill)
+            if (DateTime.UtcNow.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill || 
+                DateTime.UtcNow.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
+                DateTime.UtcNow.Subtract(lastHadContainerInSights).TotalMilliseconds <= 1000)
             {
                 CurrentTarget = new TrinityCacheObject()
                                     {

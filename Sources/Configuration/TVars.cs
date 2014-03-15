@@ -85,7 +85,7 @@ namespace Trinity
             Set(new TVar("Barbarian.Leap.EliteRange", 20f, "Leap Elite Check Range"));
             Set(new TVar("Barbarian.Leap.EliteCount", 1, "Minimum Leap Elite Count"));
             Set(new TVar("Barbarian.Leap.TrashRange", 20f, "Leap Trash Check Range"));
-            Set(new TVar("Barbarian.Leap.TrashCount", 1, "Minimum Leap Trash Count"));
+            Set(new TVar("Barbarian.Leap.TrashCount", 3, "Minimum Leap Trash Count"));
             Set(new TVar("Barbarian.Leap.MinExtraDistance", 4f, "Extra distance added to target for Leap direction"));
             Set(new TVar("Barbarian.HammerOfTheAncients.MinFury", 45, "Minimum Fury for Hammer of the Ancients"));
 

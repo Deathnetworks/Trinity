@@ -87,9 +87,9 @@ namespace Trinity.XmlTags
             return
             new Decorator(ret => !(SceneId == 0 && string.IsNullOrWhiteSpace(SceneName)),
                 new Sequence(
-                    new DecoratorContinue(ret => DateTime.Now.Subtract(lastCheckedScenes).TotalMilliseconds > 1000,
+                    new DecoratorContinue(ret => DateTime.UtcNow.Subtract(lastCheckedScenes).TotalMilliseconds > 1000,
                         new Sequence(
-                            new Action(ret => lastCheckedScenes = DateTime.Now),
+                            new Action(ret => lastCheckedScenes = DateTime.UtcNow),
                             new Action(ret => FindPrioritySceneTarget())
                         )
                     ),

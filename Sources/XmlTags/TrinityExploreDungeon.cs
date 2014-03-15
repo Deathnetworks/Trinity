@@ -759,9 +759,9 @@ namespace Trinity.XmlTags
             return
             new Decorator(ret => PriorityScenes != null && PriorityScenes.Any(),
                 new Sequence(
-                    new DecoratorContinue(ret => DateTime.Now.Subtract(lastCheckedScenes).TotalMilliseconds > 1000,
+                    new DecoratorContinue(ret => DateTime.UtcNow.Subtract(lastCheckedScenes).TotalMilliseconds > 1000,
                         new Sequence(
-                            new Action(ret => lastCheckedScenes = DateTime.Now),
+                            new Action(ret => lastCheckedScenes = DateTime.UtcNow),
                             new Action(ret => FindPrioritySceneTarget())
                         )
                     ),
@@ -1249,9 +1249,9 @@ namespace Trinity.XmlTags
 
         private void RecordPosition()
         {
-            if (DateTime.Now.Subtract(Trinity.lastAddedLocationCache).TotalMilliseconds >= 100)
+            if (DateTime.UtcNow.Subtract(Trinity.lastAddedLocationCache).TotalMilliseconds >= 100)
             {
-                Trinity.lastAddedLocationCache = DateTime.Now;
+                Trinity.lastAddedLocationCache = DateTime.UtcNow;
                 if (Vector3.Distance(myPos, Trinity.LastRecordedPosition) >= 5f)
                 {
                     MarkNearbyNodesVisited();

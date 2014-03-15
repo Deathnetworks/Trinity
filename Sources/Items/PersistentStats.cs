@@ -226,7 +226,7 @@ namespace Trinity
             }
 
             // Add the differences
-            TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
+            TimeSpan TotalRunningTime = DateTime.UtcNow.Subtract(ItemStatsWhenStartedBot);
 
             updated.IsReset = false;
             updated.WhenStartedSession = ItemStatsWhenStartedBot;
@@ -275,7 +275,7 @@ namespace Trinity
             worldStatsDictionary[cachedStaticWorldId] = PersistentUpdateOne(filename);
 
             // Sets LastSaved to now for the rest of the things
-            TimeSpan TotalRunningTime = DateTime.Now.Subtract(ItemStatsWhenStartedBot);
+            TimeSpan TotalRunningTime = DateTime.UtcNow.Subtract(ItemStatsWhenStartedBot);
             PersistentLastSaved.TotalRunningTime = TotalRunningTime;
             PersistentLastSaved.TotalDeaths = iTotalDeaths;
             PersistentLastSaved.TotalLeaveGames = TotalLeaveGames;

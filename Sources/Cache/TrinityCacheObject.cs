@@ -183,5 +183,15 @@ namespace Trinity
                  MathUtil.IntersectsPath(this.Position, this.Radius, Trinity.Player.Position, u.Position)
                  select u).Count();
         }
+
+        public int CountUnitsInFront()
+        {
+            return
+                (from u in Trinity.ObjectCache
+                 where u.RActorGuid != this.RActorGuid &&
+                 u.Type == GObjectType.Unit &&
+                 MathUtil.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position, this.Position)
+                 select u).Count();
+        }
     }
 }

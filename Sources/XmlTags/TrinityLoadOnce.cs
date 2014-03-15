@@ -15,7 +15,7 @@ namespace Trinity.XmlTags
     [XmlElement("TrinityLoadOnce")]
     public class TrinityLoadOnce : ProfileBehavior
     {
-        internal static int lastUpdate = DateTime.Now.Ticks.GetHashCode();
+        internal static int lastUpdate = DateTime.UtcNow.Ticks.GetHashCode();
         internal static List<string> UsedProfiles = new List<string>();
         internal string[] AvailableProfiles
         {
@@ -133,7 +133,7 @@ namespace Trinity.XmlTags
                     new Decorator(ret => AvailableProfiles.Length == 0,
                         new Sequence(
                             new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "TrinityLoadOnce: All available profiles have been used!", true)),
-                            new Action(ret => lastUpdate = DateTime.Now.Ticks.GetHashCode()),
+                            new Action(ret => lastUpdate = DateTime.UtcNow.Ticks.GetHashCode()),
                             new Action(ret => isDone = true)
                         )
                     ),

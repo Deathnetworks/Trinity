@@ -347,8 +347,8 @@
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>rd /S /Q "$(ProjectDir)obj\"
-rd /S /Q "$(ProjectDir)bin\"
+    <PostBuildEvent>rem rd /S /Q "$(ProjectDir)obj\"
+rem rd /S /Q "$(ProjectDir)bin\"
 rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\"
 rd /S /Q "C:\db\Plugins\$(ProjectName)\"
 del /S "$(ProjectDir)*.bak"
@@ -359,7 +359,10 @@ xcopy /E /Y "$(ProjectDir)*.xaml" "C:\db\Plugins\$(ProjectName)\"
 xcopy /E /Y "$(ProjectDir)*.xml" "C:\db\Plugins\$(ProjectName)\"
 xcopy /E /Y "$(ProjectDir)*.xsd" "C:\db\Plugins\$(ProjectName)\"
 xcopy /E /Y "$(ProjectDir)*.txt" "C:\db\Plugins\$(ProjectName)\"
-xcopy /E /Y "$(ProjectDir)*" "C:\db\svn\$(ProjectName)\trunk\Sources\"
-rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\bin\"</PostBuildEvent>
+xcopy /Y "$(ProjectDir)*" "C:\db\svn\$(ProjectName)\trunk\Sources\"
+rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\bin\"
+rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\obj\"
+rd /S /Q "C:\db\Plugins\$(ProjectName)\obj\
+rd /S /Q "C:\db\Plugins\$(ProjectName)\bin\</PostBuildEvent>
   </PropertyGroup>
 </Project>

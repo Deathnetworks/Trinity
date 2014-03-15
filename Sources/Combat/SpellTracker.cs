@@ -46,7 +46,7 @@ namespace Trinity
                        {
                            ACDGuid = acdGuid,
                            Power = power,
-                           Expiration = DateTime.Now.AddMilliseconds(duration)
+                           Expiration = DateTime.UtcNow.AddMilliseconds(duration)
                        });
                 }
             }
@@ -111,11 +111,11 @@ namespace Trinity
                     {
                         lock (TrackedUnits)
                         {
-                            //TrackedUnits.RemoveWhere(t => t.Expiration < DateTime.Now);
-                            var units = TrackedUnits.Where(t => t.Expiration < DateTime.Now);
+                            //TrackedUnits.RemoveWhere(t => t.Expiration < DateTime.UtcNow);
+                            var units = TrackedUnits.Where(t => t.Expiration < DateTime.UtcNow);
                             foreach (var unit in units.ToList())
                             {
-                                //Technicals.Logger.LogNormal("Removing unit {0} from TrackedUnits ({1}, {2})", unit.ACDGuid, unit.Expiration.Ticks, DateTime.Now.Ticks);
+                                //Technicals.Logger.LogNormal("Removing unit {0} from TrackedUnits ({1}, {2})", unit.ACDGuid, unit.Expiration.Ticks, DateTime.UtcNow.Ticks);
                                 TrackedUnits.Remove(unit);
                             }
                         }

@@ -67,7 +67,7 @@ namespace Trinity
                 {
                     Key = teamIdHash,
                     Value = teamId,
-                    Expires = DateTime.Now.AddMinutes(60)
+                    Expires = DateTime.UtcNow.AddMinutes(60)
                 });
             }
             if (teamId == 1 || teamId == 2)

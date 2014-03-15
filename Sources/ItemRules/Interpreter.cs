@@ -592,7 +592,7 @@ namespace Trinity.ItemRules
                     break;
             }
 
-            log.WriteLine(DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".Hero" + SEP + logType + SEP + action + SEP + str);
+            log.WriteLine(DateTime.UtcNow.ToString("yyyyMMddHHmmssffff") + ".Hero" + SEP + logType + SEP + action + SEP + str);
             log.Close();
         }
 

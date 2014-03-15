@@ -473,7 +473,7 @@ namespace Trinity.Combat.Abilities
         internal static double TimeSincePowerUse(SNOPower power)
         {
             if (CacheData.AbilityLastUsedCache.ContainsKey(power))
-                return DateTime.Now.Subtract(CacheData.AbilityLastUsedCache[power]).TotalMilliseconds;
+                return DateTime.UtcNow.Subtract(CacheData.AbilityLastUsedCache[power]).TotalMilliseconds;
             else
                 return -1;
         }

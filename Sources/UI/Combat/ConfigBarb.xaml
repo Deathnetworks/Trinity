@@ -8,7 +8,9 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
-            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="..\Template.xaml"/></ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="..\Template.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
             <ut:PercentConverter x:Key="percentConverter" />
             <ut:EnumBooleanConverter x:Key="enumBooleanConverter" />
@@ -100,6 +102,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <GroupBox Grid.Row="0">
                 <GroupBox.Header>Wrath of the Berserker</GroupBox.Header>
@@ -121,9 +124,17 @@
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.TargetBasedZigZag}" ToolTip="Uses Monster positions as WW points instead of random XYZ">Multi-Target Based ZigZag</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.ThreatShoutOOC}" ToolTip="Use Threating Shout Out of Combat to generate Fury">Use Threating Shout OOC</CheckBox>
                 <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseLeapOOC}" ToolTip="Leap Out Of Combat">Leap OOC</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseSprintOOC}" ToolTip="Sprint Out Of Combat">Sprint OOC</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseChargeOOC}" ToolTip="Sprint Out Of Combat">Furious Charge OOC</CheckBox>
+                <CheckBox Margin="2" IsChecked="{Binding Path=Barb.UseChargeOOC}" ToolTip="Furious Charge Out Of Combat">Furious Charge OOC</CheckBox>
             </UniformGrid>
+            <GroupBox Grid.Row="2">
+                <GroupBox.Header>Sprint</GroupBox.Header>
+                <UniformGrid Columns="2">
+                    <TextBlock Text="When to use Sprint" />
+                    <RadioButton GroupName="SprintMode" Content="Anytime" IsChecked="{Binding Path=Barb.SprintMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Always}"  />
+                    <RadioButton GroupName="SprintMode" Content="In Combat only" IsChecked="{Binding Path=Barb.SprintMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=CombatOnly}" />
+                    <RadioButton GroupName="SprintMode" Content="Out of Combat Only" IsChecked="{Binding Path=Barb.SprintMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=MovementOnly}" />
+                </UniformGrid>
+            </GroupBox>
         </Grid>
         <Grid Grid.Row="3" Margin="2">
             <ScrollViewer Tag="Combat\Avoidance.xaml" DataContext="{Binding Path=Barb}"/>

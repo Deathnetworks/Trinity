@@ -1,5 +1,7 @@
-﻿using Trinity.Technicals;
+﻿using System.Linq;
+using Trinity.Technicals;
 using Zeta.Bot.Profile;
+using Zeta.Game;
 using Zeta.TreeSharp;
 using Zeta.XmlEngine;
 
@@ -9,26 +11,72 @@ namespace Trinity.XmlTags
     [XmlElement("TrinityTownRun")]
     public class TrinityTownRun : ProfileBehavior
     {
-        private bool m_IsDone = false;
+        private bool isDone = false;
 
         public override bool IsDone
         {
-            get { return m_IsDone; }
+            get { return isDone; }
+        }
+
+        [XmlAttribute("minFreeBagSlots")]
+        public int MinFreeBagSlots { get; set; }
+
+        [XmlAttribute("minDurabilityPercent")]
+        public int MinDurability { get; set; }
+
+        /// <summary>
+        /// Returns true when the number of free slots is less than the MinFreeBagSlots
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckMinBagSlots()
+        {
+            if (MinFreeBagSlots == 0)
+                return false;
+
+            int maxFreeSlots = 60;
+            int slotsTaken = 0;
+            foreach (var item in ZetaDia.Me.Inventory.Backpack)
+            {
+                slotsTaken++;
+                if (item.IsTwoSquareItem)
+                    slotsTaken++;
+            }
+
+            return maxFreeSlots - slotsTaken < MinFreeBagSlots;
+        }
+
+        /// <summary>
+        /// returns True when the lowest durability item is less than the min durabilty
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckDurability()
+        {
+            if (MinDurability == 0)
+                return false;
+
+            return ZetaDia.Me.Inventory.Equipped.Min(i => i.DurabilityPercent) * 100 <= MinDurability;
         }
 
         protected override Composite CreateBehavior()
         {
-            return new Zeta.TreeSharp.Action(ret =>
-            {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.ProfileTag, "Town-run request received, will town-run at next possible moment.");
-                Trinity.ForceVendorRunASAP = true;
-                m_IsDone = true;
-            });
+            return new PrioritySelector(
+                new Decorator(ret => CheckDurability() || CheckMinBagSlots(),
+                    new Sequence(
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Town-run request received, will town-run at next possible moment.")),
+                        new Action(ret => Trinity.ForceVendorRunASAP = true),
+                        new Action(ret => isDone = true)
+                    )
+                ),
+                    new Sequence(
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Skipping TrinityTownRun")),
+                        new Action(ret => isDone = true)
+                    )
+            );
         }
 
         public override void ResetCachedDone()
         {
-            m_IsDone = false;
+            isDone = false;
             base.ResetCachedDone();
         }
     }

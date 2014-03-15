@@ -21,8 +21,8 @@ namespace Trinity
         /// </summary>
         internal static void ResetCheckGold()
         {
-            lastCheckBag = DateTime.Now;
-            lastRefreshCoin = DateTime.Now;
+            lastCheckBag = DateTime.UtcNow;
+            lastRefreshCoin = DateTime.UtcNow;
             lastKnowCoin = 0;
         }
 
@@ -51,7 +51,7 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "Loading world, gold inactivity reset", 0);
                     return false;
                 }
-                if ((DateTime.Now.Subtract(lastCheckBag).TotalSeconds < 5))
+                if ((DateTime.UtcNow.Subtract(lastCheckBag).TotalSeconds < 5))
                 {
                     return false;
                 }
@@ -87,19 +87,19 @@ namespace Trinity
 
 
 
-                lastCheckBag = DateTime.Now;
+                lastCheckBag = DateTime.UtcNow;
                 int currentcoin = Trinity.Player.Coinage;
 
                 if (currentcoin != lastKnowCoin && currentcoin != 0)
                 {
-                    lastRefreshCoin = DateTime.Now;
+                    lastRefreshCoin = DateTime.UtcNow;
                     lastKnowCoin = currentcoin;
                 }
-                int notpickupgoldsec = Convert.ToInt32(DateTime.Now.Subtract(lastRefreshCoin).TotalSeconds);
+                int notpickupgoldsec = Convert.ToInt32(DateTime.UtcNow.Subtract(lastRefreshCoin).TotalSeconds);
                 if (notpickupgoldsec >= Trinity.Settings.Advanced.GoldInactivityTimer)
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Gold inactivity after {0}s. Sending abort.", notpickupgoldsec);
-                    lastRefreshCoin = DateTime.Now;
+                    lastRefreshCoin = DateTime.UtcNow;
                     lastKnowCoin = currentcoin;
                     notpickupgoldsec = 0;
                     return true;
@@ -151,7 +151,7 @@ namespace Trinity
             if (!isLeavingGame && !leaveGameInitiated)
             {
                 // Exit the game and reload the profile
-                PlayerMover.timeLastRestartedGame = DateTime.Now;
+                PlayerMover.LastRestartedGame = DateTime.UtcNow;
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Gold Inactivity timer tripped - Anti-stuck measures exiting current game.");
                 // Reload this profile
                 ProfileManager.Load(Zeta.Bot.ProfileManager.CurrentProfile.Path);
@@ -168,7 +168,7 @@ namespace Trinity
                 return true;
             }            
 
-            if (DateTime.Now.Subtract(PlayerMover.timeLastRestartedGame).TotalSeconds <= 12)
+            if (DateTime.UtcNow.Subtract(PlayerMover.LastRestartedGame).TotalSeconds <= 12)
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "GoldInactiveLeaveGame waiting for LeaveGame");
                 return true;

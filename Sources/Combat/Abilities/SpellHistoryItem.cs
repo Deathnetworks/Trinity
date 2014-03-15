@@ -10,7 +10,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return DateTime.Now.Subtract(UseTime);
+                return DateTime.UtcNow.Subtract(UseTime);
             }
         }
 

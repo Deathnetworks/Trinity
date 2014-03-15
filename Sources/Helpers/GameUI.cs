@@ -131,10 +131,10 @@ namespace Trinity
             SafeClickElement(PartyFollowerBossAccept, "Party Follower Boss Accept", true);
             SafeClickElement(TalktoInteractButton1, "Conversation Button", false);
 
-            if (DateTime.Now.Subtract(lastCheckedUIButtons).TotalMilliseconds <= 500)
+            if (DateTime.UtcNow.Subtract(lastCheckedUIButtons).TotalMilliseconds <= 500)
                 return;
 
-            lastCheckedUIButtons = DateTime.Now;
+            lastCheckedUIButtons = DateTime.UtcNow;
 
             if (ZetaDia.Me.LoopingAnimationEndTime <= 0)
             {

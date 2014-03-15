@@ -89,7 +89,7 @@ namespace Trinity
             Scene = new SceneInfo()
             {
                 SceneId = -1,
-                LastUpdate = DateTime.Now
+                LastUpdate = DateTime.UtcNow
             };
         }
 
@@ -106,7 +106,7 @@ namespace Trinity
         {
             using (new PerformanceLogger("UpdateCachedPlayerData"))
             {
-                if (DateTime.Now.Subtract(Player.LastUpdated).TotalMilliseconds <= 100)
+                if (DateTime.UtcNow.Subtract(Player.LastUpdated).TotalMilliseconds <= 100)
                     return;
                 // If we aren't in the game of a world is loading, don't do anything yet
                 if (!ZetaDia.IsInGame || ZetaDia.IsLoadingWorld)
@@ -122,7 +122,7 @@ namespace Trinity
 
                     Player.ACDGuid = me.ACDGuid;
                     Player.RActorGuid = me.RActorGuid;
-                    Player.LastUpdated = DateTime.Now;
+                    Player.LastUpdated = DateTime.UtcNow;
                     Player.IsInTown = ZetaDia.IsInTown;
                     Player.IsDead = me.IsDead;
                     Player.IsInGame = ZetaDia.IsInGame;
@@ -158,7 +158,7 @@ namespace Trinity
                     //    Player.IsHidden = false;
                     Player.IsHidden = me.IsHidden;
 
-                    if (DateTime.Now.Subtract(Player.Scene.LastUpdate).TotalMilliseconds > 1000 && Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
+                    if (DateTime.UtcNow.Subtract(Player.Scene.LastUpdate).TotalMilliseconds > 1000 && Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
                     {
                         int CurrentSceneSNO = -1;
                         CurrentSceneSNO = (int)ZetaDia.Me.SceneId;

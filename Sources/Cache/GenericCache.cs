@@ -143,7 +143,7 @@ namespace Trinity
                 try
                 {
 
-                    long NowTicks = DateTime.Now.Ticks;
+                    long NowTicks = DateTime.UtcNow.Ticks;
 
                     lock (_Synchronizer)
                     {
@@ -197,7 +197,7 @@ namespace Trinity
         {
             Key = key;
             Value = value;
-            Expires = DateTime.Now.Add(expirationDuration);
+            Expires = DateTime.UtcNow.Add(expirationDuration);
         }
 
         public override bool Equals(object obj)

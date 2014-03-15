@@ -59,8 +59,8 @@ namespace Trinity
         public static DateTime LastRefreshedCache = DateTime.MinValue;
 
 		//intell
-		public static DateTime TimeToRunFromPoison = DateTime.Now;
-		public static DateTime LogTest = DateTime.Now;
+		public static DateTime TimeToRunFromPoison = DateTime.UtcNow;
+		public static DateTime LogTest = DateTime.UtcNow;
 		public static bool RunFromPoison = false;
 		public static bool GotFrenzyShrine = false;
 		public static bool GotBlessedShrine = false;
@@ -165,7 +165,7 @@ namespace Trinity
         /// Blacklist avoidance spots we failed to reach in time, for a period of time
         /// </summary>
         private static HashSet<CacheObstacleObject> hashAvoidanceBlackspot = new HashSet<CacheObstacleObject>();
-        private static DateTime lastClearedAvoidanceBlackspots = DateTime.Today;
+        private static DateTime lastClearedAvoidanceBlackspots = DateTime.MinValue;
 
         // A count for player mystic ally, gargantuans, and zombie dogs
         private static int iPlayerOwnedMysticAlly = 0;
@@ -177,13 +177,15 @@ namespace Trinity
 
         // After so many, give the player a friendly warning to check their skill/build setup
         private static int iNoAbilitiesAvailableInARow = 0;
-        private static DateTime lastRemindedAboutAbilities = DateTime.Today;
+        private static DateTime lastRemindedAboutAbilities = DateTime.MinValue;
 
         // Last had any mob in range, for loot-waiting
-        internal static DateTime lastHadUnitInSights = DateTime.Today;
+        internal static DateTime lastHadUnitInSights = DateTime.MinValue;
 
         // When we last saw a boss/elite etc.
-        internal static DateTime lastHadEliteUnitInSights = DateTime.Today;
+        internal static DateTime lastHadEliteUnitInSights = DateTime.MinValue;
+
+        internal static DateTime lastHadContainerInSights = DateTime.MinValue;
 
         // Do we need to reset the debug bar after combat handling?
         private static bool bResetStatusText = false;
@@ -302,7 +304,7 @@ namespace Trinity
         /// <summary>
         /// Prevent spam-kiting too much - allow fighting between each kite movement
         /// </summary>
-        private static DateTime timeCancelledKiteMove = DateTime.Now;
+        private static DateTime timeCancelledKiteMove = DateTime.UtcNow;
         private static int cancelledKiteMoveForMilliseconds = 0;
 
         // How many follower items were ignored, purely for item stat tracking
@@ -398,8 +400,8 @@ namespace Trinity
         private const int GEMEMERALD = 3;
         private const int GEMDIAMOND = 4;
         private static readonly string[] sGemString = new string[4] { "Ruby", "Topaz", "Amethyst", "Emerald" };
-        private static DateTime ItemStatsLastPostedReport = DateTime.Now;
-        private static DateTime ItemStatsWhenStartedBot = DateTime.Now;
+        private static DateTime ItemStatsLastPostedReport = DateTime.UtcNow;
+        private static DateTime ItemStatsWhenStartedBot = DateTime.UtcNow;
         private static bool bMaintainStatTracking = false;
 
         // Store items already logged by item-stats, to make sure no stats get doubled up by accident
@@ -535,9 +537,9 @@ namespace Trinity
         // ForesightFirstHit is used to track the 30 second buff from deadly reach.
         private static DateTime ForeSightFirstHit = new DateTime(1996, 6, 3, 22, 15, 0);
         // Foresight2 is used to track combination strike buff.
-        private static DateTime ForeSight2 = DateTime.Now;
+        private static DateTime ForeSight2 = DateTime.UtcNow;
         // Otherthandeadlyreach is used for other spirit generators to track for combination strike buff.
-        private static DateTime OtherThanDeadlyReach = DateTime.Now;
+        private static DateTime OtherThanDeadlyReach = DateTime.UtcNow;
 
         /// <summary>
         /// And a "global cooldown" to prevent non-signature-spells being used too fast

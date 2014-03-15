@@ -154,8 +154,8 @@ namespace Trinity
                 // Check for energy reservation amounts
                 ((Player.PrimaryResource >= 15 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
-                bool bGenerateNewZigZag = (DateTime.Now.Subtract(LastChangedZigZag).TotalMilliseconds >= 1500 ||
-                    (vPositionLastZigZagCheck != Vector3.Zero && Player.Position == vPositionLastZigZagCheck && DateTime.Now.Subtract(LastChangedZigZag).TotalMilliseconds >= 200) ||
+                bool bGenerateNewZigZag = (DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= 1500 ||
+                    (vPositionLastZigZagCheck != Vector3.Zero && Player.Position == vPositionLastZigZagCheck && DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= 200) ||
                     Vector3.Distance(Player.Position, CombatBase.ZigZagPosition) <= 4f ||
                     CurrentTarget.ACDGuid != LastZigZagUnitAcdGuid);
                 vPositionLastZigZagCheck = Player.Position;
@@ -167,7 +167,7 @@ namespace Trinity
                     // Resetting this to ensure the "no-spam" is reset since we changed our target location
                     LastPowerUsed = SNOPower.None;
                     LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
-                    LastChangedZigZag = DateTime.Now;
+                    LastChangedZigZag = DateTime.UtcNow;
                 }
                 return new TrinityPower(SNOPower.DemonHunter_Strafe, 25f, CombatBase.ZigZagPosition, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }

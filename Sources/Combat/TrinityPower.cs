@@ -91,7 +91,7 @@ namespace Trinity
         {
             get
             {
-                return DateTime.Now.Subtract(PowerAssignmentTime).TotalMilliseconds;
+                return DateTime.UtcNow.Subtract(PowerAssignmentTime).TotalMilliseconds;
             }
         }
 
@@ -133,7 +133,7 @@ namespace Trinity
 
         public TrinityPower()
         {
-            this.PowerAssignmentTime = DateTime.Now;
+            this.PowerAssignmentTime = DateTime.UtcNow;
 
             // default values
             SNOPower = SNOPower.None;
@@ -162,7 +162,7 @@ namespace Trinity
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
-            PowerAssignmentTime = DateTime.Now;
+            PowerAssignmentTime = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -181,7 +181,7 @@ namespace Trinity
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
-            PowerAssignmentTime = DateTime.Now;
+            PowerAssignmentTime = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace Trinity
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
-            PowerAssignmentTime = DateTime.Now;
+            PowerAssignmentTime = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace Trinity
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
-            PowerAssignmentTime = DateTime.Now;
+            PowerAssignmentTime = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace Trinity
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;
-            PowerAssignmentTime = DateTime.Now;
+            PowerAssignmentTime = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace Trinity
             WaitTicksBeforeUse = waitTicksBeforeUse;
             WaitTicksAfterUse = waitTicksAfterUse;
             WaitForAnimationFinished = true;
-            PowerAssignmentTime = DateTime.Now;
+            PowerAssignmentTime = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -285,7 +285,7 @@ namespace Trinity
             WaitTicksBeforeUse = waitTicksBeforeUse;
             WaitTicksAfterUse = waitTicksAfterUse;
             WaitForAnimationFinished = waitForAnimationFinished;
-            PowerAssignmentTime = DateTime.Now;
+            PowerAssignmentTime = DateTime.UtcNow;
         }
 
 

@@ -31,7 +31,7 @@ namespace Trinity
         private static void TrinityBotStart(IBot bot)
         {
             Logger.Log("Bot Starting");
-            DateTime timeBotStart = DateTime.Now;
+            DateTime timeBotStart = DateTime.UtcNow;
 
             V.ValidateLoad();
 
@@ -54,8 +54,8 @@ namespace Trinity
             HasMappedPlayerAbilities = false;
             if (!bMaintainStatTracking)
             {
-                ItemStatsWhenStartedBot = DateTime.Now;
-                ItemStatsLastPostedReport = DateTime.Now;
+                ItemStatsWhenStartedBot = DateTime.UtcNow;
+                ItemStatsLastPostedReport = DateTime.UtcNow;
                 bMaintainStatTracking = true;
             }
             else
@@ -68,8 +68,8 @@ namespace Trinity
 
             ReplaceTreeHooks();
 
-            PlayerMover.TimeLastRecordedPosition = DateTime.Now;
-            PlayerMover.timeLastRestartedGame = DateTime.Now;
+            PlayerMover.TimeLastRecordedPosition = DateTime.UtcNow;
+            PlayerMover.LastRestartedGame = DateTime.UtcNow;
             GoldInactivity.ResetCheckGold();
 
             if (CharacterSettings.Instance.KillRadius < 20)
@@ -86,18 +86,19 @@ namespace Trinity
                     CharacterSettings.Instance.LootRadius);
             }
 
-            BeginInvoke(new Action(() =>
-                {
-                    if (StashRule == null)
-                        StashRule = new Interpreter();
-
-                    StashRule.readConfiguration();
-                }
-            ));
+            if (Settings.Loot.ItemFilterMode == Config.Loot.ItemFilterMode.TrinityWithItemRules)
+            {
+                BeginInvoke(new Action(() =>
+                    {
+                        if (StashRule == null)
+                            StashRule = new Interpreter();
+                    }
+                ));
+            }
 
             Navigator.SearchGridProvider.Update();
 
-            Logger.LogDebug("Trinity BotStart took {0}ms", DateTime.Now.Subtract(timeBotStart).TotalMilliseconds);
+            Logger.LogDebug("Trinity BotStart took {0}ms", DateTime.UtcNow.Subtract(timeBotStart).TotalMilliseconds);
         }
 
         private void GameEvents_OnGameChanged(object sender, EventArgs e)
@@ -120,8 +121,8 @@ namespace Trinity
             iTotalBacktracks = 0;
             PlayerMover.TotalAntiStuckAttempts = 1;
             PlayerMover.vSafeMovementLocation = Vector3.Zero;
-            PlayerMover.vOldPosition = Vector3.Zero;
-            PlayerMover.iTimesReachedStuckPoint = 0;
+            PlayerMover.LastPosition = Vector3.Zero;
+            PlayerMover.TimesReachedStuckPoint = 0;
             PlayerMover.TimeLastRecordedPosition = DateTime.Today;
             PlayerMover.LastGeneratedStuckPosition = DateTime.Today;
             TrinityUseOnce.UseOnceIDs = new HashSet<int>();
@@ -133,9 +134,9 @@ namespace Trinity
 
         private void TrinityOnDeath(object src, EventArgs mea)
         {
-            if (DateTime.Now.Subtract(LastDeathTime).TotalSeconds > 10)
+            if (DateTime.UtcNow.Subtract(LastDeathTime).TotalSeconds > 10)
             {
-                LastDeathTime = DateTime.Now;
+                LastDeathTime = DateTime.UtcNow;
                 iTotalDeaths++;
                 iDeathsThisRun++;
                 PlayerInfoCache.RefreshHotbar();
@@ -217,7 +218,7 @@ namespace Trinity
                     TrinityUseOnce.UseOnceCounter = new Dictionary<int, int>();
                     iMaxDeathsAllowed = 0;
                     iDeathsThisRun = 0;
-                    LastDeathTime = DateTime.Now;
+                    LastDeathTime = DateTime.UtcNow;
                     _hashsetItemStatsLookedAt = new HashSet<string>();
                     _hashsetItemPicksLookedAt = new HashSet<string>();
                     _hashsetItemFollowersIgnored = new HashSet<string>();
@@ -230,13 +231,13 @@ namespace Trinity
                     HasMappedPlayerAbilities = false;
                     PlayerMover.TotalAntiStuckAttempts = 1;
                     PlayerMover.vSafeMovementLocation = Vector3.Zero;
-                    PlayerMover.vOldPosition = Vector3.Zero;
-                    PlayerMover.iTimesReachedStuckPoint = 0;
+                    PlayerMover.LastPosition = Vector3.Zero;
+                    PlayerMover.TimesReachedStuckPoint = 0;
                     PlayerMover.TimeLastRecordedPosition = DateTime.Today;
                     PlayerMover.LastGeneratedStuckPosition = DateTime.Today;
-                    PlayerMover.iTimesReachedMaxUnstucks = 0;
-                    PlayerMover.iCancelUnstuckerForSeconds = 0;
-                    PlayerMover._lastCancelledUnstucker = DateTime.Today;
+                    PlayerMover.TimesReachedMaxUnstucks = 0;
+                    PlayerMover.CancelUnstuckerForSeconds = 0;
+                    PlayerMover.LastCancelledUnstucker = DateTime.Today;
                     NavHelper.UsedStuckSpots = new List<GridPoint>();
 
                     // Reset all the caches

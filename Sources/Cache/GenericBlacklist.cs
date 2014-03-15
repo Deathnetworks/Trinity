@@ -132,7 +132,7 @@ namespace Trinity
         {
             while (true)
             {
-                long NowTicks = DateTime.Now.Ticks;
+                long NowTicks = DateTime.UtcNow.Ticks;
 
                 lock (_Synchronizer)
                 {

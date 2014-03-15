@@ -13,7 +13,7 @@ namespace Trinity
 
         public SpeedSensor()
         {
-            this.Timestamp = DateTime.Now;
+            this.Timestamp = DateTime.UtcNow;
         }
 
         /// <summary>

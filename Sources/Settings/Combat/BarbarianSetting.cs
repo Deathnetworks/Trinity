@@ -23,7 +23,7 @@ namespace Trinity.Config.Combat
         private bool _IgnoreGoldInWOTB;
         private float _MinHotaHealth;
         private BarbarianWOTBMode _WOTBMode;
-        private bool _UseSprintOOC;
+        private BarbarianSprintMode _SprintMode;
         private bool _UseLeapOOC;
         private bool _UseChargeOOC;
         private float _AvoidArcaneHealth;
@@ -978,19 +978,19 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
-        public bool UseSprintOOC
+        [DefaultValue(BarbarianSprintMode.MovementOnly)]
+        public BarbarianSprintMode SprintMode
         {
             get
             {
-                return _UseSprintOOC;
+                return _SprintMode;
             }
             set
             {
-                if (_UseSprintOOC != value)
+                if (_SprintMode != value)
                 {
-                    _UseSprintOOC = value;
-                    OnPropertyChanged("UseSprintOOC");
+                    _SprintMode = value;
+                    OnPropertyChanged("SprintMode");
                 }
             }
         }
@@ -1059,7 +1059,7 @@ namespace Trinity.Config.Combat
             this.MinHotaHealth = 0.40f;
             this.WOTBMode = BarbarianWOTBMode.Normal;
             this.UseLeapOOC = true;
-            this.UseSprintOOC = true;
+            this.SprintMode = BarbarianSprintMode.MovementOnly;
             this.UseChargeOOC = true;
         }
 
@@ -1079,6 +1079,7 @@ namespace Trinity.Config.Combat
             this.AvoidGrotesqueHealth = 1;
             this.AvoidOrbiterHealth = 1;
             this.AvoidWormholeHealth = 0.50f;
+            this.SprintMode = BarbarianSprintMode.MovementOnly;
         }
 
         #endregion Methods

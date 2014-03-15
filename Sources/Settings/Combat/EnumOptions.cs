@@ -44,4 +44,11 @@ namespace Trinity.Config.Combat
         Normal,
         WhenReady
     }
+
+    public enum BarbarianSprintMode
+    {
+        Always,
+        CombatOnly,
+        MovementOnly
+    }
 }

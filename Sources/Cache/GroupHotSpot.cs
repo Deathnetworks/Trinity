@@ -71,7 +71,7 @@ namespace Trinity
                     lock (hotSpotList)
                     {
                         var hotSpots = hotSpotList;
-                        foreach (var hotspot in hotSpots.Where(hotspot => DateTime.Now.Subtract(hotspot.ExpirationTime).TotalMilliseconds > 0).ToList())
+                        foreach (var hotspot in hotSpots.Where(hotspot => DateTime.UtcNow.Subtract(hotspot.ExpirationTime).TotalMilliseconds > 0).ToList())
                         {
                             hotSpotList.Remove(hotspot);
                         }
