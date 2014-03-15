@@ -1,6 +1,95 @@
 ﻿
 # Trinity
 
+### Changelog 1.8.6
+
+* Monk Mantra of Healing now used when low on health
+
+* Simpler monk Manta spam logic
+
+* Fixed Wizard Storm Armor casting every 15 seconds
+
+* TrinityTownRun added 2 attributes. Usage: <TrinityTownRun questId="1" minFreeBagSlots="10" minDurabilityPercent="50" /> - makes it easy to put at the start o
+
+* Added gems to item reports
+
+* Fixed IndexOutOfRange exception for Diamonds
+
+* Diamonds are now picked up according to the UI options (instead of Amethyst+Diamonds)
+
+* ItemRules now only loaded when used
+
+* Added a bunch of useful methods to TargetUtil
+
+* Barbarian Furious Charge and Leap should work much better and more often
+
+* Barbarians now have an option to choose when to sprint (Always, Combat, or Movement)
+
+* Wizard will now use Arcane Torrent or Blizzard for destructible objects
+
+* Removed Old Tristram Road and The Old Ruins from QuestLevelAreaId's
+
+### Changelog 1.8.5
+
+* Added option to hide BattleTag from window title
+
+* Barbarian Call of the Ancients will now be used on trash (3 minimum) instead of only elites
+
+* DemonHunter Rain of Vengeance now works with Ignoring Elites
+
+* DemonHunter Companion is now used when off cooldown and valid target(s) are in range
+
+* WitchDoctor Spirit Barrage is now used (not just Manitou rune)
+
+* Elites should now get priority when in Archon form (and not ignoring elites)
+
+* Added Scarecrow to Container Whitelist
+
+* Legendary Follower items will now always get picked up
+
+* Wizard Archon Blast, Arcane Strike and Disintegrate work correctly now
+
+* Monk Mantra Spam will now only be cast when elites are present, or when ignoring elites when trash pack settings are met
+
+* Monk Inner Sanctuary now triggers when any elite is in range, or 3+ trash mobs is in range (removed Spirit requirement)
+
+* Fixed error/bug in missing/incorrect DemonHunter TVar
+
+* Monk Exploding Palm is now used every 7 seconds (from 15)
+
+* Stashing Whites option now also stashes inferior (gray) items
+
+* Fixed always picking up white/gray items
+
+### Changelog 1.8.4
+
+* Ignore elites should work much better
+
+* Fixed casting magic weapon every 10 seconds with archon in hotbar
+
+* Fixed stashing blues when we should have been stashing whites only
+
+* Fixed not using shines/wells/pools with DB Beta 374+
+
+* Added Force Salvage all Rares option
+
+* Trinity will now perform a town run when in town, and has 6 or less free bag slots remaining, or average item durability is less than 50%
+
+* Changed default BeesWasps Aoe to 6 radius / 25% health
+
+* Ignore elites should work much better
+
+* Trinity will now perform a town run when in town, and has 6 or less free bag slots remaining, or average item durability is less than 50%
+
+* Fixed casting magic weapon every 10 seconds with Archon in hotbar
+
+* Fixed stashing blues when we should have been stashing whites only
+
+* Added Force Salvage all Rares
+
+
+
+
 ### Changelog 1.8.3
 
 * Fixed Monk refreshing sweeping wind while casting TownPortal
