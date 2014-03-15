@@ -5,15 +5,13 @@
 
 * Monk Mantra of Healing now used when low on health
 
-* Simpler monk Manta spam logic
+* Simpler monk Mantra spam logic
 
 * Fixed Wizard Storm Armor casting every 15 seconds
 
-* TrinityTownRun added 2 attributes. Usage: <TrinityTownRun questId="1" minFreeBagSlots="10" minDurabilityPercent="50" /> - makes it easy to put at the start o
+* TrinityTownRun added 2 attributes. Usage: <TrinityTownRun questId="1" minFreeBagSlots="10" minDurabilityPercent="50" /> - makes it easy to put at the start of a profile
 
-* Added gems to item reports
-
-* Fixed IndexOutOfRange exception for Diamonds
+* Added diamond gems to item reports
 
 * Diamonds are now picked up according to the UI options (instead of Amethyst+Diamonds)
 
@@ -29,9 +27,9 @@
 
 * Removed Old Tristram Road and The Old Ruins from QuestLevelAreaId's
 
-### Changelog 1.8.5
-
 * Added option to hide BattleTag from window title
+
+### Changelog 1.8.5
 
 * Barbarian Call of the Ancients will now be used on trash (3 minimum) instead of only elites
 
