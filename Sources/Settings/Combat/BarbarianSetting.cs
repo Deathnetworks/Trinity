@@ -1059,12 +1059,15 @@ namespace Trinity.Config.Combat
             this.MinHotaHealth = 0.40f;
             this.WOTBMode = BarbarianWOTBMode.Normal;
             this.UseLeapOOC = true;
-            this.SprintMode = BarbarianSprintMode.MovementOnly;
             this.UseChargeOOC = true;
+            this.AvoidGrotesqueHealth = 1;
+            this.AvoidOrbiterHealth = 1;
+            this.AvoidWormholeHealth = 0.50f;
+            this.SprintMode = BarbarianSprintMode.MovementOnly;
         }
 
         /// <summary>
-        /// This will run after the settings have been deserialized - used for migrating settings
+        /// This will run after the settings have been deserialized - used for migrating settings. Setting anything here will overwrite any user settings!
         /// </summary>
         /// <param name="context"></param>
         [OnDeserialized()]
@@ -1075,13 +1078,7 @@ namespace Trinity.Config.Combat
                 this.WOTBMode = BarbarianWOTBMode.HardElitesOnly;
                 this.WOTBHardOnly = false;
             }
-
-            this.AvoidGrotesqueHealth = 1;
-            this.AvoidOrbiterHealth = 1;
-            this.AvoidWormholeHealth = 0.50f;
-            this.SprintMode = BarbarianSprintMode.MovementOnly;
         }
-
         #endregion Methods
     }
 }

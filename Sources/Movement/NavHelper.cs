@@ -410,7 +410,7 @@ namespace Trinity
                     }
                     else if (!shouldKite && !isStuck && !avoidDeath) // melee avoidance use only
                     {
-                        var monsterCount = Trinity.ObjectCache.Count(u => u.Type == GObjectType.Unit && u.Position.Distance2D(gridPoint.Position) <= gridSquareRadius);
+                        var monsterCount = Trinity.ObjectCache.Count(u => u.IsUnit && u.Position.Distance2D(gridPoint.Position) <= gridSquareRadius);
                         if (monsterCount > 0)
                             gridPoint.Weight *= monsterCount;
                     }

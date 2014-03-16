@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Trinity.Combat.Abilities;
 using Trinity.Technicals;
@@ -14,41 +15,48 @@ namespace Trinity
 
         internal static void RecordProfile()
         {
-            RecordTrinityLoadOnceProfile();
-
-            string currentProfile = ProfileManager.CurrentProfile.Path;
-
-            if (!UsedProfiles.Contains(currentProfile))
+            try
             {
-                Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "New profile found - updating TargetBlacklists");
-                RefreshProfileBlacklists();
-                UsedProfiles.Add(currentProfile);
+                RecordTrinityLoadOnceProfile();
+
+                string currentProfile = ProfileManager.CurrentProfile.Path;
+
+                if (!UsedProfiles.Contains(currentProfile))
+                {
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "New profile found - updating TargetBlacklists");
+                    RefreshProfileBlacklists();
+                    UsedProfiles.Add(currentProfile);
+                }
+
+                if (currentProfile != Trinity.CurrentProfile)
+                {
+                    CombatBase.IsQuestingMode = false;
+
+                    // See if we appear to have started a new game
+                    if (Trinity.FirstProfile != "" && currentProfile == Trinity.FirstProfile)
+                    {
+                        Trinity.TotalProfileRecycles++;
+                    }
+
+                    Trinity.ProfileHistory.Add(currentProfile);
+                    Trinity.CurrentProfile = currentProfile;
+                    Trinity.CurrentProfileName = ProfileManager.CurrentProfile.Name;
+
+                    if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.Name != null)
+                    {
+                        Trinity.SetWindowTitle(Trinity.CurrentProfileName);
+                    }
+
+                    if (Trinity.FirstProfile == "")
+                        Trinity.FirstProfile = currentProfile;
+
+                    // Clear Trinity Combat Ignore Tag
+                    TrinityCombatIgnore.IgnoreList.Clear();
+                }
             }
-
-            if (currentProfile != Trinity.CurrentProfile)
+            catch (Exception ex)
             {
-                CombatBase.IsQuestingMode = false;
-
-                // See if we appear to have started a new game
-                if (Trinity.FirstProfile != "" && currentProfile == Trinity.FirstProfile)
-                {
-                    Trinity.TotalProfileRecycles++;
-                }
-
-                Trinity.ProfileHistory.Add(currentProfile);
-                Trinity.CurrentProfile = currentProfile;
-                Trinity.CurrentProfileName = ProfileManager.CurrentProfile.Name;
-
-                if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.Name != null)
-                {
-                    Trinity.SetWindowTitle(Trinity.CurrentProfileName);
-                }
-
-                if (Trinity.FirstProfile == "")
-                    Trinity.FirstProfile = currentProfile;
-
-                // Clear Trinity Combat Ignore Tag
-                TrinityCombatIgnore.IgnoreList.Clear();
+                Logger.LogError("Error recording new profile: " + ex.ToString());
             }
         }
 
@@ -66,13 +74,20 @@ namespace Trinity
         /// </summary>
         internal static void RefreshProfileBlacklists()
         {
-            foreach (TargetBlacklist b in ProfileManager.CurrentProfile.TargetBlacklists)
+            try
             {
-                if (!DataDictionary.BlackListIds.Contains(b.ActorId))
+                foreach (TargetBlacklist b in ProfileManager.CurrentProfile.TargetBlacklists)
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Adding Profile TargetBlacklist {0} to Trinity Blacklist", b.ActorId);
-                    DataDictionary.AddToBlacklist(b.ActorId);
+                    if (!DataDictionary.BlackListIds.Contains(b.ActorId))
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Adding Profile TargetBlacklist {0} to Trinity Blacklist", b.ActorId);
+                        DataDictionary.AddToBlacklist(b.ActorId);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error in Refreshing Profile Blacklists: " + ex.ToString());
             }
         }
     }

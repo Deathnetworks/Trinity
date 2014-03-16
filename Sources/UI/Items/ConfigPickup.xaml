@@ -3,7 +3,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ut="clr-namespace:Trinity.UIComponents"
-             mc:Ignorable="d" Foreground="{DynamicResource TextBrush}"
+             mc:Ignorable="d" Foreground="{DynamicResource TextBrush}" Background="DarkGray"
              d:DesignHeight="700" d:DesignWidth="390">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -288,7 +288,10 @@
                         <ComboBoxItem Content="62+" Tag="62" />
                         <ComboBoxItem Content="63+" Tag="63" />
                     </ComboBox>
-
+                    
+                    <TextBlock Grid.Row="6" Grid.Column="0" FontWeight="Bold" Text="Follower:"/>
+                    <CheckBox Grid.Row="6" Grid.Column="1"  Content="Magic Follower Items" IsChecked="{Binding Path=Pickup.PickupBlueFollowerItems}" Margin="8,2"/>
+                    <CheckBox Grid.Row="6" Grid.Column="2"  Content="Rare Follower Items" IsChecked="{Binding Path=Pickup.PickupYellowFollowerItems}" Margin="8,2"/>
                 </Grid>
             </Grid>
             <UniformGrid Columns="2" Grid.Row="5" Margin="5">
@@ -321,7 +324,6 @@
                     <CheckBox Content="Craft Tomes" IsChecked="{Binding Path=Pickup.CraftTomes}" Margin="5"/>
                     <CheckBox Content="Craft Materials" IsChecked="{Binding Path=Pickup.CraftMaterials}" Margin="5"/>
                     <CheckBox Content="Infernal Keys" IsChecked="{Binding Path=Pickup.InfernalKeys}" Margin="5"/>
-                    <CheckBox Content="Follower Items" IsChecked="{Binding Path=Pickup.FollowerItem}" Margin="5"/>
                     <CheckBox Content="Low Level Items" IsChecked="{Binding Path=Pickup.PickupLowLevel}" Margin="5" ToolTip="Pickup Grey and White Items to level 6/11 (for questing)"/>
                 </UniformGrid>
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Misc Item Level:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" />

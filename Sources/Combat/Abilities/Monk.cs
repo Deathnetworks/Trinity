@@ -209,10 +209,9 @@ namespace Trinity
 
             // Exploding Palm
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
-                //(TargetUtil.AnyElitesInRange(25, 0+1)  || TargetUtil.AnyMobsInRange(15, 3)  || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 14f)) &&
                 CombatBase.CanCast(SNOPower.Monk_ExplodingPalm, CombatBase.CanCastFlags.NoTimer) &&
                 !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Monk_ExplodingPalm) &&
-                (Player.PrimaryResource >= (40 + MinEnergyReserve)))
+                Player.PrimaryResource >= 40)
             {
                 return new TrinityPower(SNOPower.Monk_ExplodingPalm, 14f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }

@@ -15,6 +15,8 @@ namespace Trinity.Config.Loot
         private int _ArmorYellowLevel;
         private int _JewelryBlueLevel;
         private int _JewelryYellowLevel;
+        private bool _PickupblueFollowerItems;
+        private bool _PickupYellowFollowerItems;
         private int _PotionCount;
         private TrinityGemType _GemType;
         private int _GemLevel;
@@ -24,7 +26,6 @@ namespace Trinity.Config.Loot
         private bool _Plans;
         private bool _LegendaryPlans;
         private bool _Designs;
-        private bool _FollowerItem;
         private int _MiscItemLevel;
         private bool _CraftMaterials;
         private bool _InfernalKeys;
@@ -363,18 +364,36 @@ namespace Trinity.Config.Loot
 
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
-        public bool FollowerItem
+        public bool PickupBlueFollowerItems
         {
             get
             {
-                return _FollowerItem;
+                return _PickupblueFollowerItems;
             }
             set
             {
-                if (_FollowerItem != value)
+                if (_PickupblueFollowerItems != value)
                 {
-                    _FollowerItem = value;
-                    OnPropertyChanged("FollowerItem");
+                    _PickupblueFollowerItems = value;
+                    OnPropertyChanged("FollowerBluePickup");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool PickupYellowFollowerItems
+        {
+            get
+            {
+                return _PickupYellowFollowerItems;
+            }
+            set
+            {
+                if (_PickupYellowFollowerItems != value)
+                {
+                    _PickupYellowFollowerItems = value;
+                    OnPropertyChanged("FollowerYellowPickup");
                 }
             }
         }
@@ -610,6 +629,8 @@ namespace Trinity.Config.Loot
             this.IgnoreTwoHandedWeapons = false;
             this.PickupGrayItems = true;
             this.PickupWhiteItems = true;
+            this.PickupBlueFollowerItems = true;
+            this.PickupYellowFollowerItems = true;
         }
         #endregion Methods
     }

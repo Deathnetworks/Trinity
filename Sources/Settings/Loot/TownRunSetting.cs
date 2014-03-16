@@ -18,6 +18,7 @@ namespace Trinity.Config.Loot
         private bool _StashWhites;
         private bool _StashBlues;
         private bool _ForceSalvageRares;
+        private bool _KeepLegendaryUnid;
         #endregion Fields
 
         #region Events
@@ -232,6 +233,24 @@ namespace Trinity.Config.Loot
                 {
                     _ForceSalvageRares = value;
                     OnPropertyChanged("ForceSalvageRares");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool KeepLegendaryUnid
+        {
+            get
+            {
+                return _KeepLegendaryUnid;
+            }
+            set
+            {
+                if (_KeepLegendaryUnid != value)
+                {
+                    _KeepLegendaryUnid = value;
+                    OnPropertyChanged("KeepLegendaryUnid");
                 }
             }
         }

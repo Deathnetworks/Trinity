@@ -471,7 +471,7 @@ namespace Trinity.Combat.Abilities
                     !Player.IsIncapacitated &&
                     hasReserveEnergy &&
                     ((CanCast(SNOPower.Barbarian_Rend)) &&
-                        (Trinity.ObjectCache.Count(o => o.Type == GObjectType.Unit &&
+                        (Trinity.ObjectCache.Count(o => o.IsUnit &&
                             !o.HasDotDPS && o.RadiusDistance <= V.F("Barbarian.Rend.MaxRange")) >= V.I("Barbarian.Rend.MinNonBleedMobCount"))
                      ||
                     // Spam with Bloodlust
@@ -749,27 +749,26 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                if (Hotbar.Contains(SNOPower.Barbarian_Overpower))
-                    return new TrinityPower(SNOPower.Barbarian_Overpower, 9);
-
-                if (Hotbar.Contains(SNOPower.Barbarian_Frenzy))
+                if (CombatBase.CanCast(SNOPower.Barbarian_Frenzy))
                     return new TrinityPower(SNOPower.Barbarian_Frenzy, V.F("Barbarian.Frenzy.UseRange"));
 
-                if (Hotbar.Contains(SNOPower.Barbarian_Bash))
+                if (CombatBase.CanCast(SNOPower.Barbarian_Bash))
                     return new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"));
 
-                if (Hotbar.Contains(SNOPower.Barbarian_Cleave))
+                if (CombatBase.CanCast(SNOPower.Barbarian_Cleave))
                     return new TrinityPower(SNOPower.Barbarian_Cleave, V.F("Barbarian.Cleave.UseRange"));
 
-                if (Hotbar.Contains(SNOPower.Barbarian_Rend) && Player.PrimaryResourcePct >= 0.65)
-                    return new TrinityPower(SNOPower.Barbarian_Rend, V.F("Barbarian.Rend.UseRange"));
-
-                if (Hotbar.Contains(SNOPower.X1_Barbarian_WeaponThrow) && Player.PrimaryResource >= 20)
+                if (CombatBase.CanCast(SNOPower.X1_Barbarian_WeaponThrow))
                     return new TrinityPower(SNOPower.X1_Barbarian_WeaponThrow, V.F("Barbarian.WeaponThrow.UseRange"));
 
-                if (Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Player.PrimaryResource > MinEnergyReserve)
+                if (CombatBase.CanCast(SNOPower.Barbarian_Overpower))
+                    return new TrinityPower(SNOPower.Barbarian_Overpower, 9);
+
+                if (CombatBase.CanCast(SNOPower.Barbarian_Whirlwind))
                     return new TrinityPower(SNOPower.Barbarian_Whirlwind, V.F("Barbarian.Whirlwind.UseRange"), LastZigZagLocation);
 
+                if (CombatBase.CanCast(SNOPower.Barbarian_Rend) && Player.PrimaryResourcePct >= 0.65)
+                    return new TrinityPower(SNOPower.Barbarian_Rend, V.F("Barbarian.Rend.UseRange"));
 
                 return CombatBase.DefaultPower;
             }

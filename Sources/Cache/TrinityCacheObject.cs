@@ -63,11 +63,12 @@ namespace Trinity
         public bool HasBeenNavigable { get; set; }
         public bool HasBeenRaycastable { get; set; }
         public bool HasBeenInLoS { get; set; }
-        public bool IsBossOrEliteRareUnique { get { return (this.Type == GObjectType.Unit && (IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
-        public bool IsTrashMob { get { return (this.Type == GObjectType.Unit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
+        public bool IsBossOrEliteRareUnique { get { return (this.IsUnit && (IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
+        public bool IsTrashMob { get { return (this.IsUnit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
         public bool IsMe { get { return RActorGuid == Trinity.Player.RActorGuid; } }
         public bool IsSummonedByPlayer { get; set; }
         public bool IsSummoner { get; set; }
+        public bool IsUnit { get { return this.Type == GObjectType.Unit; } }
 
         public DiaUnit Unit
         {
@@ -170,7 +171,7 @@ namespace Trinity
                     return 0;
 
                 return Trinity.ObjectCache
-                    .Count(u => u.RActorGuid != this.RActorGuid && u.Type == GObjectType.Unit && u.Position.Distance2D(this.Position) <= range && u.HasBeenInLoS);
+                    .Count(u => u.RActorGuid != this.RActorGuid && u.IsUnit && u.Position.Distance2D(this.Position) <= range && u.HasBeenInLoS);
             }
         }
 
@@ -179,7 +180,7 @@ namespace Trinity
             return
                 (from u in Trinity.ObjectCache
                  where u.RActorGuid != this.RActorGuid &&
-                 u.Type == GObjectType.Unit &&
+                 u.IsUnit &&
                  MathUtil.IntersectsPath(this.Position, this.Radius, Trinity.Player.Position, u.Position)
                  select u).Count();
         }
@@ -189,7 +190,7 @@ namespace Trinity
             return
                 (from u in Trinity.ObjectCache
                  where u.RActorGuid != this.RActorGuid &&
-                 u.Type == GObjectType.Unit &&
+                 u.IsUnit &&
                  MathUtil.IntersectsPath(u.Position, u.Radius, Trinity.Player.Position, this.Position)
                  select u).Count();
         }

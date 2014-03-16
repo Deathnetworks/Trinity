@@ -48,7 +48,6 @@ namespace Trinity
         /// <returns></returns>
         internal static bool PickupItemValidation(PickupItem item)
         {
-
             // If it's legendary, we always want it *IF* it's level is right
             if (item.Quality >= ItemQuality.Legendary)
             {
@@ -77,15 +76,10 @@ namespace Trinity
                     {
                         return true;
                     }
-                    if (item.Level < 60 || !Settings.Loot.Pickup.FollowerItem || item.Quality < ItemQuality.Rare4)
-                    {
-                        if (!_hashsetItemFollowersIgnored.Contains(itemSha1Hash))
-                        {
-                            _hashsetItemFollowersIgnored.Add(itemSha1Hash);
-                            totalFollowerItemsIgnored++;
-                        }
-                        return false;
-                    }
+                    if (item.Quality >= ItemQuality.Magic1 && item.Quality <= ItemQuality.Magic3 && Settings.Loot.Pickup.PickupBlueFollowerItems)
+                        return true;
+                    if (item.Quality >= ItemQuality.Rare4 && item.Quality <= ItemQuality.Rare6 && Settings.Loot.Pickup.PickupYellowFollowerItems)
+                        return true;
                     break;
                 case GItemBaseType.Gem:
                     if (item.Level < Settings.Loot.Pickup.GemLevel ||
@@ -136,7 +130,7 @@ namespace Trinity
                     // Potion filtering
                     if (itemType == GItemType.HealthPotion)
                     {
-                        int potionsInBackPack = ZetaDia.Me.Inventory.Backpack.Count(p => p.Name.ToLower().Contains("potion"));
+                        int potionsInBackPack = ZetaDia.Me.Inventory.Backpack.Where(p => p.ItemType == ItemType.Potion).Sum(p => p.ItemStackQuantity);
 
                         if (potionsInBackPack >= Settings.Loot.Pickup.PotionCount)
                             return false;
@@ -177,21 +171,27 @@ namespace Trinity
                 pickupItem.Quality, pickupItem.Level, pickupItem.DBBaseType,
                 pickupItem.DBItemType, pickupItem.IsOneHand ? "1H" : pickupItem.IsTwoHand ? "2H" : "NH");
 
-            // using ItemEvaluationType.Identify isn't available so we are abusing Sell for that manner
-            Interpreter.InterpreterAction action = Trinity.StashRule.checkPickUpItem(pickupItem, ItemEvaluationType.Sell);
-
-            Logger.Log(TrinityLogLevel.Debug, LogCategory.ItemValuation, "Action is: {0}", action);
-
-            switch (action)
+            if (Trinity.StashRule != null)
             {
-                case Interpreter.InterpreterAction.IDENTIFY:
-                    return true;
-                case Interpreter.InterpreterAction.UNIDENT:
-                    return false;
-                default:
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.ScriptRule, "Trinity, item is unhandled by ItemRules (Identification)!");
-                    return IdentifyItemValidation(pickupItem);
+
+                // using ItemEvaluationType.Identify isn't available so we are abusing Sell for that manner
+                Interpreter.InterpreterAction action = Trinity.StashRule.checkPickUpItem(pickupItem, ItemEvaluationType.Sell);
+
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.ItemValuation, "Action is: {0}", action);
+
+                switch (action)
+                {
+                    case Interpreter.InterpreterAction.IDENTIFY:
+                        return true;
+                    case Interpreter.InterpreterAction.UNIDENT:
+                        return false;
+                    default:
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.ScriptRule, "Trinity, item is unhandled by ItemRules (Identification)!");
+                        return IdentifyItemValidation(pickupItem);
+                }
             }
+            else
+                return IdentifyItemValidation(pickupItem);
 
         }
         /// <summary>
@@ -201,7 +201,10 @@ namespace Trinity
         /// <returns></returns>
         internal static bool IdentifyItemValidation(PickupItem item)
         {
-            return true;
+            if (Trinity.Settings.Loot.TownRun.KeepLegendaryUnid)
+                return false;
+            else
+                return true;
         }
 
         /// <summary>
@@ -214,6 +217,10 @@ namespace Trinity
         /// <returns></returns>
         internal static bool CheckLevelRequirements(int level, ItemQuality quality, int requiredBlueLevel, int requiredYellowLevel)
         {
+            // Always pick legendaries
+            if (quality >= ItemQuality.Legendary)
+                return true;
+
             // Gray Items
             if (quality < ItemQuality.Normal)
             {

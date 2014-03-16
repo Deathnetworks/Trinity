@@ -30,7 +30,7 @@ namespace Trinity
                 TryToKite = false;
 
                 var monsterList = from m in ObjectCache
-                                  where m.Type == GObjectType.Unit &&
+                                  where m.IsUnit &&
                                   m.Weight > 0 &&
                                   m.RadiusDistance <= PlayerKiteDistance &&
                                   (m.IsBossOrEliteRareUnique ||
@@ -38,7 +38,7 @@ namespace Trinity
                                    )
                                   select m;
 
-                if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
+                if (CurrentTarget != null && CurrentTarget.IsUnit && PlayerKiteDistance > 0 && CurrentTarget.RadiusDistance <= PlayerKiteDistance)
                 {
                     TryToKite = true;
                     vKitePointAvoid = Player.Position;
@@ -60,7 +60,7 @@ namespace Trinity
                     NeedToKite = true;
 
                     monsterList = from m in ObjectCache
-                                  where m.Type == GObjectType.Unit
+                                  where m.IsUnit
                                   select m;
                 }
 

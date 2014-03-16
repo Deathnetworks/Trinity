@@ -32,12 +32,12 @@ namespace Trinity
 
 
                 bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || MovementSpeed < 1 ||
-                    ObjectCache.Count(u => u.Type == GObjectType.Unit && u.RadiusDistance < 10f) >= 3);
+                    ObjectCache.Count(u => u.IsUnit && u.RadiusDistance < 10f) >= 3);
 
                 bool hasWrathOfTheBerserker = Player.ActorClass == ActorClass.Barbarian && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
 
-                int TrashMobCount = ObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsTrashMob);
-                int EliteCount = CombatBase.IgnoringElites ? 0 : ObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
+                int TrashMobCount = ObjectCache.Count(u => u.IsUnit && u.IsTrashMob);
+                int EliteCount = CombatBase.IgnoringElites ? 0 : ObjectCache.Count(u => u.IsUnit && u.IsBossOrEliteRareUnique);
                 int AvoidanceCount = Settings.Combat.Misc.AvoidAOE ? 0 : ObjectCache.Count(o => o.Type == GObjectType.Avoidance && o.CentreDistance <= 50f);
 
                 bool profileTagCheck = false;
@@ -84,12 +84,11 @@ namespace Trinity
                         !profileTagCheck &&
                         !prioritizeCloseRangeUnits &&
                         Settings.Combat.Misc.TrashPackSize > 1 &&
-                        //EliteCount == 0 &&
                         !elitesInRangeOfUnit &&
-                        //AvoidanceCount == 0 &&
                         Player.Level >= 15 &&
                         MovementSpeed >= 1 &&
-                        Player.CurrentHealthPct > 0.10
+                        Player.CurrentHealthPct > 0.10 &&
+                        DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 500
                         ;
 
                     string unitWeightInfo = "";
@@ -151,7 +150,7 @@ namespace Trinity
                                         unitWeightInfo = "Ignoring ";
                                         ignoring = true;
                                     }
-                                    else if (cacheObject.IsEliteRareUnique && ShouldIgnoreElites)
+                                    else if (cacheObject.IsEliteRareUnique && !ShouldIgnoreElites)
                                     {
                                         unitWeightInfo = "Adding ";
                                     }
@@ -324,7 +323,7 @@ namespace Trinity
 
                                         if (PlayerKiteDistance > 0)
                                         {
-                                            if (ObjectCache.Any(m => m.Type == GObjectType.Unit &&
+                                            if (ObjectCache.Any(m => m.IsUnit &&
                                                 MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, m.Position) &&
                                                 m.RActorGuid != cacheObject.RActorGuid))
                                             {
@@ -412,7 +411,7 @@ namespace Trinity
                                 // ignore non-legendaries and gold near elites if we're ignoring elites
                                 // not sure how we should safely determine this distance
                                 if (cacheObject.ItemQuality < ItemQuality.Legendary && ((CombatBase.IgnoringElites &&
-                                    ObjectCache.Any(u => u.Type == GObjectType.Unit && u.IsEliteRareUnique &&
+                                    ObjectCache.Any(u => u.IsUnit && u.IsEliteRareUnique &&
                                         u.Position.Distance2D(cacheObject.Position) <= V.F("Weight.Items.IgnoreNonLegendaryNearEliteDistance"))) ||
                                     AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius)))
                                 {
@@ -673,7 +672,7 @@ namespace Trinity
                             }
                         case GObjectType.Door:
                             {
-                                if (!ObjectCache.Any(u => u.Type == GObjectType.Unit && u.HitPointsPct > 0 &&
+                                if (!ObjectCache.Any(u => u.IsUnit && u.HitPointsPct > 0 &&
                                     MathUtil.IntersectsPath(u.Position, u.Radius, Player.Position, cacheObject.Position)))
                                 {
                                     if (cacheObject.RadiusDistance <= 20f)
@@ -809,7 +808,7 @@ namespace Trinity
                         KiteAvoidDestination = Vector3.Zero;
 
                         // Kiting and Avoidance
-                        if (CurrentTarget.Type == GObjectType.Unit)
+                        if (CurrentTarget.IsUnit)
                         {
                             var AvoidanceList = AvoidanceObstacleCache.Where(o =>
                                 // Distance from avoidance to target is less than avoidance radius

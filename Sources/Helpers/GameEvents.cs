@@ -90,15 +90,22 @@ namespace Trinity
             {
                 BeginInvoke(new Action(() =>
                     {
-                        if (StashRule == null)
-                            StashRule = new Interpreter();
+                        try
+                        {
+                            if (StashRule == null)
+                                StashRule = new Interpreter();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError("Error configuring ItemRules Interpreter: " + ex.ToString());
+                        }
                     }
                 ));
             }
 
             Navigator.SearchGridProvider.Update();
 
-            Logger.LogDebug("Trinity BotStart took {0}ms", DateTime.UtcNow.Subtract(timeBotStart).TotalMilliseconds);
+            Logger.LogDebug("Trinity BotStart took {0:0}ms", DateTime.UtcNow.Subtract(timeBotStart).TotalMilliseconds);
         }
 
         private void GameEvents_OnGameChanged(object sender, EventArgs e)

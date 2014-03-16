@@ -67,7 +67,7 @@ namespace Trinity
             {
                 return
                     (from u in ObjectCache
-                     where u.Type == GObjectType.Unit &&
+                     where u.IsUnit &&
                      !u.IsEliteRareUnique &&
                      u.RadiusDistance <= Trinity.Settings.Combat.Misc.TrashPackClusterRadius
                      select u).Count() >= Trinity.Settings.Combat.Misc.TrashPackSize;
@@ -76,7 +76,7 @@ namespace Trinity
             {
                 return
                     (from u in ObjectCache
-                     where u.Type == GObjectType.Unit &&
+                     where u.IsUnit &&
                      u.IsBossOrEliteRareUnique &&
                      u.RadiusDistance <= range
                      select u).Any();
@@ -105,7 +105,8 @@ namespace Trinity
                 TrinityCacheObject bestClusterUnit;
                 var clusterUnits =
                     (from u in ObjectCache
-                     where ((useWeights && u.Weight > 0) || !useWeights) &&
+                     where u.IsUnit &&
+                     ((useWeights && u.Weight > 0) || !useWeights) &&
                      (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                      u.RadiusDistance <= maxRange &&
                      u.NearbyUnitsWithinDistance(radius) >= count &&
@@ -154,12 +155,12 @@ namespace Trinity
             if (minCount < 2)
                 minCount = 2;
 
-            if (forceElites && ObjectCache.Any(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique && u.RadiusDistance < maxRange))
+            if (forceElites && ObjectCache.Any(u => u.IsUnit && u.IsBossOrEliteRareUnique && u.RadiusDistance < maxRange))
                 return true;
 
             var clusterCheck =
                 (from u in ObjectCache
-                 where u.Type == GObjectType.Unit &&
+                 where u.IsUnit &&
                  u.RadiusDistance <= maxRange &&
                  u.NearbyUnitsWithinDistance(radius) >= minCount
                  select u).Any();
@@ -171,7 +172,7 @@ namespace Trinity
         {
             var bestUnit =
                 (from u in ObjectCache
-                 where u.Type == GObjectType.Unit &&
+                 where u.IsUnit &&
                  u.RadiusDistance <= maxRange
                  orderby u.CountUnitsInFront() descending
                  select u).FirstOrDefault();
@@ -366,7 +367,7 @@ namespace Trinity
                 Vector3 bestClusterPoint;
                 var clusterUnits =
                     (from u in ObjectCache
-                     where (u.Type == GObjectType.Unit || (includeHealthGlobes && u.Type == GObjectType.HealthGlobe)) &&
+                     where (u.IsUnit || (includeHealthGlobes && u.Type == GObjectType.HealthGlobe)) &&
                      ((useWeights && u.Weight > 0) || !useWeights) &&
                      (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                      u.RadiusDistance <= maxRange
@@ -417,7 +418,7 @@ namespace Trinity
             if (minCount < 1)
                 minCount = 1;
             return (from o in ObjectCache
-                    where o.Type == GObjectType.Unit &&
+                    where o.IsUnit &&
                      ((useWeights && o.Weight > 0) || !useWeights) &&
                     o.RadiusDistance <= range
                     select o).Count() >= minCount;
@@ -429,7 +430,7 @@ namespace Trinity
             if (minCount < 1)
                 minCount = 1;
             return (from o in ObjectCache
-                    where o.Type == GObjectType.Unit && o.IsTrashMob &&
+                    where o.IsUnit && o.IsTrashMob &&
                      ((useWeights && o.Weight > 0) || !useWeights) &&
                     o.RadiusDistance <= range
                     select o).Count() >= minCount;
@@ -447,7 +448,7 @@ namespace Trinity
             if (range < 5f)
                 range = 5f;
             return (from o in ObjectCache
-                    where o.Type == GObjectType.Unit &&
+                    where o.IsUnit &&
                     o.IsBossOrEliteRareUnique &&
                     o.RadiusDistance <= range
                     select o).Any();
@@ -467,7 +468,7 @@ namespace Trinity
             if (minCount < 1)
                 minCount = 1;
             return (from o in ObjectCache
-                    where o.Type == GObjectType.Unit &&
+                    where o.IsUnit &&
                     o.IsBossOrEliteRareUnique &&
                     o.RadiusDistance <= range
                     select o).Count() >= minCount;
@@ -544,10 +545,10 @@ namespace Trinity
                         useTargetBasedZigZag = Trinity.Settings.Combat.Barbarian.TargetBasedZigZag;
                     }
 
-                    int eliteCount = ObjectCache.Count(u => u.Type == GObjectType.Unit && u.IsBossOrEliteRareUnique);
+                    int eliteCount = ObjectCache.Count(u => u.IsUnit && u.IsBossOrEliteRareUnique);
                     bool shouldZigZagElites = ((Trinity.CurrentTarget.IsBossOrEliteRareUnique && eliteCount > 1) || eliteCount == 0);
 
-                    if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Count(o => o.Type == GObjectType.Unit) >= minTargets)
+                    if (useTargetBasedZigZag && shouldZigZagElites && !AnyTreasureGoblinsPresent && ObjectCache.Count(o => o.IsUnit) >= minTargets)
                     {
                         bool attackInAoe = Trinity.Settings.Combat.Misc.KillMonstersInAoE;
                         var clusterPoint = TargetUtil.GetBestClusterPoint(ringDistance, ringDistance, false, attackInAoe);
@@ -563,14 +564,14 @@ namespace Trinity
                         {
                             zigZagTargetList =
                                 (from u in ObjectCache
-                                 where u.Type == GObjectType.Unit && u.CentreDistance < maxDistance
+                                 where u.IsUnit && u.CentreDistance < maxDistance
                                  select u).ToList();
                         }
                         else
                         {
                             zigZagTargetList =
                                 (from u in ObjectCache
-                                 where u.Type == GObjectType.Unit && u.CentreDistance < maxDistance && !UnitOrPathInAoE(u)
+                                 where u.IsUnit && u.CentreDistance < maxDistance && !UnitOrPathInAoE(u)
                                  select u).ToList();
                         }
 
@@ -651,7 +652,7 @@ namespace Trinity
                             pointWeight *= distanceToPoint;
 
                             // Add weight for any units in this point
-                            int monsterCount = ObjectCache.Count(u => u.Type == GObjectType.Unit && u.Position.Distance2D(zigZagPoint) <= Math.Max(u.Radius, 10f));
+                            int monsterCount = ObjectCache.Count(u => u.IsUnit && u.Position.Distance2D(zigZagPoint) <= Math.Max(u.Radius, 10f));
                             if (monsterCount > 0)
                                 pointWeight *= monsterCount;
 

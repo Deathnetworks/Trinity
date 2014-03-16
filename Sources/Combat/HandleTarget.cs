@@ -337,7 +337,7 @@ namespace Trinity
                             }
                         }
                         // Maintain a backtrack list only while fighting monsters
-                        if (CurrentTarget.Type == GObjectType.Unit && Settings.Combat.Misc.AllowBacktracking &&
+                        if (CurrentTarget.IsUnit && Settings.Combat.Misc.AllowBacktracking &&
                             (iTotalBacktracks == 0 || Vector3.Distance(Player.Position, vBacktrackList[iTotalBacktracks]) >= 10f))
                         {
                             bool bAddThisBacktrack = true;
@@ -605,7 +605,7 @@ namespace Trinity
                                             IgnoreRactorGUID = CurrentTarget.RActorGuid;
                                             IgnoreTargetForLoops = 3;
                                             // Add this destructible/barricade to our very short-term ignore list
-                                            hashRGUIDDestructible3SecBlacklist.Add(CurrentTarget.RActorGuid);
+                                            //hashRGUIDDestructible3SecBlacklist.Add(CurrentTarget.RActorGuid);
                                             Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Blacklisting {0} {1} {2} for 3 seconds for Destrucable attack", CurrentTarget.Type, CurrentTarget.InternalName, CurrentTarget.ActorSNO);
                                             lastDestroyedDestructible = DateTime.UtcNow;
                                             bNeedClearDestructibles = true;
@@ -735,12 +735,12 @@ namespace Trinity
                     {
 
                         bool Monk_SpecialMovement = ((CurrentTarget.Type == GObjectType.Gold ||
-                            CurrentTarget.Type == GObjectType.Unit ||
+                            CurrentTarget.IsUnit ||
                             CurrentTarget.Type == GObjectType.Barricade ||
                             CurrentTarget.Type == GObjectType.Destructible) && (Monk_TempestRushReady()));
 
                         bool Barbarian_SpecialMovement = ((CurrentTarget.Type == GObjectType.Avoidance &&
-                            ObjectCache.Any(u => (u.Type == GObjectType.Unit || u.Type == GObjectType.Destructible || u.Type == GObjectType.Barricade) &&
+                            ObjectCache.Any(u => (u.IsUnit || u.Type == GObjectType.Destructible || u.Type == GObjectType.Barricade) &&
                                 MathUtil.IntersectsPath(u.Position, u.Radius, Player.Position, CurrentTarget.Position))));
 
                         // If we're doing avoidance, globes or backtracking, try to use special abilities to move quicker
@@ -829,7 +829,7 @@ namespace Trinity
                         CurrentTarget.Type != GObjectType.Backtrack &&
                         (CurrentTarget.Type != GObjectType.Item && CurrentTarget.Type != GObjectType.Gold && TargetCurrentDistance >= 6f) &&
                         (CurrentTarget.Type != GObjectType.Unit ||
-                        (CurrentTarget.Type == GObjectType.Unit && !CurrentTarget.IsTreasureGoblin &&
+                        (CurrentTarget.IsUnit && !CurrentTarget.IsTreasureGoblin &&
                         (!Settings.Combat.Barbarian.SelectiveWhirlwind || (Settings.Combat.Barbarian.SelectiveWhirlwind && bAnyNonWWIgnoreMobsInRange && !DataDictionary.WhirlwindIgnoreSNOIds.Contains(CurrentTarget.ActorSNO))))))
                     {
                         // Special code to prevent whirlwind double-spam, this helps save fury
@@ -966,14 +966,14 @@ namespace Trinity
                     bool addTargetToBlacklist = true;
 
                     // PREVENT blacklisting a monster on less than 90% health unless we haven't damaged it for more than 2 minutes
-                    if (CurrentTarget.Type == GObjectType.Unit && isNavigable && CurrentTarget.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Kamikaze)
+                    if (CurrentTarget.IsUnit && isNavigable && CurrentTarget.IsTreasureGoblin && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Kamikaze)
                     {
                         addTargetToBlacklist = false;
                     }
 
                     if (addTargetToBlacklist)
                     {
-                        if (CurrentTarget.Type == GObjectType.Unit)
+                        if (CurrentTarget.IsUnit)
                         {
                             Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior,
                                 "Blacklisting a monster because of possible stuck issues. Monster={0} [{1}] Range={2:0} health %={3:0} RActorGUID={4}",
@@ -1031,7 +1031,7 @@ namespace Trinity
                 if (ShouldPickNewAbilities && !IsWaitingForPower && !IsWaitingForPotion)
                 {
                     ShouldPickNewAbilities = false;
-                    if (CurrentTarget.Type == GObjectType.Unit)
+                    if (CurrentTarget.IsUnit)
                     {
                         // Pick a suitable ability
                         CombatBase.CurrentPower = AbilitySelector(false, false, false);
@@ -1099,7 +1099,7 @@ namespace Trinity
                         StaleCache = true;
                     }
                     // If we AREN'T getting new targets - find out if we SHOULD because the current unit has died etc.
-                    if (!StaleCache && CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit)
+                    if (!StaleCache && CurrentTarget != null && CurrentTarget.IsUnit)
                     {
                         if (CurrentTarget.Unit == null || CurrentTarget.Unit.BaseAddress == IntPtr.Zero)
                         {
@@ -1236,7 +1236,7 @@ namespace Trinity
 
         private static bool CurrentTargetIsUnit()
         {
-            return CurrentTarget.Type == GObjectType.Unit;
+            return CurrentTarget.IsUnit;
         }
 
         /// <summary>
@@ -1297,7 +1297,7 @@ namespace Trinity
 
             statusText.Append("Target=");
             statusText.Append(CurrentTarget.InternalName.PadRight(40));
-            if (CurrentTarget.Type == GObjectType.Unit && CombatBase.CurrentPower.SNOPower != SNOPower.None)
+            if (CurrentTarget.IsUnit && CombatBase.CurrentPower.SNOPower != SNOPower.None)
             {
                 statusText.Append(" Power=");
                 statusText.Append(CombatBase.CurrentPower.SNOPower.ToString().PadRight(40));

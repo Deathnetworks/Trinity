@@ -358,7 +358,7 @@ namespace Trinity
             int fireBatsMana = TimeSinceUse(SNOPower.Witchdoctor_Firebats) < 125 ? 66 : 220;
 
             bool firebatsMaintain =
-              ObjectCache.Any(u => u.Type == GObjectType.Unit &&
+              ObjectCache.Any(u => u.IsUnit &&
                   u.IsFacingPlayer && u.Weight > 0 &&
                   SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Firebats) <= TimeSpan.FromMilliseconds(150d) &&
                   u.CentreDistance <= V.F("WitchDoctor.Firebats.MaintainRange") &&

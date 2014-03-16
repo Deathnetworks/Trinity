@@ -366,6 +366,7 @@ namespace Trinity
             56686, 211999, 52685, 54882, 180575, 105478, 
             102927, // A1 Cursed Hold Prisoners
             5747, // A1 Cathedral Switch
+            365097 // Cursed Chest - Damp Cellar
         };
 
         /// <summary>
@@ -422,6 +423,7 @@ namespace Trinity
             62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866, 109264, 62866, 62860, 96993,
             // Magi
 			112182,
+			363725, 357331 // chests after Cursed Chest
          };
         /// <summary>
         /// Objects that should never be ignored due to no Line of Sight (LoS) or ZDiff
@@ -444,12 +446,10 @@ namespace Trinity
         public static HashSet<int> ContainerWhiteListIds { get { return containerWhiteListIds; } }
         private static readonly HashSet<int> containerWhiteListIds = new HashSet<int> {
             62859, 62865, 62872, 78790, 79016, 94708, 96522, 130170, 108122, 111870, 111947, 213447, 213446, 51300, 179865, 109264, 212491, 210422, 211861, 
-            // Magi
-			196945, 70534,
-            // Demonic Vessels
-            103919,
-            // GizmoType: Chest Name: trOut_Wilderness_Scarecrow_A-3924 ActorSNO: 78030 
-            78030, 
+			196945, 70534,            
+            103919,     // Demonic Vessels         
+            78030,      // GizmoType: Chest Name: trOut_Wilderness_Scarecrow_A-3924 ActorSNO: 78030 
+            173325,     // Anvil of Fury
          };
 
         /// <summary>

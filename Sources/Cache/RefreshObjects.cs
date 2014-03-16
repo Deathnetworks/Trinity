@@ -265,7 +265,7 @@ namespace Trinity
                         return true;
                     }
                     // Ok record the time we last saw any unit at all
-                    if (CurrentTarget.Type == GObjectType.Unit)
+                    if (CurrentTarget.IsUnit)
                     {
                         lastHadUnitInSights = DateTime.UtcNow;
                         // And record when we last saw any form of elite
@@ -288,7 +288,7 @@ namespace Trinity
                     else
                     {
                         // We're sticking to the same target, so update the target's health cache to check for stucks
-                        if (CurrentTarget.Type == GObjectType.Unit)
+                        if (CurrentTarget.IsUnit)
                         {
                             // Check if the health has changed, if so update the target-pick time before we blacklist them again
                             if (CurrentTarget.HitPointsPct != iTargetLastHealth)
@@ -437,7 +437,7 @@ namespace Trinity
                 Player.Position = ZetaDia.Me.Position;
                 Player.CurrentHealthPct = ZetaDia.Me.HitpointsCurrentPct;
 
-                if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit && CurrentTarget.Unit != null && CurrentTarget.Unit.IsValid)
+                if (CurrentTarget != null && CurrentTarget.IsUnit && CurrentTarget.Unit != null && CurrentTarget.Unit.IsValid)
                 {
                     try
                     {
@@ -463,7 +463,7 @@ namespace Trinity
                         forceUpdate = true;
                     }
                 }
-                else if (CurrentTarget != null && CurrentTarget.Type == GObjectType.Unit)
+                else if (CurrentTarget != null && CurrentTarget.IsUnit)
                 {
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "CurrentTarget is invalid, setting null");
                     CurrentTarget = null;
