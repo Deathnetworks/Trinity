@@ -721,8 +721,8 @@ namespace Trinity.DbProvider
                 ZetaDia.Me.UsePower(SNOPower.Walk, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
 
                 if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Moved to:{0} dir: {1} Speed:{2:0.00} Dist:{3:0} ZDiff:{4:0} Nav:{5} LoS:{6}",
-                        vMoveToTarget, MathUtil.GetHeadingToPoint(vMoveToTarget), MovementSpeed, vMyCurrentPosition.Distance2D(vMoveToTarget),
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Moved to:{0} dir:{1} Speed:{2:0.00} Dist:{3:0} ZDiff:{4:0} CanStand:{5} Raycast:{6}",
+                        NavHelper.PrettyPrintVector3(vMoveToTarget), MathUtil.GetHeadingToPoint(vMoveToTarget), MovementSpeed, vMyCurrentPosition.Distance2D(vMoveToTarget),
                         Math.Abs(vMyCurrentPosition.Z - vMoveToTarget.Z),
                         Trinity.MainGridProvider.CanStandAt(Trinity.MainGridProvider.WorldToGrid(vMoveToTarget.ToVector2())),
                         !Navigator.Raycast(vMyCurrentPosition, vMoveToTarget)
@@ -737,7 +737,6 @@ namespace Trinity.DbProvider
 
 
         }
-
 
         internal static int GetObstacleNavigationSize(CacheObstacleObject obstacle)
         {
@@ -814,7 +813,7 @@ namespace Trinity.DbProvider
                 try
                 {
                     result = Navigator.MoveTo(moveTarget, destinationName, true);
-                    Logger.Log(LogCategory.Movement, "Navigator Result={0} dest={1} ({2})", result, moveTarget, destinationName);
+                    Logger.Log(LogCategory.Movement, "Navigator {0} dest={1} ({2})", result, NavHelper.PrettyPrintVector3(moveTarget), destinationName);
                 }
                 catch (Exception ex)
                 {

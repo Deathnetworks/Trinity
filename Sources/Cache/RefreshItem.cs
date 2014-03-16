@@ -352,7 +352,7 @@ namespace Trinity
 
         private static string FormatCSVField(DateTime time)
         {
-            return String.Format("\"{0:yyyy-MM-ddTHH:mm:ss.ffffzzz}\",", time);
+            return String.Format("\"{0:yyyy-MM-ddTHH:mm:ss.ffff}\",", time.ToLocalTime());
         }
 
         private static string FormatCSVField(string text)

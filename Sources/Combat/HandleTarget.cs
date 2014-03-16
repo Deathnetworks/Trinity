@@ -1359,12 +1359,13 @@ namespace Trinity
                 {
                     bool straightLinePathing = DataDictionary.StraightLinePathingLevelAreaIds.Contains(Player.LevelAreaId);
 
-                    string destname = String.Format("Name={0} Dist={1} IsElite={2} HasBeenInLoS={3} HitPointsPct={4}",
+                    string destname = String.Format("Name={0} Dist={1:0} IsElite={2} LoS={3} HP={4:0.00} Dir={5}",
                         CurrentTarget.InternalName,
                         CurrentTarget.RadiusDistance,
                         CurrentTarget.IsBossOrEliteRareUnique,
                         CurrentTarget.HasBeenInLoS,
-                        CurrentTarget.HitPointsPct);
+                        CurrentTarget.HitPointsPct,
+                        MathUtil.GetHeadingToPoint(CurrentTarget.Position));
 
                     MoveResult lastMoveResult;
                     if (straightLinePathing)

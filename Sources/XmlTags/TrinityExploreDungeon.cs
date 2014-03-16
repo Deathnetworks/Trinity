@@ -483,7 +483,7 @@ namespace Trinity.XmlTags
                 var actor = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false).FirstOrDefault(a => a.ActorSNO == ActorId);
 
                 if (actor != null && actor.IsValid && actor.Position.Distance2D(myPos) >= ObjectDistance)
-                    Navigator.MoveTo(actor.Position);
+                    PlayerMover.NavigateTo(actor.Position);
             });
         }
 
@@ -496,7 +496,7 @@ namespace Trinity.XmlTags
                 return false;
 
             var actors = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                .Where(a => Trinity.SkipAheadAreaCache.Any(o => o.Location.Distance2D(a.Position) >= ObjectDistance));
+                .Where(a => a.ActorSNO == ActorId && Trinity.SkipAheadAreaCache.Any(o => o.Location.Distance2D(a.Position) >= ObjectDistance));
 
             if (actors == null)
                 return false;
@@ -1039,12 +1039,12 @@ namespace Trinity.XmlTags
                         new Action(ret => UpdateRoute())
                     )
                 ),
-                new Decorator(ret => PlayerMover.GetMovementSpeed() < 1 && myPos.Distance2D(CurrentNavTarget) <= 50f && !Navigator.Raycast(myPos, CurrentNavTarget),
-                    new Sequence(
-                        new Action(ret => SetNodeVisited("Stuck moving to node point, marking done (in LoS and nearby!)")),
-                        new Action(ret => UpdateRoute())
-                    )
-                ),
+                //new Decorator(ret => PlayerMover.MovementSpeed == 0 && myPos.Distance2D(CurrentNavTarget) <= 50f && !Navigator.Raycast(myPos, CurrentNavTarget),
+                //    new Sequence(
+                //        new Action(ret => SetNodeVisited("Stuck moving to node point, marking done (in LoS and nearby!)")),
+                //        new Action(ret => UpdateRoute())
+                //    )
+                //),
                 new Decorator(ret => Trinity.SkipAheadAreaCache.Any(p => p.Location.Distance2D(CurrentNavTarget) <= PathPrecision),
                     new Sequence(
                         new Action(ret => SetNodeVisited("Found node to be in skip ahead cache, marking done")),
@@ -1244,7 +1244,8 @@ namespace Trinity.XmlTags
 
             RecordPosition();
 
-            LastMoveResult = Navigator.MoveTo(CurrentNavTarget);
+            LastMoveResult = PlayerMover.NavigateTo(CurrentNavTarget);
+            //Navigator.MoveTo(CurrentNavTarget);
         }
 
         private void RecordPosition()

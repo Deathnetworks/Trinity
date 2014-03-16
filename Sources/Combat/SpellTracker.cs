@@ -91,9 +91,12 @@ namespace Trinity
             TrackedUnits = new HashSet<SpellTracker>();
             PopulateTrackedSpells();
 
-            MaintenanceThread = new Thread(RunMaintenance);
-            MaintenanceThread.IsBackground = true;
-            MaintenanceThread.Priority = ThreadPriority.Lowest;
+            MaintenanceThread = new Thread(RunMaintenance)
+            {
+                Name = "Trinity SpellTracker",
+                IsBackground = true,
+                Priority = ThreadPriority.Lowest
+            };
             MaintenanceThread.Start();
 
         }

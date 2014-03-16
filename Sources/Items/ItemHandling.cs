@@ -561,141 +561,6 @@ namespace Trinity
             }
         }
 
-        /// <summary>
-        /// Determine if we should stash this item or not based on item type and score, and/or loot rule scripting
-        /// </summary>
-        /// <param name="cItem"></param>
-        /// <returns></returns>
-        //internal static bool ShouldWeStashThis(CachedACDItem cItem, ACDItem acdItem = null)
-        //{
-        //    try
-        //    {
-        //        // Now look for Misc items we might want to keep
-        //        GItemType itemType = DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
-        //        GItemBaseType itemBaseType = DetermineBaseType(itemType);
-
-        //        if (cItem.AcdItem.IsValid && acdItem == null)
-        //            acdItem = cItem.AcdItem;
-
-        //        if (itemType == GItemType.StaffOfHerding)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, itemType);
-        //            return true;
-        //        }
-        //        if (itemType == GItemType.CraftingMaterial)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, itemType);
-        //            return true;
-        //        }
-
-        //        if (itemType == GItemType.Emerald)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
-        //            return true;
-        //        }
-        //        if (itemType == GItemType.Amethyst)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
-        //            return true;
-        //        }
-        //        if (itemType == GItemType.Topaz)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
-        //            return true;
-        //        }
-        //        if (itemType == GItemType.Ruby)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, itemType);
-        //            return true;
-        //        }
-        //        if (itemType == GItemType.CraftTome)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, itemType);
-        //            return true;
-        //        }
-        //        if (itemType == GItemType.InfernalKey)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, itemType);
-        //            return true;
-        //        }
-        //        if (itemType == GItemType.HealthPotion)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, itemType);
-        //            return false;
-        //        }
-
-        //        // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
-        //        if (cItem.IsUnidentified)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] = (autokeep unidentified items)", cItem.RealName, cItem.InternalName);
-        //            return true;
-        //        }
-
-        //        if (Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
-        //        {
-        //            Interpreter.InterpreterAction action = StashRule.checkItem(acdItem, ItemEvaluationType.Keep);
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
-        //            switch (action)
-        //            {
-        //                case Interpreter.InterpreterAction.KEEP:
-        //                    return true;
-        //                case Interpreter.InterpreterAction.TRASH:
-        //                    return false;
-        //                case Interpreter.InterpreterAction.SCORE:
-        //                    break;
-        //            }
-        //        }
-
-        //        bool isEquipment = (acdItem.ItemBaseType == ItemBaseType.Armor
-        //           || acdItem.ItemBaseType == ItemBaseType.Weapon
-        //           || acdItem.ItemBaseType == ItemBaseType.Jewelry);
-
-        //        // Stashing Whites, auto-keep
-        //        if (Settings.Loot.TownRun.StashWhites && isEquipment && cItem.Quality < ItemQuality.Magic1)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing whites)", cItem.RealName, cItem.InternalName, itemType);
-        //            return true;
-        //        }
-
-        //        // Stashing blues, auto-keep
-        //        if (Settings.Loot.TownRun.StashBlues && isEquipment && cItem.Quality < ItemQuality.Rare4 && cItem.Quality > ItemQuality.Superior)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing blues)", cItem.RealName, cItem.InternalName, itemType);
-        //            return true;
-        //        }
-
-        //        if (Settings.Loot.TownRun.ForceSalvageRares && isEquipment && cItem.Quality <= ItemQuality.Rare6 && cItem.Quality >= ItemQuality.Rare4)
-        //        {
-
-        //        }
-
-
-        //        if (cItem.Quality >= ItemQuality.Legendary)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, itemType);
-        //            return true;
-        //        }
-
-        //        if (itemType == GItemType.CraftingPlan)
-        //        {
-        //            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, itemType);
-        //            return true;
-        //        }
-
-        //        // Ok now try to do some decent item scoring based on item types
-        //        double iNeedScore = ScoreNeeded(acdItem.ItemBaseType);
-        //        double iMyScore = ItemValuation.ValueThisItem(cItem, itemType);
-
-        //        Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, itemType, iMyScore);
-        //        if (iMyScore >= iNeedScore) return true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.LogNormal("Exception in Stash Check: {0}", ex);
-        //    }
-        //    // If we reached this point, then we found no reason to keep the item!
-        //    return false;
-        //}
 
         internal static bool IsWeaponArmorJewlery(CachedACDItem thisitem)
         {
@@ -768,7 +633,7 @@ namespace Trinity
             try
             {
                 iLevel = Player.Level;
-                iParagonLevel = ZetaDia.Me.ParagonLevel;
+                iParagonLevel = Trinity.Player.ParagonLevel;
                 if (Player.Level < 60)
                 {
                     if (!(TotalXP == 0 && LastXP == 0 && NextLevelXP == 0))
@@ -782,24 +647,24 @@ namespace Trinity
                             TotalXP += ZetaDia.Me.CurrentExperience - LastXP;
                         }
                     }
-                    LastXP = ZetaDia.Me.CurrentExperience;
-                    NextLevelXP = ZetaDia.Me.ExperienceNextLevel;
+                    LastXP = Trinity.Player.CurrentExperience;
+                    NextLevelXP = Trinity.Player.ExperienceNextLevel;
                 }
                 else
                 {
                     if (!(TotalXP == 0 && LastXP == 0 && NextLevelXP == 0))
                     {
-                        if (LastXP > ZetaDia.Me.ParagonCurrentExperience)
+                        if (LastXP > Trinity.Player.ParagonCurrentExperience)
                         {
                             TotalXP += NextLevelXP;
                         }
                         else
                         {
-                            TotalXP += ZetaDia.Me.ParagonCurrentExperience - LastXP;
+                            TotalXP += Trinity.Player.ParagonCurrentExperience - LastXP;
                         }
                     }
-                    LastXP = ZetaDia.Me.ParagonCurrentExperience;
-                    NextLevelXP = ZetaDia.Me.ParagonExperienceNextLevel;
+                    LastXP = Trinity.Player.ParagonCurrentExperience;
+                    NextLevelXP = Trinity.Player.ParagonExperienceNextLevel;
                 }
 
 

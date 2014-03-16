@@ -55,7 +55,7 @@ namespace Trinity
 
             // Beast Charge should set aoe position as players current position!
             if (avoidanceType == AvoidanceType.BeastCharge)
-                c_Position = ZetaDia.Me.Position;
+                c_Position = Trinity.Player.Position;
 
             // Monks with Serenity up ignore all AOE's
             if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_Serenity) && GetHasBuff(SNOPower.Monk_Serenity))

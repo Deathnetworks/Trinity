@@ -19,7 +19,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(1, 8, 6);
+                return new Version(1, 8, 7);
             }
         }
 
@@ -86,76 +86,81 @@ namespace Trinity
         /// </summary>
         public void OnEnabled()
         {
-            Logger.Log("OnEnable start");
-            DateTime dateOnEnabledStart = DateTime.UtcNow;
-
-            BotMain.OnStart += TrinityBotStart;
-            BotMain.OnStop += TrinityBotStop;
-
-            SetWindowTitle();
-
-            if (!Directory.Exists(FileManager.PluginPath))
+            try
             {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Fatal Error - cannot enable plugin. Invalid path: {0}", FileManager.PluginPath);
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Please check you have installed the plugin to the correct location, and then restart DemonBuddy and re-enable the plugin.");
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, @"Plugin should be installed to \<DemonBuddyFolder>\Plugins\Trinity\");
-            }
-            else
-            {
-                Helpers.PluginCheck.Start();
+                Logger.Log("OnEnable start");
+                DateTime dateOnEnabledStart = DateTime.UtcNow;
 
-                HasMappedPlayerAbilities = false;
-                isPluginEnabled = true;
+                BotMain.OnStart += TrinityBotStart;
+                BotMain.OnStop += TrinityBotStop;
 
-                // Settings are available after this... 
-                LoadConfiguration();
+                SetWindowTitle();
 
-                Navigator.PlayerMover = new PlayerMover();
-                SetUnstuckProvider();
-                GameEvents.OnPlayerDied += TrinityOnDeath;
-                GameEvents.OnGameJoined += TrinityOnJoinGame;
-                GameEvents.OnGameLeft += TrinityOnLeaveGame;
-
-                GameEvents.OnItemSold += ItemEvents.TrinityOnItemSold;
-                GameEvents.OnItemSalvaged += ItemEvents.TrinityOnItemSalvaged;
-                GameEvents.OnItemStashed += ItemEvents.TrinityOnItemStashed;
-                GameEvents.OnItemIdentificationRequest += ItemEvents.TrinityOnOnItemIdentificationRequest;
-
-                GameEvents.OnGameChanged += GameEvents_OnGameChanged;
-
-                CombatTargeting.Instance.Provider = new BlankCombatProvider();
-                LootTargeting.Instance.Provider = new BlankLootProvider();
-                ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
-
-                if (Settings.Loot.ItemFilterMode != global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
+                if (!Directory.Exists(FileManager.PluginPath))
                 {
-                    ItemManager.Current = new TrinityItemManager();
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Fatal Error - cannot enable plugin. Invalid path: {0}", FileManager.PluginPath);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Please check you have installed the plugin to the correct location, and then restart DemonBuddy and re-enable the plugin.");
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, @"Plugin should be installed to \<DemonBuddyFolder>\Plugins\Trinity\");
+                }
+                else
+                {
+                    Helpers.PluginCheck.Start();
+
+                    HasMappedPlayerAbilities = false;
+                    isPluginEnabled = true;
+
+                    // Settings are available after this... 
+                    LoadConfiguration();
+
+                    Navigator.PlayerMover = new PlayerMover();
+                    SetUnstuckProvider();
+                    GameEvents.OnPlayerDied += TrinityOnDeath;
+                    GameEvents.OnGameJoined += TrinityOnJoinGame;
+                    GameEvents.OnGameLeft += TrinityOnLeaveGame;
+
+                    GameEvents.OnItemSold += ItemEvents.TrinityOnItemSold;
+                    GameEvents.OnItemSalvaged += ItemEvents.TrinityOnItemSalvaged;
+                    GameEvents.OnItemStashed += ItemEvents.TrinityOnItemStashed;
+                    GameEvents.OnItemIdentificationRequest += ItemEvents.TrinityOnOnItemIdentificationRequest;
+
+                    GameEvents.OnGameChanged += GameEvents_OnGameChanged;
+
+                    CombatTargeting.Instance.Provider = new BlankCombatProvider();
+                    LootTargeting.Instance.Provider = new BlankLootProvider();
+                    ObstacleTargeting.Instance.Provider = new BlankObstacleProvider();
+
+                    if (Settings.Loot.ItemFilterMode != global::Trinity.Config.Loot.ItemFilterMode.DemonBuddy)
+                    {
+                        ItemManager.Current = new TrinityItemManager();
+                    }
+
+                    // Safety check incase DB "OnStart" event didn't fire properly
+                    if (BotMain.IsRunning)
+                    {
+                        TrinityBotStart(null);
+                        if (ZetaDia.IsInGame)
+                            TrinityOnJoinGame(null, null);
+                    }
+
+                    BeginInvoke(new Action(() => SetBotTPS()));
+
+                    UI.UILoader.PreLoadWindowContent();
+
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
                 }
 
-                // Safety check incase DB "OnStart" event didn't fire properly
-                if (BotMain.IsRunning)
+                if (StashRule != null)
                 {
-                    TrinityBotStart(null);
-                    if (ZetaDia.IsInGame)
-                        TrinityOnJoinGame(null, null);
+                    // reseting stash rules
+                    BeginInvoke(new Action(() => StashRule.reset()));
                 }
 
-               BeginInvoke(new Action(() => SetBotTPS()));
-
-                TrinityPowerManager.LoadLegacyDelays();
-
-                UI.UILoader.PreLoadWindowContent();
-
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ENABLED: {0} now in action!", Description); ;
+                Logger.LogDebug("OnEnable took {0}ms", DateTime.UtcNow.Subtract(dateOnEnabledStart).TotalMilliseconds);
             }
-
-            if (StashRule != null)
+            catch (Exception ex)
             {
-                // reseting stash rules
-                BeginInvoke(new Action(() => StashRule.reset()));
+                Logger.LogError("Error in OnEnable: " + ex.ToString());
             }
-
-            Logger.LogDebug("OnEnable took {0}ms", DateTime.UtcNow.Subtract(dateOnEnabledStart).TotalMilliseconds);
         }
 
         /// <summary>
@@ -261,11 +266,16 @@ namespace Trinity
                 {
                     windowTitle += " - " + profileName;
                 }
-                
+
                 BeginInvoke(new Action(() =>
                 {
-                    Window mainWindow = Application.Current.MainWindow;
-                    mainWindow.Title = windowTitle;
+                    try
+                    {
+                        Window mainWindow = Application.Current.MainWindow;
+                        if (mainWindow != null && windowTitle != null)
+                            mainWindow.Title = windowTitle;
+                    }
+                    catch { }
                 }));
             }
         }

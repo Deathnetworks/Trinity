@@ -655,8 +655,8 @@ namespace Trinity
                             if (monsterCount > 0)
                                 pointWeight *= monsterCount;
 
-                            Logger.Log(LogCategory.Movement, "ZigZag Point: {0} distance={1:0} distaceFromTarget={2:0} intersectsPath={3} weight={4:0} monsterCount={5}",
-                                zigZagPoint, distanceToPoint, distanceFromTargetToPoint, intersectsPath, pointWeight, monsterCount);
+                            //Logger.Log(LogCategory.Movement, "ZigZag Point: {0} distance={1:0} distaceFromTarget={2:0} intersectsPath={3} weight={4:0} monsterCount={5}",
+                            //    zigZagPoint, distanceToPoint, distanceFromTargetToPoint, intersectsPath, pointWeight, monsterCount);
 
                             // Use this one if it's more weight, or we haven't even found one yet, or if same weight as another with a random chance
                             if (pointWeight > highestWeightFound)

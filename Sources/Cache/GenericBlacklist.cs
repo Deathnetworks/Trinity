@@ -114,6 +114,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Starting up Generic Blacklist Manager thread");
                         Manager = new Thread(Manage)
                         {
+                            Name = "Trinity Generic Blacklist",
                             IsBackground = true,
                             Priority = ThreadPriority.Lowest
                         };

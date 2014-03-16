@@ -147,7 +147,6 @@
     <Compile Include="Settings\Loot\ItemRuleSetting.cs" />
     <Compile Include="Helpers\FileManager.cs" />
     <Compile Include="DbProvider\TownRun.cs" />
-    <Compile Include="Combat\TrinityPowerManager.cs" />
     <Compile Include="Combat\ScheduledPower.cs" />
     <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Helpers\LogCategory.cs" />
@@ -347,9 +346,7 @@
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>rem rd /S /Q "$(ProjectDir)obj\"
-rem rd /S /Q "$(ProjectDir)bin\"
-rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\"
+    <PostBuildEvent>rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\"
 rd /S /Q "C:\db\Plugins\$(ProjectName)\"
 del /S "$(ProjectDir)*.bak"
 
@@ -359,10 +356,20 @@ xcopy /E /Y "$(ProjectDir)*.xaml" "C:\db\Plugins\$(ProjectName)\"
 xcopy /E /Y "$(ProjectDir)*.xml" "C:\db\Plugins\$(ProjectName)\"
 xcopy /E /Y "$(ProjectDir)*.xsd" "C:\db\Plugins\$(ProjectName)\"
 xcopy /E /Y "$(ProjectDir)*.txt" "C:\db\Plugins\$(ProjectName)\"
-xcopy /Y "$(ProjectDir)*" "C:\db\svn\$(ProjectName)\trunk\Sources\"
+
+rd /S /Q "C:\db\Plugins\$(ProjectName)\obj\
+rd /S /Q "C:\db\Plugins\$(ProjectName)\bin\
+
+xcopy /E /Y "$(ProjectDir)*.cs" "C:\db\svn\$(ProjectName)\trunk\Sources\"
+xcopy /E /Y "$(ProjectDir)*.dis" "C:\db\svn\$(ProjectName)\trunk\Sources\"
+xcopy /E /Y "$(ProjectDir)*.xaml" "C:\db\svn\$(ProjectName)\trunk\Sources\"
+xcopy /E /Y "$(ProjectDir)*.xml" "C:\db\svn\$(ProjectName)\trunk\Sources\"
+xcopy /E /Y "$(ProjectDir)*.xsd" "C:\db\svn\$(ProjectName)\trunk\Sources\"
+xcopy /E /Y "$(ProjectDir)*.txt" "C:\db\svn\$(ProjectName)\trunk\Sources\"
+
 rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\bin\"
 rd /S /Q "C:\db\svn\$(ProjectName)\trunk\Sources\obj\"
-rd /S /Q "C:\db\Plugins\$(ProjectName)\obj\
-rd /S /Q "C:\db\Plugins\$(ProjectName)\bin\</PostBuildEvent>
+
+</PostBuildEvent>
   </PropertyGroup>
 </Project>

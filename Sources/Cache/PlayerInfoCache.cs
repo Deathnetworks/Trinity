@@ -43,6 +43,11 @@ namespace Trinity
         public int Coinage { get; set; }
         public float GoldPickupRadius { get; set; }
         public bool IsHidden { get; set; }
+        public int CurrentExperience { get; set; }
+        public int ExperienceNextLevel { get; set; }
+        public int ParagonLevel { get; set; }
+        public int ParagonCurrentExperience { get; set; }
+        public long ParagonExperienceNextLevel { get; set;  }
 
         public PlayerInfoCache()
         {
@@ -151,6 +156,12 @@ namespace Trinity
                     Player.ActorClass = me.ActorClass;
                     Player.BattleTag = FileManager.BattleTagName;
                     Player.LevelAreaId = ZetaDia.CurrentLevelAreaId;
+
+                    Player.CurrentExperience = ZetaDia.Me.CurrentExperience;
+                    Player.ExperienceNextLevel = ZetaDia.Me.ExperienceNextLevel;
+                    Player.ParagonLevel = ZetaDia.Me.ParagonLevel;
+                    Player.ParagonCurrentExperience = ZetaDia.Me.ParagonCurrentExperience;
+                    Player.ParagonExperienceNextLevel = ZetaDia.Me.ParagonExperienceNextLevel;
 
                     //if (Player.ActorClass == ActorClass.Witchdoctor && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1))
                     //    Player.IsHidden = me.IsHidden;

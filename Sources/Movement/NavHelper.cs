@@ -71,6 +71,11 @@ namespace Trinity
         }
         #endregion
 
+        internal static string PrettyPrintVector3(Vector3 pos)
+        {
+            return string.Format("x=\"{0:0}\" y=\"{0:1}\" z=\"{0:2}\"", pos.X, pos.Y, pos.Z);
+        }
+
         internal static bool CanRayCast(Vector3 destination)
         {
             return CanRayCast(PlayerStatus.Position, destination);
@@ -122,21 +127,17 @@ namespace Trinity
                 }
                 hasEmergencyTeleportUp = (
                     // Leap is available
-                    (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Leap) &&
-                        DateTime.UtcNow.Subtract(CacheData.AbilityLastUsedCache[SNOPower.Barbarian_Leap]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Barbarian_Leap)) ||
+                    (!PlayerStatus.IsIncapacitated && CombatBase.CanCast(SNOPower.Barbarian_Leap)) ||
                     // Whirlwind is available
-                    (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Barbarian_Whirlwind) &&
+                    (!PlayerStatus.IsIncapacitated && CombatBase.CanCast(SNOPower.Barbarian_Whirlwind) &&
                         ((PlayerStatus.PrimaryResource >= 10 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= Trinity.MinEnergyReserve)) ||
                     // Tempest rush is available
-                    (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Monk_TempestRush) &&
+                    (!PlayerStatus.IsIncapacitated && CombatBase.CanCast(SNOPower.Monk_TempestRush) &&
                         ((PlayerStatus.PrimaryResource >= 20 && !PlayerStatus.WaitingForReserveEnergy) || PlayerStatus.PrimaryResource >= Trinity.MinEnergyReserve)) ||
                     // Teleport is available
-                    (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Teleport) &&
-                        PlayerStatus.PrimaryResource >= 15 &&
-                        PowerManager.CanCast(SNOPower.Wizard_Teleport)) ||
+                    (!PlayerStatus.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Teleport) && PlayerStatus.PrimaryResource >= 15) ||
                     // Archon Teleport is available
-                    (!PlayerStatus.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
-                        PowerManager.CanCast(SNOPower.Wizard_Archon_Teleport))
+                    (!PlayerStatus.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport))
                     );
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
                 if (!shouldKite && PlayerStatus.ActorClass == ActorClass.Wizard && Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && PlayerStatus.PrimaryResource >= 25 &&

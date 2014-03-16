@@ -32,7 +32,7 @@ namespace Trinity.Config.Loot
         private bool _IgnoreTwoHandedWeapons;
 
         private bool _IgnoreLegendaryInAoE;
-        private bool _IgnoreRareInAoE;
+        private bool _IgnoreNonLegendaryInAoE;
         private bool _IgnoreLegendaryNearElites;
         private bool _IgnoreRareNearElites;
         private bool _IgnoreGoldInAoE;
@@ -489,13 +489,13 @@ namespace Trinity.Config.Loot
         {
             get
             {
-                return _IgnoreRareInAoE;
+                return _IgnoreNonLegendaryInAoE;
             }
             set
             {
-                if (_IgnoreRareInAoE != value)
+                if (_IgnoreNonLegendaryInAoE != value)
                 {
-                    _IgnoreRareInAoE = value;
+                    _IgnoreNonLegendaryInAoE = value;
                     OnPropertyChanged("IgnoreNonLegendaryInAoE");
                 }
             }

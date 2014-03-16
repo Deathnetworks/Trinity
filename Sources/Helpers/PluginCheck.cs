@@ -22,8 +22,11 @@ namespace Trinity.Helpers
 
             if (PluginCheckWatcher == null)
             {
-                PluginCheckWatcher = new Thread(PluginChecker);
-                PluginCheckWatcher.IsBackground = true;
+                PluginCheckWatcher = new Thread(PluginChecker)
+                {
+                    Name = "Trinity PluginCheck",
+                    IsBackground = true
+                };
                 PluginCheckWatcher.Start();
                 Logger.LogDebug("Plugin Check Watcher thread started");
             }

@@ -137,6 +137,25 @@ namespace Trinity.Technicals
             Log(TrinityLogLevel.Debug, logCategory, formatMessage, args);
         }
 
+        /// <summary>
+        /// Logs a message with Normal/UserInformation
+        /// </summary>
+        /// <param name="formatMessage"></param>
+        /// <param name="args"></param>
+        public static void LogError(string formatMessage, params object[] args)
+        {
+            Log(TrinityLogLevel.Error, LogCategory.UserInformation, formatMessage, args);
+        }
+        /// <summary>
+        /// Logs a message with Normal/UserInformation
+        /// </summary>
+        /// <param name="formatMessage"></param>
+        /// <param name="args"></param>
+        public static void LogError(LogCategory logCategory, string formatMessage, params object[] args)
+        {
+            Log(TrinityLogLevel.Error, logCategory, formatMessage, args);
+        }
+
         /// <summary>Converts <see cref="TrinityLogLevel"/> to <see cref="LogLevel"/>.</summary>
         /// <param name="level">The trinity logging level.</param>
         /// <returns>DemonBuddy logging level.</returns>

@@ -221,7 +221,11 @@ namespace Trinity.ItemRules.Core
             SwitchContext = null;
             currentContext = Tree;
 
-            threadAutoHighlight = new Thread(AutoHighlightStart);
+            threadAutoHighlight = new Thread(AutoHighlightStart)
+            {
+                Name = "Text Highlighter",
+                IsBackground = true
+            };
             threadAutoHighlight.Start();
         }
 

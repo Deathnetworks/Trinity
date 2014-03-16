@@ -503,18 +503,13 @@ namespace Trinity
                                     cacheObject.Weight = 1;
 
                                 // ignore any items/gold if there is mobs in kill radius and we aren't combat looting
-                                if (CurrentTarget != null && AnyMobsInRange && !Zeta.Bot.Settings.CharacterSettings.Instance.CombatLooting && cacheObject.ItemQuality < ItemQuality.Legendary)
+                                if (CurrentTarget != null && AnyMobsInRange && cacheObject.ItemQuality < ItemQuality.Legendary)
                                     cacheObject.Weight = 1;
 
                                 // See if there's any AOE avoidance in that spot or inbetween us, if so reduce the weight to 1
                                 if (AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius))
                                     cacheObject.Weight = 1;
 
-                                // Deprioritize item if a monster is blocking our path
-                                if (MonsterObstacleCache.Any(o => MathUtil.IntersectsPath(o.Location, o.Radius, Player.Position, c_Position)))
-                                {
-                                    cacheObject.Weight *= 0.10d;
-                                }
                                 break;
                             }
                         case GObjectType.PowerGlobe:

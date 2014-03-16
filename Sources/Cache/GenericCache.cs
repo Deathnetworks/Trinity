@@ -128,6 +128,7 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Starting up Generic Cache Manage thread");
                     Manager = new Thread(Manage)
                     {
+                        Name = "Trinity Generic Cache",
                         IsBackground = true,
                         Priority = ThreadPriority.Lowest
                     };

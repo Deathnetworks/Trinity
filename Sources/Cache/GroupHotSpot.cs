@@ -29,6 +29,7 @@ namespace Trinity
         {
             ManagerThread = new System.Threading.Thread(HotSpotManager)
             {
+                Name = "Trinity HotSpot",
                 IsBackground = true,
                 Priority = System.Threading.ThreadPriority.Lowest
             };
