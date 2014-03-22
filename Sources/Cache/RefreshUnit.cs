@@ -127,7 +127,7 @@ namespace Trinity
 
             // Only if at full health, else don't bother checking each loop
             // See if we already have this monster's size stored, if not get it and cache it
-            if (!CacheData.dictionaryStoredMonsterSizes.TryGetValue(c_ActorSNO, out c_unit_MonsterSize))
+            if (!CacheData.MonsterSizes.TryGetValue(c_ActorSNO, out c_unit_MonsterSize))
             {
                 try
                 {
@@ -144,7 +144,7 @@ namespace Trinity
             if (!DataDictionary.InteractAtCustomRange.TryGetValue(c_ActorSNO, out c_Radius))
             {
                 // Retrieve collision sphere radius, cached if possible
-                if (!CacheData.collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
+                if (!CacheData.CollisionSphere.TryGetValue(c_ActorSNO, out c_Radius))
                 {
                     try
                     {
@@ -157,7 +157,7 @@ namespace Trinity
                         AddToCache = false;
                         return AddToCache;
                     }
-                    CacheData.collisionSphereCache.Add(c_ActorSNO, c_Radius);
+                    CacheData.CollisionSphere.Add(c_ActorSNO, c_Radius);
                 }
             }
 
@@ -247,7 +247,7 @@ namespace Trinity
             if (monsterInfo != null)
             {
                 c_unit_MonsterSize = monsterInfo.MonsterSize;
-                CacheData.dictionaryStoredMonsterSizes.Add(c_ActorSNO, c_unit_MonsterSize);
+                CacheData.MonsterSizes.Add(c_ActorSNO, c_unit_MonsterSize);
             }
             else
             {
@@ -263,10 +263,10 @@ namespace Trinity
             // health calculations
             double maxHealth;
             // Get the max health of this unit, a cached version if available, if not cache it
-            if (!CacheData.unitMaxHealthCache.TryGetValue(c_RActorGuid, out maxHealth))
+            if (!CacheData.UnitMaxHealth.TryGetValue(c_RActorGuid, out maxHealth))
             {
                 maxHealth = c_diaUnit.HitpointsMax;
-                CacheData.unitMaxHealthCache.Add(c_RActorGuid, maxHealth);
+                CacheData.UnitMaxHealth.Add(c_RActorGuid, maxHealth);
             }
 
             // Health calculations            
@@ -296,13 +296,13 @@ namespace Trinity
             }
 
             bool isBurrowed = false;
-            if (!CacheData.unitBurrowedCache.TryGetValue(c_RActorGuid, out isBurrowed))
+            if (!CacheData.UnitIsBurrowed.TryGetValue(c_RActorGuid, out isBurrowed))
             {
                 isBurrowed = unit.IsBurrowed;
                 // if the unit is NOT burrowed - we can attack them, add to cache (as IsAttackable)
                 if (!isBurrowed)
                 {
-                    CacheData.unitBurrowedCache.Add(c_RActorGuid, isBurrowed);
+                    CacheData.UnitIsBurrowed.Add(c_RActorGuid, isBurrowed);
                 }
             }
 
@@ -399,12 +399,12 @@ namespace Trinity
             using (new PerformanceLogger("RefreshAffixes"))
             {
                 MonsterAffixes affixFlags;
-                if (!CacheData.unitMonsterAffixCache.TryGetValue(c_RActorGuid, out affixFlags))
+                if (!CacheData.UnitMonsterAffix.TryGetValue(c_RActorGuid, out affixFlags))
                 {
                     try
                     {
                         affixFlags = c_CommonData.MonsterAffixes;
-                        CacheData.unitMonsterAffixCache.Add(c_RActorGuid, affixFlags);
+                        CacheData.UnitMonsterAffix.Add(c_RActorGuid, affixFlags);
                     }
                     catch (Exception ex)
                     {
@@ -442,9 +442,9 @@ namespace Trinity
                 }
                 // Is this going to be a new dictionary entry, or updating one already existing?
                 if (addToDictionary)
-                    CacheData.dictionaryStoredMonsterTypes.Add(c_ActorSNO, monsterType);
+                    CacheData.MonsterTypes.Add(c_ActorSNO, monsterType);
                 else
-                    CacheData.dictionaryStoredMonsterTypes[c_ActorSNO] = monsterType;
+                    CacheData.MonsterTypes[c_ActorSNO] = monsterType;
             }
             else
             {
@@ -457,7 +457,7 @@ namespace Trinity
             if (c_diaUnit != null && c_diaUnit.IsValid)
             {
 
-                if (!CacheData.summonedByACDIdCache.TryGetValue(c_ACDGUID, out c_SummonedByACDId))
+                if (!CacheData.SummonedByACDId.TryGetValue(c_ACDGUID, out c_SummonedByACDId))
                 {
                     try
                     {
@@ -468,7 +468,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Exception reading SummonedByACDId {0}", ex.ToString());
                     }
                 }
-                if (!CacheData.isSummonerCache.TryGetValue(c_ACDGUID, out c_IsSummoner))
+                if (!CacheData.IsSummonerCache.TryGetValue(c_ACDGUID, out c_IsSummoner))
                 {
                     try
                     {

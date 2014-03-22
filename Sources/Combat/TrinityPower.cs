@@ -12,7 +12,8 @@ namespace Trinity
         // 100 == 10 tps or 1/10th a second
         // 66 == 15 tps or 1/15th a second
         // 50 = 20 tps or 1/20th a second
-        private const int _tickTimeMs = 20;        
+        // 20 == 50 tps or 1/50th a second
+        private const int _tickTimeMs = 66;        
 
         public SNOPower SNOPower { get; set; }
         /// <summary>
@@ -48,14 +49,14 @@ namespace Trinity
         /// </summary>
         public DateTime PowerAssignmentTime { get; set; }
         /// <summary>
-        /// Returns the DateTime the power was last used <seealso cref="CacheData.AbilityLastUsedCache"/>
+        /// Returns the DateTime the power was last used <seealso cref="CacheData.AbilityLastUsed"/>
         /// </summary>
         public DateTime PowerLastUsedTime
         {
             get
             {
-                if (CacheData.AbilityLastUsedCache.ContainsKey(this.SNOPower))
-                    return CacheData.AbilityLastUsedCache[this.SNOPower];
+                if (CacheData.AbilityLastUsed.ContainsKey(this.SNOPower))
+                    return CacheData.AbilityLastUsed[this.SNOPower];
                 else
                     return DateTime.MinValue;
             }
@@ -312,6 +313,14 @@ namespace Trinity
                     this.TimeSinceAssigned,
                     this.TimeSinceUse,
                     this.MinimumRange);
+        }
+
+        public static int MillisecondsToTickDelay(int milliseconds)
+        {
+            var timesPerSecond = 1000 / milliseconds;
+            var totalTPS = 1000 / _tickTimeMs;
+
+            return totalTPS / (1000 / milliseconds);
         }
     }
 }

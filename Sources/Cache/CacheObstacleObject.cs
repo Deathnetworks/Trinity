@@ -5,7 +5,7 @@ namespace Trinity
     // Obstacles for quick mapping of paths etc.
     internal class CacheObstacleObject
     {
-        public Vector3 Location { get; set; }
+        public Vector3 Position { get; set; }
         public float Radius { get; set; }
         public int ActorSNO { get; set; }
         public double Weight { get; set; }
@@ -13,6 +13,7 @@ namespace Trinity
         public int HitPointsCurPct { get; set; }
         public int HitPointsCur { get; set; }
         public DateTime Expires { get; set; }
+        public int RActorGUID { get; set; }
 
         public AvoidanceType AvoidanceType
         {
@@ -22,16 +23,15 @@ namespace Trinity
             }
         }
 
-        public CacheObstacleObject()
-        {
+        public CacheObstacleObject() { }
 
-        }
-
-        public CacheObstacleObject(Vector3 location, float radius, int snoId, string name = "")
+        public CacheObstacleObject(Vector3 position, float radius, int actorSNO = 0, string name = "")
         {
-            Location = location;
+            Position = position;
             Radius = radius;
-            ActorSNO = snoId;
+            ActorSNO = actorSNO;
+            Name = name;
         }
+
     }
 }

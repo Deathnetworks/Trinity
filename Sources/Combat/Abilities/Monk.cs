@@ -628,7 +628,7 @@ namespace Trinity
                     var usePowerResult = ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, target, CurrentWorldDynamicId, -1);
                     if (usePowerResult)
                     {
-                        CacheData.AbilityLastUsedCache[SNOPower.Monk_TempestRush] = DateTime.UtcNow;
+                        CacheData.AbilityLastUsed[SNOPower.Monk_TempestRush] = DateTime.UtcNow;
                     }
                 }
             }

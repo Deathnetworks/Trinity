@@ -121,17 +121,38 @@ namespace Trinity
             // Add Cell Weight for Obstacle
             if (c_IsObstacle)
             {
-                float radius = 0f;
-                if (!DataDictionary.ObstacleCustomRadius.TryGetValue(c_ActorSNO, out radius))
-                    radius = c_diaObject.CollisionSphere.Radius;
+                if (!DataDictionary.ObstacleCustomRadius.TryGetValue(c_ActorSNO, out c_Radius) &&
+                    !CacheData.CollisionSphere.TryGetValue(c_RActorGuid, out c_Radius))
+                {
+                    c_Radius = c_diaObject.CollisionSphere.Radius;
+                    CacheData.CollisionSphere.Add(c_RActorGuid, c_Radius);
+                }
 
-                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, radius);
+                if (!CacheData.Position.TryGetValue(c_RActorGuid, out c_Position))
+                {
+                    c_Position = c_diaObject.Position;
+                    CacheData.Position.Add(c_RActorGuid, c_Position);
+                }
+
+                CacheData.NavigationObstacleCache.Add(new CacheObstacleObject()
+                {
+                    ActorSNO = c_ActorSNO,
+                    Name = c_InternalName,
+                    Position = c_Position,
+                    Radius = c_Radius
+                });
+
+                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+
+                c_IgnoreReason = "NavigationObstacle";
+                AddToCache = false;
+                return AddToCache;
             }
-
 
             // Get ACDGuid
             AddToCache = RefreshStepCachedACDGuid(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
+
             // Summons by the player 
             AddToCache = RefreshStepCachedSummons(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
@@ -173,10 +194,6 @@ namespace Trinity
             // Always Refresh ZDiff for every object
             AddToCache = RefreshStepObjectTypeZDiff(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "ZDiff"; return AddToCache; }
-
-            // Add new Obstacle to cache
-            AddToCache = RefreshStepAddObstacleToCache(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "AddObstacleToCache"; return AddToCache; }
 
             // Get DynamicId and GameBalanceId
             AddToCache = RefreshStepCachedDynamicIds(AddToCache);
@@ -274,11 +291,11 @@ namespace Trinity
                 case GObjectType.HealthWell:
                 case GObjectType.Interactable:
                 case GObjectType.Shrine:
-                    NavigationObstacleCache.Add(new CacheObstacleObject()
+                    CacheData.NavigationObstacleCache.Add(new CacheObstacleObject()
                     {
                         ActorSNO = c_ActorSNO,
                         Radius = c_Radius,
-                        Location = c_Position,
+                        Position = c_Position,
                         Name = c_InternalName,
                     });
                     break;
@@ -292,18 +309,14 @@ namespace Trinity
         {
             if (AddToCache && c_ObjectType == GObjectType.Unit)
             {
-                // Handle bosses
-                if (c_unit_IsBoss)
+                // Add to the collision-list
+                CacheData.MonsterObstacleCache.Add(new CacheObstacleObject()
                 {
-                    // Force to elite and add to the collision list
-                    c_unit_IsElite = true;
-                    MonsterObstacleCache.Add(new CacheObstacleObject(c_Position, c_Radius, c_ActorSNO));
-                }
-                else
-                {
-                    // Add to the collision-list
-                    MonsterObstacleCache.Add(new CacheObstacleObject(c_Position, c_Radius, c_ActorSNO));
-                }
+                    ActorSNO = c_ActorSNO,
+                    Name = c_InternalName,
+                    Position = c_Position,
+                    Radius = c_Radius
+                });
             }
         }
         /// <summary>
@@ -379,7 +392,7 @@ namespace Trinity
         private static bool RefreshStepCachedActorSNO(bool AddToCache)
         {
             // Get the Actor SNO, cached if possible
-            if (!CacheData.actorSNOCache.TryGetValue(c_RActorGuid, out c_ActorSNO))
+            if (!CacheData.ActorSNO.TryGetValue(c_RActorGuid, out c_ActorSNO))
             {
                 try
                 {
@@ -391,7 +404,7 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Error, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                 }
-                CacheData.actorSNOCache.Add(c_RActorGuid, c_ActorSNO);
+                CacheData.ActorSNO.Add(c_RActorGuid, c_ActorSNO);
             }
             return AddToCache;
         }
@@ -399,7 +412,7 @@ namespace Trinity
         private static bool RefreshInternalName(bool AddToCache)
         {
             // This is "internalname" for items, and just a "generic" name for objects and units - cached if possible
-            if (!CacheData.nameCache.TryGetValue(c_RActorGuid, out c_InternalName))
+            if (!CacheData.Name.TryGetValue(c_RActorGuid, out c_InternalName))
             {
                 try
                 {
@@ -411,7 +424,7 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                     AddToCache = false;
                 }
-                CacheData.nameCache.Add(c_RActorGuid, c_InternalName);
+                CacheData.Name.Add(c_RActorGuid, c_InternalName);
             }
             return AddToCache;
         }
@@ -444,20 +457,6 @@ namespace Trinity
                 {
                     AddToCache = false;
                 }
-            }
-            return AddToCache;
-        }
-
-        private static bool RefreshStepAddObstacleToCache(bool AddToCache)
-        {
-            // Have Position, Now store the location etc. of this obstacle and continue
-            if (c_IsObstacle)
-            {
-                NavigationObstacleCache.Add(new CacheObstacleObject(c_Position, DataDictionary.ObstacleCustomRadius[c_ActorSNO], c_ActorSNO));
-                AddToCache = false;
-
-                // Add pathing avoidance
-
             }
             return AddToCache;
         }
@@ -509,7 +508,7 @@ namespace Trinity
             }
 
             // Either get the cached object type, or calculate it fresh
-            else if (!c_IsObstacle && !CacheData.objectTypeCache.TryGetValue(c_RActorGuid, out c_ObjectType))
+            else if (!c_IsObstacle && !CacheData.ObjectType.TryGetValue(c_RActorGuid, out c_ObjectType))
             {
                 // See if it's an avoidance first from the SNO
                 bool isAvoidanceSNO = (DataDictionary.Avoidances.Contains(c_ActorSNO) || DataDictionary.AvoidanceBuffs.Contains(c_ActorSNO) || DataDictionary.AvoidanceProjectiles.Contains(c_ActorSNO));
@@ -530,7 +529,7 @@ namespace Trinity
                             catch
                             {
                                 // Remove on exception, otherwise it may get stuck in the cache
-                                CacheData.objectTypeCache.Remove(c_RActorGuid);
+                                CacheData.ObjectType.Remove(c_RActorGuid);
                             }
                             if (hasBuff)
                             {
@@ -539,7 +538,7 @@ namespace Trinity
                             }
                             else
                             {
-                                CacheData.objectTypeCache.Remove(c_RActorGuid);
+                                CacheData.ObjectType.Remove(c_RActorGuid);
                                 AddToCache = false;
                                 c_IgnoreSubStep = "NoBuffVisualEffect";
                             }
@@ -655,7 +654,7 @@ namespace Trinity
                 }
                 if (c_ObjectType != GObjectType.Unknown)
                 {  // Now cache the object type
-                    CacheData.objectTypeCache.Add(c_RActorGuid, c_ObjectType);
+                    CacheData.ObjectType.Add(c_RActorGuid, c_ObjectType);
                 }
             }
             return AddToCache;
@@ -816,12 +815,12 @@ namespace Trinity
                                     using (new PerformanceLogger("RefreshLoS.2"))
                                     {
                                         // Get whether or not this RActor has ever been in a path line with AllowWalk. If it hasn't, don't add to cache and keep rechecking
-                                        if (!CacheData.hasBeenRayCastedCache.TryGetValue(c_RActorGuid, out c_HasBeenRaycastable))
+                                        if (!CacheData.HasBeenRayCasted.TryGetValue(c_RActorGuid, out c_HasBeenRaycastable))
                                         {
                                             if (c_CentreDistance <= 5f)
                                             {
                                                 c_HasBeenRaycastable = true;
-                                                CacheData.hasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);
                                             }
                                             else if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
@@ -837,7 +836,7 @@ namespace Trinity
                                                 else
                                                 {
                                                     c_HasBeenRaycastable = true;
-                                                    CacheData.hasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                    CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);
                                                 }
 
                                             }
@@ -851,7 +850,7 @@ namespace Trinity
                                                 else
                                                 {
                                                     c_HasBeenRaycastable = true;
-                                                    CacheData.hasBeenRayCastedCache.Add(c_RActorGuid, c_HasBeenRaycastable);
+                                                    CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);
                                                 }
 
                                             }
@@ -868,7 +867,7 @@ namespace Trinity
                                     using (new PerformanceLogger("RefreshLoS.3"))
                                     {
                                         // Get whether or not this RActor has ever been in "Line of Sight" (as determined by Demonbuddy). If it hasn't, don't add to cache and keep rechecking
-                                        if (!CacheData.hasBeenInLoSCache.TryGetValue(c_RActorGuid, out c_HasBeenInLoS))
+                                        if (!CacheData.HasBeenInLoS.TryGetValue(c_RActorGuid, out c_HasBeenInLoS))
                                         {
                                             if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
@@ -881,13 +880,13 @@ namespace Trinity
                                                 else
                                                 {
                                                     c_HasBeenInLoS = true;
-                                                    CacheData.hasBeenInLoSCache.Add(c_RActorGuid, c_HasBeenInLoS);
+                                                    CacheData.HasBeenInLoS.Add(c_RActorGuid, c_HasBeenInLoS);
                                                 }
                                             }
                                             else
                                             {
                                                 c_HasBeenInLoS = true;
-                                                CacheData.hasBeenInLoSCache.Add(c_RActorGuid, c_HasBeenInLoS);
+                                                CacheData.HasBeenInLoS.Add(c_RActorGuid, c_HasBeenInLoS);
                                             }
                                         }
                                     }
@@ -954,7 +953,7 @@ namespace Trinity
             // Get the ACDGUID, cached if possible, only for non-avoidance stuff
             if (!c_IsObstacle && c_ObjectType != GObjectType.Avoidance)
             {
-                if (!CacheData.ACDGUIDCache.TryGetValue(c_RActorGuid, out c_ACDGUID))
+                if (!CacheData.AcdGuid.TryGetValue(c_RActorGuid, out c_ACDGUID))
                 {
                     try
                     {
@@ -966,7 +965,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
                         AddToCache = false;
                     }
-                    CacheData.ACDGUIDCache.Add(c_RActorGuid, c_ACDGUID);
+                    CacheData.AcdGuid.Add(c_RActorGuid, c_ACDGUID);
                 }
                 // No ACDGUID, so shouldn't be anything we want to deal with
                 if (c_ACDGUID == -1)
@@ -988,7 +987,7 @@ namespace Trinity
             if (c_ObjectType != GObjectType.Avoidance && c_ObjectType != GObjectType.Unit && c_ObjectType != GObjectType.Player)
             {
                 // Get the position, cached if possible
-                if (!CacheData.positionCache.TryGetValue(c_RActorGuid, out c_Position))
+                if (!CacheData.Position.TryGetValue(c_RActorGuid, out c_Position))
                 {
                     try
                     {
@@ -1011,7 +1010,7 @@ namespace Trinity
                         AddToCache = false;
                     }
                     // Now cache it
-                    CacheData.positionCache.Add(c_RActorGuid, c_Position);
+                    CacheData.Position.Add(c_RActorGuid, c_Position);
                 }
             }
             // Ok pull up live-position data for units/avoidance now...
@@ -1036,7 +1035,7 @@ namespace Trinity
             if (c_ObjectType == GObjectType.Item)
             {
                 // Get the Dynamic ID, cached if possible
-                if (!CacheData.dynamicIDCache.TryGetValue(c_RActorGuid, out c_GameDynamicID))
+                if (!CacheData.DynamicID.TryGetValue(c_RActorGuid, out c_GameDynamicID))
                 {
                     try
                     {
@@ -1049,10 +1048,10 @@ namespace Trinity
                         AddToCache = false;
                         //return bWantThis;
                     }
-                    CacheData.dynamicIDCache.Add(c_RActorGuid, c_GameDynamicID);
+                    CacheData.DynamicID.Add(c_RActorGuid, c_GameDynamicID);
                 }
                 // Get the Game Balance ID, cached if possible
-                if (!CacheData.gameBalanceIDCache.TryGetValue(c_RActorGuid, out c_BalanceID))
+                if (!CacheData.GameBalanceID.TryGetValue(c_RActorGuid, out c_BalanceID))
                 {
                     try
                     {
@@ -1065,7 +1064,7 @@ namespace Trinity
                         AddToCache = false;
                         //return bWantThis;
                     }
-                    CacheData.gameBalanceIDCache.Add(c_RActorGuid, c_BalanceID);
+                    CacheData.GameBalanceID.Add(c_RActorGuid, c_BalanceID);
                 }
             }
             else
@@ -1241,13 +1240,13 @@ namespace Trinity
         {
             if (!bHasCachedHealth)
             {
-                CacheData.currentHealthCache.Add(c_RActorGuid, dThisCurrentHealth);
-                CacheData.currentHealthCheckTimeCache.Add(c_RActorGuid, iLastCheckedHealth);
+                CacheData.CurrentUnitHealth.Add(c_RActorGuid, dThisCurrentHealth);
+                CacheData.LastCheckedUnitHealth.Add(c_RActorGuid, iLastCheckedHealth);
             }
             else
             {
-                CacheData.currentHealthCache[c_RActorGuid] = dThisCurrentHealth;
-                CacheData.currentHealthCheckTimeCache[c_RActorGuid] = iLastCheckedHealth;
+                CacheData.CurrentUnitHealth[c_RActorGuid] = dThisCurrentHealth;
+                CacheData.LastCheckedUnitHealth[c_RActorGuid] = iLastCheckedHealth;
             }
         }
 

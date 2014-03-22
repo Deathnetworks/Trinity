@@ -26,12 +26,6 @@ namespace Trinity
             }
         }
 
-        /* I create so many variables that it's a pain in the arse to categorize them
-         * So I just throw them all here for quick searching, reference etc.
-         * I've tried to make most variable names be pretty damned obvious what they are for!
-         * I've also commented a lot of variables/sections of variables to explain what they are for, incase you are trying to work them all out!
-         */
-
         /// <summary>
         /// Used for letting noobs know they started the bot without Trinity enabled in the plugins tab.
         /// </summary>
@@ -131,13 +125,6 @@ namespace Trinity
         /// </summary>
         public static PlayerInfoCache Player = new PlayerInfoCache(DateTime.MinValue, false, false, false, 0d, 0d, 0d, 0d, 0d, Vector3.Zero, false, 0, 1, ActorClass.Invalid, String.Empty);
 
-        /// <summary>
-        /// Obstacle cache, things we can't or shouldn't move through
-        /// </summary>
-        internal static HashSet<CacheObstacleObject> NavigationObstacleCache = new HashSet<CacheObstacleObject>();
-
-        // Related to the profile reloaded when restarting games, to pick the FIRST profile.
-
         // Also storing a list of all profiles, for experimental reasons/incase I want to use them down the line
         public static List<string> ProfileHistory = new List<string>();
         public static string CurrentProfile = "";
@@ -150,15 +137,6 @@ namespace Trinity
         public static Vector3 LastRecordedPosition = Vector3.Zero;
         public static bool bSkipAheadAGo = false;
 
-        /// <summary>
-        /// A list of all monsters and their positions, so we don't try to walk through them during avoidance
-        /// </summary>
-        internal static HashSet<CacheObstacleObject> MonsterObstacleCache = new HashSet<CacheObstacleObject>();
-
-        /// <summary>
-        /// A list of all current obstacles, to help avoid running through them when picking targets
-        /// </summary>
-        internal static HashSet<CacheObstacleObject> AvoidanceObstacleCache = new HashSet<CacheObstacleObject>();
 
         /// <summary>
         /// Blacklist avoidance spots we failed to reach in time, for a period of time

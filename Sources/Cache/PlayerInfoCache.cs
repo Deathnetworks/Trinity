@@ -23,8 +23,14 @@ namespace Trinity
         public double CurrentHealthPct { get; set; }
         public double PrimaryResource { get; set; }
         public double PrimaryResourcePct { get; set; }
+        public double PrimaryResourceMax { get; set; }
+        public double PrimaryResourceMissing { get; set; }
+
         public double SecondaryResource { get; set; }
         public double SecondaryResourcePct { get; set; }
+        public double SecondaryResourceMax { get; set; }
+        public double SecondaryResourceMissing { get; set; }
+
         public Vector3 Position { get; set; }
         public bool WaitingForReserveEnergy { get; set; }
         public int MyDynamicID { get; set; }
@@ -48,6 +54,7 @@ namespace Trinity
         public int ParagonLevel { get; set; }
         public int ParagonCurrentExperience { get; set; }
         public long ParagonExperienceNextLevel { get; set;  }
+        public float Rotation { get; set; }
 
         public PlayerInfoCache()
         {
@@ -139,9 +146,16 @@ namespace Trinity
                     Player.CurrentHealthPct = me.HitpointsCurrentPct;
                     Player.PrimaryResource = me.CurrentPrimaryResource;
                     Player.PrimaryResourcePct = Player.PrimaryResource / me.MaxPrimaryResource;
+                    Player.PrimaryResourceMax = me.MaxPrimaryResource;
+                    Player.PrimaryResourceMissing = Player.PrimaryResourceMax - Player.PrimaryResource;
+
                     Player.SecondaryResource = me.CurrentSecondaryResource;
                     Player.SecondaryResourcePct = Player.SecondaryResource / me.MaxSecondaryResource;
+                    Player.SecondaryResourceMax = me.MaxSecondaryResource;
+                    Player.SecondaryResourceMissing = Player.SecondaryResourceMax - Player.SecondaryResource;
+                    
                     Player.Position = me.Position;
+                    Player.Rotation = me.Movement.Rotation;
 
                     Player.GoldPickupRadius = me.GoldPickupRadius;
                     Player.Coinage = me.Inventory.Coinage;
@@ -163,10 +177,6 @@ namespace Trinity
                     Player.ParagonCurrentExperience = ZetaDia.Me.ParagonCurrentExperience;
                     Player.ParagonExperienceNextLevel = ZetaDia.Me.ParagonExperienceNextLevel;
 
-                    //if (Player.ActorClass == ActorClass.Witchdoctor && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Hex && s.RuneIndex == 1))
-                    //    Player.IsHidden = me.IsHidden;
-                    //else
-                    //    Player.IsHidden = false;
                     Player.IsHidden = me.IsHidden;
 
                     if (DateTime.UtcNow.Subtract(Player.Scene.LastUpdate).TotalMilliseconds > 1000 && Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
@@ -269,7 +279,6 @@ namespace Trinity
         {
             using (new PerformanceLogger("RefreshHotbar"))
             {
-                string hotbarSkills = "Hotbar: ";
                 // Update Hotbar Skills first
                 HotbarSkills.Update();
 
@@ -277,15 +286,14 @@ namespace Trinity
                 for (int i = 0; i <= 5; i++)
                 {
                     SNOPower power = HotbarSkills.GetPowerForSlot((HotbarSlot)i);
-                    hotbarSkills += string.Format("{0}-{1} ", power, (HotbarSlot)i);
                     Trinity.Hotbar.Add(power);
                     if (!DataDictionary.LastUseAbilityTimeDefaults.ContainsKey(power))
                     {
                         DataDictionary.LastUseAbilityTimeDefaults.Add(power, DateTime.MinValue);
                     }
-                    if (!CacheData.AbilityLastUsedCache.ContainsKey(power))
+                    if (!CacheData.AbilityLastUsed.ContainsKey(power))
                     {
-                        CacheData.AbilityLastUsedCache.Add(power, DateTime.MinValue);
+                        CacheData.AbilityLastUsed.Add(power, DateTime.MinValue);
                     }
                 }
                 Trinity.HasMappedPlayerAbilities = true;
@@ -296,7 +304,6 @@ namespace Trinity
 
                 if (!Trinity.GetHasBuff(SNOPower.Wizard_Archon) && !Player.IsHidden)
                     Trinity.hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(Trinity.Hotbar);
-                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, hotbarSkills);
          }
 
             // Monk Seven Sided Strike: Sustained Attack
@@ -324,6 +331,19 @@ namespace Trinity
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Barbarian_Earthquake, 90500);
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Barbarian_CallOfTheAncients, 90500);
                 CombatBase.SetSNOPowerUseDelay(SNOPower.Barbarian_WrathOfTheBerserker, 90500);
+            }
+        }
+
+        public static void DumpPlayerSkills()
+        {
+            using (var helper = new Helpers.ZetaCacheHelper())
+            {
+                HotbarSkills.Update(TrinityLogLevel.Info, LogCategory.UserInformation);
+
+                foreach (var skill in ZetaDia.CPlayer.PassiveSkills.ToList())
+                {
+                    Logger.Log("Passive: {0}", skill);
+                }
             }
         }
     }

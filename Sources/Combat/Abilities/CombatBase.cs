@@ -126,11 +126,11 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return CacheData.AbilityLastUsedCache;
+                return CacheData.AbilityLastUsed;
             }
             set
             {
-                CacheData.AbilityLastUsedCache = value;
+                CacheData.AbilityLastUsed = value;
             }
         }
 
@@ -316,11 +316,11 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                ACDItem rhItem = ZetaDia.Me.Inventory.Equipped.Where(i => i.InventorySlot == InventorySlot.LeftHand).FirstOrDefault();
-                if (rhItem == null)
+                ACDItem lhItem = ZetaDia.Me.Inventory.Equipped.Where(i => i.InventorySlot == InventorySlot.LeftHand).FirstOrDefault();
+                if (lhItem == null)
                     return SNOPower.None;
 
-                switch (rhItem.ItemType)
+                switch (lhItem.ItemType)
                 {
                     default:
                         return SNOPower.Weapon_Melee_Instant;
@@ -334,6 +334,7 @@ namespace Trinity.Combat.Abilities
                     case ItemType.Spear:
                     case ItemType.Staff:
                     case ItemType.Sword:
+                    case ItemType.MightyWeapon:
                         return SNOPower.Weapon_Melee_Instant;
                     case ItemType.Wand:
                         return SNOPower.Weapon_Ranged_Wand;
@@ -341,7 +342,7 @@ namespace Trinity.Combat.Abilities
                     case ItemType.Crossbow:
                     case ItemType.HandCrossbow:
                         return SNOPower.Weapon_Ranged_Projectile;
-                }
+            }
             }
         }
         /// <summary>
@@ -472,8 +473,8 @@ namespace Trinity.Combat.Abilities
         /// <returns></returns>
         internal static double TimeSincePowerUse(SNOPower power)
         {
-            if (CacheData.AbilityLastUsedCache.ContainsKey(power))
-                return DateTime.UtcNow.Subtract(CacheData.AbilityLastUsedCache[power]).TotalMilliseconds;
+            if (CacheData.AbilityLastUsed.ContainsKey(power))
+                return DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[power]).TotalMilliseconds;
             else
                 return -1;
         }

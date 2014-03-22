@@ -36,9 +36,9 @@ namespace Trinity
             ManagerThread.Start();
         }
 
-        public static void AddHotSpot(Vector3 location, DateTime expirationTime, int worldId)
+        public static void AddHotSpot(Vector3 position, DateTime expirationTime, int worldId)
         {
-            AddHotSpot(new HotSpot(location, expirationTime, worldId));
+            AddHotSpot(new HotSpot(position, expirationTime, worldId));
         }
         public static void AddHotSpot(HotSpot hotSpot)
         {

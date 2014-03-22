@@ -51,4 +51,11 @@ namespace Trinity.Config.Combat
         CombatOnly,
         MovementOnly
     }
+
+    public enum DemonHunterVaultMode
+    {
+        Always,
+        CombatOnly,
+        MovementOnly
+    }
 }

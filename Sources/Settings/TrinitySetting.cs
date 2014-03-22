@@ -57,6 +57,7 @@ namespace Trinity.Config
         #endregion Constructors
 
         #region Properties
+
         [DataMember(IsRequired = false)]
         public CombatSetting Combat
         {

@@ -14,7 +14,7 @@ namespace Trinity
             AddToCache = true;
 
             // Retrieve collision sphere radius, cached if possible
-            if (!CacheData.collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
+            if (!CacheData.CollisionSphere.TryGetValue(c_ActorSNO, out c_Radius))
             {
                 try
                 {
@@ -29,7 +29,7 @@ namespace Trinity
                     AddToCache = false;
                     return AddToCache;
                 }
-                CacheData.collisionSphereCache.Add(c_ActorSNO, c_Radius);
+                CacheData.CollisionSphere.Add(c_ActorSNO, c_Radius);
             }
 
             try
@@ -120,7 +120,7 @@ namespace Trinity
             {
                 float avoidanceRadius = (float)GetAvoidanceRadius(c_ActorSNO, c_Radius);
 
-                AvoidanceObstacleCache.Add(new CacheObstacleObject(c_Position, avoidanceRadius, c_ActorSNO, c_InternalName));
+                CacheData.AvoidanceObstacleCache.Add(new CacheObstacleObject(c_Position, avoidanceRadius, c_ActorSNO, c_InternalName));
 
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
                 if (c_CentreDistance <= minAvoidanceRadius)

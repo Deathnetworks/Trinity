@@ -90,7 +90,7 @@ namespace Trinity
         {
             get
             {
-                return Trinity.AvoidanceObstacleCache.Any(a => a.Location.Distance2D(this.Position) <= a.Radius);
+                return CacheData.AvoidanceObstacleCache.Any(a => a.Position.Distance2D(this.Position) <= a.Radius);
             }
         }
 

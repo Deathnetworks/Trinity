@@ -30,6 +30,7 @@ namespace Trinity.Config.Combat
         private bool _UseExperimentalFireChainsAvoidance;
         private int _ForceKillElitesHealth;
         private bool _ForceKillSummoners;
+        private bool _ProfileTagOverride;
         #endregion Fields
 
         #region Events
@@ -288,14 +289,51 @@ namespace Trinity.Config.Combat
         {
             get
             {
+                if (!_IgnoreElites)
+                {
+                    _ProfileTagOverride = false;
+                }
                 return _IgnoreElites;
             }
             set
             {
+                if (!_IgnoreElites)
+                {
+                    _ProfileTagOverride = false;
+                }
                 if (_IgnoreElites != value)
                 {
                     _IgnoreElites = value;
                     OnPropertyChanged("IgnoreElites");
+                    OnPropertyChanged("ProfileTagOverride");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool ProfileTagOverride
+        {
+            get
+            {
+                if (!_IgnoreElites)
+                {
+                    _ProfileTagOverride = false;
+                }
+
+                return _ProfileTagOverride;
+            }
+            set
+            {
+                if (!_IgnoreElites)
+                {
+                    _ProfileTagOverride = false;
+                }
+                if (_ProfileTagOverride != value)
+                {
+                    _ProfileTagOverride = value;
+                    OnPropertyChanged("IgnoreElites");
+                    OnPropertyChanged("ProfileTagOverride");
                 }
             }
         }
@@ -452,7 +490,7 @@ namespace Trinity.Config.Combat
                 {
                     _ForceKillSummoners = value;
                     OnPropertyChanged("ForceKillSummoners");
-                }
+             }
             }
         }
 
@@ -506,6 +544,7 @@ namespace Trinity.Config.Combat
             this.UseExperimentalFireChainsAvoidance = true;
             this.ForceKillElitesHealth = 0;
             this.ForceKillSummoners = true;
+            
         }
         #endregion Methods
     }

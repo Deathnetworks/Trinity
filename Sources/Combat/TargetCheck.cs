@@ -140,7 +140,7 @@ namespace Trinity
                             //UIManager.UsePotion();
                             GameUI.SafeClickElement(GameUI.PotionButton, "Use Potion", false);
 
-                            CacheData.AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.UtcNow;
+                            CacheData.AbilityLastUsed[SNOPower.DrinkHealthPotion] = DateTime.UtcNow;
                             WaitWhileAnimating(2, true);
                         }
                     }
@@ -182,7 +182,7 @@ namespace Trinity
                                 BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitBeforeUseDelay));
                             ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
                             LastPowerUsed = powerBuff.SNOPower;
-                            CacheData.AbilityLastUsedCache[powerBuff.SNOPower] = DateTime.UtcNow;
+                            CacheData.AbilityLastUsed[powerBuff.SNOPower] = DateTime.UtcNow;
                             if (powerBuff.WaitTicksAfterUse > 0)
                                 BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitAfterUseDelay));
                             WaitWhileAnimating(3, true);

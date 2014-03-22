@@ -208,7 +208,7 @@ namespace Trinity
                 return true;
             }
             // Else auto-trash
-            if (cItem.Quality <= ItemQuality.Superior)
+            if (cItem.Quality <= ItemQuality.Superior && (isEquipment || cItem.TrinityItemBaseType == GItemBaseType.FollowerItem))
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (trash whites)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return false;
@@ -221,14 +221,14 @@ namespace Trinity
                 return true;
             }
             // Else auto trash
-            if (cItem.Quality >= ItemQuality.Magic1 && cItem.Quality <= ItemQuality.Magic3)
+            if (cItem.Quality >= ItemQuality.Magic1 && cItem.Quality <= ItemQuality.Magic3 && (isEquipment || cItem.TrinityItemBaseType == GItemBaseType.FollowerItem))
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (trashing blues)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return false;
             }
 
             // Force salvage Rares
-            if (Trinity.Settings.Loot.TownRun.ForceSalvageRares && cItem.Quality >= ItemQuality.Rare4 && cItem.Quality <= ItemQuality.Rare6)
+            if (Trinity.Settings.Loot.TownRun.ForceSalvageRares && cItem.Quality >= ItemQuality.Rare4 && cItem.Quality <= ItemQuality.Rare6 && (isEquipment || cItem.TrinityItemBaseType == GItemBaseType.FollowerItem))
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (force salvage rare)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return false;
