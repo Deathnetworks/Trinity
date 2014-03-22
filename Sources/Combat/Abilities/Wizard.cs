@@ -35,7 +35,7 @@ namespace Trinity
                 }
             }
             // Wizards want to save up to a reserve of 65+ energy
-            MinEnergyReserve = 65;
+            MinEnergyReserve = 45;
 
             if (!GetHasBuff(SNOPower.Wizard_Archon))
             {
@@ -166,7 +166,9 @@ namespace Trinity
                 {
                     return new TrinityPower(SNOPower.Wizard_Meteor, 21f, new Vector3(CurrentTarget.Position.X, CurrentTarget.Position.Y, CurrentTarget.Position.Z), CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
+
                 // Teleport in combat for critical-mass wizards
+                /*
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Teleport) && 
                     LastPowerUsed != SNOPower.Wizard_Teleport &&
                     Player.PrimaryResource >= 15 && CurrentTarget.CentreDistance <= 35f &&
@@ -175,6 +177,7 @@ namespace Trinity
                     var pos = TargetUtil.GetBestClusterPoint(15f, 35f);
                     return new TrinityPower(SNOPower.Wizard_Teleport, 35f, pos, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
+                */
 
                 // Hydra
                 if (!UseOOCBuff && !Player.IsIncapacitated &&
@@ -298,7 +301,7 @@ namespace Trinity
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_RayOfFrost) &&
                     Player.PrimaryResource >= 12 && !Player.WaitingForReserveEnergy)
                 {
-                    float range = 60f;
+                    float range = 50f;
                     if (hasSleetStorm)
                         range = 5f;
 
