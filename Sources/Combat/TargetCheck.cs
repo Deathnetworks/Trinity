@@ -36,7 +36,7 @@ namespace Trinity
                 if (DateTime.UtcNow.Subtract(Trinity.LastDeathTime).TotalSeconds < 30 && ZetaDia.Me.Inventory.Equipped.Average(i => i.DurabilityPercent) < 0.05 && !ZetaDia.IsInTown)
                 {
                     Logger.Log("Durability is zero, emergency leave game");
-                    ZetaDia.Service.Party.LeaveGame(false);
+                    ZetaDia.Service.Party.LeaveGame(true);
                     Thread.Sleep(11000);
                     return false;
                 }

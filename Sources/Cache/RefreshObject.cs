@@ -118,6 +118,17 @@ namespace Trinity
             // Have ActorSNO Check for SNO based navigation obstacle hashlist
             c_IsObstacle = DataDictionary.NavigationObstacleIds.Contains(c_ActorSNO);
 
+            // Add Cell Weight for Obstacle
+            if (c_IsObstacle)
+            {
+                float radius = 0f;
+                if (!DataDictionary.ObstacleCustomRadius.TryGetValue(c_ActorSNO, out radius))
+                    radius = c_diaObject.CollisionSphere.Radius;
+
+                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, radius);
+            }
+
+
             // Get ACDGuid
             AddToCache = RefreshStepCachedACDGuid(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedACDGuid"; return AddToCache; }
@@ -444,6 +455,8 @@ namespace Trinity
             {
                 NavigationObstacleCache.Add(new CacheObstacleObject(c_Position, DataDictionary.ObstacleCustomRadius[c_ActorSNO], c_ActorSNO));
                 AddToCache = false;
+
+                // Add pathing avoidance
 
             }
             return AddToCache;

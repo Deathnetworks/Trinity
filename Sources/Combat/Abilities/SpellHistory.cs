@@ -46,7 +46,7 @@ namespace Trinity.Combat.Abilities
         {
             DateTime lastUsed = DateTime.MinValue;
             if (historyQueue.Any(i => i.Power.SNOPower == power))
-                lastUsed = historyQueue.OrderByDescending(i => i.UseTime).FirstOrDefault().UseTime;
+                lastUsed = historyQueue.Where(i => i.Power.SNOPower == power).OrderByDescending(i => i.UseTime).FirstOrDefault().UseTime;
             return lastUsed;
         }
 

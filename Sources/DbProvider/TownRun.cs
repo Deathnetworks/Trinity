@@ -335,113 +335,7 @@ namespace Trinity
         {
             return (randomTimer.IsRunning && randomTimer.ElapsedMilliseconds < randomTimerVal);
         }
-
-        /// <summary>
-        /// Sell Validation - Determines what should or should not be sold to vendor
-        /// </summary>
-        /// <param name="thisinternalname"></param>
-        /// <param name="thislevel"></param>
-        /// <param name="thisquality"></param>
-        /// <param name="thisdbitemtype"></param>
-        /// <param name="thisfollowertype"></param>
-        /// <returns></returns>
-
-        //internal static bool SellValidation(CachedACDItem cItem)
-        //{
-        //    // Check this isn't something we want to salvage
-        //    if (SalvageValidation(cItem))
-        //        return false;
-
-        //    if (StashValidation(cItem, cItem.AcdItem))
-        //        return false;
-
-        //    if (ItemManager.Current.ItemIsProtected(cItem.AcdItem))
-        //    {
-        //        return false;
-        //    }
-
-        //    GItemType itemType = Trinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
-        //    GItemBaseType itemBaseType = Trinity.DetermineBaseType(itemType);
-        //    switch (itemBaseType)
-        //    {
-        //        case GItemBaseType.WeaponRange:
-        //        case GItemBaseType.WeaponOneHand:
-        //        case GItemBaseType.WeaponTwoHand:
-        //        case GItemBaseType.Armor:
-        //        case GItemBaseType.Offhand:
-        //        case GItemBaseType.Jewelry:
-        //        case GItemBaseType.FollowerItem:
-        //            return true;
-        //        case GItemBaseType.Gem:
-        //        case GItemBaseType.Misc:
-        //            if (itemType == GItemType.CraftingPlan)
-        //                return true;
-        //            else
-        //                return false;
-        //        case GItemBaseType.Unknown:
-        //            return false;
-        //    }
-
-        //    return false;
-        //}
-
-        /// <summary>
-        /// Salvage Validation - Determines what should or should not be salvaged
-        /// </summary>
-        /// <param name="thisinternalname"></param>
-        /// <param name="thislevel"></param>
-        /// <param name="thisquality"></param>
-        /// <param name="thisdbitemtype"></param>
-        /// <param name="thisfollowertype"></param>
-        /// <returns></returns>
-
-        //internal static bool SalvageValidation(CachedACDItem cItem)
-        //{
-        //    GItemType itemType = Trinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
-        //    GItemBaseType itemBaseType = Trinity.DetermineBaseType(itemType);
-
-        //    // Take Salvage Option corresponding to ItemLevel
-        //    SalvageOption salvageOption = GetSalvageOption(cItem.Quality);
-
-        //    if (ItemManager.Current.ItemIsProtected(cItem.AcdItem))
-        //    {
-        //        return false;
-        //    }
-
-        //    // Stashing Whites
-        //    if (Trinity.Settings.Loot.TownRun.StashWhites && cItem.Quality < ItemQuality.Magic1)
-        //        return false;
-
-        //    // Stashing Blues
-        //    if (Trinity.Settings.Loot.TownRun.StashBlues && cItem.Quality > ItemQuality.Superior && cItem.Quality < ItemQuality.Rare4)
-        //        return false;
-
-        //    if (cItem.Quality >= ItemQuality.Legendary && salvageOption == SalvageOption.InfernoOnly && cItem.Level >= 60)
-        //        return true;
-
-        //    switch (itemBaseType)
-        //    {
-        //        case GItemBaseType.WeaponRange:
-        //        case GItemBaseType.WeaponOneHand:
-        //        case GItemBaseType.WeaponTwoHand:
-        //        case GItemBaseType.Armor:
-        //        case GItemBaseType.Offhand:
-        //            return ((cItem.Level >= 61 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
-        //        case GItemBaseType.Jewelry:
-        //            return ((cItem.Level >= 59 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
-        //        case GItemBaseType.FollowerItem:
-        //            return ((cItem.Level >= 60 && salvageOption == SalvageOption.InfernoOnly) || salvageOption == SalvageOption.All);
-        //        case GItemBaseType.Gem:
-        //        case GItemBaseType.Misc:
-        //        case GItemBaseType.Unknown:
-        //            return false;
-        //    }
-
-        //    return false;
-        //}
-
-
-        internal static SalvageOption GetSalvageOption(ItemQuality thisquality)
+                internal static SalvageOption GetSalvageOption(ItemQuality thisquality)
         {
             if (thisquality >= ItemQuality.Magic1 && thisquality <= ItemQuality.Magic3)
             {
@@ -460,35 +354,6 @@ namespace Trinity
 
         internal static Stopwatch TownRunCheckTimer = new Stopwatch();
 
-
-        //internal static bool StashValidation(CachedACDItem cItem)
-        //{
-        //    return StashValidation(cItem, cItem.AcdItem);
-        //}
-
-        /// <summary>
-        /// Determines if we should stash this item or not
-        /// </summary>
-        /// <param name="cItem"></param>
-        /// <param name="item"></param>
-        /// <returns></returns>
-
-        //internal static bool StashValidation(CachedACDItem cItem, ACDItem item)
-        //{
-        //    if (ItemManager.Current.ItemIsProtected(cItem.AcdItem))
-        //    {
-        //        return false;
-        //    }
-
-        //    bool shouldStashItem = Trinity.ShouldWeStashThis(cItem, item);
-        //    return shouldStashItem;
-        //}
-
-        /// <summary>
-        /// Pre Stash prepares stuff for our stash run
-        /// </summary>
-        /// <param name="ret"></param>
-        /// <returns></returns>
 
         internal static void SendEmailNotification()
         {
@@ -529,7 +394,7 @@ namespace Trinity
                     if (!_loggedAnythingThisStash)
                     {
                         _loggedAnythingThisStash = true;
-                        LogWriter.WriteLine(DateTime.UtcNow.ToString() + ":");
+                        LogWriter.WriteLine(DateTime.Now.ToString() + ":");
                         LogWriter.WriteLine("====================");
                     }
                     string sLegendaryString = "";
@@ -596,7 +461,7 @@ namespace Trinity
                     if (!_loggedJunkThisStash)
                     {
                         _loggedJunkThisStash = true;
-                        LogWriter.WriteLine(DateTime.UtcNow.ToString() + ":");
+                        LogWriter.WriteLine(DateTime.Now.ToString() + ":");
                         LogWriter.WriteLine("====================");
                     }
                     string isLegendaryItem = "";

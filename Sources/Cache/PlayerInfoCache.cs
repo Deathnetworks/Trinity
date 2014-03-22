@@ -299,6 +299,9 @@ namespace Trinity
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, hotbarSkills);
          }
 
+            // Monk Seven Sided Strike: Sustained Attack
+            if (Player.ActorClass == ActorClass.Monk && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_SevenSidedStrike && s.RuneIndex == 3))
+                CombatBase.SetSNOPowerUseDelay(SNOPower.Monk_SevenSidedStrike, 17000);
 
             if (Player.ActorClass == ActorClass.Witchdoctor && ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Witchdoctor_Passive_GraveInjustice))
             {

@@ -116,6 +116,10 @@ namespace Trinity
             if (Current.ItemIsProtected(item))
                 return false;
 
+            // Vanity Items
+            if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
+                return false;
+            
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
 
             // Now look for Misc items we might want to keep
@@ -203,6 +207,12 @@ namespace Trinity
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing whites)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
+            // Else auto-trash
+            if (cItem.Quality <= ItemQuality.Superior)
+            {
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (trash whites)", cItem.RealName, cItem.InternalName, trinityItemType);
+                return false;
+            }
 
             // Stashing blues, auto-keep
             if (Trinity.Settings.Loot.TownRun.StashBlues && isEquipment && cItem.Quality >= ItemQuality.Magic1 && cItem.Quality <= ItemQuality.Magic3)
@@ -210,9 +220,15 @@ namespace Trinity
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing blues)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
             }
+            // Else auto trash
+            if (cItem.Quality >= ItemQuality.Magic1 && cItem.Quality <= ItemQuality.Magic3)
+            {
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (trashing blues)", cItem.RealName, cItem.InternalName, trinityItemType);
+                return false;
+            }
 
             // Force salvage Rares
-            if (Trinity.Settings.Loot.TownRun.ForceSalvageRares && isEquipment && cItem.Quality >= ItemQuality.Rare4 && cItem.Quality <= ItemQuality.Rare6)
+            if (Trinity.Settings.Loot.TownRun.ForceSalvageRares && cItem.Quality >= ItemQuality.Rare4 && cItem.Quality <= ItemQuality.Rare6)
             {
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (force salvage rare)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return false;
@@ -301,6 +317,10 @@ namespace Trinity
             if (cItem.AcdItem.IsVendorBought)
                 return false;
 
+            // Vanity Items
+            if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
+                return false;
+
             GItemType trinityItemType = Trinity.DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
             GItemBaseType trinityItemBaseType = Trinity.DetermineBaseType(trinityItemType);
 
@@ -342,6 +362,10 @@ namespace Trinity
         private bool TrinitySell(ACDItem item)
         {
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
+
+            // Vanity Items
+            if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
+                return false;
 
             switch (cItem.TrinityItemBaseType)
             {

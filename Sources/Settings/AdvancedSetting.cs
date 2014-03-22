@@ -22,6 +22,7 @@ namespace Trinity.Config
         private bool _OutputReports;
         private bool _ItemRulesLogs;
         private bool _ShowBattleTag;
+        private bool _DisableAllMovement;
         #endregion Fields
 
         #region Events
@@ -289,6 +290,24 @@ namespace Trinity.Config
                 {
                     _ShowBattleTag = value;
                     OnPropertyChanged("ShowBattleTag");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool DisableAllMovement
+        {
+            get
+            {
+                return _DisableAllMovement;
+            }
+            set
+            {
+                if (_DisableAllMovement != value)
+                {
+                    _DisableAllMovement = value;
+                    OnPropertyChanged("DisableAllMovement");
                 }
             }
         }

@@ -198,7 +198,7 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
-                return Settings.Combat.Misc.IgnoreElites;
+                return !CombatBase.IsQuestingMode && Settings.Combat.Misc.IgnoreElites;
             }
         }
 

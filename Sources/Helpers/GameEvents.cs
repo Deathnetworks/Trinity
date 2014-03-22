@@ -103,8 +103,6 @@ namespace Trinity
                 ));
             }
 
-            Navigator.SearchGridProvider.Update();
-
             Logger.LogDebug("Trinity BotStart took {0:0}ms", DateTime.UtcNow.Subtract(timeBotStart).TotalMilliseconds);
         }
 
@@ -170,7 +168,7 @@ namespace Trinity
                             : GlobalSettings.Instance.LastProfile);
                         Thread.Sleep(1000);
                         ResetEverythingNewGame();
-                        ZetaDia.Service.Party.LeaveGame();
+                        ZetaDia.Service.Party.LeaveGame(true);
                         Thread.Sleep(10000);
                     }
                     else

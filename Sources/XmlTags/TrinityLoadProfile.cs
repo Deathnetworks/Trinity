@@ -76,7 +76,7 @@ namespace Trinity.XmlTags
                             break;
                     }
                     Thread.Sleep(1000);
-                    ZetaDia.Service.Party.LeaveGame();
+                    ZetaDia.Service.Party.LeaveGame(true);
                     Trinity.ResetEverythingNewGame();
 
                     // Wait for 10 second log out timer if not in town, else wait for 3 seconds instead

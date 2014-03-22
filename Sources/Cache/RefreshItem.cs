@@ -184,28 +184,19 @@ namespace Trinity
             {
                 if (writeHeader)
                 {
-                    LogWriter.WriteLine("Timestamp,ActorSNO,RActorGUID,DyanmicID,GameBalanceID,ACDGuid,Name,InternalName,DBBaseType,TBaseType,DBItemType,TItemType,Quality,QualityLevelIdentified,Level,IgnoreItemSubStep,Distance,Pickup,SHA1Hash");
+                    LogWriter.WriteLine("ActorSNO,GameBalanceID,Name,InternalName,DBBaseType,DBItemType,TBaseType,TItemType,Quality,Level,Pickup");
                 }
-                LogWriter.Write(FormatCSVField(DateTime.UtcNow));
                 LogWriter.Write(FormatCSVField(c_ActorSNO));
-                LogWriter.Write(FormatCSVField(c_RActorGuid));
-                LogWriter.Write(FormatCSVField(c_GameDynamicID));
-                // GameBalanceID
                 LogWriter.Write(FormatCSVField(c_GameBalanceID));
-                LogWriter.Write(FormatCSVField(c_ACDGUID));
                 LogWriter.Write(FormatCSVField(c_ItemDisplayName));
                 LogWriter.Write(FormatCSVField(c_InternalName));
                 LogWriter.Write(FormatCSVField(c_DBItemBaseType.ToString()));
-                LogWriter.Write(FormatCSVField(DetermineBaseType(c_item_GItemType).ToString()));
                 LogWriter.Write(FormatCSVField(c_DBItemType.ToString()));
+                LogWriter.Write(FormatCSVField(DetermineBaseType(c_item_GItemType).ToString()));
                 LogWriter.Write(FormatCSVField(c_item_GItemType.ToString()));
                 LogWriter.Write(FormatCSVField(c_ItemQuality.ToString()));
-                LogWriter.Write(FormatCSVField(c_ItemQualityLevelIdentified));
                 LogWriter.Write(FormatCSVField(c_ItemLevel));
-                LogWriter.Write(FormatCSVField(c_IgnoreSubStep));
-                LogWriter.Write(FormatCSVField(c_CentreDistance));
                 LogWriter.Write(FormatCSVField(pickupItem));
-                LogWriter.Write(FormatCSVField(c_ItemMd5Hash));
                 LogWriter.Write("\n");
             }
         }

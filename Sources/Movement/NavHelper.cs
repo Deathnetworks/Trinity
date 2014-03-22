@@ -7,7 +7,6 @@ using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
-using Zeta.Bot.Pathfinding;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -62,7 +61,7 @@ namespace Trinity
                 return Trinity.Hotbar;
             }
         }
-        private static ISearchAreaProvider MainGridProvider
+        private static Zeta.Bot.Navigation.MainGridProvider MainGridProvider
         {
             get
             {
@@ -170,6 +169,8 @@ namespace Trinity
 
         internal static Vector3 FindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<TrinityCacheObject> monsterList = null, bool avoidDeath = false)
         {
+            MainGridProvider.Update();
+
             /*
             generate 50x50 grid of 5x5 squares within max 100 distance from origin to edge of grid
             
@@ -185,8 +186,8 @@ namespace Trinity
             end result should be that only navigable squares where no avoidance, monsters, or obstacles are present
             */
 
-            const float gridSquareSize = 5f;
-            const int maxDistance = 200;
+            const float gridSquareSize = 2.5f;
+            const int maxDistance = 150;
             const int maxWeight = 100;
             const int maxZDiff = 14;
 
@@ -210,6 +211,7 @@ namespace Trinity
             int nodesMonsters = 0;
             int pathFailures = 0;
             int navRaycast = 0;
+            int pointsFound = 0;
 
             // Not sure if I need this...
             MainGridProvider.Update();
@@ -231,19 +233,18 @@ namespace Trinity
                         xyz = new Vector3(xy.X, xy.Y, origin.Z + 4);
                     }
 
+
                     GridPoint gridPoint = new GridPoint(xyz, 0, origin.Distance(xyz));
 
-                    //if (gridPoint.Distance > maxDistance + gridSquareRadius)
-                    //    continue;
                     if (Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
                     {
                         p_xy = MainGridProvider.WorldToGrid(xy);
-                        if (//!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) && 
-                            !MainGridProvider.CanStandAt(p_xy))
-                        {
-                            nodesNotNavigable++;
-                            continue;
-                        }
+
+                        //if (!MainGridProvider.CanStandAt(p_xy))
+                        //{
+                        //    nodesNotNavigable++;
+                        //    continue;
+                        //}
                     }
                     else
                     {
@@ -254,8 +255,10 @@ namespace Trinity
                             continue;
                         }
                     }
+                    //if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
+                    //    gridPoint.Distance > 45 && !Navigator.Raycast(origin, xyz))
                     if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
-                        gridPoint.Distance > 45 && Navigator.Raycast(origin, xyz))
+                        Navigator.Raycast(origin, xyz))
                     {
                         nodesGT45Raycast++;
                         continue;
@@ -415,6 +418,8 @@ namespace Trinity
                             gridPoint.Weight *= monsterCount;
                     }
 
+                    pointsFound++;
+
                     if (gridPoint.Weight > bestPoint.Weight && gridPoint.Distance > 1)
                     {
                         bestPoint = gridPoint;
@@ -431,14 +436,15 @@ namespace Trinity
             }
 
             Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid found {0}, distance: {1:0}, weight: {2:0}", bestPoint.Position, bestPoint.Distance, bestPoint.Weight);
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid stats NotNavigable {0} ZDiff {1} GT45Raycast {2} Avoidance {3} Monsters {4} pathFailures {5} navRaycast {6}",
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid stats NotNavigable {0} ZDiff {1} GT45Raycast {2} Avoidance {3} Monsters {4} pathFailures {5} navRaycast {6} pointsFound {7}",
                 nodesNotNavigable,
                 nodesZDiff,
                 nodesGT45Raycast,
                 nodesAvoidance,
                 nodesMonsters,
                 pathFailures,
-                navRaycast);
+                navRaycast,
+                pointsFound);
             return bestPoint.Position;
 
         }

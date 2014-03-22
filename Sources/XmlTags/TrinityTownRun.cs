@@ -30,11 +30,17 @@ namespace Trinity.XmlTags
         /// <returns></returns>
         public bool CheckMinBagSlots()
         {
-            if (MinFreeBagSlots == 0)
-                return false;
+             return GetFreeSlots() < MinFreeBagSlots;
+        }
 
+        public int GetFreeSlots()
+        {
             int maxFreeSlots = 60;
             int slotsTaken = 0;
+
+            if (MinFreeBagSlots == 0)
+                return maxFreeSlots;
+
             foreach (var item in ZetaDia.Me.Inventory.Backpack)
             {
                 slotsTaken++;
@@ -42,7 +48,7 @@ namespace Trinity.XmlTags
                     slotsTaken++;
             }
 
-            return maxFreeSlots - slotsTaken < MinFreeBagSlots;
+            return maxFreeSlots - slotsTaken;
         }
 
         /// <summary>
@@ -54,7 +60,17 @@ namespace Trinity.XmlTags
             if (MinDurability == 0)
                 return false;
 
-            return ZetaDia.Me.Inventory.Equipped.Min(i => i.DurabilityPercent) * 100 <= MinDurability;
+            return GetMinDurability() <= MinDurability;
+        }
+
+        public float GetMinDurability()
+        {
+            return ZetaDia.Me.Inventory.Equipped.Min(i => i.DurabilityPercent) * 100;
+        }
+
+        public override void OnStart()
+        {
+            Logger.Log("TrinityTownRun, freeBagSlots={0} minDurabilityPercent={1}", MinFreeBagSlots, MinDurability);
         }
 
         protected override Composite CreateBehavior()

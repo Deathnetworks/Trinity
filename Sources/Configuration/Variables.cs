@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using Trinity.Config;
 using Trinity.ItemRules;
 using Zeta.Bot.Navigation;
-using Zeta.Bot.Pathfinding;
 using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Game;
@@ -399,7 +398,7 @@ namespace Trinity
         private const int GEMAMETHYST = 2;
         private const int GEMEMERALD = 3;
         private const int GEMDIAMOND = 4;
-        private static readonly string[] sGemString = new string[4] { "Ruby", "Topaz", "Amethyst", "Emerald" };
+        private static readonly string[] sGemString = new string[5] { "Ruby", "Topaz", "Amethyst", "Emerald", "Diamond" };
         private static DateTime ItemStatsLastPostedReport = DateTime.UtcNow;
         private static DateTime ItemStatsWhenStartedBot = DateTime.UtcNow;
         private static bool bMaintainStatTracking = false;
@@ -486,11 +485,11 @@ namespace Trinity
         /// <summary>
         /// The Grid Provider for Navigation checks
         /// </summary>
-        internal static ISearchAreaProvider MainGridProvider
+        internal static Zeta.Bot.Navigation.MainGridProvider MainGridProvider
         {
             get
             {
-                return Navigator.SearchGridProvider;
+                return (Zeta.Bot.Navigation.MainGridProvider)Navigator.SearchGridProvider;
 
                 //if (Navigator.SearchGridProvider.GetType() == typeof(MainGridProvider))
                 //    return (MainGridProvider)Navigator.SearchGridProvider;

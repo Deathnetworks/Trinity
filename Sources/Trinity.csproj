@@ -78,7 +78,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\CacheDictionaries.cs" />
+    <Compile Include="Cache\CacheData.cs" />
     <Compile Include="Cache\GroupHotSpot.cs" />
     <Compile Include="Cache\RefreshAvoidance.cs" />
     <Compile Include="Cache\RefreshGizmo.cs" />

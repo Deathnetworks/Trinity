@@ -9,6 +9,13 @@ namespace Trinity
     /// </summary>
     internal class DataDictionary
     {
+        public static HashSet<string> VanityItems { get { return DataDictionary.vanityItems; } }
+        private static readonly HashSet<string> vanityItems = new HashSet<string>()
+        {
+            "x1_AngelWings_Imperius", // Wings of Valor
+            "X1_SpectralHound_Skull_promo", // Liber Canis Mortui
+            "WoDFlag", // Warsong Pennant
+        };
 
         public static HashSet<int> ForceTownPortalLevelAreaIds { get { return DataDictionary.forceTownPortalLevelAreaIds; } }
         private static readonly HashSet<int> forceTownPortalLevelAreaIds = new HashSet<int>
@@ -385,15 +392,25 @@ namespace Trinity
         public static HashSet<int> NavigationObstacleIds { get { return navigationObstacleIds; } }
         private static readonly HashSet<int> navigationObstacleIds = new HashSet<int> {
             174900, 185391, // demonic forge
-            104632, 194682, 81699, 3340, 123325, 
+            194682, 81699, 3340, 123325, 
+
+            104596, // trOut_FesteringWoods_Neph_Column_B
+            104632, // trOut_FesteringWoods_Neph_Column_B_Broken_Base
+            105303, // trOut_FesteringWoods_Neph_Column_C_Broken_Base_Bottom
+            104827, // ActorSNO: 104827 Name: trOut_FesteringWoods_Neph_Column_C_Broken_Base-489 Type: DestroyableObject Radius: 12.05 
         };
 
         /// <summary>
         /// Size of the navigation obstacles above (actual SNO list must be matching the above list!)
         /// </summary>
-        public static Dictionary<int, int> ObstacleCustomRadius { get { return obstacleCustomRadius; } }
-        private static readonly Dictionary<int, int> obstacleCustomRadius = new Dictionary<int, int> {
-            {174900, 25}, {104632, 20}, {194682, 20}, {81699, 20}, {3340, 12}, {123325, 25}, {185391, 25},
+        public static Dictionary<int, float> ObstacleCustomRadius { get { return obstacleCustomRadius; } }
+        private static readonly Dictionary<int, float> obstacleCustomRadius = new Dictionary<int, float> {
+            {174900, 25}, {194682, 20}, {81699, 20}, {3340, 12}, {123325, 25}, {185391, 25},
+            {104596, 25}, // trOut_FesteringWoods_Neph_Column_B
+            {104632, 25}, // trOut_FesteringWoods_Neph_Column_B_Broken_Base
+            {105303, 25}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base_Bottom
+            {104827, 25}, // ActorSNO: 104827 Name: trOut_FesteringWoods_Neph_Column_C_Broken_Base-489 Type: DestroyableObject Radius: 12.05 
+            
          };
 
         /// <summary>

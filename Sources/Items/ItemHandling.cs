@@ -80,7 +80,8 @@ namespace Trinity
                         return true;
                     if (item.Quality >= ItemQuality.Rare4 && item.Quality <= ItemQuality.Rare6 && Settings.Loot.Pickup.PickupYellowFollowerItems)
                         return true;
-                    break;
+                    // not matched above, ignore it
+                    return false;
                 case GItemBaseType.Gem:
                     if (item.Level < Settings.Loot.Pickup.GemLevel ||
                         (itemType == GItemType.Ruby && !Settings.Loot.Pickup.GemType.HasFlag(TrinityGemType.Ruby)) ||
@@ -284,7 +285,7 @@ namespace Trinity
             return true;
         }
 
-        private static Regex x1Regex = new Regex("^x1_", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        // private static Regex x1Regex = new Regex("^x1_", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         /// <summary>
         /// DetermineItemType - Calculates what kind of item it is from D3 internalnames
@@ -296,7 +297,8 @@ namespace Trinity
         internal static GItemType DetermineItemType(string name, ItemType dbItemType, FollowerType dbFollowerType = FollowerType.None)
         {
             name = name.ToLower();
-            name = x1Regex.Replace(name, "");
+            if (name.StartsWith("x1_"))
+                name = name.Substring(3, name.Length - 3);
             if (name.StartsWith("axe_")) return GItemType.Axe;
             if (name.StartsWith("ceremonialdagger_")) return GItemType.CeremonialKnife;
             if (name.StartsWith("handxbow_")) return GItemType.HandCrossbow;
@@ -422,27 +424,34 @@ namespace Trinity
         internal static GItemBaseType DetermineBaseType(GItemType itemType)
         {
             GItemBaseType itemBaseType = GItemBaseType.Unknown;
-            if (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger ||
+
+
+            // One Handed Weapons
+            if (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger || itemType == GItemType.Flail ||
                 itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
                 itemType == GItemType.Spear || itemType == GItemType.Sword || itemType == GItemType.Wand)
             {
                 itemBaseType = GItemBaseType.WeaponOneHand;
             }
-            else if (itemType == GItemType.TwoHandDaibo || itemType == GItemType.TwoHandMace ||
+            // Two Handed Weapons
+            else if (itemType == GItemType.TwoHandDaibo || itemType == GItemType.TwoHandMace || itemType == GItemType.TwoHandFlail ||
                 itemType == GItemType.TwoHandMighty || itemType == GItemType.TwoHandPolearm || itemType == GItemType.TwoHandStaff ||
                 itemType == GItemType.TwoHandSword || itemType == GItemType.TwoHandAxe)
             {
                 itemBaseType = GItemBaseType.WeaponTwoHand;
             }
+            // Ranged Weapons
             else if (itemType == GItemType.TwoHandCrossbow || itemType == GItemType.HandCrossbow || itemType == GItemType.TwoHandBow)
             {
                 itemBaseType = GItemBaseType.WeaponRange;
             }
+            // Off-hands
             else if (itemType == GItemType.Mojo || itemType == GItemType.Orb ||
                 itemType == GItemType.Quiver || itemType == GItemType.Shield)
             {
                 itemBaseType = GItemBaseType.Offhand;
             }
+            // Armors
             else if (itemType == GItemType.Boots || itemType == GItemType.Bracer || itemType == GItemType.Chest ||
                 itemType == GItemType.Cloak || itemType == GItemType.Gloves || itemType == GItemType.Helm ||
                 itemType == GItemType.Legs || itemType == GItemType.Shoulder || itemType == GItemType.SpiritStone ||
@@ -451,27 +460,32 @@ namespace Trinity
             {
                 itemBaseType = GItemBaseType.Armor;
             }
+            // Jewlery
             else if (itemType == GItemType.Amulet || itemType == GItemType.Ring)
             {
                 itemBaseType = GItemBaseType.Jewelry;
             }
+            // Follower Items
             else if (itemType == GItemType.FollowerEnchantress || itemType == GItemType.FollowerScoundrel ||
                 itemType == GItemType.FollowerTemplar)
             {
                 itemBaseType = GItemBaseType.FollowerItem;
             }
+            // Misc Items
             else if (itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome ||
                 itemType == GItemType.SpecialItem || itemType == GItemType.CraftingPlan || itemType == GItemType.HealthPotion ||
                 itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey || itemType == GItemType.PowerGlobe)
             {
                 itemBaseType = GItemBaseType.Misc;
             }
+            // Gems
             else if (itemType == GItemType.Ruby || itemType == GItemType.Emerald || itemType == GItemType.Topaz ||
                 itemType == GItemType.Amethyst || itemType == GItemType.Diamond)
             {
                 itemBaseType = GItemBaseType.Gem;
             }
-            else if (itemType == GItemType.HealthGlobe)
+            // Globes
+            else if (itemType == GItemType.HealthGlobe || itemType == GItemType.PowerGlobe)
             {
                 itemBaseType = GItemBaseType.HealthGlobe;
             }

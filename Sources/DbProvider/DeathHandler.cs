@@ -40,7 +40,7 @@ namespace Trinity.DbProvider
             if (max <= 1)
             {
                 Logger.Log("Durability is zero, emergency leave game");
-                ZetaDia.Service.Party.LeaveGame(false);
+                ZetaDia.Service.Party.LeaveGame(true);
                 Thread.Sleep(11000);
                 return RunStatus.Success;
             }

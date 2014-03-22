@@ -247,6 +247,7 @@ namespace Trinity
             Set(new TVar("Monk.Avoidance.Serenity", 0f, "Monk Serenity buff Avoidance health multiplier"));
             Set(new TVar("Monk.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));
             Set(new TVar("Monk.SweepingWind.SpamOnLowHealthPct", 0.50f, "Spam Sweeping Wind for Health Regen when below this Health Percent"));
+            Set(new TVar("Monk.MantraOfHealing.UseHealthPct", 0.35f, "Health threshold to pop Mantra of Healing active buff"));
 
             // Witch Doctor
             Set(new TVar("WitchDoctor.Avoidance.SpiritWalk", 0f, "WitchDoctor Spirit walk Avoidance health multiplier"));

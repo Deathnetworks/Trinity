@@ -61,37 +61,6 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Monk_Serenity, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
 
-            //Use Mantra of Healing active if health is low for shield.
-            if ((IsCurrentlyAvoiding || Player.CurrentHealthPct <= 0.80) && !Player.IsIncapacitated 
-                && CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2)
-                && !GetHasBuff(SNOPower.X1_Monk_MantraOfHealing_v2)
-                && !Player.WaitingForReserveEnergy)
-            {
-                return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
-            }
-
-            // 4 Mantras for the initial buff (slow-use)
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2_Passive) &&
-                Player.PrimaryResource >= 50)
-            {
-                return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
-            }
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2_Passive) &&
-                (Player.PrimaryResource >= 50))
-            {
-                return new TrinityPower(SNOPower.X1_Monk_MantraOfConviction_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
-            }
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfHealing_v2_Passive) &&
-                Player.PrimaryResource >= 50)
-            {
-                return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
-            }
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2_Passive) &&
-                Player.PrimaryResource >= 50)
-            {
-                return new TrinityPower(SNOPower.X1_Monk_MantraOfRetribution_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
-            }
-
             // Mystic ally
             if (CombatBase.CanCast(SNOPower.X1_Monk_MysticAlly_v2) && TargetUtil.EliteOrTrashInRange(30f))
             {
@@ -294,25 +263,26 @@ namespace Trinity
             }
 
             // 4 Mantra spam for the 4 second buff
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2_Passive) &&
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) &&
                 Player.PrimaryResource >= 150 && TargetUtil.EliteOrTrashInRange(30f))
             {
                 return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
             }
 
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2_Passive) &&
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2) &&
                 (Player.PrimaryResource >= 150) && TargetUtil.EliteOrTrashInRange(30f))
             {
                 return new TrinityPower(SNOPower.X1_Monk_MantraOfConviction_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
             }
 
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfHealing_v2_Passive) &&
-                (Player.PrimaryResource >= 150) && TargetUtil.EliteOrTrashInRange(30f))
+            //Use Mantra of Healing active if health is low for shield.
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && Player.CurrentHealthPct <= V.F("Monk.MantraOfHealing.UseHealthPct") &&
+                !Player.IsIncapacitated && !GetHasBuff(SNOPower.X1_Monk_MantraOfHealing_v2))
             {
-                return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
 
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2_Passive) &&
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) &&
                 (Player.PrimaryResource >= 150) && TargetUtil.EliteOrTrashInRange(30f))
             {
                 return new TrinityPower(SNOPower.X1_Monk_MantraOfRetribution_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
