@@ -128,8 +128,8 @@ namespace Trinity
             PlayerMover.vSafeMovementLocation = Vector3.Zero;
             PlayerMover.LastPosition = Vector3.Zero;
             PlayerMover.TimesReachedStuckPoint = 0;
-            PlayerMover.TimeLastRecordedPosition = DateTime.Today;
-            PlayerMover.LastGeneratedStuckPosition = DateTime.Today;
+            PlayerMover.TimeLastRecordedPosition = DateTime.MinValue;
+            PlayerMover.LastGeneratedStuckPosition = DateTime.MinValue;
             TrinityUseOnce.UseOnceIDs = new HashSet<int>();
             TrinityUseOnce.UseOnceCounter = new Dictionary<int, int>();
             dictRandomID = new Dictionary<int, int>();
@@ -238,11 +238,11 @@ namespace Trinity
                     PlayerMover.vSafeMovementLocation = Vector3.Zero;
                     PlayerMover.LastPosition = Vector3.Zero;
                     PlayerMover.TimesReachedStuckPoint = 0;
-                    PlayerMover.TimeLastRecordedPosition = DateTime.Today;
-                    PlayerMover.LastGeneratedStuckPosition = DateTime.Today;
+                    PlayerMover.TimeLastRecordedPosition = DateTime.MinValue;
+                    PlayerMover.LastGeneratedStuckPosition = DateTime.MinValue;
                     PlayerMover.TimesReachedMaxUnstucks = 0;
                     PlayerMover.CancelUnstuckerForSeconds = 0;
-                    PlayerMover.LastCancelledUnstucker = DateTime.Today;
+                    PlayerMover.LastCancelledUnstucker = DateTime.MinValue;
                     NavHelper.UsedStuckSpots = new List<GridPoint>();
 
                     // Reset all the caches

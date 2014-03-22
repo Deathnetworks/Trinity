@@ -45,6 +45,7 @@ namespace Trinity
         public static HashSet<int> QuestLevelAreaIds { get { return DataDictionary.questLevelAreaIds; } }
         private static readonly HashSet<int> questLevelAreaIds = new HashSet<int>
         {
+            202446, // A1 New Tristram "Attack Area"
             19947, // A1 New Tristram
             // 91324, // A1 Old Tristram Road
             109457, // A1 The Slaughtered Calf Inn

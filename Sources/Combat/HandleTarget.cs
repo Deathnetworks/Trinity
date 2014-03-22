@@ -213,7 +213,7 @@ namespace Trinity
                                 {
                                     // Make sure we start trying to move again should we need to!
                                     IsAlreadyMoving = false;
-                                    lastMovementCommand = DateTime.Today;
+                                    lastMovementCommand = DateTime.MinValue;
                                     ShouldPickNewAbilities = true;
                                 }
                             }

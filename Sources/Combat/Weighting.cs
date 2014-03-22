@@ -335,7 +335,7 @@ namespace Trinity
                                         if (cacheObject.IsTreasureGoblin && !ObjectCache.Any(u => (u.Type == GObjectType.Door || u.Type == GObjectType.Barricade) && u.RadiusDistance <= 40f))
                                         {
                                             // Logging goblin sightings
-                                            if (lastGoblinTime == DateTime.Today)
+                                            if (lastGoblinTime == DateTime.MinValue)
                                             {
                                                 iTotalNumberGoblins++;
                                                 lastGoblinTime = DateTime.UtcNow;
@@ -344,7 +344,7 @@ namespace Trinity
                                             else
                                             {
                                                 if (DateTime.UtcNow.Subtract(lastGoblinTime).TotalMilliseconds > 30000)
-                                                    lastGoblinTime = DateTime.Today;
+                                                    lastGoblinTime = DateTime.MinValue;
                                             }
 
                                             if (AvoidanceObstacleCache.Any(aoe => cacheObject.Position.Distance2D(aoe.Location) <= aoe.Radius) && Settings.Combat.Misc.GoblinPriority != GoblinPriority.Kamikaze)

@@ -58,8 +58,8 @@ namespace Trinity
         public static DateTime LastRefreshedCache = DateTime.MinValue;
 
 		//intell
-		public static DateTime TimeToRunFromPoison = DateTime.UtcNow;
-		public static DateTime LogTest = DateTime.UtcNow;
+		public static DateTime TimeToRunFromPoison = DateTime.MinValue;
+		public static DateTime LogTest = DateTime.MinValue;
 		public static bool RunFromPoison = false;
 		public static bool GotFrenzyShrine = false;
 		public static bool GotBlessedShrine = false;
@@ -114,7 +114,7 @@ namespace Trinity
         /// <summary>
         /// Timestamp of when our position was last measured as changed
         /// </summary>
-        private static DateTime lastMovedDuringCombat = DateTime.Today;
+        private static DateTime lastMovedDuringCombat = DateTime.MinValue;
 
         /// <summary>
         /// Used to ignore a specific RActor for <see cref="IgnoreTargetForLoops"/> ticks
@@ -129,7 +129,7 @@ namespace Trinity
         /// <summary>
         /// Holds all of the player's current info handily cached, updated once per loop with a minimum timer on updates to save D3 memory hits
         /// </summary>
-        public static PlayerInfoCache Player = new PlayerInfoCache(DateTime.Today, false, false, false, 0d, 0d, 0d, 0d, 0d, Vector3.Zero, false, 0, 1, ActorClass.Invalid, String.Empty);
+        public static PlayerInfoCache Player = new PlayerInfoCache(DateTime.MinValue, false, false, false, 0d, 0d, 0d, 0d, 0d, Vector3.Zero, false, 0, 1, ActorClass.Invalid, String.Empty);
 
         /// <summary>
         /// Obstacle cache, things we can't or shouldn't move through
@@ -146,7 +146,7 @@ namespace Trinity
 
         // A list of small areas covering zones we move through while fighting to help our custom move-handler skip ahead waypoints
         internal static HashSet<CacheObstacleObject> SkipAheadAreaCache = new HashSet<CacheObstacleObject>();
-        public static DateTime lastAddedLocationCache = DateTime.Today;
+        public static DateTime lastAddedLocationCache = DateTime.MinValue;
         public static Vector3 LastRecordedPosition = Vector3.Zero;
         public static bool bSkipAheadAGo = false;
 
@@ -211,7 +211,7 @@ namespace Trinity
         private static int ForceCloseRangeForMilliseconds = 0;
 
         // Date time we were last told to stick to close range targets
-        private static DateTime lastForcedKeepCloseRange = DateTime.Today;
+        private static DateTime lastForcedKeepCloseRange = DateTime.MinValue;
 
 
         // Caching of the current primary target's health, to detect if we AREN'T damaging it for a period of time
@@ -223,7 +223,7 @@ namespace Trinity
         /// <summary>
         /// Store the date-time when we *FIRST* picked this target, so we can blacklist after X period of time targeting
         /// </summary>
-        private static DateTime dateSincePickedTarget = DateTime.Today;
+        private static DateTime dateSincePickedTarget = DateTime.MinValue;
 
         // These values below are set on a per-class basis later on, so don't bother changing them here! These are the old default values
         private static double PlayerEmergencyHealthPotionLimit = 0.46;
@@ -238,10 +238,10 @@ namespace Trinity
          *  Blacklists
          */
         internal static bool NeedToClearBlacklist3 = false;
-        internal static DateTime dateSinceBlacklist3Clear = DateTime.Today;
-        internal static DateTime dateSinceBlacklist15Clear = DateTime.Today;
-        internal static DateTime dateSinceBlacklist60Clear = DateTime.Today;
-        internal static DateTime dateSinceBlacklist90Clear = DateTime.Today;
+        internal static DateTime dateSinceBlacklist3Clear = DateTime.MinValue;
+        internal static DateTime dateSinceBlacklist15Clear = DateTime.MinValue;
+        internal static DateTime dateSinceBlacklist60Clear = DateTime.MinValue;
+        internal static DateTime dateSinceBlacklist90Clear = DateTime.MinValue;
 
         /// <summary>
         /// Use RActorGUID to blacklist an object/monster for 3 seconds
@@ -262,7 +262,7 @@ namespace Trinity
 
         // This is a blacklist that is cleared within 3 seconds of last attacking a destructible
         private static HashSet<int> hashRGUIDDestructible3SecBlacklist = new HashSet<int>();
-        private static DateTime lastDestroyedDestructible = DateTime.Today;
+        private static DateTime lastDestroyedDestructible = DateTime.MinValue;
         private static bool bNeedClearDestructibles = false;
 
         // An ordered list of all of the backtrack locations to navigate through once we finish our current activities
@@ -271,7 +271,7 @@ namespace Trinity
 
         // The number of loops to extend kill range for after a fight to try to maximize kill bonus exp etc.
         private static int iKeepKillRadiusExtendedFor = 0;
-        private static DateTime timeKeepKillRadiusExtendedUntil = DateTime.Today;
+        private static DateTime timeKeepKillRadiusExtendedUntil = DateTime.MinValue;
 
         // The number of loops to extend loot range for after a fight to try to stop missing loot
         private static int iKeepLootRadiusExtendedFor = 0;
@@ -303,7 +303,7 @@ namespace Trinity
         /// <summary>
         /// Prevent spam-kiting too much - allow fighting between each kite movement
         /// </summary>
-        private static DateTime timeCancelledKiteMove = DateTime.UtcNow;
+        private static DateTime timeCancelledKiteMove = DateTime.MinValue;
         private static int cancelledKiteMoveForMilliseconds = 0;
 
         // How many follower items were ignored, purely for item stat tracking
@@ -341,16 +341,16 @@ namespace Trinity
 
         // Goblinney things
         private static int iTotalNumberGoblins = 0;
-        private static DateTime lastGoblinTime = DateTime.Today;
+        private static DateTime lastGoblinTime = DateTime.MinValue;
 
-        internal static DateTime SweepWindSpam = DateTime.Today;
+        internal static DateTime SweepWindSpam = DateTime.MinValue;
 
         // Unique ID of mob last targetting when using whirlwind
         internal static int LastZigZagUnitAcdGuid = 0;
         private static bool IsAlreadyMoving = false;
         private static Vector3 vLastMoveToTarget;
         private static float fLastDistanceFromTarget;
-        private static DateTime lastMovementCommand = DateTime.Today;
+        private static DateTime lastMovementCommand = DateTime.MinValue;
 
         // Actual combat function variables
         internal static bool HasMappedPlayerAbilities = false;
@@ -367,11 +367,11 @@ namespace Trinity
 
         // For "position-shifting" to navigate around obstacle SNO's
         internal static Vector3 vShiftedPosition = Vector3.Zero;
-        internal static DateTime lastShiftedPosition = DateTime.Today;
+        internal static DateTime lastShiftedPosition = DateTime.MinValue;
         internal static int iShiftPositionFor = 0;
         internal static Vector3 vCurrentDestination;
         //internal static Vector3 ZigZagPosition;
-        internal static DateTime LastChangedZigZag = DateTime.Today;
+        internal static DateTime LastChangedZigZag = DateTime.MinValue;
         internal static Vector3 vPositionLastZigZagCheck = Vector3.Zero;
         public static int CurrentWorldDynamicId = -1;
         public static int cachedStaticWorldId = -1; // worldId from profiles, used in persistent stats
@@ -399,8 +399,8 @@ namespace Trinity
         private const int GEMEMERALD = 3;
         private const int GEMDIAMOND = 4;
         private static readonly string[] sGemString = new string[5] { "Ruby", "Topaz", "Amethyst", "Emerald", "Diamond" };
-        private static DateTime ItemStatsLastPostedReport = DateTime.UtcNow;
-        private static DateTime ItemStatsWhenStartedBot = DateTime.UtcNow;
+        private static DateTime ItemStatsLastPostedReport = DateTime.MinValue;
+        private static DateTime ItemStatsWhenStartedBot = DateTime.MinValue;
         private static bool bMaintainStatTracking = false;
 
         // Store items already logged by item-stats, to make sure no stats get doubled up by accident
@@ -461,14 +461,14 @@ namespace Trinity
         private static Regex nameNumberTrimRegex = new Regex(@"-\d+$", RegexOptions.Compiled);
 
         // The following 2 variables are used to clear the dictionaries out - clearing one dictionary out per maximum every 2 seconds, working through in sequential order
-        private static DateTime lastClearedCacheDictionary = DateTime.Today;
+        private static DateTime lastClearedCacheDictionary = DateTime.MinValue;
 
         // On death, clear the timers for all abilities
-        internal static DateTime LastDeathTime = DateTime.Today;
+        internal static DateTime LastDeathTime = DateTime.MinValue;
         private static int iTotalDeaths = 0;
 
         // When did we last send a move-power command?
-        private static DateTime lastSentMovePower = DateTime.Today;
+        private static DateTime lastSentMovePower = DateTime.MinValue;
 
 
         /// <summary>
@@ -536,14 +536,14 @@ namespace Trinity
         // ForesightFirstHit is used to track the 30 second buff from deadly reach.
         private static DateTime ForeSightFirstHit = new DateTime(1996, 6, 3, 22, 15, 0);
         // Foresight2 is used to track combination strike buff.
-        private static DateTime ForeSight2 = DateTime.UtcNow;
+        private static DateTime ForeSight2 = DateTime.MinValue;
         // Otherthandeadlyreach is used for other spirit generators to track for combination strike buff.
-        private static DateTime OtherThanDeadlyReach = DateTime.UtcNow;
+        private static DateTime OtherThanDeadlyReach = DateTime.MinValue;
 
         /// <summary>
         /// And a "global cooldown" to prevent non-signature-spells being used too fast
         /// </summary>
-        public static DateTime lastGlobalCooldownUse = DateTime.Today;
+        public static DateTime lastGlobalCooldownUse = DateTime.MinValue;
 
 
         // Xp Counter

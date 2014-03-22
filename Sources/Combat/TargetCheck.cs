@@ -100,7 +100,7 @@ namespace Trinity
                 bDontMoveMeIAmDoingShit = false;
                 TimesBlockedMoving = 0;
                 IsAlreadyMoving = false;
-                lastMovementCommand = DateTime.Today;
+                lastMovementCommand = DateTime.MinValue;
                 IsWaitingForPower = false;
                 IsWaitingAfterPower = false;
                 IsWaitingForPotion = false;
