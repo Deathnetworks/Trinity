@@ -1,6 +1,20 @@
 ﻿
 # Trinity
 
+### Changelog 1.8.9
+
+* Fix for not stashing legendary plans
+
+* Fixed typo in Wizard UI preventing ArchonEliteDistance from being saved
+
+* Refactored TrinityItemManager stash logic
+
+* Added last use position and last target position to SpellHistory
+
+* Refactored Grom's Mirror Image logic to use spell history instead of static variables
+
+* Fix for Monk Dashing Strike
+
 ### Changelog 1.8.8
 
 * Added Option for Ignore Elites to Override Profile Tag Logic ("fixes" ignore elites for bad profiles)
