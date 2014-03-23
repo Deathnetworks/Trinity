@@ -189,6 +189,20 @@ namespace Trinity
                 return false;
             }
 
+            if (cItem.Quality >= ItemQuality.Legendary)
+            {
+                if (evaluationType == ItemEvaluationType.Keep)
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, trinityItemType);
+                return true;
+            }
+
+            if (trinityItemType == GItemType.CraftingPlan)
+            {
+                if (evaluationType == ItemEvaluationType.Keep)
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, trinityItemType);
+                return true;
+            }
+
             // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
             if (cItem.IsUnidentified)
             {
@@ -250,21 +264,6 @@ namespace Trinity
                     case Interpreter.InterpreterAction.SCORE:
                         break;
                 }
-            }
-
-            
-            if (cItem.Quality >= ItemQuality.Legendary)
-            {
-                if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, trinityItemType);
-                return true;
-            }
-
-            if (trinityItemType == GItemType.CraftingPlan)
-            {
-                if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, trinityItemType);
-                return true;
             }
 
             // Ok now try to do some decent item scoring based on item types
