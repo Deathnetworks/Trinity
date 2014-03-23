@@ -655,10 +655,10 @@ namespace Trinity.DbProvider
                 }
 
                 // Dashing Strike OOC
-                if (CombatBase.CanCast(SNOPower.Monk_DashingStrike) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC && DestinationDistance > 10f)
+                if (CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC && DestinationDistance > 30f)
                 {
-                    ZetaDia.Me.UsePower(SNOPower.Monk_DashingStrike, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsed[SNOPower.Monk_DashingStrike] = DateTime.UtcNow;
+                    ZetaDia.Me.UsePower(SNOPower.X1_Monk_DashingStrike, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
+                    CacheData.AbilityLastUsed[SNOPower.X1_Monk_DashingStrike] = DateTime.UtcNow;
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Dashing Strike for OOC movement, distance={0}", DestinationDistance);
                 }
