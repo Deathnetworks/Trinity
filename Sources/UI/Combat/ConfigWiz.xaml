@@ -151,7 +151,7 @@
                 Interval="500" Maximum="50" Minimum="5" 
                 SmallChange="1" LargeChange="5"  IsSnapToTickEnabled="True"
                 TickPlacement="BottomRight" TickFrequency="1"
-                Value="{Binding Path=Wiz.ArchonElitedistance}" 
+                Value="{Binding Path=Wiz.ArchonEliteDistance}" 
                 HorizontalAlignment="Stretch"  Margin="5,0,0,0"/>
 
         </Grid>
