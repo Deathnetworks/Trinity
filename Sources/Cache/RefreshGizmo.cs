@@ -31,7 +31,7 @@ namespace Trinity
             }
 
             // Retrieve collision sphere radius, cached if possible
-            if (!CacheData.collisionSphereCache.TryGetValue(c_ActorSNO, out c_Radius))
+            if (!CacheData.CollisionSphere.TryGetValue(c_ActorSNO, out c_Radius))
             {
                 try
                 {
@@ -48,7 +48,7 @@ namespace Trinity
                     c_IgnoreSubStep = "CollisionSphereException";
                     AddToCache = false;
                 }
-                CacheData.collisionSphereCache.Add(c_ActorSNO, c_Radius);
+                CacheData.CollisionSphere.Add(c_ActorSNO, c_Radius);
             }
 
             // A "fake distance" to account for the large-object size of monsters

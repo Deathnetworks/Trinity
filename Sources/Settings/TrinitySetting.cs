@@ -47,7 +47,7 @@ namespace Trinity.Config
             {
                 Path = Path.GetDirectoryName(GlobalSettingsFile),
                 Filter = Path.GetFileName(GlobalSettingsFile),
-                NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.Attributes | NotifyFilters.Size,
+                NotifyFilter = NotifyFilters.LastWrite,
                 EnableRaisingEvents = true
             };
             _FSWatcher.Changed += _FSWatcher_Changed;
@@ -57,6 +57,7 @@ namespace Trinity.Config
         #endregion Constructors
 
         #region Properties
+
         [DataMember(IsRequired = false)]
         public CombatSetting Combat
         {

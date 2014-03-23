@@ -13,6 +13,8 @@ namespace Trinity.Config.Combat
         private int _VaultMovementDelay;
         private bool _SpamSmokeScreen;
         private bool _SpamPreparation;
+        private int _StrafeMinHatred;
+        private DemonHunterVaultMode _VaultMode;
         private float _AvoidArcaneHealth;
         private float _AvoidAzmoBodiesHealth;
         private float _AvoidAzmoFireBallHealth;
@@ -152,6 +154,42 @@ namespace Trinity.Config.Combat
                 {
                     _SpamPreparation = value;
                     OnPropertyChanged("SpamPreparation");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(48)]
+        public int StrafeMinHatred
+        {
+            get
+            {
+                return _StrafeMinHatred;
+            }
+            set
+            {
+                if (_StrafeMinHatred != value)
+                {
+                    _StrafeMinHatred = value;
+                    OnPropertyChanged("StrafeMinHatred");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(DemonHunterVaultMode.Always)]
+        public DemonHunterVaultMode VaultMode
+        {
+            get
+            {
+                return _VaultMode;
+            }
+            set
+            {
+                if (_VaultMode != value)
+                {
+                    _VaultMode = value;
+                    OnPropertyChanged("VaultMode");
                 }
             }
         }
@@ -807,6 +845,8 @@ namespace Trinity.Config.Combat
             this.AvoidGrotesqueHealth = 1;
             this.AvoidOrbiterHealth = 1;
             this.AvoidWormholeHealth = 0.50f;
+            this.StrafeMinHatred = 48;
+            this.VaultMode = DemonHunterVaultMode.Always;
         }
         #endregion Methods
     }

@@ -20,9 +20,6 @@ namespace Trinity
 
         private static TrinityPower GetWizardPower(bool IsCurrentlyAvoiding, bool UseOOCBuff, bool UseDestructiblePower)
         {
-            // TODO
-            //- AI so Trinity knows that it is already in the densest monster area and not to teleport.
-
             // Pick the best destructible power available
             if (UseDestructiblePower)
             {
@@ -52,6 +49,7 @@ namespace Trinity
 
                 // Slow Time for in combat
                 if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_SlowTime) &&
+<<<<<<< HEAD
                     (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || Player.CurrentHealthPct <= 0.7 || 
                     ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 40f)) &&
                     PowerManager.CanCast(SNOPower.Wizard_SlowTime) &&
@@ -60,12 +58,25 @@ namespace Trinity
                 {
                     Wizard_last_slowtime = DateTime.UtcNow;
                     Wizard_last_slowtime_position = Me.Position;
+=======
+                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || Player.CurrentHealthPct <= 0.7 ||
+                    ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 40f)) &&
+                    PowerManager.CanCast(SNOPower.Wizard_SlowTime) && 
+                    (SpellHistory.TimeSinceUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastUsePosition(SNOPower.Wizard_SlowTime) > 7.5)
+                    )
+                {
+>>>>>>> UnifiedTrinity/master
                     return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
 
                 // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
+<<<<<<< HEAD
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_MirrorImage) && 
                     (Player.CurrentHealthPct <= 0.50 || TargetUtil.AnyMobsInRange(30, 4) || Player.IsIncapacitated || Player.IsRooted || 
+=======
+                if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_MirrorImage) &&
+                    (Player.CurrentHealthPct <= 0.50 || TargetUtil.AnyMobsInRange(30, 4) || Player.IsIncapacitated || Player.IsRooted ||
+>>>>>>> UnifiedTrinity/master
                     TargetUtil.AnyElitesInRange(30) || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss)
                     && PowerManager.CanCast(SNOPower.Wizard_MirrorImage))
                 {
@@ -184,6 +195,7 @@ namespace Trinity
                 {
                     return new TrinityPower(SNOPower.Wizard_Meteor, 21f, new Vector3(CurrentTarget.Position.X, CurrentTarget.Position.Y, CurrentTarget.Position.Z), CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
+<<<<<<< HEAD
 
                 // Teleport in combat for critical-mass wizards
                 /*
@@ -196,6 +208,8 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_Teleport, 35f, pos, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
                 */
+=======
+>>>>>>> UnifiedTrinity/master
 
                 // Hydra
                 if (!UseOOCBuff && !Player.IsIncapacitated &&
@@ -283,9 +297,8 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_Disintegrate, fThisRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
                 }
                 // Arcane Orb
-                if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_ArcaneOrb) &&
-                    ((Player.PrimaryResource >= 30 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
-                    SNOPowerUseTimer(SNOPower.Wizard_ArcaneOrb))
+                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ArcaneOrb) &&
+                    ((Player.PrimaryResource >= 30 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
                 {
                     return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
                 }
@@ -294,8 +307,7 @@ namespace Trinity
                     ((Player.PrimaryResource >= 16 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve) &&
                     SNOPowerUseTimer(SNOPower.Wizard_ArcaneTorrent))
                 {
-                    float fThisRange = 40f;
-                    return new TrinityPower(SNOPower.Wizard_ArcaneTorrent, fThisRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_ArcaneTorrent, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
                 }
 
                 //skillDict.Add("RayOfFrost", SNOPower.Wizard_RayOfFrost);
@@ -362,7 +374,7 @@ namespace Trinity
                 }
 
                 if (Settings.Combat.Wizard.ArchonCancelOption == WizardArchonCancelOption.Timer &&
-                    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsedCache[SNOPower.Wizard_Archon]).TotalSeconds >= Settings.Combat.Wizard.ArchonCancelSeconds)
+                    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.Wizard_Archon]).TotalSeconds >= Settings.Combat.Wizard.ArchonCancelSeconds)
                 {
                     reason += "Timer";
                     cancelArchon = true;
@@ -425,7 +437,7 @@ namespace Trinity
 
         private static bool Wizard_ShouldStartArchon()
         {
-            bool elitesOnly = Settings.Combat.Wizard.ArchonElitesOnly && (TargetUtil.AnyElitesInRange(30, 1) || TargetUtil.IsEliteTargetInRange(30f) || CurrentTarget.IsBossOrEliteRareUnique);
+            bool elitesOnly = Settings.Combat.Wizard.ArchonElitesOnly && TargetUtil.AnyElitesInRange(Settings.Combat.Wizard.ArchonEliteDistance);
             bool trashInRange = !Settings.Combat.Wizard.ArchonElitesOnly && TargetUtil.AnyMobsInRange(Settings.Combat.Wizard.ArchonMobDistance, Settings.Combat.Wizard.ArchonMobCount);
 
             return elitesOnly || trashInRange;

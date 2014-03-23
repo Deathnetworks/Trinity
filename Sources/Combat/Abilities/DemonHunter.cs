@@ -55,16 +55,43 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_Caltrops, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
 
-            bool hasPunishment = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 0);
 
-            // Preparation
-            if ((((!UseOOCBuff && !Player.IsIncapacitated && TargetUtil.AnyMobsInRange(40f)) || Settings.Combat.DemonHunter.SpamPreparation)) &&
-                CombatBase.CanCast(SNOPower.DemonHunter_Preparation) &&
-                Player.SecondaryResource <= 8 ||
-                // Punishment rune
-                (Player.PrimaryResource <= 12 && hasPunishment))
+            // Preperation: restore 30 disc / 45 sec cd
+            // Invigoration = 1 : passive + 15 disc / 45 sec cd
+            // Punishment   = 0 : Cost: 25 disc, restore 75 hatred / NO COOLDOWN
+            // Battle Scars = 3 : instantly restore 40% health + restore 30 disc / 45 sec cd
+            // Focused Mind = 2 : restore 45 disc over 15 sec / 45 sec cd
+            // Backup plan  = 4 : 30% chance Prep has no cooldown (remove cast timer)
+            
+            // Restore 75 hatred for 25 disc - NO COOLDOWN!
+            bool hasPunishment = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 0);
+            bool hasInvigoration = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 1);
+            bool hasBattleScars = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 3);
+            bool hasFocusedMind = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 2);
+            bool hasBackupPlan = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 4);
+
+            float preperationTriggerRange = V.F("DemonHunter.PreperationTriggerRange");
+            if (((!UseOOCBuff && !Player.IsIncapacitated && 
+                (TargetUtil.AnyMobsInRange(preperationTriggerRange))) || Settings.Combat.DemonHunter.SpamPreparation || hasPunishment) && 
+                Hotbar.Contains(SNOPower.DemonHunter_Preparation))
             {
-                return new TrinityPower(SNOPower.DemonHunter_Preparation, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                // Preperation w/ Punishment
+                if (hasPunishment && CombatBase.CanCast(SNOPower.DemonHunter_Preparation, CombatBase.CanCastFlags.NoTimer) && Player.SecondaryResource >= 25 && Player.PrimaryResourceMissing >= 75)
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_Preparation, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                }
+
+                // Preperation w/ Battle Scars - check for health only
+                if (hasBattleScars && CombatBase.CanCast(SNOPower.DemonHunter_Preparation, CombatBase.CanCastFlags.NoTimer) && Player.CurrentHealthPct < 0.6)
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_Preparation, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                }
+
+                // no rune || invigoration || focused mind || Backup Plan || Battle Scars (need Disc)
+                if ((!hasPunishment) && CombatBase.CanCast(SNOPower.DemonHunter_Preparation, CombatBase.CanCastFlags.NoTimer) && Player.SecondaryResourceMissing >= 30)
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_Preparation, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                }
             }
 
             //skillDict.Add("EvasiveFire", SNOPower.DemonHunter_EvasiveFire);
@@ -103,6 +130,7 @@ namespace Trinity
 
             // Vault
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_Vault) && !Player.IsRooted && !Player.IsIncapacitated &&
+                Settings.Combat.DemonHunter.VaultMode != Config.Combat.DemonHunterVaultMode.MovementOnly &&
                 // Only use vault to retreat if < level 60, or if in inferno difficulty for level 60's
                 (Player.Level < 60 || iCurrentGameDifficulty > GameDifficulty.Master) &&
                 (CurrentTarget.RadiusDistance <= 10f || TargetUtil.AnyMobsInRange(10)) &&
@@ -120,9 +148,11 @@ namespace Trinity
 
             // Rain of Vengeance
             if (!UseOOCBuff && CombatBase.CanCast(SNOPower.DemonHunter_RainOfVengeance) && !Player.IsIncapacitated &&
-                ((TargetUtil.AnyMobsInRange(25, 3) && CombatBase.IgnoringElites) || TargetUtil.AnyElitesInRange(25)))
+                (TargetUtil.ClusterExists(45f, 3) || TargetUtil.EliteOrTrashInRange(45f)))
             {
-                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(45f, 65f, false, true);
+
+                return new TrinityPower(SNOPower.DemonHunter_RainOfVengeance, 0f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
 
             // Cluster Arrow
@@ -141,35 +171,34 @@ namespace Trinity
             }
 
             // Fan of Knives
-            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.DemonHunter_FanOfKnives) && !Player.IsIncapacitated &&
-                Player.PrimaryResource >= 20 && TargetUtil.AnyMobsInRange(15, 2))
+            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.DemonHunter_FanOfKnives) && !Player.IsIncapacitated && 
+                (TargetUtil.EliteOrTrashInRange(15) || TargetUtil.AnyTrashInRange(15f, 5, false)))
             {
                 return new TrinityPower(SNOPower.DemonHunter_FanOfKnives, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
 
             // Strafe spam - similar to barbarian whirlwind routine
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_Strafe) && !Player.IsIncapacitated && !Player.IsRooted &&
-                // Only if there's 3 guys in 25 yds
-                TargetUtil.AnyMobsInRange(25, 3) &&
-                // Check for energy reservation amounts
-                ((Player.PrimaryResource >= 15 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_Strafe, CombatBase.CanCastFlags.NoTimer) && 
+                !Player.IsIncapacitated && !Player.IsRooted && Player.PrimaryResource >= Settings.Combat.DemonHunter.StrafeMinHatred)
             {
-                bool bGenerateNewZigZag = (DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= 1500 ||
-                    (vPositionLastZigZagCheck != Vector3.Zero && Player.Position == vPositionLastZigZagCheck && DateTime.UtcNow.Subtract(LastChangedZigZag).TotalMilliseconds >= 200) ||
-                    Vector3.Distance(Player.Position, CombatBase.ZigZagPosition) <= 4f ||
-                    CurrentTarget.ACDGuid != LastZigZagUnitAcdGuid);
-                vPositionLastZigZagCheck = Player.Position;
-                if (bGenerateNewZigZag)
+                bool shouldGetNewZigZag =
+                    (DateTime.UtcNow.Subtract(Trinity.LastChangedZigZag).TotalMilliseconds >= V.I("Barbarian.Whirlwind.ZigZagMaxTime") ||
+                    CurrentTarget.ACDGuid != Trinity.LastZigZagUnitAcdGuid ||
+                    CombatBase.ZigZagPosition.Distance2D(Player.Position) <= 5f);
+
+                if (shouldGetNewZigZag)
                 {
-                    //vSideToSideTarget = FindZigZagTargetLocation(CurrentTarget.vPosition, CurrentTarget.fCentreDist + fExtraDistance);
-                    float fExtraDistance = CurrentTarget.CentreDistance <= 10f ? 10f : 5f;
-                    CombatBase.ZigZagPosition = NavHelper.FindSafeZone(false, 1, CurrentTarget.Position, false);
-                    // Resetting this to ensure the "no-spam" is reset since we changed our target location
-                    LastPowerUsed = SNOPower.None;
-                    LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
-                    LastChangedZigZag = DateTime.UtcNow;
+                    var wwdist = V.F("Barbarian.Whirlwind.ZigZagDistance");
+
+                    CombatBase.ZigZagPosition = TargetUtil.GetZigZagTarget(CurrentTarget.Position, wwdist);
+
+                    Trinity.LastZigZagUnitAcdGuid = CurrentTarget.ACDGuid;
+                    Trinity.LastChangedZigZag = DateTime.UtcNow;
                 }
-                return new TrinityPower(SNOPower.DemonHunter_Strafe, 25f, CombatBase.ZigZagPosition, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+
+                int postCastTickDelay = TrinityPower.MillisecondsToTickDelay(250);
+
+                return new TrinityPower(SNOPower.DemonHunter_Strafe, 15f, CombatBase.ZigZagPosition, CurrentWorldDynamicId, -1, 0, postCastTickDelay, WAIT_FOR_ANIM);
             }
 
             // Spike Trap

@@ -48,7 +48,7 @@ namespace Trinity
         /// <summary>
         /// Updates AssignedSkills
         /// </summary>
-        public static void Update()
+        internal static void Update(TrinityLogLevel logLevel = TrinityLogLevel.Debug, LogCategory logCategory = LogCategory.CacheManagement)
         {
             _assignedSkills.Clear();
             UpdateHotbarSlotPowers();
@@ -67,7 +67,7 @@ namespace Trinity
             {
                 skillList += " " + skill.Power.ToString() + "/" + skill.RuneIndex + "/" + skill.Slot;
             }
-            Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, " Hotbar Skills (Skill/RuneIndex/Slot): " + skillList);
+            Logger.Log(logLevel, logCategory, " Hotbar Skills (Skill/RuneIndex/Slot): " + skillList);
         }
 
 

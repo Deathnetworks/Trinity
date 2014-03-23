@@ -298,7 +298,7 @@ namespace Trinity
                             {
                                 ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
                                 LastPowerUsed = powerBuff.SNOPower;
-                                CacheData.AbilityLastUsedCache[powerBuff.SNOPower] = DateTime.UtcNow;
+                                CacheData.AbilityLastUsed[powerBuff.SNOPower] = DateTime.UtcNow;
                             }
                         }
                     }
@@ -456,13 +456,13 @@ namespace Trinity
                                 case GObjectType.PowerGlobe:
                                     {
                                         // Count how many times we've tried interacting
-                                        if (!CacheData.interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                                        if (!CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                                         {
-                                            CacheData.interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
+                                            CacheData.InteractAttempts.Add(CurrentTarget.RActorGuid, 1);
                                         }
                                         else
                                         {
-                                            CacheData.interactAttemptsCache[CurrentTarget.RActorGuid]++;
+                                            CacheData.InteractAttempts[CurrentTarget.RActorGuid]++;
                                         }
                                         // If we've tried interacting too many times, blacklist this for a while
                                         if (iInteractAttempts > 3)
@@ -505,13 +505,13 @@ namespace Trinity
                                             hashRGUIDDestructible3SecBlacklist.Add(CurrentTarget.RActorGuid);
                                         }
                                         // Count how many times we've tried interacting
-                                        if (!CacheData.interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                                        if (!CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                                         {
-                                            CacheData.interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
+                                            CacheData.InteractAttempts.Add(CurrentTarget.RActorGuid, 1);
                                         }
                                         else
                                         {
-                                            CacheData.interactAttemptsCache[CurrentTarget.RActorGuid]++;
+                                            CacheData.InteractAttempts[CurrentTarget.RActorGuid]++;
                                         }
                                         // If we've tried interacting too many times, blacklist this for a while
                                         if ((iInteractAttempts > 5 || (CurrentTarget.Type == GObjectType.Interactable && iInteractAttempts > 3)) &&
@@ -589,16 +589,16 @@ namespace Trinity
                                                     LastTempestRushLocation = CurrentTarget.Position;
                                             }
                                             // Count how many times we've tried interacting
-                                            if (!CacheData.interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                                            if (!CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                                             {
-                                                CacheData.interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
+                                                CacheData.InteractAttempts.Add(CurrentTarget.RActorGuid, 1);
                                             }
                                             else
                                             {
-                                                CacheData.interactAttemptsCache[CurrentTarget.RActorGuid]++;
+                                                CacheData.InteractAttempts[CurrentTarget.RActorGuid]++;
                                             }
 
-                                            CacheData.AbilityLastUsedCache[CombatBase.CurrentPower.SNOPower] = DateTime.UtcNow;
+                                            CacheData.AbilityLastUsed[CombatBase.CurrentPower.SNOPower] = DateTime.UtcNow;
                                             //CurrentPower.SNOPower = SNOPower.None;
                                             WaitWhileAnimating(6, true);
                                             // Prevent this EXACT object being targetted again for a short while, just incase
@@ -665,57 +665,7 @@ namespace Trinity
 
 
                     // Update the last distance stored
-                    fLastDistanceFromTarget = TargetCurrentDistance;
-                    using (new PerformanceLogger("HandleTarget.PositionShift"))
-                    {
-
-                        // See if there's an obstacle in our way, if so try to navigate around it
-                        if (CurrentTarget.Type != GObjectType.Avoidance)
-                        {
-                            Vector3 point = vCurrentDestination;
-                            foreach (CacheObstacleObject tempobstacle in Trinity.NavigationObstacleCache.Where(cp =>
-                                            MathUtil.IntersectsPath(cp.Location, cp.Radius, Player.Position, point) &&
-                                            cp.Location.Distance2D(Player.Position) > PlayerMover.GetObstacleNavigationSize(cp)))
-                            {
-                                if (vShiftedPosition == Vector3.Zero)
-                                {
-                                    if (DateTime.UtcNow.Subtract(lastShiftedPosition).TotalSeconds >= 10)
-                                    {
-                                        float fDirectionToTarget = MathUtil.FindDirectionDegree(Player.Position, vCurrentDestination);
-                                        vCurrentDestination = MathEx.GetPointAt(Player.Position, 15f, MathEx.ToRadians(fDirectionToTarget - 50));
-                                        if (!NavHelper.CanRayCast(Player.Position, vCurrentDestination))
-                                        {
-                                            vCurrentDestination = MathEx.GetPointAt(Player.Position, 15f, MathEx.ToRadians(fDirectionToTarget + 50));
-                                            if (!NavHelper.CanRayCast(Player.Position, vCurrentDestination))
-                                            {
-                                                vCurrentDestination = point;
-                                            }
-                                        }
-                                        if (vCurrentDestination != point)
-                                        {
-                                            vShiftedPosition = vCurrentDestination;
-                                            iShiftPositionFor = 1000;
-                                            lastShiftedPosition = DateTime.UtcNow;
-                                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Mid-Target-Handle position shift location to: {0} (was {1})", vCurrentDestination, point);
-                                        }
-                                    }
-                                    // Make sure we only shift max once every 10 seconds
-                                }
-                                else
-                                {
-                                    if (DateTime.UtcNow.Subtract(lastShiftedPosition).TotalMilliseconds <= iShiftPositionFor)
-                                    {
-                                        vCurrentDestination = vShiftedPosition;
-                                    }
-                                    else
-                                    {
-                                        vShiftedPosition = Vector3.Zero;
-                                    }
-                                }
-                            }
-                            // Position shifting code
-                        }
-                    }
+                    fLastDistanceFromTarget = TargetCurrentDistance;                    
 
                     if (TimeSinceUse(SNOPower.Monk_TempestRush) < 250)
                     {
@@ -778,7 +728,7 @@ namespace Trinity
                                     Monk_TempestRushReady())
                                 {
                                     ZetaDia.Me.UsePower(SNOPower.Monk_TempestRush, vCurrentDestination, CurrentWorldDynamicId, -1);
-                                    CacheData.AbilityLastUsedCache[SNOPower.Monk_TempestRush] = DateTime.UtcNow;
+                                    CacheData.AbilityLastUsed[SNOPower.Monk_TempestRush] = DateTime.UtcNow;
                                     LastPowerUsed = SNOPower.Monk_TempestRush;
                                     LastTempestRushLocation = vCurrentDestination;
                                     // Store the current destination for comparison incase of changes next loop
@@ -844,7 +794,7 @@ namespace Trinity
                         {
                             ZetaDia.Me.UsePower(SNOPower.Barbarian_Whirlwind, vCurrentDestination, CurrentWorldDynamicId, -1);
                             LastPowerUsed = SNOPower.Barbarian_Whirlwind;
-                            CacheData.AbilityLastUsedCache[SNOPower.Barbarian_Whirlwind] = DateTime.UtcNow;
+                            CacheData.AbilityLastUsed[SNOPower.Barbarian_Whirlwind] = DateTime.UtcNow;
                         }
                         // Store the current destination for comparison incase of changes next loop
                         vLastMoveToTarget = vCurrentDestination;
@@ -1076,7 +1026,7 @@ namespace Trinity
                         //UIManager.UsePotion();
                         GameUI.SafeClickElement(GameUI.PotionButton, "Use Potion", false);
 
-                        CacheData.AbilityLastUsedCache[SNOPower.DrinkHealthPotion] = DateTime.UtcNow;
+                        CacheData.AbilityLastUsed[SNOPower.DrinkHealthPotion] = DateTime.UtcNow;
                         WaitWhileAnimating(2, true);
                     }
                 }
@@ -1110,13 +1060,13 @@ namespace Trinity
                             // health calculations
                             double dThisMaxHealth;
                             // Get the max health of this unit, a cached version if available, if not cache it
-                            if (!CacheData.unitMaxHealthCache.TryGetValue(c_RActorGuid, out dThisMaxHealth))
+                            if (!CacheData.UnitMaxHealth.TryGetValue(c_RActorGuid, out dThisMaxHealth))
                             {
                                 try
                                 {
 
                                     dThisMaxHealth = CurrentTarget.Unit.HitpointsMax;
-                                    CacheData.unitMaxHealthCache.Add(c_RActorGuid, CurrentTarget.Unit.HitpointsMax);
+                                    CacheData.UnitMaxHealth.Add(c_RActorGuid, CurrentTarget.Unit.HitpointsMax);
                                 }
                                 catch
                                 {
@@ -1171,7 +1121,7 @@ namespace Trinity
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_Leap, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsedCache[SNOPower.Barbarian_Leap] = DateTime.UtcNow;
+                    CacheData.AbilityLastUsed[SNOPower.Barbarian_Leap] = DateTime.UtcNow;
                     bFoundSpecialMovement = true;
                 }
                 // Furious Charge movement for a barb
@@ -1181,22 +1131,21 @@ namespace Trinity
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Barbarian_FuriousCharge, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsedCache[SNOPower.Barbarian_FuriousCharge] = DateTime.UtcNow;
+                    CacheData.AbilityLastUsed[SNOPower.Barbarian_FuriousCharge] = DateTime.UtcNow;
                     bFoundSpecialMovement = true;
                 }
                 // Vault for a Demon Hunter
-                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Vault) &&
-                    //DateTime.UtcNow.Subtract(dictAbilityLastUse[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= CombatBase.SetSNOPowerUseDelay(SNOPower.DemonHunter_Vault] &&
-                    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsedCache[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
+                if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Vault) && Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.MovementOnly &&
+                    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
-                    (PlayerKiteDistance <= 0 || (!MonsterObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
-                    !AvoidanceObstacleCache.Any(a => a.Location.Distance(vCurrentDestination) <= PlayerKiteDistance))) &&
-                    (!Trinity.AvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Location, a.Radius, Trinity.Player.Position, vCurrentDestination)))
+                    (PlayerKiteDistance <= 0 || (!CacheData.MonsterObstacles.Any(a => a.Position.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
+                    !CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance(vCurrentDestination) <= PlayerKiteDistance))) &&
+                    (!CacheData.TimeBoundAvoidance.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, vCurrentDestination)))
                     )
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.DemonHunter_Vault, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsedCache[SNOPower.DemonHunter_Vault] = DateTime.UtcNow;
+                    CacheData.AbilityLastUsed[SNOPower.DemonHunter_Vault] = DateTime.UtcNow;
                     bFoundSpecialMovement = true;
                 }
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
@@ -1207,7 +1156,7 @@ namespace Trinity
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Teleport, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsedCache[SNOPower.Wizard_Teleport] = DateTime.UtcNow;
+                    CacheData.AbilityLastUsed[SNOPower.Wizard_Teleport] = DateTime.UtcNow;
                     bFoundSpecialMovement = true;
                 }
                 // Archon Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
@@ -1217,7 +1166,7 @@ namespace Trinity
                 {
                     WaitWhileAnimating(3, true);
                     ZetaDia.Me.UsePower(SNOPower.Wizard_Archon_Teleport, vCurrentDestination, CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsedCache[SNOPower.Wizard_Archon_Teleport] = DateTime.UtcNow;
+                    CacheData.AbilityLastUsed[SNOPower.Wizard_Archon_Teleport] = DateTime.UtcNow;
                     bFoundSpecialMovement = true;
                 }
                 return bFoundSpecialMovement;
@@ -1585,7 +1534,7 @@ namespace Trinity
                     SpellTracker.TrackSpellOnUnit(CombatBase.CurrentPower.TargetACDGUID, CombatBase.CurrentPower.SNOPower);
                     SpellHistory.RecordSpell(CombatBase.CurrentPower);
 
-                    CacheData.AbilityLastUsedCache[CombatBase.CurrentPower.SNOPower] = DateTime.UtcNow;
+                    CacheData.AbilityLastUsed[CombatBase.CurrentPower.SNOPower] = DateTime.UtcNow;
                     lastGlobalCooldownUse = DateTime.UtcNow;
                     LastPowerUsed = CombatBase.CurrentPower.SNOPower;
                     //CombatBase.CurrentPower.SNOPower = SNOPower.None;
@@ -1711,16 +1660,16 @@ namespace Trinity
                 }
                 WaitWhileAnimating(5, true);
                 // Count how many times we've tried interacting
-                if (!CacheData.interactAttemptsCache.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                if (!CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                 {
-                    CacheData.interactAttemptsCache.Add(CurrentTarget.RActorGuid, 1);
+                    CacheData.InteractAttempts.Add(CurrentTarget.RActorGuid, 1);
 
                     // Fire item looted for Demonbuddy Item stats
                     GameEvents.FireItemLooted(CurrentTarget.ACDGuid);
                 }
                 else
                 {
-                    CacheData.interactAttemptsCache[CurrentTarget.RActorGuid]++;
+                    CacheData.InteractAttempts[CurrentTarget.RActorGuid]++;
                 }
                 // If we've tried interacting too many times, blacklist this for a while
                 if (iInteractAttempts > 20 && CurrentTarget.ItemQuality < ItemQuality.Legendary)

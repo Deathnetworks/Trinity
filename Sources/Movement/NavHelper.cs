@@ -100,7 +100,7 @@ namespace Trinity
             if (rc)
                 return false;
 
-            return !Trinity.NavigationObstacleCache.Any(o => MathEx.IntersectsPath(o.Location, o.Radius, vStartLocation, vDestination));
+            return !CacheData.NavigationObstacles.Any(o => MathEx.IntersectsPath(o.Position, o.Radius, vStartLocation, vDestination));
         }
 
         /// <summary>
@@ -140,8 +140,8 @@ namespace Trinity
                     );
                 // Wizards can look for bee stings in range and try a wave of force to dispel them
                 if (!shouldKite && PlayerStatus.ActorClass == ActorClass.Wizard && Hotbar.Contains(SNOPower.Wizard_WaveOfForce) && PlayerStatus.PrimaryResource >= 25 &&
-                    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsedCache[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_WaveOfForce) &&
-                    !PlayerStatus.IsIncapacitated && Trinity.AvoidanceObstacleCache.Count(u => u.ActorSNO == 5212 && u.Location.Distance(PlayerStatus.Position) <= 15f) >= 2 &&
+                    DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.Wizard_WaveOfForce]).TotalMilliseconds >= CombatBase.GetSNOPowerUseDelay(SNOPower.Wizard_WaveOfForce) &&
+                    !PlayerStatus.IsIncapacitated && CacheData.TimeBoundAvoidance.Count(u => u.ActorSNO == 5212 && u.Position.Distance(PlayerStatus.Position) <= 15f) >= 2 &&
                     (
                     //ZetaDia.CPlayer.PassiveSkills.Contains(SNOPower.Wizard_Passive_CriticalMass) || 
                     PowerManager.CanCast(SNOPower.Wizard_WaveOfForce)))
@@ -273,14 +273,14 @@ namespace Trinity
                      * Check if a square is occupied already
                      */
                     // Avoidance
-                    if (Trinity.AvoidanceObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= gridSquareRadius))
+                    if (CacheData.TimeBoundAvoidance.Any(a => Vector3.Distance(xyz, a.Position) - a.Radius <= gridSquareRadius))
                     {
                         nodesAvoidance++;
                         continue;
                     }
 
                     // Obstacles
-                    if (Trinity.NavigationObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) - a.Radius <= gridSquareRadius))
+                    if (CacheData.NavigationObstacles.Any(a => Vector3.Distance(xyz, a.Position) - a.Radius <= gridSquareRadius))
                     {
                         nodesMonsters++;
                         continue;
@@ -297,7 +297,7 @@ namespace Trinity
                         }
 
                         // Any monster standing in this GridPoint
-                        if (Trinity.MonsterObstacleCache.Any(a => Vector3.Distance(xyz, a.Location) + a.Radius <= checkRadius))
+                        if (CacheData.MonsterObstacles.Any(a => Vector3.Distance(xyz, a.Position) + a.Radius <= checkRadius))
                         {
                             nodesMonsters++;
                             continue;
@@ -306,8 +306,8 @@ namespace Trinity
                         if (!hasEmergencyTeleportUp)
                         {
                             // Any monsters blocking in a straight line between origin and this GridPoint
-                            foreach (CacheObstacleObject monster in Trinity.MonsterObstacleCache.Where(m =>
-                                MathEx.IntersectsPath(new Vector3(m.Location.X, m.Location.Y, 0), m.Radius, new Vector3(origin.X, origin.Y, 0), new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
+                            foreach (CacheObstacleObject monster in CacheData.MonsterObstacles.Where(m =>
+                                MathEx.IntersectsPath(new Vector3(m.Position.X, m.Position.Y, 0), m.Radius, new Vector3(origin.X, origin.Y, 0), new Vector3(gridPoint.Position.X, gridPoint.Position.Y, 0))
                                 ))
                             {
 
@@ -362,11 +362,11 @@ namespace Trinity
                         /*
                         * We want to down-weight any grid points where monsters are closer to it than we are
                         */
-                        foreach (CacheObstacleObject monster in Trinity.MonsterObstacleCache)
+                        foreach (CacheObstacleObject monster in CacheData.MonsterObstacles)
                         {
-                            float distFromMonster = gridPoint.Position.Distance2D(monster.Location);
+                            float distFromMonster = gridPoint.Position.Distance2D(monster.Position);
                             float distFromOrigin = gridPoint.Position.Distance2D(origin);
-                            float distFromOriginToAvoidance = origin.Distance2D(monster.Location);
+                            float distFromOriginToAvoidance = origin.Distance2D(monster.Position);
                             if (distFromOriginToAvoidance < distFromOrigin)
                                 continue;
 
@@ -379,11 +379,11 @@ namespace Trinity
                                 gridPoint.Weight += distFromMonster;
                             }
                         }
-                        foreach (CacheObstacleObject avoidance in Trinity.AvoidanceObstacleCache)
+                        foreach (CacheObstacleObject avoidance in CacheData.TimeBoundAvoidance)
                         {
-                            float distFromAvoidance = gridPoint.Position.Distance2D(avoidance.Location);
+                            float distFromAvoidance = gridPoint.Position.Distance2D(avoidance.Position);
                             float distFromOrigin = gridPoint.Position.Distance2D(origin);
-                            float distFromOriginToAvoidance = origin.Distance2D(avoidance.Location);
+                            float distFromOriginToAvoidance = origin.Distance2D(avoidance.Position);
 
                             float health = AvoidanceManager.GetAvoidanceHealthBySNO(avoidance.ActorSNO, 1f);
                             float radius = AvoidanceManager.GetAvoidanceRadiusBySNO(avoidance.ActorSNO, 1f);
@@ -447,6 +447,63 @@ namespace Trinity
                 pointsFound);
             return bestPoint.Position;
 
+        }
+
+        internal static Vector3 SimpleUnstucker()
+        {
+            var myPos = Trinity.Player.Position;
+            var navigationPos = PlayerMover.LastMoveToTarget;
+            float rotation = (float)Trinity.Player.Rotation;
+
+            const double totalPoints = 3 * Math.PI / 2;
+            const double start = Math.PI / 2;
+            const double step = Math.PI / 4;
+
+            const float minDistance = 10f;
+            const float maxDistance = 45f;
+            const float stepDistance = 5f;
+
+            HashSet<GridPoint> gridPoints = new HashSet<GridPoint>();
+
+            int raycastFail = 0;
+            int navigationObstacleFail = 0;
+
+            for (double r = start; r <= totalPoints; r += step)
+            {
+                for (float d = minDistance; d <= maxDistance; d += stepDistance)
+                {
+                    float newDirection = (float)(rotation + r);
+                    Vector3 newPos = MathEx.GetPointAt(myPos, d, newDirection);
+
+                    // If this hits a navigation wall, skip it
+                    if (Navigator.Raycast(myPos, newPos))
+                    {
+                        raycastFail++;
+                        continue;
+                    }
+                    // If this hits a known navigation obstacle, skip it
+                    if (CacheData.NavigationObstacles.Any(o => MathEx.IntersectsPath(o.Position, o.Radius, myPos, newPos)))
+                    {
+                        navigationObstacleFail++;
+                        continue;
+                    }
+                    // use distance as weight
+                    GridPoint gridPoint = new GridPoint(newPos, (int)d, d);
+                }
+            }
+
+            if (!gridPoints.Any())
+            {
+                Logger.LogDebug(LogCategory.Navigator, "Unable to generage new unstucker position! rayCast={0} navObsticle={1}", raycastFail, navigationObstacleFail);
+                return navigationPos;
+            }
+            else
+            {
+                var bestPoint = gridPoints.OrderByDescending(p => p.Weight).FirstOrDefault();
+                Logger.LogDebug(LogCategory.Navigator, "Using unstucker position {0} distance={1:0.0} rayCast={2} navObsticle={3}",
+                    NavHelper.PrettyPrintVector3(bestPoint.Position), bestPoint.Distance, raycastFail, navigationObstacleFail);
+                return bestPoint.Position;
+            }
         }
 
         internal static List<GridPoint> UsedStuckSpots = new List<GridPoint>();

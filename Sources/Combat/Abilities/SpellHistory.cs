@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Zeta.Common;
 using Zeta.Game.Internals.Actors;
 namespace Trinity.Combat.Abilities
 {
@@ -22,7 +23,9 @@ namespace Trinity.Combat.Abilities
             historyQueue.Enqueue(new SpellHistoryItem()
             {
                 Power = power,
-                UseTime = DateTime.UtcNow
+                UseTime = DateTime.UtcNow,
+                MyPosition = Trinity.Player.Position,
+                TargetPosition = power.TargetPosition
             });
         }
 
@@ -61,9 +64,7 @@ namespace Trinity.Combat.Abilities
             if (historyQueue.Any(i => i.Power.SNOPower == power))
             {
                 DateTime lookBack = DateTime.UtcNow.Subtract(time);
-
                 var spellCount = historyQueue.Count(i => i.Power.SNOPower == power && i.UseTime >= lookBack);
-
                 return spellCount;
             }
             return 0;
@@ -74,6 +75,34 @@ namespace Trinity.Combat.Abilities
             if (historyQueue.Any() && historyQueue.Any(i => i.Power.SNOPower == power))
                 return true;
             return false;
+        }
+
+        public static Vector3 GetSpellLastTargetPosition(SNOPower power)
+        {
+            Vector3 lastUsed = Vector3.Zero;
+            if (historyQueue.Any(i => i.Power.SNOPower == power))
+                lastUsed = historyQueue.Where(i => i.Power.SNOPower == power).OrderByDescending(i => i.UseTime).FirstOrDefault().TargetPosition;
+            return lastUsed;
+        }
+
+        public static Vector3 GetSpellLastMyPosition(SNOPower power)
+        {
+            Vector3 lastUsed = Vector3.Zero;
+            if (historyQueue.Any(i => i.Power.SNOPower == power))
+                lastUsed = historyQueue.Where(i => i.Power.SNOPower == power).OrderByDescending(i => i.UseTime).FirstOrDefault().MyPosition;
+            return lastUsed;
+        }
+
+        public static float DistanceFromLastTarget(SNOPower power)
+        {
+            var lastUsed = GetSpellLastTargetPosition(power);
+            return Trinity.Player.Position.Distance2D(lastUsed);
+        }
+
+        public static float DistanceFromLastUsePosition(SNOPower power)
+        {
+            var lastUsed = GetSpellLastMyPosition(power);
+            return Trinity.Player.Position.Distance2D(lastUsed);
         }
 
     }

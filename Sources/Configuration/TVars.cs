@@ -228,20 +228,21 @@ namespace Trinity
             Set(new TVar("SpellDelay.DemonHunter_SmokeScreen", 3000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_ShadowPower", 5000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_Vault", 400, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_Preparation", 5000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Preparation", 45000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.X1_DemonHunter_Companion", 30000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_MarkedForDeath", 3000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_EvasiveFire", 300, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_FanOfKnives", 10000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_SpikeTrap", 1000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_Sentry", 8000, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_Strafe", 5, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Strafe", 1, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_Multishot", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_ClusterArrow", 150, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_RainOfVengeance", 10000, "Spell Use Delay/Interval, milliseconds"));
 
             // Demon Hunter
             Set(new TVar("DemonHunter.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));
+            Set(new TVar("DemonHunter.PreperationTriggerRange", 40f, "Preperation monster trigger range"));
 
             // Monk
             Set(new TVar("Monk.Avoidance.Serenity", 0f, "Monk Serenity buff Avoidance health multiplier"));
@@ -286,6 +287,7 @@ namespace Trinity
             // Unstucker
             Set(new TVar("Unstucker.MaxDistance", 1500f, "Max distance for unstucker to be able to work"));
 
+            Set(new TVar("DebugVisibility", "Hidden", "Debug tab visibility"));
             batch = false;
         }
 

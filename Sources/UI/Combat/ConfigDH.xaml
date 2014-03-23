@@ -11,10 +11,12 @@
             <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="..\Template.xaml"/></ResourceDictionary.MergedDictionaries>
 
             <ut:PercentConverter x:Key="percentConverter" />
+            <ut:EnumBooleanConverter x:Key="enumBooleanConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -60,8 +62,23 @@
                     Value="{Binding Path=DH.KiteLimit}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
         </Grid>
-        <!--Vault-->
+        <!--Strafe-->
         <Grid Grid.Row="2" Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Minimum Strafe Hatred" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
+            <Slider Grid.Column="1" Template="{DynamicResource Slider}" 
+                    Interval="500" Maximum="150" Minimum="12" 
+                    SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True"
+                    TickPlacement="BottomRight" TickFrequency="12"
+                    Value="{Binding Path=DH.StrafeMinHatred}" 
+                    HorizontalAlignment="Stretch" Margin="2"/>
+        </Grid>
+        <!--Vault-->
+        <Grid Grid.Row="3" Margin="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="3*"/>
@@ -76,16 +93,27 @@
                     HorizontalAlignment="Stretch" Margin="2"
                     ToolTip="Vault for movement re-use delay"/>
         </Grid>
-        <Grid Grid.Row="3" Margin="2">
-            <UniformGrid Columns="2">
-                <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamSmokeScreen}" ToolTip="For use with Displacement rune">Spam Smoke Screen</CheckBox>
-                <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamPreparation}">Preparation Out of Combat</CheckBox>
-            </UniformGrid>
-        </Grid>
         <Grid Grid.Row="4" Margin="2">
+            <StackPanel>
+                <UniformGrid Columns="2">
+                    <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamSmokeScreen}" ToolTip="For use with Displacement rune">Spam Smoke Screen</CheckBox>
+                    <CheckBox Margin="2" IsChecked="{Binding Path=DH.SpamPreparation}">Preparation Out of Combat</CheckBox>
+                </UniformGrid>
+                <GroupBox>
+                    <GroupBox.Header>Vault</GroupBox.Header>
+                    <UniformGrid Columns="2">
+                        <TextBlock Text="When to use Vault" />
+                        <RadioButton GroupName="VaultMode" Content="Anytime" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Always}"  />
+                        <RadioButton GroupName="VaultMode" Content="In Combat only" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=CombatOnly}" />
+                        <RadioButton GroupName="VaultMode" Content="Out of Combat Only" IsChecked="{Binding Path=DH.VaultMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=MovementOnly}" />
+                    </UniformGrid>
+                </GroupBox>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="5" Margin="2">
             <ScrollViewer Tag="Combat\Avoidance.xaml" DataContext="{Binding Path=DH}"/>
         </Grid>
         <!--Reset Button-->
-        <Button Grid.Row="5" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetDemonHunterCommand}">Reset</Button>
+        <Button Grid.Row="6" Margin="5" HorizontalAlignment="Center" Command="{Binding ResetDemonHunterCommand}">Reset</Button>
     </Grid>
 </UserControl>

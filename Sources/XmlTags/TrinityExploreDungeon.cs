@@ -496,7 +496,7 @@ namespace Trinity.XmlTags
                 return false;
 
             var actors = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                .Where(a => a.ActorSNO == ActorId && Trinity.SkipAheadAreaCache.Any(o => o.Location.Distance2D(a.Position) >= ObjectDistance));
+                .Where(a => a.ActorSNO == ActorId && Trinity.SkipAheadAreaCache.Any(o => o.Position.Distance2D(a.Position) >= ObjectDistance));
 
             if (actors == null)
                 return false;
@@ -1033,7 +1033,7 @@ namespace Trinity.XmlTags
                         new Action(ret => UpdateRoute())
                     )
                 ),
-                new Decorator(ret => Trinity.NavigationObstacleCache.Any(o => o.Location.Distance2D(CurrentNavTarget) <= o.Radius * 2),
+                new Decorator(ret => CacheData.NavigationObstacles.Any(o => o.Position.Distance2D(CurrentNavTarget) <= o.Radius * 2),
                     new Sequence(
                         new Action(ret => SetNodeVisited("Navigation obstacle detected at node point")),
                         new Action(ret => UpdateRoute())
@@ -1045,7 +1045,7 @@ namespace Trinity.XmlTags
                 //        new Action(ret => UpdateRoute())
                 //    )
                 //),
-                new Decorator(ret => Trinity.SkipAheadAreaCache.Any(p => p.Location.Distance2D(CurrentNavTarget) <= PathPrecision),
+                new Decorator(ret => Trinity.SkipAheadAreaCache.Any(p => p.Position.Distance2D(CurrentNavTarget) <= PathPrecision),
                     new Sequence(
                         new Action(ret => SetNodeVisited("Found node to be in skip ahead cache, marking done")),
                         new Action(ret => UpdateRoute())

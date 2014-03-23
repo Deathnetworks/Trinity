@@ -395,10 +395,11 @@ namespace Trinity
             174900, 185391, // demonic forge
             194682, 81699, 3340, 123325, 
 
-            104596, // trOut_FesteringWoods_Neph_Column_B
-            104632, // trOut_FesteringWoods_Neph_Column_B_Broken_Base
-            105303, // trOut_FesteringWoods_Neph_Column_C_Broken_Base_Bottom
-            104827, // ActorSNO: 104827 Name: trOut_FesteringWoods_Neph_Column_C_Broken_Base-489 Type: DestroyableObject Radius: 12.05 
+            158681, // A1 Blacksmith_Lore
+            104596, // A1 trOut_FesteringWoods_Neph_Column_B
+            104632, // A1 trOut_FesteringWoods_Neph_Column_B_Broken_Base
+            105303, // A1 trOut_FesteringWoods_Neph_Column_C_Broken_Base_Bottom
+            104827, // A1 trOut_FesteringWoods_Neph_Column_C_Broken_Base 
         };
 
         /// <summary>

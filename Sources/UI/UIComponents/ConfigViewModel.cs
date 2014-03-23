@@ -19,6 +19,17 @@ namespace Trinity.UIComponents
         private TrinitySetting _Model;
         private TrinitySetting _OriginalModel;
 
+        public bool DebugVisibility
+        {
+            get
+            {
+                if (V.S("DebugVisibility") == "Visible")
+                    return true;
+
+                return false;
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigViewModel" /> class.
         /// </summary>
@@ -212,7 +223,25 @@ namespace Trinity.UIComponents
                                             Trinity.Settings.Save(true);
                                         }
                                     });
+            DumpSkillsCommand = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        PlayerInfoCache.DumpPlayerSkills();
+
+                                        UILoader.CloseWindow();
+                                    });
         }
+
+        /// <summary>
+        /// Opens the TVars config window
+        /// </summary>
+        /// <value>The save command.</value>
+        public ICommand DumpSkillsCommand
+        {
+            get;
+            private set;
+        }
+
 
         /// <summary>
         /// Opens the TVars config window
@@ -223,6 +252,7 @@ namespace Trinity.UIComponents
             get;
             private set;
         }
+
         /// <summary>
         /// Reloads item rules
         /// </summary>

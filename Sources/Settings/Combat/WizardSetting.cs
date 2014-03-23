@@ -15,6 +15,7 @@ namespace Trinity.Config.Combat
         private bool _ArchonElitesOnly;
         private int _ArchonMobCount;
         private float _ArchonMobDistance;
+        private float _ArchonEliteDistance;
         private WizardKiteOption _KiteOption;
         private WizardArchonCancelOption _ArchonCancelOption;
         private int _ArchonCancelSeconds;
@@ -139,6 +140,24 @@ namespace Trinity.Config.Combat
                 {
                     _ArchonMobDistance = value;
                     OnPropertyChanged("ArchonMobDistance");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(15f)]
+        public float ArchonEliteDistance
+        {
+            get
+            {
+                return _ArchonEliteDistance;
+            }
+            set
+            {
+                if (_ArchonEliteDistance != value)
+                {
+                    _ArchonEliteDistance = value;
+                    OnPropertyChanged("ArchonEliteDistance");
                 }
             }
         }
@@ -909,6 +928,7 @@ namespace Trinity.Config.Combat
             this.AvoidOrbiterHealth = 1;
             this.AvoidWormholeHealth = 0.50f;
             this.ArchonElitesOnly = true;
+            this.ArchonEliteDistance = 15f;
         }
 
         #endregion Methods

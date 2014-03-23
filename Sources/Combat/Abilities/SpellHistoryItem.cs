@@ -1,4 +1,5 @@
 ﻿using System;
+using Zeta.Common;
 
 namespace Trinity.Combat.Abilities
 {
@@ -6,6 +7,9 @@ namespace Trinity.Combat.Abilities
     {
         public TrinityPower Power { get; set; }
         public DateTime UseTime { get; set; }
+        public Vector3 MyPosition { get; set; }
+        public Vector3 TargetPosition { get; set; }
+
         public TimeSpan TimeSinceUse
         {
             get

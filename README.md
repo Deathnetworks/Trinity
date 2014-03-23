@@ -1,6 +1,102 @@
 ﻿
 # Trinity
 
+### Changelog 1.8.9
+
+* Fix for not stashing legendary plans
+
+* Fixed typo in Wizard UI preventing ArchonEliteDistance from being saved
+
+* Refactored TrinityItemManager stash logic
+
+* Added last use position and last target position to SpellHistory
+
+* Refactored Grom's Mirror Image logic to use spell history instead of static variables
+
+* Fix for Monk Dashing Strike
+
+### Changelog 1.8.8
+
+* Added Option for Ignore Elites to Override Profile Tag Logic ("fixes" ignore elites for bad profiles)
+
+* Barbarian: Fixed Call of the Ancients not being cast on elites
+
+* DemonHunter Preparation runes now fully supported
+
+* DemonHunter strafe should work much better
+
+* DemonHunter Vault now has options for "Always/Combat Only/Movement Only"
+
+* Wizard: Removed Critical Mass Teleport junk (Thanks Gorm!)
+
+* Wizard: Added Archon Elite Distance trigger UI option
+
+* Fixed selling/salvaging plans/misc items
+
+* Navigation obstacle pathing should work a little better
+
+* Implemented new "simple" unstucker
+
+* Removed more legacy weird "position shift" code (new navigation weighting logic is better)
+
+* Reduced priority/weight for containers - should no longer kamikaze these :)
+
+* (Hopefully) fixed weird time zone dependent bugs (e.g. UTC+5)
+
+* Trinity will no longer stash Vanity Items
+
+* Monk Seven Sided Strike: Sustained Attack rune is now supported
+
+* Cleaned up ItemsDropped.csv (removed unnecessary fields)
+
+* Demonbuddy should be better about pathing around known navigation obstacles (thanks to Trinity ;))
+
+* Monk Mantra's work again... at a basic level.
+
+* Fixed SpellHistory bug.
+
+* All Internal Trinity "LeaveGame" actions will now stay in a party (if we're in one)
+
+* Crusader Flail (1h and 2h) and Crusader Shields will now be stashed/sold/salvaged appropriately
+
+* Monk Mantra of Healing now only used when low on health (configurable in TVar's)
+
+* Fixed UTC timestamp in Stash Logs
+
+* Added "Disable All Movement" option in Advanced tab. Does not apply to combat movement spells (Leap, Dashing strike, etc)!
+
+* Should no longer stash weird blue items
+
+* Should no longer pickup all follower items no matter what option is selected
+
+* Unstucker should work again (Note to Nesox: MainGridProvider.CanStandAt(Point point) is broken)
+
+* Removed weird Legacy "navigation position shift" logic
+
+### Changelog 1.8.7
+
+* Fixed resetting Barbarian Sprint mode and avoidance settings every time settings was loaded
+
+* Ignore Trash is now disabled when stuck
+
+* Added option to keep legendaries Unidentified
+
+* Monk Exploding Palm now used more liberally - spirit requirement reduced from 120 to 40
+
+* Fixed picking up more potions than wanted (was counting total stacks, not number of potions in each stack)
+
+* Added Anvil of Fury, Cursed Chests as known containers - thanks Kevin Spacey
+
+* Added options to pickup Magic and Rare follower items. Legendary follower items are always picked up.
+
+* Fixed perma-stuck when actorId was specified on TrinityDungeonExplorer
+
+* All internal threads are now named
+
+* Added Experience stats to Trinity PlayerInfoCache (no more exceptions when attempting to do an OutputReport())
+
+* Fixed null reference exception with new Furious Charge logic
+
 ### Changelog 1.8.6
 
 * Monk Mantra of Healing now used when low on health

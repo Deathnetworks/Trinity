@@ -83,16 +83,16 @@ namespace Trinity
                                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Fire Chains!");
                                     StandingInAvoidance = true;
                                 }
-                                AvoidanceObstacleCache.Add(new CacheObstacleObject(fireChainSpot, fireChainSize, -2, "FireChains"));
+                                CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(fireChainSpot, fireChainSize, -2, "FireChains"));
                             }
                         }
-                        if (AvoidanceObstacleCache.Any(aoe => aoe.ActorSNO == -2))
+                        if (CacheData.TimeBoundAvoidance.Any(aoe => aoe.ActorSNO == -2))
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Generated {0} avoidance points for FireChains, minDistance={1} maxDistance={2}",
-                                AvoidanceObstacleCache.Count(aoe => aoe.ActorSNO == -2),
-                                AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == -2)
-                                    .Min(aoe => aoe.Location.Distance2D(Trinity.Player.Position)),
-                                AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == -2)
-                                    .Max(aoe => aoe.Location.Distance2D(Trinity.Player.Position)));
+                                CacheData.TimeBoundAvoidance.Count(aoe => aoe.ActorSNO == -2),
+                                CacheData.TimeBoundAvoidance.Where(aoe => aoe.ActorSNO == -2)
+                                    .Min(aoe => aoe.Position.Distance2D(Trinity.Player.Position)),
+                                CacheData.TimeBoundAvoidance.Where(aoe => aoe.ActorSNO == -2)
+                                    .Max(aoe => aoe.Position.Distance2D(Trinity.Player.Position)));
                     }
                 }
 
@@ -120,17 +120,17 @@ namespace Trinity
                                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Beast Charger!");
                                 StandingInAvoidance = true;
                             }
-                            AvoidanceObstacleCache.Add(new CacheObstacleObject(pathSpot, beastChargePathWidth, beastChargerSNO,
+                            CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(pathSpot, beastChargePathWidth, beastChargerSNO,
                                 "BeastCharge"));
                         }
-                        if (AvoidanceObstacleCache.Any(aoe => aoe.ActorSNO == beastChargerSNO))
+                        if (CacheData.TimeBoundAvoidance.Any(aoe => aoe.ActorSNO == beastChargerSNO))
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                 "Generated {0} avoidance points for BeastCharge, minDistance={1} maxDistance={2}",
-                                AvoidanceObstacleCache.Count(aoe => aoe.ActorSNO == beastChargerSNO),
-                                AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == beastChargerSNO)
-                                    .Min(aoe => aoe.Location.Distance2D(Trinity.Player.Position)),
-                                AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == beastChargerSNO)
-                                    .Max(aoe => aoe.Location.Distance2D(Trinity.Player.Position)));
+                                CacheData.TimeBoundAvoidance.Count(aoe => aoe.ActorSNO == beastChargerSNO),
+                                CacheData.TimeBoundAvoidance.Where(aoe => aoe.ActorSNO == beastChargerSNO)
+                                    .Min(aoe => aoe.Position.Distance2D(Trinity.Player.Position)),
+                                CacheData.TimeBoundAvoidance.Where(aoe => aoe.ActorSNO == beastChargerSNO)
+                                    .Max(aoe => aoe.Position.Distance2D(Trinity.Player.Position)));
                     }
                 }
 
@@ -174,13 +174,6 @@ namespace Trinity
                                     InternalName = "SafePoint"
                                 }; ;
                         }
-                        //else
-                        //{
-                        //    // Didn't find any safe spot we could reach, so don't look for any more safe spots for at least 2.8 seconds
-                        //    cancelledEmergencyMoveForMilliseconds = 2800;
-                        //    timeCancelledEmergencyMove = DateTime.UtcNow;
-                        //    DbHelper.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Unable to find kite location, canceling emergency movement for {0}ms", cancelledEmergencyMoveForMilliseconds);
-                        //}
                     }
                 }
                 /*
@@ -417,9 +410,9 @@ namespace Trinity
                                 currentObject.ActorSNO, currentObject.Name, currentObject.ActorType, currentObject.Distance, gizmoType);
                         Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "{0}", ex);
 
-                        if (c_ACDGUID != -1 && CacheData.objectTypeCache.ContainsKey(c_RActorGuid))
+                        if (c_ACDGUID != -1 && CacheData.ObjectType.ContainsKey(c_RActorGuid))
                         {
-                            CacheData.objectTypeCache.Remove(c_RActorGuid);
+                            CacheData.ObjectType.Remove(c_RActorGuid);
                         }
 
                     }
@@ -547,9 +540,9 @@ namespace Trinity
                     ForceCloseRangeTarget = false;
                 }
                 // Bunch of variables used throughout
-                MonsterObstacleCache = new HashSet<CacheObstacleObject>();
-                AvoidanceObstacleCache = new HashSet<CacheObstacleObject>();
-                NavigationObstacleCache = new HashSet<CacheObstacleObject>();
+                CacheData.MonsterObstacles = new HashSet<CacheObstacleObject>();
+                CacheData.TimeBoundAvoidance = new HashSet<CacheObstacleObject>();
+                CacheData.NavigationObstacles = new HashSet<CacheObstacleObject>();
                 //AnyElitesPresent = false;
                 AnyMobsInRange = false;
 
@@ -591,27 +584,27 @@ namespace Trinity
 
         private static void ClearCachesOnGameChange(object sender, EventArgs e)
         {
-            CacheData.positionCache = new Dictionary<int, Vector3>();
-            CacheData.objectTypeCache = new Dictionary<int, GObjectType>();
-            CacheData.actorSNOCache = new Dictionary<int, int>();
-            CacheData.ACDGUIDCache = new Dictionary<int, int>();
-            CacheData.currentHealthCache = new Dictionary<int, double>();
-            CacheData.currentHealthCheckTimeCache = new Dictionary<int, int>();
-            CacheData.unitMonsterAffixCache = new Dictionary<int, MonsterAffixes>();
-            CacheData.unitMaxHealthCache = new Dictionary<int, double>();
-            CacheData.dictionaryStoredMonsterTypes = new Dictionary<int, MonsterType>();
-            CacheData.dictionaryStoredMonsterSizes = new Dictionary<int, MonsterSize>();
-            CacheData.unitBurrowedCache = new Dictionary<int, bool>();
-            CacheData.summonedByACDIdCache = new Dictionary<int, int>();
-            CacheData.nameCache = new Dictionary<int, string>();
-            CacheData.goldAmountCache = new Dictionary<int, int>();
-            CacheData.gameBalanceIDCache = new Dictionary<int, int>();
-            CacheData.dynamicIDCache = new Dictionary<int, int>();
-            CacheData.itemQualityCache = new Dictionary<int, ItemQuality>();
-            CacheData.pickupItemCache = new Dictionary<int, bool>();
-            CacheData.hasBeenRayCastedCache = new Dictionary<int, bool>();
-            CacheData.hasBeenNavigableCache = new Dictionary<int, bool>();
-            CacheData.hasBeenInLoSCache = new Dictionary<int, bool>();
+            CacheData.Position = new Dictionary<int, Vector3>();
+            CacheData.ObjectType = new Dictionary<int, GObjectType>();
+            CacheData.ActorSNO = new Dictionary<int, int>();
+            CacheData.AcdGuid = new Dictionary<int, int>();
+            CacheData.CurrentUnitHealth = new Dictionary<int, double>();
+            CacheData.LastCheckedUnitHealth = new Dictionary<int, int>();
+            CacheData.UnitMonsterAffix = new Dictionary<int, MonsterAffixes>();
+            CacheData.UnitMaxHealth = new Dictionary<int, double>();
+            CacheData.MonsterTypes = new Dictionary<int, MonsterType>();
+            CacheData.MonsterSizes = new Dictionary<int, MonsterSize>();
+            CacheData.UnitIsBurrowed = new Dictionary<int, bool>();
+            CacheData.SummonedByACDId = new Dictionary<int, int>();
+            CacheData.Name = new Dictionary<int, string>();
+            CacheData.GoldStack = new Dictionary<int, int>();
+            CacheData.GameBalanceID = new Dictionary<int, int>();
+            CacheData.DynamicID = new Dictionary<int, int>();
+            CacheData.ItemQuality = new Dictionary<int, ItemQuality>();
+            CacheData.PickupItem = new Dictionary<int, bool>();
+            CacheData.HasBeenRayCasted = new Dictionary<int, bool>();
+            CacheData.HasBeenNavigable = new Dictionary<int, bool>();
+            CacheData.HasBeenInLoS = new Dictionary<int, bool>();
         }
 
         private static HashSet<string> ignoreNames = new HashSet<string>

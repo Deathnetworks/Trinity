@@ -8,9 +8,9 @@
              MinHeight="470" MinWidth="432">
     <UserControl.Resources>
         <ResourceDictionary>
-            <!-- Don't format this line otherwise Db can't open config window -->
-            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Template.xaml"/></ResourceDictionary.MergedDictionaries>
-            
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Template.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -33,6 +33,9 @@
             </TabItem>
             <TabItem Header="Variables" Foreground="{DynamicResource TextBrush}">
                 <Border Tag="ConfigTVars.xaml"/>
+            </TabItem>
+            <TabItem Header="Debug" Foreground="{DynamicResource TextBrush}" Visibility="{Binding Path=DebugVisibility}">
+                <Border Tag="DebugTab.xaml"/>
             </TabItem>
         </TabControl>
         <Grid Grid.Row="1">

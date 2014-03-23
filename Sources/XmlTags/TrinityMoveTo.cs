@@ -73,7 +73,7 @@ namespace Trinity.XmlTags
                     // Loop through all the skip ahead zones and see if one of them is within radius of our intended destination to skip ahead
                     foreach (CacheObstacleObject thisObject in Trinity.SkipAheadAreaCache)
                     {
-                        if (thisObject.Location.Distance(Position) <= thisObject.Radius)
+                        if (thisObject.Position.Distance(Position) <= thisObject.Radius)
                         {
                             Logger.Log(TrinityLogLevel.Verbose, LogCategory.ProfileTag, "Skipping ahead from moveto {0} to next moveto.", Position);
                             Trinity.bSkipAheadAGo = true;

@@ -8,7 +8,9 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Don't format this line otherwise Db can't open config window -->
-            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="..\Template.xaml"/></ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="..\Template.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
             <ut:PercentConverter x:Key="percentConverter" />
             <ut:EnumVisibilityConverter x:Key="enumVisibilityConverter" />
@@ -83,14 +85,15 @@
                 </ComboBox>
                 <TextBlock Grid.Column="0" Grid.Row="1"  Text="Cancel and Rebuff Archon:" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Normal" />
                 <ComboBox Grid.Column="1" Grid.Row="1"   Width="215" SelectedValuePath="Tag" SelectedValue="{Binding Path=Wiz.ArchonCancelOption}" Margin="15,5,0,5">
-                        <ComboBoxItem Content="Never" Tag="Never" ToolTip="Never cancel archon, let it expire on its own" />
-                        <ComboBoxItem Content="After Timer Expires" Tag="Timer" IsSelected="True" ToolTip="Cancel Archon after the timer expires" />
-                        <ComboBoxItem Content="To Rebuff Armor" Tag="RebuffArmor" ToolTip="Cancel Archon only to Rebuff Armor" />
-                        <ComboBoxItem Content="To Rebuff MagicWeapon/Familiar" Tag="RebuffMagicWeaponFamiliar" ToolTip="Cancel Archon only to Rebuff Magic Weapon or Familiar" />
+                    <ComboBoxItem Content="Never" Tag="Never" ToolTip="Never cancel archon, let it expire on its own" />
+                    <ComboBoxItem Content="After Timer Expires" Tag="Timer" IsSelected="True" ToolTip="Cancel Archon after the timer expires" />
+                    <ComboBoxItem Content="To Rebuff Armor" Tag="RebuffArmor" ToolTip="Cancel Archon only to Rebuff Armor" />
+                    <ComboBoxItem Content="To Rebuff MagicWeapon/Familiar" Tag="RebuffMagicWeaponFamiliar" ToolTip="Cancel Archon only to Rebuff Magic Weapon or Familiar" />
                 </ComboBox>
             </Grid>
         </Grid>
 
+        <!-- Cancel Archon After Slider -->
         <Grid Grid.Row="3" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -112,6 +115,8 @@
                 Visibility="{Binding Path=Wiz.ArchonCancelOption, Converter={StaticResource enumVisibilityConverter}, ConverterParameter=Timer}"
                        />
         </Grid>
+
+        <!-- Archon Mob Count / Range Sliders -->
         <Grid Grid.Row="4" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -119,20 +124,36 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="Archon Mob Count" FontWeight="Normal" TextAlignment="Center" VerticalAlignment="Center"/>
-            <Slider Grid.Column="1" Template="{DynamicResource Slider}" Width="100"
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <!-- Mob Count-->
+            <TextBlock Grid.Row="0" Text="Archon Mob Count" FontWeight="Normal" TextAlignment="Center" VerticalAlignment="Center"/>
+            <Slider Grid.Row="0" Grid.Column="1" Template="{DynamicResource Slider}" Width="100"
                 Interval="500" Maximum="10" Minimum="1" 
                 SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True"
                 TickPlacement="BottomRight" TickFrequency="1"
                 Value="{Binding Path=Wiz.ArchonMobCount}" 
                 HorizontalAlignment="Stretch"  Margin="5,0,0,0"/>
-            <TextBlock Grid.Column="2"  Text="Min Range" FontWeight="Normal" TextAlignment="Center" VerticalAlignment="Center"  Margin="5,0,0,0"/>
-            <Slider Grid.Column="3" Template="{DynamicResource Slider}" Width="120"
-                Interval="500" Maximum="50" Minimum="5" 
+            <!-- Range -->
+            <TextBlock Grid.Row="0" Grid.Column="2"  Text="Min Range" FontWeight="Normal" TextAlignment="Center" VerticalAlignment="Center"  Margin="5,0,0,0"/>
+            <Slider Grid.Row="0" Grid.Column="3" Template="{DynamicResource Slider}" Width="120"
+                Interval="500" Maximum="50" Minimum="2" 
                 SmallChange="1" LargeChange="5"  IsSnapToTickEnabled="True"
-                TickPlacement="BottomRight" TickFrequency="5"
+                TickPlacement="BottomRight" TickFrequency="2"
                 Value="{Binding Path=Wiz.ArchonMobDistance}" 
                 HorizontalAlignment="Stretch"  Margin="5,0,0,0"/>
+
+            <!-- Archon Elite Range-->
+            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="Archon Elite Trigger Range" FontWeight="Normal" TextAlignment="Center" VerticalAlignment="Center"  Margin="5,0,0,0"/>
+            <Slider Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Template="{DynamicResource Slider}" Width="180"
+                Interval="500" Maximum="50" Minimum="5" 
+                SmallChange="1" LargeChange="5"  IsSnapToTickEnabled="True"
+                TickPlacement="BottomRight" TickFrequency="1"
+                Value="{Binding Path=Wiz.ArchonEliteDistance}" 
+                HorizontalAlignment="Stretch"  Margin="5,0,0,0"/>
+
         </Grid>
 
         <!--CheckBox-->
