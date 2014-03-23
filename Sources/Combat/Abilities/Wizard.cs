@@ -15,9 +15,6 @@ namespace Trinity
 
     public partial class Trinity : IPlugin
     {
-        private static DateTime Wizard_last_slowtime = DateTime.Now;
-        private static Vector3 Wizard_last_slowtime_position = Vector3.Zero;
-
         private static TrinityPower GetWizardPower(bool IsCurrentlyAvoiding, bool UseOOCBuff, bool UseDestructiblePower)
         {
             // Pick the best destructible power available
@@ -49,34 +46,18 @@ namespace Trinity
 
                 // Slow Time for in combat
                 if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_SlowTime) &&
-<<<<<<< HEAD
-                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || Player.CurrentHealthPct <= 0.7 || 
-                    ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 40f)) &&
-                    PowerManager.CanCast(SNOPower.Wizard_SlowTime) &&
-                    (DateTime.UtcNow.Subtract(Wizard_last_slowtime).TotalSeconds > 15 || Me.Position.Distance2D(Wizard_last_slowtime_position) > 7.5)
-                    )
-                {
-                    Wizard_last_slowtime = DateTime.UtcNow;
-                    Wizard_last_slowtime_position = Me.Position;
-=======
                     (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || Player.CurrentHealthPct <= 0.7 ||
                     ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 40f)) &&
                     PowerManager.CanCast(SNOPower.Wizard_SlowTime) && 
                     (SpellHistory.TimeSinceUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastUsePosition(SNOPower.Wizard_SlowTime) > 7.5)
                     )
                 {
->>>>>>> UnifiedTrinity/master
                     return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
 
                 // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
-<<<<<<< HEAD
-                if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_MirrorImage) && 
-                    (Player.CurrentHealthPct <= 0.50 || TargetUtil.AnyMobsInRange(30, 4) || Player.IsIncapacitated || Player.IsRooted || 
-=======
                 if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_MirrorImage) &&
                     (Player.CurrentHealthPct <= 0.50 || TargetUtil.AnyMobsInRange(30, 4) || Player.IsIncapacitated || Player.IsRooted ||
->>>>>>> UnifiedTrinity/master
                     TargetUtil.AnyElitesInRange(30) || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss)
                     && PowerManager.CanCast(SNOPower.Wizard_MirrorImage))
                 {
@@ -195,21 +176,6 @@ namespace Trinity
                 {
                     return new TrinityPower(SNOPower.Wizard_Meteor, 21f, new Vector3(CurrentTarget.Position.X, CurrentTarget.Position.Y, CurrentTarget.Position.Z), CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
-<<<<<<< HEAD
-
-                // Teleport in combat for critical-mass wizards
-                /*
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Teleport) && 
-                    LastPowerUsed != SNOPower.Wizard_Teleport &&
-                    Player.PrimaryResource >= 15 && CurrentTarget.CentreDistance <= 35f &&
-                    PowerManager.CanCast(SNOPower.Wizard_Teleport))
-                {
-                    var pos = TargetUtil.GetBestClusterPoint(15f, 35f);
-                    return new TrinityPower(SNOPower.Wizard_Teleport, 35f, pos, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
-                }
-                */
-=======
->>>>>>> UnifiedTrinity/master
 
                 // Hydra
                 if (!UseOOCBuff && !Player.IsIncapacitated &&
@@ -293,7 +259,7 @@ namespace Trinity
                 if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Disintegrate) &&
                     ((Player.PrimaryResource >= 20 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
                 {
-                    float fThisRange = 45f;
+                    float fThisRange = 35f;
                     return new TrinityPower(SNOPower.Wizard_Disintegrate, fThisRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
                 }
                 // Arcane Orb
@@ -323,7 +289,7 @@ namespace Trinity
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_RayOfFrost) &&
                     Player.PrimaryResource >= 12 && !Player.WaitingForReserveEnergy)
                 {
-                    float range = 50f;
+                    float range = 60f;
                     if (hasSleetStorm)
                         range = 5f;
 

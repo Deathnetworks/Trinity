@@ -175,26 +175,7 @@ namespace Trinity
                 return false;
             }
 
-<<<<<<< HEAD
-            if (cItem.Quality >= ItemQuality.Legendary)
-            {
-                if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, trinityItemType);
-                return true;
-            }
-
-            if (trinityItemType == GItemType.CraftingPlan)
-            {
-                if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, trinityItemType);
-                return true;
-            }
-
-            // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
-            if (cItem.IsUnidentified)
-=======
             if (trinityItemType == GItemType.CraftingPlan && cItem.Quality >= ItemQuality.Legendary)
->>>>>>> UnifiedTrinity/master
             {
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendary plans)", cItem.RealName, cItem.InternalName, trinityItemType);
@@ -258,32 +239,12 @@ namespace Trinity
                 Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (force salvage rare)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return false;
             }
-<<<<<<< HEAD
-
-            if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.TrinityWithItemRules)
-            {
-                Interpreter.InterpreterAction action = Trinity.StashRule.checkItem(item, evaluationType);
-
-                if (evaluationType == ItemEvaluationType.Keep)
-
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (" + action + ")", cItem.AcdItem.Name, cItem.AcdItem.InternalName, cItem.AcdItem.ItemType);
-                switch (action)
-                {
-                    case Interpreter.InterpreterAction.KEEP:
-                        return true;
-                    case Interpreter.InterpreterAction.TRASH:
-                        return false;
-                    case Interpreter.InterpreterAction.SCORE:
-                        break;
-                }
-=======
            
             if (cItem.Quality >= ItemQuality.Legendary)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, trinityItemType);
                 return true;
->>>>>>> UnifiedTrinity/master
             }
 
             // Ok now try to do some decent item scoring based on item types
