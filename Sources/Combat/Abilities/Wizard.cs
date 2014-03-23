@@ -46,11 +46,24 @@ namespace Trinity
 
                 // Slow Time for in combat
                 if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_SlowTime) &&
-                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || Player.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 35f)) &&
-                    PowerManager.CanCast(SNOPower.Wizard_SlowTime))
+                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || Player.CurrentHealthPct <= 0.7 ||
+                    ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 40f)) &&
+                    PowerManager.CanCast(SNOPower.Wizard_SlowTime) && 
+                    (SpellHistory.TimeSinceUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastUsePosition(SNOPower.Wizard_SlowTime) > 7.5)
+                    )
                 {
                     return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
+
+                // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
+                if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_MirrorImage) &&
+                    (Player.CurrentHealthPct <= 0.50 || TargetUtil.AnyMobsInRange(30, 4) || Player.IsIncapacitated || Player.IsRooted ||
+                    TargetUtil.AnyElitesInRange(30) || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss)
+                    && PowerManager.CanCast(SNOPower.Wizard_MirrorImage))
+                {
+                    return new TrinityPower(SNOPower.Wizard_MirrorImage, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                }
+
                 // Familiar
                 if (!Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Familiar) && Player.PrimaryResource >= 20)
                 {
@@ -183,14 +196,6 @@ namespace Trinity
                     }
                     Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance - fExtraDistance);
                     return new TrinityPower(SNOPower.Wizard_Hydra, 30f, vNewTarget, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
-                }
-                // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
-                if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_MirrorImage) &&
-                    (Player.CurrentHealthPct <= 0.50 || TargetUtil.AnyMobsInRange(30, 5) || Player.IsIncapacitated || Player.IsRooted || (TargetUtil.AnyElitesInRange(30) && CurrentTarget.IsEliteRareUnique &&
-                    !CurrentTarget.IsBoss && CurrentTarget.HitPointsPct <= 0.35)) &&
-                    PowerManager.CanCast(SNOPower.Wizard_MirrorImage))
-                {
-                    return new TrinityPower(SNOPower.Wizard_MirrorImage, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
 
                 //SkillDict.Add("FrostNova", SNOPower.Wizard_FrostNova);
