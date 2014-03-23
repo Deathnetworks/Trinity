@@ -300,10 +300,10 @@ namespace Trinity
 
             // Dashing Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CurrentTarget.CentreDistance >= 16f && 
-                CombatBase.CanCast(SNOPower.Monk_DashingStrike, CombatBase.CanCastFlags.NoTimer))
+                CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike, CombatBase.CanCastFlags.NoTimer))
             {
                 Monk_TickSweepingWindSpam();
-                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, Vector3.Zero, CurrentWorldDynamicId, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, Vector3.Zero, CurrentWorldDynamicId, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
             }
             
             /*

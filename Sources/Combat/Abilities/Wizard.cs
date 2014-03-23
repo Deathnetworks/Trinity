@@ -259,7 +259,7 @@ namespace Trinity
                 if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Disintegrate) &&
                     ((Player.PrimaryResource >= 20 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
                 {
-                    float fThisRange = 35f;
+                    float fThisRange = 50f;
                     return new TrinityPower(SNOPower.Wizard_Disintegrate, fThisRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
                 }
                 // Arcane Orb
@@ -289,7 +289,7 @@ namespace Trinity
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_RayOfFrost) &&
                     Player.PrimaryResource >= 12 && !Player.WaitingForReserveEnergy)
                 {
-                    float range = 60f;
+                    float range = 50f;
                     if (hasSleetStorm)
                         range = 5f;
 
