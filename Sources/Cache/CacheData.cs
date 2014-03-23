@@ -140,22 +140,27 @@ namespace Trinity
         /// <summary>
         /// Stores if a unit/monster is a Summoner (spawns other units)
         /// </summary>
-        internal static Dictionary<int, bool> IsSummonerCache = new Dictionary<int, bool>();
+        internal static Dictionary<int, bool> IsSummoner = new Dictionary<int, bool>();
 
         /// <summary>
         /// Obstacle cache, things we can't or shouldn't move through
         /// </summary>
-        internal static HashSet<CacheObstacleObject> NavigationObstacleCache = new HashSet<CacheObstacleObject>();
+        internal static HashSet<CacheObstacleObject> NavigationObstacles = new HashSet<CacheObstacleObject>();
 
         /// <summary>
         /// A list of all monsters and their positions, so we don't try to walk through them during avoidance
         /// </summary>
-        internal static HashSet<CacheObstacleObject> MonsterObstacleCache = new HashSet<CacheObstacleObject>();
+        internal static HashSet<CacheObstacleObject> MonsterObstacles = new HashSet<CacheObstacleObject>();
 
         /// <summary>
         /// A list of all current obstacles, to help avoid running through them when picking targets
         /// </summary>
-        internal static HashSet<CacheObstacleObject> AvoidanceObstacleCache = new HashSet<CacheObstacleObject>();
+        internal static HashSet<CacheObstacleObject> AvoidanceObstacles = new HashSet<CacheObstacleObject>();
+
+        /// <summary>
+        /// A set of Avoidances that appear then disappear from the object manager, but can still hurt our player. We need to expire these based on a Timespan from the obstacle object.
+        /// </summary>
+        internal static HashSet<CacheObstacleObject> TimeBoundAvoidance = new HashSet<CacheObstacleObject>();
 
 
     }

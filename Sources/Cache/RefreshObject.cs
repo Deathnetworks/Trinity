@@ -134,7 +134,7 @@ namespace Trinity
                     CacheData.Position.Add(c_RActorGuid, c_Position);
                 }
 
-                CacheData.NavigationObstacleCache.Add(new CacheObstacleObject()
+                CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                 {
                     ActorSNO = c_ActorSNO,
                     Name = c_InternalName,
@@ -291,7 +291,7 @@ namespace Trinity
                 case GObjectType.HealthWell:
                 case GObjectType.Interactable:
                 case GObjectType.Shrine:
-                    CacheData.NavigationObstacleCache.Add(new CacheObstacleObject()
+                    CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                     {
                         ActorSNO = c_ActorSNO,
                         Radius = c_Radius,
@@ -310,7 +310,7 @@ namespace Trinity
             if (AddToCache && c_ObjectType == GObjectType.Unit)
             {
                 // Add to the collision-list
-                CacheData.MonsterObstacleCache.Add(new CacheObstacleObject()
+                CacheData.MonsterObstacles.Add(new CacheObstacleObject()
                 {
                     ActorSNO = c_ActorSNO,
                     Name = c_InternalName,

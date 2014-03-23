@@ -1138,9 +1138,9 @@ namespace Trinity
                 if (!bFoundSpecialMovement && Hotbar.Contains(SNOPower.DemonHunter_Vault) && Settings.Combat.DemonHunter.VaultMode != DemonHunterVaultMode.MovementOnly &&
                     DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.DemonHunter_Vault]).TotalMilliseconds >= Trinity.Settings.Combat.DemonHunter.VaultMovementDelay &&
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) &&
-                    (PlayerKiteDistance <= 0 || (!CacheData.MonsterObstacleCache.Any(a => a.Position.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
-                    !CacheData.AvoidanceObstacleCache.Any(a => a.Position.Distance(vCurrentDestination) <= PlayerKiteDistance))) &&
-                    (!CacheData.AvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, vCurrentDestination)))
+                    (PlayerKiteDistance <= 0 || (!CacheData.MonsterObstacles.Any(a => a.Position.Distance(vCurrentDestination) <= PlayerKiteDistance) &&
+                    !CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance(vCurrentDestination) <= PlayerKiteDistance))) &&
+                    (!CacheData.TimeBoundAvoidance.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, vCurrentDestination)))
                     )
                 {
                     WaitWhileAnimating(3, true);

@@ -298,30 +298,14 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }
 
-            bool hasWayOfTheFallingStar = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_DashingStrike && s.RuneIndex == 1);
-            bool hasQuicksilver = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_DashingStrike && s.RuneIndex == 3);
-            var dashingStrikeSpirit = hasQuicksilver ? 10 : 25;
-
-            // Dashing Strike, quick move to target out of range
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
-                CurrentTarget.CentreDistance >= 16f &&
-                CombatBase.CanCast(SNOPower.Monk_DashingStrike) && ((Player.PrimaryResource >= dashingStrikeSpirit && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+            // Dashing Strike
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CurrentTarget.CentreDistance >= 16f && 
+                CombatBase.CanCast(SNOPower.Monk_DashingStrike, CombatBase.CanCastFlags.NoTimer))
             {
                 Monk_TickSweepingWindSpam();
-                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, Vector3.Zero, CurrentWorldDynamicId, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
             }
-
-
-            // Dashing strike + way of the fallen Star
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Monk_DashingStrike, CombatBase.CanCastFlags.NoTimer) &&
-                (TimeSinceUse(SNOPower.Monk_DashingStrike) >= 2800) && hasWayOfTheFallingStar &&
-                ((Player.PrimaryResource >= 25 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
-            {
-                Monk_TickSweepingWindSpam();
-                return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
-            }
-
-
+            
             /*
              * Dual/Trigen Monk section
              * 

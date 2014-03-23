@@ -120,7 +120,7 @@ namespace Trinity
             {
                 float avoidanceRadius = (float)GetAvoidanceRadius(c_ActorSNO, c_Radius);
 
-                CacheData.AvoidanceObstacleCache.Add(new CacheObstacleObject(c_Position, avoidanceRadius, c_ActorSNO, c_InternalName));
+                CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(c_Position, avoidanceRadius, c_ActorSNO, c_InternalName));
 
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
                 if (c_CentreDistance <= minAvoidanceRadius)

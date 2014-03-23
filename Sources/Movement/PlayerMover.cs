@@ -564,9 +564,9 @@ namespace Trinity.DbProvider
                     PowerManager.CanCast(SNOPower.DemonHunter_Vault) && !ShrinesInArea(vMoveToTarget) &&
                     // Don't Vault into avoidance/monsters if we're kiting
                     (Trinity.PlayerKiteDistance <= 0 || (Trinity.PlayerKiteDistance > 0 &&
-                     (!CacheData.AvoidanceObstacleCache.Any(a => a.Position.Distance(vMoveToTarget) <= Trinity.PlayerKiteDistance) ||
-                     (!CacheData.AvoidanceObstacleCache.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, vMoveToTarget))) ||
-                     !CacheData.MonsterObstacleCache.Any(a => a.Position.Distance(vMoveToTarget) <= Trinity.PlayerKiteDistance))))
+                     (!CacheData.TimeBoundAvoidance.Any(a => a.Position.Distance(vMoveToTarget) <= Trinity.PlayerKiteDistance) ||
+                     (!CacheData.TimeBoundAvoidance.Any(a => MathEx.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, vMoveToTarget))) ||
+                     !CacheData.MonsterObstacles.Any(a => a.Position.Distance(vMoveToTarget) <= Trinity.PlayerKiteDistance))))
                     )
                 {
 
@@ -655,10 +655,10 @@ namespace Trinity.DbProvider
                 }
 
                 // Dashing Strike OOC
-                if (CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC && DestinationDistance > 10f)
+                if (CombatBase.CanCast(SNOPower.Monk_DashingStrike) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC && DestinationDistance > 10f)
                 {
-                    ZetaDia.Me.UsePower(SNOPower.X1_Monk_DashingStrike, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
-                    CacheData.AbilityLastUsed[SNOPower.X1_Monk_DashingStrike] = DateTime.UtcNow;
+                    ZetaDia.Me.UsePower(SNOPower.Monk_DashingStrike, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
+                    CacheData.AbilityLastUsed[SNOPower.Monk_DashingStrike] = DateTime.UtcNow;
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Movement))
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.Movement, "Using Dashing Strike for OOC movement, distance={0}", DestinationDistance);
                 }

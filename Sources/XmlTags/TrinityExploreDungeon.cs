@@ -1033,7 +1033,7 @@ namespace Trinity.XmlTags
                         new Action(ret => UpdateRoute())
                     )
                 ),
-                new Decorator(ret => CacheData.NavigationObstacleCache.Any(o => o.Position.Distance2D(CurrentNavTarget) <= o.Radius * 2),
+                new Decorator(ret => CacheData.NavigationObstacles.Any(o => o.Position.Distance2D(CurrentNavTarget) <= o.Radius * 2),
                     new Sequence(
                         new Action(ret => SetNodeVisited("Navigation obstacle detected at node point")),
                         new Action(ret => UpdateRoute())

@@ -468,7 +468,7 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Exception reading SummonedByACDId {0}", ex.ToString());
                     }
                 }
-                if (!CacheData.IsSummonerCache.TryGetValue(c_ACDGUID, out c_IsSummoner))
+                if (!CacheData.IsSummoner.TryGetValue(c_ACDGUID, out c_IsSummoner))
                 {
                     try
                     {

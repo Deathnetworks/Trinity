@@ -83,15 +83,15 @@ namespace Trinity
                                     Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Fire Chains!");
                                     StandingInAvoidance = true;
                                 }
-                                CacheData.AvoidanceObstacleCache.Add(new CacheObstacleObject(fireChainSpot, fireChainSize, -2, "FireChains"));
+                                CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(fireChainSpot, fireChainSize, -2, "FireChains"));
                             }
                         }
-                        if (CacheData.AvoidanceObstacleCache.Any(aoe => aoe.ActorSNO == -2))
+                        if (CacheData.TimeBoundAvoidance.Any(aoe => aoe.ActorSNO == -2))
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Generated {0} avoidance points for FireChains, minDistance={1} maxDistance={2}",
-                                CacheData.AvoidanceObstacleCache.Count(aoe => aoe.ActorSNO == -2),
-                                CacheData.AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == -2)
+                                CacheData.TimeBoundAvoidance.Count(aoe => aoe.ActorSNO == -2),
+                                CacheData.TimeBoundAvoidance.Where(aoe => aoe.ActorSNO == -2)
                                     .Min(aoe => aoe.Position.Distance2D(Trinity.Player.Position)),
-                                CacheData.AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == -2)
+                                CacheData.TimeBoundAvoidance.Where(aoe => aoe.ActorSNO == -2)
                                     .Max(aoe => aoe.Position.Distance2D(Trinity.Player.Position)));
                     }
                 }
@@ -120,16 +120,16 @@ namespace Trinity
                                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Avoiding Beast Charger!");
                                 StandingInAvoidance = true;
                             }
-                            CacheData.AvoidanceObstacleCache.Add(new CacheObstacleObject(pathSpot, beastChargePathWidth, beastChargerSNO,
+                            CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(pathSpot, beastChargePathWidth, beastChargerSNO,
                                 "BeastCharge"));
                         }
-                        if (CacheData.AvoidanceObstacleCache.Any(aoe => aoe.ActorSNO == beastChargerSNO))
+                        if (CacheData.TimeBoundAvoidance.Any(aoe => aoe.ActorSNO == beastChargerSNO))
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                                 "Generated {0} avoidance points for BeastCharge, minDistance={1} maxDistance={2}",
-                                CacheData.AvoidanceObstacleCache.Count(aoe => aoe.ActorSNO == beastChargerSNO),
-                                CacheData.AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == beastChargerSNO)
+                                CacheData.TimeBoundAvoidance.Count(aoe => aoe.ActorSNO == beastChargerSNO),
+                                CacheData.TimeBoundAvoidance.Where(aoe => aoe.ActorSNO == beastChargerSNO)
                                     .Min(aoe => aoe.Position.Distance2D(Trinity.Player.Position)),
-                                CacheData.AvoidanceObstacleCache.Where(aoe => aoe.ActorSNO == beastChargerSNO)
+                                CacheData.TimeBoundAvoidance.Where(aoe => aoe.ActorSNO == beastChargerSNO)
                                     .Max(aoe => aoe.Position.Distance2D(Trinity.Player.Position)));
                     }
                 }
@@ -540,9 +540,9 @@ namespace Trinity
                     ForceCloseRangeTarget = false;
                 }
                 // Bunch of variables used throughout
-                CacheData.MonsterObstacleCache = new HashSet<CacheObstacleObject>();
-                CacheData.AvoidanceObstacleCache = new HashSet<CacheObstacleObject>();
-                CacheData.NavigationObstacleCache = new HashSet<CacheObstacleObject>();
+                CacheData.MonsterObstacles = new HashSet<CacheObstacleObject>();
+                CacheData.TimeBoundAvoidance = new HashSet<CacheObstacleObject>();
+                CacheData.NavigationObstacles = new HashSet<CacheObstacleObject>();
                 //AnyElitesPresent = false;
                 AnyMobsInRange = false;
 

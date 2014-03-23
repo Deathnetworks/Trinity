@@ -14,11 +14,8 @@ namespace Trinity.Technicals
         public PerformanceLogger(string blockName)
         {
             _BlockName = blockName;
-            if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
-            {
-                _Stopwatch = new Stopwatch();
-                _Stopwatch.Start();
-            }
+            _Stopwatch = new Stopwatch();
+            _Stopwatch.Start();
         }
 
         #region IDisposable Members
@@ -28,12 +25,17 @@ namespace Trinity.Technicals
             if (!_IsDisposed)
             {
                 _IsDisposed = true;
-                if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
+                _Stopwatch.Stop();
+                if (_Stopwatch.Elapsed.TotalMilliseconds > 100)
                 {
-                    _Stopwatch.Stop();
-                    if (_Stopwatch.Elapsed.TotalMilliseconds > 100)
+                    if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
                     {
                         Logging.DebugFormat("[Trinity][Performance] Execution of the block {0} took {1:00.00}ms.", _BlockName,
+                                            _Stopwatch.Elapsed.TotalMilliseconds);
+                    }
+                    else if (_Stopwatch.Elapsed.TotalMilliseconds > 250)
+                    {
+                        Logging.ErrorFormat("[Trinity][Performance] Execution of the block {0} took {1:00.00}ms.", _BlockName,
                                             _Stopwatch.Elapsed.TotalMilliseconds);
                     }
                 }

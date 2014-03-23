@@ -191,7 +191,7 @@ namespace Trinity
                 }
 
                 // check for navigation obstacles (never TP near demonic forges, etc)
-                if (CacheData.NavigationObstacleCache.Any(o => Vector3.Distance(o.Position, Trinity.Player.Position) < 90f))
+                if (CacheData.NavigationObstacles.Any(o => Vector3.Distance(o.Position, Trinity.Player.Position) < 90f))
                 {
                     Trinity.IsReadyToTownRun = false;
                 }

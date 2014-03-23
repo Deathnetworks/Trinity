@@ -264,7 +264,7 @@ namespace Trinity
                     CacheData.SummonedByACDId = new Dictionary<int, int>();
                     CacheData.InteractAttempts = new Dictionary<int, int>();
                     CacheData.ItemLinkQuality = new Dictionary<int, ItemQuality>();
-                    CacheData.IsSummonerCache = new Dictionary<int, bool>();
+                    CacheData.IsSummoner = new Dictionary<int, bool>();
                     ProfileHistory = new List<string>();
                     CurrentProfile = "";
                     FirstProfile = "";
