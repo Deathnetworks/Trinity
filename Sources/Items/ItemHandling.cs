@@ -53,6 +53,11 @@ namespace Trinity
                 return (Settings.Loot.Pickup.LegendaryLevel > 0 && (item.Level >= Settings.Loot.Pickup.LegendaryLevel || Settings.Loot.Pickup.LegendaryLevel == 1));
             }
 
+            if (item.IsUpgrade && Settings.Loot.Pickup.PickupUpgrades)
+            {
+                return true;
+            }
+
             // Calculate item types and base types etc.
             GItemType itemType = DetermineItemType(item.InternalName, item.DBItemType, item.ItemFollowerType);
             GItemBaseType baseType = DetermineBaseType(itemType);
@@ -164,6 +169,7 @@ namespace Trinity
                                        item.IsOneHand,
                                        item.IsTwoHand,
                                        item.FollowerSpecialType,
+                                       item.ACDGuid,
                                        item.DynamicId);
 
             Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation,

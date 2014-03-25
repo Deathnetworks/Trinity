@@ -71,7 +71,7 @@ namespace Trinity
 
 
         public ItemDropStats()
-            : this(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[5], new double[64], new double[5, 64], 0)
+            : this(0, new double[4], new double[74], new double[4, 74], 0, new double[74], 0, new double[5], new double[74], new double[5, 74], 0)
         {
             // Creates the default values used by most
         }

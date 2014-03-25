@@ -37,8 +37,8 @@ namespace Trinity
 
             public PersistentStats()
             {
-                ItemsDropped = new ItemDropStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
-                ItemsPicked = new ItemDropStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[4], new double[64], new double[4, 64], 0);
+                ItemsDropped = new ItemDropStats(0, new double[4], new double[74], new double[4, 74], 0, new double[74], 0, new double[5], new double[74], new double[4, 74], 0);
+                ItemsPicked = new ItemDropStats(0, new double[4], new double[74], new double[4, 74], 0, new double[74], 0, new double[5], new double[74], new double[4, 74], 0);
 
                 Reset();
             }

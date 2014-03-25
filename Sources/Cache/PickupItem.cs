@@ -18,10 +18,13 @@ namespace Trinity.Cache
         public Vector3 Position { get; set; }
         public int ActorSNO { get; set; }
         public int ACDGuid { get; set; }
+        public ACDItem ACDItem { get { return Zeta.Game.ZetaDia.Actors.GetACDItemByGuid(this.ACDGuid); } }
+        public bool IsUpgrade { get; set; }
 
         public PickupItem() { }
 
-        public PickupItem(string Name, string internalName, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int dynamicID = 0)
+        public PickupItem(string Name, string internalName, int level, ItemQuality quality, int balanceId, ItemBaseType dbItemBaseType, 
+            ItemType dbItemType, bool isOneHand, bool isTwoHand, FollowerType followerType, int acdGuid, int dynamicID = 0)
         {
             this.Name = Name;
             this.InternalName = internalName;
@@ -33,8 +36,11 @@ namespace Trinity.Cache
             this.IsOneHand = IsOneHand;
             this.IsTwoHand = IsTwoHand;
             this.ItemFollowerType = followerType;
+            this.ACDGuid = acdGuid;
             this.DynamicID = dynamicID;
         }
+
+
 
     }
 }

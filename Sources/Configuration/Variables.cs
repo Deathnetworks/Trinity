@@ -387,8 +387,8 @@ namespace Trinity
         private static HashSet<string> _hashsetItemFollowersIgnored = new HashSet<string>();
 
         // These objects are instances of my stats class above, holding identical types of data for two different things - one holds item DROP stats, one holds item PICKUP stats
-        internal static ItemDropStats ItemsDroppedStats = new ItemDropStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[5], new double[64], new double[4, 64], 0);
-        internal static ItemDropStats ItemsPickedStats = new ItemDropStats(0, new double[4], new double[64], new double[4, 64], 0, new double[64], 0, new double[5], new double[64], new double[4, 64], 0);
+        internal static ItemDropStats ItemsDroppedStats = new ItemDropStats(0, new double[4], new double[74], new double[4, 74], 0, new double[74], 0, new double[5], new double[74], new double[4, 74], 0);
+        internal static ItemDropStats ItemsPickedStats = new ItemDropStats(0, new double[4], new double[74], new double[4, 74], 0, new double[74], 0, new double[5], new double[74], new double[4, 74], 0);
 
 
         // Whether to try forcing a vendor-run for custom reasons

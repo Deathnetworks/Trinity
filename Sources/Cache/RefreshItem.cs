@@ -42,7 +42,7 @@ namespace Trinity
             c_GameBalanceID = diaItem.CommonData.GameBalanceId;
 
             // Compute item quality from item link for Crafting Plans (Blacksmith or Jewler)
-            if(c_InternalName.StartsWith("CraftingPlan_") || c_InternalName.StartsWith("CraftingReagent_Legendary_Unique_"))
+            if (c_InternalName.StartsWith("CraftingPlan_") || c_InternalName.StartsWith("CraftingReagent_Legendary_Unique_"))
             {
                 if (!CacheData.ItemLinkQuality.TryGetValue(c_ACDGUID, out c_ItemQuality))
                 {
@@ -83,6 +83,13 @@ namespace Trinity
             c_IsTwoHandedItem = diaItem.CommonData.IsTwoHand;
             c_item_tFollowerType = diaItem.CommonData.FollowerSpecialType;
 
+            float damage, toughness, healing = 0;
+            bool isUpgrade = false;
+            diaItem.CommonData.GetStatChanges(out damage, out healing, out toughness);
+
+            if (damage > 0 && toughness > 0)
+                isUpgrade = true;
+
             var pickupItem = new PickupItem
             {
                 Name = c_ItemDisplayName,
@@ -97,8 +104,11 @@ namespace Trinity
                 ItemFollowerType = c_item_tFollowerType,
                 DynamicID = c_GameDynamicID,
                 Position = c_Position,
-                ActorSNO = c_ActorSNO
+                ActorSNO = c_ActorSNO,
+                ACDGuid = c_ACDGUID,
+                IsUpgrade = isUpgrade,
             };
+
 
             // Calculate item type
             c_item_GItemType = DetermineItemType(c_InternalName, c_DBItemType, c_item_tFollowerType);
@@ -123,8 +133,6 @@ namespace Trinity
                 CacheData.ObjectType[c_RActorGuid] = c_ObjectType;
                 AddToCache = true;
             }
-
-
 
             // Item stats
             logNewItem = RefreshItemStats(itemBaseType);

@@ -79,7 +79,7 @@ namespace Trinity
             }
 
             /* Always refresh monster type */
-            if (c_ObjectType != GObjectType.Player)
+            if (c_ObjectType != GObjectType.Player && !c_unit_IsBoss)
             {
                 switch (c_CommonData.MonsterInfo.MonsterType)
                 {
