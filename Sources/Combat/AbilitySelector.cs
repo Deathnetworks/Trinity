@@ -126,6 +126,10 @@ namespace Trinity
                             //power = GetBarbarianPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
                             power = BarbarianCombat.GetPower();
                             break;
+                        // Crusader
+                        case ActorClass.Crusader:
+                            power = CrusaderCombat.GetPower();
+                            break;
                         // Monks
                         case ActorClass.Monk:
                             power = GetMonkPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);

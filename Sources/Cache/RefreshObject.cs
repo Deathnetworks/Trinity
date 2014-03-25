@@ -77,6 +77,7 @@ namespace Trinity
         private static double c_KillRange = 0f;
         private static MonsterAffixes c_MonsterAffixes = MonsterAffixes.None;
         private static bool c_IsFacingPlayer;
+        private static bool c_IsPlayerFacing;
         private static float c_Rotation;
         private static bool c_IsSummoner = false;
 
@@ -273,6 +274,7 @@ namespace Trinity
                         ItemLink = c_ItemLink,
                         Rotation = c_Rotation,
                         IsFacingPlayer = c_IsFacingPlayer,
+                        IsPlayerFacing = c_IsPlayerFacing,
                         IsSummonedByPlayer = c_IsSummonedByPlayer,
                         IsSummoner = c_IsSummoner
                     });
@@ -379,6 +381,7 @@ namespace Trinity
             c_KillRange = 0f;
             c_MonsterAffixes = MonsterAffixes.None;
             c_IsFacingPlayer = false;
+            c_IsPlayerFacing = false;
             c_Rotation = 0f;
             c_IsSummonedByPlayer = false;
             c_IsSummoner = false;

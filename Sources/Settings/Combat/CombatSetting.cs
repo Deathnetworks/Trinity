@@ -10,6 +10,7 @@ namespace Trinity.Config.Combat
         private MiscCombatSetting _Misc;
         private AvoidanceRadiusSetting _AvoidanceRadius;
         private BarbarianSetting _Barbarian;
+        private CrusaderSetting _Crusader;
         private MonkSetting _Monk;
         private WizardSetting _Wizard;
         private WitchDoctorSetting _WitchDoctor;
@@ -32,6 +33,7 @@ namespace Trinity.Config.Combat
             Misc = new MiscCombatSetting();
             AvoidanceRadius = new AvoidanceRadiusSetting();
             Barbarian = new BarbarianSetting();
+            Crusader = new CrusaderSetting();
             Monk = new MonkSetting();
             Wizard = new WizardSetting();
             WitchDoctor = new WitchDoctorSetting();
@@ -87,6 +89,23 @@ namespace Trinity.Config.Combat
                 {
                     _Barbarian = value;
                     OnPropertyChanged("Barbarian");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false, EmitDefaultValue = true)]
+        public CrusaderSetting Crusader
+        {
+            get
+            {
+                return _Crusader;
+            }
+            set
+            {
+                if (_Crusader != value)
+                {
+                    _Crusader = value;
+                    OnPropertyChanged("Crusader");
                 }
             }
         }

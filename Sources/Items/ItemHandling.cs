@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Trinity.Cache;
 using Trinity.Config.Loot;
 using Trinity.ItemRules;

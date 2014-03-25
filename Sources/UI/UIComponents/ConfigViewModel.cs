@@ -383,6 +383,16 @@ namespace Trinity.UIComponents
         }
 
         /// <summary>
+        /// Gets the reset command for Crusader Tab.
+        /// </summary>
+        /// <value>The reset command for Barbarian Tab.</value>
+        public ICommand ResetCrusaderCommand
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets the reset command for Monk Tab.
         /// </summary>
         /// <value>The reset command for Monk Tab.</value>
@@ -570,6 +580,18 @@ namespace Trinity.UIComponents
         }
 
         /// <summary>
+        /// Gets the Barbarian Configuration Model.
+        /// </summary>
+        /// <value>The Barbarian Configuration Model.</value>
+        public CrusaderSetting Crusader
+        {
+            get
+            {
+                return _Model.Combat.Crusader;
+            }
+        }
+
+        /// <summary>
         /// Gets the Demon Hunter Configuration Model.
         /// </summary>
         /// <value>The Demon Hunter Configuration Model.</value>
@@ -700,6 +722,12 @@ namespace Trinity.UIComponents
                                     (parameter) =>
                                     {
                                         _Model.Combat.Barbarian.Reset();
+                                        _Model.Combat.AvoidanceRadius.Reset();
+                                    });
+            ResetCrusaderCommand = new RelayCommand(
+                                    (parameter) =>
+                                    {
+                                        _Model.Combat.Crusader.Reset();
                                         _Model.Combat.AvoidanceRadius.Reset();
                                     });
             ResetMonkCommand = new RelayCommand(

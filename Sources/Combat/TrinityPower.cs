@@ -190,14 +190,14 @@ namespace Trinity
         /// </summary>
         /// <param name="snoPower"></param>
         /// <param name="minimumRange"></param>
-        /// <param name="targetRActorGUID"></param>
-        public TrinityPower(SNOPower snoPower, float minimumRange, int targetRActorGUID)
+        /// <param name="targetACDGuid"></param>
+        public TrinityPower(SNOPower snoPower, float minimumRange, int targetACDGuid)
         {
             SNOPower = snoPower;
             MinimumRange = minimumRange;
             TargetPosition = Vector3.Zero;
             TargetDynamicWorldId = CombatBase.Player.WorldDynamicID;
-            TargetACDGUID = targetRActorGUID;
+            TargetACDGUID = targetACDGuid;
             WaitTicksBeforeUse = V.F("Combat.DefaultTickPreDelay");
             WaitTicksAfterUse = V.F("Combat.DefaultTickPostDelay");
             WaitForAnimationFinished = true;

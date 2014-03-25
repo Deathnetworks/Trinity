@@ -17,6 +17,7 @@ namespace Trinity.Cache
         public int DynamicID { get; set; }
         public Vector3 Position { get; set; }
         public int ActorSNO { get; set; }
+        public int ACDGuid { get; set; }
 
         public PickupItem() { }
 

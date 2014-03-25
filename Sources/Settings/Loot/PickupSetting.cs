@@ -7,6 +7,7 @@ namespace Trinity.Config.Loot
     public class PickupSetting : ITrinitySetting<PickupSetting>, INotifyPropertyChanged
     {
         #region Fields
+        private bool _PickupUpgrades;
         private bool _PickupGrayItems;
         private bool _PickupWhiteItems;
         private int _WeaponBlueLevel;
@@ -58,6 +59,23 @@ namespace Trinity.Config.Loot
         #endregion Constructors
 
         #region Properties
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool PickupUpgrades
+        {
+            get
+            {
+                return _PickupUpgrades;
+            }
+            set
+            {
+                if (_PickupUpgrades != value)
+                {
+                    _PickupUpgrades = value;
+                    OnPropertyChanged("PickupUpgrades");
+                }
+            }
+        }
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool PickupGrayItems
@@ -631,6 +649,7 @@ namespace Trinity.Config.Loot
             this.PickupWhiteItems = true;
             this.PickupBlueFollowerItems = true;
             this.PickupYellowFollowerItems = true;
+            this.PickupUpgrades = true;
         }
         #endregion Methods
     }

@@ -9,6 +9,9 @@
             <TabItem Header="Misc" Foreground="{DynamicResource TextBrush}">
                 <Border Tag="Combat\ConfigMisc.xaml"/>
             </TabItem>
+            <TabItem Header="Crusader" Foreground="{DynamicResource TextBrush}">
+                <Border Tag="Combat\ConfigCrusader.xaml"/>
+            </TabItem>
             <TabItem Header="Barbarian" Foreground="{DynamicResource TextBrush}">
                 <Border Tag="Combat\ConfigBarb.xaml"/>
             </TabItem>

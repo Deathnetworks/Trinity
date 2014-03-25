@@ -57,6 +57,34 @@ namespace Trinity
         #endregion
 
         /// <summary>
+        /// Gets the number of units facing player
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        internal static int UnitsFacingPlayer(float range)
+        {
+            return
+                (from u in ObjectCache
+                 where u.IsUnit &&
+                 u.IsFacingPlayer
+                 select u).Count();
+        }
+
+        /// <summary>
+        /// Gets the number of units player is facing
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        internal static int UnitsPlayerFacing(float range)
+        {
+            return
+                (from u in ObjectCache
+                 where u.IsUnit &&
+                 u.IsPlayerFacing 
+                 select u).Count();
+        }
+
+        /// <summary>
         /// If ignoring elites, checks to see if enough trash trash pack are around
         /// </summary>
         /// <param name="range"></param>

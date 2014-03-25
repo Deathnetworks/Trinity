@@ -85,6 +85,9 @@ namespace Trinity.Combat.Abilities
                         case ActorClass.Barbarian:
                             power = BarbarianCombat.GetPower();
                             break;
+                        case ActorClass.Crusader:
+                            power = CrusaderCombat.GetPower();
+                            break;
                         // Monks
                         //case ActorClass.Monk:
                         //    power = GetMonkPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
@@ -342,7 +345,7 @@ namespace Trinity.Combat.Abilities
                     case ItemType.Crossbow:
                     case ItemType.HandCrossbow:
                         return SNOPower.Weapon_Ranged_Projectile;
-            }
+                }
             }
         }
         /// <summary>
@@ -379,10 +382,14 @@ namespace Trinity.Combat.Abilities
             if (!hasPower)
                 return false;
 
-            bool timer = flags.HasFlag(CanCastFlags.NoTimer) || SNOPowerUseTimer(power);
+            // Skip this if we're Crusader, for now
+            if (Player.ActorClass != ActorClass.Crusader)
+            {
+                bool timer = flags.HasFlag(CanCastFlags.NoTimer) || SNOPowerUseTimer(power);
 
-            if (!timer)
-                return false;
+                if (!timer)
+                    return false;
+            }
 
             bool powerManager = flags.HasFlag(CanCastFlags.NoPowerManager) || PowerManager.CanCast(power);
 

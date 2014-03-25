@@ -51,7 +51,14 @@ namespace Trinity
         public double HitPoints { get; set; }
         public float Radius { get; set; }
         public float Rotation { get; set; }
+        /// <summary>
+        /// If unit is facing player
+        /// </summary>
         public bool IsFacingPlayer { get; set; }
+        /// <summary>
+        /// If Player is facing unit
+        /// </summary>
+        public bool IsPlayerFacing { get; set; }
         public bool ForceLeapAgainst { get; set; }
         public bool HasBeenPrimaryTarget { get; set; }
         public int TimesBeenPrimaryTarget { get; set; }

@@ -84,6 +84,7 @@
     <Compile Include="Cache\RefreshGizmo.cs" />
     <Compile Include="Combat\Abilities\BarbarianCombat.cs" />
     <Compile Include="Combat\Abilities\CombatBase.cs" />
+    <Compile Include="Combat\Abilities\CrusaderCombat.cs" />
     <Compile Include="Combat\Abilities\Monk.cs" />
     <Compile Include="Combat\Abilities\SpellHistory.cs" />
     <Compile Include="Combat\Abilities\SpellHistoryItem.cs" />
@@ -133,6 +134,7 @@
     <Compile Include="Items\TrinityItemManager.cs" />
     <Compile Include="Helpers\UsedProfileManager.cs" />
     <Compile Include="Configuration\Constants.cs" />
+    <Compile Include="Settings\Combat\CrusaderSetting.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Combat\HandleTarget.cs" />
     <Compile Include="Combat\AbilitySelector.cs" />
@@ -260,6 +262,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Combat\Avoidance.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Combat\ConfigCrusader.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

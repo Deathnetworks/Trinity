@@ -41,6 +41,7 @@ namespace Trinity
                 if (c_diaUnit.Movement.IsValid)
                 {
                     c_IsFacingPlayer = c_diaUnit.IsFacingPlayer;
+                    c_IsPlayerFacing = c_diaUnit.IsFacing(Trinity.Player.Position, 70f);
                     c_Rotation = c_diaUnit.Movement.Rotation;
                 }
             }

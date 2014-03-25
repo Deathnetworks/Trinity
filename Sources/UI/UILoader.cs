@@ -30,7 +30,7 @@ namespace Trinity.UI
 
         public static Window GetDisplayWindow(string uiPath)
         {
-           using (new PerformanceLogger("GetDisplayWindow"))
+            using (new PerformanceLogger("GetDisplayWindow"))
             {
                 // Check we can actually find the .xaml file first - if not, report an error
                 if (!File.Exists(Path.Combine(uiPath, "MainView.xaml")))
@@ -148,23 +148,20 @@ namespace Trinity.UI
         /// <param name="uiPath">The UI path.</param>
         private static void LoadChild(FrameworkElement parentControl, string uiPath)
         {
-            using (new PerformanceLogger("LoadChild"))
+            // Loop in Children of parent control of type FrameworkElement 
+            foreach (FrameworkElement ctrl in LogicalTreeHelper.GetChildren(parentControl).OfType<FrameworkElement>())
             {
-                // Loop in Children of parent control of type FrameworkElement 
-                foreach (FrameworkElement ctrl in LogicalTreeHelper.GetChildren(parentControl).OfType<FrameworkElement>())
+                string contentName = ctrl.Tag as string;
+                // Tag contains a string end with ".xaml" : It's dymanic content 
+                if (!string.IsNullOrWhiteSpace(contentName) && contentName.EndsWith(".xaml"))
                 {
-                    string contentName = ctrl.Tag as string;
-                    // Tag contains a string end with ".xaml" : It's dymanic content 
-                    if (!string.IsNullOrWhiteSpace(contentName) && contentName.EndsWith(".xaml"))
-                    {
-                        // Load content from XAML file
-                        LoadDynamicContent(uiPath, ctrl, System.IO.Path.Combine(uiPath, contentName));
-                    }
-                    else
-                    {
-                        // Try again with children of control
-                        LoadChild(ctrl, uiPath);
-                    }
+                    // Load content from XAML file
+                    LoadDynamicContent(uiPath, ctrl, System.IO.Path.Combine(uiPath, contentName));
+                }
+                else
+                {
+                    // Try again with children of control
+                    LoadChild(ctrl, uiPath);
                 }
             }
         }

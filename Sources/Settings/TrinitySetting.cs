@@ -384,30 +384,37 @@ namespace Trinity.Config
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "Starting CopyTo Object {0}", type.Name);
                 foreach (PropertyInfo prop in type.GetProperties(BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
                 {
-                    if (prop.PropertyType.IsValueType || prop.PropertyType == typeof(string))
+                    try
                     {
-                        prop.SetValue(destination, prop.GetValue(source, null), null);
+                        if (prop.PropertyType.IsValueType || prop.PropertyType == typeof(string))
+                        {
+                            prop.SetValue(destination, prop.GetValue(source, null), null);
+                        }
+                        else
+                        {
+                            object destinationValue = prop.GetValue(destination, null);
+                            object sourceValue = prop.GetValue(source, null);
+                            if (sourceValue != null && destinationValue != null)
+                            {
+                                MethodBase method = prop.PropertyType.GetMethod("CopyTo", new[] { prop.PropertyType });
+                                if (method != null)
+                                {
+                                    method.Invoke(sourceValue, new[] { destinationValue });
+                                }
+                            }
+                            else if (sourceValue != null && destinationValue != null)
+                            {
+                                MethodBase method = prop.PropertyType.GetMethod("Clone", null);
+                                if (method != null)
+                                {
+                                    prop.SetValue(destination, method.Invoke(sourceValue, null), null);
+                                }
+                            }
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        object destinationValue = prop.GetValue(destination, null);
-                        object sourceValue = prop.GetValue(source, null);
-                        if (destinationValue != null)
-                        {
-                            MethodBase method = prop.PropertyType.GetMethod("CopyTo", new[] { prop.PropertyType });
-                            if (method != null)
-                            {
-                                method.Invoke(sourceValue, new[] { destinationValue });
-                            }
-                        }
-                        else if (destinationValue != null)
-                        {
-                            MethodBase method = prop.PropertyType.GetMethod("Clone", null);
-                            if (method != null)
-                            {
-                                prop.SetValue(destination, method.Invoke(sourceValue, null), null);
-                            }
-                        }
+                        Logger.Log(TrinityLogLevel.Error, LogCategory.UserInformation, "Error while CopyTo Setting {0} : {1} Property: {2}", typeof(T).Name, ex.Message, prop.Name);
                     }
                 }
                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Configuration, "End CopyTo Object {0}", type.Name);
