@@ -55,6 +55,7 @@ namespace Trinity
         public int ParagonCurrentExperience { get; set; }
         public long ParagonExperienceNextLevel { get; set;  }
         public float Rotation { get; set; }
+        public Vector2 DirectionVector { get; set; }
 
         public PlayerInfoCache()
         {
@@ -156,6 +157,7 @@ namespace Trinity
                     
                     Player.Position = me.Position;
                     Player.Rotation = me.Movement.Rotation;
+                    Player.DirectionVector = me.Movement.DirectionVector;
 
                     Player.GoldPickupRadius = me.GoldPickupRadius;
                     Player.Coinage = me.Inventory.Coinage;
@@ -346,5 +348,20 @@ namespace Trinity
                 }
             }
         }
+
+        public bool IsFacing(Vector3 targetPosition, float arcDegrees = 70f)
+        {
+            if (DirectionVector != Vector2.Zero)
+            {
+                Vector3 u = targetPosition - this.Position;
+                u.Z = 0f;
+                Vector3 v = new Vector3(DirectionVector.X, DirectionVector.Y, 0f);
+                bool result = ((MathEx.ToDegrees(Vector3.AngleBetween(u, v)) <= arcDegrees) ? 1 : 0) != 0;
+                return result;
+            }
+            else
+                return false;
+        }
+
     }
 }

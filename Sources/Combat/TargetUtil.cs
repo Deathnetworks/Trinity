@@ -75,12 +75,12 @@ namespace Trinity
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        internal static int UnitsPlayerFacing(float range)
+        internal static int UnitsPlayerFacing(float range, float arcDegrees = 70f)
         {
             return
                 (from u in ObjectCache
                  where u.IsUnit &&
-                 u.IsPlayerFacing 
+                 u.IsPlayerFacing(arcDegrees)
                  select u).Count();
         }
 
@@ -196,16 +196,25 @@ namespace Trinity
             return clusterCheck;
         }
 
-        internal static TrinityCacheObject GetBestPierceTarget(float maxRange)
+        internal static TrinityCacheObject GetBestPierceTarget(float maxRange, int arcDegrees = 0)
         {
-            var bestUnit =
+            return
                 (from u in ObjectCache
-                 where u.IsUnit &&
-                 u.RadiusDistance <= maxRange
-                 orderby u.CountUnitsInFront() descending
-                 select u).FirstOrDefault();
+                where u.IsUnit &&
+                u.RadiusDistance <= maxRange
+                orderby u.CountUnitsInFront() descending
+                select u).FirstOrDefault();
+        }
 
-            return bestUnit;
+        internal static TrinityCacheObject GetBestArcTarget(float maxRange, float arcDegrees)
+        {
+            return
+                (from u in ObjectCache
+                where u.IsUnit &&
+                u.RadiusDistance <= maxRange &&
+                u.IsPlayerFacing(arcDegrees)
+                orderby u.CountUnitsInFront() descending
+                select u).FirstOrDefault();
         }
 
         private static Vector3 GetBestAoEMovementPosition()
@@ -462,7 +471,7 @@ namespace Trinity
                      ((useWeights && o.Weight > 0) || !useWeights) &&
                     o.RadiusDistance <= range
                     select o).Count() >= minCount;
-        }       
+        }
         /// <summary>
         /// Fast check to see if there are any attackable Elite units within a certain distance
         /// </summary>

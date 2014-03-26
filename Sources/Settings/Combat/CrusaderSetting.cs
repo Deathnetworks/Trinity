@@ -7,6 +7,7 @@ namespace Trinity.Config.Combat
     public class CrusaderSetting : ITrinitySetting<CrusaderSetting>, IAvoidanceHealth, INotifyPropertyChanged
     {
         #region Fields
+        private int _TauntAoECount;
         private int _SweepAttackAoECount;
         private int _JudgmentAoECount;
         private int _ShieldGlareAoECount;
@@ -75,6 +76,24 @@ namespace Trinity.Config.Combat
         #endregion Constructors
 
         #region Properties
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(5)]
+        public int ProvokeAoECount
+        {
+            get
+            {
+                return _TauntAoECount;
+            }
+            set
+            {
+                if (_TauntAoECount != value)
+                {
+                    _TauntAoECount = value;
+                    OnPropertyChanged("TauntAoECount");
+                }
+            }
+        }
 
         [DataMember(IsRequired = false)]
         [DefaultValue(5)]

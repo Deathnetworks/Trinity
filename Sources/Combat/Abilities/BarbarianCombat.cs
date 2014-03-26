@@ -326,7 +326,8 @@ namespace Trinity.Combat.Abilities
                     !IsCurrentlyAvoiding &&
                     CanCast(SNOPower.Barbarian_CallOfTheAncients) &&
                     !Player.IsIncapacitated &&
-                    (TargetUtil.AnyMobsInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange"), 3) || TargetUtil.AnyElitesInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")));
+                    (TargetUtil.EliteOrTrashInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")) ||
+                    TargetUtil.AnyMobsInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange"), 3) || TargetUtil.AnyElitesInRange(V.F("Barbarian.CallOfTheAncients.MinEliteRange")));
             }
         }
         public static bool CanCastBattleRage
