@@ -9,6 +9,8 @@ namespace Trinity
     /// </summary>
     internal class DataDictionary
     {
+
+
         public static HashSet<string> VanityItems { get { return DataDictionary.vanityItems; } }
         private static readonly HashSet<string> vanityItems = new HashSet<string>()
         {
@@ -17,6 +19,12 @@ namespace Trinity
             "WoDFlag", // Warsong Pennant
         };
 
+        public static HashSet<int> NeverTownPortalLevelAreaIds { get { return neverTownPortalLevelAreaIds; } }
+        private static readonly HashSet<int> neverTownPortalLevelAreaIds = new HashSet<int>()
+        {
+            202446, // A1 New Tristram "Attack Area"
+        };
+        
         public static HashSet<int> ForceTownPortalLevelAreaIds { get { return DataDictionary.forceTownPortalLevelAreaIds; } }
         private static readonly HashSet<int> forceTownPortalLevelAreaIds = new HashSet<int>
         {
@@ -374,7 +382,10 @@ namespace Trinity
             56686, 211999, 52685, 54882, 180575, 105478, 
             102927, // A1 Cursed Hold Prisoners
             5747, // A1 Cathedral Switch
-            365097 // Cursed Chest - Damp Cellar
+            365097, // Cursed Chest - Damp Cellar
+
+            // A5
+            328830, // x1_Fortress_Portal_Switch
         };
 
         /// <summary>
@@ -408,10 +419,10 @@ namespace Trinity
         public static Dictionary<int, float> ObstacleCustomRadius { get { return obstacleCustomRadius; } }
         private static readonly Dictionary<int, float> obstacleCustomRadius = new Dictionary<int, float> {
             {174900, 25}, {194682, 20}, {81699, 20}, {3340, 12}, {123325, 25}, {185391, 25},
-            {104596, 25}, // trOut_FesteringWoods_Neph_Column_B
-            {104632, 25}, // trOut_FesteringWoods_Neph_Column_B_Broken_Base
-            {105303, 25}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base_Bottom
-            {104827, 25}, // ActorSNO: 104827 Name: trOut_FesteringWoods_Neph_Column_C_Broken_Base-489 Type: DestroyableObject Radius: 12.05 
+            {104596, 15}, // trOut_FesteringWoods_Neph_Column_B
+            {104632, 15}, // trOut_FesteringWoods_Neph_Column_B_Broken_Base
+            {105303, 15}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base_Bottom
+            {104827, 15}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base 
             
          };
 
@@ -517,6 +528,27 @@ namespace Trinity
             263014, 
             5724, 5727, 
             116063, 
+
+            /*
+             * A5
+             */
+
+            // Pandemonium Fortress
+            357297, // X1_Fortress_Rack_C
+            374196, // X1_Fortress_Rack_C_Stump
+            357295, // X1_Fortress_Rack_B
+            374195, // X1_Fortress_Rack_B_Stump
+            357299, // X1_Fortress_Rack_D
+            374197, // X1_Fortress_Rack_D_Stump
+            357301, // X1_Fortress_Rack_E
+            374198, // X1_Fortress_Rack_E_Stump
+            357306, // X1_Fortress_Rack_F
+            374199, // X1_Fortress_Rack_F_Stump
+            365503, // X1_Fortress_FloatRubble_A
+            365739, // X1_Fortress_FloatRubble_F
+            365580, // X1_Fortress_FloatRubble_C
+
+
         };
 
         /// <summary>

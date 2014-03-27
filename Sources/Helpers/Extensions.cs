@@ -77,6 +77,13 @@ namespace Trinity.Helpers
                 case "{c:ff6969ff}":
                     qualityResult = ItemQuality.Magic1;
                     break;
+                case "{c:ffffffff}":
+                    qualityResult = ItemQuality.Normal;
+                    break;
+                    // got this off a "lore book" - not sure what it actually equates to
+                case "{c:ff99bbff}":
+                    qualityResult = ItemQuality.Normal;
+                    break;
                 default:
                     Logger.Log("Invalid Item Link color={0} internalName={1} name={2} gameBalanceId={3}", linkColor, item.InternalName, item.Name, item.GameBalanceId);
                     qualityResult = item.ItemQualityLevel;

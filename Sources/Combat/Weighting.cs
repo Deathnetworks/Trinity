@@ -31,7 +31,7 @@ namespace Trinity
                 bool noGoblinsPresent = (!AnyTreasureGoblinsPresent && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize) || Settings.Combat.Misc.GoblinPriority < GoblinPriority.Prioritize;
 
 
-                bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || 
+                bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted ||
                     ObjectCache.Count(u => u.IsUnit && u.RadiusDistance < 10f) >= 3);
 
                 bool hasWrathOfTheBerserker = Player.ActorClass == ActorClass.Barbarian && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
@@ -115,16 +115,18 @@ namespace Trinity
                                         (cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealth ||
                                          cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS))
                                     {
-                                        unitWeightInfo = "Ignoring ";
+                                        unitWeightInfo = "Ignoring Health/DoT ";
                                         ignoring = true;
                                     }
 
-                                    bool forceKillSummoner = ((cacheObject.IsSummoner && Settings.Combat.Misc.ForceKillSummoners) || !cacheObject.IsSummoner);
+                                    bool ignoreSummoner = true;
+                                    if (cacheObject.IsSummoner && Settings.Combat.Misc.ForceKillSummoners)
+                                        ignoreSummoner = false;
 
                                     // Ignore Solitary Trash mobs (no elites present)
                                     // Except if has been primary target or if already low on health (<= 20%)
                                     if (shouldIgnoreTrashMobs && !isInHotSpot &&
-                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) && forceKillSummoner)
+                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) && ignoreSummoner)
                                     {
                                         unitWeightInfo = "Ignoring ";
                                         ignoring = true;
@@ -133,8 +135,8 @@ namespace Trinity
                                     {
                                         unitWeightInfo = "Adding ";
                                     }
-                                    unitWeightInfo += String.Format("nearbyCount={0} radiusDistance={1:0} hotspot={2} ShouldIgnore={3} elitesInRange={4} hitPointsPc={5}",
-                                        nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot, shouldIgnoreTrashMobs, elitesInRangeOfUnit, cacheObject.HitPointsPct);
+                                    unitWeightInfo += String.Format("nearbyCount={0} radiusDistance={1:0} hotspot={2} ShouldIgnore={3} elitesInRange={4} hitPointsPc={5:0.0} summoner={6}",
+                                        nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot, shouldIgnoreTrashMobs, elitesInRangeOfUnit, cacheObject.HitPointsPct, ignoreSummoner);
 
                                     if (ignoring)
                                         break;

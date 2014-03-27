@@ -98,11 +98,20 @@ namespace Trinity
                 Trinity.IsReadyToTownRun = false;
 
                 if (Trinity.Player.IsDead)
+                {
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Unable to Town Portal - Player is dead!");
                     return false;
-
+                }
                 if (DataDictionary.BossLevelAreaIDs.Contains(Trinity.Player.LevelAreaId))
+                {
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Unable to Town Portal - Boss Area!");
                     return false;
-
+                }
+                if (DataDictionary.NeverTownPortalLevelAreaIds.Contains(Trinity.Player.LevelAreaId))
+                {
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Unable to Town Portal in this area!");
+                    return false;
+                }
                 if (ZetaDia.IsInTown && DbProvider.DeathHandler.EquipmentNeedsEmergencyRepair())
                 {
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "EquipmentNeedsEmergencyRepair!");
@@ -110,7 +119,8 @@ namespace Trinity
                 }
                 if (Trinity.IsReadyToTownRun && Trinity.CurrentTarget != null)
                 {
-                    TownRunCheckTimer.Reset();
+                    TownRunCheckTimer.Restart();
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Restarting TownRunCheckTimer, we have a target!");
                     return false;
                 }
 
@@ -150,21 +160,22 @@ namespace Trinity
                     }
 
                     var equippedItems = ZetaDia.Me.Inventory.Equipped.Where(i => i.DurabilityCurrent != i.DurabilityMax);
-                    if (!equippedItems.Any())
-                        return false;
-                    double avg = equippedItems.Average(i => i.DurabilityPercent);
-
-                    float threshold = Trinity.Player.IsInTown ? 0.50f : Zeta.Bot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow;
-                    bool needsRepair = avg <= threshold;
-
-                    if (needsRepair)
+                    if (equippedItems.Any())
                     {
-                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Items may need repair, now running town-run routine.");
+                        double avg = equippedItems.Average(i => i.DurabilityPercent);
 
-                        Trinity.IsReadyToTownRun = true;
-                        Trinity.ForceVendorRunASAP = true;
-                        TownRun.SetPreTownRunPosition();
-                    }         
+                        float threshold = Trinity.Player.IsInTown ? 0.50f : Zeta.Bot.Settings.CharacterSettings.Instance.RepairWhenDurabilityBelow;
+                        bool needsRepair = avg <= threshold;
+
+                        if (needsRepair)
+                        {
+                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Items may need repair, now running town-run routine.");
+
+                            Trinity.IsReadyToTownRun = true;
+                            Trinity.ForceVendorRunASAP = true;
+                            TownRun.SetPreTownRunPosition();
+                        }
+                    }    
                     
                 }
 
@@ -187,12 +198,7 @@ namespace Trinity
                 // Fix for A1 new game with bags full
                 if (Trinity.Player.LevelAreaId == 19947 && ZetaDia.CurrentQuest.QuestSNO == 87700 && (ZetaDia.CurrentQuest.StepId == -1 || ZetaDia.CurrentQuest.StepId == 42))
                 {
-                    Trinity.IsReadyToTownRun = false;
-                }
-
-                // check for navigation obstacles (never TP near demonic forges, etc)
-                if (CacheData.NavigationObstacles.Any(o => Vector3.Distance(o.Position, Trinity.Player.Position) < 90f))
-                {
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Can't townrun with the current quest!");
                     Trinity.IsReadyToTownRun = false;
                 }
 
@@ -207,12 +213,14 @@ namespace Trinity
                 }
 
 
-                if ((Trinity.IsReadyToTownRun && TownRunTimerFinished()) || BrainBehavior.IsVendoring)
+                if ((Trinity.IsReadyToTownRun && (TownRunTimerFinished() || Trinity.Player.IsInTown)) || BrainBehavior.IsVendoring)
                 {
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Waiting for town run timer");
                     return true;
                 }
                 if (Trinity.IsReadyToTownRun && !TownRunCheckTimer.IsRunning)
                 {
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Starting town run timer");
                     TownRunCheckTimer.Start();
                     _loggedAnythingThisStash = false;
                     _loggedJunkThisStash = false;

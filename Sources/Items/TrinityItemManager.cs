@@ -511,7 +511,18 @@ namespace Trinity
                 {
                     object val = property.GetValue(item, null);
                     if (val != null)
+                    {
                         Logger.Log(typeof(T).Name + "." + property.Name + "=" + val.ToString());
+
+                        // Special cases!
+                        if (property.Name == "ValidInventorySlots")
+                        {
+                            foreach (var slot in ((InventorySlot[])val))
+                            {
+                                Logger.Log(slot.ToString());
+                            }
+                        }
+                    }
                 }
                 catch
                 {

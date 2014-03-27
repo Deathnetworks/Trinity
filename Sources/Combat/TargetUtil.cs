@@ -409,7 +409,7 @@ namespace Trinity
                      (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
                      u.RadiusDistance <= maxRange
                      orderby u.Type != GObjectType.HealthGlobe // if it's a globe this will be false and sorted at the top
-                     orderby u.IsBossOrEliteRareUnique
+                     orderby !u.IsBossOrEliteRareUnique
                      orderby u.NearbyUnitsWithinDistance(radius) descending
                      orderby u.CentreDistance
                      orderby u.HitPointsPct descending
