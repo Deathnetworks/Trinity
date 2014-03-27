@@ -442,13 +442,13 @@ namespace Trinity
                     {
                         if (ts.ItemsDropped.TotalPerQuality[iThisQuality] > 0)
                         {
-                            LogWriter.WriteLine("- " + sQualityString[iThisQuality] + ": " + ts.ItemsDropped.TotalPerQuality[iThisQuality].ToString() + " [" + Math.Round(ts.ItemsDropped.TotalPerQuality[iThisQuality] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsDropped.TotalPerQuality[iThisQuality] / ts.ItemsDropped.Total) * 100, 2).ToString("0.00") + " %}");
+                            LogWriter.WriteLine("- " + ItemQualityTypeStrings[iThisQuality] + ": " + ts.ItemsDropped.TotalPerQuality[iThisQuality].ToString() + " [" + Math.Round(ts.ItemsDropped.TotalPerQuality[iThisQuality] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsDropped.TotalPerQuality[iThisQuality] / ts.ItemsDropped.Total) * 100, 2).ToString("0.00") + " %}");
                             //intell
 							if (iThisQuality == 3)
 							{
                             for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
                                 if (ts.ItemsDropped.TotalPerQPerL[iThisQuality, itemLevel] > 0)
-                                    LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sQualityString[iThisQuality] + ": " + ts.ItemsDropped.TotalPerQPerL[iThisQuality, itemLevel].ToString() + " [" + Math.Round(ts.ItemsDropped.TotalPerQPerL[iThisQuality, itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsDropped.TotalPerQPerL[iThisQuality, itemLevel] / ts.ItemsDropped.Total) * 100, 2).ToString("0.00") + " %}");
+                                    LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + ItemQualityTypeStrings[iThisQuality] + ": " + ts.ItemsDropped.TotalPerQPerL[iThisQuality, itemLevel].ToString() + " [" + Math.Round(ts.ItemsDropped.TotalPerQPerL[iThisQuality, itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsDropped.TotalPerQPerL[iThisQuality, itemLevel] / ts.ItemsDropped.Total) * 100, 2).ToString("0.00") + " %}");
                         }
                         }
 
@@ -486,13 +486,13 @@ namespace Trinity
                     {
                         if (ts.ItemsPicked.TotalPerQuality[iThisQuality] > 0)
                         {
-                            LogWriter.WriteLine("- " + sQualityString[iThisQuality] + ": " + ts.ItemsPicked.TotalPerQuality[iThisQuality].ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPerQuality[iThisQuality] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.TotalPerQuality[iThisQuality] / ts.ItemsPicked.Total) * 100, 2).ToString("0.00") + " %}");
+                            LogWriter.WriteLine("- " + ItemQualityTypeStrings[iThisQuality] + ": " + ts.ItemsPicked.TotalPerQuality[iThisQuality].ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPerQuality[iThisQuality] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.TotalPerQuality[iThisQuality] / ts.ItemsPicked.Total) * 100, 2).ToString("0.00") + " %}");
                             //intell
 							if (iThisQuality == 3)
 							{
                             for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
                                 if (ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel] > 0)
-                                    LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sQualityString[iThisQuality] + ": " + ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel].ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel] / ts.ItemsPicked.Total) * 100, 2).ToString("0.00") + " %}");
+                                    LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + ItemQualityTypeStrings[iThisQuality] + ": " + ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel].ToString() + " [" + Math.Round(ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.TotalPerQPerL[iThisQuality, itemLevel] / ts.ItemsPicked.Total) * 100, 2).ToString("0.00") + " %}");
                         }
                         }
 
@@ -528,10 +528,10 @@ namespace Trinity
                     {
                         if (ts.ItemsPicked.GemsPerType[iThisGemType] > 0)
                         {
-                            LogWriter.WriteLine("- " + sGemString[iThisGemType] + ": " + ts.ItemsPicked.GemsPerType[iThisGemType].ToString() + " [" + Math.Round(ts.ItemsPicked.GemsPerType[iThisGemType] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.GemsPerType[iThisGemType] / ts.ItemsPicked.TotalGems) * 100, 2).ToString("0.00") + " %}");
+                            LogWriter.WriteLine("- " + GemTypeStrings[iThisGemType] + ": " + ts.ItemsPicked.GemsPerType[iThisGemType].ToString() + " [" + Math.Round(ts.ItemsPicked.GemsPerType[iThisGemType] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.GemsPerType[iThisGemType] / ts.ItemsPicked.TotalGems) * 100, 2).ToString("0.00") + " %}");
                             for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
                                 if (ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel] > 0)
-                                    LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sGemString[iThisGemType] + ": " + ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel].ToString() + " [" + Math.Round(ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel] / ts.ItemsPicked.TotalGems) * 100, 2).ToString("0.00") + " %}");
+                                    LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + GemTypeStrings[iThisGemType] + ": " + ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel].ToString() + " [" + Math.Round(ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel] / ts.TotalRunningTime.TotalHours, 2).ToString("0.00") + " per hour] {" + Math.Round((ts.ItemsPicked.GemsPerTPerL[iThisGemType, itemLevel] / ts.ItemsPicked.TotalGems) * 100, 2).ToString("0.00") + " %}");
                         }
 
                         // Any at all this quality?

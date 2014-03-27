@@ -170,6 +170,7 @@ namespace Trinity
         internal static Vector3 FindSafeZone(Vector3 origin, bool shouldKite = false, bool isStuck = false, IEnumerable<TrinityCacheObject> monsterList = null, bool avoidDeath = false)
         {
             MainGridProvider.Update();
+            Navigator.Clear();
 
             /*
             generate 50x50 grid of 5x5 squares within max 100 distance from origin to edge of grid
@@ -204,7 +205,7 @@ namespace Trinity
 
             GridPoint bestPoint = new GridPoint(Vector3.Zero, 0, 0);
 
-            int nodesNotNavigable = 0;
+            int nodesCantStand = 0;
             int nodesZDiff = 0;
             int nodesGT45Raycast = 0;
             int nodesAvoidance = 0;
@@ -240,11 +241,11 @@ namespace Trinity
                     {
                         p_xy = MainGridProvider.WorldToGrid(xy);
 
-                        //if (!MainGridProvider.CanStandAt(p_xy))
-                        //{
-                        //    nodesNotNavigable++;
-                        //    continue;
-                        //}
+                        if (!MainGridProvider.CanStandAt(p_xy))
+                        {
+                            nodesCantStand++;
+                            continue;
+                        }
                     }
                     else
                     {
@@ -436,8 +437,8 @@ namespace Trinity
             }
 
             Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid found {0}, distance: {1:0}, weight: {2:0}", bestPoint.Position, bestPoint.Distance, bestPoint.Weight);
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid stats NotNavigable {0} ZDiff {1} GT45Raycast {2} Avoidance {3} Monsters {4} pathFailures {5} navRaycast {6} pointsFound {7}",
-                nodesNotNavigable,
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid stats CantStand {0} ZDiff {1} GT45Raycast {2} Avoidance {3} Monsters {4} pathFailures {5} navRaycast {6} pointsFound {7}",
+                nodesCantStand,
                 nodesZDiff,
                 nodesGT45Raycast,
                 nodesAvoidance,
@@ -499,6 +500,8 @@ namespace Trinity
             }
             else
             {
+                Navigator.Clear();
+                
                 var bestPoint = gridPoints.OrderByDescending(p => p.Weight).FirstOrDefault();
                 Logger.LogDebug(LogCategory.Navigator, "Using unstucker position {0} distance={1:0.0} rayCast={2} navObsticle={3}",
                     NavHelper.PrettyPrintVector3(bestPoint.Position), bestPoint.Distance, raycastFail, navigationObstacleFail);

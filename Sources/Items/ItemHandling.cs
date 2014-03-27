@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Trinity.Cache;
 using Trinity.Config.Loot;
+using Trinity.Helpers;
 using Trinity.ItemRules;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -99,7 +100,7 @@ namespace Trinity
                     break;
                 case GItemBaseType.Misc:
 
-                    if (itemType == GItemType.CraftingMaterial && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.CraftMaterials))
+                    if (itemType == GItemType.CraftingMaterial && (item.ACDItem.GetTrinityItemQuality() < Settings.Loot.Pickup.MiscItemQuality || !Settings.Loot.Pickup.CraftMaterials))
                     {
                         return false;
                     }
@@ -110,13 +111,13 @@ namespace Trinity
                     }
 
                     // Plans
-                    if (item.InternalName.ToLower().StartsWith("craftingplan_smith") && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.Plans))
+                    if (item.InternalName.ToLower().StartsWith("craftingplan_smith") && (item.ACDItem.GetTrinityItemQuality() < Settings.Loot.Pickup.MiscItemQuality || !Settings.Loot.Pickup.Plans))
                     {
                         return false;
                     }
 
                     // Designs
-                    if (item.InternalName.ToLower().StartsWith("craftingplan_jeweler") && (item.Level < Settings.Loot.Pickup.MiscItemLevel || !Settings.Loot.Pickup.Designs))
+                    if (item.InternalName.ToLower().StartsWith("craftingplan_jeweler") && (item.ACDItem.GetTrinityItemQuality() < Settings.Loot.Pickup.MiscItemQuality || !Settings.Loot.Pickup.Designs))
                     {
                         return false;
                     }
@@ -309,6 +310,8 @@ namespace Trinity
             if (name.StartsWith("handxbow_")) return GItemType.HandCrossbow;
             if (name.StartsWith("dagger_")) return GItemType.Dagger;
             if (name.StartsWith("fistweapon_")) return GItemType.FistWeapon;
+            if (name.StartsWith("flail1h_")) return GItemType.Flail;
+            if (name.StartsWith("flail2h_")) return GItemType.TwoHandFlail;
             if (name.StartsWith("mace_")) return GItemType.Mace;
             if (name.StartsWith("mightyweapon_1h_")) return GItemType.MightyWeapon;
             if (name.StartsWith("spear_")) return GItemType.Spear;
@@ -328,7 +331,7 @@ namespace Trinity
             if (name.StartsWith("orb_")) return GItemType.Orb;
             if (name.StartsWith("quiver_")) return GItemType.Quiver;
             if (name.StartsWith("shield_")) return GItemType.Shield;
-            if (name.StartsWith("crushield_")) return GItemType.Shield;
+            if (name.StartsWith("crushield_")) return GItemType.CrusaderShield;
             if (name.StartsWith("amulet_")) return GItemType.Amulet;
             if (name.StartsWith("ring_")) return GItemType.Ring;
             if (name.StartsWith("boots_")) return GItemType.Boots;
@@ -355,6 +358,7 @@ namespace Trinity
             if (name.StartsWith("followeritem_templar_") || dbFollowerType == FollowerType.Templar) return GItemType.FollowerTemplar;
             if (name.StartsWith("craftingplan_")) return GItemType.CraftingPlan;
             if (name.StartsWith("craftingmaterials_")) return GItemType.CraftingMaterial;
+            if (name.StartsWith("crafting_")) return GItemType.CraftingMaterial;
             if (name.StartsWith("craftingreagent_legendary_")) return GItemType.CraftingPlan;
             if (name.StartsWith("dye_")) return GItemType.Dye;
             if (name.StartsWith("a1_")) return GItemType.SpecialItem;
@@ -451,7 +455,7 @@ namespace Trinity
                 itemBaseType = GItemBaseType.WeaponRange;
             }
             // Off-hands
-            else if (itemType == GItemType.Mojo || itemType == GItemType.Orb ||
+            else if (itemType == GItemType.Mojo || itemType == GItemType.Orb || itemType == GItemType.CrusaderShield ||
                 itemType == GItemType.Quiver || itemType == GItemType.Shield)
             {
                 itemBaseType = GItemBaseType.Offhand;
@@ -543,47 +547,50 @@ namespace Trinity
         /// </summary>
         internal static void TestScoring()
         {
-            try
+            using (var helper = new Helpers.ZetaCacheHelper())
             {
-                if (TownRun.TestingBackpack) return;
-                TownRun.TestingBackpack = true;
-                //ZetaDia.Actors.Update();
-                if (ZetaDia.Actors.Me == null)
+                try
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Error testing scores - not in game world?");
-                    return;
-                }
-                if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
-                {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "===== Outputting Test Scores =====");
-                    foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
+                    if (TownRun.TestingBackpack) return;
+                    TownRun.TestingBackpack = true;
+                    //ZetaDia.Actors.Update();
+                    if (ZetaDia.Actors.Me == null)
                     {
-                        if (item.BaseAddress == IntPtr.Zero)
-                        {
-                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [TestScore-1]");
-                        }
-                        else
-                        {
-                            CachedACDItem cItem = new CachedACDItem(item, item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId, item.DynamicId,
-                                item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.IsTwoHand, item.DyeType, item.ItemType, item.ItemBaseType, item.FollowerSpecialType, item.IsUnidentified, item.ItemStackQuantity,
-                                item.Stats);
-                            bool bShouldStashTest = TrinityItemManager.Current.ShouldStashItem(item);
-                            Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, bShouldStashTest ? "* KEEP *" : "-- TRASH --");
-                        }
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Error testing scores - not in game world?");
+                        return;
                     }
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "===== Finished Test Score Outputs =====");
-                    //Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: See bad scores? Wrong item types? Known DB bug - restart DB before using the test button!");
+                    if (ZetaDia.IsInGame && !ZetaDia.IsLoadingWorld)
+                    {
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "===== Outputting Test Scores =====");
+                        foreach (ACDItem item in ZetaDia.Me.Inventory.Backpack)
+                        {
+                            if (item.BaseAddress == IntPtr.Zero)
+                            {
+                                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "GSError: Diablo 3 memory read error, or item became invalid [TestScore-1]");
+                            }
+                            else
+                            {
+                                CachedACDItem cItem = new CachedACDItem(item, item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId, item.DynamicId,
+                                    item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.IsTwoHand, item.DyeType, item.ItemType, item.ItemBaseType, item.FollowerSpecialType, item.IsUnidentified, item.ItemStackQuantity,
+                                    item.Stats);
+                                bool bShouldStashTest = TrinityItemManager.Current.ShouldStashItem(item);
+                                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, bShouldStashTest ? "* KEEP *" : "-- TRASH --");
+                            }
+                        }
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "===== Finished Test Score Outputs =====");
+                        //Logger.Log(TrinityLogLevel.Normal, LogCategory.UserInformation, "Note: See bad scores? Wrong item types? Known DB bug - restart DB before using the test button!");
+                    }
+                    else
+                    {
+                        Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Error testing scores - not in game world?");
+                    }
+                    TownRun.TestingBackpack = false;
                 }
-                else
+                catch (Exception ex)
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Error testing scores - not in game world?");
+                    Logger.LogNormal("Exception in TestScoring(): {0}", ex);
+                    TownRun.TestingBackpack = false;
                 }
-                TownRun.TestingBackpack = false;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogNormal("Exception in TestScoring(): {0}", ex);
-                TownRun.TestingBackpack = false;
             }
         }
 
@@ -664,7 +671,7 @@ namespace Trinity
                 {
                     if (!(TotalXP == 0 && LastXP == 0 && NextLevelXP == 0))
                     {
-                        if (LastXP > ZetaDia.Me.CurrentExperience)
+                        if (LastXP > Trinity.Player.CurrentExperience)
                         {
                             TotalXP += NextLevelXP;
                         }
@@ -760,10 +767,10 @@ namespace Trinity
                             {
                                 if (ItemsDroppedStats.TotalPerQuality[iThisQuality] > 0)
                                 {
-                                    LogWriter.WriteLine("- " + sQualityString[iThisQuality] + ": " + ItemsDroppedStats.TotalPerQuality[iThisQuality].ToString() + " [" + Math.Round(ItemsDroppedStats.TotalPerQuality[iThisQuality] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsDroppedStats.TotalPerQuality[iThisQuality] / ItemsDroppedStats.Total) * 100, 2).ToString() + " %}");
+                                    LogWriter.WriteLine("- " + ItemQualityTypeStrings[iThisQuality] + ": " + ItemsDroppedStats.TotalPerQuality[iThisQuality].ToString() + " [" + Math.Round(ItemsDroppedStats.TotalPerQuality[iThisQuality] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsDroppedStats.TotalPerQuality[iThisQuality] / ItemsDroppedStats.Total) * 100, 2).ToString() + " %}");
                                     for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
                                         if (ItemsDroppedStats.TotalPerQPerL[iThisQuality, itemLevel] > 0)
-                                            LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sQualityString[iThisQuality] + ": " + ItemsDroppedStats.TotalPerQPerL[iThisQuality, itemLevel].ToString() + " [" + Math.Round(ItemsDroppedStats.TotalPerQPerL[iThisQuality, itemLevel] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsDroppedStats.TotalPerQPerL[iThisQuality, itemLevel] / ItemsDroppedStats.Total) * 100, 2).ToString() + " %}");
+                                            LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + ItemQualityTypeStrings[iThisQuality] + ": " + ItemsDroppedStats.TotalPerQPerL[iThisQuality, itemLevel].ToString() + " [" + Math.Round(ItemsDroppedStats.TotalPerQPerL[iThisQuality, itemLevel] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsDroppedStats.TotalPerQPerL[iThisQuality, itemLevel] / ItemsDroppedStats.Total) * 100, 2).ToString() + " %}");
                                 }
 
                                 // Any at all this quality?
@@ -775,18 +782,6 @@ namespace Trinity
 
                         // End of item stats
 
-                        // Potion stats
-                        if (ItemsDroppedStats.TotalPotions > 0)
-                        {
-                            LogWriter.WriteLine("Potion Drops:");
-                            LogWriter.WriteLine("Total potions: " + ItemsDroppedStats.TotalPotions.ToString() + " [" + Math.Round(ItemsDroppedStats.TotalPotions / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                            for (int itemLevel = 1; itemLevel <= 63; itemLevel++) if (ItemsDroppedStats.PotionsPerLevel[itemLevel] > 0)
-                                    LogWriter.WriteLine("- ilvl " + itemLevel.ToString() + ": " + ItemsDroppedStats.PotionsPerLevel[itemLevel].ToString() + " [" + Math.Round(ItemsDroppedStats.PotionsPerLevel[itemLevel] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsDroppedStats.PotionsPerLevel[itemLevel] / ItemsDroppedStats.TotalPotions) * 100, 2).ToString() + " %}");
-                            LogWriter.WriteLine("");
-                        }
-
-                        // End of potion stats
-
                         // Gem stats
                         if (ItemsDroppedStats.TotalGems > 0)
                         {
@@ -796,10 +791,10 @@ namespace Trinity
                             {
                                 if (ItemsDroppedStats.GemsPerType[iThisGemType] > 0)
                                 {
-                                    LogWriter.WriteLine("- " + sGemString[iThisGemType] + ": " + ItemsDroppedStats.GemsPerType[iThisGemType].ToString() + " [" + Math.Round(ItemsDroppedStats.GemsPerType[iThisGemType] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsDroppedStats.GemsPerType[iThisGemType] / ItemsDroppedStats.TotalGems) * 100, 2).ToString() + " %}");
+                                    LogWriter.WriteLine("- " + GemTypeStrings[iThisGemType] + ": " + ItemsDroppedStats.GemsPerType[iThisGemType].ToString() + " [" + Math.Round(ItemsDroppedStats.GemsPerType[iThisGemType] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsDroppedStats.GemsPerType[iThisGemType] / ItemsDroppedStats.TotalGems) * 100, 2).ToString() + " %}");
                                     for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
                                         if (ItemsDroppedStats.GemsPerTPerL[iThisGemType, itemLevel] > 0)
-                                            LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sGemString[iThisGemType] + ": " + ItemsDroppedStats.GemsPerTPerL[iThisGemType, itemLevel].ToString() + " [" + Math.Round(ItemsDroppedStats.GemsPerTPerL[iThisGemType, itemLevel] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsDroppedStats.GemsPerTPerL[iThisGemType, itemLevel] / ItemsDroppedStats.TotalGems) * 100, 2).ToString() + " %}");
+                                            LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + GemTypeStrings[iThisGemType] + ": " + ItemsDroppedStats.GemsPerTPerL[iThisGemType, itemLevel].ToString() + " [" + Math.Round(ItemsDroppedStats.GemsPerTPerL[iThisGemType, itemLevel] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsDroppedStats.GemsPerTPerL[iThisGemType, itemLevel] / ItemsDroppedStats.TotalGems) * 100, 2).ToString() + " %}");
                                 }
 
                                 // Any at all this quality?
@@ -837,10 +832,10 @@ namespace Trinity
                             {
                                 if (ItemsPickedStats.TotalPerQuality[iThisQuality] > 0)
                                 {
-                                    LogWriter.WriteLine("- " + sQualityString[iThisQuality] + ": " + ItemsPickedStats.TotalPerQuality[iThisQuality].ToString() + " [" + Math.Round(ItemsPickedStats.TotalPerQuality[iThisQuality] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsPickedStats.TotalPerQuality[iThisQuality] / ItemsPickedStats.Total) * 100, 2).ToString() + " %}");
+                                    LogWriter.WriteLine("- " + ItemQualityTypeStrings[iThisQuality] + ": " + ItemsPickedStats.TotalPerQuality[iThisQuality].ToString() + " [" + Math.Round(ItemsPickedStats.TotalPerQuality[iThisQuality] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsPickedStats.TotalPerQuality[iThisQuality] / ItemsPickedStats.Total) * 100, 2).ToString() + " %}");
                                     for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
                                         if (ItemsPickedStats.TotalPerQPerL[iThisQuality, itemLevel] > 0)
-                                            LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sQualityString[iThisQuality] + ": " + ItemsPickedStats.TotalPerQPerL[iThisQuality, itemLevel].ToString() + " [" + Math.Round(ItemsPickedStats.TotalPerQPerL[iThisQuality, itemLevel] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsPickedStats.TotalPerQPerL[iThisQuality, itemLevel] / ItemsPickedStats.Total) * 100, 2).ToString() + " %}");
+                                            LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + ItemQualityTypeStrings[iThisQuality] + ": " + ItemsPickedStats.TotalPerQPerL[iThisQuality, itemLevel].ToString() + " [" + Math.Round(ItemsPickedStats.TotalPerQPerL[iThisQuality, itemLevel] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsPickedStats.TotalPerQPerL[iThisQuality, itemLevel] / ItemsPickedStats.Total) * 100, 2).ToString() + " %}");
                                 }
 
                                 // Any at all this quality?
@@ -855,19 +850,6 @@ namespace Trinity
                         }
 
                         // End of item stats
-
-                        // Potion stats
-                        if (ItemsPickedStats.TotalPotions > 0)
-                        {
-                            LogWriter.WriteLine("Potion Pickups:");
-                            LogWriter.WriteLine("Total potions: " + ItemsPickedStats.TotalPotions.ToString() + " [" + Math.Round(ItemsPickedStats.TotalPotions / TotalRunningTime.TotalHours, 2).ToString() + " per hour]");
-                            for (int itemLevel = 1; itemLevel <= 63; itemLevel++) if (ItemsPickedStats.PotionsPerLevel[itemLevel] > 0)
-                                    LogWriter.WriteLine("- ilvl " + itemLevel.ToString() + ": " + ItemsPickedStats.PotionsPerLevel[itemLevel].ToString() + " [" + Math.Round(ItemsPickedStats.PotionsPerLevel[itemLevel] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsPickedStats.PotionsPerLevel[itemLevel] / ItemsPickedStats.TotalPotions) * 100, 2).ToString() + " %}");
-                            LogWriter.WriteLine("");
-                        }
-
-                        // End of potion stats
-
                         // Gem stats
                         if (ItemsPickedStats.TotalGems > 0)
                         {
@@ -877,10 +859,10 @@ namespace Trinity
                             {
                                 if (ItemsPickedStats.GemsPerType[iThisGemType] > 0)
                                 {
-                                    LogWriter.WriteLine("- " + sGemString[iThisGemType] + ": " + ItemsPickedStats.GemsPerType[iThisGemType].ToString() + " [" + Math.Round(ItemsPickedStats.GemsPerType[iThisGemType] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsPickedStats.GemsPerType[iThisGemType] / ItemsPickedStats.TotalGems) * 100, 2).ToString() + " %}");
+                                    LogWriter.WriteLine("- " + GemTypeStrings[iThisGemType] + ": " + ItemsPickedStats.GemsPerType[iThisGemType].ToString() + " [" + Math.Round(ItemsPickedStats.GemsPerType[iThisGemType] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsPickedStats.GemsPerType[iThisGemType] / ItemsPickedStats.TotalGems) * 100, 2).ToString() + " %}");
                                     for (int itemLevel = 1; itemLevel <= 63; itemLevel++)
                                         if (ItemsPickedStats.GemsPerTPerL[iThisGemType, itemLevel] > 0)
-                                            LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + sGemString[iThisGemType] + ": " + ItemsPickedStats.GemsPerTPerL[iThisGemType, itemLevel].ToString() + " [" + Math.Round(ItemsPickedStats.GemsPerTPerL[iThisGemType, itemLevel] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsPickedStats.GemsPerTPerL[iThisGemType, itemLevel] / ItemsPickedStats.TotalGems) * 100, 2).ToString() + " %}");
+                                            LogWriter.WriteLine("--- ilvl " + itemLevel.ToString() + " " + GemTypeStrings[iThisGemType] + ": " + ItemsPickedStats.GemsPerTPerL[iThisGemType, itemLevel].ToString() + " [" + Math.Round(ItemsPickedStats.GemsPerTPerL[iThisGemType, itemLevel] / TotalRunningTime.TotalHours, 2).ToString() + " per hour] {" + Math.Round((ItemsPickedStats.GemsPerTPerL[iThisGemType, itemLevel] / ItemsPickedStats.TotalGems) * 100, 2).ToString() + " %}");
                                 }
 
                                 // Any at all this quality?

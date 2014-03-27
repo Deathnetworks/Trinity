@@ -73,6 +73,7 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Crusader_IronSkin);
                 }
 
+                // Provoke
                 if (CombatBase.CanCast(SNOPower.X1_Crusader_Provoke) && (TargetUtil.EliteOrTrashInRange(15f) || TargetUtil.AnyMobsInRange(15f, CrusaderSettings.ProvokeAoECount)))
                 {
                     return new TrinityPower(SNOPower.X1_Crusader_Provoke);
@@ -322,6 +323,12 @@ namespace Trinity.Combat.Abilities
         {
             get
             {
+                // Sweep Attack
+                if (CombatBase.CanCast(SNOPower.X1_Crusader_SweepAttack))
+                {
+                    return new TrinityPower(SNOPower.X1_Crusader_SweepAttack, 15f, CurrentTarget.ACDGuid);
+                }
+
                 // Justice
                 if (CombatBase.CanCast(SNOPower.X1_Crusader_Justice))
                 {

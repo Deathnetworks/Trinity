@@ -568,27 +568,36 @@ namespace Trinity.ItemRules
             if (!Trinity.Settings.Advanced.ItemRulesLogs)
                 return;
 
+            if (!Directory.Exists(Path.GetDirectoryName(FileManager.LoggingPath)))
+                Directory.CreateDirectory(Path.GetDirectoryName(FileManager.LoggingPath));
+
+            string filePath = string.Empty;
             switch (action)
             {
                 case InterpreterAction.PICKUP:
                 case InterpreterAction.IGNORE:
-                    log = new StreamWriter(Path.Combine(FileManager.LoggingPath, PickLogFile), true);
+                    filePath = Path.Combine(FileManager.LoggingPath, PickLogFile);
+                    log = new StreamWriter(filePath, true);
                     break;
                 case InterpreterAction.IDENTIFY:
                 case InterpreterAction.UNIDENT:
-                    log = new StreamWriter(Path.Combine(FileManager.LoggingPath, RestLogFile), true);
+                    filePath = Path.Combine(FileManager.LoggingPath, RestLogFile);
+                    log = new StreamWriter(filePath, true);
                     break;
                 case InterpreterAction.KEEP:
                 case InterpreterAction.TRASH:
                 case InterpreterAction.SCORE:
-                    log = new StreamWriter(Path.Combine(FileManager.LoggingPath, KeepLogFile), true);
+                    filePath = Path.Combine(FileManager.LoggingPath, KeepLogFile);
+                    log = new StreamWriter(filePath, true);
                     break;
                 case InterpreterAction.SALVAGE:
                 case InterpreterAction.SELL:
-                    log = new StreamWriter(Path.Combine(FileManager.LoggingPath, RestLogFile), true);
+                    filePath = Path.Combine(FileManager.LoggingPath, RestLogFile);
+                    log = new StreamWriter(filePath, true);
                     break;
                 case InterpreterAction.NULL:
-                    log = new StreamWriter(Path.Combine(FileManager.LoggingPath, BugsLogFile), true);
+                    filePath = Path.Combine(FileManager.LoggingPath, BugsLogFile);
+                    log = new StreamWriter(filePath, true);
                     break;
             }
 

@@ -31,7 +31,7 @@ namespace Trinity
                 bool noGoblinsPresent = (!AnyTreasureGoblinsPresent && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize) || Settings.Combat.Misc.GoblinPriority < GoblinPriority.Prioritize;
 
 
-                bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || MovementSpeed < 1 ||
+                bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || 
                     ObjectCache.Count(u => u.IsUnit && u.RadiusDistance < 10f) >= 3);
 
                 bool hasWrathOfTheBerserker = Player.ActorClass == ActorClass.Barbarian && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
@@ -82,13 +82,12 @@ namespace Trinity
                         !XmlTags.TrinityTownPortal.ForceClearArea &&
                         !usingTownPortal &&
                         !profileTagCheck &&
-                        !prioritizeCloseRangeUnits &&
+                        (MovementSpeed < 1 && CurrentTarget == null) &&
                         Settings.Combat.Misc.TrashPackSize > 1 &&
                         !elitesInRangeOfUnit &&
                         Player.Level >= 15 &&
-                        MovementSpeed >= 1 &&
                         Player.CurrentHealthPct > 0.10 &&
-                        DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 500
+                        DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500
                         ;
 
                     string unitWeightInfo = "";

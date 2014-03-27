@@ -821,11 +821,12 @@ namespace Trinity.UIComponents
             _Model.Loot.Pickup.PickupBlueFollowerItems = true;
             _Model.Loot.Pickup.PickupYellowFollowerItems = true;
             _Model.Loot.Pickup.MinimumGoldStack = 0;
-            _Model.Loot.Pickup.MiscItemLevel = 1;
+            _Model.Loot.Pickup.MiscItemQuality = TrinityItemQuality.Common;
             _Model.Loot.Pickup.PotionCount = 98;
             _Model.Loot.Pickup.Plans = true;
             _Model.Loot.Pickup.CraftTomes = true;
             _Model.Loot.Pickup.PickupLowLevel = true;
+            _Model.Loot.Pickup.LegendaryPlans = true;
         }
 
         private void ConfigHuntingLoot()
@@ -844,11 +845,12 @@ namespace Trinity.UIComponents
             _Model.Loot.Pickup.PickupBlueFollowerItems = true;
             _Model.Loot.Pickup.PickupYellowFollowerItems = true;
             _Model.Loot.Pickup.MinimumGoldStack = 900;
-            _Model.Loot.Pickup.MiscItemLevel = 60;
+            _Model.Loot.Pickup.MiscItemQuality = TrinityItemQuality.Rare;
             _Model.Loot.Pickup.PotionCount = 98;
             _Model.Loot.Pickup.Plans = false;
             _Model.Loot.Pickup.CraftTomes = false;
             _Model.Loot.Pickup.PickupLowLevel = false;
+            _Model.Loot.Pickup.LegendaryPlans = true;
         }
 
         private void LoadItemRulesPath()

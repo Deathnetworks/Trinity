@@ -58,4 +58,16 @@ namespace Trinity.Config.Combat
         CombatOnly,
         MovementOnly
     }
+
+    public enum TrinityItemQuality
+    {
+        Invalid = -1,
+        None = 0,
+        Inferior,
+        Common,
+        Magic,
+        Rare,
+        Legendary,
+        Set
+    }
 }

@@ -370,13 +370,13 @@ namespace Trinity
         private const int QUALITYBLUE = 1;
         private const int QUALITYYELLOW = 2;
         private const int QUALITYORANGE = 3;
-        private static readonly string[] sQualityString = new string[4] { "White", "Magic", "Rare", "Legendary" };
+        private static readonly string[] ItemQualityTypeStrings = new string[4] { "White", "Magic", "Rare", "Legendary" };
         private const int GEMRUBY = 0;
         private const int GEMTOPAZ = 1;
         private const int GEMAMETHYST = 2;
         private const int GEMEMERALD = 3;
         private const int GEMDIAMOND = 4;
-        private static readonly string[] sGemString = new string[5] { "Ruby", "Topaz", "Amethyst", "Emerald", "Diamond" };
+        private static readonly string[] GemTypeStrings = new string[5] { "Ruby", "Topaz", "Amethyst", "Emerald", "Diamond" };
         private static DateTime ItemStatsLastPostedReport = DateTime.MinValue;
         private static DateTime ItemStatsWhenStartedBot = DateTime.MinValue;
         private static bool bMaintainStatTracking = false;

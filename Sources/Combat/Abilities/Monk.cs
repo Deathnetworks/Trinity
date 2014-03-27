@@ -26,6 +26,28 @@ namespace Trinity
             // Monks need 80 for special spam like tempest rushing
             MinEnergyReserve = 80;
 
+
+            // Epiphany
+            // Desert shroud: reduce incoming damage by 50%
+            bool hasDesertShroud = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Monk_Epiphany && s.RuneIndex == 0);
+            // Soothing Mist: heal self and allies for 4129+(0.25*HealthGlobeBonus) life
+            bool hasSoothingMist = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Monk_Epiphany && s.RuneIndex == 1);
+
+            //Inner Fire X1_Monk_Epiphany/3/HotbarSlot3 
+            //Windwalker  X1_Monk_Epiphany/2/HotbarSlot3 
+            //Soothing Mist X1_Monk_Epiphany/1/HotbarSlot3 
+            //Ascendance X1_Monk_Epiphany/4/HotbarSlot3 
+            //Desert Shroud  X1_Monk_Epiphany/0/HotbarSlot3 
+            //None   X1_Monk_Epiphany/0/HotbarSlot3 
+
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_Monk_Epiphany, CombatBase.CanCastFlags.NoTimer) &&
+                (TargetUtil.EliteOrTrashInRange(15f) || TargetUtil.AnyMobsInRange(15f, 5)) && 
+                (Player.PrimaryResourcePct < 0.50 || ((hasDesertShroud || hasSoothingMist) && Player.CurrentHealthPct < 0.50))
+                )
+            {
+                return new TrinityPower(SNOPower.X1_Monk_Epiphany);
+            }
+
             //// Monk - Primary
 
             bool hasThunderClap = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_FistsofThunder && s.RuneIndex == 0);

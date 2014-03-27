@@ -54,6 +54,10 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
+            // Avalanche
+            if (IsNull(power) && CanUseAvalanche)
+                power = PowerAvalanche;
+
             // WOTB
             if (IsNull(power) && CanCastWrathOfTheBerserker)
             {
@@ -661,7 +665,17 @@ namespace Trinity.Combat.Abilities
         public static bool CanUseFrenzy { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Frenzy) && PowerManager.CanCast(SNOPower.Barbarian_Frenzy); } }
         public static bool CanUseBash { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Bash) && PowerManager.CanCast(SNOPower.Barbarian_Bash); } }
         public static bool CanUseCleave { get { return !UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Barbarian_Cleave) && PowerManager.CanCast(SNOPower.Barbarian_Cleave); } }
+        public static bool CanUseAvalanche
+        {
+            get
+            {
+                return !UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_Barbarian_Avalanche_v2, CanCastFlags.NoTimer) &&
+                       (TargetUtil.AnyMobsInRange(3) || TargetUtil.IsEliteTargetInRange());
+            }
+        }
 
+
+        public static TrinityPower PowerAvalanche { get { return new TrinityPower(SNOPower.X1_Barbarian_Avalanche_v2); } }
         public static TrinityPower PowerIgnorePain { get { return new TrinityPower(SNOPower.Barbarian_IgnorePain); } }
         public static TrinityPower PowerEarthquake { get { return new TrinityPower(SNOPower.Barbarian_Earthquake); } }
         public static TrinityPower PowerWrathOfTheBerserker { get { return new TrinityPower(SNOPower.Barbarian_WrathOfTheBerserker); } }

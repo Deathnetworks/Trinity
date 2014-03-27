@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using Trinity.Config.Loot;
+using Trinity.Helpers;
 using Trinity.ItemRules;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -119,16 +119,19 @@ namespace Trinity
             // Vanity Items
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
                 return false;
-            
+
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
 
             // Now look for Misc items we might want to keep
-            GItemType trinityItemType = cItem.TrinityItemType; // DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
-            GItemBaseType trinityBaseType = cItem.TrinityItemBaseType; // DetermineBaseType(trinityItemType);
+            GItemType tItemType = cItem.TrinityItemType; // DetermineItemType(cItem.InternalName, cItem.DBItemType, cItem.FollowerType);
+            GItemBaseType tBaseType = cItem.TrinityItemBaseType; // DetermineBaseType(trinityItemType);
 
-            bool isEquipment = (cItem.DBBaseType == ItemBaseType.Armor
-               || cItem.DBBaseType == ItemBaseType.Weapon
-               || cItem.DBBaseType == ItemBaseType.Jewelry);
+            bool isEquipment = (tBaseType == GItemBaseType.Armor ||
+                tBaseType == GItemBaseType.Jewelry ||
+                tBaseType == GItemBaseType.Offhand ||
+                tBaseType == GItemBaseType.WeaponOneHand ||
+                tBaseType == GItemBaseType.WeaponRange ||
+                tBaseType == GItemBaseType.WeaponTwoHand);
 
             // Stash all unidentified items - assume we want to keep them since we are using an identifier over-ride
             if (cItem.IsUnidentified)
@@ -137,48 +140,48 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] = (autokeep unidentified items)", cItem.RealName, cItem.InternalName);
                 return true;
             }
-            if (trinityItemType == GItemType.StaffOfHerding)
+            if (tItemType == GItemType.StaffOfHerding)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep staff of herding)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
-            if (trinityItemType == GItemType.CraftingMaterial)
+            if (tItemType == GItemType.CraftingMaterial)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep craft materials)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
 
-            if (trinityItemType == GItemType.Emerald || trinityItemType == GItemType.Amethyst || trinityItemType == GItemType.Topaz || trinityItemType == GItemType.Ruby || trinityItemType == GItemType.Diamond)
+            if (tItemType == GItemType.Emerald || tItemType == GItemType.Amethyst || tItemType == GItemType.Topaz || tItemType == GItemType.Ruby || tItemType == GItemType.Diamond)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep gems)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
-            if (trinityItemType == GItemType.CraftTome)
+            if (tItemType == GItemType.CraftTome)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (autokeep tomes)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
-            if (trinityItemType == GItemType.InfernalKey)
+            if (tItemType == GItemType.InfernalKey)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep infernal key)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
-            if (trinityItemType == GItemType.HealthPotion)
+            if (tItemType == GItemType.HealthPotion)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.ItemValuation, "{0} [{1}] [{2}] = (ignoring potions)", cItem.RealName, cItem.InternalName, tItemType);
                 return false;
             }
 
-            if (trinityItemType == GItemType.CraftingPlan && cItem.Quality >= ItemQuality.Legendary)
+            if (tItemType == GItemType.CraftingPlan && cItem.Quality >= ItemQuality.Legendary)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendary plans)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendary plans)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
 
@@ -200,59 +203,59 @@ namespace Trinity
                 }
             }
 
-            if (trinityItemType == GItemType.CraftingPlan)
+            if (tItemType == GItemType.CraftingPlan)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep plans)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
 
             // Stashing Whites, auto-keep
             if (Trinity.Settings.Loot.TownRun.StashWhites && isEquipment && cItem.Quality <= ItemQuality.Superior)
             {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing whites)", cItem.RealName, cItem.InternalName, trinityItemType);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing whites)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
             // Else auto-trash
             if (cItem.Quality <= ItemQuality.Superior && (isEquipment || cItem.TrinityItemBaseType == GItemBaseType.FollowerItem))
             {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (trash whites)", cItem.RealName, cItem.InternalName, trinityItemType);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (trash whites)", cItem.RealName, cItem.InternalName, tItemType);
                 return false;
             }
 
             // Stashing blues, auto-keep
             if (Trinity.Settings.Loot.TownRun.StashBlues && isEquipment && cItem.Quality >= ItemQuality.Magic1 && cItem.Quality <= ItemQuality.Magic3)
             {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing blues)", cItem.RealName, cItem.InternalName, trinityItemType);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (stashing blues)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
             // Else auto trash
             if (cItem.Quality >= ItemQuality.Magic1 && cItem.Quality <= ItemQuality.Magic3 && (isEquipment || cItem.TrinityItemBaseType == GItemBaseType.FollowerItem))
             {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (trashing blues)", cItem.RealName, cItem.InternalName, trinityItemType);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (trashing blues)", cItem.RealName, cItem.InternalName, tItemType);
                 return false;
             }
 
             // Force salvage Rares
             if (Trinity.Settings.Loot.TownRun.ForceSalvageRares && cItem.Quality >= ItemQuality.Rare4 && cItem.Quality <= ItemQuality.Rare6 && (isEquipment || cItem.TrinityItemBaseType == GItemBaseType.FollowerItem))
             {
-                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (force salvage rare)", cItem.RealName, cItem.InternalName, trinityItemType);
+                Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (force salvage rare)", cItem.RealName, cItem.InternalName, tItemType);
                 return false;
             }
-           
+
             if (cItem.Quality >= ItemQuality.Legendary)
             {
                 if (evaluationType == ItemEvaluationType.Keep)
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, trinityItemType);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "{0} [{1}] [{2}] = (autokeep legendaries)", cItem.RealName, cItem.InternalName, tItemType);
                 return true;
             }
 
             // Ok now try to do some decent item scoring based on item types
             double iNeedScore = Trinity.ScoreNeeded(item.ItemBaseType);
-            double iMyScore = ItemValuation.ValueThisItem(cItem, trinityItemType);
+            double iMyScore = ItemValuation.ValueThisItem(cItem, tItemType);
 
             if (evaluationType == ItemEvaluationType.Keep)
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, trinityItemType, iMyScore);
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.ItemValuation, "{0} [{1}] [{2}] = {3}", cItem.RealName, cItem.InternalName, tItemType, iMyScore);
             if (iMyScore >= iNeedScore)
                 return true;
 
@@ -314,7 +317,7 @@ namespace Trinity
             // Stashing Blues
             if (Trinity.Settings.Loot.TownRun.StashBlues && cItem.Quality > ItemQuality.Superior && cItem.Quality < ItemQuality.Rare4)
                 return false;
-            
+
             if (cItem.Quality >= ItemQuality.Legendary && salvageOption == SalvageOption.InfernoOnly && cItem.Level >= 60)
                 return true;
 
@@ -478,7 +481,7 @@ namespace Trinity
 
                     try
                     {
-                        Logger.Log("Link Color ItemQuality=" + ItemLinkColorToQuality(item.ItemLink, item.InternalName, item.Name, item.GameBalanceId));
+                        Logger.Log("Link Color ItemQuality=" + item.ItemLinkColorQuality());
                     }
                     catch (Exception ex)
                     {
@@ -510,50 +513,13 @@ namespace Trinity
                     if (val != null)
                         Logger.Log(typeof(T).Name + "." + property.Name + "=" + val.ToString());
                 }
-                catch 
+                catch
                 {
                     Logger.Log("Exception reading {0} from object", property.Name);
                 }
             }
         }
 
-        private static Regex ItemQualityRegex = new Regex("{c:[a-zA-Z0-9]{8}}", RegexOptions.Compiled);
-        public static ItemQuality ItemLinkColorToQuality(string itemLink, string internalName, string name, int gameBalanceId)
-        {
-            /*
-            {c:ff00ff00} = Set
-            {c:ffff8000} = Legendary
-            {c:ffffff00} = Rare
-            {c:ff6969ff} = Magic
-             */
-
-            string linkColor = ItemQualityRegex.Match(itemLink).Value;
-
-            ItemQuality qualityResult;
-            string itemLinkLog = itemLink.Replace("{", "{{").Replace("}", "}}");
-
-            switch (linkColor)
-            {
-                case "{c:ff00ff00}":
-                    qualityResult = ItemQuality.Legendary;
-                    break;
-                case "{c:ffff8000}":
-                    qualityResult = ItemQuality.Legendary;
-                    break;
-                case "{c:ffffff00}":
-                    qualityResult = ItemQuality.Rare4;
-                    break;
-                case "{c:ff6969ff}":
-                    qualityResult = ItemQuality.Magic1;
-                    break;
-                default:
-                    Logger.Log("Invalid Item Link color={0} link={1} internalName={2} name={3} gameBalanceId={4}", linkColor, itemLinkLog, internalName, name, gameBalanceId);
-                    qualityResult = ItemQuality.Invalid;
-                    break;
-            }
-
-            return qualityResult;
-        }
 
     }
 }

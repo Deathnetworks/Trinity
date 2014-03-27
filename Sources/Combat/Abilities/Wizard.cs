@@ -37,6 +37,28 @@ namespace Trinity
             if (!GetHasBuff(SNOPower.Wizard_Archon))
             {
 
+                // Black Hole experiment
+                //spell steal
+                //[Trinity] Hotbar Skills (Skill/RuneIndex/Slot): Weapon_Ranged_Wand/-1/HotbarMouseLeft X1_Wizard_Wormhole/3/HotbarSlot1 None/-1/HotbarSlot2
+                //blazar
+                //[Trinity] Hotbar Skills (Skill/RuneIndex/Slot): Weapon_Ranged_Wand/-1/HotbarMouseLeft X1_Wizard_Wormhole/2/HotbarSlot1 None/-1/HotbarSlot2
+                //event horizon
+                //[Trinity] Hotbar Skills (Skill/RuneIndex/Slot): Weapon_Ranged_Wand/-1/HotbarMouseLeft X1_Wizard_Wormhole/1/HotbarSlot1 None/-1/HotbarSlot2
+                //absolute zero
+                //[Trinity] Hotbar Skills (Skill/RuneIndex/Slot): Weapon_Ranged_Wand/-1/HotbarMouseLeft X1_Wizard_Wormhole/4/HotbarSlot1 None/-1/HotbarSlot2
+                //super massive
+                //[Trinity] Hotbar Skills (Skill/RuneIndex/Slot): Weapon_Ranged_Wand/-1/HotbarMouseLeft X1_Wizard_Wormhole/0/HotbarSlot1 None/-1/HotbarSlot2
+                //no rune
+                //[Trinity] Hotbar Skills (Skill/RuneIndex/Slot): Weapon_Ranged_Wand/-1/HotbarMouseLeft X1_Wizard_Wormhole/-1/HotbarSlot1 None/-1/HotbarSlot2
+
+                bool hasSupermassive = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Wizard_Wormhole && s.RuneIndex == 0);
+                float blackholeRadius = hasSupermassive ? 20f : 15f;
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_Wizard_Wormhole, CombatBase.CanCastFlags.NoTimer) &&
+                    TargetUtil.ClusterExists(blackholeRadius, 45f, 4, true))
+                {
+                    return new TrinityPower(SNOPower.X1_Wizard_Wormhole, 45f, TargetUtil.GetBestClusterUnit(blackholeRadius, 45f, 1, false, true).Position);
+                }
+
                 // Diamond Skin SPAM
                 if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Wizard_DiamondSkin) && LastPowerUsed != SNOPower.Wizard_DiamondSkin && !GetHasBuff(SNOPower.Wizard_DiamondSkin) &&
                     (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 1) || Player.CurrentHealthPct <= 0.90 || Player.IsIncapacitated || Player.IsRooted || CurrentTarget.RadiusDistance <= 40f))

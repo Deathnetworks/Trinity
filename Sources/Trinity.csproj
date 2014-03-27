@@ -101,6 +101,7 @@
     <Compile Include="DbProvider\DeathHandler.cs" />
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\DoubleInt.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\GameEvents.cs" />
     <Compile Include="Helpers\GameUI.cs" />
     <Compile Include="Helpers\HotSpot.cs" />

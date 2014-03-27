@@ -2,6 +2,7 @@
 using System.IO;
 using Trinity.Cache;
 using Trinity.Config.Loot;
+using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Game;
@@ -41,12 +42,25 @@ namespace Trinity
             c_ItemDisplayName = diaItem.CommonData.Name;
             c_GameBalanceID = diaItem.CommonData.GameBalanceId;
 
+
+            c_ItemLevel = diaItem.CommonData.Level;
+            c_DBItemBaseType = diaItem.CommonData.ItemBaseType;
+            c_DBItemType = diaItem.CommonData.ItemType;
+            c_IsOneHandedItem = diaItem.CommonData.IsOneHand;
+            c_IsTwoHandedItem = diaItem.CommonData.IsTwoHand;
+            c_item_tFollowerType = diaItem.CommonData.FollowerSpecialType;
+            // Calculate item type
+            c_item_GItemType = DetermineItemType(c_InternalName, c_DBItemType, c_item_tFollowerType);
+
+            // And temporarily store the base type
+            GItemBaseType itemBaseType = DetermineBaseType(c_item_GItemType);
+
             // Compute item quality from item link for Crafting Plans (Blacksmith or Jewler)
-            if (c_InternalName.StartsWith("CraftingPlan_") || c_InternalName.StartsWith("CraftingReagent_Legendary_Unique_"))
+            if (itemBaseType == GItemBaseType.Misc || itemBaseType == GItemBaseType.Unknown)
             {
                 if (!CacheData.ItemLinkQuality.TryGetValue(c_ACDGUID, out c_ItemQuality))
                 {
-                    c_ItemQuality = TrinityItemManager.ItemLinkColorToQuality(diaItem.CommonData.ItemLink, c_InternalName, c_ItemDisplayName, c_GameBalanceID);
+                    c_ItemQuality = diaItem.CommonData.ItemLinkColorQuality();
                     CacheData.ItemLinkQuality.Add(c_ACDGUID, c_ItemQuality);
                 }
             }
@@ -76,13 +90,6 @@ namespace Trinity
                 }
             }
 
-            c_ItemLevel = diaItem.CommonData.Level;
-            c_DBItemBaseType = diaItem.CommonData.ItemBaseType;
-            c_DBItemType = diaItem.CommonData.ItemType;
-            c_IsOneHandedItem = diaItem.CommonData.IsOneHand;
-            c_IsTwoHandedItem = diaItem.CommonData.IsTwoHand;
-            c_item_tFollowerType = diaItem.CommonData.FollowerSpecialType;
-
             float damage, toughness, healing = 0;
             bool isUpgrade = false;
             diaItem.CommonData.GetStatChanges(out damage, out healing, out toughness);
@@ -109,12 +116,6 @@ namespace Trinity
                 IsUpgrade = isUpgrade,
             };
 
-
-            // Calculate item type
-            c_item_GItemType = DetermineItemType(c_InternalName, c_DBItemType, c_item_tFollowerType);
-
-            // And temporarily store the base type
-            GItemBaseType itemBaseType = DetermineBaseType(c_item_GItemType);
 
             // Treat all globes as a yes
             if (c_item_GItemType == GItemType.HealthGlobe)
@@ -174,7 +175,7 @@ namespace Trinity
             if (!AddToCache && c_IgnoreSubStep == String.Empty)
                 c_IgnoreSubStep = "NoMatchingRule";
 
-            if (Settings.Advanced.LogDroppedItems && logNewItem)
+            if (Settings.Advanced.LogDroppedItems && logNewItem && c_item_GItemType != GItemType.HealthGlobe && c_item_GItemType != GItemType.HealthPotion && c_item_GItemType != GItemType.PowerGlobe)
                 LogDroppedItem();
 
             return AddToCache;
@@ -270,57 +271,87 @@ namespace Trinity
             {
                 GenericCache.AddToCache(new GenericCacheObject(c_ItemMd5Hash, null, new TimeSpan(1, 0, 0)));
 
-                isNewLogItem = true;
-                if (tempbasetype == GItemBaseType.Armor || tempbasetype == GItemBaseType.WeaponOneHand || tempbasetype == GItemBaseType.WeaponTwoHand ||
-                    tempbasetype == GItemBaseType.WeaponRange || tempbasetype == GItemBaseType.Jewelry || tempbasetype == GItemBaseType.FollowerItem ||
-                    tempbasetype == GItemBaseType.Offhand)
+                try
                 {
-                    int iThisQuality;
-                    ItemsDroppedStats.Total++;
-                    if (c_ItemQuality >= ItemQuality.Legendary)
-                        iThisQuality = QUALITYORANGE;
-                    else if (c_ItemQuality >= ItemQuality.Rare4)
-                        iThisQuality = QUALITYYELLOW;
-                    else if (c_ItemQuality >= ItemQuality.Magic1)
-                        iThisQuality = QUALITYBLUE;
-                    else
-                        iThisQuality = QUALITYWHITE;
-                    ItemsDroppedStats.TotalPerQuality[iThisQuality]++;
-                    ItemsDroppedStats.TotalPerLevel[c_ItemLevel]++;
-                    ItemsDroppedStats.TotalPerQPerL[iThisQuality, c_ItemLevel]++;
+                    isNewLogItem = true;
+                    if (tempbasetype == GItemBaseType.Armor || tempbasetype == GItemBaseType.WeaponOneHand || tempbasetype == GItemBaseType.WeaponTwoHand ||
+                        tempbasetype == GItemBaseType.WeaponRange || tempbasetype == GItemBaseType.Jewelry || tempbasetype == GItemBaseType.FollowerItem ||
+                        tempbasetype == GItemBaseType.Offhand)
+                    {
+                        try
+                        {
+                            int iThisQuality;
+                            ItemsDroppedStats.Total++;
+                            if (c_ItemQuality >= ItemQuality.Legendary)
+                                iThisQuality = QUALITYORANGE;
+                            else if (c_ItemQuality >= ItemQuality.Rare4)
+                                iThisQuality = QUALITYYELLOW;
+                            else if (c_ItemQuality >= ItemQuality.Magic1)
+                                iThisQuality = QUALITYBLUE;
+                            else
+                                iThisQuality = QUALITYWHITE;
+                            ItemsDroppedStats.TotalPerQuality[iThisQuality]++;
+                            ItemsDroppedStats.TotalPerLevel[c_ItemLevel]++;
+                            ItemsDroppedStats.TotalPerQPerL[iThisQuality, c_ItemLevel]++;
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError("Error Refreshing Item Stats for Equippable Item: " + ex.ToString());
+                        }
+                    }
+                    else if (tempbasetype == GItemBaseType.Gem)
+                    {
+                        try
+                        {
+                            int iThisGemType = 0;
+                            ItemsDroppedStats.TotalGems++;
+                            if (c_item_GItemType == GItemType.Topaz)
+                                iThisGemType = GEMTOPAZ;
+                            if (c_item_GItemType == GItemType.Ruby)
+                                iThisGemType = GEMRUBY;
+                            if (c_item_GItemType == GItemType.Emerald)
+                                iThisGemType = GEMEMERALD;
+                            if (c_item_GItemType == GItemType.Amethyst)
+                                iThisGemType = GEMAMETHYST;
+                            if (c_item_GItemType == GItemType.Diamond)
+                                iThisGemType = GEMDIAMOND;
+                            ItemsDroppedStats.GemsPerType[iThisGemType]++;
+                            ItemsDroppedStats.GemsPerLevel[c_ItemLevel]++;
+                            ItemsDroppedStats.GemsPerTPerL[iThisGemType, c_ItemLevel]++;
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError("Error refreshing item stats for Gem: " + ex.ToString());
+                        }
+                    }
+                    else if (c_item_GItemType == GItemType.InfernalKey)
+                    {
+                        try
+                        {
+                            ItemsDroppedStats.TotalInfernalKeys++;
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError("Error refreshing item stats for InfernalKey: " + ex.ToString());
+                        }
+                    }
+                    // See if we should update the stats file
+                    if (DateTime.UtcNow.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
+                    {
+                        try
+                        {
+                            ItemStatsLastPostedReport = DateTime.UtcNow;
+                            OutputReport();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError("Error Calling OutputReport from RefreshItemStats " + ex.ToString());
+                        }
+                    }
                 }
-                else if (tempbasetype == GItemBaseType.Gem)
+                catch (Exception ex)
                 {
-                    int iThisGemType = 0;
-                    ItemsDroppedStats.TotalGems++;
-                    if (c_item_GItemType == GItemType.Topaz)
-                        iThisGemType = GEMTOPAZ;
-                    if (c_item_GItemType == GItemType.Ruby)
-                        iThisGemType = GEMRUBY;
-                    if (c_item_GItemType == GItemType.Emerald)
-                        iThisGemType = GEMEMERALD;
-                    if (c_item_GItemType == GItemType.Amethyst)
-                        iThisGemType = GEMAMETHYST;
-                    if (c_item_GItemType == GItemType.Diamond)
-                        iThisGemType = GEMDIAMOND;
-                    ItemsDroppedStats.GemsPerType[iThisGemType]++;
-                    ItemsDroppedStats.GemsPerLevel[c_ItemLevel]++;
-                    ItemsDroppedStats.GemsPerTPerL[iThisGemType, c_ItemLevel]++;
-                }
-                else if (c_item_GItemType == GItemType.HealthPotion)
-                {
-                    ItemsDroppedStats.TotalPotions++;
-                    ItemsDroppedStats.PotionsPerLevel[c_ItemLevel]++;
-                }
-                else if (c_item_GItemType == GItemType.InfernalKey)
-                {
-                    ItemsDroppedStats.TotalInfernalKeys++;
-                }
-                // See if we should update the stats file
-                if (DateTime.UtcNow.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)
-                {
-                    ItemStatsLastPostedReport = DateTime.UtcNow;
-                    OutputReport();
+                    Logger.LogError("Couldn't do Item Stats" + ex.ToString());
                 }
             }
             return isNewLogItem;

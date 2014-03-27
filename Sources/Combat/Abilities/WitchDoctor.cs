@@ -463,8 +463,6 @@ namespace Trinity
 
         private static TrinityPower GetWitchDoctorDestroyPower()
         {
-            if (Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) && Settings.Combat.WitchDoctor.ZeroDogs)
-                return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 12f, Vector3.Zero, -1, -1, 1, 2, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Witchdoctor_Firebomb))
                 return new TrinityPower(SNOPower.Witchdoctor_Firebomb, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Witchdoctor_PoisonDart))
@@ -477,8 +475,8 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_PlagueOfToads, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Witchdoctor_AcidCloud) && Player.PrimaryResource >= 172)
                 return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
-            //if (Hotbar.Contains(SNOPower.Witchdoctor_Firebats))
-            //    return new TrinityPower(SNOPower.Witchdoctor_Firebats, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+            if (Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) && Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && PlayerOwnedZombieDog > 0 && Settings.Combat.WitchDoctor.ZeroDogs)
+                return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 12f, Vector3.Zero, -1, -1, 1, 2, WAIT_FOR_ANIM);
             return CombatBase.DefaultPower;
         }
 

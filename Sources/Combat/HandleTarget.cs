@@ -1617,7 +1617,7 @@ namespace Trinity
                         {
                             Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ERROR: Item type (" + iQuality + ") out of range");
                         }
-                        if ((CurrentTarget.ItemLevel < 0) || (CurrentTarget.ItemLevel >= 64))
+                        if ((CurrentTarget.ItemLevel < 0) || (CurrentTarget.ItemLevel >= 74))
                         {
                             Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "ERROR: Item level (" + CurrentTarget.ItemLevel + ") out of range");
                         }

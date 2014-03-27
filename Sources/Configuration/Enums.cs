@@ -18,6 +18,7 @@
         CraftTome,
         CraftingMaterial,
         CraftingPlan,
+        CrusaderShield,
         Dagger,
         Diamond,
         Dye,

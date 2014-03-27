@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
+using Trinity.Config.Combat;
 
 namespace Trinity.Config.Loot
 {
@@ -27,7 +28,7 @@ namespace Trinity.Config.Loot
         private bool _Plans;
         private bool _LegendaryPlans;
         private bool _Designs;
-        private int _MiscItemLevel;
+        private TrinityItemQuality _TItemQuality;
         private bool _CraftMaterials;
         private bool _InfernalKeys;
         private bool _PickupLowLevel;
@@ -345,6 +346,7 @@ namespace Trinity.Config.Loot
                 }
             }
         }
+
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool LegendaryPlans
@@ -362,6 +364,7 @@ namespace Trinity.Config.Loot
                 }
             }
         }
+
         [DataMember(IsRequired = false)]
         [DefaultValue(true)]
         public bool Designs
@@ -418,17 +421,17 @@ namespace Trinity.Config.Loot
 
         [DataMember(IsRequired = false)]
         [DefaultValue(1)]
-        public int MiscItemLevel
+        public TrinityItemQuality MiscItemQuality
         {
             get
             {
-                return _MiscItemLevel;
+                return _TItemQuality;
             }
             set
             {
-                if (_MiscItemLevel != value)
+                if (_TItemQuality != value)
                 {
-                    _MiscItemLevel = value;
+                    _TItemQuality = value;
                     OnPropertyChanged("MiscItemLevel");
                 }
             }
@@ -650,6 +653,7 @@ namespace Trinity.Config.Loot
             this.PickupBlueFollowerItems = true;
             this.PickupYellowFollowerItems = true;
             this.PickupUpgrades = true;
+            this.MiscItemQuality = Combat.TrinityItemQuality.Common;
         }
         #endregion Methods
     }
