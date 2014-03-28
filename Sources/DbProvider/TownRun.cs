@@ -215,8 +215,8 @@ namespace Trinity
 
                 if (Trinity.IsReadyToTownRun && (TownRunTimerFinished() || BrainBehavior.IsVendoring))
                 {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Town run timer finished {0} or in town {1} or is vendoring {2} (TownRun)",
-                        TownRunTimerFinished(), Trinity.Player.IsInTown, BrainBehavior.IsVendoring);
+                    //Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Town run timer finished {0} or in town {1} or is vendoring {2} (TownRun)",
+                    //    TownRunTimerFinished(), Trinity.Player.IsInTown, BrainBehavior.IsVendoring);
                     Trinity.IsReadyToTownRun = false;
                     return true;
                 }

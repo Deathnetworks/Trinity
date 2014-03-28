@@ -452,6 +452,9 @@ namespace Trinity
 
         internal static Vector3 SimpleUnstucker()
         {
+            // Clear caches just in case
+            
+
             var myPos = Trinity.Player.Position;
             var navigationPos = PlayerMover.LastMoveToTarget;
             float rotation = (float)Trinity.Player.Rotation;

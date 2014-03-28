@@ -82,7 +82,7 @@ namespace Trinity
                         !XmlTags.TrinityTownPortal.ForceClearArea &&
                         !usingTownPortal &&
                         !profileTagCheck &&
-                        (MovementSpeed > 1 && CurrentTarget == null) &&
+                        MovementSpeed > 1 &&
                         Settings.Combat.Misc.TrashPackSize > 1 &&
                         !elitesInRangeOfUnit &&
                         Player.Level >= 15 &&
@@ -674,19 +674,40 @@ namespace Trinity
                         case GObjectType.Door:
                             {
                                 if (!ObjectCache.Any(u => u.IsUnit && u.HitPointsPct > 0 &&
-                                    MathUtil.IntersectsPath(u.Position, u.Radius, Player.Position, cacheObject.Position)))
+                                    MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, u.Position)))
                                 {
                                     if (cacheObject.RadiusDistance <= 20f)
                                         cacheObject.Weight += 15000d;
 
-                                    // We're standing on the damn thing... open it!!
-                                    if (cacheObject.RadiusDistance <= 12f)
-                                        cacheObject.Weight += 30000d;
                                 }
+
+                                // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
+                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                    cacheObject.Weight += 1000;
+
+                                // We're standing on the damn thing... open it!!
+                                if (cacheObject.RadiusDistance <= 12f)
+                                    cacheObject.Weight += 30000d;
+
                                 break;
                             }
-                        case GObjectType.Destructible:
                         case GObjectType.Barricade:
+                            {
+                                // rrrix added this as a single "weight" source based on the DestructableRange.
+                                // Calculate the weight based on distance, where a distance = 1 is 5000, 90 = 0
+                                cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 5000f;
+
+                                // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
+                                if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                    cacheObject.Weight += 1000;
+                                
+                                // We're standing on the damn thing... open it!!
+                                if (cacheObject.RadiusDistance <= 12f)
+                                    cacheObject.Weight += 30000d;
+                            }
+                            break;
+
+                        case GObjectType.Destructible:
                             {
 
                                 // rrrix added this as a single "weight" source based on the DestructableRange.

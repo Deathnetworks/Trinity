@@ -100,13 +100,10 @@ namespace Trinity
              * Set Common Data
              */
             AddToCache = RefreshStepGetCommonData(freshObject);
-            //if (!AddToCache) { c_IgnoreReason = "GetCommonData"; return AddToCache; }
+
             // Ractor GUID
             c_RActorGuid = freshObject.RActorGuid;
             // Check to see if we've already looked at this GUID
-
-            //AddToCache = RefreshStepSkipDoubleCheckGuid(AddToCache);
-            //if (!AddToCache) { c_IgnoreReason = "SkipDoubleCheckGuid"; return AddToCache; }
 
             // Get Internal Name
             AddToCache = RefreshInternalName(AddToCache);
@@ -158,6 +155,13 @@ namespace Trinity
             AddToCache = RefreshStepCachedSummons(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
 
+            // Get Cached Position
+            AddToCache = RefreshStepCachedPosition(AddToCache);
+            if (!AddToCache) { c_IgnoreReason = "CachedPosition"; return AddToCache; }
+
+            // Always Refresh Distance for every object
+            RefreshStepCalculateDistance();
+
             using (new PerformanceLogger("RefreshDiaObject.CachedType"))
             {
                 /*
@@ -172,10 +176,6 @@ namespace Trinity
             AddToCache = RefreshStepCheckBlacklists(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CheckBlacklists"; return AddToCache; }
 
-            // Get Cached Position
-            AddToCache = RefreshStepCachedPosition(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "CachedPosition"; return AddToCache; }
-
             if (c_ObjectType == GObjectType.Item)
             {
                 if (GenericBlacklist.ContainsKey(c_ObjectHash))
@@ -188,9 +188,6 @@ namespace Trinity
                 /* Generic Blacklisting for shifting RActorGUID bug */
                 c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, c_Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
             }
-
-            // Always Refresh Distance for every object
-            RefreshStepCalculateDistance();
 
             // Always Refresh ZDiff for every object
             AddToCache = RefreshStepObjectTypeZDiff(AddToCache);
@@ -610,8 +607,9 @@ namespace Trinity
                     else if (DataDictionary.InteractWhiteListIds.Contains(c_ActorSNO))
                         c_ObjectType = GObjectType.Interactable;
 
-                    else if (c_diaObject is DiaGizmo && c_diaObject.ActorType == ActorType.Gizmo)
+                    else if (c_diaObject is DiaGizmo && c_diaObject.ActorType == ActorType.Gizmo && c_CentreDistance <= 90)
                     {
+
                         DiaGizmo c_diaGizmo;
                         c_diaGizmo = (DiaGizmo)c_diaObject;
 
@@ -660,8 +658,8 @@ namespace Trinity
                         c_ObjectType = GObjectType.Unknown;
                 }
                 if (c_ObjectType != GObjectType.Unknown)
-                {  // Now cache the object type
-                    CacheData.ObjectType.Add(c_RActorGuid, c_ObjectType);
+                {  // Now cache the object type if it's on the screen and we know what it is
+                    //CacheData.ObjectType.Add(c_RActorGuid, c_ObjectType);
                 }
             }
             return AddToCache;
@@ -991,7 +989,7 @@ namespace Trinity
         private static bool RefreshStepCachedPosition(bool AddToCache)
         {
             // Try and get a cached position for anything that isn't avoidance or units (avoidance and units can move, sadly, so we risk DB mis-reads for those things!
-            if (c_ObjectType != GObjectType.Avoidance && c_ObjectType != GObjectType.Unit && c_ObjectType != GObjectType.Player)
+            if (c_ObjectType != GObjectType.Avoidance && c_ObjectType != GObjectType.Unit && c_ObjectType != GObjectType.Player && c_ObjectType != GObjectType.Unknown)
             {
                 // Get the position, cached if possible
                 if (!CacheData.Position.TryGetValue(c_RActorGuid, out c_Position))
@@ -1017,7 +1015,7 @@ namespace Trinity
                         AddToCache = false;
                     }
                     // Now cache it
-                    CacheData.Position.Add(c_RActorGuid, c_Position);
+                    //CacheData.Position.Add(c_RActorGuid, c_Position);
                 }
             }
             // Ok pull up live-position data for units/avoidance now...

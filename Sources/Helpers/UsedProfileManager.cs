@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Technicals;
 using Trinity.XmlTags;
@@ -77,7 +76,7 @@ namespace Trinity
         {
             try
             {
-                if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.TargetBlacklists.Any())
+                if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.TargetBlacklists != null)
                 {
                     foreach (TargetBlacklist b in ProfileManager.CurrentProfile.TargetBlacklists)
                     {

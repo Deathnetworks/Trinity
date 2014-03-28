@@ -17,7 +17,7 @@ namespace Trinity
         /// Contains the time we last used a spell
         /// </summary>
         public static Dictionary<SNOPower, DateTime> AbilityLastUsed { get { return abilityLastUsedCache; } internal set { abilityLastUsedCache = value; } }
-        internal static Dictionary<SNOPower, DateTime> abilityLastUsedCache = new Dictionary<SNOPower, DateTime>();
+        private static Dictionary<SNOPower, DateTime> abilityLastUsedCache = new Dictionary<SNOPower, DateTime>();
 
         /// <summary>
         /// Special cache for monster types {ActorSNO, MonsterType}
@@ -33,7 +33,7 @@ namespace Trinity
         /// Caches the ObjectType of each object as we find it (RactorGUID based)
         /// </summary>
         internal static Dictionary<int, GObjectType> ObjectType = new Dictionary<int, GObjectType>();
-        
+
         /// <summary>
         /// Caches monster affixes for the monster ID, as this value can be a pain to get and slow (RactorGUID based)
         /// </summary>
@@ -162,6 +162,26 @@ namespace Trinity
         /// </summary>
         internal static HashSet<CacheObstacleObject> TimeBoundAvoidance = new HashSet<CacheObstacleObject>();
 
+        internal static void Clear()
+        {
+            CacheData.AvoidanceObstacles.Clear();
+            CacheData.AcdGuid.Clear();
+            CacheData.ActorSNO.Clear();
+            CacheData.CollisionSphere.Clear();
+            CacheData.CurrentUnitHealth.Clear();
+            CacheData.HasBeenInLoS.Clear();
+            CacheData.HasBeenNavigable.Clear();
+            CacheData.HasBeenRayCasted.Clear();
+            CacheData.InteractAttempts.Clear();
+            CacheData.MonsterObstacles.Clear();
+            CacheData.MonsterSizes.Clear();
+            CacheData.MonsterTypes.Clear();
+            CacheData.NavigationObstacles.Clear();
+            CacheData.ObjectType.Clear();
+            CacheData.Position.Clear();
+            CacheData.TimeBoundAvoidance.Clear();
+            CacheData.UnitMonsterAffix.Clear();
+        }
 
     }
 }

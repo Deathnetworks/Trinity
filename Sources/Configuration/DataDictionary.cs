@@ -25,8 +25,12 @@ namespace Trinity
             202446, // A1 New Tristram "Attack Area"
 
             284069, // A5 Westmarch Overlook
+            308323, // A5 Westmarch Wolf Gate
             315938, // A5 Westmarch Wolf Gate
             316374, // A5 Westmarch Storehouse
+            311624, // A5 Westmarch Cathedral Courtyard
+            311623, // A5 Streets of Westmarch
+            309413, // A5 Westmarch Cathedral
 
         };
 

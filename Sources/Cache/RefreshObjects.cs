@@ -275,7 +275,7 @@ namespace Trinity
                         RecordTargetHistory();
 
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, 
-                            "Found New Target {0} dist={1:0} IsElite={2} Radius={3:0.0} Weight={4} ActorSNO={5} " +
+                            "Found New Target {0} dist={1:0} IsElite={2} Radius={3:0.0} Weight={4:0} ActorSNO={5} " +
                             "Anim={6} Target++={7} Type={8} ",
                             CurrentTarget.InternalName, 
                             CurrentTarget.CentreDistance, 
