@@ -710,6 +710,26 @@ namespace Trinity
                         case GObjectType.Destructible:
                             {
 
+                                // Not Stuck, skip!
+                                if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.OnlyIfStuck &&
+                                    MovementSpeed > 1)
+                                {
+                                    break;
+                                }
+
+                                // Not stuck, skip
+                                if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.OnlyIfStuck &&
+                                    DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500)
+                                {
+                                    break;
+                                }
+
+                                if (cacheObject.RadiusDistance > Settings.WorldObject.DestructibleRange &&
+                                    (DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500 || MovementSpeed > 1))
+                                {
+                                    break;
+                                }
+
                                 // rrrix added this as a single "weight" source based on the DestructableRange.
                                 // Calculate the weight based on distance, where a distance = 1 is 5000, 90 = 0
                                 cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 5000f;

@@ -481,6 +481,7 @@ namespace Trinity.DbProvider
                 {
                     vSafeMovementLocation = Vector3.Zero;
                     TimesReachedStuckPoint++;
+
                     // Do we want to immediately generate a 2nd waypoint to "chain" anti-stucks in an ever-increasing path-length?
                     if (TimesReachedStuckPoint <= TotalAntiStuckAttempts)
                     {

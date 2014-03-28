@@ -498,7 +498,7 @@ namespace Trinity
 
             if (!gridPoints.Any())
             {
-                Logger.LogDebug(LogCategory.Navigator, "Unable to generage new unstucker position! rayCast={0} navObsticle={1}", raycastFail, navigationObstacleFail);
+                Logger.LogDebug(LogCategory.UserInformation, "Unable to generage new unstucker position! rayCast={0} navObsticle={1}", raycastFail, navigationObstacleFail);
                 return navigationPos;
             }
             else
@@ -506,7 +506,7 @@ namespace Trinity
                 Navigator.Clear();
                 
                 var bestPoint = gridPoints.OrderByDescending(p => p.Weight).FirstOrDefault();
-                Logger.LogDebug(LogCategory.Navigator, "Using unstucker position {0} distance={1:0.0} rayCast={2} navObsticle={3}",
+                Logger.LogDebug(LogCategory.UserInformation, "Generated Unstuck position {0} distance={1:0.0} rayCast={2} navObsticle={3}",
                     NavHelper.PrettyPrintVector3(bestPoint.Position), bestPoint.Distance, raycastFail, navigationObstacleFail);
                 return bestPoint.Position;
             }
