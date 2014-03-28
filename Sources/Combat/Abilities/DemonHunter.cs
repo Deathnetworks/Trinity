@@ -28,6 +28,12 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_ShadowPower, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
 
+            // Vengeance
+            if (!IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_DemonHunter_Vengeance) && (TargetUtil.EliteOrTrashInRange(60) || TargetUtil.AnyMobsInRange(60, 6)))
+            {
+                return new TrinityPower(SNOPower.X1_DemonHunter_Vengeance, 60f, TargetUtil.GetBestClusterUnit(60f, 60f, 1, false, true).Position);
+            }
+            
             // Smoke Screen
             if ((!UseOOCBuff || Settings.Combat.DemonHunter.SpamSmokeScreen) && CombatBase.CanCast(SNOPower.DemonHunter_SmokeScreen) &&
                 !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14 &&
