@@ -200,11 +200,10 @@ namespace Trinity
                 }
 
                 // Hydra
-                if (!UseOOCBuff && !Player.IsIncapacitated &&
+                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Hydra, CombatBase.CanCastFlags.NoTimer) &&
                     LastPowerUsed != SNOPower.Wizard_Hydra &&
                     (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || Player.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 15f)) &&
-                    Hotbar.Contains(SNOPower.Wizard_Hydra) &&
-                    Player.PrimaryResource >= 15 && SNOPowerUseTimer(SNOPower.Wizard_Hydra))
+                    Player.PrimaryResource >= 15)
                 {
                     // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
                     float fExtraDistance = 0f;

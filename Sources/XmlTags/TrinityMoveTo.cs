@@ -92,10 +92,10 @@ namespace Trinity.XmlTags
             Vector3 NavTarget = Position;
             Vector3 MyPos = Trinity.Player.Position;
             // DB 300+ always uses local nav! Yay :)
-            //if (!ZetaDia.WorldInfo.IsGenerated && Vector3.Distance(MyPos, NavTarget) > 250)
-            //{
-            //    NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
-            //}
+            if (!ZetaDia.WorldInfo.IsGenerated && Vector3.Distance(MyPos, NavTarget) > 250)
+            {
+                NavTarget = MathEx.CalculatePointFrom(MyPos, NavTarget, Vector3.Distance(MyPos, NavTarget) - 250);
+            }
 
             if (useNavigator != null && useNavigator.ToLower() == "false")
             {
