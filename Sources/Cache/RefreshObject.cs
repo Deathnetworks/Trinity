@@ -616,8 +616,9 @@ namespace Trinity
                         c_diaGizmo = (DiaGizmo)c_diaObject;
 
                         if (c_diaGizmo.IsBarricade)
+                        {
                             c_ObjectType = GObjectType.Barricade;
-
+                        }
                         else
                         {
                             switch (c_diaGizmo.ActorInfo.GizmoType)
@@ -636,7 +637,11 @@ namespace Trinity
                                     c_ObjectType = GObjectType.Container;
                                     break;
                                 case GizmoType.BreakableDoor:
+                                    c_ObjectType = GObjectType.Barricade;
+                                    break;
                                 case GizmoType.BreakableChest:
+                                    c_ObjectType = GObjectType.Destructible;
+                                    break;
                                 case GizmoType.DestroyableObject:
                                     c_ObjectType = GObjectType.Destructible;
                                     break;

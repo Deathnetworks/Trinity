@@ -313,15 +313,10 @@ namespace Trinity
                             }
                         }
 
-
                         // Set min distance to user-defined setting
                         minDistance = Settings.WorldObject.DestructibleRange + c_Radius;
                         if (ForceCloseRangeTarget)
                             minDistance += 6f;
-
-                        // Large objects, like logs - Give an extra xx feet of distance
-                        //if (dictSNOExtendedDestructRange.TryGetValue(c_ActorSNO, out iExtendedRange))
-                        //    iMinDistance = Settings.WorldObject.DestructibleRange + iExtendedRange;
 
                         // This object isn't yet in our destructible desire range
                         if (minDistance <= 0 || c_RadiusDistance > minDistance)
