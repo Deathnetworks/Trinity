@@ -39,6 +39,11 @@ namespace Trinity
             }
         }
 
+        private bool MouseLeft()
+        {
+            return (System.Windows.Forms.Control.MouseButtons & System.Windows.Forms.MouseButtons.Left) == System.Windows.Forms.MouseButtons.Left;
+        }
+
         /// <summary>
         /// Receive Pulse event from DemonBuddy.
         /// </summary>
@@ -53,6 +58,11 @@ namespace Trinity
 
                     if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                         return;
+
+                    if (!BotMain.IsPaused)
+                    {
+                        BotMain.PauseWhile(MouseLeft);
+                    }
 
                     GameUI.SafeClickUIButtons();
 

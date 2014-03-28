@@ -359,7 +359,7 @@ namespace Trinity
             if (name.StartsWith("craftingplan_")) return GItemType.CraftingPlan;
             if (name.StartsWith("craftingmaterials_")) return GItemType.CraftingMaterial;
             if (name.StartsWith("crafting_")) return GItemType.CraftingMaterial;
-            if (name.StartsWith("craftingreagent_legendary_")) return GItemType.CraftingPlan;
+            if (name.StartsWith("craftingreagent_legendary_")) return GItemType.CraftingMaterial;
             if (name.StartsWith("dye_")) return GItemType.Dye;
             if (name.StartsWith("a1_")) return GItemType.SpecialItem;
             if (name.StartsWith("healthglobe")) return GItemType.HealthGlobe;

@@ -9,7 +9,7 @@ namespace Trinity
     /// </summary>
     internal class DataDictionary
     {
-
+        public const int WALLER_SNO = 226808; //monsterAffix_waller_model (226808)
 
         public static HashSet<string> VanityItems { get { return DataDictionary.vanityItems; } }
         private static readonly HashSet<string> vanityItems = new HashSet<string>()
@@ -23,8 +23,13 @@ namespace Trinity
         private static readonly HashSet<int> neverTownPortalLevelAreaIds = new HashSet<int>()
         {
             202446, // A1 New Tristram "Attack Area"
+
+            284069, // A5 Westmarch Overlook
+            315938, // A5 Westmarch Wolf Gate
+            316374, // A5 Westmarch Storehouse
+
         };
-        
+
         public static HashSet<int> ForceTownPortalLevelAreaIds { get { return DataDictionary.forceTownPortalLevelAreaIds; } }
         private static readonly HashSet<int> forceTownPortalLevelAreaIds = new HashSet<int>
         {
@@ -68,6 +73,8 @@ namespace Trinity
             60757, // A2 Belial's chambers
             55313, // A2 Caldeum Bazaar
             102964, // A2 City of Caldeum
+
+            309413, // A5 Westmarch Cathedral
         };
 
 
@@ -341,8 +348,12 @@ namespace Trinity
             84919, // Skelton King
             108444, // ZombieFemale_A_TristramQuest (Wretched Mothers)
             176889, // ZombieFemale_Unique_WretchedQueen
-         };
 
+            // A5
+            316839, // x1_deathOrb_bodyPile
+            375106, // A5 x1_Death_Orb_Monster
+            375111, // A5 x1_Death_Orb_Master_Monster
+        };
 
         // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
 
@@ -392,9 +403,15 @@ namespace Trinity
         /// NOTE: you don't NEED interactable SNO's listed here. But if they are listed here, *THIS* is the range at which your character will try to walk to within the object
         /// BEFORE trying to actually "click it". Certain objects need you to get very close, so it's worth having them listed with low interact ranges
         /// </summary>
-        public static Dictionary<int, float> InteractAtCustomRange { get { return interactAtCustomRange; } }
-        private static readonly Dictionary<int, float> interactAtCustomRange = new Dictionary<int, float> {
-            {56686, 4}, {52685, 4}, {54882, 40}, {3349, 25}, {225270, 35}, {180575, 10}
+        public static Dictionary<int, float> CustomObjectRadius { get { return customObjectRadius; } }
+        private static readonly Dictionary<int, float> customObjectRadius = new Dictionary<int, float> {
+            {56686, 4}, 
+            {52685, 4}, 
+            {54882, 40}, 
+            {3349, 25}, // Belial
+            {225270, 35}, 
+            {180575, 10}, // Diablo Arena Health Well
+            {375111, 40f} // A5 x1_Death_Orb_Master_Monster
         };
 
         /// <summary>
@@ -425,6 +442,13 @@ namespace Trinity
             {104827, 15}, // trOut_FesteringWoods_Neph_Column_C_Broken_Base 
             
          };
+
+        public static HashSet<int> ForceDestructibles { get { return forceDestructibles; } }
+        private static HashSet<int> forceDestructibles = new HashSet<int>()
+        {
+            273323, // x1_westm_Door_Wide_Clicky
+            55325, // a3dun_Keep_Door_Destructable
+        };
 
         /// <summary>
         /// This is the RadiusDistance at which destructibles and barricades (logstacks, large crates, carts, etc.) are added to the cache
@@ -468,6 +492,9 @@ namespace Trinity
             3349,   // Big Belial (3349),    
             210268, // Corrupt Growths 2nd Tier
             193077, // a3dun_Crater_ST_GiantDemonHeart_Mob
+
+            375106, // A5 x1_Death_Orb_Monster
+            375111, // A5 x1_Death_Orb_Master_Monster
         };
 
         /// <summary>
@@ -548,7 +575,11 @@ namespace Trinity
             365739, // X1_Fortress_FloatRubble_F
             365580, // X1_Fortress_FloatRubble_C
 
+            284713, // x1_westmarch_rat_A
+            355365, // x1_Abattoir_furnaceWall
 
+            304313, // x1_abattoir_furnace_01 
+            375383, // x1_Abattoir_furnaceSpinner_Event_Phase2 -- this is a rotating avoidance, with a fire "beam" about 45f in length
         };
 
         /// <summary>

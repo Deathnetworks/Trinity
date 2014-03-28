@@ -125,7 +125,7 @@ namespace Trinity
                 }
 
                 // Check if we should be forcing a town-run
-                if (Trinity.ForceVendorRunASAP || BrainBehavior.IsVendoring)
+                if (!Trinity.Player.IsInTown && Trinity.ForceVendorRunASAP || BrainBehavior.IsVendoring)
                 {
                     if (!LastTownRunCheckResult)
                     {
@@ -213,9 +213,11 @@ namespace Trinity
                 }
 
 
-                if ((Trinity.IsReadyToTownRun && (TownRunTimerFinished() || Trinity.Player.IsInTown)) || BrainBehavior.IsVendoring)
+                if (Trinity.IsReadyToTownRun && (TownRunTimerFinished() || BrainBehavior.IsVendoring))
                 {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Waiting for town run timer");
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Town run timer finished {0} or in town {1} or is vendoring {2} (TownRun)",
+                        TownRunTimerFinished(), Trinity.Player.IsInTown, BrainBehavior.IsVendoring);
+                    Trinity.IsReadyToTownRun = false;
                     return true;
                 }
                 if (Trinity.IsReadyToTownRun && !TownRunCheckTimer.IsRunning)

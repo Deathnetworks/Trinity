@@ -144,7 +144,6 @@ namespace Trinity
                 LastDeathTime = DateTime.UtcNow;
                 iTotalDeaths++;
                 iDeathsThisRun++;
-                PlayerInfoCache.RefreshHotbar();
                 CacheData.AbilityLastUsed = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
                 vBacktrackList = new SortedList<int, Vector3>();
                 iTotalBacktracks = 0;
@@ -200,7 +199,6 @@ namespace Trinity
         public static void ResetEverythingNewGame()
         {
             // In-thread stuff
-            PlayerInfoCache.RefreshHotbar();
             V.ValidateLoad();
 
             // Out of thread Async stuff

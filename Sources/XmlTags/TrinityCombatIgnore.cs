@@ -103,7 +103,7 @@ namespace Trinity.XmlTags
 
             public bool AttackTrash(TrinityCacheObject tco)
             {
-                if (!ExceptTrash && tco.IsTrashMob)
+                if (ExceptTrash && tco.IsTrashMob)
                     return true;
 
                 return false;

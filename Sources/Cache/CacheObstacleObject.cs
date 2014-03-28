@@ -14,7 +14,8 @@ namespace Trinity
         public int HitPointsCur { get; set; }
         public DateTime Expires { get; set; }
         public int RActorGUID { get; set; }
-
+        public float Rotation { get; set; }
+        public float BeamLength { get; set; }
         public AvoidanceType AvoidanceType
         {
             get

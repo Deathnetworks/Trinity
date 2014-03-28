@@ -82,7 +82,7 @@ namespace Trinity
                         !XmlTags.TrinityTownPortal.ForceClearArea &&
                         !usingTownPortal &&
                         !profileTagCheck &&
-                        (MovementSpeed < 1 && CurrentTarget == null) &&
+                        (MovementSpeed > 1 && CurrentTarget == null) &&
                         Settings.Combat.Misc.TrashPackSize > 1 &&
                         !elitesInRangeOfUnit &&
                         Player.Level >= 15 &&
@@ -299,7 +299,7 @@ namespace Trinity
                                             cacheObject.Weight = 300d;
 
                                         // If standing Molten, Arcane, or Poison Tree near unit, reduce weight
-                                        if (PlayerKiteDistance <= 0 &&
+                                        if (PlayerKiteDistance <= 0 && 
                                             CacheData.TimeBoundAvoidance.Any(aoe =>
                                             (aoe.AvoidanceType == AvoidanceType.Arcane ||
                                             aoe.AvoidanceType == AvoidanceType.MoltenCore ||
@@ -310,14 +310,14 @@ namespace Trinity
 
                                         // If any AoE between us and target, reduce weight, for melee only
                                         if (!Settings.Combat.Misc.KillMonstersInAoE &&
-                                            PlayerKiteDistance <= 0 &&
+                                            PlayerKiteDistance <= 0 && cacheObject.RadiusDistance > 3f &&
                                             CacheData.TimeBoundAvoidance.Any(aoe => aoe.AvoidanceType != AvoidanceType.PlagueCloud &&
                                                 MathUtil.IntersectsPath(aoe.Position, aoe.Radius, Player.Position, cacheObject.Position)))
                                             cacheObject.Weight = 1;
 
                                         // See if there's any AOE avoidance in that spot, if so reduce the weight to 1, for melee only
                                         if (!Settings.Combat.Misc.KillMonstersInAoE &&
-                                            PlayerKiteDistance <= 0 &&
+                                            PlayerKiteDistance <= 0 && cacheObject.RadiusDistance > 3f &&
                                             CacheData.TimeBoundAvoidance.Any(aoe => aoe.AvoidanceType != AvoidanceType.PlagueCloud &&
                                                 cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
                                             cacheObject.Weight = 1d;

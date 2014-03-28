@@ -351,7 +351,7 @@ namespace Trinity
                             break;
                         }
 
-                        if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.ForceIgnore)
+                        if (!DataDictionary.ForceDestructibles.Contains(c_ActorSNO) && Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.ForceIgnore)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "ForceIgnoreDestructibles";

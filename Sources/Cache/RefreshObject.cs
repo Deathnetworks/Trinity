@@ -638,7 +638,6 @@ namespace Trinity
                                 case GizmoType.BreakableDoor:
                                 case GizmoType.BreakableChest:
                                 case GizmoType.DestroyableObject:
-                                    //case GizmoType.DestroySelfWhenNear:
                                     c_ObjectType = GObjectType.Destructible;
                                     break;
                                 case GizmoType.PlacedLoot:

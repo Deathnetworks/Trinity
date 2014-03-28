@@ -273,8 +273,21 @@ namespace Trinity
                     if (LastTargetRactorGUID != CurrentTarget.RActorGuid)
                     {
                         RecordTargetHistory();
-                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, "Found New Target {0} dist={1} IsElite={2} Radius={3}",
-                                        CurrentTarget.InternalName, CurrentTarget.CentreDistance, CurrentTarget.IsEliteRareUnique, CurrentTarget.Radius);
+
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, 
+                            "Found New Target {0} dist={1:0} IsElite={2} Radius={3:0.0} Weight={4} ActorSNO={5} " +
+                            "Anim={6} Target++={7} Type={8} ",
+                            CurrentTarget.InternalName, 
+                            CurrentTarget.CentreDistance, 
+                            CurrentTarget.IsEliteRareUnique, 
+                            CurrentTarget.Radius,
+                            CurrentTarget.Weight,
+                            CurrentTarget.ActorSNO,
+                            CurrentTarget.Animation,
+                            CurrentTarget.TimesBeenPrimaryTarget,
+                            CurrentTarget.Type
+                            );
+
                         dateSincePickedTarget = DateTime.UtcNow;
                         iTargetLastHealth = 0f;
                     }

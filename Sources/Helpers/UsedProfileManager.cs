@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Technicals;
 using Trinity.XmlTags;
@@ -76,12 +77,15 @@ namespace Trinity
         {
             try
             {
-                foreach (TargetBlacklist b in ProfileManager.CurrentProfile.TargetBlacklists)
+                if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.TargetBlacklists.Any())
                 {
-                    if (!DataDictionary.BlackListIds.Contains(b.ActorId))
+                    foreach (TargetBlacklist b in ProfileManager.CurrentProfile.TargetBlacklists)
                     {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Adding Profile TargetBlacklist {0} to Trinity Blacklist", b.ActorId);
-                        DataDictionary.AddToBlacklist(b.ActorId);
+                        if (!DataDictionary.BlackListIds.Contains(b.ActorId))
+                        {
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "Adding Profile TargetBlacklist {0} to Trinity Blacklist", b.ActorId);
+                            DataDictionary.AddToBlacklist(b.ActorId);
+                        }
                     }
                 }
             }

@@ -1406,7 +1406,7 @@ namespace Trinity
                             TargetRangeRequired = CurrentTarget.Radius + 5f;
                             //TargetRangeRequired = 5f;
                             float _range;
-                            if (DataDictionary.InteractAtCustomRange.TryGetValue(CurrentTarget.ActorSNO, out _range))
+                            if (DataDictionary.CustomObjectRadius.TryGetValue(CurrentTarget.ActorSNO, out _range))
                             {
                                 TargetRangeRequired = _range;
                             }
@@ -1424,7 +1424,7 @@ namespace Trinity
                             if (fDistanceToDestination <= 1.5f)
                                 TargetDistanceReduction += 1f;
                             float range;
-                            if (DataDictionary.InteractAtCustomRange.TryGetValue(CurrentTarget.ActorSNO, out range))
+                            if (DataDictionary.CustomObjectRadius.TryGetValue(CurrentTarget.ActorSNO, out range))
                             {
                                 TargetRangeRequired = range;
                             }
@@ -1439,7 +1439,7 @@ namespace Trinity
                                 TargetRangeRequired -= 2f;
                             // Check if it's in our interactable range dictionary or not
                             float range;
-                            if (DataDictionary.InteractAtCustomRange.TryGetValue(CurrentTarget.ActorSNO, out range))
+                            if (DataDictionary.CustomObjectRadius.TryGetValue(CurrentTarget.ActorSNO, out range))
                             {
                                 TargetRangeRequired = range;
                             }

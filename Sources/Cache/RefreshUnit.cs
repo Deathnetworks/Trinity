@@ -71,10 +71,10 @@ namespace Trinity
                     Expires = DateTime.UtcNow.AddMinutes(60)
                 });
             }
-            if (teamId == 1 || teamId == 2)
+            if (teamId == 1 || teamId == 2 || teamId == 17)
             {
                 AddToCache = false;
-                c_IgnoreSubStep += "IsTeam1|2+";
+                c_IgnoreSubStep += "IsTeam" + teamId.ToString();
                 return AddToCache;
             }
 
@@ -142,7 +142,7 @@ namespace Trinity
                     return AddToCache;
                 }
             }
-            if (!DataDictionary.InteractAtCustomRange.TryGetValue(c_ActorSNO, out c_Radius))
+            if (!DataDictionary.CustomObjectRadius.TryGetValue(c_ActorSNO, out c_Radius))
             {
                 // Retrieve collision sphere radius, cached if possible
                 if (!CacheData.CollisionSphere.TryGetValue(c_ActorSNO, out c_Radius))

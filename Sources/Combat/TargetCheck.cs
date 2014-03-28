@@ -214,7 +214,7 @@ namespace Trinity
 
                 if ((Trinity.ForceVendorRunASAP || Trinity.IsReadyToTownRun) && TownRun.TownRunTimerRunning())
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Waiting for town run timer", true);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Waiting for town run timer (Target Check)", true);
                     return true;
                 }
 
