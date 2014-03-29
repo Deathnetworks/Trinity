@@ -1,6 +1,86 @@
 ﻿
 # Trinity
 
+### Changelog 1.8.13
+
+* Fixed bug in unstucker never generating an unstuck point
+
+* Unstucker should now always generate an unstuck point no matter what
+
+* Monk Dashing Strike should be used more Liberally for Out of Combat movement
+
+* "Salvage all Rares" is now "Trash all rares"
+
+* Some adjustments to Destructible object triggering (should be less sensitive to walking next to destructibles)
+
+* Unstuck positions will now be logged
+
+* very close range doors and barricades should get more weight now
+
+* Added townportal blacklist for A5 before we get into Town
+
+* Fixes for weird door/barricade/destructible type objects
+
+* Wizard should now use more than one Hydra, if available
+
+* Fixed another error with Gem stats
+
+* DemonHunter Vengeance should now work
+
+* Fixed ignoring trash mobs - thanks Faebs
+
+* Fixed TrinityCombatIgnore boolean flip  - thanks Faebs
+
+* Added "LazyRaider" (left click to pause bot) - thanks elvatoloco
+
+* Fixed an A3 Keep Depths door being marked as a Container for some strange reason
+
+* Fixed A5 Questing new TeamID 17
+
+* Added some more "Never Town Portal" level area ID's
+
+* Hopefully fixed very old TownRun bug (where it would never take townrun if near a navigation obstacle)
+
+* Crusader Laws should now be used in combat when surrounded by trash mobs
+
+* Fixed boolean sort in Cluster targeting
+
+* Fixed trying to town portal in A1 "Attack Area"
+
+### Changelog 1.8.12
+
+* Should now properly pickup RoS items
+
+* Changed "Misc Item Level" to "Misc Item Quality"
+
+* Added some more debug logging for Item stats junk in case it's still broken
+
+* Added Avalanche, thanks Phelon.  UNTESTED By me so yell at him if it sucks :P
+
+* Hopefully fixed WD not destroying objects when ZeroDogs is accidentally checked
+
+* Added Wizard Black Hole + Supermassive rune support
+
+* Every single Crusader Shield and flail  should no longer be stashed (should now be scored appropriately or whatever)
+
+* Added Monk Epiphany support
+
+* Hopefully fixed stupid bug with ignoring trash
+
+* Unstucker and kite/Avoidance now regenerates the current navigation path
+
+### Changelog 1.8.11
+
+* Fixed Jondar not being attacked
+
+* (Hopefully) fixed Item Stats exceptions
+
+* More crusader combat support
+
+### Changelog 1.8.10
+
+* Basic Crusader Support - Thanks Nuok for the Belphegor code
+
 ### Changelog 1.8.9
 
 * Fix for not stashing legendary plans
