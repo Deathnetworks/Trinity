@@ -402,7 +402,12 @@ namespace Trinity
                                 // Unit, use our primary power to attack
                                 case GObjectType.Unit:
                                     {
-                                        if (CombatBase.CurrentPower.SNOPower != SNOPower.None)
+                                        if (CurrentTarget.IsNPC && CurrentTarget.NPCIsOperable)
+                                        {
+                                            CurrentTarget.Unit.Interact();
+                                            runStatus = HandlerRunStatus.TreeRunning;
+                                        }
+                                        else if (CombatBase.CurrentPower.SNOPower != SNOPower.None)
                                         {
                                             if (IsWaitingForPower && CombatBase.CurrentPower.ShouldWaitBeforeUse)
                                             {
@@ -665,7 +670,7 @@ namespace Trinity
 
 
                     // Update the last distance stored
-                    fLastDistanceFromTarget = TargetCurrentDistance;                    
+                    fLastDistanceFromTarget = TargetCurrentDistance;
 
                     if (TimeSinceUse(SNOPower.Monk_TempestRush) < 250)
                     {
@@ -1370,8 +1375,16 @@ namespace Trinity
                                 TargetDistanceReduction -= 3f;
                             if (TargetDistanceReduction <= 0f)
                                 TargetDistanceReduction = 0f;
-                            // Pick a range to try to reach
-                            TargetRangeRequired = CombatBase.CurrentPower.SNOPower == SNOPower.None ? 9f : CombatBase.CurrentPower.MinimumRange;
+
+                            if (CurrentTarget.IsNPC && CurrentTarget.NPCIsOperable)
+                            {
+                                TargetRangeRequired = CurrentTarget.Radius;
+                            }
+                            else
+                            {
+                                // Pick a range to try to reach
+                                TargetRangeRequired = CombatBase.CurrentPower.SNOPower == SNOPower.None ? 9f : CombatBase.CurrentPower.MinimumRange;
+                            }
                             break;
                         }
                     // * Item - need to get within 6 feet and then interact with it
@@ -1510,6 +1523,13 @@ namespace Trinity
         {
             using (new PerformanceLogger("HandleTarget.HandleUnitInRange"))
             {
+                if (CurrentTarget.IsNPC && CurrentTarget.NPCIsOperable)
+                {
+                    bool result = CurrentTarget.Unit.Interact();
+                    Logger.Log("Interacted with NPC, result = {0}", result);                    
+                    return;
+                }
+
                 // Wait while animating before an attack
                 if (CombatBase.CurrentPower.WaitForAnimationFinished)
                     WaitWhileAnimating(5, false);

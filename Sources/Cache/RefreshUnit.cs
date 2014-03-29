@@ -71,7 +71,27 @@ namespace Trinity
                     Expires = DateTime.UtcNow.AddMinutes(60)
                 });
             }
-            if (teamId == 1 || teamId == 2 || teamId == 17)
+
+
+            try
+            {
+                CurrentCacheObject.IsNPC = (c_CommonData.GetAttribute<int>(ActorAttributeType.IsNPC) > 0);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug("Error refreshing IsNPC");
+            }
+
+            try
+            {
+                CurrentCacheObject.NPCIsOperable = (c_CommonData.GetAttribute<int>(ActorAttributeType.NPCIsOperatable) > 0);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug("Error refreshing IsNPC");
+            }
+
+            if ((teamId == 1 || teamId == 2 || teamId == 17))
             {
                 AddToCache = false;
                 c_IgnoreSubStep += "IsTeam" + teamId.ToString();
@@ -185,14 +205,10 @@ namespace Trinity
                 return AddToCache;
 
 
-            // A "fake distance" to account for the large-object size of monsters
             c_RadiusDistance -= (float)c_Radius;
+
             if (c_RadiusDistance <= 1f)
                 c_RadiusDistance = 1f;
-
-            // Special flags to decide whether to target anything at all
-            //if (c_IsEliteRareUnique || c_unit_IsBoss)
-            //    AnyElitesPresent = true;
 
             // Extended kill radius after last fighting, or when we want to force a town run
             if ((Settings.Combat.Misc.ExtendedTrashKill && iKeepKillRadiusExtendedFor > 0) || ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
@@ -207,24 +223,7 @@ namespace Trinity
             }
             if (c_unit_IsTreasureGoblin)
                 AnyTreasureGoblinsPresent = true;
-
-            // Units with very high priority (1900+) allow an extra 50% on the non-elite kill slider range
-            //if (!AnyMobsInRange && !AnyElitesPresent && !AnyTreasureGoblinsPresent && c_RadiusDistance <= (Settings.Combat.Misc.NonEliteRange * 1.5))
-            //{
-            //    int extraPriority;
-            //    // Enable extended kill radius for specific unit-types
-            //    if (DataDictionary.RangedMonsterIds.Contains(c_ActorSNO))
-            //    {
-            //        AnyMobsInRange = true;
-            //    }
-            //    if (!AnyMobsInRange && DataDictionary.MonsterCustomWeights.TryGetValue(c_ActorSNO, out extraPriority))
-            //    {
-            //        if (extraPriority >= 1900)
-            //        {
-            //            AnyMobsInRange = true;
-            //        }
-            //    }
-            //}
+            
             return AddToCache;
         }
 

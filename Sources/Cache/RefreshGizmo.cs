@@ -1,4 +1,5 @@
-﻿using Trinity.Config.Combat;
+﻿using System;
+using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Technicals;
 using Zeta.Common.Plugins;
@@ -133,6 +134,22 @@ namespace Trinity
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "GizmoStateException";
+                            return AddToCache;
+                        }
+
+                        int unTargetable = c_CommonData.GetAttribute<int>(ActorAttributeType.Untargetable);
+                        if (unTargetable > 0)
+                        {
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject()
+                            {
+                                ActorSNO = c_ActorSNO,
+                                Name = c_InternalName,
+                                Position = c_Position,
+                                Radius = c_Radius,
+                            });
+
+                            AddToCache = false;
+                            c_IgnoreSubStep = "Untargetable";
                             return AddToCache;
                         }
 
@@ -330,7 +347,7 @@ namespace Trinity
                     }
                 case GObjectType.Destructible:
                     {
-                        AddToCache = false;
+                        AddToCache = true;
 
                         if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_TempestRush) && TimeSinceUse(SNOPower.Monk_TempestRush) <= 150)
                         {
@@ -390,7 +407,7 @@ namespace Trinity
                             AddToCache = false;
                             c_IgnoreSubStep = "NotInDestructableRange";
                         }
-                        if (AddToCache && c_RadiusDistance <= 2f && PlayerMover.GetMovementSpeed() < 1)
+                        if (AddToCache && c_RadiusDistance <= 2f && DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalMilliseconds > 500)
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "NotStuck2";

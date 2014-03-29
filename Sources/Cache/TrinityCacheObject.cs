@@ -63,20 +63,32 @@ namespace Trinity
         public bool HasBeenPrimaryTarget { get; set; }
         public int TimesBeenPrimaryTarget { get; set; }
         public DateTime FirstTargetAssignmentTime { get; set; }
-        public DiaObject DiaObject { get; set; }
+        [NoCopy]
+        public DiaObject DiaObject { get { return ZetaDia.Actors.GetActorsOfType<DiaObject>(true, true).Where(o => o.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
+        [NoCopy]
+        public DiaUnit Unit { get { return ZetaDia.Actors.GetActorsOfType<DiaUnit>(true, true).Where(u => u.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
+        [NoCopy]
+        public DiaGizmo Gizmo { get { return ZetaDia.Actors.GetActorsOfType<DiaGizmo>(true, true).Where(u => u.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
         public string ObjectHash { get; set; }
         public double KillRange { get; set; }
         public MonsterSize MonsterSize { get; set; }
         public bool HasBeenNavigable { get; set; }
         public bool HasBeenRaycastable { get; set; }
         public bool HasBeenInLoS { get; set; }
+        [NoCopy]
         public bool IsBossOrEliteRareUnique { get { return (this.IsUnit && (IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
+        [NoCopy]
         public bool IsTrashMob { get { return (this.IsUnit && !(IsEliteRareUnique || IsBoss || IsTreasureGoblin)); } }
+        [NoCopy]
         public bool IsMe { get { return RActorGuid == Trinity.Player.RActorGuid; } }
         public bool IsSummonedByPlayer { get; set; }
         public bool IsSummoner { get; set; }
+        [NoCopy]
         public bool IsUnit { get { return this.Type == GObjectType.Unit; } }
+        public bool IsNPC { get; set; }
+        public bool NPCIsOperable { get; set; }
 
+        [NoCopy]
         public bool IsFacing(Vector3 targetPosition, float arcDegrees = 70f)
         {
             if (DirectionVector != Vector2.Zero)
@@ -91,27 +103,13 @@ namespace Trinity
                 return false;
         }
 
+        [NoCopy]
         public bool IsPlayerFacing(float arc)
         {
             return Trinity.Player.IsFacing(this.Position, arc);
         }
 
-        public DiaUnit Unit
-        {
-            get
-            {
-                return ZetaDia.Actors.GetActorsOfType<DiaUnit>(true, true).Where(u => u.RActorGuid == this.RActorGuid).FirstOrDefault();
-            }
-
-        }
-        public DiaGizmo Gizmo
-        {
-            get
-            {
-                return ZetaDia.Actors.GetActorsOfType<DiaGizmo>(true, true).Where(u => u.RActorGuid == this.RActorGuid).FirstOrDefault();
-            }
-
-        }
+        [NoCopy]
         public bool IsStandingInAvoidance
         {
             get
@@ -120,6 +118,7 @@ namespace Trinity
             }
         }
 
+        [NoCopy]
         public AvoidanceType AvoidanceType
         {
             get
@@ -130,63 +129,8 @@ namespace Trinity
 
         public TrinityCacheObject(DiaObject _DiaObject = null)
         {
-            DiaObject = _DiaObject;
-        }
-
-        // For cloning the object (and not simply referencing it)
-        public TrinityCacheObject Clone()
-        {
-            TrinityCacheObject clone = new TrinityCacheObject(Unit)
-            {
-                Position = Position,
-                Type = Type,
-                Weight = Weight,
-                CentreDistance = CentreDistance,
-                RadiusDistance = RadiusDistance,
-                InternalName = InternalName,
-                ACDGuid = ACDGuid,
-                RActorGuid = RActorGuid,
-                DynamicID = DynamicID,
-                BalanceID = BalanceID,
-                ActorSNO = ActorSNO,
-                ItemLevel = ItemLevel,
-                GoldAmount = GoldAmount,
-                OneHanded = OneHanded,
-                TwoHanded = TwoHanded,
-                ItemQuality = ItemQuality,
-                DBItemBaseType = DBItemBaseType,
-                DBItemType = DBItemType,
-                FollowerType = FollowerType,
-                TrinityItemType = TrinityItemType,
-                IsElite = IsElite,
-                IsRare = IsRare,
-                IsUnique = IsUnique,
-                IsMinion = IsMinion,
-                IsTreasureGoblin = IsTreasureGoblin,
-                IsEliteRareUnique = IsEliteRareUnique,
-                IsBoss = IsBoss,
-                IsAttackable = IsAttackable,
-                HitPointsPct = HitPointsPct,
-                HitPoints = HitPoints,
-                Radius = Radius,
-                MonsterSize = MonsterSize,
-                ForceLeapAgainst = ForceLeapAgainst,
-                ObjectHash = ObjectHash,
-                HasBeenInLoS = HasBeenInLoS,
-                HasBeenNavigable = HasBeenNavigable,
-                HasBeenPrimaryTarget = HasBeenPrimaryTarget,
-                HasBeenRaycastable = HasBeenRaycastable,
-                HasDotDPS = HasDotDPS,
-                DiaObject = DiaObject,
-                FirstTargetAssignmentTime = FirstTargetAssignmentTime,
-                HasAffixShielded = HasAffixShielded,
-                ItemLink = ItemLink,
-                KillRange = KillRange,
-                MonsterAffixes = MonsterAffixes,
-                TimesBeenPrimaryTarget = TimesBeenPrimaryTarget,
-                Animation = Animation,
-            };
-            return clone;
+            if (_DiaObject != null)
+                this.RActorGuid = _DiaObject.RActorGuid;
         }
 
         public int NearbyUnitsWithinDistance(float range = 5f)

@@ -4,19 +4,18 @@ using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
-using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
 namespace Trinity
 {
-    public partial class Trinity : IPlugin
+    public partial class Trinity
     {
         /// <summary>
         /// This will eventually be come our single source of truth and we can get rid of most/all of the below "c_" variables
         /// </summary>
-        //private static TrinityCacheObject cacheEntry = null;
+        private static TrinityCacheObject CurrentCacheObject = new TrinityCacheObject();
 
         private static Vector3 c_Position = Vector3.Zero;
         private static GObjectType c_ObjectType = GObjectType.Unknown;
@@ -223,58 +222,57 @@ namespace Trinity
             if (AddToCache)
             {
                 c_IgnoreReason = "None";
-                ObjectCache.Add(
-                    new TrinityCacheObject(c_diaObject)
-                    {
-                        Position = c_Position,
-                        Type = c_ObjectType,
-                        CentreDistance = c_CentreDistance,
-                        RadiusDistance = c_RadiusDistance,
-                        InternalName = c_InternalName,
-                        Animation = c_CurrentAnimation,
-                        ACDGuid = c_ACDGUID,
-                        RActorGuid = c_RActorGuid,
-                        DynamicID = c_GameDynamicID,
-                        BalanceID = c_BalanceID,
-                        ActorSNO = c_ActorSNO,
-                        ItemLevel = c_ItemLevel,
-                        GoldAmount = c_GoldStackSize,
-                        OneHanded = c_IsOneHandedItem,
-                        TwoHanded = c_IsTwoHandedItem,
-                        ItemQuality = c_ItemQuality,
-                        DBItemBaseType = c_DBItemBaseType,
-                        DBItemType = c_DBItemType,
-                        FollowerType = c_item_tFollowerType,
-                        TrinityItemType = c_item_GItemType,
-                        IsElite = c_unit_IsElite,
-                        IsRare = c_unit_IsRare,
-                        IsUnique = c_unit_IsUnique,
-                        IsMinion = c_unit_IsMinion,
-                        IsTreasureGoblin = c_unit_IsTreasureGoblin,
-                        IsBoss = c_unit_IsBoss,
-                        IsAttackable = c_unit_IsAttackable,
-                        HitPoints = c_HitPoints,
-                        HitPointsPct = c_HitPointsPct,
-                        Radius = c_Radius,
-                        MonsterSize = c_unit_MonsterSize,
-                        IsEliteRareUnique = c_IsEliteRareUnique,
-                        ForceLeapAgainst = c_ForceLeapAgainst,
-                        HasDotDPS = c_HasDotDPS,
-                        ObjectHash = c_ObjectHash,
-                        KillRange = c_KillRange,
-                        HasAffixShielded = c_unit_HasShieldAffix,
-                        MonsterAffixes = c_MonsterAffixes,
-                        DiaObject = c_diaObject,
-                        HasBeenInLoS = c_HasBeenInLoS,
-                        HasBeenNavigable = c_HasBeenNavigable,
-                        HasBeenRaycastable = c_HasBeenRaycastable,
-                        ItemLink = c_ItemLink,
-                        Rotation = c_Rotation,
-                        DirectionVector = c_DirectionVector,
-                        IsFacingPlayer = c_IsFacingPlayer,
-                        IsSummonedByPlayer = c_IsSummonedByPlayer,
-                        IsSummoner = c_IsSummoner
-                    });
+
+
+                CurrentCacheObject.Position = c_Position;
+                CurrentCacheObject.Type = c_ObjectType;
+                CurrentCacheObject.CentreDistance = c_CentreDistance;
+                CurrentCacheObject.RadiusDistance = c_RadiusDistance;
+                CurrentCacheObject.InternalName = c_InternalName;
+                CurrentCacheObject.Animation = c_CurrentAnimation;
+                CurrentCacheObject.ACDGuid = c_ACDGUID;
+                CurrentCacheObject.RActorGuid = c_RActorGuid;
+                CurrentCacheObject.DynamicID = c_GameDynamicID;
+                CurrentCacheObject.BalanceID = c_BalanceID;
+                CurrentCacheObject.ActorSNO = c_ActorSNO;
+                CurrentCacheObject.ItemLevel = c_ItemLevel;
+                CurrentCacheObject.GoldAmount = c_GoldStackSize;
+                CurrentCacheObject.OneHanded = c_IsOneHandedItem;
+                CurrentCacheObject.TwoHanded = c_IsTwoHandedItem;
+                CurrentCacheObject.ItemQuality = c_ItemQuality;
+                CurrentCacheObject.DBItemBaseType = c_DBItemBaseType;
+                CurrentCacheObject.DBItemType = c_DBItemType;
+                CurrentCacheObject.FollowerType = c_item_tFollowerType;
+                CurrentCacheObject.TrinityItemType = c_item_GItemType;
+                CurrentCacheObject.IsElite = c_unit_IsElite;
+                CurrentCacheObject.IsRare = c_unit_IsRare;
+                CurrentCacheObject.IsUnique = c_unit_IsUnique;
+                CurrentCacheObject.IsMinion = c_unit_IsMinion;
+                CurrentCacheObject.IsTreasureGoblin = c_unit_IsTreasureGoblin;
+                CurrentCacheObject.IsBoss = c_unit_IsBoss;
+                CurrentCacheObject.IsAttackable = c_unit_IsAttackable;
+                CurrentCacheObject.HitPoints = c_HitPoints;
+                CurrentCacheObject.HitPointsPct = c_HitPointsPct;
+                CurrentCacheObject.Radius = c_Radius;
+                CurrentCacheObject.MonsterSize = c_unit_MonsterSize;
+                CurrentCacheObject.IsEliteRareUnique = c_IsEliteRareUnique;
+                CurrentCacheObject.ForceLeapAgainst = c_ForceLeapAgainst;
+                CurrentCacheObject.HasDotDPS = c_HasDotDPS;
+                CurrentCacheObject.ObjectHash = c_ObjectHash;
+                CurrentCacheObject.KillRange = c_KillRange;
+                CurrentCacheObject.HasAffixShielded = c_unit_HasShieldAffix;
+                CurrentCacheObject.MonsterAffixes = c_MonsterAffixes;
+                CurrentCacheObject.HasBeenInLoS = c_HasBeenInLoS;
+                CurrentCacheObject.HasBeenNavigable = c_HasBeenNavigable;
+                CurrentCacheObject.HasBeenRaycastable = c_HasBeenRaycastable;
+                CurrentCacheObject.ItemLink = c_ItemLink;
+                CurrentCacheObject.Rotation = c_Rotation;
+                CurrentCacheObject.DirectionVector = c_DirectionVector;
+                CurrentCacheObject.IsFacingPlayer = c_IsFacingPlayer;
+                CurrentCacheObject.IsSummonedByPlayer = c_IsSummonedByPlayer;
+                CurrentCacheObject.IsSummoner = c_IsSummoner;
+
+                ObjectCache.Add(CurrentCacheObject);
             }
             return true;
         }
@@ -323,6 +321,7 @@ namespace Trinity
         /// </summary>
         private static void RefreshStepInit(out bool AddTocache)
         {
+            CurrentCacheObject = new TrinityCacheObject();
             AddTocache = true;
             // Start this object as off as unknown type
             c_ObjectType = GObjectType.Unknown;
@@ -763,25 +762,8 @@ namespace Trinity
                 case GObjectType.Interactable:
                 case GObjectType.HealthWell:
                     {
-                        //if (!(c_diaObject is DiaGizmo))
-                        //{
-                        //    string debugInfo = string.Format("Type: {0} Name: {1} ActorType: {2} SNO: {3} ObjectType: {4}",
-                        //        c_diaObject.GetType().Name,
-                        //        c_diaObject.Name,
-                        //        c_diaObject.ActorType,
-                        //        c_diaObject.ActorSNO,
-                        //        c_ObjectType);
-
-                        //    Logger.LogDebug("Attempted to Refresh Gizmo on Object that is not a Gizmo! " + debugInfo);
-                        //    c_IgnoreSubStep = "InvalidGizmoCast";
-                        //    AddToCache = false;
-                        //    break;
-                        //}
-                        //else
-                        //{
                         AddToCache = RefreshGizmo(AddToCache);
                         break;
-                        //}
                     }
                 // Object switch on type (to seperate shrines, destructibles, barricades etc.)
                 case GObjectType.Unknown:
@@ -1158,8 +1140,6 @@ namespace Trinity
             }
             return AddToCache;
         }
-
-
 
         private static bool RefreshStepCheckBlacklists(bool AddToCache)
         {

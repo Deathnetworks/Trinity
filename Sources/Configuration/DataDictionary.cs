@@ -154,6 +154,9 @@ namespace Trinity
             340319, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
             341512, // Thunderstorm x1_MonsterAffix_Thunderstorm_Impact
             337109, // Wormhole X1_MonsterAffix_TeleportMines
+
+            338889, // x1_Adria_bouncingProjectile
+            360738, // X1_Adria_arcanePool
         };
 
         /// <summary>
@@ -176,7 +179,8 @@ namespace Trinity
             341512, // Thunderstorm 
             316389, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
             340319, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
-         };
+            338889, // x1_Adria_bouncingProjectile
+      };
 
         /// <summary>
         /// A list of SNO's that spawn AoE then disappear from the object manager
@@ -357,6 +361,7 @@ namespace Trinity
             316839, // x1_deathOrb_bodyPile
             375106, // A5 x1_Death_Orb_Monster
             375111, // A5 x1_Death_Orb_Master_Monster
+            279394, // A5 Adria 
         };
 
         // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
@@ -401,6 +406,9 @@ namespace Trinity
 
             // A5
             328830, // x1_Fortress_Portal_Switch
+
+            348096, // Paths of the Drowned - portal switches
+            361364, // A5 Siege Rune Path of War
         };
 
         /// <summary>
@@ -432,6 +440,11 @@ namespace Trinity
             104632, // A1 trOut_FesteringWoods_Neph_Column_B_Broken_Base
             105303, // A1 trOut_FesteringWoods_Neph_Column_C_Broken_Base_Bottom
             104827, // A1 trOut_FesteringWoods_Neph_Column_C_Broken_Base 
+
+            332924, // x1_Bog_bloodSpring_small, Blood Spring - Overgrown Ruins
+            332922, // x1_Bog_bloodSpring_medium
+            332923, // x1_Bog_bloodSpring_large     
+            321855, // x1_Pand_Ext_Ordnance_Mine
         };
 
         /// <summary>
@@ -584,6 +597,7 @@ namespace Trinity
 
             304313, // x1_abattoir_furnace_01 
             375383, // x1_Abattoir_furnaceSpinner_Event_Phase2 -- this is a rotating avoidance, with a fire "beam" about 45f in length
+
         };
 
         /// <summary>

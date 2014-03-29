@@ -192,11 +192,10 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_Blizzard, 45f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
                 // Meteor
-                if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Meteor) &&
-                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 3) || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss || CurrentTarget.IsTreasureGoblin) &&
-                    Player.PrimaryResource >= 50 && PowerManager.CanCast(SNOPower.Wizard_Meteor))
+                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
+                    (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2, true)))
                 {
-                    return new TrinityPower(SNOPower.Wizard_Meteor, 21f, new Vector3(CurrentTarget.Position.X, CurrentTarget.Position.Y, CurrentTarget.Position.Z), CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_Meteor, 21f, TargetUtil.GetBestClusterUnit().Position);
                 }
 
                 // Hydra
@@ -237,8 +236,8 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_FrostNova, 20f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
                 }
 
-                // Explosive Blast SPAM when enough AP, blow erry thing up, nah mean
-                if (!UseOOCBuff && Hotbar.Contains(SNOPower.Wizard_ExplosiveBlast) && !Player.IsIncapacitated && Player.PrimaryResource >= 20 &&
+                // Explosive Blast
+                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ExplosiveBlast, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 20 &&
                     (TargetUtil.AnyMobsInRange(25) && CurrentTarget.RadiusDistance <= 25f) &&
                     PowerManager.CanCast(SNOPower.Wizard_ExplosiveBlast))
                 {
@@ -280,8 +279,7 @@ namespace Trinity
                 if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Disintegrate) &&
                     ((Player.PrimaryResource >= 20 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
                 {
-                    float fThisRange = 50f;
-                    return new TrinityPower(SNOPower.Wizard_Disintegrate, fThisRange, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_Disintegrate, 35f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
                 }
                 // Arcane Orb
                 if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ArcaneOrb) &&
@@ -316,10 +314,17 @@ namespace Trinity
 
                     return new TrinityPower(SNOPower.Wizard_RayOfFrost, range, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, NO_WAIT_ANIM);
                 }
+
+                bool hasConflagrate = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_MagicMissile && s.RuneIndex == 2);
+
                 // Magic Missile
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_MagicMissile))
                 {
-                    return new TrinityPower(SNOPower.Wizard_MagicMissile, 35f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 3, WAIT_FOR_ANIM);
+                    int targetId = hasConflagrate ?
+                        TargetUtil.GetBestPierceTarget(45f, 0).ACDGuid :
+                        CurrentTarget.ACDGuid;
+
+                    return new TrinityPower(SNOPower.Wizard_MagicMissile, 45f, targetId);
                 }
                 // Shock Pulse
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.Wizard_ShockPulse))

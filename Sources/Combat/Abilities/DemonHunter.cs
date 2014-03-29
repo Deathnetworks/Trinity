@@ -5,6 +5,8 @@ using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
+
+
 namespace Trinity
 {
     public partial class Trinity : IPlugin
@@ -33,7 +35,7 @@ namespace Trinity
             {
                 return new TrinityPower(SNOPower.X1_DemonHunter_Vengeance, 60f, TargetUtil.GetBestClusterUnit(60f, 60f, 1, false, true).Position);
             }
-            
+
             // Smoke Screen
             if ((!UseOOCBuff || Settings.Combat.DemonHunter.SpamSmokeScreen) && CombatBase.CanCast(SNOPower.DemonHunter_SmokeScreen) &&
                 !GetHasBuff(SNOPower.DemonHunter_ShadowPower) && Player.SecondaryResource >= 14 &&
@@ -68,7 +70,7 @@ namespace Trinity
             // Battle Scars = 3 : instantly restore 40% health + restore 30 disc / 45 sec cd
             // Focused Mind = 2 : restore 45 disc over 15 sec / 45 sec cd
             // Backup plan  = 4 : 30% chance Prep has no cooldown (remove cast timer)
-            
+
             // Restore 75 hatred for 25 disc - NO COOLDOWN!
             bool hasPunishment = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 0);
             bool hasInvigoration = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 1);
@@ -77,8 +79,8 @@ namespace Trinity
             bool hasBackupPlan = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.DemonHunter_Preparation && s.RuneIndex == 4);
 
             float preperationTriggerRange = V.F("DemonHunter.PreperationTriggerRange");
-            if (((!UseOOCBuff && !Player.IsIncapacitated && 
-                (TargetUtil.AnyMobsInRange(preperationTriggerRange))) || Settings.Combat.DemonHunter.SpamPreparation || hasPunishment) && 
+            if (((!UseOOCBuff && !Player.IsIncapacitated &&
+                (TargetUtil.AnyMobsInRange(preperationTriggerRange))) || Settings.Combat.DemonHunter.SpamPreparation || hasPunishment) &&
                 Hotbar.Contains(SNOPower.DemonHunter_Preparation))
             {
                 // Preperation w/ Punishment
@@ -177,14 +179,14 @@ namespace Trinity
             }
 
             // Fan of Knives
-            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.DemonHunter_FanOfKnives) && !Player.IsIncapacitated && 
+            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.DemonHunter_FanOfKnives) && !Player.IsIncapacitated &&
                 (TargetUtil.EliteOrTrashInRange(15) || TargetUtil.AnyTrashInRange(15f, 5, false)))
             {
                 return new TrinityPower(SNOPower.DemonHunter_FanOfKnives, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
 
             // Strafe spam - similar to barbarian whirlwind routine
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_Strafe, CombatBase.CanCastFlags.NoTimer) && 
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_Strafe, CombatBase.CanCastFlags.NoTimer) &&
                 !Player.IsIncapacitated && !Player.IsRooted && Player.PrimaryResource >= Settings.Combat.DemonHunter.StrafeMinHatred)
             {
                 bool shouldGetNewZigZag =
@@ -276,12 +278,14 @@ namespace Trinity
             }
 
             // Rapid Fire
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && !Player.IsIncapacitated &&
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_RapidFire, CombatBase.CanCastFlags.NoTimer) && !Player.IsIncapacitated &&
                 ((Player.PrimaryResource >= 20 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 // Players with grenades *AND* rapid fire should spam grenades at close-range instead
                 if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)
-                    return new TrinityPower(SNOPower.DemonHunter_Grenades, 18f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
+                {
+                    return new TrinityPower(SNOPower.DemonHunter_Grenades, 18f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);                    
+                }
                 // Now return rapid fire, if not sending grenades instead
                 return new TrinityPower(SNOPower.DemonHunter_RapidFire, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
             }

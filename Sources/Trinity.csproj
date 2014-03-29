@@ -100,6 +100,8 @@
     <Compile Include="Configuration\TVars.cs" />
     <Compile Include="DbProvider\DeathHandler.cs" />
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
+    <Compile Include="Helpers\Attributes\NoCopy.cs" />
+    <Compile Include="Helpers\CloneExtension.cs" />
     <Compile Include="Helpers\DoubleInt.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\GameEvents.cs" />

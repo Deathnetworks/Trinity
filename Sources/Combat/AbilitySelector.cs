@@ -109,6 +109,7 @@ namespace Trinity
         {
             using (new PerformanceLogger("AbilitySelector"))
             {
+
                 // See if archon just appeared/disappeared, so update the hotbar
                 if (ShouldRefreshHotbarAbilities)
                     PlayerInfoCache.RefreshHotbar();
@@ -117,35 +118,42 @@ namespace Trinity
 
                 TrinityPower power = CombatBase.CurrentPower;
 
-                using (new PerformanceLogger("AbilitySelector.ClassAbility"))
+                if (CurrentTarget != null && CurrentTarget.IsNPC && CurrentTarget.NPCIsOperable)
                 {
-                    switch (Player.ActorClass)
+                    power = new TrinityPower(SNOPower.Axe_Operate_NPC, CurrentTarget.Radius, CurrentTarget.ACDGuid);
+                }
+                else
+                {
+                    using (new PerformanceLogger("AbilitySelector.ClassAbility"))
                     {
-                        // Barbs
-                        case ActorClass.Barbarian:
-                            //power = GetBarbarianPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                            power = BarbarianCombat.GetPower();
-                            break;
-                        // Crusader
-                        case ActorClass.Crusader:
-                            power = CrusaderCombat.GetPower();
-                            break;
-                        // Monks
-                        case ActorClass.Monk:
-                            power = GetMonkPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                            break;
-                        // Wizards
-                        case ActorClass.Wizard:
-                            power = GetWizardPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                            break;
-                        // Witch Doctors
-                        case ActorClass.Witchdoctor:
-                            power = GetWitchDoctorPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                            break;
-                        // Demon Hunters
-                        case ActorClass.DemonHunter:
-                            power = GetDemonHunterPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                            break;
+                        switch (Player.ActorClass)
+                        {
+                            // Barbs
+                            case ActorClass.Barbarian:
+                                //power = GetBarbarianPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                                power = BarbarianCombat.GetPower();
+                                break;
+                            // Crusader
+                            case ActorClass.Crusader:
+                                power = CrusaderCombat.GetPower();
+                                break;
+                            // Monks
+                            case ActorClass.Monk:
+                                power = GetMonkPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                                break;
+                            // Wizards
+                            case ActorClass.Wizard:
+                                power = GetWizardPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                                break;
+                            // Witch Doctors
+                            case ActorClass.Witchdoctor:
+                                power = GetWitchDoctorPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                                break;
+                            // Demon Hunters
+                            case ActorClass.DemonHunter:
+                                power = GetDemonHunterPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                                break;
+                        }
                     }
                 }
                 // use IEquatable to check if they're equal

@@ -117,7 +117,7 @@ namespace Trinity
                     return Trinity.Settings.Combat.AvoidanceRadius.ZoltTwister;
                 default:
                     {
-                        Logger.Log(TrinityLogLevel.Error, LogCategory.Avoidance, "Unknown Avoidance type in Radius Switch! {0}", type.ToString());
+                        //Logger.Log(TrinityLogLevel.Error, LogCategory.Avoidance, "Unknown Avoidance type in Radius Switch! {0}", type.ToString());
                         return defaultValue;
                     }
             }
@@ -133,7 +133,7 @@ namespace Trinity
             }
             else
             {
-                Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Radius! {0}", snoId);
+                //Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Radius! {0}", snoId);
             }
             return defaultValue;
         }
@@ -237,7 +237,7 @@ namespace Trinity
                         return avoidanceHealth.AvoidZoltTwisterHealth;
                     default:
                         {
-                            Logger.Log(TrinityLogLevel.Error, LogCategory.Avoidance, "Unknown Avoidance type in Health Switch! {0}", type.ToString());
+                            //Logger.Log(TrinityLogLevel.Error, LogCategory.Avoidance, "Unknown Avoidance type in Health Switch! {0}", type.ToString());
                             return defaultValue;
                         }
                 }
@@ -255,7 +255,7 @@ namespace Trinity
             }
             else
             {
-                Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Health! {0}", snoId);
+                //Logger.Log(TrinityLogLevel.Debug, LogCategory.Avoidance, "Unkown Avoidance type for Health! {0}", snoId);
             }
             return defaultValue;
         }

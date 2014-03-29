@@ -13,6 +13,7 @@ using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
 using Logger = Trinity.Technicals.Logger;
+
 namespace Trinity
 {
     public partial class Trinity : IPlugin
@@ -101,6 +102,12 @@ namespace Trinity
                         // Weight Units
                         case GObjectType.Unit:
                             {
+                                if (cacheObject.IsNPC && cacheObject.NPCIsOperable)
+                                {
+                                    cacheObject.Weight = 300;
+                                    break;
+                                }
+
                                 int nearbyMonsterCount = ObjectCache.Count(u => u.ACDGuid != cacheObject.ACDGuid && u.IsTrashMob && u.HitPoints > 0 &&
                                     cacheObject.Position.Distance2D(u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius);
 
@@ -832,9 +839,14 @@ namespace Trinity
                         cacheObject.Weight = 0;
                         ShouldStayPutDuringAvoidance = true;
                     }
+
+                    unitWeightInfo += cacheObject.IsNPC ? " IsNPC" : "";
+                    unitWeightInfo += cacheObject.NPCIsOperable ? " IsOperable" : "";
+
                     Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
                         "Weight={0:0} name={1} sno={2} type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
-                            cacheObject.Weight, cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique, cacheObject.RActorGuid, unitWeightInfo);
+                            cacheObject.Weight, cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique, 
+                            cacheObject.RActorGuid, unitWeightInfo);
 
                     // Prevent current target dynamic ranged weighting flip-flop 
                     if (LastTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)
@@ -846,7 +858,7 @@ namespace Trinity
                     if (cacheObject.Weight > w_HighestWeightFound && cacheObject.Weight > 0)
                     {
                         // Clone the current CacheObject
-                        CurrentTarget = cacheObject.Clone();
+                        CurrentTarget = cacheObject.Copy();
                         w_HighestWeightFound = cacheObject.Weight;
 
                         // See if we can try attempting kiting later

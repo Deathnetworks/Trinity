@@ -112,48 +112,7 @@ namespace Trinity
 
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="radius"></param>
-        /// <param name="maxRange"></param>
-        /// <param name="count"></param>
-        /// <param name="useWeights"></param>
-        /// <param name="includeUnitsInAoe"></param>
-        /// <returns></returns>
-        internal static TrinityCacheObject GetBestClusterUnit(float radius = 15f, float maxRange = 65f, int count = 1, bool useWeights = true, bool includeUnitsInAoe = true)
-        {
-            if (radius < 1f)
-                radius = 1f;
-            if (maxRange > 300f)
-                maxRange = 300f;
-
-            using (new PerformanceLogger("TargetUtil.GetBestClusterUnit"))
-            {
-                TrinityCacheObject bestClusterUnit;
-                var clusterUnits =
-                    (from u in ObjectCache
-                     where u.IsUnit &&
-                     ((useWeights && u.Weight > 0) || !useWeights) &&
-                     (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
-                     u.RadiusDistance <= maxRange &&
-                     u.NearbyUnitsWithinDistance(radius) >= count &&
-                     !u.IsBossOrEliteRareUnique
-                     orderby u.Type != GObjectType.HealthGlobe && u.Type != GObjectType.PowerGlobe
-                     orderby u.NearbyUnitsWithinDistance(radius)
-                     orderby u.CentreDistance
-                     select u).ToList();
-
-                if (clusterUnits.Any())
-                    bestClusterUnit = clusterUnits.FirstOrDefault();
-                else if (Trinity.CurrentTarget != null)
-                    bestClusterUnit = Trinity.CurrentTarget;
-                else
-                    bestClusterUnit = null;
-
-                return bestClusterUnit;
-            }
-        }
+        
         /// <summary>
         /// Checks to make sure there's at least one valid cluster with the minimum monster count
         /// </summary>
@@ -264,7 +223,7 @@ namespace Trinity
                 return bestClusterUnit;
             }
         }
-        /// <summary>
+          /// <summary>
         /// Finds the optimal cluster position, works regardless if there is a cluster or not (will return single unit position if not). This is not a K-Means cluster, but rather a psuedo cluster based
         /// on the number of other monsters within a radius of any given unit
         /// </summary>
@@ -369,7 +328,47 @@ namespace Trinity
             return clusterCheck;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <param name="maxRange"></param>
+        /// <param name="count"></param>
+        /// <param name="useWeights"></param>
+        /// <param name="includeUnitsInAoe"></param>
+        /// <returns></returns>
+        internal static TrinityCacheObject GetBestClusterUnit(float radius = 15f, float maxRange = 65f, int count = 1, bool useWeights = true, bool includeUnitsInAoe = true)
+        {
+            if (radius < 1f)
+                radius = 1f;
+            if (maxRange > 300f)
+                maxRange = 300f;
 
+            using (new PerformanceLogger("TargetUtil.GetBestClusterUnit"))
+            {
+                TrinityCacheObject bestClusterUnit;
+                var clusterUnits =
+                    (from u in ObjectCache
+                     where u.IsUnit &&
+                     ((useWeights && u.Weight > 0) || !useWeights) &&
+                     (includeUnitsInAoe || !UnitOrPathInAoE(u)) &&
+                     u.RadiusDistance <= maxRange
+                     orderby !u.IsBossOrEliteRareUnique
+                     orderby u.NearbyUnitsWithinDistance(radius) descending
+                     orderby u.CentreDistance
+                     orderby u.HitPointsPct descending
+                     select u).ToList();
+
+                if (clusterUnits.Any())
+                    bestClusterUnit = clusterUnits.FirstOrDefault();
+                else if (Trinity.CurrentTarget != null)
+                    bestClusterUnit = Trinity.CurrentTarget;
+                else
+                    bestClusterUnit = null;
+
+                return bestClusterUnit;
+            }
+        } 
         /// <summary>
         /// Finds the optimal cluster position, works regardless if there is a cluster or not (will return single unit position if not). This is not a K-Means cluster, but rather a psuedo cluster based
         /// on the number of other monsters within a radius of any given unit

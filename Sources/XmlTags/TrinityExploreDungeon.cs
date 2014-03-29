@@ -223,8 +223,12 @@ namespace Trinity.XmlTags
         {
             [XmlAttribute("actorId")]
             public int ActorId { get; set; }
+
             [XmlAttribute("objectDistance")]
             public float ObjectDistance { get; set; }
+
+            [XmlAttribute("interactRange")]
+            public float InteractRange { get; set; }
 
             public AlternateActor()
             {
@@ -306,7 +310,19 @@ namespace Trinity.XmlTags
         public int MinVisistedNodes { get; set; }
 
         [XmlAttribute("SetNodesExploredAutomatically")]
+        [XmlAttribute("setNodesExploredAutomatically")]
         public bool SetNodesExploredAutomatically { get; set; }
+
+        [XmlAttribute("minObjectOccurances")]
+        public int MinOccurances { get; set; }
+
+        [XmlAttribute("interactWithObject")]
+        public bool InteractWithObject { get; set; }
+
+        [XmlAttribute("interactRange")]
+        public float ObjectInteractRange { get; set; }
+
+        Dictionary<int, Vector3> foundObjects = new Dictionary<int, Vector3>();
 
         /// <summary>
         /// The Position of the CurrentNode NavigableCenter
@@ -378,13 +394,16 @@ namespace Trinity.XmlTags
                 BrainBehavior.DungeonExplorer.SetNodesExploredAutomatically = false;
             }
 
-            UpdateSearchGridProvider();
+            if (!IgnoreGridReset)
+            {
+                UpdateSearchGridProvider();
 
-            CheckResetDungeonExplorer();
+                CheckResetDungeonExplorer();
 
-            GridSegmentation.Reset();
-            BrainBehavior.DungeonExplorer.Reset();
-            MiniMapMarker.KnownMarkers.Clear();
+                GridSegmentation.Reset();
+                BrainBehavior.DungeonExplorer.Reset();
+                MiniMapMarker.KnownMarkers.Clear();
+            }
 
             if (!InitDone)
             {
@@ -442,7 +461,7 @@ namespace Trinity.XmlTags
                         MiniMapMarker.VisitMiniMapMarkers(myPos, MarkerDistance)
                     ),
                     new Decorator(ret => ShouldInvestigateActor(),
-                        InvestigatActor()
+                        InvestigateActor()
                     ),
                     new Sequence(
                         new DecoratorContinue(ret => DungeonRouteIsEmpty(),
@@ -474,7 +493,7 @@ namespace Trinity.XmlTags
             return BrainBehavior.DungeonExplorer != null && BrainBehavior.DungeonExplorer.CurrentRoute != null && !BrainBehavior.DungeonExplorer.CurrentRoute.Any();
         }
 
-        private Action InvestigatActor()
+        private Composite InvestigateActor()
         {
             return new Action(ret =>
             {
@@ -496,7 +515,9 @@ namespace Trinity.XmlTags
                 return false;
 
             var actors = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                .Where(a => a.ActorSNO == ActorId && Trinity.SkipAheadAreaCache.Any(o => o.Position.Distance2D(a.Position) >= ObjectDistance));
+                .Where(a => a.ActorSNO == ActorId &&
+                    Trinity.SkipAheadAreaCache.Any(o => o.Position.Distance2D(a.Position) >= ObjectDistance &&
+                    !foundObjects.Any(fo => fo.Key == o.ActorSNO && fo.Value == o.Position)));
 
             if (actors == null)
                 return false;
@@ -1287,7 +1308,7 @@ namespace Trinity.XmlTags
                 MarkerDistance = 25f;
 
             if (TimeoutValue == 0)
-                TimeoutValue = 900;
+                TimeoutValue = 1800;
 
             Trinity.SkipAheadAreaCache.Clear();
             PriorityScenesInvestigated.Clear();
