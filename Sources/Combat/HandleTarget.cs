@@ -389,6 +389,12 @@ namespace Trinity
                                 //bAvoidDirectionBlacklisting = false;
                                 runStatus = HandlerRunStatus.TreeRunning;
                             }
+
+                            if (CurrentTarget.Type == GObjectType.Interactable && PlayerMover.MovementSpeed > 0)
+                            {
+                                runStatus = HandlerRunStatus.TreeRunning;
+                            }
+
                             //check if we are returning to the tree
                             if (runStatus != HandlerRunStatus.NotFinished)
                                 return GetTreeSharpRunStatus(runStatus);
@@ -402,12 +408,7 @@ namespace Trinity
                                 // Unit, use our primary power to attack
                                 case GObjectType.Unit:
                                     {
-                                        if (CurrentTarget.IsNPC && CurrentTarget.NPCIsOperable)
-                                        {
-                                            CurrentTarget.Unit.Interact();
-                                            runStatus = HandlerRunStatus.TreeRunning;
-                                        }
-                                        else if (CombatBase.CurrentPower.SNOPower != SNOPower.None)
+                                        if (CombatBase.CurrentPower.SNOPower != SNOPower.None)
                                         {
                                             if (IsWaitingForPower && CombatBase.CurrentPower.ShouldWaitBeforeUse)
                                             {
@@ -504,11 +505,7 @@ namespace Trinity
                                             WaitWhileAnimating(1500, true);
                                         else
                                             WaitWhileAnimating(12, true);
-                                        if (CurrentTarget.Type == GObjectType.Interactable)
-                                        {
-                                            IgnoreTargetForLoops = 30;
-                                            hashRGUIDDestructible3SecBlacklist.Add(CurrentTarget.RActorGuid);
-                                        }
+
                                         // Count how many times we've tried interacting
                                         if (!CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
                                         {
@@ -523,7 +520,6 @@ namespace Trinity
                                             !(CurrentTarget.Type != GObjectType.HealthWell))
                                         {
                                             hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
-                                            //dateSinceBlacklist90Clear = DateTime.UtcNow;
                                         }
 
                                         // Now tell Trinity to get a new target!
@@ -1363,7 +1359,7 @@ namespace Trinity
                 TargetDistanceReduction = 0f;
                 // Set current destination to our current target's destination
                 vCurrentDestination = CurrentTarget.Position;
-                float fDistanceToDestination = Player.Position.Distance(vCurrentDestination);
+                float DistanceToDestination = Player.Position.Distance(vCurrentDestination);
                 switch (CurrentTarget.Type)
                 {
                     // * Unit, we need to pick an ability to use and get within range
@@ -1376,15 +1372,8 @@ namespace Trinity
                             if (TargetDistanceReduction <= 0f)
                                 TargetDistanceReduction = 0f;
 
-                            if (CurrentTarget.IsNPC && CurrentTarget.NPCIsOperable)
-                            {
-                                TargetRangeRequired = CurrentTarget.Radius;
-                            }
-                            else
-                            {
-                                // Pick a range to try to reach
-                                TargetRangeRequired = CombatBase.CurrentPower.SNOPower == SNOPower.None ? 9f : CombatBase.CurrentPower.MinimumRange;
-                            }
+                            // Pick a range to try to reach
+                            TargetRangeRequired = CombatBase.CurrentPower.SNOPower == SNOPower.None ? 9f : CombatBase.CurrentPower.MinimumRange;
                             break;
                         }
                     // * Item - need to get within 6 feet and then interact with it
@@ -1434,7 +1423,7 @@ namespace Trinity
                             if (ForceCloseRangeTarget)
                                 TargetRangeRequired -= 2f;
                             // Treat the distance as closer if the X & Y distance are almost point-blank, for objects
-                            if (fDistanceToDestination <= 1.5f)
+                            if (DistanceToDestination <= 1.5f)
                                 TargetDistanceReduction += 1f;
                             float range;
                             if (DataDictionary.CustomObjectRadius.TryGetValue(CurrentTarget.ActorSNO, out range))
@@ -1447,18 +1436,19 @@ namespace Trinity
                         {
                             // Treat the distance as closer based on the radius of the object
                             TargetDistanceReduction = CurrentTarget.Radius;
-                            TargetRangeRequired = 12f;
+                            TargetRangeRequired = CurrentTarget.Radius;
+
                             if (ForceCloseRangeTarget)
                                 TargetRangeRequired -= 2f;
+
                             // Check if it's in our interactable range dictionary or not
                             float range;
+
                             if (DataDictionary.CustomObjectRadius.TryGetValue(CurrentTarget.ActorSNO, out range))
                             {
                                 TargetRangeRequired = range;
                             }
-                            // Treat the distance as closer if the X & Y distance are almost point-blank, for objects
-                            if (fDistanceToDestination <= 1.5f)
-                                TargetDistanceReduction += 1f;
+
                             break;
                         }
                     // * Destructible - need to pick an ability and attack it
@@ -1474,7 +1464,7 @@ namespace Trinity
                             if (TargetDistanceReduction <= 0f)
                                 TargetDistanceReduction = 0f;
                             // Treat the distance as closer if the X & Y distance are almost point-blank, for destructibles
-                            if (fDistanceToDestination <= 1.5f)
+                            if (DistanceToDestination <= 1.5f)
                                 TargetDistanceReduction += 1f;
                             break;
                         }
@@ -1497,7 +1487,7 @@ namespace Trinity
                         {
                             TargetRangeRequired = 2f;
                             // Treat the distance as closer if the X & Y distance are almost point-blank, for avoidance spots
-                            if (fDistanceToDestination <= 1.5f)
+                            if (DistanceToDestination <= 1.5f)
                                 TargetDistanceReduction += 2f;
                             break;
                         }
@@ -1523,13 +1513,6 @@ namespace Trinity
         {
             using (new PerformanceLogger("HandleTarget.HandleUnitInRange"))
             {
-                if (CurrentTarget.IsNPC && CurrentTarget.NPCIsOperable)
-                {
-                    bool result = CurrentTarget.Unit.Interact();
-                    Logger.Log("Interacted with NPC, result = {0}", result);                    
-                    return;
-                }
-
                 // Wait while animating before an attack
                 if (CombatBase.CurrentPower.WaitForAnimationFinished)
                     WaitWhileAnimating(5, false);

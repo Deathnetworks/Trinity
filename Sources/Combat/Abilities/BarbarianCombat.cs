@@ -634,7 +634,8 @@ namespace Trinity.Combat.Abilities
             get
             {
                 return !UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !IsWaitingForSpecial && CanCast(SNOPower.Barbarian_HammerOfTheAncients) &&
-                    Player.PrimaryResource >= V.F("Barbarian.HammerOfTheAncients.MinFury") && Player.CurrentHealthPct >= Settings.Combat.Barbarian.MinHotaHealth;
+                    (Player.PrimaryResource >= V.F("Barbarian.HammerOfTheAncients.MinFury") || LastPowerUsed == SNOPower.Barbarian_HammerOfTheAncients) && 
+                    (!Hotbar.Contains(SNOPower.Barbarian_Whirlwind) || (Player.CurrentHealthPct >= Settings.Combat.Barbarian.MinHotaHealth && Hotbar.Contains(SNOPower.Barbarian_Whirlwind)));
             }
         }
         public static bool CanUseHammerOfTheAncientsElitesOnly
@@ -645,10 +646,10 @@ namespace Trinity.Combat.Abilities
 
                 if (canUseHota)
                 {
-                    bool hotaElites = (CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin) && !TargetUtil.AnyMobsInRange(10f, 3, false);
+                    bool hotaElites = (CurrentTarget.IsBossOrEliteRareUnique || CurrentTarget.IsTreasureGoblin) && TargetUtil.EliteOrTrashInRange(10f);
 
                     bool hotaTrash = CombatBase.IgnoringElites && CurrentTarget.IsTrashMob &&
-                        (Trinity.ObjectCache.Count(u => u.Position.Distance(CurrentTarget.Position) <= 6f) >= 3 || CurrentTarget.MonsterSize == Zeta.Game.Internals.SNO.MonsterSize.Big);
+                        (TargetUtil.EliteOrTrashInRange(6f) || CurrentTarget.MonsterSize == Zeta.Game.Internals.SNO.MonsterSize.Big);
 
                     return canUseHota && (hotaElites || hotaTrash);
                 }

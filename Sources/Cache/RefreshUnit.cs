@@ -77,7 +77,7 @@ namespace Trinity
             {
                 CurrentCacheObject.IsNPC = (c_CommonData.GetAttribute<int>(ActorAttributeType.IsNPC) > 0);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Logger.LogDebug("Error refreshing IsNPC");
             }
@@ -86,9 +86,9 @@ namespace Trinity
             {
                 CurrentCacheObject.NPCIsOperable = (c_CommonData.GetAttribute<int>(ActorAttributeType.NPCIsOperatable) > 0);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Logger.LogDebug("Error refreshing IsNPC");
+                Logger.LogDebug("Error refreshing NPCIsOperable");
             }
 
             if ((teamId == 1 || teamId == 2 || teamId == 17))

@@ -36,14 +36,14 @@
                     Interval="500" Maximum="99" Minimum="0" 
                     SmallChange="1" LargeChange="5"
                     TickPlacement="None" 
-                    Value="{Binding Path=WD.PotionLevel, Converter={StaticResource percentConverter}}" 
+                    Value="{Binding Path=Crusader.PotionLevel, Converter={StaticResource percentConverter}}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
                         <TextBlock Grid.Column="2" Text="Globe %" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Grid.Column="3" Template="{DynamicResource Slider}" 
                     Interval="500" Maximum="100" Minimum="0" 
                     SmallChange="1" LargeChange="5"
                     TickPlacement="None" 
-                    Value="{Binding Path=WD.HealthGlobeLevel, Converter={StaticResource percentConverter}}" 
+                    Value="{Binding Path=Crusader.HealthGlobeLevel, Converter={StaticResource percentConverter}}" 
                     HorizontalAlignment="Stretch" Margin="2"/>
                     </Grid>
 

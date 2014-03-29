@@ -73,6 +73,15 @@ namespace Trinity
             }
             catch
             {
+                CacheData.NavigationObstacles.Add(new CacheObstacleObject()
+                {
+                    ActorSNO = c_ActorSNO,
+                    Radius = c_Radius,
+                    Position = c_Position,
+                    RActorGUID = c_RActorGuid,
+                    ObjectType = c_ObjectType,
+                });
+                
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                     "Safely handled exception getting Gizmo-Disabled-By-Script attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
                 c_IgnoreSubStep = "isGizmoDisabledByScriptException";
@@ -80,6 +89,15 @@ namespace Trinity
             }
             if (isGizmoDisabledByScript)
             {
+                CacheData.NavigationObstacles.Add(new CacheObstacleObject()
+                {
+                    ActorSNO = c_ActorSNO,
+                    Radius = c_Radius,
+                    Position = c_Position,
+                    RActorGUID = c_RActorGuid,
+                    ObjectType = c_ObjectType,
+                });
+
                 AddToCache = false;
                 c_IgnoreSubStep = "GizmoDisabledByScript";
                 return AddToCache;
@@ -146,6 +164,7 @@ namespace Trinity
                                 Name = c_InternalName,
                                 Position = c_Position,
                                 Radius = c_Radius,
+                                ObjectType = c_ObjectType,
                             });
 
                             AddToCache = false;
@@ -164,6 +183,15 @@ namespace Trinity
 
                                     if (door != null && door.IsGizmoDisabledByScript)
                                     {
+                                        CacheData.NavigationObstacles.Add(new CacheObstacleObject()
+                                        {
+                                            ActorSNO = c_ActorSNO,
+                                            Radius = c_Radius,
+                                            Position = c_Position,
+                                            RActorGUID = c_RActorGuid,
+                                            ObjectType = c_ObjectType,
+                                        });
+
                                         hashRGUIDBlacklist3.Add(c_RActorGuid);
                                         AddToCache = false;
                                         c_IgnoreSubStep = "DoorDisabledbyScript";
@@ -183,14 +211,7 @@ namespace Trinity
                     break;
                 case GObjectType.Interactable:
                     AddToCache = true;
-                    // Special interactables
-                    if (c_CentreDistance > 30f)
-                    {
-                        AddToCache = false;
-                        c_IgnoreSubStep = "interactableDistance";
-                        return AddToCache;
-                    }
-                    c_Radius = 4f;
+                    c_Radius = c_diaObject.CollisionSphere.Radius;
                     break;
                 case GObjectType.HealthWell:
                     {

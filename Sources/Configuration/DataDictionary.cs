@@ -102,6 +102,10 @@ namespace Trinity
            new DoubleInt(3337, (int)SNOAnim.Beast_start_charge_02), // A1 Savage Beast Charge - needs special handling!
            new DoubleInt(3337, (int)SNOAnim.Beast_charge_02), // A1 Savage Beast Charge - needs special handling!
            new DoubleInt(3337, (int)SNOAnim.Beast_charge_04), // A1 Savage Beast Charge - needs special handling!
+           new DoubleInt(330824, 330824), // Urzael flame 
+           new DoubleInt(330824, 348109), // Urzael Cannonball Aim
+           new DoubleInt(330824, 344952), // Urzael Flying           
+           
        };
 
 
@@ -157,6 +161,15 @@ namespace Trinity
 
             338889, // x1_Adria_bouncingProjectile
             360738, // X1_Adria_arcanePool
+            358404, // X1_Adria_blood_large
+
+            360598, // x1_Urzael_CeilingDebris_DamagingFire_wall
+            359205, // x1_Urzael_ceilingDebris_Impact_Beam
+            360883, // x1_Urzael_ceilingDebris_Impact_Circle
+
+            362850, // x1_Urzael_Cannonball_burning_invisible
+            346976, // x1_Urzael_Cannonball_burning_impact
+            346975, // x1_Urzael_Cannonball_burning
         };
 
         /// <summary>
@@ -180,6 +193,11 @@ namespace Trinity
             316389, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
             340319, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
             338889, // x1_Adria_bouncingProjectile
+
+            362850, // x1_Urzael_Cannonball_burning_invisible
+            346976, // x1_Urzael_Cannonball_burning_impact
+            346975, // x1_Urzael_Cannonball_burning
+
       };
 
         /// <summary>
@@ -206,6 +224,19 @@ namespace Trinity
             {340319, TimeSpan.FromSeconds(10)}, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
         };
 
+        public static Dictionary<int, float> DefaultAvoidanceCustomRadius { get { return defaultAvoidanceCustomRadius; } }
+        private static readonly Dictionary<int, float> defaultAvoidanceCustomRadius = new Dictionary<int, float>()
+        {
+            {330824, 65f }, // A5 Urzael animations
+            {360598, 25f }, // x1_Urzael_CeilingDebris_DamagingFire_wall
+            {359205, 25f }, // x1_Urzael_ceilingDebris_Impact_Beam
+            {360883, 25f }, // x1_Urzael_ceilingDebris_Impact_Circle
+            {362850, 25f }, // x1_Urzael_Cannonball_burning_invisible
+            {346976, 25f }, // x1_Urzael_Cannonball_burning_impact
+            {346975, 25f }, // x1_Urzael_Cannonball_burning
+
+        };
+        
         /*
          * Combat-related dictionaries/defaults
          */
@@ -297,6 +328,9 @@ namespace Trinity
             //{256508, 2999}, {256187, 1899},
             // Uber Bosses - Ghom {256709} & Rakanot {256711}
             {256709, 2999}, {256711, 1899},
+
+            // A5 Forgotton War trash
+            { 300864, -300 },
          };
 
 
@@ -362,6 +396,11 @@ namespace Trinity
             375106, // A5 x1_Death_Orb_Monster
             375111, // A5 x1_Death_Orb_Master_Monster
             279394, // A5 Adria 
+
+            300862, // X1_BigRed_Chronodemon_Event_ForgottenWar
+            318425, // X1_CoreEliteDemon_Chronodemon_Event_ForgottenWar
+
+            300866, // X1_Angel_TrooperBoss_Event_ForgottenWar
         };
 
         // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
@@ -409,6 +448,13 @@ namespace Trinity
 
             348096, // Paths of the Drowned - portal switches
             361364, // A5 Siege Rune Path of War
+            301177, // x1_PandExt_Time_Activator
+            328830, // x1_Fortress_Portal_Switch
+
+            274457, // A5 Spirit of Malthael - Tower of Korelan
+            368515, // A5 Nephalem Switch -  Passage to Corvus 
+            301177, // A5 Timeless Prison Switch
+
         };
 
         /// <summary>
@@ -422,8 +468,10 @@ namespace Trinity
             {54882, 40}, 
             {3349, 25}, // Belial
             {225270, 35}, 
-            {180575, 10}, // Diablo Arena Health Well
-            {375111, 45f} // A5 x1_Death_Orb_Master_Monster
+            {180575, 10},  // Diablo Arena Health Well
+            {375111, 45f}, // A5 x1_Death_Orb_Master_Monster
+            {301177, 15f}, // x1_PandExt_Time_Activator
+            {368515, 5f},
         };
 
         /// <summary>
@@ -598,6 +646,10 @@ namespace Trinity
             304313, // x1_abattoir_furnace_01 
             375383, // x1_Abattoir_furnaceSpinner_Event_Phase2 -- this is a rotating avoidance, with a fire "beam" about 45f in length
 
+            265637, // x1_Catacombs_Weapon_Rack_Raise
+
+            321479, // x1_Westm_HeroWorship03_VO
+
         };
 
         /// <summary>
@@ -627,6 +679,39 @@ namespace Trinity
         private static readonly HashSet<int> ignoreUntargettableAttribute = new HashSet<int>()
         {
             5432, // A2 Snakem
+        };
+
+        public static HashSet<string> WhiteItemCraftingWhiteList { get { return whiteItemCraftingWhiteList; } }
+        private static HashSet<string> whiteItemCraftingWhiteList = new HashSet<string>()
+        {
+            "Ascended Pauldrons",
+            "Ascended Armor",
+            "Ascended Bracers",
+            "Ascended Crown",
+            "Ascended Pauldrons",
+            "Archon Sash",
+            "Ascended Faulds",
+            "Ascended Greaves",
+            "Ascended Gauntlets",
+
+            "Limb Cleaver",
+            "Doubleshot",
+            "Whirlwind Staff",
+            "Flesh Render",
+            "Penetrator",
+            "Ascended Shield",
+            "Punyal",
+            "Dire Axe",
+            "Tsunami Blade",
+            "Kerykeion",
+            "Steppes Smasher",
+            "Grandfather Flail",
+            "Oxybeles",
+            "Persuader",
+            "Skullsplitter",
+            "Suwaiya",
+            "Tecpatl",
+            "Diabolic Wand"
         };
 
         #region Methods

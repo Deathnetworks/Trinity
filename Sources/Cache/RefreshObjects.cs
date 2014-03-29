@@ -554,10 +554,14 @@ namespace Trinity
                 {
                     ForceCloseRangeTarget = false;
                 }
+                
                 // Bunch of variables used throughout
                 CacheData.MonsterObstacles = new HashSet<CacheObstacleObject>();
-                CacheData.TimeBoundAvoidance = new HashSet<CacheObstacleObject>();
+                
+                //CacheData.TimeBoundAvoidance = new HashSet<CacheObstacleObject>();
+                CacheData.TimeBoundAvoidance.RemoveWhere(aoe => aoe.Expires < DateTime.UtcNow);
                 CacheData.NavigationObstacles = new HashSet<CacheObstacleObject>();
+
                 //AnyElitesPresent = false;
                 AnyMobsInRange = false;
 

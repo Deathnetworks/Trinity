@@ -32,7 +32,7 @@ namespace Trinity
                 bool noGoblinsPresent = (!AnyTreasureGoblinsPresent && Settings.Combat.Misc.GoblinPriority >= GoblinPriority.Prioritize) || Settings.Combat.Misc.GoblinPriority < GoblinPriority.Prioritize;
 
 
-                bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted ||
+                bool prioritizeCloseRangeUnits = (ForceCloseRangeTarget || Player.IsRooted || DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 1000 &&
                     ObjectCache.Count(u => u.IsUnit && u.RadiusDistance < 10f) >= 3);
 
                 bool hasWrathOfTheBerserker = Player.ActorClass == ActorClass.Barbarian && GetHasBuff(SNOPower.Barbarian_WrathOfTheBerserker);
@@ -91,10 +91,12 @@ namespace Trinity
                         DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500
                         ;
 
-                    string unitWeightInfo = "";
+                    string objWeightInfo = "";
 
                     // Just to make sure each one starts at 0 weight...
                     cacheObject.Weight = 0d;
+
+                    bool navBlocking = CacheData.NavigationObstacles.Any(ob => MathUtil.IntersectsPath(ob.Position, ob.Radius, Trinity.Player.Position, cacheObject.Position));
 
                     // Now do different calculations based on the object type
                     switch (cacheObject.Type)
@@ -122,7 +124,7 @@ namespace Trinity
                                         (cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealth ||
                                          cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS))
                                     {
-                                        unitWeightInfo = "Ignoring Health/DoT ";
+                                        objWeightInfo = "Ignoring Health/DoT ";
                                         ignoring = true;
                                     }
 
@@ -135,14 +137,14 @@ namespace Trinity
                                     if (shouldIgnoreTrashMobs && !isInHotSpot &&
                                         !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) && ignoreSummoner)
                                     {
-                                        unitWeightInfo = "Ignoring ";
+                                        objWeightInfo = "Ignoring ";
                                         ignoring = true;
                                     }
                                     else
                                     {
-                                        unitWeightInfo = "Adding ";
+                                        objWeightInfo = "Adding ";
                                     }
-                                    unitWeightInfo += String.Format("nearbyCount={0} radiusDistance={1:0} hotspot={2} ShouldIgnore={3} elitesInRange={4} hitPointsPc={5:0.0} summoner={6}",
+                                    objWeightInfo += String.Format("nearbyCount={0} radiusDistance={1:0} hotspot={2} ShouldIgnore={3} elitesInRange={4} hitPointsPc={5:0.0} summoner={6}",
                                         nearbyMonsterCount, cacheObject.RadiusDistance, isInHotSpot, shouldIgnoreTrashMobs, elitesInRangeOfUnit, cacheObject.HitPointsPct, ignoreSummoner);
 
                                     if (ignoring)
@@ -155,14 +157,14 @@ namespace Trinity
                                     if (!cacheObject.IsBoss && ShouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
                                         !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100)))
                                     {
-                                        unitWeightInfo = "Ignoring ";
+                                        objWeightInfo = "Ignoring ";
                                         ignoring = true;
                                     }
                                     else if (cacheObject.IsEliteRareUnique && !ShouldIgnoreElites)
                                     {
-                                        unitWeightInfo = "Adding ";
+                                        objWeightInfo = "Adding ";
                                     }
-                                    unitWeightInfo += String.Format("shouldIgnore={0} hitPointsPct={1}", ShouldIgnoreElites, cacheObject.HitPointsPct);
+                                    objWeightInfo += String.Format("shouldIgnore={0} hitPointsPct={1}", ShouldIgnoreElites, cacheObject.HitPointsPct);
 
                                     if (ignoring)
                                         break;
@@ -171,7 +173,7 @@ namespace Trinity
                                 // Monster on Combat Ignore list
                                 if (!usingTownPortal && !profileTagCheck && TrinityCombatIgnore.IgnoreList.Any(u => u.ActorSNO == cacheObject.ActorSNO && !u.ShouldAttack(cacheObject)))
                                 {
-                                    unitWeightInfo += " CombatIgnore";
+                                    objWeightInfo += " CombatIgnore";
                                 }
 
                                 // Monster is in cache but not within kill range
@@ -408,6 +410,13 @@ namespace Trinity
                         case GObjectType.Item:
                         case GObjectType.Gold:
                             {
+                                if (navBlocking)
+                                {
+                                    objWeightInfo += " NavBlocking";
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
                                 // Weight Items
 
                                 // We'll weight them based on distance, giving gold less weight and close objects more
@@ -538,6 +547,13 @@ namespace Trinity
                                 if (CacheData.TimeBoundAvoidance.Any(aoe => cacheObject.Position.Distance2D(aoe.Position) <= aoe.Radius))
                                     cacheObject.Weight = 1;
 
+                                if (navBlocking)
+                                {
+                                    objWeightInfo += " NavBlocking";
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
                                 break;
                             }
                         case GObjectType.HealthGlobe:
@@ -618,6 +634,14 @@ namespace Trinity
                                     if (CacheData.TimeBoundAvoidance.Any(m => m.Position.Distance(cacheObject.Position) < PlayerKiteDistance))
                                         cacheObject.Weight = 0;
                                 }
+
+                                if (navBlocking)
+                                {
+                                    objWeightInfo += " NavBlocking";
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
                                 break;
                             }
                         case GObjectType.HealthWell:
@@ -640,6 +664,14 @@ namespace Trinity
                                 // Current Health Percentage is higher than setting
                                 if (Player.CurrentHealthPct * 100 > Settings.WorldObject.HealthWellMinHealth)
                                     break;
+
+                                if (navBlocking)
+                                {
+                                    objWeightInfo += " NavBlocking";
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
 
                                 // As a percentage of health with typical maximum weight
                                 cacheObject.Weight = 50000d * (1 - Trinity.Player.CurrentHealthPct);
@@ -680,8 +712,17 @@ namespace Trinity
                             }
                         case GObjectType.Door:
                             {
+                                // Ignore doors where units are blocking our LoS
+                                if (ObjectCache.Any(u => u.IsUnit && u.HitPointsPct > 0 &&
+                                        MathUtil.IntersectsPath(u.Position, u.Radius, Player.Position, cacheObject.Position)))
+                                {
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
+                                // Prioritize doors where units are behind them
                                 if (!ObjectCache.Any(u => u.IsUnit && u.HitPointsPct > 0 &&
-                                    MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, u.Position)))
+                                        MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, u.Position)))
                                 {
                                     if (cacheObject.RadiusDistance <= 20f)
                                         cacheObject.Weight += 15000d;
@@ -777,7 +818,7 @@ namespace Trinity
                                     break;
 
                                 // Weight Interactable Specials
-                                cacheObject.Weight = (90d - cacheObject.CentreDistance) / 90d * 1500d;
+                                cacheObject.Weight = (90d - cacheObject.CentreDistance) / 90d * 15000d;
 
                                 // Very close interactables get a weight increase
                                 if (cacheObject.CentreDistance <= 12f)
@@ -804,11 +845,22 @@ namespace Trinity
                             {
                                 // Need to Prioritize, forget it!
                                 if (prioritizeCloseRangeUnits)
+                                {
+                                    objWeightInfo += " prioritizeCloseRangeUnits";
+                                    cacheObject.Weight = 0;
                                     break;
+                                }
 
                                 float maxRange = Settings.WorldObject.ContainerOpenRange;
                                 if (cacheObject.InternalName.ToLower().Contains("chest_rare"))
                                     maxRange = 250f;
+
+                                if (navBlocking)
+                                {
+                                    objWeightInfo += " NavBlocking";
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
 
                                 // Weight Containers
                                 cacheObject.Weight = (maxRange - cacheObject.CentreDistance) / maxRange * 1000d;
@@ -840,19 +892,20 @@ namespace Trinity
                         ShouldStayPutDuringAvoidance = true;
                     }
 
-                    unitWeightInfo += cacheObject.IsNPC ? " IsNPC" : "";
-                    unitWeightInfo += cacheObject.NPCIsOperable ? " IsOperable" : "";
-
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
-                        "Weight={0:0} name={1} sno={2} type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
-                            cacheObject.Weight, cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique, 
-                            cacheObject.RActorGuid, unitWeightInfo);
 
                     // Prevent current target dynamic ranged weighting flip-flop 
-                    if (LastTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1)
+                    if (LastTargetRactorGUID == cacheObject.RActorGuid && cacheObject.Weight <= 1 && !navBlocking)
                     {
                         cacheObject.Weight = 100;
                     }
+
+                    objWeightInfo += cacheObject.IsNPC ? " IsNPC" : "";
+                    objWeightInfo += cacheObject.NPCIsOperable ? " IsOperable" : "";
+
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Weight,
+                        "Weight={0:0} name={1} sno={2} type={3} R-Dist={4:0} IsElite={5} RAGuid={6} {7}",
+                            cacheObject.Weight, cacheObject.InternalName, cacheObject.ActorSNO, cacheObject.Type, cacheObject.RadiusDistance, cacheObject.IsEliteRareUnique,
+                            cacheObject.RActorGuid, objWeightInfo);
 
                     // Is the weight of this one higher than the current-highest weight? Then make this the new primary target!
                     if (cacheObject.Weight > w_HighestWeightFound && cacheObject.Weight > 0)

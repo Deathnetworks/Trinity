@@ -39,6 +39,9 @@ namespace Trinity
             catch (Exception)
             { }
 
+            // Check default radius if not in AoE settings
+            DataDictionary.DefaultAvoidanceCustomRadius.TryGetValue(c_ActorSNO, out c_Radius);
+
             double minAvoidanceHealth = GetAvoidanceHealth(c_ActorSNO);
             double minAvoidanceRadius = GetAvoidanceRadius(c_ActorSNO, c_Radius);
 

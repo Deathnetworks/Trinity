@@ -136,7 +136,8 @@ namespace Trinity
                     ActorSNO = c_ActorSNO,
                     Name = c_InternalName,
                     Position = c_Position,
-                    Radius = c_Radius
+                    Radius = c_Radius,
+                    ObjectType = c_ObjectType,
                 });
 
                 ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
@@ -294,6 +295,7 @@ namespace Trinity
                         Radius = c_Radius,
                         Position = c_Position,
                         Name = c_InternalName,
+                        ObjectType = c_ObjectType,
                     });
                     break;
             }
@@ -312,7 +314,8 @@ namespace Trinity
                     ActorSNO = c_ActorSNO,
                     Name = c_InternalName,
                     Position = c_Position,
-                    Radius = c_Radius
+                    Radius = c_Radius,
+                    ObjectType = c_ObjectType,
                 });
             }
         }

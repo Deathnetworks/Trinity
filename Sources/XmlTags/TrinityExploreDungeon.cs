@@ -1260,6 +1260,17 @@ namespace Trinity.XmlTags
             NextNode = BrainBehavior.DungeonExplorer.CurrentNode;
             Vector3 moveTarget = NextNode.NavigableCenter;
 
+            Vector3 lastPlayerMoverTarget = PlayerMover.LastMoveToTarget;
+            bool isStuck = PlayerMover.MovementSpeed < 1;
+
+            if (isStuck && CacheData.NavigationObstacles.Any(o => MathUtil.IntersectsPath(o.Position, o.Radius, Trinity.Player.Position, lastPlayerMoverTarget)))
+            {
+                SetNodeVisited("Nav Obstacle detected!");
+                UpdateRoute();
+
+                return;
+            }
+
             string nodeName = String.Format("{0} Distance: {1:0} Direction: {2}",
                 NextNode.NavigableCenter, NextNode.NavigableCenter.Distance(Trinity.Player.Position), MathUtil.GetHeadingToPoint(NextNode.NavigableCenter));
 

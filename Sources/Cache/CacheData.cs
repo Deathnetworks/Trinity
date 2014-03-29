@@ -179,7 +179,6 @@ namespace Trinity
             CacheData.NavigationObstacles.Clear();
             CacheData.ObjectType.Clear();
             CacheData.Position.Clear();
-            CacheData.TimeBoundAvoidance.Clear();
             CacheData.UnitMonsterAffix.Clear();
         }
 

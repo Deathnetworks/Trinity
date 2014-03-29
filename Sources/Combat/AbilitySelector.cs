@@ -118,42 +118,36 @@ namespace Trinity
 
                 TrinityPower power = CombatBase.CurrentPower;
 
-                if (CurrentTarget != null && CurrentTarget.IsNPC && CurrentTarget.NPCIsOperable)
+
+                using (new PerformanceLogger("AbilitySelector.ClassAbility"))
                 {
-                    power = new TrinityPower(SNOPower.Axe_Operate_NPC, CurrentTarget.Radius, CurrentTarget.ACDGuid);
-                }
-                else
-                {
-                    using (new PerformanceLogger("AbilitySelector.ClassAbility"))
+                    switch (Player.ActorClass)
                     {
-                        switch (Player.ActorClass)
-                        {
-                            // Barbs
-                            case ActorClass.Barbarian:
-                                //power = GetBarbarianPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                                power = BarbarianCombat.GetPower();
-                                break;
-                            // Crusader
-                            case ActorClass.Crusader:
-                                power = CrusaderCombat.GetPower();
-                                break;
-                            // Monks
-                            case ActorClass.Monk:
-                                power = GetMonkPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                                break;
-                            // Wizards
-                            case ActorClass.Wizard:
-                                power = GetWizardPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                                break;
-                            // Witch Doctors
-                            case ActorClass.Witchdoctor:
-                                power = GetWitchDoctorPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                                break;
-                            // Demon Hunters
-                            case ActorClass.DemonHunter:
-                                power = GetDemonHunterPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
-                                break;
-                        }
+                        // Barbs
+                        case ActorClass.Barbarian:
+                            //power = GetBarbarianPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            power = BarbarianCombat.GetPower();
+                            break;
+                        // Crusader
+                        case ActorClass.Crusader:
+                            power = CrusaderCombat.GetPower();
+                            break;
+                        // Monks
+                        case ActorClass.Monk:
+                            power = GetMonkPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            break;
+                        // Wizards
+                        case ActorClass.Wizard:
+                            power = GetWizardPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            break;
+                        // Witch Doctors
+                        case ActorClass.Witchdoctor:
+                            power = GetWitchDoctorPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            break;
+                        // Demon Hunters
+                        case ActorClass.DemonHunter:
+                            power = GetDemonHunterPower(IsCurrentlyAvoiding, UseOOCBuff, UseDestructiblePower);
+                            break;
                     }
                 }
                 // use IEquatable to check if they're equal

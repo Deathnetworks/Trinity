@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Zeta.Common;
+using Zeta.Game;
 namespace Trinity
 {
     // Obstacles for quick mapping of paths etc.
@@ -16,6 +18,12 @@ namespace Trinity
         public int RActorGUID { get; set; }
         public float Rotation { get; set; }
         public float BeamLength { get; set; }
+
+        public List<SNOAnim> AvoidanceAnimations { get; set; }
+        public float DirectionalAvoidanceDegrees { get; set; }
+        public bool AvoidAtPlayerPosition { get; set; }
+        public GObjectType ObjectType { get; set; }
+
         public AvoidanceType AvoidanceType
         {
             get
@@ -32,6 +40,7 @@ namespace Trinity
             Radius = radius;
             ActorSNO = actorSNO;
             Name = name;
+            Expires = DateTime.MinValue;
         }
 
     }
