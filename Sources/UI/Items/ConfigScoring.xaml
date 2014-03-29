@@ -92,7 +92,7 @@
                     <CheckBox Margin="10,0" ToolTip="Stash Blue Items" IsChecked="{Binding Path=TownRun.StashBlues}" HorizontalAlignment="Left" />
 
                     <TextBlock Text="Salvage all Rares" FontWeight="Bold" HorizontalAlignment="Right" />
-                    <CheckBox Margin="10,0" ToolTip="Salvage all Rares" IsChecked="{Binding Path=TownRun.ForceSalvageRares}" HorizontalAlignment="Left" />
+                    <CheckBox Margin="10,0" ToolTip="Trash all Rares" IsChecked="{Binding Path=TownRun.ForceSalvageRares}" HorizontalAlignment="Left" />
 
                     <TextBlock Text="Keep Legendaries Unidentified" FontWeight="Bold" HorizontalAlignment="Right" />
                     <CheckBox Margin="10,0" ToolTip="Keep Legendaries Unidentified" IsChecked="{Binding Path=TownRun.KeepLegendaryUnid}" HorizontalAlignment="Left" />

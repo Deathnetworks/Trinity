@@ -415,7 +415,7 @@ namespace Trinity
             {3349, 25}, // Belial
             {225270, 35}, 
             {180575, 10}, // Diablo Arena Health Well
-            {375111, 40f} // A5 x1_Death_Orb_Master_Monster
+            {375111, 45f} // A5 x1_Death_Orb_Master_Monster
         };
 
         /// <summary>

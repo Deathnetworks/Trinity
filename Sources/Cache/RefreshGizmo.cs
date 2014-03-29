@@ -365,11 +365,6 @@ namespace Trinity
                             AddToCache = true;
                             c_IgnoreSubStep = "";
                         }
-                        else
-                        {
-                            AddToCache = false;
-                            c_IgnoreSubStep = "IgnoringDestructables";
-                        }
 
                         float maxRadiusDistance = -1f;
 

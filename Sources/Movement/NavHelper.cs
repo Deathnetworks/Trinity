@@ -453,7 +453,7 @@ namespace Trinity
         internal static Vector3 SimpleUnstucker()
         {
             // Clear caches just in case
-            
+
 
             var myPos = Trinity.Player.Position;
             var navigationPos = PlayerMover.LastMoveToTarget;
@@ -492,19 +492,24 @@ namespace Trinity
                         continue;
                     }
                     // use distance as weight
-                    GridPoint gridPoint = new GridPoint(newPos, (int)d, d);
+                    gridPoints.Add(new GridPoint(newPos, (int)d, d));
                 }
             }
 
             if (!gridPoints.Any())
             {
-                Logger.LogDebug(LogCategory.UserInformation, "Unable to generage new unstucker position! rayCast={0} navObsticle={1}", raycastFail, navigationObstacleFail);
-                return navigationPos;
+                Logger.LogDebug(LogCategory.UserInformation, "Unable to generate new unstucker position! rayCast={0} navObsticle={1} - trying RANDOM point!", raycastFail, navigationObstacleFail);
+
+                Random random = new Random();
+                int distance = random.Next(5, 30);
+                float direction = (float)random.NextDouble();
+
+                return MathEx.GetPointAt(myPos, distance, direction);
             }
             else
             {
                 Navigator.Clear();
-                
+
                 var bestPoint = gridPoints.OrderByDescending(p => p.Weight).FirstOrDefault();
                 Logger.LogDebug(LogCategory.UserInformation, "Generated Unstuck position {0} distance={1:0.0} rayCast={2} navObsticle={3}",
                     NavHelper.PrettyPrintVector3(bestPoint.Position), bestPoint.Distance, raycastFail, navigationObstacleFail);

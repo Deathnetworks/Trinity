@@ -44,6 +44,7 @@ namespace Trinity
 
                 using (new PerformanceLogger("RefreshDiaObjectCache.UpdateBlock"))
                 {
+                    CacheData.Clear();
                     GenericCache.MaintainCache();
                     GenericBlacklist.MaintainBlacklist();
 

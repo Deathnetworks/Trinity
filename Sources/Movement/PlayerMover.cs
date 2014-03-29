@@ -7,6 +7,7 @@ using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
 using Zeta.Bot;
+using Zeta.Bot.Dungeons;
 using Zeta.Bot.Navigation;
 using Zeta.Bot.Profile;
 using Zeta.Bot.Profile.Common;
@@ -237,6 +238,7 @@ namespace Trinity.DbProvider
             if (TimesReachedMaxUnstucks == 1)
             {
                 Navigator.Clear();
+                GridSegmentation.Reset();
                 Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Anti-stuck measures now attempting to kickstart DB's path-finder into action.");
                 Navigator.MoveTo(vOriginalDestination, "original destination", false);
                 CancelUnstuckerForSeconds = 40;
@@ -656,7 +658,7 @@ namespace Trinity.DbProvider
                 }
 
                 // Dashing Strike OOC
-                if (CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC && DestinationDistance > 30f)
+                if (CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike) && Trinity.Settings.Combat.Monk.UseDashingStrikeOOC && DestinationDistance > 15f)
                 {
                     ZetaDia.Me.UsePower(SNOPower.X1_Monk_DashingStrike, vMoveToTarget, Trinity.CurrentWorldDynamicId, -1);
                     CacheData.AbilityLastUsed[SNOPower.X1_Monk_DashingStrike] = DateTime.UtcNow;

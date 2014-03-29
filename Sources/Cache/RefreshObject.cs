@@ -123,13 +123,13 @@ namespace Trinity
                     !CacheData.CollisionSphere.TryGetValue(c_RActorGuid, out c_Radius))
                 {
                     c_Radius = c_diaObject.CollisionSphere.Radius;
-                    CacheData.CollisionSphere.Add(c_RActorGuid, c_Radius);
+                    //CacheData.CollisionSphere.Add(c_RActorGuid, c_Radius);
                 }
 
                 if (!CacheData.Position.TryGetValue(c_RActorGuid, out c_Position))
                 {
                     c_Position = c_diaObject.Position;
-                    CacheData.Position.Add(c_RActorGuid, c_Position);
+                    //CacheData.Position.Add(c_RActorGuid, c_Position);
                 }
 
                 CacheData.NavigationObstacles.Add(new CacheObstacleObject()
