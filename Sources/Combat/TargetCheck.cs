@@ -24,7 +24,7 @@ namespace Trinity
         /// <returns></returns>
         internal static bool TargetCheck(object ret)
         {
-            using (new PerformanceLogger("Trinity.CheckHasTarget"))
+            using (new PerformanceLogger("TargetCheck"))
             {
                 // If we aren't in the game or a world is loading, don't do anything yet
                 if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
@@ -108,7 +108,7 @@ namespace Trinity
 
                 ClearBlacklists();
 
-                using (new PerformanceLogger("CheckHasTarget.RefreshCache"))
+                using (new PerformanceLogger("TargetCheck.RefreshCache"))
                 {
                     // Refresh Cache if needed
                     bool CacheWasRefreshed = RefreshDiaObjectCache();
@@ -126,22 +126,25 @@ namespace Trinity
                 //Monk_MaintainTempestRush();
 
 
-                // Pop a potion when necessary
-                if (Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
+                using (new PerformanceLogger("TargetCheck.OOCPotion"))
                 {
-                    if (!Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
+                    // Pop a potion when necessary
+                    if (Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
                     {
-                        IsWaitingForPotion = false;
-                        bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.GameBalanceId == -2142362846);
-                        if (hasPotion)
+                        if (!Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
-                            WaitWhileAnimating(3, true);
-                            //UIManager.UsePotion();
-                            GameUI.SafeClickElement(GameUI.PotionButton, "Use Potion", false);
+                            IsWaitingForPotion = false;
+                            bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.GameBalanceId == -2142362846);
+                            if (hasPotion)
+                            {
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
+                                WaitWhileAnimating(3, true);
+                                //UIManager.UsePotion();
+                                GameUI.SafeClickElement(GameUI.PotionButton, "Use Potion", false);
 
-                            CacheData.AbilityLastUsed[SNOPower.DrinkHealthPotion] = DateTime.UtcNow;
-                            WaitWhileAnimating(2, true);
+                                CacheData.AbilityLastUsed[SNOPower.DrinkHealthPotion] = DateTime.UtcNow;
+                                WaitWhileAnimating(2, true);
+                            }
                         }
                     }
                 }
@@ -157,57 +160,38 @@ namespace Trinity
 
                 if (DateTime.UtcNow.Subtract(lastMaintenanceCheck).TotalMilliseconds > 150)
                 {
-                    lastMaintenanceCheck = DateTime.UtcNow;
-                    
-                    // Out of combat buffing etc. but only if we don't want to return to town etc.
-                    ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
-
-                    bool isLoopingAnimation = ZetaDia.Me.LoopingAnimationEndTime > 0;
-
-                    if (!isLoopingAnimation && !IsReadyToTownRun && !ForceVendorRunASAP && myAnimationState != null
-                        && myAnimationState.State != AnimationState.Attacking
-                        && myAnimationState.State != AnimationState.Casting
-                        && myAnimationState.State != AnimationState.Channeling)
+                    using (new PerformanceLogger("TargetCheck.OOCBuff"))
                     {
-                        BarbarianCombat.AllowSprintOOC = true;
-                        DisableOutofCombatSprint = false;
+                        lastMaintenanceCheck = DateTime.UtcNow;
 
-                        powerBuff = AbilitySelector(false, true, false);
+                        bool isLoopingAnimation = ZetaDia.Me.LoopingAnimationEndTime > 0;
 
-                        if (powerBuff.SNOPower != SNOPower.None)
+                        if (!isLoopingAnimation && !IsReadyToTownRun && !ForceVendorRunASAP)
                         {
-                            WaitWhileAnimating(4, true);
-                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", powerBuff.SNOPower.ToString());
-                            if (powerBuff.WaitTicksBeforeUse > 0)
-                                BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitBeforeUseDelay));
-                            ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
-                            LastPowerUsed = powerBuff.SNOPower;
-                            CacheData.AbilityLastUsed[powerBuff.SNOPower] = DateTime.UtcNow;
-                            if (powerBuff.WaitTicksAfterUse > 0)
-                                BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitAfterUseDelay));
-                            WaitWhileAnimating(3, true);
-                        }
-                    }
-                    else if (myAnimationState != null)
-                    {
-                        // Check if we are portalling to town, if so increase our kill radius temporarily
-                        switch (myAnimationState.Current)
-                        {
-                            case SNOAnim.barbarian_male_HTH_Recall_Channel_01:
-                            case SNOAnim.Barbarian_Female_HTH_Recall_Channel_01:
-                            case SNOAnim.Monk_Male_recall_channel:
-                            case SNOAnim.Monk_Female_recall_channel:
-                            case SNOAnim.WitchDoctor_Male_recall_channel:
-                            case SNOAnim.WitchDoctor_Female_recall_channel:
-                            case SNOAnim.Wizard_Male_HTH_recall_channel:
-                            case SNOAnim.Wizard_Female_HTH_recall_channel:
-                            case SNOAnim.Demonhunter_Male_HTH_recall_channel:
-                            case SNOAnim.Demonhunter_Female_HTH_recall_channel:
-                                iKeepKillRadiusExtendedFor = 20;
-                                timeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(iKeepKillRadiusExtendedFor);
-                                break;
-                        }
+                            BarbarianCombat.AllowSprintOOC = true;
+                            DisableOutofCombatSprint = false;
 
+                            powerBuff = AbilitySelector(false, true, false);
+
+                            if (powerBuff.SNOPower != SNOPower.None)
+                            {
+                                WaitWhileAnimating(4, true);
+                                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", powerBuff.SNOPower.ToString());
+                                if (powerBuff.WaitTicksBeforeUse > 0)
+                                    BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitBeforeUseDelay));
+                                ZetaDia.Me.UsePower(powerBuff.SNOPower, powerBuff.TargetPosition, powerBuff.TargetDynamicWorldId, powerBuff.TargetACDGUID);
+                                LastPowerUsed = powerBuff.SNOPower;
+                                CacheData.AbilityLastUsed[powerBuff.SNOPower] = DateTime.UtcNow;
+                                if (powerBuff.WaitTicksAfterUse > 0)
+                                    BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitAfterUseDelay));
+                                WaitWhileAnimating(3, true);
+                            }
+                        }
+                        else if (isLoopingAnimation)
+                        {
+                            iKeepKillRadiusExtendedFor = 20;
+                            timeKeepKillRadiusExtendedUntil = DateTime.UtcNow.AddSeconds(iKeepKillRadiusExtendedFor);
+                        }
                     }
                 }
                 CurrentTarget = null;

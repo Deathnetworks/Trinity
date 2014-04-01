@@ -383,13 +383,13 @@ namespace Trinity.Combat.Abilities
                 return false;
 
             // Skip this 
-            //if (Player.ActorClass != ActorClass.Crusader)
-            //{
-            //    bool timer = flags.HasFlag(CanCastFlags.NoTimer) || SNOPowerUseTimer(power);
+            if (Player.ActorClass == ActorClass.Wizard || Player.ActorClass == ActorClass.DemonHunter)
+            {
+                bool timer = flags.HasFlag(CanCastFlags.NoTimer) || SNOPowerUseTimer(power);
 
-            //    if (!timer)
-            //        return false;
-            //}
+                if (!timer)
+                    return false;
+            }
 
             bool powerManager = flags.HasFlag(CanCastFlags.NoPowerManager) || PowerManager.CanCast(power);
 

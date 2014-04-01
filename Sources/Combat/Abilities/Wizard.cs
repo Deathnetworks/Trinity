@@ -87,7 +87,7 @@ namespace Trinity
                 }
 
                 // Familiar
-                if (!Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Familiar) && Player.PrimaryResource >= 20)
+                if (!Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Familiar) && Player.PrimaryResource >= 20 && !Wizard_HasFamiliar())
                 {
                     return new TrinityPower(SNOPower.Wizard_Familiar, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }

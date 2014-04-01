@@ -79,7 +79,8 @@ namespace Trinity.XmlTags
             FullyExplored = 0,
             ObjectFound,
             ExitFound,
-            SceneFound
+            SceneFound,
+            SceneLeftOrActorFound
         }
 
         [XmlAttribute("endType", true)]
@@ -98,6 +99,12 @@ namespace Trinity.XmlTags
         [XmlElement("PriorityScenes")]
         [XmlElement("PrioritizeScenes")]
         public List<PrioritizeScene> PriorityScenes { get; set; }
+
+        /// <summary>
+        /// The list of Scene SNOId's or Scene Names that the bot will use for endtype SceneLeftOrActorFound
+        /// </summary>
+        [XmlElement("AlternateScenes")]
+        public List<AlternateScene> AlternateScenes { get; set; }
 
         /// <summary>
         /// The Ignore Scene class, used as IgnoreScenes child elements
@@ -206,6 +213,40 @@ namespace Trinity.XmlTags
                 this.SceneName = name;
             }
             public PrioritizeScene(int id)
+            {
+                this.SceneId = id;
+            }
+            public bool Equals(Scene other)
+            {
+                return (SceneName != String.Empty && other.Name.ToLowerInvariant().Contains(SceneName.ToLowerInvariant())) || other.SceneInfo.SNOId == SceneId;
+            }
+        }
+
+        /// <summary>
+        /// The Alternate Scene class, used as AlternateScenes child elements
+        /// </summary>
+        [XmlElement("AlternateScene")]
+        public class AlternateScene : IEquatable<Scene>
+        {
+            [XmlAttribute("sceneName")]
+            public string SceneName { get; set; }
+            [XmlAttribute("sceneId")]
+            public int SceneId { get; set; }
+            [XmlAttribute("pathPrecision")]
+            public float PathPrecision { get; set; }
+
+            public AlternateScene()
+            {
+                PathPrecision = 15f;
+                SceneName = String.Empty;
+                SceneId = -1;
+            }
+
+            public AlternateScene(string name)
+            {
+                this.SceneName = name;
+            }
+            public AlternateScene(int id)
             {
                 this.SceneId = id;
             }
@@ -777,14 +818,14 @@ namespace Trinity.XmlTags
                         new Action(ret => isDone = true)
                     )
                 ),
-                new Decorator(ret => EndType == TrinityExploreEndType.ObjectFound && ActorId != 0 && ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                new Decorator(ret => (EndType == TrinityExploreEndType.ObjectFound || EndType == TrinityExploreEndType.SceneLeftOrActorFound) && ActorId != 0 && ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
                     .Any(a => a.ActorSNO == ActorId && a.Distance <= ObjectDistance),
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found Object {0}!", ActorId)),
                         new Action(ret => isDone = true)
                     )
                 ),
-                new Decorator(ret => EndType == TrinityExploreEndType.ObjectFound && AlternateActorsFound(),
+                new Decorator(ret => (EndType == TrinityExploreEndType.ObjectFound || EndType == TrinityExploreEndType.SceneLeftOrActorFound) && AlternateActorsFound(),
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found Alternate Object {0}!", GetAlternateActor().ActorSNO)),
                         new Action(ret => isDone = true)
@@ -802,6 +843,18 @@ namespace Trinity.XmlTags
                         new Action(ret => isDone = true)
                     )
                 ),
+                new Decorator(ret => (EndType == TrinityExploreEndType.SceneFound || EndType == TrinityExploreEndType.SceneLeftOrActorFound) && SceneId != 0 && SceneIdLeft(),
+                    new Sequence(
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Left SceneId {0}!", SceneId)),
+                        new Action(ret => isDone = true)
+                    )
+                ),
+                new Decorator(ret => (EndType == TrinityExploreEndType.SceneFound || EndType == TrinityExploreEndType.SceneLeftOrActorFound)&& !string.IsNullOrWhiteSpace(SceneName) && SceneNameLeft(),
+                    new Sequence(
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Left SceneName {0}!", SceneName)),
+                        new Action(ret => isDone = true)
+                    )
+                ),
                 new Decorator(ret => Trinity.Player.IsInTown,
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Cannot use TrinityExploreDungeon in town - tag finished!", SceneName)),
@@ -815,6 +868,16 @@ namespace Trinity.XmlTags
         {
             return AlternateActors.Any() && ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
                     .Where(o => AlternateActors.Any(a => a.ActorId == o.ActorSNO && o.Distance <= a.ObjectDistance)).Any();
+        }
+
+        private bool SceneIdLeft()
+        {
+            return Trinity.Player.SceneId != SceneId;
+        }
+
+        private bool SceneNameLeft()
+        {
+            return !ZetaDia.Me.CurrentScene.Name.ToLower().Contains(SceneName.ToLower()) && AlternateScenes != null && AlternateScenes.Any() && AlternateScenes.All(o => !ZetaDia.Me.CurrentScene.Name.ToLower().Contains(o.SceneName.ToLower()));
         }
 
         private DiaObject GetAlternateActor()

@@ -410,6 +410,8 @@ namespace Trinity
             108444, // ZombieFemale_A_TristramQuest (Wretched Mothers)
             176889, // ZombieFemale_Unique_WretchedQueen
 
+            210268, // A4 Gardens of Hope Corrupt Growths
+
             164502, // sandMonster_A_Head_Guardian
 
             // A5

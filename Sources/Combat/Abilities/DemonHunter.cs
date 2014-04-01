@@ -117,7 +117,7 @@ namespace Trinity
             bool hasFerret = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_DemonHunter_Companion && s.RuneIndex == 4);
             bool hasWolf = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_DemonHunter_Companion && s.RuneIndex == 2);
 
-            if (!Player.IsIncapacitated && Hotbar.Contains(SNOPower.X1_DemonHunter_Companion))
+            if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.X1_DemonHunter_Companion))
             {
                 // Use Spider Slow on 4 or more trash mobs in an area or on Unique/Elite/Champion
                 if (hasSpider && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && TargetUtil.ClusterExists(25f, 4) && TargetUtil.EliteOrTrashInRange(25f))
@@ -132,7 +132,7 @@ namespace Trinity
                 }
 
                 // Use Boar Taunt on 3 or more trash mobs in an area or on Unique/Elite/Champion
-                if (hasBoar && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && ((TargetUtil.ClusterExists(20f, 4) && TargetUtil.EliteOrTrashInRange(20f)) ||
+                if (!UseOOCBuff && hasBoar && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && ((TargetUtil.ClusterExists(20f, 4) && TargetUtil.EliteOrTrashInRange(20f)) ||
                     (CurrentTarget.IsEliteRareUnique && CurrentTarget.CentreDistance <= 20f)))
                 {
                     return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
