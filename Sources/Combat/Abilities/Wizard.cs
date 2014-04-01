@@ -67,12 +67,9 @@ namespace Trinity
                 }
 
                 // Slow Time for in combat
-                if (!UseOOCBuff && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_SlowTime) &&
-                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || Player.CurrentHealthPct <= 0.7 ||
-                    ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 40f)) &&
-                    PowerManager.CanCast(SNOPower.Wizard_SlowTime) &&
-                    (SpellHistory.TimeSinceUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastUsePosition(SNOPower.Wizard_SlowTime) > 7.5)
-                    )
+                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_SlowTime, CombatBase.CanCastFlags.NoTimer) &&
+                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 40f)) &&
+                    (SpellHistory.TimeSinceUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastUsePosition(SNOPower.Wizard_SlowTime) > 7.5))
                 {
                     return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
@@ -124,6 +121,26 @@ namespace Trinity
                 if (!Player.IsIncapacitated && Player.PrimaryResource >= 25 && CombatBase.CanCast(SNOPower.Wizard_MagicWeapon) && !GetHasBuff(SNOPower.Wizard_MagicWeapon))
                 {
                     return new TrinityPower(SNOPower.Wizard_MagicWeapon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
+                }
+
+                // Hydra
+                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Hydra, CombatBase.CanCastFlags.NoTimer) &&
+                    LastPowerUsed != SNOPower.Wizard_Hydra &&
+                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f)) &&
+                    Player.PrimaryResource >= 15)
+                {
+                    // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
+                    float fExtraDistance = 0f;
+                    if (CurrentTarget.CentreDistance > 17f && !CurrentTarget.IsTreasureGoblin)
+                    {
+                        fExtraDistance = CurrentTarget.CentreDistance - 17f;
+                        if (fExtraDistance > 5f)
+                            fExtraDistance = 5f;
+                        if (CurrentTarget.CentreDistance - fExtraDistance < 15f)
+                            fExtraDistance -= 2;
+                    }
+                    Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance - fExtraDistance);
+                    return new TrinityPower(SNOPower.Wizard_Hydra, 30f, vNewTarget, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
                 }
 
                 // Archon
@@ -198,25 +215,6 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_Meteor, 21f, TargetUtil.GetBestClusterUnit().Position);
                 }
 
-                // Hydra
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Hydra, CombatBase.CanCastFlags.NoTimer) &&
-                    LastPowerUsed != SNOPower.Wizard_Hydra &&
-                    (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 4) || Player.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsBoss || CurrentTarget.IsTreasureGoblin) && CurrentTarget.RadiusDistance <= 15f)) &&
-                    Player.PrimaryResource >= 15)
-                {
-                    // For distant monsters, try to target a little bit in-front of them (as they run towards us), if it's not a treasure goblin
-                    float fExtraDistance = 0f;
-                    if (CurrentTarget.CentreDistance > 17f && !CurrentTarget.IsTreasureGoblin)
-                    {
-                        fExtraDistance = CurrentTarget.CentreDistance - 17f;
-                        if (fExtraDistance > 5f)
-                            fExtraDistance = 5f;
-                        if (CurrentTarget.CentreDistance - fExtraDistance < 15f)
-                            fExtraDistance -= 2;
-                    }
-                    Vector3 vNewTarget = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.CentreDistance - fExtraDistance);
-                    return new TrinityPower(SNOPower.Wizard_Hydra, 30f, vNewTarget, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
-                }
 
                 //SkillDict.Add("FrostNova", SNOPower.Wizard_FrostNova);
                 //RuneDict.Add("Shatter", 1);
@@ -396,15 +394,17 @@ namespace Trinity
                 // Archon form
                 // Archon Slow Time for in combat
                 if (!UseOOCBuff && !Player.IsIncapacitated &&
-                    (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || Player.CurrentHealthPct <= 0.7 || ((CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin || CurrentTarget.IsBoss) && CurrentTarget.RadiusDistance <= 35f)) &&
-                    CombatBase.CanCast(SNOPower.Wizard_Archon_SlowTime))
+                    (TargetUtil.AnyElitesInRange(25, 1) || 
+                    TargetUtil.EliteOrTrashInRange(25f) || 
+                    (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 35f)) &&
+                    CombatBase.CanCast(SNOPower.Wizard_Archon_SlowTime, CombatBase.CanCastFlags.NoTimer))
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
 
                 // Archon Teleport in combat
                 if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
-                    CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport) &&
+                    CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport, CombatBase.CanCastFlags.NoTimer) &&
                     // Try and teleport-retreat from 1 elite or 3+ greys or a boss at 15 foot range
                     (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 3) || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 15f)))
                 {
@@ -413,7 +413,7 @@ namespace Trinity
                 }
 
                 // Arcane Blast - 2 second cooldown, big AoE
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_ArcaneBlast) && TargetUtil.AnyMobsInRange(15, 1))
+                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_ArcaneBlast, CombatBase.CanCastFlags.NoTimer) && TargetUtil.AnyMobsInRange(15, 1))
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_ArcaneBlast, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }

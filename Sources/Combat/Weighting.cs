@@ -129,7 +129,7 @@ namespace Trinity
                                     }
 
                                     bool ignoreSummoner = true;
-                                    if (cacheObject.IsSummoner && Settings.Combat.Misc.ForceKillSummoners)
+                                    if (cacheObject.IsSummoner && Settings.Combat.Misc.ForceKillSummoners && !navBlocking)
                                         ignoreSummoner = false;
 
                                     // Ignore Solitary Trash mobs (no elites present)
