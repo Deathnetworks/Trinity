@@ -1,6 +1,64 @@
 ﻿
 # Trinity
 
+### Changelog 1.8.14
+
+* Trinity should now support using Legendary potions if we have one in our backpack (untested - please confirm!)
+
+* Crusader Judgement will now be used in Melee range
+
+* DemonHunter: Added Stede's companion cast logic
+
+* DemonHunter Sentry will be re-cast if available
+
+* DemonHunter Kridershot support added - not tested, no idea if it works, please test and report back
+
+* DemonHunter ShadowPower will save some Discipline for Preparation if needed
+
+* Wizard Disintegrate: Entropy support added
+
+* Wizard Magic Missle: Conflagrate support added
+
+* Wizard Meteor should work better
+
+* Wizard Disintegrate should work better
+
+* Wizard added Conflagrate rune support for magic missle
+
+* WitchDoctor BigBad Voodoo should work better
+
+* Removed all SNOPower Timer checks - Trinity will now use the Hotbar cooldown to see if a spell is ready (via PowerManager), should fix things like WD Grave I
+
+* Added Option to enable LazyRaider Click to Pause - default OFF
+
+* Rebuilt Interactable/Container "click" handling to better accommodate bounties, quests, and act 5 and fix buggy/missed interactions
+
+* Added Avoidance for Uzrael, Adria and Malthael boss fights
+
+* Rebuilt some Trinity caching logic to better utilize new DB caching
+
+* Trinity will now use "Jumplink" Portals in Pandemonium fortress - it's not "smart" but it works...
+
+* Trinity will be better about refreshing its hotbar in combat (if we changed spells recently)
+
+* Trinity should be better about unlocking cursed chests and shrines, and completing events - more work needed however
+
+* Trinity scoring should work better for RoS - thanks darktitan!!
+
+* Bot should no longer attempt to loot items/chests behind navigation obstacles
+
+* Dungeon explorer will deque the current node when there's a navigation obstacle in the route to it
+
+* Fixed UI tooltip for Force Attack Summoner
+
+* Fixed Crusader health/globe settings pointing at WD settings
+
+* Added more A5 navigation obstacles
+
+* Untargetable doors will be ignored and added as nav obstacles
+
+* Fixed TargetUtil Cluster not prioritizing elites
+
 ### Changelog 1.8.13
 
 * Fixed bug in unstucker never generating an unstuck point
