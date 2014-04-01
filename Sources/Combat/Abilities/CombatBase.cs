@@ -70,7 +70,7 @@ namespace Trinity.Combat.Abilities
             using (new PerformanceLogger("AbilitySelector"))
             {
                 // See if archon just appeared/disappeared, so update the hotbar
-                if (Trinity.ShouldRefreshHotbarAbilities)
+                if (Trinity.ShouldRefreshHotbarAbilities || Trinity.HotbarRefreshTimer.ElapsedMilliseconds > 1000)
                     PlayerInfoCache.RefreshHotbar();
 
                 // Switch based on the cached character class
@@ -382,14 +382,14 @@ namespace Trinity.Combat.Abilities
             if (!hasPower)
                 return false;
 
-            // Skip this if we're Crusader, for now
-            if (Player.ActorClass != ActorClass.Crusader)
-            {
-                bool timer = flags.HasFlag(CanCastFlags.NoTimer) || SNOPowerUseTimer(power);
+            // Skip this 
+            //if (Player.ActorClass != ActorClass.Crusader)
+            //{
+            //    bool timer = flags.HasFlag(CanCastFlags.NoTimer) || SNOPowerUseTimer(power);
 
-                if (!timer)
-                    return false;
-            }
+            //    if (!timer)
+            //        return false;
+            //}
 
             bool powerManager = flags.HasFlag(CanCastFlags.NoPowerManager) || PowerManager.CanCast(power);
 

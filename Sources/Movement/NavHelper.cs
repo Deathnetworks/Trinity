@@ -70,6 +70,7 @@ namespace Trinity
         }
         #endregion
 
+
         internal static string PrettyPrintVector3(Vector3 pos)
         {
             return string.Format("x=\"{0:0}\" y=\"{0:1}\" z=\"{0:2}\"", pos.X, pos.Y, pos.Z);
@@ -437,7 +438,8 @@ namespace Trinity
             }
 
             Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid found {0}, distance: {1:0}, weight: {2:0}", bestPoint.Position, bestPoint.Distance, bestPoint.Weight);
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid stats CantStand {0} ZDiff {1} GT45Raycast {2} Avoidance {3} Monsters {4} pathFailures {5} navRaycast {6} pointsFound {7}",
+            Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "Kiting grid stats CantStand {0} ZDiff {1} GT45Raycast {2} Avoidance {3} Monsters {4} pathFailures {5} navRaycast {6} "
+            + "pointsFound {7} shouldKite={8} isStuck={9} avoidDeath={10} monsters={11}",
                 nodesCantStand,
                 nodesZDiff,
                 nodesGT45Raycast,
@@ -445,7 +447,12 @@ namespace Trinity
                 nodesMonsters,
                 pathFailures,
                 navRaycast,
-                pointsFound);
+                pointsFound,
+                shouldKite,
+                isStuck,
+                avoidDeath,
+                monsterList == null ? 0 : monsterList.Count()
+                );
             return bestPoint.Position;
 
         }
@@ -566,6 +573,15 @@ namespace Trinity
                     Position = new Vector3(579, 582, 21),
                     Name = "Azmodan",
                     Radius = 120f
+                }
+            },
+            {
+                new UnSafeZone()
+                {
+                    WorldId = 308446, 
+                    Position = new Vector3(469.9994f, 355.01f, -15.85094f),
+                    Name = "Urzael",
+                    Radius = (new Vector3(375.144f, 359.9929f, 0.1f)).Distance2D(new Vector3(469.9994f, 355.01f, -15.85094f)),
                 }
             }
         };

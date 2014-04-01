@@ -8,6 +8,7 @@ namespace Trinity.Config
     public class AdvancedSetting : ITrinitySetting<AdvancedSetting>, INotifyPropertyChanged
     {
         #region Fields
+        private bool _LazyRaiderClickToPause;
         private bool _UnstuckerEnabled;
         private bool _AllowRestartGame;
         private bool _TPSEnabled;
@@ -57,6 +58,24 @@ namespace Trinity.Config
                 {
                     _LogCategories = value;
                     OnPropertyChanged("LogCategories");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool LazyRaiderClickToPause
+        {
+            get
+            {
+                return _LazyRaiderClickToPause;
+            }
+            set
+            {
+                if (_LazyRaiderClickToPause != value)
+                {
+                    _LazyRaiderClickToPause = value;
+                    OnPropertyChanged("LazyRaiderClickToPause");
                 }
             }
         }

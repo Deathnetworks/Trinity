@@ -21,6 +21,9 @@ namespace Trinity
 
             MinEnergyReserve = 25;
 
+            //Kridershot InternalName=x1_bow_norm_unique_09-137 GameBalanceID=1999595351 ItemLink: {c:ffff8000}Kridershot{/c}
+            bool hasKridershot = ZetaDia.Me.Inventory.Equipped.Any(i => i.GameBalanceId == 1999595351);
+
             bool hasPreparation = Hotbar.Contains(SNOPower.DemonHunter_Preparation);
 
             // Shadow Power
@@ -50,7 +53,7 @@ namespace Trinity
             }
 
             // Sentry Turret
-            if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Sentry) &&
+            if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Sentry, CombatBase.CanCastFlags.NoTimer) &&
                 (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50, 2) || TargetUtil.IsEliteTargetInRange(50)) &&
                 Player.PrimaryResource >= 30)
             {
@@ -101,6 +104,46 @@ namespace Trinity
                 if ((!hasPunishment) && CombatBase.CanCast(SNOPower.DemonHunter_Preparation, CombatBase.CanCastFlags.NoTimer) && Player.SecondaryResourceMissing >= 30)
                 {
                     return new TrinityPower(SNOPower.DemonHunter_Preparation, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                }
+            }
+
+
+            // SOURCE: Stede - http://www.thebuddyforum.com/demonbuddy-forum/plugins/trinity/155398-trinity-dh-companion-use-abilities.html#post1445496
+
+            // Companion On-Use Abilities Added in 2.0
+            bool hasSpider = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_DemonHunter_Companion && s.RuneIndex == 0);
+            bool hasBat = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_DemonHunter_Companion && s.RuneIndex == 3);
+            bool hasBoar = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_DemonHunter_Companion && s.RuneIndex == 1);
+            bool hasFerret = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_DemonHunter_Companion && s.RuneIndex == 4);
+            bool hasWolf = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_DemonHunter_Companion && s.RuneIndex == 2);
+
+            if (!Player.IsIncapacitated && Hotbar.Contains(SNOPower.X1_DemonHunter_Companion))
+            {
+                // Use Spider Slow on 4 or more trash mobs in an area or on Unique/Elite/Champion
+                if (hasSpider && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && TargetUtil.ClusterExists(25f, 4) && TargetUtil.EliteOrTrashInRange(25f))
+                {
+                    return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
+                }
+
+                //Use Bat when Hatred is Needed
+                if (hasBat && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && Player.PrimaryResourceMissing >= 60)
+                {
+                    return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
+                }
+
+                // Use Boar Taunt on 3 or more trash mobs in an area or on Unique/Elite/Champion
+                if (hasBoar && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && ((TargetUtil.ClusterExists(20f, 4) && TargetUtil.EliteOrTrashInRange(20f)) ||
+                    (CurrentTarget.IsEliteRareUnique && CurrentTarget.CentreDistance <= 20f)))
+                {
+                    return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
+                }
+
+                // Placeholder for Ferrets Logic - Unsure if utilities Exist to Determine Whether Gold and Health Globes are Within a Certain Range - Consider Interaction with Blood Vengeance for Optimized Results
+
+                // Use Wolf Howl on Unique/Elite/Champion - Would help for farming trash, but trash farming should not need this - Used on Elites to reduce Deaths per hour
+                if (hasWolf && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && CurrentTarget.IsEliteRareUnique)
+                {
+                    return new TrinityPower(SNOPower.X1_DemonHunter_Companion);
                 }
             }
 
@@ -245,10 +288,10 @@ namespace Trinity
             // Elemental Arrow
             if (!UseOOCBuff && !IsCurrentlyAvoiding && Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) &&
                 SNOPowerUseTimer(SNOPower.DemonHunter_ElementalArrow) && !Player.IsIncapacitated &&
-                ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+                ((Player.PrimaryResource >= 10 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve || hasKridershot))
             {
                 // Players with grenades *AND* elemental arrow should spam grenades at close-range instead
-                if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)
+                if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f && !hasKridershot)
                     return new TrinityPower(SNOPower.DemonHunter_Grenades, 18f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
                 // Now return elemental arrow, if not sending grenades instead
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 65f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
@@ -286,7 +329,7 @@ namespace Trinity
                 // Players with grenades *AND* rapid fire should spam grenades at close-range instead
                 if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)
                 {
-                    return new TrinityPower(SNOPower.DemonHunter_Grenades, 18f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);                    
+                    return new TrinityPower(SNOPower.DemonHunter_Grenades, 18f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
                 }
                 // Now return rapid fire, if not sending grenades instead
                 return new TrinityPower(SNOPower.DemonHunter_RapidFire, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);

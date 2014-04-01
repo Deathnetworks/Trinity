@@ -92,8 +92,11 @@ namespace Trinity
              *  Get primary reference objects and keys
              */
             c_diaObject = freshObject;
+
             if (freshObject is DiaUnit)
+            {
                 c_diaUnit = freshObject as DiaUnit;
+            }
 
             /*
              * Set Common Data
@@ -103,6 +106,8 @@ namespace Trinity
             // Ractor GUID
             c_RActorGuid = freshObject.RActorGuid;
             // Check to see if we've already looked at this GUID
+            CurrentCacheObject.RActorGuid = freshObject.RActorGuid;
+            CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
 
             // Get Internal Name
             AddToCache = RefreshInternalName(AddToCache);
@@ -111,6 +116,7 @@ namespace Trinity
             // ActorSNO
             AddToCache = RefreshStepCachedActorSNO(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
+            CurrentCacheObject.ActorSNO = freshObject.ActorSNO;
 
             // Have ActorSNO Check for SNO based navigation obstacle hashlist
             c_IsObstacle = DataDictionary.NavigationObstacleIds.Contains(c_ActorSNO);
@@ -155,9 +161,9 @@ namespace Trinity
             AddToCache = RefreshStepCachedSummons(AddToCache);
             if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
 
-            // Get Cached Position
-            AddToCache = RefreshStepCachedPosition(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "CachedPosition"; return AddToCache; }
+
+            c_Position = CurrentCacheObject.DiaObject.Position;
+            CurrentCacheObject.Position = CurrentCacheObject.DiaObject.Position;
 
             // Always Refresh Distance for every object
             RefreshStepCalculateDistance();
@@ -170,6 +176,10 @@ namespace Trinity
                 // Set Object Type
                 AddToCache = RefreshStepCachedObjectType(AddToCache);
                 if (!AddToCache) { c_IgnoreReason = "CachedObjectType"; return AddToCache; }
+            }
+            if (DataDictionary.SameWorldPortals.Contains(CurrentCacheObject.ActorSNO))
+            {
+                c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, c_Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
             }
 
             // Check Blacklists
@@ -334,6 +344,8 @@ namespace Trinity
             c_RadiusDistance = 0f;
             c_Radius = 0f;
             c_ZDiff = 0f;
+            c_ItemDisplayName = "";
+            c_ItemLink = "";
             c_InternalName = "";
             c_IgnoreReason = "";
             c_IgnoreSubStep = "";
@@ -467,9 +479,11 @@ namespace Trinity
         {
             // Calculate distance, don't rely on DB's internal method as this may hit Diablo 3 memory again
             c_CentreDistance = Player.Position.Distance2D(c_Position);
+            CurrentCacheObject.CentreDistance = Player.Position.Distance2D(CurrentCacheObject.Position);
 
             // Set radius-distance to centre distance at first
             c_RadiusDistance = c_CentreDistance;
+            CurrentCacheObject.RadiusDistance = Player.Position.Distance2D(CurrentCacheObject.Position);
         }
 
         private static bool RefreshStepSkipDoubleCheckGuid(bool AddToCache)

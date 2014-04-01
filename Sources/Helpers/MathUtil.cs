@@ -9,6 +9,42 @@ namespace Trinity
          * http://upload.wikimedia.org/wikipedia/commons/9/9a/Degree-Radian_Conversion.svg
          */
 
+        internal static bool PositionIsInCircle(Vector3 position, Vector3 center, float radius)
+        {
+            if (center.Distance2DSqr(position) < (Math.Pow((double)radius, (double)radius)))
+                return true;
+            return false;
+        }
+
+        internal static bool PositionIsInsideArc(Vector3 position, Vector3 center, float radius, float rotation, float arcDegrees)
+        {
+            if (PositionIsInCircle(position, center, radius))
+            {
+                return GetIsFacingPosition(position, center, rotation, arcDegrees);
+            }
+            return false;
+        }
+
+        internal static bool GetIsFacingPosition(Vector3 position, Vector3 center, float rotation, float arcDegrees)
+        {
+            var DirectionVector = GetDirectionVectorFromRotation(rotation);
+            if (DirectionVector != Vector2.Zero)
+            {
+                Vector3 u = position - center;
+                u.Z = 0f;
+                Vector3 v = new Vector3(DirectionVector.X, DirectionVector.Y, 0f);
+                bool result = ((MathEx.ToDegrees(Vector3.AngleBetween(u, v)) <= arcDegrees) ? 1 : 0) != 0;
+                return result;
+            }
+            else
+                return false;
+        }
+
+        internal static Vector2 GetDirectionVectorFromRotation(double rotation)
+        {
+            return new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
+        }
+
 
         #region Angle Finding
         /// <summary>

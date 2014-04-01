@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.DbProvider;
 using Trinity.Technicals;
+using Trinity.XmlTags;
 using Zeta.Bot.Navigation;
 using Zeta.Common;
 using Zeta.Game;
@@ -17,6 +18,8 @@ namespace Trinity
     /// </summary>
     public class MiniMapMarker : IEquatable<MiniMapMarker>
     {
+        private const int WAYPOINT_MARKER = -1751517829;
+
         public int MarkerNameHash { get; set; }
         public Vector3 Position { get; set; }
         public bool Visited { get; set; }
@@ -107,12 +110,23 @@ namespace Trinity
             }
         }
 
+        internal static void AddMarkersToList(List<TrinityExploreDungeon.Objective> objectives)
+        {
+            foreach (var objective in objectives.Where(o => o.MarkerNameHash != 0))
+            {
+                if (ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.NameHash == objective.MarkerNameHash))
+                {
+                    AddMarkersToList(objective.MarkerNameHash);
+                }
+            }
+        }
+
         private static IEnumerable<Zeta.Game.Internals.MinimapMarker> GetMarkerList(int includeMarker)
         {
             return ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => (m.NameHash == 0 || m.NameHash == includeMarker) && !KnownMarkers.Any(ml => ml.Position == m.Position && ml.MarkerNameHash == m.NameHash)).OrderBy(m => m.NameHash != 0);
         }
 
-        internal static DecoratorContinue DetectMiniMapMarkers(int includeMarker = 0)
+        internal static Composite DetectMiniMapMarkers(int includeMarker = 0)
         {
             return
             new DecoratorContinue(ret => ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => (m.NameHash == 0 || m.NameHash == includeMarker) && !KnownMarkers.Any(m2 => m2.Position != m.Position && m2.MarkerNameHash == m.NameHash)),
@@ -122,7 +136,12 @@ namespace Trinity
             );
         }
 
-        internal static Decorator VisitMiniMapMarkers(Vector3 near, float markerDistance)
+        internal static Composite DetectMiniMapMarkers(List<TrinityExploreDungeon.Objective> objectives)
+        {
+            return new Action(ret => MiniMapMarker.AddMarkersToList(objectives));
+        }
+
+        internal static Composite VisitMiniMapMarkers(Vector3 near, float markerDistance)
         {
             return
             new Decorator(ret => MiniMapMarker.AnyUnvisitedMarkers(),

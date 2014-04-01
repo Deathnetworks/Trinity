@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Technicals;
@@ -31,26 +32,32 @@ namespace Trinity
                 c_IgnoreSubStep = "";
             }
 
-            // Retrieve collision sphere radius, cached if possible
-            if (!CacheData.CollisionSphere.TryGetValue(c_ActorSNO, out c_Radius))
-            {
-                try
-                {
-                    c_Radius = c_diaObject.CollisionSphere.Radius;
-                    // Minimum range clamp
-                    if (c_Radius <= 1f)
-                        c_Radius = 1f;
 
-                    c_RadiusDistance = c_Radius + c_CentreDistance;
-                }
-                catch
+
+            if (!DataDictionary.CustomObjectRadius.TryGetValue(CurrentCacheObject.ActorSNO, out c_Radius))
+            {
+                // Retrieve collision sphere radius, cached if possible
+                if (!CacheData.CollisionSphere.TryGetValue(c_ActorSNO, out c_Radius))
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for object {0} [{1}]", c_InternalName, c_ActorSNO);
-                    c_IgnoreSubStep = "CollisionSphereException";
-                    AddToCache = false;
+                    try
+                    {
+                        c_Radius = c_diaObject.CollisionSphere.Radius;
+                        // Minimum range clamp
+                        if (c_Radius <= 1f)
+                            c_Radius = 1f;
+
+                        c_RadiusDistance = c_Radius + c_CentreDistance;
+                    }
+                    catch
+                    {
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                        c_IgnoreSubStep = "CollisionSphereException";
+                        AddToCache = false;
+                    }
+                    CacheData.CollisionSphere.Add(c_ActorSNO, c_Radius);
                 }
-                CacheData.CollisionSphere.Add(c_ActorSNO, c_Radius);
             }
+            CurrentCacheObject.Radius = c_Radius;
 
             // A "fake distance" to account for the large-object size of monsters
             c_RadiusDistance -= (float)c_Radius;
@@ -81,7 +88,7 @@ namespace Trinity
                     RActorGUID = c_RActorGuid,
                     ObjectType = c_ObjectType,
                 });
-                
+
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
                     "Safely handled exception getting Gizmo-Disabled-By-Script attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
                 c_IgnoreSubStep = "isGizmoDisabledByScriptException";
@@ -210,8 +217,30 @@ namespace Trinity
                     }
                     break;
                 case GObjectType.Interactable:
-                    AddToCache = true;
-                    c_Radius = c_diaObject.CollisionSphere.Radius;
+                    {
+                        AddToCache = true;
+
+                        // Same world portal check
+                        if (DataDictionary.SameWorldPortals.Contains(CurrentCacheObject.ActorSNO) &&
+                            CacheData.SameWorldPortals.Any(p => p.WorldID == Trinity.Player.WorldID &&
+                                DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < 1 && p.StartPosition.Distance2D(Trinity.Player.Position) > 25f) &&
+                                CurrentCacheObject.RadiusDistance <= 35f)
+                        {
+                            c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, c_Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
+
+                            GenericBlacklist.AddToBlacklist(new GenericCacheObject()
+                            {
+                                Key = c_ObjectHash,
+                                Value = null,
+                                Expires = DateTime.UtcNow.AddSeconds(45)
+                            });
+
+                            AddToCache = false;
+                            c_IgnoreSubStep = "RecentSameWorldPortal";
+                        }
+
+                        c_Radius = c_diaObject.CollisionSphere.Radius;
+                    }
                     break;
                 case GObjectType.HealthWell:
                     {

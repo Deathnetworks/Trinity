@@ -263,6 +263,7 @@ namespace Trinity
                     CacheData.InteractAttempts = new Dictionary<int, int>();
                     CacheData.ItemLinkQuality = new Dictionary<int, ItemQuality>();
                     CacheData.IsSummoner = new Dictionary<int, bool>();
+                    CacheData.SameWorldPortals.Clear();
                     ProfileHistory = new List<string>();
                     CurrentProfile = "";
                     FirstProfile = "";

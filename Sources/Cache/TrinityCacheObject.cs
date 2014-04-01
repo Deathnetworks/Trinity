@@ -13,19 +13,28 @@ namespace Trinity
     // Completely minimizing the D3 memory reads to the bare minimum
     public class TrinityCacheObject
     {
+        [NoCopy]
+        public DiaObject DiaObject { get { return ZetaDia.Actors.GetActorsOfType<DiaObject>(true, true).Where(o => o.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
+        [NoCopy]
+        public DiaUnit Unit { get { return ZetaDia.Actors.GetActorsOfType<DiaUnit>(true, true).Where(u => u.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
+        [NoCopy]
+        public DiaGizmo Gizmo { get { return ZetaDia.Actors.GetActorsOfType<DiaGizmo>(true, true).Where(u => u.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
+
+        public int ACDGuid { get; set; }
+        public int RActorGuid { get; set; }
+        public int ActorSNO { get; set; }
+
         // Generic stuff applicable to all objects
         public GObjectType Type { get; set; }
         public double Weight { get; set; }
         public Vector3 Position { get; set; }
+        public AABB AABBBounds { get; set; }
         public float CentreDistance { get; set; }
         public float RadiusDistance { get; set; }
         public string InternalName { get; set; }
         public SNOAnim Animation { get; set; }
-        public int ACDGuid { get; set; }
-        public int RActorGuid { get; set; }
         public int DynamicID { get; set; }
         public int BalanceID { get; set; }
-        public int ActorSNO { get; set; }
         public int ItemLevel { get; set; }
         public string ItemLink { get; set; }
         public int GoldAmount { get; set; }
@@ -63,12 +72,6 @@ namespace Trinity
         public bool HasBeenPrimaryTarget { get; set; }
         public int TimesBeenPrimaryTarget { get; set; }
         public DateTime FirstTargetAssignmentTime { get; set; }
-        [NoCopy]
-        public DiaObject DiaObject { get { return ZetaDia.Actors.GetActorsOfType<DiaObject>(true, true).Where(o => o.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
-        [NoCopy]
-        public DiaUnit Unit { get { return ZetaDia.Actors.GetActorsOfType<DiaUnit>(true, true).Where(u => u.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
-        [NoCopy]
-        public DiaGizmo Gizmo { get { return ZetaDia.Actors.GetActorsOfType<DiaGizmo>(true, true).Where(u => u.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
         public string ObjectHash { get; set; }
         public double KillRange { get; set; }
         public MonsterSize MonsterSize { get; set; }
@@ -87,6 +90,7 @@ namespace Trinity
         public bool IsUnit { get { return this.Type == GObjectType.Unit; } }
         public bool IsNPC { get; set; }
         public bool NPCIsOperable { get; set; }
+        public bool IsQuestMonster { get; set; }
 
         [NoCopy]
         public bool IsFacing(Vector3 targetPosition, float arcDegrees = 70f)

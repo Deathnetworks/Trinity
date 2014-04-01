@@ -175,7 +175,7 @@ namespace Trinity.Combat.Abilities
                 // Justice
                 if (CombatBase.CanCast(SNOPower.X1_Crusader_Justice))
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_Justice, 65f, CurrentTarget.ACDGuid);
+                    return new TrinityPower(SNOPower.X1_Crusader_Justice, 7f, CurrentTarget.ACDGuid);
                 }
 
                 // Smite

@@ -387,7 +387,11 @@ namespace Trinity
                                         } break;
                                     case GObjectType.Avoidance:
                                         {
-                                            extraData += " Ro:" + c_Rotation.ToString("0.00");
+                                            extraData += " Ro:" + CurrentCacheObject.Rotation.ToString("0.00");
+                                            extraData += " AABB: [" +
+                                                CurrentCacheObject.AABBBounds.Min.ToString() +
+                                                CurrentCacheObject.AABBBounds.Max.ToString() +
+                                                "]";
                                             break;
                                         }
                                 }

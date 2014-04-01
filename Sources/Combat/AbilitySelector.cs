@@ -60,33 +60,33 @@ namespace Trinity
         /// <summary>
         /// Quick and Dirty routine just to force a wait until the character is "free"
         /// </summary>
-        /// <param name="maxSafetyLoops">The max safety loops.</param>
+        /// <param name="maxLoops">The max safety loops.</param>
         /// <param name="waitForAttacking">if set to <c>true</c> wait for attacking.</param>
-        public static void WaitWhileAnimating(int maxSafetyLoops = 10, bool waitForAttacking = false)
+        public static void WaitWhileAnimating(int maxLoops = 10, bool waitForAttacking = false)
         {
-            bool bKeepLooping = true;
-            int iSafetyLoops = 0;
+            bool loop = true;
+            int loopCount = 0;
             ACDAnimationInfo myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
-            while (bKeepLooping)
+            while (loop)
             {
-                iSafetyLoops++;
-                if (iSafetyLoops > maxSafetyLoops)
-                    bKeepLooping = false;
-                bool bIsAnimating = false;
+                loopCount++;
+                if (loopCount > maxLoops)
+                    loop = false;
+                bool isAnimating = false;
                 try
                 {
                     myAnimationState = ZetaDia.Me.CommonData.AnimationInfo;
                     if (myAnimationState == null || myAnimationState.State == AnimationState.Casting || myAnimationState.State == AnimationState.Channeling)
-                        bIsAnimating = true;
+                        isAnimating = true;
                     if (waitForAttacking && (myAnimationState == null || myAnimationState.State == AnimationState.Attacking))
-                        bIsAnimating = true;
+                        isAnimating = true;
                 }
                 catch
                 {
-                    bIsAnimating = true;
+                    isAnimating = true;
                 }
-                if (!bIsAnimating)
-                    bKeepLooping = false;
+                if (!isAnimating)
+                    loop = false;
                 //DbHelper.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "Waiting for animation, maxLoops={0} waitForAttacking={1} anim={2}", maxSafetyLoops, waitForAttacking, myAnimationState.State);
 
             }
@@ -109,9 +109,11 @@ namespace Trinity
         {
             using (new PerformanceLogger("AbilitySelector"))
             {
+                if (!UseOOCBuff && CurrentTarget == null)
+                    return new TrinityPower();
 
                 // See if archon just appeared/disappeared, so update the hotbar
-                if (ShouldRefreshHotbarAbilities)
+                if (ShouldRefreshHotbarAbilities || Trinity.HotbarRefreshTimer.ElapsedMilliseconds > 1000)
                     PlayerInfoCache.RefreshHotbar();
 
                 // Switch based on the cached character class

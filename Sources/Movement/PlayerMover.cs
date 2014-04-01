@@ -161,7 +161,7 @@ namespace Trinity.DbProvider
         {
             if (Trinity.Settings.Advanced.DisableAllMovement)
                 return Vector3.Zero;
-            
+
             // Update the last time we generated a path
             LastGeneratedStuckPosition = DateTime.UtcNow;
             Navigator.Clear();
@@ -293,11 +293,11 @@ namespace Trinity.DbProvider
         private static HashSet<Vector3> hashDoneThisVector = new HashSet<Vector3>();
         private static Vector3 vShiftedPosition = Vector3.Zero;
         private static DateTime lastShiftedPosition = DateTime.MinValue;
-        private static int iShiftPositionFor = 0;
 
         private static Vector3 lastMovementPosition = Vector3.Zero;
         private static DateTime lastRecordedPosition = DateTime.UtcNow;
-        internal static double MovementSpeed { get; private set; }
+
+        internal static double MovementSpeed { get { return GetMovementSpeed(); } }
 
         private static List<SpeedSensor> SpeedSensors = new List<SpeedSensor>();
         private static int MaxSpeedSensors = 5;
@@ -422,7 +422,6 @@ namespace Trinity.DbProvider
             LastMoveToTarget = vMoveToTarget;
 
             // Set the public variable
-            MovementSpeed = GetMovementSpeed();
 
             vMoveToTarget = WarnAndLogLongPath(vMoveToTarget);
 
@@ -461,7 +460,7 @@ namespace Trinity.DbProvider
                     {
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Movement, "Unable to find Unstuck point!", vSafeMovementLocation);
                         return;
-                    } 
+                    }
                     Logger.Log(TrinityLogLevel.Verbose, LogCategory.Movement, "SafeMovement Location set to {0}", vSafeMovementLocation);
 
                 }
@@ -509,7 +508,7 @@ namespace Trinity.DbProvider
                     }
                 }
             }
-            
+
             // don't use special movement within 10 seconds of being stuck
             bool cancelSpecialMovementAfterStuck = DateTime.UtcNow.Subtract(LastGeneratedStuckPosition).TotalMilliseconds > 10000;
 
@@ -520,7 +519,7 @@ namespace Trinity.DbProvider
 
                 // Whirlwind for a barb, special context only
                 if (Trinity.Settings.Combat.Barbarian.SprintMode != BarbarianSprintMode.CombatOnly &&
-                    Trinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Trinity.ObjectCache.Any(u => u.IsUnit && 
+                    Trinity.Hotbar.Contains(SNOPower.Barbarian_Whirlwind) && Trinity.ObjectCache.Any(u => u.IsUnit &&
                     MathUtil.IntersectsPath(u.Position, u.Radius + 5f, Trinity.Player.Position, vMoveToTarget)) &&
                     Trinity.Player.PrimaryResource >= V.F("Barbarian.Whirlwind.MinFury") && !Trinity.IsWaitingForSpecial && V.B("Barbarian.Whirlwind.UseForMovement"))
                 {
@@ -733,7 +732,7 @@ namespace Trinity.DbProvider
 
 
         }
-        
+
 
         private static Vector3 WarnAndLogLongPath(Vector3 vMoveToTarget)
         {

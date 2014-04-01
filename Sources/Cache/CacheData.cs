@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Trinity.Cache;
 using Zeta.Common;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
@@ -161,6 +162,11 @@ namespace Trinity
         /// A set of Avoidances that appear then disappear from the object manager, but can still hurt our player. We need to expire these based on a Timespan from the obstacle object.
         /// </summary>
         internal static HashSet<CacheObstacleObject> TimeBoundAvoidance = new HashSet<CacheObstacleObject>();
+
+        /// <summary>
+        /// Stores the last use of same world portals, like in Pandemonium fortress 
+        /// </summary>
+        internal static HashSet<SameWorldPortal> SameWorldPortals = new HashSet<SameWorldPortal>();
 
         internal static void Clear()
         {

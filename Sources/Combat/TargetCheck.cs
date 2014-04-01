@@ -164,7 +164,7 @@ namespace Trinity
 
                     bool isLoopingAnimation = ZetaDia.Me.LoopingAnimationEndTime > 0;
 
-                    if (!Player.IsInTown && !isLoopingAnimation && !IsReadyToTownRun && !ForceVendorRunASAP && myAnimationState != null
+                    if (!isLoopingAnimation && !IsReadyToTownRun && !ForceVendorRunASAP && myAnimationState != null
                         && myAnimationState.State != AnimationState.Attacking
                         && myAnimationState.State != AnimationState.Casting
                         && myAnimationState.State != AnimationState.Channeling)

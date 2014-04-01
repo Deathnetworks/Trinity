@@ -34,10 +34,36 @@ namespace Trinity
 
             try
             {
-                c_CurrentAnimation = c_CommonData.CurrentAnimation;
+                CurrentCacheObject.Animation = CurrentCacheObject.DiaObject.CommonData.CurrentAnimation;
             }
             catch (Exception)
-            { }
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading CurrentAnimation for AoE {0}", CurrentCacheObject.RActorGuid);
+            }
+            try
+            {
+                CurrentCacheObject.DirectionVector = CurrentCacheObject.DiaObject.Movement.DirectionVector;
+            }
+            catch (Exception)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading DirectionVector for AoE {0}", CurrentCacheObject.RActorGuid);
+            }
+            try
+            {
+                CurrentCacheObject.Rotation = CurrentCacheObject.DiaObject.Movement.Rotation;
+            }
+            catch (Exception)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading Rotation for AoE {0}", CurrentCacheObject.RActorGuid);
+            }
+            try
+            {
+                CurrentCacheObject.AABBBounds = CurrentCacheObject.DiaObject.ActorInfo.AABBBounds;
+            }
+            catch (Exception)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading AABBBounds for AoE {0}", CurrentCacheObject.RActorGuid);
+            }
 
             // Check default radius if not in AoE settings
             DataDictionary.DefaultAvoidanceCustomRadius.TryGetValue(c_ActorSNO, out c_Radius);
@@ -123,7 +149,15 @@ namespace Trinity
             {
                 float avoidanceRadius = (float)GetAvoidanceRadius(c_ActorSNO, c_Radius);
 
-                CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(c_Position, avoidanceRadius, c_ActorSNO, c_InternalName));
+                TimeSpan aoeExpiration;
+                DataDictionary.AvoidanceSpawnerDuration.TryGetValue(CurrentCacheObject.ActorSNO, out aoeExpiration);
+
+                CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(c_Position, avoidanceRadius, c_ActorSNO, c_InternalName)
+                {
+                    Expires = DateTime.UtcNow.Add(aoeExpiration),
+                    ObjectType = GObjectType.Avoidance,
+                    Rotation = CurrentCacheObject.Rotation
+                });
 
                 // Is this one under our feet? If so flag it up so we can find an avoidance spot
                 if (c_CentreDistance <= minAvoidanceRadius)
@@ -151,8 +185,8 @@ namespace Trinity
             }
             else
             {
-               //Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Enough health for avoidance, ignoring Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
-               //c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
+                //Logger.Log(TrinityLogLevel.Verbose, LogCategory.Avoidance, "Enough health for avoidance, ignoring Name={0} SNO={1} radius={2:0} health={3:0.00} dist={4:0}",
+                //c_InternalName, c_ActorSNO, minAvoidanceRadius, minAvoidanceHealth, c_CentreDistance);
             }
 
             return AddToCache;

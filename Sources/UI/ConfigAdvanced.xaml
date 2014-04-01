@@ -29,6 +29,7 @@
         <!-- Misc Advanced -->
         <UniformGrid Grid.Row="0" Columns="2" Margin="5">
             <CheckBox Margin="5" IsChecked="{Binding Advanced.ShowBattleTag}" Content="Show BattleTag in Title bar"/>
+            <CheckBox Margin="5" IsChecked="{Binding Advanced.LazyRaiderClickToPause}" Content="Lazy Raider Click to Pause"/>
             <CheckBox Margin="5" IsChecked="{Binding Advanced.UnstuckerEnabled}" Content="Enable Trinity unstucker"/>
             <CheckBox Margin="5" IsChecked="{Binding Advanced.AllowRestartGame}" Content="Allow game restarts"/>
             <CheckBox Margin="5" IsChecked="{Binding Advanced.DisableAllMovement}" Content="Disable All Movement"/>

@@ -237,6 +237,33 @@ namespace Trinity.XmlTags
             }
         }
 
+        [XmlElement("Objectives")]
+        public List<Objective> Objectives { get; set; }
+
+        [XmlElement("Objective")]
+        public class Objective
+        {
+            [XmlAttribute("actorId")]
+            public int ActorID { get; set; }
+
+            [XmlAttribute("markerNameHash")]
+            public int MarkerNameHash { get; set; }
+
+            [XmlAttribute("count")]
+            public int Count { get; set; }
+
+            [XmlAttribute("endAnimation")]
+            public SNOAnim EndAnimation { get; set; }
+
+            [XmlAttribute("interact")]
+            public bool Interact { get; set; }
+
+            public Objective()
+            {
+
+            }
+        }
+
         /// <summary>
         /// The Scene SNOId, used with ExploreUntil="SceneFound"
         /// </summary>
@@ -322,7 +349,8 @@ namespace Trinity.XmlTags
         [XmlAttribute("interactRange")]
         public float ObjectInteractRange { get; set; }
 
-        Dictionary<int, Vector3> foundObjects = new Dictionary<int, Vector3>();
+
+        HashSet<Tuple<int, Vector3>> foundObjects = new HashSet<Tuple<int, Vector3>>();
 
         /// <summary>
         /// The Position of the CurrentNode NavigableCenter
@@ -412,8 +440,13 @@ namespace Trinity.XmlTags
             TagTimer.Reset();
             timesForcedReset = 0;
 
-            PrintNodeCounts("PostInit");
+            if (Objectives == null)
+                Objectives = new List<Objective>();
 
+            if (ObjectDistance == 0)
+                ObjectDistance = 25f;
+
+            PrintNodeCounts("PostInit");
         }
 
         /// <summary>
@@ -450,7 +483,10 @@ namespace Trinity.XmlTags
             return
             new Sequence(
                 new DecoratorContinue(ret => !IgnoreMarkers,
-                    MiniMapMarker.DetectMiniMapMarkers(ExitNameHash)
+                    new Sequence(
+                        MiniMapMarker.DetectMiniMapMarkers(ExitNameHash),
+                        MiniMapMarker.DetectMiniMapMarkers(Objectives)
+                    )
                 ),
                 UpdateSearchGridProvider(),
                 new Action(ret => CheckResetDungeonExplorer()),
@@ -461,7 +497,16 @@ namespace Trinity.XmlTags
                         MiniMapMarker.VisitMiniMapMarkers(myPos, MarkerDistance)
                     ),
                     new Decorator(ret => ShouldInvestigateActor(),
-                        InvestigateActor()
+                        new PrioritySelector(
+                            new Decorator(ret => CurrentActor != null && CurrentActor.IsValid && 
+                                Objectives.Any(o => o.ActorID == CurrentActor.ActorSNO && o.Interact) &&
+                                CurrentActor.Position.Distance(Trinity.Player.Position) <= CurrentActor.CollisionSphere.Radius,
+                                new Sequence(
+                                    new Action(ret => CurrentActor.Interact())
+                                )
+                            ),
+                            InvestigateActor()
+                        )
                     ),
                     new Sequence(
                         new DecoratorContinue(ret => DungeonRouteIsEmpty(),
@@ -493,6 +538,34 @@ namespace Trinity.XmlTags
             return BrainBehavior.DungeonExplorer != null && BrainBehavior.DungeonExplorer.CurrentRoute != null && !BrainBehavior.DungeonExplorer.CurrentRoute.Any();
         }
 
+        private bool CurrentActorIsFinished
+        {
+            get
+            {
+                return Objectives.Any(o => o.ActorID == CurrentActor.ActorSNO && o.EndAnimation == CurrentActor.CommonData.CurrentAnimation);
+            }
+        }
+
+        private DiaObject CurrentActor
+        {
+            get
+            {
+                var actor = 
+                ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
+                .Where(a => (a.ActorSNO == ActorId ||
+                    Objectives.Any(o => o.ActorID != 0 && o.ActorID == a.ActorSNO)) &&
+                    Trinity.SkipAheadAreaCache.Any(o => o.Position.Distance2D(a.Position) >= ObjectDistance &&
+                    !foundObjects.Any(fo => fo != new Tuple<int,Vector3>(o.ActorSNO, o.Position))))
+                .OrderBy(o => o.Distance)
+                .FirstOrDefault();
+
+                if (actor != null && actor.IsValid)
+                    return actor;
+
+                return default(DiaObject);
+            }
+        }
+
         private Composite InvestigateActor()
         {
             return new Action(ret =>
@@ -508,16 +581,14 @@ namespace Trinity.XmlTags
 
         private bool ShouldInvestigateActor()
         {
-            if (ActorId == 0)
-                return false;
-
-            if (ObjectDistance == 0)
+            if (ActorId == 0 || Objectives.All(o => o.ActorID == 0))
                 return false;
 
             var actors = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
-                .Where(a => a.ActorSNO == ActorId &&
+                .Where(a => (a.ActorSNO == ActorId ||
+                    Objectives.Any(o => o.ActorID != 0 && o.ActorID == a.ActorSNO)) &&
                     Trinity.SkipAheadAreaCache.Any(o => o.Position.Distance2D(a.Position) >= ObjectDistance &&
-                    !foundObjects.Any(fo => fo.Key == o.ActorSNO && fo.Value == o.Position)));
+                    !foundObjects.Any(fo => fo != new Tuple<int, Vector3>(o.ActorSNO, o.Position))));
 
             if (actors == null)
                 return false;
@@ -968,7 +1039,7 @@ namespace Trinity.XmlTags
         private Composite CheckIgnoredScenes()
         {
             return
-            new Decorator(ret => IgnoreScenes != null && IgnoreScenes.Any(),
+            new Decorator(ret => timesForcedReset == 0 && IgnoreScenes != null && IgnoreScenes.Any(),
                 new PrioritySelector(
                     new Decorator(ret => IsPositionInsideIgnoredScene(CurrentNavTarget),
                         new Sequence(
@@ -1261,7 +1332,7 @@ namespace Trinity.XmlTags
             Vector3 moveTarget = NextNode.NavigableCenter;
 
             Vector3 lastPlayerMoverTarget = PlayerMover.LastMoveToTarget;
-            bool isStuck = PlayerMover.MovementSpeed < 1;
+            bool isStuck = DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds < 500;
 
             if (isStuck && CacheData.NavigationObstacles.Any(o => MathUtil.IntersectsPath(o.Position, o.Radius, Trinity.Player.Position, lastPlayerMoverTarget)))
             {

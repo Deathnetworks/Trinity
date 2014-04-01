@@ -122,7 +122,7 @@ namespace Trinity
                                     // Ignore trash mobs < 15% health or 50% health with a DoT
                                     if (cacheObject.IsTrashMob && shouldIgnoreTrashMobs &&
                                         (cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealth ||
-                                         cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS))
+                                         cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS) && !cacheObject.IsQuestMonster)
                                     {
                                         objWeightInfo = "Ignoring Health/DoT ";
                                         ignoring = true;
@@ -135,7 +135,7 @@ namespace Trinity
                                     // Ignore Solitary Trash mobs (no elites present)
                                     // Except if has been primary target or if already low on health (<= 20%)
                                     if (shouldIgnoreTrashMobs && !isInHotSpot &&
-                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) && ignoreSummoner)
+                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) && ignoreSummoner && !cacheObject.IsQuestMonster)
                                     {
                                         objWeightInfo = "Ignoring ";
                                         ignoring = true;
@@ -717,26 +717,31 @@ namespace Trinity
                                         MathUtil.IntersectsPath(u.Position, u.Radius, Player.Position, cacheObject.Position)))
                                 {
                                     cacheObject.Weight = 0;
+                                    objWeightInfo += " Unitblocking";
                                     break;
                                 }
 
                                 // Prioritize doors where units are behind them
-                                if (!ObjectCache.Any(u => u.IsUnit && u.HitPointsPct > 0 &&
-                                        MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, u.Position)))
-                                {
-                                    if (cacheObject.RadiusDistance <= 20f)
-                                        cacheObject.Weight += 15000d;
-
-                                }
+                                //if (!ObjectCache.Any(u => u.IsUnit && u.HitPointsPct > 0 &&
+                                //    MathUtil.IntersectsPath(cacheObject.Position, cacheObject.Radius, Player.Position, u.Position)) && cacheObject.RadiusDistance <= 5f)
+                                //{
+                                //        cacheObject.Weight += 15000d;
+                                //        objWeightInfo += " BlockingUnit";
+                                //}
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
+                                {
                                     cacheObject.Weight += 1000;
+                                    objWeightInfo += " RePick";
 
+                                }
                                 // We're standing on the damn thing... open it!!
                                 if (cacheObject.RadiusDistance <= 12f)
+                                {
                                     cacheObject.Weight += 30000d;
-
+                                    objWeightInfo += " <12f";
+                                }
                                 break;
                             }
                         case GObjectType.Barricade:

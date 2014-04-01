@@ -201,6 +201,15 @@ namespace Trinity
 
             AddToCache = RefreshUnitAttributes(AddToCache, c_diaUnit);
 
+            try
+            {
+                CurrentCacheObject.IsQuestMonster = CurrentCacheObject.Unit.CommonData.GetAttribute<int>(ActorAttributeType.MinimapActive) > 1;
+            }
+            catch
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading MinimapActive for Unit {0}", CurrentCacheObject.RActorGuid);
+            }
+
             if (!AddToCache)
                 return AddToCache;
 
@@ -223,7 +232,7 @@ namespace Trinity
             }
             if (c_unit_IsTreasureGoblin)
                 AnyTreasureGoblinsPresent = true;
-            
+
             return AddToCache;
         }
 

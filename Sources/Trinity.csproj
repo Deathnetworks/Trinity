@@ -82,6 +82,7 @@
     <Compile Include="Cache\GroupHotSpot.cs" />
     <Compile Include="Cache\RefreshAvoidance.cs" />
     <Compile Include="Cache\RefreshGizmo.cs" />
+    <Compile Include="Cache\SameWorldPortal.cs" />
     <Compile Include="Combat\Abilities\BarbarianCombat.cs" />
     <Compile Include="Combat\Abilities\CombatBase.cs" />
     <Compile Include="Combat\Abilities\CrusaderCombat.cs" />

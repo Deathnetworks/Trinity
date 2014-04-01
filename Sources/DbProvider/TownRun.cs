@@ -99,31 +99,9 @@ namespace Trinity
 
                 if (Trinity.Player.IsDead)
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Unable to Town Portal - Player is dead!");
                     return false;
                 }
-                if (DataDictionary.BossLevelAreaIDs.Contains(Trinity.Player.LevelAreaId))
-                {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Unable to Town Portal - Boss Area!");
-                    return false;
-                }
-                if (DataDictionary.NeverTownPortalLevelAreaIds.Contains(Trinity.Player.LevelAreaId))
-                {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Unable to Town Portal in this area!");
-                    return false;
-                }
-                if (ZetaDia.IsInTown && DbProvider.DeathHandler.EquipmentNeedsEmergencyRepair())
-                {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "EquipmentNeedsEmergencyRepair!");
-                    return true;
-                }
-                if (Trinity.IsReadyToTownRun && Trinity.CurrentTarget != null)
-                {
-                    TownRunCheckTimer.Restart();
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Restarting TownRunCheckTimer, we have a target!");
-                    return false;
-                }
-
+                
                 // Check if we should be forcing a town-run
                 if (!Trinity.Player.IsInTown && Trinity.ForceVendorRunASAP || BrainBehavior.IsVendoring)
                 {
@@ -213,6 +191,28 @@ namespace Trinity
                 }
 
 
+                if (Trinity.IsReadyToTownRun && DataDictionary.BossLevelAreaIDs.Contains(Trinity.Player.LevelAreaId))
+                {
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Unable to Town Portal - Boss Area!");
+                    return false;
+                }
+                if (Trinity.IsReadyToTownRun && ZetaDia.IsInTown && DbProvider.DeathHandler.EquipmentNeedsEmergencyRepair())
+                {
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "EquipmentNeedsEmergencyRepair!");
+                    return true;
+                }
+                if (Trinity.IsReadyToTownRun && Trinity.CurrentTarget != null)
+                {
+                    TownRunCheckTimer.Restart();
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Restarting TownRunCheckTimer, we have a target!");
+                    return false;
+                }
+
+                if (Trinity.IsReadyToTownRun && DataDictionary.NeverTownPortalLevelAreaIds.Contains(Trinity.Player.LevelAreaId))
+                {
+                    Logger.Log(TrinityLogLevel.Debug, LogCategory.GlobalHandler, "Unable to Town Portal in this area!");
+                    return false;
+                }
                 if (Trinity.IsReadyToTownRun && (TownRunTimerFinished() || BrainBehavior.IsVendoring))
                 {
                     //Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Town run timer finished {0} or in town {1} or is vendoring {2} (TownRun)",

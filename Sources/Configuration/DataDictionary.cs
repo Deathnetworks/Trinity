@@ -170,6 +170,10 @@ namespace Trinity
             362850, // x1_Urzael_Cannonball_burning_invisible
             346976, // x1_Urzael_Cannonball_burning_impact
             346975, // x1_Urzael_Cannonball_burning
+
+            335505, // x1_malthael_drainSoul_ghost
+            325136, // x1_Malthael_DeathFogMonster
+            340512, // x1_Malthael_Mephisto_LightningObject
         };
 
         /// <summary>
@@ -192,11 +196,18 @@ namespace Trinity
             341512, // Thunderstorm 
             316389, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
             340319, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
+            
+            // A5
+
             338889, // x1_Adria_bouncingProjectile
 
             362850, // x1_Urzael_Cannonball_burning_invisible
             346976, // x1_Urzael_Cannonball_burning_impact
             346975, // x1_Urzael_Cannonball_burning
+
+            335505, // x1_malthael_drainSoul_ghost
+            325136, // x1_Malthael_DeathFogMonster
+            340512, // x1_Malthael_Mephisto_LightningObject
 
       };
 
@@ -235,8 +246,16 @@ namespace Trinity
             {346976, 25f }, // x1_Urzael_Cannonball_burning_impact
             {346975, 25f }, // x1_Urzael_Cannonball_burning
 
+            {360738, 12f}, // X1_Adria_arcanePool
+            {338889, 5f}, // x1_Adria_bouncingProjectile
+            {358404, 15f}, // X1_Adria_blood_large
+
+            {335505, 5f}, // x1_malthael_drainSoul_ghost
+            {325136, 20f}, // x1_Malthael_DeathFogMonster
+            {340512, 8f}, // x1_Malthael_Mephisto_LightningObject
+
         };
-        
+
         /*
          * Combat-related dictionaries/defaults
          */
@@ -391,6 +410,8 @@ namespace Trinity
             108444, // ZombieFemale_A_TristramQuest (Wretched Mothers)
             176889, // ZombieFemale_Unique_WretchedQueen
 
+            164502, // sandMonster_A_Head_Guardian
+
             // A5
             316839, // x1_deathOrb_bodyPile
             375106, // A5 x1_Death_Orb_Monster
@@ -401,6 +422,9 @@ namespace Trinity
             318425, // X1_CoreEliteDemon_Chronodemon_Event_ForgottenWar
 
             300866, // X1_Angel_TrooperBoss_Event_ForgottenWar
+
+            346482, // X1_PandExt_TimeTrap 
+            367456, // x1_Pand_Ext_Event_Hive_Blocker
         };
 
         // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
@@ -471,7 +495,9 @@ namespace Trinity
             {180575, 10},  // Diablo Arena Health Well
             {375111, 45f}, // A5 x1_Death_Orb_Master_Monster
             {301177, 15f}, // x1_PandExt_Time_Activator
-            {368515, 5f},
+            {368515, 5f}, // A5 Nephalem Switch -  Passage to Corvus
+            {309432, 37f}, // x1_westm_Bridge
+            {54850, 14f}, // a3dun_Keep_SiegeTowerDoor
         };
 
         /// <summary>
@@ -560,6 +586,8 @@ namespace Trinity
 
             375106, // A5 x1_Death_Orb_Monster
             375111, // A5 x1_Death_Orb_Master_Monster
+
+            329390, // x1_Pand_BatteringRam_Hook_B_low
         };
 
         /// <summary>
@@ -650,6 +678,9 @@ namespace Trinity
 
             321479, // x1_Westm_HeroWorship03_VO
 
+            328008, // X1_Westm_Door_Giant_Closed
+            312441, // X1_Westm_Door_Giant_Opening_Event
+
         };
 
         /// <summary>
@@ -679,6 +710,13 @@ namespace Trinity
         private static readonly HashSet<int> ignoreUntargettableAttribute = new HashSet<int>()
         {
             5432, // A2 Snakem
+        };
+
+
+        public static HashSet<int> SameWorldPortals { get { return sameWorldPortals; } }
+        private static readonly HashSet<int> sameWorldPortals = new HashSet<int>()
+        {
+            328830, // x1_Fortress_Portal_Switch
         };
 
         public static HashSet<string> WhiteItemCraftingWhiteList { get { return whiteItemCraftingWhiteList; } }

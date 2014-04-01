@@ -156,7 +156,7 @@ namespace Trinity
 
                     // Whether we should refresh the target list or not
                     // See if we should update hotbar abilities
-                    if (ShouldRefreshHotbarAbilities)
+                    if (ShouldRefreshHotbarAbilities || Trinity.HotbarRefreshTimer.ElapsedMilliseconds > 1000)
                     {
                         PlayerInfoCache.RefreshHotbar();
                     }
@@ -266,7 +266,8 @@ namespace Trinity
 
                     // This variable just prevents an instant 2-target update after coming here from the main decorator function above
                     IsWholeNewTarget = false;
-                    AssignMonsterTargetPower();
+                    if (CurrentTarget != null)
+                        AssignMonsterTargetPower();
 
                     bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.GameBalanceId == -2142362846);
 
@@ -496,34 +497,51 @@ namespace Trinity
                                 case GObjectType.Container:
                                 case GObjectType.Interactable:
                                     {
-                                        WaitWhileAnimating(5, true);
-                                        ZetaDia.Me.UsePower(SNOPower.Axe_Operate_Gizmo, Vector3.Zero, 0, CurrentTarget.ACDGuid);
-                                        //iIgnoreThisRactorGUID = CurrentTarget.iRActorGuid;
-                                        //iIgnoreThisForLoops = 2;
-                                        // Interactables can have a long channeling time...
-                                        if (CurrentTarget.Type == GObjectType.Interactable)
-                                            WaitWhileAnimating(1500, true);
-                                        else
-                                            WaitWhileAnimating(12, true);
-
-                                        // Count how many times we've tried interacting
-                                        if (!CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
-                                        {
-                                            CacheData.InteractAttempts.Add(CurrentTarget.RActorGuid, 1);
-                                        }
-                                        else
-                                        {
-                                            CacheData.InteractAttempts[CurrentTarget.RActorGuid]++;
-                                        }
-                                        // If we've tried interacting too many times, blacklist this for a while
-                                        if ((iInteractAttempts > 5 || (CurrentTarget.Type == GObjectType.Interactable && iInteractAttempts > 3)) &&
-                                            !(CurrentTarget.Type != GObjectType.HealthWell))
-                                        {
-                                            hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
-                                        }
-
-                                        // Now tell Trinity to get a new target!
                                         ForceTargetUpdate = true;
+                                        if (PlayerMover.GetMovementSpeed() == 0)
+                                        {
+                                            if (SpellHistory.TimeSinceUse(SNOPower.Axe_Operate_Gizmo) < TimeSpan.FromMilliseconds(500))
+                                            {
+                                                return GetTreeSharpRunStatus(HandlerRunStatus.TreeRunning);
+                                            }
+
+                                            if (DataDictionary.SameWorldPortals.Contains(CurrentTarget.ActorSNO))
+                                            {
+                                                Logger.LogDebug("Adding {0} {1} to SameWorldPortals", CurrentTarget.InternalName, CurrentTarget.ActorSNO);
+                                                CacheData.SameWorldPortals.Add(new Cache.SameWorldPortal() { ActorSNO = CurrentTarget.ActorSNO, RActorGUID = CurrentTarget.RActorGuid });
+                                            }
+
+                                            Logger.LogDebug(LogCategory.Behavior, "Using {0} on {1} Distance {2} Radius {3}",
+                                                SNOPower.Axe_Operate_Gizmo, CurrentTarget.InternalName, CurrentTarget.CentreDistance, CurrentTarget.Radius);
+                                            ZetaDia.Me.UsePower(SNOPower.Axe_Operate_Gizmo, Vector3.Zero, 0, CurrentTarget.ACDGuid);
+                                            SpellHistory.RecordSpell(new TrinityPower()
+                                                {
+                                                    SNOPower = SNOPower.Axe_Operate_Gizmo,
+                                                    TargetACDGUID = CurrentTarget.ACDGuid,
+                                                    MinimumRange = TargetRangeRequired,
+                                                    TargetPosition = CurrentTarget.Position,
+                                                });
+
+                                            // Count how many times we've tried interacting
+                                            if (!CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out iInteractAttempts))
+                                            {
+                                                CacheData.InteractAttempts.Add(CurrentTarget.RActorGuid, 1);
+                                            }
+                                            else
+                                            {
+                                                CacheData.InteractAttempts[CurrentTarget.RActorGuid]++;
+                                            }
+
+                                            // If we've tried interacting too many times, blacklist this for a while
+                                            if (CacheData.InteractAttempts[CurrentTarget.RActorGuid] > 15 && !(CurrentTarget.Type != GObjectType.HealthWell))
+                                            {
+                                                Logger.Log("Blacklisting {0} ({1}) for 15 seconds after {2} interactions",
+                                                    CurrentTarget.InternalName, CurrentTarget.ActorSNO, iInteractAttempts);
+                                                hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
+                                            }
+                                        }
+
+                                        Logger.Log(LogCategory.Behavior, "Waiting to stop moving before interaction");
 
                                         runStatus = HandlerRunStatus.TreeRunning;
 
@@ -811,7 +829,7 @@ namespace Trinity
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.Behavior, "{0}", ex);
+                    Logger.Log(TrinityLogLevel.Error, LogCategory.Behavior, "{0}", ex);
                     runStatus = HandlerRunStatus.TreeFailure;
                     return GetTreeSharpRunStatus(runStatus);
                 }
@@ -922,6 +940,15 @@ namespace Trinity
                         addTargetToBlacklist = false;
                     }
 
+                    int interactAttempts;
+                    CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out interactAttempts);
+
+                    if ((CurrentTarget.Type == GObjectType.Door || CurrentTarget.Type == GObjectType.Interactable || CurrentTarget.Type == GObjectType.Container) &&
+                        interactAttempts > 45 && DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalSeconds > 15)
+                    {
+                        addTargetToBlacklist = false;
+                    }
+
                     if (addTargetToBlacklist)
                     {
                         if (CurrentTarget.IsUnit)
@@ -985,7 +1012,8 @@ namespace Trinity
                     if (CurrentTarget.IsUnit)
                     {
                         // Pick a suitable ability
-                        CombatBase.CurrentPower = AbilitySelector(false, false, false);
+                        if (CurrentTarget != null)
+                            CombatBase.CurrentPower = AbilitySelector(false, false, false);
                         if (CombatBase.CurrentPower.SNOPower == SNOPower.None && !Player.IsIncapacitated)
                         {
                             iNoAbilitiesAvailableInARow++;
@@ -1021,11 +1049,28 @@ namespace Trinity
 
                     if (!Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
                     {
+                        var legendaryPotions = ZetaDia.Me.Inventory.Backpack.Where(i => i.InternalName.ToLower()
+                            .Contains("healthpotion_legendary_"));
+
+                        var regularPotions = ZetaDia.Me.Inventory.Backpack.Where(i => i.InternalName.ToLower()
+                            .Contains("healthpotion_") && !i.InternalName.ToLower().Contains("legendary"));
+
                         IsWaitingForPotion = false;
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
-                        WaitWhileAnimating(3, true);
-                        //UIManager.UsePotion();
-                        GameUI.SafeClickElement(GameUI.PotionButton, "Use Potion", false);
+
+                        int dynamicId = 0;
+                        if (legendaryPotions.Any())
+                            dynamicId = legendaryPotions.FirstOrDefault().DynamicId;
+                        else if (regularPotions.Any())
+                            dynamicId = regularPotions.FirstOrDefault().DynamicId;
+                        else
+                        {
+                            // no potions?
+                        }
+                        if (dynamicId != 0)
+                        {
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
+                            ZetaDia.Me.Inventory.UseItem(dynamicId);
+                        }
 
                         CacheData.AbilityLastUsed[SNOPower.DrinkHealthPotion] = DateTime.UtcNow;
                         WaitWhileAnimating(2, true);
@@ -1448,6 +1493,12 @@ namespace Trinity
                             {
                                 TargetRangeRequired = range;
                             }
+                            int attempts = 0;
+                            if (CacheData.InteractAttempts.TryGetValue(CurrentTarget.ActorSNO, out attempts))
+                                TargetRangeRequired -= attempts;
+
+                            if (TargetRangeRequired <= 0)
+                                TargetRangeRequired = 1f;
 
                             break;
                         }

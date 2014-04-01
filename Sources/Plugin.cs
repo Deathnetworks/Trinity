@@ -19,7 +19,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(1, 8, 13);
+                return new Version(1, 8, 14);
             }
         }
 
@@ -59,7 +59,7 @@ namespace Trinity
                     if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                         return;
 
-                    if (!BotMain.IsPaused)
+                    if (Settings.Advanced.LazyRaiderClickToPause && !BotMain.IsPaused)
                     {
                         BotMain.PauseWhile(MouseLeft);
                     }
