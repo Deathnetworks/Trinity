@@ -1,6 +1,16 @@
 ﻿
 # Trinity
 
+### Changelog 1.8.15
+
+* Fixes for Wizard Familiar timers
+
+* Re-enabled Spell Timer checks for Wizard and DemonHunter
+
+* Fixes errors / OOC buffing for DemonHunter companions
+
+* Added Faebs SceneOrActorFound to TrinityExploreDungeon
+
 ### Changelog 1.8.14
 
 * Trinity should now support using Legendary potions if we have one in our backpack (untested - please confirm!)
