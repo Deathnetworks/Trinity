@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using Trinity.Technicals;
 using Zeta.Game;
@@ -9,6 +10,7 @@ namespace Trinity.DbProvider
 {
     public static class DeathHandler
     {
+        [Obsolete("Demonbuddy handles this kind of behavior now, this class is no longer needed")]
         public static Composite CreateDeathHandler(Composite original)
         {
             return

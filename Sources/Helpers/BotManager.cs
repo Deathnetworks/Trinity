@@ -8,7 +8,6 @@ using Zeta.Common;
 using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.TreeSharp;
-using Action = Zeta.TreeSharp.Action;
 using Logger = Trinity.Technicals.Logger;
 
 namespace Trinity
@@ -30,11 +29,11 @@ namespace Trinity
                 new Decorator(ret => TownRun.TownRunCanRun(ret), TownRun.TownRunWrapper(VendorRunPrioritySelector)));
 
             // Loot tree is now empty and never runs (Loot is handled through combat)
-            TreeHooks.Instance.ReplaceHook("Loot", new Decorator(ret => false, new Action()));
+            //TreeHooks.Instance.ReplaceHook("Loot", new Decorator(ret => false, new Action()));
 
             // Death Handling
-            TreeHooks.Instance.ReplaceHook("Death",
-                DbProvider.DeathHandler.CreateDeathHandler(TreeHooks.Instance.Hooks["Death"][0]));
+            //TreeHooks.Instance.ReplaceHook("Death",
+            //    DbProvider.DeathHandler.CreateDeathHandler(TreeHooks.Instance.Hooks["Death"][0]));
         }
 
 

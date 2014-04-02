@@ -87,10 +87,10 @@ namespace Trinity.ItemRules
         private Dictionary<string, string> macroDic;
 
         // dictionary for cached rules
-        Dictionary<string, string[]> cachedRules;
+        Dictionary<string, string[]> cachedRules = new Dictionary<string,string[]>();
 
         // dictionary for cached interpreter actions
-        Dictionary<string, InterpreterAction> interpreterActionCache;
+        Dictionary<string, InterpreterAction> interpreterActionCache = new Dictionary<string,InterpreterAction>();
 
         /// <summary>
         /// 
@@ -111,22 +111,25 @@ namespace Trinity.ItemRules
 
         public void reset()
         {
-            string actualKeepLog = Path.Combine(FileManager.LoggingPath, KeepLogFile);
-            string archivePath = Path.Combine(FileManager.LoggingPath, "IR2Archive");
-            string archiveKeepLog = Path.Combine(archivePath, "IR2KeepArchive.log");
-            string archivePickLog = Path.Combine(archivePath, "IR2PickArchive.log");
+            if (FileManager.BattleTagName != null)
+            {
+                string actualKeepLog = Path.Combine(FileManager.LoggingPath, KeepLogFile);
+                string archivePath = Path.Combine(FileManager.LoggingPath, "IR2Archive");
+                string archiveKeepLog = Path.Combine(archivePath, "IR2KeepArchive.log");
+                string archivePickLog = Path.Combine(archivePath, "IR2PickArchive.log");
 
-            if (!File.Exists(actualKeepLog))
-                return;
+                if (!File.Exists(actualKeepLog))
+                    return;
 
-            if (!Directory.Exists(archivePath))
-                Directory.CreateDirectory(archivePath);
+                if (!Directory.Exists(archivePath))
+                    Directory.CreateDirectory(archivePath);
 
-            using (Stream input = File.OpenRead(actualKeepLog))
-            using (Stream output = new FileStream(archiveKeepLog, FileMode.Append, FileAccess.Write, FileShare.None))
-                input.CopyTo(output);
+                using (Stream input = File.OpenRead(actualKeepLog))
+                using (Stream output = new FileStream(archiveKeepLog, FileMode.Append, FileAccess.Write, FileShare.None))
+                    input.CopyTo(output);
 
-            File.Delete(actualKeepLog);
+                File.Delete(actualKeepLog);
+            }
         }
 
         public bool reloadFromUI()
