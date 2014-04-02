@@ -1,6 +1,77 @@
 ﻿
 # Trinity
 
+## Changelog 1.8.17
+
+Removed DeathHandler, latest DB does this automatically.
+Fixed error on Interpreter initialization when BattleTag is not available.
+
+## Changelog 1.8.16
+
+* DumpSkills will stop the bot before dumping (freeze prevention)
+
+* IsQuestMonster and MinimapActive monsters and gizmo's will be properly used now (used for cursed chests, bounties, etc)
+
+* Fixed errors in Crusader Combat
+
+* TargetUtil ArcPosition should now always try and return something valid
+
+* DemonHunter destroy object powers should work now
+
+* Added WitchDoctor Piranhas support
+
+* WitchDoctor Spirit Barrage should work again
+
+* Wizard Meteor should work better
+
+* Wizard Meteor with Arcane Dynamo (5 stacks) now supported
+
+* Hackfix for A5 townrun bug
+
+* Trinity should now click the Bounty Reward dialog confirmation
+
+* Added some caching for ItemRules interpreter to boost performance slightly
+
+* Fix for TrinityExploreDungeon ending on SceneLeft when using SceneFound
+
+* Trinity should now correctly interact with or kill "IsQuestMonster" and "MinimapActive" units and gizmo's
+
+* Trinity should be better about knowing when an Gizmo has already been used
+
+* Crusader: Shield glare should no longer cause an error
+
+* DemonHunter Destructible attacks should work now
+
+* WitchDoctor: Added basic Piranhas support
+
+* Fixed WD trying to use Spirit Barrage OOC
+
+* Wizard Arcane Dynamo with Meteor is now supported
+
+* Wizard Meteor should work better
+
+* Fixed TargetUtil returning null for PierceTarget, ArcTarget
+
+* Fixed Interacting with headstones while monsters are still attacking us
+
+* Trinity will now click the Adventure Mode Bounty Complete dialog
+
+* Increased default PlagueCloud radius from 6 to 10
+
+* Fixed bug with SceneOrActorFound when using SceneFound end type
+
+* Regular ol' WitchDoctor Spirit Barage should work again
+
+* Wizard Slow time should work better
+
+* Wizard will now cast Hydra before using Archon
+
+* Wizard Archon Arcane blast is now used as soon as off cooldown
+
+* SpellHistory is now cleared on a new game
+
+* Summoner's will no longer be weighted if they are Nav-blocked
+
 ### Changelog 1.8.15
 
 * Fixes for Wizard Familiar timers
