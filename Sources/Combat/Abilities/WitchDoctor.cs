@@ -279,7 +279,7 @@ namespace Trinity
             bool hasManitou = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_SpiritBarrage && s.RuneIndex == 4);
 
             // Spirit Barrage Manitou
-            if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource >= 100 && TimeSinceUse(SNOPower.Witchdoctor_SpiritBarrage) > 18000 && hasManitou)
+            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource >= 100 && TimeSinceUse(SNOPower.Witchdoctor_SpiritBarrage) > 18000 && hasManitou)
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
             }
