@@ -27,7 +27,7 @@ namespace Trinity.Combat.Abilities
                 }
             }
 
-            if (!UseOOCBuff && !IsCurrentlyAvoiding)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CurrentTarget != null)
             {
                 /*
                  *  Laws for Active Buff
@@ -64,7 +64,9 @@ namespace Trinity.Combat.Abilities
                 // Shield Glare
                 if (CanCastShieldGlare())
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_ShieldGlare, 15f, TargetUtil.GetBestArcTarget(45f, 70f).Position);
+                    var arcTarget = TargetUtil.GetBestArcTarget(45f, 70f);
+                    if (arcTarget != null && arcTarget.Position != Vector3.Zero)
+                        return new TrinityPower(SNOPower.X1_Crusader_ShieldGlare, 15f, arcTarget.Position);
                 }
 
                 // Iron Skin
@@ -94,7 +96,7 @@ namespace Trinity.Combat.Abilities
                 // Bombardment
                 if (CanCastBombardment())
                 {
-                    Vector3 bestPoint = CurrentTarget.IsEliteRareUnique ? 
+                    Vector3 bestPoint = CurrentTarget.IsEliteRareUnique ?
                         CurrentTarget.Position :
                         TargetUtil.GetBestClusterPoint(15f);
                     return new TrinityPower(SNOPower.X1_Crusader_Bombardment, 16f, bestPoint);
@@ -103,7 +105,7 @@ namespace Trinity.Combat.Abilities
                 // FallingSword
                 if (CanCastFallingSword())
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_FallingSword, 16f, TargetUtil.GetBestClusterPoint(15f,65f, false, true));
+                    return new TrinityPower(SNOPower.X1_Crusader_FallingSword, 16f, TargetUtil.GetBestClusterPoint(15f, 65f, false, true));
                 }
 
                 // HeavensFury
@@ -128,7 +130,9 @@ namespace Trinity.Combat.Abilities
                 bool hasPiercingShield = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.X1_Crusader_BlessedShield && s.RuneIndex == 5);
                 if (CanCastBlessedShieldPiercingShield(hasPiercingShield))
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_BlessedShield, 14f, TargetUtil.GetBestPierceTarget(45f).ACDGuid);
+                    var bestPierceTarget = TargetUtil.GetBestPierceTarget(45f);
+                    if (bestPierceTarget != null)
+                        return new TrinityPower(SNOPower.X1_Crusader_BlessedShield, 14f, bestPierceTarget.ACDGuid);
                 }
 
                 // Blessed Shield
@@ -152,7 +156,9 @@ namespace Trinity.Combat.Abilities
                 // Shield Bash
                 if (CombatBase.CanCast(SNOPower.X1_Crusader_ShieldBash2))
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 65f, TargetUtil.GetBestPierceTarget(65f).ACDGuid);
+                    var bestPierceTarget = TargetUtil.GetBestPierceTarget(65f);
+                    if (bestPierceTarget != null)
+                        return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 65f, bestPierceTarget.ACDGuid);
                 }
 
                 // Blessed Hammer, spin outwards 
@@ -181,7 +187,7 @@ namespace Trinity.Combat.Abilities
                 // Smite
                 if (CombatBase.CanCast(SNOPower.X1_Crusader_Smite))
                 {
-                    return new TrinityPower(SNOPower.X1_Crusader_Smite, 15f, TargetUtil.GetBestClusterUnit(15f, 15f).ACDGuid );
+                    return new TrinityPower(SNOPower.X1_Crusader_Smite, 15f, TargetUtil.GetBestClusterUnit(15f, 15f).ACDGuid);
                 }
 
                 // Slash
@@ -240,7 +246,7 @@ namespace Trinity.Combat.Abilities
 
         private static bool CanCastSweepAttack()
         {
-            return CombatBase.CanCast(SNOPower.X1_Crusader_SweepAttack) && 
+            return CombatBase.CanCast(SNOPower.X1_Crusader_SweepAttack) &&
                 (TargetUtil.UnitsPlayerFacing(18f) > CrusaderSettings.SweepAttackAoECount || TargetUtil.EliteOrTrashInRange(18f) || Player.PrimaryResource > 60 || CurrentTarget.CountUnitsBehind(12f) > 1);
         }
 
@@ -267,7 +273,7 @@ namespace Trinity.Combat.Abilities
 
         private static bool CanCastSteedCharge()
         {
-            return CombatBase.CanCast(SNOPower.X1_Crusader_SteedCharge) 
+            return CombatBase.CanCast(SNOPower.X1_Crusader_SteedCharge)
                 && (TargetUtil.ClusterExists(CrusaderSettings.SteedChargeMinRange, 3) || TargetUtil.EliteOrTrashInRange(CrusaderSettings.SteedChargeMinRange));
         }
 
@@ -304,7 +310,7 @@ namespace Trinity.Combat.Abilities
 
         private static bool CanCastIronSkin()
         {
-            return CombatBase.CanCast(SNOPower.X1_Crusader_IronSkin) && ((Player.CurrentHealthPct <= CrusaderSettings.IronSkinHpPct) || 
+            return CombatBase.CanCast(SNOPower.X1_Crusader_IronSkin) && ((Player.CurrentHealthPct <= CrusaderSettings.IronSkinHpPct) ||
                 (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 10f));
         }
 

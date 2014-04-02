@@ -203,11 +203,22 @@ namespace Trinity
 
             try
             {
-                CurrentCacheObject.IsQuestMonster = CurrentCacheObject.Unit.CommonData.GetAttribute<int>(ActorAttributeType.MinimapActive) > 1;
+                CurrentCacheObject.IsMinimapActive = CurrentCacheObject.Unit.CommonData.GetAttribute<int>(ActorAttributeType.MinimapActive) > 0;
             }
-            catch
+            catch (Exception ex)
             {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading MinimapActive for Unit {0}", CurrentCacheObject.RActorGuid);
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading IsMinimapActive for Unit sno:{0} raGuid:{1} name:{2} ex:{3}",
+                    CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
+            }
+
+            try
+            {
+                CurrentCacheObject.IsQuestMonster = CurrentCacheObject.Unit.CommonData.GetAttribute<int>(ActorAttributeType.QuestMonster) > 1;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading IsQuestMonster for Unit sno:{0} raGuid:{1} name:{2} ex:{3}",
+                    CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
             }
 
             if (!AddToCache)

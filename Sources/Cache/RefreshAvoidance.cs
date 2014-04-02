@@ -34,35 +34,39 @@ namespace Trinity
 
             try
             {
-                CurrentCacheObject.Animation = CurrentCacheObject.DiaObject.CommonData.CurrentAnimation;
+                CurrentCacheObject.Animation = CurrentCacheObject.Object.CommonData.CurrentAnimation;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading CurrentAnimation for AoE {0}", CurrentCacheObject.RActorGuid);
-            }
-            try
-            {
-                CurrentCacheObject.DirectionVector = CurrentCacheObject.DiaObject.Movement.DirectionVector;
-            }
-            catch (Exception)
-            {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading DirectionVector for AoE {0}", CurrentCacheObject.RActorGuid);
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading CurrentAnimation for AoE sno:{0} raGuid:{1} name:{2} ex:{3}",
+                  CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
             }
             try
             {
-                CurrentCacheObject.Rotation = CurrentCacheObject.DiaObject.Movement.Rotation;
+                CurrentCacheObject.DirectionVector = CurrentCacheObject.Object.Movement.DirectionVector;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading Rotation for AoE {0}", CurrentCacheObject.RActorGuid);
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading DirectionVector for AoE sno:{0} raGuid:{1} name:{2} ex:{3}",
+                  CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
             }
             try
             {
-                CurrentCacheObject.AABBBounds = CurrentCacheObject.DiaObject.ActorInfo.AABBBounds;
+                CurrentCacheObject.Rotation = CurrentCacheObject.Object.Movement.Rotation;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading AABBBounds for AoE {0}", CurrentCacheObject.RActorGuid);
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading Rotation for AoE sno:{0} raGuid:{1} name:{2} ex:{3}",
+                  CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
+            }
+            try
+            {
+                CurrentCacheObject.AABBBounds = CurrentCacheObject.Object.ActorInfo.AABBBounds;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading AABBBounds for AoE sno:{0} raGuid:{1} name:{2} ex:{3}",
+                  CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
             }
 
             // Check default radius if not in AoE settings

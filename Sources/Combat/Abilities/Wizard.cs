@@ -208,11 +208,23 @@ namespace Trinity
                     var bestClusterPoint = TargetUtil.GetBestClusterPoint(18f, 45f, false);
                     return new TrinityPower(SNOPower.Wizard_Blizzard, 45f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
+
+                bool hasArcaneDynamoPassive = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Wizard_Passive_ArcaneDynamo);
+
+                var bestMeteorClusterUnit = TargetUtil.GetBestClusterUnit(15f, 65f, 1, true, true);
                 // Meteor
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
+                if (!UseOOCBuff && !Player.IsIncapacitated && !hasArcaneDynamoPassive && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
                     (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2, true)))
                 {
-                    return new TrinityPower(SNOPower.Wizard_Meteor, 21f, TargetUtil.GetBestClusterUnit().Position);
+                    return new TrinityPower(SNOPower.Wizard_Meteor, 65f, bestMeteorClusterUnit.Position);
+                }
+
+                // Meteor Arcane Dynamo
+                if (!UseOOCBuff && !Player.IsIncapacitated && hasArcaneDynamoPassive && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
+                    GetBuffStacks(SNOPower.Wizard_Passive_ArcaneDynamo) == 5 &&
+                    (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2, true)))
+                {
+                    return new TrinityPower(SNOPower.Wizard_Meteor, 65f, bestMeteorClusterUnit.Position);
                 }
 
 
@@ -413,7 +425,7 @@ namespace Trinity
                 }
 
                 // Arcane Blast - 2 second cooldown, big AoE
-                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_ArcaneBlast, CombatBase.CanCastFlags.NoTimer) && TargetUtil.AnyMobsInRange(15, 1))
+                if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_ArcaneBlast, CombatBase.CanCastFlags.NoTimer) && TargetUtil.AnyMobsInRange(15, 1) && CurrentTarget.IsFacingPlayer)
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_ArcaneBlast, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }

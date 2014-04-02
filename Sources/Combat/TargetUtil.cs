@@ -97,6 +97,7 @@ namespace Trinity
                     (from u in ObjectCache
                      where u.IsUnit &&
                      !u.IsEliteRareUnique &&
+                     u.Weight > 0 &&
                      u.RadiusDistance <= Trinity.Settings.Combat.Misc.TrashPackClusterRadius
                      select u).Count() >= Trinity.Settings.Combat.Misc.TrashPackSize;
             }
@@ -105,6 +106,7 @@ namespace Trinity
                 return
                     (from u in ObjectCache
                      where u.IsUnit &&
+                     u.Weight > 0 &&
                      u.IsBossOrEliteRareUnique &&
                      u.RadiusDistance <= range
                      select u).Any();
@@ -112,7 +114,7 @@ namespace Trinity
 
         }
 
-        
+
         /// <summary>
         /// Checks to make sure there's at least one valid cluster with the minimum monster count
         /// </summary>
@@ -157,23 +159,33 @@ namespace Trinity
 
         internal static TrinityCacheObject GetBestPierceTarget(float maxRange, int arcDegrees = 0)
         {
-            return
+            var result =
                 (from u in ObjectCache
-                where u.IsUnit &&
-                u.RadiusDistance <= maxRange
-                orderby u.CountUnitsInFront() descending
-                select u).FirstOrDefault();
+                 where u.IsUnit &&
+                 u.RadiusDistance <= maxRange
+                 orderby u.CountUnitsInFront() descending
+                 select u).FirstOrDefault();
+            if (result == null && CurrentTarget != null)
+                result = CurrentTarget;
+            else
+                result = default(TrinityCacheObject);
+            return result;
         }
 
         internal static TrinityCacheObject GetBestArcTarget(float maxRange, float arcDegrees)
         {
-            return
+            var result =
                 (from u in ObjectCache
-                where u.IsUnit &&
-                u.RadiusDistance <= maxRange &&
-                u.IsPlayerFacing(arcDegrees)
-                orderby u.CountUnitsInFront() descending
-                select u).FirstOrDefault();
+                 where u.IsUnit &&
+                 u.RadiusDistance <= maxRange                 
+                 orderby u.IsPlayerFacing(arcDegrees) descending
+                 orderby u.CountUnitsInFront() descending
+                 select u).FirstOrDefault();
+            if (result == null && CurrentTarget != null)
+                result = CurrentTarget;
+            else
+                result = GetBestClusterUnit(15f, maxRange);
+            return result;
         }
 
         private static Vector3 GetBestAoEMovementPosition()
@@ -218,12 +230,12 @@ namespace Trinity
                 else if (Trinity.CurrentTarget != null)
                     bestClusterUnit = Trinity.CurrentTarget;
                 else
-                    bestClusterUnit = null;
+                    bestClusterUnit = default(TrinityCacheObject);
 
                 return bestClusterUnit;
             }
         }
-          /// <summary>
+        /// <summary>
         /// Finds the optimal cluster position, works regardless if there is a cluster or not (will return single unit position if not). This is not a K-Means cluster, but rather a psuedo cluster based
         /// on the number of other monsters within a radius of any given unit
         /// </summary>
@@ -364,11 +376,11 @@ namespace Trinity
                 else if (Trinity.CurrentTarget != null)
                     bestClusterUnit = Trinity.CurrentTarget;
                 else
-                    bestClusterUnit = null;
+                    bestClusterUnit = default(TrinityCacheObject); ;
 
                 return bestClusterUnit;
             }
-        } 
+        }
         /// <summary>
         /// Finds the optimal cluster position, works regardless if there is a cluster or not (will return single unit position if not). This is not a K-Means cluster, but rather a psuedo cluster based
         /// on the number of other monsters within a radius of any given unit

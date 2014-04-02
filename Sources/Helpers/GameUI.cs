@@ -15,6 +15,12 @@ namespace Trinity
         private const ulong partyLeaderBossAcceptHash = 0x69B3F61C0F8490B0;
         private const ulong partyFollowerBossAcceptHash = 0xF495983BA9BE450F;
         private const ulong potionButtonHash = 0xE1F43DD874E42728;
+        private const ulong bountyRewardDialogHash = 0x278249110947CA00;
+
+        public static UIElement BountyRewardDialog
+        {
+            get { return UIElement.FromHash(bountyRewardDialogHash); }
+        }
 
         public static UIElement PotionButton
         {
@@ -126,6 +132,7 @@ namespace Trinity
         private static DateTime lastCheckedUIButtons = DateTime.MinValue;
         public static void SafeClickUIButtons()
         {
+            SafeClickElement(BountyRewardDialog, "Bounty Reward Dialog");
             SafeClickElement(ConversationSkipButton, "Conversation Button");
             SafeClickElement(PartyLeaderBossAccept, "Party Leader Boss Accept", true);
             SafeClickElement(PartyFollowerBossAccept, "Party Follower Boss Accept", true);

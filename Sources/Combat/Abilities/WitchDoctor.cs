@@ -67,11 +67,11 @@ namespace Trinity
 
             // Spirit Walk OOC 
             if (UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 49 &&
-               Settings.Combat.Misc.AllowOOCMovement)              
+               Settings.Combat.Misc.AllowOOCMovement)
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
-          
+
             // Spirit Walk While incapacitated or for Goblins
             if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk, CombatBase.CanCastFlags.NoTimer) && Player.PrimaryResource >= 49 &&
                 (Player.IsIncapacitated || Player.IsRooted ||
@@ -82,14 +82,14 @@ namespace Trinity
             }
 
             // Spirit Walk < 65% Health: Healing Journey
-            if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk) && Player.PrimaryResource >= 49 && hasHealingJourney && 
-                Player.CurrentHealthPct <= V.F("WitchDoctor.SpiritWalk.HealingJourneyHealth"))                
+            if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk) && Player.PrimaryResource >= 49 && hasHealingJourney &&
+                Player.CurrentHealthPct <= V.F("WitchDoctor.SpiritWalk.HealingJourneyHealth"))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
 
             // Spirit Walk < 50% Mana: Honored Guest
-            if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk) && Player.PrimaryResource >= 49 && hasHonoredGuest && 
+            if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritWalk) && Player.PrimaryResource >= 49 && hasHonoredGuest &&
                 Player.PrimaryResourcePct <= V.F("WitchDoctor.SpiritWalk.HonoredGuestMana"))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritWalk, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
@@ -228,6 +228,17 @@ namespace Trinity
 
                 return new TrinityPower(SNOPower.Witchdoctor_GraspOfTheDead, 25f, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
+
+            // Piranhas
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Witchdoctor_Piranhas) && !Player.IsIncapacitated &&
+                (TargetUtil.AnyMobsInRange(30, 2)) &&
+                Player.PrimaryResource >= 250)
+            {
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15);
+
+                return new TrinityPower(SNOPower.Witchdoctor_Piranhas, 25f, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+            }
+
             //skillDict.Add("Horrify", SNOPower.Witchdoctor_Horrify);
             //runeDict.Add("Phobia", 2);
             //runeDict.Add("Stalker", 4);
@@ -285,7 +296,7 @@ namespace Trinity
             }
 
             // Regular spirit barage
-            if (CombatBase.CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource >= 100 && !hasManitou)
+            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource >= 100 && !hasManitou)
             {
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 12f, CurrentTarget.ACDGuid);
             }
@@ -403,7 +414,7 @@ namespace Trinity
             }
 
             // Zombie Charger backup
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated  && CombatBase.CanCast(SNOPower.Witchdoctor_ZombieCharger)&& Player.PrimaryResource >= 140)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 140)
             {
                 return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, zombieChargerRange, CurrentTarget.Position, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }

@@ -13,8 +13,8 @@ namespace Trinity.DbProvider
         public List<DiaObject> GetObjectsByWeight()
         {
             var list = new List<DiaObject>();
-            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.DiaObject != null && Trinity.CurrentTarget.DiaObject.IsValid)
-                list.Add(Trinity.CurrentTarget.DiaObject);
+            if (Trinity.CurrentTarget != null && Trinity.CurrentTarget.Object != null && Trinity.CurrentTarget.Object.IsValid)
+                list.Add(Trinity.CurrentTarget.Object);
             return list;
         }
 

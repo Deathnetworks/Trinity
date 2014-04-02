@@ -427,6 +427,8 @@ namespace Trinity
 
             346482, // X1_PandExt_TimeTrap 
             367456, // x1_Pand_Ext_Event_Hive_Blocker
+
+            347276, // x1_Fortress_Soul_Grinder_A
         };
 
         // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
@@ -480,6 +482,8 @@ namespace Trinity
             274457, // A5 Spirit of Malthael - Tower of Korelan
             368515, // A5 Nephalem Switch -  Passage to Corvus 
             301177, // A5 Timeless Prison Switch
+
+            354407, // X1_Angel_Common_Event_GreatWeapon
 
         };
 
@@ -590,6 +594,7 @@ namespace Trinity
             375111, // A5 x1_Death_Orb_Master_Monster
 
             329390, // x1_Pand_BatteringRam_Hook_B_low
+            368515, // A5 Nephalem Switch -  Passage to Corvus 
         };
 
         /// <summary>

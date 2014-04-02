@@ -14,7 +14,7 @@ namespace Trinity
     public class TrinityCacheObject
     {
         [NoCopy]
-        public DiaObject DiaObject { get { return ZetaDia.Actors.GetActorsOfType<DiaObject>(true, true).Where(o => o.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
+        public DiaObject Object { get { return ZetaDia.Actors.GetActorsOfType<DiaObject>(true, true).Where(o => o.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
         [NoCopy]
         public DiaUnit Unit { get { return ZetaDia.Actors.GetActorsOfType<DiaUnit>(true, true).Where(u => u.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
         [NoCopy]
@@ -91,6 +91,7 @@ namespace Trinity
         public bool IsNPC { get; set; }
         public bool NPCIsOperable { get; set; }
         public bool IsQuestMonster { get; set; }
+        public bool IsMinimapActive { get; set; }
 
         [NoCopy]
         public bool IsFacing(Vector3 targetPosition, float arcDegrees = 70f)

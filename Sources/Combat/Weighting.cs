@@ -122,7 +122,7 @@ namespace Trinity
                                     // Ignore trash mobs < 15% health or 50% health with a DoT
                                     if (cacheObject.IsTrashMob && shouldIgnoreTrashMobs &&
                                         (cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealth ||
-                                         cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS) && !cacheObject.IsQuestMonster)
+                                         cacheObject.HitPointsPct < Settings.Combat.Misc.IgnoreTrashBelowHealthDoT && cacheObject.HasDotDPS) && !cacheObject.IsQuestMonster && !cacheObject.IsMinimapActive)
                                     {
                                         objWeightInfo = "Ignoring Health/DoT ";
                                         ignoring = true;
@@ -135,7 +135,7 @@ namespace Trinity
                                     // Ignore Solitary Trash mobs (no elites present)
                                     // Except if has been primary target or if already low on health (<= 20%)
                                     if (shouldIgnoreTrashMobs && !isInHotSpot &&
-                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) && ignoreSummoner && !cacheObject.IsQuestMonster)
+                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) && ignoreSummoner && !cacheObject.IsQuestMonster && !cacheObject.IsMinimapActive)
                                     {
                                         objWeightInfo = "Ignoring ";
                                         ignoring = true;
@@ -308,7 +308,7 @@ namespace Trinity
                                             cacheObject.Weight = 300d;
 
                                         // If standing Molten, Arcane, or Poison Tree near unit, reduce weight
-                                        if (PlayerKiteDistance <= 0 && 
+                                        if (PlayerKiteDistance <= 0 &&
                                             CacheData.TimeBoundAvoidance.Any(aoe =>
                                             (aoe.AvoidanceType == AvoidanceType.Arcane ||
                                             aoe.AvoidanceType == AvoidanceType.MoltenCore ||
@@ -753,7 +753,7 @@ namespace Trinity
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                     cacheObject.Weight += 1000;
-                                
+
                                 // We're standing on the damn thing... open it!!
                                 if (cacheObject.RadiusDistance <= 12f)
                                     cacheObject.Weight += 30000d;
@@ -821,6 +821,14 @@ namespace Trinity
                                 // Need to Prioritize, forget it!
                                 if (prioritizeCloseRangeUnits)
                                     break;
+
+                                // nearby monsters attacking us - don't try to use headtone
+                                if (cacheObject.Object is DiaGizmo && cacheObject.Gizmo.CommonData.ActorInfo.GizmoType == GizmoType.Headstone && 
+                                    ObjectCache.Any(u => u.IsUnit && u.RadiusDistance < 25f && u.IsFacingPlayer))
+                                {
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
 
                                 // Weight Interactable Specials
                                 cacheObject.Weight = (90d - cacheObject.CentreDistance) / 90d * 15000d;

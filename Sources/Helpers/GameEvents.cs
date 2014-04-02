@@ -216,6 +216,7 @@ namespace Trinity
                     TownRun.WasVendoring = false;
 
                     CacheData.AbilityLastUsed.Clear();
+                    SpellHistory.HistoryQueue.Clear();
 
                     TrinityUseOnce.UseOnceIDs = new HashSet<int>();
                     TrinityUseOnce.UseOnceCounter = new Dictionary<int, int>();

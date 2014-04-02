@@ -32,6 +32,25 @@ namespace Trinity
                 c_IgnoreSubStep = "";
             }
 
+            try
+            {
+                CurrentCacheObject.IsMinimapActive = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.MinimapActive) > 0;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading MinimapActive for Gizmo sno:{0} raGuid:{1} name:{2} ex:{3}",
+                    CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
+            }
+
+            try
+            {
+                CurrentCacheObject.IsQuestMonster = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.QuestMonster) > 0;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading IsQuestMonster for Gizmo sno:{0} raGuid:{1} name:{2} ex:{3}",
+                    CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
+            }
 
 
             if (!DataDictionary.CustomObjectRadius.TryGetValue(CurrentCacheObject.ActorSNO, out c_Radius))
@@ -223,8 +242,8 @@ namespace Trinity
                         // Same world portal check
                         if (DataDictionary.SameWorldPortals.Contains(CurrentCacheObject.ActorSNO) &&
                             CacheData.SameWorldPortals.Any(p => p.WorldID == Trinity.Player.WorldID &&
-                                DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < 1 && p.StartPosition.Distance2D(Trinity.Player.Position) > 25f) &&
-                                CurrentCacheObject.RadiusDistance <= 35f)
+                                DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < V.F("Cache.SameWorldPortalRange.InteractSeconds") && p.StartPosition.Distance2D(Trinity.Player.Position) > V.F("Cache.SameWorldPortalRange.MinRange")) &&
+                                CurrentCacheObject.RadiusDistance <= V.F("Cache.SameWorldPortalRange.MaxRange"))
                         {
                             c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, c_Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
 
@@ -237,6 +256,27 @@ namespace Trinity
 
                             AddToCache = false;
                             c_IgnoreSubStep = "RecentSameWorldPortal";
+                        }
+
+                        // SameWorldPortals can have GizmoState=1 (e.g. Gizmo "Used")
+                        if (!DataDictionary.SameWorldPortals.Contains(CurrentCacheObject.ActorSNO))
+                        {
+                            try
+                            {
+                                int gizmoState = c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
+                                if (gizmoState == 1)
+                                {
+                                    AddToCache = false;
+                                    c_IgnoreSubStep = "GizmoState=1";
+                                    return AddToCache;
+                                }
+                            }
+                            catch
+                            {
+                                AddToCache = false;
+                                c_IgnoreSubStep = "GizmoStateException";
+                                return AddToCache;
+                            }
                         }
 
                         c_Radius = c_diaObject.CollisionSphere.Radius;
@@ -254,6 +294,22 @@ namespace Trinity
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting shrine-been-operated attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
                             AddToCache = true;
                             //return bWantThis;
+                        }
+                        try
+                        {
+                            int gizmoState = c_CommonData.GetAttribute<int>(ActorAttributeType.GizmoState);
+                            if (gizmoState == 1)
+                            {
+                                AddToCache = false;
+                                c_IgnoreSubStep = "GizmoState=1";
+                                return AddToCache;
+                            }
+                        }
+                        catch
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "GizmoStateException";
+                            return AddToCache;
                         }
                         if (gizmoUsed)
                         {
@@ -413,6 +469,13 @@ namespace Trinity
                             break;
                         }
 
+                        if (CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsMinimapActive)
+                        {
+                            AddToCache = true;
+                            c_IgnoreSubStep = "";
+                            break;
+                        }
+
                         if (!DataDictionary.ForceDestructibles.Contains(c_ActorSNO) && Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.ForceIgnore)
                         {
                             AddToCache = false;
@@ -494,6 +557,15 @@ namespace Trinity
                             AddToCache = false;
                             c_IgnoreSubStep = "ForceVendorRunASAP";
                         }
+
+
+                        if (CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsMinimapActive)
+                        {
+                            AddToCache = true;
+                            c_IgnoreSubStep = "";
+                            return AddToCache;
+                        }
+                        
                         // Already open, blacklist it and don't look at it again
                         bool chestOpen = false;
                         try

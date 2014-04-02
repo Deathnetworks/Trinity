@@ -101,6 +101,14 @@ namespace Trinity
                 {
                     return false;
                 }
+
+                var a5hubMaxRangePoint=new Vector3(441.0972f, 519.0328f, 7.718145f);
+                var a5waypoint=new Vector3(556.9158f, 524.3738f, 2.796464f);
+                var a5hubRange = a5waypoint.Distance2D(a5hubMaxRangePoint);
+                if (Trinity.Player.LevelAreaId == 270011 && Trinity.Player.Position.Distance2D(a5waypoint) >= a5hubRange)
+                {
+                    return false;
+                }
                 
                 // Check if we should be forcing a town-run
                 if (!Trinity.Player.IsInTown && Trinity.ForceVendorRunASAP || BrainBehavior.IsVendoring)

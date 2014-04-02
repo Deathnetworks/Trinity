@@ -20,6 +20,9 @@ namespace Trinity.Cache
         public int ACDGuid { get; set; }
         public ACDItem ACDItem { get { return Zeta.Game.ZetaDia.Actors.GetACDItemByGuid(this.ACDGuid); } }
         public bool IsUpgrade { get; set; }
+        public float UpgradeDamage { get; set; }
+        public float UpgradeToughness { get; set; }
+        public float UpgradeHealing { get; set; }
 
         public PickupItem() { }
 

@@ -457,7 +457,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(6)]
+        [DefaultValue(10)]
         public int PlagueCloud
         {
             get

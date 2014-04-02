@@ -109,9 +109,9 @@ namespace Trinity
             CurrentCacheObject.RActorGuid = freshObject.RActorGuid;
             CurrentCacheObject.ACDGuid = freshObject.ACDGuid;
 
-            // Get Internal Name
-            AddToCache = RefreshInternalName(AddToCache);
-            if (!AddToCache) { c_IgnoreReason = "InternalName"; return AddToCache; }
+            // Get Name
+            c_InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
+            CurrentCacheObject.InternalName = nameNumberTrimRegex.Replace(freshObject.Name, "");
 
             // ActorSNO
             AddToCache = RefreshStepCachedActorSNO(AddToCache);
@@ -162,8 +162,8 @@ namespace Trinity
             if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
 
 
-            c_Position = CurrentCacheObject.DiaObject.Position;
-            CurrentCacheObject.Position = CurrentCacheObject.DiaObject.Position;
+            c_Position = CurrentCacheObject.Object.Position;
+            CurrentCacheObject.Position = CurrentCacheObject.Object.Position;
 
             // Always Refresh Distance for every object
             RefreshStepCalculateDistance();
@@ -614,6 +614,7 @@ namespace Trinity
                             {
                                 AddToCache = false;
                             }
+
                             if (c_InternalName.ToLower().StartsWith("gold"))
                             {
                                 c_ObjectType = GObjectType.Gold;

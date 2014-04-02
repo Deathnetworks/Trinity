@@ -120,6 +120,11 @@ namespace Trinity
             if (DataDictionary.VanityItems.Any(i => item.InternalName.StartsWith(i)))
                 return false;
 
+            if (Trinity.Settings.Loot.ItemFilterMode == ItemFilterMode.DemonBuddy)
+            {
+                return ItemManager.Current.ShouldStashItem(item);
+            }
+
             CachedACDItem cItem = CachedACDItem.GetCachedItem(item);
 
             // Now look for Misc items we might want to keep

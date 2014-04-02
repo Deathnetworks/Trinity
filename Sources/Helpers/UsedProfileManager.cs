@@ -15,48 +15,51 @@ namespace Trinity
 
         internal static void RecordProfile()
         {
-            try
+            using (new PerformanceLogger("RecordProfile"))
             {
-                RecordTrinityLoadOnceProfile();
-
-                string currentProfile = ProfileManager.CurrentProfile.Path;
-
-                if (!UsedProfiles.Contains(currentProfile))
+                try
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "New profile found - updating TargetBlacklists");
-                    RefreshProfileBlacklists();
-                    UsedProfiles.Add(currentProfile);
-                }
+                    RecordTrinityLoadOnceProfile();
 
-                if (currentProfile != Trinity.CurrentProfile)
-                {
-                    CombatBase.IsQuestingMode = false;
+                    string currentProfile = ProfileManager.CurrentProfile.Path;
 
-                    // See if we appear to have started a new game
-                    if (Trinity.FirstProfile != "" && currentProfile == Trinity.FirstProfile)
+                    if (!UsedProfiles.Contains(currentProfile))
                     {
-                        Trinity.TotalProfileRecycles++;
+                        Logger.Log(TrinityLogLevel.Debug, LogCategory.UserInformation, "New profile found - updating TargetBlacklists");
+                        RefreshProfileBlacklists();
+                        UsedProfiles.Add(currentProfile);
                     }
 
-                    Trinity.ProfileHistory.Add(currentProfile);
-                    Trinity.CurrentProfile = currentProfile;
-                    Trinity.CurrentProfileName = ProfileManager.CurrentProfile.Name;
-
-                    if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.Name != null)
+                    if (currentProfile != Trinity.CurrentProfile)
                     {
-                        Trinity.SetWindowTitle(Trinity.CurrentProfileName);
+                        CombatBase.IsQuestingMode = false;
+
+                        // See if we appear to have started a new game
+                        if (Trinity.FirstProfile != "" && currentProfile == Trinity.FirstProfile)
+                        {
+                            Trinity.TotalProfileRecycles++;
+                        }
+
+                        Trinity.ProfileHistory.Add(currentProfile);
+                        Trinity.CurrentProfile = currentProfile;
+                        Trinity.CurrentProfileName = ProfileManager.CurrentProfile.Name;
+
+                        if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.Name != null)
+                        {
+                            Trinity.SetWindowTitle(Trinity.CurrentProfileName);
+                        }
+
+                        if (Trinity.FirstProfile == "")
+                            Trinity.FirstProfile = currentProfile;
+
+                        // Clear Trinity Combat Ignore Tag
+                        TrinityCombatIgnore.IgnoreList.Clear();
                     }
-
-                    if (Trinity.FirstProfile == "")
-                        Trinity.FirstProfile = currentProfile;
-
-                    // Clear Trinity Combat Ignore Tag
-                    TrinityCombatIgnore.IgnoreList.Clear();
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError("Error recording new profile: " + ex.ToString());
+                catch (Exception ex)
+                {
+                    Logger.LogError("Error recording new profile: " + ex.ToString());
+                }
             }
         }
 

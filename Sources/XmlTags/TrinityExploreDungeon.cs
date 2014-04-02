@@ -525,6 +525,7 @@ namespace Trinity.XmlTags
             new Sequence(
                 new DecoratorContinue(ret => !IgnoreMarkers,
                     new Sequence(
+                        MiniMapMarker.DetectMiniMapMarkers(0),
                         MiniMapMarker.DetectMiniMapMarkers(ExitNameHash),
                         MiniMapMarker.DetectMiniMapMarkers(Objectives)
                     )
@@ -843,13 +844,13 @@ namespace Trinity.XmlTags
                         new Action(ret => isDone = true)
                     )
                 ),
-                new Decorator(ret => (EndType == TrinityExploreEndType.SceneFound || EndType == TrinityExploreEndType.SceneLeftOrActorFound) && SceneId != 0 && SceneIdLeft(),
+                new Decorator(ret => EndType == TrinityExploreEndType.SceneLeftOrActorFound && SceneId != 0 && SceneIdLeft(),
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Left SceneId {0}!", SceneId)),
                         new Action(ret => isDone = true)
                     )
                 ),
-                new Decorator(ret => (EndType == TrinityExploreEndType.SceneFound || EndType == TrinityExploreEndType.SceneLeftOrActorFound)&& !string.IsNullOrWhiteSpace(SceneName) && SceneNameLeft(),
+                new Decorator(ret => (EndType == TrinityExploreEndType.SceneFound || EndType == TrinityExploreEndType.SceneLeftOrActorFound) && !string.IsNullOrWhiteSpace(SceneName) && SceneNameLeft(),
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Left SceneName {0}!", SceneName)),
                         new Action(ret => isDone = true)

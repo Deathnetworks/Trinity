@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Technicals;
+using Zeta.Bot;
 using Zeta.Common;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -338,6 +339,9 @@ namespace Trinity
 
         public static void DumpPlayerSkills()
         {
+            if (BotMain.IsRunning)
+                BotMain.Stop();
+
             using (var helper = new Helpers.ZetaCacheHelper())
             {
                 HotbarSkills.Update(TrinityLogLevel.Info, LogCategory.UserInformation);

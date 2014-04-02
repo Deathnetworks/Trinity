@@ -114,6 +114,9 @@ namespace Trinity
                 ActorSNO = c_ActorSNO,
                 ACDGuid = c_ACDGUID,
                 IsUpgrade = isUpgrade,
+                UpgradeDamage = damage,
+                UpgradeToughness = toughness,
+                UpgradeHealing = healing
             };
 
 
@@ -124,6 +127,7 @@ namespace Trinity
                 // Create or alter this cached object type
                 CacheData.ObjectType[c_RActorGuid] = c_ObjectType;
                 AddToCache = true;
+                return AddToCache;
             }
 
             // Treat all globes as a yes
@@ -133,6 +137,7 @@ namespace Trinity
                 // Create or alter this cached object type
                 CacheData.ObjectType[c_RActorGuid] = c_ObjectType;
                 AddToCache = true;
+                return AddToCache;
             }
 
             // Item stats

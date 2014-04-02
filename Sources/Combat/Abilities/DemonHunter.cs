@@ -383,21 +383,21 @@ namespace Trinity
         private static TrinityPower GetDemonHunterDestroyPower()
         {
             if (Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow))
-                return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, 40f, CurrentTarget.ACDGuid);
             if (Hotbar.Contains(SNOPower.X1_DemonHunter_EntanglingShot))
-                return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, 40f, CurrentTarget.ACDGuid);
             if (Hotbar.Contains(SNOPower.DemonHunter_Bolas))
-                return new TrinityPower(SNOPower.DemonHunter_Bolas, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_Bolas, 40f, CurrentTarget.ACDGuid);
             if (Hotbar.Contains(SNOPower.DemonHunter_Grenades))
-                return new TrinityPower(SNOPower.DemonHunter_Grenades, 15f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_Grenades, 15f, CurrentTarget.ACDGuid);
             if (Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && Player.PrimaryResource >= 10)
-                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 40f, CurrentTarget.ACDGuid);
             if (Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && Player.PrimaryResource >= 10)
-                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 40f, CurrentTarget.ACDGuid);
             if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && Player.PrimaryResource >= 20)
-                return new TrinityPower(SNOPower.DemonHunter_Chakram, 0f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_Chakram, 0f, CurrentTarget.ACDGuid);
             if (Hotbar.Contains(SNOPower.X1_DemonHunter_EvasiveFire) && Player.PrimaryResource >= 20)
-                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, 40f, CurrentTarget.ACDGuid);
             return CombatBase.DefaultPower;
         }
     }

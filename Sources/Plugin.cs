@@ -59,12 +59,19 @@ namespace Trinity
                     if (!ZetaDia.IsInGame || !ZetaDia.Me.IsValid || ZetaDia.IsLoadingWorld)
                         return;
 
-                    if (Settings.Advanced.LazyRaiderClickToPause && !BotMain.IsPaused)
-                    {
-                        BotMain.PauseWhile(MouseLeft);
-                    }
-
                     GameUI.SafeClickUIButtons();
+
+                    if (ZetaDia.Me.IsDead)
+                        return;
+
+                    using (new PerformanceLogger("LazyRaiderClickToPause"))
+                    {
+
+                        if (Settings.Advanced.LazyRaiderClickToPause && !BotMain.IsPaused)
+                        {
+                            BotMain.PauseWhile(MouseLeft);
+                        }
+                    }
 
                     SetWindowTitle(Trinity.CurrentProfileName);
 
@@ -252,12 +259,23 @@ namespace Trinity
 
 
         private static DateTime _lastWindowTitleTick = DateTime.MinValue;
+        private static Window mainWindow;
+        private static string mainWindowTitle;
         internal static void SetWindowTitle(string profileName = "")
         {
-            if (DateTime.UtcNow.Subtract(_lastWindowTitleTick).TotalMilliseconds < 500)
+            if (DateTime.UtcNow.Subtract(_lastWindowTitleTick).TotalMilliseconds < 5000)
                 return;
 
-            if (ZetaDia.Service.IsValid && ZetaDia.Service.Platform.IsValid && ZetaDia.Service.Platform.IsConnected)
+            if (mainWindow == null)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() => mainWindow = Application.Current.MainWindow));
+            }
+            if (mainWindow != null)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() => mainWindowTitle = mainWindow.Title));
+            }
+
+            if (mainWindowTitle.Contains("Demonbuddy") && ZetaDia.Service.IsValid && ZetaDia.Service.Platform.IsValid && ZetaDia.Service.Platform.IsConnected)
             {
 
                 string battleTagName = "";
@@ -281,11 +299,13 @@ namespace Trinity
                 {
                     try
                     {
-                        Window mainWindow = Application.Current.MainWindow;
                         if (mainWindow != null && windowTitle != null)
                             mainWindow.Title = windowTitle;
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError("Unable to set MainWindow Title {0}", ex.ToString());
+                    }
                 }));
             }
         }

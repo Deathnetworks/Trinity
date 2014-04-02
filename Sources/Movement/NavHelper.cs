@@ -287,6 +287,10 @@ namespace Trinity
                         nodesMonsters++;
                         continue;
                     }
+                    if (CacheData.NavigationObstacles.Any(a => MathUtil.IntersectsPath(a.Position, a.Radius, Trinity.Player.Position, gridPoint.Position)))
+                    {
+                        pathFailures++;
+                    }
 
                     // Monsters
                     if (shouldKite)
