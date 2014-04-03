@@ -79,7 +79,14 @@
 [QUALITY] == "Rare" # [OFFSTATS]+[DEFSTATS] > 4
 [QUALITY] == "Rare" # [AS%] * [CRIT%] * [CRITDMG%] > 0
 [QUALITY] == "Rare" # [MAXSTATVIT] > 100 && [PICKRAD] >= 7 && [GF%] >= 25 && ([TYPE] != "Helm" || [SOCKET] > 0)
-                                        
+                 
+[QUALITY] == "Rare" # ([UPDMG] + [UPHEAL] + [UPTOUGH]) > 0
+
+//[QUALITY] == "Rare" # [AREADMGPROC%] > 0
+//[QUALITY] == "Rare" # [CDRED%] > 0
+//[QUALITY] == "Rare" # [RESRED%] > 0
+//[QUALITY] == "Rare" # [SKILLDMG%] > 0				 
+			                        
 // +---------------------------------------------------------------------------+ 
 // |  _ _ _ _____ _____ _____ _____ _____ 
 // | | | | |   __|  _  |  _  |     |   | |

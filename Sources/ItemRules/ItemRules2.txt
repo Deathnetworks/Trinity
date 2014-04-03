@@ -253,12 +253,25 @@
 // |  [ARMORBONUS]                    | ArmorBonus                  | 200						 
 // |  [ARMORTOT]                      | ArmorTotal                  | 1300					 
 // +----------------------------------+-----------------------------+----------+
-// |  [FIREDMG%]                      | FireDamagePercent           | 3					 
-// |  [LIGHTNINGDMG%]                 | LightningDamagePercent      | 3			 
-// |  [COLDDMG%]                      | ColdDamagePercent           | 3					 
-// |  [POISONDMG%]                    | PoisonDamagePercent         | 3				 
-// |  [ARCANEDMG%]                    | ArcaneDamagePercent         | 3				 
-// |  [HOLYDMG%]                      | HolyDamagePercent           | 3					 
+// |  [SKILLDMG%]                     | SkillDamagePercentBonus     | 3			
+// |  [FIREDMG%]                      | FireDamagePercentBonus      | 3					 
+// |  [LIGHTNINGDMG%]                 | LightningDamagePercentBonus | 3			 
+// |  [COLDDMG%]                      | ColdDamagePercentBonus      | 3					 
+// |  [POISONDMG%]                    | PoisonDamagePercentBonus    | 3				 
+// |  [ARCANEDMG%]                    | ArcaneDamagePercentBonus    | 3				 
+// |  [HOLYDMG%]                      | HolyDamagePercentBonus      | 3	
+// +----------------------------------+-----------------------------+----------+	
+// |  [SLOWPROC%]                     | WeaponOnHitSlowProcChance   | 3	
+// |  [BLINDPROC%]                    | WeaponOnHitBlindProcChance  | 3	
+// |  [CHILLPROC%]                    | WeaponOnHitChillProcChance  | 3	
+// |  [FEARPROC%]                     | WeaponOnHitFearProcChance   | 3	
+// |  [FREEZEPROC%]                   | WeaponOnHitFreezeProcChance | 3	
+// |  [IMMOPROC%]                     | WeaponOnHitImmobilizeProcC. | 3	
+// |  [KNOCKPROC%]                    | WeaponOnHitKnockbackProcC.  | 3	
+// |  [BLEEDPROC%]                    | WeaponOnHitBleedProcChance  | 3		
+// |  [AREADMGPROC%]                  | OnHitAreaDamageProcChance   | 3	
+// |  [CDRED%]                        | PowerCooldownReductionPerc. | 3	
+// |  [RESRED%]                       | ResourceCostReductionPer.   | 3	 				 
 // +----------------------------------+-----------------------------+----------+
 // |  [DPS]                           | WeaponDamagePerSecond       | 1100				 
 // |  [WEAPAS]                        | WeaponAttacksPerSecond      | 1.5

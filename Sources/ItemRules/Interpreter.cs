@@ -853,12 +853,6 @@ namespace Trinity.ItemRules
             itemDic.Add("[RESARCANE]", item.Stats.ResistArcane);
             itemDic.Add("[RESCOLD]", item.Stats.ResistCold);
             itemDic.Add("[RESPOISON]", item.Stats.ResistPoison);
-            //itemDic.Add("[FIREDMG%]", item.Stats.FireDamagePercent);
-            //itemDic.Add("[LIGHTNINGDMG%]", item.Stats.LightningDamagePercent);
-            //itemDic.Add("[COLDDMG%]", item.Stats.ColdDamagePercent);
-            //itemDic.Add("[POISONDMG%]", item.Stats.PoisonDamagePercent);
-            //itemDic.Add("[ARCANEDMG%]", item.Stats.ArcaneDamagePercent);
-            //itemDic.Add("[HOLYDMG%]", item.Stats.HolyDamagePercent);
             itemDic.Add("[ARMOR]", item.Stats.Armor);
             itemDic.Add("[ARMORBONUS]", item.Stats.ArmorBonus);
             itemDic.Add("[ARMORTOT]", item.Stats.ArmorTotal);
@@ -878,6 +872,38 @@ namespace Trinity.ItemRules
             itemDic.Add("[HATREDREG]", item.Stats.HatredRegen);
             itemDic.Add("[MAXMANA]", item.Stats.MaxMana);
             itemDic.Add("[MANAREG]", item.Stats.ManaRegen);
+
+             // - ROS & MORE STATS ADDED -------------------------------------------//
+             itemDic.Add("[SLOWPROC%]", item.Stats.WeaponOnHitSlowProcChance);
+             itemDic.Add("[BLINDPROC%]", item.Stats.WeaponOnHitBlindProcChance);
+             itemDic.Add("[CHILLPROC%]", item.Stats.WeaponOnHitChillProcChance);
+             itemDic.Add("[FEARPROC%]", item.Stats.WeaponOnHitFearProcChance);
+             itemDic.Add("[FREEZEPROC%]", item.Stats.WeaponOnHitFreezeProcChance);
+             itemDic.Add("[IMMOPROC%]", item.Stats.WeaponOnHitImmobilizeProcChance);
+             itemDic.Add("[KNOCKPROC%]", item.Stats.WeaponOnHitKnockbackProcChance);
+             itemDic.Add("[BLEEDPROC%]", item.Stats.WeaponOnHitBleedProcChance);
+
+             itemDic.Add("[AREADMGPROC%]", item.Stats.OnHitAreaDamageProcChance);
+
+             itemDic.Add("[CDRED%]", item.Stats.PowerCooldownReductionPercent);
+             itemDic.Add("[RESRED%]", item.Stats.ResourceCostReductionPercent);
+
+             itemDic.Add("[SKILLDMG%]", item.Stats.SkillDamagePercentBonus);
+             itemDic.Add("[FIREDMG%]", item.Stats.FireSkillDamagePercentBonus);
+             itemDic.Add("[LIGHTNINGDMG%]", item.Stats.LightningSkillDamagePercentBonus);
+             itemDic.Add("[COLDDMG%]", item.Stats.ColdSkillDamagePercentBonus);
+             itemDic.Add("[POISONDMG%]", item.Stats.PosionSkillDamagePercentBonus);
+             itemDic.Add("[ARCANEDMG%]", item.Stats.ArcaneSkillDamagePercentBonus);
+             itemDic.Add("[HOLYDMG%]", item.Stats.HolySkillDamagePercentBonus);
+
+             float damage, healing, toughness;
+             item.GetStatChanges(out damage, out healing, out toughness);
+             itemDic.Add("[UPDMG]", damage);
+             itemDic.Add("[UPHEAL]", healing);
+             itemDic.Add("[UPTOUGH]", toughness);
+
+             // - SPECIAL VARIABLES ------------------------------------------------//
+             itemDic.Add("[MAXSTAT]", new float[] { item.Stats.Strength, item.Stats.Intell
 
             // - NEW STATS ADDED --------------------------------------------------//
             itemDic.Add("[LEVELRED]", (float)item.Stats.ItemLevelRequirementReduction);
