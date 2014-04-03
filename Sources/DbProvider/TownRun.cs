@@ -628,13 +628,12 @@ namespace Trinity
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Always make sure you empty your backpack, open the stash, then RESTART DEMONBUDDY before sorting!");
                     return;
                 }
-                CachedACDItem thiscacheditem = new CachedACDItem(item, item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId,
+                CachedACDItem cItem = new CachedACDItem(item, item.InternalName, item.Name, item.Level, item.ItemQualityLevel, item.Gold, item.GameBalanceId,
                     item.DynamicId, item.Stats.WeaponDamagePerSecond, item.IsOneHand, item.IsTwoHand, item.DyeType, item.ItemType, item.ItemBaseType, item.FollowerSpecialType,
                     item.IsUnidentified, item.ItemStackQuantity, item.Stats);
 
-                double ItemValue = ItemValuation.ValueThisItem(thiscacheditem, itemType);
+                double ItemValue = ItemValuation.ValueThisItem(cItem, itemType);
                 double NeedScore = Trinity.ScoreNeeded(item.ItemBaseType);
-
 
                 // Ignore stackable items
                 // TODO check if item.MaxStackCount is 0 on non stackable items or 1

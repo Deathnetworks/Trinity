@@ -1,4 +1,5 @@
 ﻿using System;
+using Zeta.Game;
 using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
 namespace Trinity
@@ -84,6 +85,9 @@ namespace Trinity
         public int Row { get; set; }
         public int Column { get; set; }
         public string ItemLink { get; set; }
+        public float UpgradeDamage { get; set; }
+        public float UpgradeToughness { get; set; }
+        public float UpgradeHealing { get; set; }
 
         public CachedACDItem(ItemStats stats)
         {
@@ -187,8 +191,6 @@ namespace Trinity
             IsUnidentified = unidentified;
             ItemStackQuantity = stackQuantity;
 
-
-
             Dexterity = itemStats.Dexterity;
             Intelligence = itemStats.Intelligence;
             Strength = itemStats.Strength;
@@ -246,6 +248,8 @@ namespace Trinity
 
             TrinityItemType = Trinity.DetermineItemType(internalName, itemType, followerType);
             TrinityItemBaseType = Trinity.DetermineBaseType(TrinityItemType);
+
+            ComputeUpgrade();
         }
 
 
@@ -290,7 +294,41 @@ namespace Trinity
                 TrinityItemBaseType = Trinity.DetermineBaseType(Trinity.DetermineItemType(item.InternalName, item.ItemType, item.FollowerSpecialType))
             };
 
+            cItem.ComputeUpgrade();
+
             return cItem;
+        }
+
+        public void ComputeUpgrade()
+        {
+            float damage = 0, healing = 0, toughness = 0;
+
+            float altDamage = 0, altHealing = 0, altToughness = 0;
+
+            foreach (var slot in AcdItem.ValidInventorySlots)
+            {
+                if (slot == InventorySlot.RightFinger)
+                {
+                    AcdItem.GetStatChanges(out altDamage, out altHealing, out altToughness, true);
+                }
+                else if (slot == InventorySlot.RightHand)
+                {
+                    AcdItem.GetStatChanges(out altDamage, out altHealing, out altToughness, true);
+                }
+                else
+                {
+                    AcdItem.GetStatChanges(out damage, out healing, out toughness, false);
+                }
+            }
+            if ((altDamage + altToughness) > (damage + toughness))
+            {
+                damage = altDamage;
+                toughness = altToughness;
+            }
+
+            this.UpgradeDamage = damage;
+            this.UpgradeToughness = toughness;
+            this.UpgradeHealing = healing;
         }
     }
 }
