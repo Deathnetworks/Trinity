@@ -67,7 +67,7 @@ namespace Trinity
                 // Add Team HotSpots to the cache
                 ObjectCache.AddRange(GroupHotSpots.GetCacheObjectHotSpots());
 
-                    /* Fire Chains Experimental Avoidance */
+                /* Fire Chains Experimental Avoidance */
                 if (Settings.Combat.Misc.UseExperimentalFireChainsAvoidance)
                 {
                     const float fireChainSize = 5f;
@@ -266,6 +266,11 @@ namespace Trinity
                         if (CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin)
                             lastHadEliteUnitInSights = DateTime.UtcNow;
                     }
+
+                    // And record when we last saw a boss
+                    if (CurrentTarget.IsBoss)
+                        lastHadBossUnitInSights = DateTime.UtcNow;
+
                     if (CurrentTarget.Type == GObjectType.Container)
                     {
                         lastHadContainerInSights = DateTime.UtcNow;
@@ -275,12 +280,12 @@ namespace Trinity
                     {
                         RecordTargetHistory();
 
-                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight, 
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight,
                             "Found New Target {0} dist={1:0} IsElite={2} Radius={3:0.0} Weight={4:0} ActorSNO={5} " +
                             "Anim={6} Target++={7} Type={8} ",
-                            CurrentTarget.InternalName, 
-                            CurrentTarget.CentreDistance, 
-                            CurrentTarget.IsEliteRareUnique, 
+                            CurrentTarget.InternalName,
+                            CurrentTarget.CentreDistance,
+                            CurrentTarget.IsEliteRareUnique,
                             CurrentTarget.Radius,
                             CurrentTarget.Weight,
                             CurrentTarget.ActorSNO,
@@ -558,10 +563,10 @@ namespace Trinity
                 {
                     ForceCloseRangeTarget = false;
                 }
-                
+
                 // Bunch of variables used throughout
                 CacheData.MonsterObstacles = new HashSet<CacheObstacleObject>();
-                
+
                 //CacheData.TimeBoundAvoidance = new HashSet<CacheObstacleObject>();
                 CacheData.TimeBoundAvoidance.RemoveWhere(aoe => aoe.Expires < DateTime.UtcNow);
                 CacheData.NavigationObstacles = new HashSet<CacheObstacleObject>();
@@ -636,7 +641,7 @@ namespace Trinity
             "minimapicon", 
         };
 
-        
+
         private static IOrderedEnumerable<DiaObject> ReadDebugActorsFromMemory()
         {
             return from o in ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
@@ -653,9 +658,10 @@ namespace Trinity
         private static void RefreshDoBackTrack()
         {
             // See if we should wait for [playersetting] milliseconds for possible loot drops before continuing run
-            if (DateTime.UtcNow.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill || 
+            if (DateTime.UtcNow.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
                 DateTime.UtcNow.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
-                DateTime.UtcNow.Subtract(lastHadContainerInSights).TotalMilliseconds <= 1000)
+                DateTime.UtcNow.Subtract(lastHadBossUnitInSights).TotalMilliseconds <= 3000 ||
+                DateTime.UtcNow.Subtract(lastHadContainerInSights).TotalMilliseconds <= 2000)
             {
                 CurrentTarget = new TrinityCacheObject()
                                     {

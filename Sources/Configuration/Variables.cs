@@ -161,6 +161,7 @@ namespace Trinity
 
         // When we last saw a boss/elite etc.
         internal static DateTime lastHadEliteUnitInSights = DateTime.MinValue;
+        internal static DateTime lastHadBossUnitInSights = DateTime.MinValue;
 
         internal static DateTime lastHadContainerInSights = DateTime.MinValue;
 

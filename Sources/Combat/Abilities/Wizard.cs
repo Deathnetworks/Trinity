@@ -167,7 +167,7 @@ namespace Trinity
                         (
                         //hasBuffSpells &&
                         CheckAbilityAndBuff(SNOPower.Wizard_MagicWeapon) &&
-                        Wizard_HasFamiliar() &&
+                        (!Hotbar.Contains(SNOPower.Wizard_Familiar) || Wizard_HasFamiliar()) &&
                         CheckAbilityAndBuff(SNOPower.Wizard_EnergyArmor) &&
                         CheckAbilityAndBuff(SNOPower.Wizard_IceArmor) &&
                         CheckAbilityAndBuff(SNOPower.Wizard_StormArmor));
@@ -209,24 +209,17 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_Blizzard, 45f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
 
-                bool hasArcaneDynamoPassive = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Wizard_Passive_ArcaneDynamo);
+                bool arcaneDynamoPassiveReady = 
+                    (ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Wizard_Passive_ArcaneDynamo) && GetBuffStacks(SNOPower.Wizard_Passive_ArcaneDynamo) == 5) ||
+                    !ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Wizard_Passive_ArcaneDynamo);
 
                 var bestMeteorClusterUnit = TargetUtil.GetBestClusterUnit(15f, 65f, 1, true, true);
                 // Meteor
-                if (!UseOOCBuff && !Player.IsIncapacitated && !hasArcaneDynamoPassive && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
+                if (!UseOOCBuff && !Player.IsIncapacitated && !arcaneDynamoPassiveReady && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
                     (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2, true)))
                 {
                     return new TrinityPower(SNOPower.Wizard_Meteor, 65f, bestMeteorClusterUnit.Position);
                 }
-
-                // Meteor Arcane Dynamo
-                if (!UseOOCBuff && !Player.IsIncapacitated && hasArcaneDynamoPassive && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
-                    GetBuffStacks(SNOPower.Wizard_Passive_ArcaneDynamo) == 5 &&
-                    (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2, true)))
-                {
-                    return new TrinityPower(SNOPower.Wizard_Meteor, 65f, bestMeteorClusterUnit.Position);
-                }
-
 
                 //SkillDict.Add("FrostNova", SNOPower.Wizard_FrostNova);
                 //RuneDict.Add("Shatter", 1);

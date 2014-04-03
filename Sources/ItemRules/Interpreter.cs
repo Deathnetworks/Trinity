@@ -87,10 +87,10 @@ namespace Trinity.ItemRules
         private Dictionary<string, string> macroDic;
 
         // dictionary for cached rules
-        Dictionary<string, string[]> cachedRules = new Dictionary<string,string[]>();
+        Dictionary<string, string[]> cachedRules = new Dictionary<string, string[]>();
 
         // dictionary for cached interpreter actions
-        Dictionary<string, InterpreterAction> interpreterActionCache = new Dictionary<string,InterpreterAction>();
+        Dictionary<string, InterpreterAction> interpreterActionCache = new Dictionary<string, InterpreterAction>();
 
         /// <summary>
         /// 
@@ -560,17 +560,16 @@ namespace Trinity.ItemRules
             if (str == null)
                 return InterpreterAction.NULL;
 
-            InterpreterAction action;
+            InterpreterAction action = InterpreterAction.NULL;
             if (!interpreterActionCache.TryGetValue(str, out action))
             {
-                if (!Enum.TryParse<InterpreterAction>(str, out action))
+                if (!Enum.TryParse<InterpreterAction>(str.Replace("[", "").Replace("]", ""), out action))
                 {
+                    interpreterActionCache.Add(str, action);
                     return InterpreterAction.NULL;
                 }
-            }
-
-            if (action != null)
                 interpreterActionCache.Add(str, action);
+            }
 
             return action;
             //foreach (InterpreterAction action in Enum.GetValues(typeof(InterpreterAction)))
