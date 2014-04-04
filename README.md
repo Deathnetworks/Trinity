@@ -1,10 +1,41 @@
 ﻿
 # Trinity
 
+### Changelog 1.8.18
+
+* Gizmos (Destructibles, Barricades, Interactables) should now properly be ignored when disabled by game scripts
+
+* Changed Barbarian destructible ranges to better accomodate large objects
+
+* Increased hotbar fresh delay to improve performance
+
+* Evasive fire will now be used less liberally (e.g. so rapid Fire, Impale, etc can now be used)
+
+* More A5 blacklisted objects
+
+* Changed defaults for Gold Inactivity timer, default disabled and increased to 10 minutes
+
+* Ghom Gas Health default set to 60% for all classes
+
+* Default Misc Combat settings are updated (trashpack=4, radius=20f, GoblinPriority=Normal, nonEliteRange=35, delayAfterKill=150)
+
+* Default Pickup settings are updated (now best for a regular level 70 character) - white/blue/trash items disabled, only picks up 70+ rares and legendaries
+
+* ItemRules now supports many more stats (documentation coming)
+
+* Added 1 second wait after killing bosses (wait for legendary drops)
+
+* Fixed ItemRules Interpreter Action cache
+
+* Gorms Wizard/Archon without Familiar fix
+
+* Gorms DemonHunter elemental arrows with grenade
+
 ## Changelog 1.8.17
 
-Removed DeathHandler, latest DB does this automatically.
-Fixed error on Interpreter initialization when BattleTag is not available.
+* Removed DeathHandler, latest DB does this automatically.
+
+* Fixed error on Interpreter initialization when BattleTag is not available.
 
 ## Changelog 1.8.16
 
@@ -655,15 +686,15 @@ ExcludeTrash: When set to "True", will cause the bot to attack trash mob units o
 
 Example to ignore a unit type, except elites of that unit type:
 
-    <TrinityCombatIgnore actorId="4157" name="FleshPitFlyer_B" exceptElites="True" exceptTrash="False" />
+<TrinityCombatIgnore actorId="4157" name="FleshPitFlyer_B" exceptElites="True" exceptTrash="False" />
 
 Example to ignore a unit type, including elites and trash:
 
-    <TrinityCombatIgnore actorId="4157" name="FleshPitFlyer_B" exceptElites="False" exceptTrash="False" />
+<TrinityCombatIgnore actorId="4157" name="FleshPitFlyer_B" exceptElites="False" exceptTrash="False" />
 
 Example to ignore a unit type, except trash mobs of that unit type:
 
-    <TrinityCombatIgnore actorId="4157" name="FleshPitFlyer_B" exceptElites="False" exceptTrash="True" />
+<TrinityCombatIgnore actorId="4157" name="FleshPitFlyer_B" exceptElites="False" exceptTrash="True" />
 
 Setting both excludeElites and excludeTrash to True will effectively *do nothing* - the bot will still attack all units of this type.
 
@@ -1210,17 +1241,17 @@ For example, when the bot first starts exploring an area, it needs to navigate a
 the bot would immediately exit from navigation without exploring anything at all.  
 
 Example Keeps 2 tag:
-      <TrinityExploreDungeon questId="101758" stepId="1" 
-        until="FullyExplored" boxSize="80" boxTolerance="0.01" 
-        timeoutType="GoldInactivity" townPortalOnTimeout="True" timeoutValue="60" 
-        ignoreMarkers="True" ignoreLastNodes="3" minVisitedNodes="10">
-        <IgnoreScenes>
-          <IgnoreScene sceneName="_N_" />
-          <IgnoreScene sceneName="_S_" />
-          <IgnoreScene sceneName="_E_" />
-          <IgnoreScene sceneName="_W_" />
-        </IgnoreScenes>
-      </TrinityExploreDungeon>
+<TrinityExploreDungeon questId="101758" stepId="1" 
+until="FullyExplored" boxSize="80" boxTolerance="0.01" 
+timeoutType="GoldInactivity" townPortalOnTimeout="True" timeoutValue="60" 
+ignoreMarkers="True" ignoreLastNodes="3" minVisitedNodes="10">
+<IgnoreScenes>
+<IgnoreScene sceneName="_N_" />
+<IgnoreScene sceneName="_S_" />
+<IgnoreScene sceneName="_E_" />
+<IgnoreScene sceneName="_W_" />
+</IgnoreScenes>
+</TrinityExploreDungeon>
 
 
 
@@ -1627,25 +1658,25 @@ Core Logic:
 
 ItemRules changes:  
 
-    - added [WEIGHTS] you can use now scoring from DB inside rules  
+- added [WEIGHTS] you can use now scoring from DB inside rules  
 
-    - fixed [AS%] working now on weapon, armor and jewelry  
-    - name is now correctly working (item name bug is fixed)  
-    - changed [AS%] now working also on weapons   
-    - changed [BLOCK%] now working also on shield  
-    - added [TOTBLOCK%] for total blockchance on shield  
-    - added [DMGVSELITE%] for percent damage bonus vs elite  
-    - added [DMGREDELITE%] for percent damage reduction from elite  
-    - added [EXPBONUS] for experience bonus  
-    - added [LOK] for Life on kill  
-    - added [REQLEVEL] for item required level  
-    - added [WEAPDMGTYPE] (Arcane,Holy, etv.)  
-    - added [WEAPDMG%] for damage % enhancment on wepon  
-    - added [ROLL] representing the attribut roll on magic and rare items  
-    - added [D3QUALITY] orginal db quality rare3,rare4 etc.  
-    - Polearm and Andariels workaround removed again ... DB is right now  
-    - maximum function is now usable examples will follow  
-    - changed logging to use with itemviewer  
+- fixed [AS%] working now on weapon, armor and jewelry  
+- name is now correctly working (item name bug is fixed)  
+- changed [AS%] now working also on weapons   
+- changed [BLOCK%] now working also on shield  
+- added [TOTBLOCK%] for total blockchance on shield  
+- added [DMGVSELITE%] for percent damage bonus vs elite  
+- added [DMGREDELITE%] for percent damage reduction from elite  
+- added [EXPBONUS] for experience bonus  
+- added [LOK] for Life on kill  
+- added [REQLEVEL] for item required level  
+- added [WEAPDMGTYPE] (Arcane,Holy, etv.)  
+- added [WEAPDMG%] for damage % enhancment on wepon  
+- added [ROLL] representing the attribut roll on magic and rare items  
+- added [D3QUALITY] orginal db quality rare3,rare4 etc.  
+- Polearm and Andariels workaround removed again ... DB is right now  
+- maximum function is now usable examples will follow  
+- changed logging to use with itemviewer  
 
 
 
