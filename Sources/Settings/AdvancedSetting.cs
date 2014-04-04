@@ -117,7 +117,7 @@ namespace Trinity.Config
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         public bool GoldInactivityEnabled
         {
             get
@@ -135,7 +135,7 @@ namespace Trinity.Config
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(300)]
+        [DefaultValue(600)]
         public int GoldInactivityTimer
         {
             get

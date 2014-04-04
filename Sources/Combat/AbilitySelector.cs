@@ -113,7 +113,7 @@ namespace Trinity
                     return new TrinityPower();
 
                 // See if archon just appeared/disappeared, so update the hotbar
-                if (ShouldRefreshHotbarAbilities || Trinity.HotbarRefreshTimer.ElapsedMilliseconds > 1000)
+                if (ShouldRefreshHotbarAbilities || Trinity.HotbarRefreshTimer.ElapsedMilliseconds > 5000)
                     PlayerInfoCache.RefreshHotbar();
 
                 // Switch based on the cached character class

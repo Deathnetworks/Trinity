@@ -78,7 +78,7 @@ namespace Trinity.Config.Loot
             }
         }
         [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         public bool PickupGrayItems
         {
             get
@@ -96,7 +96,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         public bool PickupWhiteItems
         {
             get
@@ -132,7 +132,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(58)]
+        [DefaultValue(70)]
         public int WeaponYellowLevel
         {
             get
@@ -168,7 +168,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(58)]
+        [DefaultValue(70)]
         public int ArmorYellowLevel
         {
             get
@@ -204,7 +204,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(56)]
+        [DefaultValue(70)]
         public int JewelryYellowLevel
         {
             get
@@ -258,7 +258,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(14)]
+        [DefaultValue(60)]
         public int GemLevel
         {
             get
@@ -294,7 +294,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(100)]
+        [DefaultValue(150)]
         public int MinimumGoldStack
         {
             get
@@ -384,7 +384,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         public bool PickupBlueFollowerItems
         {
             get
@@ -402,7 +402,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         public bool PickupYellowFollowerItems
         {
             get
@@ -420,7 +420,7 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(1)]
+        [DefaultValue(TrinityItemQuality.Rare)]
         public TrinityItemQuality MiscItemQuality
         {
             get

@@ -808,7 +808,7 @@ namespace Trinity
                 // Everything except items and the current target
                 if (c_ObjectType != GObjectType.Item && c_RActorGuid != LastTargetRactorGUID && c_ObjectType != GObjectType.Unknown)
                 {
-                    if (c_CentreDistance < 125)
+                    if (c_CentreDistance < 95)
                     {
                         switch (c_ObjectType)
                         {
@@ -822,7 +822,7 @@ namespace Trinity
                                         // Get whether or not this RActor has ever been in a path line with AllowWalk. If it hasn't, don't add to cache and keep rechecking
                                         if (!CacheData.HasBeenRayCasted.TryGetValue(c_RActorGuid, out c_HasBeenRaycastable))
                                         {
-                                            if (c_CentreDistance <= 5f)
+                                            if (c_CentreDistance >= 1f && c_CentreDistance <= 5f)
                                             {
                                                 c_HasBeenRaycastable = true;
                                                 CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);

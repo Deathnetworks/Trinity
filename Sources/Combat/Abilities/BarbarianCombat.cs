@@ -749,16 +749,16 @@ namespace Trinity.Combat.Abilities
             get
             {
                 if (CombatBase.CanCast(SNOPower.Barbarian_Frenzy))
-                    return new TrinityPower(SNOPower.Barbarian_Frenzy, V.F("Barbarian.Frenzy.UseRange"));
+                    return new TrinityPower(SNOPower.Barbarian_Frenzy, 4f);
 
                 if (CombatBase.CanCast(SNOPower.Barbarian_Bash))
-                    return new TrinityPower(SNOPower.Barbarian_Bash, V.F("Barbarian.Bash.UseRange"));
+                    return new TrinityPower(SNOPower.Barbarian_Bash, 4f);
 
                 if (CombatBase.CanCast(SNOPower.Barbarian_Cleave))
-                    return new TrinityPower(SNOPower.Barbarian_Cleave, V.F("Barbarian.Cleave.UseRange"));
+                    return new TrinityPower(SNOPower.Barbarian_Cleave, 4f);
 
                 if (CombatBase.CanCast(SNOPower.X1_Barbarian_WeaponThrow))
-                    return new TrinityPower(SNOPower.X1_Barbarian_WeaponThrow, V.F("Barbarian.WeaponThrow.UseRange"));
+                    return new TrinityPower(SNOPower.X1_Barbarian_WeaponThrow, 4f);
 
                 if (CombatBase.CanCast(SNOPower.Barbarian_Overpower))
                     return new TrinityPower(SNOPower.Barbarian_Overpower, 9);

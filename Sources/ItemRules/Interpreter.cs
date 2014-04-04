@@ -902,9 +902,6 @@ namespace Trinity.ItemRules
              itemDic.Add("[UPHEAL]", healing);
              itemDic.Add("[UPTOUGH]", toughness);
 
-             // - SPECIAL VARIABLES ------------------------------------------------//
-             itemDic.Add("[MAXSTAT]", new float[] { item.Stats.Strength, item.Stats.Intell
-
             // - NEW STATS ADDED --------------------------------------------------//
             itemDic.Add("[LEVELRED]", (float)item.Stats.ItemLevelRequirementReduction);
             itemDic.Add("[TOTBLOCK%]", item.Stats.BlockChance);

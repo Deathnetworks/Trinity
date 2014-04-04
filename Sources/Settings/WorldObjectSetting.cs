@@ -260,7 +260,7 @@ namespace Trinity.Config
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(90)]
+        [DefaultValue(50)]
         public int HealthWellMinHealth
         {
             get

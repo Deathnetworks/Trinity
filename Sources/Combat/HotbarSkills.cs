@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Trinity.Technicals;
 using Zeta.Game;
 using Zeta.Game.Internals;
 using Zeta.Game.Internals.Actors;
+
 namespace Trinity
 {
     public class HotbarSkills
@@ -50,16 +52,28 @@ namespace Trinity
         /// </summary>
         internal static void Update(TrinityLogLevel logLevel = TrinityLogLevel.Debug, LogCategory logCategory = LogCategory.CacheManagement)
         {
-            _assignedSkills.Clear();
+
             UpdateHotbarSlotPowers();
-            foreach (SNOPower p in Trinity.Hotbar)
+            
+            HashSet<HotbarSkills> oldSkills = new HashSet<HotbarSkills>();
+            foreach (var skill in _assignedSkills)
             {
-                _assignedSkills.Add(new HotbarSkills()
+                oldSkills.Add(skill);
+            }
+
+            if (Trinity.Hotbar.Any(hb => !oldSkills.Any(old => old.Power == hb)))
+            {
+                _assignedSkills.Clear();
+
+                foreach (SNOPower p in Trinity.Hotbar)
                 {
-                    Power = p,
-                    Slot = HotbarSkills.GetHotbarSlotFromPower(p),
-                    RuneIndex = HotbarSkills.GetRuneIndexFromPower(p)
-                });
+                    _assignedSkills.Add(new HotbarSkills()
+                    {
+                        Power = p,
+                        Slot = HotbarSkills.GetHotbarSlotFromPower(p),
+                        RuneIndex = HotbarSkills.GetRuneIndexFromPower(p)
+                    });
+                }
             }
 
             string skillList = "";

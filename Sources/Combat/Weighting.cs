@@ -539,7 +539,7 @@ namespace Trinity
                                 if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 12f)
                                     cacheObject.Weight += 1000d;
 
-                                // If there's a monster in the path-line to the item, reduce the weight to 1, except legendaries
+                                // If there's a monster in the path-line to the item, reduce the weight to 1
                                 if (CacheData.MonsterObstacles.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius * 1.2f, Player.Position, cacheObject.Position)))
                                     cacheObject.Weight = 1;
 

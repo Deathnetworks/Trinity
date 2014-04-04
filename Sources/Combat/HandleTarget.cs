@@ -156,7 +156,7 @@ namespace Trinity
 
                     // Whether we should refresh the target list or not
                     // See if we should update hotbar abilities
-                    if (ShouldRefreshHotbarAbilities || Trinity.HotbarRefreshTimer.ElapsedMilliseconds > 1000)
+                    if (ShouldRefreshHotbarAbilities || Trinity.HotbarRefreshTimer.ElapsedMilliseconds > 5000)
                     {
                         PlayerInfoCache.RefreshHotbar();
                     }

@@ -87,14 +87,9 @@ namespace Trinity
             bool isGizmoDisabledByScript = false;
             try
             {
-                switch (c_ObjectType)
+                if (CurrentCacheObject.Object is DiaGizmo)
                 {
-                    case GObjectType.Shrine:
-                    case GObjectType.Door:
-                    case GObjectType.Container:
-                    case GObjectType.Interactable:
-                        isGizmoDisabledByScript = ((DiaGizmo)c_diaObject).IsGizmoDisabledByScript;
-                        break;
+                    isGizmoDisabledByScript = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.GizmoDisabledByScript) > 0;
                 }
             }
             catch
@@ -127,6 +122,32 @@ namespace Trinity
                 AddToCache = false;
                 c_IgnoreSubStep = "GizmoDisabledByScript";
                 return AddToCache;
+            }
+
+
+            bool noDamage = false;
+            try
+            {
+                if (CurrentCacheObject.Object is DiaGizmo)
+                {
+                    noDamage = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.NoDamage) > 0;
+                }
+            }
+            catch
+            {
+                CacheData.NavigationObstacles.Add(new CacheObstacleObject()
+                {
+                    ActorSNO = c_ActorSNO,
+                    Radius = c_Radius,
+                    Position = c_Position,
+                    RActorGUID = c_RActorGuid,
+                    ObjectType = c_ObjectType,
+                });
+
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                    "Safely handled exception getting NoDamage attribute for object {0} [{1}]", c_InternalName, c_ActorSNO);
+                c_IgnoreSubStep = "NoDamage";
+                AddToCache = false;
             }
 
             double minDistance;
@@ -425,7 +446,28 @@ namespace Trinity
                     {
                         AddToCache = true;
 
+                        if (noDamage)
+                        {
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject()
+                            {
+                                ActorSNO = c_ActorSNO,
+                                Radius = c_Radius,
+                                Position = c_Position,
+                                RActorGUID = c_RActorGuid,
+                                ObjectType = c_ObjectType,
+                            });
+
+                            AddToCache = false;
+                            c_IgnoreSubStep = "NoDamage";
+                            return AddToCache;
+                        }
+
                         float maxRadiusDistance = -1f;
+
+                        if (isGizmoDisabledByScript)
+                        {
+
+                        }
 
                         if (DataDictionary.DestructableObjectRadius.TryGetValue(c_ActorSNO, out maxRadiusDistance))
                         {
@@ -454,6 +496,22 @@ namespace Trinity
                 case GObjectType.Destructible:
                     {
                         AddToCache = true;
+
+                        if (noDamage)
+                        {
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject()
+                            {
+                                ActorSNO = c_ActorSNO,
+                                Radius = c_Radius,
+                                Position = c_Position,
+                                RActorGUID = c_RActorGuid,
+                                ObjectType = c_ObjectType,
+                            });
+
+                            AddToCache = false;
+                            c_IgnoreSubStep = "NoDamage";
+                            return AddToCache;
+                        }
 
                         if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_TempestRush) && TimeSinceUse(SNOPower.Monk_TempestRush) <= 150)
                         {
@@ -565,7 +623,7 @@ namespace Trinity
                             c_IgnoreSubStep = "";
                             return AddToCache;
                         }
-                        
+
                         // Already open, blacklist it and don't look at it again
                         bool chestOpen = false;
                         try
@@ -602,6 +660,12 @@ namespace Trinity
                         }
 
                         if (isRareChest && Settings.WorldObject.OpenRareChests)
+                        {
+                            AddToCache = true;
+                            return AddToCache;
+                        }
+
+                        if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.DestroyAll)
                         {
                             AddToCache = true;
                             return AddToCache;

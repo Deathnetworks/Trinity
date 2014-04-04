@@ -405,7 +405,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(0.75f)]
+        [DefaultValue(0.60f)]
         public float AvoidGhomGasHealth
         {
             get

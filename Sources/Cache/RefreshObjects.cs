@@ -368,59 +368,56 @@ namespace Trinity
                             if (duration <= 1 && c_IgnoreSubStep == "IgnoreNames")
                                 continue;
 
-                            if ((Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance) && duration > 1 || !Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance)))
+                            string extraData = "";
+
+                            switch (c_ObjectType)
                             {
-                                string extraData = "";
+                                case GObjectType.Unit:
+                                    {
+                                        if (c_IsEliteRareUnique)
+                                            extraData += " IsElite " + c_MonsterAffixes.ToString();
 
-                                switch (c_ObjectType)
-                                {
-                                    case GObjectType.Unit:
-                                        {
-                                            if (c_IsEliteRareUnique)
-                                                extraData += " IsElite " + c_MonsterAffixes.ToString();
+                                        if (c_unit_HasShieldAffix)
+                                            extraData += " HasAffixShielded";
 
-                                            if (c_unit_HasShieldAffix)
-                                                extraData += " HasAffixShielded";
+                                        if (c_HasDotDPS)
+                                            extraData += " HasDotDPS";
 
-                                            if (c_HasDotDPS)
-                                                extraData += " HasDotDPS";
+                                        if (c_HasBeenInLoS)
+                                            extraData += " HasBeenInLoS";
 
-                                            if (c_HasBeenInLoS)
-                                                extraData += " HasBeenInLoS";
-
-                                            extraData += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
-                                        } break;
-                                    case GObjectType.Avoidance:
-                                        {
-                                            extraData += " Ro:" + CurrentCacheObject.Rotation.ToString("0.00");
-                                            extraData += " AABB: [" +
-                                                CurrentCacheObject.AABBBounds.Min.ToString() +
-                                                CurrentCacheObject.AABBBounds.Max.ToString() +
-                                                "]";
-                                            break;
-                                        }
-                                }
-
-                                if (c_IgnoreReason != "InternalName")
-                                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
-                                        "[{0:0000.00}ms] {1} {2} Type: {3} ({4}/{5}) Name={6} ({7}) {8} {9} Dist2Mid={10:0} Dist2Rad={11:0} ZDiff={12:0} Radius={13:0} RAGuid={14} {15}",
-                                        duration,
-                                        (AddToCache ? "Added " : "Ignored"),
-                                        (!AddToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
-                                        c_diaObject.ActorType,
-                                        c_diaObject is DiaGizmo ? ((DiaGizmo)c_diaObject).ActorInfo.GizmoType.ToString() : "",
-                                        c_ObjectType,
-                                        c_InternalName,
-                                        c_ActorSNO,
-                                        (c_unit_IsBoss ? " IsBoss" : ""),
-                                        (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
-                                        c_CentreDistance,
-                                        c_RadiusDistance,
-                                        c_ZDiff,
-                                        c_Radius,
-                                        c_RActorGuid,
-                                        extraData);
+                                        extraData += " HP=" + c_HitPoints.ToString("0") + " (" + c_HitPointsPct.ToString("0.00") + ")";
+                                    } break;
+                                case GObjectType.Avoidance:
+                                    {
+                                        extraData += " Ro:" + CurrentCacheObject.Rotation.ToString("0.00");
+                                        extraData += " AABB: [" +
+                                            CurrentCacheObject.AABBBounds.Min.ToString() +
+                                            CurrentCacheObject.AABBBounds.Max.ToString() +
+                                            "]";
+                                        break;
+                                    }
                             }
+
+                            if (c_IgnoreReason != "InternalName")
+                                Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement,
+                                    "[{0:0000.00}ms] {1} {2} Type: {3} ({4}/{5}) Name={6} ({7}) {8} {9} Dist2Mid={10:0} Dist2Rad={11:0} ZDiff={12:0} Radius={13:0} RAGuid={14} {15}",
+                                    duration,
+                                    (AddToCache ? "Added " : "Ignored"),
+                                    (!AddToCache ? ("By: " + (c_IgnoreReason != "None" ? c_IgnoreReason + "." : "") + c_IgnoreSubStep) : ""),
+                                    c_diaObject.ActorType,
+                                    c_diaObject is DiaGizmo ? ((DiaGizmo)c_diaObject).ActorInfo.GizmoType.ToString() : "",
+                                    c_ObjectType,
+                                    c_InternalName,
+                                    c_ActorSNO,
+                                    (c_unit_IsBoss ? " IsBoss" : ""),
+                                    (c_CurrentAnimation != SNOAnim.Invalid ? " Anim: " + c_CurrentAnimation : ""),
+                                    c_CentreDistance,
+                                    c_RadiusDistance,
+                                    c_ZDiff,
+                                    c_Radius,
+                                    c_RActorGuid,
+                                    extraData);
                         }
                     }
                     catch (Exception ex)

@@ -50,7 +50,7 @@ namespace Trinity.Config.Combat
         #region Properties
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(2)]
+        [DefaultValue(4)]
         public int TrashPackSize
         {
             get
@@ -68,7 +68,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(40f)]
+        [DefaultValue(20f)]
         public float TrashPackClusterRadius
         {
             get
@@ -104,7 +104,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(GoblinPriority.Prioritize)]
+        [DefaultValue(GoblinPriority.Normal)]
         public GoblinPriority GoblinPriority
         {
             get
@@ -122,7 +122,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(40)]
+        [DefaultValue(35)]
         public int NonEliteRange
         {
             get
@@ -266,7 +266,7 @@ namespace Trinity.Config.Combat
         }
 
         [DataMember(IsRequired = false)]
-        [DefaultValue(100)]
+        [DefaultValue(150)]
         public int DelayAfterKill
         {
             get

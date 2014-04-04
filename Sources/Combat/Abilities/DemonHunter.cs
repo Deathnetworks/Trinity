@@ -154,15 +154,7 @@ namespace Trinity
             //runeDict.Add("Displace", 4);
             //runeDict.Add("Surge", 3);
 
-            // Evasive Fire
-            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.X1_DemonHunter_EvasiveFire) && !Player.IsIncapacitated &&
-                  (TargetUtil.AnyMobsInRange(10f) || DemonHunter_HasNoPrimary()))
-            {
-                float range = DemonHunter_HasNoPrimary() ? 70f : 0f;
-
-                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, range, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
-            }
-
+           
             // Companion
             if (!Player.IsIncapacitated && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && TargetUtil.EliteOrTrashInRange(30f) &&
                 Player.SecondaryResource >= 10)
@@ -320,7 +312,7 @@ namespace Trinity
 
             // Rapid Fire
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_RapidFire, CombatBase.CanCastFlags.NoTimer) && !Player.IsIncapacitated &&
-                ((Player.PrimaryResource >= 20 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+                Player.PrimaryResource >= 20)
             {
                 // Players with grenades *AND* rapid fire should spam grenades at close-range instead
                 if (Hotbar.Contains(SNOPower.DemonHunter_Grenades) && CurrentTarget.RadiusDistance <= 18f)
@@ -328,7 +320,7 @@ namespace Trinity
                     return new TrinityPower(SNOPower.DemonHunter_Grenades, 18f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, WAIT_FOR_ANIM);
                 }
                 // Now return rapid fire, if not sending grenades instead
-                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 0, NO_WAIT_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 50f, CurrentTarget.Position);
             }
 
             // Impale
@@ -338,6 +330,15 @@ namespace Trinity
                 CurrentTarget.RadiusDistance <= 50f)
             {
                 return new TrinityPower(SNOPower.DemonHunter_Impale, 50f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 0, 1, WAIT_FOR_ANIM);
+            }
+
+            // Evasive Fire
+            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.X1_DemonHunter_EvasiveFire) && !Player.IsIncapacitated &&
+                  (TargetUtil.AnyMobsInRange(10f) || DemonHunter_HasNoPrimary()))
+            {
+                float range = DemonHunter_HasNoPrimary() ? 70f : 0f;
+
+                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, range, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }
 
             // Hungering Arrow
@@ -380,20 +381,28 @@ namespace Trinity
         {
             if (Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow))
                 return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, 40f, CurrentTarget.ACDGuid);
+            
             if (Hotbar.Contains(SNOPower.X1_DemonHunter_EntanglingShot))
                 return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, 40f, CurrentTarget.ACDGuid);
+            
             if (Hotbar.Contains(SNOPower.DemonHunter_Bolas))
                 return new TrinityPower(SNOPower.DemonHunter_Bolas, 40f, CurrentTarget.ACDGuid);
+            
             if (Hotbar.Contains(SNOPower.DemonHunter_Grenades))
                 return new TrinityPower(SNOPower.DemonHunter_Grenades, 15f, CurrentTarget.ACDGuid);
+            
             if (Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && Player.PrimaryResource >= 10)
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 40f, CurrentTarget.ACDGuid);
+            
+            if (Hotbar.Contains(SNOPower.X1_DemonHunter_EvasiveFire) && Player.PrimaryResource >= 10)
+                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, 40f, CurrentTarget.ACDGuid);
+            
             if (Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && Player.PrimaryResource >= 10)
-                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 40f, CurrentTarget.ACDGuid);
+                return new TrinityPower(SNOPower.DemonHunter_RapidFire, 40f, CurrentTarget.Position);
+            
             if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && Player.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 0f, CurrentTarget.ACDGuid);
-            if (Hotbar.Contains(SNOPower.X1_DemonHunter_EvasiveFire) && Player.PrimaryResource >= 20)
-                return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, 40f, CurrentTarget.ACDGuid);
+            
             return CombatBase.DefaultPower;
         }
     }

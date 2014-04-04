@@ -655,6 +655,8 @@ namespace Trinity
             263014, 
             5724, 5727, 
             116063, 
+            5869, // trDun_Gargoyle_01
+            5738, // trDun_Cath_Breakable_pillar
 
             /*
              * A5
@@ -687,6 +689,10 @@ namespace Trinity
 
             328008, // X1_Westm_Door_Giant_Closed
             312441, // X1_Westm_Door_Giant_Opening_Event
+
+            328942, // x1_Pand_Ext_ImperiusCharge_Barricade 
+            324867, // x1_Westm_DeathOrb_Caster_TEST
+            313302, // X1_Westm_Breakable_Wolf_Head_A
 
         };
 

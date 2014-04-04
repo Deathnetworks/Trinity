@@ -70,7 +70,7 @@ namespace Trinity.Combat.Abilities
             using (new PerformanceLogger("AbilitySelector"))
             {
                 // See if archon just appeared/disappeared, so update the hotbar
-                if (Trinity.ShouldRefreshHotbarAbilities || Trinity.HotbarRefreshTimer.ElapsedMilliseconds > 1000)
+                if (Trinity.ShouldRefreshHotbarAbilities || Trinity.HotbarRefreshTimer.ElapsedMilliseconds > 5000)
                     PlayerInfoCache.RefreshHotbar();
 
                 // Switch based on the cached character class
