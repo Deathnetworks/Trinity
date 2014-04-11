@@ -62,13 +62,15 @@ namespace Trinity
 
         internal static void SetProfileInWindowTitle()
         {
+
+            string fileName = Path.GetFileName(ProfileManager.CurrentProfile.Path);
+
             if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.Name != null)
             {
-                Trinity.SetWindowTitle(Trinity.CurrentProfileName);
+                Trinity.SetWindowTitle(Trinity.CurrentProfileName + " " + fileName);
             }
             else if (ProfileManager.CurrentProfile != null && string.IsNullOrWhiteSpace(ProfileManager.CurrentProfile.Name))
             {
-                string fileName = Path.GetFileName(ProfileManager.CurrentProfile.Path);
                 Trinity.SetWindowTitle(fileName);
             }
         }

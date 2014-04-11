@@ -16,6 +16,12 @@ namespace Trinity
         private const ulong partyFollowerBossAcceptHash = 0xF495983BA9BE450F;
         private const ulong potionButtonHash = 0xE1F43DD874E42728;
         private const ulong bountyRewardDialogHash = 0x278249110947CA00;
+        private const ulong gamePotionHash = 0xE1F43DD874E42728;
+
+        public static UIElement GamePotion
+        {
+            get { return UIElement.FromHash(gamePotionHash); }
+        }
 
         public static UIElement BountyRewardDialog
         {

@@ -673,7 +673,6 @@ namespace Trinity
 
                         if (!isChest && !isCorpse && !isRareChest)
                         {
-                            Logger.LogDebug("Possible Chest SNO: {0} ({1})", c_ActorSNO, c_InternalName);
                             c_IgnoreSubStep = "InvalidContainer";
                         }
                         else

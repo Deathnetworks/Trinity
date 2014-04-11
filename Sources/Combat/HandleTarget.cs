@@ -272,14 +272,6 @@ namespace Trinity
                     bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.GameBalanceId == -2142362846);
 
                     // Pop a potion when necessary
-                    // Note that we force a single-loop pause first, to help potion popping "go off"
-                    if (hasPotion && Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit && !IsWaitingForPower && !IsWaitingForPotion
-                        && !Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
-                    {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Setting isWaitingForPotion: MyHP={0}, Limit={1}", Player.CurrentHealthPct, PlayerEmergencyHealthPotionLimit);
-                        IsWaitingForPotion = true;
-                        runStatus = HandlerRunStatus.TreeRunning;
-                    }
 
                     UsePotionIfNeeded();
 
@@ -1047,7 +1039,7 @@ namespace Trinity
                 if (IsWaitingForPotion)
                 {
 
-                    if (!Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
+                    if (!Player.IsIncapacitated && GameUI.IsElementVisible(GameUI.GamePotion) && GameUI.GamePotion.IsEnabled)
                     {
                         var legendaryPotions = ZetaDia.Me.Inventory.Backpack.Where(i => i.InternalName.ToLower()
                             .Contains("healthpotion_legendary_"));
@@ -1059,21 +1051,20 @@ namespace Trinity
 
                         int dynamicId = 0;
                         if (legendaryPotions.Any())
-                            dynamicId = legendaryPotions.FirstOrDefault().DynamicId;
-                        else if (regularPotions.Any())
-                            dynamicId = regularPotions.FirstOrDefault().DynamicId;
-                        else
-                        {
-                            // no potions?
-                        }
-                        if (dynamicId != 0)
                         {
                             Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
+                            dynamicId = legendaryPotions.FirstOrDefault().DynamicId;
                             ZetaDia.Me.Inventory.UseItem(dynamicId);
                         }
-
-                        CacheData.AbilityLastUsed[SNOPower.DrinkHealthPotion] = DateTime.UtcNow;
-                        WaitWhileAnimating(2, true);
+                        else if (GameUI.GamePotion.IsEnabled)
+                        {
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
+                            GameUI.SafeClickElement(GameUI.GamePotion);
+                        }
+                        else
+                        {
+                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "No Available potions!", 0);
+                        }
                     }
                 }
             }

@@ -213,14 +213,14 @@ namespace Trinity.Technicals
                             }
                         }
                         
-                        trinityAppender.Layout = trinityLayout;
+                        //trinityAppender.Layout = trinityLayout;
                         trinityAppender.AddFilter(trinityFilter);
 
                         trinityAppender.ActivateOptions();
 
                         trinityLog = LogManager.GetLogger("TrinityDebug");
                         trinityLogger = ((log4net.Repository.Hierarchy.Logger)trinityLog.Logger);
-                        trinityLogger.Additivity = false;
+                        trinityLogger.Additivity = true;
                         trinityLogger.AddAppender(trinityAppender);                                               
                     }
                 }

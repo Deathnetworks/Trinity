@@ -402,7 +402,8 @@ namespace Trinity
                     (TargetUtil.AnyElitesInRange(25, 1) || 
                     TargetUtil.EliteOrTrashInRange(25f) || 
                     (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 35f)) &&
-                    CombatBase.CanCast(SNOPower.Wizard_Archon_SlowTime, CombatBase.CanCastFlags.NoTimer))
+                    CombatBase.CanCast(SNOPower.Wizard_Archon_SlowTime, CombatBase.CanCastFlags.NoTimer) &&
+                    (SpellHistory.TimeSinceUse(SNOPower.Wizard_Archon_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastUsePosition(SNOPower.Wizard_Archon_SlowTime) > 7.5))
                 {
                     return new TrinityPower(SNOPower.Wizard_Archon_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }

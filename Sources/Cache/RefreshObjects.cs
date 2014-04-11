@@ -149,11 +149,15 @@ namespace Trinity
 
                 using (new PerformanceLogger("RefreshDiaObjectCache.AvoidanceCheck"))
                 {
+                    if (Player.IsGhosted)
+                        StandingInAvoidance = true;
+
                     // Note that if treasure goblin level is set to kamikaze, even avoidance moves are disabled to reach the goblin!
                     if (StandingInAvoidance && (!AnyTreasureGoblinsPresent || Settings.Combat.Misc.GoblinPriority <= GoblinPriority.Prioritize) &&
                         DateTime.UtcNow.Subtract(timeCancelledEmergencyMove).TotalMilliseconds >= cancelledEmergencyMoveForMilliseconds)
                     {
                         Vector3 vAnySafePoint = NavHelper.FindSafeZone(false, 1, Player.Position, true, null, true);
+
                         // Ignore avoidance stuff if we're incapacitated or didn't find a safe spot we could reach
                         if (vAnySafePoint != Vector3.Zero)
                         {

@@ -9,7 +9,6 @@ namespace Trinity.XmlTags
     [XmlElement("HaveBounty")]
     public class HaveBounty : BaseComplexNodeTag
     {
-
         protected override Composite CreateBehavior()
         {
             PrioritySelector decorated = new PrioritySelector(new Composite[0]);
@@ -22,19 +21,12 @@ namespace Trinity.XmlTags
 
         public override bool GetConditionExec()
         {
-            return ZetaDia.ActInfo.Bounties.Where(bounty => bounty.Info.QuestSNO == QuestSNO && bounty.Info.State != QuestState.Completed).FirstOrDefault() != null;
+            return ZetaDia.ActInfo.Bounties.Where(bounty => bounty.Info.QuestSNO == QuestId && bounty.Info.State != QuestState.Completed).FirstOrDefault() != null;
         }
 
         private bool CheckNotAlreadyDone(object obj)
         {
             return !IsDone;
-        }
-
-        [XmlAttribute("questSNO", true)]
-        public int QuestSNO
-        {
-            get;
-            set;
         }
     }
 }

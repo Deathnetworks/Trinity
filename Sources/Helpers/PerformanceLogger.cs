@@ -33,7 +33,7 @@ namespace Trinity.Technicals
                         Logging.DebugFormat("[Trinity][Performance] Execution of the block {0} took {1:00.00}ms.", _BlockName,
                                             _Stopwatch.Elapsed.TotalMilliseconds);
                     }
-                    else if (_Stopwatch.Elapsed.TotalMilliseconds > 250)
+                    else if (_Stopwatch.Elapsed.TotalMilliseconds > 1000)
                     {
                         Logging.ErrorFormat("[Trinity][Performance] Execution of the block {0} took {1:00.00}ms.", _BlockName,
                                             _Stopwatch.Elapsed.TotalMilliseconds);

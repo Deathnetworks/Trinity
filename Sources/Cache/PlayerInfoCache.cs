@@ -54,9 +54,10 @@ namespace Trinity
         public int ExperienceNextLevel { get; set; }
         public int ParagonLevel { get; set; }
         public int ParagonCurrentExperience { get; set; }
-        public long ParagonExperienceNextLevel { get; set;  }
+        public long ParagonExperienceNextLevel { get; set; }
         public float Rotation { get; set; }
         public Vector2 DirectionVector { get; set; }
+        public bool IsGhosted { get; set; }
 
         public PlayerInfoCache()
         {
@@ -155,7 +156,7 @@ namespace Trinity
                     Player.SecondaryResourcePct = Player.SecondaryResource / me.MaxSecondaryResource;
                     Player.SecondaryResourceMax = me.MaxSecondaryResource;
                     Player.SecondaryResourceMissing = Player.SecondaryResourceMax - Player.SecondaryResource;
-                    
+
                     Player.Position = me.Position;
                     Player.Rotation = me.Movement.Rotation;
                     Player.DirectionVector = me.Movement.DirectionVector;
@@ -181,6 +182,9 @@ namespace Trinity
                     Player.ParagonExperienceNextLevel = ZetaDia.Me.ParagonExperienceNextLevel;
 
                     Player.IsHidden = me.IsHidden;
+
+                    if (Player.CurrentHealthPct > 0)
+                        Player.IsGhosted = ZetaDia.Me.CommonData.GetAttribute<int>(ActorAttributeType.Ghosted) > 0;
 
                     if (DateTime.UtcNow.Subtract(Player.Scene.LastUpdate).TotalMilliseconds > 1000 && Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
                     {
@@ -224,8 +228,8 @@ namespace Trinity
                 bool archonBuff = false;
                 int stackCount;
                 string buffList = "";
-				Trinity.GotFrenzyShrine = false;
-				Trinity.GotBlessedShrine = false;
+                Trinity.GotFrenzyShrine = false;
+                Trinity.GotBlessedShrine = false;
                 // Store how many stacks of each buff we have
                 foreach (Buff buff in Trinity.listCachedBuffs)
                 {
@@ -237,10 +241,10 @@ namespace Trinity
                     // Check for archon stuff
                     if (buff.SNOId == (int)SNOPower.Wizard_Archon)
                         archonBuff = true;
-					if (buff.SNOId == 30476) //Blessed (+25% defence)
-						Trinity.GotBlessedShrine = true;
-					if (buff.SNOId == 30479) //Frenzy  (+25% atk speed)
-						Trinity.GotFrenzyShrine = true;
+                    if (buff.SNOId == 30476) //Blessed (+25% defence)
+                        Trinity.GotBlessedShrine = true;
+                    if (buff.SNOId == 30479) //Frenzy  (+25% atk speed)
+                        Trinity.GotFrenzyShrine = true;
                 }
                 Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Refreshed buffs: " + buffList);
                 // Archon stuff
@@ -307,7 +311,7 @@ namespace Trinity
 
                 if (!Trinity.GetHasBuff(SNOPower.Wizard_Archon) && !Player.IsHidden)
                     Trinity.hashCachedPowerHotbarAbilities = new HashSet<SNOPower>(Trinity.Hotbar);
-         }
+            }
 
             // Monk Seven Sided Strike: Sustained Attack
             if (Player.ActorClass == ActorClass.Monk && HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Monk_SevenSidedStrike && s.RuneIndex == 3))

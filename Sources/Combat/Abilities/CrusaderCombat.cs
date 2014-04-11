@@ -156,7 +156,7 @@ namespace Trinity.Combat.Abilities
                 // Shield Bash
                 if (CombatBase.CanCast(SNOPower.X1_Crusader_ShieldBash2))
                 {
-                    var bestPierceTarget = TargetUtil.GetBestPierceTarget(65f);
+                    var bestPierceTarget = TargetUtil.GetBestClusterUnit(15f, 65f, 1, false, false);
                     if (bestPierceTarget != null)
                         return new TrinityPower(SNOPower.X1_Crusader_ShieldBash2, 65f, bestPierceTarget.ACDGuid);
                 }

@@ -213,7 +213,6 @@
     <Compile Include="Cache\RefreshObjects.cs" />
     <Compile Include="XmlTags\ActBountiesComplete.cs" />
     <Compile Include="XmlTags\BaseComplexNodeTag.cs" />
-    <Compile Include="XmlTags\BountAtStep.cs" />
     <Compile Include="XmlTags\HaveBounty.cs" />
     <Compile Include="XmlTags\TrinitySetQuesting.cs" />
     <Compile Include="XmlTags\TrinityCombatIgnore.cs" />
