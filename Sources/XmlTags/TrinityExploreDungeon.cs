@@ -540,7 +540,7 @@ namespace Trinity.XmlTags
                     ),
                     new Decorator(ret => ShouldInvestigateActor(),
                         new PrioritySelector(
-                            new Decorator(ret => CurrentActor != null && CurrentActor.IsValid && 
+                            new Decorator(ret => CurrentActor != null && CurrentActor.IsValid &&
                                 Objectives.Any(o => o.ActorID == CurrentActor.ActorSNO && o.Interact) &&
                                 CurrentActor.Position.Distance(Trinity.Player.Position) <= CurrentActor.CollisionSphere.Radius,
                                 new Sequence(
@@ -592,12 +592,12 @@ namespace Trinity.XmlTags
         {
             get
             {
-                var actor = 
+                var actor =
                 ZetaDia.Actors.GetActorsOfType<DiaObject>(true, false)
                 .Where(a => (a.ActorSNO == ActorId ||
                     Objectives.Any(o => o.ActorID != 0 && o.ActorID == a.ActorSNO)) &&
                     Trinity.SkipAheadAreaCache.Any(o => o.Position.Distance2D(a.Position) >= ObjectDistance &&
-                    !foundObjects.Any(fo => fo != new Tuple<int,Vector3>(o.ActorSNO, o.Position))))
+                    !foundObjects.Any(fo => fo != new Tuple<int, Vector3>(o.ActorSNO, o.Position))))
                 .OrderBy(o => o.Distance)
                 .FirstOrDefault();
 
@@ -801,6 +801,12 @@ namespace Trinity.XmlTags
             return
             new PrioritySelector(
                 TimeoutCheck(),
+                new Decorator(ret => GetIsBountyDone(),
+                    new Sequence(
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Bounty is done. Tag Finished.", IgnoreLastNodes)),
+                        new Action(ret => isDone = true)
+                    )
+                ),
                 new Decorator(ret => EndType == TrinityExploreEndType.FullyExplored && IgnoreLastNodes > 0 && GetRouteUnvisitedNodeCount() <= IgnoreLastNodes && GetGridSegmentationVisistedNodeCount() >= MinVisistedNodes,
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Fully explored area! Ignoring {0} nodes. Tag Finished.", IgnoreLastNodes)),
@@ -1495,6 +1501,54 @@ namespace Trinity.XmlTags
             isDone = false;
             InitDone = false;
         }
+
+        //Had to use ActiveBounty, caused too much lag constantly searching the bounty list
+        public bool GetIsBountyDone()
+        {
+            // Only valid for Adventure mode
+            if (ZetaDia.CurrentAct != Act.OpenWorld)
+                return false;
+
+            try
+            {
+                var b = ZetaDia.ActInfo.ActiveBounty;
+                if (b == null)
+                {
+                    Logger.Log("Active bounty returned null, Assuming done.");
+                    return true;
+                }
+                if (!b.Info.IsValid)
+                {
+                    Logger.Log("Does this even work? Thinks the bounty is not valid.");
+                }
+                if (b.Info.QuestSNO > 500000 || b.Info.QuestSNO < 200000)
+                {
+                    Logger.Log("Got some weird numbers going on with the QuestSNO of the active bounty. Assuming glitched and done.");
+                    return true;
+                }
+                //If completed or on next step, we are good.
+                if (b.Info.State == QuestState.Completed)
+                {
+                    Logger.Log("Seems completed!");
+                    return true;
+                }
+                if (ZetaDia.IsInTown)
+                {
+                    return true;
+                }
+                if (ZetaDia.Me.IsInBossEncounter)
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Exception reading ActiveBounty " + ex.Message);
+            }
+
+            return false;
+        }
+
     }
 }
 

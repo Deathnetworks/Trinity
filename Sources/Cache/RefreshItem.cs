@@ -110,7 +110,7 @@ namespace Trinity
                 IsTwoHand = c_IsTwoHandedItem,
                 ItemFollowerType = c_item_tFollowerType,
                 DynamicID = c_GameDynamicID,
-                Position = c_Position,
+                Position = CurrentCacheObject.Position,
                 ActorSNO = c_ActorSNO,
                 ACDGuid = c_ACDGUID,
                 IsUpgrade = isUpgrade,
@@ -270,7 +270,7 @@ namespace Trinity
         {
             bool isNewLogItem = false;
 
-            c_ItemMd5Hash = HashGenerator.GenerateItemHash(c_Position, c_ActorSNO, c_InternalName, CurrentWorldDynamicId, c_ItemQuality, c_ItemLevel);
+            c_ItemMd5Hash = HashGenerator.GenerateItemHash(CurrentCacheObject.Position, c_ActorSNO, c_InternalName, CurrentWorldDynamicId, c_ItemQuality, c_ItemLevel);
 
             if (!GenericCache.ContainsKey(c_ItemMd5Hash))
             {

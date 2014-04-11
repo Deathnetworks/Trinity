@@ -17,7 +17,6 @@ namespace Trinity
         /// </summary>
         private static TrinityCacheObject CurrentCacheObject = new TrinityCacheObject();
 
-        private static Vector3 c_Position = Vector3.Zero;
         private static GObjectType c_ObjectType = GObjectType.Unknown;
         /// <summary>
         /// Percent of total health remaining on unit
@@ -131,17 +130,20 @@ namespace Trinity
                     //CacheData.CollisionSphere.Add(c_RActorGuid, c_Radius);
                 }
 
-                if (!CacheData.Position.TryGetValue(c_RActorGuid, out c_Position))
+                Vector3 pos;
+                if (!CacheData.Position.TryGetValue(c_RActorGuid, out pos))
                 {
-                    c_Position = c_diaObject.Position;
-                    //CacheData.Position.Add(c_RActorGuid, c_Position);
+                    CurrentCacheObject.Position = c_diaObject.Position;
+                    //CacheData.Position.Add(c_RActorGuid, CurrentCacheObject.Position);
                 }
+                if (pos != Vector3.Zero)
+                    CurrentCacheObject.Position = pos;
 
                 CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                 {
                     ActorSNO = c_ActorSNO,
                     Name = c_InternalName,
-                    Position = c_Position,
+                    Position = CurrentCacheObject.Position,
                     Radius = c_Radius,
                     ObjectType = c_ObjectType,
                 });
@@ -162,7 +164,6 @@ namespace Trinity
             if (!AddToCache) { c_IgnoreReason = "CachedPlayerSummons"; return AddToCache; }
 
 
-            c_Position = CurrentCacheObject.Object.Position;
             CurrentCacheObject.Position = CurrentCacheObject.Object.Position;
 
             // Always Refresh Distance for every object
@@ -179,7 +180,7 @@ namespace Trinity
             }
             if (DataDictionary.SameWorldPortals.Contains(CurrentCacheObject.ActorSNO))
             {
-                c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, c_Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
+                c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, CurrentCacheObject.Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
             }
 
             // Check Blacklists
@@ -196,7 +197,7 @@ namespace Trinity
                 }
 
                 /* Generic Blacklisting for shifting RActorGUID bug */
-                c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, c_Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
+                c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, CurrentCacheObject.Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
             }
 
             // Always Refresh ZDiff for every object
@@ -234,8 +235,6 @@ namespace Trinity
             {
                 c_IgnoreReason = "None";
 
-
-                CurrentCacheObject.Position = c_Position;
                 CurrentCacheObject.Type = c_ObjectType;
                 CurrentCacheObject.CentreDistance = c_CentreDistance;
                 CurrentCacheObject.RadiusDistance = c_RadiusDistance;
@@ -303,7 +302,7 @@ namespace Trinity
                     {
                         ActorSNO = c_ActorSNO,
                         Radius = c_Radius,
-                        Position = c_Position,
+                        Position = CurrentCacheObject.Position,
                         Name = c_InternalName,
                         ObjectType = c_ObjectType,
                     });
@@ -323,7 +322,7 @@ namespace Trinity
                 {
                     ActorSNO = c_ActorSNO,
                     Name = c_InternalName,
-                    Position = c_Position,
+                    Position = CurrentCacheObject.Position,
                     Radius = c_Radius,
                     ObjectType = c_ObjectType,
                 });
@@ -338,8 +337,7 @@ namespace Trinity
             AddTocache = true;
             // Start this object as off as unknown type
             c_ObjectType = GObjectType.Unknown;
-            // We will set weight up later in RefreshDiaObjects after we process all valid items
-            c_Position = Vector3.Zero;
+
             c_CentreDistance = 0f;
             c_RadiusDistance = 0f;
             c_Radius = 0f;
@@ -478,7 +476,7 @@ namespace Trinity
         private static void RefreshStepCalculateDistance()
         {
             // Calculate distance, don't rely on DB's internal method as this may hit Diablo 3 memory again
-            c_CentreDistance = Player.Position.Distance2D(c_Position);
+            c_CentreDistance = Player.Position.Distance2D(CurrentCacheObject.Position);
             CurrentCacheObject.CentreDistance = Player.Position.Distance2D(CurrentCacheObject.Position);
 
             // Set radius-distance to centre distance at first
@@ -811,8 +809,9 @@ namespace Trinity
                     if (c_CentreDistance < 95)
                     {
                         switch (c_ObjectType)
-                        {
+                        { 
                             case GObjectType.Destructible:
+                            case GObjectType.HealthWell:
                             case GObjectType.Unit:
                             case GObjectType.Shrine:
                             case GObjectType.Gold:
@@ -830,10 +829,13 @@ namespace Trinity
                                             else if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {
                                                 Vector3 myPos = new Vector3(Player.Position.X, Player.Position.Y, Player.Position.Z + 8f);
-                                                Vector3 cPos = new Vector3(c_Position.X, c_Position.Y, c_Position.Z + 8f);
+                                                Vector3 cPos = new Vector3(CurrentCacheObject.Position.X, CurrentCacheObject.Position.Y, CurrentCacheObject.Position.Z + 8f);
                                                 cPos = MathEx.CalculatePointFrom(cPos, myPos, c_Radius + 1f);
 
-                                                if (Navigator.Raycast(myPos, cPos))
+                                                if (Single.IsNaN(cPos.X) || Single.IsNaN(cPos.Y) || Single.IsNaN(cPos.Z))
+                                                    cPos = CurrentCacheObject.Position;
+
+                                                if (!NavHelper.CanRayCast(myPos, cPos))
                                                 {
                                                     AddToCache = false;
                                                     c_IgnoreSubStep = "UnableToRayCast";
@@ -843,7 +845,6 @@ namespace Trinity
                                                     c_HasBeenRaycastable = true;
                                                     CacheData.HasBeenRayCasted.Add(c_RActorGuid, c_HasBeenRaycastable);
                                                 }
-
                                             }
                                             else
                                             {
@@ -985,55 +986,7 @@ namespace Trinity
             }
             return AddToCache;
         }
-
-        private static bool RefreshStepCachedPosition(bool AddToCache)
-        {
-            // Try and get a cached position for anything that isn't avoidance or units (avoidance and units can move, sadly, so we risk DB mis-reads for those things!
-            if (c_ObjectType != GObjectType.Avoidance && c_ObjectType != GObjectType.Unit && c_ObjectType != GObjectType.Player && c_ObjectType != GObjectType.Unknown)
-            {
-                // Get the position, cached if possible
-                if (!CacheData.Position.TryGetValue(c_RActorGuid, out c_Position))
-                {
-                    try
-                    {
-                        //c_vPosition = thisobj.Position;
-                        Vector3 pos = c_diaObject.Position;
-
-                        if (Settings.Combat.Misc.UseNavMeshTargeting)
-                        {
-                            // always get Height of wherever the nav says it is (for flying things..)
-                            c_Position = new Vector3(pos.X, pos.Y, MainGridProvider.GetHeight(pos.ToVector2()));
-                        }
-                        else
-                            c_Position = pos;
-
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting position for a static object [{0}]", c_ActorSNO);
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                        AddToCache = false;
-                    }
-                    // Now cache it
-                    //CacheData.Position.Add(c_RActorGuid, c_Position);
-                }
-            }
-            // Ok pull up live-position data for units/avoidance now...
-            else
-            {
-                try
-                {
-                    c_Position = c_diaObject.Position;
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting position for a unit or avoidance object [{0}]", c_ActorSNO);
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                }
-            }
-            return AddToCache;
-        }
-
+        
         private static bool RefreshStepCachedDynamicIds(bool AddToCache)
         {
             // Try and grab the dynamic id and game balance id, if necessary and if possible

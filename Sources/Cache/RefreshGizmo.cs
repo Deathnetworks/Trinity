@@ -98,7 +98,7 @@ namespace Trinity
                 {
                     ActorSNO = c_ActorSNO,
                     Radius = c_Radius,
-                    Position = c_Position,
+                    Position = CurrentCacheObject.Position,
                     RActorGUID = c_RActorGuid,
                     ObjectType = c_ObjectType,
                 });
@@ -114,7 +114,7 @@ namespace Trinity
                 {
                     ActorSNO = c_ActorSNO,
                     Radius = c_Radius,
-                    Position = c_Position,
+                    Position = CurrentCacheObject.Position,
                     RActorGUID = c_RActorGuid,
                     ObjectType = c_ObjectType,
                 });
@@ -139,7 +139,7 @@ namespace Trinity
                 {
                     ActorSNO = c_ActorSNO,
                     Radius = c_Radius,
-                    Position = c_Position,
+                    Position = CurrentCacheObject.Position,
                     RActorGUID = c_RActorGuid,
                     ObjectType = c_ObjectType,
                 });
@@ -209,7 +209,7 @@ namespace Trinity
                             {
                                 ActorSNO = c_ActorSNO,
                                 Name = c_InternalName,
-                                Position = c_Position,
+                                Position = CurrentCacheObject.Position,
                                 Radius = c_Radius,
                                 ObjectType = c_ObjectType,
                             });
@@ -234,7 +234,7 @@ namespace Trinity
                                         {
                                             ActorSNO = c_ActorSNO,
                                             Radius = c_Radius,
-                                            Position = c_Position,
+                                            Position = CurrentCacheObject.Position,
                                             RActorGUID = c_RActorGuid,
                                             ObjectType = c_ObjectType,
                                         });
@@ -266,7 +266,7 @@ namespace Trinity
                                 DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < V.F("Cache.SameWorldPortalRange.InteractSeconds") && p.StartPosition.Distance2D(Trinity.Player.Position) > V.F("Cache.SameWorldPortalRange.MinRange")) &&
                                 CurrentCacheObject.RadiusDistance <= V.F("Cache.SameWorldPortalRange.MaxRange"))
                         {
-                            c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, c_Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
+                            c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, CurrentCacheObject.Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
 
                             GenericBlacklist.AddToBlacklist(new GenericCacheObject()
                             {
@@ -452,7 +452,7 @@ namespace Trinity
                             {
                                 ActorSNO = c_ActorSNO,
                                 Radius = c_Radius,
-                                Position = c_Position,
+                                Position = CurrentCacheObject.Position,
                                 RActorGUID = c_RActorGuid,
                                 ObjectType = c_ObjectType,
                             });
@@ -503,7 +503,7 @@ namespace Trinity
                             {
                                 ActorSNO = c_ActorSNO,
                                 Radius = c_Radius,
-                                Position = c_Position,
+                                Position = CurrentCacheObject.Position,
                                 RActorGUID = c_RActorGuid,
                                 ObjectType = c_ObjectType,
                             });

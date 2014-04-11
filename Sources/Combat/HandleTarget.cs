@@ -1333,7 +1333,7 @@ namespace Trinity
             {
                 // prevent spam
                 lastStatusText = statusText.ToString();
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.Targetting, "{0}", statusText.ToString());
+                Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "{0}", statusText.ToString());
                 bResetStatusText = true;
             }
         }

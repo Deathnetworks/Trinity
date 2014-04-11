@@ -6,7 +6,7 @@ namespace Trinity.DbProvider
     /// <summary>Combat Targeting Provider </summary>
     public class BlankCombatProvider : ITargetingProvider
     {
-        private static readonly List<DiaObject> listEmptyList = new List<DiaObject>();
+        private static readonly List<DiaObject> targetList = new List<DiaObject>();
 
         /// <summary> Gets list of target in range by weight.</summary>
         /// <returns>Blank list of target, Trinity don't use this Db process.</returns>

@@ -19,7 +19,7 @@ namespace Trinity
         {
             get
             {
-                return new Version(1, 8, 18);
+                return new Version(1, 8, 19);
             }
         }
 
@@ -73,7 +73,7 @@ namespace Trinity
                         }
                     }
 
-                    SetWindowTitle(Trinity.CurrentProfileName);
+                    UsedProfileManager.SetProfileInWindowTitle();
 
                     // See if we should update the stats file
                     if (DateTime.UtcNow.Subtract(ItemStatsLastPostedReport).TotalSeconds > 10)

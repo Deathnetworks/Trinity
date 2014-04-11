@@ -88,7 +88,7 @@ namespace Trinity
 
             // Beast Charge should set aoe position as players current position!
             if (avoidanceType == AvoidanceType.BeastCharge)
-                c_Position = Trinity.Player.Position;
+                CurrentCacheObject.Position = Trinity.Player.Position;
 
             // Monks with Serenity up ignore all AOE's
             if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_Serenity) && GetHasBuff(SNOPower.Monk_Serenity))
@@ -156,7 +156,7 @@ namespace Trinity
                 TimeSpan aoeExpiration;
                 DataDictionary.AvoidanceSpawnerDuration.TryGetValue(CurrentCacheObject.ActorSNO, out aoeExpiration);
 
-                CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(c_Position, avoidanceRadius, c_ActorSNO, c_InternalName)
+                CacheData.TimeBoundAvoidance.Add(new CacheObstacleObject(CurrentCacheObject.Position, avoidanceRadius, c_ActorSNO, c_InternalName)
                 {
                     Expires = DateTime.UtcNow.Add(aoeExpiration),
                     ObjectType = GObjectType.Avoidance,

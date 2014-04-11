@@ -148,6 +148,9 @@ namespace Trinity
                 case ActorClass.Barbarian:
                     avoidanceHealth = Trinity.Settings.Combat.Barbarian;
                     break;
+                case ActorClass.Crusader:
+                    avoidanceHealth = Trinity.Settings.Combat.Crusader;
+                    break;
                 case ActorClass.Monk:
                     avoidanceHealth = Trinity.Settings.Combat.Monk;
                     break;

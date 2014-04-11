@@ -96,7 +96,29 @@ namespace Trinity
             // So ZetaDia.Physics.Raycast() == !Navigator.Raycast()
             // We're using Navigator.Raycast now because it's "faster" (per Nesox)
 
-            bool rc = Navigator.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + ZDiff), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + ZDiff));
+            const int precision = 1;
+
+            vStartLocation = new Vector3()
+            {
+                X = (float)Math.Round((decimal)vStartLocation.X, precision),
+                Y = (float)Math.Round((decimal)vStartLocation.Y, precision),
+                Z = (float)Math.Round((decimal)vStartLocation.Z, precision),
+            };
+
+            vDestination = new Vector3()
+            {
+                X = (float)Math.Round((decimal)vDestination.X, precision),
+                Y = (float)Math.Round((decimal)vDestination.Y, precision),
+                Z = (float)Math.Round((decimal)vDestination.Z, precision),
+            };
+
+            bool rc = false;
+            Tuple<Vector3, Vector3> cacheTuple = new Tuple<Vector3, Vector3>(vStartLocation, vDestination);
+
+            if (!CacheData.RaycastCache.TryGetValue(cacheTuple, out rc))
+            {
+                rc = Navigator.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + ZDiff), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + ZDiff));
+            }
 
             if (rc)
                 return false;
@@ -218,6 +240,8 @@ namespace Trinity
             // Not sure if I need this...
             MainGridProvider.Update();
 
+            int worldId = Trinity.Player.WorldID;
+
             for (int x = 0; x < gridTotalSize; x++)
             {
                 for (int y = 0; y < gridTotalSize; y++)
@@ -226,23 +250,34 @@ namespace Trinity
                     Vector3 xyz = Vector3.Zero;
                     Point p_xy = Point.Empty;
 
-                    if (Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
-                    {
-                        xyz = new Vector3(xy.X, xy.Y, MainGridProvider.GetHeight(xy));
-                    }
-                    else
-                    {
-                        xyz = new Vector3(xy.X, xy.Y, origin.Z + 4);
-                    }
+                    Tuple<int, Vector2> cacheTuple = new Tuple<int, Vector2>(worldId, xy);
 
+                    if (!CacheData.WorldHeightCache.TryGetValue(cacheTuple, out xyz))
+                    {
+                        if (Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
+                        {
+                            xyz = new Vector3(xy.X, xy.Y, MainGridProvider.GetHeight(xy));
+                        }
+                        else
+                        {
+                            xyz = new Vector3(xy.X, xy.Y, origin.Z + 4);
+                        }
+                        CacheData.WorldHeightCache.Add(cacheTuple, xyz);
+                    }
 
                     GridPoint gridPoint = new GridPoint(xyz, 0, origin.Distance(xyz));
 
                     if (Trinity.Settings.Combat.Misc.UseNavMeshTargeting)
                     {
-                        p_xy = MainGridProvider.WorldToGrid(xy);
+                        bool canStand = false;
 
-                        if (!MainGridProvider.CanStandAt(p_xy))
+                        if (!CacheData.CanStandAtCache.TryGetValue(cacheTuple, out canStand))
+                        {
+                            p_xy = MainGridProvider.WorldToGrid(xy);
+                            canStand = MainGridProvider.CanStandAt(p_xy);
+                        }
+
+                        if (!canStand)
                         {
                             nodesCantStand++;
                             continue;
@@ -260,7 +295,7 @@ namespace Trinity
                     //if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
                     //    gridPoint.Distance > 45 && !Navigator.Raycast(origin, xyz))
                     if (!DataDictionary.StraightLinePathingLevelAreaIds.Contains(Trinity.Player.LevelAreaId) &&
-                        Navigator.Raycast(origin, xyz))
+                        !CanRayCast(origin, xyz))
                     {
                         nodesGT45Raycast++;
                         continue;

@@ -168,6 +168,21 @@ namespace Trinity
         /// </summary>
         internal static HashSet<SameWorldPortal> SameWorldPortals = new HashSet<SameWorldPortal>();
 
+        /// <summary>
+        /// Stores a list of world points where we can stand (according to GridProvider)
+        /// </summary>
+        internal static Dictionary<Tuple<int, Vector2>, bool> CanStandAtCache = new Dictionary<Tuple<int, Vector2>, bool>();
+
+        /// <summary>
+        /// Stores a list of Z according to the Vector2 points (according to GridProvider)
+        /// </summary>
+        internal static Dictionary<Tuple<int, Vector2>, Vector3> WorldHeightCache = new Dictionary<Tuple<int, Vector2>, Vector3>();
+
+        /// <summary>
+        /// Stores results of raycasting
+        /// </summary>
+        internal static Dictionary<Tuple<Vector3, Vector3>, bool> RaycastCache = new Dictionary<Tuple<Vector3, Vector3>, bool>();
+
         internal static void Clear()
         {
             CacheData.AvoidanceObstacles.Clear();

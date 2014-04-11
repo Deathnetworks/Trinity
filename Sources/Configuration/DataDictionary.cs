@@ -231,8 +231,8 @@ namespace Trinity
         {
             {5482, TimeSpan.FromSeconds(10)},   // Poison Tree
             {6578, TimeSpan.FromSeconds(10)},   // Poison Tree
-            {316389, TimeSpan.FromSeconds(10)}, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
-            {340319, TimeSpan.FromSeconds(10)}, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
+            {316389, TimeSpan.FromSeconds(6)}, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_projectile (316389)
+            {340319, TimeSpan.FromSeconds(6)}, // PoisonEnchanted x1_MonsterAffix_CorpseBomber_bomb_start (340319)
         };
 
         public static Dictionary<int, float> DefaultAvoidanceCustomRadius { get { return defaultAvoidanceCustomRadius; } }

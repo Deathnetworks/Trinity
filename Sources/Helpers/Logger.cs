@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
 using log4net;
 using log4net.Appender;
 using log4net.Layout;
+using log4net.Repository.Hierarchy;
 using Zeta.Common;
 
 namespace Trinity.Technicals
@@ -23,27 +22,7 @@ namespace Trinity.Technicals
             get { return Logger.prefix; }
             set { Logger.prefix = value; }
         }
-
-        internal static void AlterPrefix()
-        {
-            Prefix = "[Trinityy]";
-        }
-
-        public static void LoadSNOTable()
-        {
-            try
-            {
-                Zeta.Game.ZetaDia.SNO.LookupSNOName(Zeta.Game.Internals.SNOGroup.Actor, -1);
-            }
-            catch
-            {
-                // do nothing
-            }
-            string a = "VXNpbmcgU05PUmVjb3JkIFRhYmxl";
-            byte[] b = Convert.FromBase64String(a);
-            DBLog.Critical(Encoding.UTF8.GetString(b) + " " + (new Random().Next(128, 1024)).ToString());
-        }
-
+        
         /// <summary>Logs the specified level.</summary>
         /// <param name="level">The logging level.</param>
         /// <param name="category">The category.</param>
@@ -55,7 +34,7 @@ namespace Trinity.Technicals
             {
                 string msg = string.Format(prefix + "{0} {1}", category != LogCategory.UserInformation ? "[" + category.ToString() + "]" : string.Empty, formatMessage);
 
-                LogToTrinityDebug(msg, args);
+                //LogToTrinityDebug(msg, args);
 
                 switch (level)
                 {
@@ -69,7 +48,7 @@ namespace Trinity.Technicals
                         DBLog.DebugFormat(msg, args);
                         break;
                     case TrinityLogLevel.Debug:
-                        //DBLog.DebugFormat(msg, args);
+                        LogToTrinityDebug(msg, args);
                         break;
                 }
             }
@@ -200,7 +179,7 @@ namespace Trinity.Technicals
         private static log4net.Filter.LoggerMatchFilter trinityFilter;
         private static PatternLayout trinityLayout;
         private static log4net.Repository.Hierarchy.Logger trinityLogger;
-        private static RollingFileAppender trinityAppender;
+        private static FileAppender trinityAppender;
         private static Object _loglock = 0;
 
         private static void SetupLogger()
@@ -211,11 +190,9 @@ namespace Trinity.Technicals
                 {
                     lock (_loglock)
                     {
-
                         DBLog.Info("Setting up Trinity Logging");
                         int myPid = Process.GetCurrentProcess().Id;
                         DateTime startTime = Process.GetCurrentProcess().StartTime;
-                        string logFile = Path.Combine(FileManager.DemonBuddyPath, "Logs", myPid + " " + startTime.ToString("yyyy-MM-dd HH.mm") + " TrinityDebug.txt");
 
                         trinityLayout = new PatternLayout("%date{HH:mm:ss.fff} %-5level %m%n");
                         trinityLayout.ActivateOptions();
@@ -225,28 +202,26 @@ namespace Trinity.Technicals
                         trinityFilter.AcceptOnMatch = true;
                         trinityFilter.ActivateOptions();
 
-                        trinityAppender = new RollingFileAppender();
-                        trinityAppender.File = logFile;
+                        Hierarchy h = (Hierarchy)LogManager.GetRepository();
+                        var appenders = h.GetAppenders();
+
+                        foreach (var appender in appenders)
+                        {
+                            if (appender is FileAppender)
+                            {
+                                trinityAppender = appender as FileAppender;
+                            }
+                        }
+                        
                         trinityAppender.Layout = trinityLayout;
                         trinityAppender.AddFilter(trinityFilter);
 
-                        trinityAppender.MaxFileSize = 20971520;
-                        trinityAppender.MaxSizeRollBackups = 10;
-                        trinityAppender.PreserveLogFileNameExtension = true;
-                        trinityAppender.RollingStyle = RollingFileAppender.RollingMode.Size;
-
                         trinityAppender.ActivateOptions();
-
-                        //Hierarchy logHierarchy = (Hierarchy)LogManager.GetRepository();
-                        //trinityLogger = logHierarchy.LoggerFactory.CreateLogger(logHierarchy, "TrinityDebug");
-                        //trinityLogger.AddAppender(trinityAppender);
-                        //trinityLogger.Additivity = false;
 
                         trinityLog = LogManager.GetLogger("TrinityDebug");
                         trinityLogger = ((log4net.Repository.Hierarchy.Logger)trinityLog.Logger);
                         trinityLogger.Additivity = false;
-                        trinityLogger.AddAppender(trinityAppender);
-                        
+                        trinityLogger.AddAppender(trinityAppender);                                               
                     }
                 }
             }
