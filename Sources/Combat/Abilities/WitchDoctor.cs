@@ -312,26 +312,26 @@ namespace Trinity
 
             // Haunt the shit out of monster and maybe they will give you treats
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Witchdoctor_Haunt) &&
-                !Player.IsIncapacitated && Player.PrimaryResource >= 98 &&
+                !Player.IsIncapacitated && Player.PrimaryResource >= 50 &&
                 !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Witchdoctor_Haunt))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Haunt, 21f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_Haunt, 21f, CurrentTarget.ACDGuid);
             }
 
             //skillDict.Add("LocustSwarm", SNOPower.Witchdoctor_Locust_Swarm);
 
-            // Locust
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Witchdoctor_Locust_Swarm) && !Player.IsIncapacitated && Player.PrimaryResource >= 196 &&
+            // Locust Swarm
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Witchdoctor_Locust_Swarm) && !Player.IsIncapacitated && Player.PrimaryResource >= 300 &&
                 !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Witchdoctor_Locust_Swarm) && LastPowerUsed != SNOPower.Witchdoctor_Locust_Swarm)
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, 12f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_Locust_Swarm, 12f, CurrentTarget.ACDGuid);
             }
 
             // Sacrifice for 0 Dogs
             if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_Sacrifice, CombatBase.CanCastFlags.NoTimer) &&
                 (Settings.Combat.WitchDoctor.ZeroDogs || !WitchDoctorHasPrimaryAttack))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 9f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 2, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 9f);
             }
 
             // Wall of Zombies
@@ -345,10 +345,9 @@ namespace Trinity
             var zombieChargerRange = hasGraveInjustice ? Math.Min(Player.GoldPickupRadius + 8f, 11f) : 11f;
 
             // Zombie Charger aka Zombie bears Spams Bears @ Everything from 11feet away
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 140 &&
-                TargetUtil.AnyMobsInRange(zombieChargerRange))
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_ZombieCharger) && Player.PrimaryResource >= 150)
             {
-                return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, zombieChargerRange, CurrentTarget.Position, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, zombieChargerRange, CurrentTarget.Position);
             }
 
             //skillDict.Add("Firebats", SNOPower.Witchdoctor_Firebats);

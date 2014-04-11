@@ -285,30 +285,34 @@ namespace Trinity
             }
 
             // 4 Mantra spam for the 4 second buff
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) &&
-                Player.PrimaryResource >= 150 && TargetUtil.EliteOrTrashInRange(30f))
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated)
             {
-                return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
-            }
+                if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) &&
+                    Player.PrimaryResource >= 50 && CurrentTarget != null)
+                {
+                    return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2);
+                }
 
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2) &&
-                (Player.PrimaryResource >= 150) && TargetUtil.EliteOrTrashInRange(30f))
-            {
-                return new TrinityPower(SNOPower.X1_Monk_MantraOfConviction_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
+                if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2) &&
+                    (Player.PrimaryResource >= 50) && CurrentTarget != null)
+                {
+                    return new TrinityPower(SNOPower.X1_Monk_MantraOfConviction_v2);
+                }
+
+                if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) &&
+                    (Player.PrimaryResource >= 50) && CurrentTarget != null)
+                {
+                    return new TrinityPower(SNOPower.X1_Monk_MantraOfRetribution_v2);
+                }
             }
 
             //Use Mantra of Healing active if health is low for shield.
             if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfHealing_v2) && Player.CurrentHealthPct <= V.F("Monk.MantraOfHealing.UseHealthPct") &&
                 !Player.IsIncapacitated && !GetHasBuff(SNOPower.X1_Monk_MantraOfHealing_v2))
             {
-                return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2);
             }
 
-            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfRetribution_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) &&
-                (Player.PrimaryResource >= 150) && TargetUtil.EliteOrTrashInRange(30f))
-            {
-                return new TrinityPower(SNOPower.X1_Monk_MantraOfRetribution_v2, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 1, WAIT_FOR_ANIM);
-            }
 
             // Lashing Tail Kick
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Monk_LashingTailKick) && !Player.IsIncapacitated &&
@@ -492,17 +496,17 @@ namespace Trinity
         private static TrinityPower GetMonkDestroyPower()
         {
             if (Monk_TempestRushReady())
-                return new TrinityPower(SNOPower.Monk_TempestRush, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Monk_TempestRush, 5f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (CombatBase.CanCast(SNOPower.Monk_DashingStrike))
                 return new TrinityPower(SNOPower.Monk_DashingStrike, Monk_MaxDashingStrikeRange, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (CombatBase.CanCast(SNOPower.Monk_FistsofThunder))
-                return new TrinityPower(SNOPower.Monk_FistsofThunder, 15f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Monk_FistsofThunder, 5f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (CombatBase.CanCast(SNOPower.Monk_DeadlyReach))
-                return new TrinityPower(SNOPower.Monk_DeadlyReach, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Monk_DeadlyReach, 5f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (CombatBase.CanCast(SNOPower.Monk_CripplingWave))
-                return new TrinityPower(SNOPower.Monk_CripplingWave, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Monk_CripplingWave, 5f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (CombatBase.CanCast(SNOPower.Monk_WayOfTheHundredFists))
-                return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 10f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Monk_WayOfTheHundredFists, 5f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             return CombatBase.DefaultPower;
         }
         /// <summary>

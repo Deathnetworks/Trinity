@@ -383,7 +383,7 @@ namespace Trinity.Combat.Abilities
                 return false;
 
             // Skip this 
-            if (Player.ActorClass == ActorClass.Wizard || Player.ActorClass == ActorClass.DemonHunter)
+            if (Player.ActorClass == ActorClass.Wizard || Player.ActorClass == ActorClass.DemonHunter || Player.ActorClass == ActorClass.Monk)
             {
                 bool timer = flags.HasFlag(CanCastFlags.NoTimer) || SNOPowerUseTimer(power);
 

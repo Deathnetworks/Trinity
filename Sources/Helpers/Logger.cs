@@ -220,7 +220,7 @@ namespace Trinity.Technicals
 
                         trinityLog = LogManager.GetLogger("TrinityDebug");
                         trinityLogger = ((log4net.Repository.Hierarchy.Logger)trinityLog.Logger);
-                        trinityLogger.Additivity = true;
+                        trinityLogger.Additivity = false;
                         trinityLogger.AddAppender(trinityAppender);                                               
                     }
                 }

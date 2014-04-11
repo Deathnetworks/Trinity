@@ -765,27 +765,15 @@ namespace Trinity
 
                                 // Not Stuck, skip!
                                 if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.OnlyIfStuck &&
-                                    MovementSpeed > 1)
+                                    DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds > 3)
                                 {
+                                    objWeightInfo += "NotStuck";
                                     break;
                                 }
-
-                                // Not stuck, skip
-                                if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.OnlyIfStuck &&
-                                    DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500)
-                                {
-                                    break;
-                                }
-
-                                if (cacheObject.RadiusDistance > Settings.WorldObject.DestructibleRange &&
-                                    (DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalMilliseconds > 500 || MovementSpeed > 1))
-                                {
-                                    break;
-                                }
-
+                                
                                 // rrrix added this as a single "weight" source based on the DestructableRange.
                                 // Calculate the weight based on distance, where a distance = 1 is 5000, 90 = 0
-                                cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 5000f;
+                                cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 1000f;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
@@ -805,7 +793,7 @@ namespace Trinity
 
                                 // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
                                 if (prioritizeCloseRangeUnits)
-                                    cacheObject.Weight = (200d - cacheObject.CentreDistance) / 200d * 19200d;
+                                    cacheObject.Weight = (15f - cacheObject.CentreDistance) / 15f * 19200d;
 
                                 //// We're standing on the damn thing... break it
                                 if (cacheObject.RadiusDistance <= 5f)
@@ -876,7 +864,7 @@ namespace Trinity
                                 }
 
                                 // Weight Containers
-                                cacheObject.Weight = (maxRange - cacheObject.CentreDistance) / maxRange * 1000d;
+                                cacheObject.Weight = (maxRange - cacheObject.CentreDistance) / maxRange * 100d;
 
                                 // Very close containers get a weight increase
                                 if (cacheObject.CentreDistance <= 8f)

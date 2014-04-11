@@ -153,10 +153,11 @@ namespace Trinity
             Set(new TVar("SpellDelay.Monk_CycloneStrike", 900, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.Monk_SevenSidedStrike", 30200, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.X1_Monk_MysticAlly_v2", 30000, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.X1_Monk_MantraOfEvasion_v2", 3300, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.X1_Monk_MantraOfRetribution_v2", 3300, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.X1_Monk_MantraOfHealing_v2", 3300, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.X1_Monk_MantraOfConviction_v2", 3300, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_Monk_MantraOfEvasion_v2", 2800, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_Monk_MantraOfRetribution_v2", 2800, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_Monk_MantraOfHealing_v2", 2800, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_Monk_MantraOfConviction_v2", 2800, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_Monk_Epiphany", 60000, "Spell Use Delay/Interval, milliseconds"));
 
             // Wizard skills
             Set(new TVar("SpellDelay.Wizard_MagicMissile", 5, "Spell Use Delay/Interval, milliseconds"));
@@ -230,6 +231,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.DemonHunter_Vault", 400, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_Preparation", 45000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.X1_DemonHunter_Companion", 30000, "Spell Use Delay/Interval, milliseconds"));
+            
             Set(new TVar("SpellDelay.DemonHunter_MarkedForDeath", 3000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_EvasiveFire", 300, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_FanOfKnives", 10000, "Spell Use Delay/Interval, milliseconds"));
@@ -239,6 +241,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.DemonHunter_Multishot", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_ClusterArrow", 150, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_RainOfVengeance", 10000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_DemonHunter_Vengeance", 900000, "Spell Use Delay/Interval, milliseconds"));
 
             // Demon Hunter
             Set(new TVar("DemonHunter.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));

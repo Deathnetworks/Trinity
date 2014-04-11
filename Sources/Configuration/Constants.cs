@@ -74,7 +74,7 @@ namespace Trinity
         // Variable name                                                  Dex, Int, Str, Vit, Life%,  LOH,Steal%, LPS, MF, GF, MS, Rad, Sox,  Crit%, CDam%, ASPD,  Min+, Max+, Blk, Thrn, AR, SR,  DPS, ARMOR, Disc, Mana, Arc.,  Regen, Globes (Values were updated to 85% of max based on d3maxstats.com and experience by DarkTitan)
         internal static double[] MaxPointsWeaponTwoHand = new double[29] { 956, 956, 956, 956, 0, 4000, 5.8, 0, 0, 0, 0, 0, 1, 0, 170, 0, 0, 0, 0, 0, 0, 0, 2285, 0, 10, 119, 10, 14, 0 };
         internal static double[] MaxPointsWeaponOneHand = new double[29] { 956, 956, 1125, 956, 0, 2800, 2.8, 0, 0, 0, 0, 0, 1, 0, 85, 0, 0, 0, 0, 0, 0, 0, 1870, 0, 10, 150, 10, 14, 0 };
-        internal static double[] MaxPointsWeaponRanged = new double[29] { 562, 562, 562, 562, 0, 2800, 2.8, 0, 0, 0, 0, 0, 1, 0, 85, 0, 0, 0, 0, 0, 0, 0, 2040, 0, 0, 0, 0, 14, 0 };
+        internal static double[] MaxPointsWeaponRanged = new double[29] { 562, 562, 562, 562, 0, 2800, 2.8, 0, 0, 0, 0, 0, 1, 0, 85, 0, 0, 0, 0, 0, 0, 0, 2040, 0, 10, 0, 0, 14, 0 };
         internal static double[] MaxPointsOffHand = new double[29] { 562, 562, 562, 562, 9, 0, 0, 2000, 18, 20, 0, 0, 1, 8.5, 0, 15, 210, 402, 0, 979, 0, 0, 0, 0, 10, 119, 10, 11, 25256 };
         internal static double[] MaxPointsShield = new double[29] { 562, 562, 562, 562, 16, 0, 0, 2000, 20, 25, 0, 0, 1, 10, 0, 0, 0, 0, 30, 2544, 80, 136, 0, 397, 0, 0, 0, 0, 25256 };
         internal static double[] MaxPointsRing = new double[29] { 425, 425, 425, 425, 12, 1600, 0, 1834, 20, 25, 0, 0, 1, 6, 50, 9, 36, 100, 0, 979, 80, 136, 0, 240, 0, 0, 0, 0, 25256 };

@@ -168,7 +168,7 @@ namespace Trinity
             if (result == null && CurrentTarget != null)
                 result = CurrentTarget;
             else
-                result = default(TrinityCacheObject);
+                result = GetBestClusterUnit(15f, maxRange);
             return result;
         }
 

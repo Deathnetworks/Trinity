@@ -55,7 +55,8 @@ namespace Trinity
             // Sentry Turret
             if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Sentry, CombatBase.CanCastFlags.NoTimer) &&
                 (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50, 2) || TargetUtil.IsEliteTargetInRange(50)) &&
-                Player.PrimaryResource >= 30)
+                Player.PrimaryResource >= 30 &&
+                (SpellHistory.TimeSinceUse(SNOPower.DemonHunter_Sentry) > TimeSpan.FromSeconds(10) || SpellHistory.DistanceFromLastUsePosition(SNOPower.DemonHunter_Sentry) > 7.5))
             {
 
                 return new TrinityPower(SNOPower.DemonHunter_Sentry, 0f, Player.Position, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
@@ -154,7 +155,7 @@ namespace Trinity
             //runeDict.Add("Displace", 4);
             //runeDict.Add("Surge", 3);
 
-           
+
             // Companion
             if (!Player.IsIncapacitated && CombatBase.CanCast(SNOPower.X1_DemonHunter_Companion) && TargetUtil.EliteOrTrashInRange(30f) &&
                 Player.SecondaryResource >= 10)
@@ -381,28 +382,28 @@ namespace Trinity
         {
             if (Hotbar.Contains(SNOPower.DemonHunter_HungeringArrow))
                 return new TrinityPower(SNOPower.DemonHunter_HungeringArrow, 40f, CurrentTarget.ACDGuid);
-            
+
             if (Hotbar.Contains(SNOPower.X1_DemonHunter_EntanglingShot))
                 return new TrinityPower(SNOPower.X1_DemonHunter_EntanglingShot, 40f, CurrentTarget.ACDGuid);
-            
+
             if (Hotbar.Contains(SNOPower.DemonHunter_Bolas))
                 return new TrinityPower(SNOPower.DemonHunter_Bolas, 40f, CurrentTarget.ACDGuid);
-            
+
             if (Hotbar.Contains(SNOPower.DemonHunter_Grenades))
                 return new TrinityPower(SNOPower.DemonHunter_Grenades, 15f, CurrentTarget.ACDGuid);
-            
+
             if (Hotbar.Contains(SNOPower.DemonHunter_ElementalArrow) && Player.PrimaryResource >= 10)
                 return new TrinityPower(SNOPower.DemonHunter_ElementalArrow, 40f, CurrentTarget.ACDGuid);
-            
+
             if (Hotbar.Contains(SNOPower.X1_DemonHunter_EvasiveFire) && Player.PrimaryResource >= 10)
                 return new TrinityPower(SNOPower.X1_DemonHunter_EvasiveFire, 40f, CurrentTarget.ACDGuid);
-            
+
             if (Hotbar.Contains(SNOPower.DemonHunter_RapidFire) && Player.PrimaryResource >= 10)
                 return new TrinityPower(SNOPower.DemonHunter_RapidFire, 40f, CurrentTarget.Position);
-            
+
             if (Hotbar.Contains(SNOPower.DemonHunter_Chakram) && Player.PrimaryResource >= 20)
                 return new TrinityPower(SNOPower.DemonHunter_Chakram, 0f, CurrentTarget.ACDGuid);
-            
+
             return CombatBase.DefaultPower;
         }
     }

@@ -64,8 +64,6 @@ namespace Trinity
                         // Minimum range clamp
                         if (c_Radius <= 1f)
                             c_Radius = 1f;
-
-                        c_RadiusDistance = c_Radius + c_CentreDistance;
                     }
                     catch
                     {
@@ -78,8 +76,7 @@ namespace Trinity
             }
             CurrentCacheObject.Radius = c_Radius;
 
-            // A "fake distance" to account for the large-object size of monsters
-            c_RadiusDistance -= (float)c_Radius;
+            c_RadiusDistance = c_CentreDistance - c_Radius;
             if (c_RadiusDistance <= 1f)
                 c_RadiusDistance = 1f;
 
@@ -478,6 +475,13 @@ namespace Trinity
                             }
                         }
 
+                        if (DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds <= 1)
+                        {
+                            AddToCache = true;
+                            c_IgnoreSubStep = "";
+                            break;
+                        }
+
                         // Set min distance to user-defined setting
                         minDistance = Settings.WorldObject.DestructibleRange + c_Radius;
                         if (ForceCloseRangeTarget)
@@ -538,6 +542,13 @@ namespace Trinity
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "ForceIgnoreDestructibles";
+                            break;
+                        }
+
+                        if (DateTime.UtcNow.Subtract(PlayerMover.LastGeneratedStuckPosition).TotalSeconds <= 1)
+                        {
+                            AddToCache = true;
+                            c_IgnoreSubStep = "";
                             break;
                         }
 
