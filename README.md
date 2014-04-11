@@ -1,6 +1,46 @@
 ﻿
 # Trinity
 
+### Changelog 1.8.19
+
+* Added Sychotix's ActbountiesComplete, HaveBounty and TrinityExploreDungeon additions
+
+* Fixed radius distance on gizmos
+
+* Monk Sentry turrent should now be used more appropriately when off cooldown
+
+* Monk Mantras should work better
+
+* Bot should no longer get stuck on large destructibles
+
+* Haunt, Locust Swarm and Zombie Charger should all work better
+
+* Hero should now attempt to kite/flee into a clearer area after reviving at its corpse
+
+* Crusader Shield Bash will now use the best cluster target instead of best pierce target
+
+* Wizard Archon Slow Time should now be properly used
+
+* Fixed using regular potions
+
+* Increased required delay for performance alerts
+
+* Profile filename is now also shown in title bar
+
+* HaveBounty modified to use questId attribute instead of questSNO
+
+* Added caching for Raycasting, World Z heights, and CanStandAt locations - should reduce CPU and increase performance, particularly with Avoidance
+
+* Fixed avoidance not working at all with Crusader
+
+* Fixed perma freeze when attempting to raycast an invalid position
+
+* Barbarian Furious charge no longer throws an error
+
+* Barbarian Avalanche should pick a better target now
+
+* Trinity now logs all Debug to the main DB log file, but not to the WPF Textbox
+
 ### Changelog 1.8.18
 
 * Gizmos (Destructibles, Barricades, Interactables) should now properly be ignored when disabled by game scripts
