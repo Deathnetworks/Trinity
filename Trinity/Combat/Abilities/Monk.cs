@@ -285,9 +285,9 @@ namespace Trinity
             }
 
             // 4 Mantra spam for the 4 second buff
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated)
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !Settings.Combat.Monk.DisableMantraSpam)
             {
-                if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfRetribution_v2) &&
+                if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfEvasion_v2) &&
                     Player.PrimaryResource >= 50 && CurrentTarget != null)
                 {
                     return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2);

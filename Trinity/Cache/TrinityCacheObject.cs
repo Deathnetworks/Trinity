@@ -14,11 +14,41 @@ namespace Trinity
     public class TrinityCacheObject
     {
         [NoCopy]
-        public DiaObject Object { get { return ZetaDia.Actors.GetActorsOfType<DiaObject>(true, true).Where(o => o.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
+        private DiaObject _object;
         [NoCopy]
-        public DiaUnit Unit { get { return ZetaDia.Actors.GetActorsOfType<DiaUnit>(true, true).Where(u => u.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
+        public DiaObject Object
+        {
+            get
+            {
+                if (_object == null || (_object != null && !_object.IsValid))
+                {
+                    _object = ZetaDia.Actors.GetActorsOfType<DiaObject>(true, true).Where(o => o.RActorGuid == this.RActorGuid).FirstOrDefault();
+                }
+                return _object;
+            }
+        }
         [NoCopy]
-        public DiaGizmo Gizmo { get { return ZetaDia.Actors.GetActorsOfType<DiaGizmo>(true, true).Where(u => u.RActorGuid == this.RActorGuid).FirstOrDefault(); } }
+        public DiaUnit Unit
+        {
+            get
+            {
+                if (Object != null && Object.IsValid && Object is DiaUnit)
+                    return Object as DiaUnit;
+                else
+                    return null;
+            }
+        }
+        [NoCopy]
+        public DiaGizmo Gizmo
+        {
+            get
+            {
+                if (Object != null && Object.IsValid && Object is DiaGizmo)
+                    return Object as DiaGizmo;
+                else
+                    return null;
+            }
+        }
 
         public int ACDGuid { get; set; }
         public int RActorGuid { get; set; }

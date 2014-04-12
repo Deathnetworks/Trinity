@@ -262,23 +262,21 @@ namespace Trinity
                     {
                         return true;
                     }
-                    // Ok record the time we last saw any unit at all
-                    if (CurrentTarget.IsUnit)
-                    {
-                        lastHadUnitInSights = DateTime.UtcNow;
-                        // And record when we last saw any form of elite
-                        if (CurrentTarget.IsBoss || CurrentTarget.IsEliteRareUnique || CurrentTarget.IsTreasureGoblin)
-                            lastHadEliteUnitInSights = DateTime.UtcNow;
-                    }
 
-                    // And record when we last saw a boss
-                    if (CurrentTarget.IsBoss)
+
+                    if (CurrentTarget.IsUnit)
+                        lastHadUnitInSights = DateTime.UtcNow;
+
+                    if (CurrentTarget.IsBossOrEliteRareUnique)
+                        lastHadEliteUnitInSights = DateTime.UtcNow;
+
+                    if (CurrentTarget.IsBoss || CurrentTarget.IsBountyObjective)
                         lastHadBossUnitInSights = DateTime.UtcNow;
 
+
                     if (CurrentTarget.Type == GObjectType.Container)
-                    {
                         lastHadContainerInSights = DateTime.UtcNow;
-                    }
+
                     // Record the last time our target changed
                     if (LastTargetRactorGUID != CurrentTarget.RActorGuid)
                     {
