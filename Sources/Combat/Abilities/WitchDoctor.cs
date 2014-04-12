@@ -295,12 +295,6 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
             }
 
-            // Regular spirit barage
-            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource >= 100 && !hasManitou)
-            {
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 12f, CurrentTarget.ACDGuid);
-            }
-
             //skillDict.Add("Haunt", SNOPower.Witchdoctor_Haunt);
             //runeDict.Add("ConsumingSpirit", 0);
             //runeDict.Add("ResentfulSpirit", 4);
@@ -310,7 +304,7 @@ namespace Trinity
 
             bool hasResentfulSpirit = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Witchdoctor_Haunt && s.RuneIndex == 4);
 
-            // Haunt the shit out of monster and maybe they will give you treats
+            // Haunt 
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Witchdoctor_Haunt) &&
                 !Player.IsIncapacitated && Player.PrimaryResource >= 50 &&
                 !SpellTracker.IsUnitTracked(CurrentTarget, SNOPower.Witchdoctor_Haunt))
@@ -418,10 +412,10 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_ZombieCharger, zombieChargerRange, CurrentTarget.Position, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }
 
-            // Spirit Barrage
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource >= 108 && !hasManitou)
+            // Regular spirit barage
+            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource >= 100 && !hasManitou)
             {
-                return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 21f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 2, 2, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 12f, CurrentTarget.ACDGuid);
             }
 
             // Poison Darts fast-attack Spams Darts when mana is too low (to cast bears) @12yds or @10yds if Bears avialable

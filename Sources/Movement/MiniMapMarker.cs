@@ -112,6 +112,9 @@ namespace Trinity
 
         internal static void AddMarkersToList(List<TrinityExploreDungeon.Objective> objectives)
         {
+            if (objectives == null)
+                return;
+
             foreach (var objective in objectives.Where(o => o.MarkerNameHash != 0))
             {
                 if (ZetaDia.Minimap.Markers.CurrentWorldMarkers.Any(m => m.NameHash == objective.MarkerNameHash))

@@ -269,8 +269,6 @@ namespace Trinity
                     if (CurrentTarget != null)
                         AssignMonsterTargetPower();
 
-                    bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.GameBalanceId == -2142362846);
-
                     // Pop a potion when necessary
 
                     UsePotionIfNeeded();
@@ -1036,37 +1034,42 @@ namespace Trinity
         {
             using (new PerformanceLogger("HandleTarget.UseHealthPotionIfNeeded"))
             {
-                if (IsWaitingForPotion)
+                if (!Player.IsIncapacitated && Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
                 {
+                    var legendaryPotions = ZetaDia.Me.Inventory.Backpack.Where(i => i.InternalName.ToLower()
+                        .Contains("healthpotion_legendary_"));
 
-                    if (!Player.IsIncapacitated && GameUI.IsElementVisible(GameUI.GamePotion) && GameUI.GamePotion.IsEnabled)
+                    var regularPotions = ZetaDia.Me.Inventory.Backpack.Where(i => i.InternalName.ToLower()
+                        .Contains("healthpotion_") && !i.InternalName.ToLower().Contains("legendary"));
+
+                    if (GameUI.IsElementVisible(GameUI.GamePotion) && GameUI.GamePotion.IsEnabled)
                     {
-                        var legendaryPotions = ZetaDia.Me.Inventory.Backpack.Where(i => i.InternalName.ToLower()
-                            .Contains("healthpotion_legendary_"));
-
-                        var regularPotions = ZetaDia.Me.Inventory.Backpack.Where(i => i.InternalName.ToLower()
-                            .Contains("healthpotion_") && !i.InternalName.ToLower().Contains("legendary"));
-
                         IsWaitingForPotion = false;
 
                         int dynamicId = 0;
                         if (legendaryPotions.Any())
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
+                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Legendary Potion", 0);
                             dynamicId = legendaryPotions.FirstOrDefault().DynamicId;
                             ZetaDia.Me.Inventory.UseItem(dynamicId);
                         }
                         else if (GameUI.GamePotion.IsEnabled)
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
-                            GameUI.SafeClickElement(GameUI.GamePotion);
+                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Potion", 0);
+                            dynamicId = regularPotions.FirstOrDefault().DynamicId;
+                            ZetaDia.Me.Inventory.UseItem(dynamicId);
                         }
                         else
                         {
-                            Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "No Available potions!", 0);
+                            Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "No Available potions!", 0);
                         }
                     }
+                    else
+                    {
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "GamePotion Visible: {0} Enabled: {1}", GameUI.GamePotion.IsVisible, GameUI.GamePotion.IsEnabled);
+                    }
                 }
+
             }
         }
 

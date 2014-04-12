@@ -136,6 +136,11 @@ namespace Trinity
                         return false;
                     }
 
+                    if (itemType == GItemType.LootRunKey)
+                    {
+                        return true;
+                    }
+
                     // Potion filtering
                     if (itemType == GItemType.HealthPotion)
                     {
@@ -308,64 +313,65 @@ namespace Trinity
             name = name.ToLower();
             if (name.StartsWith("x1_"))
                 name = name.Substring(3, name.Length - 3);
+            if (name.StartsWith("a1_")) return GItemType.SpecialItem;
+            if (name.StartsWith("amethyst")) return GItemType.Amethyst;
+            if (name.StartsWith("amulet_")) return GItemType.Amulet;
             if (name.StartsWith("axe_")) return GItemType.Axe;
+            if (name.StartsWith("barbbelt_")) return GItemType.MightyBelt;
+            if (name.StartsWith("blacksmithstome")) return GItemType.CraftTome;
+            if (name.StartsWith("boots_")) return GItemType.Boots;
+            if (name.StartsWith("bow_")) return GItemType.TwoHandBow;
+            if (name.StartsWith("bracers_")) return GItemType.Bracer;
             if (name.StartsWith("ceremonialdagger_")) return GItemType.CeremonialKnife;
-            if (name.StartsWith("handxbow_")) return GItemType.HandCrossbow;
+            if (name.StartsWith("cloak_")) return GItemType.Cloak;
+            if (name.StartsWith("combatstaff_")) return GItemType.TwoHandDaibo;
+            if (name.StartsWith("crafting_")) return GItemType.CraftingMaterial;
+            if (name.StartsWith("craftingmaterials_")) return GItemType.CraftingMaterial;
+            if (name.StartsWith("craftingplan_")) return GItemType.CraftingPlan;
+            if (name.StartsWith("craftingreagent_legendary_")) return GItemType.CraftingMaterial;
+            if (name.StartsWith("crushield_")) return GItemType.CrusaderShield;
             if (name.StartsWith("dagger_")) return GItemType.Dagger;
+            if (name.StartsWith("diamond_")) return GItemType.Diamond;
+            if (name.StartsWith("dye_")) return GItemType.Dye;
+            if (name.StartsWith("emerald_")) return GItemType.Emerald;
             if (name.StartsWith("fistweapon_")) return GItemType.FistWeapon;
             if (name.StartsWith("flail1h_")) return GItemType.Flail;
             if (name.StartsWith("flail2h_")) return GItemType.TwoHandFlail;
-            if (name.StartsWith("mace_")) return GItemType.Mace;
-            if (name.StartsWith("mightyweapon_1h_")) return GItemType.MightyWeapon;
-            if (name.StartsWith("spear_")) return GItemType.Spear;
-            if (name.StartsWith("sword_")) return GItemType.Sword;
-            if (name.StartsWith("wand_")) return GItemType.Wand;
-            if (name.StartsWith("twohandedaxe_")) return GItemType.TwoHandAxe;
-            if (name.StartsWith("bow_")) return GItemType.TwoHandBow;
-            if (name.StartsWith("combatstaff_")) return GItemType.TwoHandDaibo;
-            if (name.StartsWith("xbow_")) return GItemType.TwoHandCrossbow;
-            if (name.StartsWith("twohandedmace_")) return GItemType.TwoHandMace;
-            if (name.StartsWith("mightyweapon_2h_")) return GItemType.TwoHandMighty;
-            if (name.StartsWith("polearm_") || dbItemType == ItemType.Polearm) return GItemType.TwoHandPolearm;
-            if (name.StartsWith("staff_")) return GItemType.TwoHandStaff;
-            if (name.StartsWith("twohandedsword_")) return GItemType.TwoHandSword;
-            if (name.StartsWith("staffofcow")) return GItemType.StaffOfHerding;
-            if (name.StartsWith("mojo_")) return GItemType.Mojo;
-            if (name.StartsWith("orb_")) return GItemType.Orb;
-            if (name.StartsWith("quiver_")) return GItemType.Quiver;
-            if (name.StartsWith("shield_")) return GItemType.Shield;
-            if (name.StartsWith("crushield_")) return GItemType.CrusaderShield;
-            if (name.StartsWith("amulet_")) return GItemType.Amulet;
-            if (name.StartsWith("ring_")) return GItemType.Ring;
-            if (name.StartsWith("boots_")) return GItemType.Boots;
-            if (name.StartsWith("bracers_")) return GItemType.Bracer;
-            if (name.StartsWith("cloak_")) return GItemType.Cloak;
-            if (name.StartsWith("gloves_")) return GItemType.Gloves;
-            if (name.StartsWith("pants_")) return GItemType.Legs;
-            if (name.StartsWith("barbbelt_")) return GItemType.MightyBelt;
-            if (name.StartsWith("shoulderpads_")) return GItemType.Shoulder;
-            if (name.StartsWith("spiritstone_")) return GItemType.SpiritStone;
-            if (name.StartsWith("voodoomask_")) return GItemType.VoodooMask;
-            if (name.StartsWith("wizardhat_")) return GItemType.WizardHat;
-            if (name.StartsWith("lore_book_")) return GItemType.CraftTome;
-            if (name.StartsWith("page_of_")) return GItemType.CraftTome;
-            if (name.StartsWith("blacksmithstome")) return GItemType.CraftTome;
-            if (name.StartsWith("ruby_")) return GItemType.Ruby;
-            if (name.StartsWith("emerald_")) return GItemType.Emerald;
-            if (name.StartsWith("topaz_")) return GItemType.Topaz;
-            if (name.StartsWith("amethyst")) return GItemType.Amethyst;
-            if (name.StartsWith("diamond_")) return GItemType.Diamond;
-            if (name.StartsWith("healthpotion")) return GItemType.HealthPotion;
             if (name.StartsWith("followeritem_enchantress_") || dbFollowerType == FollowerType.Enchantress) return GItemType.FollowerEnchantress;
             if (name.StartsWith("followeritem_scoundrel_") || dbFollowerType == FollowerType.Scoundrel) return GItemType.FollowerScoundrel;
             if (name.StartsWith("followeritem_templar_") || dbFollowerType == FollowerType.Templar) return GItemType.FollowerTemplar;
-            if (name.StartsWith("craftingplan_")) return GItemType.CraftingPlan;
-            if (name.StartsWith("craftingmaterials_")) return GItemType.CraftingMaterial;
-            if (name.StartsWith("crafting_")) return GItemType.CraftingMaterial;
-            if (name.StartsWith("craftingreagent_legendary_")) return GItemType.CraftingMaterial;
-            if (name.StartsWith("dye_")) return GItemType.Dye;
-            if (name.StartsWith("a1_")) return GItemType.SpecialItem;
+            if (name.StartsWith("gloves_")) return GItemType.Gloves;
+            if (name.StartsWith("handxbow_")) return GItemType.HandCrossbow;
             if (name.StartsWith("healthglobe")) return GItemType.HealthGlobe;
+            if (name.StartsWith("healthpotion")) return GItemType.HealthPotion;
+            if (name.StartsWith("lore_book_")) return GItemType.CraftTome;
+            if (name.StartsWith("lootrunkey")) return GItemType.LootRunKey;
+            if (name.StartsWith("mace_")) return GItemType.Mace;
+            if (name.StartsWith("mightyweapon_1h_")) return GItemType.MightyWeapon;
+            if (name.StartsWith("mightyweapon_2h_")) return GItemType.TwoHandMighty;
+            if (name.StartsWith("mojo_")) return GItemType.Mojo;
+            if (name.StartsWith("orb_")) return GItemType.Orb;
+            if (name.StartsWith("page_of_")) return GItemType.CraftTome;
+            if (name.StartsWith("pants_")) return GItemType.Legs;
+            if (name.StartsWith("polearm_") || dbItemType == ItemType.Polearm) return GItemType.TwoHandPolearm;
+            if (name.StartsWith("quiver_")) return GItemType.Quiver;
+            if (name.StartsWith("ring_")) return GItemType.Ring;
+            if (name.StartsWith("ruby_")) return GItemType.Ruby;
+            if (name.StartsWith("shield_")) return GItemType.Shield;
+            if (name.StartsWith("shoulderpads_")) return GItemType.Shoulder;
+            if (name.StartsWith("spear_")) return GItemType.Spear;
+            if (name.StartsWith("spiritstone_")) return GItemType.SpiritStone;
+            if (name.StartsWith("staff_")) return GItemType.TwoHandStaff;
+            if (name.StartsWith("staffofcow")) return GItemType.StaffOfHerding;
+            if (name.StartsWith("sword_")) return GItemType.Sword;
+            if (name.StartsWith("topaz_")) return GItemType.Topaz;
+            if (name.StartsWith("twohandedaxe_")) return GItemType.TwoHandAxe;
+            if (name.StartsWith("twohandedmace_")) return GItemType.TwoHandMace;
+            if (name.StartsWith("twohandedsword_")) return GItemType.TwoHandSword;
+            if (name.StartsWith("voodoomask_")) return GItemType.VoodooMask;
+            if (name.StartsWith("wand_")) return GItemType.Wand;
+            if (name.StartsWith("wizardhat_")) return GItemType.WizardHat;
+            if (name.StartsWith("xbow_")) return GItemType.TwoHandCrossbow;
             if (name == "console_powerglobe") return GItemType.PowerGlobe;
 
             // Follower item types
@@ -437,7 +443,6 @@ namespace Trinity
         {
             GItemBaseType itemBaseType = GItemBaseType.Unknown;
 
-
             // One Handed Weapons
             if (itemType == GItemType.Axe || itemType == GItemType.CeremonialKnife || itemType == GItemType.Dagger || itemType == GItemType.Flail ||
                 itemType == GItemType.FistWeapon || itemType == GItemType.Mace || itemType == GItemType.MightyWeapon ||
@@ -484,9 +489,9 @@ namespace Trinity
                 itemBaseType = GItemBaseType.FollowerItem;
             }
             // Misc Items
-            else if (itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome ||
+            else if (itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome || itemType == GItemType.LootRunKey ||
                 itemType == GItemType.SpecialItem || itemType == GItemType.CraftingPlan || itemType == GItemType.HealthPotion ||
-                itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey || itemType == GItemType.PowerGlobe)
+                itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey)
             {
                 itemBaseType = GItemBaseType.Misc;
             }
@@ -497,9 +502,13 @@ namespace Trinity
                 itemBaseType = GItemBaseType.Gem;
             }
             // Globes
-            else if (itemType == GItemType.HealthGlobe || itemType == GItemType.PowerGlobe)
+            else if (itemType == GItemType.HealthGlobe)
             {
                 itemBaseType = GItemBaseType.HealthGlobe;
+            }
+            else if (itemType == GItemType.PowerGlobe)
+            {
+                itemBaseType = GItemBaseType.PowerGlobe;
             }
             return itemBaseType;
         }

@@ -242,6 +242,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.DemonHunter_ClusterArrow", 150, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_RainOfVengeance", 10000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.X1_DemonHunter_Vengeance", 900000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.X1_DemonHunter_EvasiveFire", 5, "Spell Use Delay/Interval, milliseconds"));
 
             // Demon Hunter
             Set(new TVar("DemonHunter.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));

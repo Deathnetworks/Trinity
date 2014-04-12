@@ -1502,11 +1502,14 @@ namespace Trinity.XmlTags
             InitDone = false;
         }
 
-        //Had to use ActiveBounty, caused too much lag constantly searching the bounty list
         public bool GetIsBountyDone()
         {
             // Only valid for Adventure mode
             if (ZetaDia.CurrentAct != Act.OpenWorld)
+                return false;
+
+            // We're in a rift, not a bounty!
+            if (ZetaDia.CurrentAct == Act.OpenWorld && DataDictionary.RiftWorldIds.Contains(ZetaDia.CurrentWorldId))
                 return false;
 
             try

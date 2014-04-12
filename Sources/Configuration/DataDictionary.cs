@@ -11,6 +11,20 @@ namespace Trinity
     {
         public const int WALLER_SNO = 226808; //monsterAffix_waller_model (226808)
 
+        /// <summary>
+        /// Contains a list of Rift WorldId's
+        /// </summary>
+        public static HashSet<int> RiftWorldIds { get { return DataDictionary.riftWorldIds; } }
+        private static HashSet<int> riftWorldIds = new HashSet<int>()
+        {
+            288454,
+            288685,
+            288687,
+            288798,
+            288800,
+        };
+
+
         public static HashSet<string> VanityItems { get { return DataDictionary.vanityItems; } }
         private static readonly HashSet<string> vanityItems = new HashSet<string>()
         {

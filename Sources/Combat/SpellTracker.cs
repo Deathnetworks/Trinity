@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Trinity.Technicals;
 using Zeta.Game.Internals.Actors;
 namespace Trinity
 {
@@ -41,7 +42,7 @@ namespace Trinity
 
                 if (duration > 0)
                 {
-                    Technicals.Logger.Log(Technicals.LogCategory.SpellTrack, "Tracking unit {0} with power {1} for duration {2:0.00}", acdGuid, power, duration);
+                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Tracking unit {0} with power {1} for duration {2:0.00}", acdGuid, power, duration);
                     TrackSpellOnUnit(new SpellTracker()
                        {
                            ACDGuid = acdGuid,
@@ -52,7 +53,7 @@ namespace Trinity
             }
             catch (Exception ex)
             {
-                Technicals.Logger.LogNormal("Exception in TrackSpellOnUnit: {0}", ex.ToString());
+                Logger.LogNormal("Exception in TrackSpellOnUnit: {0}", ex.ToString());
             }
         }
 

@@ -35,6 +35,7 @@
         Helm,
         InfernalKey,
         Legs,
+        LootRunKey,
         Mace,
         MightyBelt,
         MightyWeapon,
@@ -82,7 +83,8 @@
         FollowerItem,
         Misc,
         Gem,
-        HealthGlobe
+        HealthGlobe,
+        PowerGlobe,
     }
 
     /// <summary>
