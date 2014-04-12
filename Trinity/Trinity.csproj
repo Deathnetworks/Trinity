@@ -102,7 +102,10 @@
     <Compile Include="DbProvider\DeathHandler.cs" />
     <Compile Include="DbProvider\SearchAreaProvider.cs" />
     <Compile Include="Helpers\Attributes\NoCopy.cs" />
+    <Compile Include="Helpers\Bounties\BountyType.cs" />
+    <Compile Include="Helpers\Bounties\Extensions.cs" />
     <Compile Include="Helpers\CloneExtension.cs" />
+    <Compile Include="Helpers\Composites.cs" />
     <Compile Include="Helpers\DoubleInt.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\GameEvents.cs" />
@@ -124,6 +127,7 @@
     <Compile Include="Items\CachedACDItem.cs" />
     <Compile Include="Cache\GameBalanceDataCache.cs" />
     <Compile Include="Items\ItemDropStats.cs" />
+    <Compile Include="Items\ItemIds.cs" />
     <Compile Include="Items\StashSortItem.cs" />
     <Compile Include="Helpers\GoldInactivity.cs" />
     <Compile Include="Cache\HashGenerator.cs" />
@@ -329,7 +333,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Helpers\Bounties\" />
     <Folder Include="ItemRules\Rules\custom\" />
   </ItemGroup>
   <ItemGroup>

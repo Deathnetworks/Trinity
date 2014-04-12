@@ -135,7 +135,7 @@ namespace Trinity
                                     // Ignore Solitary Trash mobs (no elites present)
                                     // Except if has been primary target or if already low on health (<= 20%)
                                     if (shouldIgnoreTrashMobs && !isInHotSpot &&
-                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) && ignoreSummoner && !cacheObject.IsQuestMonster && !cacheObject.IsMinimapActive)
+                                        !(nearbyMonsterCount >= Settings.Combat.Misc.TrashPackSize) && ignoreSummoner && !cacheObject.IsQuestMonster && !cacheObject.IsMinimapActive && !cacheObject.IsBountyObjective)
                                     {
                                         objWeightInfo = "Ignoring ";
                                         ignoring = true;
@@ -154,7 +154,7 @@ namespace Trinity
                                 if (cacheObject.IsEliteRareUnique)
                                 {
                                     // Ignore elite option, except if trying to town portal
-                                    if (!cacheObject.IsBoss && ShouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
+                                    if (!cacheObject.IsBoss && !cacheObject.IsBountyObjective && ShouldIgnoreElites && cacheObject.IsEliteRareUnique && !isInHotSpot &&
                                         !(cacheObject.HitPointsPct <= (Settings.Combat.Misc.ForceKillElitesHealth / 100)))
                                     {
                                         objWeightInfo = "Ignoring ";

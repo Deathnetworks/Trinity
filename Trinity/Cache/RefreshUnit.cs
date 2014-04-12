@@ -72,7 +72,15 @@ namespace Trinity
                 });
             }
 
-
+            try
+            {
+                CurrentCacheObject.IsBountyObjective = (c_CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) > 0);
+            }
+            catch (Exception)
+            {
+                Logger.LogDebug("Error refreshing IsNPC");
+            }
+            
             try
             {
                 CurrentCacheObject.IsNPC = (c_CommonData.GetAttribute<int>(ActorAttributeType.IsNPC) > 0);
@@ -89,6 +97,26 @@ namespace Trinity
             catch (Exception)
             {
                 Logger.LogDebug("Error refreshing NPCIsOperable");
+            }
+
+            try
+            {
+                CurrentCacheObject.IsMinimapActive = CurrentCacheObject.Unit.CommonData.GetAttribute<int>(ActorAttributeType.MinimapActive) > 0;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading IsMinimapActive for Unit sno:{0} raGuid:{1} name:{2} ex:{3}",
+                    CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
+            }
+
+            try
+            {
+                CurrentCacheObject.IsQuestMonster = CurrentCacheObject.Unit.CommonData.GetAttribute<int>(ActorAttributeType.QuestMonster) > 1;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading IsQuestMonster for Unit sno:{0} raGuid:{1} name:{2} ex:{3}",
+                    CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
             }
 
             if ((teamId == 1 || teamId == 2 || teamId == 17))
@@ -201,44 +229,22 @@ namespace Trinity
 
             AddToCache = RefreshUnitAttributes(AddToCache, c_diaUnit);
 
-            try
-            {
-                CurrentCacheObject.IsMinimapActive = CurrentCacheObject.Unit.CommonData.GetAttribute<int>(ActorAttributeType.MinimapActive) > 0;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading IsMinimapActive for Unit sno:{0} raGuid:{1} name:{2} ex:{3}",
-                    CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
-            }
-
-            try
-            {
-                CurrentCacheObject.IsQuestMonster = CurrentCacheObject.Unit.CommonData.GetAttribute<int>(ActorAttributeType.QuestMonster) > 1;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogDebug(LogCategory.CacheManagement, "Error reading IsQuestMonster for Unit sno:{0} raGuid:{1} name:{2} ex:{3}",
-                    CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
-            }
-
             if (!AddToCache)
                 return AddToCache;
 
 
-            c_RadiusDistance -= (float)c_Radius;
-
-            if (c_RadiusDistance <= 1f)
-                c_RadiusDistance = 1f;
+            if (CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsBountyObjective)
+                return AddToCache;
 
             // Extended kill radius after last fighting, or when we want to force a town run
             if ((Settings.Combat.Misc.ExtendedTrashKill && iKeepKillRadiusExtendedFor > 0) || ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
             {
-                if (c_RadiusDistance <= killRange && AddToCache)
+                if (CurrentCacheObject.RadiusDistance <= killRange && AddToCache)
                     AnyMobsInRange = true;
             }
             else
             {
-                if (c_RadiusDistance <= Settings.Combat.Misc.NonEliteRange && AddToCache)
+                if (CurrentCacheObject.RadiusDistance <= Settings.Combat.Misc.NonEliteRange && AddToCache)
                     AnyMobsInRange = true;
             }
             if (c_unit_IsTreasureGoblin)

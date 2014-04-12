@@ -92,6 +92,7 @@ namespace Trinity
         public bool NPCIsOperable { get; set; }
         public bool IsQuestMonster { get; set; }
         public bool IsMinimapActive { get; set; }
+        public bool IsBountyObjective { get; set; }
 
         [NoCopy]
         public bool IsFacing(Vector3 targetPosition, float arcDegrees = 70f)

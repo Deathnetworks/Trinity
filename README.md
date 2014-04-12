@@ -1,6 +1,24 @@
 ﻿
 # Trinity
 
+### Changelog 1.8.20
+ 
+* WitchDoctor Spirit Barrage has lower priority
+
+* Wizard Arcane Orb distanced slightly reduced to 35f
+
+* New Potion use logic
+
+* Fixed missing Crusader potion/globe settings
+
+* Items and gold will generally have lower weight/priority when monsters are around (except legendaries)
+
+* Trinity will now pickup Rift Keystone Fragments
+
+* Fixed TrinityExploreDungeon in Rifts
+
+* Fixed exception in Minimap Marker tracking
+
 ### Changelog 1.8.19
 
 * Added Sychotix's ActbountiesComplete, HaveBounty and TrinityExploreDungeon additions

@@ -144,7 +144,7 @@ namespace Trinity
                 }
 
                 // Archon
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Wizard_Archon) && Wizard_ShouldStartArchon())
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Wizard_Archon, CombatBase.CanCastFlags.NoTimer) && Wizard_ShouldStartArchon())
                 {
                     //CanCastArchon = false;
                     //return new TrinityPower(SNOPower.Wizard_Archon, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 4, 5, WAIT_FOR_ANIM);

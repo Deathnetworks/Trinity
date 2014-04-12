@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Trinity.Combat.Abilities;
+using Trinity.Helpers;
 using Trinity.Technicals;
 using Zeta.Bot;
 using Zeta.Common.Plugins;
@@ -129,29 +130,16 @@ namespace Trinity
                     return true;
                 }
 
-                //Monk_MaintainTempestRush();
-
+                // if we just opened a horadric cache, wait around to open it
+                if (DateTime.UtcNow.Subtract(Composites.LastFoundHoradricCache).TotalSeconds < 5)
+                    return true;
 
                 using (new PerformanceLogger("TargetCheck.OOCPotion"))
                 {
                     // Pop a potion when necessary
                     if (Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
                     {
-                        if (!Player.IsIncapacitated && SNOPowerUseTimer(SNOPower.DrinkHealthPotion))
-                        {
-                            IsWaitingForPotion = false;
-                            bool hasPotion = ZetaDia.Me.Inventory.Backpack.Any(p => p.GameBalanceId == -2142362846);
-                            if (hasPotion)
-                            {
-                                Logger.Log(TrinityLogLevel.Debug, LogCategory.Targetting, "Using Potion", 0);
-                                WaitWhileAnimating(3, true);
-                                //UIManager.UsePotion();
-                                GameUI.SafeClickElement(GameUI.PotionButton, "Use Potion", false);
-
-                                CacheData.AbilityLastUsed[SNOPower.DrinkHealthPotion] = DateTime.UtcNow;
-                                WaitWhileAnimating(2, true);
-                            }
-                        }
+                        Trinity.UsePotionIfNeeded();
                     }
                 }
                 sStatusText = "[Trinity] No more targets - DemonBuddy/profile management is now in control";
@@ -181,7 +169,7 @@ namespace Trinity
 
                             if (powerBuff.SNOPower != SNOPower.None)
                             {
-                                WaitWhileAnimating(4, true);
+
                                 Logger.Log(TrinityLogLevel.Verbose, LogCategory.Behavior, "Using OOC Buff: {0}", powerBuff.SNOPower.ToString());
                                 if (powerBuff.WaitTicksBeforeUse > 0)
                                     BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitBeforeUseDelay));
@@ -190,7 +178,7 @@ namespace Trinity
                                 CacheData.AbilityLastUsed[powerBuff.SNOPower] = DateTime.UtcNow;
                                 if (powerBuff.WaitTicksAfterUse > 0)
                                     BotMain.PauseFor(new TimeSpan(0, 0, 0, 0, (int)powerBuff.WaitAfterUseDelay));
-                                WaitWhileAnimating(3, true);
+
                             }
                         }
                         else if (isLoopingAnimation)

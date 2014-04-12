@@ -908,7 +908,7 @@ namespace Trinity
 
 
                     // always set true for bosses nearby
-                    if (c_unit_IsBoss && c_RadiusDistance < 100f)
+                    if ((c_unit_IsBoss || CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsBountyObjective) && c_RadiusDistance < 100f)
                     {
                         AddToCache = true;
                         c_IgnoreSubStep = "";
@@ -1114,7 +1114,7 @@ namespace Trinity
 
         private static bool RefreshStepCheckBlacklists(bool AddToCache)
         {
-            if (!DataDictionary.Avoidances.Contains(c_ActorSNO) && !DataDictionary.AvoidanceBuffs.Contains(c_ActorSNO))
+            if (!DataDictionary.Avoidances.Contains(c_ActorSNO) && !DataDictionary.AvoidanceBuffs.Contains(c_ActorSNO) && !CurrentCacheObject.IsBountyObjective && !CurrentCacheObject.IsQuestMonster)
             {
                 // See if it's something we should always ignore like ravens etc.
                 if (!c_IsObstacle && DataDictionary.BlackListIds.Contains(c_ActorSNO))

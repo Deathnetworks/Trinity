@@ -1034,7 +1034,7 @@ namespace Trinity
         {
             using (new PerformanceLogger("HandleTarget.UseHealthPotionIfNeeded"))
             {
-                if (!Player.IsIncapacitated && Player.CurrentHealthPct > 0 && SpellHistory.TimeSinceUse(SNOPower.DrinkHealthPotion) < TimeSpan.FromSeconds(30) && 
+                if (!Player.IsIncapacitated && Player.CurrentHealthPct > 0 && SpellHistory.TimeSinceUse(SNOPower.DrinkHealthPotion) > TimeSpan.FromSeconds(30) && 
                     Player.CurrentHealthPct <= PlayerEmergencyHealthPotionLimit)
                 {
                     var legendaryPotions = ZetaDia.Me.Inventory.Backpack.Where(i => i.InternalName.ToLower()

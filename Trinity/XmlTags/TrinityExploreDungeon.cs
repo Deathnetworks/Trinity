@@ -390,6 +390,8 @@ namespace Trinity.XmlTags
         [XmlAttribute("interactRange")]
         public float ObjectInteractRange { get; set; }
 
+        [XmlAttribute("stayAfterBounty", true)]
+        public bool StayAfterBounty { get; set; }
 
         HashSet<Tuple<int, Vector3>> foundObjects = new HashSet<Tuple<int, Vector3>>();
 
@@ -801,7 +803,7 @@ namespace Trinity.XmlTags
             return
             new PrioritySelector(
                 TimeoutCheck(),
-                new Decorator(ret => GetIsBountyDone(),
+                new Decorator(ret => !StayAfterBounty && GetIsBountyDone(),
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Bounty is done. Tag Finished.", IgnoreLastNodes)),
                         new Action(ret => isDone = true)

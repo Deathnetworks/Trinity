@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 namespace Trinity.Combat.Abilities
 {
     public class WitchDoctorCombat : CombatBase
@@ -11,7 +12,13 @@ namespace Trinity.Combat.Abilities
 
             return VisionQuestRefreshTimer.ElapsedMilliseconds;
         }
-
+        
+        public static readonly HashSet<int> ZunimasaItemIds = new HashSet<int>()
+        {
+            -960430780, // Zunimassa's String of Skulls
+            -1187722720, // Zunimassa's Pox
+            1941359608, // Zunimassa's Trail
+        };
 
     }
 }

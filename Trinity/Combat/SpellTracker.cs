@@ -24,10 +24,6 @@ namespace Trinity
             {
                 TrackedUnits.Add(trackedUnit);
             }
-            else
-            {
-                Logger.Log("Unit is {0} already tracked with spell {1}", trackedUnit.ACDGuid, trackedUnit.Power);
-            }
         }
 
         internal static void TrackSpellOnUnit(int acdGuid, SNOPower power)
@@ -46,7 +42,7 @@ namespace Trinity
 
                 if (duration > 0)
                 {
-                    Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Tracking unit {0} with power {1} for duration {2:0.00}", acdGuid, power, duration);
+                    //Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Tracking unit {0} with power {1} for duration {2:0.00}", acdGuid, power, duration);
                     TrackSpellOnUnit(new SpellTracker()
                        {
                            ACDGuid = acdGuid,
@@ -83,10 +79,10 @@ namespace Trinity
             if (unit.Type != GObjectType.Unit)
                 return false;
             bool result = TrackedUnits.Any(t => t.ACDGuid == unit.ACDGuid && t.Power == power);
-            if (result)
-                Technicals.Logger.LogNormal("Unit {0} is tracked with power {1}", unit.ACDGuid, power);
-            else
-                Technicals.Logger.LogNormal("Unit {0} is NOT tracked with power {1}", unit.ACDGuid, power);
+            //if (result)
+            //    Technicals.Logger.LogNormal("Unit {0} is tracked with power {1}", unit.ACDGuid, power);
+            //else
+            //    Technicals.Logger.LogNormal("Unit {0} is NOT tracked with power {1}", unit.ACDGuid, power);
             return result;
         }
 
