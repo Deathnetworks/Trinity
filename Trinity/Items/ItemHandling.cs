@@ -141,6 +141,11 @@ namespace Trinity
                         return true;
                     }
 
+                    if (itemType == GItemType.HoradricRelic)
+                    {
+                        return true;
+                    }
+
                     // Potion filtering
                     if (itemType == GItemType.HealthPotion)
                     {
@@ -431,6 +436,12 @@ namespace Trinity
             {
                 return GItemType.InfernalKey;
             }
+
+            if (name.StartsWith("horadricrelic"))
+            {
+                return GItemType.HoradricRelic;
+            }
+
             return GItemType.Unknown;
         }
 
@@ -489,7 +500,7 @@ namespace Trinity
                 itemBaseType = GItemBaseType.FollowerItem;
             }
             // Misc Items
-            else if (itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome || itemType == GItemType.LootRunKey ||
+            else if (itemType == GItemType.CraftingMaterial || itemType == GItemType.CraftTome || itemType == GItemType.LootRunKey || itemType == GItemType.HoradricRelic ||
                 itemType == GItemType.SpecialItem || itemType == GItemType.CraftingPlan || itemType == GItemType.HealthPotion ||
                 itemType == GItemType.Dye || itemType == GItemType.StaffOfHerding || itemType == GItemType.InfernalKey)
             {

@@ -33,6 +33,7 @@
         HealthGlobe,
         HealthPotion,
         Helm,
+        HoradricRelic,
         InfernalKey,
         Legs,
         LootRunKey,
