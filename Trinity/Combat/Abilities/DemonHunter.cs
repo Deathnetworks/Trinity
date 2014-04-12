@@ -36,9 +36,9 @@ namespace Trinity
             }
 
             // Vengeance
-            if (!IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_DemonHunter_Vengeance) && (TargetUtil.EliteOrTrashInRange(60) || TargetUtil.AnyMobsInRange(60, 6)))
+            if (!IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.X1_DemonHunter_Vengeance, CombatBase.CanCastFlags.NoTimer) && (TargetUtil.EliteOrTrashInRange(60) || TargetUtil.AnyMobsInRange(60, 6)))
             {
-                return new TrinityPower(SNOPower.X1_DemonHunter_Vengeance, 60f, TargetUtil.GetBestClusterUnit(60f, 60f, 1, false, true).Position);
+                return new TrinityPower(SNOPower.X1_DemonHunter_Vengeance);
             }
 
             // Smoke Screen
