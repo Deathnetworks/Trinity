@@ -290,7 +290,7 @@ namespace Trinity
                 if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ArcaneOrb) &&
                     ((Player.PrimaryResource >= 30 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
                 {
-                    return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 40f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 35f, CurrentTarget.ACDGuid);
                 }
                 // Arcane Torrent
                 if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_ArcaneTorrent) &&
@@ -474,7 +474,7 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Wizard_EnergyTwister, 9f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
 
             if (Hotbar.Contains(SNOPower.Wizard_ArcaneOrb))
-                return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 40f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Wizard_ArcaneOrb, 35f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
 
             if (Hotbar.Contains(SNOPower.Wizard_MagicMissile))
                 return new TrinityPower(SNOPower.Wizard_MagicMissile, 15f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);

@@ -153,6 +153,7 @@ namespace Trinity
                 // Reset pre-townrun position if we die
                 TownRun.PreTownRunPosition = Vector3.Zero;
                 TownRun.PreTownRunWorldId = -1;
+                SpellHistory.HistoryQueue.Clear();
 
                 // Does Trinity need to handle deaths?
                 if (iMaxDeathsAllowed > 0)

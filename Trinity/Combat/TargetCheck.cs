@@ -67,6 +67,12 @@ namespace Trinity
                             PlayerEmergencyHealthGlobeLimit = Settings.Combat.Barbarian.HealthGlobeLevel;
                             PlayerKiteDistance = Settings.Combat.Barbarian.KiteLimit;
                             break;
+                        case ActorClass.Crusader:
+                            // What health % should we use a potion, or look for a globe
+                            PlayerEmergencyHealthPotionLimit = Settings.Combat.Crusader.PotionLevel;
+                            PlayerEmergencyHealthGlobeLimit = Settings.Combat.Crusader.HealthGlobeLevel;
+                            PlayerKiteDistance = 0;
+                            break;
                         case ActorClass.Monk:
                             // What health % should we use a potion, or look for a globe
                             PlayerEmergencyHealthPotionLimit = Settings.Combat.Monk.PotionLevel;

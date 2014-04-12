@@ -235,7 +235,6 @@ namespace Trinity
                                             cacheObject.Weight += 10000d;
                                         }
 
-
                                         // Monsters near players given higher weight
                                         if (cacheObject.Weight > 0)
                                         {
@@ -484,13 +483,13 @@ namespace Trinity
                                 }
 
                                 if (cacheObject.GoldAmount > 0)
-                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 9000d;
+                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 500d;
                                 else
-                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 9000d;
+                                    cacheObject.Weight = (300 - cacheObject.CentreDistance) / 300 * 500d;
 
 
                                 // Point-blank items get a weight increase 
-                                if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 12f)
+                                if (cacheObject.GoldAmount <= 0 && cacheObject.CentreDistance <= 9f)
                                     cacheObject.Weight += 1000d;
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
@@ -499,15 +498,11 @@ namespace Trinity
 
                                 // Give yellows more weight
                                 if (cacheObject.GoldAmount <= 0 && cacheObject.ItemQuality >= ItemQuality.Rare4)
-                                    cacheObject.Weight += 4000d;
+                                    cacheObject.Weight += 100d;
 
                                 // Give legendaries more weight
                                 if (cacheObject.GoldAmount <= 0 && cacheObject.ItemQuality >= ItemQuality.Legendary)
                                     cacheObject.Weight += 15000d;
-
-                                // Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
-                                //if (PrioritizeCloseRangeUnits)
-                                //    cacheObject.Weight = (200f - cacheObject.CentreDistance) / 200f * 18000d;
 
                                 if (Player.ActorClass == ActorClass.Monk && TimeSinceUse(SNOPower.Monk_TempestRush) < 1000 && cacheObject.ItemQuality < ItemQuality.Legendary)
                                 {

@@ -12,6 +12,6 @@ ZIPFILE=$A$B$D
 
 ./CreateZip.cmd
 
-mv Latest-Trinity.zip ../Releases/$ZIPFILE
+mv Latest-Trinity.zip ../Builds/$ZIPFILE
 
 cd /c/db/svn/Trinity

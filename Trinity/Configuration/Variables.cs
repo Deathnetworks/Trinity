@@ -205,8 +205,8 @@ namespace Trinity
         private static DateTime dateSincePickedTarget = DateTime.MinValue;
 
         // These values below are set on a per-class basis later on, so don't bother changing them here! These are the old default values
-        private static double PlayerEmergencyHealthPotionLimit = 0.46;
-        private static double PlayerEmergencyHealthGlobeLimit = 0.6;
+        public static double PlayerEmergencyHealthPotionLimit = 0.35;
+        private static double PlayerEmergencyHealthGlobeLimit = 0.35;
 
         /// <summary>
         /// Distance to kite, read settings (class independant)
