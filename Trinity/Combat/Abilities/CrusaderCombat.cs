@@ -202,6 +202,11 @@ namespace Trinity.Combat.Abilities
                     return new TrinityPower(SNOPower.X1_Crusader_Punish, 7f, CurrentTarget.ACDGuid);
                 }
 
+                //Blessed Shield no wrath needed with special weapon
+                if (CombatBase.CanCast(SNOPower.X1_Crusader_BlessedShield))
+                {
+                    return new TrinityPower(SNOPower.X1_Crusader_BlessedShield, 14f, CurrentTarget.ACDGuid);
+                }
 
             }
 

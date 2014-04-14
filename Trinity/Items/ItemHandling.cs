@@ -995,7 +995,8 @@ namespace Trinity
                     }
 
                     // free bag slots is less than required
-                    if (freeBagSlots <= 1 || freeBagSlots <= Trinity.Settings.Loot.TownRun.FreeBagSlots || (freeBagSlots <= 6 && Trinity.Player.IsInTown))
+                    if (freeBagSlots <= 1 || freeBagSlots <= Trinity.Settings.Loot.TownRun.FreeBagSlots || 
+                        (freeBagSlots <= Trinity.Settings.Loot.TownRun.FreeBagSlotsInTown && Trinity.Player.IsInTown))
                         return new Vector2(-1, -1);
 
                     int x = -1;

@@ -15,6 +15,8 @@ namespace Trinity.Config.Loot
         private SalvageOption _SalvageYellowItemOption;
         private SalvageOption _SalvageLegendaryItemOption;
         private int _FreeBagSlots;
+        private int _FreeBagSlotsInTown;
+        private bool _OpenHoradricCaches;
         private bool _StashWhites;
         private bool _StashBlues;
         private bool _ForceSalvageRares;
@@ -184,6 +186,42 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(30)]
+        public int FreeBagSlotsInTown
+        {
+            get
+            {
+                return _FreeBagSlotsInTown;
+            }
+            set
+            {
+                if (_FreeBagSlotsInTown != value)
+                {
+                    _FreeBagSlotsInTown = value;
+                    OnPropertyChanged("FreeBagSlotsInTown");
+                }
+            }
+        }
+
+        
+        [DataMember(IsRequired = false)]
+        [DefaultValue(false)]
+        public bool OpenHoradricCaches
+        {
+            get
+            {
+                return _OpenHoradricCaches;
+            }
+            set
+            {
+                if (_OpenHoradricCaches != value)
+                {
+                    _OpenHoradricCaches = value;
+                    OnPropertyChanged("OpenHoradricCaches");
+                }
+            }
+        }
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool StashWhites
         {
@@ -292,6 +330,8 @@ namespace Trinity.Config.Loot
         internal void OnDeserializingMethod(StreamingContext context)
         {
             this.FreeBagSlots = 1;
+            this.FreeBagSlotsInTown = 6;
+            this.OpenHoradricCaches = true;
         }
 
         #endregion Methods

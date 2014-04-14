@@ -30,6 +30,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*" />
@@ -40,6 +42,14 @@
                         Interval="500" Maximum="59" Minimum="0" SmallChange="1" LargeChange="10"
                         TickFrequency="1" TickPlacement="BottomRight" IsSnapToTickEnabled="True"
                         Value="{Binding Path=TownRun.FreeBagSlots}" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Free Bag slots in Town:" />
+                <Slider Grid.Row="1" Grid.Column="1" Template="{DynamicResource Slider}"
+                        Interval="500" Maximum="59" Minimum="0" SmallChange="1" LargeChange="10"
+                        TickFrequency="1" TickPlacement="BottomRight" IsSnapToTickEnabled="True"
+                        Value="{Binding Path=TownRun.FreeBagSlotsInTown}" />
+                <UniformGrid Grid.Row="2" Grid.Column="0" >
+                    <CheckBox Content="Open Horadric Cache's" IsChecked="{Binding Path=TownRun.OpenHoradricCaches}" />
+                </UniformGrid>
             </Grid>
 
             <!--Junk items Settings-->

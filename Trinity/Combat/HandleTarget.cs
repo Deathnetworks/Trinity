@@ -1052,7 +1052,7 @@ namespace Trinity
                         ZetaDia.Me.Inventory.UseItem(dynamicId);
                         SpellHistory.RecordSpell(new TrinityPower(SNOPower.DrinkHealthPotion));
                     }
-                    else if (GameUI.GamePotion.IsEnabled)
+                    else if (regularPotions.Any())
                     {
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.UserInformation, "Using Potion", 0);
                         dynamicId = regularPotions.FirstOrDefault().DynamicId;

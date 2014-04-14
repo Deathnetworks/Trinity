@@ -279,7 +279,7 @@ namespace Trinity
 
                 bool hasEntropy = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Disintegrate && s.RuneIndex == 2);
 
-                float disintegrateRange = hasEntropy ? 15f : 35f;
+                float disintegrateRange = hasEntropy ? 10f : 35f;
                 // Disintegrate
                 if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Disintegrate) &&
                     ((Player.PrimaryResource >= 20 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))

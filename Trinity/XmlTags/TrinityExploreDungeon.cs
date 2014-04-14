@@ -772,6 +772,14 @@ namespace Trinity.XmlTags
                 new Decorator(ret => GetRouteUnvisitedNodeCount() == 0,
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Visited all nodes but objective not complete, forcing grid reset!")),
+                        new DecoratorContinue(ret => timesForcedReset > 2 && GetCurrentRouteNodeCount() == 1,
+                            new Sequence(
+                                new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Only 1 node found and 3 grid resets, falling back to failsafe!")),
+                                new Action(ret => BoxSize = 25),
+                                new Action(ret => BoxTolerance = 0.01f),
+                                new Action(ret => IgnoreScenes.Clear())
+                            )
+                        ),
                         new Action(ret => timesForcedReset++),
                         new Action(ret => Trinity.SkipAheadAreaCache.Clear()),
                         new Action(ret => MiniMapMarker.KnownMarkers.Clear()),
@@ -1340,7 +1348,7 @@ namespace Trinity.XmlTags
             else
                 return 0;
         }
-
+        
         /// <summary>
         /// Gets the number of nodes in the DungeonExplorer Route
         /// </summary>
