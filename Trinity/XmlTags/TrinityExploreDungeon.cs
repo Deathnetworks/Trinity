@@ -1525,7 +1525,7 @@ namespace Trinity.XmlTags
             try
             {
                 var b = ZetaDia.ActInfo.ActiveBounty;
-                if (b == null)
+                if (b == null && QuestId != 1 && QuestId != 312429)
                 {
                     Logger.Log("Active bounty returned null, Assuming done.");
                     return true;

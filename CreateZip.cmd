@@ -26,7 +26,7 @@ xcopy /E /Y "Trinity\*.xsd"  "C:\db\Projects\Builds\Trinity\"
 xcopy /E /Y "Trinity\*.txt"  "C:\db\Projects\Builds\Trinity\"
 
 REM Copy to SVN
-xcopy /E /Y "C:\db\Projects\Builds\Trinity\" "C:\db\svn\Trinity\trunk\Trinity\"
+xcopy /E /Y "C:\db\Projects\Builds\Trinity\" "C:\db\svn\Trinity\trunk\Sources\"
 
 REM Zip fresh directory
 7za.exe a Latest-Trinity.zip "C:\db\Projects\Builds\Trinity\" -mx9

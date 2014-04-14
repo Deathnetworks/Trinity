@@ -227,7 +227,7 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_Blizzard, 45f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
 
-                bool hasArcaneDynamo = (ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Wizard_Passive_ArcaneDynamo);
+                bool hasArcaneDynamo = ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Wizard_Passive_ArcaneDynamo);
 
                 // Meteor - no arcane dynamo
                 if (!UseOOCBuff && !Player.IsIncapacitated && !hasArcaneDynamo && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
