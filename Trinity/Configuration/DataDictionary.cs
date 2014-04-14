@@ -563,6 +563,8 @@ namespace Trinity
         {
             273323, // x1_westm_Door_Wide_Clicky
             55325, // a3dun_Keep_Door_Destructable
+
+            225252, // Shamanic Ward - Revenge of Gharbad bounty
         };
 
         /// <summary>

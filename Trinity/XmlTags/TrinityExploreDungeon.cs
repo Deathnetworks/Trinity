@@ -1540,7 +1540,7 @@ namespace Trinity.XmlTags
                     return true;
                 }
                 //If completed or on next step, we are good.
-                if (b.Info.State == QuestState.Completed)
+                if (b != null && b.Info.State == QuestState.Completed)
                 {
                     Logger.Log("Seems completed!");
                     return true;

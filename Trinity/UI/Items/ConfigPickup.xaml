@@ -325,6 +325,8 @@
                     <CheckBox Content="Craft Materials" IsChecked="{Binding Path=Pickup.CraftMaterials}" Margin="5"/>
                     <CheckBox Content="Infernal Keys" IsChecked="{Binding Path=Pickup.InfernalKeys}" Margin="5"/>
                     <CheckBox Content="Low Level Items" IsChecked="{Binding Path=Pickup.PickupLowLevel}" Margin="5" ToolTip="Pickup Grey and White Items to level 6/11 (for questing)"/>
+                    <CheckBox Content="Blood Shards" IsChecked="{Binding Path=Pickup.BloodShards}" Margin="5" ToolTip="Pickup Blood Shards"/>
+                    <CheckBox Content="Rift Keys" IsChecked="{Binding Path=Pickup.LootRunkey}" Margin="5" ToolTip="Pickup Rift Key Fragments"/>
                 </UniformGrid>
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Misc Item Level:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" />
                 <ComboBox Grid.Row="1" Grid.Column="1" SelectedValuePath="Tag" Margin="5" SelectedValue="{Binding Path=Pickup.MiscItemQuality}">

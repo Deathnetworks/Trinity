@@ -32,6 +32,8 @@ namespace Trinity.Config.Loot
         private bool _CraftMaterials;
         private bool _InfernalKeys;
         private bool _PickupLowLevel;
+        private bool _LootRunKey;
+        private bool _BloodShards;
         private bool _IgnoreTwoHandedWeapons;
 
         private bool _IgnoreLegendaryInAoE;
@@ -490,6 +492,42 @@ namespace Trinity.Config.Loot
         }
 
         [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool LootRunKey
+        {
+            get
+            {
+                return _LootRunKey;
+            }
+            set
+            {
+                if (_LootRunKey != value)
+                {
+                    _LootRunKey = value;
+                    OnPropertyChanged("LootRunKey");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
+        [DefaultValue(true)]
+        public bool BloodShards
+        {
+            get
+            {
+                return _BloodShards;
+            }
+            set
+            {
+                if (_BloodShards != value)
+                {
+                    _BloodShards = value;
+                    OnPropertyChanged("BloodShards");
+                }
+            }
+        }
+
+        [DataMember(IsRequired = false)]
         [DefaultValue(false)]
         public bool IgnoreTwoHandedWeapons
         {
@@ -654,6 +692,8 @@ namespace Trinity.Config.Loot
             this.PickupYellowFollowerItems = true;
             this.PickupUpgrades = true;
             this.MiscItemQuality = Combat.TrinityItemQuality.Common;
+            this.BloodShards = true;
+            this.LootRunKey = true;
         }
         #endregion Methods
     }

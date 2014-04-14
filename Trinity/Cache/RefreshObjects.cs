@@ -659,8 +659,7 @@ namespace Trinity
             // See if we should wait for [playersetting] milliseconds for possible loot drops before continuing run
             if (DateTime.UtcNow.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
                 DateTime.UtcNow.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
-                DateTime.UtcNow.Subtract(lastHadBossUnitInSights).TotalMilliseconds <= 3000 ||
-                DateTime.UtcNow.Subtract(lastHadContainerInSights).TotalMilliseconds <= 2000)
+                DateTime.UtcNow.Subtract(lastHadBossUnitInSights).TotalMilliseconds <= 3000)
             {
                 CurrentTarget = new TrinityCacheObject()
                                     {

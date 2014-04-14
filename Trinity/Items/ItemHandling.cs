@@ -136,12 +136,14 @@ namespace Trinity
                         return false;
                     }
 
-                    if (itemType == GItemType.LootRunKey)
+                    // Rift Keystone Fragments == LootRunkey
+                    if (itemType == GItemType.LootRunKey && Settings.Loot.Pickup.LootRunKey)
                     {
                         return true;
                     }
 
-                    if (itemType == GItemType.HoradricRelic)
+                    // Blood Shards == HoradricRelic
+                    if (itemType == GItemType.HoradricRelic && Settings.Loot.Pickup.BloodShards)
                     {
                         return true;
                     }
