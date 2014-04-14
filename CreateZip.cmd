@@ -6,29 +6,27 @@ REM ***********************************************
 
 PAUSE
 
+rd /S /Q "C:\db\Projects\Builds\Trinity\"
+
 REM Clean Directory
-rd /S /Q "Sources\bin"
-rd /S /Q "Sources\obj"
-rd /S /Q "Sources\Logs"
-del /F /S /Q "Sources\ItemRules\Log\*"
+rd /S /Q "Trinity\bin"
+rd /S /Q "Trinity\obj"
+rd /S /Q "Trinity\Logs"
+del /F /S /Q "Trinity\ItemRules\Log\*"
 
 REM Clean Old Zip file
 del Latest-Trinity.zip
 
 REM Create Temp Directory and pull source inside
-md Trinity
-xcopy /E /Y "Sources\*.cs" "Trinity\"
-xcopy /E /Y "Sources\*.dis" "Trinity\"
-xcopy /E /Y "Sources\*.xaml" "Trinity\"
-xcopy /E /Y "Sources\*.xml" "Trinity\"
-xcopy /E /Y "Sources\*.xsd" "Trinity\"
-xcopy /E /Y "Sources\*.txt" "Trinity\"
+xcopy /E /Y "Trinity\*.cs"   "C:\db\Projects\Builds\Trinity\"
+xcopy /E /Y "Trinity\*.dis"  "C:\db\Projects\Builds\Trinity\"
+xcopy /E /Y "Trinity\*.xaml" "C:\db\Projects\Builds\Trinity\"
+xcopy /E /Y "Trinity\*.xml"  "C:\db\Projects\Builds\Trinity\"
+xcopy /E /Y "Trinity\*.xsd"  "C:\db\Projects\Builds\Trinity\"
+xcopy /E /Y "Trinity\*.txt"  "C:\db\Projects\Builds\Trinity\"
 
 REM Copy to SVN
-xcopy /E /Y "C:\db\Projects\Trinity\Trinity" "C:\db\svn\Trinity\trunk\Sources\"
+xcopy /E /Y "C:\db\Projects\Builds\Trinity\" "C:\db\svn\Trinity\trunk\Trinity\"
 
 REM Zip fresh directory
-7za.exe a Latest-Trinity.zip Trinity\ -mx9
-
-REM Clean Temp directory
-rd /S /Q Trinity 
+7za.exe a Latest-Trinity.zip "C:\db\Projects\Builds\Trinity\" -mx9
