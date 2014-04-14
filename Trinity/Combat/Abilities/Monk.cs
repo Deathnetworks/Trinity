@@ -139,7 +139,8 @@ namespace Trinity
             // Seven Sided Strike
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated &&
                 (TargetUtil.AnyElitesInRange(15, 1) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 15f) || Player.CurrentHealthPct <= 0.55) &&
-                CombatBase.CanCast(SNOPower.Monk_SevenSidedStrike) && ((Player.PrimaryResource >= 50 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+                CombatBase.CanCast(SNOPower.Monk_SevenSidedStrike, CombatBase.CanCastFlags.NoTimer) && 
+                ((Player.PrimaryResource >= 50 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
             {
                 Monk_TickSweepingWindSpam();
                 return new TrinityPower(SNOPower.Monk_SevenSidedStrike, 16f, CurrentTarget.Position, CurrentWorldDynamicId, -1, 2, 3, WAIT_FOR_ANIM);
@@ -284,15 +285,27 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Monk_TempestRush, 23f, CombatBase.ZigZagPosition, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
             }
 
+            // Lashing Tail Kick
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Monk_LashingTailKick) && !Player.IsIncapacitated &&
+                // Either doesn't have sweeping wind, or does but the buff is already up
+                (!Hotbar.Contains(SNOPower.Monk_SweepingWind) || (Hotbar.Contains(SNOPower.Monk_SweepingWind) && GetHasBuff(SNOPower.Monk_SweepingWind))) &&
+                ((Player.PrimaryResource >= 65 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+            {
+                Monk_TickSweepingWindSpam();
+                return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
+            }
+
+            // Dashing Strike
+            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CurrentTarget.CentreDistance >= 16f &&
+                CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike, CombatBase.CanCastFlags.NoTimer))
+            {
+                Monk_TickSweepingWindSpam();
+                return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, CurrentTarget.Position, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
+            }
+
             // 4 Mantra spam for the 4 second buff
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && !Settings.Combat.Monk.DisableMantraSpam)
             {
-                if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfEvasion_v2) &&
-                    Player.PrimaryResource >= 50 && CurrentTarget != null)
-                {
-                    return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2);
-                }
-
                 if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfConviction_v2) && !GetHasBuff(SNOPower.X1_Monk_MantraOfConviction_v2) &&
                     (Player.PrimaryResource >= 50) && CurrentTarget != null)
                 {
@@ -313,24 +326,12 @@ namespace Trinity
                 return new TrinityPower(SNOPower.X1_Monk_MantraOfHealing_v2);
             }
 
-
-            // Lashing Tail Kick
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Monk_LashingTailKick) && !Player.IsIncapacitated &&
-                // Either doesn't have sweeping wind, or does but the buff is already up
-                (!Hotbar.Contains(SNOPower.Monk_SweepingWind) || (Hotbar.Contains(SNOPower.Monk_SweepingWind) && GetHasBuff(SNOPower.Monk_SweepingWind))) &&
-                ((Player.PrimaryResource >= 65 && !Player.WaitingForReserveEnergy) || Player.PrimaryResource >= MinEnergyReserve))
+            if (CombatBase.CanCast(SNOPower.X1_Monk_MantraOfEvasion_v2) && Player.CurrentHealthPct <= V.F("Monk.MantraOfHealing.UseHealthPct") &&
+                !GetHasBuff(SNOPower.X1_Monk_MantraOfEvasion_v2) && CurrentTarget != null)
             {
-                Monk_TickSweepingWindSpam();
-                return new TrinityPower(SNOPower.Monk_LashingTailKick, 10f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.X1_Monk_MantraOfEvasion_v2);
             }
 
-            // Dashing Strike
-            if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CurrentTarget.CentreDistance >= 16f && 
-                CombatBase.CanCast(SNOPower.X1_Monk_DashingStrike, CombatBase.CanCastFlags.NoTimer))
-            {
-                Monk_TickSweepingWindSpam();
-                return new TrinityPower(SNOPower.X1_Monk_DashingStrike, Monk_MaxDashingStrikeRange, CurrentTarget.Position, CurrentWorldDynamicId, -1, 2, 2, WAIT_FOR_ANIM);
-            }
             
             /*
              * Dual/Trigen Monk section

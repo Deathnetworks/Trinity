@@ -65,6 +65,10 @@ namespace Trinity
                 }
             }
 
+            // Gem quality level hax
+            if (itemBaseType == GItemBaseType.Gem)
+                c_ItemLevel = diaItem.CommonData.GetGemQualityLevel();
+
             float fExtraRange = 0f;
 
             if (c_ItemQuality >= ItemQuality.Legendary)

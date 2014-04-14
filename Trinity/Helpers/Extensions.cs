@@ -84,6 +84,9 @@ namespace Trinity.Helpers
                 case "{c:ff99bbff}":
                     qualityResult = ItemQuality.Normal;
                     break;
+                case "{c:ffc236ff}":
+                    qualityResult = ItemQuality.Special;
+                    break;
                 case "":
                     qualityResult = ItemQuality.Invalid;
                     break;
@@ -94,6 +97,20 @@ namespace Trinity.Helpers
             }
 
             return qualityResult;
+        }
+
+        public static int GetGemQualityLevel(this ACDItem item)
+        {
+            if (item == null)
+                return 0;
+            if (!item.IsValid)
+                return 0;
+
+            // Imperial Gem hax
+            if (item.InternalName.EndsWith("_16"))
+                return 68;
+
+            return item.Level;
         }
     }
 }

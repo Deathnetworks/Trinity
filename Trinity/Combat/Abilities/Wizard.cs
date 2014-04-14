@@ -59,6 +59,17 @@ namespace Trinity
                     return new TrinityPower(SNOPower.X1_Wizard_Wormhole, 45f, TargetUtil.GetBestClusterUnit(blackholeRadius, 45f, 1, false, true).Position);
                 }
 
+                bool arcaneDynamoPassiveReady =
+                 (ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Wizard_Passive_ArcaneDynamo) && GetBuffStacks(SNOPower.Wizard_Passive_ArcaneDynamo) == 5);
+
+                var bestMeteorClusterUnit = TargetUtil.GetBestClusterUnit(15f, 65f, 1, true, true);
+                // Meteor: Arcane Dynamo
+                if (!UseOOCBuff && !Player.IsIncapacitated && !arcaneDynamoPassiveReady && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
+                    (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2, true)))
+                {
+                    return new TrinityPower(SNOPower.Wizard_Meteor, 65f, bestMeteorClusterUnit.Position);
+                }
+                
                 // Diamond Skin SPAM
                 if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Wizard_DiamondSkin) && LastPowerUsed != SNOPower.Wizard_DiamondSkin && !GetHasBuff(SNOPower.Wizard_DiamondSkin) &&
                     (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 1) || Player.CurrentHealthPct <= 0.90 || Player.IsIncapacitated || Player.IsRooted || CurrentTarget.RadiusDistance <= 40f))
@@ -71,7 +82,14 @@ namespace Trinity
                     (TargetUtil.AnyElitesInRange(25, 1) || TargetUtil.AnyMobsInRange(25, 2) || (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 40f)) &&
                     (SpellHistory.TimeSinceUse(SNOPower.Wizard_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastUsePosition(SNOPower.Wizard_SlowTime) > 7.5))
                 {
-                    return new TrinityPower(SNOPower.Wizard_SlowTime, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                    bool castOnSelf = false;
+                    if (TargetUtil.AnyMobsInRange(20f))
+                        castOnSelf = true;
+
+                    if (castOnSelf)
+                        return new TrinityPower(SNOPower.Wizard_SlowTime);
+                    else
+                        return new TrinityPower(SNOPower.Wizard_SlowTime, 55f, TargetUtil.GetBestClusterUnit(20f, 65f, 1, true, true).Position);
                 }
 
                 // Mirror Image  @ half health or 5+ monsters or rooted/incapacitated or last elite left @25% health
@@ -209,13 +227,10 @@ namespace Trinity
                     return new TrinityPower(SNOPower.Wizard_Blizzard, 45f, bestClusterPoint, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
 
-                bool arcaneDynamoPassiveReady = 
-                    (ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Wizard_Passive_ArcaneDynamo) && GetBuffStacks(SNOPower.Wizard_Passive_ArcaneDynamo) == 5) ||
-                    !ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Wizard_Passive_ArcaneDynamo);
+                bool hasArcaneDynamo = (ZetaDia.CPlayer.PassiveSkills.Any(s => s == SNOPower.Wizard_Passive_ArcaneDynamo);
 
-                var bestMeteorClusterUnit = TargetUtil.GetBestClusterUnit(15f, 65f, 1, true, true);
-                // Meteor
-                if (!UseOOCBuff && !Player.IsIncapacitated && !arcaneDynamoPassiveReady && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
+                // Meteor - no arcane dynamo
+                if (!UseOOCBuff && !Player.IsIncapacitated && !hasArcaneDynamo && CombatBase.CanCast(SNOPower.Wizard_Meteor, CombatBase.CanCastFlags.NoTimer) &&
                     (TargetUtil.EliteOrTrashInRange(65) || TargetUtil.ClusterExists(15f, 65, 2, true)))
                 {
                     return new TrinityPower(SNOPower.Wizard_Meteor, 65f, bestMeteorClusterUnit.Position);
@@ -399,8 +414,8 @@ namespace Trinity
                 // Archon form
                 // Archon Slow Time for in combat
                 if (!UseOOCBuff && !Player.IsIncapacitated &&
-                    (TargetUtil.AnyElitesInRange(25, 1) || 
-                    TargetUtil.EliteOrTrashInRange(25f) || 
+                    (TargetUtil.AnyElitesInRange(25, 1) ||
+                    TargetUtil.EliteOrTrashInRange(25f) ||
                     (CurrentTarget.IsBossOrEliteRareUnique && CurrentTarget.RadiusDistance <= 35f)) &&
                     CombatBase.CanCast(SNOPower.Wizard_Archon_SlowTime, CombatBase.CanCastFlags.NoTimer) &&
                     (SpellHistory.TimeSinceUse(SNOPower.Wizard_Archon_SlowTime) > TimeSpan.FromSeconds(15) || SpellHistory.DistanceFromLastUsePosition(SNOPower.Wizard_Archon_SlowTime) > 7.5))

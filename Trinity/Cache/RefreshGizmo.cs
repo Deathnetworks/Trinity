@@ -627,7 +627,6 @@ namespace Trinity
                             c_IgnoreSubStep = "ForceVendorRunASAP";
                         }
 
-
                         if (CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsMinimapActive)
                         {
                             AddToCache = true;
