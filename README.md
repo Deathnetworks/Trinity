@@ -2,7 +2,47 @@
 # Trinity
 
 ### Changelog 1.8.20
- 
+
+* Changed description of "Trash All Rares" to "Sell/Salvage all rares" - hopefully this makes more sense now
+
+* Added Marquise and Imperial Gem pickup options
+
+* Fixed log noise when blood shards are dropped
+
+* Wizard: Meteor with Arcane dynamo given higher priority
+
+* Wizard: Meteor without Arcane dynamo is back to normal
+
+* Wizard: Slow Time will be cast on distant ranged targets if no close-range targets are near
+
+* Monk Mantras have lower priority (moved Lashing Tail Kick and Dashing Strike higher). "Disable Mantra Spam" button works again
+
+* Added Option in Items > Scoring/Townrun for "Open Horadric Cache" and "Free Bag Slots for TownRun in Town"
+
+* Wizard Disintegrate: Entropy now used slightly closer range
+
+* Crusader Blessed Shield added as last-fall back optional with no-wrath requirement
+
+* Horadric Cache is now used by name, not by GameBalanceID
+
+* TrinityExploreDungeon will fall back into safe-mode of 25/0.01 if the current box size/tolerance can only produce a single navigable node
+
+* DemonHunter Vengeance should work now
+
+* Trinity should now pickup Blood Sharts ("HoradricRelic")
+
+* Refactored native object access slightly
+
+* Fixed Monk Mantra of Evasion re-cast
+
+* Trinity will now open Horadric Cache's while in town
+
+* Bounty Objective Bosses now get higher priority and max range
+
+* Wizard Archon can now be cast when off cooldown
+
+* Added some Bounty related functions (GetBountyType, GetBountyAct)
+
 * WitchDoctor Spirit Barrage has lower priority
 
 * Wizard Arcane Orb distanced slightly reduced to 35f
