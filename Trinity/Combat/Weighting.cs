@@ -972,7 +972,10 @@ namespace Trinity
                 TrinityCacheObject cTarget = (TrinityCacheObject)GenericCache.GetObject(targetMd5Hash).Value;
                 bool isEliteLowHealth = cTarget.HitPointsPct <= 0.75 && cTarget.IsBossOrEliteRareUnique;
                 bool isLegendaryItem = cTarget.Type == GObjectType.Item && cTarget.ItemQuality >= ItemQuality.Legendary;
-                if (!cTarget.IsBoss && cTarget.TimesBeenPrimaryTarget > 100 && !isEliteLowHealth && !isLegendaryItem)
+
+                bool isHoradricRelic = (cTarget.InternalName.ToLower().StartsWith("horadricrelic") && cTarget.TimesBeenPrimaryTarget > 5);
+
+                if ((!cTarget.IsBoss && cTarget.TimesBeenPrimaryTarget > 100 && !isEliteLowHealth && !isLegendaryItem) || isHoradricRelic)
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Blacklisting target {0} ActorSNO={1} RActorGUID={2} due to possible stuck/flipflop!",
                         CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid);

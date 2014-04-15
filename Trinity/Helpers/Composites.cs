@@ -38,7 +38,7 @@ namespace Trinity.Helpers
             return
             new PrioritySelector(
                 new Decorator(ret => Trinity.Settings.Loot.TownRun.OpenHoradricCaches && !BrainBehavior.IsVendoring &&
-                    Trinity.Player.IsInTown && DateTime.UtcNow.Subtract(lastCheckedForHoradricCache).TotalSeconds > 30,
+                        Trinity.Player.IsInTown && DateTime.UtcNow.Subtract(lastCheckedForHoradricCache).TotalSeconds > 30,
                     new Sequence(
                         new Action(ret => lastCheckedForHoradricCache = DateTime.UtcNow),
                         new Decorator(ret => HasHoradricCaches(),

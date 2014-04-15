@@ -32,14 +32,14 @@ namespace Trinity.UI
         {
             using (new PerformanceLogger("GetDisplayWindow"))
             {
-                // Check we can actually find the .xaml file first - if not, report an error
-                if (!File.Exists(Path.Combine(uiPath, "MainView.xaml")))
-                {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "MainView.xaml not found {0}", Path.Combine(uiPath, "MainView.xaml"));
-                    return null;
-                }
                 try
                 {
+                    // Check we can actually find the .xaml file first - if not, report an error
+                    if (!File.Exists(Path.Combine(uiPath, "MainView.xaml")))
+                    {
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "MainView.xaml not found {0}", Path.Combine(uiPath, "MainView.xaml"));
+                        return null;
+                    }
                     Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "MainView.xaml found");
                     if (_configWindow == null)
                     {
@@ -86,30 +86,51 @@ namespace Trinity.UI
         /// </summary>
         internal static void PreLoadWindowContent()
         {
-            Trinity.BeginInvoke(new Action(() => LoadWindowContent(Path.Combine(FileManager.PluginPath, "UI"))));
+            try
+            {
+                Trinity.BeginInvoke(new Action(() => LoadWindowContent(Path.Combine(FileManager.PluginPath, "UI"))));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Exception pre-loadingn window content! " + ex.ToString());
+            }
         }
 
         internal static void LoadWindowContent(string uiPath)
         {
-            lock (_contentLock)
+            try
             {
-                _windowContent = LoadAndTransformXamlFile<UserControl>(Path.Combine(uiPath, "MainView.xaml"));
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Children");
-                LoadChild(_windowContent, uiPath);
-                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Resources");
-                LoadResourceForWindow(Path.Combine(uiPath, "Template.xaml"), _windowContent);
+                lock (_contentLock)
+                {
+                    _windowContent = LoadAndTransformXamlFile<UserControl>(Path.Combine(uiPath, "MainView.xaml"));
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Children");
+                    LoadChild(_windowContent, uiPath);
+                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load Resources");
+                    LoadResourceForWindow(Path.Combine(uiPath, "Template.xaml"), _windowContent);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Exception loading window content! {0}", ex);
             }
         }
 
         private static void LoadResourceForWindow(string filename, UserControl control)
         {
-            using (new PerformanceLogger("LoadResourceForWindow"))
+            try
             {
-                ResourceDictionary resource = LoadAndTransformXamlFile<ResourceDictionary>(filename);
-                foreach (System.Collections.DictionaryEntry res in resource)
+                using (new PerformanceLogger("LoadResourceForWindow"))
                 {
-                    control.Resources.Add(res.Key, res.Value);
+                    ResourceDictionary resource = LoadAndTransformXamlFile<ResourceDictionary>(filename);
+                    foreach (System.Collections.DictionaryEntry res in resource)
+                    {
+                        control.Resources.Add(res.Key, res.Value);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error loading resources {0}", ex);
             }
         }
 
@@ -118,19 +139,27 @@ namespace Trinity.UI
         /// <returns><see cref="Stream"/> which contains transformed XAML file.</returns>
         internal static T LoadAndTransformXamlFile<T>(string filename)
         {
-            Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load XAML file : {0}", filename);
-            string filecontent = File.ReadAllText(filename);
+            try
+            {
+                Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Load XAML file : {0}", filename);
+                string filecontent = File.ReadAllText(filename);
 
-            // Change reference to custom Trinity class
-            filecontent = filecontent.Replace("xmlns:ut=\"clr-namespace:Trinity.UIComponents\"", "xmlns:ut=\"clr-namespace:Trinity.UIComponents;assembly=" + Assembly.GetExecutingAssembly().GetName().Name + "\"");
+                // Change reference to custom Trinity class
+                filecontent = filecontent.Replace("xmlns:ut=\"clr-namespace:Trinity.UIComponents\"", "xmlns:ut=\"clr-namespace:Trinity.UIComponents;assembly=" + Assembly.GetExecutingAssembly().GetName().Name + "\"");
 
-            // Remove Template designer reference
-            //filecontent = filecontent.Replace("<ResourceDictionary.MergedDictionaries><ResourceDictionary Source=\"..\\Template.xaml\"/></ResourceDictionary.MergedDictionaries>", string.Empty);
-            //filecontent = filecontent.Replace("<ResourceDictionary.MergedDictionaries><ResourceDictionary Source=\"Template.xaml\"/></ResourceDictionary.MergedDictionaries>", string.Empty);
+                // Remove Template designer reference
+                //filecontent = filecontent.Replace("<ResourceDictionary.MergedDictionaries><ResourceDictionary Source=\"..\\Template.xaml\"/></ResourceDictionary.MergedDictionaries>", string.Empty);
+                //filecontent = filecontent.Replace("<ResourceDictionary.MergedDictionaries><ResourceDictionary Source=\"Template.xaml\"/></ResourceDictionary.MergedDictionaries>", string.Empty);
 
-            filecontent = Regex.Replace(filecontent, "<ResourceDictionary.MergedDictionaries>.*</ResourceDictionary.MergedDictionaries>", string.Empty, RegexOptions.Singleline | RegexOptions.Compiled);
+                filecontent = Regex.Replace(filecontent, "<ResourceDictionary.MergedDictionaries>.*</ResourceDictionary.MergedDictionaries>", string.Empty, RegexOptions.Singleline | RegexOptions.Compiled);
 
-            return (T)XamlReader.Load(new MemoryStream(Encoding.UTF8.GetBytes(filecontent)));
+                return (T)XamlReader.Load(new MemoryStream(Encoding.UTF8.GetBytes(filecontent)));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error loading/transforming XAML {0}", ex);
+                return default(T);
+            }
         }
 
         /// <summary>Call when Config Window is closed.</summary>
@@ -148,21 +177,28 @@ namespace Trinity.UI
         /// <param name="uiPath">The UI path.</param>
         private static void LoadChild(FrameworkElement parentControl, string uiPath)
         {
-            // Loop in Children of parent control of type FrameworkElement 
-            foreach (FrameworkElement ctrl in LogicalTreeHelper.GetChildren(parentControl).OfType<FrameworkElement>())
+            try
             {
-                string contentName = ctrl.Tag as string;
-                // Tag contains a string end with ".xaml" : It's dymanic content 
-                if (!string.IsNullOrWhiteSpace(contentName) && contentName.EndsWith(".xaml"))
+                // Loop in Children of parent control of type FrameworkElement 
+                foreach (FrameworkElement ctrl in LogicalTreeHelper.GetChildren(parentControl).OfType<FrameworkElement>())
                 {
-                    // Load content from XAML file
-                    LoadDynamicContent(uiPath, ctrl, System.IO.Path.Combine(uiPath, contentName));
+                    string contentName = ctrl.Tag as string;
+                    // Tag contains a string end with ".xaml" : It's dymanic content 
+                    if (!string.IsNullOrWhiteSpace(contentName) && contentName.EndsWith(".xaml"))
+                    {
+                        // Load content from XAML file
+                        LoadDynamicContent(uiPath, ctrl, System.IO.Path.Combine(uiPath, contentName));
+                    }
+                    else
+                    {
+                        // Try again with children of control
+                        LoadChild(ctrl, uiPath);
+                    }
                 }
-                else
-                {
-                    // Try again with children of control
-                    LoadChild(ctrl, uiPath);
-                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Exception loading child {0}", ex);
             }
         }
 
@@ -172,32 +208,39 @@ namespace Trinity.UI
         /// <param name="filename">Name of the content.</param>
         private static void LoadDynamicContent(string uiPath, FrameworkElement ctrl, string filename)
         {
-            if (File.Exists(filename))
+            try
             {
-                UserControl xamlContent = LoadAndTransformXamlFile<UserControl>(filename);
+                if (File.Exists(filename))
+                {
+                    UserControl xamlContent = LoadAndTransformXamlFile<UserControl>(filename);
 
-                // Dynamic load of content is possible on Content control (UserControl, ...)
-                if (ctrl is ContentControl)
-                {
-                    ((ContentControl)ctrl).Content = xamlContent;
+                    // Dynamic load of content is possible on Content control (UserControl, ...)
+                    if (ctrl is ContentControl)
+                    {
+                        ((ContentControl)ctrl).Content = xamlContent;
+                    }
+                    // Or on Decorator control (Border, ...)
+                    else if (ctrl is Decorator)
+                    {
+                        ((Decorator)ctrl).Child = xamlContent;
+                    }
+                    // Otherwise, log control where you try to put dynamic tag
+                    else
+                    {
+                        Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Control of type '{0}' can't be used for dynamic loading.", ctrl.GetType().FullName);
+                        return;
+                    }
+                    // Content added to parent control, try to search dynamic control in children
+                    LoadChild(xamlContent, uiPath);
                 }
-                // Or on Decorator control (Border, ...)
-                else if (ctrl is Decorator)
-                {
-                    ((Decorator)ctrl).Child = xamlContent;
-                }
-                // Otherwise, log control where you try to put dynamic tag
                 else
                 {
-                    Logger.Log(TrinityLogLevel.Verbose, LogCategory.UI, "Control of type '{0}' can't be used for dynamic loading.", ctrl.GetType().FullName);
-                    return;
+                    Logger.Log(TrinityLogLevel.Error, LogCategory.UI, "Error XAML file not found : '{0}'", filename);
                 }
-                // Content added to parent control, try to search dynamic control in children
-                LoadChild(xamlContent, uiPath);
             }
-            else
+            catch (Exception ex)
             {
-                Logger.Log(TrinityLogLevel.Error, LogCategory.UI, "Error XAML file not found : '{0}'", filename);
+                Logger.LogError("Exception loading Dynamic Content {0}", ex);
             }
         }
 

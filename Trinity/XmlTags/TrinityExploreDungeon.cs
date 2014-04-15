@@ -447,6 +447,9 @@ namespace Trinity.XmlTags
         /// </summary>
         private Vector3 GPUpdatePosition = Vector3.Zero;
 
+
+        private bool startedWithBounty = false;
+
         /// <summary>
         /// Called when the profile behavior starts
         /// </summary>
@@ -489,6 +492,9 @@ namespace Trinity.XmlTags
             if (ObjectDistance == 0)
                 ObjectDistance = 25f;
 
+            if (ZetaDia.ActInfo.ActiveBounty != null)
+                startedWithBounty = true;
+
             PrintNodeCounts("PostInit");
         }
 
@@ -525,6 +531,9 @@ namespace Trinity.XmlTags
         {
             return
             new Sequence(
+                new DecoratorContinue(ret => !startedWithBounty && IsInAdventureMode() && ZetaDia.ActInfo.ActiveBounty != null,
+                    new Action(ret => startedWithBounty = true)
+                ),
                 new DecoratorContinue(ret => !IgnoreMarkers,
                     new Sequence(
                         MiniMapMarker.DetectMiniMapMarkers(0),
@@ -1348,7 +1357,7 @@ namespace Trinity.XmlTags
             else
                 return 0;
         }
-        
+
         /// <summary>
         /// Gets the number of nodes in the DungeonExplorer Route
         /// </summary>
@@ -1512,39 +1521,27 @@ namespace Trinity.XmlTags
             InitDone = false;
         }
 
-        public bool GetIsBountyDone()
+        public bool IsInAdventureMode()
         {
             // Only valid for Adventure mode
-            if (ZetaDia.CurrentAct != Act.OpenWorld)
-                return false;
+            if (ZetaDia.CurrentAct == Act.OpenWorld)
+                return true;
 
-            // We're in a rift, not a bounty!
-            if (ZetaDia.CurrentAct == Act.OpenWorld && DataDictionary.RiftWorldIds.Contains(ZetaDia.CurrentWorldId))
-                return false;
+            return false;
+        }
 
+        public bool GetIsBountyDone()
+        {
             try
             {
-                var b = ZetaDia.ActInfo.ActiveBounty;
-                if (b == null && QuestId != 1 && QuestId != 312429)
-                {
-                    Logger.Log("Active bounty returned null, Assuming done.");
-                    return true;
-                }
-                if (!b.Info.IsValid)
-                {
-                    Logger.Log("Does this even work? Thinks the bounty is not valid.");
-                }
-                if (b.Info.QuestSNO > 500000 || b.Info.QuestSNO < 200000)
-                {
-                    Logger.Log("Got some weird numbers going on with the QuestSNO of the active bounty. Assuming glitched and done.");
-                    return true;
-                }
-                //If completed or on next step, we are good.
-                if (b != null && b.Info.State == QuestState.Completed)
-                {
-                    Logger.Log("Seems completed!");
-                    return true;
-                }
+                // Only valid for Adventure mode
+                if (ZetaDia.CurrentAct != Act.OpenWorld)
+                    return false;
+
+                // We're in a rift, not a bounty!
+                if (ZetaDia.CurrentAct == Act.OpenWorld && DataDictionary.RiftWorldIds.Contains(ZetaDia.CurrentWorldId))
+                    return false;
+
                 if (ZetaDia.IsInTown)
                 {
                     return true;
@@ -1553,6 +1550,32 @@ namespace Trinity.XmlTags
                 {
                     return false;
                 }
+
+                var b = ZetaDia.ActInfo.ActiveBounty;
+                if (startedWithBounty && b == null)
+                {
+                    Logger.Log("Active bounty returned null, Assuming done.");
+                    return true;
+                }
+                if (b != null && startedWithBounty)
+                {
+                    if (!b.Info.IsValid)
+                    {
+                        Logger.Log("Does this even work? Thinks the bounty is not valid.");
+                    }
+                    if (b.Info.QuestSNO > 500000 || b.Info.QuestSNO < 200000)
+                    {
+                        Logger.Log("Got some weird numbers going on with the QuestSNO of the active bounty. Assuming glitched and done.");
+                        return true;
+                    }
+                    //If completed or on next step, we are good.
+                    if (b.Info.State == QuestState.Completed)
+                    {
+                        Logger.Log("Seems completed!");
+                        return true;
+                    }
+                }
+
             }
             catch (Exception ex)
             {
