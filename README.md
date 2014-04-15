@@ -3,13 +3,11 @@
 
 ### Changelog 1.8.22
 
-* Optimized TrinityExploreDungeon bounty check
-
 * Removed WorldHeightCache and Raycast Cache to save memory
 
-### Changelog 1.8.21
+* Added lots of Try/Catch to UI loading stuff
 
-
+* Added "Started with Bounty" check to TrinityExploreDungeon 
 
 ### Changelog 1.8.20
 
