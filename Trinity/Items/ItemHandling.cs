@@ -683,7 +683,7 @@ namespace Trinity
                 if (!Settings.Advanced.OutputReports)
                     return;
 
-                if (cachedStaticWorldId <= 0 || Player.ActorClass == ActorClass.Invalid)
+                if (CurrentWorldId <= 0 || Player.ActorClass == ActorClass.Invalid)
                     return;
 
                 if (!ZetaDia.IsInGame)

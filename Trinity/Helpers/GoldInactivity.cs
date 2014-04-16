@@ -35,6 +35,11 @@ namespace Trinity
             if (Trinity.Settings.Advanced.DisableAllMovement)
                 return false;
 
+            if (BotMain.IsPaused)
+            {
+                ResetCheckGold();
+                return false;
+            }
             if (!Trinity.Settings.Advanced.GoldInactivityEnabled)
             {
                 // timer isn't enabled so move along!
@@ -169,7 +174,7 @@ namespace Trinity
                 ZetaDia.Service.Party.LeaveGame(true);
                 Logger.Log(TrinityLogLevel.Info, LogCategory.GlobalHandler, "GoldInactiveLeaveGame initiated LeaveGame");
                 return true;
-            }            
+            }
 
             if (DateTime.UtcNow.Subtract(PlayerMover.LastRestartedGame).TotalSeconds <= 12)
             {

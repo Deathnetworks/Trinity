@@ -15,14 +15,126 @@ namespace Trinity
         /// Contains a list of Rift WorldId's
         /// </summary>
         public static HashSet<int> RiftWorldIds { get { return DataDictionary.riftWorldIds; } }
-        private static HashSet<int> riftWorldIds = new HashSet<int>()
+        private static readonly HashSet<int> riftWorldIds = new HashSet<int>()
         {
             288454,
             288685,
             288687,
             288798,
             288800,
+            288802,
+            288804,
+            288806,
         };
+
+        public static HashSet<int> BountyTurnInQuests { get { return DataDictionary.bountyTurnInQuests; } }
+        private static readonly HashSet<int> bountyTurnInQuests = new HashSet<int>()
+        {
+            356988, //x1_AdventureMode_BountyTurnin_A1 
+            356994, //x1_AdventureMode_BountyTurnin_A2 
+            356996, //x1_AdventureMode_BountyTurnin_A3 
+            356999, //x1_AdventureMode_BountyTurnin_A4 
+            357001, //x1_AdventureMode_BountyTurnin_A5 
+        };
+
+        public static HashSet<int> EventQuests { get { return DataDictionary.eventQuests; } }
+        private static readonly HashSet<int> eventQuests = new HashSet<int>()
+        {
+            365821, // [D7499CC] Quest: x1_Catacombs_NS_06Mutant_Evant, QuestSNO: 365821, QuestMeter: -1, QuestState: InProgress, QuestStep: 10, KillCount: 0, BonusCount: 0 
+            369381, // [2ECD96F4] Quest: x1_Event_Horde_HunterKillers, QuestSNO: 369381, QuestMeter: 0.004814815, QuestState: InProgress, QuestStep: 14, KillCount: 0, BonusCount: 0
+            369431, // [2ECD9860] Quest: x1_Event_WaveFight_AncientEvils, QuestSNO: 369431, QuestMeter: -1, QuestState: InProgress, QuestStep: 13, KillCount: 0, BonusCount: 0
+            336293, // [417DD860] Quest: X1_Graveyard_GraveRobber_Event, QuestSNO: 336293, QuestMeter: -1, QuestState: InProgress, QuestStep: 46, KillCount: 0, BonusCount: 0
+        
+
+            368306, // x1_Event_Horde_ArmyOfHell,
+            369332, // x1_Event_Horde_Bonepit,
+            365252, // x1_Event_Horde_DeathCellar,
+            365150, // x1_Event_Horde_Deathfire,
+            365695, // x1_Event_Horde_DesertFortress,
+            367979, // x1_Event_Horde_Dustbowl,
+            364880, // x1_Event_Horde_FleshpitGrove,
+            369525, // x1_Event_Horde_FlyingAssasins,
+            365796, // x1_Event_Horde_FoulHatchery,
+            365305, // x1_Event_Horde_GhoulSwarm,
+            369366, // x1_Event_Horde_GuardSlaughter,
+            369381, // x1_Event_Horde_HunterKillers,
+            368035, // x1_Event_Horde_InfernalSky,
+            365269, // x1_Event_Horde_SpiderTrap,
+            366331, // x1_Event_Horde_UdderChaos,
+            239301, // x1_Event_Jar_Of_Souls_NecroVersion,
+            370334, // x1_Event_SpeedKill_Angel_Corrupt_A,
+            370316, // x1_Event_SpeedKill_BileCrawler_A,
+            369841, // x1_Event_SpeedKill_Bloodhawk_A,
+            370556, // x1_Event_SpeedKill_Boss_Adria,
+            370373, // x1_Event_SpeedKill_Boss_Despair,
+            370154, // x1_Event_SpeedKill_Boss_Ghom,
+            369892, // x1_Event_SpeedKill_Boss_Maghda,
+            365630, // x1_Event_SpeedKill_Boss_SkeletonKing,
+            370349, // x1_Event_SpeedKill_Champion_BigRed_A,
+            370082, // x1_Event_SpeedKill_Champion_FallenHound_D,
+            369895, // x1_Event_SpeedKill_Champion_FleshPitFlyer_C,
+            365586, // x1_Event_SpeedKill_Champion_GhostA,
+            365593, // x1_Event_SpeedKill_Champion_GoatmanB,
+            370364, // x1_Event_SpeedKill_Champion_MalletDemon_A,
+            369906, // x1_Event_SpeedKill_Champion_SandShark_A,
+            370135, // x1_Event_SpeedKill_Champion_SoulRipper_A,
+            370837, // x1_Event_SpeedKill_Champion_SquiggletA,
+            365617, // x1_Event_SpeedKill_Champion_SummonableA,
+            370077, // x1_Event_SpeedKill_Champion_azmodanBodyguard_A,
+            370066, // x1_Event_SpeedKill_Champion_creepMob_A,
+            370341, // x1_Event_SpeedKill_Champion_morluSpellcaster_A,
+            370516, // x1_Event_SpeedKill_Champion_x1_FloaterAngel_A,
+            370544, // x1_Event_SpeedKill_Champon_x1_Rockworm_Pand_A,
+            370320, // x1_Event_SpeedKill_CoreEliteDemon_A,
+            370038, // x1_Event_SpeedKill_Fallen_C,
+            365551, // x1_Event_SpeedKill_GhostHumansA,
+            370053, // x1_Event_SpeedKill_Ghoul_E,
+            364644, // x1_Event_SpeedKill_GoatmanA,
+            365509, // x1_Event_SpeedKill_Goatman_Melee_A_Ghost,
+            370044, // x1_Event_SpeedKill_Goatmutant_B,
+            369873, // x1_Event_SpeedKill_Lacuni_B,
+            370049, // x1_Event_SpeedKill_Monstrosity_Scorpion_A,
+            369910, // x1_Event_SpeedKill_Rare_Ghoul_B,
+            365622, // x1_Event_SpeedKill_Rare_Skeleton2HandA,
+            370147, // x1_Event_SpeedKill_Rare_ThousandPounder,
+            370359, // x1_Event_SpeedKill_Rare_demonTrooper_C,
+            370499, // x1_Event_SpeedKill_Rare_x1_westmarchBrute_C,
+            370060, // x1_Event_SpeedKill_Skeleton_E,
+            364635, // x1_Event_SpeedKill_SkeletonsA,
+            369856, // x1_Event_SpeedKill_Snakeman_A,
+            369884, // x1_Event_SpeedKill_Spiderling_B,
+            369863, // x1_Event_SpeedKill_Swarm_A,
+            370666, // x1_Event_SpeedKill_TentacleBears,
+            369832, // x1_Event_SpeedKill_TriuneCultist_C,
+            365526, // x1_Event_SpeedKill_TriuneVesselA,
+            365547, // x1_Event_SpeedKill_ZombieB,
+            370033, // x1_Event_SpeedKill_demonFlyer_B,
+            369817, // x1_Event_SpeedKill_electricEel_A,
+            369837, // x1_Event_SpeedKill_fastMummy_A,
+            370329, // x1_Event_SpeedKill_morluMelee_B,
+            370482, // x1_Event_SpeedKill_x1_BileCrawler_Skeletal_A,
+            370435, // x1_Event_SpeedKill_x1_BogFamily_A,
+            370452, // x1_Event_SpeedKill_x1_Monstrosity_ScorpionBug_A,
+            370427, // x1_Event_SpeedKill_x1_Skeleton_Ghost_A,
+            370561, // x1_Event_SpeedKill_x1_Tentacle_A,
+            370445, // x1_Event_SpeedKill_x1_bogBlight_Maggot_A,
+            370466, // x1_Event_SpeedKill_x1_leaperAngel_A,
+            370489, // x1_Event_SpeedKill_x1_portalGuardianMinion_A,
+            370476, // x1_Event_SpeedKill_x1_westmarchHound_A,
+            369431, // x1_Event_WaveFight_AncientEvils,
+            365751, // x1_Event_WaveFight_ArmyOfTheDead,
+            368092, // x1_Event_WaveFight_BloodClanAssault,
+            365300, // x1_Event_WaveFight_ChamberOfBone,
+            365033, // x1_Event_WaveFight_CultistLegion,
+            368056, // x1_Event_WaveFight_DeathChill,
+            365678, // x1_Event_WaveFight_FallenWarband,
+            368124, // x1_Event_WaveFight_ForsakenSoldiers,
+            369482, // x1_Event_WaveFight_HostileRealm,
+            368334, // x1_Event_WaveFight_Juggernaut,
+            365133, // x1_Event_WaveFight_KhazraWarband,
+            365953, // x1_Event_WaveFight_SunkenGrave,
+        };
+
 
 
         public static HashSet<string> VanityItems { get { return DataDictionary.vanityItems; } }
@@ -93,6 +205,8 @@ namespace Trinity
             102964, // A2 City of Caldeum
 
             309413, // A5 Westmarch Cathedral
+
+            336846, // x1_westm_KingEvent01 - Westmarch Commons Contested Villa
         };
 
 
@@ -447,6 +561,8 @@ namespace Trinity
             367456, // x1_Pand_Ext_Event_Hive_Blocker
 
             347276, // x1_Fortress_Soul_Grinder_A
+
+            374751, // x1_PortalGuardian_A
         };
 
         // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog
@@ -490,19 +606,28 @@ namespace Trinity
             365097, // Cursed Chest - Damp Cellar
 
             // A5
-            328830, // x1_Fortress_Portal_Switch
-
-            348096, // Paths of the Drowned - portal switches
+            348096, // Paths of the Drowned - portal switches - x1_Bog_Beacon_B
             361364, // A5 Siege Rune Path of War
             301177, // x1_PandExt_Time_Activator
-            328830, // x1_Fortress_Portal_Switch
 
             274457, // A5 Spirit of Malthael - Tower of Korelan
-            368515, // A5 Nephalem Switch -  Passage to Corvus 
+            368515, // A5 Nephalem Switch - Passage to Corvus 
             301177, // A5 Timeless Prison Switch
 
             354407, // X1_Angel_Common_Event_GreatWeapon
 
+        };
+
+        public static HashSet<int> JumpLinkPortalIds { get { return DataDictionary.jumpLinkPortalIds; } }
+        private static readonly HashSet<int> jumpLinkPortalIds = new HashSet<int>()
+        {
+            328830, // x1_Fortress_Portal_Switch
+        };
+
+        public static Dictionary<int, int> InteractEndAnimations { get { return interactEndAnimations; } }
+        private static readonly Dictionary<int, int> interactEndAnimations = new Dictionary<int, int>()
+        {
+            {348096, 348093}, // x1_Bog_Beacon_B
         };
 
         /// <summary>
@@ -684,15 +809,15 @@ namespace Trinity
 
             // Pandemonium Fortress
             357297, // X1_Fortress_Rack_C
-            374196, // X1_Fortress_Rack_C_Stump
+            //374196, // X1_Fortress_Rack_C_Stump
             357295, // X1_Fortress_Rack_B
-            374195, // X1_Fortress_Rack_B_Stump
+            //374195, // X1_Fortress_Rack_B_Stump
             357299, // X1_Fortress_Rack_D
-            374197, // X1_Fortress_Rack_D_Stump
+            //374197, // X1_Fortress_Rack_D_Stump
             357301, // X1_Fortress_Rack_E
-            374198, // X1_Fortress_Rack_E_Stump
+            //374198, // X1_Fortress_Rack_E_Stump
             357306, // X1_Fortress_Rack_F
-            374199, // X1_Fortress_Rack_F_Stump
+            //374199, // X1_Fortress_Rack_F_Stump
             365503, // X1_Fortress_FloatRubble_A
             365739, // X1_Fortress_FloatRubble_F
             365580, // X1_Fortress_FloatRubble_C
@@ -714,7 +839,23 @@ namespace Trinity
             324867, // x1_Westm_DeathOrb_Caster_TEST
             313302, // X1_Westm_Breakable_Wolf_Head_A
 
+            368268, // x1_Urzael_SoundSpawner
+            368626, // x1_Urzael_SoundSpawner
+            368599, // x1_Urzael_SoundSpawner
+            368621, // x1_Urzael_SoundSpawner
+
         };
+
+
+
+        public static HashSet<int> AlwaysRaycastWorlds { get { return DataDictionary.alwaysRaycastWorlds; } }
+        private static readonly HashSet<int> alwaysRaycastWorlds = new HashSet<int>()
+        {
+            271233, // Pandemonium Fortress 1
+            271235, // Pandemonium Fortress 2
+        };
+
+
 
         /// <summary>
         /// Last used-timers for all abilities to prevent spamming D3 memory for cancast checks too often

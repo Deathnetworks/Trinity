@@ -88,7 +88,7 @@ namespace Trinity
         /// <param name="vDestination"></param>
         /// <param name="ZDiff"></param>
         /// <returns></returns>
-        internal static bool CanRayCast(Vector3 vStartLocation, Vector3 vDestination, float ZDiff = 4f)
+        internal static bool CanRayCast(Vector3 vStartLocation, Vector3 vDestination, float ZDiff = 2f)
         {
             // Navigator.Raycast is REVERSE Of ZetaDia.Physics.Raycast
             // Navigator.Raycast returns True if it "hits" an edge
@@ -97,7 +97,6 @@ namespace Trinity
             // We're using Navigator.Raycast now because it's "faster" (per Nesox)
 
             bool rc = Navigator.Raycast(new Vector3(vStartLocation.X, vStartLocation.Y, vStartLocation.Z + ZDiff), new Vector3(vDestination.X, vDestination.Y, vDestination.Z + ZDiff));
-
 
             if (rc)
                 return false;

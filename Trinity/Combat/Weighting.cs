@@ -54,8 +54,14 @@ namespace Trinity
                     }
                 }
 
+                bool isKillBounty =
+                    Player.ActiveBounty != null &&
+                    Player.ActiveBounty.Info.KillCount > 0;
+
                 bool ShouldIgnoreElites =
+                     !(isKillBounty || Player.InActiveEvent) &&
                      !CombatBase.IsQuestingMode &&
+                     !DataDictionary.RiftWorldIds.Contains(Player.WorldID) &&
                      !DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId) &&
                      !profileTagCheck &&
                      !XmlTags.TrinityTownPortal.ForceClearArea &&
@@ -72,14 +78,17 @@ namespace Trinity
 
                 bool inQuestArea = DataDictionary.QuestLevelAreaIds.Contains(Player.LevelAreaId);
                 bool usingTownPortal = TownRun.IsTryingToTownPortal();
+
                 foreach (TrinityCacheObject cacheObject in ObjectCache.OrderBy(c => c.CentreDistance))
                 {
                     bool elitesInRangeOfUnit = !CombatBase.IgnoringElites &&
                         ObjectCache.Any(u => u.ACDGuid != cacheObject.ACDGuid && u.IsEliteRareUnique && u.Position.Distance2D(cacheObject.Position) <= 25f);
 
                     bool shouldIgnoreTrashMobs =
+                        !(isKillBounty || Player.InActiveEvent) &&
                         !CombatBase.IsQuestingMode &&
                         !inQuestArea &&
+                        !DataDictionary.RiftWorldIds.Contains(Player.WorldID) &&
                         !XmlTags.TrinityTownPortal.ForceClearArea &&
                         !usingTownPortal &&
                         !profileTagCheck &&
@@ -177,10 +186,13 @@ namespace Trinity
                                 }
 
                                 // Monster is in cache but not within kill range
-                                if (!cacheObject.IsBoss && cacheObject.RadiusDistance > cacheObject.KillRange)
+                                if (!cacheObject.IsBoss && cacheObject.RadiusDistance > cacheObject.KillRange && !(isKillBounty || Player.InActiveEvent || cacheObject.IsQuestMonster || cacheObject.IsBountyObjective))
                                 {
                                     if (cacheObject.Weight <= 0)
+                                    {
+                                        objWeightInfo += "KillRange";
                                         break;
+                                    }
                                 }
 
                                 if (cacheObject.HitPoints <= 0)
@@ -217,6 +229,7 @@ namespace Trinity
                                         // Elites/Bosses that are killed should have weight erased so we don't keep attacking
                                         if ((cacheObject.IsEliteRareUnique || cacheObject.IsBoss) && cacheObject.HitPointsPct <= 0)
                                         {
+                                            objWeightInfo += "EliteHitPoints0";
                                             cacheObject.Weight = 0;
                                             break;
                                         }
@@ -228,6 +241,14 @@ namespace Trinity
                                         // Starting weight of 1000 for elites
                                         if (cacheObject.IsBossOrEliteRareUnique)
                                             cacheObject.Weight = Math.Max((90f - cacheObject.RadiusDistance) / 90f * 2000d, 20d);
+
+                                        // Bounty Objectives goooo
+                                        if (cacheObject.IsBountyObjective)
+                                            cacheObject.Weight += 50000d;
+
+                                        // set a minimum 100 just to make sure it's not 0
+                                        if ((isKillBounty || Player.InActiveEvent))
+                                            cacheObject.Weight += 100;
 
                                         // Elites with Archon get super weight
                                         if (!CombatBase.IgnoringElites && Player.ActorClass == ActorClass.Wizard && GetHasBuff(SNOPower.Wizard_Archon) && cacheObject.IsBossOrEliteRareUnique)
@@ -409,6 +430,13 @@ namespace Trinity
                         case GObjectType.Item:
                         case GObjectType.Gold:
                             {
+                                if (ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
+                                {
+                                    objWeightInfo += "TownRun";
+                                    cacheObject.Weight = 0;
+                                    break;
+                                }
+
                                 if (navBlocking)
                                 {
                                     objWeightInfo += " NavBlocking";
@@ -673,6 +701,7 @@ namespace Trinity
 
                                 break;
                             }
+                        case GObjectType.CursedShrine:
                         case GObjectType.Shrine:
                             {
                                 // Weight Shrines
@@ -757,6 +786,13 @@ namespace Trinity
 
                         case GObjectType.Destructible:
                             {
+                                if (DataDictionary.ForceDestructibles.Contains(cacheObject.ActorSNO))
+                                {
+                                    objWeightInfo += "ForceDestructibles";
+                                    cacheObject.Weight = 100;
+                                    break;
+                                }
+
 
                                 // Not Stuck, skip!
                                 if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.OnlyIfStuck &&
@@ -765,7 +801,7 @@ namespace Trinity
                                     objWeightInfo += "NotStuck";
                                     break;
                                 }
-                                
+
                                 // rrrix added this as a single "weight" source based on the DestructableRange.
                                 // Calculate the weight based on distance, where a distance = 1 is 5000, 90 = 0
                                 cacheObject.Weight = (90f - cacheObject.RadiusDistance) / 90f * 1000f;
@@ -799,6 +835,7 @@ namespace Trinity
                                     cacheObject.Weight = 100 + cacheObject.RadiusDistance;
                                 break;
                             }
+                        case GObjectType.JumpLinkPortal:
                         case GObjectType.Interactable:
                             {
                                 // Need to Prioritize, forget it!
@@ -806,7 +843,7 @@ namespace Trinity
                                     break;
 
                                 // nearby monsters attacking us - don't try to use headtone
-                                if (cacheObject.Object is DiaGizmo && cacheObject.Gizmo.CommonData.ActorInfo.GizmoType == GizmoType.Headstone && 
+                                if (cacheObject.Object is DiaGizmo && cacheObject.Gizmo.CommonData.ActorInfo.GizmoType == GizmoType.Headstone &&
                                     ObjectCache.Any(u => u.IsUnit && u.RadiusDistance < 25f && u.IsFacingPlayer))
                                 {
                                     cacheObject.Weight = 0;
@@ -814,19 +851,24 @@ namespace Trinity
                                 }
 
                                 // Weight Interactable Specials
-                                cacheObject.Weight = (90d - cacheObject.CentreDistance) / 90d * 15000d;
+                                cacheObject.Weight = (300d - cacheObject.CentreDistance) / 300d * 1000d;
 
                                 // Very close interactables get a weight increase
-                                if (cacheObject.CentreDistance <= 12f)
+                                if (cacheObject.CentreDistance <= 8f)
                                     cacheObject.Weight += 1000d;
+
+                                if (cacheObject.IsQuestMonster)
+                                {
+                                    cacheObject.Weight += 3000d;
+                                }
 
                                 // Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
                                 if (cacheObject.RActorGuid == LastTargetRactorGUID && cacheObject.CentreDistance <= 25f)
                                     cacheObject.Weight += 400;
 
-                                // If there's a monster in the path-line to the item, reduce the weight by 50%
+                                // If there's a monster in the path-line to the item, if so reduce the weight to 1
                                 if (CacheData.MonsterObstacles.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius, Player.Position, cacheObject.Position)))
-                                    cacheObject.Weight *= 0.5;
+                                    cacheObject.Weight = 1;
 
                                 // See if there's any AOE avoidance in that spot, if so reduce the weight to 1
                                 if (CacheData.TimeBoundAvoidance.Any(cp => MathUtil.IntersectsPath(cp.Position, cp.Radius, Player.Position, cacheObject.Position)))
@@ -886,6 +928,7 @@ namespace Trinity
                     {
                         cacheObject.Weight = 0;
                         ShouldStayPutDuringAvoidance = true;
+                        objWeightInfo += "StayPutAoE ";
                     }
 
 

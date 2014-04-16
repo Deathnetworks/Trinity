@@ -261,7 +261,7 @@ namespace Trinity
 
         private static void PersistentUpdateStats()
         {
-            if (cachedStaticWorldId <= 0 || Player.ActorClass == Zeta.Game.ActorClass.Invalid)
+            if (CurrentWorldId <= 0 || Player.ActorClass == Zeta.Game.ActorClass.Invalid)
 				return;
 
             // Total stats
@@ -269,10 +269,10 @@ namespace Trinity
             PersistentTotalStats = PersistentUpdateOne(filename);
 
             // World ID stats
-            filename = Path.Combine(FileManager.LoggingPath, String.Format("WorldStats {1} - {0}.xml", Player.ActorClass, cachedStaticWorldId));
-            if (!worldStatsDictionary.ContainsKey(cachedStaticWorldId))
-                worldStatsDictionary.Add(cachedStaticWorldId, new PersistentStats());
-            worldStatsDictionary[cachedStaticWorldId] = PersistentUpdateOne(filename);
+            filename = Path.Combine(FileManager.LoggingPath, String.Format("WorldStats {1} - {0}.xml", Player.ActorClass, CurrentWorldId));
+            if (!worldStatsDictionary.ContainsKey(CurrentWorldId))
+                worldStatsDictionary.Add(CurrentWorldId, new PersistentStats());
+            worldStatsDictionary[CurrentWorldId] = PersistentUpdateOne(filename);
 
             // Sets LastSaved to now for the rest of the things
             TimeSpan TotalRunningTime = DateTime.UtcNow.Subtract(ItemStatsWhenStartedBot);
@@ -330,13 +330,13 @@ namespace Trinity
 
             try
             {
-                if (cachedStaticWorldId > 0 && Player.ActorClass != ActorClass.Invalid)
+                if (CurrentWorldId > 0 && Player.ActorClass != ActorClass.Invalid)
 				{
-                var worldStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("WorldStats {1} - {0}.log", Player.ActorClass, cachedStaticWorldId));
+                var worldStatsPath = Path.Combine(FileManager.LoggingPath, String.Format("WorldStats {1} - {0}.log", Player.ActorClass, CurrentWorldId));
 
                 using (FileStream LogStream = File.Open(worldStatsPath, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
-                    LogStats(LogStream, worldStatsDictionary[cachedStaticWorldId]);
+                    LogStats(LogStream, worldStatsDictionary[CurrentWorldId]);
                 }
             }
             }

@@ -117,5 +117,8 @@
         StartLocation, 
         Trigger,
         Unit,
+        JumpLinkPortal,
+        CursedChest,
+        CursedShrine,
     }
 }

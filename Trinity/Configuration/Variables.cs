@@ -353,8 +353,8 @@ namespace Trinity
         internal static DateTime LastChangedZigZag = DateTime.MinValue;
         internal static Vector3 vPositionLastZigZagCheck = Vector3.Zero;
         public static int CurrentWorldDynamicId = -1;
-        public static int cachedStaticWorldId = -1; // worldId from profiles, used in persistent stats
-        public static GameDifficulty iCurrentGameDifficulty = GameDifficulty.Normal;
+        public static int CurrentWorldId = -1; // worldId from profiles, used in persistent stats
+        public static GameDifficulty CurrentGameDifficulty = GameDifficulty.Normal;
 
 
         /// <summary>

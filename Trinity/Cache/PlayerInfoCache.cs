@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trinity.Cache;
 using Trinity.Combat.Abilities;
 using Trinity.Technicals;
 using Zeta.Bot;
@@ -58,6 +59,10 @@ namespace Trinity
         public float Rotation { get; set; }
         public Vector2 DirectionVector { get; set; }
         public bool IsGhosted { get; set; }
+
+        public TrinityBountyInfo ActiveBounty { get; set; }
+
+        public bool InActiveEvent { get; set; }
 
         public PlayerInfoCache()
         {
@@ -198,11 +203,44 @@ namespace Trinity
 
                     // World ID safety caching incase it's ever unavailable
                     Trinity.CurrentWorldDynamicId = ZetaDia.CurrentWorldDynamicId;
+                    Trinity.CurrentWorldId = ZetaDia.CurrentWorldId;
                     Player.WorldDynamicID = ZetaDia.CurrentWorldDynamicId;
                     Player.WorldID = ZetaDia.CurrentWorldId;
-                    Trinity.cachedStaticWorldId = ZetaDia.CurrentWorldId;
                     // Game difficulty, used really for vault on DH's
-                    Trinity.iCurrentGameDifficulty = ZetaDia.Service.Hero.CurrentDifficulty;
+                    Trinity.CurrentGameDifficulty = ZetaDia.Service.Hero.CurrentDifficulty;
+
+                    using (new PerformanceLogger("BountyInfo"))
+                    {
+                        Player.InActiveEvent = ZetaDia.ActInfo.ActiveQuests.Any(q => DataDictionary.EventQuests.Contains(q.QuestSNO));
+
+                        if (ZetaDia.ActInfo.ActiveBounty != null)
+                        {
+                            var ab = ZetaDia.ActInfo.ActiveBounty;
+                            Player.ActiveBounty = new TrinityBountyInfo()
+                            {
+                                Act = ab.Act,
+                                LevelArea = ab.LevelArea,
+                                Quest = ab.Quest,
+                                State = ab.State,
+                                Info = new TrinityQuestInfo()
+                                {
+                                    Quest = ab.Info.Quest,
+                                    State = ab.Info.State,
+                                    QuestType = ab.Info.QuestType,
+                                    QuestSNO = ab.Info.QuestSNO,
+                                    BonusCount = ab.Info.BonusCount,
+                                    KillCount = ab.Info.KillCount,
+                                    LevelArea = ab.Info.LevelArea,
+
+                                    QuestInfo = ab.Info,
+                                },
+                                BountyInfo = ab
+                            };
+
+                        }
+                        else
+                            Player.ActiveBounty = null;
+                    }
 
                     // Refresh player buffs (to check for archon)
                     RefreshBuffs();

@@ -20,7 +20,7 @@ namespace Trinity.XmlTags
 
         [XmlAttribute("waitTime")]
         [XmlAttribute("wait")]
-        public static int WaitTime { get; set; }
+        public int WaitTime { get; set; }
 
         public static Stopwatch AreaClearTimer = null;
         public static Stopwatch PortalCastTimer = null;
@@ -58,7 +58,7 @@ namespace Trinity.XmlTags
             {
                 WaitTime = DefaultWaitTime;
             }
-            else
+            else if (WaitTime <= 0 && forceWaitTime > 0)
             {
                 WaitTime = forceWaitTime;
             }

@@ -56,6 +56,8 @@ namespace Trinity
 
         // Generic stuff applicable to all objects
         public GObjectType Type { get; set; }
+        public ActorType ActorType { get; set; }
+        public GizmoType GizmoType { get; set; }
         public double Weight { get; set; }
         public Vector3 Position { get; set; }
         public AABB AABBBounds { get; set; }
@@ -123,6 +125,7 @@ namespace Trinity
         public bool IsQuestMonster { get; set; }
         public bool IsMinimapActive { get; set; }
         public bool IsBountyObjective { get; set; }
+        public bool IsQuestGiver { get; set; }
 
         [NoCopy]
         public bool IsFacing(Vector3 targetPosition, float arcDegrees = 70f)

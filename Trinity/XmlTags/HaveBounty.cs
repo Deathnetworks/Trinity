@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Zeta.Bot.Profile;
 using Zeta.Game;
 using Zeta.Game.Internals;
 using Zeta.TreeSharp;
@@ -11,12 +10,12 @@ namespace Trinity.XmlTags
     {
         protected override Composite CreateBehavior()
         {
-            PrioritySelector decorated = new PrioritySelector(new Composite[0]);
-            foreach (ProfileBehavior behavior in base.GetNodes())
-            {
-                decorated.AddChild(behavior.Behavior);
-            }
-            return new Zeta.TreeSharp.Decorator(new CanRunDecoratorDelegate(CheckNotAlreadyDone), decorated);
+            return
+            new Decorator(ret => !IsDone,
+                new PrioritySelector(
+                    base.GetNodes().Select(b => b.Behavior).ToArray()
+                )
+            );
         }
 
         public override bool GetConditionExec()

@@ -80,7 +80,9 @@ namespace Trinity.XmlTags
             ObjectFound,
             ExitFound,
             SceneFound,
-            SceneLeftOrActorFound
+            SceneLeftOrActorFound,
+            BountyComplete,
+            RiftComplete,
         }
 
         [XmlAttribute("endType", true)]
@@ -390,9 +392,6 @@ namespace Trinity.XmlTags
         [XmlAttribute("interactRange")]
         public float ObjectInteractRange { get; set; }
 
-        [XmlAttribute("stayAfterBounty", true)]
-        public bool StayAfterBounty { get; set; }
-
         HashSet<Tuple<int, Vector3>> foundObjects = new HashSet<Tuple<int, Vector3>>();
 
         /// <summary>
@@ -493,7 +492,10 @@ namespace Trinity.XmlTags
                 ObjectDistance = 25f;
 
             if (ZetaDia.ActInfo.ActiveBounty != null)
+            {
+                Logger.Log("Explorer started with Bounty! Tag will end when bounty is complete.");
                 startedWithBounty = true;
+            }
 
             PrintNodeCounts("PostInit");
         }
@@ -532,7 +534,10 @@ namespace Trinity.XmlTags
             return
             new Sequence(
                 new DecoratorContinue(ret => !startedWithBounty && IsInAdventureMode() && ZetaDia.ActInfo.ActiveBounty != null,
-                    new Action(ret => startedWithBounty = true)
+                    new Sequence(
+                        new Action(ret => Logger.Log("Explorer Started with Bounty! Tag will end when bounty is complete.")),
+                        new Action(ret => startedWithBounty = true)
+                    )
                 ),
                 new DecoratorContinue(ret => !IgnoreMarkers,
                     new Sequence(
@@ -820,7 +825,7 @@ namespace Trinity.XmlTags
             return
             new PrioritySelector(
                 TimeoutCheck(),
-                new Decorator(ret => !StayAfterBounty && GetIsBountyDone(),
+                new Decorator(ret => EndType == TrinityExploreEndType.BountyComplete && GetIsBountyDone(),
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Bounty is done. Tag Finished.", IgnoreLastNodes)),
                         new Action(ret => isDone = true)
@@ -1530,10 +1535,45 @@ namespace Trinity.XmlTags
             return false;
         }
 
+        private DateTime _LastCheckRiftDone = DateTime.MinValue;
+
+        public bool GetIsRiftDone()
+        {
+            if (DateTime.UtcNow.Subtract(_LastCheckRiftDone).TotalSeconds < 1)
+                return false;
+
+            _LastCheckRiftDone = DateTime.UtcNow;
+
+            if (ZetaDia.Me.IsInBossEncounter)
+            {
+                return false;
+            }
+            
+            if (ZetaDia.CurrentAct == Act.OpenWorld && DataDictionary.RiftWorldIds.Contains(ZetaDia.CurrentWorldId))
+            {
+                //X1_LR_DungeonFinder = 337492,
+                if (ZetaDia.ActInfo.AllQuests.Any(q => q.QuestSNO == 337492 && q.State == QuestState.InProgress))
+                    return false;
+
+                // Bounty Turn-in
+                if (ZetaDia.ActInfo.AllQuests.Any(q => DataDictionary.BountyTurnInQuests.Contains(q.QuestSNO) && q.State == QuestState.InProgress))
+                    return true;
+
+            }
+            return false;
+        }
+
+        private DateTime _LastCheckBountyDone = DateTime.MinValue;
+
         public bool GetIsBountyDone()
         {
             try
             {
+                if (DateTime.UtcNow.Subtract(_LastCheckBountyDone).TotalSeconds < 1)
+                    return false;
+
+                _LastCheckBountyDone = DateTime.UtcNow;
+                
                 // Only valid for Adventure mode
                 if (ZetaDia.CurrentAct != Act.OpenWorld)
                     return false;
@@ -1544,6 +1584,7 @@ namespace Trinity.XmlTags
 
                 if (ZetaDia.IsInTown)
                 {
+                    Logger.Log("In Town, Assuming done.");
                     return true;
                 }
                 if (ZetaDia.Me.IsInBossEncounter)
@@ -1551,13 +1592,25 @@ namespace Trinity.XmlTags
                     return false;
                 }
 
+                // Bounty Turn-in
+                if (ZetaDia.ActInfo.AllQuests.Any(q => DataDictionary.BountyTurnInQuests.Contains(q.QuestSNO) && q.State == QuestState.InProgress))
+                {
+                    Logger.Log("Bounty Turn-In available, Assuming done.");
+                    return true;
+                }
+
                 var b = ZetaDia.ActInfo.ActiveBounty;
-                if (startedWithBounty && b == null)
+                if (b == null)
                 {
                     Logger.Log("Active bounty returned null, Assuming done.");
                     return true;
                 }
-                if (b != null && startedWithBounty)
+                if (b == null && ZetaDia.ActInfo.ActiveQuests.Any(q => q.Quest.ToString().ToLower().StartsWith("x1_AdventureMode_BountyTurnin") && q.State == QuestState.InProgress))
+                {
+                    Logger.Log("Bounty Turn-in quest is In-Progress, Assuming done.");
+                    return true;
+                }
+                if (b != null)
                 {
                     if (!b.Info.IsValid)
                     {

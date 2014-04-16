@@ -117,6 +117,8 @@ namespace Trinity
             if (!AddToCache) { c_IgnoreReason = "CachedActorSNO"; return AddToCache; }
             CurrentCacheObject.ActorSNO = freshObject.ActorSNO;
 
+            CurrentCacheObject.ActorType = freshObject.ActorType;
+
             // Have ActorSNO Check for SNO based navigation obstacle hashlist
             c_IsObstacle = DataDictionary.NavigationObstacleIds.Contains(c_ActorSNO);
 
@@ -521,7 +523,14 @@ namespace Trinity
                 c_ObjectType = GObjectType.Avoidance;
             }
 
-            // Either get the cached object type, or calculate it fresh
+            if (DataDictionary.JumpLinkPortalIds.Contains(CurrentCacheObject.ActorSNO))
+            {
+                c_ObjectType = GObjectType.JumpLinkPortal;                
+                return true;
+            }
+
+
+        // Either get the cached object type, or calculate it fresh
             else if (!c_IsObstacle && !CacheData.ObjectType.TryGetValue(c_RActorGuid, out c_ObjectType))
             {
                 // See if it's an avoidance first from the SNO
@@ -628,6 +637,18 @@ namespace Trinity
                         DiaGizmo c_diaGizmo;
                         c_diaGizmo = (DiaGizmo)c_diaObject;
 
+                        if (CurrentCacheObject.InternalName.Contains("CursedChest"))
+                        {
+                            c_ObjectType = GObjectType.CursedChest;
+                            return true;
+                        }
+
+                        if (CurrentCacheObject.InternalName.Contains("CursedShrine"))
+                        {
+                            c_ObjectType = GObjectType.CursedShrine;
+                            return true;
+                        }
+
                         if (c_diaGizmo.IsBarricade)
                         {
                             c_ObjectType = GObjectType.Barricade;
@@ -718,7 +739,7 @@ namespace Trinity
                         //    break;
                         //}
 
-                        if (c_ObjectType != GObjectType.HealthGlobe && (ForceVendorRunASAP || TownRun.TownRunTimerRunning()))
+                        if (c_ObjectType != GObjectType.HealthGlobe && c_ObjectType != GObjectType.PowerGlobe && (ForceVendorRunASAP || TownRun.TownRunTimerRunning()))
                         {
                             AddToCache = false;
                             c_IgnoreSubStep = "IsTryingToTownPortal";
@@ -777,6 +798,9 @@ namespace Trinity
                 case GObjectType.Shrine:
                 case GObjectType.Interactable:
                 case GObjectType.HealthWell:
+                case GObjectType.JumpLinkPortal:
+                case GObjectType.CursedChest:
+                case GObjectType.CursedShrine:
                     {
                         AddToCache = RefreshGizmo(AddToCache);
                         break;
@@ -803,6 +827,14 @@ namespace Trinity
         {
             try
             {
+                // Bounty Objectives should always be on the weight list
+                if (CurrentCacheObject.IsBountyObjective)
+                    return true;
+
+                // Always LoS Units during events
+                if (c_ObjectType == GObjectType.Unit && Player.InActiveEvent)
+                    return true;
+
                 // Everything except items and the current target
                 if (c_ObjectType != GObjectType.Item && c_RActorGuid != LastTargetRactorGUID && c_ObjectType != GObjectType.Unknown)
                 {

@@ -26,7 +26,7 @@ namespace Trinity.Technicals
             {
                 _IsDisposed = true;
                 _Stopwatch.Stop();
-                if (_Stopwatch.Elapsed.TotalMilliseconds > 100)
+                if (_Stopwatch.Elapsed.TotalMilliseconds > 10)
                 {
                     if (Trinity.Settings.Advanced.LogCategories.HasFlag(LogCategory.Performance))
                     {

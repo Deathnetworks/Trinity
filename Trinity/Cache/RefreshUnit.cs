@@ -75,29 +75,47 @@ namespace Trinity
             try
             {
                 CurrentCacheObject.IsBountyObjective = (c_CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) > 0);
+                if (CurrentCacheObject.IsBountyObjective)
+                    c_unit_IsBoss = true;
             }
             catch (Exception)
             {
-                Logger.LogDebug("Error refreshing IsNPC");
-            }
-            
-            try
-            {
-                CurrentCacheObject.IsNPC = (c_CommonData.GetAttribute<int>(ActorAttributeType.IsNPC) > 0);
-            }
-            catch (Exception)
-            {
-                Logger.LogDebug("Error refreshing IsNPC");
+                Logger.LogDebug("Error refreshing IsBountyObjective");
             }
 
             try
             {
-                CurrentCacheObject.NPCIsOperable = (c_CommonData.GetAttribute<int>(ActorAttributeType.NPCIsOperatable) > 0);
+                CurrentCacheObject.IsQuestGiver = CurrentCacheObject.Unit.IsQuestGiver;
+
+                if (CurrentCacheObject.IsQuestGiver)
+                {
+                    c_ObjectType = GObjectType.Interactable;
+                    CurrentCacheObject.Type = GObjectType.Interactable;
+                    return true;
+                }
             }
             catch (Exception)
             {
-                Logger.LogDebug("Error refreshing NPCIsOperable");
+                Logger.LogDebug("Error refreshing IsQuestGiver");
             }
+
+            //try
+            //{
+            //    CurrentCacheObject.IsNPC = (c_CommonData.GetAttribute<int>(ActorAttributeType.IsNPC) > 0);
+            //}
+            //catch (Exception)
+            //{
+            //    Logger.LogDebug("Error refreshing IsNPC");
+            //}
+
+            //try
+            //{
+            //    CurrentCacheObject.NPCIsOperable = (c_CommonData.GetAttribute<int>(ActorAttributeType.NPCIsOperatable) > 0);
+            //}
+            //catch (Exception)
+            //{
+            //    Logger.LogDebug("Error refreshing NPCIsOperable");
+            //}
 
             try
             {
@@ -182,12 +200,9 @@ namespace Trinity
                 {
                     RefreshMonsterSize();
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting monstersize info for unit {0} [{1}]", c_InternalName, c_ActorSNO);
-                    Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                    AddToCache = false;
-                    return AddToCache;
+                    Logger.LogDebug("Error refreshing MonsterSize");
                 }
             }
             if (!DataDictionary.CustomObjectRadius.TryGetValue(c_ActorSNO, out c_Radius))
@@ -199,12 +214,9 @@ namespace Trinity
                     {
                         RefreshMonsterRadius();
                     }
-                    catch (Exception ex)
+                    catch
                     {
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "Safely handled exception getting collisionsphere radius for unit {0} [{1}]", c_InternalName, c_ActorSNO);
-                        Logger.Log(TrinityLogLevel.Debug, LogCategory.CacheManagement, "{0}", ex);
-                        AddToCache = false;
-                        return AddToCache;
+                        Logger.LogDebug("Error refreshing MonsterRadius");
                     }
                     CacheData.CollisionSphere.Add(c_ActorSNO, c_Radius);
                 }
@@ -227,13 +239,12 @@ namespace Trinity
                 return AddToCache;
             }
 
+            if (CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsBountyObjective)
+                return AddToCache;
+
             AddToCache = RefreshUnitAttributes(AddToCache, c_diaUnit);
 
             if (!AddToCache)
-                return AddToCache;
-
-
-            if (CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsBountyObjective)
                 return AddToCache;
 
             // Extended kill radius after last fighting, or when we want to force a town run

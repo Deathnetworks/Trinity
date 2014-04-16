@@ -178,7 +178,7 @@ namespace Trinity
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_Vault) && !Player.IsRooted && !Player.IsIncapacitated &&
                 Settings.Combat.DemonHunter.VaultMode != Config.Combat.DemonHunterVaultMode.MovementOnly &&
                 // Only use vault to retreat if < level 60, or if in inferno difficulty for level 60's
-                (Player.Level < 60 || iCurrentGameDifficulty > GameDifficulty.Master) &&
+                (Player.Level < 60 || CurrentGameDifficulty > GameDifficulty.Master) &&
                 (CurrentTarget.RadiusDistance <= 10f || TargetUtil.AnyMobsInRange(10)) &&
                 // if we have ShadowPower and Disicpline is >= 16
                 // or if we don't have ShadoWpower and Discipline is >= 22

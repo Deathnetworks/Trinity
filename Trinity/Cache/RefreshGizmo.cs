@@ -3,6 +3,7 @@ using System.Linq;
 using Trinity.Config.Combat;
 using Trinity.DbProvider;
 using Trinity.Technicals;
+using Zeta.Bot.Navigation;
 using Zeta.Common.Plugins;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
@@ -34,6 +35,24 @@ namespace Trinity
 
             try
             {
+                CurrentCacheObject.IsBountyObjective = (c_CommonData.GetAttribute<int>(ActorAttributeType.BountyObjective) > 0);
+            }
+            catch (Exception)
+            {
+                Logger.LogDebug("Error refreshing IsBountyObjective");
+            }
+            try
+            {
+                CurrentCacheObject.IsQuestMonster = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.QuestMonster) > 1;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(LogCategory.CacheManagement, "Error reading IsQuestMonster for Unit sno:{0} raGuid:{1} name:{2} ex:{3}",
+                    CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
+            }
+
+            try
+            {
                 CurrentCacheObject.IsMinimapActive = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.MinimapActive) > 0;
             }
             catch (Exception ex)
@@ -52,6 +71,10 @@ namespace Trinity
                     CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
             }
 
+            if (c_diaObject is DiaGizmo)
+            {
+                CurrentCacheObject.GizmoType = CurrentCacheObject.Gizmo.ActorInfo.GizmoType;
+            }
 
             if (!DataDictionary.CustomObjectRadius.TryGetValue(CurrentCacheObject.ActorSNO, out c_Radius))
             {
@@ -119,8 +142,56 @@ namespace Trinity
                 AddToCache = false;
                 c_IgnoreSubStep = "GizmoDisabledByScript";
                 return AddToCache;
+
+                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
             }
 
+
+            // Anything that's Untargetable
+            bool Untargetable = false;
+            try
+            {
+                if (CurrentCacheObject.Object is DiaGizmo)
+                {
+                    Untargetable = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.Untargetable) > 0;
+                }
+            }
+            catch
+            {
+               
+            }
+            if (Untargetable)
+            {
+                CacheData.NavigationObstacles.Add(new CacheObstacleObject()
+                {
+                    ActorSNO = c_ActorSNO,
+                    Radius = c_Radius,
+                    Position = CurrentCacheObject.Position,
+                    RActorGUID = c_RActorGuid,
+                    ObjectType = c_ObjectType,
+                });
+
+                AddToCache = false;
+                c_IgnoreSubStep = "Untargetable";
+                return AddToCache;
+                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+            }
+
+
+
+            // Anything that's Untargetable
+            bool Invulnerable = false;
+            try
+            {
+                if (CurrentCacheObject.Object is DiaGizmo)
+                {
+                    Untargetable = CurrentCacheObject.Object.CommonData.GetAttribute<int>(ActorAttributeType.Invulnerable) > 0;
+                }
+            }
+            catch
+            {
+
+            }
 
             bool noDamage = false;
             try
@@ -253,14 +324,13 @@ namespace Trinity
                         }
                     }
                     break;
-                case GObjectType.Interactable:
+                case GObjectType.JumpLinkPortal:
                     {
-                        AddToCache = true;
-
                         // Same world portal check
                         if (DataDictionary.SameWorldPortals.Contains(CurrentCacheObject.ActorSNO) &&
                             CacheData.SameWorldPortals.Any(p => p.WorldID == Trinity.Player.WorldID &&
-                                DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < V.F("Cache.SameWorldPortalRange.InteractSeconds") && p.StartPosition.Distance2D(Trinity.Player.Position) > V.F("Cache.SameWorldPortalRange.MinRange")) &&
+                                DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < V.F("Cache.SameWorldPortalRange.InteractSeconds") && 
+                                p.StartPosition.Distance2D(Trinity.Player.Position) > V.F("Cache.SameWorldPortalRange.MinRange")) &&
                                 CurrentCacheObject.RadiusDistance <= V.F("Cache.SameWorldPortalRange.MaxRange"))
                         {
                             c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, CurrentCacheObject.Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
@@ -269,12 +339,19 @@ namespace Trinity
                             {
                                 Key = c_ObjectHash,
                                 Value = null,
-                                Expires = DateTime.UtcNow.AddSeconds(45)
+                                Expires = DateTime.UtcNow.AddSeconds(30)
                             });
 
                             AddToCache = false;
                             c_IgnoreSubStep = "RecentSameWorldPortal";
                         }
+                        break;
+                    }
+                case GObjectType.Interactable:
+                    {
+                        AddToCache = true;
+
+                        
 
                         // SameWorldPortals can have GizmoState=1 (e.g. Gizmo "Used")
                         if (!DataDictionary.SameWorldPortals.Contains(CurrentCacheObject.ActorSNO))
@@ -296,6 +373,18 @@ namespace Trinity
                                 return AddToCache;
                             }
                         }
+
+                        int endAnimation;
+                        if (DataDictionary.InteractEndAnimations.TryGetValue(CurrentCacheObject.ActorSNO, out endAnimation))
+                        {
+                            if (endAnimation == (int)CurrentCacheObject.Gizmo.CommonData.CurrentAnimation)
+                            {
+                                AddToCache = false;
+                                c_IgnoreSubStep = "EndAnimation";
+                                return AddToCache;
+                            }
+                        }
+
 
                         c_Radius = c_diaObject.CollisionSphere.Radius;
                     }
@@ -457,6 +546,24 @@ namespace Trinity
                             AddToCache = false;
                             c_IgnoreSubStep = "NoDamage";
                             return AddToCache;
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                        }
+
+                        if (Invulnerable)
+                        {
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject()
+                            {
+                                ActorSNO = c_ActorSNO,
+                                Radius = c_Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = c_RActorGuid,
+                                ObjectType = c_ObjectType,
+                            });
+
+                            AddToCache = false;
+                            c_IgnoreSubStep = "Invulnerable";
+                            return AddToCache;
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
                         }
 
                         float maxRadiusDistance = -1f;
@@ -515,6 +622,24 @@ namespace Trinity
                             AddToCache = false;
                             c_IgnoreSubStep = "NoDamage";
                             return AddToCache;
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                        }
+
+                        if (Invulnerable)
+                        {
+                            CacheData.NavigationObstacles.Add(new CacheObstacleObject()
+                            {
+                                ActorSNO = c_ActorSNO,
+                                Radius = c_Radius,
+                                Position = CurrentCacheObject.Position,
+                                RActorGUID = c_RActorGuid,
+                                ObjectType = c_ObjectType,
+                            });
+
+                            AddToCache = false;
+                            c_IgnoreSubStep = "Invulnerable";
+                            return AddToCache;
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
                         }
 
                         if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_TempestRush) && TimeSinceUse(SNOPower.Monk_TempestRush) <= 150)

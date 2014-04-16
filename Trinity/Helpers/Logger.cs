@@ -22,7 +22,7 @@ namespace Trinity.Technicals
             get { return Logger.prefix; }
             set { Logger.prefix = value; }
         }
-        
+
         /// <summary>Logs the specified level.</summary>
         /// <param name="level">The logging level.</param>
         /// <param name="category">The category.</param>
@@ -212,16 +212,18 @@ namespace Trinity.Technicals
                                 trinityAppender = appender as FileAppender;
                             }
                         }
-                        
+
                         //trinityAppender.Layout = trinityLayout;
-                        trinityAppender.AddFilter(trinityFilter);
+                        //trinityAppender.AddFilter(trinityFilter);
+                        trinityAppender.LockingModel = new FileAppender.ExclusiveLock();
+                        //trinityAppender.LockingModel = new FileAppender.InterProcessLock();
 
                         trinityAppender.ActivateOptions();
 
                         trinityLog = LogManager.GetLogger("TrinityDebug");
                         trinityLogger = ((log4net.Repository.Hierarchy.Logger)trinityLog.Logger);
                         trinityLogger.Additivity = false;
-                        trinityLogger.AddAppender(trinityAppender);                                               
+                        trinityLogger.AddAppender(trinityAppender);
                     }
                 }
             }
