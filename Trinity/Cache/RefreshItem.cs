@@ -69,6 +69,14 @@ namespace Trinity
             if (itemBaseType == GItemBaseType.Gem)
                 c_ItemLevel = diaItem.CommonData.GetGemQualityLevel();
 
+            CurrentCacheObject.ObjectHash = HashGenerator.GenerateItemHash(
+                CurrentCacheObject.Position,
+                CurrentCacheObject.ActorSNO,
+                CurrentCacheObject.InternalName,
+                Player.WorldID,
+                c_ItemQuality,
+                c_ItemLevel);
+
             float fExtraRange = 0f;
 
             if (c_ItemQuality >= ItemQuality.Legendary)

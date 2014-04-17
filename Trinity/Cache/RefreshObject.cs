@@ -71,7 +71,6 @@ namespace Trinity
         private static bool c_HasBeenInLoS = false;
         private static string c_ItemMd5Hash = string.Empty;
         private static bool c_HasDotDPS = false;
-        private static string c_ObjectHash = String.Empty;
         private static double c_KillRange = 0f;
         private static MonsterAffixes c_MonsterAffixes = MonsterAffixes.None;
         private static bool c_IsFacingPlayer;
@@ -174,15 +173,16 @@ namespace Trinity
             using (new PerformanceLogger("RefreshDiaObject.CachedType"))
             {
                 /*
-                 * Begin main refresh routine
+                 * Set Object Type
                  */
-                // Set Object Type
                 AddToCache = RefreshStepCachedObjectType(AddToCache);
                 if (!AddToCache) { c_IgnoreReason = "CachedObjectType"; return AddToCache; }
             }
-            if (DataDictionary.SameWorldPortals.Contains(CurrentCacheObject.ActorSNO))
+
+            CurrentCacheObject.Type = c_ObjectType;
+            if (CurrentCacheObject.Type != GObjectType.Item)
             {
-                c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, CurrentCacheObject.Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
+                CurrentCacheObject.ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, CurrentCacheObject.Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
             }
 
             // Check Blacklists
@@ -191,15 +191,12 @@ namespace Trinity
 
             if (c_ObjectType == GObjectType.Item)
             {
-                if (GenericBlacklist.ContainsKey(c_ObjectHash))
+                if (GenericBlacklist.ContainsKey(CurrentCacheObject.ObjectHash))
                 {
                     AddToCache = false;
                     c_IgnoreReason = "GenericBlacklist";
                     return AddToCache;
                 }
-
-                /* Generic Blacklisting for shifting RActorGUID bug */
-                c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, CurrentCacheObject.Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
             }
 
             // Always Refresh ZDiff for every object
@@ -217,6 +214,13 @@ namespace Trinity
                  */
                 RefreshStepMainObjectType(ref AddToCache);
                 if (!AddToCache) { c_IgnoreReason = "MainObjectType"; return AddToCache; }
+            }
+
+            if (CurrentCacheObject.ObjectHash != String.Empty && GenericBlacklist.ContainsKey(CurrentCacheObject.ObjectHash))
+            {
+                AddToCache = false;
+                c_IgnoreSubStep = "GenericBlacklist";
+                return AddToCache;
             }
 
             // Ignore anything unknown
@@ -270,7 +274,6 @@ namespace Trinity
                 CurrentCacheObject.IsEliteRareUnique = c_IsEliteRareUnique;
                 CurrentCacheObject.ForceLeapAgainst = c_ForceLeapAgainst;
                 CurrentCacheObject.HasDotDPS = c_HasDotDPS;
-                CurrentCacheObject.ObjectHash = c_ObjectHash;
                 CurrentCacheObject.KillRange = c_KillRange;
                 CurrentCacheObject.HasAffixShielded = c_unit_HasShieldAffix;
                 CurrentCacheObject.MonsterAffixes = c_MonsterAffixes;
@@ -388,7 +391,6 @@ namespace Trinity
             c_diaUnit = null;
             c_CurrentAnimation = SNOAnim.Invalid;
             c_HasDotDPS = false;
-            c_ObjectHash = String.Empty;
             c_KillRange = 0f;
             c_MonsterAffixes = MonsterAffixes.None;
             c_IsFacingPlayer = false;
@@ -485,21 +487,7 @@ namespace Trinity
             c_RadiusDistance = c_CentreDistance;
             CurrentCacheObject.RadiusDistance = Player.Position.Distance2D(CurrentCacheObject.Position);
         }
-
-        private static bool RefreshStepSkipDoubleCheckGuid(bool AddToCache)
-        {
-            // See if we've already checked this ractor, this loop
-            if (hashDoneThisRactor.Contains(c_RActorGuid))
-            {
-                AddToCache = false;
-                //return bWantThis;
-            }
-            else
-            {
-                hashDoneThisRactor.Add(c_RActorGuid);
-            }
-            return AddToCache;
-        }
+             
 
         private static bool RefreshStepCachedObjectType(bool AddToCache)
         {
@@ -523,9 +511,9 @@ namespace Trinity
                 c_ObjectType = GObjectType.Avoidance;
             }
 
-            if (DataDictionary.JumpLinkPortalIds.Contains(CurrentCacheObject.ActorSNO))
+            if (DataDictionary.SameWorldPortals.Contains(CurrentCacheObject.ActorSNO))
             {
-                c_ObjectType = GObjectType.JumpLinkPortal;                
+                c_ObjectType = GObjectType.JumpLinkPortal;
                 return true;
             }
 
@@ -842,7 +830,7 @@ namespace Trinity
                     if (c_CentreDistance < 95)
                     {
                         switch (c_ObjectType)
-                        { 
+                        {
                             case GObjectType.Destructible:
                             case GObjectType.HealthWell:
                             case GObjectType.Unit:
@@ -1019,7 +1007,7 @@ namespace Trinity
             }
             return AddToCache;
         }
-        
+
         private static bool RefreshStepCachedDynamicIds(bool AddToCache)
         {
             // Try and grab the dynamic id and game balance id, if necessary and if possible
@@ -1196,12 +1184,6 @@ namespace Trinity
                 {
                     AddToCache = false;
                     c_IgnoreSubStep = "hashRGUIDBlacklist15";
-                    return AddToCache;
-                }
-                if (c_ObjectHash != String.Empty && GenericBlacklist.ContainsKey(c_ObjectHash))
-                {
-                    AddToCache = false;
-                    c_IgnoreSubStep = "GenericBlacklist";
                     return AddToCache;
                 }
             }

@@ -181,15 +181,15 @@ namespace Trinity
                         }
                     }
                 }
+
                 /*
-                 * Give weights to objects
+                 *  Set Weights, assign CurrentTarget
                  */
-                // Special flag for special whirlwind circumstances
-                bAnyNonWWIgnoreMobsInRange = false;
-                // Now give each object a weight *IF* we aren't skipping direcly to a safe-spot
+
                 if (!hasFoundSafePoint)
                 {
                     RefreshDiaGetWeights();
+
                     RefreshSetKiting(ref KiteAvoidDestination, NeedToKite, ref TryToKite);
                 }
                 // Not heading straight for a safe-spot?
@@ -252,11 +252,34 @@ namespace Trinity
                         bDontMoveMeIAmDoingShit = true;
                     }
 
+                    if (CurrentTarget != null && CurrentTarget.IsQuestGiver)
+                    {
+                        EventStartPosition = Vector3.Zero;
+                    }
+
+                    if (CurrentTarget == null && Player.InActiveEvent)
+                    {
+                        if (EventStartPosition == Vector3.Zero)
+                            EventStartPosition = Player.Position;
+
+                        CurrentTarget = new TrinityCacheObject()
+                        {
+                            Position = EventStartPosition,
+                            Type = GObjectType.Avoidance,
+                            Weight = 20000,
+                            CentreDistance = 2f,
+                            RadiusDistance = 2f,
+                            InternalName = "WaitForEvent"
+                        };
+                        Logger.Log("Waiting for Event");
+                    }
+                    
                     // Still no target, let's see if we should backtrack or wait for wrath to come off cooldown...
                     if (CurrentTarget == null)
                     {
                         RefreshDoBackTrack();
                     }
+
                     // Still no target, let's end it all!
                     if (CurrentTarget == null)
                     {
@@ -284,7 +307,7 @@ namespace Trinity
 
                         Logger.Log(TrinityLogLevel.Verbose, LogCategory.Weight,
                             "Found New Target {0} dist={1:0} IsElite={2} Radius={3:0.0} Weight={4:0} ActorSNO={5} " +
-                            "Anim={6} Target++={7} Type={8} ",
+                            "Anim={6} TargetedCount={7} Type={8} ",
                             CurrentTarget.InternalName,
                             CurrentTarget.CentreDistance,
                             CurrentTarget.IsEliteRareUnique,
@@ -562,14 +585,7 @@ namespace Trinity
                 {
                     ForceCloseRangeTarget = false;
                 }
-
-                // Bunch of variables used throughout
-                CacheData.MonsterObstacles = new HashSet<CacheObstacleObject>();
-
-                //CacheData.TimeBoundAvoidance = new HashSet<CacheObstacleObject>();
-                CacheData.TimeBoundAvoidance.RemoveWhere(aoe => aoe.Expires < DateTime.UtcNow);
-                CacheData.NavigationObstacles = new HashSet<CacheObstacleObject>();
-
+                
                 //AnyElitesPresent = false;
                 AnyMobsInRange = false;
 
@@ -601,11 +617,12 @@ namespace Trinity
 
                 // Flag for if we should search for an avoidance spot or not
                 StandingInAvoidance = false;
+
                 // Highest weight found as we progress through, so we can pick the best target at the end (the one with the highest weight)
                 w_HighestWeightFound = 0;
+
                 // Here's the list we'll use to store each object
                 ObjectCache = new List<TrinityCacheObject>();
-                hashDoneThisRactor = new HashSet<int>();
             }
         }
 
@@ -656,20 +673,7 @@ namespace Trinity
 
         private static void RefreshDoBackTrack()
         {
-            if (CurrentTarget == null && Player.InActiveEvent)
-            {
-                CurrentTarget = new TrinityCacheObject()
-                {
-                    Position = Player.Position,
-                    Type = GObjectType.Avoidance,
-                    Weight = 20000,
-                    CentreDistance = 2f,
-                    RadiusDistance = 2f,
-                    InternalName = "WaitForEvent"
-                };
-                Logger.Log("Waiting for Event");
-            }
-
+            
             // See if we should wait for [playersetting] milliseconds for possible loot drops before continuing run
             if (CurrentTarget == null && (DateTime.UtcNow.Subtract(lastHadUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||
                 DateTime.UtcNow.Subtract(lastHadEliteUnitInSights).TotalMilliseconds <= Settings.Combat.Misc.DelayAfterKill ||

@@ -44,7 +44,7 @@ namespace Trinity
             369381, // [2ECD96F4] Quest: x1_Event_Horde_HunterKillers, QuestSNO: 369381, QuestMeter: 0.004814815, QuestState: InProgress, QuestStep: 14, KillCount: 0, BonusCount: 0
             369431, // [2ECD9860] Quest: x1_Event_WaveFight_AncientEvils, QuestSNO: 369431, QuestMeter: -1, QuestState: InProgress, QuestStep: 13, KillCount: 0, BonusCount: 0
             336293, // [417DD860] Quest: X1_Graveyard_GraveRobber_Event, QuestSNO: 336293, QuestMeter: -1, QuestState: InProgress, QuestStep: 46, KillCount: 0, BonusCount: 0
-        
+            369414, // [33955B38] Quest: X1_Pand_Ext_ForgottenWar_Adventure, QuestSNO: 369414, QuestMeter: -1, QuestState: InProgress, QuestStep: 2, KillCount: 1, BonusCount: 0
 
             368306, // x1_Event_Horde_ArmyOfHell,
             369332, // x1_Event_Horde_Bonepit,
@@ -609,20 +609,12 @@ namespace Trinity
             // A5
             348096, // Paths of the Drowned - portal switches - x1_Bog_Beacon_B
             361364, // A5 Siege Rune Path of War
-            301177, // x1_PandExt_Time_Activator
 
             274457, // A5 Spirit of Malthael - Tower of Korelan
             368515, // A5 Nephalem Switch - Passage to Corvus 
-            301177, // A5 Timeless Prison Switch
 
             354407, // X1_Angel_Common_Event_GreatWeapon
 
-        };
-
-        public static HashSet<int> JumpLinkPortalIds { get { return DataDictionary.jumpLinkPortalIds; } }
-        private static readonly HashSet<int> jumpLinkPortalIds = new HashSet<int>()
-        {
-            328830, // x1_Fortress_Portal_Switch
         };
 
         public static Dictionary<int, int> InteractEndAnimations { get { return interactEndAnimations; } }
@@ -720,8 +712,10 @@ namespace Trinity
             62873, 95011, 81424, 108230, 111808, 111809, 211861, 62866, 109264, 62866, 62860, 96993,
             // Magi
 			112182,
-			363725, 357331 // chests after Cursed Chest
-         };
+			363725, 357331, // chests after Cursed Chest
+
+             301177, // A5 Timeless Prison Switch
+        };
         /// <summary>
         /// Objects that should never be ignored due to no Line of Sight (LoS) or ZDiff
         /// </summary>
@@ -753,7 +747,9 @@ namespace Trinity
             103919,     // Demonic Vessels         
             78030,      // GizmoType: Chest Name: trOut_Wilderness_Scarecrow_A-3924 ActorSNO: 78030 
             173325,     // Anvil of Fury
-         };
+
+            301177, // A5 Timeless Prison Switch
+        };
 
         /// <summary>
         /// Contains ActorSNO's of world objects that should be blacklisted
@@ -845,6 +841,9 @@ namespace Trinity
             368599, // x1_Urzael_SoundSpawner
             368621, // x1_Urzael_SoundSpawner
 
+            377253, // x1_Fortress_Crystal_Prison_Shield
+            316221, // X1_WarpToPortal 
+
         };
 
 
@@ -886,7 +885,6 @@ namespace Trinity
         {
             5432, // A2 Snakem
         };
-
 
         public static HashSet<int> SameWorldPortals { get { return sameWorldPortals; } }
         private static readonly HashSet<int> sameWorldPortals = new HashSet<int>()

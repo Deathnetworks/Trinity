@@ -174,6 +174,13 @@ namespace Trinity
                         IsWaitingAfterPower = false;
                     }
 
+                    if (CurrentTarget != null && CurrentTarget.Type == GObjectType.JumpLinkPortal && 
+                        CacheData.SameWorldPortals.Any(p => DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < 5) && !NavHelper.CanRayCast(CurrentTarget.Position))
+                    {
+                        CurrentTarget = null;
+                        runStatus = HandlerRunStatus.TreeRunning;
+                    }
+
                     //check if we are returning to the tree
                     if (runStatus != HandlerRunStatus.NotFinished)
                         return GetTreeSharpRunStatus(runStatus);
@@ -252,7 +259,6 @@ namespace Trinity
                         Logger.Log(TrinityLogLevel.Info, LogCategory.Behavior, "CurrentTarget set as null in refresh! Error 2");
                         runStatus = HandlerRunStatus.TreeFailure;
                     }
-
 
                     //check if we are returning to the tree
                     if (runStatus != HandlerRunStatus.NotFinished)
@@ -381,12 +387,16 @@ namespace Trinity
                     {
                         bool stuckOnTarget = 
                             ((CurrentTarget.Type == GObjectType.Barricade ||
-                             CurrentTarget.Type == GObjectType.Interactable || CurrentTarget.Type == GObjectType.CursedChest || CurrentTarget.Type == GObjectType.CursedShrine ||
+                             CurrentTarget.Type == GObjectType.Interactable || 
+                             CurrentTarget.Type == GObjectType.CursedChest || 
+                             CurrentTarget.Type == GObjectType.CursedShrine ||
                              CurrentTarget.Type == GObjectType.Destructible) && 
                              !ZetaDia.Me.Movement.IsMoving && DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalMilliseconds < 500);
 
+                        bool npcInRange = CurrentTarget.IsQuestGiver && CurrentTarget.RadiusDistance <= 3f;
+
                         // Interact/use power on target if already in range
-                        if (TargetRangeRequired <= 0f || (TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS) || stuckOnTarget)
+                        if (TargetRangeRequired <= 0f || (TargetCurrentDistance <= TargetRangeRequired && CurrentTargetIsInLoS) || stuckOnTarget || npcInRange)
                         {
                             // If avoidance, instantly skip
                             if (CurrentTarget.Type == GObjectType.Avoidance)
@@ -507,7 +517,7 @@ namespace Trinity
                                 case GObjectType.CursedShrine:
                                     {
                                         ForceTargetUpdate = true;
-                                        if (!ZetaDia.Me.Movement.IsMoving)
+                                        if (!ZetaDia.Me.Movement.IsMoving || DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalSeconds > 5)
                                         {
                                             if (SpellHistory.TimeSinceUse(SNOPower.Axe_Operate_Gizmo) < TimeSpan.FromMilliseconds(500))
                                             {
@@ -517,6 +527,13 @@ namespace Trinity
                                             Logger.LogDebug(LogCategory.Behavior, "Using {0} on {1} Distance {2} Radius {3}",
                                                 SNOPower.Axe_Operate_Gizmo, CurrentTarget.InternalName, CurrentTarget.CentreDistance, CurrentTarget.Radius);
 
+                                            if (CurrentTarget.Type == GObjectType.JumpLinkPortal)
+                                            {
+                                                Logger.LogDebug("Adding {0} {1} to SameWorldPortals", CurrentTarget.InternalName, CurrentTarget.ActorSNO);
+                                                CacheData.SameWorldPortals.Add(new Cache.SameWorldPortal() { ActorSNO = CurrentTarget.ActorSNO, RActorGUID = CurrentTarget.RActorGuid });
+
+                                            }                                            
+                                            
                                             bool interactSuccessful = false;
                                             if (CurrentTarget.ActorType == ActorType.Monster)
                                                 interactSuccessful = ZetaDia.Me.UsePower(SNOPower.Axe_Operate_NPC, Vector3.Zero, CurrentWorldDynamicId, CurrentTarget.ACDGuid);
@@ -531,14 +548,10 @@ namespace Trinity
                                                     TargetPosition = CurrentTarget.Position,
                                                 });
 
-                                            if (DataDictionary.SameWorldPortals.Contains(CurrentTarget.ActorSNO))
-                                            {
-                                                Logger.LogDebug("Adding {0} {1} to SameWorldPortals", CurrentTarget.InternalName, CurrentTarget.ActorSNO);
-                                                CacheData.SameWorldPortals.Add(new Cache.SameWorldPortal() { ActorSNO = CurrentTarget.ActorSNO, RActorGUID = CurrentTarget.RActorGuid });
+                                            if (CurrentTarget.Type == GObjectType.JumpLinkPortal && interactSuccessful)
+                                                hashRGUIDBlacklist3.Add(CurrentTarget.RActorGuid);
 
-                                                if (interactSuccessful)
-                                                    hashRGUIDBlacklist3.Add(CurrentTarget.RActorGuid);
-                                            }
+
                                             //else if (interactSuccessful)
                                             //{
                                             //    IgnoreRactorGUID = CurrentTarget.RActorGuid;
@@ -968,7 +981,7 @@ namespace Trinity
                     CacheData.InteractAttempts.TryGetValue(CurrentTarget.RActorGuid, out interactAttempts);
 
                     if ((CurrentTarget.Type == GObjectType.Door || CurrentTarget.Type == GObjectType.Interactable || CurrentTarget.Type == GObjectType.Container) &&
-                        interactAttempts > 45 && DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalSeconds > 15)
+                        interactAttempts < 45 && DateTime.UtcNow.Subtract(PlayerMover.LastRecordedAnyStuck).TotalSeconds > 15)
                     {
                         addTargetToBlacklist = false;
                     }

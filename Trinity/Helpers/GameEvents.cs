@@ -135,6 +135,7 @@ namespace Trinity
             dictRandomID = new Dictionary<int, int>();
             iMaxDeathsAllowed = 0;
             iDeathsThisRun = 0;
+            CacheData.FullClear();
         }
 
         private void TrinityOnDeath(object src, EventArgs mea)
@@ -245,32 +246,12 @@ namespace Trinity
                     PlayerMover.LastCancelledUnstucker = DateTime.MinValue;
                     NavHelper.UsedStuckSpots = new List<GridPoint>();
 
+                    CacheData.FullClear();
+
                     // Reset all the caches
-                    CacheData.ObjectType = new Dictionary<int, GObjectType>();
-                    CacheData.UnitMonsterAffix = new Dictionary<int, MonsterAffixes>();
-                    CacheData.UnitMaxHealth = new Dictionary<int, double>();
-                    CacheData.CurrentUnitHealth = new Dictionary<int, double>();
-                    CacheData.LastCheckedUnitHealth = new Dictionary<int, int>();
-                    CacheData.UnitIsBurrowed = new Dictionary<int, bool>();
-                    CacheData.ActorSNO = new Dictionary<int, int>();
-                    CacheData.AcdGuid = new Dictionary<int, int>();
-                    CacheData.Name = new Dictionary<int, string>();
-                    CacheData.GameBalanceID = new Dictionary<int, int>();
-                    CacheData.DynamicID = new Dictionary<int, int>();
-                    CacheData.Position = new Dictionary<int, Vector3>();
-                    CacheData.GoldStack = new Dictionary<int, int>();
-                    CacheData.ItemQuality = new Dictionary<int, ItemQuality>();
-                    CacheData.PickupItem = new Dictionary<int, bool>();
-                    CacheData.SummonedByACDId = new Dictionary<int, int>();
-                    CacheData.InteractAttempts = new Dictionary<int, int>();
-                    CacheData.ItemLinkQuality = new Dictionary<int, ItemQuality>();
-                    CacheData.IsSummoner = new Dictionary<int, bool>();
-                    CacheData.SameWorldPortals.Clear();
                     ProfileHistory = new List<string>();
                     CurrentProfile = "";
                     FirstProfile = "";
-
-                    CacheData.AbilityLastUsed = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
 
                     GoldInactivity.ResetCheckGold();
 

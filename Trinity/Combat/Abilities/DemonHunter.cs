@@ -52,14 +52,17 @@ namespace Trinity
                 return new TrinityPower(SNOPower.DemonHunter_SmokeScreen, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
             }
 
+
+            int sentryCoolDown = SpellHistory.SpellUseCountInTime(SNOPower.DemonHunter_Sentry, TimeSpan.FromSeconds(24)) >= 4 ? 12 : 6;
+
             // Sentry Turret
             if (!UseOOCBuff && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.DemonHunter_Sentry, CombatBase.CanCastFlags.NoTimer) &&
                 (TargetUtil.AnyElitesInRange(50) || TargetUtil.AnyMobsInRange(50, 2) || TargetUtil.IsEliteTargetInRange(50)) &&
                 Player.PrimaryResource >= 30 &&
-                (SpellHistory.TimeSinceUse(SNOPower.DemonHunter_Sentry) > TimeSpan.FromSeconds(10) || SpellHistory.DistanceFromLastUsePosition(SNOPower.DemonHunter_Sentry) > 7.5))
+                (SpellHistory.TimeSinceUse(SNOPower.DemonHunter_Sentry) > TimeSpan.FromSeconds(sentryCoolDown) || SpellHistory.DistanceFromLastUsePosition(SNOPower.DemonHunter_Sentry) > 7.5))
             {
 
-                return new TrinityPower(SNOPower.DemonHunter_Sentry, 0f, Player.Position, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_Sentry, 0f, Player.Position);
             }
 
             // Caltrops
@@ -90,7 +93,8 @@ namespace Trinity
                 Hotbar.Contains(SNOPower.DemonHunter_Preparation))
             {
                 // Preperation w/ Punishment
-                if (hasPunishment && CombatBase.CanCast(SNOPower.DemonHunter_Preparation, CombatBase.CanCastFlags.NoTimer) && Player.SecondaryResource >= 25 && Player.PrimaryResourceMissing >= 75)
+                if (hasPunishment && CombatBase.CanCast(SNOPower.DemonHunter_Preparation, CombatBase.CanCastFlags.NoTimer) &&
+                    Player.SecondaryResource >= 25 && Player.PrimaryResourceMissing >= 75 && TimeSinceUse(SNOPower.DemonHunter_Preparation) >= 1000)
                 {
                     return new TrinityPower(SNOPower.DemonHunter_Preparation, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
                 }
@@ -205,7 +209,7 @@ namespace Trinity
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.DemonHunter_ClusterArrow) && !Player.IsIncapacitated &&
                 Player.PrimaryResource >= 50)
             {
-                return new TrinityPower(SNOPower.DemonHunter_ClusterArrow, 69f, Vector3.Zero, CurrentWorldDynamicId, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.DemonHunter_ClusterArrow, V.F("DemonHunter.ClusterArrow.UseRange"), CurrentTarget.ACDGuid);
             }
 
             // Multi Shot

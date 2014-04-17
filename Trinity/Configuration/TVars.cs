@@ -225,7 +225,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.DemonHunter_RapidFire", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_Chakram", 5, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_ElementalArrow", 5, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_Caltrops", 3000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Caltrops", 5500, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_SmokeScreen", 3000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_ShadowPower", 5000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_Vault", 400, "Spell Use Delay/Interval, milliseconds"));
@@ -247,7 +247,7 @@ namespace Trinity
             // Demon Hunter
             Set(new TVar("DemonHunter.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));
             Set(new TVar("DemonHunter.PreperationTriggerRange", 40f, "Preperation monster trigger range"));
-
+            Set(new TVar("DemonHunter.ClusterArrow.UseRange", 45f, "Cluster Arrow Maximum range"));
             // Monk
             Set(new TVar("Monk.Avoidance.Serenity", 0f, "Monk Serenity buff Avoidance health multiplier"));
             Set(new TVar("Monk.MinEnergyReserve", 0, "Ignore Pain Emergency Use Minimum Health Percent"));
@@ -279,9 +279,9 @@ namespace Trinity
             Set(new TVar("Cache.PretownRun.MaxDistance", 1500, "Default PreTownrun max distance"));
             Set(new TVar("Cache.TownPortal.KillRange", 60f, "Forced maximum distance for clearing the area before using a Town Portal"));
 
-            Set(new TVar("Cache.SameWorldPortalRange.MinRange", 25f));
-            Set(new TVar("Cache.SameWorldPortalRange.MaxRange", 35f));
-            Set(new TVar("Cache.SameWorldPortalRange.InteractSeconds", 1.0f)); 
+            Set(new TVar("Cache.SameWorldPortalRange.MinRange", 15f));
+            Set(new TVar("Cache.SameWorldPortalRange.MaxRange", 45f));
+            Set(new TVar("Cache.SameWorldPortalRange.InteractSeconds", 10.0f)); 
 
 
             Set(new TVar("Cache.HotSpot.MaxDistance", 2500f, "Maximum distance to add team hotspots to cache"));

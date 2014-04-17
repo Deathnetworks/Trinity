@@ -85,37 +85,21 @@ namespace Trinity
 
             try
             {
-                CurrentCacheObject.IsQuestGiver = CurrentCacheObject.Unit.IsQuestGiver;
-
-                if (CurrentCacheObject.IsQuestGiver)
-                {
-                    c_ObjectType = GObjectType.Interactable;
-                    CurrentCacheObject.Type = GObjectType.Interactable;
-                    return true;
-                }
+                CurrentCacheObject.IsNPC = (c_CommonData.GetAttribute<int>(ActorAttributeType.IsNPC) > 0);
             }
             catch (Exception)
             {
-                Logger.LogDebug("Error refreshing IsQuestGiver");
+                Logger.LogDebug("Error refreshing IsNPC");
             }
 
-            //try
-            //{
-            //    CurrentCacheObject.IsNPC = (c_CommonData.GetAttribute<int>(ActorAttributeType.IsNPC) > 0);
-            //}
-            //catch (Exception)
-            //{
-            //    Logger.LogDebug("Error refreshing IsNPC");
-            //}
-
-            //try
-            //{
-            //    CurrentCacheObject.NPCIsOperable = (c_CommonData.GetAttribute<int>(ActorAttributeType.NPCIsOperatable) > 0);
-            //}
-            //catch (Exception)
-            //{
-            //    Logger.LogDebug("Error refreshing NPCIsOperable");
-            //}
+            try
+            {
+                CurrentCacheObject.NPCIsOperable = (c_CommonData.GetAttribute<int>(ActorAttributeType.NPCIsOperatable) > 0);
+            }
+            catch (Exception)
+            {
+                Logger.LogDebug("Error refreshing NPCIsOperable");
+            }
 
             try
             {
@@ -135,6 +119,22 @@ namespace Trinity
             {
                 Logger.LogDebug(LogCategory.CacheManagement, "Error reading IsQuestMonster for Unit sno:{0} raGuid:{1} name:{2} ex:{3}",
                     CurrentCacheObject.ActorSNO, CurrentCacheObject.RActorGuid, CurrentCacheObject.InternalName, ex.Message);
+            }
+
+            try
+            {
+                CurrentCacheObject.IsQuestGiver = CurrentCacheObject.Unit.IsQuestGiver;
+
+                if (CurrentCacheObject.IsQuestGiver)
+                {
+                    c_ObjectType = GObjectType.Interactable;
+                    CurrentCacheObject.Type = GObjectType.Interactable;
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                Logger.LogDebug("Error refreshing IsQuestGiver");
             }
 
             if ((teamId == 1 || teamId == 2 || teamId == 17))
@@ -526,7 +526,7 @@ namespace Trinity
                 // Count up Mystic Allys, gargantuans, and zombies - if the player has those skills
                 if (Player.ActorClass == ActorClass.Monk)
                 {
-                    if (Hotbar.Contains(SNOPower.X1_Monk_MysticAlly_v2) && DataDictionary.MysticAllyIds.Contains(c_ActorSNO))
+                    if (DataDictionary.MysticAllyIds.Contains(c_ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             iPlayerOwnedMysticAlly++;
@@ -536,7 +536,7 @@ namespace Trinity
                 // Count up Demon Hunter pets
                 if (Player.ActorClass == ActorClass.DemonHunter)
                 {
-                    if (Hotbar.Contains(SNOPower.X1_DemonHunter_Companion) && DataDictionary.DemonHunterPetIds.Contains(c_ActorSNO))
+                    if ( DataDictionary.DemonHunterPetIds.Contains(c_ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             iPlayerOwnedDHPets++;
@@ -546,13 +546,13 @@ namespace Trinity
                 // Count up zombie dogs and gargantuans next
                 if (Player.ActorClass == ActorClass.Witchdoctor)
                 {
-                    if (Hotbar.Contains(SNOPower.Witchdoctor_Gargantuan) && DataDictionary.GargantuanIds.Contains(c_ActorSNO))
+                    if (DataDictionary.GargantuanIds.Contains(c_ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             iPlayerOwnedGargantuan++;
                         AddToCache = false;
                     }
-                    if (Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && DataDictionary.ZombieDogIds.Contains(c_ActorSNO))
+                    if (DataDictionary.ZombieDogIds.Contains(c_ActorSNO))
                     {
                         if (c_diaUnit.SummonedByACDId == Player.MyDynamicID)
                             PlayerOwnedZombieDog++;

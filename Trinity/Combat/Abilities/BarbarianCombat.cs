@@ -188,9 +188,8 @@ namespace Trinity.Combat.Abilities
                     !UseOOCBuff &&
                     !IsCurrentlyAvoiding &&
                     !CanCast(SNOPower.Barbarian_Earthquake) &&
-                    TargetUtil.AnyElitesInRange(25) &&
-                    !GetHasBuff(SNOPower.Barbarian_Earthquake) &&
-                    Player.PrimaryResource <= 50; ;
+                    TargetUtil.EliteOrTrashInRange(45) &&
+                    Player.PrimaryResource <= 50;
             }
         }
         public static bool CanCastEarthquake
@@ -202,8 +201,7 @@ namespace Trinity.Combat.Abilities
                     !IsCurrentlyAvoiding &&
                     !Player.IsIncapacitated &&
                     CanCast(SNOPower.Barbarian_Earthquake) &&
-                    !GetHasBuff(SNOPower.Barbarian_Earthquake) &&
-                    TargetUtil.IsEliteTargetInRange(6f) &&
+                    TargetUtil.IsEliteTargetInRange(45f) &&
                     Player.PrimaryResource > 50;
             }
         }
@@ -678,7 +676,7 @@ namespace Trinity.Combat.Abilities
 
         public static TrinityPower PowerAvalanche { get { return new TrinityPower(SNOPower.X1_Barbarian_Avalanche_v2, 15f, TargetUtil.GetBestClusterUnit(15f, 45f).Position); } }
         public static TrinityPower PowerIgnorePain { get { return new TrinityPower(SNOPower.Barbarian_IgnorePain); } }
-        public static TrinityPower PowerEarthquake { get { return new TrinityPower(SNOPower.Barbarian_Earthquake); } }
+        public static TrinityPower PowerEarthquake { get { return new TrinityPower(SNOPower.Barbarian_Earthquake, 45f, TargetUtil.GetBestClusterUnit(20f, 65f, 1, true, true).Position); } }
         public static TrinityPower PowerWrathOfTheBerserker { get { return new TrinityPower(SNOPower.Barbarian_WrathOfTheBerserker); } }
         public static TrinityPower PowerCallOfTheAncients { get { return new TrinityPower(SNOPower.Barbarian_CallOfTheAncients, V.I("Barbarian.CallOfTheAncients.TickDelay"), V.I("Barbarian.CallOfTheAncients.TickDelay")); } }
         public static TrinityPower PowerBattleRage { get { return new TrinityPower(SNOPower.Barbarian_BattleRage); } }

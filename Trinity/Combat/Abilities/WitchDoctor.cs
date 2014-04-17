@@ -361,10 +361,9 @@ namespace Trinity
 
             bool firebatsMaintain =
               ObjectCache.Any(u => u.IsUnit &&
-                  u.IsFacingPlayer && u.Weight > 0 &&
-                  SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Firebats) <= TimeSpan.FromMilliseconds(150d) &&
+                  u.IsPlayerFacing(70f) && u.Weight > 0 &&
                   u.CentreDistance <= V.F("WitchDoctor.Firebats.MaintainRange") &&
-                  u.Unit.Movement.IsMoving);
+                  SpellHistory.TimeSinceUse(SNOPower.Witchdoctor_Firebats) <= TimeSpan.FromMilliseconds(250d));
 
             // Fire Bats:Cloud of bats 
             if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && hasCloudOfBats && (TargetUtil.AnyMobsInRange(8f) || firebatsMaintain) &&
@@ -479,6 +478,9 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_AcidCloud, 12f, Vector3.Zero, -1, -1, 0, 0, WAIT_FOR_ANIM);
             if (Hotbar.Contains(SNOPower.Witchdoctor_Sacrifice) && Hotbar.Contains(SNOPower.Witchdoctor_SummonZombieDog) && PlayerOwnedZombieDog > 0 && Settings.Combat.WitchDoctor.ZeroDogs)
                 return new TrinityPower(SNOPower.Witchdoctor_Sacrifice, 12f, Vector3.Zero, -1, -1, 1, 2, WAIT_FOR_ANIM);
+
+            if (Hotbar.Contains(SNOPower.Witchdoctor_SpiritBarrage) && Player.PrimaryResource > 100)
+                return new TrinityPower(SNOPower.Witchdoctor_SpiritBarrage, 12f, CurrentTarget.ACDGuid);
             return CombatBase.DefaultPower;
         }
 

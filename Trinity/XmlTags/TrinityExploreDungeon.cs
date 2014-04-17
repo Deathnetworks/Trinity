@@ -83,6 +83,7 @@ namespace Trinity.XmlTags
             SceneLeftOrActorFound,
             BountyComplete,
             RiftComplete,
+            PortalExitFound,
         }
 
         [XmlAttribute("endType", true)]
@@ -810,7 +811,14 @@ namespace Trinity.XmlTags
             return
             new PrioritySelector(
                 TimeoutCheck(),
-                new Decorator(ret => EndType == TrinityExploreEndType.BountyComplete && GetIsBountyDone(),
+
+                new Decorator(ret => EndType == TrinityExploreEndType.PortalExitFound && 
+                    PortalExitMarker() != null && PortalExitMarker().Position.Distance2D(myPos) <= MarkerDistance,
+                    new Sequence(
+                        new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Found portal exit! Tag Finished.")),
+                        new Action(ret => isDone = true)
+                    )
+                ), new Decorator(ret => EndType == TrinityExploreEndType.BountyComplete && GetIsBountyDone(),
                     new Sequence(
                         new Action(ret => Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Bounty is done. Tag Finished.", IgnoreLastNodes)),
                         new Action(ret => isDone = true)
@@ -878,6 +886,11 @@ namespace Trinity.XmlTags
                     )
                 )
             );
+        }
+
+        private static MinimapMarker PortalExitMarker()
+        {
+            return ZetaDia.Minimap.Markers.CurrentWorldMarkers.FirstOrDefault(m => m.IsPortalExit);
         }
 
         private bool AlternateActorsFound()

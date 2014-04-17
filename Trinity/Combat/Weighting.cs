@@ -48,7 +48,11 @@ namespace Trinity
                 {
                     Type behaviorType = ProfileManager.CurrentProfileBehavior.GetType();
                     behaviorName = behaviorType.Name;
-                    if (!Settings.Combat.Misc.ProfileTagOverride && CombatBase.IsQuestingMode || behaviorType == typeof(WaitTimerTag) || behaviorType == typeof(UseTownPortalTag) || behaviorType == typeof(XmlTags.TrinityTownRun) || behaviorType == typeof(XmlTags.TrinityTownPortal))
+                    if (!Settings.Combat.Misc.ProfileTagOverride && CombatBase.IsQuestingMode ||
+                        behaviorType == typeof(WaitTimerTag) ||
+                        behaviorType == typeof(UseTownPortalTag) ||
+                        behaviorType == typeof(XmlTags.TrinityTownRun) ||
+                        behaviorType == typeof(XmlTags.TrinityTownPortal))
                     {
                         profileTagCheck = true;
                     }
@@ -324,8 +328,11 @@ namespace Trinity
                                         //    cacheObject.Weight *= 0.10d;
 
                                         // Prevent going less than 300 yet to prevent annoyances (should only lose this much weight from priority reductions in priority list?)
-                                        if (cacheObject.Weight < 300)
-                                            cacheObject.Weight = 300d;
+                                        if (cacheObject.Weight < 100)
+                                            cacheObject.Weight = 100d;
+
+                                        if (cacheObject.IsBoss)
+                                            cacheObject.Weight *= 2;
 
                                         // If standing Molten, Arcane, or Poison Tree near unit, reduce weight
                                         if (PlayerKiteDistance <= 0 &&
@@ -430,7 +437,8 @@ namespace Trinity
                         case GObjectType.Item:
                         case GObjectType.Gold:
                             {
-                                if (ForceVendorRunASAP || TownRun.IsTryingToTownPortal())
+                                // Don't pickup items if we're doing a TownRun
+                                if (ForceVendorRunASAP || IsReadyToTownRun)
                                 {
                                     objWeightInfo += "TownRun";
                                     cacheObject.Weight = 0;
@@ -950,6 +958,11 @@ namespace Trinity
                     if (cacheObject.Weight > w_HighestWeightFound && cacheObject.Weight > 0)
                     {
                         // Clone the current CacheObject
+
+                        /*
+                         *  Assign CurrentTarget
+                         */
+
                         CurrentTarget = cacheObject.Copy();
                         w_HighestWeightFound = cacheObject.Weight;
 
@@ -1000,30 +1013,26 @@ namespace Trinity
 
         private static void RecordTargetHistory()
         {
-            string targetMd5Hash = HashGenerator.GenerateObjecthash(CurrentTarget);
+            int timesBeenPrimaryTarget;
 
-            // clean up past targets
-            if (!GenericCache.ContainsKey(targetMd5Hash))
+            string objectKey = CurrentTarget.Type.ToString() + CurrentTarget.Position + CurrentTarget.InternalName + CurrentTarget.ItemLevel + CurrentTarget.ItemQuality + CurrentTarget.HitPoints;
+
+            if (CacheData.PrimaryTargetCount.TryGetValue(objectKey, out timesBeenPrimaryTarget))
             {
+                timesBeenPrimaryTarget++;
+                CacheData.PrimaryTargetCount[objectKey] = timesBeenPrimaryTarget;
+                CurrentTarget.TimesBeenPrimaryTarget = timesBeenPrimaryTarget;
                 CurrentTarget.HasBeenPrimaryTarget = true;
-                CurrentTarget.TimesBeenPrimaryTarget = 1;
-                CurrentTarget.FirstTargetAssignmentTime = DateTime.UtcNow;
-                GenericCache.AddToCache(new GenericCacheObject(targetMd5Hash, CurrentTarget, new TimeSpan(0, 10, 0)));
-            }
-            else if (GenericCache.ContainsKey(targetMd5Hash))
-            {
-                TrinityCacheObject cTarget = (TrinityCacheObject)GenericCache.GetObject(targetMd5Hash).Value;
-                bool isEliteLowHealth = cTarget.HitPointsPct <= 0.75 && cTarget.IsBossOrEliteRareUnique;
-                bool isLegendaryItem = cTarget.Type == GObjectType.Item && cTarget.ItemQuality >= ItemQuality.Legendary;
 
-                bool isHoradricRelic = (cTarget.InternalName.ToLower().StartsWith("horadricrelic") && cTarget.TimesBeenPrimaryTarget > 5);
+                bool isEliteLowHealth = CurrentTarget.HitPointsPct <= 0.75 && CurrentTarget.IsBossOrEliteRareUnique;
+                bool isLegendaryItem = CurrentTarget.Type == GObjectType.Item && CurrentTarget.ItemQuality >= ItemQuality.Legendary;
 
-                if ((!cTarget.IsBoss && cTarget.TimesBeenPrimaryTarget > 100 && !isEliteLowHealth && !isLegendaryItem) || isHoradricRelic)
+                bool isHoradricRelic = (CurrentTarget.InternalName.ToLower().StartsWith("horadricrelic") && CurrentTarget.TimesBeenPrimaryTarget > 5);
+
+                if ((!CurrentTarget.IsBoss && CurrentTarget.TimesBeenPrimaryTarget > 100 && !isEliteLowHealth && !isLegendaryItem) || isHoradricRelic)
                 {
                     Logger.Log(TrinityLogLevel.Info, LogCategory.UserInformation, "Blacklisting target {0} ActorSNO={1} RActorGUID={2} due to possible stuck/flipflop!",
                         CurrentTarget.InternalName, CurrentTarget.ActorSNO, CurrentTarget.RActorGuid);
-
-                    hashRGUIDBlacklist60.Add(CurrentTarget.RActorGuid);
 
                     // Add to generic blacklist for safety, as the RActorGUID on items and gold can change as we move away and get closer to the items (while walking around corners)
                     // So we can't use any ID's but rather have to use some data which never changes (actorSNO, position, type, worldID)
@@ -1031,15 +1040,14 @@ namespace Trinity
                     {
                         Key = CurrentTarget.ObjectHash,
                         Value = null,
-                        Expires = DateTime.UtcNow.AddSeconds(60)
+                        Expires = DateTime.UtcNow.AddSeconds(30)
                     });
                 }
-                else
-                {
-                    cTarget.TimesBeenPrimaryTarget++;
-                    GenericCache.UpdateObject(new GenericCacheObject(targetMd5Hash, cTarget, new TimeSpan(0, 10, 0)));
-                }
-
+            }
+            else
+            {
+                // Add to Primary Target Cache Count
+                CacheData.PrimaryTargetCount.Add(objectKey, 1);
             }
         }
     }

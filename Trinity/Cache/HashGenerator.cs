@@ -41,12 +41,12 @@ namespace Trinity
             {
                 string objHashBase;
                 if (obj.Type == GObjectType.Unit)
-                    objHashBase = String.Format("{0}{1}{2}{3}", obj.ActorSNO, obj.InternalName, obj.Type, Trinity.CurrentWorldDynamicId);
+                    objHashBase = obj.ActorSNO + obj.InternalName + obj.Position + obj.Type + Trinity.CurrentWorldDynamicId;
                 else if (obj.Type == GObjectType.Item)
                     return GenerateItemHash(obj.Position, obj.ActorSNO, obj.InternalName, Trinity.CurrentWorldId, obj.ItemQuality, obj.ItemLevel);
                 else
                     objHashBase = String.Format("{0}{1}{2}{3}", obj.ActorSNO, obj.Position, obj.Type, Trinity.CurrentWorldDynamicId);
-                
+
                 string objHash = GetMd5Hash(md5, objHashBase);
                 return objHash;
             }

@@ -126,7 +126,10 @@ namespace Trinity
 
         private static IEnumerable<Zeta.Game.Internals.MinimapMarker> GetMarkerList(int includeMarker)
         {
-            return ZetaDia.Minimap.Markers.CurrentWorldMarkers.Where(m => (m.NameHash == 0 || m.NameHash == includeMarker) && !KnownMarkers.Any(ml => ml.Position == m.Position && ml.MarkerNameHash == m.NameHash)).OrderBy(m => m.NameHash != 0);
+            return ZetaDia.Minimap.Markers.CurrentWorldMarkers
+                .Where(m => (m.NameHash == 0 || m.NameHash == includeMarker || m.IsPointOfInterest || m.IsPortalExit) && 
+                    !KnownMarkers.Any(ml => ml.Position == m.Position && ml.MarkerNameHash == m.NameHash))
+                    .OrderBy(m => m.NameHash != 0);
         }
 
         internal static Composite DetectMiniMapMarkers(int includeMarker = 0)

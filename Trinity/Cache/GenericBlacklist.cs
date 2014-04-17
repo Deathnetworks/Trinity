@@ -19,7 +19,7 @@ namespace Trinity
 
         public static bool AddToBlacklist(GenericCacheObject obj)
         {
-            if (obj.Key == "")
+            if (string.IsNullOrWhiteSpace(obj.Key))
                 return false;
 
             lock (_Synchronizer)
@@ -36,7 +36,7 @@ namespace Trinity
 
         public static bool UpdateObject(GenericCacheObject obj)
         {
-            if (obj.Key == "")
+            if (string.IsNullOrWhiteSpace(obj.Key))
                 return false;
 
             lock (_Synchronizer)
@@ -52,7 +52,7 @@ namespace Trinity
 
         public static bool RemoveObject(string key)
         {
-            if (key == "")
+            if (string.IsNullOrWhiteSpace(key))
                 return false;
 
             lock (_Synchronizer)
@@ -70,7 +70,7 @@ namespace Trinity
         
         public static bool ContainsKey(string key)
         {
-            if (key == "")
+            if (string.IsNullOrWhiteSpace(key))
                 return false;
 
             lock (_Synchronizer)

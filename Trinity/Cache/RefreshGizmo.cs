@@ -130,6 +130,8 @@ namespace Trinity
             }
             if (isGizmoDisabledByScript)
             {
+                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
+                
                 CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                 {
                     ActorSNO = c_ActorSNO,
@@ -143,7 +145,6 @@ namespace Trinity
                 c_IgnoreSubStep = "GizmoDisabledByScript";
                 return AddToCache;
 
-                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
             }
 
 
@@ -162,6 +163,7 @@ namespace Trinity
             }
             if (Untargetable)
             {
+                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
                 CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                 {
                     ActorSNO = c_ActorSNO,
@@ -174,7 +176,6 @@ namespace Trinity
                 AddToCache = false;
                 c_IgnoreSubStep = "Untargetable";
                 return AddToCache;
-                ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
             }
 
 
@@ -327,17 +328,14 @@ namespace Trinity
                 case GObjectType.JumpLinkPortal:
                     {
                         // Same world portal check
-                        if (DataDictionary.SameWorldPortals.Contains(CurrentCacheObject.ActorSNO) &&
-                            CacheData.SameWorldPortals.Any(p => p.WorldID == Trinity.Player.WorldID &&
-                                DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < V.F("Cache.SameWorldPortalRange.InteractSeconds") && 
-                                p.StartPosition.Distance2D(Trinity.Player.Position) > V.F("Cache.SameWorldPortalRange.MinRange")) &&
-                                CurrentCacheObject.RadiusDistance <= V.F("Cache.SameWorldPortalRange.MaxRange"))
+                        if (CacheData.SameWorldPortals.Any(p => p.WorldID == Trinity.Player.WorldID &&
+                                DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < 30 && 
+                                p.StartPosition.Distance2D(Trinity.Player.Position) > 5f) &&
+                                CurrentCacheObject.CentreDistance <= 90f)
                         {
-                            c_ObjectHash = HashGenerator.GenerateWorldObjectHash(c_ActorSNO, CurrentCacheObject.Position, c_ObjectType.ToString(), Trinity.CurrentWorldDynamicId);
-
                             GenericBlacklist.AddToBlacklist(new GenericCacheObject()
                             {
-                                Key = c_ObjectHash,
+                                Key = CurrentCacheObject.ObjectHash,
                                 Value = null,
                                 Expires = DateTime.UtcNow.AddSeconds(30)
                             });
@@ -534,6 +532,7 @@ namespace Trinity
 
                         if (noDamage)
                         {
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
                                 ActorSNO = c_ActorSNO,
@@ -546,11 +545,11 @@ namespace Trinity
                             AddToCache = false;
                             c_IgnoreSubStep = "NoDamage";
                             return AddToCache;
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
                         }
 
                         if (Invulnerable)
                         {
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
                                 ActorSNO = c_ActorSNO,
@@ -563,7 +562,6 @@ namespace Trinity
                             AddToCache = false;
                             c_IgnoreSubStep = "Invulnerable";
                             return AddToCache;
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
                         }
 
                         float maxRadiusDistance = -1f;
@@ -610,6 +608,7 @@ namespace Trinity
 
                         if (noDamage)
                         {
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
                                 ActorSNO = c_ActorSNO,
@@ -622,11 +621,11 @@ namespace Trinity
                             AddToCache = false;
                             c_IgnoreSubStep = "NoDamage";
                             return AddToCache;
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
                         }
 
                         if (Invulnerable)
                         {
+                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
                             CacheData.NavigationObstacles.Add(new CacheObstacleObject()
                             {
                                 ActorSNO = c_ActorSNO,
@@ -639,7 +638,6 @@ namespace Trinity
                             AddToCache = false;
                             c_IgnoreSubStep = "Invulnerable";
                             return AddToCache;
-                            ((MainGridProvider)MainGridProvider).AddCellWeightingObstacle(c_ActorSNO, c_Radius);
                         }
 
                         if (Player.ActorClass == ActorClass.Monk && Hotbar.Contains(SNOPower.Monk_TempestRush) && TimeSinceUse(SNOPower.Monk_TempestRush) <= 150)
@@ -752,13 +750,6 @@ namespace Trinity
                             c_IgnoreSubStep = "ForceVendorRunASAP";
                         }
 
-                        if (CurrentCacheObject.IsQuestMonster || CurrentCacheObject.IsMinimapActive)
-                        {
-                            AddToCache = true;
-                            c_IgnoreSubStep = "";
-                            return AddToCache;
-                        }
-
                         // Already open, blacklist it and don't look at it again
                         bool chestOpen = false;
                         try
@@ -801,6 +792,12 @@ namespace Trinity
                         }
 
                         if (Settings.WorldObject.DestructibleOption == DestructibleIgnoreOption.DestroyAll)
+                        {
+                            AddToCache = true;
+                            return AddToCache;
+                        }
+
+                        if (CurrentCacheObject.IsQuestMonster)
                         {
                             AddToCache = true;
                             return AddToCache;

@@ -134,12 +134,12 @@ namespace Trinity
         internal static Dictionary<int, bool> HasBeenInLoS = new Dictionary<int, bool>();
 
         /// <summary>
-        /// Stores the computed ItemQuality from an ACDItem.ItemLink
+        /// Stores the computed ItemQuality from an ACDItem.ItemLink (ACDGuid based)
         /// </summary>
         internal static Dictionary<int, ItemQuality> ItemLinkQuality = new Dictionary<int, ItemQuality>();
 
         /// <summary>
-        /// Stores if a unit/monster is a Summoner (spawns other units)
+        /// Stores if a unit/monster is a Summoner (spawns other units) (ACDGuid based)
         /// </summary>
         internal static Dictionary<int, bool> IsSummoner = new Dictionary<int, bool>();
 
@@ -169,38 +169,57 @@ namespace Trinity
         internal static HashSet<SameWorldPortal> SameWorldPortals = new HashSet<SameWorldPortal>();
 
         /// <summary>
-        /// Stores a list of world points where we can stand (according to GridProvider)
+        /// Contains an RActorGUID and count of the number of times we've switched to this target
         /// </summary>
-        internal static Dictionary<Tuple<int, Vector2>, bool> CanStandAtCache = new Dictionary<Tuple<int, Vector2>, bool>();
+        internal static Dictionary<string, int> PrimaryTargetCount = new Dictionary<string, int>(); 
 
         /// <summary>
-        /// Stores a list of Z according to the Vector2 points (according to GridProvider)
+        /// Called every cache-refresh
         /// </summary>
-        internal static Dictionary<Tuple<int, Vector2>, Vector3> WorldHeightCache = new Dictionary<Tuple<int, Vector2>, Vector3>();
-
-        /// <summary>
-        /// Stores results of raycasting
-        /// </summary>
-        internal static Dictionary<Tuple<Vector3, Vector3>, bool> RaycastCache = new Dictionary<Tuple<Vector3, Vector3>, bool>();
-
         internal static void Clear()
         {
-            CacheData.AvoidanceObstacles.Clear();
             CacheData.AcdGuid.Clear();
             CacheData.ActorSNO.Clear();
             CacheData.CollisionSphere.Clear();
             CacheData.CurrentUnitHealth.Clear();
+            CacheData.DynamicID.Clear();
+            CacheData.GameBalanceID.Clear();
+            CacheData.LastCheckedUnitHealth.Clear();
+            CacheData.MonsterObstacles.Clear();
+            CacheData.MonsterSizes.Clear();
+            CacheData.MonsterTypes.Clear();
+            CacheData.Name.Clear();
+            CacheData.ObjectType.Clear();
+            CacheData.Position.Clear();
+            CacheData.SummonedByACDId.Clear();
+            CacheData.TimeBoundAvoidance.RemoveWhere(aoe => aoe.Expires < DateTime.UtcNow);
+            CacheData.UnitIsBurrowed.Clear();
+            CacheData.UnitMaxHealth.Clear();
+            CacheData.UnitMonsterAffix.Clear();
+        }
+
+        /// <summary>
+        /// Called on bot stop, new game, join game, etc
+        /// </summary>
+        internal static void FullClear()
+        {
+            Clear();
+
+            CacheData.AbilityLastUsed = new Dictionary<SNOPower, DateTime>(DataDictionary.LastUseAbilityTimeDefaults);
+            CacheData.AvoidanceObstacles.Clear();
+            CacheData.GoldStack.Clear();
             CacheData.HasBeenInLoS.Clear();
             CacheData.HasBeenNavigable.Clear();
             CacheData.HasBeenRayCasted.Clear();
             CacheData.InteractAttempts.Clear();
-            CacheData.MonsterObstacles.Clear();
-            CacheData.MonsterSizes.Clear();
-            CacheData.MonsterTypes.Clear();
+            CacheData.IsSummoner.Clear();
+            CacheData.ItemLinkQuality.Clear();
+            CacheData.ItemLinkQuality.Clear();
             CacheData.NavigationObstacles.Clear();
-            CacheData.ObjectType.Clear();
-            CacheData.Position.Clear();
-            CacheData.UnitMonsterAffix.Clear();
+            CacheData.PickupItem.Clear();
+            CacheData.PrimaryTargetCount.Clear();
+            CacheData.SameWorldPortals.Clear();
+            CacheData.TimeBoundAvoidance.Clear();        
         }
 
     }
