@@ -542,5 +542,13 @@ namespace Trinity
             get { return Trinity.eventStartPosition; }
             set { Trinity.eventStartPosition = value; }
         }
+
+        private static DateTime eventStartTime = DateTime.MinValue;
+        public static DateTime EventStartTime
+        {
+            get { return Trinity.eventStartTime; }
+            set { Trinity.eventStartTime = value; }
+        }
+
     }
 }

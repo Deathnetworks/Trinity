@@ -818,6 +818,7 @@ namespace Trinity
             365503, // X1_Fortress_FloatRubble_A
             365739, // X1_Fortress_FloatRubble_F
             365580, // X1_Fortress_FloatRubble_C
+            365611, // X1_Fortress_FloatRubble_E
 
             284713, // x1_westmarch_rat_A
             355365, // x1_Abattoir_furnaceWall

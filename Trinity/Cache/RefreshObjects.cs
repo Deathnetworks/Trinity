@@ -252,15 +252,19 @@ namespace Trinity
                         bDontMoveMeIAmDoingShit = true;
                     }
 
-                    if (CurrentTarget != null && CurrentTarget.IsQuestGiver)
+                    if (!Player.InActiveEvent)
                     {
                         EventStartPosition = Vector3.Zero;
+                        EventStartTime = DateTime.MinValue;
                     }
 
-                    if (CurrentTarget == null && Player.InActiveEvent)
+                    if (CurrentTarget == null && Player.InActiveEvent && DateTime.UtcNow.Subtract(EventStartTime).TotalSeconds < 30)
                     {
                         if (EventStartPosition == Vector3.Zero)
+                        {
                             EventStartPosition = Player.Position;
+                            EventStartTime = DateTime.UtcNow;
+                        }
 
                         CurrentTarget = new TrinityCacheObject()
                         {

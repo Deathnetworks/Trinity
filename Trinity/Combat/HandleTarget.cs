@@ -517,7 +517,12 @@ namespace Trinity
                                 case GObjectType.CursedShrine:
                                     {
                                         ForceTargetUpdate = true;
-                                        if (!ZetaDia.Me.Movement.IsMoving || DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalSeconds > 5)
+                                        if (CurrentTarget.RadiusDistance <= 5f && ZetaDia.Me.Movement.IsMoving)
+                                        {
+                                            Logger.Log(LogCategory.Behavior, "Trying to stop");
+                                            Navigator.MoveTo(Player.Position, "Player Position", false);
+                                        }
+                                        else if (!ZetaDia.Me.Movement.IsMoving || DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalSeconds > 5)
                                         {
                                             if (SpellHistory.TimeSinceUse(SNOPower.Axe_Operate_Gizmo) < TimeSpan.FromMilliseconds(500))
                                             {
@@ -576,7 +581,7 @@ namespace Trinity
                                                 hashRGUIDBlacklist15.Add(CurrentTarget.RActorGuid);
                                             }
                                         }
-
+                                        
                                         Logger.Log(LogCategory.Behavior, "Waiting to stop moving before interaction");
 
                                         runStatus = HandlerRunStatus.TreeRunning;
@@ -1515,6 +1520,11 @@ namespace Trinity
                         }
                     case GObjectType.Interactable:
                         {
+                            if (CurrentTarget.IsQuestGiver)
+                            {
+                                vCurrentDestination = MathEx.CalculatePointFrom(CurrentTarget.Position, Player.Position, CurrentTarget.Radius);
+                            }
+
                             // Treat the distance as closer based on the radius of the object
                             TargetDistanceReduction = CurrentTarget.Radius;
                             TargetRangeRequired = CurrentTarget.Radius;

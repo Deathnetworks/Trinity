@@ -117,12 +117,6 @@ namespace Trinity
                         // Weight Units
                         case GObjectType.Unit:
                             {
-                                if (cacheObject.IsNPC && cacheObject.NPCIsOperable)
-                                {
-                                    cacheObject.Weight = 300;
-                                    break;
-                                }
-
                                 int nearbyMonsterCount = ObjectCache.Count(u => u.ACDGuid != cacheObject.ACDGuid && u.IsTrashMob && u.HitPoints > 0 &&
                                     cacheObject.Position.Distance2D(u.Position) <= Settings.Combat.Misc.TrashPackClusterRadius);
 
