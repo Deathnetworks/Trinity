@@ -563,6 +563,7 @@ namespace Trinity
             347276, // x1_Fortress_Soul_Grinder_A
 
             374751, // x1_PortalGuardian_A
+            307339, // X1_Rockworm_Pand_Unique_HexMaze
         };
 
         // Three special lists used purely for checking for the existance of a player's summoned mystic ally, gargantuan, or zombie dog

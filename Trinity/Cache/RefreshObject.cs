@@ -732,12 +732,13 @@ namespace Trinity
                     {
                         // Not allowed to loot due to profile settings
                         // rrrix disabled this since noobs can't figure out their profile is broken... looting is always enabled now
-                        //if (!ProfileManager.CurrentProfile.PickupLoot || !LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
-                        //{
-                        //    AddToCache = false;
-                        //    c_IgnoreSubStep = "LootingDisabled";
-                        //    break;
-                        //}
+                        if (!LootTargeting.Instance.AllowedToLoot || LootTargeting.Instance.DisableLooting)
+                        {
+                            AddToCache = false;
+                            c_IgnoreSubStep = "LootingDisabled";
+                            break;
+                        }
+
 
                         if (c_ObjectType != GObjectType.HealthGlobe && c_ObjectType != GObjectType.PowerGlobe && (ForceVendorRunASAP || TownRun.TownRunTimerRunning()))
                         {

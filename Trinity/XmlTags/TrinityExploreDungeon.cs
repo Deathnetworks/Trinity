@@ -446,9 +446,6 @@ namespace Trinity.XmlTags
         /// </summary>
         private Vector3 GPUpdatePosition = Vector3.Zero;
 
-
-        private bool startedWithBounty = false;
-
         /// <summary>
         /// Called when the profile behavior starts
         /// </summary>
@@ -491,12 +488,6 @@ namespace Trinity.XmlTags
             if (ObjectDistance == 0)
                 ObjectDistance = 25f;
 
-            if (ZetaDia.ActInfo.ActiveBounty != null)
-            {
-                Logger.Log("Explorer started with Bounty! Tag will end when bounty is complete.");
-                startedWithBounty = true;
-            }
-
             PrintNodeCounts("PostInit");
         }
 
@@ -533,12 +524,6 @@ namespace Trinity.XmlTags
         {
             return
             new Sequence(
-                new DecoratorContinue(ret => !startedWithBounty && IsInAdventureMode() && ZetaDia.ActInfo.ActiveBounty != null,
-                    new Sequence(
-                        new Action(ret => Logger.Log("Explorer Started with Bounty! Tag will end when bounty is complete.")),
-                        new Action(ret => startedWithBounty = true)
-                    )
-                ),
                 new DecoratorContinue(ret => !IgnoreMarkers,
                     new Sequence(
                         MiniMapMarker.DetectMiniMapMarkers(0),
