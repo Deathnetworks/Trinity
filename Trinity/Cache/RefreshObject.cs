@@ -840,7 +840,7 @@ namespace Trinity
                                     using (new PerformanceLogger("RefreshLoS.2"))
                                     {
                                         // Get whether or not this RActor has ever been in a path line with AllowWalk. If it hasn't, don't add to cache and keep rechecking
-                                        if (!CacheData.HasBeenRayCasted.TryGetValue(c_RActorGuid, out c_HasBeenRaycastable))
+                                        if (!CacheData.HasBeenRayCasted.TryGetValue(c_RActorGuid, out c_HasBeenRaycastable) || DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
                                         {
                                             if (c_CentreDistance >= 1f && c_CentreDistance <= 5f)
                                             {
@@ -894,7 +894,7 @@ namespace Trinity
                                     using (new PerformanceLogger("RefreshLoS.3"))
                                     {
                                         // Get whether or not this RActor has ever been in "Line of Sight" (as determined by Demonbuddy). If it hasn't, don't add to cache and keep rechecking
-                                        if (!CacheData.HasBeenInLoS.TryGetValue(c_RActorGuid, out c_HasBeenInLoS))
+                                        if (!CacheData.HasBeenInLoS.TryGetValue(c_RActorGuid, out c_HasBeenInLoS) || DataDictionary.AlwaysRaycastWorlds.Contains(Trinity.Player.WorldID))
                                         {
                                             if (Settings.Combat.Misc.UseNavMeshTargeting)
                                             {

@@ -214,9 +214,9 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_MassConfusion, 0f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }
             // Big Bad Voodoo, elites and bosses only
-            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && !Player.IsIncapacitated && TargetUtil.EliteOrTrashInRange(12f))
+            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && !Player.IsIncapacitated && TargetUtil.EliteOrTrashInRange(25f))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo);
             }
 
             // Grasp of the Dead, look below, droping globes and dogs when using it on elites and 3 norms
@@ -231,10 +231,10 @@ namespace Trinity
 
             // Piranhas
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Witchdoctor_Piranhas) && !Player.IsIncapacitated &&
-                (TargetUtil.AnyMobsInRange(30, 2)) &&
+                (TargetUtil.AnyMobsInRange(30, 2) || TargetUtil.ClusterExists(15f, 45f, 2, true) || TargetUtil.AnyElitesInRange(45f)) &&
                 Player.PrimaryResource >= 250)
             {
-                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15);
+                var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f);
 
                 return new TrinityPower(SNOPower.Witchdoctor_Piranhas, 25f, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
             }

@@ -201,8 +201,7 @@ namespace Trinity.Combat.Abilities
                     !IsCurrentlyAvoiding &&
                     !Player.IsIncapacitated &&
                     CanCast(SNOPower.Barbarian_Earthquake) &&
-                    TargetUtil.IsEliteTargetInRange(45f) &&
-                    Player.PrimaryResource > 50;
+                    TargetUtil.IsEliteTargetInRange(45f);
             }
         }
         public static bool ShouldWaitForWrathOfTheBerserker
