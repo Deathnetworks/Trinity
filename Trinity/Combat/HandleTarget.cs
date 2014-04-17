@@ -174,7 +174,7 @@ namespace Trinity
                         IsWaitingAfterPower = false;
                     }
 
-                    if (CurrentTarget != null && CurrentTarget.Type == GObjectType.JumpLinkPortal && 
+                    if (CurrentTarget != null && CurrentTarget.Type == GObjectType.JumpLinkPortal &&
                         CacheData.SameWorldPortals.Any(p => DateTime.UtcNow.Subtract(p.LastInteract).TotalSeconds < 5) && !NavHelper.CanRayCast(CurrentTarget.Position))
                     {
                         CurrentTarget = null;
@@ -385,12 +385,12 @@ namespace Trinity
 
                     using (new PerformanceLogger("HandleTarget.InRange"))
                     {
-                        bool stuckOnTarget = 
+                        bool stuckOnTarget =
                             ((CurrentTarget.Type == GObjectType.Barricade ||
-                             CurrentTarget.Type == GObjectType.Interactable || 
-                             CurrentTarget.Type == GObjectType.CursedChest || 
+                             CurrentTarget.Type == GObjectType.Interactable ||
+                             CurrentTarget.Type == GObjectType.CursedChest ||
                              CurrentTarget.Type == GObjectType.CursedShrine ||
-                             CurrentTarget.Type == GObjectType.Destructible) && 
+                             CurrentTarget.Type == GObjectType.Destructible) &&
                              !ZetaDia.Me.Movement.IsMoving && DateTime.UtcNow.Subtract(PlayerMover.TimeLastUsedPlayerMover).TotalMilliseconds < 500);
 
                         bool npcInRange = CurrentTarget.IsQuestGiver && CurrentTarget.RadiusDistance <= 3f;
@@ -532,8 +532,8 @@ namespace Trinity
                                                 Logger.LogDebug("Adding {0} {1} to SameWorldPortals", CurrentTarget.InternalName, CurrentTarget.ActorSNO);
                                                 CacheData.SameWorldPortals.Add(new Cache.SameWorldPortal() { ActorSNO = CurrentTarget.ActorSNO, RActorGUID = CurrentTarget.RActorGuid });
 
-                                            }                                            
-                                            
+                                            }
+
                                             bool interactSuccessful = false;
                                             if (CurrentTarget.ActorType == ActorType.Monster)
                                                 interactSuccessful = ZetaDia.Me.UsePower(SNOPower.Axe_Operate_NPC, Vector3.Zero, CurrentWorldDynamicId, CurrentTarget.ACDGuid);

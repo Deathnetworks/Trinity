@@ -717,13 +717,14 @@ namespace Trinity
                     {
                         if (!(TotalXP == 0 && LastXP == 0 && NextLevelXP == 0))
                         {
-                            if (LastXP > Trinity.Player.ParagonCurrentExperience)
+                            // We have leveled up
+                            if (NextLevelXP < Trinity.Player.ParagonExperienceNextLevel)
                             {
-                                TotalXP += NextLevelXP;
+                                TotalXP += NextLevelXP + Trinity.Player.ParagonCurrentExperience;
                             }
-                            else
+                            else // We have not leveled up
                             {
-                                TotalXP += Trinity.Player.ParagonCurrentExperience - LastXP;
+                                TotalXP += NextLevelXP - Trinity.Player.ParagonExperienceNextLevel;
                             }
                         }
                         LastXP = Trinity.Player.ParagonCurrentExperience;
