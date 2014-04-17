@@ -127,6 +127,8 @@ namespace Trinity
                     BalanceID = c_BalanceID,
                     DBBaseType = c_DBItemBaseType,
                     DBItemType = c_DBItemType,
+                    TBaseType = itemBaseType,
+                    TType = c_item_GItemType,
                     IsOneHand = c_IsOneHandedItem,
                     IsTwoHand = c_IsTwoHandedItem,
                     ItemFollowerType = c_item_tFollowerType,
@@ -134,6 +136,7 @@ namespace Trinity
                     Position = CurrentCacheObject.Position,
                     ActorSNO = c_ActorSNO,
                     ACDGuid = c_ACDGUID,
+                    RActorGUID = c_RActorGuid,
                     IsUpgrade = isUpgrade,
                     UpgradeDamage = damage,
                     UpgradeToughness = toughness,
@@ -204,38 +207,10 @@ namespace Trinity
                     c_IgnoreSubStep = "NoMatchingRule";
 
                 if (Settings.Advanced.LogDroppedItems && logNewItem && c_item_GItemType != GItemType.HealthGlobe && c_item_GItemType != GItemType.HealthPotion && c_item_GItemType != GItemType.PowerGlobe)
-                    LogDroppedItem();
+                    //LogDroppedItem();
+                    ItemDroppedAppender.Instance.AppendDroppedItem(pickupItem);
 
                 return AddToCache;
-            }
-        }
-
-        private static void LogDroppedItem()
-        {
-            string droppedItemLogPath = Path.Combine(FileManager.TrinityLogsPath, String.Format("ItemsDropped.csv"));
-
-            bool pickupItem = false;
-            CacheData.PickupItem.TryGetValue(c_RActorGuid, out pickupItem);
-
-            bool writeHeader = !File.Exists(droppedItemLogPath);
-            using (var LogWriter = new StreamWriter(droppedItemLogPath, true))
-            {
-                if (writeHeader)
-                {
-                    LogWriter.WriteLine("ActorSNO,GameBalanceID,Name,InternalName,DBBaseType,DBItemType,TBaseType,TItemType,Quality,Level,Pickup");
-                }
-                LogWriter.Write(FormatCSVField(c_ActorSNO));
-                LogWriter.Write(FormatCSVField(c_GameBalanceID));
-                LogWriter.Write(FormatCSVField(c_ItemDisplayName));
-                LogWriter.Write(FormatCSVField(c_InternalName));
-                LogWriter.Write(FormatCSVField(c_DBItemBaseType.ToString()));
-                LogWriter.Write(FormatCSVField(c_DBItemType.ToString()));
-                LogWriter.Write(FormatCSVField(DetermineBaseType(c_item_GItemType).ToString()));
-                LogWriter.Write(FormatCSVField(c_item_GItemType.ToString()));
-                LogWriter.Write(FormatCSVField(c_ItemQuality.ToString()));
-                LogWriter.Write(FormatCSVField(c_ItemLevel));
-                LogWriter.Write(FormatCSVField(pickupItem));
-                LogWriter.Write("\n");
             }
         }
 

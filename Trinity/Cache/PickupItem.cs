@@ -11,6 +11,8 @@ namespace Trinity.Cache
         public int BalanceID { get; set; }
         public ItemBaseType DBBaseType { get; set; }
         public ItemType DBItemType { get; set; }
+        public GItemBaseType TBaseType { get; set; }
+        public GItemType TType { get; set; }
         public bool IsOneHand { get; set; }
         public bool IsTwoHand { get; set; }
         public FollowerType ItemFollowerType { get; set; }
@@ -18,6 +20,7 @@ namespace Trinity.Cache
         public Vector3 Position { get; set; }
         public int ActorSNO { get; set; }
         public int ACDGuid { get; set; }
+        public int RActorGUID { get; set; }
         public ACDItem ACDItem { get { return Zeta.Game.ZetaDia.Actors.GetACDItemByGuid(this.ACDGuid); } }
         public bool IsUpgrade { get; set; }
         public float UpgradeDamage { get; set; }

@@ -135,9 +135,12 @@ namespace Trinity.Technicals
         {
             get
             {
-                return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                if (string.IsNullOrWhiteSpace(_DemonBuddyPath))
+                    _DemonBuddyPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                return _DemonBuddyPath;
             }
         }
+        private static string _DemonBuddyPath;
 
         /// <summary>
         /// Gets the plugin path.
@@ -147,9 +150,12 @@ namespace Trinity.Technicals
         {
             get
             {
-                return Path.Combine(DemonBuddyPath, "Plugins", TrinityName);
+                if (string.IsNullOrWhiteSpace(_PluginPath))
+                    _PluginPath = Path.Combine(DemonBuddyPath, "Plugins", TrinityName);
+                return _PluginPath;
             }
         }
+        private static string _PluginPath;
 
         /// <summary>
         /// The full path to the built-in Trinity combat routine, for auto-installation
@@ -242,11 +248,15 @@ namespace Trinity.Technicals
         {
             get
             {
-                string path = Path.Combine(DemonBuddyPath, "TrinityLogs");
-                CreateDirectory(path);
-                return path;
+                if (string.IsNullOrWhiteSpace(_TrinityLogsPath))
+                {
+                    _TrinityLogsPath = Path.Combine(DemonBuddyPath, "TrinityLogs");
+                    CreateDirectory(_TrinityLogsPath);
+                }
+                return _TrinityLogsPath;
             }
         }
+        private static string _TrinityLogsPath;
 
         /// <summary>
         /// Gets the scripted item rules path.
