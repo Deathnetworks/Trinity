@@ -96,19 +96,19 @@ namespace Trinity
                 if (hasPunishment && CombatBase.CanCast(SNOPower.DemonHunter_Preparation, CombatBase.CanCastFlags.NoTimer) &&
                     Player.SecondaryResource >= 25 && Player.PrimaryResourceMissing >= 75 && TimeSinceUse(SNOPower.DemonHunter_Preparation) >= 1000)
                 {
-                    return new TrinityPower(SNOPower.DemonHunter_Preparation, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.DemonHunter_Preparation);
                 }
 
                 // Preperation w/ Battle Scars - check for health only
-                if (hasBattleScars && CombatBase.CanCast(SNOPower.DemonHunter_Preparation, CombatBase.CanCastFlags.NoTimer) && Player.CurrentHealthPct < 0.6)
+                if (hasBattleScars && CombatBase.CanCast(SNOPower.DemonHunter_Preparation) && Player.CurrentHealthPct < 0.6)
                 {
-                    return new TrinityPower(SNOPower.DemonHunter_Preparation, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.DemonHunter_Preparation);
                 }
 
                 // no rune || invigoration || focused mind || Backup Plan || Battle Scars (need Disc)
-                if ((!hasPunishment) && CombatBase.CanCast(SNOPower.DemonHunter_Preparation, CombatBase.CanCastFlags.NoTimer) && Player.SecondaryResourceMissing >= 30)
+                if ((!hasPunishment) && CombatBase.CanCast(SNOPower.DemonHunter_Preparation) && Player.SecondaryResourceMissing >= 30)
                 {
-                    return new TrinityPower(SNOPower.DemonHunter_Preparation, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 1, 1, WAIT_FOR_ANIM);
+                    return new TrinityPower(SNOPower.DemonHunter_Preparation);
                 }
             }
 

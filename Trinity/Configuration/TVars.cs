@@ -229,7 +229,7 @@ namespace Trinity
             Set(new TVar("SpellDelay.DemonHunter_SmokeScreen", 3000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_ShadowPower", 5000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.DemonHunter_Vault", 400, "Spell Use Delay/Interval, milliseconds"));
-            Set(new TVar("SpellDelay.DemonHunter_Preparation", 45000, "Spell Use Delay/Interval, milliseconds"));
+            Set(new TVar("SpellDelay.DemonHunter_Preparation", 1000, "Spell Use Delay/Interval, milliseconds"));
             Set(new TVar("SpellDelay.X1_DemonHunter_Companion", 30000, "Spell Use Delay/Interval, milliseconds"));
             
             Set(new TVar("SpellDelay.DemonHunter_MarkedForDeath", 3000, "Spell Use Delay/Interval, milliseconds"));
