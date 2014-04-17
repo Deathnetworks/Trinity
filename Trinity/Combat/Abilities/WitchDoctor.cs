@@ -197,14 +197,14 @@ namespace Trinity
                 CombatBase.CanCast(SNOPower.Witchdoctor_Hex) && hasAngryChicken && Player.PrimaryResource >= 49)
             {
                 ShouldRefreshHotbarAbilities = true;
-                return new TrinityPower(SNOPower.Witchdoctor_Hex, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 2, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_Hex);
             }
 
             // Hex Spam Cast without angry chicken
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Witchdoctor_Hex) && !Player.IsIncapacitated && Player.PrimaryResource >= 49 && !hasAngryChicken &&
                (TargetUtil.AnyElitesInRange(12) || TargetUtil.AnyMobsInRange(12, 2) || TargetUtil.IsEliteTargetInRange(18f)))
             {
-                return new TrinityPower(SNOPower.Witchdoctor_Hex, 0f, Vector3.Zero, CurrentWorldDynamicId, -1, 0, 0, NO_WAIT_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_Hex);
             }
             // Mass Confuse, elites only or big mobs or to escape on low health
             if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_MassConfusion) && !Player.IsIncapacitated && Player.PrimaryResource >= 74 &&
@@ -214,19 +214,19 @@ namespace Trinity
                 return new TrinityPower(SNOPower.Witchdoctor_MassConfusion, 0f, Vector3.Zero, -1, CurrentTarget.ACDGuid, 1, 1, WAIT_FOR_ANIM);
             }
             // Big Bad Voodoo, elites and bosses only
-            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && !Player.IsIncapacitated && TargetUtil.EliteOrTrashInRange(25f))
+            if (!UseOOCBuff && CombatBase.CanCast(SNOPower.Witchdoctor_BigBadVoodoo) && !Player.IsIncapacitated && (TargetUtil.EliteOrTrashInRange(25f) || CurrentTarget.IsBoss))
             {
                 return new TrinityPower(SNOPower.Witchdoctor_BigBadVoodoo);
             }
 
             // Grasp of the Dead, look below, droping globes and dogs when using it on elites and 3 norms
             if (!UseOOCBuff && !IsCurrentlyAvoiding && CombatBase.CanCast(SNOPower.Witchdoctor_GraspOfTheDead) && !Player.IsIncapacitated &&
-                (TargetUtil.AnyMobsInRange(30, 2)) &&
+                (TargetUtil.AnyMobsInRange(30, 2) || TargetUtil.EliteOrTrashInRange(30f)) &&
                 Player.PrimaryResource >= 78)
             {
                 var bestClusterPoint = TargetUtil.GetBestClusterPoint(15);
 
-                return new TrinityPower(SNOPower.Witchdoctor_GraspOfTheDead, 25f, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_GraspOfTheDead, 25f, bestClusterPoint);
             }
 
             // Piranhas
@@ -236,7 +236,7 @@ namespace Trinity
             {
                 var bestClusterPoint = TargetUtil.GetBestClusterPoint(15f);
 
-                return new TrinityPower(SNOPower.Witchdoctor_Piranhas, 25f, bestClusterPoint, CurrentWorldDynamicId, -1, 0, 0, WAIT_FOR_ANIM);
+                return new TrinityPower(SNOPower.Witchdoctor_Piranhas, 25f, bestClusterPoint);
             }
 
             //skillDict.Add("Horrify", SNOPower.Witchdoctor_Horrify);

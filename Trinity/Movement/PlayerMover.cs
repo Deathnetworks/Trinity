@@ -669,10 +669,8 @@ namespace Trinity.DbProvider
                 bool hasWormHole = HotbarSkills.AssignedSkills.Any(s => s.Power == SNOPower.Wizard_Teleport && s.RuneIndex == 4);
 
                 // Teleport for a wizard (need to be able to check skill rune in DB for a 3-4 teleport spam in a row)
-                if (Trinity.Hotbar.Contains(SNOPower.Wizard_Teleport) &&
-                    ((PowerManager.CanCast(SNOPower.Wizard_Teleport) &&
-                    CombatBase.SNOPowerUseTimer(SNOPower.Wizard_Teleport)) ||
-                    (hasWormHole && WizardTeleportCount < 3 && DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.Wizard_Teleport]).TotalMilliseconds >= 250)) &&
+                if (CombatBase.CanCast(SNOPower.Wizard_Teleport, CombatBase.CanCastFlags.NoTimer) &&
+                    (hasWormHole && WizardTeleportCount < 3 && DateTime.UtcNow.Subtract(CacheData.AbilityLastUsed[SNOPower.Wizard_Teleport]).TotalMilliseconds >= 250) &&
                     DestinationDistance >= 10f && !ShrinesInArea(vMoveToTarget))
                 {
                     // Reset teleport count if we've already hit the max

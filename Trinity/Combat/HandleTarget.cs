@@ -1519,9 +1519,6 @@ namespace Trinity
                             TargetDistanceReduction = CurrentTarget.Radius;
                             TargetRangeRequired = CurrentTarget.Radius;
 
-                            if (ForceCloseRangeTarget)
-                                TargetRangeRequired -= 2f;
-
                             // Check if it's in our interactable range dictionary or not
                             float range;
 
@@ -1529,12 +1526,8 @@ namespace Trinity
                             {
                                 TargetRangeRequired = range;
                             }
-                            int attempts = 0;
-                            if (CacheData.InteractAttempts.TryGetValue(CurrentTarget.ActorSNO, out attempts))
-                                TargetRangeRequired -= attempts;
-
                             if (TargetRangeRequired <= 0)
-                                TargetRangeRequired = 1f;
+                                TargetRangeRequired = CurrentTarget.Radius;
 
                             break;
                         }

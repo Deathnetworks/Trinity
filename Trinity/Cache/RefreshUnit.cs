@@ -3,6 +3,7 @@ using System.Linq;
 using Trinity.Combat.Abilities;
 using Trinity.Config.Combat;
 using Trinity.Technicals;
+using Zeta.Bot.Logic;
 using Zeta.Game;
 using Zeta.Game.Internals.Actors;
 using Zeta.Game.Internals.SNO;
@@ -125,7 +126,8 @@ namespace Trinity
             {
                 CurrentCacheObject.IsQuestGiver = CurrentCacheObject.Unit.IsQuestGiver;
 
-                if (CurrentCacheObject.IsQuestGiver)
+                // Interact with quest givers, except when doing town-runs
+                if (ZetaDia.CurrentAct == Act.OpenWorld && CurrentCacheObject.IsQuestGiver && !(Trinity.IsReadyToTownRun || Trinity.ForceVendorRunASAP || BrainBehavior.IsVendoring))
                 {
                     c_ObjectType = GObjectType.Interactable;
                     CurrentCacheObject.Type = GObjectType.Interactable;

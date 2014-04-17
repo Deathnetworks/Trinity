@@ -424,8 +424,7 @@ namespace Trinity
                 }
 
                 // Archon Teleport in combat
-                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && Hotbar.Contains(SNOPower.Wizard_Archon_Teleport) &&
-                    CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport, CombatBase.CanCastFlags.NoTimer) &&
+                if (!UseOOCBuff && !IsCurrentlyAvoiding && !Player.IsIncapacitated && CombatBase.CanCast(SNOPower.Wizard_Archon_Teleport, CombatBase.CanCastFlags.NoTimer) &&
                     // Try and teleport-retreat from 1 elite or 3+ greys or a boss at 15 foot range
                     (TargetUtil.AnyElitesInRange(15, 1) || TargetUtil.AnyMobsInRange(15, 3) || (CurrentTarget.IsBoss && CurrentTarget.RadiusDistance <= 15f)))
                 {
